@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { simulateAnalysis, ProgressUpdate } from '@/lib/analysis/analyzer';
+import { auth } from '@clerk/nextjs/server';
+import { prisma } from '@/lib/db';
+
+export async function POST(request: NextRequest) {
+    try {
+        const { userId } = await auth();
+        if (!userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { documentId } = await request.json();
+        if (!documentId) {
+            return NextResponse.json({ error: 'Document ID is required' }, { status: 400 });
+        }
+
+        // Verify ownership
+        const doc = await prisma.document.findFirst({
+            where: { id: documentId, userId }
+        });
+
+        if (!doc) {
+            return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+        }
+
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+            async start(controller) {
+                const sendUpdate = (update: ProgressUpdate) => {
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify(update)}\n\n`));
+                };
+
+                try {
+                    // Update status to analyzing
+                    await prisma.document.update({
+                        where: { id: documentId },
+                        data: { status: 'analyzing' }
+                    });
+
+                    const result = await simulateAnalysis(doc.content, (update) => {
+                        sendUpdate(update);
+                    });
+
+                    // Store analysis
+                    const foundBiases = result.biases.filter(b => b.found);
+                    await prisma.analysis.create({
+                        data: {
+                            documentId,
+                            overallScore: result.overallScore,
+                            noiseScore: result.noiseScore,
+                            summary: result.summary,
+                            biases: {
+                                create: foundBiases.map(bias => ({
+                                    biasType: bias.biasType,
+                                    severity: bias.severity,
+                                    excerpt: bias.excerpts[0]?.text || '',
+                                    explanation: bias.excerpts[0]?.explanation || '',
+                                    suggestion: bias.suggestion
+                                }))
+                            }
+                        }
+                    });
+
+                    // Update document status
+                    await prisma.document.update({
+                        where: { id: documentId },
+                        data: { status: 'complete' }
+                    });
+
+                    sendUpdate({ type: 'complete', progress: 100, result });
+                    controller.close();
+                } catch (error) {
+                    console.error('Stream error:', error);
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'error', message: 'Analysis failed' })}\n\n`));
+                    controller.close();
+                }
+            }
+        });
+
+        return new NextResponse(stream, {
+            headers: {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+            },
+        });
+
+    } catch (error) {
+        console.error('API Error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}

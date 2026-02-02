@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Decision Intel Audit</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Decision Intel</h1>
+      <p class="subtitle">Cognitive Bias Auditor</p>
+    </header>
+
+    <div id="initial-view">
+      <p class="instruction">Analyze the current page for biases and decision noise.</p>
+      <button id="analyze-btn" class="btn-primary">
+        Analyze Page
+      </button>
+    </div>
+
+    <div id="loading-view" class="hidden">
+      <div class="spinner"></div>
+      <p>Analyzing content...</p>
+    </div>
+
+    <div id="results-view" class="hidden">
+      <div class="score-card">
+        <div class="score-label">Decision Score</div>
+        <div class="score-value" id="score-value">--</div>
+      </div>
+      
+      <div class="bias-list">
+        <h3>Top Biases Detected</h3>
+        <ul id="bias-list-items">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+
+      <a href="#" id="view-report-btn" class="btn-secondary" target="_blank">View Full Report</a>
+    </div>
+
+    <div id="error-view" class="hidden">
+      <p class="error-msg" id="error-msg">Something went wrong.</p>
+      <button id="retry-btn" class="btn-secondary">Try Again</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

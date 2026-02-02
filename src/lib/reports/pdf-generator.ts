@@ -1,0 +1,151 @@
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+// Define types locally to match the structure we pass from the page
+export interface ReportBiasInstance {
+    biasType: string;
+    severity: string;
+    explanation: string;
+    excerpt: string;
+    suggestion: string;
+}
+
+export interface ReportAnalysisData {
+    overallScore: number;
+    noiseScore: number;
+    summary: string;
+    biases: ReportBiasInstance[];
+}
+
+interface ReportData {
+    filename: string;
+    analysis: ReportAnalysisData;
+}
+
+export class PdfGenerator {
+    private doc: jsPDF;
+    private primaryColor: [number, number, number] = [79, 70, 229]; // Indigo-600
+    private secondaryColor: [number, number, number] = [30, 41, 59]; // Slate-800
+    private accentColor: [number, number, number] = [244, 63, 94]; // Rose-500
+
+    constructor() {
+        this.doc = new jsPDF();
+    }
+
+    public generateReport(data: ReportData) {
+        this.addHeader();
+        this.addDocumentInfo(data.filename, data.analysis);
+        this.addExecutiveSummary(data.analysis.summary);
+        this.addBiasTable(data.analysis.biases);
+        this.addFooter();
+
+        this.doc.save(`decision-audit-${data.filename.split('.')[0]}.pdf`);
+    }
+
+    private addHeader() {
+        this.doc.setFillColor(this.secondaryColor[0], this.secondaryColor[1], this.secondaryColor[2]);
+        this.doc.rect(0, 0, 210, 40, 'F');
+
+        this.doc.setTextColor(255, 255, 255);
+        this.doc.setFontSize(24);
+        this.doc.setFont('helvetica', 'bold');
+        this.doc.text('Decision Intel', 20, 20);
+
+        this.doc.setFontSize(10);
+        this.doc.setFont('helvetica', 'normal');
+        this.doc.setTextColor(200, 200, 200);
+        this.doc.text('Cognitive Bias Audit Report', 20, 30);
+
+        this.doc.text(new Date().toLocaleDateString(), 170, 20);
+    }
+
+    private addDocumentInfo(filename: string, analysis: ReportAnalysisData) {
+        let yPos = 60;
+
+        // Document Name
+        this.doc.setTextColor(0, 0, 0);
+        this.doc.setFontSize(16);
+        this.doc.setFont('helvetica', 'bold');
+        this.doc.text(`File: ${filename}`, 20, yPos);
+
+        yPos += 20;
+
+        // Score Cards
+        this.drawScoreCard('Decision Score', `${analysis.overallScore}/100`, 20, yPos, [240, 253, 244], [22, 163, 74]); // Green
+        this.drawScoreCard('Noise Score', `${analysis.noiseScore}/100`, 85, yPos, [255, 251, 235], [217, 119, 6]); // Yellow
+        this.drawScoreCard('Biases Found', `${analysis.biases?.length || 0}`, 150, yPos, [254, 242, 242], [225, 29, 72]); // Red
+    }
+
+    private drawScoreCard(label: string, value: string, x: number, y: number, bgColor: number[], textColor: number[]) {
+        this.doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+        this.doc.roundedRect(x, y, 40, 30, 3, 3, 'F');
+
+        this.doc.setFontSize(8);
+        this.doc.setTextColor(100, 100, 100);
+        this.doc.text(label.toUpperCase(), x + 20, y + 10, { align: 'center' });
+
+        this.doc.setFontSize(14);
+        this.doc.setFont('helvetica', 'bold');
+        this.doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        this.doc.text(value, x + 20, y + 22, { align: 'center' });
+    }
+
+    private addExecutiveSummary(summary: string) {
+        this.doc.setFontSize(14);
+        this.doc.setTextColor(0, 0, 0);
+        this.doc.text('Executive Summary', 20, 130);
+
+        this.doc.setFontSize(10);
+        this.doc.setTextColor(50, 50, 50);
+        this.doc.setFont('helvetica', 'normal');
+
+        const splitText = this.doc.splitTextToSize(summary, 170);
+        this.doc.text(splitText, 20, 140);
+    }
+
+    private addBiasTable(biases: ReportBiasInstance[]) {
+        if (!biases || biases.length === 0) return;
+
+        const tableData = biases.map(bias => [
+            bias.biasType,
+            bias.severity.toUpperCase(),
+            bias.explanation
+        ]);
+
+        autoTable(this.doc, {
+            startY: 170,
+            head: [['Bias Detected', 'Severity', 'Analysis']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: {
+                fillColor: this.secondaryColor,
+                textColor: [255, 255, 255],
+                fontStyle: 'bold'
+            },
+            columnStyles: {
+                0: { fontStyle: 'bold', cellWidth: 40 },
+                1: { cellWidth: 30 },
+                2: { cellWidth: 'auto' }
+            },
+            styles: {
+                fontSize: 10,
+                cellPadding: 5
+            }
+        });
+    }
+
+    private addFooter() {
+        const pageCount = this.doc.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            this.doc.setPage(i);
+            this.doc.setFontSize(8);
+            this.doc.setTextColor(150, 150, 150);
+            this.doc.text(
+                `Proprietary Analysis - Generated by Decision Intel Platform - Page ${i} of ${pageCount}`,
+                105,
+                285,
+                { align: 'center' }
+            );
+        }
+    }
+}

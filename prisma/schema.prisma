@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id         String     @id @default(cuid())
+  userId     String   // Clerk User ID
+  filename   String
+  fileType   String
+  fileSize   Int
+  content    String
+  uploadedAt DateTime   @default(now())
+  status     String     @default("pending")
+  analyses   Analysis[]
+
+  @@index([userId])
+}
+
+model Analysis {
+  id           String         @id @default(cuid())
+  documentId   String
+  document     Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  overallScore Float
+  noiseScore   Float
+  summary      String
+  createdAt    DateTime       @default(now())
+  biases       BiasInstance[]
+}
+
+model BiasInstance {
+  id          String   @id @default(cuid())
+  analysisId  String
+  analysis    Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  biasType    String
+  severity    String
+  excerpt     String
+  explanation String
+  suggestion  String
+}

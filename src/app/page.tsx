@@ -1,65 +1,278 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useCallback } from 'react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+
+interface UploadedDoc {
+  id: string;
+  filename: string;
+  status: string;
+  score?: number;
+}
 
 export default function Home() {
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedDocs, setUploadedDocs] = useState<UploadedDoc[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
+
+  const uploadAndAnalyze = async (file: File) => {
+    setError(null);
+    setUploading(true);
+
+    try {
+      // Upload file
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const uploadRes = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadRes.ok) {
+        const data = await uploadRes.json();
+        throw new Error(data.error || 'Upload failed');
+      }
+
+      const uploadData = await uploadRes.json();
+
+      // Add to list with pending status
+      setUploadedDocs(prev => [
+        { id: uploadData.id, filename: uploadData.filename, status: 'analyzing' },
+        ...prev
+      ]);
+
+      // Trigger analysis
+      const analyzeRes = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentId: uploadData.id }),
+      });
+
+      if (!analyzeRes.ok) {
+        throw new Error('Analysis failed');
+      }
+
+      const analyzeData = await analyzeRes.json();
+
+      // Update status
+      setUploadedDocs(prev => prev.map(doc =>
+        doc.id === uploadData.id
+          ? { ...doc, status: 'complete', score: analyzeData.overallScore }
+          : doc
+      ));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      await uploadAndAnalyze(files[0]);
+    }
+  }, []);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      await uploadAndAnalyze(files[0]);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
+      {/* Header */}
+      <header className="flex items-center justify-between mb-xl">
+        <div>
+          <h1 style={{ marginBottom: 'var(--spacing-xs)' }}>
+            <span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Decision Intel
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+          <p>Audit decisions for cognitive bias and noise</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <nav className="flex gap-md">
+          <Link href="/dashboard" className="btn btn-secondary">
+            Dashboard
+          </Link>
+        </nav>
+      </header>
+
+      {/* Upload Zone */}
+      <div
+        className={`upload-zone mb-xl ${isDragOver ? 'dragover' : ''}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => document.getElementById('file-input')?.click()}
+      >
+        <input
+          type="file"
+          id="file-input"
+          hidden
+          accept=".pdf,.txt,.md,.doc,.docx"
+          onChange={handleFileSelect}
+          disabled={uploading}
+        />
+
+        {uploading ? (
+          <div className="flex flex-col items-center gap-md">
+            <Loader2 size={48} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+            <p>Analyzing document for biases...</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-md">
+            <Upload size={48} style={{ color: 'var(--accent-primary)' }} />
+            <div>
+              <p style={{ color: 'var(--text-primary)', fontWeight: 500, marginBottom: 'var(--spacing-xs)' }}>
+                Drop your decision document here
+              </p>
+              <p style={{ fontSize: '0.875rem' }}>
+                or click to browse • PDF, TXT, MD, DOC, DOCX
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Error message */}
+      {error && (
+        <div className="card mb-lg" style={{ borderColor: 'var(--error)', background: 'rgba(239, 68, 68, 0.1)' }}>
+          <div className="card-body flex items-center gap-md">
+            <AlertTriangle size={20} style={{ color: 'var(--error)' }} />
+            <span style={{ color: 'var(--error)' }}>{error}</span>
+          </div>
         </div>
-      </main>
+      )}
+
+      {/* Recently uploaded */}
+      {uploadedDocs.length > 0 && (
+        <div className="card">
+          <div className="card-header">
+            <h3>Recently Uploaded</h3>
+          </div>
+          <div className="card-body">
+            <div className="flex flex-col gap-md">
+              {uploadedDocs.map((doc, idx) => (
+                <div
+                  key={doc.id}
+                  className="flex items-center justify-between animate-fade-in"
+                  style={{
+                    padding: 'var(--spacing-md)',
+                    background: 'var(--bg-secondary)',
+                    borderRadius: 'var(--radius-md)',
+                    animationDelay: `${idx * 0.1}s`
+                  }}
+                >
+                  <div className="flex items-center gap-md">
+                    <FileText size={20} style={{ color: 'var(--accent-primary)' }} />
+                    <span>{doc.filename}</span>
+                  </div>
+                  <div className="flex items-center gap-md">
+                    {doc.status === 'analyzing' && (
+                      <span className="badge badge-analyzing flex items-center gap-sm">
+                        <Loader2 size={12} className="animate-spin" />
+                        Analyzing
+                      </span>
+                    )}
+                    {doc.status === 'complete' && (
+                      <>
+                        <span className="badge badge-complete flex items-center gap-sm">
+                          <CheckCircle size={12} />
+                          Complete
+                        </span>
+                        {doc.score !== undefined && (
+                          <span style={{
+                            fontWeight: 600,
+                            color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                          }}>
+                            {Math.round(doc.score)}%
+                          </span>
+                        )}
+                        <Link href={`/documents/${doc.id}`} className="btn btn-ghost" style={{ fontSize: '0.75rem' }}>
+                          View Details →
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Features */}
+      <div className="grid grid-3 mt-xl">
+        <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="card-body">
+            <div style={{
+              width: 48, height: 48, borderRadius: 'var(--radius-md)',
+              background: 'rgba(99, 102, 241, 0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 'var(--spacing-md)'
+            }}>
+              <FileText size={24} style={{ color: 'var(--accent-primary)' }} />
+            </div>
+            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Document Ingestion</h4>
+            <p style={{ fontSize: '0.875rem' }}>
+              Upload PDFs, meeting notes, memos, and emails for instant analysis.
+            </p>
+          </div>
+        </div>
+
+        <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <div className="card-body">
+            <div style={{
+              width: 48, height: 48, borderRadius: 'var(--radius-md)',
+              background: 'rgba(139, 92, 246, 0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 'var(--spacing-md)'
+            }}>
+              <AlertTriangle size={24} style={{ color: 'var(--accent-secondary)' }} />
+            </div>
+            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Bias Detection</h4>
+            <p style={{ fontSize: '0.875rem' }}>
+              AI-powered detection of 15 cognitive biases with severity scoring.
+            </p>
+          </div>
+        </div>
+
+        <div className="card animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div className="card-body">
+            <div style={{
+              width: 48, height: 48, borderRadius: 'var(--radius-md)',
+              background: 'rgba(16, 185, 129, 0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 'var(--spacing-md)'
+            }}>
+              <CheckCircle size={24} style={{ color: 'var(--success)' }} />
+            </div>
+            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Actionable Insights</h4>
+            <p style={{ fontSize: '0.875rem' }}>
+              Get specific recommendations to improve decision quality.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
