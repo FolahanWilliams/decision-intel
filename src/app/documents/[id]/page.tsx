@@ -5,17 +5,18 @@ import Link from 'next/link';
 import {
     ArrowLeft, FileText, AlertTriangle, CheckCircle,
     Loader2, ChevronRight, Lightbulb, Download, Table,
-    Terminal, PlayCircle, Save, Info, RefreshCw
+    Terminal, PlayCircle, Info, RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
 
 interface BiasInstance {
-    id: string;
+    id?: string;
     biasType: string;
     severity: string;
     excerpt: string;
     explanation: string;
     suggestion: string;
+    found?: boolean; // Used in simulation results
 }
 
 interface Analysis {
@@ -24,7 +25,7 @@ interface Analysis {
     noiseScore: number;
     summary: string;
     createdAt: string;
-    biases: any[]; // Use any for now to handle both DB and Simulation formats
+    biases: BiasInstance[];
 }
 
 interface Document {
@@ -431,7 +432,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
                                     <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>BIAS_COUNT</div>
-                                    <div style={{ fontSize: '2rem', fontWeight: 700 }}>{simulationResult.biases.filter((b: any) => b.found !== false).length}</div>
+                                    <div style={{ fontSize: '2rem', fontWeight: 700 }}>{simulationResult.biases.filter(b => b.found !== false).length}</div>
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
                                     <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>NOISE_LEVEL</div>

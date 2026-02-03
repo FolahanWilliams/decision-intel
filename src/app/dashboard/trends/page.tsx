@@ -5,7 +5,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, Cell, LineChart, Line
 } from 'recharts';
-import { Calendar, Filter, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 
 const mockTrendData = Array.from({ length: 30 }, (_, i) => ({
     date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],

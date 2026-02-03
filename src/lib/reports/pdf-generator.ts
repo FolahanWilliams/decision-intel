@@ -24,9 +24,8 @@ interface ReportData {
 
 export class PdfGenerator {
     private doc: jsPDF;
-    private primaryColor: [number, number, number] = [79, 70, 229]; // Indigo-600
     private secondaryColor: [number, number, number] = [30, 41, 59]; // Slate-800
-    private accentColor: [number, number, number] = [244, 63, 94]; // Rose-500
+
 
     constructor() {
         this.doc = new jsPDF();

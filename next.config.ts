@@ -12,13 +12,14 @@ const nextConfig: NextConfig = {
           { key: "Access-Control-Allow-Headers", value: "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" },
         ]
       }
-    ]
-    experimental: {
-      serverActions: {
-        bodySizeLimit: '10mb',
-    },
-      serverComponentsExternalPackages: ['pdf-parse'],
+    ];
   },
-  };
+  serverExternalPackages: ['pdf-parse'],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
+};
 
-  export default nextConfig;
+export default nextConfig;

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { simulateAnalysis, ProgressUpdate } from '@/lib/analysis/analyzer';
 import { auth } from '@clerk/nextjs/server';
-import { prisma } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
     try {

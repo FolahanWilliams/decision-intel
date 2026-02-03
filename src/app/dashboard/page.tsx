@@ -4,12 +4,11 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
     BarChart3, FileText, TrendingUp, AlertTriangle,
-    ArrowLeft, RefreshCw, Loader2
+    RefreshCw, Loader2
 } from 'lucide-react';
 import {
     PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
-    Tooltip, ResponsiveContainer, RadarChart, PolarGrid,
-    PolarAngleAxis, Radar
+    Tooltip, ResponsiveContainer
 } from 'recharts';
 import { UserButton } from "@clerk/nextjs";
 
@@ -98,11 +97,7 @@ export default function Dashboard() {
         }))
         : [];
 
-    const biasRadarData = stats?.topBiases.map(b => ({
-        bias: b.name.replace(' Bias', '').replace(' Heuristic', '').replace(' Effect', ''),
-        count: b.count,
-        fullMark: Math.max(...(stats?.topBiases.map(x => x.count) || [1]))
-    })) || [];
+
 
     return (
         <div className="container" style={{ paddingTop: 'var(--spacing-lg)', paddingBottom: 'var(--spacing-2xl)', maxWidth: '100%' }}>

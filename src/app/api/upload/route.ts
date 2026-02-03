@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -21,6 +21,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 });
         }
 
+        // Enforce file size limit (5MB)
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        if (file.size > MAX_FILE_SIZE) {
+            return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
+        }
+
         // Validate file type
         const allowedTypes = [
             'application/pdf',
@@ -30,7 +36,8 @@ export async function POST(request: NextRequest) {
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         ];
 
-        if (!allowedTypes.includes(file.type) && !file.name.endsWith('.txt') && !file.name.endsWith('.md')) {
+        const isTextFile = file.name.endsWith('.txt') || file.name.endsWith('.md');
+        if (!allowedTypes.includes(file.type) && !isTextFile) {
             return NextResponse.json(
                 { error: 'Invalid file type. Supported: PDF, TXT, MD, DOC, DOCX' },
                 { status: 400 }

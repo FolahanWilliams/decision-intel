@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { detectBias, detectNoise, generateSummary } from '@/lib/ai/bias-engine';
 import { BiasCategory, AnalysisResult, BIAS_CATEGORIES } from '@/types';
 

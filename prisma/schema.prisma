@@ -13,9 +13,12 @@ model Document {
   filename   String
   fileType   String
   fileSize   Int
-  content    String
-  uploadedAt DateTime   @default(now())
+  content    String     @db.Text
   status     String     @default("pending")
+  
+  uploadedAt DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  
   analyses   Analysis[]
 
   @@index([userId])
@@ -27,9 +30,14 @@ model Analysis {
   document     Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
   overallScore Float
   noiseScore   Float
-  summary      String
+  summary      String         @db.Text
+  
   createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  
   biases       BiasInstance[]
+
+  @@index([documentId])
 }
 
 model BiasInstance {
@@ -38,7 +46,11 @@ model BiasInstance {
   analysis    Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
   biasType    String
   severity    String
-  excerpt     String
-  explanation String
-  suggestion  String
+  excerpt     String   @db.Text
+  explanation String   @db.Text
+  suggestion  String   @db.Text
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
+

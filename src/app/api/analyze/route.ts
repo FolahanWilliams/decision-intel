@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeDocument } from '@/lib/analysis/analyzer';
 import { auth } from '@clerk/nextjs/server';
-import { prisma } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 const EXTENSION_API_KEY = 'sk_ext_decision_intel_2024';
 
