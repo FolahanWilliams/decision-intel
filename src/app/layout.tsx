@@ -14,6 +14,7 @@ import { dark } from '@clerk/themes'
 import { ToastProvider } from "@/components/ui/ToastContext";
 import Sidebar from "@/components/ui/Sidebar";
 import Ticker from "@/components/ui/Ticker";
+import { Analytics } from '@vercel/analytics/next';
 
 export default function RootLayout({
   children,
@@ -44,6 +45,7 @@ export default function RootLayout({
               </main>
             </div>
           </ToastProvider>
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>

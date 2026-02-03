@@ -14,6 +14,7 @@
     "@clerk/nextjs": "^6.37.1",
     "@clerk/themes": "^2.4.51",
     "@prisma/client": "^5.19.1",
+    "@vercel/analytics": "^1.6.1",
     "dotenv": "^17.2.3",
     "jspdf": "^4.1.0",
     "jspdf-autotable": "^5.0.7",
