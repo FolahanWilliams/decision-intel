@@ -1,3 +1,7 @@
+// CONFIGURATION
+// Create a vercel deployment (e.g. https://decision-intel.vercel.app) and update this URL
+const API_BASE_URL = 'https://decision-intel-ppj3.vercel.app';
+
 document.addEventListener('DOMContentLoaded', () => {
     const analyzeBtn = document.getElementById('analyze-btn');
     const initialView = document.getElementById('initial-view');
@@ -8,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const retryBtn = document.getElementById('retry-btn');
 
     // API Endpoint (Localhost for dev)
-    const API_URL = 'http://localhost:3000/api/analyze';
+    const API_URL = `${API_BASE_URL}/api/analyze`;
 
     analyzeBtn.addEventListener('click', startAnalysis);
     retryBtn.addEventListener('click', () => {
@@ -97,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Link to full report
         const reportBtn = document.getElementById('view-report-btn');
-        reportBtn.href = `http://localhost:3000/documents/${data.documentId}`;
+        reportBtn.href = `${API_BASE_URL}/documents/${data.documentId}`;
     }
 
     function setView(viewName) {
