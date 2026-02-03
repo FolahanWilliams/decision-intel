@@ -3,33 +3,54 @@ import { analyzeDocument } from '@/lib/analysis/analyzer';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/db';
 
+const EXTENSION_API_KEY = 'sk_ext_decision_intel_2024';
+
 export async function POST(request: NextRequest) {
     try {
         const { userId } = await auth();
+        const apiKey = request.headers.get('x-extension-key');
+        let effectiveUserId = userId;
 
-        if (!userId) {
+        if (!effectiveUserId && apiKey === EXTENSION_API_KEY) {
+            effectiveUserId = 'extension_user';
+        }
+
+        if (!effectiveUserId) {
+            console.error('Unified Auth Failed: No Session ID and Invalid API Key');
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { documentId } = await request.json();
+        const body = await request.json();
+        let documentId = body.documentId;
 
-        if (!documentId) {
-            return NextResponse.json(
-                { error: 'Document ID is required' },
-                { status: 400 }
-            );
+        // Handle direct text analysis (from extension)
+        if (!documentId && body.text) {
+            const newDoc = await prisma.document.create({
+                data: {
+                    userId: effectiveUserId,
+                    filename: body.filename || 'Web analysis',
+                    fileType: body.fileType || 'web',
+                    fileSize: body.text.length,
+                    content: body.text,
+                    status: 'pending'
+                }
+            });
+            documentId = newDoc.id;
         }
 
-        // Verify document ownership
+        if (!documentId) {
+            return NextResponse.json({ error: 'Missing documentId or text' }, { status: 400 });
+        }
+
+        // Verify ownership
         const doc = await prisma.document.findFirst({
-            where: { id: documentId, userId }
+            where: { id: documentId, userId: effectiveUserId }
         });
 
         if (!doc) {
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
 
-        // Start analysis (this runs async)
         const result = await analyzeDocument(documentId);
 
         return NextResponse.json({
@@ -38,13 +59,12 @@ export async function POST(request: NextRequest) {
             overallScore: result.overallScore,
             noiseScore: result.noiseScore,
             summary: result.summary,
-            biasesFound: result.biases.filter(b => b.found).length
+            biasesFound: result.biases.filter((b: any) => b.found).length,
+            biases: result.biases
         });
+
     } catch (error) {
         console.error('Analysis error:', error);
-        return NextResponse.json(
-            { error: 'Failed to analyze document' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Analysis failed' }, { status: 500 });
     }
 }

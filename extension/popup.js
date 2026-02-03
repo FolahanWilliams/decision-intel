@@ -50,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const apiResponse = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'x-extension-key': 'sk_ext_decision_intel_2024'
                 },
                 body: JSON.stringify({
                     text: contentData.text,
