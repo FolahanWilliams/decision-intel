@@ -13,7 +13,12 @@ const nextConfig: NextConfig = {
         ]
       }
     ]
-  }
-};
+    experimental: {
+      serverActions: {
+        bodySizeLimit: '10mb',
+    },
+      serverComponentsExternalPackages: ['pdf-parse'],
+  },
+  };
 
-export default nextConfig;
+  export default nextConfig;
