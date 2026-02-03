@@ -84,26 +84,22 @@ export async function simulateAnalysis(
     const totalSteps = ALL_BIASES.length + 2; // +1 for noise, +1 for summary
     let currentStep = 0;
 
-    // Run bias detection for all bias types in batches
-    for (let i = 0; i < ALL_BIASES.length; i += 3) { // Smaller batches for better streaming feel
-        const batch = ALL_BIASES.slice(i, i + 3);
-        const batchResults = await Promise.all(
-            batch.map(async biasType => {
-                const res = await detectBias(content, biasType);
-                currentStep++;
-                if (onProgress) {
-                    onProgress({
-                        type: 'bias',
-                        biasType,
-                        result: res,
-                        progress: Math.round((currentStep / totalSteps) * 100)
-                    });
-                }
-                return res;
-            })
-        );
-        biasResults.push(...batchResults);
-    }
+    // Run bias detection for all bias types in parallel for maximum speed
+    const biasResults = await Promise.all(
+        ALL_BIASES.map(async biasType => {
+            const res = await detectBias(content, biasType);
+            currentStep++;
+            if (onProgress) {
+                onProgress({
+                    type: 'bias',
+                    biasType,
+                    result: res,
+                    progress: Math.round((currentStep / totalSteps) * 100)
+                });
+            }
+            return res;
+        })
+    );
 
     // Detect noise
     const noiseResult = await detectNoise(content);
