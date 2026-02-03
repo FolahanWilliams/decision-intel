@@ -89,80 +89,7 @@ export async function detectBias(
         };
     } catch (error) {
         console.error(`Error detecting ${biasType}:`, error);
-
-        // Mock fallback for demo purposes when API quota is exceeded
-        const isMockTarget = content.includes('European market') || content.includes('Project Phoenix');
-
-        if (isMockTarget) {
-            if (biasType === 'authority_bias' && content.includes('CEO')) {
-                return {
-                    biasType: biasInfo.name,
-                    found: true,
-                    severity: 'high',
-                    excerpts: [{
-                        text: "His judgment has never been wrong before, so we should follow his recommendation without further analysis.",
-                        explanation: "Blindly following a leader's recommendation without independent verification is a textbook Authority Bias."
-                    }],
-                    suggestion: "Conduct independent market analysis to validate the CEO's intuition with data."
-                };
-            }
-            if (biasType === 'sunk_cost_fallacy' && content.includes('invested $15M')) {
-                return {
-                    biasType: biasInfo.name,
-                    found: true,
-                    severity: 'medium',
-                    excerpts: [{
-                        text: "Given this substantial investment, it would be wasteful to abandon the initiative now.",
-                        explanation: "Justifying future action based on unrecoverable past costs is Sunk Cost Fallacy."
-                    }],
-                    suggestion: "Evaluate the project based solely on future ROI, ignoring past spend."
-                };
-            }
-            if (biasType === 'overconfidence_bias' && content.includes('obvious')) {
-                return {
-                    biasType: biasInfo.name,
-                    found: true,
-                    severity: 'high',
-                    excerpts: [{
-                        text: "it's obvious that we will replicate these results internationally",
-                        explanation: "Assuming success in a new context based on past success elsewhere without evidence is Overconfidence Bias."
-                    }],
-                    suggestion: "Conduct a 'pre-mortem' exercise to identify potential failure modes."
-                };
-            }
-            if (biasType === 'groupthink' && content.includes('95% of team members')) {
-                return {
-                    biasType: biasInfo.name,
-                    found: true,
-                    severity: 'medium',
-                    excerpts: [{
-                        text: "With such strong consensus, we are confident this is the right path forward. Any dissenting opinions represent a small minority view",
-                        explanation: "Dismissing dissent due to majority consensus suggests Groupthink."
-                    }],
-                    suggestion: "Actively solicit and reward dissenting opinions to challenge the consensus."
-                };
-            }
-            if (biasType === 'bandwagon_effect' && content.includes('competitors are all expanding')) {
-                return {
-                    biasType: biasInfo.name,
-                    found: true,
-                    severity: 'low',
-                    excerpts: [{
-                        text: "Since our competitors are all expanding internationally, we must do the same",
-                        explanation: "Justifying action based primarily on competitors' actions is the Bandwagon Effect."
-                    }],
-                    suggestion: "Evaluate the expansion based on unique strategic fit, not just competitor activity."
-                };
-            }
-        }
-
-        return {
-            biasType: biasInfo.name,
-            found: false,
-            severity: 'low',
-            excerpts: [],
-            suggestion: ''
-        };
+        throw error;
     }
 }
 
@@ -197,20 +124,7 @@ Respond in JSON format:
         };
     } catch (error) {
         console.error('Error detecting noise:', error);
-
-        // Mock fallback
-        if (content.includes('European market') || content.includes('Project Phoenix')) {
-            return {
-                score: 65,
-                issues: [
-                    "Inconsistent reasoning regarding market entry barriers",
-                    "Subjective judgments on CEO intuition vs data",
-                    "Unclear criteria for 'success' replication"
-                ]
-            };
-        }
-
-        return { score: 0, issues: [] };
+        throw error;
     }
 }
 
@@ -249,12 +163,6 @@ Respond in JSON format:
         return result.summary || 'Analysis complete.';
     } catch (error) {
         console.error('Error generating summary:', error);
-
-        // Mock fallback
-        if (content.includes('European market') || content.includes('Project Phoenix')) {
-            return "This decision exhibits significant cognitive bias, particularly Authority Bias and Overconfidence. The justification relies heavily on leadership intuition and past sunk costs rather than forward-looking market data. We recommend delaying approval until an independent market analysis is conducted.";
-        }
-
-        return 'Analysis complete. Review detailed findings for more information.';
+        throw error;
     }
 }
