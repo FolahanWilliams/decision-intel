@@ -50,8 +50,12 @@ export async function POST(request: NextRequest) {
                 const pdfParse = require('pdf-parse');
                 const pdfData = await pdfParse(buffer);
                 content = pdfData.text;
-            } catch {
-                return NextResponse.json({ error: 'Failed to parse PDF' }, { status: 400 });
+            } catch (error) {
+                console.error('PDF Parse Error:', error);
+                return NextResponse.json({
+                    error: 'Failed to parse PDF',
+                    details: error instanceof Error ? error.message : String(error)
+                }, { status: 400 });
             }
         } else {
             // Plain text files
