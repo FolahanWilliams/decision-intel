@@ -80,7 +80,7 @@ export async function simulateAnalysis(
     content: string,
     onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
-    const biasResults = [];
+
     const totalSteps = ALL_BIASES.length + 2; // +1 for noise, +1 for summary
     let currentStep = 0;
 
