@@ -12,7 +12,9 @@ export async function POST(request: NextRequest) {
         let effectiveUserId = userId;
 
         if (!effectiveUserId && apiKey === EXTENSION_API_KEY) {
-            effectiveUserId = 'extension_user';
+            // Support unique extension users if provided, else separate 'guest'
+            const extUserId = request.headers.get('x-extension-user-id');
+            effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';
         }
 
         if (!effectiveUserId) {
