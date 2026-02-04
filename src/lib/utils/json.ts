@@ -16,6 +16,20 @@ export const parseJSON = (text: string): any | null => {
     }
     const opening = text[start];
     const closing = opening === "{" ? "}" : "]";
+
+    // Optimization: Attempt to parse the substring from the first opening brace to the last closing brace.
+    // This covers the common case where the text contains a single valid JSON object/array, optionally surrounded by text.
+    // It is significantly faster (native JSON.parse) than the manual state machine loop.
+    const end = text.lastIndexOf(closing);
+    if (end !== -1 && end > start) {
+        const candidate = text.slice(start, end + 1);
+        try {
+            return JSON.parse(candidate);
+        } catch (e) {
+            // Fallback to robust parsing if optimistic attempt fails
+        }
+    }
+
     let depth = 0;
     let inString = false;
     for (let i = start; i < text.length; i++) {
