@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { simulateAnalysis, ProgressUpdate } from '@/lib/analysis/analyzer';
+import { formatSSE } from '@/lib/sse';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 
@@ -28,7 +29,8 @@ export async function POST(request: NextRequest) {
         const stream = new ReadableStream({
             async start(controller) {
                 const sendUpdate = (update: ProgressUpdate) => {
-                    controller.enqueue(encoder.encode(`data: ${JSON.stringify(update)}\n\n`));
+                    const sseString = formatSSE(update);
+                    controller.enqueue(encoder.encode(sseString));
                 };
 
                 try {
@@ -72,7 +74,8 @@ export async function POST(request: NextRequest) {
                     controller.close();
                 } catch (error) {
                     console.error('Stream error:', error);
-                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'error', message: 'Analysis failed' })}\n\n`));
+                    const errorSSE = formatSSE({ type: 'error', message: 'Analysis failed' });
+                    controller.enqueue(encoder.encode(errorSSE));
                     controller.close();
                 }
             }

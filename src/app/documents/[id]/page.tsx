@@ -8,6 +8,7 @@ import {
     Terminal, PlayCircle, Info, RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
+import { SSEReader } from '@/lib/sse';
 
 interface BiasInstance {
     id?: string;
@@ -189,32 +190,30 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
             if (!reader) throw new Error('Failed to start stream');
 
             const decoder = new TextDecoder();
+            const sseReader = new SSEReader();
+
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
 
                 const chunk = decoder.decode(value);
-                const lines = chunk.split('\n');
+                sseReader.processChunk(chunk, (update: any) => {
+                    if (update.type === 'bias' && update.result.found) {
+                        setStreamLogs(prev => [...prev, {
+                            msg: `DETECTED: ${update.biasType} (${update.result.severity.toUpperCase()})`,
+                            type: 'bias'
+                        }]);
+                    } else if (update.type === 'noise') {
+                        setStreamLogs(prev => [...prev, { msg: `NOISE ANALYSIS: ${Math.round(update.result.score)}% intensity`, type: 'info' }]);
+                    } else if (update.type === 'complete') {
+                        setStreamLogs(prev => [...prev, { msg: 'Audit successfully committed to ledger.', type: 'success' }]);
+                        setDocument(prev => prev ? { ...prev, analyses: [update.result, ...prev.analyses], status: 'complete' } : null);
+                    }
 
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const update = JSON.parse(line.slice(6));
-
-                        if (update.type === 'bias' && update.result.found) {
-                            setStreamLogs(prev => [...prev, {
-                                msg: `DETECTED: ${update.biasType} (${update.result.severity.toUpperCase()})`,
-                                type: 'bias'
-                            }]);
-                        } else if (update.type === 'noise') {
-                            setStreamLogs(prev => [...prev, { msg: `NOISE ANALYSIS: ${Math.round(update.result.score)}% intensity`, type: 'info' }]);
-                        } else if (update.type === 'complete') {
-                            setStreamLogs(prev => [...prev, { msg: 'Audit successfully committed to ledger.', type: 'success' }]);
-                            setDocument(prev => prev ? { ...prev, analyses: [update.result, ...prev.analyses], status: 'complete' } : null);
-                        }
-
+                    if (typeof update.progress === 'number') {
                         setScanProgress(update.progress);
                     }
-                }
+                });
             }
         } catch (err) {
             showToast('Live scan failed', 'error');

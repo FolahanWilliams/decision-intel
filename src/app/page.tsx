@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { Upload, FileText, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { SSEReader } from '@/lib/sse';
 
 interface UploadedDoc {
   id: string;
@@ -69,26 +70,20 @@ export default function Home() {
       // Read the stream for progress updates
       const reader = analyzeRes.body?.getReader();
       const decoder = new TextDecoder();
-      let finalResult = null;
+      let finalResult: any = null;
 
       if (reader) {
+        const sseReader = new SSEReader();
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
           const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n').filter(line => line.trim());
-
-          for (const line of lines) {
-            try {
-              const data = JSON.parse(line);
-              if (data.type === 'complete' && data.result) {
-                finalResult = data.result;
-              }
-            } catch {
-              // Skip malformed JSON chunks
+          sseReader.processChunk(chunk, (data) => {
+            if (data.type === 'complete' && data.result) {
+              finalResult = data.result;
             }
-          }
+          });
         }
       }
 
