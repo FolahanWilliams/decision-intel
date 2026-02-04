@@ -62,22 +62,21 @@ export default function Home() {
         body: JSON.stringify({ documentId: uploadData.id }),
       });
 
-      if (!analyzeRes.ok) {
-        const errorData = await analyzeRes.json().catch((err: unknown) => {
-          console.error('Analysis failed:', err);
-          return { error: err instanceof Error ? err.message : String(err) };
-        });
-        throw new Error(errorData.error || 'Analysis failed');
+      // For SSE streams, check if we got a response body
+      // Note: SSE always returns 200, errors come through the stream
+      if (!analyzeRes.body) {
+        throw new Error('No response body from analysis endpoint');
       }
 
       // Read the stream for progress updates
-      const reader = analyzeRes.body?.getReader();
+      const reader = analyzeRes.body.getReader();
       const decoder = new TextDecoder();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let finalResult: any = null;
+      let streamError: Error | null = null;
 
-      if (reader) {
-        const sseReader = new SSEReader();
+      const sseReader = new SSEReader();
+      try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -86,11 +85,30 @@ export default function Home() {
           sseReader.processChunk(chunk, (data: unknown) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const update = data as any;
+            
+            // Check for error messages in the SSE stream
+            if (update.type === 'error') {
+              streamError = new Error(update.message || 'Analysis failed');
+            }
+            
             if (update.type === 'complete' && update.result) {
               finalResult = update.result;
             }
           });
         }
+      } catch (readError) {
+        console.error('Stream read error:', readError);
+        streamError = readError instanceof Error ? readError : new Error('Stream read failed');
+      }
+
+      // Check if we got an error from the stream
+      if (streamError) {
+        throw streamError;
+      }
+
+      // Check if we got a valid result
+      if (!finalResult) {
+        throw new Error('Analysis completed but no result received');
       }
 
       // Update status with final result

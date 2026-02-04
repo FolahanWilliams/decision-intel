@@ -23,16 +23,26 @@ const model = genAI.getGenerativeModel({
     ]
 });
 
+// Timeout wrapper for LLM calls to prevent hanging
+const LLM_TIMEOUT_MS = 45000; // 45 seconds
+
+async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS): Promise<T> {
+    const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`LLM timeout after ${ms}ms`)), ms)
+    );
+    return Promise.race([promise, timeout]);
+}
+
 // Helper to safely parse JSON from LLM output - Imported from utils/json
 
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Structurer Node (Gemini) ---");
     try {
         const content = state.structuredContent || state.originalContent;
-        const result = await model.generateContent([
+        const result = await withTimeout(model.generateContent([
             STRUCTURER_PROMPT,
             `Input Text:\n<input_text>\n${content}\n</input_text>`
-        ]);
+        ]));
         const response = result.response.text();
         const data = parseJSON(response);
 
@@ -53,10 +63,10 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
     console.log("--- Bias Detective Node (Gemini) ---");
     try {
         const content = state.structuredContent || state.originalContent;
-        const result = await model.generateContent([
+        const result = await withTimeout(model.generateContent([
             BIAS_DETECTIVE_PROMPT,
             `Text to Analyze:\n<input_text>\n${content}\n</input_text>`
-        ]);
+        ]));
         const response = result.response.text();
         const data = parseJSON(response);
 
@@ -74,11 +84,11 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
     // Spawn 3 independent "judges" (parallel calls)
     try {
         const promises = [1, 2, 3].map(() =>
-            model.generateContent([
+            withTimeout(model.generateContent([
                 NOISE_JUDGE_PROMPT,
                 `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>`,
                 `\n(Random Seed: ${Math.random()})` // Inject noise to encourage variance if model defines deterministic
-            ])
+            ]))
         );
 
         const results = await Promise.all(promises);
@@ -116,7 +126,7 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     // For now, we simulate the redaction using a prompt
     const content = state.originalContent;
     try {
-        const result = await model.generateContent([
+        const result = await withTimeout(model.generateContent([
             `You are a GDPR Anonymizer. 
             Goal: Redact PII (names, emails, dates) but PRESERVE structural context.
             - John Smith -> [PERSON_1]
@@ -125,7 +135,7 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
             
             Return valid JSON: { "redactedText": "..." }`,
             `Input Text:\n<input_text>\n${content}\n</input_text>`
-        ]);
+        ]));
         const data = parseJSON(result.response.text());
         return { structuredContent: data?.redactedText || content };
     } catch (e) {
