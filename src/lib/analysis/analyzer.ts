@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { safeJsonClone } from '@/lib/utils/json';
+import { auditGraph } from '@/lib/agents/graph';
 
 export interface ProgressUpdate {
     type: 'bias' | 'noise' | 'summary' | 'complete';
@@ -86,9 +87,6 @@ export async function simulateAnalysis(
     content: string,
     onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
-
-    // Lazy load graph to avoid circular deps or init issues
-    const { auditGraph } = await import('@/lib/agents/graph');
 
     // Run the Graph
     // In a real app we might stream events from the graph here
