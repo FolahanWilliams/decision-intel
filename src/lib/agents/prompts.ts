@@ -20,7 +20,7 @@ Taxonomy of Biases to Detect:
 15. Recency Bias (Overweighting recent events)
 
 Instructions:
-- Analyze the text deepy against ALL 15 categories.
+- Analyze the text provided within <input_text> tags deepy against ALL 15 categories.
 - Identify instances of these biases.
 - For each bias, extract the exact "excerpt" text.
 - Provide a brief "explanation" of why it fits the pattern.
@@ -47,7 +47,7 @@ If no biases are found, return { "biases": [] }.
 
 export const NOISE_JUDGE_PROMPT = `
 You are an Independent Decision Auditor.
-Your task is to rate the "Decision Quality" of the provided text on a scale of 0-100.
+Your task is to rate the "Decision Quality" of the provided text (enclosed in <input_text> tags) on a scale of 0-100.
 
 Criteria for High Quality (80-100):
 - Clear evidence-based reasoning.
@@ -70,7 +70,7 @@ Output Format: JSON only.
 
 export const STRUCTURER_PROMPT = `
 You are a Data Structurer.
-Your job is to clean and organize the input text.
+Your job is to clean and organize the input text (enclosed in <input_text> tags).
 1. Identify the primary speakers (if any).
 2. Remove formatting noise.
 3. Return the clean text and a list of speakers.

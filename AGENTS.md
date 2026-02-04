@@ -42,7 +42,7 @@ The state is managed via **LangGraph Annotations**. Crucially, it uses **Append/
 ### A. GDPR Anonymizer (`gdprAnonymizerNode`)
 *   **Goal**: Protect user privacy by stripping PII before analysis.
 *   **Logic**: Uses a specific "GDPR Anonymizer" persona to replace entities (e.g., "John Smith" -> `[PERSON_1]`).
-*   **Fallback**: If the LLM fails, it returns the `originalContent` (fail-open) to ensure analysis continues, though `structurerNode` has a second safety catch.
+*   **Fallback**: If the LLM fails or redaction is invalid, it returns `[REDACTION_FAILED]` (fail-safe) to prevent PII leakage.
 
 ### B. Data Structurer (`structurerNode`)
 *   **Goal**: Prepare messy input for high-quality analysis.
@@ -105,3 +105,7 @@ The `analyzer.ts` layer ensures strict mapping of:
 *   `speakers` -> Postgres Array
 *   `noiseStats` -> JSON
 *   `structuredContent` -> Text (for audit trails)
+
+## 5. Security Measures
+*   **Prompt Injection Mitigation**: All user inputs are wrapped in `<input_text>` tags to prevent instruction override.
+*   **JSON Resilience**: `parseJSON` uses non-greedy matching to safely extract JSON payloads.
