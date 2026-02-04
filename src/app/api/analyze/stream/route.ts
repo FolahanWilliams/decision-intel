@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { simulateAnalysis, ProgressUpdate } from '@/lib/analysis/analyzer';
+import { runAnalysis, saveAnalysisResult, ProgressUpdate } from '@/lib/analysis/analyzer';
 import { formatSSE } from '@/lib/sse';
 import { safeJsonClone } from '@/lib/utils/json';
 import { auth } from '@clerk/nextjs/server';
@@ -41,43 +41,12 @@ export async function POST(request: NextRequest) {
                         data: { status: 'analyzing' }
                     });
 
-                    const result = await simulateAnalysis(doc.content, (update) => {
+                    const result = await runAnalysis(doc.content, (update) => {
                         sendUpdate(update);
                     });
 
                     // Store analysis and update document status
-                    const foundBiases = result.biases.filter(b => b.found);
-                    await prisma.document.update({
-                        where: { id: documentId },
-                        data: {
-                            status: 'complete',
-                            analyses: {
-                                create: {
-                                    overallScore: result.overallScore,
-                                    noiseScore: result.noiseScore,
-                                    summary: result.summary,
-                                    biases: {
-                                        create: foundBiases.map(bias => ({
-                                            biasType: bias.biasType,
-                                            severity: bias.severity,
-                                            excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                                            explanation: bias.explanation || '',
-                                            suggestion: bias.suggestion,
-                                            confidence: bias.confidence || 0.0
-                                        })),
-                                    },
-                                    // Persist new Multi-Agent Data
-                                    structuredContent: result.structuredContent || '',
-                                    noiseStats: result.noiseStats || undefined,
-                                    factCheck: result.factCheck || undefined,
-                                    compliance: result.compliance || undefined,
-                                    preMortem: result.preMortem || undefined,
-                                    sentiment: result.sentiment || undefined,
-                                    speakers: result.speakers || []
-                                }
-                            }
-                        }
-                    });
+                    await saveAnalysisResult(documentId, result);
 
                     sendUpdate({ type: 'complete', progress: 100, result: safeJsonClone(result) });
                     controller.close();

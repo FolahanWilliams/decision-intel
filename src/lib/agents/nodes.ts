@@ -1,8 +1,20 @@
 import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
+import { sanitizeInput } from '../utils/text';
 import { AnalysisResult } from '../../types';
+import { GEMINI_MODEL_NAME } from '../config';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
-import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
+import {
+    BIAS_DETECTIVE_PROMPT,
+    NOISE_JUDGE_PROMPT,
+    STRUCTURER_PROMPT,
+    GDPR_ANONYMIZER_PROMPT,
+    FACT_CHECKER_EXTRACTION_PROMPT,
+    FACT_CHECKER_VERIFICATION_PROMPT,
+    PRE_MORTEM_PROMPT,
+    COMPLIANCE_MAPPER_PROMPT,
+    SENTIMENT_ANALYZER_PROMPT
+} from "./prompts";
 
 if (!process.env.GOOGLE_API_KEY) {
     throw new Error("Missing GOOGLE_API_KEY env variable");
@@ -10,7 +22,7 @@ if (!process.env.GOOGLE_API_KEY) {
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 // Using gemini-3-pro-preview - deep reasoning for sophisticated analysis
 const model = genAI.getGenerativeModel({
-    model: "gemini-3-pro-preview",
+    model: GEMINI_MODEL_NAME,
     generationConfig: {
         responseMimeType: "application/json",
         maxOutputTokens: 8192
@@ -38,7 +50,7 @@ async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS):
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Structurer Node (Gemini) ---");
     try {
-        const content = state.structuredContent || state.originalContent;
+        const content = sanitizeInput(state.structuredContent || state.originalContent);
         const result = await withTimeout(model.generateContent([
             STRUCTURER_PROMPT,
             `Input Text:\n<input_text>\n${content}\n</input_text>`
@@ -62,7 +74,7 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
 export async function biasDetectiveNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Bias Detective Node (Gemini) ---");
     try {
-        const content = state.structuredContent || state.originalContent;
+        const content = sanitizeInput(state.structuredContent || state.originalContent);
         const result = await withTimeout(model.generateContent([
             BIAS_DETECTIVE_PROMPT,
             `Text to Analyze:\n<input_text>\n${content}\n</input_text>`
@@ -79,7 +91,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
 
 export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Noise Judge Node (Gemini x3) ---");
-    const content = state.structuredContent || state.originalContent;
+    const content = sanitizeInput(state.structuredContent || state.originalContent);
 
     // Spawn 3 independent "judges" (parallel calls)
     try {
@@ -124,16 +136,10 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     console.log("--- GDPR Anonymizer Node (Gemini) ---");
     // In a real implementation: Load skill instructions from .agent/skills/gdpr-anonymizer/SKILL.md
     // For now, we simulate the redaction using a prompt
-    const content = state.originalContent;
+    const content = sanitizeInput(state.originalContent);
     try {
         const result = await withTimeout(model.generateContent([
-            `You are a GDPR Anonymizer. 
-            Goal: Redact PII (names, emails, dates) but PRESERVE structural context.
-            - John Smith -> [PERSON_1]
-            - CEO -> [EXECUTIVE_ROLE]
-            - Google -> [TECH_COMPANY]
-            
-            Return valid JSON: { "redactedText": "..." }`,
+            GDPR_ANONYMIZER_PROMPT,
             `Input Text:\n<input_text>\n${content}\n</input_text>`
         ]));
         const data = parseJSON(result.response.text());
@@ -150,12 +156,12 @@ import { getFinancialContext } from "../tools/financial";
 
 export async function factCheckerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Fact Checker Node (Gemini + FMP) ---");
-    const content = state.structuredContent || state.originalContent;
+    const content = sanitizeInput(state.structuredContent || state.originalContent);
 
     try {
         // Step 1: Extract Tickers
         const extractionResult = await model.generateContent([
-            `Extract any stock symbols (e.g. AAPL, TSLA) mentioned in the text. Return JSON: { "tickers": ["AAPL"] }`,
+            FACT_CHECKER_EXTRACTION_PROMPT,
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
         const extracted = parseJSON(extractionResult.response.text());
@@ -172,9 +178,7 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
 
         // Step 3: Verify Claims using Context
         const result = await model.generateContent([
-            `You are a Fact Checker. Verify key claims in the text using the provided Financial Data.
-            If a claim contradicts the data (e.g. "We are in the Energy sector" but data says "Technology"), flag it.
-            Return JSON: { "score": 0-100, "flags": ["Claim X contradicts market data..."] }`,
+            FACT_CHECKER_VERIFICATION_PROMPT,
             `Text:\n<input_text>\n${content}\n</input_text>`,
             financialContext
         ]);
@@ -191,14 +195,10 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
 // New Node: Pre-Mortem Architect
 export async function preMortemNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Pre-Mortem Node (Gemini) ---");
-    const content = state.structuredContent || state.originalContent;
+    const content = sanitizeInput(state.structuredContent || state.originalContent);
     try {
         const result = await model.generateContent([
-            `You are a Pre-Mortem Architect. 
-            Imagine it is 1 year in the future and the decision/plan described in the text has failed catastrophically.
-            List 3 plausible reasons why (Failure Scenarios) and 3 Preventive Measures.
-            
-            Output JSON: { "failureScenarios": ["..."], "preventiveMeasures": ["..."] }`,
+            PRE_MORTEM_PROMPT,
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
         const data = parseJSON(result.response.text());
@@ -212,13 +212,10 @@ export async function preMortemNode(state: AuditState): Promise<Partial<AuditSta
 // New Node: Compliance Mapper
 export async function complianceMapperNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Compliance Mapper (Consumer Duty) ---");
-    const content = state.structuredContent || state.originalContent;
+    const content = sanitizeInput(state.structuredContent || state.originalContent);
     try {
         const result = await model.generateContent([
-            `You are a Compliance Officer. Analyze the text for alignment with Consumer Duty regulations.
-            Check for: 1. Unclear information. 2. Foreseeable Harm. 3. Poor Value.
-            
-            Output JSON: { "status": "PASS" | "WARN" | "FAIL", "details": "Summary of findings..." }`,
+            COMPLIANCE_MAPPER_PROMPT,
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
         const data = parseJSON(result.response.text());
@@ -271,14 +268,11 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
 export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Sentiment Analyzer Node (Gemini) ---");
     try {
-        const content = state.structuredContent || state.originalContent;
-        const result = await model.generateContent([
-            `You are a Sentiment Analyzer. ONLY return raw JSON with two keys:
-            - "score": A number between -1 and 1.
-            - "label": "Positive" | "Negative" | "Neutral".
-            Example: { "score": 0.8, "label": "Positive" }`,
-            `Text to Analyze:\n${content}`
-        ]);
+        const content = sanitizeInput(state.structuredContent || state.originalContent);
+        const result = await withTimeout(model.generateContent([
+            SENTIMENT_ANALYZER_PROMPT,
+            `Text to Analyze:\n<input_text>\n${content}\n</input_text>`
+        ]));
         const response = result.response.text();
         const data = parseJSON(response);
 
