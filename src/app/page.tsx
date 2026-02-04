@@ -63,13 +63,17 @@ export default function Home() {
       });
 
       if (!analyzeRes.ok) {
-        const errorData = await analyzeRes.json().catch(() => ({ error: 'Analysis failed' }));
+        const errorData = await analyzeRes.json().catch((err: unknown) => {
+          console.error('Analysis failed:', err);
+          return { error: err instanceof Error ? err.message : String(err) };
+        });
         throw new Error(errorData.error || 'Analysis failed');
       }
 
       // Read the stream for progress updates
       const reader = analyzeRes.body?.getReader();
       const decoder = new TextDecoder();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let finalResult: any = null;
 
       if (reader) {
@@ -79,9 +83,11 @@ export default function Home() {
           if (done) break;
 
           const chunk = decoder.decode(value, { stream: true });
-          sseReader.processChunk(chunk, (data) => {
-            if (data.type === 'complete' && data.result) {
-              finalResult = data.result;
+          sseReader.processChunk(chunk, (data: unknown) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const update = data as any;
+            if (update.type === 'complete' && update.result) {
+              finalResult = update.result;
             }
           });
         }

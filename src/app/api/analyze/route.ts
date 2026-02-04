@@ -96,33 +96,51 @@ export async function POST(request: NextRequest) {
         console.error('Analysis error:', error);
         // Sanitize error message to prevent prompt injection into Jules
         let errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack || '' : '';
         errorMessage = errorMessage.slice(0, 200).replace(/[<>]/g, ''); // Truncate and remove basic HTML/XML tags
 
         // Self-Healing Trigger
-        if (errorMessage.includes('JSON') || errorMessage.includes('Unexpected end of JSON')) {
+        const isHealableError =
+            errorMessage.includes('JSON') ||
+            errorMessage.includes('Unexpected end of JSON') ||
+            errorMessage.includes('SAFETY') ||
+            errorMessage.includes('blocked');
+
+        if (isHealableError) {
             jsonErrorCount++;
-            console.warn(`⚠️ JSON Error detected. Count: ${jsonErrorCount}`);
+            console.warn(`⚠️ Healable error detected. Count: ${jsonErrorCount}`);
 
-            if (jsonErrorCount >= 3) {
-                console.log("🚑 Critical Error Threshold Reached. Triggering Jules for Self-Healing...");
+            // Only trigger healing in development to prevent runaway costs
+            const isDevelopment = process.env.NODE_ENV === 'development';
+
+            if (jsonErrorCount >= 3 && isDevelopment) {
+                console.log("🚑 Critical Error Threshold Reached. Triggering Jules Healing Pipeline...");
+
                 try {
-                    // Lazy load to avoid build-time issues with server-only modules if any
-                    const { jules } = await import('@/lib/jules');
+                    // Use shell exec to trigger the healing script
+                    const { exec } = await import('child_process');
+                    const sanitizedStack = errorStack
+                        .slice(0, 500)
+                        .replace(/[<>'"]/g, '')
+                        .replace(/\n/g, ' ');
 
-                    // Trigger Jules to fix the specific issue
-                    await jules.createSession(
-                        `CRITICAL: production-API is failing with '${errorMessage}'. ` +
-                        `The Bias Detective node is consistently failing to parse JSON. ` +
-                        `Refactor src/lib/agents/nodes.ts to implement chunking or more resilient parsing.`,
-                        0 // Use first connected source
-                    );
+                    exec(`./scripts/jules-healing.sh "${sanitizedStack}"`, (execError, stdout, stderr) => {
+                        if (execError) {
+                            console.error("❌ Healing script failed:", execError.message);
+                        } else {
+                            console.log("✅ Healing script triggered:", stdout);
+                        }
+                        if (stderr) console.error("Healing stderr:", stderr);
+                    });
 
-                    // Reset count after triggering (to avoid spamming Jules)
+                    // Reset count after triggering (to avoid spamming)
                     jsonErrorCount = 0;
-                    console.log("✅ Jules Triggered. PR expected shortly.");
-                } catch (julesError) {
-                    console.error("❌ Failed to trigger Jules:", julesError);
+                    console.log("✅ Jules Healing Pipeline Dispatched.");
+                } catch (healingError) {
+                    console.error("❌ Failed to trigger healing:", healingError);
                 }
+            } else if (jsonErrorCount >= 3 && !isDevelopment) {
+                console.warn("⚠️ Would trigger healing, but NODE_ENV !== 'development'. Skipping.");
             }
         }
 

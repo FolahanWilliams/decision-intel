@@ -16,7 +16,9 @@
     "jules:docs": "node scripts/jules.js \"Read all files in src/lib/agents and update AGENTS.md to match the current logic and architecture\"",
     "jules:audit": "node scripts/jules.js \"Audit the entire codebase for security vulnerabilities, hardcoded secrets, and GDPR compliance gaps\"",
     "gemini": "gemini",
-    "test": "vitest run"
+    "test": "vitest run",
+    "audit:ai": "bash ./scripts/gemini-audit.sh",
+    "prepare": "husky"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.37.1",
@@ -47,6 +49,7 @@
     "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "husky": "^9.1.7",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.18"

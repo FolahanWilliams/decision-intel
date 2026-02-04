@@ -46,11 +46,11 @@ export async function GET() {
 
         // Calculate average scores
         const avgOverallScore = analyses.length > 0
-            ? analyses.reduce((sum: number, a: any) => sum + a.overallScore, 0) / analyses.length
+            ? analyses.reduce((sum: number, a: { overallScore: number }) => sum + a.overallScore, 0) / analyses.length
             : 0;
 
         const avgNoiseScore = analyses.length > 0
-            ? analyses.reduce((sum: number, a: any) => sum + a.noiseScore, 0) / analyses.length
+            ? analyses.reduce((sum: number, a: { noiseScore: number }) => sum + a.noiseScore, 0) / analyses.length
             : 0;
 
         // Count biases by type
@@ -79,7 +79,7 @@ export async function GET() {
             },
             topBiases,
             severityDistribution: severityCounts,
-            recentDocuments: recentDocuments.map((doc: any) => ({
+            recentDocuments: recentDocuments.map((doc: { id: string, filename: string, status: string, uploadedAt: Date, analyses: { overallScore: number }[] }) => ({
                 id: doc.id,
                 filename: doc.filename,
                 status: doc.status,
@@ -87,10 +87,10 @@ export async function GET() {
                 score: doc.analyses[0]?.overallScore
             }))
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error fetching stats:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch stats', details: error.message },
+            { error: 'Failed to fetch stats', details: error instanceof Error ? error.message : String(error) },
             { status: 500 }
         );
     }

@@ -8,6 +8,7 @@ describe('formatSSE', () => {
     });
 
     it('handles circular references safely', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const a: any = { name: 'a' };
         a.self = a;
         const output = formatSSE(a);

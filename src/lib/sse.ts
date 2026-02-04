@@ -21,7 +21,7 @@ import { safeStringify } from './utils/json';
  * @param data The payload to send
  * @returns String format: "data: <json>\n\n"
  */
-export function formatSSE(data: any): string {
+export function formatSSE(data: unknown): string {
     const json = safeStringify(data);
     return `data: ${json}\n\n`;
 }
@@ -45,7 +45,7 @@ export class SSEReader {
      * Processes a raw text chunk from the stream.
      * Invokes callback for each valid valid JSON message found.
      */
-    processChunk(chunk: string, onMessage: (data: any) => void) {
+    processChunk(chunk: string, onMessage: (data: unknown) => void) {
         this.buffer += chunk;
 
         // Split by double newline (SSE standard delimiter)

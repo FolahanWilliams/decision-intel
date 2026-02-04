@@ -1,6 +1,29 @@
 # Gemini CLI Configuration
-default_model = "gemini-1.5-pro-002"
+# ========================
+# High-reasoning model for production audits
+
+[model]
+# Use Gemini 2.5 Pro for advanced reasoning during audits
+default = "gemini-2.5-pro-preview-05-06"
+
+[generation]
+# Conservative temperature for accurate code analysis
+temperature = 0.3
+# Allow longer responses for detailed audit reports
+max_output_tokens = 4096
+
+[safety]
+# Standard safety settings for code analysis
+harm_block_threshold = "BLOCK_MEDIUM_AND_ABOVE"
 
 [experimental]
-# Enable advanced reasoning for cli tasks
+# Enable advanced reasoning for CLI tasks
 reasoning = true
+
+[context]
+# Include project context files automatically
+include_files = [
+    "AGENTS.md",
+    "GEMINI.md",
+    "prisma/schema.prisma"
+]

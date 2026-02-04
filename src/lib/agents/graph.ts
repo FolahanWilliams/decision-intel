@@ -1,6 +1,6 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
 import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode } from "./nodes";
-import { AnalysisResult } from '@/types';
+import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
 // Define the State using Annotation.Root
@@ -21,7 +21,7 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => [],
     }),
-    biasAnalysis: Annotation<any>({
+    biasAnalysis: Annotation<BiasDetectionResult[]>({
         reducer: (x, y) => [...(x || []), ...(y || [])],
         default: () => [],
     }),

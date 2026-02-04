@@ -197,6 +197,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                 if (done) break;
 
                 const chunk = decoder.decode(value);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 sseReader.processChunk(chunk, (update: any) => {
                     if (update.type === 'bias' && update.result.found) {
                         setStreamLogs(prev => [...prev, {
@@ -379,11 +380,14 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                 <div className="text-muted">TASK_PROGRESS: {scanProgress}%</div>
                             </div>
                         ) : null}
-                        {streamLogs.map((log, i) => (
-                            <div key={i} style={{ marginBottom: '4px', color: log.type === 'bias' ? 'var(--error)' : log.type === 'success' ? 'var(--success)' : 'var(--text-secondary)' }}>
-                                <span style={{ color: '#444' }}>[{new Date().toLocaleTimeString([], { hour12: false })}]</span> {log.msg}
-                            </div>
-                        ))}
+
+                        {
+                            streamLogs.map((log, i) => (
+                                <div key={i} style={{ marginBottom: '4px', color: log.type === 'bias' ? 'var(--error)' : log.type === 'success' ? 'var(--success)' : 'var(--text-secondary)' }}>
+                                    <span style={{ color: '#444' }}>[{new Date().toLocaleTimeString([], { hour12: false })}]</span> {log.msg}
+                                </div>
+                            ))
+                        }
                     </div>
                 </div>
             </div>

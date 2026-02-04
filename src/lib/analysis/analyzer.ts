@@ -5,7 +5,7 @@ import { safeJsonClone } from '@/lib/utils/json';
 export interface ProgressUpdate {
     type: 'bias' | 'noise' | 'summary' | 'complete';
     biasType?: string;
-    result?: any;
+    result?: unknown;
     progress: number;
 }
 
@@ -81,7 +81,7 @@ export async function analyzeDocument(
     }
 }
 
-// New Multi-Agent Analysis Implementation
+// New Multi-Agent// Mock Analysis function (simulating AI delay)
 export async function simulateAnalysis(
     content: string,
     onProgress?: (update: ProgressUpdate) => void

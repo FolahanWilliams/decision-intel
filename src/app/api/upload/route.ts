@@ -101,10 +101,10 @@ export async function POST(request: NextRequest) {
             status: document.status,
             message: 'Document uploaded successfully'
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Upload error:', error);
         return NextResponse.json(
-            { error: 'Failed to upload document', details: error.message },
+            { error: 'Failed to upload document', details: error instanceof Error ? error.message : String(error) },
             { status: 500 }
         );
     }
@@ -130,10 +130,10 @@ export async function GET() {
         });
 
         return NextResponse.json(documents);
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error fetching documents:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch documents', details: error.message },
+            { error: 'Failed to fetch documents', details: error instanceof Error ? error.message : String(error) },
             { status: 500 }
         );
     }

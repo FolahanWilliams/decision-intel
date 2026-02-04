@@ -1,0 +1,33 @@
+#!/bin/sh
+# ==============================================================================
+# Pre-Commit Hook: AI-Powered Architectural Safety Check
+# ==============================================================================
+# Runs the Gemini CLI audit before every commit.
+# Blocks commit if critical issues are found.
+# ==============================================================================
+
+echo ""
+echo "🔍 Running AI Architectural Audit..."
+echo ""
+
+# Run the audit script
+npm run audit:ai
+
+# Capture exit code
+AUDIT_EXIT_CODE=$?
+
+if [ $AUDIT_EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ❌ COMMIT BLOCKED: AI Audit Failed                          ║"
+    echo "╠══════════════════════════════════════════════════════════════╣"
+    echo "║  Fix the issues above before committing, or bypass with:    ║"
+    echo "║  git commit --no-verify                                     ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    exit 1
+fi
+
+echo ""
+echo "✅ AI Audit Passed - Proceeding with commit"
+echo ""

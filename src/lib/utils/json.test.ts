@@ -47,6 +47,7 @@ describe('safeStringify', () => {
     });
 
     it('handles Circular references', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const a: any = { name: 'root' };
         a.self = a;
         // First usage of safeStringify might return [Circular] string or full structure depending on where recursion happens
