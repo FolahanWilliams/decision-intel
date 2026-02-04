@@ -1,28 +1,35 @@
-#!/bin/bash
-
 # Setup Gemini CLI Tools & Extensions
 echo "🛠️  Setting up Gemini Command Center..."
 
-# Ensure gemini CLI is installed (locally or globally)
-if ! command -v gemini &> /dev/null; then
-    echo "📦 Installing Gemini CLI..."
-    npm install -g @google/gemini-cli
+# Load env vars
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | xargs)
 fi
+
+
+# Ensure gemini is installed locally
+if [ ! -f "node_modules/.bin/gemini" ]; then
+    echo "📦 Installing Gemini CLI locally..."
+    npm install -D @google/gemini-cli
+fi
+
+# Define alias for this script execution
+GEMINI_CMD="npx gemini"
 
 # Install Conductor (Orchestration)
 echo "conductor: Installing..."
-gemini extensions install https://github.com/gemini-cli-extensions/conductor --auto-update
+$GEMINI_CMD extensions install https://github.com/gemini-cli-extensions/conductor --auto-update
 
 # Install Security (Guardrails)
 echo "security: Installing..."
-gemini extensions install https://github.com/gemini-cli-extensions/security
+$GEMINI_CMD extensions install https://github.com/gemini-cli-extensions/security
 
 # Install Code Review (QA)
 echo "code-review: Installing..."
-gemini extensions install https://github.com/gemini-cli-extensions/code-review
+$GEMINI_CMD extensions install https://github.com/gemini-cli-extensions/code-review
 
 # Install Jules (Autonomous Coding)
 echo "jules: Installing..."
-gemini extensions install https://github.com/gemini-cli-extensions/jules
+$GEMINI_CMD extensions install https://github.com/gemini-cli-extensions/jules
 
 echo "✅ Agentic Command Center Ready."
