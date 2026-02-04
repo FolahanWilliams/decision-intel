@@ -37,6 +37,14 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),
+    preMortemResult: Annotation<{ optimisticAssumptions: string[]; failureScenarios: string[] } | null>({
+        reducer: (x, y) => y ?? x,
+        default: () => null,
+    }),
+    complianceResult: Annotation<{ status: 'PASS' | 'FLAGGED'; details: string } | null>({
+        reducer: (x, y) => y ?? x,
+        default: () => null,
+    }),
     finalReport: Annotation<AnalysisResult | null>({
         reducer: (x, y) => y ?? x,
         default: () => null,

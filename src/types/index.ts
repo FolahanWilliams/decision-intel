@@ -29,6 +29,10 @@ export interface AnalysisResult {
         details: string;
     };
     speakers?: string[];
+    preMortem?: {
+        optimisticAssumptions: string[];
+        failureScenarios: string[];
+    };
 }
 
 export interface DocumentWithAnalysis {

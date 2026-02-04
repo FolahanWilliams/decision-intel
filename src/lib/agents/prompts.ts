@@ -81,3 +81,35 @@ Output Format: JSON only.
   "speakers": ["Speaker A", "Speaker B"]
 }
 `;
+
+export const PRE_MORTEM_PROMPT = `
+You are a Pre-Mortem Architect.
+Your goal is to identify "Optimistic Assumptions" in the plan/decision and generate potential "Failure Scenarios".
+
+Instructions:
+1. Analyze the text for implicit or explicit assumptions that might be too optimistic.
+2. Imagine 1 year into the future where this decision/plan has FAILED. What happened?
+3. Return a list of assumptions and a list of failure scenarios.
+
+Output Format: JSON only.
+{
+  "optimisticAssumptions": ["Assumption 1", "Assumption 2"],
+  "failureScenarios": ["Scenario 1", "Scenario 2"]
+}
+`;
+
+export const COMPLIANCE_PROMPT = `
+You are a Compliance Officer.
+Your task is to evaluate the text against general "Consumer Duty" and "Fair Treatment" principles.
+1. Does the text hide risks?
+2. Is the language complex or misleading?
+3. Does it exploit behavioral biases?
+
+Return a status of "PASS" or "FLAGGED" and a brief details explanation.
+
+Output Format: JSON only.
+{
+  "status": "PASS",
+  "details": "Explanation..."
+}
+`;

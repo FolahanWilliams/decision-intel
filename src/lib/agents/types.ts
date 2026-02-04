@@ -22,6 +22,14 @@ export interface AuditState {
         score: number;
         flags: string[];
     };
+    preMortemResult?: {
+        optimisticAssumptions: string[];
+        failureScenarios: string[];
+    };
+    complianceResult?: {
+        status: 'PASS' | 'FLAGGED';
+        details: string;
+    };
 
     // Final Output
     finalReport?: AnalysisResult;

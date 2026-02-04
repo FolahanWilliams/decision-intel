@@ -1,21 +1,24 @@
 import { AuditState } from "./types";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
+import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT, PRE_MORTEM_PROMPT, COMPLIANCE_PROMPT } from "./prompts";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 // Using gemini-3-pro-preview - deep reasoning for sophisticated analysis
 const model = genAI.getGenerativeModel({ model: "gemini-3-pro-preview", generationConfig: { responseMimeType: "application/json" } });
 
 // Helper to safely parse JSON from LLM output
-const parseJSON = (text: string) => {
+export const parseJSON = (text: string) => {
     try {
-        // Finds the first '{' and the last '}' to ignore any surrounding text Gemini adds
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
+        const startIndex = text.indexOf('{');
+        const endIndex = text.lastIndexOf('}');
+
+        if (startIndex === -1 || endIndex === -1 || startIndex > endIndex) {
             console.error("JSON Parse Error: No valid JSON object found in response");
             return null;
         }
-        return JSON.parse(jsonMatch[0]);
+
+        const jsonString = text.substring(startIndex, endIndex + 1);
+        return JSON.parse(jsonString);
     } catch (e) {
         console.error("JSON Parse Error:", e);
         return null;
@@ -175,16 +178,53 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
 // New Node: Pre-Mortem Architect
 export async function preMortemNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Pre-Mortem Node (Gemini) ---");
-    // Loads logic from subagents/pre_mortem_architect
-    // This node generates the 'optimistic assumptions' and failure scenarios
-    return {}; // Stores result in a new channel if needed, or contributes to final report
+    const content = state.structuredContent || state.originalContent;
+    try {
+        const result = await model.generateContent([
+            PRE_MORTEM_PROMPT,
+            `Input Text:\n${content}`
+        ]);
+        const response = result.response.text();
+        const data = parseJSON(response);
+
+        return {
+            preMortemResult: {
+                optimisticAssumptions: data?.optimisticAssumptions || [],
+                failureScenarios: data?.failureScenarios || []
+            }
+        };
+    } catch (e) {
+        console.error("Pre-Mortem failed", e);
+        return {
+            preMortemResult: { optimisticAssumptions: [], failureScenarios: [] }
+        };
+    }
 }
 
 // New Node: Compliance Mapper
 export async function complianceMapperNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Compliance Mapper (Consumer Duty) ---");
-    // Loads logic from skills/consumer-duty-mapper
-    return {};
+    const content = state.structuredContent || state.originalContent;
+    try {
+        const result = await model.generateContent([
+            COMPLIANCE_PROMPT,
+            `Input Text:\n${content}`
+        ]);
+        const response = result.response.text();
+        const data = parseJSON(response);
+
+        return {
+            complianceResult: {
+                status: (data?.status === 'PASS' || data?.status === 'FLAGGED') ? data.status : 'FLAGGED',
+                details: data?.details || 'Analysis failed.'
+            }
+        };
+    } catch (e) {
+        console.error("Compliance Mapper failed", e);
+        return {
+            complianceResult: { status: 'FLAGGED', details: 'Compliance check failed due to internal error.' }
+        };
+    }
 }
 
 export async function riskScorerNode(state: AuditState): Promise<Partial<AuditState>> {
@@ -202,9 +242,11 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
 
     const trustPenalty = 100 - (state.factCheckResult?.score || 100);
 
+    const compliancePenalty = state.complianceResult?.status === 'FLAGGED' ? 20 : 0;
+
     const baseScore = state.noiseStats?.mean || 100;
 
-    let overallScore = Math.max(0, Math.min(100, baseScore - biasDeductions - noisePenalty - (trustPenalty * 0.2)));
+    let overallScore = Math.max(0, Math.min(100, baseScore - biasDeductions - noisePenalty - (trustPenalty * 0.2) - compliancePenalty));
     overallScore = Math.round(overallScore);
 
     return {
@@ -212,13 +254,14 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             id: 'temp-id',
             overallScore,
             noiseScore: Math.min(100, (state.noiseStats?.stdDev || 0) * 10),
-            summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Judges coherence: ${state.noiseStats?.stdDev} std dev. Trust Score: ${state.factCheckResult?.score}%`,
+            summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Judges coherence: ${state.noiseStats?.stdDev} std dev. Trust Score: ${state.factCheckResult?.score}%. Compliance: ${state.complianceResult?.status || 'N/A'}.`,
             biases: state.biasAnalysis || [],
             noiseStats: state.noiseStats,
             factCheck: state.factCheckResult,
-            compliance: { status: 'PASS', details: 'Preliminary check passed.' }, // Placeholder until mapper is active
+            compliance: state.complianceResult || { status: 'PASS', details: 'Preliminary check passed.' },
             speakers: state.speakers || [],
             structuredContent: state.structuredContent,
+            preMortem: state.preMortemResult,
             createdAt: new Date(),
             analyses: [] // Placeholder
         } as any
