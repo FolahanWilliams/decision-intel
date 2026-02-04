@@ -28,12 +28,16 @@ The state is managed via **LangGraph Annotations**. Crucially, it uses **Append/
 
 | Channel | Type | Reducer Strategy | Purpose |
 | :--- | :--- | :--- | :--- |
+| `documentId` | `string` | Overwrite | Unique identifier for the document. |
 | `originalContent` | `string` | Overwrite | Raw input text. |
 | `structuredContent` | `string` | Overwrite | Cleaned/Redacted text used by all downstream agents. |
+| `speakers` | `Array` | Overwrite | List of speakers identified in the text. |
 | `biasAnalysis` | `Array` | **Append** (`[...x, ...y]`) | Collects findings from multiple bias checks (expandable). |
 | `noiseScores` | `Array` | **Append** (`[...x, ...y]`) | Aggregates scores from the 3 parallel noise judges. |
+| `noiseStats` | `Object` | Overwrite | Statistics (mean, stdDev, variance) of the noise scores. |
 | `factCheckResult` | `Object` | Overwrite | Stores the trust score and verification flags. |
 | `finalReport` | `Object` | Overwrite | The final database-ready JSON object. |
+| `messages` | `Array` | **Append** | Stores conversation history (LangChain artifact). |
 
 ---
 
@@ -42,16 +46,20 @@ The state is managed via **LangGraph Annotations**. Crucially, it uses **Append/
 ### A. GDPR Anonymizer (`gdprAnonymizerNode`)
 *   **Goal**: Protect user privacy by stripping PII before analysis.
 *   **Logic**: Uses a specific "GDPR Anonymizer" persona to replace entities (e.g., "John Smith" -> `[PERSON_1]`).
-*   **Fallback**: If the LLM fails, it returns the `originalContent` (fail-open) to ensure analysis continues, though `structurerNode` has a second safety catch.
+*   **Output**: Updates `structuredContent` with the redacted text.
 
 ### B. Data Structurer (`structurerNode`)
 *   **Goal**: Prepare messy input for high-quality analysis.
+*   **Logic**: Inputs `originalContent` to clean and organize the text.
 *   **Output**: `structuredContent` (clean text) and `speakers` (array).
 *   **Resilience**: Contains a **Critical Fallback**:
     ```typescript
-    return { structuredContent: state.structuredContent || state.originalContent };
+    return {
+        structuredContent: state.structuredContent || state.originalContent,
+        speakers: state.speakers || []
+    };
     ```
-    This ensures that if structuring fails, we don't accidentally revert a previous redaction.
+    If the structurer fails, it defaults to the existing `structuredContent` (potentially from `gdprAnonymizer`) or `originalContent`, ensuring downstream nodes have text to process.
 
 ### C. Bias Detective (`biasDetectiveNode`)
 *   **Goal**: Identify "Neurocognitive Distortions".
@@ -90,7 +98,9 @@ The state is managed via **LangGraph Annotations**. Crucially, it uses **Append/
 ### F. Risk Scorer (`riskScorerNode`)
 *   **Goal**: Quantify the "Decision Quality".
 *   **Formula**:
-    `Score = Base(100) - BiasPenalties - (NoiseStdDev * 4) - (TrustPenalty * 0.2)`
+    `Score = Base(NoiseMean) - BiasPenalties - (NoiseStdDev * 4) - (TrustPenalty * 0.2)`
+    *   **Base Score**: Defaults to the mean of the noise scores (or 100 if undefined).
+    *   **Noise Penalty**: Standard Deviation * 4.
 *   **Output**: Returns the final `AnalysisResult` object matching the Prisma schema.
 
 ---
