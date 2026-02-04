@@ -222,7 +222,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     console.log("--- Risk Scorer Node ---");
 
     // Aggregate results including Fact Check and Compliance
-    const biasDeductions = (state.biasAnalysis || []).reduce((acc: number, b: any) => {
+    const biasDeductions = (state.biasAnalysis || []).reduce((acc: number, b) => {
         const severityScores: Record<string, number> = { low: 5, medium: 15, high: 30, critical: 50 };
         return acc + (severityScores[b.severity] || 5);
     }, 0);

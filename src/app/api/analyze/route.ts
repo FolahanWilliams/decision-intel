@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeDocument } from '@/lib/analysis/analyzer';
+import { BiasDetectionResult } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 
@@ -26,8 +27,8 @@ export async function POST(request: NextRequest) {
         if (!effectiveUserId && EXTENSION_API_KEY && apiKey === EXTENSION_API_KEY) {
             // Check if EXTENSION_API_KEY is empty or default
             if (EXTENSION_API_KEY.trim().length === 0) {
-                 console.error('Security Risk: EXTENSION_API_KEY is empty.');
-                 return NextResponse.json({ error: 'Server Configuration Error' }, { status: 500 });
+                console.error('Security Risk: EXTENSION_API_KEY is empty.');
+                return NextResponse.json({ error: 'Server Configuration Error' }, { status: 500 });
             }
             const extUserId = request.headers.get('x-extension-user-id');
             effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
             overallScore: result.overallScore,
             noiseScore: result.noiseScore,
             summary: result.summary,
-            biasesFound: result.biases.filter((b: any) => b.found).length,
+            biasesFound: result.biases.filter((b: BiasDetectionResult) => b.found).length,
             biases: result.biases
         });
 

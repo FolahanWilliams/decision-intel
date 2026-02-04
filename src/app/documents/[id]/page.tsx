@@ -395,7 +395,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                     <div className="card">
                         <div className="card-header justify-between">
                             <h3 className="flex items-center gap-sm">
-                                <Info size={16} /> "WHAT-IF" SIMULATOR (MODIFIABLE)
+                                <Info size={16} /> &quot;WHAT-IF&quot; SIMULATOR (MODIFIABLE)
                             </h3>
                             <button
                                 onClick={runSimulation}
@@ -522,7 +522,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                         <div>
                             <h4 className="text-xs text-muted mb-sm">EXCERPT</h4>
                             <blockquote style={{ padding: 'var(--spacing-md)', background: '#000', borderLeft: `4px solid ${SEVERITY_COLORS[selectedBias.severity]}`, fontSize: '12px' }}>
-                                "{selectedBias.excerpt}"
+                                &quot;{selectedBias.excerpt}&quot;
                             </blockquote>
                         </div>
                         <div>

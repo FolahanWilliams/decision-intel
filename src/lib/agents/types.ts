@@ -1,4 +1,4 @@
-import { AnalysisResult } from '@/types';
+import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
 export interface AuditState {
@@ -11,7 +11,7 @@ export interface AuditState {
     speakers?: string[];
 
     // Agent Outputs
-    biasAnalysis?: any;
+    biasAnalysis?: BiasDetectionResult[];
     noiseScores?: number[];
     noiseStats?: {
         mean: number;

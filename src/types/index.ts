@@ -25,7 +25,7 @@ export interface AnalysisResult {
         flags: string[];
     };
     compliance?: {
-        status: 'PASS' | 'FLAGGED';
+        status: 'PASS' | 'WARN' | 'FAIL';
         details: string;
     };
     speakers?: string[];

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { AnalysisResult } from '@/types';
+import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { safeStringify } from '@/lib/utils/json';
 
 export interface ProgressUpdate {
@@ -117,7 +117,7 @@ export async function simulateAnalysis(
     const finalReport = {
         ...result.finalReport,
         overallScore: result.finalReport.overallScore || 0,
-        biases: (result.finalReport.biases || []).map((b: any) => ({ ...b, found: true }))
+        biases: (result.finalReport.biases || []).map((b: BiasDetectionResult) => ({ ...b, found: true }))
     };
 
     return finalReport;
