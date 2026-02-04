@@ -58,9 +58,16 @@ export async function POST(request: NextRequest) {
                                     severity: bias.severity,
                                     excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
                                     explanation: bias.explanation || '',
-                                    suggestion: bias.suggestion
-                                }))
-                            }
+                                    suggestion: bias.suggestion,
+                                    confidence: bias.confidence || 0.0
+                                })),
+                            },
+                            // Persist new Multi-Agent Data
+                            structuredContent: result.structuredContent || '',
+                            noiseStats: result.noiseStats || undefined,
+                            factCheck: result.factCheck || undefined,
+                            compliance: result.compliance || undefined,
+                            speakers: result.speakers || []
                         }
                     });
 
