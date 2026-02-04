@@ -225,3 +225,27 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
         } as any
     };
 }
+
+// New Node logic for src/lib/agents/nodes.ts
+export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<AuditState>> {
+    console.log("--- Sentiment Analyzer Node (Gemini) ---");
+    try {
+        const content = state.structuredContent || state.originalContent;
+        const result = await model.generateContent([
+            `You are a Sentiment Analyzer. Analyze the sentiment of the text.
+            Return a JSON object with two keys:
+            - "score": A number between -1 (very negative) and 1 (very positive).
+            - "label": A string ("Positive", "Negative", or "Neutral").
+
+            Example: { "score": 0.8, "label": "Positive" }`,
+            `Text to Analyze:\n${content}`
+        ]);
+        const response = result.response.text();
+        const data = parseJSON(response);
+
+        return { sentimentAnalysis: data || { score: 0, label: 'Neutral' } };
+    } catch (e) {
+        console.error("Sentiment Analyzer failed", e);
+        return { sentimentAnalysis: { score: 0, label: 'Neutral' } };
+    }
+}

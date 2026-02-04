@@ -22,6 +22,10 @@ export interface AuditState {
         score: number;
         flags: string[];
     };
+    sentimentAnalysis?: {
+        score: number;
+        label: string;
+    };
 
     // Final Output
     finalReport?: AnalysisResult;

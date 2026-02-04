@@ -1,5 +1,5 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
-import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode } from "./nodes";
+import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode, sentimentAnalyzerNode } from "./nodes";
 import { AnalysisResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
@@ -37,6 +37,10 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),
+    sentimentAnalysis: Annotation<{ score: number; label: string } | null>({
+        reducer: (x, y) => y ?? x,
+        default: () => null,
+    }),
     finalReport: Annotation<AnalysisResult | null>({
         reducer: (x, y) => y ?? x,
         default: () => null,
@@ -56,6 +60,7 @@ const workflow = new StateGraph(GraphState)
     .addNode("factChecker", factCheckerNode)
     .addNode("preMortem", preMortemNode)
     .addNode("complianceMapper", complianceMapperNode)
+    .addNode("sentimentAnalyzer", sentimentAnalyzerNode)
     .addNode("riskScorer", riskScorerNode)
 
     .setEntryPoint("gdprAnonymizer")
@@ -66,12 +71,14 @@ const workflow = new StateGraph(GraphState)
     .addEdge("structurer", "factChecker")
     .addEdge("structurer", "preMortem")
     .addEdge("structurer", "complianceMapper")
+    .addEdge("structurer", "sentimentAnalyzer")
 
     .addEdge("biasDetective", "riskScorer")
     .addEdge("noiseJudge", "riskScorer")
     .addEdge("factChecker", "riskScorer")
     .addEdge("preMortem", "riskScorer")
     .addEdge("complianceMapper", "riskScorer")
+    .addEdge("sentimentAnalyzer", "riskScorer")
 
     .addEdge("riskScorer", END);
 
