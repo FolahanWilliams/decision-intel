@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import os from 'os';
 import { v4 as uuidv4 } from 'uuid';
 import { auth } from '@clerk/nextjs/server';
 // pdf-parse is imported dynamically below for CommonJS compatibility
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Save file to disk
-        const uploadDir = path.join(process.cwd(), 'uploads');
+        const uploadDir = path.join(os.tmpdir(), 'uploads');
         await mkdir(uploadDir, { recursive: true });
 
         const fileId = uuidv4();
