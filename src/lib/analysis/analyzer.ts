@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { AnalysisResult, BiasDetectionResult } from '@/types';
-import { safeStringify } from '@/lib/utils/json';
+import { safeJsonClone } from '@/lib/utils/json';
 
 export interface ProgressUpdate {
     type: 'bias' | 'noise' | 'summary' | 'complete';
@@ -106,7 +106,7 @@ export async function simulateAnalysis(
     }
 
     // Ensure plain serializable object (removes Map, Set, Circular refs)
-    result.finalReport = JSON.parse(safeStringify(result.finalReport));
+    result.finalReport = safeJsonClone(result.finalReport);
 
     if (!result.finalReport) {
         throw new Error("Report corrupted during normalization");

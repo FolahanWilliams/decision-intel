@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { simulateAnalysis, ProgressUpdate } from '@/lib/analysis/analyzer';
 import { formatSSE } from '@/lib/sse';
+import { safeJsonClone } from '@/lib/utils/json';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
                         data: { status: 'complete' }
                     });
 
-                    sendUpdate({ type: 'complete', progress: 100, result });
+                    sendUpdate({ type: 'complete', progress: 100, result: safeJsonClone(result) });
                     controller.close();
                 } catch (error) {
                     console.error('Stream error:', error);

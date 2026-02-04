@@ -47,7 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 3. Send to API
-            const apiKey = localStorage.getItem('EXTENSION_API_KEY');
+            const storage = await chrome.storage.local.get('EXTENSION_API_KEY');
+            const apiKey = storage.EXTENSION_API_KEY; // Managed via options page
+
             if (!apiKey) throw new Error('Extension API Key not configured. Go to Options.');
 
             const apiResponse = await fetch(API_URL, {

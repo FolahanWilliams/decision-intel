@@ -30,13 +30,13 @@ export const parseJSON = (text: string): any | null => {
                 try {
                     return JSON.parse(candidate);
                 } catch (e) {
-                    console.error("JSON Parse Error: candidate failed to parse", e);
+                    console.error("JSON Parse Error: candidate failed to parse", e, "Raw (500 chars):", text.slice(0, 500));
                     return null;
                 }
             }
         }
     }
-    console.error("JSON Parse Error: no balanced JSON found");
+    console.error("JSON Parse Error: no balanced JSON found. Raw (500 chars):", text.slice(0, 500));
     return null;
 };
 
@@ -75,4 +75,12 @@ export function safeStringify(obj: any): string {
             return JSON.stringify({ type: 'error', message: 'Non-serializable payload' });
         }
     }
+}
+
+/**
+ * Creates a deep clone of the object that is safe for JSON serialization/persistence.
+ * Handles BigInt (to string), Dates (to ISO), and Circular references.
+ */
+export function safeJsonClone<T>(obj: T): T {
+    return JSON.parse(safeStringify(obj));
 }
