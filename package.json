@@ -10,7 +10,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "jules": "node scripts/jules.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.37.1",

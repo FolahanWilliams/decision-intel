@@ -8,15 +8,22 @@ const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY;
 // Allow longer processing times for AI analysis
 export const maxDuration = 60;
 
+// Simple in-memory error tracking (per server instance)
+let jsonErrorCount = 0;
+
 export async function POST(request: NextRequest) {
     try {
         const { userId } = await auth();
+        // ... (auth logic kept same by replacing outer block, but let's be careful with replacement scope)
+        // Actually, I should use a smaller replacement scope or be very careful.
+        // Let's replace the whole try/catch block of the POST function.
+
+        // ... (auth parts)
         const apiKey = request.headers.get('x-extension-key');
         let effectiveUserId = userId;
 
         // Secure check: ensure EXTENSION_API_KEY is defined before comparing
         if (!effectiveUserId && EXTENSION_API_KEY && apiKey === EXTENSION_API_KEY) {
-            // Support unique extension users if provided, else separate 'guest'
             const extUserId = request.headers.get('x-extension-user-id');
             effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';
         }
@@ -65,7 +72,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
 
+        // Reset error count on success
         const result = await analyzeDocument(documentId);
+        jsonErrorCount = 0;
 
         return NextResponse.json({
             success: true,
@@ -79,9 +88,39 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('Analysis error:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+
+        // Self-Healing Trigger
+        if (errorMessage.includes('JSON') || errorMessage.includes('Unexpected end of JSON')) {
+            jsonErrorCount++;
+            console.warn(`⚠️ JSON Error detected. Count: ${jsonErrorCount}`);
+
+            if (jsonErrorCount >= 3) {
+                console.log("🚑 Critical Error Threshold Reached. Triggering Jules for Self-Healing...");
+                try {
+                    // Lazy load to avoid build-time issues with server-only modules if any
+                    const { jules } = await import('@/lib/jules');
+
+                    // Trigger Jules to fix the specific issue
+                    await jules.createSession(
+                        `CRITICAL: production-API is failing with '${errorMessage}'. ` +
+                        `The Bias Detective node is consistently failing to parse JSON. ` +
+                        `Refactor src/lib/agents/nodes.ts to implement chunking or more resilient parsing.`,
+                        0 // Use first connected source
+                    );
+
+                    // Reset count after triggering (to avoid spamming Jules)
+                    jsonErrorCount = 0;
+                    console.log("✅ Jules Triggered. PR expected shortly.");
+                } catch (julesError) {
+                    console.error("❌ Failed to trigger Jules:", julesError);
+                }
+            }
+        }
+
         return NextResponse.json({
             error: 'Analysis failed',
-            details: error instanceof Error ? error.message : String(error)
+            details: errorMessage
         }, { status: 500 });
     }
 }
