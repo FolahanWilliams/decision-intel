@@ -10,23 +10,39 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        // Get total documents for user
-        const totalDocuments = await prisma.document.count({
-            where: { userId }
-        });
+        // Execute independent queries in parallel
+        const [totalDocuments, documentsAnalyzed, analyses, recentDocuments] = await Promise.all([
+            // Get total documents for user
+            prisma.document.count({
+                where: { userId }
+            }),
 
-        // Get documents by status for user
-        const documentsAnalyzed = await prisma.document.count({
-            where: { userId, status: 'complete' }
-        });
+            // Get documents by status for user
+            prisma.document.count({
+                where: { userId, status: 'complete' }
+            }),
 
-        // Get all analyses with biases for user's documents
-        const analyses = await prisma.analysis.findMany({
-            where: {
-                document: { userId }
-            },
-            include: { biases: true }
-        });
+            // Get all analyses with biases for user's documents
+            prisma.analysis.findMany({
+                where: {
+                    document: { userId }
+                },
+                include: { biases: true }
+            }),
+
+            // Get recent documents for user
+            prisma.document.findMany({
+                where: { userId },
+                take: 5,
+                orderBy: { uploadedAt: 'desc' },
+                include: {
+                    analyses: {
+                        take: 1,
+                        orderBy: { createdAt: 'desc' }
+                    }
+                }
+            })
+        ]);
 
         // Calculate average scores
         const avgOverallScore = analyses.length > 0
@@ -53,19 +69,6 @@ export async function GET() {
             .sort(([, a], [, b]) => b - a)
             .slice(0, 5)
             .map(([name, count]) => ({ name, count }));
-
-        // Get recent documents for user
-        const recentDocuments = await prisma.document.findMany({
-            where: { userId },
-            take: 5,
-            orderBy: { uploadedAt: 'desc' },
-            include: {
-                analyses: {
-                    take: 1,
-                    orderBy: { createdAt: 'desc' }
-                }
-            }
-        });
 
         return NextResponse.json({
             overview: {
