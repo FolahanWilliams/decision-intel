@@ -1,5 +1,5 @@
 import { AuditState } from "./types";
-import { parseJSON } from '@/lib/utils/json';
+import { parseJSON } from '../utils/json';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
 
@@ -265,7 +265,7 @@ export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<
             - "score": A number between -1 and 1.
             - "label": "Positive" | "Negative" | "Neutral".
             Example: { "score": 0.8, "label": "Positive" }`,
-            `Text to Analyze:\n${content}`
+            `Text to Analyze:\n<input_text>\n${content}\n</input_text>`
         ]);
         const response = result.response.text();
         const data = parseJSON(response);
