@@ -32,7 +32,7 @@ export interface AuditState {
     };
     sentimentAnalysis?: {
         score: number;
-        label: string;
+        label: 'Positive' | 'Negative' | 'Neutral';
     };
 
     // Final Output

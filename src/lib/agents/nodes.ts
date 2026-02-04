@@ -312,11 +312,9 @@ export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<
     try {
         const content = state.structuredContent || state.originalContent;
         const result = await model.generateContent([
-            `You are a Sentiment Analyzer. Analyze the sentiment of the text.
-            Return a JSON object with two keys:
-            - "score": A number between -1 (very negative) and 1 (very positive).
-            - "label": A string ("Positive", "Negative", or "Neutral").
-
+            `You are a Sentiment Analyzer. ONLY return raw JSON with two keys:
+            - "score": A number between -1 and 1.
+            - "label": "Positive" | "Negative" | "Neutral".
             Example: { "score": 0.8, "label": "Positive" }`,
             `Text to Analyze:\n${content}`
         ]);
