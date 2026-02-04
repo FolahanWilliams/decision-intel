@@ -2,15 +2,17 @@ export interface BiasDetectionResult {
     biasType: string;
     found: boolean;
     severity: 'low' | 'medium' | 'high' | 'critical';
-    excerpt: string; // Changed from excerpts[] to single string
+    excerpt: string;
     explanation: string;
     suggestion: string;
+    confidence?: number;
 }
 
 export interface AnalysisResult {
     overallScore: number;
     noiseScore: number;
     summary: string;
+    structuredContent?: string;
     biases: BiasDetectionResult[];
     // New Fields for Multi-Agent Output
     noiseStats?: {

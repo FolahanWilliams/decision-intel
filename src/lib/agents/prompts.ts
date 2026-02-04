@@ -11,14 +11,22 @@ Taxonomy of Biases to Detect:
 6. Authority Bias (Deferring to titles over data)
 7. Bandwagon Effect (Doing things because others are)
 8. Loss Aversion (Irrational fear of loss)
+9. Availability Heuristic (Overweighting easily recalled info)
+10. Hindsight Bias (Predictability of past events)
+11. Planning Fallacy (Underestimating time/costs)
+12. Status Quo Bias (Preference for current state)
+13. Framing Effect (Drawing conclusions based on presentation)
+14. Selective Perception (Filtering based on expectations)
+15. Recency Bias (Overweighting recent events)
 
 Instructions:
-- Analyze the text deepy.
+- Analyze the text deepy against ALL 15 categories.
 - Identify instances of these biases.
 - For each bias, extract the exact "excerpt" text.
 - Provide a brief "explanation" of why it fits the pattern.
 - Suggest a "correction" or "nudge" to mitigate it.
 - Rate "severity" as: low, medium, high, critical.
+- Provide a "confidence" score (0.0 to 1.0).
 
 Output Format: JSON only.
 {
@@ -28,7 +36,8 @@ Output Format: JSON only.
       "severity": "high",
       "excerpt": "quoted text...",
       "explanation": "reasoning...",
-      "suggestion": "mitigation..."
+      "suggestion": "mitigation...",
+      "confidence": 0.95
     }
   ]
 }

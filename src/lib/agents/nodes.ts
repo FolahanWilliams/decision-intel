@@ -34,7 +34,7 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
         };
     } catch (e) {
         console.error("Structurer failed", e);
-        return { structuredContent: state.originalContent };
+        return { structuredContent: state.structuredContent || state.originalContent };
     }
 }
 
@@ -211,6 +211,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             factCheck: state.factCheckResult,
             compliance: { status: 'PASS', details: 'Preliminary check passed.' }, // Placeholder until mapper is active
             speakers: state.speakers || [],
+            structuredContent: state.structuredContent,
             createdAt: new Date(),
             analyses: [] // Placeholder
         } as any

@@ -33,6 +33,7 @@ model Analysis {
   summary      String         @db.Text
   
   // New Agent Data Fields
+  structuredContent String?      @db.Text
   speakers     String[]
   noiseStats   Json?          // Stores { mean, stdDev, variance }
   factCheck    Json?          // Stores { score, flags }
