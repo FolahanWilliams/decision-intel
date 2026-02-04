@@ -33,7 +33,7 @@ jobs:
         id: build
 
       - name: Jules Self-Healing
-        if: steps.build.outcome == 'failure'
+        if: steps.build.outcome == 'failure' && secrets.JULES_API_KEY != ''
         env:
           JULES_API_KEY: ${{ secrets.JULES_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { AnalysisResult } from '@/types';
+import { safeStringify } from '@/lib/sse';
 
 export interface ProgressUpdate {
     type: 'bias' | 'noise' | 'summary' | 'complete';
@@ -103,6 +104,9 @@ export async function simulateAnalysis(
     if (!result.finalReport) {
         throw new Error("Audit Pipeline failed to generate a report");
     }
+
+    // Ensure plain serializable object (removes Map, Set, Circular refs)
+    result.finalReport = JSON.parse(safeStringify(result.finalReport));
 
     // Adapt to UI expected structure
     // Ensure all biased findings are marked as "found"

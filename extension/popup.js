@@ -47,11 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 3. Send to API
+            const apiKey = localStorage.getItem('EXTENSION_API_KEY');
+            if (!apiKey) throw new Error('Extension API Key not configured. Go to Options.');
+
             const apiResponse = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-extension-key': 'sk_ext_decision_intel_2024'
+                    'x-extension-key': apiKey
                 },
                 body: JSON.stringify({
                     text: contentData.text,

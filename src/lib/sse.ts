@@ -13,15 +13,43 @@
  * @param data The payload to send
  * @returns String format: "data: <json>\n\n"
  */
-export function formatSSE(data: any): string {
+/**
+ * Handles safe JSON serialization with circular reference support.
+ */
+export function safeStringify(obj: any): string {
+    const getCircularReplacer = () => {
+        const seen = new WeakSet();
+        return (_key: any, value: any) => {
+            if (typeof value === "object" && value !== null) {
+                if (seen.has(value)) {
+                    return "[Circular]";
+                }
+                seen.add(value);
+            }
+            return value;
+        };
+    };
+
     try {
-        const json = JSON.stringify(data);
-        return `data: ${json}\n\n`;
+        return JSON.stringify(obj);
     } catch (e) {
-        console.error("SSE Serialization Error:", e);
-        // Fallback error message
-        return `data: {"type":"error", "message":"Serialization Failed"}\n\n`;
+        try {
+            return JSON.stringify(obj, getCircularReplacer());
+        } catch (e2) {
+            return JSON.stringify({ type: 'error', message: 'Non-serializable payload' });
+        }
     }
+}
+
+/**
+ * Formats a data object into a valid SSE string chunk.
+ * Handles JSON serialization safely.
+ * @param data The payload to send
+ * @returns String format: "data: <json>\n\n"
+ */
+export function formatSSE(data: any): string {
+    const json = safeStringify(data);
+    return `data: ${json}\n\n`;
 }
 
 // ----------------------------------------------------------------------
