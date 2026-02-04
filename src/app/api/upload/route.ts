@@ -5,7 +5,7 @@ import path from 'path';
 import os from 'os';
 import { v4 as uuidv4 } from 'uuid';
 import { auth } from '@clerk/nextjs/server';
-// pdf-parse is imported dynamically below for CommonJS compatibility
+import { parseFile } from '@/lib/utils/file-parser';
 
 export async function POST(request: NextRequest) {
     try {
@@ -33,14 +33,13 @@ export async function POST(request: NextRequest) {
             'application/pdf',
             'text/plain',
             'text/markdown',
-            'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         ];
 
         const isTextFile = file.name.endsWith('.txt') || file.name.endsWith('.md');
         if (!allowedTypes.includes(file.type) && !isTextFile) {
             return NextResponse.json(
-                { error: 'Invalid file type. Supported: PDF, TXT, MD, DOC, DOCX' },
+                { error: 'Invalid file type. Supported: PDF, TXT, MD, DOCX' },
                 { status: 400 }
             );
         }
@@ -49,25 +48,17 @@ export async function POST(request: NextRequest) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        // Extract text content based on file type
+        // Extract text content
         let content = '';
 
-        if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-            try {
-                // eslint-disable-next-line @typescript-eslint/no-require-imports
-                const pdfParse = require('pdf-parse');
-                const pdfData = await pdfParse(buffer);
-                content = pdfData.text;
-            } catch (error) {
-                console.error('PDF Parse Error:', error);
-                return NextResponse.json({
-                    error: 'Failed to parse PDF',
-                    details: error instanceof Error ? error.message : String(error)
-                }, { status: 400 });
-            }
-        } else {
-            // Plain text files
-            content = buffer.toString('utf-8');
+        try {
+            content = await parseFile(buffer, file.type, file.name);
+        } catch (error) {
+            console.error('File Parse Error:', error);
+            return NextResponse.json({
+                error: 'Failed to parse file',
+                details: error instanceof Error ? error.message : String(error)
+            }, { status: 400 });
         }
 
         if (!content.trim()) {
