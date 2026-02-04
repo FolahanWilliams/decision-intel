@@ -45,37 +45,36 @@ export async function POST(request: NextRequest) {
                         sendUpdate(update);
                     });
 
-                    // Store analysis
+                    // Store analysis and update document status
                     const foundBiases = result.biases.filter(b => b.found);
-                    await prisma.analysis.create({
-                        data: {
-                            documentId,
-                            overallScore: result.overallScore,
-                            noiseScore: result.noiseScore,
-                            summary: result.summary,
-                            biases: {
-                                create: foundBiases.map(bias => ({
-                                    biasType: bias.biasType,
-                                    severity: bias.severity,
-                                    excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                                    explanation: bias.explanation || '',
-                                    suggestion: bias.suggestion,
-                                    confidence: bias.confidence || 0.0
-                                })),
-                            },
-                            // Persist new Multi-Agent Data
-                            structuredContent: result.structuredContent || '',
-                            noiseStats: result.noiseStats || undefined,
-                            factCheck: result.factCheck || undefined,
-                            compliance: result.compliance || undefined,
-                            speakers: result.speakers || []
-                        }
-                    });
-
-                    // Update document status
                     await prisma.document.update({
                         where: { id: documentId },
-                        data: { status: 'complete' }
+                        data: {
+                            status: 'complete',
+                            analyses: {
+                                create: {
+                                    overallScore: result.overallScore,
+                                    noiseScore: result.noiseScore,
+                                    summary: result.summary,
+                                    biases: {
+                                        create: foundBiases.map(bias => ({
+                                            biasType: bias.biasType,
+                                            severity: bias.severity,
+                                            excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                                            explanation: bias.explanation || '',
+                                            suggestion: bias.suggestion,
+                                            confidence: bias.confidence || 0.0
+                                        })),
+                                    },
+                                    // Persist new Multi-Agent Data
+                                    structuredContent: result.structuredContent || '',
+                                    noiseStats: result.noiseStats || undefined,
+                                    factCheck: result.factCheck || undefined,
+                                    compliance: result.compliance || undefined,
+                                    speakers: result.speakers || []
+                                }
+                            }
+                        }
                     });
 
                     sendUpdate({ type: 'complete', progress: 100, result: safeJsonClone(result) });
