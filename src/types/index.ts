@@ -28,6 +28,14 @@ export interface AnalysisResult {
         status: 'PASS' | 'WARN' | 'FAIL';
         details: string;
     };
+    preMortem?: {
+        failureScenarios: string[];
+        preventiveMeasures: string[];
+    };
+    sentiment?: {
+        score: number;
+        label: string;
+    };
     speakers?: string[];
 }
 

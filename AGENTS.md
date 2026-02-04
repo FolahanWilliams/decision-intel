@@ -15,8 +15,9 @@ The system uses a directed cyclic graph (DAG) where a single input document move
     *   `biasDetective`: Scans for 15 specific cognitive biases.
     *   `noiseJudge`: Instantiates 3 independent "Judges" to rate decision quality (measuring variance).
     *   `factChecker`: Cross-references claims with real-time financial data (FMP).
-    *   `preMortem`: (Placeholder) Generates failure scenarios.
-    *   `complianceMapper`: (Placeholder) Checks regulatory alignment.
+    *   `preMortem`: Generates failure scenarios and preventive measures.
+    *   `complianceMapper`: Checks regulatory alignment (Consumer Duty).
+    *   `sentimentAnalyzer`: Analyzes emotional tone and sentiment.
 4.  **Synthesis**:
     *   `riskScorer`: Aggregates all data into a final `overallScore` and JSON report.
 
@@ -36,6 +37,9 @@ The state is managed via **LangGraph Annotations**. Crucially, it uses **Append/
 | `noiseScores` | `Array` | **Append** (`[...x, ...y]`) | Aggregates scores from the 3 parallel noise judges. |
 | `noiseStats` | `Object` | Overwrite | Statistics (mean, stdDev, variance) of the noise scores. |
 | `factCheckResult` | `Object` | Overwrite | Stores the trust score and verification flags. |
+| `preMortem` | `Object` | Overwrite | Failure scenarios and preventive measures. |
+| `compliance` | `Object` | Overwrite | Compliance status and details. |
+| `sentimentAnalysis` | `Object` | Overwrite | Sentiment score and label. |
 | `finalReport` | `Object` | Overwrite | The final database-ready JSON object. |
 | `messages` | `Array` | **Append** | Stores conversation history (LangChain artifact). |
 
@@ -95,7 +99,21 @@ The state is managed via **LangGraph Annotations**. Crucially, it uses **Append/
     2.  Fetch Market Data.
     3.  Verify text claims against that data.
 
-### F. Risk Scorer (`riskScorerNode`)
+### F. Pre-Mortem Architect (`preMortemNode`)
+*   **Goal**: Anticipate failure modes.
+*   **Logic**: Simulates a future failure of the decision.
+*   **Output**: List of failure scenarios and preventive measures.
+
+### G. Compliance Mapper (`complianceMapperNode`)
+*   **Goal**: Ensure regulatory alignment (Consumer Duty).
+*   **Logic**: Checks for unclear info, foreseeable harm, and poor value.
+*   **Output**: Compliance status (PASS/WARN/FAIL) and details.
+
+### H. Sentiment Analyzer (`sentimentAnalyzerNode`)
+*   **Goal**: Analyze emotional tone.
+*   **Output**: Score (-1 to 1) and Label (Positive/Negative/Neutral).
+
+### I. Risk Scorer (`riskScorerNode`)
 *   **Goal**: Quantify the "Decision Quality".
 *   **Formula**:
     `Score = Base(NoiseMean) - BiasPenalties - (NoiseStdDev * 4) - (TrustPenalty * 0.2)`

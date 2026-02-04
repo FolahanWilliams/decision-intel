@@ -38,6 +38,8 @@ model Analysis {
   noiseStats   Json?          // Stores { mean, stdDev, variance }
   factCheck    Json?          // Stores { score, flags }
   compliance   Json?          // Stores { status, details }
+  preMortem    Json?          // Stores { failureScenarios, preventiveMeasures }
+  sentiment    Json?          // Stores { score, label }
   
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
