@@ -60,5 +60,7 @@ model BiasInstance {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([analysisId])
 }
 
