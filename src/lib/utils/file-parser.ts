@@ -1,5 +1,5 @@
 import mammoth from 'mammoth';
-import pdfParse from 'pdf-parse';
+import { PDFParse } from 'pdf-parse';
 
 /**
  * Parses the content of a file buffer based on its MIME type or filename extension.
@@ -14,7 +14,8 @@ export async function parseFile(buffer: Buffer, mimeType: string, filename: stri
 
     if (isPdf) {
         try {
-            const data = await pdfParse(buffer);
+            const parser = new PDFParse({ data: buffer });
+            const data = await parser.getText();
             return data.text;
         } catch (error) {
             throw new Error(`Failed to parse PDF: ${error instanceof Error ? error.message : String(error)}`);
