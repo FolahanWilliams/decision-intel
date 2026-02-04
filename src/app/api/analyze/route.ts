@@ -5,13 +5,17 @@ import { prisma } from '@/lib/prisma';
 
 const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY;
 
+// Allow longer processing times for AI analysis
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
     try {
         const { userId } = await auth();
         const apiKey = request.headers.get('x-extension-key');
         let effectiveUserId = userId;
 
-        if (!effectiveUserId && apiKey === EXTENSION_API_KEY) {
+        // Secure check: ensure EXTENSION_API_KEY is defined before comparing
+        if (!effectiveUserId && EXTENSION_API_KEY && apiKey === EXTENSION_API_KEY) {
             // Support unique extension users if provided, else separate 'guest'
             const extUserId = request.headers.get('x-extension-user-id');
             effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';

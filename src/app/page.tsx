@@ -54,27 +54,56 @@ export default function Home() {
         ...prev
       ]);
 
-      // Trigger analysis
-      const analyzeRes = await fetch('/api/analyze', {
+      // Use streaming endpoint to prevent timeout
+      const analyzeRes = await fetch('/api/analyze/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: uploadData.id }),
       });
 
       if (!analyzeRes.ok) {
-        throw new Error('Analysis failed');
+        const errorData = await analyzeRes.json().catch(() => ({ error: 'Analysis failed' }));
+        throw new Error(errorData.error || 'Analysis failed');
       }
 
-      const analyzeData = await analyzeRes.json();
+      // Read the stream for progress updates
+      const reader = analyzeRes.body?.getReader();
+      const decoder = new TextDecoder();
+      let finalResult = null;
 
-      // Update status
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n').filter(line => line.trim());
+
+          for (const line of lines) {
+            try {
+              const data = JSON.parse(line);
+              if (data.type === 'complete' && data.result) {
+                finalResult = data.result;
+              }
+            } catch {
+              // Skip malformed JSON chunks
+            }
+          }
+        }
+      }
+
+      // Update status with final result
       setUploadedDocs(prev => prev.map(doc =>
         doc.id === uploadData.id
-          ? { ...doc, status: 'complete', score: analyzeData.overallScore }
+          ? { ...doc, status: 'complete', score: finalResult?.overallScore }
           : doc
       ));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
+      // Mark as error in list
+      setUploadedDocs(prev => prev.map(doc =>
+        doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc
+      ));
     } finally {
       setUploading(false);
     }
