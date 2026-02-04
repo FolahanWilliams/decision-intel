@@ -2,10 +2,8 @@ export interface BiasDetectionResult {
     biasType: string;
     found: boolean;
     severity: 'low' | 'medium' | 'high' | 'critical';
-    excerpts: Array<{
-        text: string;
-        explanation: string;
-    }>;
+    excerpt: string; // Changed from excerpts[] to single string
+    explanation: string;
     suggestion: string;
 }
 
@@ -14,6 +12,20 @@ export interface AnalysisResult {
     noiseScore: number;
     summary: string;
     biases: BiasDetectionResult[];
+    // New Fields for Multi-Agent Output
+    noiseStats?: {
+        mean: number;
+        stdDev: number;
+        variance: number;
+    };
+    factCheck?: {
+        score: number;
+        flags: string[];
+    };
+    compliance?: {
+        status: 'PASS' | 'FLAGGED';
+        details: string;
+    };
 }
 
 export interface DocumentWithAnalysis {

@@ -3,7 +3,7 @@ import { analyzeDocument } from '@/lib/analysis/analyzer';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 
-const EXTENSION_API_KEY = 'sk_ext_decision_intel_2024';
+const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY;
 
 export async function POST(request: NextRequest) {
     try {

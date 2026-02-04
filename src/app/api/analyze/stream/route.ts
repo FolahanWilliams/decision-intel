@@ -54,8 +54,8 @@ export async function POST(request: NextRequest) {
                                 create: foundBiases.map(bias => ({
                                     biasType: bias.biasType,
                                     severity: bias.severity,
-                                    excerpt: bias.excerpts[0]?.text || '',
-                                    explanation: bias.excerpts[0]?.explanation || '',
+                                    excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                                    explanation: bias.explanation || '',
                                     suggestion: bias.suggestion
                                 }))
                             }

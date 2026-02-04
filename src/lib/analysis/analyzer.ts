@@ -1,8 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { detectBias, detectNoise, generateSummary } from '@/lib/ai/bias-engine';
-import { BiasCategory, AnalysisResult, BIAS_CATEGORIES } from '@/types';
-
-const ALL_BIASES: BiasCategory[] = Object.keys(BIAS_CATEGORIES) as BiasCategory[];
+import { AnalysisResult } from '@/types';
 
 export interface ProgressUpdate {
     type: 'bias' | 'noise' | 'summary' | 'complete';
@@ -47,9 +44,9 @@ export async function analyzeDocument(
                     create: foundBiases.map(bias => ({
                         biasType: bias.biasType,
                         severity: bias.severity,
-                        excerpt: bias.excerpts[0]?.text || '',
-                        explanation: bias.excerpts[0]?.explanation || '',
-                        suggestion: bias.suggestion
+                        excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                        explanation: bias.explanation || '',
+                        suggestion: bias.suggestion || ''
                     }))
                 }
             }
@@ -76,72 +73,38 @@ export async function analyzeDocument(
     }
 }
 
+// New Multi-Agent Analysis Implementation
 export async function simulateAnalysis(
     content: string,
     onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
 
-    const totalSteps = ALL_BIASES.length + 2; // +1 for noise, +1 for summary
-    let currentStep = 0;
+    // Lazy load graph to avoid circular deps or init issues
+    const { auditGraph } = await import('@/lib/agents/graph');
 
-    // Run bias detection for all bias types in parallel for maximum speed
-    const biasResults = await Promise.all(
-        ALL_BIASES.map(async biasType => {
-            const res = await detectBias(content, biasType);
-            currentStep++;
-            if (onProgress) {
-                onProgress({
-                    type: 'bias',
-                    biasType,
-                    result: res,
-                    progress: Math.round((currentStep / totalSteps) * 100)
-                });
-            }
-            return res;
-        })
-    );
+    // Run the Graph
+    // In a real app we might stream events from the graph here
+    if (onProgress) onProgress({ type: 'bias', progress: 10 });
 
-    // Detect noise
-    const noiseResult = await detectNoise(content);
-    currentStep++;
-    if (onProgress) {
-        onProgress({
-            type: 'noise',
-            result: noiseResult,
-            progress: Math.round((currentStep / totalSteps) * 100)
-        });
+    const result = await auditGraph.invoke({
+        originalContent: content,
+        documentId: "temp",
+    });
+
+    if (onProgress) onProgress({ type: 'summary', progress: 90 });
+
+    if (!result.finalReport) {
+        throw new Error("Audit Pipeline failed to generate a report");
     }
 
-    // Calculate overall score
-    const foundBiases = biasResults.filter(b => b.found);
-    const severityScores: Record<string, number> = {
-        low: 5,
-        medium: 15,
-        high: 30,
-        critical: 50
+    // Adapt to UI expected structure
+    // Ensure all biased findings are marked as "found"
+    const finalReport = {
+        ...result.finalReport,
+        biases: (result.finalReport.biases || []).map(b => ({ ...b, found: true }))
     };
 
-    const biasDeductions = foundBiases.reduce((sum, b) => sum + severityScores[b.severity], 0);
-    const noiseDeduction = noiseResult.score * 0.3;
-    const overallScore = Math.max(0, 100 - biasDeductions - noiseDeduction);
-
-    // Generate summary
-    const summary = await generateSummary(content, biasResults, noiseResult.score);
-    currentStep++;
-    if (onProgress) {
-        onProgress({
-            type: 'summary',
-            result: summary,
-            progress: 100
-        });
-    }
-
-    return {
-        overallScore,
-        noiseScore: noiseResult.score,
-        summary,
-        biases: biasResults
-    };
+    return finalReport;
 }
 
 export function calculateRiskLevel(score: number): 'low' | 'medium' | 'high' | 'critical' {

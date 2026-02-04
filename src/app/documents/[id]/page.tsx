@@ -26,6 +26,10 @@ interface Analysis {
     summary: string;
     createdAt: string;
     biases: BiasInstance[];
+    // Extended fields
+    noiseStats?: { mean: number; stdDev: number; variance: number };
+    factCheck?: { score: number; flags: string[] };
+    compliance?: { status: 'PASS' | 'FLAGGED'; details: string };
 }
 
 interface Document {
@@ -277,55 +281,65 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
 
             {/* Analysis Summary */}
             {analysis && (
-                <div className="grid grid-3 mb-xl">
+                <div className="grid grid-2 lg:grid-4 mb-xl gap-md">
+                    {/* 1. Decision Quality */}
                     <div className="card animate-fade-in">
-                        <div className="card-body" style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--spacing-sm)' }}>
-                                Decision Quality Score
-                            </div>
+                        <div className="card-body text-center p-md">
+                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Decision Quality</div>
                             <div style={{
-                                fontSize: '3.5rem',
-                                fontWeight: 700,
+                                fontSize: '2.5rem', fontWeight: 800,
                                 color: analysis.overallScore >= 70 ? 'var(--success)' :
-                                    analysis.overallScore >= 40 ? 'var(--warning)' :
-                                        'var(--error)'
+                                    analysis.overallScore >= 40 ? 'var(--warning)' : 'var(--error)'
                             }}>
                                 {Math.round(analysis.overallScore)}
                             </div>
-                            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>out of 100</div>
+                            <div className="text-xs text-muted">out of 100</div>
                         </div>
                     </div>
 
+                    {/* 2. Noise & Variance */}
                     <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                        <div className="card-body" style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--spacing-sm)' }}>
-                                Noise Score
-                            </div>
+                        <div className="card-body text-center p-md">
+                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Noise Risk</div>
                             <div style={{
-                                fontSize: '3.5rem',
-                                fontWeight: 700,
+                                fontSize: '2.5rem', fontWeight: 800,
                                 color: analysis.noiseScore <= 30 ? 'var(--success)' :
                                     analysis.noiseScore <= 60 ? 'var(--warning)' : 'var(--error)'
                             }}>
-                                {Math.round(analysis.noiseScore)}
+                                {Math.round(analysis.noiseScore)}%
                             </div>
-                            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>lower is better</div>
+                            <div className="text-xs text-muted">
+                                {analysis.noiseStats ? `σ=${analysis.noiseStats.stdDev} (3 Judges)` : 'Unknown Variance'}
+                            </div>
                         </div>
                     </div>
 
+                    {/* 3. Logical Fact Check */}
                     <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                        <div className="card-body" style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 'var(--spacing-sm)' }}>
-                                Biases Detected
-                            </div>
+                        <div className="card-body text-center p-md">
+                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Truth Score</div>
                             <div style={{
-                                fontSize: '3.5rem',
-                                fontWeight: 700,
-                                color: 'var(--accent-primary)'
+                                fontSize: '2.5rem', fontWeight: 800,
+                                color: (analysis.factCheck?.score || 0) >= 80 ? 'var(--success)' : 'var(--warning)'
                             }}>
-                                {biases.length}
+                                {analysis.factCheck ? Math.round(analysis.factCheck.score) : '--'}%
                             </div>
-                            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>cognitive biases</div>
+                            <div className="text-xs text-muted">
+                                {analysis.factCheck?.flags.length || 0} Flags Detected
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 4. Bias & Compliance */}
+                    <div className="card animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                        <div className="card-body text-center p-md">
+                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Compliance</div>
+                            <div className={`badge ${analysis.compliance?.status === 'FLAGGED' ? 'badge-critical' : 'badge-success'}`} style={{ fontSize: '1.25rem', margin: '0.5rem 0' }}>
+                                {analysis.compliance?.status || 'PENDING'}
+                            </div>
+                            <div className="text-xs text-muted">
+                                {biases.length} Biases Detected
+                            </div>
                         </div>
                     </div>
                 </div>

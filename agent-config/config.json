@@ -1,0 +1,6 @@
+{
+  "name": "DecisionAuditPlatform",
+  "description": "A Multi-Agent decision auditing platform that detects bias and noise in company documents. It orchestrates specialized agents to structure data, perform independent noise audits, detect psycholinguistic bias markers, and fact-check claims against external evidence.",
+  "visibility_scope": "user",
+  "triggers_paused": false
+}

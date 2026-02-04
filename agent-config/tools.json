@@ -1,0 +1,44 @@
+{
+  "tools": [
+    {
+      "name": "google_docs_read_document",
+      "mcp_server_url": "https://eu.tools.langchain.com",
+      "mcp_server_name": "Agent Builder",
+      "display_name": "google_docs_read_document"
+    },
+    {
+      "name": "gmail_read_emails",
+      "mcp_server_url": "https://eu.tools.langchain.com",
+      "mcp_server_name": "Agent Builder",
+      "display_name": "gmail_read_emails"
+    },
+    {
+      "name": "read_url_content",
+      "mcp_server_url": "https://eu.tools.langchain.com",
+      "mcp_server_name": "Agent Builder",
+      "display_name": "read_url_content"
+    },
+    {
+      "name": "github_create_issue",
+      "mcp_server_url": "https://eu.tools.langchain.com",
+      "mcp_server_name": "Agent Builder",
+      "display_name": "github_create_issue"
+    },
+    {
+      "name": "github_list_pull_requests",
+      "mcp_server_url": "https://eu.tools.langchain.com",
+      "mcp_server_name": "Agent Builder",
+      "display_name": "github_list_pull_requests"
+    },
+    {
+      "name": "github_get_pull_request",
+      "mcp_server_url": "https://eu.tools.langchain.com",
+      "mcp_server_name": "Agent Builder",
+      "display_name": "github_get_pull_request"
+    }
+  ],
+  "interrupt_config": {
+    "https://eu.tools.langchain.com::google_docs_read_document::Agent Builder": false,
+    "https://eu.tools.langchain.com::gmail_read_emails::Agent Builder": false
+  }
+}

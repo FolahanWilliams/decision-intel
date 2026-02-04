@@ -1,0 +1,13 @@
+{
+  "tools": [
+    {
+      "name": "tavily_web_search",
+      "mcp_server_url": "https://eu.tools.langchain.com",
+      "mcp_server_name": "Agent Builder",
+      "display_name": "tavily_web_search"
+    }
+  ],
+  "interrupt_config": {
+    "https://eu.tools.langchain.com::tavily_web_search::Agent Builder": false
+  }
+}
