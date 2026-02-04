@@ -24,16 +24,18 @@ const parseJSON = (text: string) => {
 
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Structurer Node (Gemini) ---");
+    const inputContent = state.structuredContent || state.originalContent;
+
     try {
         const result = await model.generateContent([
             STRUCTURER_PROMPT,
-            `Input Text:\n${state.originalContent}`
+            `Input Text:\n${inputContent}`
         ]);
         const response = result.response.text();
         const data = parseJSON(response);
 
         return {
-            structuredContent: data?.structuredContent || state.originalContent,
+            structuredContent: data?.structuredContent || inputContent,
             speakers: data?.speakers || []
         };
     } catch (e) {
