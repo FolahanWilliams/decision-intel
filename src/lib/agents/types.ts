@@ -22,6 +22,18 @@ export interface AuditState {
         score: number;
         flags: string[];
     };
+    preMortem?: {
+        failureScenarios: string[];
+        preventiveMeasures: string[];
+    };
+    compliance?: {
+        status: "PASS" | "WARN" | "FAIL";
+        details: string;
+    };
+    sentimentAnalysis?: {
+        score: number;
+        label: string;
+    };
 
     // Final Output
     finalReport?: AnalysisResult;
