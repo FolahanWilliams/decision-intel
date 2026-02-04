@@ -26,6 +26,8 @@ jobs:
         run: npm ci
         
       - name: Verify Builds
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'pk_test_Y2xlcmsuaW5jbHVkZWQuY29tJA' }}
         run: npm run build
         continue-on-error: true # Let Jules fix it if it fails
         id: build
