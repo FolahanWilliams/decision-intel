@@ -22,7 +22,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const body = await request.json();
+        // Safety check for malformed or missing request body
+        let body;
+        try {
+            body = await request.json();
+        } catch (parseError) {
+            console.error('Request body parse error:', parseError);
+            return NextResponse.json({ error: 'Invalid or missing request body' }, { status: 400 });
+        }
+
         let documentId = body.documentId;
 
         // Handle direct text analysis (from extension)
