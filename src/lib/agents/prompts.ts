@@ -37,7 +37,8 @@ Output Format: JSON only.
       "excerpt": "quoted text...",
       "explanation": "reasoning...",
       "suggestion": "mitigation...",
-      "confidence": 0.95
+      "confidence": 0.95,
+      "found": true
     }
   ]
 }

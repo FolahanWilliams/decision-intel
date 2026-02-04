@@ -52,9 +52,9 @@ export async function analyzeDocument(
                 },
                 // Persist new Multi-Agent Data
                 structuredContent: result.structuredContent || '',
-                noiseStats: result.noiseStats ? JSON.parse(JSON.stringify(result.noiseStats)) : undefined,
-                factCheck: result.factCheck ? JSON.parse(JSON.stringify(result.factCheck)) : undefined,
-                compliance: result.compliance ? JSON.parse(JSON.stringify(result.compliance)) : undefined,
+                noiseStats: result.noiseStats || undefined,
+                factCheck: result.factCheck || undefined,
+                compliance: result.compliance || undefined,
                 speakers: result.speakers || []
             }
         });
