@@ -115,3 +115,17 @@ The `analyzer.ts` layer ensures strict mapping of:
 *   `speakers` -> Postgres Array
 *   `noiseStats` -> JSON
 *   `structuredContent` -> Text (for audit trails)
+
+## 5. Delegation Hooks
+
+This section defines protocols for **Autonomous Agents (Jules/Gemini)** when modifying this system.
+
+### Safe Refactoring Protocol
+When refactoring nodes in `src/lib/agents/nodes.ts`:
+1.  **Immutable State**: Do NOT remove existing keys from `AuditState` or return objects that violate the interface.
+2.  **Input Preservation**: If a node fails, it MUST return at least the input state keys to prevent graph disconnects.
+3.  **JSON Safety**: All new LLM calls MUST use the `parseJSON` helper.
+
+### Recovery Hooks
+*   **Graph Failure**: If the graph halts, agents should check `channels` with `undefined` values.
+*   **Schema Drift**: If `AnalysisResult` type changes, you MUST update `prisma/schema.prisma` and run `npx prisma migrate dev`.

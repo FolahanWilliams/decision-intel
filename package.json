@@ -11,7 +11,11 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "postinstall": "prisma generate",
-    "jules": "node scripts/jules.js"
+    "jules": "node scripts/jules.js",
+    "jules:test": "node scripts/jules.js \"Write comprehensive Jest unit tests for src/lib/agents/nodes.ts covering all edge cases\"",
+    "jules:docs": "node scripts/jules.js \"Read all files in src/lib/agents and update AGENTS.md to match the current logic and architecture\"",
+    "jules:audit": "node scripts/jules.js \"Audit the entire codebase for security vulnerabilities, hardcoded secrets, and GDPR compliance gaps\"",
+    "gemini": "gemini"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.37.1",
@@ -33,6 +37,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@google/gemini-cli": "^0.27.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pdf-parse": "^1.1.5",

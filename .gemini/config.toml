@@ -1,0 +1,6 @@
+# Gemini CLI Configuration
+default_model = "gemini-1.5-pro-002"
+
+[experimental]
+# Enable advanced reasoning for cli tasks
+reasoning = true

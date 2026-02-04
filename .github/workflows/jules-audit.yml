@@ -1,0 +1,42 @@
+name: Jules Autonomous Audit
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Allow commenting/PR creation
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Verify Builds
+        run: npm run build
+        continue-on-error: true # Let Jules fix it if it fails
+        id: build
+
+      - name: Jules Self-Healing
+        if: steps.build.outcome == 'failure'
+        env:
+          JULES_API_KEY: ${{ secrets.JULES_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: |
+          echo "Build failed! Triggering Jules..."
+          # In a real action, we would capture the build log
+          # For now, we trigger a generic fix request
+          npm run jules -- "The build failed in CI/CD. Run 'npm run build' to reproduce the error, analyze the logs, and fix the codebase."
