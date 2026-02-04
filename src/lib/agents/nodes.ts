@@ -18,18 +18,59 @@ const model = genAI.getGenerativeModel({
     ]
 });
 
-// Helper to safely parse JSON from LLM output
+// Helper to safely parse JSON from LLM output (Robust Balanced Extractor)
 const parseJSON = (text: string) => {
+    if (!text) return null;
     try {
-        // Finds the first '{' and the last '}' to ignore any surrounding text Gemini adds
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            console.error("JSON Parse Error: No valid JSON object found in response");
+        // 1. Attempt clean parse first (fastest)
+        return JSON.parse(text);
+    } catch (e) {
+        // 2. Scan for first '{' or '['
+        const startIndex = text.search(/[\{\[]/);
+        if (startIndex === -1) {
+            console.error("JSON Parse Error: No JSON start char found", "\nRaw:", text?.substring(0, 200));
             return null;
         }
-        return JSON.parse(jsonMatch[0]);
-    } catch (e) {
-        console.error("JSON Parse Error:", e, "\nRaw Text Preview:", text?.substring(0, 500));
+
+        const openChar = text[startIndex];
+        const closeChar = openChar === '{' ? '}' : ']';
+        let balance = 0;
+        let inString = false;
+        let escape = false;
+
+        for (let i = startIndex; i < text.length; i++) {
+            const char = text[i];
+            if (escape) {
+                escape = false;
+                continue;
+            }
+            if (char === '\\') {
+                escape = true;
+                continue;
+            }
+            if (char === '"') {
+                inString = !inString;
+                continue;
+            }
+            if (!inString) {
+                if (char === openChar) {
+                    balance++;
+                } else if (char === closeChar) {
+                    balance--;
+                    if (balance === 0) {
+                        const jsonStr = text.substring(startIndex, i + 1);
+                        try {
+                            return JSON.parse(jsonStr);
+                        } catch (innerE) {
+                            console.error("JSON Parse Error (Extraction Failed):", innerE);
+                            return null; // Bad JSON inside good braces
+                        }
+                    }
+                }
+            }
+        }
+
+        console.error("JSON Parse Error: Unbalanced or truncated", "\nRaw:", text?.substring(0, 200));
         return null;
     }
 };
