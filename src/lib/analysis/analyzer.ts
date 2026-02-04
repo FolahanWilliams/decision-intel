@@ -108,11 +108,16 @@ export async function simulateAnalysis(
     // Ensure plain serializable object (removes Map, Set, Circular refs)
     result.finalReport = JSON.parse(safeStringify(result.finalReport));
 
+    if (!result.finalReport) {
+        throw new Error("Report corrupted during normalization");
+    }
+
     // Adapt to UI expected structure
     // Ensure all biased findings are marked as "found"
     const finalReport = {
         ...result.finalReport,
-        biases: (result.finalReport.biases || []).map(b => ({ ...b, found: true }))
+        overallScore: result.finalReport.overallScore || 0,
+        biases: (result.finalReport.biases || []).map((b: any) => ({ ...b, found: true }))
     };
 
     return finalReport;

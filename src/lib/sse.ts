@@ -13,7 +13,7 @@
  * @param data The payload to send
  * @returns String format: "data: <json>\n\n"
  */
-import { safeStringify } from '@/lib/utils/json';
+import { safeStringify } from './utils/json';
 
 /**
  * Formats a data object into a valid SSE string chunk.
