@@ -15,6 +15,7 @@ export async function parseFile(buffer: Buffer, mimeType: string, filename: stri
     if (isPdf) {
         try {
             // pdf-parse v2 requires a Uint8Array (Buffer is a Uint8Array in Node)
+            // Using named import PDFParse
             const parser = new PDFParse({ data: buffer });
             const data = await parser.getText();
             return data.text;
