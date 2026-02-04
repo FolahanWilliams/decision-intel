@@ -3,8 +3,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-// Using gemini-1.5-pro-002 as the high-reasoning "Pro" model requested
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-002", generationConfig: { responseMimeType: "application/json" } });
+// Using gemini-2.5-flash - fast and reliable for JSON generation
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json" } });
 
 // Helper to safely parse JSON from LLM output
 const parseJSON = (text: string) => {
