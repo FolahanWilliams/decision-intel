@@ -43,8 +43,19 @@ export default function Home() {
       });
 
       if (!uploadRes.ok) {
-        const data = await uploadRes.json();
-        throw new Error(data.error || 'Upload failed');
+        let errorMessage;
+        try {
+          const errorText = await uploadRes.text();
+          try {
+            const data = JSON.parse(errorText);
+            errorMessage = data.error;
+          } catch {
+            errorMessage = errorText;
+          }
+        } catch (readError) {
+          errorMessage = 'Failed to read error response';
+        }
+        throw new Error(errorMessage || 'Upload failed');
       }
 
       const uploadData = await uploadRes.json();
