@@ -56,6 +56,8 @@ export async function analyzeDocument(
                 noiseStats: result.noiseStats || undefined,
                 factCheck: result.factCheck || undefined,
                 compliance: result.compliance || undefined,
+                preMortem: result.preMortem || undefined,
+                sentiment: result.sentiment || undefined,
                 speakers: result.speakers || []
             }
         });

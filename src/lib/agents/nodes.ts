@@ -1,6 +1,6 @@
 import { AuditState } from "./types";
-import { parseJSON } from '@/lib/utils/json';
-import { AnalysisResult } from '@/types';
+import { parseJSON } from '../utils/json';
+import { AnalysisResult } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
 
@@ -258,7 +258,9 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             biases: state.biasAnalysis || [],
             noiseStats: state.noiseStats,
             factCheck: state.factCheckResult,
-            compliance: { status: 'PASS', details: 'Preliminary check passed.' }, // Placeholder until mapper is active
+            compliance: state.compliance || { status: 'WARN', details: 'Compliance check unavailable.' },
+            preMortem: state.preMortem,
+            sentiment: state.sentimentAnalysis,
             speakers: state.speakers || [],
             createdAt: new Date(),
             analyses: [] // Placeholder
