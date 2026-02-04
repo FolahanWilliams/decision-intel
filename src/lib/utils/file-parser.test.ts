@@ -2,12 +2,22 @@ import { describe, it, expect, vi } from 'vitest';
 import { parseFile } from './file-parser';
 
 // Mock dependencies
-const mockPdfParse = vi.hoisted(() => vi.fn());
+const mockGetText = vi.hoisted(() => vi.fn());
+const mockPDFParseConstructor = vi.hoisted(() => vi.fn());
 const mockMammothExtractRawText = vi.hoisted(() => vi.fn());
 
-vi.mock('pdf-parse', () => ({
-    default: mockPdfParse
-}));
+vi.mock('pdf-parse', () => {
+    return {
+        PDFParse: class {
+            constructor(params: any) {
+                mockPDFParseConstructor(params);
+            }
+            getText() {
+                return mockGetText();
+            }
+        }
+    };
+});
 
 vi.mock('mammoth', () => ({
     default: {
@@ -18,11 +28,12 @@ vi.mock('mammoth', () => ({
 describe('parseFile', () => {
     it('should parse PDF files correctly', async () => {
         const buffer = Buffer.from('mock pdf content');
-        mockPdfParse.mockResolvedValue({ text: 'Parsed PDF Content' });
+        mockGetText.mockResolvedValue({ text: 'Parsed PDF Content' });
 
         const result = await parseFile(buffer, 'application/pdf', 'test.pdf');
 
-        expect(mockPdfParse).toHaveBeenCalledWith(buffer);
+        expect(mockPDFParseConstructor).toHaveBeenCalledWith({ data: buffer });
+        expect(mockGetText).toHaveBeenCalled();
         expect(result).toBe('Parsed PDF Content');
     });
 
@@ -63,7 +74,7 @@ describe('parseFile', () => {
 
     it('should handle PDF parse errors', async () => {
          const buffer = Buffer.from('bad pdf');
-         mockPdfParse.mockRejectedValue(new Error('PDF Corrupt'));
+         mockGetText.mockRejectedValue(new Error('PDF Corrupt'));
 
          await expect(parseFile(buffer, 'application/pdf', 'bad.pdf'))
             .rejects
