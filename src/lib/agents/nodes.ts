@@ -1,8 +1,12 @@
 import { AuditState } from "./types";
+import { parseJSON } from '@/lib/utils/json';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
+if (!process.env.GOOGLE_API_KEY) {
+    throw new Error("Missing GOOGLE_API_KEY env variable");
+}
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 // Using gemini-3-pro-preview - deep reasoning for sophisticated analysis
 const model = genAI.getGenerativeModel({
     model: "gemini-3-pro-preview",
@@ -18,62 +22,7 @@ const model = genAI.getGenerativeModel({
     ]
 });
 
-// Helper to safely parse JSON from LLM output (Robust Balanced Extractor)
-const parseJSON = (text: string) => {
-    if (!text) return null;
-    try {
-        // 1. Attempt clean parse first (fastest)
-        return JSON.parse(text);
-    } catch (e) {
-        // 2. Scan for first '{' or '['
-        const startIndex = text.search(/[\{\[]/);
-        if (startIndex === -1) {
-            console.error("JSON Parse Error: No JSON start char found", "\nRaw:", text?.substring(0, 200));
-            return null;
-        }
-
-        const openChar = text[startIndex];
-        const closeChar = openChar === '{' ? '}' : ']';
-        let balance = 0;
-        let inString = false;
-        let escape = false;
-
-        for (let i = startIndex; i < text.length; i++) {
-            const char = text[i];
-            if (escape) {
-                escape = false;
-                continue;
-            }
-            if (char === '\\') {
-                escape = true;
-                continue;
-            }
-            if (char === '"') {
-                inString = !inString;
-                continue;
-            }
-            if (!inString) {
-                if (char === openChar) {
-                    balance++;
-                } else if (char === closeChar) {
-                    balance--;
-                    if (balance === 0) {
-                        const jsonStr = text.substring(startIndex, i + 1);
-                        try {
-                            return JSON.parse(jsonStr);
-                        } catch (innerE) {
-                            console.error("JSON Parse Error (Extraction Failed):", innerE);
-                            return null; // Bad JSON inside good braces
-                        }
-                    }
-                }
-            }
-        }
-
-        console.error("JSON Parse Error: Unbalanced or truncated", "\nRaw:", text?.substring(0, 200));
-        return null;
-    }
-};
+// Helper to safely parse JSON from LLM output - Imported from utils/json
 
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Structurer Node (Gemini) ---");
@@ -138,7 +87,7 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         });
 
         // Calculate Statistics
-        const validScores = scores.filter(s => s > 0);
+        const validScores = scores.filter(s => typeof s === 'number' && isFinite(s));
         if (validScores.length === 0) return { noiseScores: [], noiseStats: { mean: 0, stdDev: 0, variance: 0 } };
 
         const mean = validScores.reduce((a, b) => a + b, 0) / validScores.length;

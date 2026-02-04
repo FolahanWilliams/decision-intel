@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { AnalysisResult } from '@/types';
-import { safeStringify } from '@/lib/sse';
+import { safeStringify } from '@/lib/utils/json';
 
 export interface ProgressUpdate {
     type: 'bias' | 'noise' | 'summary' | 'complete';

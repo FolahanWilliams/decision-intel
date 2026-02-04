@@ -13,33 +13,7 @@
  * @param data The payload to send
  * @returns String format: "data: <json>\n\n"
  */
-/**
- * Handles safe JSON serialization with circular reference support.
- */
-export function safeStringify(obj: any): string {
-    const getCircularReplacer = () => {
-        const seen = new WeakSet();
-        return (_key: any, value: any) => {
-            if (typeof value === "object" && value !== null) {
-                if (seen.has(value)) {
-                    return "[Circular]";
-                }
-                seen.add(value);
-            }
-            return value;
-        };
-    };
-
-    try {
-        return JSON.stringify(obj);
-    } catch (e) {
-        try {
-            return JSON.stringify(obj, getCircularReplacer());
-        } catch (e2) {
-            return JSON.stringify({ type: 'error', message: 'Non-serializable payload' });
-        }
-    }
-}
+import { safeStringify } from '@/lib/utils/json';
 
 /**
  * Formats a data object into a valid SSE string chunk.
