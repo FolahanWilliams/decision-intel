@@ -7,8 +7,10 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-3-pro-preview", generationConfig: { responseMimeType: "application/json" } });
 
 // Helper to safely parse JSON from LLM output
-const parseJSON = (text: string) => {
+const parseJSON = (text: string | null | undefined) => {
     try {
+        if (!text) return null;
+
         // Finds the first '{' and the last '}' to ignore any surrounding text Gemini adds
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
