@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseJSON } from './json';
+import { parseJSON, safeStringify } from './json';
 
 describe('Robust parseJSON', () => {
     it('parses valid JSON object', () => {
@@ -37,5 +37,30 @@ describe('Robust parseJSON', () => {
 
     it('returns null on broken JSON', () => {
         expect(parseJSON('{"foo": ')).toBeNull(); // truncated
+    });
+});
+
+describe('safeStringify', () => {
+    it('handles BigInt by converting to string', () => {
+        const obj = { val: BigInt(9007199254740991) };
+        expect(safeStringify(obj)).toBe('{"val":"9007199254740991"}');
+    });
+
+    it('handles Circular references', () => {
+        const a: any = { name: 'root' };
+        a.self = a;
+        // First usage of safeStringify might return [Circular] string or full structure depending on where recursion happens
+        // {"name":"root","self":"[Circular]"}
+        const json = safeStringify(a);
+        expect(json).toContain('"self":"[Circular]"');
+    });
+
+    it('handles standard objects', () => {
+        expect(safeStringify({ a: 1 })).toBe('{"a":1}');
+    });
+
+    it('handles valid Dates', () => {
+        const d = new Date('2023-01-01T00:00:00.000Z');
+        expect(safeStringify({ d })).toBe('{"d":"2023-01-01T00:00:00.000Z"}');
     });
 });

@@ -44,9 +44,12 @@ export const parseJSON = (text: string): any | null => {
  * Handles safe JSON serialization with circular reference support.
  */
 export function safeStringify(obj: any): string {
-    const getCircularReplacer = () => {
+    const safeReplacer = () => {
         const seen = new WeakSet();
         return (_key: any, value: any) => {
+            if (typeof value === 'bigint') {
+                return value.toString();
+            }
             if (typeof value === "object" && value !== null) {
                 if (seen.has(value)) {
                     return "[Circular]";
@@ -58,10 +61,16 @@ export function safeStringify(obj: any): string {
     };
 
     try {
+        // Try strict first for speed, but BigInt will fail here
+        // If we suspect BigInt might be common, we should just use replacer always.
+        // Given the use case (Analysis Report), BigInt is rare but possible.
+        // Let's safe-guard by using replacer logic if fallback needed.
+        // But users wanted "Direct use".
+        // Actually, JSON.stringify(obj) is fast. If it throws, we check why.
         return JSON.stringify(obj);
     } catch (e) {
         try {
-            return JSON.stringify(obj, getCircularReplacer());
+            return JSON.stringify(obj, safeReplacer());
         } catch (e2) {
             return JSON.stringify({ type: 'error', message: 'Non-serializable payload' });
         }
