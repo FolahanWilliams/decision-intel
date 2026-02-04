@@ -9,11 +9,15 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-002", generation
 // Helper to safely parse JSON from LLM output
 const parseJSON = (text: string) => {
     try {
-        // Remove markdown code blocks if present
-        const clean = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        return JSON.parse(clean);
+        // Finds the first '{' and the last '}' to ignore any surrounding text Gemini adds
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            console.error("JSON Parse Error: No valid JSON object found in response");
+            return null;
+        }
+        return JSON.parse(jsonMatch[0]);
     } catch (e) {
-        console.error("JSON Parse Error", e);
+        console.error("JSON Parse Error:", e);
         return null;
     }
 };
