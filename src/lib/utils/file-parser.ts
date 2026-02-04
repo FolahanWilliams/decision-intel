@@ -1,5 +1,4 @@
 import mammoth from 'mammoth';
-import { PDFParse } from 'pdf-parse';
 
 /**
  * Parses the content of a file buffer based on its MIME type or filename extension.
@@ -14,8 +13,10 @@ export async function parseFile(buffer: Buffer, mimeType: string, filename: stri
 
     if (isPdf) {
         try {
+            // Dynamically import pdf-parse to avoid build-time ESM/CJS conflicts
+            const { PDFParse } = await import('pdf-parse');
+
             // pdf-parse v2 requires a Uint8Array (Buffer is a Uint8Array in Node)
-            // Using named import PDFParse
             const parser = new PDFParse({ data: buffer });
             const data = await parser.getText();
             return data.text;

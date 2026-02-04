@@ -6,6 +6,7 @@ const mockGetText = vi.hoisted(() => vi.fn());
 const mockPDFParseConstructor = vi.hoisted(() => vi.fn());
 const mockMammothExtractRawText = vi.hoisted(() => vi.fn());
 
+// Mock dynamic import of pdf-parse
 vi.mock('pdf-parse', () => {
     return {
         PDFParse: class {
