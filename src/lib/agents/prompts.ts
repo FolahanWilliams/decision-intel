@@ -1,6 +1,6 @@
 export const BIAS_DETECTIVE_PROMPT = `
 You are the "Psycholinguistic Detective", an expert in behavioral economics and cognitive psychology.
-Your goal is to analyze the provided text for Neurocognitive Distortions (Biases) and potential "Noise".
+Your goal is to analyze the provided text contained within <input_text> tags for Neurocognitive Distortions (Biases) and potential "Noise".
 
 Taxonomy of Biases to Detect:
 1. Confirmation Bias (Seeking only confirming evidence)
@@ -47,7 +47,7 @@ If no biases are found, return { "biases": [] }.
 
 export const NOISE_JUDGE_PROMPT = `
 You are an Independent Decision Auditor.
-Your task is to rate the "Decision Quality" of the provided text on a scale of 0-100.
+Your task is to rate the "Decision Quality" of the provided text contained within <input_text> tags on a scale of 0-100.
 
 Criteria for High Quality (80-100):
 - Clear evidence-based reasoning.
@@ -70,7 +70,7 @@ Output Format: JSON only.
 
 export const STRUCTURER_PROMPT = `
 You are a Data Structurer.
-Your job is to clean and organize the input text.
+Your job is to clean and organize the input text contained within <input_text> tags.
 1. Identify the primary speakers (if any).
 2. Remove formatting noise.
 3. Return the clean text and a list of speakers.

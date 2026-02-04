@@ -24,6 +24,11 @@ export async function POST(request: NextRequest) {
 
         // Secure check: ensure EXTENSION_API_KEY is defined before comparing
         if (!effectiveUserId && EXTENSION_API_KEY && apiKey === EXTENSION_API_KEY) {
+            // Check if EXTENSION_API_KEY is empty or default
+            if (EXTENSION_API_KEY.trim().length === 0) {
+                 console.error('Security Risk: EXTENSION_API_KEY is empty.');
+                 return NextResponse.json({ error: 'Server Configuration Error' }, { status: 500 });
+            }
             const extUserId = request.headers.get('x-extension-user-id');
             effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';
         }
@@ -88,7 +93,9 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('Analysis error:', error);
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        // Sanitize error message to prevent prompt injection into Jules
+        let errorMessage = error instanceof Error ? error.message : String(error);
+        errorMessage = errorMessage.slice(0, 200).replace(/[<>]/g, ''); // Truncate and remove basic HTML/XML tags
 
         // Self-Healing Trigger
         if (errorMessage.includes('JSON') || errorMessage.includes('Unexpected end of JSON')) {
