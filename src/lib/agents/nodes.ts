@@ -25,15 +25,16 @@ const parseJSON = (text: string) => {
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Structurer Node (Gemini) ---");
     try {
+        const content = state.structuredContent || state.originalContent;
         const result = await model.generateContent([
             STRUCTURER_PROMPT,
-            `Input Text:\n${state.originalContent}`
+            `Input Text:\n<input_text>\n${content}\n</input_text>`
         ]);
         const response = result.response.text();
         const data = parseJSON(response);
 
         return {
-            structuredContent: data?.structuredContent || state.originalContent,
+            structuredContent: data?.structuredContent || content,
             speakers: data?.speakers || []
         };
     } catch (e) {
@@ -51,7 +52,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
         const content = state.structuredContent || state.originalContent;
         const result = await model.generateContent([
             BIAS_DETECTIVE_PROMPT,
-            `Text to Analyze:\n${content}`
+            `Text to Analyze:\n<input_text>\n${content}\n</input_text>`
         ]);
         const response = result.response.text();
         const data = parseJSON(response);
@@ -72,7 +73,7 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         const promises = [1, 2, 3].map(() =>
             model.generateContent([
                 NOISE_JUDGE_PROMPT,
-                `Decision Text to Rate:\n${content}`,
+                `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>`,
                 `\n(Random Seed: ${Math.random()})` // Inject noise to encourage variance if model defines deterministic
             ])
         );
@@ -120,7 +121,7 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
             - Google -> [TECH_COMPANY]
             
             Return valid JSON: { "redactedText": "..." }`,
-            `Input Text:\n${content}`
+            `Input Text:\n<input_text>\n${content}\n</input_text>`
         ]);
         const data = parseJSON(result.response.text());
         return { structuredContent: data?.redactedText || content };
@@ -141,7 +142,7 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         // Step 1: Extract Tickers
         const extractionResult = await model.generateContent([
             `Extract any stock symbols (e.g. AAPL, TSLA) mentioned in the text. Return JSON: { "tickers": ["AAPL"] }`,
-            `Text:\n${content}`
+            `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
         const extracted = parseJSON(extractionResult.response.text());
         const tickers = extracted?.tickers || [];
@@ -160,7 +161,7 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
             `You are a Fact Checker. Verify key claims in the text using the provided Financial Data.
             If a claim contradicts the data (e.g. "We are in the Energy sector" but data says "Technology"), flag it.
             Return JSON: { "score": 0-100, "flags": ["Claim X contradicts market data..."] }`,
-            `Text:\n${content}`,
+            `Text:\n<input_text>\n${content}\n</input_text>`,
             financialContext
         ]);
 
