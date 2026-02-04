@@ -1,0 +1,24 @@
+# Security Guardrails for Jules/Gemini
+# Validated by the Security Extension
+
+[guardrails]
+
+[[guardrails.rule]]
+name = "GDPR_Bypass_Prevention"
+description = "Ensures no agent attempts to bypass the anonymizer node."
+pattern = 'addEdge\(".*", "biasDetective"\)' # Regex checking edges
+condition = "must_not_match_if_source_is_input" # Pseudo-rule: Input must go to Anonymizer/Structurer first
+
+[[guardrails.rule]]
+name = "PII_Leak_Prevention"
+description = "Prevents logging of raw PII content."
+pattern = 'console\.log\(.*state\.originalContent.*\)'
+severity = "critical"
+action = "block_commit"
+
+[[guardrails.rule]]
+name = "Extension_Auth_Hardening"
+description = "Ensure extension endpoints check for API Key."
+pattern = 'request\.headers\.get\((["\'`])x-extension-key\1\)'
+scope = "src/app/api/**/route.ts"
+required = true
