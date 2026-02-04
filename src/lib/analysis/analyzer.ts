@@ -29,44 +29,11 @@ export async function analyzeDocument(
     });
 
     try {
-        const result = await simulateAnalysis(document.content, (update) => {
+        const result = await runAnalysis(document.content, (update) => {
             if (onProgress) onProgress(update);
         });
 
-        // Store analysis in database
-        const foundBiases = result.biases.filter(b => b.found);
-        await prisma.analysis.create({
-            data: {
-                documentId,
-                overallScore: result.overallScore,
-                noiseScore: result.noiseScore,
-                summary: result.summary,
-                biases: {
-                    create: foundBiases.map(bias => ({
-                        biasType: bias.biasType,
-                        severity: bias.severity,
-                        excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                        explanation: bias.explanation || '',
-                        suggestion: bias.suggestion || '',
-                        confidence: bias.confidence || 0.0
-                    }))
-                },
-                // Persist new Multi-Agent Data
-                structuredContent: result.structuredContent || '',
-                noiseStats: result.noiseStats || undefined,
-                factCheck: result.factCheck || undefined,
-                compliance: result.compliance || undefined,
-                preMortem: result.preMortem || undefined,
-                sentiment: result.sentiment || undefined,
-                speakers: result.speakers || []
-            }
-        });
-
-        // Update document status
-        await prisma.document.update({
-            where: { id: documentId },
-            data: { status: 'complete' }
-        });
+        await saveAnalysisResult(documentId, result);
 
         if (onProgress) {
             onProgress({ type: 'complete', progress: 100, result });
@@ -83,8 +50,43 @@ export async function analyzeDocument(
     }
 }
 
+export async function saveAnalysisResult(documentId: string, result: AnalysisResult) {
+    const foundBiases = result.biases.filter(b => b.found);
+    await prisma.document.update({
+        where: { id: documentId },
+        data: {
+            status: 'complete',
+            analyses: {
+                create: {
+                    overallScore: result.overallScore,
+                    noiseScore: result.noiseScore,
+                    summary: result.summary,
+                    biases: {
+                        create: foundBiases.map(bias => ({
+                            biasType: bias.biasType,
+                            severity: bias.severity,
+                            excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                            explanation: bias.explanation || '',
+                            suggestion: bias.suggestion,
+                            confidence: bias.confidence || 0.0
+                        })),
+                    },
+                    // Persist new Multi-Agent Data
+                    structuredContent: result.structuredContent || '',
+                    noiseStats: result.noiseStats || undefined,
+                    factCheck: result.factCheck || undefined,
+                    compliance: result.compliance || undefined,
+                    preMortem: result.preMortem || undefined,
+                    sentiment: result.sentiment || undefined,
+                    speakers: result.speakers || []
+                }
+            }
+        }
+    });
+}
+
 // New Multi-Agent// Mock Analysis function (simulating AI delay)
-export async function simulateAnalysis(
+export async function runAnalysis(
     content: string,
     onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
