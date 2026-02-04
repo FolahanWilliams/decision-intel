@@ -26,6 +26,7 @@ export interface AnalysisResult {
         status: 'PASS' | 'FLAGGED';
         details: string;
     };
+    speakers?: string[];
 }
 
 export interface DocumentWithAnalysis {

@@ -106,7 +106,13 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     const content = state.originalContent;
     try {
         const result = await model.generateContent([
-            `You are a GDPR Anonymizer. Redact all PII (names, emails, locations) from the text. Replace with [REDACTED_ENTITY]. Return valid JSON: { "redactedText": "..." }`,
+            `You are a GDPR Anonymizer. 
+            Goal: Redact PII (names, emails, dates) but PRESERVE structural context.
+            - John Smith -> [PERSON_1]
+            - CEO -> [EXECUTIVE_ROLE]
+            - Google -> [TECH_COMPANY]
+            
+            Return valid JSON: { "redactedText": "..." }`,
             `Input Text:\n${content}`
         ]);
         const data = parseJSON(result.response.text());
@@ -183,7 +189,10 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
         return acc + (severityScores[b.severity] || 5);
     }, 0);
 
-    const noisePenalty = (state.noiseStats?.stdDev || 0) * 2;
+    // Heavy penalty for high noise (disagreement among judges)
+    // If stdDev is > 10, confidence implies the document is ambiguous.
+    const noisePenalty = (state.noiseStats?.stdDev || 0) * 4; // Increased multiplier from 2 to 4
+
     const trustPenalty = 100 - (state.factCheckResult?.score || 100);
 
     const baseScore = state.noiseStats?.mean || 100;
@@ -201,6 +210,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             noiseStats: state.noiseStats,
             factCheck: state.factCheckResult,
             compliance: { status: 'PASS', details: 'Preliminary check passed.' }, // Placeholder until mapper is active
+            speakers: state.speakers || [],
             createdAt: new Date(),
             analyses: [] // Placeholder
         } as any

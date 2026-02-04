@@ -22,11 +22,11 @@ const GraphState = Annotation.Root({
         default: () => [],
     }),
     biasAnalysis: Annotation<any>({
-        reducer: (x, y) => y ?? x,
+        reducer: (x, y) => [...(x || []), ...(y || [])],
         default: () => [],
     }),
     noiseScores: Annotation<number[]>({
-        reducer: (x, y) => y ?? x,
+        reducer: (x, y) => [...(x || []), ...(y || [])],
         default: () => [],
     }),
     noiseStats: Annotation<{ mean: number; stdDev: number; variance: number }>({
@@ -42,7 +42,7 @@ const GraphState = Annotation.Root({
         default: () => null,
     }),
     messages: Annotation<BaseMessage[]>({
-        reducer: (x, y) => y ?? x,
+        reducer: (x, y) => [...(x || []), ...(y || [])],
         default: () => [],
     }),
 });

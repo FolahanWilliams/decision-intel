@@ -48,7 +48,12 @@ export async function analyzeDocument(
                         explanation: bias.explanation || '',
                         suggestion: bias.suggestion || ''
                     }))
-                }
+                },
+                // Persist new Multi-Agent Data
+                noiseStats: result.noiseStats ? JSON.parse(JSON.stringify(result.noiseStats)) : undefined,
+                factCheck: result.factCheck ? JSON.parse(JSON.stringify(result.factCheck)) : undefined,
+                compliance: result.compliance ? JSON.parse(JSON.stringify(result.compliance)) : undefined,
+                speakers: result.speakers || []
             }
         });
 
