@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
                         data: { status: 'analyzing' }
                     });
 
-                    const result = await runAnalysis(doc.content, (update) => {
+                    const result = await runAnalysis(doc.content, documentId, (update) => {
                         sendUpdate(update);
                     });
 

@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NextRequest } from 'next/server';
 
 const mocks = vi.hoisted(() => {
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -21,12 +20,29 @@ const mocks = vi.hoisted(() => {
     }
 });
 
+vi.mock('next/server', () => {
+    return {
+        NextRequest: class {},
+        NextResponse: class {
+            body: any;
+            status: number;
+            constructor(body: any, options: any) {
+                this.body = body;
+                this.status = options?.status || 200;
+            }
+            static json(body: any, options: any) {
+                return { body, status: options?.status || 200, json: async () => body };
+            }
+        }
+    }
+});
+
 vi.mock('@clerk/nextjs/server', () => ({
   auth: vi.fn().mockResolvedValue({ userId: 'user_123' }),
 }));
 
 vi.mock('@/lib/analysis/analyzer', () => ({
-  runAnalysis: vi.fn().mockImplementation(async (content, onProgress) => {
+  runAnalysis: vi.fn().mockImplementation(async (content, documentId, onProgress) => {
     // Simulate some work/progress
     if (onProgress) onProgress({ type: 'progress', progress: 50 });
     return {
@@ -66,7 +82,7 @@ describe('Performance Benchmark', () => {
   it('measures execution time of POST handler', async () => {
     const req = {
       json: async () => ({ documentId: 'doc_123' }),
-    } as unknown as NextRequest;
+    } as any;
 
     const start = performance.now();
     const response = await POST(req);
@@ -83,7 +99,9 @@ describe('Performance Benchmark', () => {
     const end = performance.now();
     console.log(`Execution time: ${(end - start).toFixed(2)}ms`);
 
-    expect(response.status).toBe(200);
+    // Check status (depending on mock implementation)
+    // The mocked NextResponse returns an object with status
+    expect((response as any).status).toBe(200);
     // Ensure we are hitting the DB
     expect(mocks.document.findFirst).toHaveBeenCalled();
   });

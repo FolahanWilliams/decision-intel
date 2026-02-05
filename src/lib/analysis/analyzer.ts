@@ -39,7 +39,7 @@ export async function analyzeDocument(
     });
 
     try {
-        const result = await runAnalysis(document.content, (update) => {
+        const result = await runAnalysis(document.content, documentId, (update) => {
             if (onProgress) onProgress(update);
         });
 
@@ -105,9 +105,9 @@ async function getGraph() {
     return graphInstance;
 }
 
-// New Multi-Agent// Mock Analysis function (simulating AI delay)
 export async function runAnalysis(
     content: string,
+    documentId: string,
     onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
 
@@ -119,7 +119,7 @@ export async function runAnalysis(
 
     const result = await auditGraph.invoke({
         originalContent: content,
-        documentId: "temp",
+        documentId: documentId,
     });
 
     if (onProgress) onProgress({ type: 'summary', progress: 90 });

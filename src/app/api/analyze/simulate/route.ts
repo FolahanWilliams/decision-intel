@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Run analysis in simulation mode (no DB storage)
-        const result = await runAnalysis(content);
+        const result = await runAnalysis(content, "simulate");
 
         return NextResponse.json(result);
     } catch (error) {

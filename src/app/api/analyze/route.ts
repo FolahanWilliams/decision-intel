@@ -10,6 +10,9 @@ const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY;
 export const maxDuration = 60;
 
 // Simple in-memory error tracking (per server instance)
+// NOTE: This global variable is for demonstration/local-dev self-healing purposes.
+// In a serverless environment (like Vercel), this state is not shared across requests
+// and may reset at any time. Do not rely on it for critical production logic.
 let jsonErrorCount = 0;
 
 export async function POST(request: NextRequest) {
