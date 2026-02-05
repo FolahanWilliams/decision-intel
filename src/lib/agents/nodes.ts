@@ -16,12 +16,12 @@ function getModel(): GenerativeModel {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-    // Using gemini-2.5-flash - fast, reliable, and cost-effective for analysis
+    // Using gemini-3-pro-preview - deep reasoning for sophisticated analysis
     modelInstance = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
+        model: "gemini-3-pro-preview",
         generationConfig: {
             responseMimeType: "application/json",
-            maxOutputTokens: 8192
+            maxOutputTokens: 16384  // Increased to prevent JSON truncation
         },
         safetySettings: [
             { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
