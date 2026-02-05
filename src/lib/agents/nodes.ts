@@ -54,7 +54,7 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
             STRUCTURER_PROMPT,
             `Input Text:\n<input_text>\n${content}\n</input_text>`
         ]));
-        const response = result.response.text();
+        const response = result.response?.text ? result.response.text() : "";
         const data = parseJSON(response);
 
         return {
@@ -78,7 +78,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
             BIAS_DETECTIVE_PROMPT,
             `Text to Analyze:\n<input_text>\n${content}\n</input_text>`
         ]));
-        const response = result.response.text();
+        const response = result.response?.text ? result.response.text() : "";
         const data = parseJSON(response);
 
         return { biasAnalysis: data?.biases || [] };
@@ -104,7 +104,8 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
 
         const results = await Promise.all(promises);
         const scores = results.map(r => {
-            const data = parseJSON(r.response.text());
+            const text = r.response?.text ? r.response.text() : "";
+            const data = parseJSON(text);
             return typeof data?.score === 'number' ? data.score : 0;
         });
 
@@ -144,10 +145,15 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
             - CEO -> [EXECUTIVE_ROLE]
             - Google -> [TECH_COMPANY]
             
-            Return valid JSON: { "redactedText": "..." }`,
+            CRITICAL OUTPUT RULES:
+            1. Return ONLY valid JSON.
+            2. Follow specific schema: { "redactedText": "your_redacted_string_here" }
+            3. Do NOT use markdown formatting (no \`\`\`json wrappers).
+            4. Do NOT include preamble or explanations.`,
             `Input Text:\n<input_text>\n${content}\n</input_text>`
         ]));
-        const data = parseJSON(result.response.text());
+        const text = result.response?.text ? result.response.text() : "";
+        const data = parseJSON(text);
         return { structuredContent: data?.redactedText || content };
     } catch (e) {
         // FAIL SAFE: Do not return raw content if redaction failed.
@@ -166,7 +172,8 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
             `Extract any stock symbols (e.g. AAPL, TSLA) mentioned in the text. Return JSON: { "tickers": ["AAPL"] }`,
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
-        const extracted = parseJSON(extractionResult.response.text());
+        const extractionText = extractionResult.response?.text ? extractionResult.response.text() : "";
+        const extracted = parseJSON(extractionText);
         const rawTickers = extracted?.tickers || [];
         // Deduplicate tickers to avoid redundant API calls
         const tickers = Array.isArray(rawTickers) ? [...new Set(rawTickers as string[])] : [];
@@ -189,7 +196,8 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
             financialContext
         ]);
 
-        const data = parseJSON(result.response.text());
+        const text = result.response?.text ? result.response.text() : "";
+        const data = parseJSON(text);
         return { factCheckResult: data || { score: 0, flags: [] } };
     } catch (e) {
         console.error("Fact Checker failed", e);
@@ -211,7 +219,8 @@ export async function preMortemNode(state: AuditState): Promise<Partial<AuditSta
             Output JSON: { "failureScenarios": ["..."], "preventiveMeasures": ["..."] }`,
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
-        const data = parseJSON(result.response.text());
+        const text = result.response?.text ? result.response.text() : "";
+        const data = parseJSON(text);
         return { preMortem: data || { failureScenarios: [], preventiveMeasures: [] } }; // Note: Update AuditState type if needed, or store in 'analyses'
     } catch (e) {
         console.error("Pre-Mortem failed", e);
@@ -231,7 +240,8 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
             Output JSON: { "status": "PASS" | "WARN" | "FAIL", "details": "Summary of findings..." }`,
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
-        const data = parseJSON(result.response.text());
+        const text = result.response?.text ? result.response.text() : "";
+        const data = parseJSON(text);
         return { compliance: data || { status: "WARN", details: "Compliance check failed to parse." } };
     } catch (e) {
         console.error("Compliance failed", e);
@@ -289,7 +299,7 @@ export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<
             Example: { "score": 0.8, "label": "Positive" }`,
             `Text to Analyze:\n${content}`
         ]);
-        const response = result.response.text();
+        const response = result.response?.text ? result.response.text() : "";
         const data = parseJSON(response);
 
         return { sentimentAnalysis: data || { score: 0, label: 'Neutral' } };

@@ -159,7 +159,10 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                 body: JSON.stringify({ content: editableContent })
             });
 
-            if (!res.ok) throw new Error('Simulation failed');
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Simulation failed');
+            }
             const data = await res.json();
 
             setSimulationResult(data);
@@ -167,7 +170,9 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
             setStreamLogs(prev => [...prev, { msg: 'Simulation complete. Score Delta calculated.', type: 'success' }]);
             showToast('Simulation complete', 'success');
         } catch (err) {
-            showToast('Simulation failed', 'error');
+            const msg = err instanceof Error ? err.message : 'Simulation failed';
+            setStreamLogs(prev => [...prev, { msg: `ERROR: ${msg}`, type: 'bias' }]);
+            showToast(msg, 'error');
         } finally {
             setIsSimulating(false);
         }
@@ -214,10 +219,16 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                     if (typeof update.progress === 'number') {
                         setScanProgress(update.progress);
                     }
+
+                    if (update.type === 'error') {
+                        throw new Error(update.message || 'Analysis failed during stream');
+                    }
                 });
             }
         } catch (err) {
-            showToast('Live scan failed', 'error');
+            const msg = err instanceof Error ? err.message : 'Live scan failed';
+            setStreamLogs(prev => [...prev, { msg: `CRITICAL_ERROR: ${msg}`, type: 'bias' }]);
+            showToast(msg, 'error');
         } finally {
             setIsScanning(false);
         }

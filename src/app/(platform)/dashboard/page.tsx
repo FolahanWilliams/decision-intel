@@ -128,10 +128,10 @@ export default function Dashboard() {
           ? { ...doc, status: 'complete', score: finalResult?.overallScore }
           : doc
       ));
-    } catch {
-      console.error('Upload/Analysis error occurred.');
-      // Sanitize error message for UI to prevent PII leakage
-      setError('An error occurred during document analysis. Please try again.');
+    } catch (err) {
+      console.error('Upload/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
+      // Display actual error message (sanitized by backend)
+      setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
 
       // Mark as error in list
       setUploadedDocs(prev => prev.map(doc =>

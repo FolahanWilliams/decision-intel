@@ -4,6 +4,8 @@ import { formatSSE } from '@/lib/sse';
 import { safeJsonClone } from '@/lib/utils/json';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
+import { getSafeErrorMessage } from '@/lib/utils/error';
 
 export async function POST(request: NextRequest) {
     try {
@@ -68,11 +70,11 @@ export async function POST(request: NextRequest) {
                                     },
                                     // Persist new Multi-Agent Data
                                     structuredContent: result.structuredContent || '',
-                                    noiseStats: result.noiseStats || undefined,
-                                    factCheck: result.factCheck || undefined,
-                                    compliance: result.compliance || undefined,
-                                    preMortem: result.preMortem || undefined,
-                                    sentiment: result.sentiment || undefined,
+                                    noiseStats: result.noiseStats ?? Prisma.JsonNull,
+                                    factCheck: result.factCheck ?? Prisma.JsonNull,
+                                    compliance: result.compliance ?? Prisma.JsonNull,
+                                    preMortem: result.preMortem ?? Prisma.JsonNull,
+                                    sentiment: result.sentiment ?? Prisma.JsonNull,
                                     speakers: result.speakers || []
                                 }
                             }
@@ -83,7 +85,8 @@ export async function POST(request: NextRequest) {
                     controller.close();
                 } catch (error) {
                     console.error('Stream error:', error);
-                    const errorSSE = formatSSE({ type: 'error', message: 'Analysis failed' });
+                    const errorMessage = getSafeErrorMessage(error);
+                    const errorSSE = formatSSE({ type: 'error', message: errorMessage });
                     controller.enqueue(encoder.encode(errorSSE));
                     controller.close();
                 }

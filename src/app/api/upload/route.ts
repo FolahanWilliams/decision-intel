@@ -4,6 +4,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { auth } from '@clerk/nextjs/server';
 import { parseFile } from '@/lib/utils/file-parser';
+import { getSafeErrorMessage } from '@/lib/utils/error';
 
 export async function POST(request: NextRequest) {
     try {
@@ -54,8 +55,7 @@ export async function POST(request: NextRequest) {
         } catch (error) {
             console.error('File Parse Error:', error);
             return NextResponse.json({
-                error: 'Failed to parse file',
-                details: error instanceof Error ? error.message : String(error)
+                error: getSafeErrorMessage(error)
             }, { status: 400 });
         }
 
@@ -106,9 +106,9 @@ export async function POST(request: NextRequest) {
             message: 'Document uploaded successfully'
         });
     } catch (error) {
-        console.error('Upload error:', error);
+        console.error('Upload error:', getSafeErrorMessage(error));
         return NextResponse.json(
-            { error: 'Failed to upload document', details: error instanceof Error ? error.message : String(error) },
+            { error: getSafeErrorMessage(error) },
             { status: 500 }
         );
     }

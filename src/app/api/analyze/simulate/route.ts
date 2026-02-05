@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runAnalysis } from '@/lib/analysis/analyzer';
 import { auth } from '@clerk/nextjs/server';
+import { getSafeErrorMessage } from '@/lib/utils/error';
 
 export async function POST(request: NextRequest) {
     try {
@@ -20,6 +21,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(result);
     } catch (error) {
         console.error('Simulation error:', error);
-        return NextResponse.json({ error: 'Failed to simulate analysis' }, { status: 500 });
+        return NextResponse.json(
+            { error: getSafeErrorMessage(error) },
+            { status: 500 }
+        );
     }
 }
