@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
 const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY;
 
 // Allow longer processing times for AI analysis
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 // Simple in-memory error tracking (per server instance)
 // NOTE: This global variable is for demonstration/local-dev self-healing purposes.
