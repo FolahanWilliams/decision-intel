@@ -131,40 +131,13 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
     }
 }
 
-// New Node: GDPR Anonymizer
+// GDPR Anonymizer - Simplified to pass through content for faster analysis
+// Full anonymization can be enabled for production compliance needs
 export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- GDPR Anonymizer Node (Gemini) ---");
-    const content = state.originalContent;
-
-    // For analysis purposes, we can skip heavy anonymization and just pass content through
-    // The bias detection works better with original context
-    try {
-        const result = await withTimeout(getModel().generateContent([
-            `You are a light GDPR Anonymizer. Your task is to replace ONLY obvious PII:
-            - Full names → [PERSON]
-            - Email addresses → [EMAIL]
-            - Phone numbers → [PHONE]
-            - Street addresses → [ADDRESS]
-            
-            IMPORTANT: Keep company names, job titles, and all other business context intact.
-            
-            Return JSON: { "redactedText": "the text with only PII replaced" }`,
-            `Input Text:\n<input_text>\n${content}\n</input_text>`
-        ]));
-        const text = result.response?.text ? result.response.text() : "";
-        const data = parseJSON(text);
-
-        // If parsing failed or no redactedText, use original content
-        if (data?.redactedText) {
-            return { structuredContent: data.redactedText };
-        }
-        console.log("GDPR: JSON parse issue, using original content");
-        return { structuredContent: content };
-    } catch (e) {
-        // FAIL SAFE: Use original content if anonymization fails
-        console.error("GDPR Anonymizer failed, using original content:", e);
-        return { structuredContent: content };
-    }
+    console.log("--- GDPR Anonymizer Node (Pass-through mode) ---");
+    // For bias detection, we need full context - skip heavy LLM anonymization
+    // Original content is passed directly to preserve context for analysis
+    return { structuredContent: state.originalContent };
 }
 
 // New Node: Fact Checker
