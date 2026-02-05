@@ -1,5 +1,42 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NextRequest } from 'next/server';
+
+// Mock next/server to avoid environment dependency issues
+vi.mock('next/server', () => {
+    return {
+        NextRequest: class {
+            url: string;
+            bodyUsed = false;
+            constructor(input: any, init?: any) {
+                this.url = typeof input === 'string' ? input : input.url || '';
+            }
+            async json() { return {}; } // Mocked in test
+        },
+        NextResponse: class {
+            body: any;
+            status: number;
+            headers: Headers;
+            constructor(body?: any, init?: any) {
+                this.body = body;
+                this.status = init?.status || 200;
+                this.headers = new Headers(init?.headers);
+            }
+            static json(body: any, init?: any) {
+                return {
+                    body,
+                    status: init?.status || 200,
+                    json: async () => body
+                };
+            }
+        }
+    };
+});
+
+// Global Headers polyfill if needed (Vitest node env might miss it)
+if (!global.Headers) {
+    global.Headers = class extends Map {
+        append(key: string, value: string) { this.set(key, value); }
+    } as any;
+}
 
 const mocks = vi.hoisted(() => {
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -57,6 +94,7 @@ vi.mock('@/lib/utils/json', () => ({
 
 // Import after mocks
 import { POST } from './route';
+import { NextRequest } from 'next/server';
 
 describe('Performance Benchmark', () => {
   beforeEach(() => {
@@ -72,12 +110,14 @@ describe('Performance Benchmark', () => {
     const response = await POST(req);
 
     // Consume stream to ensure all async work completes
-    const reader = response.body?.getReader();
-    if (reader) {
-      while (true) {
-        const { done } = await reader.read();
-        if (done) break;
-      }
+    // In our mock, body is the stream
+    const stream = response.body as ReadableStream;
+    if (stream && stream.getReader) {
+        const reader = stream.getReader();
+        while (true) {
+            const { done } = await reader.read();
+            if (done) break;
+        }
     }
 
     const end = performance.now();

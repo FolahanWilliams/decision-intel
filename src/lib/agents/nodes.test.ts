@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { riskScorerNode, sentimentAnalyzerNode } from './nodes';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { riskScorerNode, sentimentAnalyzerNode, noiseJudgeNode } from './nodes';
 import { AuditState } from './types';
 
 // Hoist mocks
@@ -30,86 +30,117 @@ vi.mock('@google/generative-ai', () => {
     };
 });
 
-describe('riskScorerNode', () => {
-    it('should correctly aggregate scores and include new fields', async () => {
-        const state: AuditState = {
-            documentId: 'doc-1',
-            originalContent: 'test content',
-            biasAnalysis: [],
-            noiseStats: { mean: 80, stdDev: 2, variance: 4 },
-            factCheckResult: { score: 90, flags: [] },
-            compliance: { status: 'WARN', details: 'Some warning' },
-            preMortem: { failureScenarios: ['Fail 1'], preventiveMeasures: ['Prevent 1'] },
-            sentimentAnalysis: { score: 0.5, label: 'Positive' },
-            speakers: ['Speaker A']
-        };
+describe('nodes', () => {
+    const originalEnv = process.env;
 
-        const result = await riskScorerNode(state);
-        const report = result.finalReport;
-
-        expect(report).toBeDefined();
-        if (!report) return;
-
-        expect(report.compliance).toEqual(state.compliance);
-        expect(report.preMortem).toEqual(state.preMortem);
-        expect(report.sentiment).toEqual(state.sentimentAnalysis);
-
-        // formula: Score = Base(NoiseMean) - BiasPenalties - (NoiseStdDev * 4) - (TrustPenalty * 0.2)
-        // 80 - 0 - 8 - 2 = 70.
-        expect(report.overallScore).toBe(70);
-    });
-
-    it('should handle missing fields gracefully', async () => {
-        const state: AuditState = {
-            documentId: 'doc-1',
-            originalContent: 'test content',
-            // Missing compliance, preMortem, sentimentAnalysis
-        };
-
-        const result = await riskScorerNode(state);
-        const report = result.finalReport;
-
-        expect(report).toBeDefined();
-        if (!report) return;
-
-        // Check defaults
-        expect(report.compliance).toEqual({ status: 'WARN', details: 'Compliance check unavailable.' });
-        expect(report.preMortem).toBeUndefined();
-        expect(report.sentiment).toBeUndefined();
-        expect(report.overallScore).toBe(100);
-    });
-});
-
-describe('sentimentAnalyzerNode', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        process.env = { ...originalEnv, GOOGLE_API_KEY: 'mock_key' };
     });
 
-    it('should parse valid JSON response', async () => {
-        mockGenerateContent.mockResolvedValueOnce({
-            response: {
-                text: () => JSON.stringify({ score: 0.8, label: 'Positive' })
-            }
+    afterEach(() => {
+        process.env = originalEnv;
+    });
+
+    describe('riskScorerNode', () => {
+        it('should correctly aggregate scores and include new fields', async () => {
+            const state: AuditState = {
+                documentId: 'doc-1',
+                originalContent: 'test content',
+                biasAnalysis: [],
+                noiseStats: { mean: 80, stdDev: 2, variance: 4 },
+                factCheckResult: { score: 90, flags: [] },
+                compliance: { status: 'WARN', details: 'Some warning' },
+                preMortem: { failureScenarios: ['Fail 1'], preventiveMeasures: ['Prevent 1'] },
+                sentimentAnalysis: { score: 0.5, label: 'Positive' },
+                speakers: ['Speaker A']
+            };
+
+            const result = await riskScorerNode(state);
+            const report = result.finalReport;
+
+            expect(report).toBeDefined();
+            if (!report) return;
+
+            expect(report.compliance).toEqual(state.compliance);
+            expect(report.preMortem).toEqual(state.preMortem);
+            expect(report.sentiment).toEqual(state.sentimentAnalysis);
+
+            // formula: Score = Base(NoiseMean) - BiasPenalties - (NoiseStdDev * 4) - (TrustPenalty * 0.2)
+            // 80 - 0 - 8 - 2 = 70.
+            expect(report.overallScore).toBe(70);
         });
 
-        const state: AuditState = {
-            documentId: 'doc-1',
-            originalContent: 'I am very happy.',
-        };
+        it('should handle missing fields gracefully', async () => {
+            const state: AuditState = {
+                documentId: 'doc-1',
+                originalContent: 'test content',
+                // Missing compliance, preMortem, sentimentAnalysis
+            };
 
-        const result = await sentimentAnalyzerNode(state);
-        expect(result.sentimentAnalysis).toEqual({ score: 0.8, label: 'Positive' });
+            const result = await riskScorerNode(state);
+            const report = result.finalReport;
+
+            expect(report).toBeDefined();
+            if (!report) return;
+
+            // Check defaults
+            expect(report.compliance).toEqual({ status: 'WARN', details: 'Compliance check unavailable.' });
+            expect(report.preMortem).toBeUndefined();
+            expect(report.sentiment).toBeUndefined();
+            expect(report.overallScore).toBe(100);
+        });
     });
 
-    it('should fallback to neutral on error', async () => {
-        mockGenerateContent.mockRejectedValueOnce(new Error('API Error'));
+    describe('sentimentAnalyzerNode', () => {
+        it('should parse valid JSON response', async () => {
+            mockGenerateContent.mockResolvedValueOnce({
+                response: {
+                    text: () => JSON.stringify({ score: 0.8, label: 'Positive' })
+                }
+            });
 
-        const state: AuditState = {
-            documentId: 'doc-1',
-            originalContent: 'content',
-        };
+            const state: AuditState = {
+                documentId: 'doc-1',
+                originalContent: 'I am very happy.',
+            };
 
-        const result = await sentimentAnalyzerNode(state);
-        expect(result.sentimentAnalysis).toEqual({ score: 0, label: 'Neutral' });
+            const result = await sentimentAnalyzerNode(state);
+            expect(result.sentimentAnalysis).toEqual({ score: 0.8, label: 'Positive' });
+        });
+
+        it('should fallback to neutral on error', async () => {
+            mockGenerateContent.mockRejectedValueOnce(new Error('API Error'));
+
+            const state: AuditState = {
+                documentId: 'doc-1',
+                originalContent: 'content',
+            };
+
+            const result = await sentimentAnalyzerNode(state);
+            expect(result.sentimentAnalysis).toEqual({ score: 0, label: 'Neutral' });
+        });
     });
+
+    describe('noiseJudgeNode', () => {
+        it('should handle partial failures gracefully', async () => {
+            // Mock 3 calls: 2 success, 1 failure
+            mockGenerateContent
+               .mockResolvedValueOnce({ response: { text: () => JSON.stringify({ score: 10 }) } })
+               .mockRejectedValueOnce(new Error("API Error"))
+               .mockResolvedValueOnce({ response: { text: () => JSON.stringify({ score: 20 }) } });
+
+            const state: AuditState = {
+                documentId: 'doc-1',
+                originalContent: 'text',
+            };
+
+            const result = await noiseJudgeNode(state);
+
+            expect(result.noiseStats).toBeDefined();
+            // 10, 0, 20 -> mean 10.
+            expect(result.noiseStats?.mean).toBe(10);
+            expect(mockGenerateContent).toHaveBeenCalledTimes(3);
+        });
+   });
 });
