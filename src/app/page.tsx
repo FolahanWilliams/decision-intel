@@ -1,337 +1,504 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { SSEReader } from '@/lib/sse';
+import {
+    Chart as ChartJS,
+    RadialLinearScale,
+    PointElement,
+    LineElement,
+    Filler,
+    Tooltip,
+    Legend,
+    LinearScale,
+    CategoryScale,
+    BarElement,
+    Title
+} from 'chart.js';
+import { Scatter, Radar, Bar } from 'react-chartjs-2';
 
-interface UploadedDoc {
-  id: string;
-  filename: string;
-  status: string;
-  score?: number;
+// --- 1. CONFIG & REGISTRATION ---
+
+ChartJS.register(
+    RadialLinearScale,
+    PointElement,
+    LineElement,
+    Filler,
+    Tooltip,
+    Legend,
+    LinearScale,
+    CategoryScale,
+    BarElement,
+    Title
+);
+
+// Font config to match design
+ChartJS.defaults.font.family = "'Inter', sans-serif";
+
+const CHART_COLORS = {
+    teal: '#0D9488',
+    tealTrans: 'rgba(13, 148, 136, 0.6)',
+    tealSolid: 'rgba(13, 148, 136, 0.8)',
+    tealLight: 'rgba(13, 148, 136, 0.2)',
+    orange: '#F97316',
+    orangeTrans: 'rgba(249, 115, 22, 0.6)',
+    stone: '#78716C',
+    stoneTrans: 'rgba(120, 113, 108, 0.6)',
+};
+
+// --- 2. HELPERS ---
+
+// Box-Muller transform for normal distribution
+function generateScatterData(count: number, meanX: number, meanY: number, stdDev: number) {
+    const data = [];
+    for (let i = 0; i < count; i++) {
+        const u = 1 - Math.random();
+        const v = Math.random();
+        const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        const z2 = Math.sqrt(-2.0 * Math.log(u)) * Math.sin(2.0 * Math.PI * v);
+
+        data.push({
+            x: meanX + (z * stdDev),
+            y: meanY + (z2 * stdDev)
+        });
+    }
+    return data;
 }
 
-export default function Home() {
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadedDocs, setUploadedDocs] = useState<UploadedDoc[]>([]);
-  const [error, setError] = useState<string | null>(null);
+const wrapLabel = (str: string, maxLen = 16) => {
+    if (str.length <= maxLen) return str;
+    const words = str.split(' ');
+    const lines = [];
+    let currentLine = words[0];
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  }, []);
-
-  const uploadAndAnalyze = async (file: File) => {
-    setError(null);
-    setUploading(true);
-
-    try {
-      // Upload file
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const uploadRes = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!uploadRes.ok) {
-        let errorMessage;
-        try {
-          const errorText = await uploadRes.text();
-          try {
-            const data = JSON.parse(errorText);
-            errorMessage = data.error;
-          } catch {
-            errorMessage = errorText;
-          }
-        } catch (readError) {
-          errorMessage = 'Failed to read error response';
+    for (let i = 1; i < words.length; i++) {
+        if (currentLine.length + 1 + words[i].length <= maxLen) {
+            currentLine += ' ' + words[i];
+        } else {
+            lines.push(currentLine);
+            currentLine = words[i];
         }
-        throw new Error(errorMessage || 'Upload failed');
-      }
+    }
+    lines.push(currentLine);
+    return lines;
+};
 
-      const uploadData = await uploadRes.json();
+// --- 3. COMPONENTS ---
 
-      // Add to list with pending status
-      setUploadedDocs(prev => [
-        { id: uploadData.id, filename: uploadData.filename, status: 'analyzing' },
-        ...prev
-      ]);
+export default function LandingPage() {
+    // --- STATE: Interactive Primer ---
+    const [scatterMode, setScatterMode] = useState<'noise' | 'bias' | 'optimized'>('noise');
+    const [scatterData, setScatterData] = useState<{ x: number; y: number }[]>([]);
 
-      // Use streaming endpoint to prevent timeout
-      const analyzeRes = await fetch('/api/analyze/stream', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentId: uploadData.id }),
-      });
+    useEffect(() => {
+        // Generate initial data (client-side only to avoid hydration mismatch)
+        // eslint-disable-next-line
+        setScatterData(generateScatterData(50, 50, 50, 20));
+    }, []);
 
-      // For SSE streams, check if we got a response body
-      // Note: SSE always returns 200, errors come through the stream
-      if (!analyzeRes.body) {
-        throw new Error('No response body from analysis endpoint');
-      }
-
-      // Read the stream for progress updates
-      const reader = analyzeRes.body.getReader();
-      const decoder = new TextDecoder();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let finalResult: any = null;
-      let streamError: Error | null = null;
-
-      const sseReader = new SSEReader();
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          sseReader.processChunk(chunk, (data: unknown) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const update = data as any;
-            
-            // Check for error messages in the SSE stream
-            if (update.type === 'error') {
-              streamError = new Error(update.message || 'Analysis failed');
-            }
-            
-            if (update.type === 'complete' && update.result) {
-              finalResult = update.result;
-            }
-          });
+    const updateScatter = (mode: 'noise' | 'bias' | 'optimized') => {
+        setScatterMode(mode);
+        if (mode === 'noise') {
+            setScatterData(generateScatterData(50, 50, 50, 20)); // Wide spread
+        } else if (mode === 'bias') {
+            setScatterData(generateScatterData(50, 75, 75, 5)); // Tight, off-center
+        } else {
+            setScatterData(generateScatterData(50, 50, 50, 3)); // Tight, centered
         }
-      } catch (readError) {
-        console.error('Stream read error:', readError);
-        streamError = readError instanceof Error ? readError : new Error('Stream read failed');
-      }
+    };
 
-      // Check if we got an error from the stream
-      if (streamError) {
-        throw streamError;
-      }
+    const getScatterExplanation = () => {
+        switch (scatterMode) {
+            case 'noise':
+                return {
+                    text: "Decisions scatter widely. The average is correct, but individual reliability is low.",
+                    border: "border-stone-400"
+                };
+            case 'bias':
+                return {
+                    text: "Consistent, but consistently wrong. Everyone agrees, but they are all missing the target.",
+                    border: "border-orange-500"
+                };
+            case 'optimized':
+                return {
+                    text: "NeuroAudit reduces noise and corrects bias, leading to consistent, accurate outcomes.",
+                    border: "border-teal-500"
+                };
+        }
+    };
 
-      // Check if we got a valid result
-      if (!finalResult) {
-        throw new Error('Analysis completed but no result received');
-      }
+    const scatterExplanation = getScatterExplanation();
 
-      // Update status with final result
-      setUploadedDocs(prev => prev.map(doc =>
-        doc.id === uploadData.id
-          ? { ...doc, status: 'complete', score: finalResult?.overallScore }
-          : doc
-      ));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Upload failed');
-      // Mark as error in list
-      setUploadedDocs(prev => prev.map(doc =>
-        doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc
-      ));
-    } finally {
-      setUploading(false);
-    }
-  };
+    // --- STATE: Calculator ---
+    const [calcVolume, setCalcVolume] = useState(1200);
+    const [calcValue, setCalcValue] = useState(50000);
 
-  const handleDrop = useCallback(async (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
+    const estimatedLoss = (calcVolume * calcValue) * 0.10;
+    const formattedLoss = estimatedLoss >= 1000000
+        ? `$${(estimatedLoss / 1000000).toFixed(1)}M`
+        : `$${(estimatedLoss / 1000).toFixed(0)}k`;
 
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      await uploadAndAnalyze(files[0]);
-    }
-  }, []);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      await uploadAndAnalyze(files[0]);
-    }
-  };
+    return (
+        <div className="min-h-screen bg-[#FAFAF9] text-[#44403C] font-sans selection:bg-teal-100 selection:text-teal-900">
 
-  return (
-    <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
-      {/* Header */}
-      <header className="flex items-center justify-between mb-xl">
-        <div>
-          <h1 style={{ marginBottom: 'var(--spacing-xs)' }}>
-            <span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Decision Intel
-            </span>
-          </h1>
-          <p>Audit decisions for cognitive bias and noise</p>
-        </div>
-        <nav className="flex gap-md">
-          <Link href="/dashboard" className="btn btn-secondary">
-            Dashboard
-          </Link>
-        </nav>
-      </header>
-
-      {/* Upload Zone */}
-      <div
-        className={`upload-zone mb-xl ${isDragOver ? 'dragover' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => document.getElementById('file-input')?.click()}
-      >
-        <input
-          type="file"
-          id="file-input"
-          hidden
-          accept=".pdf,.txt,.md,.doc,.docx"
-          onChange={handleFileSelect}
-          disabled={uploading}
-        />
-
-        {uploading ? (
-          <div className="flex flex-col items-center gap-md">
-            <Loader2 size={48} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
-            <p>Analyzing document for biases...</p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-md">
-            <Upload size={48} style={{ color: 'var(--accent-primary)' }} />
-            <div>
-              <p style={{ color: 'var(--text-primary)', fontWeight: 500, marginBottom: 'var(--spacing-xs)' }}>
-                Drop your decision document here
-              </p>
-              <p style={{ fontSize: '0.875rem' }}>
-                or click to browse • PDF, TXT, MD, DOC, DOCX
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Error message */}
-      {error && (
-        <div className="card mb-lg" style={{ borderColor: 'var(--error)', background: 'rgba(239, 68, 68, 0.1)' }}>
-          <div className="card-body flex items-center gap-md">
-            <AlertTriangle size={20} style={{ color: 'var(--error)' }} />
-            <span style={{ color: 'var(--error)' }}>{error}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Recently uploaded */}
-      {uploadedDocs.length > 0 && (
-        <div className="card">
-          <div className="card-header">
-            <h3>Recently Uploaded</h3>
-          </div>
-          <div className="card-body">
-            <div className="flex flex-col gap-md">
-              {uploadedDocs.map((doc, idx) => (
-                <div
-                  key={doc.id}
-                  className="flex items-center justify-between animate-fade-in"
-                  style={{
-                    padding: 'var(--spacing-md)',
-                    background: 'var(--bg-secondary)',
-                    borderRadius: 'var(--radius-md)',
-                    animationDelay: `${idx * 0.1}s`
-                  }}
-                >
-                  <div className="flex items-center gap-md">
-                    <FileText size={20} style={{ color: 'var(--accent-primary)' }} />
-                    <span>{doc.filename}</span>
-                  </div>
-                  <div className="flex items-center gap-md">
-                    {doc.status === 'analyzing' && (
-                      <span className="badge badge-analyzing flex items-center gap-sm">
-                        <Loader2 size={12} className="animate-spin" />
-                        Analyzing
-                      </span>
-                    )}
-                    {doc.status === 'complete' && (
-                      <>
-                        <span className="badge badge-complete flex items-center gap-sm">
-                          <CheckCircle size={12} />
-                          Complete
-                        </span>
-                        {doc.score !== undefined && (
-                          <span style={{
-                            fontWeight: 600,
-                            color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
-                          }}>
-                            {Math.round(doc.score)}%
-                          </span>
-                        )}
-                        <Link href={`/documents/${doc.id}`} className="btn btn-ghost" style={{ fontSize: '0.75rem' }}>
-                          View Details →
-                        </Link>
-                      </>
-                    )}
-                  </div>
+            {/* Navigation */}
+            <nav className="sticky top-0 z-50 bg-[#FAFAF9]/90 backdrop-blur-md border-b border-stone-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between h-16 items-center">
+                        <div className="flex items-center gap-2">
+                            <span className="text-2xl font-bold text-stone-800 tracking-tight">Neuro<span className="text-teal-600">Audit</span></span>
+                        </div>
+                        <div className="hidden md:flex space-x-8">
+                            <Link href="#concept" className="text-stone-500 hover:text-teal-600 text-sm font-medium transition-colors">The Concept</Link>
+                            <Link href="#dashboard" className="text-stone-500 hover:text-teal-600 text-sm font-medium transition-colors">Audit Results</Link>
+                            <Link href="#process" className="text-stone-500 hover:text-teal-600 text-sm font-medium transition-colors">How It Works</Link>
+                            <Link href="/dashboard" className="bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-stone-700 transition-colors">
+                                Launch App
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+            </nav>
 
-      {/* Features */}
-      <div className="grid grid-3 mt-xl">
-        <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <div className="card-body">
-            <div style={{
-              width: 48, height: 48, borderRadius: 'var(--radius-md)',
-              background: 'rgba(99, 102, 241, 0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: 'var(--spacing-md)'
-            }}>
-              <FileText size={24} style={{ color: 'var(--accent-primary)' }} />
-            </div>
-            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Document Ingestion</h4>
-            <p style={{ fontSize: '0.875rem' }}>
-              Upload PDFs, meeting notes, memos, and emails for instant analysis.
-            </p>
-          </div>
-        </div>
+            {/* Hero Section */}
+            <header className="pt-16 pb-12 sm:pt-24 sm:pb-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-stone-900 tracking-tight mb-6">
+                        Detect the Invisible <br />
+                        <span className="text-teal-600">Cost of Noise.</span>
+                    </h1>
+                    <p className="mt-4 max-w-2xl mx-auto text-xl text-stone-500">
+                        A decision-intelligence platform that quantifies neurocognitive bias and inconsistency inside your organization using AI.
+                    </p>
+                    <div className="mt-8 flex justify-center gap-4">
+                        <Link href="#concept" className="bg-teal-600 text-white px-6 py-3 rounded-lg font-medium shadow-sm hover:bg-teal-700 transition-colors">
+                            Explore the Platform
+                        </Link>
+                        <Link href="#dashboard" className="bg-white text-stone-700 border border-stone-200 px-6 py-3 rounded-lg font-medium hover:bg-stone-50 transition-colors">
+                            View Sample Audit
+                        </Link>
+                    </div>
+                </div>
+            </header>
 
-        <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <div className="card-body">
-            <div style={{
-              width: 48, height: 48, borderRadius: 'var(--radius-md)',
-              background: 'rgba(139, 92, 246, 0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: 'var(--spacing-md)'
-            }}>
-              <AlertTriangle size={24} style={{ color: 'var(--accent-secondary)' }} />
-            </div>
-            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Bias Detection</h4>
-            <p style={{ fontSize: '0.875rem' }}>
-              AI-powered detection of 15 cognitive biases with severity scoring.
-            </p>
-          </div>
-        </div>
+            {/* SECTION 1: The Concept (Interactive Primer) */}
+            <section id="concept" className="py-16 bg-white border-y border-stone-100">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="mb-10 text-center max-w-3xl mx-auto">
+                        <h2 className="text-3xl font-bold text-stone-900 mb-4">Bias is Systematic. Noise is Random.</h2>
+                        <p className="text-stone-500">
+                            Most organizations focus on Bias (errors in one direction), but ignore Noise (random scatter).
+                            Use the simulation below to understand how <strong>Decision Noise</strong> affects your bottom line.
+                        </p>
+                    </div>
 
-        <div className="card animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          <div className="card-body">
-            <div style={{
-              width: 48, height: 48, borderRadius: 'var(--radius-md)',
-              background: 'rgba(16, 185, 129, 0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: 'var(--spacing-md)'
-            }}>
-              <CheckCircle size={24} style={{ color: 'var(--success)' }} />
-            </div>
-            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Actionable Insights</h4>
-            <p style={{ fontSize: '0.875rem' }}>
-              Get specific recommendations to improve decision quality.
-            </p>
-          </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                        {/* Controls / Narrative */}
+                        <div className="lg:col-span-1 space-y-6">
+                            <div className="bg-white border border-stone-200 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-1px_rgba(0,0,0,0.02)] rounded-xl p-6 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-200">
+                                <h3 className="font-semibold text-lg text-stone-800 mb-2">Select a Scenario:</h3>
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={() => updateScatter('noise')}
+                                        className={`w-full text-left px-4 py-3 rounded-lg border transition-all group focus:ring-2 focus:ring-teal-500 focus:outline-none ${scatterMode === 'noise' ? 'border-teal-500 bg-teal-50 ring-1 ring-teal-500' : 'border-stone-200 hover:border-teal-500 hover:bg-teal-50'}`}
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <span className={`font-medium ${scatterMode === 'noise' ? 'text-teal-700' : 'text-stone-700 group-hover:text-teal-700'}`}>High Noise</span>
+                                            <span className="text-xs bg-stone-100 text-stone-500 px-2 py-1 rounded group-hover:bg-white">Common</span>
+                                        </div>
+                                        <p className="text-xs text-stone-400 mt-1">High variance. Correct average, but widely scattered.</p>
+                                    </button>
+
+                                    <button
+                                        onClick={() => updateScatter('bias')}
+                                        className={`w-full text-left px-4 py-3 rounded-lg border transition-all group focus:ring-2 focus:ring-orange-500 focus:outline-none ${scatterMode === 'bias' ? 'border-orange-500 bg-orange-50 ring-1 ring-orange-500' : 'border-stone-200 hover:border-orange-500 hover:bg-orange-50'}`}
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <span className={`font-medium ${scatterMode === 'bias' ? 'text-orange-700' : 'text-stone-700 group-hover:text-orange-700'}`}>Systemic Bias</span>
+                                            <span className="text-xs bg-stone-100 text-stone-500 px-2 py-1 rounded group-hover:bg-white">Dangerous</span>
+                                        </div>
+                                        <p className="text-xs text-stone-400 mt-1">Low variance, but consistently wrong.</p>
+                                    </button>
+
+                                    <button
+                                        onClick={() => updateScatter('optimized')}
+                                        className={`w-full text-left px-4 py-3 rounded-lg border transition-all group focus:ring-2 focus:ring-teal-500 focus:outline-none ${scatterMode === 'optimized' ? 'border-teal-500 bg-teal-50 ring-1 ring-teal-500' : 'border-stone-200 hover:border-teal-500 hover:bg-teal-50'}`}
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <span className={`font-medium ${scatterMode === 'optimized' ? 'text-teal-700' : 'text-stone-700 group-hover:text-teal-700'}`}>AI Optimized</span>
+                                            <span className="text-xs bg-teal-100 text-teal-600 px-2 py-1 rounded group-hover:bg-white">Goal</span>
+                                        </div>
+                                        <p className="text-xs text-stone-400 mt-1">NeuroAudit framework reduces both bias and noise.</p>
+                                    </button>
+                                </div>
+                            </div>
+                            <div className={`text-sm text-stone-500 italic border-l-4 pl-4 py-1 ${scatterExplanation.border}`}>
+                                <strong>{scatterMode === 'noise' ? 'High Noise:' : scatterMode === 'bias' ? 'Systemic Bias:' : 'Optimized:'}</strong> {scatterExplanation.text}
+                            </div>
+                        </div>
+
+                        {/* Visualization */}
+                        <div className="lg:col-span-2">
+                            <div className="bg-white border border-stone-200 shadow-sm rounded-xl p-6">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-semibold text-stone-700">Decision Outcome Visualization</h3>
+                                    <span className="text-xs text-stone-400">Target Value = 50</span>
+                                </div>
+                                <div className="relative w-full h-[300px] md:h-[350px]">
+                                    <Scatter
+                                        data={{
+                                            datasets: [
+                                                {
+                                                    label: 'Decisions',
+                                                    data: scatterData,
+                                                    backgroundColor: scatterMode === 'noise' ? CHART_COLORS.stoneTrans : scatterMode === 'bias' ? CHART_COLORS.orangeTrans : CHART_COLORS.tealSolid,
+                                                    borderColor: scatterMode === 'noise' ? CHART_COLORS.stone : scatterMode === 'bias' ? CHART_COLORS.orange : CHART_COLORS.teal,
+                                                    borderWidth: 1,
+                                                    pointRadius: 5,
+                                                },
+                                                {
+                                                    label: 'Target',
+                                                    data: [{ x: 50, y: 50 }],
+                                                    backgroundColor: '#E7E5E4',
+                                                    pointRadius: 15,
+                                                    pointHoverRadius: 15,
+                                                }
+                                            ]
+                                        }}
+                                        options={{
+                                            maintainAspectRatio: false,
+                                            scales: {
+                                                x: { min: 0, max: 100, grid: { display: false }, ticks: { display: false } },
+                                                y: { min: 0, max: 100, grid: { display: false }, ticks: { display: false } }
+                                            },
+                                            plugins: {
+                                                legend: { display: false },
+                                                tooltip: { enabled: false }
+                                            },
+                                            animation: {
+                                                duration: 1000,
+                                                easing: 'easeOutQuart'
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div className="mt-4 flex justify-center gap-6 text-sm text-stone-500">
+                                    <div className="flex items-center gap-2">
+                                        <span className={`w-3 h-3 rounded-full ${scatterMode === 'noise' ? 'bg-stone-500' : scatterMode === 'bias' ? 'bg-orange-500' : 'bg-teal-500'}`}></span> Decisions
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-3 h-3 rounded-full bg-stone-300"></span> Target
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* SECTION 2: The Audit Dashboard */}
+            <section id="dashboard" className="py-16 bg-stone-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="mb-12">
+                        <span className="text-teal-600 font-semibold tracking-wide uppercase text-sm">Case Study</span>
+                        <h2 className="text-3xl font-bold text-stone-900 mt-2">Sample Organizational Audit</h2>
+                        <p className="text-stone-500 mt-4 max-w-2xl">
+                            We audited 1,200 loan applications and strategic documents. The data revealed a
+                            <strong>55% variance</strong> in expert judgment on identical cases, costing an estimated <strong>$3B+</strong> annually.
+                        </p>
+                    </div>
+
+                    {/* Key Metrics Strip */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        {[
+                            { val: '12.5x', label: 'ROI', sub: 'Return on investment', color: 'text-teal-600' },
+                            { val: '+34%', label: 'Consistency', sub: 'Process alignment', color: 'text-stone-800' },
+                            { val: '-22%', label: 'Risk Exposure', sub: 'Bad debt reduction', color: 'text-orange-500' }
+                        ].map((metric, i) => (
+                            <div key={i} className="bg-white border border-stone-100 rounded-xl p-6 flex flex-col items-center text-center shadow-sm hover:translate-y-[-2px] hover:shadow-md transition-all">
+                                <span className={`text-4xl font-bold ${metric.color} mb-1`}>{metric.val}</span>
+                                <span className="text-sm font-medium text-stone-600 uppercase tracking-wider">{metric.label}</span>
+                                <p className="text-xs text-stone-400 mt-2">{metric.sub}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Detailed Visuals Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                        {/* Radar Chart: Biases */}
+                        <div className="bg-white border border-stone-100 rounded-xl p-6 shadow-sm">
+                            <div className="mb-4 border-b border-stone-100 pb-4">
+                                <h3 className="font-bold text-lg text-stone-800">Prevalent Cognitive Biases</h3>
+                                <p className="text-sm text-stone-500">Frequency of biases detected in text audits.</p>
+                            </div>
+                            <div className="relative w-full h-[300px] md:h-[350px]">
+                                <Radar
+                                    data={{
+                                        labels: ["Confirmation Bias", "Anchoring Effect", "Sunk Cost", "Halo Effect", "Availability", "Groupthink"].map(l => wrapLabel(l)),
+                                        datasets: [{
+                                            label: 'Detected Frequency',
+                                            data: [85, 92, 45, 60, 75, 50],
+                                            fill: true,
+                                            backgroundColor: CHART_COLORS.tealLight,
+                                            borderColor: CHART_COLORS.teal,
+                                            pointBackgroundColor: CHART_COLORS.teal,
+                                            pointBorderColor: '#fff',
+                                            pointHoverBackgroundColor: '#fff',
+                                            pointHoverBorderColor: CHART_COLORS.teal
+                                        }]
+                                    }}
+                                    options={{
+                                        maintainAspectRatio: false,
+                                        scales: {
+                                            r: {
+                                                angleLines: { color: '#E7E5E4' },
+                                                grid: { color: '#E7E5E4' },
+                                                pointLabels: { font: { family: "'Inter', sans-serif", size: 11 }, color: '#57534E' },
+                                                ticks: { display: false }
+                                            }
+                                        },
+                                        plugins: { legend: { display: false } }
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Histogram: Noise */}
+                        <div className="bg-white border border-stone-100 rounded-xl p-6 shadow-sm">
+                            <div className="mb-4 border-b border-stone-100 pb-4">
+                                <h3 className="font-bold text-lg text-stone-800">Judgment Variance (Noise)</h3>
+                                <p className="text-sm text-stone-500">Distribution of valuations via different underwriters.</p>
+                            </div>
+                            <div className="relative w-full h-[300px] md:h-[350px]">
+                                <Bar
+                                    data={{
+                                        labels: ["-30% Undervalued", "-15%", "Correct Value", "+15%", "+30% Overvalued"].map(l => wrapLabel(l)),
+                                        datasets: [{
+                                            label: '% of Decisions',
+                                            data: [15, 25, 30, 20, 10],
+                                            backgroundColor: ['#D6D3D1', '#A8A29E', '#0D9488', '#A8A29E', '#D6D3D1'],
+                                            borderRadius: 4
+                                        }]
+                                    }}
+                                    options={{
+                                        maintainAspectRatio: false,
+                                        scales: {
+                                            y: { beginAtZero: true, grid: { color: '#F5F5F4' }, ticks: { color: '#78716C' } },
+                                            x: { grid: { display: false }, ticks: { color: '#78716C' } }
+                                        },
+                                        plugins: { legend: { display: false } }
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* SECTION 3: The Process */}
+            <section id="process" className="py-16 bg-white border-y border-stone-100">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-bold text-stone-900">How NeuroAudit Works</h2>
+                        <p className="text-stone-500 mt-4 max-w-2xl mx-auto">
+                            Our AI engine ingests unstructured data to turn decision patterns into actionable insights.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        {[
+                            { icon: '📄', title: '1. Ingest', desc: 'Connects to emails, CRM notes, and documents.' },
+                            { icon: '🧠', title: '2. Scan', desc: 'AI agents detect linguistic markers of bias.' },
+                            { icon: '⚖️', title: '3. Audit', desc: 'Compare against historical baselines to quantify noise.' },
+                            { icon: '🔔', title: '4. Nudge', desc: 'Real-time prompts to reconsider judgments.' }
+                        ].map((step, i) => (
+                            <div key={i} className="bg-white border border-stone-200 rounded-xl p-6 relative group hover:bg-stone-50 transition-colors shadow-sm">
+                                <div className="text-4xl mb-4 text-teal-600 opacity-80 group-hover:opacity-100 transition-opacity">{step.icon}</div>
+                                <h3 className="font-bold text-stone-800 mb-2">{step.title}</h3>
+                                <p className="text-sm text-stone-500">{step.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* SECTION 4: Calculator */}
+            <section className="py-16 bg-stone-900 text-stone-100">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-bold text-white">Calculate Your Noise Cost</h2>
+                        <p className="text-stone-400 mt-2">
+                            Research suggests noise costs organizations roughly 10% of total decision value per year.
+                        </p>
+                    </div>
+
+                    <div className="bg-stone-800 rounded-xl p-8 border border-stone-700 shadow-2xl">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            {/* Inputs */}
+                            <div className="space-y-8">
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Annual Decision Volume</label>
+                                    <input
+                                        type="range"
+                                        min="100" max="10000" step="100"
+                                        value={calcVolume}
+                                        onChange={(e) => setCalcVolume(Number(e.target.value))}
+                                        className="w-full accent-teal-600 h-1 bg-stone-600 rounded-lg appearance-none cursor-pointer"
+                                    />
+                                    <div className="flex justify-between text-xs text-stone-500 mt-2">
+                                        <span>100</span>
+                                        <span className="text-teal-400 font-bold">{calcVolume.toLocaleString()}</span>
+                                        <span>10k</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-300 mb-2">Avg. Value per Decision ($)</label>
+                                    <input
+                                        type="range"
+                                        min="1000" max="1000000" step="1000"
+                                        value={calcValue}
+                                        onChange={(e) => setCalcValue(Number(e.target.value))}
+                                        className="w-full accent-teal-600 h-1 bg-stone-600 rounded-lg appearance-none cursor-pointer"
+                                    />
+                                    <div className="flex justify-between text-xs text-stone-500 mt-2">
+                                        <span>$1k</span>
+                                        <span className="text-teal-400 font-bold">${calcValue.toLocaleString()}</span>
+                                        <span>$1M</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Output */}
+                            <div className="flex flex-col justify-center items-center bg-stone-900 rounded-lg border border-stone-700 p-6">
+                                <span className="text-stone-400 text-sm uppercase tracking-widest mb-2">Estimated Annual Loss</span>
+                                <div className="text-4xl md:text-5xl font-bold text-white mb-2">{formattedLoss}</div>
+                                <p className="text-xs text-stone-500 text-center">Based on conservative 10% noise variance model.</p>
+                                <button className="mt-6 w-full bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded transition-colors text-sm font-medium">
+                                    Download Full Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="bg-stone-50 border-t border-stone-200 py-12">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="text-center md:text-left">
+                        <span className="text-xl font-bold text-stone-800 tracking-tight">Neuro<span className="text-teal-600">Audit</span></span>
+                        <p className="text-sm text-stone-500 mt-1">Consistency is the new competitive advantage.</p>
+                    </div>
+                    <div className="flex gap-6 text-sm text-stone-500">
+                        <a href="#" className="hover:text-stone-800 transition-colors">Privacy Policy</a>
+                        <a href="#" className="hover:text-stone-800 transition-colors">Terms of Service</a>
+                        <a href="#" className="hover:text-stone-800 transition-colors">Contact</a>
+                    </div>
+                </div>
+            </footer>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
