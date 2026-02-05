@@ -13,7 +13,7 @@ const { mockGenerateContent, mockGetGenerativeModel } = vi.hoisted(() => {
 
 vi.mock('@google/generative-ai', () => {
     return {
-        GoogleGenerativeAI: vi.fn().mockImplementation(function(this: any) {
+        GoogleGenerativeAI: vi.fn().mockImplementation(function () {
             return {
                 getGenerativeModel: mockGetGenerativeModel
             };

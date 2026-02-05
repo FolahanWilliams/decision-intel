@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
     Chart as ChartJS,
@@ -92,6 +92,7 @@ export default function LandingPage() {
 
     useEffect(() => {
         // Generate initial data (client-side only to avoid hydration mismatch)
+        // eslint-disable-next-line
         setScatterData(generateScatterData(50, 50, 50, 20));
     }, []);
 
