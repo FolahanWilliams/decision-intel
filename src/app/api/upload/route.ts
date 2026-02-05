@@ -75,8 +75,8 @@ export async function POST(request: NextRequest) {
 
         // Ensure bucket exists (idempotent-ish)
         const { data: buckets } = await supabase.storage.listBuckets();
-        if (!buckets?.find(b => b.name === 'documents')) {
-            await supabase.storage.createBucket('documents', {
+        if (!buckets?.find(b => b.name === 'pdf')) {
+            await supabase.storage.createBucket('pdf', {
                 public: false, // Private bucket
                 fileSizeLimit: 5242880, // 5MB
             });
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
         // Upload to Supabase
         const { error: uploadError } = await supabase.storage
-            .from('documents')
+            .from('pdf')
             .upload(storagePath, buffer, {
                 contentType: file.type,
                 upsert: false
