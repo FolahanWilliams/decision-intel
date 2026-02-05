@@ -1,4 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.hoisted(() => {
+    process.env.GOOGLE_API_KEY = 'test-key';
+});
+
 import { riskScorerNode, sentimentAnalyzerNode } from './nodes';
 import { AuditState } from './types';
 
