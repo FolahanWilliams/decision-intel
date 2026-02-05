@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { safeJsonClone } from '@/lib/utils/json';
+import { Document } from '@prisma/client';
 
 export interface ProgressUpdate {
     type: 'bias' | 'noise' | 'summary' | 'complete';
@@ -10,16 +11,25 @@ export interface ProgressUpdate {
 }
 
 export async function analyzeDocument(
-    documentId: string,
+    documentOrId: string | Document,
     onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
-    // Get the document
-    const document = await prisma.document.findUnique({
-        where: { id: documentId }
-    });
+    let document: Document;
+    let documentId: string;
 
-    if (!document) {
-        throw new Error(`Document ${documentId} not found`);
+    if (typeof documentOrId === 'string') {
+        documentId = documentOrId;
+        const fetched = await prisma.document.findUnique({
+            where: { id: documentId }
+        });
+
+        if (!fetched) {
+            throw new Error(`Document ${documentId} not found`);
+        }
+        document = fetched;
+    } else {
+        document = documentOrId;
+        documentId = document.id;
     }
 
     // Update status to analyzing
