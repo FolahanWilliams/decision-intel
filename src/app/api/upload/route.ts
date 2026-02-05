@@ -113,7 +113,15 @@ export async function GET() {
         const documents = await prisma.document.findMany({
             where: { userId },
             orderBy: { uploadedAt: 'desc' },
-            include: {
+            select: {
+                id: true,
+                userId: true,
+                filename: true,
+                fileType: true,
+                fileSize: true,
+                status: true,
+                uploadedAt: true,
+                updatedAt: true,
                 analyses: {
                     take: 1,
                     orderBy: { createdAt: 'desc' }
