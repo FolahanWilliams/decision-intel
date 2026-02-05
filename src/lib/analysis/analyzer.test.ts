@@ -50,10 +50,11 @@ describe('runAnalysis', () => {
 
     invokeMock.mockResolvedValue({ finalReport: mockReport });
 
-    const result = await runAnalysis('test content');
+    const result = await runAnalysis('test content', 'test-doc-id');
 
     expect(invokeMock).toHaveBeenCalledWith(expect.objectContaining({
-      originalContent: 'test content'
+      originalContent: 'test content',
+      documentId: 'test-doc-id'
     }));
     expect(result).toEqual(expect.objectContaining({
       overallScore: 90

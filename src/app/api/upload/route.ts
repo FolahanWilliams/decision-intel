@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import os from 'os';
-import { v4 as uuidv4 } from 'uuid';
 import { auth } from '@clerk/nextjs/server';
 import { parseFile } from '@/lib/utils/file-parser';
 
@@ -64,16 +60,6 @@ export async function POST(request: NextRequest) {
         if (!content.trim()) {
             return NextResponse.json({ error: 'Document appears to be empty' }, { status: 400 });
         }
-
-        // Save file to disk
-        const uploadDir = path.join(os.tmpdir(), 'uploads');
-        await mkdir(uploadDir, { recursive: true });
-
-        const fileId = uuidv4();
-        const ext = path.extname(file.name);
-        const savedFilename = `${fileId}${ext}`;
-        const filePath = path.join(uploadDir, savedFilename);
-        await writeFile(filePath, buffer);
 
         // Store in database
         const document = await prisma.document.create({

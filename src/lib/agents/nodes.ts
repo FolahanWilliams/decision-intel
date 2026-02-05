@@ -1,27 +1,38 @@
 import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult } from '../../types';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
+import { getFinancialContext } from "../tools/financial";
 
-if (!process.env.GOOGLE_API_KEY) {
-    throw new Error("Missing GOOGLE_API_KEY env variable");
+// Lazy singleton for the model
+let modelInstance: GenerativeModel | null = null;
+
+function getModel(): GenerativeModel {
+    if (modelInstance) return modelInstance;
+
+    if (!process.env.GOOGLE_API_KEY) {
+        throw new Error("Missing GOOGLE_API_KEY env variable");
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+    // Using gemini-3-pro-preview - deep reasoning for sophisticated analysis
+    modelInstance = genAI.getGenerativeModel({
+        model: "gemini-3-pro-preview",
+        generationConfig: {
+            responseMimeType: "application/json",
+            maxOutputTokens: 8192
+        },
+        safetySettings: [
+            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
+        ]
+    });
+
+    return modelInstance;
 }
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-// Using gemini-3-pro-preview - deep reasoning for sophisticated analysis
-const model = genAI.getGenerativeModel({
-    model: "gemini-3-pro-preview",
-    generationConfig: {
-        responseMimeType: "application/json",
-        maxOutputTokens: 8192
-    },
-    safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
-    ]
-});
 
 // Timeout wrapper for LLM calls to prevent hanging
 const LLM_TIMEOUT_MS = 45000; // 45 seconds
@@ -39,7 +50,7 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
     console.log("--- Structurer Node (Gemini) ---");
     try {
         const content = state.structuredContent || state.originalContent;
-        const result = await withTimeout(model.generateContent([
+        const result = await withTimeout(getModel().generateContent([
             STRUCTURER_PROMPT,
             `Input Text:\n<input_text>\n${content}\n</input_text>`
         ]));
@@ -63,7 +74,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
     console.log("--- Bias Detective Node (Gemini) ---");
     try {
         const content = state.structuredContent || state.originalContent;
-        const result = await withTimeout(model.generateContent([
+        const result = await withTimeout(getModel().generateContent([
             BIAS_DETECTIVE_PROMPT,
             `Text to Analyze:\n<input_text>\n${content}\n</input_text>`
         ]));
@@ -84,7 +95,7 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
     // Spawn 3 independent "judges" (parallel calls)
     try {
         const promises = [1, 2, 3].map(() =>
-            withTimeout(model.generateContent([
+            withTimeout(getModel().generateContent([
                 NOISE_JUDGE_PROMPT,
                 `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>`,
                 `\n(Random Seed: ${Math.random()})` // Inject noise to encourage variance if model defines deterministic
@@ -126,7 +137,7 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     // For now, we simulate the redaction using a prompt
     const content = state.originalContent;
     try {
-        const result = await withTimeout(model.generateContent([
+        const result = await withTimeout(getModel().generateContent([
             `You are a GDPR Anonymizer. 
             Goal: Redact PII (names, emails, dates) but PRESERVE structural context.
             - John Smith -> [PERSON_1]
@@ -145,16 +156,13 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
 }
 
 // New Node: Fact Checker
-// New Node: Fact Checker with FMP Integration
-import { getFinancialContext } from "../tools/financial";
-
 export async function factCheckerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Fact Checker Node (Gemini + FMP) ---");
     const content = state.structuredContent || state.originalContent;
 
     try {
         // Step 1: Extract Tickers
-        const extractionResult = await model.generateContent([
+        const extractionResult = await getModel().generateContent([
             `Extract any stock symbols (e.g. AAPL, TSLA) mentioned in the text. Return JSON: { "tickers": ["AAPL"] }`,
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
@@ -173,7 +181,7 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         }
 
         // Step 3: Verify Claims using Context
-        const result = await model.generateContent([
+        const result = await getModel().generateContent([
             `You are a Fact Checker. Verify key claims in the text using the provided Financial Data.
             If a claim contradicts the data (e.g. "We are in the Energy sector" but data says "Technology"), flag it.
             Return JSON: { "score": 0-100, "flags": ["Claim X contradicts market data..."] }`,
@@ -195,7 +203,7 @@ export async function preMortemNode(state: AuditState): Promise<Partial<AuditSta
     console.log("--- Pre-Mortem Node (Gemini) ---");
     const content = state.structuredContent || state.originalContent;
     try {
-        const result = await model.generateContent([
+        const result = await getModel().generateContent([
             `You are a Pre-Mortem Architect. 
             Imagine it is 1 year in the future and the decision/plan described in the text has failed catastrophically.
             List 3 plausible reasons why (Failure Scenarios) and 3 Preventive Measures.
@@ -216,7 +224,7 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
     console.log("--- Compliance Mapper (Consumer Duty) ---");
     const content = state.structuredContent || state.originalContent;
     try {
-        const result = await model.generateContent([
+        const result = await getModel().generateContent([
             `You are a Compliance Officer. Analyze the text for alignment with Consumer Duty regulations.
             Check for: 1. Unclear information. 2. Foreseeable Harm. 3. Poor Value.
             
@@ -274,7 +282,7 @@ export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<
     console.log("--- Sentiment Analyzer Node (Gemini) ---");
     try {
         const content = state.structuredContent || state.originalContent;
-        const result = await model.generateContent([
+        const result = await getModel().generateContent([
             `You are a Sentiment Analyzer. ONLY return raw JSON with two keys:
             - "score": A number between -1 and 1.
             - "label": "Positive" | "Negative" | "Neutral".
