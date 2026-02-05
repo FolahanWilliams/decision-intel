@@ -35,7 +35,7 @@ function getModel(): GenerativeModel {
 }
 
 // Timeout wrapper for LLM calls to prevent hanging
-const LLM_TIMEOUT_MS = 45000; // 45 seconds
+const LLM_TIMEOUT_MS = 90000; // 90 seconds - increased for complex analysis
 
 async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS): Promise<T> {
     const timeout = new Promise<never>((_, reject) =>
@@ -46,28 +46,15 @@ async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS):
 
 // Helper to safely parse JSON from LLM output - Imported from utils/json
 
+// Structurer Node - Simplified to pass-through for faster analysis
+// The bias detection works well with raw content
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Structurer Node (Gemini) ---");
-    try {
-        const content = state.structuredContent || state.originalContent;
-        const result = await withTimeout(getModel().generateContent([
-            STRUCTURER_PROMPT,
-            `Input Text:\n<input_text>\n${content}\n</input_text>`
-        ]));
-        const response = result.response?.text ? result.response.text() : "";
-        const data = parseJSON(response);
-
-        return {
-            structuredContent: data?.structuredContent || content,
-            speakers: data?.speakers || []
-        };
-    } catch (e) {
-        console.error("Structurer failed", e);
-        return {
-            structuredContent: state.structuredContent || state.originalContent,
-            speakers: state.speakers || []
-        };
-    }
+    console.log("--- Structurer Node (Pass-through mode) ---");
+    // Skip LLM structuring to avoid timeouts - raw content works well for bias detection
+    return {
+        structuredContent: state.structuredContent || state.originalContent,
+        speakers: []
+    };
 }
 
 export async function biasDetectiveNode(state: AuditState): Promise<Partial<AuditState>> {
