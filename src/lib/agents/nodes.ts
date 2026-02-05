@@ -2,7 +2,7 @@ import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
-import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
+import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT } from "./prompts";
 import { getFinancialContext } from "../tools/financial";
 
 // Lazy singleton for the model

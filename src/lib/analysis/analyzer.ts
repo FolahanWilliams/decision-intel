@@ -4,9 +4,12 @@ import { safeJsonClone } from '@/lib/utils/json';
 import { Document, Prisma } from '@prisma/client';
 
 export interface ProgressUpdate {
-    type: 'bias' | 'noise' | 'summary' | 'complete';
+    type: 'step' | 'bias' | 'noise' | 'summary' | 'complete' | 'error';
+    step?: string;
+    status?: 'running' | 'complete' | 'error';
     biasType?: string;
     result?: unknown;
+    message?: string;
     progress: number;
 }
 
@@ -113,16 +116,28 @@ export async function runAnalysis(
 
     const auditGraph = await getGraph();
 
-    // Run the Graph
-    // In a real app we might stream events from the graph here
-    if (onProgress) onProgress({ type: 'bias', progress: 10 });
+    // Send step-by-step progress updates
+    const sendStep = (step: string, status: 'running' | 'complete', progress: number) => {
+        if (onProgress) onProgress({ type: 'step', step, status, progress });
+    };
+
+    // Start analysis pipeline with detailed steps
+    sendStep('Preparing document', 'running', 5);
+    sendStep('Preparing document', 'complete', 10);
+    sendStep('Detecting cognitive biases', 'running', 15);
 
     const result = await auditGraph.invoke({
         originalContent: content,
         documentId: documentId,
     });
 
-    if (onProgress) onProgress({ type: 'summary', progress: 90 });
+    // Mark all analysis steps as complete
+    sendStep('Detecting cognitive biases', 'complete', 40);
+    sendStep('Analyzing decision noise', 'complete', 55);
+    sendStep('Fact checking claims', 'complete', 70);
+    sendStep('Evaluating compliance', 'complete', 80);
+    sendStep('Generating risk assessment', 'complete', 90);
+    sendStep('Finalizing report', 'running', 95);
 
     if (!result.finalReport) {
         throw new Error("Audit Pipeline failed to generate a report");

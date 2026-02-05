@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck } from 'lucide-react';
 import Link from 'next/link';
 import { SSEReader } from '@/lib/sse';
 
@@ -12,11 +12,29 @@ interface UploadedDoc {
   score?: number;
 }
 
+interface AnalysisStep {
+  name: string;
+  status: 'pending' | 'running' | 'complete';
+  icon: React.ReactNode;
+}
+
+const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
+  { name: 'Preparing document', icon: <FileText size={16} /> },
+  { name: 'Detecting cognitive biases', icon: <Brain size={16} /> },
+  { name: 'Analyzing decision noise', icon: <Scale size={16} /> },
+  { name: 'Fact checking claims', icon: <FileCheck size={16} /> },
+  { name: 'Evaluating compliance', icon: <Shield size={16} /> },
+  { name: 'Generating risk assessment', icon: <BarChart3 size={16} /> },
+  { name: 'Finalizing report', icon: <CheckCircle size={16} /> },
+];
+
 export default function Dashboard() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadedDocs, setUploadedDocs] = useState<UploadedDoc[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [analysisSteps, setAnalysisSteps] = useState<AnalysisStep[]>([]);
+  const [currentProgress, setCurrentProgress] = useState(0);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -79,6 +97,9 @@ export default function Dashboard() {
         throw new Error('No response body from analysis endpoint');
       }
 
+      // Initialize analysis steps
+      setAnalysisSteps(ANALYSIS_STEPS.map(s => ({ ...s, status: 'pending' as const })));
+
       // Read the stream for progress updates
       const reader = analyzeRes.body.getReader();
       const decoder = new TextDecoder();
@@ -97,6 +118,17 @@ export default function Dashboard() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const update = data as any;
 
+            // Handle step progress updates
+            if (update.type === 'step' && update.step) {
+              setCurrentProgress(update.progress || 0);
+              setAnalysisSteps(prev => prev.map(s => ({
+                ...s,
+                status: s.name === update.step
+                  ? update.status
+                  : s.status === 'complete' ? 'complete' : s.status
+              })));
+            }
+
             // Check for error messages in the SSE stream
             if (update.type === 'error') {
               streamError = new Error(update.message || 'Analysis failed');
@@ -104,6 +136,8 @@ export default function Dashboard() {
 
             if (update.type === 'complete' && update.result) {
               finalResult = update.result;
+              // Mark all steps complete
+              setAnalysisSteps(prev => prev.map(s => ({ ...s, status: 'complete' as const })));
             }
           });
         }
@@ -196,9 +230,76 @@ export default function Dashboard() {
         />
 
         {uploading ? (
-          <div className="flex flex-col items-center gap-md">
-            <Loader2 size={48} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
-            <p>Analyzing document for biases...</p>
+          <div className="flex flex-col items-center gap-lg" style={{ width: '100%', maxWidth: '400px' }}>
+            {/* Progress bar */}
+            <div style={{
+              width: '100%',
+              height: '4px',
+              background: 'var(--bg-secondary)',
+              borderRadius: 'var(--radius-sm)',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                width: `${currentProgress}%`,
+                height: '100%',
+                background: 'var(--accent-gradient)',
+                transition: 'width 0.3s ease-out'
+              }} />
+            </div>
+
+            {/* Step list */}
+            <div className="flex flex-col gap-sm" style={{ width: '100%' }}>
+              {analysisSteps.map((step, idx) => (
+                <div
+                  key={step.name}
+                  className="flex items-center gap-md animate-fade-in"
+                  style={{
+                    animationDelay: `${idx * 0.1}s`,
+                    opacity: step.status === 'pending' ? 0.4 : 1,
+                    transition: 'opacity 0.3s ease'
+                  }}
+                >
+                  <div style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: step.status === 'complete'
+                      ? 'rgba(16, 185, 129, 0.2)'
+                      : step.status === 'running'
+                        ? 'rgba(99, 102, 241, 0.2)'
+                        : 'var(--bg-secondary)',
+                    color: step.status === 'complete'
+                      ? 'var(--success)'
+                      : step.status === 'running'
+                        ? 'var(--accent-primary)'
+                        : 'var(--text-muted)'
+                  }}>
+                    {step.status === 'running' ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : step.status === 'complete' ? (
+                      <CheckCircle size={14} />
+                    ) : (
+                      step.icon
+                    )}
+                  </div>
+                  <span style={{
+                    fontSize: '0.875rem',
+                    color: step.status === 'running'
+                      ? 'var(--text-primary)'
+                      : step.status === 'complete'
+                        ? 'var(--success)'
+                        : 'var(--text-muted)',
+                    fontWeight: step.status === 'running' ? 500 : 400
+                  }}>
+                    {step.name}
+                    {step.status === 'running' && '...'}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-md">
