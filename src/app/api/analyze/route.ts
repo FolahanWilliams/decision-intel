@@ -99,7 +99,6 @@ export async function POST(request: NextRequest) {
         console.error('Analysis error:', error);
         // Sanitize error message to prevent prompt injection into Jules
         let errorMessage = error instanceof Error ? error.message : String(error);
-        const errorStack = error instanceof Error ? error.stack || '' : '';
         errorMessage = errorMessage.slice(0, 200).replace(/[<>]/g, ''); // Truncate and remove basic HTML/XML tags
 
         // Self-Healing Trigger
@@ -113,37 +112,10 @@ export async function POST(request: NextRequest) {
             jsonErrorCount++;
             console.warn(`⚠️ Healable error detected. Count: ${jsonErrorCount}`);
 
-            // Only trigger healing in development to prevent runaway costs
-            const isDevelopment = process.env.NODE_ENV === 'development';
-
-            if (jsonErrorCount >= 3 && isDevelopment) {
-                console.log("🚑 Critical Error Threshold Reached. Triggering Jules Healing Pipeline...");
-
-                try {
-                    // Use shell exec to trigger the healing script
-                    const { exec } = await import('child_process');
-                    const sanitizedStack = errorStack
-                        .slice(0, 500)
-                        .replace(/[<>'"]/g, '')
-                        .replace(/\n/g, ' ');
-
-                    exec(`./scripts/jules-healing.sh "${sanitizedStack}"`, (execError, stdout, stderr) => {
-                        if (execError) {
-                            console.error("❌ Healing script failed:", execError.message);
-                        } else {
-                            console.log("✅ Healing script triggered:", stdout);
-                        }
-                        if (stderr) console.error("Healing stderr:", stderr);
-                    });
-
-                    // Reset count after triggering (to avoid spamming)
-                    jsonErrorCount = 0;
-                    console.log("✅ Jules Healing Pipeline Dispatched.");
-                } catch (healingError) {
-                    console.error("❌ Failed to trigger healing:", healingError);
-                }
-            } else if (jsonErrorCount >= 3 && !isDevelopment) {
-                console.warn("⚠️ Would trigger healing, but NODE_ENV !== 'development'. Skipping.");
+            // Self-healing via shell execution is disabled for Serverless compatibility.
+            // In a real production setup, this should trigger a webhook or background job.
+            if (process.env.NODE_ENV === 'development' && jsonErrorCount >= 3) {
+                console.warn("⚠️ Self-healing threshold reached. Skipping local shell script execution to ensure Vercel compatibility.");
             }
         }
 

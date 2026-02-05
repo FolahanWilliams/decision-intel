@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { safeJsonClone } from '@/lib/utils/json';
-import { Document } from '@prisma/client';
+import { Document, Prisma } from '@prisma/client';
 
 export interface ProgressUpdate {
     type: 'bias' | 'noise' | 'summary' | 'complete';
@@ -63,11 +63,11 @@ export async function analyzeDocument(
                 },
                 // Persist new Multi-Agent Data
                 structuredContent: result.structuredContent || '',
-                noiseStats: result.noiseStats || undefined,
-                factCheck: result.factCheck || undefined,
-                compliance: result.compliance || undefined,
-                preMortem: result.preMortem || undefined,
-                sentiment: result.sentiment || undefined,
+                noiseStats: result.noiseStats ?? Prisma.JsonNull,
+                factCheck: result.factCheck ?? Prisma.JsonNull,
+                compliance: result.compliance ?? Prisma.JsonNull,
+                preMortem: result.preMortem ?? Prisma.JsonNull,
+                sentiment: result.sentiment ?? Prisma.JsonNull,
                 speakers: result.speakers || []
             }
         });
