@@ -83,14 +83,25 @@ export async function analyzeDocument(
     }
 }
 
+// Lazy singleton for the graph
+let graphInstance: typeof import('@/lib/agents/graph').auditGraph | null = null;
+
+async function getGraph() {
+    if (!graphInstance) {
+        // Lazy load graph to avoid circular deps or init issues
+        const { auditGraph } = await import('@/lib/agents/graph');
+        graphInstance = auditGraph;
+    }
+    return graphInstance;
+}
+
 // New Multi-Agent// Mock Analysis function (simulating AI delay)
 export async function runAnalysis(
     content: string,
     onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
 
-    // Lazy load graph to avoid circular deps or init issues
-    const { auditGraph } = await import('@/lib/agents/graph');
+    const auditGraph = await getGraph();
 
     // Run the Graph
     // In a real app we might stream events from the graph here
