@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { simulateAnalysis } from '@/lib/analysis/analyzer';
+import { runAnalysis } from '@/lib/analysis/analyzer';
 import { auth } from '@clerk/nextjs/server';
 
 export async function POST(request: NextRequest) {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Run analysis in simulation mode (no DB storage)
-        const result = await simulateAnalysis(content);
+        const result = await runAnalysis(content);
 
         return NextResponse.json(result);
     } catch (error) {

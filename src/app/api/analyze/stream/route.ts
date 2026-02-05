@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { simulateAnalysis, ProgressUpdate } from '@/lib/analysis/analyzer';
+import { runAnalysis, ProgressUpdate } from '@/lib/analysis/analyzer';
 import { formatSSE } from '@/lib/sse';
 import { safeJsonClone } from '@/lib/utils/json';
 import { auth } from '@clerk/nextjs/server';
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
                         data: { status: 'analyzing' }
                     });
 
-                    const result = await simulateAnalysis(doc.content, (update) => {
+                    const result = await runAnalysis(doc.content, (update) => {
                         sendUpdate(update);
                     });
 

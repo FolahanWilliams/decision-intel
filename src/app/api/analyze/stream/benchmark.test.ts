@@ -26,7 +26,7 @@ vi.mock('@clerk/nextjs/server', () => ({
 }));
 
 vi.mock('@/lib/analysis/analyzer', () => ({
-  simulateAnalysis: vi.fn().mockImplementation(async (content, onProgress) => {
+  runAnalysis: vi.fn().mockImplementation(async (content, onProgress) => {
     // Simulate some work/progress
     if (onProgress) onProgress({ type: 'progress', progress: 50 });
     return {

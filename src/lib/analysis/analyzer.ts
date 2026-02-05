@@ -29,7 +29,7 @@ export async function analyzeDocument(
     });
 
     try {
-        const result = await simulateAnalysis(document.content, (update) => {
+        const result = await runAnalysis(document.content, (update) => {
             if (onProgress) onProgress(update);
         });
 
@@ -84,7 +84,7 @@ export async function analyzeDocument(
 }
 
 // New Multi-Agent// Mock Analysis function (simulating AI delay)
-export async function simulateAnalysis(
+export async function runAnalysis(
     content: string,
     onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
