@@ -1,5 +1,4 @@
 import mammoth from 'mammoth';
-import { PDFParse } from 'pdf-parse';
 
 /**
  * Parses the content of a file buffer based on its MIME type or filename extension.
@@ -14,8 +13,10 @@ export async function parseFile(buffer: Buffer, mimeType: string, filename: stri
 
     if (isPdf) {
         try {
-            const parser = new PDFParse({ data: buffer });
-            const data = await parser.getText();
+            // pdf-parse is a CommonJS module, best to require it to avoid type mismatches
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const pdf = require('pdf-parse');
+            const data = await pdf(buffer);
             return data.text;
         } catch (error) {
             throw new Error(`Failed to parse PDF: ${error instanceof Error ? error.message : String(error)}`);
@@ -26,7 +27,7 @@ export async function parseFile(buffer: Buffer, mimeType: string, filename: stri
         try {
             const result = await mammoth.extractRawText({ buffer });
             if (!result.value.trim()) {
-                 console.warn(`DOCX parsing yielded empty text for ${filename}. Messages:`, result.messages);
+                console.warn(`DOCX parsing yielded empty text for ${filename}. Messages:`, result.messages);
             }
             return result.value;
         } catch (error) {
