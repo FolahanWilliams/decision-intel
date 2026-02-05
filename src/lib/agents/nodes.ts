@@ -4,24 +4,32 @@ import { AnalysisResult } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
 
-if (!process.env.GOOGLE_API_KEY) {
-    throw new Error("Missing GOOGLE_API_KEY env variable");
+// Lazy load the model to avoid side effects during import (e.g. in tests)
+let _model: any = null;
+
+function getModel() {
+    if (_model) return _model;
+
+    if (!process.env.GOOGLE_API_KEY) {
+        throw new Error("Missing GOOGLE_API_KEY env variable");
+    }
+    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+    // Using gemini-3-pro-preview - deep reasoning for sophisticated analysis
+    _model = genAI.getGenerativeModel({
+        model: "gemini-3-pro-preview",
+        generationConfig: {
+            responseMimeType: "application/json",
+            maxOutputTokens: 8192
+        },
+        safetySettings: [
+            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
+        ]
+    });
+    return _model;
 }
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-// Using gemini-3-pro-preview - deep reasoning for sophisticated analysis
-const model = genAI.getGenerativeModel({
-    model: "gemini-3-pro-preview",
-    generationConfig: {
-        responseMimeType: "application/json",
-        maxOutputTokens: 8192
-    },
-    safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
-    ]
-});
 
 // Timeout wrapper for LLM calls to prevent hanging
 const LLM_TIMEOUT_MS = 45000; // 45 seconds
@@ -38,6 +46,7 @@ async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS):
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Structurer Node (Gemini) ---");
     try {
+        const model = getModel();
         const content = state.structuredContent || state.originalContent;
         const result = await withTimeout(model.generateContent([
             STRUCTURER_PROMPT,
@@ -62,6 +71,7 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
 export async function biasDetectiveNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Bias Detective Node (Gemini) ---");
     try {
+        const model = getModel();
         const content = state.structuredContent || state.originalContent;
         const result = await withTimeout(model.generateContent([
             BIAS_DETECTIVE_PROMPT,
@@ -83,6 +93,7 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
 
     // Spawn 3 independent "judges" (parallel calls)
     try {
+        const model = getModel();
         const promises = [1, 2, 3].map(() =>
             withTimeout(model.generateContent([
                 NOISE_JUDGE_PROMPT,
@@ -91,10 +102,14 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
             ]))
         );
 
-        const results = await Promise.all(promises);
+        const results = await Promise.allSettled(promises);
         const scores = results.map(r => {
-            const data = parseJSON(r.response.text());
-            return typeof data?.score === 'number' ? data.score : 0;
+            if (r.status === 'fulfilled') {
+                const data = parseJSON(r.value.response.text());
+                return typeof data?.score === 'number' ? data.score : 0;
+            }
+            console.error("Noise Judge failed:", r.reason);
+            return 0;
         });
 
         // Calculate Statistics
@@ -126,6 +141,7 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     // For now, we simulate the redaction using a prompt
     const content = state.originalContent;
     try {
+        const model = getModel();
         const result = await withTimeout(model.generateContent([
             `You are a GDPR Anonymizer. 
             Goal: Redact PII (names, emails, dates) but PRESERVE structural context.
@@ -153,6 +169,7 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
     const content = state.structuredContent || state.originalContent;
 
     try {
+        const model = getModel();
         // Step 1: Extract Tickers
         const extractionResult = await model.generateContent([
             `Extract any stock symbols (e.g. AAPL, TSLA) mentioned in the text. Return JSON: { "tickers": ["AAPL"] }`,
@@ -193,6 +210,7 @@ export async function preMortemNode(state: AuditState): Promise<Partial<AuditSta
     console.log("--- Pre-Mortem Node (Gemini) ---");
     const content = state.structuredContent || state.originalContent;
     try {
+        const model = getModel();
         const result = await model.generateContent([
             `You are a Pre-Mortem Architect. 
             Imagine it is 1 year in the future and the decision/plan described in the text has failed catastrophically.
@@ -214,6 +232,7 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
     console.log("--- Compliance Mapper (Consumer Duty) ---");
     const content = state.structuredContent || state.originalContent;
     try {
+        const model = getModel();
         const result = await model.generateContent([
             `You are a Compliance Officer. Analyze the text for alignment with Consumer Duty regulations.
             Check for: 1. Unclear information. 2. Foreseeable Harm. 3. Poor Value.
@@ -271,6 +290,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
 export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Sentiment Analyzer Node (Gemini) ---");
     try {
+        const model = getModel();
         const content = state.structuredContent || state.originalContent;
         const result = await model.generateContent([
             `You are a Sentiment Analyzer. ONLY return raw JSON with two keys:
