@@ -159,7 +159,9 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
         const extracted = parseJSON(extractionResult.response.text());
-        const tickers = extracted?.tickers || [];
+        const rawTickers = extracted?.tickers || [];
+        // Deduplicate tickers to avoid redundant API calls
+        const tickers = Array.isArray(rawTickers) ? [...new Set(rawTickers as string[])] : [];
 
         // Step 2: Fetch Financial Data (Tool Use)
         let financialContext = "";
