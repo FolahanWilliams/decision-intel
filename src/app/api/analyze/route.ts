@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Reset error count on success
-        const result = await analyzeDocument(documentId);
+        const result = await analyzeDocument(doc);
         jsonErrorCount = 0;
 
         return NextResponse.json({
