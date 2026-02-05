@@ -1,4 +1,5 @@
 import mammoth from 'mammoth';
+import { extractText } from 'unpdf';
 
 /**
  * Parses the content of a file buffer based on its MIME type or filename extension.
@@ -13,11 +14,10 @@ export async function parseFile(buffer: Buffer, mimeType: string, filename: stri
 
     if (isPdf) {
         try {
-            // pdf-parse is a CommonJS module, best to require it to avoid type mismatches
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const pdf = require('pdf-parse');
-            const data = await pdf(buffer);
-            return data.text;
+            // unpdf is a pure JavaScript PDF parser that works in serverless environments
+            const { text } = await extractText(new Uint8Array(buffer));
+            // text is an array of strings (one per page), join them
+            return Array.isArray(text) ? text.join('\n') : text;
         } catch (error) {
             throw new Error(`Failed to parse PDF: ${error instanceof Error ? error.message : String(error)}`);
         }
