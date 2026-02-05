@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import { auth } from '@clerk/nextjs/server';
 import { parseFile } from '@/lib/utils/file-parser';
 
@@ -61,6 +61,37 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Document appears to be empty' }, { status: 400 });
         }
 
+        // Initialize Supabase Admin (Bypass RLS for upload)
+        const { getServiceSupabase } = await import('@/lib/supabase');
+        const supabase = getServiceSupabase();
+
+        const fileId = uuidv4();
+        const ext = path.extname(file.name);
+        // Sanitize filename for storage path
+        const safeFilename = fileId + ext;
+        const storagePath = `${userId}/${safeFilename}`;
+
+        // Ensure bucket exists (idempotent-ish)
+        const { data: buckets } = await supabase.storage.listBuckets();
+        if (!buckets?.find(b => b.name === 'documents')) {
+            await supabase.storage.createBucket('documents', {
+                public: false, // Private bucket
+                fileSizeLimit: 5242880, // 5MB
+            });
+        }
+
+        // Upload to Supabase
+        const { error: uploadError } = await supabase.storage
+            .from('documents')
+            .upload(storagePath, buffer, {
+                contentType: file.type,
+                upsert: false
+            });
+
+        if (uploadError) {
+            console.error('Supabase Storage Upload Error:', uploadError);
+            throw new Error(`Storage Upload Failed: ${uploadError.message}`);
+        }
         // Store in database
         const document = await prisma.document.create({
             data: {
