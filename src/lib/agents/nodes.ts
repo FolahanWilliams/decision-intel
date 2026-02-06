@@ -263,7 +263,7 @@ Return JSON:
 CLAIMS TO VERIFY:
 ${JSON.stringify(claims, null, 2)}
 
-REAL-TIME FINANCIAL DATA (from FMP API):
+REAL-TIME FINANCIAL DATA (from Finnhub API):
 ${JSON.stringify(fetchedData, null, 2)}
 
 VERIFICATION RULES:
