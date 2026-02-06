@@ -613,7 +613,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                     key={idx}
                                     style={{
                                         padding: '16px',
-                                        borderBottom: idx < analysis.factCheck.verifications.length - 1 ? '1px solid var(--border-color)' : 'none'
+                                        borderBottom: idx < (analysis.factCheck?.verifications?.length || 0) - 1 ? '1px solid var(--border-color)' : 'none'
                                     }}
                                 >
                                     <div className="flex items-start gap-md">

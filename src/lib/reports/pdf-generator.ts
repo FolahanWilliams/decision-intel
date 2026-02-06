@@ -99,8 +99,6 @@ export class PdfGenerator {
     }
 
     private addDocumentInfo(filename: string, analysis: ReportAnalysisData) {
-        let yPos = 60;
-
         // Metadata Box
         this.doc.setDrawColor(200, 200, 200);
         this.doc.setFillColor(250, 250, 250);
