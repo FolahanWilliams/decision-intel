@@ -97,3 +97,17 @@ model AuditLog {
   @@index([action])
 }
 
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+  keyPrefix String   // "dk_..." (first 8 chars for logic)
+  keyHash   String   // SHA-256 hash of full key
+  name      String   // e.g. "Production App"
+  lastUsed  DateTime?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([keyHash])
+  @@index([userId])
+}
+

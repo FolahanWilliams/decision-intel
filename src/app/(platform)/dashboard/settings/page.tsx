@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import {
     Settings, Bell, Key, User, Shield, Moon,
-    Save, CheckCircle, AlertTriangle, Eye, EyeOff
+    Save, CheckCircle, AlertTriangle
 } from 'lucide-react';
+
+import { ApiKeyList } from './ApiKeyList';
 
 export default function SettingsPage() {
     // Notification preferences
@@ -15,9 +17,6 @@ export default function SettingsPage() {
     // Display preferences
     const [darkMode, setDarkMode] = useState(true);
     const [compactView, setCompactView] = useState(false);
-
-    // API Key visibility
-    const [showApiKey, setShowApiKey] = useState(false);
 
     // Save state
     const [saved, setSaved] = useState(false);
@@ -146,37 +145,33 @@ export default function SettingsPage() {
 
             {/* API Configuration */}
             <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <div className="card-header">
+                <div className="card-header justify-between">
                     <h3 className="flex items-center gap-sm">
                         <Key size={18} />
-                        API Configuration
+                        Developer API Keys
                     </h3>
+                    <button
+                        onClick={async () => {
+                            const result = await import('@/app/actions/api-keys').then(m => m.createApiKey());
+                            // In a real app, use a proper modal. For now, prompt/alert is a quick way to show "Here is your key"
+                            window.prompt("SAVE THIS KEY NOW! It will not be shown again.", result.key);
+                            // Refresh list
+                            window.location.reload();
+                        }}
+                        className="btn btn-sm btn-primary"
+                        style={{ fontSize: '12px' }}
+                    >
+                        Generate New Key
+                    </button>
                 </div>
                 <div className="card-body">
                     <div className="mb-lg">
-                        <label className="text-xs text-muted uppercase tracking-wider mb-xs block">Google Gemini API Key</label>
-                        <div className="flex items-center gap-md">
-                            <div style={{
-                                flex: 1,
-                                padding: 'var(--spacing-md)',
-                                background: 'var(--bg-secondary)',
-                                borderRadius: 'var(--radius-sm)',
-                                fontFamily: 'monospace',
-                                fontSize: '13px'
-                            }}>
-                                {showApiKey ? 'AIzaSy...configured-on-server' : '••••••••••••••••••••••••'}
-                            </div>
-                            <button
-                                onClick={() => setShowApiKey(!showApiKey)}
-                                className="btn btn-ghost"
-                                style={{ padding: '10px' }}
-                            >
-                                {showApiKey ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
-                        </div>
-                        <p className="text-xs text-muted mt-sm">
-                            API keys are configured server-side via environment variables
+                        <p className="text-xs text-muted mb-md">
+                            Use these keys to authenticate via the <code>x-api-key</code> header.
+                            Keys are hashed and cannot be recovered if lost.
                         </p>
+
+                        <ApiKeyList />
                     </div>
 
                     <div style={{
@@ -190,8 +185,7 @@ export default function SettingsPage() {
                             <span className="text-xs font-bold uppercase" style={{ color: 'var(--warning)' }}>Security Note</span>
                         </div>
                         <p className="text-xs text-muted">
-                            API keys are stored securely on the server and never exposed to the client.
-                            Contact your administrator to update API credentials.
+                            Do not share these keys. If a key is compromised, revoke it immediately.
                         </p>
                     </div>
                 </div>
