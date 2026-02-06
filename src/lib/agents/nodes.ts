@@ -3,10 +3,11 @@ import { parseJSON } from '../utils/json';
 import { AnalysisResult } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT } from "./prompts";
-import { getFinancialContext } from "../tools/financial";
+import { getEnrichedFinancialContext, ClaimType } from "../tools/financial";
 
 // Lazy singleton for the model
 let modelInstance: GenerativeModel | null = null;
+
 
 function getModel(): GenerativeModel {
     if (modelInstance) return modelInstance;
@@ -150,47 +151,123 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     return { structuredContent: state.originalContent };
 }
 
-// New Node: Fact Checker
+// New Node: Fact Checker with Claim Type Detection
 export async function factCheckerNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Fact Checker Node (Gemini + FMP) ---");
+    console.log("--- Fact Checker Node (Gemini + FMP Enhanced) ---");
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
-        // Step 1: Extract Tickers
+        // Step 1: Extract Tickers AND Claim Types
         const extractionResult = await getModel().generateContent([
-            `Extract any stock symbols (e.g. AAPL, TSLA) mentioned in the text. Return JSON: { "tickers": ["AAPL"] }`,
+            `Analyze the text and extract:
+            1. Stock symbols mentioned (e.g. AAPL, TSLA)
+            2. Types of financial claims made. Categories:
+               - "revenue" = revenue, sales, earnings, profit claims
+               - "stock_price" = stock price, share price, returns claims
+               - "market_cap" = valuation, market cap claims
+               - "competitor" = competitor comparisons, market position
+               - "industry" = sector, industry trend claims
+               - "general" = other verifiable financial claims
+            
+            Return JSON: { 
+                "tickers": ["AAPL"], 
+                "claimTypes": ["revenue", "stock_price"],
+                "claims": [
+                    {"text": "Revenue grew 40%", "type": "revenue"},
+                    {"text": "Stock is up 20%", "type": "stock_price"}
+                ]
+            }`,
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
+
         const extractionText = extractionResult.response?.text ? extractionResult.response.text() : "";
         const extracted = parseJSON(extractionText);
         const rawTickers = extracted?.tickers || [];
-        // Deduplicate tickers to avoid redundant API calls
         const tickers = Array.isArray(rawTickers) ? [...new Set(rawTickers as string[])] : [];
+        const claimTypes: ClaimType[] = extracted?.claimTypes || ['general'];
+        const extractedClaims = extracted?.claims || [];
 
-        // Step 2: Fetch Financial Data (Tool Use)
+        console.log(`Tickers: ${tickers.join(', ') || 'None'}`);
+        console.log(`Claim Types: ${claimTypes.join(', ')}`);
+        console.log(`Extracted Claims: ${extractedClaims.length}`);
+
+        // Step 2: Fetch Enriched Financial Data Based on Claim Types
         let financialContext = "";
+        const financialData: Record<string, unknown> = {};
+
         if (tickers.length > 0) {
-            console.log(`Fetching FMP data for: ${tickers.join(', ')}`);
-            const contextPromises = tickers.map((t: string) => getFinancialContext(t));
-            const contexts = await Promise.all(contextPromises);
-            financialContext = `\nREAL-TIME FINANCIAL DATA (FMP):\n${contexts.join('\n')}\n`;
+            console.log(`Fetching enriched FMP data for: ${tickers.join(', ')}`);
+
+            const contextPromises = tickers.map(async (ticker: string) => {
+                const data = await getEnrichedFinancialContext(ticker, claimTypes);
+                return { ticker, data };
+            });
+
+            const results = await Promise.all(contextPromises);
+            results.forEach(({ ticker, data }) => {
+                financialData[ticker] = data;
+            });
+
+            financialContext = `
+=== REAL-TIME FINANCIAL DATA (FMP) ===
+${JSON.stringify(financialData, null, 2)}
+======================================
+`;
         }
 
-        // Step 3: Verify Claims using Context
+        // Step 3: Verify Claims using Enriched Context
         const result = await getModel().generateContent([
-            `You are a Fact Checker. Verify key claims in the text using the provided Financial Data.
-            If a claim contradicts the data (e.g. "We are in the Energy sector" but data says "Technology"), flag it.
-            Return JSON: { "score": 0-100, "flags": ["Claim X contradicts market data..."] }`,
-            `Text:\n<input_text>\n${content}\n</input_text>`,
-            financialContext
+            `You are a Financial Fact Checker with access to real-time market data.
+
+TASK: Verify each claim in the document against the provided financial data.
+
+VERIFICATION GUIDELINES:
+- Revenue/Earnings Claims: Compare stated growth rates, margins, and figures against actual income statement data
+- Stock Price Claims: Verify price changes, returns, and ranges against quote data
+- Market Cap Claims: Verify valuation claims against actual market cap
+- Competitor Claims: Cross-reference with peers list
+- Industry Claims: Check sector classification and performance
+
+For each claim, determine if it is:
+1. VERIFIED - Data supports the claim
+2. CONTRADICTED - Data contradicts the claim (flag these)
+3. UNVERIFIABLE - Insufficient data to verify
+
+EXTRACTED CLAIMS TO VERIFY:
+${JSON.stringify(extractedClaims, null, 2)}
+
+Return JSON: {
+    "score": 0-100,  // Higher = more accurate/verifiable
+    "verifiedCount": number,
+    "contradictedCount": number,
+    "unverifiableCount": number,
+    "flags": [
+        {
+            "claim": "Original claim text",
+            "verdict": "VERIFIED|CONTRADICTED|UNVERIFIABLE", 
+            "actualData": "What the data shows",
+            "explanation": "Why this is flagged"
+        }
+    ]
+}`,
+            `Document:\n<input_text>\n${content}\n</input_text>`,
+            financialContext || "No financial data available - verify claims as UNVERIFIABLE"
         ]);
 
         const text = result.response?.text ? result.response.text() : "";
         const data = parseJSON(text);
-        return { factCheckResult: data || { score: 0, flags: [] } };
+
+        // Enrich result with financial context for display
+        const enrichedResult = {
+            ...(data || { score: 0, flags: [] }),
+            financialContext: financialData,
+            tickersAnalyzed: tickers,
+            claimTypesDetected: claimTypes
+        };
+
+        return { factCheckResult: enrichedResult };
     } catch (e) {
         console.error("Fact Checker failed", e);
-        // FAIL SAFE: Return 0 score on error, not 100.
         return { factCheckResult: { score: 0, flags: ["Error: Fact Check Service Unavailable"] } };
     }
 }
