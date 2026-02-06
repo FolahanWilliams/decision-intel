@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck } from 'lucide-react';
 import Link from 'next/link';
 import { SSEReader } from '@/lib/sse';
@@ -35,6 +35,25 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [analysisSteps, setAnalysisSteps] = useState<AnalysisStep[]>([]);
   const [currentProgress, setCurrentProgress] = useState(0);
+  const [loadingDocs, setLoadingDocs] = useState(true);
+
+  // Fetch existing documents on page load
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const res = await fetch('/api/documents');
+        if (res.ok) {
+          const docs = await res.json();
+          setUploadedDocs(docs);
+        }
+      } catch (err) {
+        console.error('Failed to fetch documents:', err);
+      } finally {
+        setLoadingDocs(false);
+      }
+    };
+    fetchDocuments();
+  }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -326,13 +345,22 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Recently uploaded */}
-      {uploadedDocs.length > 0 && (
-        <div className="card">
-          <div className="card-header">
-            <h3>Recently Uploaded</h3>
-          </div>
-          <div className="card-body">
+      {/* Recently uploaded / Saved documents */}
+      <div className="card">
+        <div className="card-header">
+          <h3>Recently Uploaded</h3>
+        </div>
+        <div className="card-body">
+          {loadingDocs ? (
+            <div className="flex items-center justify-center gap-md" style={{ padding: 'var(--spacing-xl)' }}>
+              <Loader2 size={20} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+              <span className="text-muted">Loading documents...</span>
+            </div>
+          ) : uploadedDocs.length === 0 ? (
+            <div className="text-center text-muted" style={{ padding: 'var(--spacing-xl)' }}>
+              No documents yet. Upload your first document above.
+            </div>
+          ) : (
             <div className="flex flex-col gap-md">
               {uploadedDocs.map((doc, idx) => (
                 <div
@@ -379,9 +407,9 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Features */}
       <div className="grid grid-3 mt-xl">
