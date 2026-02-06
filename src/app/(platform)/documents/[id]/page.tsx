@@ -250,6 +250,18 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                 filename: document.filename,
                 analysis: analysis
             });
+
+            // Log Audit Event (Non-blocking)
+            fetch('/api/audit', {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'EXPORT_PDF',
+                    resource: 'Document',
+                    resourceId: document.id,
+                    details: { filename: document.filename }
+                })
+            }).catch(e => console.error('Audit log failed', e));
+
             showToast('PDF report generated successfully', 'success');
         } catch (error) {
             console.error('Failed to generate PDF:', error);

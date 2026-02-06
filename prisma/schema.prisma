@@ -81,3 +81,19 @@ model DecisionEmbedding {
   @@index([documentId])
 }
 
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String   // Clerk User ID
+  action    String   // e.g. "EXPORT_PDF", "SCAN_DOCUMENT"
+  resource  String   // e.g. "Document", "Analysis"
+  resourceId String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+}
+

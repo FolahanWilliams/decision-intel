@@ -29,6 +29,8 @@
     "@prisma/client": "^5.19.1",
     "@supabase/supabase-js": "^2.95.1",
     "chart.js": "^4.5.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "jspdf": "^4.1.0",
     "jspdf-autotable": "^5.0.7",
@@ -39,6 +41,7 @@
     "react-chartjs-2": "^5.3.1",
     "react-dom": "19.2.3",
     "recharts": "^3.7.0",
+    "tailwind-merge": "^3.4.0",
     "unpdf": "^1.4.0",
     "uuid": "^13.0.0"
   },
