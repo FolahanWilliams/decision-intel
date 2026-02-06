@@ -220,7 +220,17 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
             REAL-TIME FINANCIAL DATA (Finnhub):
             ${JSON.stringify(fetchedData, null, 2)}
             
-            Return JSON schema (score, verifications array).`,
+            Return valid JSON matching this schema:
+            {
+                "score": 0-100,
+                "verifications": [
+                    { 
+                        "claim": "string", 
+                        "verdict": "VERIFIED" | "CONTRADICTED" | "UNVERIFIABLE", 
+                        "explanation": "string including search source citations" 
+                    }
+                ]
+            }`,
             `Primary Company: ${companyName}`
         ]);
 
