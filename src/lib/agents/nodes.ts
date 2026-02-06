@@ -188,13 +188,18 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         // Fetch Data (Finnhub)
         let fetchedData: Record<string, unknown> = {};
         if (dataRequests.length > 0) {
-            const validRequests: DataRequest[] = dataRequests.map((r: any) => ({
-                ticker: r.ticker.toUpperCase(),
-                dataType: r.dataType,
-                reason: r.reason,
-                claimToVerify: r.claimToVerify
-            }));
-            fetchedData = await executeDataRequests(validRequests);
+            const validRequests: DataRequest[] = dataRequests
+                .filter((r: any) => r && r.ticker && typeof r.ticker === 'string')
+                .map((r: any) => ({
+                    ticker: r.ticker.toUpperCase(),
+                    dataType: r.dataType,
+                    reason: r.reason,
+                    claimToVerify: r.claimToVerify
+                }));
+
+            if (validRequests.length > 0) {
+                fetchedData = await executeDataRequests(validRequests);
+            }
         }
 
         // PASS 2: Verify with Grounding (Using Grounded Model)
