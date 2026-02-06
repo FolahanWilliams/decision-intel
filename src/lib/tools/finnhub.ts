@@ -103,7 +103,7 @@ export async function getFinnhubProfile(ticker: string, apiKey: string): Promise
         symbol: data.ticker,
         price: 0, // Profile2 doesn't have price, handle upstream
         companyName: data.name,
-        description: `Industry: ${data.finnhubIndustry}, Exchange: ${data.exchange}`,
+        description: `Industry: ${data.finnhubIndustry}, Exchange: ${data.exchange}, IPO Date: ${data.ipo}, Phone: ${data.phone}, Website: ${data.weburl}`,
         sector: data.finnhubIndustry, // Finnhub uses industry broadly
         industry: data.finnhubIndustry,
         mktCap: data.marketCapitalization * 1000000, // Finnhub is in millions
