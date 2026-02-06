@@ -43,6 +43,7 @@ interface FactCheck {
     verifications?: Verification[];
     primaryCompany?: { ticker: string; name: string };
     dataFetchedAt?: string;
+    searchSources?: string[];
 }
 
 interface Analysis {
@@ -560,6 +561,39 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                             </span>
                         )}
                     </div>
+                    {/* Search Grounding Sources */}
+                    {analysis.factCheck.searchSources && analysis.factCheck.searchSources.length > 0 && (
+                        <div style={{ padding: '12px 16px', background: 'rgba(66, 133, 244, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
+                            <div className="flex items-center gap-sm" style={{ fontSize: '11px', fontWeight: 600, marginBottom: '8px', color: 'var(--accent-primary)' }}>
+                                <ExternalLink size={12} />
+                                VERIFIED WITH GOOGLE SEARCH GROUNDING:
+                            </div>
+                            <div className="flex flex-wrap gap-sm">
+                                {analysis.factCheck.searchSources.map((source, i) => {
+                                    try {
+                                        return (
+                                            <a key={i} href={source} target="_blank" rel="noopener noreferrer"
+                                                className="badge hover:opacity-80 transition-opacity"
+                                                style={{
+                                                    textDecoration: 'none',
+                                                    background: 'var(--bg-card)',
+                                                    border: '1px solid var(--border-color)',
+                                                    color: 'var(--text-primary)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px',
+                                                    maxWidth: '100%'
+                                                }}>
+                                                <span style={{ opacity: 0.7 }}>Source {i + 1}:</span>
+                                                <span style={{ fontWeight: 500 }}>{new URL(source).hostname}</span>
+                                                <ExternalLink size={10} style={{ opacity: 0.5 }} />
+                                            </a>
+                                        );
+                                    } catch (e) { return null; }
+                                })}
+                            </div>
+                        </div>
+                    )}
                     <div className="card-body" style={{ padding: 0 }}>
                         {analysis.factCheck.verifications.map((v, idx) => (
                             <div
