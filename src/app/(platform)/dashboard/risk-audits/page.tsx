@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
     ShieldAlert, FileText, AlertTriangle, CheckCircle,
     Loader2, TrendingUp, TrendingDown, ArrowRight,
-    AlertCircle, Shield, BarChart3
+    AlertCircle, Shield, BarChart3, Trash2
 } from 'lucide-react';
 
 interface DocumentWithRisk {
@@ -34,6 +34,12 @@ export default function RiskAuditsPage() {
     const [documents, setDocuments] = useState<DocumentWithRisk[]>([]);
     const [loading, setLoading] = useState(true);
     const [summary, setSummary] = useState<RiskSummary | null>(null);
+
+    // Delete state
+    const [deleteModal, setDeleteModal] = useState<{ open: boolean; docId: string; filename: string }>({
+        open: false, docId: '', filename: ''
+    });
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         const fetchRiskData = async () => {
@@ -99,6 +105,26 @@ export default function RiskAuditsPage() {
         if (score < 40) return { label: 'HIGH RISK', color: 'var(--error)', bg: 'rgba(239, 68, 68, 0.1)' };
         if (score < 70) return { label: 'MEDIUM RISK', color: 'var(--warning)', bg: 'rgba(245, 158, 11, 0.1)' };
         return { label: 'LOW RISK', color: 'var(--success)', bg: 'rgba(34, 197, 94, 0.1)' };
+    };
+
+    // Delete handler
+    const handleDelete = async () => {
+        if (!deleteModal.docId) return;
+        setDeleting(true);
+        try {
+            const res = await fetch(`/api/documents/${deleteModal.docId}`, { method: 'DELETE' });
+            if (res.ok) {
+                setDocuments(prev => prev.filter(d => d.id !== deleteModal.docId));
+                // Recalculate summary
+                const newDocs = documents.filter(d => d.id !== deleteModal.docId);
+                setSummary(calculateRiskSummary(newDocs));
+                setDeleteModal({ open: false, docId: '', filename: '' });
+            }
+        } catch (err) {
+            console.error('Delete failed:', err);
+        } finally {
+            setDeleting(false);
+        }
     };
 
     if (loading) {
@@ -337,6 +363,14 @@ export default function RiskAuditsPage() {
                                         >
                                             View Details <ArrowRight size={14} />
                                         </Link>
+                                        <button
+                                            onClick={() => setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })}
+                                            className="btn btn-ghost"
+                                            style={{ padding: '8px', color: 'var(--text-muted)' }}
+                                            title="Delete document"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
                                 </div>
                             );
@@ -375,6 +409,46 @@ export default function RiskAuditsPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteModal.open && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.75)', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                }}>
+                    <div className="card" style={{ maxWidth: 400, width: '90%' }}>
+                        <div className="card-header">
+                            <h3 className="flex items-center gap-sm">
+                                <AlertTriangle size={20} style={{ color: 'var(--error)' }} />
+                                Delete Document
+                            </h3>
+                        </div>
+                        <div className="card-body">
+                            <p className="mb-lg">
+                                Are you sure you want to delete <strong>{deleteModal.filename}</strong>? This action cannot be undone.
+                            </p>
+                            <div className="flex items-center gap-md justify-end">
+                                <button
+                                    onClick={() => setDeleteModal({ open: false, docId: '', filename: '' })}
+                                    className="btn btn-ghost"
+                                    disabled={deleting}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="btn"
+                                    style={{ background: 'var(--error)', color: '#fff' }}
+                                    disabled={deleting}
+                                >
+                                    {deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck } from 'lucide-react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, Filter, X } from 'lucide-react';
 import Link from 'next/link';
 import { SSEReader } from '@/lib/sse';
 
@@ -37,6 +37,17 @@ export default function Dashboard() {
   const [currentProgress, setCurrentProgress] = useState(0);
   const [loadingDocs, setLoadingDocs] = useState(true);
 
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>('all');
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Delete confirmation state
+  const [deleteModal, setDeleteModal] = useState<{ open: boolean; docId: string; filename: string }>({
+    open: false, docId: '', filename: ''
+  });
+  const [deleting, setDeleting] = useState(false);
+
   // Fetch existing documents on page load
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -54,6 +65,35 @@ export default function Dashboard() {
     };
     fetchDocuments();
   }, []);
+
+  // Filtered documents based on search and status
+  const filteredDocs = useMemo(() => {
+    return uploadedDocs.filter(doc => {
+      const matchesSearch = doc.filename.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [uploadedDocs, searchQuery, statusFilter]);
+
+  // Delete document handler
+  const handleDelete = async () => {
+    if (!deleteModal.docId) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/documents/${deleteModal.docId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setUploadedDocs(prev => prev.filter(d => d.id !== deleteModal.docId));
+        setDeleteModal({ open: false, docId: '', filename: '' });
+      } else {
+        setError('Failed to delete document');
+      }
+    } catch (err) {
+      console.error('Delete failed:', err);
+      setError('Failed to delete document');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -347,9 +387,67 @@ export default function Dashboard() {
 
       {/* Recently uploaded / Saved documents */}
       <div className="card">
-        <div className="card-header">
-          <h3>Recently Uploaded</h3>
+        <div className="card-header flex items-center justify-between">
+          <h3>Your Documents</h3>
+          <div className="flex items-center gap-md">
+            {/* Search Input */}
+            <div style={{ position: 'relative' }}>
+              <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                placeholder="Search documents..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  padding: '8px 12px 8px 36px',
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-primary)',
+                  fontSize: '13px',
+                  width: 200
+                }}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+            {/* Filter Button */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`btn btn-ghost flex items-center gap-sm ${showFilters ? 'active' : ''}`}
+              style={{ fontSize: '12px', padding: '8px 12px', background: showFilters ? 'rgba(99, 102, 241, 0.1)' : 'transparent' }}
+            >
+              <Filter size={14} />
+              Filter
+            </button>
+          </div>
         </div>
+
+        {/* Filter Options */}
+        {showFilters && (
+          <div style={{ padding: 'var(--spacing-md)', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-tertiary)' }}>
+            <div className="flex items-center gap-md">
+              <span className="text-xs text-muted">Status:</span>
+              {(['all', 'complete', 'analyzing', 'pending'] as const).map(status => (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`btn ${statusFilter === status ? 'btn-primary' : 'btn-ghost'}`}
+                  style={{ fontSize: '11px', padding: '4px 10px', textTransform: 'capitalize' }}
+                >
+                  {status === 'all' ? 'All' : status}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="card-body">
           {loadingDocs ? (
             <div className="flex items-center justify-center gap-md" style={{ padding: 'var(--spacing-xl)' }}>
@@ -360,9 +458,13 @@ export default function Dashboard() {
             <div className="text-center text-muted" style={{ padding: 'var(--spacing-xl)' }}>
               No documents yet. Upload your first document above.
             </div>
+          ) : filteredDocs.length === 0 ? (
+            <div className="text-center text-muted" style={{ padding: 'var(--spacing-xl)' }}>
+              No documents match your search or filter.
+            </div>
           ) : (
             <div className="flex flex-col gap-md">
-              {uploadedDocs.map((doc, idx) => (
+              {filteredDocs.map((doc, idx) => (
                 <div
                   key={doc.id}
                   className="flex items-center justify-between animate-fade-in"
@@ -370,7 +472,7 @@ export default function Dashboard() {
                     padding: 'var(--spacing-md)',
                     background: 'var(--bg-secondary)',
                     borderRadius: 'var(--radius-md)',
-                    animationDelay: `${idx * 0.1}s`
+                    animationDelay: `${idx * 0.05}s`
                   }}
                 >
                   <div className="flex items-center gap-md">
@@ -403,6 +505,15 @@ export default function Dashboard() {
                         </Link>
                       </>
                     )}
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })}
+                      className="btn btn-ghost"
+                      style={{ padding: '6px', color: 'var(--text-muted)' }}
+                      title="Delete document"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -410,6 +521,46 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.open && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.75)', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', zIndex: 1000
+        }}>
+          <div className="card" style={{ maxWidth: 400, width: '90%' }}>
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <AlertTriangle size={20} style={{ color: 'var(--error)' }} />
+                Delete Document
+              </h3>
+            </div>
+            <div className="card-body">
+              <p className="mb-lg">
+                Are you sure you want to delete <strong>{deleteModal.filename}</strong>? This action cannot be undone.
+              </p>
+              <div className="flex items-center gap-md justify-end">
+                <button
+                  onClick={() => setDeleteModal({ open: false, docId: '', filename: '' })}
+                  className="btn btn-ghost"
+                  disabled={deleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="btn"
+                  style={{ background: 'var(--error)', color: '#fff' }}
+                  disabled={deleting}
+                >
+                  {deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Features */}
       <div className="grid grid-3 mt-xl">

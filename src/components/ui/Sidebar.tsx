@@ -44,7 +44,7 @@ export default function Sidebar() {
                 <div style={{ fontSize: '11px', color: '#666', padding: '16px 12px 8px', textTransform: 'uppercase' }}>
                     System
                 </div>
-                <NavItem href="#" icon={<Settings size={18} />} label="Settings" />
+                <NavItem href="/dashboard/settings" icon={<Settings size={18} />} label="Settings" active={pathname === '/dashboard/settings'} />
             </nav>
 
             <div style={{ padding: '16px', borderTop: '1px solid var(--border-color)' }}>
