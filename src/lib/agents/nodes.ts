@@ -158,35 +158,60 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
 
     try {
         // Step 1: Extract Tickers AND Claim Types
+        // IMPORTANT: Be very strict about ticker extraction - only exact matches
         const extractionResult = await getModel().generateContent([
-            `Analyze the text and extract:
-            1. Stock symbols mentioned (e.g. AAPL, TSLA)
-            2. Types of financial claims made. Categories:
-               - "revenue" = revenue, sales, earnings, profit claims
-               - "stock_price" = stock price, share price, returns claims
-               - "market_cap" = valuation, market cap claims
-               - "competitor" = competitor comparisons, market position
-               - "industry" = sector, industry trend claims
-               - "general" = other verifiable financial claims
-            
-            Return JSON: { 
-                "tickers": ["AAPL"], 
-                "claimTypes": ["revenue", "stock_price"],
-                "claims": [
-                    {"text": "Revenue grew 40%", "type": "revenue"},
-                    {"text": "Stock is up 20%", "type": "stock_price"}
-                ]
-            }`,
+            `You are a strict financial document parser. Analyze the text and extract ONLY the following:
+
+1. STOCK TICKERS: Extract stock symbols (like AAPL, TSLA, ABNB) that are EXPLICITLY WRITTEN in the text.
+   - Only include a ticker if the exact symbol appears in the document (e.g., "ABNB" or "Airbnb (ABNB)")
+   - If a company is mentioned by name only (e.g., "Apple" without "AAPL"), try to identify its ticker
+   - DO NOT hallucinate or guess tickers that aren't related to the document's main subject
+   - If the document is about Airbnb, only include ABNB unless other tickers are explicitly mentioned
+
+2. CLAIM TYPES: What kinds of financial claims are made:
+   - "revenue" = revenue, sales, earnings, profit claims
+   - "stock_price" = stock price, share price, returns claims  
+   - "market_cap" = valuation, market cap claims
+   - "competitor" = competitor comparisons (only if specific competitors are named)
+   - "industry" = sector, industry trend claims
+   - "general" = other verifiable financial claims
+
+3. CLAIMS: List specific verifiable financial claims with their text
+
+CRITICAL: Focus on the PRIMARY company being analyzed. If this is an Airbnb document, don't add AAPL or AMZN unless they are explicitly discussed as comparisons.
+
+Return JSON: { 
+    "primaryCompany": "ABNB",
+    "tickers": ["ABNB"], 
+    "claimTypes": ["revenue", "stock_price"],
+    "claims": [
+        {"text": "Revenue grew 40%", "type": "revenue", "company": "ABNB"},
+        {"text": "Stock is up 20%", "type": "stock_price", "company": "ABNB"}
+    ]
+}`,
             `Text:\n<input_text>\n${content}\n</input_text>`
         ]);
 
         const extractionText = extractionResult.response?.text ? extractionResult.response.text() : "";
         const extracted = parseJSON(extractionText);
         const rawTickers = extracted?.tickers || [];
-        const tickers = Array.isArray(rawTickers) ? [...new Set(rawTickers as string[])] : [];
+
+        // Validation: Only keep tickers that make sense for the document
+        const primaryCompany = extracted?.primaryCompany || null;
+        let tickers = Array.isArray(rawTickers) ? [...new Set(rawTickers as string[])] : [];
+
+        // If we have a primary company, prioritize it
+        if (primaryCompany && !tickers.includes(primaryCompany)) {
+            tickers = [primaryCompany, ...tickers];
+        }
+
+        // Limit to 3 tickers max to avoid noise
+        tickers = tickers.slice(0, 3);
+
         const claimTypes: ClaimType[] = extracted?.claimTypes || ['general'];
         const extractedClaims = extracted?.claims || [];
 
+        console.log(`Primary Company: ${primaryCompany || 'Unknown'}`);
         console.log(`Tickers: ${tickers.join(', ') || 'None'}`);
         console.log(`Claim Types: ${claimTypes.join(', ')}`);
         console.log(`Extracted Claims: ${extractedClaims.length}`);
