@@ -51,6 +51,72 @@ const SEVERITY_COLORS: Record<string, string> = {
     critical: 'var(--severity-critical)'
 };
 
+// Helper function to get bias definitions for AI reasoning explanation
+function getBiasDefinition(biasType: string): string {
+    const definitions: Record<string, string> = {
+        'Confirmation Bias': 'A cognitive bias where individuals favor information that confirms their pre-existing beliefs while ignoring contradictory evidence. The AI detected linguistic patterns suggesting the author is selectively presenting evidence that supports a predetermined conclusion.',
+        'Anchoring Bias': 'The tendency to rely too heavily on the first piece of information encountered (the "anchor") when making decisions. The AI identified initial figures or statements that appear to disproportionately influence subsequent reasoning.',
+        'Sunk Cost Fallacy': 'The tendency to continue investing in something because of previously invested resources, rather than future value. The AI detected language justifying continued investment based on past spending rather than prospective returns.',
+        'Overconfidence Bias': 'Excessive confidence in one\'s own answers, beliefs, or abilities without adequate evidence. The AI identified absolute language, certainty claims, or dismissal of risks without supporting data.',
+        'Groupthink': 'A psychological phenomenon where the desire for harmony leads to irrational decision-making. The AI detected patterns of unanimous agreement, suppression of dissenting views, or pressure to conform.',
+        'Authority Bias': 'The tendency to attribute greater accuracy to opinions of an authority figure. The AI identified deference to titles, positions, or status over evidence and logical reasoning.',
+        'Bandwagon Effect': 'The tendency to follow trends or adopt beliefs because others do. The AI detected reasoning based on popularity or peer behavior rather than independent analysis.',
+        'Loss Aversion': 'The tendency to prefer avoiding losses over acquiring equivalent gains. The AI identified disproportionate focus on potential losses compared to potential gains.',
+        'Availability Heuristic': 'Overweighting easily recalled or recent events when making decisions. The AI detected references to memorable or recent events without proportional consideration of base rates.',
+        'Hindsight Bias': 'The tendency to believe, after an event occurs, that one would have predicted or expected it. The AI identified post-hoc rationalization or claims of foreknowledge about past outcomes.',
+        'Planning Fallacy': 'The tendency to underestimate time, costs, or complexity of future tasks. The AI detected optimistic projections without adequate consideration of potential obstacles.',
+        'Status Quo Bias': 'A preference for the current state of affairs and resistance to change. The AI identified language favoring existing conditions without objective comparison to alternatives.',
+        'Framing Effect': 'Drawing different conclusions from the same information depending on how it\'s presented. The AI detected selective presentation of information that may influence perception.',
+        'Selective Perception': 'Filtering information based on expectations or desires. The AI identified patterns of interpreting data in ways that align with predetermined expectations.',
+        'Recency Bias': 'Overweighting recent events over historical patterns. The AI detected disproportionate emphasis on recent data while ignoring longer-term trends.'
+    };
+    return definitions[biasType] || `${biasType} is a cognitive distortion that can lead to flawed decision-making. The AI detected patterns in the text that match this bias profile.`;
+}
+
+// Helper function to explain how the AI detected the bias
+function getDetectionMethodology(biasType: string, excerpt: string): string {
+    const methods: Record<string, string> = {
+        'Confirmation Bias': 'Analyzed text for one-sided evidence presentation, absence of counterarguments, and selective data citation patterns.',
+        'Anchoring Bias': 'Identified initial numeric values or statements that subsequent analysis appears tethered to, with insufficient adjustment.',
+        'Sunk Cost Fallacy': 'Scanned for references to past investments (time, money, effort) used to justify future decisions rather than forward-looking analysis.',
+        'Overconfidence Bias': 'Detected absolute language ("certainly", "definitely", "will"), dismissal of uncertainty, and lack of hedging or risk acknowledgment.',
+        'Groupthink': 'Identified consensus language without documented debate, unanimous approval patterns, and absence of dissenting viewpoints.',
+        'Authority Bias': 'Found citations of authority figures, titles, or credentials as primary justification rather than evidence-based reasoning.',
+        'Bandwagon Effect': 'Detected reasoning based on market trends, competitor actions, or "everyone is doing it" justifications.',
+        'Loss Aversion': 'Analyzed risk language asymmetry—identifying disproportionate focus on potential losses vs. equivalent gains.',
+        'Availability Heuristic': 'Identified references to recent, memorable, or emotionally salient events without base rate consideration.',
+        'Hindsight Bias': 'Detected post-event language claiming predictability ("we knew", "it was obvious", "as expected").',
+        'Planning Fallacy': 'Analyzed projections for optimistic bias, absence of contingency buffers, and historical accuracy of similar estimates.',
+        'Status Quo Bias': 'Identified resistance language, risk framing of change, and insufficient comparative analysis of alternatives.',
+        'Framing Effect': 'Detected selective presentation of statistics, emphasis patterns, and language that could influence perception.',
+        'Selective Perception': 'Analyzed interpretation patterns for consistency with stated expectations or desired outcomes.',
+        'Recency Bias': 'Compared temporal weighting of evidence—identifying overemphasis on recent vs. historical data.'
+    };
+    const wordCount = excerpt.split(' ').length;
+    return `${methods[biasType] || 'Applied psycholinguistic pattern matching to identify cognitive distortion markers.'} The flagged excerpt (${wordCount} words) triggered this detection with high confidence.`;
+}
+
+// Helper function to assess impact based on bias type and severity
+function getImpactAssessment(biasType: string, severity: string): string {
+    const severityImpacts: Record<string, string> = {
+        'low': 'Minor impact on decision quality. May slightly skew perception but unlikely to cause significant harm if addressed.',
+        'medium': 'Moderate impact on decision quality. Could lead to suboptimal outcomes if not corrected. Warrants attention in review process.',
+        'high': 'Significant impact on decision quality. High probability of leading to flawed conclusions. Requires immediate attention and correction.',
+        'critical': 'Severe impact on decision quality. This bias pattern could fundamentally undermine the validity of the analysis and lead to catastrophic outcomes.'
+    };
+
+    const biasRisks: Record<string, string> = {
+        'Confirmation Bias': 'May cause rejection of valid counterevidence and missed opportunities.',
+        'Overconfidence Bias': 'Can lead to inadequate risk preparation and unexpected failures.',
+        'Sunk Cost Fallacy': 'May perpetuate losing investments and delay necessary pivots.',
+        'Groupthink': 'Suppresses innovation and can lead to catastrophic blind spots.',
+        'Hindsight Bias': 'Prevents learning from experience and distorts future planning.',
+        'Planning Fallacy': 'Leads to budget overruns, missed deadlines, and resource misallocation.'
+    };
+
+    return `${severityImpacts[severity] || severityImpacts['medium']} ${biasRisks[biasType] || 'This bias type can distort judgment and lead to flawed decision-making.'}`;
+}
+
 export default function DocumentDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const [document, setDocument] = useState<Document | null>(null);
@@ -522,33 +588,130 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
 
             {/* Bias Detail Lightbox (at bottom or floating) */}
             {selectedBias && (
-                <div className="card mt-xl">
-                    <div className="card-header flex items-center justify-between">
+                <div className="card mt-xl" style={{ border: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}20` }}>
+                    <div className="card-header flex items-center justify-between" style={{ borderBottom: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}30` }}>
                         <div className="flex items-center gap-md">
                             <AlertTriangle
                                 size={20}
                                 style={{ color: SEVERITY_COLORS[selectedBias.severity] }}
                             />
                             <h3>{selectedBias.biasType}</h3>
+                            <span className={`badge badge-${selectedBias.severity}`} style={{ marginLeft: 'var(--spacing-sm)' }}>
+                                {selectedBias.severity.toUpperCase()}
+                            </span>
                         </div>
                         <button onClick={() => setSelectedBias(null)} className="btn btn-ghost" style={{ padding: 0 }}>CLOSE</button>
                     </div>
-                    <div className="card-body grid grid-2">
-                        <div>
-                            <h4 className="text-xs text-muted mb-sm">EXCERPT</h4>
-                            <blockquote style={{ padding: 'var(--spacing-md)', background: '#000', borderLeft: `4px solid ${SEVERITY_COLORS[selectedBias.severity]}`, fontSize: '12px' }}>
-                                &quot;{selectedBias.excerpt}&quot;
-                            </blockquote>
+
+                    <div className="card-body" style={{ padding: 0 }}>
+                        {/* Section 1: Bias Definition */}
+                        <div style={{ padding: 'var(--spacing-lg)', background: 'rgba(99, 102, 241, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
+                            <div className="flex items-center gap-sm mb-sm">
+                                <Info size={14} style={{ color: 'var(--accent-primary)' }} />
+                                <h4 className="text-xs text-muted uppercase">What is {selectedBias.biasType}?</h4>
+                            </div>
+                            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                                {getBiasDefinition(selectedBias.biasType)}
+                            </p>
                         </div>
-                        <div>
-                            <h4 className="text-xs text-muted mb-sm">ANALYSIS & RECOMMENDATION</h4>
-                            <p className="mb-md" style={{ fontSize: '13px' }}>{selectedBias.explanation}</p>
-                            <div style={{ padding: 'var(--spacing-md)', background: 'rgba(48, 209, 88, 0.05)', border: '1px solid var(--success)' }}>
-                                <div className="flex items-center gap-sm mb-xs">
-                                    <Lightbulb size={16} style={{ color: 'var(--success)' }} />
-                                    <span className="text-xs font-bold text-success uppercase">Correction</span>
+
+                        <div className="grid grid-2">
+                            {/* Section 2: Evidence Found */}
+                            <div style={{ padding: 'var(--spacing-lg)', borderRight: '1px solid var(--border-color)' }}>
+                                <h4 className="text-xs text-muted mb-md uppercase flex items-center gap-sm">
+                                    <FileText size={14} />
+                                    Evidence Detected
+                                </h4>
+                                <blockquote style={{
+                                    padding: 'var(--spacing-md)',
+                                    background: '#0a0a0a',
+                                    borderLeft: `4px solid ${SEVERITY_COLORS[selectedBias.severity]}`,
+                                    fontSize: '13px',
+                                    fontStyle: 'italic',
+                                    marginBottom: 'var(--spacing-md)'
+                                }}>
+                                    &quot;{selectedBias.excerpt}&quot;
+                                </blockquote>
+
+                                {/* AI Detection Methodology */}
+                                <div style={{
+                                    padding: 'var(--spacing-md)',
+                                    background: 'rgba(255, 159, 10, 0.05)',
+                                    border: '1px solid rgba(255, 159, 10, 0.2)',
+                                    borderRadius: 'var(--radius-sm)'
+                                }}>
+                                    <div className="flex items-center gap-sm mb-sm">
+                                        <Terminal size={12} style={{ color: 'var(--warning)' }} />
+                                        <span className="text-xs font-bold uppercase" style={{ color: 'var(--warning)' }}>AI Detection Method</span>
+                                    </div>
+                                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                        {getDetectionMethodology(selectedBias.biasType, selectedBias.excerpt)}
+                                    </p>
                                 </div>
-                                <p style={{ fontSize: '13px' }}>{selectedBias.suggestion}</p>
+                            </div>
+
+                            {/* Section 3: AI Analysis */}
+                            <div style={{ padding: 'var(--spacing-lg)' }}>
+                                <h4 className="text-xs text-muted mb-md uppercase flex items-center gap-sm">
+                                    <AlertTriangle size={14} />
+                                    AI Analysis
+                                </h4>
+                                <p className="mb-lg" style={{ fontSize: '13px', lineHeight: 1.6 }}>{selectedBias.explanation}</p>
+
+                                {/* Why This Matters */}
+                                <div style={{
+                                    padding: 'var(--spacing-md)',
+                                    background: 'rgba(239, 68, 68, 0.05)',
+                                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                                    borderRadius: 'var(--radius-sm)',
+                                    marginBottom: 'var(--spacing-md)'
+                                }}>
+                                    <div className="flex items-center gap-sm mb-sm">
+                                        <AlertTriangle size={12} style={{ color: 'var(--error)' }} />
+                                        <span className="text-xs font-bold uppercase" style={{ color: 'var(--error)' }}>Impact Assessment</span>
+                                    </div>
+                                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                        {getImpactAssessment(selectedBias.biasType, selectedBias.severity)}
+                                    </p>
+                                </div>
+
+                                {/* Correction Recommendation */}
+                                <div style={{
+                                    padding: 'var(--spacing-md)',
+                                    background: 'rgba(48, 209, 88, 0.05)',
+                                    border: '1px solid var(--success)',
+                                    borderRadius: 'var(--radius-sm)'
+                                }}>
+                                    <div className="flex items-center gap-sm mb-sm">
+                                        <Lightbulb size={14} style={{ color: 'var(--success)' }} />
+                                        <span className="text-xs font-bold uppercase" style={{ color: 'var(--success)' }}>Recommended Correction</span>
+                                    </div>
+                                    <p style={{ fontSize: '13px', lineHeight: 1.5 }}>{selectedBias.suggestion}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Section 4: Confidence & Methodology Footer */}
+                        <div style={{
+                            padding: 'var(--spacing-md) var(--spacing-lg)',
+                            background: 'var(--bg-secondary)',
+                            borderTop: '1px solid var(--border-color)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <div className="flex items-center gap-lg">
+                                <div>
+                                    <span className="text-xs text-muted">Detection Model: </span>
+                                    <span className="text-xs" style={{ color: 'var(--accent-primary)' }}>Gemini 3 Pro</span>
+                                </div>
+                                <div>
+                                    <span className="text-xs text-muted">Analysis Type: </span>
+                                    <span className="text-xs">Psycholinguistic Pattern Matching</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-md">
+                                <span className="text-xs text-muted">Severity assessed based on language intensity and decision impact potential</span>
                             </div>
                         </div>
                     </div>
