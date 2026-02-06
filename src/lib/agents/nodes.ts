@@ -273,15 +273,44 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
 }
 
 export async function riskScorerNode(state: AuditState): Promise<Partial<AuditState>> {
-    const biasDeductions = (state.biasAnalysis || []).length * 5;
+    console.log("--- Risk Scorer Node (Aggressive) ---");
+
+    // 1. Bias Deductions (Weighted by Severity)
+    const biasDeductions = (state.biasAnalysis || []).reduce((acc: number, b: any) => {
+        const severityScores: Record<string, number> = {
+            low: 5,
+            medium: 15,
+            high: 30,
+            critical: 50
+        };
+        const severity = (b.severity || 'low').toLowerCase();
+        return acc + (severityScores[severity] || 5);
+    }, 0);
+
+    // 2. Noise Penalty (StdDev * 5)
+    // If Judges disagree (High Variance), confidence drops.
+    const noisePenalty = (state.noiseStats?.stdDev || 0) * 5;
+
+    // 3. Trust Penalty (Fact Check)
+    // If Truth Score is low, decision quality suffers proportionally.
+    // If Truth=0, Penalty = 30 points.
+    const trustScore = state.factCheckResult?.score || 100;
+    const trustPenalty = (100 - trustScore) * 0.3;
+
+    // Calculate Base
     const baseScore = 100;
-    const overallScore = Math.max(0, baseScore - biasDeductions);
+    let overallScore = baseScore - biasDeductions - noisePenalty - trustPenalty;
+
+    // Clamp 0-100
+    overallScore = Math.max(0, Math.min(100, Math.round(overallScore)));
+
+    console.log(`Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) = ${overallScore}`);
 
     return {
         finalReport: {
             overallScore,
-            noiseScore: 0,
-            summary: `Audit complete.`,
+            noiseScore: Math.min(100, (state.noiseStats?.stdDev || 0) * 10),
+            summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Trust Score: ${trustScore}%.`,
             biases: state.biasAnalysis || [],
             noiseStats: state.noiseStats,
             factCheck: state.factCheckResult,
