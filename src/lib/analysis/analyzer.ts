@@ -121,22 +121,53 @@ export async function runAnalysis(
         if (onProgress) onProgress({ type: 'step', step, status, progress });
     };
 
-    // Start analysis pipeline with detailed steps
-    sendStep('Preparing document', 'running', 5);
-    sendStep('Preparing document', 'complete', 10);
-    sendStep('Detecting cognitive biases', 'running', 15);
+    // Define analysis steps with timing
+    const analysisSteps = [
+        { name: 'Preparing document', delay: 0, progress: 10 },
+        { name: 'Detecting cognitive biases', delay: 8000, progress: 25 },
+        { name: 'Analyzing decision noise', delay: 16000, progress: 40 },
+        { name: 'Fact checking claims', delay: 24000, progress: 55 },
+        { name: 'Evaluating compliance', delay: 32000, progress: 70 },
+        { name: 'Generating risk assessment', delay: 40000, progress: 85 }
+    ];
 
-    const result = await auditGraph.invoke({
-        originalContent: content,
-        documentId: documentId,
-    });
+    // Track which step we're on
+    let currentStepIndex = 0;
 
-    // Mark all analysis steps as complete
-    sendStep('Detecting cognitive biases', 'complete', 40);
-    sendStep('Analyzing decision noise', 'complete', 55);
-    sendStep('Fact checking claims', 'complete', 70);
-    sendStep('Evaluating compliance', 'complete', 80);
-    sendStep('Generating risk assessment', 'complete', 90);
+    // Start with first step immediately
+    sendStep(analysisSteps[0].name, 'complete', analysisSteps[0].progress);
+    sendStep(analysisSteps[1].name, 'running', 15);
+    currentStepIndex = 1;
+
+    // Set up interval to send progress updates during LLM call
+    const progressInterval = setInterval(() => {
+        if (currentStepIndex < analysisSteps.length - 1) {
+            // Complete current step
+            sendStep(analysisSteps[currentStepIndex].name, 'complete', analysisSteps[currentStepIndex].progress);
+            currentStepIndex++;
+
+            // Start next step
+            if (currentStepIndex < analysisSteps.length) {
+                sendStep(analysisSteps[currentStepIndex].name, 'running', analysisSteps[currentStepIndex].progress - 5);
+            }
+        }
+    }, 8000); // Update every 8 seconds
+
+    let result;
+    try {
+        result = await auditGraph.invoke({
+            originalContent: content,
+            documentId: documentId,
+        });
+    } finally {
+        // Clear the interval when LLM call completes
+        clearInterval(progressInterval);
+    }
+
+    // Complete all remaining steps rapidly after LLM finishes
+    for (let i = currentStepIndex; i < analysisSteps.length; i++) {
+        sendStep(analysisSteps[i].name, 'complete', analysisSteps[i].progress);
+    }
     sendStep('Finalizing report', 'running', 95);
 
     if (!result.finalReport) {
