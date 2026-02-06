@@ -91,7 +91,63 @@ export function safeStringify(obj: any): string {
 /**
  * Creates a deep clone of the object that is safe for JSON serialization/persistence.
  * Handles BigInt (to string), Dates (to ISO), and Circular references.
+ * Optimized to use single-pass traversal instead of double serialization.
  */
 export function safeJsonClone<T>(obj: T): T {
-    return JSON.parse(safeStringify(obj));
+    const seen = new WeakSet<any>();
+
+    function clone(value: any): any {
+        // Primitives and null
+        if (value === null || typeof value !== 'object') {
+            if (typeof value === 'bigint') {
+                return value.toString();
+            }
+            if (typeof value === 'undefined' || typeof value === 'function' || typeof value === 'symbol') {
+                return undefined;
+            }
+            return value;
+        }
+
+        // Date
+        if (value instanceof Date) {
+            return value.toISOString();
+        }
+
+        // Handle .toJSON()
+        if (typeof value.toJSON === 'function') {
+            return clone(value.toJSON());
+        }
+
+        // Circular check
+        if (seen.has(value)) {
+            return "[Circular]";
+        }
+        seen.add(value);
+
+        // Array
+        if (Array.isArray(value)) {
+            const res = new Array(value.length);
+            for (let i = 0; i < value.length; i++) {
+                const v = clone(value[i]);
+                // JSON.stringify converts undefined/function/symbol in arrays to null
+                res[i] = (v === undefined) ? null : v;
+            }
+            return res as any;
+        }
+
+        // Plain Object
+        const res: any = {};
+        for (const key in value) {
+            if (Object.prototype.hasOwnProperty.call(value, key)) {
+                const v = clone(value[key]);
+                // JSON.stringify skips undefined properties
+                if (v !== undefined) {
+                    res[key] = v;
+                }
+            }
+        }
+        return res;
+    }
+
+    return clone(obj);
 }
