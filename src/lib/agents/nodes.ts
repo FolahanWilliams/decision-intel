@@ -3,7 +3,7 @@ import { parseJSON } from '../utils/json';
 import { AnalysisResult } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT } from "./prompts";
-import { getEnrichedFinancialContext, ClaimType } from "../tools/financial";
+import { executeDataRequests, DataRequest } from "../tools/financial";
 
 // Lazy singleton for the model
 let modelInstance: GenerativeModel | null = null;
@@ -151,144 +151,170 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     return { structuredContent: state.originalContent };
 }
 
-// New Node: Fact Checker with Claim Type Detection
+// New Node: Fact Checker with Two-Pass AI-Driven Data Fetching
 export async function factCheckerNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Fact Checker Node (Gemini + FMP Enhanced) ---");
+    console.log("--- Fact Checker Node (Two-Pass Architecture) ---");
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
-        // Step 1: Extract Tickers AND Claim Types
-        // IMPORTANT: Be very strict about ticker extraction - only exact matches
-        const extractionResult = await getModel().generateContent([
-            `You are a strict financial document parser. Analyze the text and extract ONLY the following:
+        // ================================================================
+        // PASS 1: AI analyzes document and requests specific data it needs
+        // ================================================================
+        console.log("Pass 1: Analyzing document and identifying data requirements...");
 
-1. STOCK TICKERS: Extract stock symbols (like AAPL, TSLA, ABNB) that are EXPLICITLY WRITTEN in the text.
-   - Only include a ticker if the exact symbol appears in the document (e.g., "ABNB" or "Airbnb (ABNB)")
-   - If a company is mentioned by name only (e.g., "Apple" without "AAPL"), try to identify its ticker
-   - DO NOT hallucinate or guess tickers that aren't related to the document's main subject
-   - If the document is about Airbnb, only include ABNB unless other tickers are explicitly mentioned
+        const analysisResult = await getModel().generateContent([
+            `You are a Financial Analyst preparing to fact-check a document. Your task is to:
 
-2. CLAIM TYPES: What kinds of financial claims are made:
-   - "revenue" = revenue, sales, earnings, profit claims
-   - "stock_price" = stock price, share price, returns claims  
-   - "market_cap" = valuation, market cap claims
-   - "competitor" = competitor comparisons (only if specific competitors are named)
-   - "industry" = sector, industry trend claims
-   - "general" = other verifiable financial claims
+1. Identify the PRIMARY COMPANY this document is about
+2. Extract SPECIFIC CLAIMS that can be verified with financial data
+3. REQUEST THE EXACT DATA you need to verify each claim
 
-3. CLAIMS: List specific verifiable financial claims with their text
+AVAILABLE DATA TYPES you can request:
+- profile: Company info (name, sector, industry, market cap)
+- quote: Current stock price, change%, P/E ratio, EPS, 52-week range
+- income_annual: Annual revenue, profit, margins, YoY growth
+- income_quarterly: Quarterly financials with YoY comparison (last 4 quarters)
+- key_metrics: Valuation ratios (P/E, P/S, EV/EBITDA, ROE, ROA)
+- historical_price: Stock price history (current, week ago, month ago)
+- peers: List of competitor stock tickers
+- sector_performance: Performance of all market sectors
 
-CRITICAL: Focus on the PRIMARY company being analyzed. If this is an Airbnb document, don't add AAPL or AMZN unless they are explicitly discussed as comparisons.
+RULES:
+- Only request data for companies EXPLICITLY mentioned in the document
+- Be SPECIFIC about which data type you need for each claim
+- Don't request data you don't need
 
-Return JSON: { 
-    "primaryCompany": "ABNB",
-    "tickers": ["ABNB"], 
-    "claimTypes": ["revenue", "stock_price"],
+Return JSON:
+{
+    "primaryTicker": "ABNB",
+    "companyName": "Airbnb",
     "claims": [
-        {"text": "Revenue grew 40%", "type": "revenue", "company": "ABNB"},
-        {"text": "Stock is up 20%", "type": "stock_price", "company": "ABNB"}
+        {
+            "id": 1,
+            "text": "Revenue grew 18% YoY to $2.5B",
+            "category": "revenue",
+            "needsVerification": true
+        }
+    ],
+    "dataRequests": [
+        {
+            "ticker": "ABNB",
+            "dataType": "income_quarterly",
+            "reason": "To verify Q3 revenue and YoY growth rate",
+            "forClaimIds": [1]
+        },
+        {
+            "ticker": "ABNB",
+            "dataType": "profile",
+            "reason": "To verify company basics and sector"
+        }
     ]
 }`,
-            `Text:\n<input_text>\n${content}\n</input_text>`
+            `Document to analyze:\n<document>\n${content}\n</document>`
         ]);
 
-        const extractionText = extractionResult.response?.text ? extractionResult.response.text() : "";
-        const extracted = parseJSON(extractionText);
-        const rawTickers = extracted?.tickers || [];
+        const analysisText = analysisResult.response?.text ? analysisResult.response.text() : "";
+        const analysis = parseJSON(analysisText);
 
-        // Validation: Only keep tickers that make sense for the document
-        const primaryCompany = extracted?.primaryCompany || null;
-        let tickers = Array.isArray(rawTickers) ? [...new Set(rawTickers as string[])] : [];
+        const primaryTicker = analysis?.primaryTicker || null;
+        const companyName = analysis?.companyName || null;
+        const claims = analysis?.claims || [];
+        const dataRequests = analysis?.dataRequests || [];
 
-        // If we have a primary company, prioritize it
-        if (primaryCompany && !tickers.includes(primaryCompany)) {
-            tickers = [primaryCompany, ...tickers];
+        console.log(`Primary Company: ${companyName} (${primaryTicker})`);
+        console.log(`Claims identified: ${claims.length}`);
+        console.log(`Data requests: ${dataRequests.length}`);
+
+        // ================================================================
+        // DATA FETCHING: Execute the AI's data requests
+        // ================================================================
+        let fetchedData: Record<string, unknown> = {};
+
+        if (dataRequests.length > 0) {
+            console.log("Executing AI data requests...");
+
+            // Validate and limit requests to prevent abuse
+            const validRequests: DataRequest[] = dataRequests
+                .slice(0, 5) // Max 5 requests
+                .filter((r: { ticker: string; dataType: string; reason: string }) =>
+                    r.ticker && r.dataType && typeof r.ticker === 'string'
+                )
+                .map((r: { ticker: string; dataType: string; reason: string; claimToVerify?: string }) => ({
+                    ticker: r.ticker.toUpperCase(),
+                    dataType: r.dataType as DataRequest['dataType'],
+                    reason: r.reason || 'Verification',
+                    claimToVerify: r.claimToVerify
+                }));
+
+            console.log(`Executing ${validRequests.length} validated requests:`,
+                validRequests.map(r => `${r.ticker}:${r.dataType}`).join(', '));
+
+            fetchedData = await executeDataRequests(validRequests);
         }
 
-        // Limit to 3 tickers max to avoid noise
-        tickers = tickers.slice(0, 3);
+        // ================================================================
+        // PASS 2: AI verifies claims using the fetched data
+        // ================================================================
+        console.log("Pass 2: Verifying claims with fetched data...");
 
-        const claimTypes: ClaimType[] = extracted?.claimTypes || ['general'];
-        const extractedClaims = extracted?.claims || [];
+        const verificationResult = await getModel().generateContent([
+            `You are a Financial Fact Checker. Verify each claim using ONLY the provided real-time data.
 
-        console.log(`Primary Company: ${primaryCompany || 'Unknown'}`);
-        console.log(`Tickers: ${tickers.join(', ') || 'None'}`);
-        console.log(`Claim Types: ${claimTypes.join(', ')}`);
-        console.log(`Extracted Claims: ${extractedClaims.length}`);
+CLAIMS TO VERIFY:
+${JSON.stringify(claims, null, 2)}
 
-        // Step 2: Fetch Enriched Financial Data Based on Claim Types
-        let financialContext = "";
-        const financialData: Record<string, unknown> = {};
+REAL-TIME FINANCIAL DATA (from FMP API):
+${JSON.stringify(fetchedData, null, 2)}
 
-        if (tickers.length > 0) {
-            console.log(`Fetching enriched FMP data for: ${tickers.join(', ')}`);
+VERIFICATION RULES:
+1. VERIFIED: The data directly supports the claim (within reasonable margin, e.g., "revenue grew 18%" when data shows 17.5% is still verified)
+2. CONTRADICTED: The data clearly contradicts the claim (e.g., claim says 30% growth but data shows 10%)
+3. UNVERIFIABLE: Can't verify because data is missing or claim is too vague
 
-            const contextPromises = tickers.map(async (ticker: string) => {
-                const data = await getEnrichedFinancialContext(ticker, claimTypes);
-                return { ticker, data };
-            });
+For each claim, show your reasoning by citing the specific data you used.
 
-            const results = await Promise.all(contextPromises);
-            results.forEach(({ ticker, data }) => {
-                financialData[ticker] = data;
-            });
-
-            financialContext = `
-=== REAL-TIME FINANCIAL DATA (FMP) ===
-${JSON.stringify(financialData, null, 2)}
-======================================
-`;
-        }
-
-        // Step 3: Verify Claims using Enriched Context
-        const result = await getModel().generateContent([
-            `You are a Financial Fact Checker with access to real-time market data.
-
-TASK: Verify each claim in the document against the provided financial data.
-
-VERIFICATION GUIDELINES:
-- Revenue/Earnings Claims: Compare stated growth rates, margins, and figures against actual income statement data
-- Stock Price Claims: Verify price changes, returns, and ranges against quote data
-- Market Cap Claims: Verify valuation claims against actual market cap
-- Competitor Claims: Cross-reference with peers list
-- Industry Claims: Check sector classification and performance
-
-For each claim, determine if it is:
-1. VERIFIED - Data supports the claim
-2. CONTRADICTED - Data contradicts the claim (flag these)
-3. UNVERIFIABLE - Insufficient data to verify
-
-EXTRACTED CLAIMS TO VERIFY:
-${JSON.stringify(extractedClaims, null, 2)}
-
-Return JSON: {
-    "score": 0-100,  // Higher = more accurate/verifiable
+Return JSON:
+{
+    "score": 0-100,
+    "summary": "Brief summary of verification results",
     "verifiedCount": number,
     "contradictedCount": number,
     "unverifiableCount": number,
-    "flags": [
+    "verifications": [
         {
+            "claimId": 1,
             "claim": "Original claim text",
-            "verdict": "VERIFIED|CONTRADICTED|UNVERIFIABLE", 
-            "actualData": "What the data shows",
-            "explanation": "Why this is flagged"
+            "verdict": "VERIFIED|CONTRADICTED|UNVERIFIABLE",
+            "dataUsed": "The specific data point you checked",
+            "explanation": "Your reasoning"
         }
     ]
 }`,
-            `Document:\n<input_text>\n${content}\n</input_text>`,
-            financialContext || "No financial data available - verify claims as UNVERIFIABLE"
+            `Primary Company: ${companyName} (${primaryTicker})`
         ]);
 
-        const text = result.response?.text ? result.response.text() : "";
-        const data = parseJSON(text);
+        const verificationText = verificationResult.response?.text ? verificationResult.response.text() : "";
+        const verification = parseJSON(verificationText);
 
-        // Enrich result with financial context for display
+        // Build enriched result
         const enrichedResult = {
-            ...(data || { score: 0, flags: [] }),
-            financialContext: financialData,
-            tickersAnalyzed: tickers,
-            claimTypesDetected: claimTypes
+            score: verification?.score || 0,
+            summary: verification?.summary || "Verification completed",
+            verifiedCount: verification?.verifiedCount || 0,
+            contradictedCount: verification?.contradictedCount || 0,
+            unverifiableCount: verification?.unverifiableCount || 0,
+            flags: verification?.verifications || [],
+            // Metadata for transparency
+            primaryCompany: { ticker: primaryTicker, name: companyName },
+            claimsAnalyzed: claims.length,
+            dataRequestsMade: dataRequests.length,
+            fetchedData: fetchedData
         };
+
+        console.log(`Verification complete: Score ${enrichedResult.score}, ` +
+            `${enrichedResult.verifiedCount} verified, ` +
+            `${enrichedResult.contradictedCount} contradicted, ` +
+            `${enrichedResult.unverifiableCount} unverifiable`);
 
         return { factCheckResult: enrichedResult };
     } catch (e) {
