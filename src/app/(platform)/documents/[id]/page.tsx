@@ -509,28 +509,192 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                         </div>
                     </div>
 
-                    {/* Simulation Result Overlay (if active) */}
+                    {/* Simulation Result - Structured Comparison View */}
                     {simulationResult && (
-                        <div className="card" style={{ borderColor: 'var(--accent-secondary)', background: 'rgba(10, 132, 255, 0.05)' }}>
+                        <div className="card" style={{ borderColor: 'var(--accent-secondary)', background: 'rgba(10, 132, 255, 0.03)' }}>
                             <div className="card-header justify-between" style={{ background: 'rgba(10, 132, 255, 0.1)' }}>
-                                <h3 style={{ color: 'var(--accent-secondary)' }}>SIMULATION_DELTA_RESULT</h3>
-                                <button onClick={() => setSimulationResult(null)} className="btn btn-ghost" style={{ padding: 0 }}><RefreshCw size={12} /></button>
+                                <h3 className="flex items-center gap-sm" style={{ color: 'var(--accent-secondary)' }}>
+                                    <CheckCircle size={16} />
+                                    SIMULATION RESULTS
+                                </h3>
+                                <button onClick={() => setSimulationResult(null)} className="btn btn-ghost" style={{ padding: '4px 8px', fontSize: '11px' }}>
+                                    <RefreshCw size={12} /> Clear
+                                </button>
                             </div>
-                            <div className="card-body grid grid-3">
-                                <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>PROJECTED_DQ_IDX</div>
-                                    <div style={{ fontSize: '2rem', fontWeight: 700 }}>{Math.round(simulationResult.overallScore)}</div>
-                                    <div style={{ fontSize: '10px', color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--error)' }}>
-                                        {simulationResult.overallScore > (analysis?.overallScore || 0) ? '+' : ''}{Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))}pts improvement
+                            <div className="card-body" style={{ padding: 'var(--spacing-lg)' }}>
+                                {/* Score Comparison - Visual Gauge */}
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: 'var(--spacing-xl)',
+                                    marginBottom: 'var(--spacing-lg)',
+                                    padding: 'var(--spacing-lg)',
+                                    background: 'var(--bg-secondary)',
+                                    borderRadius: 'var(--radius-md)'
+                                }}>
+                                    {/* Before Score */}
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>ORIGINAL</div>
+                                        <div style={{
+                                            fontSize: '2.5rem',
+                                            fontWeight: 800,
+                                            color: 'var(--text-secondary)'
+                                        }}>
+                                            {analysis ? Math.round(analysis.overallScore) : '--'}
+                                        </div>
+                                    </div>
+
+                                    {/* Arrow + Delta */}
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{
+                                            fontSize: '24px',
+                                            color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--error)'
+                                        }}>
+                                            →
+                                        </div>
+                                        <div style={{
+                                            fontSize: '14px',
+                                            fontWeight: 700,
+                                            padding: '4px 12px',
+                                            borderRadius: 'var(--radius-sm)',
+                                            background: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                            color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--error)'
+                                        }}>
+                                            {simulationResult.overallScore > (analysis?.overallScore || 0) ? '+' : ''}{Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} pts
+                                        </div>
+                                    </div>
+
+                                    {/* After Score */}
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>PROJECTED</div>
+                                        <div style={{
+                                            fontSize: '2.5rem',
+                                            fontWeight: 800,
+                                            color: simulationResult.overallScore >= 70 ? 'var(--success)' : simulationResult.overallScore >= 40 ? 'var(--warning)' : 'var(--error)'
+                                        }}>
+                                            {Math.round(simulationResult.overallScore)}
+                                        </div>
                                     </div>
                                 </div>
-                                <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>BIAS_COUNT</div>
-                                    <div style={{ fontSize: '2rem', fontWeight: 700 }}>{simulationResult.biases.filter(b => b.found !== false).length}</div>
-                                </div>
-                                <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>NOISE_LEVEL</div>
-                                    <div style={{ fontSize: '2rem', fontWeight: 700 }}>{Math.round(simulationResult.noiseScore)}%</div>
+
+                                {/* Metrics Comparison Table */}
+                                <table style={{
+                                    width: '100%',
+                                    borderCollapse: 'collapse',
+                                    marginBottom: 'var(--spacing-lg)'
+                                }}>
+                                    <thead>
+                                        <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                            <th style={{ textAlign: 'left', padding: '8px 0', fontSize: '11px', color: 'var(--text-muted)' }}>METRIC</th>
+                                            <th style={{ textAlign: 'center', padding: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>ORIGINAL</th>
+                                            <th style={{ textAlign: 'center', padding: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>PROJECTED</th>
+                                            <th style={{ textAlign: 'center', padding: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>CHANGE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                            <td style={{ padding: '12px 0', fontSize: '13px' }}>Decision Quality Score</td>
+                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{analysis ? Math.round(analysis.overallScore) : '--'}</td>
+                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{Math.round(simulationResult.overallScore)}</td>
+                                            <td style={{
+                                                textAlign: 'center',
+                                                fontWeight: 600,
+                                                color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--error)'
+                                            }}>
+                                                {simulationResult.overallScore > (analysis?.overallScore || 0) ? '↑' : '↓'} {Math.abs(Math.round(simulationResult.overallScore - (analysis?.overallScore || 0)))}
+                                            </td>
+                                        </tr>
+                                        <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                            <td style={{ padding: '12px 0', fontSize: '13px' }}>Cognitive Biases</td>
+                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{analysis?.biases.length || 0}</td>
+                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length}</td>
+                                            <td style={{
+                                                textAlign: 'center',
+                                                fontWeight: 600,
+                                                color: simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length < (analysis?.biases.length || 0) ? 'var(--success)' : 'var(--error)'
+                                            }}>
+                                                {simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length < (analysis?.biases.length || 0) ? '↓' : '↑'} {Math.abs(simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length - (analysis?.biases.length || 0))}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ padding: '12px 0', fontSize: '13px' }}>Noise Level</td>
+                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{analysis ? Math.round(analysis.noiseScore) : '--'}%</td>
+                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{Math.round(simulationResult.noiseScore)}%</td>
+                                            <td style={{
+                                                textAlign: 'center',
+                                                fontWeight: 600,
+                                                color: simulationResult.noiseScore < (analysis?.noiseScore || 0) ? 'var(--success)' : 'var(--error)'
+                                            }}>
+                                                {simulationResult.noiseScore < (analysis?.noiseScore || 0) ? '↓' : '↑'} {Math.abs(Math.round(simulationResult.noiseScore - (analysis?.noiseScore || 0)))}%
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                {/* Bias Changes Detail */}
+                                {simulationResult.biases && simulationResult.biases.length > 0 && (
+                                    <div>
+                                        <div style={{
+                                            fontSize: '11px',
+                                            color: 'var(--text-muted)',
+                                            marginBottom: 'var(--spacing-sm)',
+                                            textTransform: 'uppercase'
+                                        }}>
+                                            Bias Analysis
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            {simulationResult.biases.slice(0, 5).map((bias: BiasInstance, idx: number) => (
+                                                <div
+                                                    key={idx}
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'space-between',
+                                                        padding: '8px 12px',
+                                                        background: 'var(--bg-tertiary)',
+                                                        borderRadius: 'var(--radius-sm)',
+                                                        borderLeft: `3px solid ${bias.found === false ? 'var(--success)' : SEVERITY_COLORS[bias.severity as keyof typeof SEVERITY_COLORS] || 'var(--warning)'}`
+                                                    }}
+                                                >
+                                                    <span style={{ fontSize: '13px' }}>{bias.biasType}</span>
+                                                    <span style={{
+                                                        fontSize: '10px',
+                                                        padding: '2px 8px',
+                                                        borderRadius: 'var(--radius-sm)',
+                                                        background: bias.found === false ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                                        color: bias.found === false ? 'var(--success)' : 'var(--error)'
+                                                    }}>
+                                                        {bias.found === false ? '✓ RESOLVED' : 'STILL PRESENT'}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                            {simulationResult.biases.length > 5 && (
+                                                <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>
+                                                    +{simulationResult.biases.length - 5} more biases...
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Summary Insight */}
+                                <div style={{
+                                    marginTop: 'var(--spacing-lg)',
+                                    padding: 'var(--spacing-md)',
+                                    background: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                    borderRadius: 'var(--radius-md)',
+                                    borderLeft: `3px solid ${simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--warning)'}`
+                                }}>
+                                    <div style={{ fontSize: '11px', fontWeight: 600, marginBottom: '4px', color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--warning)' }}>
+                                        {simulationResult.overallScore > (analysis?.overallScore || 0) ? '✓ IMPROVEMENTS DETECTED' : '⚠ NEEDS MORE WORK'}
+                                    </div>
+                                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                                        {simulationResult.overallScore > (analysis?.overallScore || 0)
+                                            ? `Your edits improved the decision quality by ${Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} points. ${simulationResult.biases.filter((b: BiasInstance) => b.found === false).length} biases were addressed.`
+                                            : `The edits didn't improve the score. Focus on addressing the remaining biases and reducing noise in the document.`
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
