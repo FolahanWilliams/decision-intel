@@ -543,7 +543,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* Financial Fact Check Verifications */}
-            {analysis?.factCheck?.verifications && analysis.factCheck.verifications.length > 0 && (
+            {analysis?.factCheck && (
                 <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
                     <div className="card-header flex items-center justify-between">
                         <h3 className="flex items-center gap-sm">
@@ -595,90 +595,47 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                         </div>
                     )}
                     <div className="card-body" style={{ padding: 0 }}>
-                        {analysis.factCheck.verifications.map((v, idx) => (
-                            <div
-                                key={idx}
-                                style={{
-                                    padding: 'var(--spacing-md) var(--spacing-lg)',
-                                    borderBottom: idx < (analysis.factCheck?.verifications?.length || 0) - 1 ? '1px solid var(--border-color)' : 'none',
-                                    background: v.verdict === 'CONTRADICTED' ? 'rgba(239, 68, 68, 0.05)' :
-                                        v.verdict === 'VERIFIED' ? 'rgba(34, 197, 94, 0.05)' : 'transparent'
-                                }}
-                            >
-                                <div className="flex items-start gap-md">
-                                    {/* Verdict Icon */}
-                                    <div style={{
-                                        marginTop: '2px',
-                                        color: v.verdict === 'VERIFIED' ? 'var(--success)' :
-                                            v.verdict === 'CONTRADICTED' ? 'var(--error)' : 'var(--text-muted)'
-                                    }}>
-                                        {v.verdict === 'VERIFIED' && <CheckCircle size={18} />}
-                                        {v.verdict === 'CONTRADICTED' && <XCircle size={18} />}
-                                        {v.verdict === 'UNVERIFIABLE' && <HelpCircle size={18} />}
-                                    </div>
-
-                                    <div style={{ flex: 1 }}>
-                                        {/* Claim */}
-                                        <div style={{ fontSize: '13px', fontWeight: 500, marginBottom: '6px' }}>
-                                            &quot;{v.claim}&quot;
+                        {analysis.factCheck.verifications && analysis.factCheck.verifications.length > 0 ? (
+                            analysis.factCheck.verifications.map((v, idx) => (
+                                <div
+                                    key={idx}
+                                    style={{
+                                        padding: '16px',
+                                        borderBottom: idx < analysis.factCheck.verifications.length - 1 ? '1px solid var(--border-color)' : 'none'
+                                    }}
+                                >
+                                    <div className="flex items-start gap-md">
+                                        {/* Status Icon */}
+                                        <div style={{ marginTop: '2px' }}>
+                                            {v.verdict?.toUpperCase() === 'VERIFIED' ? (
+                                                <CheckCircle size={16} className="text-success" />
+                                            ) : v.verdict?.toUpperCase() === 'CONTRADICTED' ? (
+                                                <XCircle size={16} className="text-error" />
+                                            ) : (
+                                                <HelpCircle size={16} className="text-warning" />
+                                            )}
                                         </div>
-
-                                        {/* Verdict Badge */}
-                                        <span className={`badge ${v.verdict === 'VERIFIED' ? 'badge-success' : v.verdict === 'CONTRADICTED' ? 'badge-critical' : 'badge-secondary'}`}
-                                            style={{ fontSize: '10px', marginBottom: '8px', display: 'inline-block' }}>
-                                            {v.verdict}
-                                        </span>
-
-                                        {/* Explanation */}
-                                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.5 }}>
-                                            {v.explanation}
-                                        </p>
-
-                                        {/* Source Citation */}
-                                        {v.source && (
-                                            <div style={{
-                                                background: 'var(--bg-tertiary)',
-                                                borderRadius: 'var(--radius-sm)',
-                                                padding: '8px 12px',
-                                                fontSize: '11px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '12px',
-                                                flexWrap: 'wrap'
-                                            }}>
-                                                <span style={{ color: 'var(--text-muted)' }}>
-                                                    <ExternalLink size={12} style={{ display: 'inline', marginRight: '4px' }} />
-                                                    SOURCE:
-                                                </span>
-                                                {v.source.ticker && (
-                                                    <span className="badge badge-secondary" style={{ fontSize: '10px' }}>
-                                                        {v.source.ticker}
-                                                    </span>
-                                                )}
-                                                {v.source.endpoint && (
-                                                    <span style={{ color: 'var(--accent-secondary)' }}>
-                                                        {v.source.endpoint}
-                                                    </span>
-                                                )}
-                                                {v.source.field && v.source.displayValue && (
-                                                    <span>
-                                                        <strong>{v.source.field}:</strong> {v.source.displayValue}
-                                                    </span>
-                                                )}
-                                                {v.source.period && (
-                                                    <span style={{ color: 'var(--text-muted)' }}>
-                                                        ({v.source.period})
-                                                    </span>
-                                                )}
+                                        <div className="flex-1">
+                                            <p style={{ fontSize: '13px', fontWeight: 500, marginBottom: '4px', color: '#eee' }}>"{v.claim}"</p>
+                                            <div style={{ fontSize: '10px', fontWeight: 700, marginBottom: '6px', color: v.verdict?.toUpperCase() === 'VERIFIED' ? 'var(--success)' : v.verdict?.toUpperCase() === 'CONTRADICTED' ? 'var(--error)' : 'var(--warning)' }}>
+                                                {v.verdict?.toUpperCase()}
                                             </div>
-                                        )}
+                                            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                                {v.explanation}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="p-xl text-center text-muted">
+                                <p>No specific financial claims were isolated for verification.</p>
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             )}
+
 
             {/* Biases & Simulator */}
             <div className="grid" style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}>
@@ -962,214 +919,220 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* Bias Detail Lightbox (at bottom or floating) */}
-            {selectedBias && (
-                <div className="card mt-xl" style={{ border: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}20` }}>
-                    <div className="card-header flex items-center justify-between" style={{ borderBottom: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}30` }}>
-                        <div className="flex items-center gap-md">
-                            <AlertTriangle
-                                size={20}
-                                style={{ color: SEVERITY_COLORS[selectedBias.severity] }}
-                            />
-                            <h3>{selectedBias.biasType}</h3>
-                            <span className={`badge badge-${selectedBias.severity}`} style={{ marginLeft: 'var(--spacing-sm)' }}>
-                                {selectedBias.severity.toUpperCase()}
-                            </span>
-                        </div>
-                        <button onClick={() => setSelectedBias(null)} className="btn btn-ghost" style={{ padding: 0 }}>CLOSE</button>
-                    </div>
-
-                    <div className="card-body" style={{ padding: 0 }}>
-                        {/* Section 1: Bias Definition */}
-                        <div style={{ padding: 'var(--spacing-lg)', background: 'rgba(99, 102, 241, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
-                            <div className="flex items-center gap-sm mb-sm">
-                                <Info size={14} style={{ color: 'var(--accent-primary)' }} />
-                                <h4 className="text-xs text-muted uppercase">What is {selectedBias.biasType}?</h4>
-                            </div>
-                            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                                {getBiasDefinition(selectedBias.biasType)}
-                            </p>
-                        </div>
-
-                        <div className="grid grid-2">
-                            {/* Section 2: Evidence Found */}
-                            <div style={{ padding: 'var(--spacing-lg)', borderRight: '1px solid var(--border-color)' }}>
-                                <h4 className="text-xs text-muted mb-md uppercase flex items-center gap-sm">
-                                    <FileText size={14} />
-                                    Evidence Detected
-                                </h4>
-                                <blockquote style={{
-                                    padding: 'var(--spacing-md)',
-                                    background: '#0a0a0a',
-                                    borderLeft: `4px solid ${SEVERITY_COLORS[selectedBias.severity]}`,
-                                    fontSize: '13px',
-                                    fontStyle: 'italic',
-                                    marginBottom: 'var(--spacing-md)'
-                                }}>
-                                    &quot;{selectedBias.excerpt}&quot;
-                                </blockquote>
-
-                                {/* AI Detection Methodology */}
-                                <div style={{
-                                    padding: 'var(--spacing-md)',
-                                    background: 'rgba(255, 159, 10, 0.05)',
-                                    border: '1px solid rgba(255, 159, 10, 0.2)',
-                                    borderRadius: 'var(--radius-sm)'
-                                }}>
-                                    <div className="flex items-center gap-sm mb-sm">
-                                        <Terminal size={12} style={{ color: 'var(--warning)' }} />
-                                        <span className="text-xs font-bold uppercase" style={{ color: 'var(--warning)' }}>AI Detection Method</span>
-                                    </div>
-                                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                        {getDetectionMethodology(selectedBias.biasType, selectedBias.excerpt)}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Section 3: AI Analysis */}
-                            <div style={{ padding: 'var(--spacing-lg)' }}>
-                                <h4 className="text-xs text-muted mb-md uppercase flex items-center gap-sm">
-                                    <AlertTriangle size={14} />
-                                    AI Analysis
-                                </h4>
-                                <p className="mb-lg" style={{ fontSize: '13px', lineHeight: 1.6 }}>{selectedBias.explanation}</p>
-
-                                {/* Why This Matters */}
-                                <div style={{
-                                    padding: 'var(--spacing-md)',
-                                    background: 'rgba(239, 68, 68, 0.05)',
-                                    border: '1px solid rgba(239, 68, 68, 0.2)',
-                                    borderRadius: 'var(--radius-sm)',
-                                    marginBottom: 'var(--spacing-md)'
-                                }}>
-                                    <div className="flex items-center gap-sm mb-sm">
-                                        <AlertTriangle size={12} style={{ color: 'var(--error)' }} />
-                                        <span className="text-xs font-bold uppercase" style={{ color: 'var(--error)' }}>Impact Assessment</span>
-                                    </div>
-                                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                        {getImpactAssessment(selectedBias.biasType, selectedBias.severity)}
-                                    </p>
-                                </div>
-
-                                {/* Correction Recommendation */}
-                                <div style={{
-                                    padding: 'var(--spacing-md)',
-                                    background: 'rgba(48, 209, 88, 0.05)',
-                                    border: '1px solid var(--success)',
-                                    borderRadius: 'var(--radius-sm)'
-                                }}>
-                                    <div className="flex items-center gap-sm mb-sm">
-                                        <Lightbulb size={14} style={{ color: 'var(--success)' }} />
-                                        <span className="text-xs font-bold uppercase" style={{ color: 'var(--success)' }}>Recommended Correction</span>
-                                    </div>
-                                    <p style={{ fontSize: '13px', lineHeight: 1.5 }}>{selectedBias.suggestion}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Section 4: Confidence & Methodology Footer */}
-                        <div style={{
-                            padding: 'var(--spacing-md) var(--spacing-lg)',
-                            background: 'var(--bg-secondary)',
-                            borderTop: '1px solid var(--border-color)',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}>
-                            <div className="flex items-center gap-lg">
-                                <div>
-                                    <span className="text-xs text-muted">Detection Model: </span>
-                                    <span className="text-xs" style={{ color: 'var(--accent-primary)' }}>Gemini 3 Pro</span>
-                                </div>
-                                <div>
-                                    <span className="text-xs text-muted">Analysis Type: </span>
-                                    <span className="text-xs">Psycholinguistic Pattern Matching</span>
-                                </div>
-                            </div>
+            {
+                selectedBias && (
+                    <div className="card mt-xl" style={{ border: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}20` }}>
+                        <div className="card-header flex items-center justify-between" style={{ borderBottom: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}30` }}>
                             <div className="flex items-center gap-md">
-                                <span className="text-xs text-muted">Severity assessed based on language intensity and decision impact potential</span>
+                                <AlertTriangle
+                                    size={20}
+                                    style={{ color: SEVERITY_COLORS[selectedBias.severity] }}
+                                />
+                                <h3>{selectedBias.biasType}</h3>
+                                <span className={`badge badge-${selectedBias.severity}`} style={{ marginLeft: 'var(--spacing-sm)' }}>
+                                    {selectedBias.severity.toUpperCase()}
+                                </span>
+                            </div>
+                            <button onClick={() => setSelectedBias(null)} className="btn btn-ghost" style={{ padding: 0 }}>CLOSE</button>
+                        </div>
+
+                        <div className="card-body" style={{ padding: 0 }}>
+                            {/* Section 1: Bias Definition */}
+                            <div style={{ padding: 'var(--spacing-lg)', background: 'rgba(99, 102, 241, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
+                                <div className="flex items-center gap-sm mb-sm">
+                                    <Info size={14} style={{ color: 'var(--accent-primary)' }} />
+                                    <h4 className="text-xs text-muted uppercase">What is {selectedBias.biasType}?</h4>
+                                </div>
+                                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                                    {getBiasDefinition(selectedBias.biasType)}
+                                </p>
+                            </div>
+
+                            <div className="grid grid-2">
+                                {/* Section 2: Evidence Found */}
+                                <div style={{ padding: 'var(--spacing-lg)', borderRight: '1px solid var(--border-color)' }}>
+                                    <h4 className="text-xs text-muted mb-md uppercase flex items-center gap-sm">
+                                        <FileText size={14} />
+                                        Evidence Detected
+                                    </h4>
+                                    <blockquote style={{
+                                        padding: 'var(--spacing-md)',
+                                        background: '#0a0a0a',
+                                        borderLeft: `4px solid ${SEVERITY_COLORS[selectedBias.severity]}`,
+                                        fontSize: '13px',
+                                        fontStyle: 'italic',
+                                        marginBottom: 'var(--spacing-md)'
+                                    }}>
+                                        &quot;{selectedBias.excerpt}&quot;
+                                    </blockquote>
+
+                                    {/* AI Detection Methodology */}
+                                    <div style={{
+                                        padding: 'var(--spacing-md)',
+                                        background: 'rgba(255, 159, 10, 0.05)',
+                                        border: '1px solid rgba(255, 159, 10, 0.2)',
+                                        borderRadius: 'var(--radius-sm)'
+                                    }}>
+                                        <div className="flex items-center gap-sm mb-sm">
+                                            <Terminal size={12} style={{ color: 'var(--warning)' }} />
+                                            <span className="text-xs font-bold uppercase" style={{ color: 'var(--warning)' }}>AI Detection Method</span>
+                                        </div>
+                                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                            {getDetectionMethodology(selectedBias.biasType, selectedBias.excerpt)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Section 3: AI Analysis */}
+                                <div style={{ padding: 'var(--spacing-lg)' }}>
+                                    <h4 className="text-xs text-muted mb-md uppercase flex items-center gap-sm">
+                                        <AlertTriangle size={14} />
+                                        AI Analysis
+                                    </h4>
+                                    <p className="mb-lg" style={{ fontSize: '13px', lineHeight: 1.6 }}>{selectedBias.explanation}</p>
+
+                                    {/* Why This Matters */}
+                                    <div style={{
+                                        padding: 'var(--spacing-md)',
+                                        background: 'rgba(239, 68, 68, 0.05)',
+                                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                                        borderRadius: 'var(--radius-sm)',
+                                        marginBottom: 'var(--spacing-md)'
+                                    }}>
+                                        <div className="flex items-center gap-sm mb-sm">
+                                            <AlertTriangle size={12} style={{ color: 'var(--error)' }} />
+                                            <span className="text-xs font-bold uppercase" style={{ color: 'var(--error)' }}>Impact Assessment</span>
+                                        </div>
+                                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                            {getImpactAssessment(selectedBias.biasType, selectedBias.severity)}
+                                        </p>
+                                    </div>
+
+                                    {/* Correction Recommendation */}
+                                    <div style={{
+                                        padding: 'var(--spacing-md)',
+                                        background: 'rgba(48, 209, 88, 0.05)',
+                                        border: '1px solid var(--success)',
+                                        borderRadius: 'var(--radius-sm)'
+                                    }}>
+                                        <div className="flex items-center gap-sm mb-sm">
+                                            <Lightbulb size={14} style={{ color: 'var(--success)' }} />
+                                            <span className="text-xs font-bold uppercase" style={{ color: 'var(--success)' }}>Recommended Correction</span>
+                                        </div>
+                                        <p style={{ fontSize: '13px', lineHeight: 1.5 }}>{selectedBias.suggestion}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Section 4: Confidence & Methodology Footer */}
+                            <div style={{
+                                padding: 'var(--spacing-md) var(--spacing-lg)',
+                                background: 'var(--bg-secondary)',
+                                borderTop: '1px solid var(--border-color)',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <div className="flex items-center gap-lg">
+                                    <div>
+                                        <span className="text-xs text-muted">Detection Model: </span>
+                                        <span className="text-xs" style={{ color: 'var(--accent-primary)' }}>Gemini 3 Pro</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs text-muted">Analysis Type: </span>
+                                        <span className="text-xs">Psycholinguistic Pattern Matching</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-md">
+                                    <span className="text-xs text-muted">Severity assessed based on language intensity and decision impact potential</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* No biases */}
-            {biases.length === 0 && analysis && (
-                <div className="card animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                    <div className="card-body flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-2xl)' }}>
-                        <CheckCircle size={64} style={{ color: 'var(--success)' }} />
-                        <h3 style={{ color: 'var(--success)' }}>No Cognitive Biases Detected!</h3>
-                        <p style={{ textAlign: 'center', maxWidth: 500 }}>
-                            This document appears to demonstrate sound decision-making practices
-                            without significant cognitive bias patterns.
-                        </p>
+            {
+                biases.length === 0 && analysis && (
+                    <div className="card animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                        <div className="card-body flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-2xl)' }}>
+                            <CheckCircle size={64} style={{ color: 'var(--success)' }} />
+                            <h3 style={{ color: 'var(--success)' }}>No Cognitive Biases Detected!</h3>
+                            <p style={{ textAlign: 'center', maxWidth: 500 }}>
+                                This document appears to demonstrate sound decision-making practices
+                                without significant cognitive bias patterns.
+                            </p>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Similar Documents (RAG) */}
-            {similarDocs.length > 0 && (
-                <div className="card animate-fade-in" style={{ animationDelay: '0.5s', marginTop: 'var(--spacing-xl)' }}>
-                    <div className="card-header flex items-center gap-sm">
-                        <Table size={18} style={{ color: 'var(--accent-primary)' }} />
-                        <h3>Similar Documents</h3>
-                        <span className="badge badge-secondary" style={{ fontSize: '10px', marginLeft: 'auto' }}>
-                            Based on content similarity
-                        </span>
-                    </div>
-                    <div className="card-body" style={{ padding: 0 }}>
-                        {similarDocs.map((doc, idx) => (
-                            <Link
-                                key={doc.documentId}
-                                href={`/documents/${doc.documentId}`}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: 'var(--spacing-md) var(--spacing-lg)',
-                                    borderBottom: idx < similarDocs.length - 1 ? '1px solid var(--border-color)' : 'none',
-                                    textDecoration: 'none',
-                                    color: 'inherit',
-                                    transition: 'background 0.2s'
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                            >
-                                <div className="flex items-center gap-md">
-                                    <FileText size={16} style={{ color: 'var(--text-muted)' }} />
-                                    <div>
-                                        <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                                            {doc.filename}
-                                        </div>
-                                        <div className="flex items-center gap-sm" style={{ marginTop: '4px' }}>
-                                            {doc.biases.slice(0, 2).map(bias => (
-                                                <span key={bias} className="badge badge-warning" style={{ fontSize: '9px' }}>
-                                                    {bias}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-lg">
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={{
-                                            fontSize: '14px',
-                                            fontWeight: 600,
-                                            color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
-                                        }}>
-                                            {doc.score}/100
-                                        </div>
-                                        <div className="text-xs text-muted">
-                                            {Math.round(doc.similarity * 100)}% similar
+            {
+                similarDocs.length > 0 && (
+                    <div className="card animate-fade-in" style={{ animationDelay: '0.5s', marginTop: 'var(--spacing-xl)' }}>
+                        <div className="card-header flex items-center gap-sm">
+                            <Table size={18} style={{ color: 'var(--accent-primary)' }} />
+                            <h3>Similar Documents</h3>
+                            <span className="badge badge-secondary" style={{ fontSize: '10px', marginLeft: 'auto' }}>
+                                Based on content similarity
+                            </span>
+                        </div>
+                        <div className="card-body" style={{ padding: 0 }}>
+                            {similarDocs.map((doc, idx) => (
+                                <Link
+                                    key={doc.documentId}
+                                    href={`/documents/${doc.documentId}`}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        padding: 'var(--spacing-md) var(--spacing-lg)',
+                                        borderBottom: idx < similarDocs.length - 1 ? '1px solid var(--border-color)' : 'none',
+                                        textDecoration: 'none',
+                                        color: 'inherit',
+                                        transition: 'background 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    <div className="flex items-center gap-md">
+                                        <FileText size={16} style={{ color: 'var(--text-muted)' }} />
+                                        <div>
+                                            <div style={{ fontSize: '13px', fontWeight: 500 }}>
+                                                {doc.filename}
+                                            </div>
+                                            <div className="flex items-center gap-sm" style={{ marginTop: '4px' }}>
+                                                {doc.biases.slice(0, 2).map(bias => (
+                                                    <span key={bias} className="badge badge-warning" style={{ fontSize: '9px' }}>
+                                                        {bias}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                    <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
-                                </div>
-                            </Link>
-                        ))}
+                                    <div className="flex items-center gap-lg">
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{
+                                                fontSize: '14px',
+                                                fontWeight: 600,
+                                                color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                                            }}>
+                                                {doc.score}/100
+                                            </div>
+                                            <div className="text-xs text-muted">
+                                                {Math.round(doc.similarity * 100)}% similar
+                                            </div>
+                                        </div>
+                                        <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
