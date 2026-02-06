@@ -203,18 +203,19 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
             `You are a Financial Fact Checker with access to Google Search.
 
             CORE INSTRUCTION:
-            1. First, check the "REAL-TIME FINANCIAL DATA" (Finnhub) provided below.
-            2. CRITICAL: If data is missing (e.g. historical revenue, specific news), you MUST use Google Search to find it. 
-            3. Do NOT mark claims as "UNVERIFIABLE" unless you have searched and found nothing.
-            4. If you use Search, incorporate the findings into your explanation.
+            1. ANALYZE the "REAL-TIME FINANCIAL DATA" provided below.
+            2. IF A CLAIM IS NOT FULLY SUPPORTED by that data, you **MUST** use Google Search to verify it.
+            3. **NEVER** mark a claim as "UNVERIFIABLE" due to "missing data" without searching first. 
+            4. **EXAMPLE**: If claim is "Revenue dropped 80% in 2020" and API data is empty for 2020, DELETE the excuse "data provided is insufficient" and SEARCH "Airbnb 2020 revenue drop".
+            5. Cite your sources (Search or API).
 
             CLAIMS TO VERIFY:
             ${JSON.stringify(claims, null, 2)}
 
-            REAL-TIME FINANCIAL DATA:
+            REAL-TIME FINANCIAL DATA (Finnhub):
             ${JSON.stringify(fetchedData, null, 2)}
             
-            Return JSON schema as defined previously (score, verifications array).`,
+            Return JSON schema (score, verifications array).`,
             `Primary Company: ${companyName}`
         ]);
 
