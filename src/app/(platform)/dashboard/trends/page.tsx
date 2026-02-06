@@ -39,11 +39,34 @@ interface TrendsData {
     endDate: string;
 }
 
+interface MarketAnalysis {
+    summary: string;
+    impactAssessment: Array<{ category: string; status: string; details: string }>;
+    searchSources: string[];
+}
+
 export default function TrendsPage() {
     const [timeRange, setTimeRange] = useState('1M');
     const [data, setData] = useState<TrendsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis | null>(null);
+    const [analyzing, setAnalyzing] = useState(false);
+
+    const analyzeMarket = async () => {
+        setAnalyzing(true);
+        try {
+            const res = await fetch('/api/trends/analyze', { method: 'POST' });
+            if (res.ok) {
+                const data = await res.json();
+                setMarketAnalysis(data);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setAnalyzing(false);
+        }
+    };
 
     const fetchTrends = async (range: string) => {
         setLoading(true);
@@ -169,6 +192,86 @@ export default function TrendsPage() {
             {!loading && !error && data && data.trendData.length === 0 && (
                 <div className="card mb-xl">
                     <EmptyState />
+                </div>
+            )}
+
+            {/* AI Market Analyst (New Feature) */}
+            {data && data.stats.totalAnalyses > 0 && (
+                <div className="card mb-xl animate-fade-in" style={{ borderColor: 'var(--accent-secondary)' }}>
+                    <div className="card-header flex justify-between items-center" style={{ background: 'rgba(66, 133, 244, 0.05)' }}>
+                        <div>
+                            <h3 className="flex items-center gap-sm" style={{ color: 'var(--accent-secondary)' }}>
+                                <TrendingUp size={16} /> AI MARKET ANALYST (LIVE)
+                            </h3>
+                            <p className="text-muted" style={{ fontSize: '11px', marginTop: '4px' }}>
+                                Real-time Grounding via Google Search
+                            </p>
+                        </div>
+                        {!marketAnalysis && (
+                            <button
+                                onClick={analyzeMarket}
+                                disabled={analyzing}
+                                className="btn btn-primary"
+                                style={{ background: 'var(--accent-secondary)', borderColor: 'var(--accent-secondary)' }}
+                            >
+                                {analyzing ? <RefreshCw className="spin" size={14} /> : <TrendingUp size={14} />}
+                                {analyzing ? 'SCANNING MARKET...' : 'ANALYZE ACTIVE SECTORS'}
+                            </button>
+                        )}
+                    </div>
+
+                    {marketAnalysis && (
+                        <div className="card-body">
+                            <div className="mb-lg">
+                                <h4 className="text-sm font-bold mb-sm text-white">EXECUTIVE BRIEFING</h4>
+                                <p className="text-sm text-muted" style={{ lineHeight: 1.6 }}>{marketAnalysis.summary}</p>
+                            </div>
+
+                            <div className="grid grid-3 gap-md mb-lg">
+                                {marketAnalysis.impactAssessment?.map((impact, i) => (
+                                    <div key={i} style={{
+                                        padding: '12px',
+                                        background: 'var(--bg-tertiary)',
+                                        borderRadius: 'var(--radius-sm)',
+                                        borderLeft: `3px solid ${impact.status === 'High' ? 'var(--error)' : impact.status === 'Medium' ? 'var(--warning)' : 'var(--success)'}`
+                                    }}>
+                                        <div className="flex justify-between mb-xs">
+                                            <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{impact.category}</span>
+                                            <span className={`badge ${impact.status === 'High' ? 'badge-critical' : 'badge-secondary'}`} style={{ fontSize: '9px' }}>{impact.status} impact</span>
+                                        </div>
+                                        <p style={{ fontSize: '12px', fontWeight: 500 }}>{impact.details}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Sources */}
+                            {marketAnalysis.searchSources?.length > 0 && (
+                                <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+                                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                                        Verified Sources:
+                                    </div>
+                                    <div className="flex flex-wrap gap-sm">
+                                        {marketAnalysis.searchSources.map((source, i) => (
+                                            <a key={i} href={source} target="_blank" rel="noopener noreferrer"
+                                                className="badge hover:opacity-80"
+                                                style={{
+                                                    textDecoration: 'none',
+                                                    background: 'var(--bg-secondary)',
+                                                    color: 'var(--text-secondary)',
+                                                    fontSize: '10px',
+                                                    maxWidth: '250px',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap'
+                                                }}>
+                                                {new URL(source).hostname}
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
 
