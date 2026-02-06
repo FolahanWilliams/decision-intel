@@ -197,3 +197,59 @@ button,
     border-radius: 6px;
     font-size: 13px;
 }
+
+/* Fact Check Section */
+.fact-check-section {
+    margin-bottom: 20px;
+}
+
+.fact-check-section h3 {
+    font-size: 11px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #333;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.fact-check-summary {
+    display: flex;
+    gap: 8px;
+}
+
+.fact-badge {
+    flex: 1;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid transparent;
+}
+
+.fact-badge.verified {
+    background: rgba(48, 209, 88, 0.1);
+    color: var(--success);
+    border-color: rgba(48, 209, 88, 0.2);
+}
+
+.fact-badge.contradicted {
+    background: rgba(255, 69, 58, 0.1);
+    color: var(--danger);
+    border-color: rgba(255, 69, 58, 0.2);
+}
+
+.fact-badge .count {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.fact-check-note {
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    text-align: center;
+}

@@ -105,6 +105,28 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Financial Fact Check
+        const fcSection = document.getElementById('fact-check-section');
+        if (data.factCheckResult) {
+            fcSection.classList.remove('hidden');
+            document.getElementById('fc-verified').textContent = data.factCheckResult.verifiedCount || 0;
+            document.getElementById('fc-contradicted').textContent = data.factCheckResult.contradictedCount || 0;
+
+            const stats = data.factCheckResult;
+            const noteEl = document.getElementById('fc-note');
+
+            if (stats.score >= 80) {
+                noteEl.textContent = "Data verified against real-time market stats.";
+                noteEl.style.color = "var(--success)";
+            } else if (stats.score < 50) {
+                noteEl.textContent = "Warning: Significant contradictions found.";
+                noteEl.style.color = "var(--danger)";
+            } else {
+                noteEl.textContent = "Analyzed against real-time market data.";
+                noteEl.style.color = "var(--text-secondary)";
+            }
+        }
+
         // Link to full report
         const reportBtn = document.getElementById('view-report-btn');
         reportBtn.href = `${API_BASE_URL}/documents/${data.documentId}`;

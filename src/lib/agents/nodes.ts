@@ -17,9 +17,9 @@ function getModel(): GenerativeModel {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-    // Using gemini-3-pro-preview - deep reasoning for sophisticated analysis
+    // Using gemini-3-flash - cost-effective model for analysis tasks
     modelInstance = genAI.getGenerativeModel({
-        model: "gemini-3-pro-preview",
+        model: "gemini-3-flash",
         generationConfig: {
             responseMimeType: "application/json",
             maxOutputTokens: 16384  // Increased to prevent JSON truncation
@@ -271,7 +271,10 @@ VERIFICATION RULES:
 2. CONTRADICTED: The data clearly contradicts the claim (e.g., claim says 30% growth but data shows 10%)
 3. UNVERIFIABLE: Can't verify because data is missing or claim is too vague
 
-For each claim, show your reasoning by citing the specific data you used.
+For each claim, you MUST cite the EXACT source data used including:
+- The ticker symbol
+- The data endpoint (e.g., "income_quarterly", "key_metrics", "quote")
+- The specific field and value from the data
 
 Return JSON:
 {
@@ -285,8 +288,15 @@ Return JSON:
             "claimId": 1,
             "claim": "Original claim text",
             "verdict": "VERIFIED|CONTRADICTED|UNVERIFIABLE",
-            "dataUsed": "The specific data point you checked",
-            "explanation": "Your reasoning"
+            "explanation": "Your reasoning",
+            "source": {
+                "ticker": "AAPL",
+                "endpoint": "income_quarterly",
+                "field": "revenue",
+                "value": 94836000000,
+                "displayValue": "$94.8B",
+                "period": "2024-Q3"
+            }
         }
     ]
 }`,
@@ -296,19 +306,22 @@ Return JSON:
         const verificationText = verificationResult.response?.text ? verificationResult.response.text() : "";
         const verification = parseJSON(verificationText);
 
-        // Build enriched result
+        // Build enriched result with source citations
         const enrichedResult = {
             score: verification?.score || 0,
             summary: verification?.summary || "Verification completed",
             verifiedCount: verification?.verifiedCount || 0,
             contradictedCount: verification?.contradictedCount || 0,
             unverifiableCount: verification?.unverifiableCount || 0,
-            flags: verification?.verifications || [],
+            verifications: verification?.verifications || [],
+            flags: (verification?.verifications || []).filter(
+                (v: { verdict: string }) => v.verdict === 'CONTRADICTED'
+            ).map((v: { claim: string }) => v.claim),
             // Metadata for transparency
             primaryCompany: { ticker: primaryTicker, name: companyName },
             claimsAnalyzed: claims.length,
             dataRequestsMade: dataRequests.length,
-            fetchedData: fetchedData
+            dataFetchedAt: new Date().toISOString()
         };
 
         console.log(`Verification complete: Score ${enrichedResult.score}, ` +

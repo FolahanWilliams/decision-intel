@@ -25,7 +25,7 @@ export const parseJSON = (text: string): any | null => {
         const candidate = text.slice(start, end + 1);
         try {
             return JSON.parse(candidate);
-        } catch (e) {
+        } catch (_e) {
             // Fallback to robust parsing if optimistic attempt fails
         }
     }
@@ -79,10 +79,10 @@ export function safeStringify(obj: any): string {
 
     try {
         return JSON.stringify(obj);
-    } catch (e) {
+    } catch (_e) {
         try {
             return JSON.stringify(obj, safeReplacer());
-        } catch (e2) {
+        } catch (_e2) {
             return JSON.stringify({ type: 'error', message: 'Non-serializable payload' });
         }
     }
@@ -94,8 +94,10 @@ export function safeStringify(obj: any): string {
  * Optimized to use single-pass traversal instead of double serialization.
  */
 export function safeJsonClone<T>(obj: T): T {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const seen = new WeakSet<any>();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function clone(value: any): any {
         // Primitives and null
         if (value === null || typeof value !== 'object') {

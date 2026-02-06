@@ -81,6 +81,24 @@ export async function analyzeDocument(
             data: { status: 'complete' }
         });
 
+        // Store embedding for RAG (non-blocking)
+        try {
+            const { storeAnalysisEmbedding } = await import('@/lib/rag/embeddings');
+            await storeAnalysisEmbedding(
+                documentId,
+                document.filename,
+                result.summary,
+                foundBiases.map(b => ({
+                    biasType: b.biasType,
+                    severity: b.severity,
+                    explanation: b.explanation || ''
+                })),
+                result.overallScore
+            );
+        } catch (embeddingError) {
+            console.warn('Failed to store embedding (non-critical):', embeddingError);
+        }
+
         if (onProgress) {
             onProgress({ type: 'complete', progress: 100, result });
         }
@@ -121,53 +139,92 @@ export async function runAnalysis(
         if (onProgress) onProgress({ type: 'step', step, status, progress });
     };
 
-    // Define analysis steps with timing
-    const analysisSteps = [
-        { name: 'Preparing document', delay: 0, progress: 10 },
-        { name: 'Detecting cognitive biases', delay: 8000, progress: 25 },
-        { name: 'Analyzing decision noise', delay: 16000, progress: 40 },
-        { name: 'Fact checking claims', delay: 24000, progress: 55 },
-        { name: 'Evaluating compliance', delay: 32000, progress: 70 },
-        { name: 'Generating risk assessment', delay: 40000, progress: 85 }
-    ];
+    // Map agent node names to human-readable labels
+    const NODE_LABELS: Record<string, string> = {
+        'gdprAnonymizer': 'Privacy Protection',
+        'structurer': 'Document Parsing',
+        'biasDetective': 'Bias Detection',
+        'noiseJudge': 'Noise Analysis',
+        'factChecker': 'Financial Fact Check',
+        'preMortemAnalyzer': 'Pre-Mortem Analysis',
+        'complianceMapper': 'Compliance Check',
+        'sentimentAnalyzer': 'Sentiment Analysis',
+        'riskScorer': 'Final Risk Scoring'
+    };
 
-    // Track which step we're on
-    let currentStepIndex = 0;
+    // Track completed nodes for progress calculation
+    const completedNodes = new Set<string>();
+    const totalNodes = Object.keys(NODE_LABELS).length;
 
-    // Start with first step immediately
-    sendStep(analysisSteps[0].name, 'complete', analysisSteps[0].progress);
-    sendStep(analysisSteps[1].name, 'running', 15);
-    currentStepIndex = 1;
-
-    // Set up interval to send progress updates during LLM call
-    const progressInterval = setInterval(() => {
-        if (currentStepIndex < analysisSteps.length - 1) {
-            // Complete current step
-            sendStep(analysisSteps[currentStepIndex].name, 'complete', analysisSteps[currentStepIndex].progress);
-            currentStepIndex++;
-
-            // Start next step
-            if (currentStepIndex < analysisSteps.length) {
-                sendStep(analysisSteps[currentStepIndex].name, 'running', analysisSteps[currentStepIndex].progress - 5);
-            }
-        }
-    }, 8000); // Update every 8 seconds
+    // Initial step
+    sendStep('Initializing audit pipeline', 'running', 5);
 
     let result;
     try {
+        // Use streamEvents for real-time node tracking
+        const eventStream = auditGraph.streamEvents(
+            { originalContent: content, documentId: documentId },
+            { version: 'v2' }
+        );
+
+        for await (const event of eventStream) {
+            // Track node start events
+            if (event.event === 'on_chain_start' && event.name && NODE_LABELS[event.name]) {
+                const label = NODE_LABELS[event.name];
+                sendStep(label, 'running', Math.round((completedNodes.size / totalNodes) * 80) + 10);
+            }
+
+            // Track node end events
+            if (event.event === 'on_chain_end' && event.name && NODE_LABELS[event.name]) {
+                completedNodes.add(event.name);
+                const label = NODE_LABELS[event.name];
+                const progress = Math.round((completedNodes.size / totalNodes) * 80) + 10;
+                sendStep(label, 'complete', progress);
+
+                // Send bias detection updates specifically
+                if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
+                    const biases = event.data.output.biasAnalysis;
+                    for (const bias of biases) {
+                        if (bias.found && onProgress) {
+                            onProgress({
+                                type: 'bias',
+                                biasType: bias.biasType,
+                                progress,
+                                result: { found: true, severity: bias.severity }
+                            });
+                        }
+                    }
+                }
+
+                // Send noise analysis updates
+                if (event.name === 'noiseJudge' && event.data?.output?.noiseStats) {
+                    if (onProgress) {
+                        onProgress({
+                            type: 'noise',
+                            progress,
+                            result: { score: event.data.output.noiseStats.mean }
+                        });
+                    }
+                }
+            }
+        }
+
+        // Get final result after stream completes
         result = await auditGraph.invoke({
             originalContent: content,
             documentId: documentId,
         });
-    } finally {
-        // Clear the interval when LLM call completes
-        clearInterval(progressInterval);
+
+    } catch (error) {
+        console.error('Streaming error, falling back to invoke:', error);
+        // Fallback to non-streaming invoke if streaming fails
+        sendStep('Processing document', 'running', 50);
+        result = await auditGraph.invoke({
+            originalContent: content,
+            documentId: documentId,
+        });
     }
 
-    // Complete all remaining steps rapidly after LLM finishes
-    for (let i = currentStepIndex; i < analysisSteps.length; i++) {
-        sendStep(analysisSteps[i].name, 'complete', analysisSteps[i].progress);
-    }
     sendStep('Finalizing report', 'running', 95);
 
     if (!result.finalReport) {

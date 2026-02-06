@@ -3,9 +3,9 @@
 import { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import {
-    ArrowLeft, FileText, AlertTriangle, CheckCircle,
+    ArrowLeft, FileText, AlertTriangle, CheckCircle, XCircle,
     Loader2, ChevronRight, Lightbulb, Download, Table,
-    Terminal, PlayCircle, Info, RefreshCw
+    Terminal, PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';
@@ -20,6 +20,31 @@ interface BiasInstance {
     found?: boolean; // Used in simulation results
 }
 
+interface VerificationSource {
+    ticker?: string;
+    endpoint?: string;
+    field?: string;
+    value?: number | string;
+    displayValue?: string;
+    period?: string;
+}
+
+interface Verification {
+    claimId: number;
+    claim: string;
+    verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE';
+    explanation: string;
+    source?: VerificationSource;
+}
+
+interface FactCheck {
+    score: number;
+    flags: string[];
+    verifications?: Verification[];
+    primaryCompany?: { ticker: string; name: string };
+    dataFetchedAt?: string;
+}
+
 interface Analysis {
     id: string;
     overallScore: number;
@@ -29,7 +54,7 @@ interface Analysis {
     biases: BiasInstance[];
     // Extended fields
     noiseStats?: { mean: number; stdDev: number; variance: number };
-    factCheck?: { score: number; flags: string[] };
+    factCheck?: FactCheck;
     compliance?: { status: 'PASS' | 'FLAGGED'; details: string };
 }
 
@@ -129,6 +154,13 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
     const [streamLogs, setStreamLogs] = useState<{ msg: string, type: 'info' | 'bias' | 'success' }[]>([]);
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
+    const [similarDocs, setSimilarDocs] = useState<Array<{
+        documentId: string;
+        filename: string;
+        score: number;
+        similarity: number;
+        biases: string[];
+    }>>([]);
     const { showToast } = useToast();
 
     useEffect(() => {
@@ -151,6 +183,32 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
 
         fetchDocument();
     }, [resolvedParams.id]);
+
+    // Fetch similar documents after document loads
+    useEffect(() => {
+        if (document?.content && document.status === 'complete') {
+            const fetchSimilar = async () => {
+                try {
+                    const res = await fetch('/api/search', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            query: document.content.slice(0, 5000),
+                            limit: 3,
+                            documentId: document.id
+                        })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        setSimilarDocs(data.results || []);
+                    }
+                } catch (err) {
+                    console.warn('Failed to fetch similar docs:', err);
+                }
+            };
+            fetchSimilar();
+        }
+    }, [document?.id, document?.content, document?.status]);
 
     if (loading) {
         return (
@@ -270,15 +328,29 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                 const chunk = decoder.decode(value);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 sseReader.processChunk(chunk, (update: any) => {
-                    if (update.type === 'bias' && update.result.found) {
+                    // Handle step updates (agent-level progress)
+                    if (update.type === 'step') {
+                        const icon = update.status === 'complete' ? '✓' : '►';
+                        const color = update.status === 'complete' ? 'success' : 'info';
                         setStreamLogs(prev => [...prev, {
-                            msg: `DETECTED: ${update.biasType} (${update.result.severity.toUpperCase()})`,
+                            msg: `${icon} ${update.step}`,
+                            type: color
+                        }]);
+                    } else if (update.type === 'bias' && update.result.found) {
+                        setStreamLogs(prev => [...prev, {
+                            msg: `⚠ BIAS: ${update.biasType} (${update.result.severity.toUpperCase()})`,
                             type: 'bias'
                         }]);
                     } else if (update.type === 'noise') {
-                        setStreamLogs(prev => [...prev, { msg: `NOISE ANALYSIS: ${Math.round(update.result.score)}% intensity`, type: 'info' }]);
+                        setStreamLogs(prev => [...prev, {
+                            msg: `◐ NOISE: ${Math.round(update.result.score)}% variance detected`,
+                            type: 'info'
+                        }]);
                     } else if (update.type === 'complete') {
-                        setStreamLogs(prev => [...prev, { msg: 'Audit successfully committed to ledger.', type: 'success' }]);
+                        setStreamLogs(prev => [...prev, {
+                            msg: '✓ Analysis complete. Results saved.',
+                            type: 'success'
+                        }]);
                         setDocument(prev => prev ? { ...prev, analyses: [update.result, ...prev.analyses], status: 'complete' } : null);
                     }
 
@@ -468,6 +540,111 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                     </div>
                 </div>
             </div>
+
+            {/* Financial Fact Check Verifications */}
+            {analysis?.factCheck?.verifications && analysis.factCheck.verifications.length > 0 && (
+                <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                    <div className="card-header flex items-center justify-between">
+                        <h3 className="flex items-center gap-sm">
+                            <CheckCircle size={18} style={{ color: 'var(--accent-primary)' }} />
+                            Financial Fact Check
+                            {analysis.factCheck.primaryCompany && (
+                                <span className="badge badge-secondary" style={{ marginLeft: '8px', fontSize: '10px' }}>
+                                    {analysis.factCheck.primaryCompany.name} ({analysis.factCheck.primaryCompany.ticker})
+                                </span>
+                            )}
+                        </h3>
+                        {analysis.factCheck.dataFetchedAt && (
+                            <span className="text-xs text-muted">
+                                Data fetched: {new Date(analysis.factCheck.dataFetchedAt).toLocaleString()}
+                            </span>
+                        )}
+                    </div>
+                    <div className="card-body" style={{ padding: 0 }}>
+                        {analysis.factCheck.verifications.map((v, idx) => (
+                            <div
+                                key={idx}
+                                style={{
+                                    padding: 'var(--spacing-md) var(--spacing-lg)',
+                                    borderBottom: idx < (analysis.factCheck?.verifications?.length || 0) - 1 ? '1px solid var(--border-color)' : 'none',
+                                    background: v.verdict === 'CONTRADICTED' ? 'rgba(239, 68, 68, 0.05)' :
+                                        v.verdict === 'VERIFIED' ? 'rgba(34, 197, 94, 0.05)' : 'transparent'
+                                }}
+                            >
+                                <div className="flex items-start gap-md">
+                                    {/* Verdict Icon */}
+                                    <div style={{
+                                        marginTop: '2px',
+                                        color: v.verdict === 'VERIFIED' ? 'var(--success)' :
+                                            v.verdict === 'CONTRADICTED' ? 'var(--error)' : 'var(--text-muted)'
+                                    }}>
+                                        {v.verdict === 'VERIFIED' && <CheckCircle size={18} />}
+                                        {v.verdict === 'CONTRADICTED' && <XCircle size={18} />}
+                                        {v.verdict === 'UNVERIFIABLE' && <HelpCircle size={18} />}
+                                    </div>
+
+                                    <div style={{ flex: 1 }}>
+                                        {/* Claim */}
+                                        <div style={{ fontSize: '13px', fontWeight: 500, marginBottom: '6px' }}>
+                                            &quot;{v.claim}&quot;
+                                        </div>
+
+                                        {/* Verdict Badge */}
+                                        <span className={`badge ${v.verdict === 'VERIFIED' ? 'badge-success' : v.verdict === 'CONTRADICTED' ? 'badge-critical' : 'badge-secondary'}`}
+                                            style={{ fontSize: '10px', marginBottom: '8px', display: 'inline-block' }}>
+                                            {v.verdict}
+                                        </span>
+
+                                        {/* Explanation */}
+                                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.5 }}>
+                                            {v.explanation}
+                                        </p>
+
+                                        {/* Source Citation */}
+                                        {v.source && (
+                                            <div style={{
+                                                background: 'var(--bg-tertiary)',
+                                                borderRadius: 'var(--radius-sm)',
+                                                padding: '8px 12px',
+                                                fontSize: '11px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '12px',
+                                                flexWrap: 'wrap'
+                                            }}>
+                                                <span style={{ color: 'var(--text-muted)' }}>
+                                                    <ExternalLink size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                                                    SOURCE:
+                                                </span>
+                                                {v.source.ticker && (
+                                                    <span className="badge badge-secondary" style={{ fontSize: '10px' }}>
+                                                        {v.source.ticker}
+                                                    </span>
+                                                )}
+                                                {v.source.endpoint && (
+                                                    <span style={{ color: 'var(--accent-secondary)' }}>
+                                                        {v.source.endpoint}
+                                                    </span>
+                                                )}
+                                                {v.source.field && v.source.displayValue && (
+                                                    <span>
+                                                        <strong>{v.source.field}:</strong> {v.source.displayValue}
+                                                    </span>
+                                                )}
+                                                {v.source.period && (
+                                                    <span style={{ color: 'var(--text-muted)' }}>
+                                                        ({v.source.period})
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Biases & Simulator */}
             <div className="grid" style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}>
@@ -892,6 +1069,70 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                             This document appears to demonstrate sound decision-making practices
                             without significant cognitive bias patterns.
                         </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Similar Documents (RAG) */}
+            {similarDocs.length > 0 && (
+                <div className="card animate-fade-in" style={{ animationDelay: '0.5s', marginTop: 'var(--spacing-xl)' }}>
+                    <div className="card-header flex items-center gap-sm">
+                        <Table size={18} style={{ color: 'var(--accent-primary)' }} />
+                        <h3>Similar Documents</h3>
+                        <span className="badge badge-secondary" style={{ fontSize: '10px', marginLeft: 'auto' }}>
+                            Based on content similarity
+                        </span>
+                    </div>
+                    <div className="card-body" style={{ padding: 0 }}>
+                        {similarDocs.map((doc, idx) => (
+                            <Link
+                                key={doc.documentId}
+                                href={`/documents/${doc.documentId}`}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: 'var(--spacing-md) var(--spacing-lg)',
+                                    borderBottom: idx < similarDocs.length - 1 ? '1px solid var(--border-color)' : 'none',
+                                    textDecoration: 'none',
+                                    color: 'inherit',
+                                    transition: 'background 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                            >
+                                <div className="flex items-center gap-md">
+                                    <FileText size={16} style={{ color: 'var(--text-muted)' }} />
+                                    <div>
+                                        <div style={{ fontSize: '13px', fontWeight: 500 }}>
+                                            {doc.filename}
+                                        </div>
+                                        <div className="flex items-center gap-sm" style={{ marginTop: '4px' }}>
+                                            {doc.biases.slice(0, 2).map(bias => (
+                                                <span key={bias} className="badge badge-warning" style={{ fontSize: '9px' }}>
+                                                    {bias}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-lg">
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{
+                                            fontSize: '14px',
+                                            fontWeight: 600,
+                                            color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                                        }}>
+                                            {doc.score}/100
+                                        </div>
+                                        <div className="text-xs text-muted">
+                                            {Math.round(doc.similarity * 100)}% similar
+                                        </div>
+                                    </div>
+                                    <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
+                                </div>
+                            </Link>
+                        ))}
                     </div>
                 </div>
             )}

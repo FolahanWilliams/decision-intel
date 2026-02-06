@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Decision Intel Audit</title>
   <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -28,12 +30,25 @@
         <div class="score-label">Decision Score</div>
         <div class="score-value" id="score-value">--</div>
       </div>
-      
+
       <div class="bias-list">
         <h3>Top Biases Detected</h3>
         <ul id="bias-list-items">
           <!-- Populated by JS -->
         </ul>
+      </div>
+
+      <div class="fact-check-section hidden" id="fact-check-section">
+        <h3>Financial Fact Check</h3>
+        <div class="fact-check-summary">
+          <div class="fact-badge verified">
+            <span class="count" id="fc-verified">0</span> Verified
+          </div>
+          <div class="fact-badge contradicted">
+            <span class="count" id="fc-contradicted">0</span> Flags
+          </div>
+        </div>
+        <p class="fact-check-note" id="fc-note">Analyzed against real-time market data.</p>
       </div>
 
       <a href="#" id="view-report-btn" class="btn-secondary" target="_blank">View Full Report</a>
@@ -46,4 +61,5 @@
   </div>
   <script src="popup.js"></script>
 </body>
+
 </html>

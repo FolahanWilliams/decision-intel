@@ -74,7 +74,7 @@ export class SSEReader {
                     try {
                         const data = JSON.parse(line);
                         onMessage(data);
-                    } catch (e) {
+                    } catch (_e) {
                         // Ignore noise
                     }
                 }
