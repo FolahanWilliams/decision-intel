@@ -39,7 +39,7 @@ export default function Sidebar() {
                     Analysis
                 </div>
                 <NavItem href="/dashboard/trends" icon={<Activity size={18} />} label="Historical Trends" active={pathname === '/dashboard/trends'} />
-                <NavItem href="#" icon={<ShieldAlert size={18} />} label="Risk Audits" />
+                <NavItem href="/dashboard/risk-audits" icon={<ShieldAlert size={18} />} label="Risk Audits" active={pathname === '/dashboard/risk-audits'} />
 
                 <div style={{ fontSize: '11px', color: '#666', padding: '16px 12px 8px', textTransform: 'uppercase' }}>
                     System
