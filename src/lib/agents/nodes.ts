@@ -46,6 +46,14 @@ async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS):
 
 // Helper to safely parse JSON from LLM output - Imported from utils/json
 
+// Text truncation to prevent timeouts on large documents
+const MAX_INPUT_CHARS = 25000; // ~6K tokens, safe for most models
+function truncateText(text: string): string {
+    if (text.length <= MAX_INPUT_CHARS) return text;
+    console.log(`Truncating text from ${text.length} to ${MAX_INPUT_CHARS} chars`);
+    return text.slice(0, MAX_INPUT_CHARS) + "\n\n[... text truncated for analysis ...]";
+}
+
 // Structurer Node - Simplified to pass-through for faster analysis
 // The bias detection works well with raw content
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
@@ -60,24 +68,37 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
 export async function biasDetectiveNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Bias Detective Node (Gemini) ---");
     try {
-        const content = state.structuredContent || state.originalContent;
+        const content = truncateText(state.structuredContent || state.originalContent);
+        console.log(`Analyzing ${content.length} chars for biases...`);
+
         const result = await withTimeout(getModel().generateContent([
             BIAS_DETECTIVE_PROMPT,
             `Text to Analyze:\n<input_text>\n${content}\n</input_text>`
         ]));
-        const response = result.response?.text ? result.response.text() : "";
-        const data = parseJSON(response);
 
-        return { biasAnalysis: data?.biases || [] };
+        const response = result.response?.text ? result.response.text() : "";
+        console.log(`Bias Detective response length: ${response.length}`);
+
+        const data = parseJSON(response);
+        const biases = data?.biases || [];
+
+        console.log(`Detected ${biases.length} biases`);
+
+        // If no biases found, this might indicate an issue - log for debugging
+        if (biases.length === 0) {
+            console.warn("No biases detected - response preview:", response.slice(0, 500));
+        }
+
+        return { biasAnalysis: biases };
     } catch (e) {
-        console.error("Bias Detective failed", e);
+        console.error("Bias Detective failed:", e instanceof Error ? e.message : e);
         return { biasAnalysis: [] };
     }
 }
 
 export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Noise Judge Node (Gemini x3) ---");
-    const content = state.structuredContent || state.originalContent;
+    const content = truncateText(state.structuredContent || state.originalContent);
 
     // Spawn 3 independent "judges" (parallel calls)
     try {
@@ -95,6 +116,8 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
             const data = parseJSON(text);
             return typeof data?.score === 'number' ? data.score : 0;
         });
+
+        console.log(`Noise Judge scores: ${scores.join(', ')}`);
 
         // Calculate Statistics
         const validScores = scores.filter(s => typeof s === 'number' && isFinite(s));
@@ -130,7 +153,7 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
 // New Node: Fact Checker
 export async function factCheckerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Fact Checker Node (Gemini + FMP) ---");
-    const content = state.structuredContent || state.originalContent;
+    const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
         // Step 1: Extract Tickers
@@ -175,7 +198,7 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
 // New Node: Pre-Mortem Architect
 export async function preMortemNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Pre-Mortem Node (Gemini) ---");
-    const content = state.structuredContent || state.originalContent;
+    const content = truncateText(state.structuredContent || state.originalContent);
     try {
         const result = await getModel().generateContent([
             `You are a Pre-Mortem Architect. 
