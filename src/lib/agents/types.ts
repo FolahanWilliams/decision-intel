@@ -21,6 +21,9 @@ export interface AuditState {
     factCheckResult?: {
         score: number;
         flags: string[];
+        searchSources?: string[];
+        summary?: string;
+        verifications?: any[];
     };
     preMortem?: {
         failureScenarios: string[];

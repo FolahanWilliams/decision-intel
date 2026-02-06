@@ -198,15 +198,15 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         }
 
         // PASS 2: Verify with Grounding (Using Grounded Model)
-        // This enabled Google Search to fill gaps in fetchedData
         console.log("Verifying with Google Search Grounding...");
         const verificationResult = await getGroundedModel().generateContent([
             `You are a Financial Fact Checker with access to Google Search.
 
             CORE INSTRUCTION:
             1. First, check the "REAL-TIME FINANCIAL DATA" (Finnhub) provided below.
-            2. If that data is insufficient (missing history, specific news), use Google Search to find reliable sources.
-            3. Verify claims based on ALL evidence.
+            2. CRITICAL: If data is missing (e.g. historical revenue, specific news), you MUST use Google Search to find it. 
+            3. Do NOT mark claims as "UNVERIFIABLE" unless you have searched and found nothing.
+            4. If you use Search, incorporate the findings into your explanation.
 
             CLAIMS TO VERIFY:
             ${JSON.stringify(claims, null, 2)}
@@ -221,13 +221,23 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         const verificationText = verificationResult.response?.text ? verificationResult.response.text() : "";
         const verification = parseJSON(verificationText);
 
+        // Extract Search Sources (Grounding Metadata)
+        // @ts-ignore - groundingMetadata is in v1beta SDK but might miss types
+        const metadata = verificationResult.response.candidates?.[0]?.groundingMetadata;
+        const searchSources: string[] = metadata?.groundingChunks
+            ?.map((c: any) => c.web?.uri)
+            .filter((u: string) => typeof u === 'string') || [];
+
+        console.log(`Found ${searchSources.length} search sources.`);
+
         const enrichedResult = {
             score: verification?.score || 0,
             summary: verification?.summary || "Verification completed",
             verifications: verification?.verifications || [],
             primaryCompany: { ticker: primaryTicker, name: companyName },
             dataFetchedAt: new Date().toISOString(),
-            flags: [] // Required by interface
+            flags: [],
+            searchSources: searchSources // New Field: Actable Sources!
         };
 
         return { factCheckResult: enrichedResult };
