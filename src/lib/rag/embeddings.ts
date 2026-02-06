@@ -8,8 +8,8 @@
 import { prisma } from '@/lib/prisma';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+// Initialize Gemini - use same env var as nodes.ts for consistency
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 // Embedding model - uses text-embedding-004 which outputs 768 dimensions
 // We pad to 1536 for schema compatibility (pgvector setup)
