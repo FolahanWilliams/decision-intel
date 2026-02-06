@@ -322,7 +322,10 @@ export interface DataRequest {
 // Execute a single data request
 export async function executeDataRequest(request: DataRequest): Promise<{ request: DataRequest; data: unknown; error?: string }> {
     const apiKey = process.env.FMP_API_KEY;
-    if (!apiKey) return { request, data: null, error: "No FMP API Key configured" };
+    if (!apiKey) {
+        console.error("CRITICAL: FMP_API_KEY is missing in environment variables");
+        return { request, data: null, error: "Configuration Error: Missing FMP_API_KEY" };
+    }
 
     try {
         let data: unknown = null;

@@ -11,9 +11,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // Initialize Gemini - use same env var as nodes.ts for consistency
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
-// Embedding model - uses text-embedding-004 which outputs 768 dimensions
+// Embedding model - using embedding-001 as text-embedding-004 is returning 404 on V1Beta
 // We pad to 1536 for schema compatibility (pgvector setup)
-const EMBEDDING_MODEL = 'text-embedding-004';
+const EMBEDDING_MODEL = 'embedding-001';
 
 interface EmbeddingMetadata {
     documentId: string;
