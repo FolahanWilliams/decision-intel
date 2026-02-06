@@ -17,9 +17,9 @@ function getModel(): GenerativeModel {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-    // Using gemini-3-flash - cost-effective model for analysis tasks
+    // Using gemini-3-flash-preview - cost-effective model for analysis tasks
     modelInstance = genAI.getGenerativeModel({
-        model: "gemini-3-flash",
+        model: "gemini-3-flash-preview",
         generationConfig: {
             responseMimeType: "application/json",
             maxOutputTokens: 16384  // Increased to prevent JSON truncation
