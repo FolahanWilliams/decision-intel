@@ -13,8 +13,11 @@ import { SwotMatrix } from './SwotMatrix';
 import { FallacyList } from './FallacyList';
 import { RedTeamView } from './RedTeamView';
 import { NoiseJudge } from './NoiseJudge';
+import { BoardroomSimulator } from './BoardroomSimulator';
 import { BiasInstance } from '@prisma/client';
-import { ResearchInsight, SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark } from '@/types';
+import { ResearchInsight, SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, InstitutionalMemoryResult, ComplianceResult } from '@/types';
+import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
+import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 
 
 interface VerificationSource {
@@ -54,10 +57,22 @@ interface Analysis {
     noiseStats?: { mean: number; stdDev: number; variance: number };
     noiseBenchmarks?: NoiseBenchmark[];
     factCheck?: FactCheck;
-    compliance?: { status: 'PASS' | 'FLAGGED'; details: string };
+    compliance?: ComplianceResult;
     swotAnalysis?: SwotAnalysisResult;
     logicalAnalysis?: LogicalAnalysisResult;
     cognitiveAnalysis?: CognitiveAnalysisResult;
+    simulation?: {
+        overallVerdict: 'APPROVED' | 'REJECTED' | 'MIXED';
+        twins: Array<{
+            name: string;
+            role: string;
+            vote: 'APPROVE' | 'REJECT' | 'REVISE';
+            confidence: number;
+            rationale: string;
+            keyRiskIdentified?: string;
+        }>;
+    };
+    institutionalMemory?: InstitutionalMemoryResult;
 }
 
 interface Document {
@@ -161,14 +176,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     const [streamLogs, setStreamLogs] = useState<{ msg: string, type: 'info' | 'bias' | 'success' }[]>([]);
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
-    const [similarDocs, setSimilarDocs] = useState<Array<{
-        documentId: string;
-        filename: string;
-        score: number;
-        similarity: number;
-        biases: string[];
-    }>>([]);
-    const [activeTab, setActiveTab] = useState<'overview' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team'>('overview');
+
+    const [activeTab, setActiveTab] = useState<'overview' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team' | 'boardroom'>('overview');
 
     const { showToast } = useToast();
 
@@ -193,31 +202,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         fetchDocument();
     }, [resolvedParams.id]);
 
-    // Fetch similar documents after document loads
-    useEffect(() => {
-        if (document?.content && document.status === 'complete') {
-            const fetchSimilar = async () => {
-                try {
-                    const res = await fetch('/api/search', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            query: document.content.slice(0, 5000),
-                            limit: 3,
-                            documentId: document.id
-                        })
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        setSimilarDocs(data.results || []);
-                    }
-                } catch (err) {
-                    console.warn('Failed to fetch similar docs:', err);
-                }
-            };
-            fetchSimilar();
-        }
-    }, [document?.id, document?.content, document?.status]);
+
 
     if (loading) {
         return (
@@ -504,7 +489,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     <div className="card animate-fade-in" style={{ animationDelay: '0.3s' }}>
                         <div className="card-body text-center p-md">
                             <div className="text-xs text-muted uppercase tracking-wider mb-sm">Compliance</div>
-                            <div className={`badge ${analysis.compliance?.status === 'FLAGGED' ? 'badge-critical' : 'badge-success'}`} style={{ fontSize: '1.25rem', margin: '0.5rem 0' }}>
+                            <div className={`badge ${analysis.compliance?.status === 'FAIL' ? 'badge-critical' : analysis.compliance?.status === 'WARN' ? 'badge-warning' : 'badge-success'}`} style={{ fontSize: '1.25rem', margin: '0.5rem 0' }}>
                                 {analysis.compliance?.status || 'PENDING'}
                             </div>
                             <div className="text-xs text-muted">
@@ -695,6 +680,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             Simulator
                         </button>
                         <button
+                            onClick={() => setActiveTab('boardroom')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'boardroom' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Virtual Board
+                        </button>
+                        <button
                             onClick={() => setActiveTab('red-team')}
                             className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'red-team' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
                         >
@@ -800,6 +791,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             </div>
                         </div>
                     )}
+
+                    {activeTab === 'boardroom' && (
+                        <div className="card">
+                            <div className="card-body">
+                                {analysis?.simulation ? (
+                                    <BoardroomSimulator simulation={analysis.simulation} />
+                                ) : (
+                                    <div className="text-center p-8 text-muted">Run "Live Scan" to convene the Virtual Board.</div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
 
                     {activeTab === 'simulator' && (
                         <div className="card">
@@ -1233,71 +1237,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 )
             }
 
-            {/* Similar Documents (RAG) */}
-            {
-                similarDocs.length > 0 && (
-                    <div className="card animate-fade-in" style={{ animationDelay: '0.5s', marginTop: 'var(--spacing-xl)' }}>
-                        <div className="card-header flex items-center gap-sm">
-                            <Table size={18} style={{ color: 'var(--accent-primary)' }} />
-                            <h3>Similar Documents</h3>
-                            <span className="badge badge-secondary" style={{ fontSize: '10px', marginLeft: 'auto' }}>
-                                Based on content similarity
-                            </span>
-                        </div>
-                        <div className="card-body" style={{ padding: 0 }}>
-                            {similarDocs.map((doc, idx) => (
-                                <Link
-                                    key={doc.documentId}
-                                    href={`/documents/${doc.documentId}`}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        padding: 'var(--spacing-md) var(--spacing-lg)',
-                                        borderBottom: idx < similarDocs.length - 1 ? '1px solid var(--border-color)' : 'none',
-                                        textDecoration: 'none',
-                                        color: 'inherit',
-                                        transition: 'background 0.2s'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
-                                    <div className="flex items-center gap-md">
-                                        <FileText size={16} style={{ color: 'var(--text-muted)' }} />
-                                        <div>
-                                            <div style={{ fontSize: '13px', fontWeight: 500 }}>
-                                                {doc.filename}
-                                            </div>
-                                            <div className="flex items-center gap-sm" style={{ marginTop: '4px' }}>
-                                                {doc.biases.slice(0, 2).map(bias => (
-                                                    <span key={bias} className="badge badge-warning" style={{ fontSize: '9px' }}>
-                                                        {bias}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-lg">
-                                        <div style={{ textAlign: 'right' }}>
-                                            <div style={{
-                                                fontSize: '14px',
-                                                fontWeight: 600,
-                                                color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
-                                            }}>
-                                                {doc.score}/100
-                                            </div>
-                                            <div className="text-xs text-muted">
-                                                {Math.round(doc.similarity * 100)}% similar
-                                            </div>
-                                        </div>
-                                        <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                )
-            }
+            {/* Regulatory Horizon Widget */}
+            {analysis?.compliance && (
+                <div className="mb-xl">
+                    <RegulatoryHorizonWidget compliance={analysis.compliance} />
+                </div>
+            )}
+
+            {/* Institutional Memory Widget */}
+            {analysis?.institutionalMemory && (
+                <div className="mb-xl">
+                    <InstitutionalMemoryWidget memory={analysis.institutionalMemory} />
+                </div>
+            )}
         </div>
     );
 }

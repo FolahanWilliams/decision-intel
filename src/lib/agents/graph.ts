@@ -1,6 +1,6 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
-import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode, sentimentAnalyzerNode, logicalFallacyNode, strategicInsightNode, cognitiveDiversityNode } from "./nodes";
-import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult } from '@/types';
+import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode, sentimentAnalyzerNode, logicalFallacyNode, strategicInsightNode, cognitiveDiversityNode, decisionTwinNode, memoryRecallNode } from "./nodes";
+import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
 // Define the State using Annotation.Root
@@ -41,7 +41,7 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),
-    compliance: Annotation<{ status: "PASS" | "WARN" | "FAIL"; details: string } | null>({
+    compliance: Annotation<ComplianceResult | null>({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),
@@ -65,6 +65,14 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),
+    simulation: Annotation<SimulationResult | null>({
+        reducer: (x, y) => y ?? x,
+        default: () => null,
+    }),
+    institutionalMemory: Annotation<InstitutionalMemoryResult | null>({
+        reducer: (x, y) => y ?? x,
+        default: () => null,
+    }),
     messages: Annotation<BaseMessage[]>({
         reducer: (x, y) => [...(x || []), ...(y || [])],
         default: () => [],
@@ -84,6 +92,8 @@ const workflow = new StateGraph(GraphState)
     .addNode("logicalFallacyScanner", logicalFallacyNode)
     .addNode("strategicInsight", strategicInsightNode)
     .addNode("cognitiveDiversity", cognitiveDiversityNode)
+    .addNode("decisionTwin", decisionTwinNode)
+    .addNode("memoryRecall", memoryRecallNode)
     .addNode("riskScorer", riskScorerNode)
 
     .setEntryPoint("gdprAnonymizer")
@@ -98,6 +108,8 @@ const workflow = new StateGraph(GraphState)
     .addEdge("structurer", "logicalFallacyScanner")
     .addEdge("structurer", "strategicInsight")
     .addEdge("structurer", "cognitiveDiversity")
+    .addEdge("structurer", "decisionTwin")
+    .addEdge("structurer", "memoryRecall")
 
     .addEdge("biasDetective", "riskScorer")
     .addEdge("noiseJudge", "riskScorer")
@@ -108,6 +120,8 @@ const workflow = new StateGraph(GraphState)
     .addEdge("logicalFallacyScanner", "riskScorer")
     .addEdge("strategicInsight", "riskScorer")
     .addEdge("cognitiveDiversity", "riskScorer")
+    .addEdge("decisionTwin", "riskScorer")
+    .addEdge("memoryRecall", "riskScorer")
 
     .addEdge("riskScorer", END);
 

@@ -1,4 +1,4 @@
-import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark } from '@/types';
+import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
 export interface AuditState {
@@ -30,10 +30,7 @@ export interface AuditState {
         failureScenarios: string[];
         preventiveMeasures: string[];
     };
-    compliance?: {
-        status: "PASS" | "WARN" | "FAIL";
-        details: string;
-    };
+    compliance?: ComplianceResult;
     sentimentAnalysis?: {
         score: number;
         label: 'Positive' | 'Negative' | 'Neutral';
@@ -43,6 +40,8 @@ export interface AuditState {
     logicalAnalysis?: LogicalAnalysisResult;
     swotAnalysis?: SwotAnalysisResult;
     cognitiveAnalysis?: CognitiveAnalysisResult;
+    simulation?: SimulationResult;
+    institutionalMemory?: InstitutionalMemoryResult;
 
 
     // Final Output

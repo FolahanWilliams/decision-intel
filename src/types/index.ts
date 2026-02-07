@@ -26,10 +26,7 @@ export interface AnalysisResult {
         score: number;
         flags: string[];
     };
-    compliance?: {
-        status: 'PASS' | 'WARN' | 'FAIL';
-        details: string;
-    };
+    compliance?: ComplianceResult;
     preMortem?: {
         failureScenarios: string[];
         preventiveMeasures: string[];
@@ -43,7 +40,37 @@ export interface AnalysisResult {
     logicalAnalysis?: LogicalAnalysisResult;
     swotAnalysis?: SwotAnalysisResult;
     cognitiveAnalysis?: CognitiveAnalysisResult;
+    simulation?: SimulationResult;
+    institutionalMemory?: InstitutionalMemoryResult;
 
+}
+
+export interface SimulationResult {
+    overallVerdict: 'APPROVED' | 'REJECTED' | 'MIXED';
+    twins: DecisionTwin[];
+}
+
+export interface DecisionTwin {
+    name: string;
+    role: string;
+    vote: 'APPROVE' | 'REJECT' | 'REVISE';
+    confidence: number;
+    rationale: string;
+    keyRiskIdentified?: string;
+}
+
+export interface InstitutionalMemoryResult {
+    recallScore: number; // 0-100 relevance
+    similarEvents: Array<{
+        documentId: string;
+        title: string;
+        date: string;
+        summary: string;
+        outcome: 'SUCCESS' | 'FAILURE' | 'MIXED';
+        similarity: number;
+        lessonLearned: string;
+    }>;
+    strategicAdvice: string;
 }
 
 export interface LogicalAnalysisResult {
@@ -80,6 +107,19 @@ export interface CognitiveAnalysisResult {
 }
 
 
+
+export interface ComplianceResult {
+    status: 'PASS' | 'WARN' | 'FAIL';
+    riskScore: number;
+    summary: string;
+    regulations: Array<{
+        name: string;
+        status: 'COMPLIANT' | 'NON_COMPLIANT' | 'PARTIAL';
+        description: string;
+        riskLevel: 'low' | 'medium' | 'high' | 'critical';
+    }>;
+    searchQueries: string[];
+}
 
 export interface ResearchInsight {
     title: string;

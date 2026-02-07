@@ -3,7 +3,8 @@ import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult, BiasDetectionResult, NoiseBenchmark } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
-import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, LOGICAL_FALLACY_PROMPT, STRATEGIC_SWOT_PROMPT, COGNITIVE_DIVERSITY_PROMPT } from "./prompts";
+import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, LOGICAL_FALLACY_PROMPT, STRATEGIC_SWOT_PROMPT, COGNITIVE_DIVERSITY_PROMPT, INSTITUTIONAL_MEMORY_PROMPT, COMPLIANCE_CHECKER_PROMPT } from "./prompts";
+import { searchSimilarDocuments } from "../rag/embeddings";
 import { executeDataRequests, DataRequest } from "../tools/financial";
 
 // ============================================================
@@ -371,15 +372,30 @@ export async function preMortemNode(state: AuditState): Promise<Partial<AuditSta
 }
 
 export async function complianceMapperNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = state.structuredContent || state.originalContent;
+    const content = truncateText(state.structuredContent || state.originalContent);
     try {
-        const result = await getModel().generateContent([
-            `Compliance Officer. Check for Unclear Info, Harm, Poor Value. Output JSON.`,
-            `Text:\n${content}`
+        console.log("Running Compliance Check with Google Search Grounding...");
+        const result = await getGroundedModel().generateContent([
+            COMPLIANCE_CHECKER_PROMPT,
+            `Document Content:\n${content}`
         ]);
-        const data = parseJSON(result.response.text());
-        return { compliance: data || { status: "WARN", details: "Failed to parse." } };
-    } catch { return { compliance: { status: "WARN", details: "Unavailable." } }; }
+
+        const text = result.response.text();
+        const data = parseJSON(text);
+
+        return { compliance: data };
+    } catch (e) {
+        console.error("Compliance Node failed", e);
+        return {
+            compliance: {
+                status: "WARN",
+                riskScore: 50,
+                summary: "Compliance check failed due to technical error.",
+                regulations: [],
+                searchQueries: []
+            }
+        };
+    }
 }
 
 export async function riskScorerNode(state: AuditState): Promise<Partial<AuditState>> {
@@ -523,5 +539,62 @@ export async function cognitiveDiversityNode(state: AuditState): Promise<Partial
     } catch (e) {
         console.error("Cognitive Diversity Node failed", e);
         return {};
+    }
+}
+
+export async function decisionTwinNode(state: AuditState): Promise<Partial<AuditState>> {
+    const content = truncateText(state.structuredContent || state.originalContent);
+
+    try {
+        const { DECISION_TWIN_PROMPT } = await import('./prompts');
+
+        console.log("Running Decision Twin Simulation with Live Market Data...");
+
+        const result = await getGroundedModel().generateContent([
+            DECISION_TWIN_PROMPT,
+            `Proposal to Vote On:\n${content}`,
+            `CRITICAL INSTRUCTION:
+            You have access to Google Search.
+            BEFORE voting, the "Adversarial CFO" and "Market Skeptic" MUST search for:
+            1. Current market volatility (VIX, Bond Yields).
+            2. Recent competitor announcements.
+            3. Macroeconomic risks relevant to this proposal.
+            
+            Cite these specific data points in their "rationale".`
+        ]);
+
+        const text = result.response.text();
+        const data = parseJSON(text);
+
+        return { simulation: data };
+    } catch (e) {
+        console.error("Decision Twin Node failed", e);
+        return { simulation: undefined };
+    }
+}
+
+export async function memoryRecallNode(state: AuditState): Promise<Partial<AuditState>> {
+    const content = truncateText(state.structuredContent || state.originalContent);
+
+    try {
+        // 1. Vector Search for Similar Docs
+        // Using "system" or "global" as userId wildcard since we lack context here.
+        // In a real app, this should come from state.
+        const similarDocs = await searchSimilarDocuments(content, "system", 3);
+
+        // 2. LLM Analysis
+        const result = await getModel().generateContent([
+            INSTITUTIONAL_MEMORY_PROMPT,
+            `Current Document Summary:\n${content.slice(0, 2000)}`,
+            `Similar Past Cases Found:\n${JSON.stringify(similarDocs)}`
+        ]);
+
+        const text = result.response.text();
+        const data = parseJSON(text);
+
+        return { institutionalMemory: data };
+    } catch (e) {
+        console.error("Memory Recall Node failed", e);
+        return { institutionalMemory: undefined };
     }
 }

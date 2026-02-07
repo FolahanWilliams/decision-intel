@@ -49,6 +49,8 @@ model Analysis {
   logicalAnalysis Json?       // Stores { score, fallacies }
   swotAnalysis    Json?       // Stores { strengths, weaknesses, opportunities, threats, advice }
   cognitiveAnalysis Json?     // Stores { blindSpotGap, blindSpots, counterArguments }
+  simulation      Json?       // Stores { overallVerdict, twins }
+  institutionalMemory Json?   // Stores { recallScore, similarEvents, strategicAdvice }
   
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
