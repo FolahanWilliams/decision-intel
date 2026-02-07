@@ -46,37 +46,65 @@ export async function analyzeDocument(
             if (onProgress) onProgress(update);
         });
 
-        // Store analysis in database
+        // Store analysis in database with Schema Drift Protection
         const foundBiases = result.biases.filter(b => b.found);
-        await prisma.analysis.create({
-            data: {
-                documentId,
-                overallScore: result.overallScore,
-                noiseScore: result.noiseScore,
-                summary: result.summary,
-                biases: {
-                    create: foundBiases.map(bias => ({
-                        biasType: bias.biasType,
-                        severity: bias.severity,
-                        excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                        explanation: bias.explanation || '',
-                        suggestion: bias.suggestion || '',
-                        confidence: bias.confidence || 0.0
-                    }))
-                },
-                // Persist new Multi-Agent Data
-                structuredContent: result.structuredContent || '',
-                noiseStats: (result.noiseStats ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                factCheck: (result.factCheck ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                compliance: (result.compliance ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                preMortem: (result.preMortem ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                sentiment: (result.sentiment ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                cognitiveAnalysis: (result.cognitiveAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                simulation: (result.simulation ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                institutionalMemory: (result.institutionalMemory ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                speakers: result.speakers || []
+
+        try {
+            await prisma.analysis.create({
+                data: {
+                    documentId,
+                    overallScore: result.overallScore,
+                    noiseScore: result.noiseScore,
+                    summary: result.summary,
+                    biases: {
+                        create: foundBiases.map(bias => ({
+                            biasType: bias.biasType,
+                            severity: bias.severity,
+                            excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                            explanation: bias.explanation || '',
+                            suggestion: bias.suggestion || '',
+                            confidence: bias.confidence || 0.0
+                        }))
+                    },
+                    // New Fields (May cause P2022 if DB not migrated)
+                    structuredContent: result.structuredContent || '',
+                    noiseStats: (result.noiseStats ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    factCheck: (result.factCheck ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    compliance: (result.compliance ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    preMortem: (result.preMortem ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    sentiment: (result.sentiment ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    cognitiveAnalysis: (result.cognitiveAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    simulation: (result.simulation ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    institutionalMemory: (result.institutionalMemory ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    speakers: result.speakers || []
+                }
+            });
+        } catch (dbError: any) {
+            // Check for "Column does not exist" error (P2021, P2022)
+            if (dbError.code === 'P2021' || dbError.code === 'P2022' || dbError.message?.includes('does not exist')) {
+                console.warn('⚠️ Schema drift detected. Retrying save with CORE fields only.', dbError.code);
+
+                // Fallback: Save only what the old schema supports
+                await prisma.analysis.create({
+                    data: {
+                        documentId,
+                        overallScore: result.overallScore,
+                        noiseScore: result.noiseScore,
+                        summary: result.summary,
+                        biases: {
+                            create: foundBiases.map(bias => ({
+                                biasType: bias.biasType,
+                                severity: bias.severity,
+                                excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                                explanation: bias.explanation || ''
+                            }))
+                        }
+                    }
+                });
+            } else {
+                throw dbError; // Rethrow other errors
             }
-        });
+        }
 
         // Update document status
         await prisma.document.update({
