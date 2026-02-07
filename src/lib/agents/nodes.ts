@@ -293,8 +293,11 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
                     claimToVerify: r.claimToVerify
                 }));
 
-            if (validRequests.length > 0) {
-                fetchedData = await executeDataRequests(validRequests);
+            // Deduplicate requests by ticker to save API calls
+            const uniqueRequests = Array.from(new Map(validRequests.map(item => [item.ticker, item])).values());
+
+            if (uniqueRequests.length > 0) {
+                fetchedData = await executeDataRequests(uniqueRequests);
             }
         }
 
@@ -435,7 +438,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             biases: state.biasAnalysis || [],
             noiseStats: state.noiseStats,
             factCheck: state.factCheckResult,
-            compliance: state.compliance,
+            compliance: state.compliance || { status: 'WARN', details: 'Compliance check unavailable.' },
             preMortem: state.preMortem,
             sentiment: state.sentimentAnalysis,
             logicalAnalysis: state.logicalAnalysis,

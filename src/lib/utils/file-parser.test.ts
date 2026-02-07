@@ -3,18 +3,10 @@ import { parseFile } from './file-parser';
 
 // Mock dependencies
 const mockMammothExtractRawText = vi.hoisted(() => vi.fn());
-const { mockPdfParseConstructor, mockGetText } = vi.hoisted(() => {
-    const mockGetText = vi.fn();
-    const mockPdfParseConstructor = vi.fn(function () {
-        return {
-            getText: mockGetText
-        };
-    });
-    return { mockPdfParseConstructor, mockGetText };
-});
+const mockUnpdfExtractText = vi.hoisted(() => vi.fn());
 
-vi.mock('pdf-parse', () => ({
-    PDFParse: mockPdfParseConstructor
+vi.mock('unpdf', () => ({
+    extractText: mockUnpdfExtractText
 }));
 
 vi.mock('mammoth', () => ({
@@ -26,11 +18,11 @@ vi.mock('mammoth', () => ({
 describe('parseFile', () => {
     it('should parse PDF files correctly', async () => {
         const buffer = Buffer.from('mock pdf content');
-        mockGetText.mockResolvedValue({ text: 'Parsed PDF Content' });
+        mockUnpdfExtractText.mockResolvedValue({ text: ['Parsed PDF Content'] });
 
         const result = await parseFile(buffer, 'application/pdf', 'test.pdf');
 
-        expect(mockPdfParseConstructor).toHaveBeenCalledWith({ data: buffer });
+        expect(mockUnpdfExtractText).toHaveBeenCalledWith(expect.any(Uint8Array));
         expect(result).toBe('Parsed PDF Content');
     });
 
@@ -70,19 +62,19 @@ describe('parseFile', () => {
     });
 
     it('should handle PDF parse errors', async () => {
-         const buffer = Buffer.from('bad pdf');
-         mockGetText.mockRejectedValue(new Error('PDF Corrupt'));
+        const buffer = Buffer.from('bad pdf');
+        mockUnpdfExtractText.mockRejectedValue(new Error('PDF Corrupt'));
 
-         await expect(parseFile(buffer, 'application/pdf', 'bad.pdf'))
+        await expect(parseFile(buffer, 'application/pdf', 'bad.pdf'))
             .rejects
             .toThrow('Failed to parse PDF: PDF Corrupt');
     });
 
     it('should handle DOCX parse errors', async () => {
-         const buffer = Buffer.from('bad docx');
-         mockMammothExtractRawText.mockRejectedValue(new Error('DOCX Corrupt'));
+        const buffer = Buffer.from('bad docx');
+        mockMammothExtractRawText.mockRejectedValue(new Error('DOCX Corrupt'));
 
-         await expect(parseFile(buffer, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'bad.docx'))
+        await expect(parseFile(buffer, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'bad.docx'))
             .rejects
             .toThrow('Failed to parse DOCX: DOCX Corrupt');
     });

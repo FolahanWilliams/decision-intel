@@ -42,7 +42,13 @@ const { mockGetFinancialContext } = vi.hoisted(() => {
 });
 
 vi.mock('../tools/financial', () => ({
-    getFinancialContext: mockGetFinancialContext
+    getFinancialContext: mockGetFinancialContext,
+    executeDataRequests: vi.fn(async (requests) => {
+        for (const req of requests) {
+            await mockGetFinancialContext(req.ticker);
+        }
+        return {};
+    })
 }));
 
 describe('factCheckerNode Performance', () => {
@@ -54,7 +60,13 @@ describe('factCheckerNode Performance', () => {
         // 1. Mock Extraction Result (Duplicate Tickers)
         mockGenerateContent.mockResolvedValueOnce({
             response: {
-                text: () => JSON.stringify({ tickers: ["AAPL", "AAPL", "MSFT"] })
+                text: () => JSON.stringify({
+                    dataRequests: [
+                        { ticker: "AAPL", dataType: "financials", reason: "test", claimToVerify: "A" },
+                        { ticker: "AAPL", dataType: "financials", reason: "test", claimToVerify: "A" },
+                        { ticker: "MSFT", dataType: "financials", reason: "test", claimToVerify: "M" }
+                    ]
+                })
             }
         });
 
