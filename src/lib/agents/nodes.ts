@@ -25,7 +25,7 @@ function getModel(): GenerativeModel {
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
     // Using gemini-3-flash-preview - cost-effective model for analysis tasks
     modelInstance = genAI.getGenerativeModel({
-        model: "gemini-3-flash-preview",
+        model: "models/gemini-3-flash-preview",
         generationConfig: {
             responseMimeType: "application/json",
             maxOutputTokens: 16384
@@ -51,7 +51,7 @@ function getGroundedModel(): GenerativeModel {
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
     groundedModelInstance = genAI.getGenerativeModel({
-        model: "gemini-3-flash-preview",
+        model: "models/gemini-3-flash-preview",
         tools: [
             // @ts-expect-error - googleSearch is supported in v1beta but missing in some SDK types
             { googleSearch: {} }
