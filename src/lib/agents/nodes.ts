@@ -3,7 +3,7 @@ import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult, BiasDetectionResult, NoiseBenchmark } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
-import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, LOGICAL_FALLACY_PROMPT, STRATEGIC_SWOT_PROMPT, COGNITIVE_DIVERSITY_PROMPT, INSTITUTIONAL_MEMORY_PROMPT, COMPLIANCE_CHECKER_PROMPT } from "./prompts";
+import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, COGNITIVE_DIVERSITY_PROMPT, INSTITUTIONAL_MEMORY_PROMPT, COMPLIANCE_CHECKER_PROMPT, LINGUISTIC_ANALYSIS_PROMPT, STRATEGIC_ANALYSIS_PROMPT } from "./prompts";
 import { searchSimilarDocuments } from "../rag/embeddings";
 import { executeDataRequests, DataRequest } from "../tools/financial";
 
@@ -359,18 +359,6 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
     }
 }
 
-export async function preMortemNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
-    try {
-        const result = await getModel().generateContent([
-            `Pre-Mortem Architect. List 3 Failure Scenarios and 3 Preventive Measures. Output JSON.`,
-            `Text:\n${content}`
-        ]);
-        const data = parseJSON(result.response.text());
-        return { preMortem: data || { failureScenarios: [], preventiveMeasures: [] } };
-    } catch { return {}; }
-}
-
 export async function complianceMapperNode(state: AuditState): Promise<Partial<AuditState>> {
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
@@ -399,8 +387,6 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
 }
 
 export async function riskScorerNode(state: AuditState): Promise<Partial<AuditState>> {
-
-
     // 1. Bias Deductions (Weighted by Severity)
     const biasDeductions = (state.biasAnalysis || []).reduce((acc: number, b: { severity?: string }) => {
         const severityScores: Record<string, number> = {
@@ -462,46 +448,45 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     };
 }
 
-export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<AuditState>> {
-    try {
-        const result = await getModel().generateContent([
-            `Sentiment Analyzer. Output JSON { "score": number, "label": string }`,
-            `Text:\n${state.originalContent}`
-        ]);
-        const data = parseJSON(result.response.text());
-        return { sentimentAnalysis: data || { score: 0, label: 'Neutral' } };
-    } catch { return { sentimentAnalysis: { score: 0, label: 'Neutral' } }; }
-}
-
-export async function logicalFallacyNode(state: AuditState): Promise<Partial<AuditState>> {
-
+export async function linguisticAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
         const result = await getModel().generateContent([
-            LOGICAL_FALLACY_PROMPT,
+            LINGUISTIC_ANALYSIS_PROMPT,
             `Text:\n${content}`
         ]);
         const data = parseJSON(result.response.text());
-        return { logicalAnalysis: data || { score: 100, fallacies: [] } };
+        return {
+            sentimentAnalysis: data?.sentiment || { score: 0, label: 'Neutral' },
+            logicalAnalysis: data?.logicalAnalysis || { score: 100, fallacies: [] }
+        };
     } catch (e) {
-        console.error("Logical Fallacy Node failed", e);
-        return { logicalAnalysis: { score: 100, fallacies: [] } };
+        console.error("Linguistic Analysis Node failed", e);
+        return {
+            sentimentAnalysis: { score: 0, label: 'Neutral' },
+            logicalAnalysis: { score: 100, fallacies: [] }
+        };
     }
 }
 
-export async function strategicInsightNode(state: AuditState): Promise<Partial<AuditState>> {
-
+export async function strategicAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
         const result = await getModel().generateContent([
-            STRATEGIC_SWOT_PROMPT,
+            STRATEGIC_ANALYSIS_PROMPT,
             `Text:\n${content}`
         ]);
         const data = parseJSON(result.response.text());
-        return { swotAnalysis: data };
+        return {
+            swotAnalysis: data?.swot,
+            preMortem: data?.preMortem
+        };
     } catch (e) {
-        console.error("Strategic Insight Node failed", e);
-        return {};
+        console.error("Strategic Analysis Node failed", e);
+        return {
+            swotAnalysis: undefined,
+            preMortem: undefined
+        };
     }
 }
 

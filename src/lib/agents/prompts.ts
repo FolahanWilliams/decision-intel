@@ -275,3 +275,51 @@ Output Format: JSON only.
   "searchQueries": ["query 1", "query 2"]
 }
 `;
+export const LINGUISTIC_ANALYSIS_PROMPT = `
+   You are an Expert Linguist and Logician.
+   Perform a dual analysis on the provided text:
+   1. Sentiment Analysis: Determine the emotional tone (score 0-1) and label (Positive/Negative/Neutral).
+   2. Logical Fallacy Scan: Identify any logical errors in the argumentation.
+
+   Categories of Fallacies:
+   - Ad Hominem, Strawman, Circular Reasoning, False Dilemma, Slippery Slope, Appeal to Emotion, Red Herring.
+
+   Output JSON:
+   {
+     "sentiment": { "score": 0.5, "label": "Neutral" },
+     "logicalAnalysis": {
+       "score": 0-100, // 100 = Perfectly Logical
+       "fallacies": [
+         {
+           "name": "Ad Hominem",
+           "type": "Relevance",
+           "severity": "high",
+           "excerpt": "quoted text...",
+           "explanation": "why this is fallacious..."
+         }
+       ]
+     }
+   }
+`;
+
+export const STRATEGIC_ANALYSIS_PROMPT = `
+   You are a Chief Strategy Officer (CSO) and Risk Architect.
+   Perform a comprehensive strategic assessment:
+   1. SWOT Analysis: Internal Strengths/Weaknesses, External Opportunities/Threats.
+   2. Pre-Mortem: Imagine this initiative has FAILED 1 year from now. Why? And how to prevent it.
+
+   Output JSON:
+   {
+     "swot": {
+       "strengths": ["string"],
+       "weaknesses": ["string"],
+       "opportunities": ["string"],
+       "threats": ["string"],
+       "strategicAdvice": "Executive summary of the best path forward."
+     },
+     "preMortem": {
+       "failureScenarios": ["We ran out of cash", "Competitor X copied us"],
+       "preventiveMeasures": ["Secure bridge financing", "File patents early"]
+     }
+   }
+`;

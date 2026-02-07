@@ -4,7 +4,7 @@ vi.hoisted(() => {
     process.env.GOOGLE_API_KEY = 'test-key';
 });
 
-import { riskScorerNode, sentimentAnalyzerNode } from './nodes';
+import { riskScorerNode, linguisticAnalysisNode } from './nodes';
 import { AuditState } from './types';
 
 // Hoist mocks
@@ -91,36 +91,49 @@ describe('riskScorerNode', () => {
     });
 });
 
-describe('sentimentAnalyzerNode', () => {
+describe('linguisticAnalysisNode', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    it('should parse valid JSON response', async () => {
+    it('should parse valid JSON response for both sentiment and fallacies', async () => {
         mockGenerateContent.mockResolvedValueOnce({
             response: {
-                text: () => JSON.stringify({ score: 0.8, label: 'Positive' })
+                text: () => JSON.stringify({
+                    sentiment: { score: 0.8, label: 'Positive' },
+                    logicalAnalysis: { score: 100, fallacies: [] }
+                })
             }
         });
 
         const state: AuditState = {
             documentId: 'doc-1',
-            originalContent: 'I am very happy.',
+            originalContent: 'I am very happy and logical.',
+            structuredContent: '',
+            biasAnalysis: [],
+            noiseStats: { mean: 0, stdDev: 0, variance: 0 },
+            speakers: []
         };
 
-        const result = await sentimentAnalyzerNode(state);
+        const result = await linguisticAnalysisNode(state);
         expect(result.sentimentAnalysis).toEqual({ score: 0.8, label: 'Positive' });
+        expect(result.logicalAnalysis).toEqual({ score: 100, fallacies: [] });
     });
 
-    it('should fallback to neutral on error', async () => {
+    it('should fallback to defaults on error', async () => {
         mockGenerateContent.mockRejectedValueOnce(new Error('API Error'));
 
         const state: AuditState = {
             documentId: 'doc-1',
             originalContent: 'content',
+            structuredContent: '',
+            biasAnalysis: [],
+            noiseStats: { mean: 0, stdDev: 0, variance: 0 },
+            speakers: []
         };
 
-        const result = await sentimentAnalyzerNode(state);
+        const result = await linguisticAnalysisNode(state);
         expect(result.sentimentAnalysis).toEqual({ score: 0, label: 'Neutral' });
+        expect(result.logicalAnalysis).toEqual({ score: 100, fallacies: [] });
     });
 });
