@@ -13,7 +13,7 @@ export interface AuditLogParams {
     action: AuditAction;
     resource: string;
     resourceId?: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
 }
 
 export async function logAudit(params: AuditLogParams) {
@@ -31,7 +31,8 @@ export async function logAudit(params: AuditLogParams) {
                 action: params.action,
                 resource: params.resource,
                 resourceId: params.resourceId,
-                details: params.details || {},
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                details: (params.details as any) || {},
                 userAgent: 'server-action', // Can be enhanced with headers() if needed
             }
         });

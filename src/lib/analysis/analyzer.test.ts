@@ -12,20 +12,20 @@ vi.mock('@/lib/agents/graph', () => ({
 
 // Mock safeJsonClone to be identity for simplicity
 vi.mock('@/lib/utils/json', () => ({
-  safeJsonClone: (obj: any) => obj
+  safeJsonClone: (obj: unknown) => obj
 }));
 
 // Mock Prisma
 vi.mock('@/lib/prisma', () => ({
-    prisma: {
-        document: {
-            findUnique: vi.fn(),
-            update: vi.fn(),
-        },
-        analysis: {
-            create: vi.fn(),
-        }
+  prisma: {
+    document: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+    analysis: {
+      create: vi.fn(),
     }
+  }
 }));
 
 describe('runAnalysis', () => {

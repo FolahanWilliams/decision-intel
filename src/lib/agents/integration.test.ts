@@ -54,7 +54,7 @@ describe('Integration Tests', () => {
             });
 
             // Mock Step 2: FMP Tool
-            (financialTools.getFinancialContext as any).mockResolvedValue("AAPL Price: 150");
+            (financialTools.getFinancialContext as unknown as ReturnType<typeof vi.fn>).mockResolvedValue("AAPL Price: 150");
 
             // Mock Step 3: Verify Claims
             mockGenerateContent.mockResolvedValueOnce({
@@ -75,8 +75,8 @@ describe('Integration Tests', () => {
         });
 
         it('should handle no tickers found', async () => {
-             // Mock Step 1: No tickers
-             mockGenerateContent.mockResolvedValueOnce({
+            // Mock Step 1: No tickers
+            mockGenerateContent.mockResolvedValueOnce({
                 response: { text: () => JSON.stringify({ tickers: [] }) }
             });
 

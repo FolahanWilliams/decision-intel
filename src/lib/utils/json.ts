@@ -25,7 +25,7 @@ export const parseJSON = (text: string): any | null => {
         const candidate = text.slice(start, end + 1);
         try {
             return JSON.parse(candidate);
-        } catch (_e) {
+        } catch {
             // Fallback to robust parsing if optimistic attempt fails
         }
     }
@@ -79,10 +79,10 @@ export function safeStringify(obj: any): string {
 
     try {
         return JSON.stringify(obj);
-    } catch (_e) {
+    } catch {
         try {
             return JSON.stringify(obj, safeReplacer());
-        } catch (_e2) {
+        } catch {
             return JSON.stringify({ type: 'error', message: 'Non-serializable payload' });
         }
     }
@@ -134,11 +134,11 @@ export function safeJsonClone<T>(obj: T): T {
                 // JSON.stringify converts undefined/function/symbol in arrays to null
                 res[i] = (v === undefined) ? null : v;
             }
-            return res as any;
+            return res as T;
         }
 
         // Plain Object
-        const res: any = {};
+        const res: Record<string, unknown> = {};
         for (const key in value) {
             if (Object.prototype.hasOwnProperty.call(value, key)) {
                 const v = clone(value[key]);

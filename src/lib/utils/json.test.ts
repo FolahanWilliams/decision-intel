@@ -84,7 +84,7 @@ describe('safeJsonClone', () => {
     });
 
     it('handles Circular references by replacing with string', () => {
-        const a: any = { name: 'root' };
+        const a: Record<string, unknown> = { name: 'root' };
         a.self = a;
         const cloned = safeJsonClone(a);
         expect(cloned.name).toBe('root');
@@ -95,7 +95,7 @@ describe('safeJsonClone', () => {
         const obj = {
             a: 1,
             b: undefined,
-            c: () => {},
+            c: () => { },
             d: Symbol('sym')
         };
         const cloned = safeJsonClone(obj);
@@ -104,7 +104,7 @@ describe('safeJsonClone', () => {
     });
 
     it('converts undefined, function, symbol to null in arrays', () => {
-        const arr = [1, undefined, () => {}, Symbol('sym'), 2];
+        const arr = [1, undefined, () => { }, Symbol('sym'), 2];
         const cloned = safeJsonClone(arr);
         expect(cloned).toEqual([1, null, null, null, 2]);
     });
@@ -126,7 +126,7 @@ describe('safeJsonClone', () => {
     it('handles .toJSON() returning BigInt (via nesting)', () => {
         const obj = {
             toJSON() {
-                 return { b: BigInt(123) };
+                return { b: BigInt(123) };
             }
         };
         // JSON.stringify calls toJSON -> returns { b: BigInt(123) }.
@@ -135,7 +135,7 @@ describe('safeJsonClone', () => {
         expect(safeJsonClone(obj)).toEqual({ b: '123' });
     });
 
-     it('handles deep structures', () => {
+    it('handles deep structures', () => {
         const obj = {
             a: {
                 b: {

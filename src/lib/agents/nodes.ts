@@ -3,7 +3,7 @@ import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
-import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT } from "./prompts";
+import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, LOGICAL_FALLACY_PROMPT, STRATEGIC_SWOT_PROMPT } from "./prompts";
 import { executeDataRequests, DataRequest } from "../tools/financial";
 
 // ============================================================
@@ -52,7 +52,7 @@ function getGroundedModel(): GenerativeModel {
     groundedModelInstance = genAI.getGenerativeModel({
         model: "gemini-3-flash-preview",
         tools: [
-            // @ts-ignore - googleSearch is supported in v1beta but missing in some SDK types
+            // @ts-expect-error - googleSearch is supported in v1beta but missing in some SDK types
             { googleSearch: {} }
         ],
         generationConfig: {
@@ -189,8 +189,8 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         let fetchedData: Record<string, unknown> = {};
         if (dataRequests.length > 0) {
             const validRequests: DataRequest[] = dataRequests
-                .filter((r: any) => r && r.ticker && typeof r.ticker === 'string')
-                .map((r: any) => ({
+                .filter((r: { ticker?: unknown }) => r && r.ticker && typeof r.ticker === 'string')
+                .map((r: { ticker: string; dataType: string; reason: string; claimToVerify: string }) => ({
                     ticker: r.ticker.toUpperCase(),
                     dataType: r.dataType,
                     reason: r.reason,
@@ -238,11 +238,11 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         const verification = parseJSON(verificationText);
 
         // Extract Search Sources (Grounding Metadata)
-        // @ts-ignore - groundingMetadata is in v1beta SDK but might miss types
+        // Extract Search Sources (Grounding Metadata)
         const metadata = verificationResult.response.candidates?.[0]?.groundingMetadata;
         const searchSources: string[] = metadata?.groundingChunks
-            ?.map((c: any) => c.web?.uri)
-            .filter((u: string) => typeof u === 'string') || [];
+            ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
+            .filter((u: unknown): u is string => typeof u === 'string') || [];
 
         console.log(`Found ${searchSources.length} search sources.`);
 
@@ -272,7 +272,7 @@ export async function preMortemNode(state: AuditState): Promise<Partial<AuditSta
         ]);
         const data = parseJSON(result.response.text());
         return { preMortem: data || { failureScenarios: [], preventiveMeasures: [] } };
-    } catch (e) { return {}; }
+    } catch { return {}; }
 }
 
 export async function complianceMapperNode(state: AuditState): Promise<Partial<AuditState>> {
@@ -284,14 +284,14 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
         ]);
         const data = parseJSON(result.response.text());
         return { compliance: data || { status: "WARN", details: "Failed to parse." } };
-    } catch (e) { return { compliance: { status: "WARN", details: "Unavailable." } }; }
+    } catch { return { compliance: { status: "WARN", details: "Unavailable." } }; }
 }
 
 export async function riskScorerNode(state: AuditState): Promise<Partial<AuditState>> {
     console.log("--- Risk Scorer Node (Aggressive) ---");
 
     // 1. Bias Deductions (Weighted by Severity)
-    const biasDeductions = (state.biasAnalysis || []).reduce((acc: number, b: any) => {
+    const biasDeductions = (state.biasAnalysis || []).reduce((acc: number, b: { severity?: string }) => {
         const severityScores: Record<string, number> = {
             low: 5,
             medium: 15,
@@ -312,14 +312,18 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     const trustScore = state.factCheckResult?.score || 100;
     const trustPenalty = (100 - trustScore) * 0.3;
 
+    // 4. Logic Penalty
+    const logicScore = state.logicalAnalysis?.score || 100;
+    const logicPenalty = (100 - logicScore) * 0.4;
+
     // Calculate Base
     const baseScore = 100;
-    let overallScore = baseScore - biasDeductions - noisePenalty - trustPenalty;
+    let overallScore = baseScore - biasDeductions - noisePenalty - trustPenalty - logicPenalty;
 
     // Clamp 0-100
     overallScore = Math.max(0, Math.min(100, Math.round(overallScore)));
 
-    console.log(`Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) = ${overallScore}`);
+    console.log(`Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) = ${overallScore}`);
 
     return {
         finalReport: {
@@ -332,6 +336,8 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             compliance: state.compliance,
             preMortem: state.preMortem,
             sentiment: state.sentimentAnalysis,
+            logicalAnalysis: state.logicalAnalysis,
+            swotAnalysis: state.swotAnalysis,
             speakers: [],
             createdAt: new Date(),
             analyses: []
@@ -347,5 +353,37 @@ export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<
         ]);
         const data = parseJSON(result.response.text());
         return { sentimentAnalysis: data || { score: 0, label: 'Neutral' } };
-    } catch (e) { return { sentimentAnalysis: { score: 0, label: 'Neutral' } }; }
+    } catch { return { sentimentAnalysis: { score: 0, label: 'Neutral' } }; }
+}
+
+export async function logicalFallacyNode(state: AuditState): Promise<Partial<AuditState>> {
+    console.log("--- Logical Fallacy Node ---");
+    const content = truncateText(state.structuredContent || state.originalContent);
+    try {
+        const result = await getModel().generateContent([
+            LOGICAL_FALLACY_PROMPT,
+            `Text:\n${content}`
+        ]);
+        const data = parseJSON(result.response.text());
+        return { logicalAnalysis: data || { score: 100, fallacies: [] } };
+    } catch (e) {
+        console.error("Logical Fallacy Node failed", e);
+        return { logicalAnalysis: { score: 100, fallacies: [] } };
+    }
+}
+
+export async function strategicInsightNode(state: AuditState): Promise<Partial<AuditState>> {
+    console.log("--- Strategic Insight Node (SWOT) ---");
+    const content = truncateText(state.structuredContent || state.originalContent);
+    try {
+        const result = await getModel().generateContent([
+            STRATEGIC_SWOT_PROMPT,
+            `Text:\n${content}`
+        ]);
+        const data = parseJSON(result.response.text());
+        return { swotAnalysis: data };
+    } catch (e) {
+        console.error("Strategic Insight Node failed", e);
+        return {};
+    }
 }

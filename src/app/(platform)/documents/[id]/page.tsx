@@ -5,10 +5,13 @@ import Link from 'next/link';
 import {
     ArrowLeft, FileText, AlertTriangle, CheckCircle, XCircle,
     Loader2, ChevronRight, Lightbulb, Download, Table,
-    Terminal, PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink
+    Terminal, PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink, Brain
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';
+import { SwotMatrix } from './SwotMatrix';
+import { FallacyList } from './FallacyList';
+import { SwotAnalysisResult, LogicalAnalysisResult } from '@/types';
 
 interface BiasInstance {
     id?: string;
@@ -57,6 +60,8 @@ interface Analysis {
     noiseStats?: { mean: number; stdDev: number; variance: number };
     factCheck?: FactCheck;
     compliance?: { status: 'PASS' | 'FLAGGED'; details: string };
+    swotAnalysis?: SwotAnalysisResult;
+    logicalAnalysis?: LogicalAnalysisResult;
 }
 
 interface Document {
@@ -162,6 +167,8 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
         similarity: number;
         biases: string[];
     }>>([]);
+    const [activeTab, setActiveTab] = useState<'overview' | 'logic' | 'swot' | 'simulator'>('overview');
+
     const { showToast } = useToast();
 
     useEffect(() => {
@@ -601,7 +608,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                                 <ExternalLink size={10} style={{ opacity: 0.5 }} />
                                             </a>
                                         );
-                                    } catch (e) { return null; }
+                                    } catch { return null; }
                                 })}
                             </div>
                         </div>
@@ -628,7 +635,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                             )}
                                         </div>
                                         <div className="flex-1">
-                                            <p style={{ fontSize: '13px', fontWeight: 500, marginBottom: '4px', color: '#eee' }}>"{v.claim}"</p>
+                                            <p style={{ fontSize: '13px', fontWeight: 500, marginBottom: '4px', color: '#eee' }}>&quot;{v.claim}&quot;</p>
                                             <div style={{ fontSize: '10px', fontWeight: 700, marginBottom: '6px', color: v.verdict?.toUpperCase() === 'VERIFIED' ? 'var(--success)' : v.verdict?.toUpperCase() === 'CONTRADICTED' ? 'var(--error)' : 'var(--warning)' }}>
                                                 {v.verdict?.toUpperCase()}
                                             </div>
@@ -649,48 +656,135 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
             )}
 
 
-            {/* Biases & Simulator */}
+            {/* Bias, Logic & Simulator Tabs */}
             <div className="grid" style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}>
-                {/* Left Column: Editor/Simulator */}
+                {/* Left Column: Analysis Views */}
                 <div className="flex flex-col gap-lg">
-                    <div className="card">
-                        <div className="card-header justify-between">
-                            <h3 className="flex items-center gap-sm">
-                                <Info size={16} /> &quot;WHAT-IF&quot; SIMULATOR (MODIFIABLE)
-                            </h3>
-                            <button
-                                onClick={runSimulation}
-                                disabled={isSimulating}
-                                className="btn btn-secondary"
-                                style={{ padding: '2px 8px', fontSize: '10px' }}
-                            >
-                                {isSimulating ? <Loader2 size={12} className="animate-spin" /> : <PlayCircle size={12} />}
-                                SIMULATE SCAN
-                            </button>
-                        </div>
-                        <div className="card-body" style={{ padding: 0 }}>
-                            <textarea
-                                value={editableContent}
-                                onChange={(e) => setEditableContent(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    minHeight: '400px',
-                                    background: '#0a0a0a',
-                                    color: '#eee',
-                                    border: 'none',
-                                    padding: '24px',
-                                    fontSize: '14px',
-                                    lineHeight: '1.8',
-                                    fontFamily: 'inherit',
-                                    resize: 'vertical',
-                                    outline: 'none'
-                                }}
-                            />
-                        </div>
+
+                    {/* Tabs Header */}
+                    <div className="flex items-center gap-md border-b border-border mb-md">
+                        <button
+                            onClick={() => setActiveTab('overview')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'overview' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Overview & Biases
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('logic')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'logic' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Logical Fallacies
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('swot')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'swot' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Strategic SWOT
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('simulator')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'simulator' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Simulator
+                        </button>
                     </div>
 
-                    {/* Simulation Result - Structured Comparison View */}
-                    {simulationResult && (
+                    {/* Tab Content */}
+                    {activeTab === 'overview' && (
+                        /* Biases List (Existing) - We can keep the Simulator here or move it. 
+                           For now, let's keep the Simulator in its own tab or side-by-side?
+                           The original design had Simulator as "Left Column: Editor/Simulator". 
+                           Let's put the Content Editor in the "Simulator" tab and keep Biases in Overview. 
+                        */
+                        <div className="card">
+                            <div className="card-header"><h3 className="flex items-center gap-2"><Brain size={16} /> Detected Biases</h3></div>
+                            <div className="card-body">
+                                {biases.length === 0 ? (
+                                    <div className="text-center p-8 text-muted">No cognitive biases detected.</div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {biases.map((bias, i) => (
+                                            <div key={i} className={`p-4 rounded-lg border bg-card/50 ${bias.severity === 'critical' ? 'border-red-500/20 bg-red-500/5' : 'border-border'}`}>
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div>
+                                                        <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${bias.severity === 'critical' ? 'bg-red-500/20 text-red-400' : 'bg-slate-700 text-slate-300'}`}>{bias.biasType}</span>
+                                                    </div>
+                                                    <span className="text-xs text-muted capitalize">{bias.severity} Severity</span>
+                                                </div>
+                                                <p className="text-sm italic text-slate-300 border-l-2 border-slate-700 pl-3 my-2">&quot;{bias.excerpt}&quot;</p>
+                                                <p className="text-sm text-slate-400">{bias.explanation}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'logic' && (
+                        <div className="card">
+                            <div className="card-body">
+                                {analysis?.logicalAnalysis ? (
+                                    <FallacyList data={analysis.logicalAnalysis} />
+                                ) : (
+                                    <div className="text-center p-8 text-muted">No logical analysis data available.</div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'swot' && (
+                        <div className="card">
+                            <div className="card-body">
+                                {analysis?.swotAnalysis ? (
+                                    <SwotMatrix data={analysis.swotAnalysis} />
+                                ) : (
+                                    <div className="text-center p-8 text-muted">No SWOT analysis data available.</div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'simulator' && (
+                        <div className="card">
+                            <div className="card-header justify-between">
+                                <h3 className="flex items-center gap-sm">
+                                    <Info size={16} /> &quot;WHAT-IF&quot; SIMULATOR (MODIFIABLE)
+                                </h3>
+                                <button
+                                    onClick={runSimulation}
+                                    disabled={isSimulating}
+                                    className="btn btn-secondary"
+                                    style={{ padding: '2px 8px', fontSize: '10px' }}
+                                >
+                                    {isSimulating ? <Loader2 size={12} className="animate-spin" /> : <PlayCircle size={12} />}
+                                    SIMULATE SCAN
+                                </button>
+                            </div>
+                            <div className="card-body" style={{ padding: 0 }}>
+                                <textarea
+                                    value={editableContent}
+                                    onChange={(e) => setEditableContent(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        minHeight: '400px',
+                                        background: '#0a0a0a',
+                                        color: '#eee',
+                                        border: 'none',
+                                        padding: '24px',
+                                        fontSize: '14px',
+                                        lineHeight: '1.8',
+                                        fontFamily: 'inherit',
+                                        resize: 'vertical',
+                                        outline: 'none'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Simulation Result - Structured Comparison View (Only show if result exists AND we are in simulator tab) */}
+                    {simulationResult && activeTab === 'simulator' && (
                         <div className="card" style={{ borderColor: 'var(--accent-secondary)', background: 'rgba(10, 132, 255, 0.03)' }}>
                             <div className="card-header justify-between" style={{ background: 'rgba(10, 132, 255, 0.1)' }}>
                                 <h3 className="flex items-center gap-sm" style={{ color: 'var(--accent-secondary)' }}>
@@ -797,7 +891,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                                 {simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length < (analysis?.biases.length || 0) ? '↓' : '↑'} {Math.abs(simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length - (analysis?.biases.length || 0))}
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                                             <td style={{ padding: '12px 0', fontSize: '13px' }}>Noise Level</td>
                                             <td style={{ textAlign: 'center', fontWeight: 600 }}>{analysis ? Math.round(analysis.noiseScore) : '--'}%</td>
                                             <td style={{ textAlign: 'center', fontWeight: 600 }}>{Math.round(simulationResult.noiseScore)}%</td>
@@ -811,77 +905,80 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                         </tr>
                                     </tbody>
                                 </table>
-
-                                {/* Bias Changes Detail */}
-                                {simulationResult.biases && simulationResult.biases.length > 0 && (
-                                    <div>
-                                        <div style={{
-                                            fontSize: '11px',
-                                            color: 'var(--text-muted)',
-                                            marginBottom: 'var(--spacing-sm)',
-                                            textTransform: 'uppercase'
-                                        }}>
-                                            Bias Analysis
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                            {simulationResult.biases.slice(0, 5).map((bias: BiasInstance, idx: number) => (
-                                                <div
-                                                    key={idx}
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'space-between',
-                                                        padding: '8px 12px',
-                                                        background: 'var(--bg-tertiary)',
-                                                        borderRadius: 'var(--radius-sm)',
-                                                        borderLeft: `3px solid ${bias.found === false ? 'var(--success)' : SEVERITY_COLORS[bias.severity as keyof typeof SEVERITY_COLORS] || 'var(--warning)'}`
-                                                    }}
-                                                >
-                                                    <span style={{ fontSize: '13px' }}>{bias.biasType}</span>
-                                                    <span style={{
-                                                        fontSize: '10px',
-                                                        padding: '2px 8px',
-                                                        borderRadius: 'var(--radius-sm)',
-                                                        background: bias.found === false ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                                        color: bias.found === false ? 'var(--success)' : 'var(--error)'
-                                                    }}>
-                                                        {bias.found === false ? '✓ RESOLVED' : 'STILL PRESENT'}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                            {simulationResult.biases.length > 5 && (
-                                                <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>
-                                                    +{simulationResult.biases.length - 5} more biases...
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Summary Insight */}
-                                <div style={{
-                                    marginTop: 'var(--spacing-lg)',
-                                    padding: 'var(--spacing-md)',
-                                    background: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                                    borderRadius: 'var(--radius-md)',
-                                    borderLeft: `3px solid ${simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--warning)'}`
-                                }}>
-                                    <div style={{ fontSize: '11px', fontWeight: 600, marginBottom: '4px', color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--warning)' }}>
-                                        {simulationResult.overallScore > (analysis?.overallScore || 0) ? '✓ IMPROVEMENTS DETECTED' : '⚠ NEEDS MORE WORK'}
-                                    </div>
-                                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                                        {simulationResult.overallScore > (analysis?.overallScore || 0)
-                                            ? `Your edits improved the decision quality by ${Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} points. ${simulationResult.biases.filter((b: BiasInstance) => b.found === false).length} biases were addressed.`
-                                            : `The edits didn't improve the score. Focus on addressing the remaining biases and reducing noise in the document.`
-                                        }
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     )}
+
+                    {/* Bias Changes Detail (Only if simulation exists) */}
+                    {simulationResult && simulationResult.biases && simulationResult.biases.length > 0 && activeTab === 'simulator' && (
+                        <div>
+                            <div style={{
+                                fontSize: '11px',
+                                color: 'var(--text-muted)',
+                                marginBottom: 'var(--spacing-sm)',
+                                textTransform: 'uppercase'
+                            }}>
+                                Bias Analysis
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {simulationResult.biases.slice(0, 5).map((bias: BiasInstance, idx: number) => (
+                                    <div
+                                        key={idx}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '8px 12px',
+                                            background: 'var(--bg-tertiary)',
+                                            borderRadius: 'var(--radius-sm)',
+                                            borderLeft: `3px solid ${bias.found === false ? 'var(--success)' : SEVERITY_COLORS[bias.severity as keyof typeof SEVERITY_COLORS] || 'var(--warning)'}`
+                                        }}
+                                    >
+                                        <span style={{ fontSize: '13px' }}>{bias.biasType}</span>
+                                        <span style={{
+                                            fontSize: '10px',
+                                            padding: '2px 8px',
+                                            borderRadius: 'var(--radius-sm)',
+                                            background: bias.found === false ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                            color: bias.found === false ? 'var(--success)' : 'var(--error)'
+                                        }}>
+                                            {bias.found === false ? '✓ RESOLVED' : 'STILL PRESENT'}
+                                        </span>
+                                    </div>
+                                ))}
+                                {simulationResult.biases.length > 5 && (
+                                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>
+                                        +{simulationResult.biases.length - 5} more biases...
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Summary Insight (Only if simulation exists) */}
+                    {simulationResult && activeTab === 'simulator' && (
+                        <div style={{
+                            marginTop: 'var(--spacing-lg)',
+                            padding: 'var(--spacing-md)',
+                            background: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                            borderRadius: 'var(--radius-md)',
+                            borderLeft: `3px solid ${simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--warning)'}`
+                        }}>
+                            <div style={{ fontSize: '11px', fontWeight: 600, marginBottom: '4px', color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--warning)' }}>
+                                {simulationResult.overallScore > (analysis?.overallScore || 0) ? '✓ IMPROVEMENTS DETECTED' : '⚠ NEEDS MORE WORK'}
+                            </div>
+                            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                                {simulationResult.overallScore > (analysis?.overallScore || 0)
+                                    ? `Your edits improved the decision quality by ${Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} points. ${simulationResult.biases?.filter((b: BiasInstance) => b.found === false).length || 0} biases were addressed.`
+                                    : `The edits didn't improve the score. Focus on addressing the remaining biases and reducing noise in the document.`
+                                }
+                            </div>
+                        </div>
+                    )}
+
                 </div>
 
-                {/* Right Column: Bias List */}
+                {/* Right Column: Bias List & Stats */}
                 <div className="flex flex-col gap-lg">
                     {/* Scores in sidebar for simulation comparison */}
                     <div className="card">
@@ -1145,6 +1242,6 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                     </div>
                 )
             }
-        </div >
+        </div>
     );
 }

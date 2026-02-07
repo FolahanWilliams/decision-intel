@@ -4,12 +4,14 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, Filter, X } from 'lucide-react';
 import Link from 'next/link';
 import { SSEReader } from '@/lib/sse';
+import { RiskTrendChart } from './RiskTrendChart';
 
 interface UploadedDoc {
   id: string;
   filename: string;
   status: string;
   score?: number;
+  uploadedAt: string;
 }
 
 interface AnalysisStep {
@@ -129,7 +131,7 @@ export default function Dashboard() {
           } catch {
             errorMessage = errorText;
           }
-        } catch (readError) {
+        } catch {
           errorMessage = 'Failed to read error response';
         }
         throw new Error(errorMessage || 'Upload failed');
@@ -139,7 +141,7 @@ export default function Dashboard() {
 
       // Add to list with pending status
       setUploadedDocs(prev => [
-        { id: uploadData.id, filename: uploadData.filename, status: 'analyzing' },
+        { id: uploadData.id, filename: uploadData.filename, status: 'analyzing', uploadedAt: new Date().toISOString() },
         ...prev
       ]);
 
@@ -375,15 +377,38 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Error message */}
-      {error && (
-        <div className="card mb-lg" style={{ borderColor: 'var(--error)', background: 'rgba(239, 68, 68, 0.1)' }}>
-          <div className="card-body flex items-center gap-md">
-            <AlertTriangle size={20} style={{ color: 'var(--error)' }} />
-            <span style={{ color: 'var(--error)' }}>{error}</span>
+      {/* Risk Trend & Error Message */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Trend Chart */}
+        <div className="lg:col-span-2 card">
+          <div className="card-header pb-2">
+            <h3 className="flex items-center gap-2">
+              <BarChart3 size={18} className="text-indigo-500" />
+              Decision Quality Trend
+            </h3>
+          </div>
+          <div className="card-body pt-0">
+            <RiskTrendChart data={[...uploadedDocs]
+              .filter(d => d.score !== undefined)
+              .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
+              .map(d => ({
+                date: new Date(d.uploadedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                score: d.score || 0
+              }))
+            } />
           </div>
         </div>
-      )}
+
+        {/* Error Message Area */}
+        {error && (
+          <div className="card border-red-500/50 bg-red-500/10 h-fit">
+            <div className="card-body flex items-start gap-3">
+              <AlertTriangle size={20} className="text-red-500 shrink-0 mt-0.5" />
+              <span className="text-red-400 text-sm font-medium">{error}</span>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Recently uploaded / Saved documents */}
       <div className="card">

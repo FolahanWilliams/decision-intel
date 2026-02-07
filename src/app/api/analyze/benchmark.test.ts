@@ -4,11 +4,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('next/server', () => {
     return {
         NextRequest: class {
-            constructor(public body: any) {}
+            constructor(public body: unknown) { }
             json() { return this.body; }
         },
         NextResponse: {
-            json: (body: any, init?: any) => {
+            json: (body: unknown, init?: { status?: number }) => {
                 return {
                     json: async () => body,
                     status: init?.status || 200,
@@ -54,7 +54,7 @@ const mocks = vi.hoisted(() => {
 });
 
 vi.mock('@clerk/nextjs/server', () => ({
-  auth: vi.fn().mockResolvedValue({ userId: 'user_123' }),
+    auth: vi.fn().mockResolvedValue({ userId: 'user_123' }),
 }));
 
 vi.mock('@/lib/agents/graph', () => ({
@@ -71,39 +71,39 @@ vi.mock('@/lib/agents/graph', () => ({
 }));
 
 vi.mock('@/lib/prisma', () => ({
-  prisma: mocks
+    prisma: mocks
 }));
 
 vi.mock('@/lib/utils/json', () => ({
-  safeJsonClone: (obj: unknown) => obj
+    safeJsonClone: (obj: unknown) => obj
 }));
 
 import { POST } from './route';
 
 describe('Performance Benchmark', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mocks.document.findFirst.mockClear();
-    mocks.document.findUnique.mockClear();
-  });
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mocks.document.findFirst.mockClear();
+        mocks.document.findUnique.mockClear();
+    });
 
-  it('measures execution time of POST handler', async () => {
-    const req = {
-      json: async () => ({ documentId: 'doc_123' }),
-      headers: { get: () => null }
-    } as unknown as NextRequest;
+    it('measures execution time of POST handler', async () => {
+        const req = {
+            json: async () => ({ documentId: 'doc_123' }),
+            headers: { get: () => null }
+        } as unknown as NextRequest;
 
-    const start = performance.now();
-    const response = await POST(req);
-    const json = await response.json();
-    const end = performance.now();
+        const start = performance.now();
+        const response = await POST(req);
+        const json = await response.json();
+        const end = performance.now();
 
-    console.log(`Execution time: ${(end - start).toFixed(2)}ms`);
+        console.log(`Execution time: ${(end - start).toFixed(2)}ms`);
 
-    expect(response.status).toBe(200);
-    expect(json.success).toBe(true);
+        expect(response.status).toBe(200);
+        expect(json.success).toBe(true);
 
-    console.log('findFirst calls:', mocks.document.findFirst.mock.calls.length);
-    console.log('findUnique calls:', mocks.document.findUnique.mock.calls.length);
-  });
+        console.log('findFirst calls:', mocks.document.findFirst.mock.calls.length);
+        console.log('findUnique calls:', mocks.document.findUnique.mock.calls.length);
+    });
 });

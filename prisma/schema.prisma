@@ -13,6 +13,7 @@ datasource db {
 model Document {
   id         String     @id @default(cuid())
   userId     String   // Clerk User ID
+  orgId      String?  // Clerk Organization ID
   filename   String
   fileType   String
   fileSize   Int
@@ -44,6 +45,8 @@ model Analysis {
   compliance   Json?          // Stores { status, details }
   preMortem    Json?          // Stores { failureScenarios, preventiveMeasures }
   sentiment    Json?          // Stores { score, label }
+  logicalAnalysis Json?       // Stores { score, fallacies }
+  swotAnalysis    Json?       // Stores { strengths, weaknesses, opportunities, threats, advice }
   
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -84,6 +87,7 @@ model DecisionEmbedding {
 model AuditLog {
   id        String   @id @default(cuid())
   userId    String   // Clerk User ID
+  orgId     String?  // Clerk Organization ID
   action    String   // e.g. "EXPORT_PDF", "SCAN_DOCUMENT"
   resource  String   // e.g. "Document", "Analysis"
   resourceId String?
@@ -94,20 +98,8 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([userId])
+  @@index([orgId])
   @@index([action])
 }
 
-model ApiKey {
-  id        String   @id @default(cuid())
-  userId    String
-  keyPrefix String   // "dk_..." (first 8 chars for logic)
-  keyHash   String   // SHA-256 hash of full key
-  name      String   // e.g. "Production App"
-  lastUsed  DateTime?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-
-  @@index([keyHash])
-  @@index([userId])
-}
 

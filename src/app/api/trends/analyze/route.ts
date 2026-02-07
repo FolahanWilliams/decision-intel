@@ -11,7 +11,7 @@ function getMarketAnalystModel() {
     return genAI.getGenerativeModel({
         model: "gemini-3-flash-preview", // Fast, Supports Tools
         tools: [
-            // @ts-ignore - Google Search Tool
+            // @ts-expect-error - Google Search Tool
             { googleSearch: {} }
         ],
         generationConfig: {
@@ -21,7 +21,7 @@ function getMarketAnalystModel() {
     });
 }
 
-export async function POST(request: Request) {
+export async function POST(_: Request) {
     try {
         const { userId } = await auth();
         if (!userId) {
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         // Extract Tickers
         const tickers = new Set<string>();
         recentAnalyses.forEach(a => {
-            const fc = a.factCheck as any; // Type assertion since it's JSON
+            const fc = a.factCheck as unknown as { primaryCompany: { ticker: string } }; // Type assertion since it's JSON
             if (fc?.primaryCompany?.ticker) {
                 tickers.add(fc.primaryCompany.ticker);
             }
@@ -87,18 +87,17 @@ export async function POST(request: Request) {
         let analysis;
         try {
             analysis = JSON.parse(responseText);
-        } catch (e) {
+        } catch {
             // Fallback if model returns Markdown block
             const cleanText = responseText.replace(/```json/g, '').replace(/```/g, '');
             analysis = JSON.parse(cleanText);
         }
 
         // Extract Sources from Grounding Metadata
-        // @ts-ignore
         const metadata = result.response.candidates?.[0]?.groundingMetadata;
         const searchSources = metadata?.groundingChunks
-            ?.map((c: any) => c.web?.uri)
-            .filter((u: string) => typeof u === 'string') || [];
+            ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
+            .filter((u: unknown): u is string => typeof u === 'string') || [];
 
         return NextResponse.json({
             ...analysis,

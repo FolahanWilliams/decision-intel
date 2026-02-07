@@ -30,7 +30,7 @@ interface FinnhubQuote {
 }
 
 interface FinnhubMetric {
-    series: Record<string, any>;
+    series: Record<string, unknown>;
     metric: {
         "52WeekHigh": number;
         "52WeekLow": number;
@@ -134,7 +134,7 @@ export async function getFinnhubQuote(ticker: string, apiKey: string): Promise<S
     };
 }
 
-export async function getFinnhubMetrics(ticker: string, apiKey: string): Promise<any | null> {
+export async function getFinnhubMetrics(ticker: string, apiKey: string): Promise<FinnhubMetric['metric'] | null> {
     const data = await fetchFinnhub<FinnhubMetric>('/stock/metric', apiKey, { symbol: ticker, metric: 'all' });
     if (!data || !data.metric) return null;
     return data.metric;

@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import {
-    Settings, Bell, Key, User, Shield, Moon,
-    Save, CheckCircle, AlertTriangle
+    Settings, Bell, User, Shield, Moon,
+    Save, CheckCircle
 } from 'lucide-react';
 
-import { ApiKeyList } from './ApiKeyList';
+
 
 export default function SettingsPage() {
     // Notification preferences
@@ -143,53 +143,7 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            {/* API Configuration */}
-            <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <div className="card-header justify-between">
-                    <h3 className="flex items-center gap-sm">
-                        <Key size={18} />
-                        Developer API Keys
-                    </h3>
-                    <button
-                        onClick={async () => {
-                            const result = await import('@/app/actions/api-keys').then(m => m.createApiKey());
-                            // In a real app, use a proper modal. For now, prompt/alert is a quick way to show "Here is your key"
-                            window.prompt("SAVE THIS KEY NOW! It will not be shown again.", result.key);
-                            // Refresh list
-                            window.location.reload();
-                        }}
-                        className="btn btn-sm btn-primary"
-                        style={{ fontSize: '12px' }}
-                    >
-                        Generate New Key
-                    </button>
-                </div>
-                <div className="card-body">
-                    <div className="mb-lg">
-                        <p className="text-xs text-muted mb-md">
-                            Use these keys to authenticate via the <code>x-api-key</code> header.
-                            Keys are hashed and cannot be recovered if lost.
-                        </p>
 
-                        <ApiKeyList />
-                    </div>
-
-                    <div style={{
-                        padding: 'var(--spacing-md)',
-                        background: 'rgba(245, 158, 11, 0.1)',
-                        border: '1px solid rgba(245, 158, 11, 0.3)',
-                        borderRadius: 'var(--radius-md)'
-                    }}>
-                        <div className="flex items-center gap-sm mb-sm">
-                            <AlertTriangle size={16} style={{ color: 'var(--warning)' }} />
-                            <span className="text-xs font-bold uppercase" style={{ color: 'var(--warning)' }}>Security Note</span>
-                        </div>
-                        <p className="text-xs text-muted">
-                            Do not share these keys. If a key is compromised, revoke it immediately.
-                        </p>
-                    </div>
-                </div>
-            </div>
 
             {/* Security */}
             <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.4s' }}>

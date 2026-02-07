@@ -1,40 +1,41 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { NextRequest } from 'next/server';
 const mocks = vi.hoisted(() => {
-    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-    const DB_LATENCY = 50;
-    return {
-        document: {
-            findFirst: vi.fn().mockResolvedValue({ id: 'doc_123', content: 'test content' }),
-            update: vi.fn().mockImplementation(async () => {
-                await delay(DB_LATENCY);
-                return { id: 'doc_123' };
-            }),
-        },
-        analysis: {
-            create: vi.fn().mockImplementation(async () => {
-                await delay(DB_LATENCY);
-                return { id: 'analysis_123' };
-            }),
-        }
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  const DB_LATENCY = 50;
+  return {
+    document: {
+      findFirst: vi.fn().mockResolvedValue({ id: 'doc_123', content: 'test content' }),
+      update: vi.fn().mockImplementation(async () => {
+        await delay(DB_LATENCY);
+        return { id: 'doc_123' };
+      }),
+    },
+    analysis: {
+      create: vi.fn().mockImplementation(async () => {
+        await delay(DB_LATENCY);
+        return { id: 'analysis_123' };
+      }),
     }
+  }
 });
 
 vi.mock('next/server', () => {
-    return {
-        NextRequest: class {},
-        NextResponse: class {
-            body: any;
-            status: number;
-            constructor(body: any, options: any) {
-                this.body = body;
-                this.status = options?.status || 200;
-            }
-            static json(body: any, options: any) {
-                return { body, status: options?.status || 200, json: async () => body };
-            }
-        }
+  return {
+    NextRequest: class { },
+    NextResponse: class {
+      body: unknown;
+      status: number;
+      constructor(body: unknown, options: { status?: number }) {
+        this.body = body;
+        this.status = options?.status || 200;
+      }
+      static json(body: unknown, options: { status?: number }) {
+        return { body, status: options?.status || 200, json: async () => body };
+      }
     }
+  }
 });
 
 vi.mock('@clerk/nextjs/server', () => ({
@@ -82,7 +83,7 @@ describe('Performance Benchmark', () => {
   it('measures execution time of POST handler', async () => {
     const req = {
       json: async () => ({ documentId: 'doc_123' }),
-    } as any;
+    } as unknown as NextRequest;
 
     const start = performance.now();
     const response = await POST(req);
@@ -101,7 +102,7 @@ describe('Performance Benchmark', () => {
 
     // Check status (depending on mock implementation)
     // The mocked NextResponse returns an object with status
-    expect((response as any).status).toBe(200);
+    expect((response as unknown as { status: number }).status).toBe(200);
     // Ensure we are hitting the DB
     expect(mocks.document.findFirst).toHaveBeenCalled();
   });

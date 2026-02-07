@@ -1,6 +1,6 @@
 import path from 'path';
 
-export default {
+const config = {
   test: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -8,3 +8,5 @@ export default {
     environment: 'node',
   },
 };
+
+export default config;

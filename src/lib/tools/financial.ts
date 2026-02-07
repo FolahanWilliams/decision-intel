@@ -149,7 +149,7 @@ export async function getIncomeStatement(ticker: string, apiKey: string): Promis
     };
 }
 
-export async function getQuarterlyIncomeStatement(ticker: string, apiKey: string): Promise<object | null> {
+export async function getQuarterlyIncomeStatement(ticker: string, _: string): Promise<object | null> {
     // Finnhub Free does not support historical quarterly data via simple API.
     // Returning null to indicate unavailablity (Fact Checker will define as UNVERIFIABLE)
     console.warn(`Quarterly history not supported on Finnhub Free Tier for ${ticker}`);
@@ -160,7 +160,7 @@ export async function getKeyMetrics(ticker: string, apiKey: string): Promise<obj
     return await getFinnhubMetrics(ticker, apiKey);
 }
 
-export async function getHistoricalPrice(ticker: string, apiKey: string): Promise<object | null> {
+export async function getHistoricalPrice(_: string, __: string): Promise<object | null> {
     // Basic metrics doesn't support generic history without 'candle'
     // For now returning null
     return null;
@@ -170,7 +170,7 @@ export async function getStockPeers(ticker: string, apiKey: string): Promise<str
     return await getFinnhubPeers(ticker, apiKey);
 }
 
-export async function getSectorPerformance(apiKey: string): Promise<object[] | null> {
+export async function getSectorPerformance(_: string): Promise<object[] | null> {
     // Not available on Finnhub
     return null;
 }

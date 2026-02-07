@@ -1,4 +1,4 @@
-import { AnalysisResult, BiasDetectionResult } from '@/types';
+import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
 export interface AuditState {
@@ -23,7 +23,7 @@ export interface AuditState {
         flags: string[];
         searchSources?: string[];
         summary?: string;
-        verifications?: any[];
+        verifications?: { claim: string; result: string; source?: string }[];
     };
     preMortem?: {
         failureScenarios: string[];
@@ -37,6 +37,11 @@ export interface AuditState {
         score: number;
         label: 'Positive' | 'Negative' | 'Neutral';
     };
+
+    // Phase 4 Extensions
+    logicalAnalysis?: LogicalAnalysisResult;
+    swotAnalysis?: SwotAnalysisResult;
+
 
     // Final Output
     finalReport?: AnalysisResult;

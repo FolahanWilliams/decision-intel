@@ -37,6 +37,28 @@ export interface AnalysisResult {
         label: string;
     };
     speakers?: string[];
+    // Phase 4: Deep Logic Extensions
+    logicalAnalysis?: LogicalAnalysisResult;
+    swotAnalysis?: SwotAnalysisResult;
+}
+
+export interface LogicalAnalysisResult {
+    score: number; // 0-100 (100 = Logical, 0 = Fallacious)
+    fallacies: Array<{
+        name: string;
+        type: string;
+        severity: 'low' | 'medium' | 'high';
+        excerpt: string;
+        explanation: string;
+    }>;
+}
+
+export interface SwotAnalysisResult {
+    strengths: string[];
+    weaknesses: string[];
+    opportunities: string[];
+    threats: string[];
+    strategicAdvice: string;
 }
 
 export interface DocumentWithAnalysis {

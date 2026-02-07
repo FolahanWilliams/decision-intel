@@ -58,7 +58,7 @@ export class PdfGenerator {
             yPos = 40; // Reset for new page
             this.addPageHeader("Financial Fact Check");
             yPos = this.addFactCheckTable(data.analysis.factCheck, yPos);
-            yPos = this.addSourcesAppendix(data.analysis.factCheck.searchSources, yPos);
+            this.addSourcesAppendix(data.analysis.factCheck.searchSources, yPos);
         }
 
         // Bias Table
@@ -188,7 +188,7 @@ export class PdfGenerator {
             }
         });
 
-        // @ts-ignore
+        // @ts-expect-error - jsPDF types for autotable state are incomplete
         return this.doc.lastAutoTable.finalY + 20;
     }
 

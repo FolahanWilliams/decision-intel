@@ -1,6 +1,6 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
-import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode, sentimentAnalyzerNode } from "./nodes";
-import { AnalysisResult, BiasDetectionResult } from '@/types';
+import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode, sentimentAnalyzerNode, logicalFallacyNode, strategicInsightNode } from "./nodes";
+import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
 // Define the State using Annotation.Root
@@ -49,6 +49,14 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),
+    logicalAnalysis: Annotation<LogicalAnalysisResult | null>({
+        reducer: (x, y) => y ?? x,
+        default: () => null,
+    }),
+    swotAnalysis: Annotation<SwotAnalysisResult | null>({
+        reducer: (x, y) => y ?? x,
+        default: () => null,
+    }),
     finalReport: Annotation<AnalysisResult | null>({
         reducer: (x, y) => y ?? x,
         default: () => null,
@@ -69,6 +77,8 @@ const workflow = new StateGraph(GraphState)
     .addNode("preMortemAnalyzer", preMortemNode)
     .addNode("complianceMapper", complianceMapperNode)
     .addNode("sentimentAnalyzer", sentimentAnalyzerNode)
+    .addNode("logicalFallacyScanner", logicalFallacyNode)
+    .addNode("strategicInsight", strategicInsightNode)
     .addNode("riskScorer", riskScorerNode)
 
     .setEntryPoint("gdprAnonymizer")
@@ -80,6 +90,8 @@ const workflow = new StateGraph(GraphState)
     .addEdge("structurer", "preMortemAnalyzer")
     .addEdge("structurer", "complianceMapper")
     .addEdge("structurer", "sentimentAnalyzer")
+    .addEdge("structurer", "logicalFallacyScanner")
+    .addEdge("structurer", "strategicInsight")
 
     .addEdge("biasDetective", "riskScorer")
     .addEdge("noiseJudge", "riskScorer")
@@ -87,6 +99,8 @@ const workflow = new StateGraph(GraphState)
     .addEdge("preMortemAnalyzer", "riskScorer")
     .addEdge("complianceMapper", "riskScorer")
     .addEdge("sentimentAnalyzer", "riskScorer")
+    .addEdge("logicalFallacyScanner", "riskScorer")
+    .addEdge("strategicInsight", "riskScorer")
 
     .addEdge("riskScorer", END);
 
