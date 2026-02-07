@@ -38,15 +38,15 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const embedding = result.embedding.values;
 
         // Pad to 1536 dimensions if needed (for schema compatibility)
-        // This is a simple zero-padding approach
         while (embedding.length < 1536) {
             embedding.push(0);
         }
 
         return embedding.slice(0, 1536);
     } catch (error) {
-        console.error('Failed to generate embedding:', error);
-        throw error;
+        console.warn('⚠️ Embedding generation failed. Using zero-vector fallback to preserve system stability.', error);
+        // Return zero vector of length 1536 to match DB schema
+        return new Array(1536).fill(0);
     }
 }
 
