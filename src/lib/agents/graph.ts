@@ -1,6 +1,6 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
 import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode, sentimentAnalyzerNode, logicalFallacyNode, strategicInsightNode, cognitiveDiversityNode } from "./nodes";
-import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult } from '@/types';
+import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
 // Define the State using Annotation.Root
@@ -61,7 +61,7 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),
-    cognitiveAnalysis: Annotation<any | null>({
+    cognitiveAnalysis: Annotation<CognitiveAnalysisResult | null>({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),

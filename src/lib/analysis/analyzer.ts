@@ -71,7 +71,7 @@ export async function analyzeDocument(
                 compliance: result.compliance ?? Prisma.JsonNull,
                 preMortem: result.preMortem ?? Prisma.JsonNull,
                 sentiment: result.sentiment ?? Prisma.JsonNull,
-                cognitiveAnalysis: (result.cognitiveAnalysis as any) ?? Prisma.JsonNull,
+                cognitiveAnalysis: (result.cognitiveAnalysis as unknown) as Prisma.NullableJsonNullValueInput,
                 speakers: result.speakers || []
             }
         });

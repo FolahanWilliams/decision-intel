@@ -13,18 +13,9 @@ import { SwotMatrix } from './SwotMatrix';
 import { FallacyList } from './FallacyList';
 import { RedTeamView } from './RedTeamView';
 import { NoiseJudge } from './NoiseJudge';
-import { SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult } from '@/types';
+import { BiasInstance } from '@prisma/client';
+import { ResearchInsight, SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark } from '@/types';
 
-interface BiasInstance {
-    id?: string;
-    biasType: string;
-    severity: string;
-    excerpt: string;
-    explanation: string;
-    suggestion: string;
-    found?: boolean; // Used in simulation results
-    researchInsight?: { title: string; summary: string; sourceUrl: string };
-}
 
 interface VerificationSource {
     ticker?: string;
@@ -61,7 +52,7 @@ interface Analysis {
     biases: BiasInstance[];
     // Extended fields
     noiseStats?: { mean: number; stdDev: number; variance: number };
-    noiseBenchmarks?: any[]; // Using any to avoid importing the type again locally, or we could import it.
+    noiseBenchmarks?: NoiseBenchmark[];
     factCheck?: FactCheck;
     compliance?: { status: 'PASS' | 'FLAGGED'; details: string };
     swotAnalysis?: SwotAnalysisResult;
@@ -153,7 +144,12 @@ function getImpactAssessment(biasType: string, severity: string): string {
     return `${severityImpacts[severity] || severityImpacts['medium']} ${biasRisks[biasType] || 'This bias type can distort judgment and lead to flawed decision-making.'}`;
 }
 
-export default function DocumentDetailPage({ params }: { params: Promise<{ id: string }> }) {
+// Local extension to include runtime-only fields like researchInsight
+interface ExtendedBiasInstance extends BiasInstance {
+    researchInsight: ResearchInsight;
+}
+
+export default function DocumentAnalysisPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const [document, setDocument] = useState<Document | null>(null);
     const [loading, setLoading] = useState(true);
@@ -732,21 +728,21 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                                 <p className="text-sm text-slate-400 mb-3">{bias.explanation}</p>
 
                                                 {/* Educational Insight */}
-                                                {(bias as any).researchInsight && (
+                                                {(bias as unknown as ExtendedBiasInstance).researchInsight && (
                                                     <div className="mt-3 p-3 rounded bg-blue-500/10 border border-blue-500/20">
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <Lightbulb className="w-4 h-4 text-blue-400" />
                                                             <span className="text-xs font-semibold text-blue-300">Scientific Insight</span>
                                                         </div>
                                                         <a
-                                                            href={(bias as any).researchInsight.sourceUrl}
+                                                            href={(bias as unknown as ExtendedBiasInstance).researchInsight.sourceUrl}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="text-sm font-medium text-blue-300 hover:text-blue-200 block mb-1"
                                                         >
-                                                            {(bias as any).researchInsight.title} <ExternalLink size={10} className="inline ml-1" />
+                                                            {(bias as unknown as ExtendedBiasInstance).researchInsight.title} <ExternalLink size={10} className="inline ml-1" />
                                                         </a>
-                                                        <p className="text-xs text-slate-400">{(bias as any).researchInsight.summary}</p>
+                                                        <p className="text-xs text-slate-400">{(bias as unknown as ExtendedBiasInstance).researchInsight.summary}</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -942,13 +938,13 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                         <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                                             <td style={{ padding: '12px 0', fontSize: '13px' }}>Cognitive Biases</td>
                                             <td style={{ textAlign: 'center', fontWeight: 600 }}>{analysis?.biases.length || 0}</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length}</td>
+                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{simulationResult.biases.filter((b: BiasInstance) => (b as any).found !== false).length}</td>
                                             <td style={{
                                                 textAlign: 'center',
                                                 fontWeight: 600,
-                                                color: simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length < (analysis?.biases.length || 0) ? 'var(--success)' : 'var(--error)'
+                                                color: simulationResult.biases.filter((b: BiasInstance) => (b as any).found !== false).length < (analysis?.biases.length || 0) ? 'var(--success)' : 'var(--error)'
                                             }}>
-                                                {simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length < (analysis?.biases.length || 0) ? '↓' : '↑'} {Math.abs(simulationResult.biases.filter((b: BiasInstance) => b.found !== false).length - (analysis?.biases.length || 0))}
+                                                {simulationResult.biases.filter((b: BiasInstance) => (b as any).found !== false).length < (analysis?.biases.length || 0) ? '↓' : '↑'} {Math.abs(simulationResult.biases.filter((b: BiasInstance) => (b as any).found !== false).length - (analysis?.biases.length || 0))}
                                             </td>
                                         </tr>
                                         <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
@@ -991,7 +987,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                             padding: '8px 12px',
                                             background: 'var(--bg-tertiary)',
                                             borderRadius: 'var(--radius-sm)',
-                                            borderLeft: `3px solid ${bias.found === false ? 'var(--success)' : SEVERITY_COLORS[bias.severity as keyof typeof SEVERITY_COLORS] || 'var(--warning)'}`
+                                            borderLeft: `3px solid ${(bias as any).found === false ? 'var(--success)' : SEVERITY_COLORS[bias.severity as keyof typeof SEVERITY_COLORS] || 'var(--warning)'}`
                                         }}
                                     >
                                         <span style={{ fontSize: '13px' }}>{bias.biasType}</span>
@@ -999,10 +995,10 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                             fontSize: '10px',
                                             padding: '2px 8px',
                                             borderRadius: 'var(--radius-sm)',
-                                            background: bias.found === false ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                            color: bias.found === false ? 'var(--success)' : 'var(--error)'
+                                            background: (bias as any).found === false ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                            color: (bias as any).found === false ? 'var(--success)' : 'var(--error)'
                                         }}>
-                                            {bias.found === false ? '✓ RESOLVED' : 'STILL PRESENT'}
+                                            {(bias as any).found === false ? '✓ RESOLVED' : 'STILL PRESENT'}
                                         </span>
                                     </div>
                                 ))}
@@ -1029,7 +1025,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                             </div>
                             <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                                 {simulationResult.overallScore > (analysis?.overallScore || 0)
-                                    ? `Your edits improved the decision quality by ${Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} points. ${simulationResult.biases?.filter((b: BiasInstance) => b.found === false).length || 0} biases were addressed.`
+                                    ? `Your edits improved the decision quality by ${Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} points. ${simulationResult.biases?.filter((b: BiasInstance) => (b as any).found === false).length || 0} biases were addressed.`
                                     : `The edits didn't improve the score. Focus on addressing the remaining biases and reducing noise in the document.`
                                 }
                             </div>
