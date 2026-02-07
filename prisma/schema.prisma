@@ -82,7 +82,7 @@ model DecisionEmbedding {
   documentId String
   document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
   content String @db.Text
-  embedding Unsupported("vector(1536)")?
+  embedding Unsupported("vector(3072)")?
   metadata Json?
 
   @@index([documentId])

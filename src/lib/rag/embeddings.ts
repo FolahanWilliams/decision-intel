@@ -11,8 +11,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // Initialize Gemini - use same env var as nodes.ts for consistency
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
-// Embedding model - using text-embedding-004 as standard version
-const EMBEDDING_MODEL = 'text-embedding-004';
+// Embedding model - using the specific ID found via diagnostic script
+const EMBEDDING_MODEL = 'models/gemini-embedding-001';
 
 interface EmbeddingMetadata {
     documentId: string;
@@ -37,16 +37,13 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const result = await model.embedContent(truncatedText);
         const embedding = result.embedding.values;
 
-        // Pad to 1536 dimensions if needed (for schema compatibility)
-        while (embedding.length < 1536) {
-            embedding.push(0);
-        }
-
-        return embedding.slice(0, 1536);
+        // Vector length validation (gemini-embedding-001 returns 3072)
+        // We just return it as-is, matching the new schema.
+        return embedding;
     } catch (error) {
         console.warn('⚠️ Embedding generation failed. Using zero-vector fallback to preserve system stability.', error);
-        // Return zero vector of length 1536 to match DB schema
-        return new Array(1536).fill(0);
+        // Return zero vector of length 3072 to match DB schema
+        return new Array(3072).fill(0);
     }
 }
 
