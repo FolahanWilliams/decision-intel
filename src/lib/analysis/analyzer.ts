@@ -96,7 +96,9 @@ export async function analyzeDocument(
                                 biasType: bias.biasType,
                                 severity: bias.severity,
                                 excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                                explanation: bias.explanation || ''
+                                explanation: bias.explanation || '',
+                                suggestion: bias.suggestion || '',
+                                confidence: bias.confidence || 0.0
                             }))
                         }
                     }
