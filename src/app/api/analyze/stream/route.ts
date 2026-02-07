@@ -70,11 +70,13 @@ export async function POST(request: NextRequest) {
                                     },
                                     // Persist new Multi-Agent Data
                                     structuredContent: result.structuredContent || '',
-                                    noiseStats: result.noiseStats ?? Prisma.JsonNull,
-                                    factCheck: result.factCheck ?? Prisma.JsonNull,
-                                    compliance: result.compliance ?? Prisma.JsonNull,
-                                    preMortem: result.preMortem ?? Prisma.JsonNull,
-                                    sentiment: result.sentiment ?? Prisma.JsonNull,
+                                    noiseStats: (result.noiseStats ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                                    factCheck: (result.factCheck ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                                    compliance: (result.compliance ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                                    preMortem: (result.preMortem ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                                    sentiment: (result.sentiment ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                                    simulation: (result.simulation ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                                    institutionalMemory: (result.institutionalMemory ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                                     speakers: result.speakers || []
                                 }
                             }

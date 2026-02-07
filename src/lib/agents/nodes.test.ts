@@ -43,7 +43,13 @@ describe('riskScorerNode', () => {
             biasAnalysis: [],
             noiseStats: { mean: 80, stdDev: 2, variance: 4 },
             factCheckResult: { score: 90, flags: [] },
-            compliance: { status: 'WARN', details: 'Some warning' },
+            compliance: {
+                status: 'WARN',
+                riskScore: 50,
+                summary: 'Warning',
+                regulations: [],
+                searchQueries: []
+            },
             preMortem: { failureScenarios: ['Fail 1'], preventiveMeasures: ['Prevent 1'] },
             sentimentAnalysis: { score: 0.5, label: 'Positive' },
             speakers: ['Speaker A']
