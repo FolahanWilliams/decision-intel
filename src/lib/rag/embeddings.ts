@@ -12,7 +12,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 // Embedding model - using embedding-001 (Gecko) as standard stable version
-const EMBEDDING_MODEL = 'embedding-001';
+const EMBEDDING_MODEL = 'text-embedding-004';
 
 interface EmbeddingMetadata {
     documentId: string;
