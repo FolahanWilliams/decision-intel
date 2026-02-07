@@ -84,7 +84,6 @@ async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS):
 const MAX_INPUT_CHARS = 25000; // ~6K tokens
 function truncateText(text: string): string {
     if (text.length <= MAX_INPUT_CHARS) return text;
-    console.log(`Truncating text from ${text.length} to ${MAX_INPUT_CHARS} chars`);
     return text.slice(0, MAX_INPUT_CHARS) + "\n\n[... text truncated for analysis ...]";
 }
 
@@ -93,7 +92,7 @@ function truncateText(text: string): string {
 // ============================================================
 
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Structurer Node (Pass-through mode) ---");
+
     return {
         structuredContent: state.structuredContent || state.originalContent,
         speakers: []
@@ -101,7 +100,7 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
 }
 
 export async function biasDetectiveNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Bias Detective Node (Gemini) ---");
+
     try {
         const content = truncateText(state.structuredContent || state.originalContent);
 
@@ -168,7 +167,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
 }
 
 export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Noise Judge Node (Gemini x3 + Benchmarking) ---");
+
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
@@ -255,13 +254,13 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
 }
 
 export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- GDPR Anonymizer Node (Pass-through mode) ---");
+
     return { structuredContent: state.originalContent };
 }
 
 // Fact Checker Node with Two-Pass Architecture and Search Grounding
 export async function factCheckerNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Fact Checker Node (Search Grounded) ---");
+
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
@@ -384,7 +383,7 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
 }
 
 export async function riskScorerNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Risk Scorer Node (Aggressive) ---");
+
 
     // 1. Bias Deductions (Weighted by Severity)
     const biasDeductions = (state.biasAnalysis || []).reduce((acc: number, b: { severity?: string }) => {
@@ -459,7 +458,7 @@ export async function sentimentAnalyzerNode(state: AuditState): Promise<Partial<
 }
 
 export async function logicalFallacyNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Logical Fallacy Node ---");
+
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
         const result = await getModel().generateContent([
@@ -475,7 +474,7 @@ export async function logicalFallacyNode(state: AuditState): Promise<Partial<Aud
 }
 
 export async function strategicInsightNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Strategic Insight Node (SWOT) ---");
+
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
         const result = await getModel().generateContent([
@@ -491,7 +490,7 @@ export async function strategicInsightNode(state: AuditState): Promise<Partial<A
 }
 
 export async function cognitiveDiversityNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Cognitive Diversity Node (Red Team) ---");
+
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {

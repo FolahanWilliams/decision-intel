@@ -27,6 +27,7 @@ model Document {
   embeddings DecisionEmbedding[]
 
   @@index([userId])
+  @@index([updatedAt]) // For sorting by recent
 }
 
 model Analysis {
