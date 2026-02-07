@@ -237,7 +237,7 @@ export async function runAnalysis(
                 documentId: documentId,
             }),
             timeoutPromise
-        ]);
+        ]) as any;
     }
 
     sendStep('Finalizing report', 'running', 95);
