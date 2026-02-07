@@ -802,7 +802,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 {analysis?.simulation ? (
                                     <BoardroomSimulator simulation={analysis.simulation} />
                                 ) : (
-                                    <div className="text-center p-8 text-muted">Run "Live Scan" to convene the Virtual Board.</div>
+                                    <div className="text-center p-8 text-muted">Run &quot;Live Scan&quot; to convene the Virtual Board.</div>
                                 )}
                             </div>
                         </div>
