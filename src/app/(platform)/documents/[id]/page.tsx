@@ -938,13 +938,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                         <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                                             <td style={{ padding: '12px 0', fontSize: '13px' }}>Cognitive Biases</td>
                                             <td style={{ textAlign: 'center', fontWeight: 600 }}>{analysis?.biases.length || 0}</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{simulationResult.biases.filter((b: BiasInstance) => (b as any).found !== false).length}</td>
+                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{simulationResult.biases.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found !== false).length}</td>
                                             <td style={{
                                                 textAlign: 'center',
                                                 fontWeight: 600,
-                                                color: simulationResult.biases.filter((b: BiasInstance) => (b as any).found !== false).length < (analysis?.biases.length || 0) ? 'var(--success)' : 'var(--error)'
+                                                color: simulationResult.biases.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found !== false).length < (analysis?.biases.length || 0) ? 'var(--success)' : 'var(--error)'
                                             }}>
-                                                {simulationResult.biases.filter((b: BiasInstance) => (b as any).found !== false).length < (analysis?.biases.length || 0) ? '↓' : '↑'} {Math.abs(simulationResult.biases.filter((b: BiasInstance) => (b as any).found !== false).length - (analysis?.biases.length || 0))}
+                                                {simulationResult.biases.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found !== false).length < (analysis?.biases.length || 0) ? '↓' : '↑'} {Math.abs(simulationResult.biases.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found !== false).length - (analysis?.biases.length || 0))}
                                             </td>
                                         </tr>
                                         <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
@@ -987,7 +987,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                             padding: '8px 12px',
                                             background: 'var(--bg-tertiary)',
                                             borderRadius: 'var(--radius-sm)',
-                                            borderLeft: `3px solid ${(bias as any).found === false ? 'var(--success)' : SEVERITY_COLORS[bias.severity as keyof typeof SEVERITY_COLORS] || 'var(--warning)'}`
+                                            borderLeft: `3px solid ${(bias as BiasInstance & { found?: boolean }).found === false ? 'var(--success)' : SEVERITY_COLORS[bias.severity as keyof typeof SEVERITY_COLORS] || 'var(--warning)'}`
                                         }}
                                     >
                                         <span style={{ fontSize: '13px' }}>{bias.biasType}</span>
@@ -995,10 +995,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                             fontSize: '10px',
                                             padding: '2px 8px',
                                             borderRadius: 'var(--radius-sm)',
-                                            background: (bias as any).found === false ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                            color: (bias as any).found === false ? 'var(--success)' : 'var(--error)'
+                                            background: (bias as BiasInstance & { found?: boolean }).found === false ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                            color: (bias as BiasInstance & { found?: boolean }).found === false ? 'var(--success)' : 'var(--error)'
                                         }}>
-                                            {(bias as any).found === false ? '✓ RESOLVED' : 'STILL PRESENT'}
+                                            {(bias as BiasInstance & { found?: boolean }).found === false ? '✓ RESOLVED' : 'STILL PRESENT'}
                                         </span>
                                     </div>
                                 ))}
@@ -1025,7 +1025,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             </div>
                             <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                                 {simulationResult.overallScore > (analysis?.overallScore || 0)
-                                    ? `Your edits improved the decision quality by ${Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} points. ${simulationResult.biases?.filter((b: BiasInstance) => (b as any).found === false).length || 0} biases were addressed.`
+                                    ? `Your edits improved the decision quality by ${Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} points. ${simulationResult.biases?.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found === false).length || 0} biases were addressed.`
                                     : `The edits didn't improve the score. Focus on addressing the remaining biases and reducing noise in the document.`
                                 }
                             </div>
