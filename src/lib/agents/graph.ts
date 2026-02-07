@@ -116,9 +116,7 @@ const workflow = new StateGraph(GraphState)
     .addEdge("memoryRecall", "riskScorer")
     .addEdge("linguisticAnalysis", "riskScorer")
     .addEdge("strategicAnalysis", "riskScorer")
-    .addEdge("cognitiveDiversity", "riskScorer")
-    .addEdge("decisionTwin", "riskScorer")
-    .addEdge("memoryRecall", "riskScorer")
+
 
     .addEdge("riskScorer", END);
 
