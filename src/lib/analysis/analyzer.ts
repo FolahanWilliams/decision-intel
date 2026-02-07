@@ -225,10 +225,19 @@ export async function runAnalysis(
         console.error('Streaming error, falling back to invoke:', error);
         // Fallback to non-streaming invoke if streaming fails
         sendStep('Processing document', 'running', 50);
-        result = await auditGraph.invoke({
-            originalContent: content,
-            documentId: documentId,
-        });
+
+        // Add timeout to fallback invocation (25 seconds max for serverless safety)
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Analysis timed out")), 25000)
+        );
+
+        result = await Promise.race([
+            auditGraph.invoke({
+                originalContent: content,
+                documentId: documentId,
+            }),
+            timeoutPromise
+        ]);
     }
 
     sendStep('Finalizing report', 'running', 95);
