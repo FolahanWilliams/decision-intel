@@ -23,6 +23,7 @@ interface BiasInstance {
     explanation: string;
     suggestion: string;
     found?: boolean; // Used in simulation results
+    researchInsight?: { title: string; summary: string; sourceUrl: string };
 }
 
 interface VerificationSource {

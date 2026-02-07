@@ -1,7 +1,7 @@
 
 import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
-import { AnalysisResult } from '../../types';
+import { AnalysisResult, BiasDetectionResult, NoiseBenchmark } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, LOGICAL_FALLACY_PROMPT, STRATEGIC_SWOT_PROMPT, COGNITIVE_DIVERSITY_PROMPT } from "./prompts";
 import { executeDataRequests, DataRequest } from "../tools/financial";
@@ -112,11 +112,11 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
 
         const response = result.response?.text ? result.response.text() : "";
         const data = parseJSON(response);
-        let biases = data?.biases || [];
+        const biases = data?.biases || [];
 
         // Educational Insight (Dynamic Retrieval)
         // For HIGH/CRITICAL biases, fetch scientific context
-        const severeBiases = biases.filter((b: any) =>
+        const severeBiases = biases.filter((b: BiasDetectionResult) =>
             (b.severity === 'high' || b.severity === 'critical') && b.biasType
         );
 
@@ -124,7 +124,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
             console.log(`Fetching educational insights for ${severeBiases.length} severe biases...`);
 
             // Allow up to 3 parallel searches to avoid rate limits
-            const insightPromises = severeBiases.slice(0, 3).map(async (bias: any) => {
+            const insightPromises = severeBiases.slice(0, 3).map(async (bias: BiasDetectionResult) => {
                 try {
                     const searchResult = await getGroundedModel().generateContent([
                         `You are a Cognitive Psychology Tutor.
@@ -183,7 +183,7 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
 
         const results = await Promise.all(promises);
 
-        let extractedBenchmarks: any[] = [];
+        let extractedBenchmarks: NoiseBenchmark[] = [];
         const scores = results.map(r => {
             const text = r.response?.text ? r.response.text() : "";
             const data = parseJSON(text);
@@ -237,7 +237,7 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
                 ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
                 .filter((u: unknown): u is string => typeof u === 'string') || [];
 
-            noiseBenchmarks = noiseBenchmarks.map((b: any, i: number) => ({
+            noiseBenchmarks = noiseBenchmarks.map((b: NoiseBenchmark, i: number) => ({
                 ...b,
                 sourceUrl: b.sourceUrl || searchSources[i % searchSources.length]
             }));
@@ -514,7 +514,7 @@ export async function cognitiveDiversityNode(state: AuditState): Promise<Partial
 
         // Inject search sources into counter-arguments if missing
         if (data && data.counterArguments) {
-            data.counterArguments = data.counterArguments.map((arg: any, index: number) => ({
+            data.counterArguments = data.counterArguments.map((arg: { sourceUrl?: string }, index: number) => ({
                 ...arg,
                 sourceUrl: arg.sourceUrl || searchSources[index % searchSources.length]
             }));

@@ -9,11 +9,9 @@ const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY;
 // Allow longer processing times for AI analysis
 export const maxDuration = 300;
 
-// Simple in-memory error tracking (per server instance)
-// NOTE: This global variable is for demonstration/local-dev self-healing purposes.
-// In a serverless environment (like Vercel), this state is not shared across requests
+// Simple stateless error handling
+// NOTE: Global state is removed for serverless compatibility.
 // and may reset at any time. Do not rely on it for critical production logic.
-let jsonErrorCount = 0;
 
 export async function POST(request: NextRequest) {
     try {
@@ -83,7 +81,6 @@ export async function POST(request: NextRequest) {
 
         // Reset error count on success
         const result = await analyzeDocument(doc);
-        jsonErrorCount = 0;
 
         return NextResponse.json({
             success: true,
@@ -109,13 +106,8 @@ export async function POST(request: NextRequest) {
             errorMessage.includes('blocked');
 
         if (isHealableError) {
-            jsonErrorCount++;
-            console.warn(`⚠️ Healable error detected. Count: ${jsonErrorCount}`);
-
-            // Self-healing via shell execution is disabled for Serverless compatibility.
-            // In a real production setup, this should trigger a webhook or background job.
-            if (process.env.NODE_ENV === 'development' && jsonErrorCount >= 3) {
-                console.warn("⚠️ Self-healing threshold reached. Skipping local shell script execution to ensure Vercel compatibility.");
+            if (isHealableError) {
+                console.warn(`⚠️ Healable error detected: ${errorMessage}`);
             }
         }
 

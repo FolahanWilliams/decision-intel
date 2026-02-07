@@ -1,10 +1,10 @@
 import { AnalysisResult, NoiseBenchmark } from '@/types';
-import { Activity, TrendingUp, AlertTriangle, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { Activity, TrendingUp, ExternalLink } from 'lucide-react';
 
 export function NoiseJudge({ analysis }: { analysis: AnalysisResult['noiseStats'] & { benchmarks?: NoiseBenchmark[], score: number } }) {
     if (!analysis) return null;
 
-    const { mean, stdDev, variance } = analysis;
+    const { stdDev } = analysis;
     const score = analysis.score;
     const benchmarks = analysis.benchmarks || [];
 
@@ -60,7 +60,7 @@ export function NoiseJudge({ analysis }: { analysis: AnalysisResult['noiseStats'
                                             <td className="px-4 py-3">{b.marketValue}</td>
                                             <td className="px-4 py-3">
                                                 <span className={`badge ${b.variance === 'High' ? 'badge-error' :
-                                                        b.variance === 'Medium' ? 'badge-warning' : 'badge-success'
+                                                    b.variance === 'Medium' ? 'badge-warning' : 'badge-success'
                                                     }`}>
                                                     {b.variance}
                                                 </span>

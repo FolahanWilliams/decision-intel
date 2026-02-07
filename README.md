@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Decision Intelligence Platform
 
-## Getting Started
+A sophisticated AI-powered document auditing system designed to help executives, investors, and boards minimize "Decision Noise" and cognitive bias.
 
-First, run the development server:
+## 🚀 Key Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 1. **Bias Detection & Education**
+- **Cognitive Bias Scanning**: Detects 15+ psychological biases (e.g., Confirmation Bias, Sunk Cost Fallacy).
+- **Scientific Insights**: Fetches real-world psychological studies (e.g., HBR, Kaggle) to explain *why* a bias is occurring.
+- **"Coaching Mode"**: Moves beyond criticism to provide constructive, scientifically-backed advice.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. **Noise Benchmarking (Market Reality Check)**
+- **Internal Consistency**: Checks if the document contradicts itself.
+- **External Benchmarking**: Uses Google Search Grounding to compare internal claims (e.g., "15% Growth") against live market data (e.g., "Industry Avg 12%").
+- **Variance Visualization**: Side-by-side table showing "Document vs. Market" deltas.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. **Red Team (Cognitive Diversity)**
+- **Devil's Advocate**: Simulates an opposing viewpoint to challenge core assumptions.
+- **Blind Spot Detection**: Identifies risks that the authors may have missed due to "Groupthink" or "Tunnel Vision".
+- **Verified Counter-Arguments**: Every counter-point is backed by a live URL source.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. **Financial Fact-Checking**
+- **Deep Integration**: Cross-references claims against financial APIs (Finnhub) and Google Search.
+- **Truth Score**: Assigns a "Veracity Score" (0-100%) based on data alignment.
 
-## Learn More
+## 🛠 Tech Stack
+- **Framework**: Next.js 15 (App Router)
+- **AI**: Gemini 2.0 Flash (with Google Search Grounding)
+- **Database**: PostgreSQL (Prisma ORM)
+- **Auth**: Clerk (Enterprise-ready)
+- **Styling**: TailwindCSS + Shadcn/UI (Dark Mode Optimized)
 
-To learn more about Next.js, take a look at the following resources:
+## 🏁 Getting Started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Clone & Install**
+   ```bash
+   git clone [repo]
+   npm install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Environment Setup**
+   Create `.env` with:
+   ```bash
+   DATABASE_URL="..."
+   GOOGLE_API_KEY="..." # Specific to Gemini 2.0
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="..."
+   CLERK_SECRET_KEY="..."
+   ```
 
-## Deploy on Vercel
+3. **Run Locally**
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📊 Deployment
+The platform is "Vercel-Ready". 
+- **Stateless API**: Optimized for serverless functions (verified in Audit Phase 8).
+- **Secure**: Strict API key validation and input sanitization.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔮 Future Roadmap (Backlog)
+- **Multi-Speaker Diarization**: Analyzing meeting transcripts for speaker-specific biases.
+- **Enterprise SSO**: SAML integration for large orgs.

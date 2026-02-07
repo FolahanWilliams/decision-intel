@@ -81,6 +81,12 @@ export interface CognitiveAnalysisResult {
 
 
 
+export interface ResearchInsight {
+    title: string;
+    summary: string;
+    sourceUrl: string;
+}
+
 export interface NoiseBenchmark {
     metric: string;
     documentValue: string;
