@@ -6,6 +6,7 @@ export interface BiasDetectionResult {
     explanation: string;
     suggestion: string;
     confidence?: number;
+    researchInsight?: ResearchInsight;
 }
 
 export interface AnalysisResult {
@@ -20,6 +21,7 @@ export interface AnalysisResult {
         stdDev: number;
         variance: number;
     };
+    noiseBenchmarks?: NoiseBenchmark[];
     factCheck?: {
         score: number;
         flags: string[];
@@ -40,6 +42,8 @@ export interface AnalysisResult {
     // Phase 4: Deep Logic Extensions
     logicalAnalysis?: LogicalAnalysisResult;
     swotAnalysis?: SwotAnalysisResult;
+    cognitiveAnalysis?: CognitiveAnalysisResult;
+
 }
 
 export interface LogicalAnalysisResult {
@@ -59,6 +63,31 @@ export interface SwotAnalysisResult {
     opportunities: string[];
     threats: string[];
     strategicAdvice: string;
+}
+
+export interface CognitiveAnalysisResult {
+    blindSpotGap: number; // 0-100
+    blindSpots: Array<{
+        name: string;
+        description: string;
+    }>;
+    counterArguments: Array<{
+        perspective: string;
+        argument: string;
+        sourceUrl?: string;
+        confidence: number;
+    }>;
+}
+
+
+
+export interface NoiseBenchmark {
+    metric: string;
+    documentValue: string;
+    marketValue: string;
+    variance: 'Low' | 'Medium' | 'High';
+    explanation: string;
+    sourceUrl?: string;
 }
 
 export interface DocumentWithAnalysis {

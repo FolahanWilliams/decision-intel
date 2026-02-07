@@ -11,7 +11,9 @@ import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';
 import { SwotMatrix } from './SwotMatrix';
 import { FallacyList } from './FallacyList';
-import { SwotAnalysisResult, LogicalAnalysisResult } from '@/types';
+import { RedTeamView } from './RedTeamView';
+import { NoiseJudge } from './NoiseJudge';
+import { SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult } from '@/types';
 
 interface BiasInstance {
     id?: string;
@@ -58,10 +60,12 @@ interface Analysis {
     biases: BiasInstance[];
     // Extended fields
     noiseStats?: { mean: number; stdDev: number; variance: number };
+    noiseBenchmarks?: any[]; // Using any to avoid importing the type again locally, or we could import it.
     factCheck?: FactCheck;
     compliance?: { status: 'PASS' | 'FLAGGED'; details: string };
     swotAnalysis?: SwotAnalysisResult;
     logicalAnalysis?: LogicalAnalysisResult;
+    cognitiveAnalysis?: CognitiveAnalysisResult;
 }
 
 interface Document {
@@ -167,7 +171,7 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
         similarity: number;
         biases: string[];
     }>>([]);
-    const [activeTab, setActiveTab] = useState<'overview' | 'logic' | 'swot' | 'simulator'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team'>('overview');
 
     const { showToast } = useToast();
 
@@ -682,10 +686,22 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                             Strategic SWOT
                         </button>
                         <button
+                            onClick={() => setActiveTab('noise')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'noise' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Noise & Benchmarks
+                        </button>
+                        <button
                             onClick={() => setActiveTab('simulator')}
                             className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'simulator' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             Simulator
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('red-team')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'red-team' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Red Team (Diversity)
                         </button>
                     </div>
 
@@ -712,7 +728,26 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                                     <span className="text-xs text-muted capitalize">{bias.severity} Severity</span>
                                                 </div>
                                                 <p className="text-sm italic text-slate-300 border-l-2 border-slate-700 pl-3 my-2">&quot;{bias.excerpt}&quot;</p>
-                                                <p className="text-sm text-slate-400">{bias.explanation}</p>
+                                                <p className="text-sm text-slate-400 mb-3">{bias.explanation}</p>
+
+                                                {/* Educational Insight */}
+                                                {(bias as any).researchInsight && (
+                                                    <div className="mt-3 p-3 rounded bg-blue-500/10 border border-blue-500/20">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <Lightbulb className="w-4 h-4 text-blue-400" />
+                                                            <span className="text-xs font-semibold text-blue-300">Scientific Insight</span>
+                                                        </div>
+                                                        <a
+                                                            href={(bias as any).researchInsight.sourceUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-sm font-medium text-blue-300 hover:text-blue-200 block mb-1"
+                                                        >
+                                                            {(bias as any).researchInsight.title} <ExternalLink size={10} className="inline ml-1" />
+                                                        </a>
+                                                        <p className="text-xs text-slate-400">{(bias as any).researchInsight.summary}</p>
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -733,6 +768,18 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                         </div>
                     )}
 
+                    {activeTab === 'noise' && (
+                        <div className="card">
+                            <div className="card-body">
+                                {analysis?.noiseStats ? (
+                                    <NoiseJudge analysis={{ ...analysis.noiseStats, benchmarks: analysis.noiseBenchmarks, score: analysis.noiseScore }} />
+                                ) : (
+                                    <div className="text-center p-8 text-muted">No noise analysis available.</div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {activeTab === 'swot' && (
                         <div className="card">
                             <div className="card-body">
@@ -740,6 +787,18 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
                                     <SwotMatrix data={analysis.swotAnalysis} />
                                 ) : (
                                     <div className="text-center p-8 text-muted">No SWOT analysis data available.</div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'red-team' && (
+                        <div className="card">
+                            <div className="card-body">
+                                {analysis?.cognitiveAnalysis ? (
+                                    <RedTeamView analysis={analysis.cognitiveAnalysis} />
+                                ) : (
+                                    <div className="text-center p-8 text-muted">No cognitive diversity analysis available.</div>
                                 )}
                             </div>
                         </div>

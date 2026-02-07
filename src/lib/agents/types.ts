@@ -1,4 +1,4 @@
-import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult } from '@/types';
+import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, ResearchInsight } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
 export interface AuditState {
@@ -18,6 +18,7 @@ export interface AuditState {
         stdDev: number;
         variance: number;
     };
+    noiseBenchmarks?: NoiseBenchmark[];
     factCheckResult?: {
         score: number;
         flags: string[];
@@ -41,6 +42,7 @@ export interface AuditState {
     // Phase 4 Extensions
     logicalAnalysis?: LogicalAnalysisResult;
     swotAnalysis?: SwotAnalysisResult;
+    cognitiveAnalysis?: CognitiveAnalysisResult;
 
 
     // Final Output

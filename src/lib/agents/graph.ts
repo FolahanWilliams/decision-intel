@@ -1,5 +1,5 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
-import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode, sentimentAnalyzerNode, logicalFallacyNode, strategicInsightNode } from "./nodes";
+import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, preMortemNode, complianceMapperNode, sentimentAnalyzerNode, logicalFallacyNode, strategicInsightNode, cognitiveDiversityNode } from "./nodes";
 import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
@@ -61,6 +61,10 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),
+    cognitiveAnalysis: Annotation<any | null>({
+        reducer: (x, y) => y ?? x,
+        default: () => null,
+    }),
     messages: Annotation<BaseMessage[]>({
         reducer: (x, y) => [...(x || []), ...(y || [])],
         default: () => [],
@@ -79,6 +83,7 @@ const workflow = new StateGraph(GraphState)
     .addNode("sentimentAnalyzer", sentimentAnalyzerNode)
     .addNode("logicalFallacyScanner", logicalFallacyNode)
     .addNode("strategicInsight", strategicInsightNode)
+    .addNode("cognitiveDiversity", cognitiveDiversityNode)
     .addNode("riskScorer", riskScorerNode)
 
     .setEntryPoint("gdprAnonymizer")
@@ -92,6 +97,7 @@ const workflow = new StateGraph(GraphState)
     .addEdge("structurer", "sentimentAnalyzer")
     .addEdge("structurer", "logicalFallacyScanner")
     .addEdge("structurer", "strategicInsight")
+    .addEdge("structurer", "cognitiveDiversity")
 
     .addEdge("biasDetective", "riskScorer")
     .addEdge("noiseJudge", "riskScorer")
@@ -101,6 +107,7 @@ const workflow = new StateGraph(GraphState)
     .addEdge("sentimentAnalyzer", "riskScorer")
     .addEdge("logicalFallacyScanner", "riskScorer")
     .addEdge("strategicInsight", "riskScorer")
+    .addEdge("cognitiveDiversity", "riskScorer")
 
     .addEdge("riskScorer", END);
 

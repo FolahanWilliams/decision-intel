@@ -48,8 +48,10 @@ Output Format: Return ONLY valid JSON.
 
 
 export const NOISE_JUDGE_PROMPT = `
-You are an Independent Decision Auditor.
-Your task is to rate the "Decision Quality" of the provided text contained within <input_text> tags on a scale of 0-100.
+You are an Independent Decision Auditor and Market Analyst.
+Your task is TWO-FOLD:
+1. Rate the "Decision Quality" (0-100) based on logic and evidence.
+2. Extract specific FINANCIAL or STRATEGIC METRICS that can be benchmarked against external market data.
 
 Criteria for High Quality (80-100):
 - Clear evidence-based reasoning.
@@ -57,16 +59,20 @@ Criteria for High Quality (80-100):
 - Acknowledgment of risks/uncertainties.
 - Lack of emotional reasoning.
 
-Criteria for Low Quality (0-40):
-- Emotional or reactionary language.
-- Lack of supporting data.
-- Ignoring obvious counter-arguments.
-- Vague or defensive tone.
+Instructions for Benchmarking:
+- Identify claims like "Market growth is 5%" or "Churn is 2%".
+- Create a list of these metrics for external verification.
 
 Output Format: JSON only.
 {
   "score": 85,
-  "reasoning": "brief explanation..."
+  "reasoning": "brief explanation...",
+  "benchmarks": [
+    {
+      "metric": "Projected Market Growth",
+      "documentValue": "15% per year"
+    }
+  ]
 }
 `;
 
@@ -129,5 +135,32 @@ Output JSON:
   "opportunities": ["string", "string"],
   "threats": ["string", "string"],
   "strategicAdvice": "A 2-3 sentence executive summary of the best path forward."
+}
+`;
+
+export const COGNITIVE_DIVERSITY_PROMPT = `
+You are the "Red Team Leader" and a Cognitive Diversity Engine.
+Your goal is to challenge the consensus of the provided document by finding valid, evidence-based opposing viewpoints.
+
+CORE INSTRUCTION:
+1. Extract the core arguments/assumptions in the text.
+2. Use Google Search to find specific external evidence, trends, or models that CONTRADICT these arguments.
+3. Identify "Blind Spots" - perspectives completely missing from the internal analysis.
+4. Do NOT just be contrarian for the sake of it; only flag significant risks/gaps.
+
+Output JSON:
+{
+  "blindSpotGap": 0-100, // 0 = Tunnel Vision (High Gap), 100 = Highly Diverse/Balanced
+  "blindSpots": [
+    { "name": "Regulatory Risk", "description": "Totally ignored new EU AI Act implications" }
+  ],
+  "counterArguments": [
+    {
+      "perspective": "Market Saturation",
+      "argument": "Competitor X is already dominating this niche",
+      "sourceUrl": "https://...",
+      "confidence": 0.9
+    }
+  ]
 }
 `;

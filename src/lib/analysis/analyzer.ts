@@ -71,6 +71,7 @@ export async function analyzeDocument(
                 compliance: result.compliance ?? Prisma.JsonNull,
                 preMortem: result.preMortem ?? Prisma.JsonNull,
                 sentiment: result.sentiment ?? Prisma.JsonNull,
+                cognitiveAnalysis: (result.cognitiveAnalysis as any) ?? Prisma.JsonNull,
                 speakers: result.speakers || []
             }
         });
@@ -149,6 +150,9 @@ export async function runAnalysis(
         'preMortemAnalyzer': 'Pre-Mortem Analysis',
         'complianceMapper': 'Compliance Check',
         'sentimentAnalyzer': 'Sentiment Analysis',
+        'logicalFallacyScanner': 'Logical Analysis',
+        'strategicInsight': 'SWOT Analysis',
+        'cognitiveDiversity': 'Cognitive Diversity (Red Team)',
         'riskScorer': 'Final Risk Scoring'
     };
 

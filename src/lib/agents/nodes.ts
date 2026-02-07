@@ -3,7 +3,7 @@ import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
-import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, LOGICAL_FALLACY_PROMPT, STRATEGIC_SWOT_PROMPT } from "./prompts";
+import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, LOGICAL_FALLACY_PROMPT, STRATEGIC_SWOT_PROMPT, COGNITIVE_DIVERSITY_PROMPT } from "./prompts";
 import { executeDataRequests, DataRequest } from "../tools/financial";
 
 // ============================================================
@@ -112,7 +112,53 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
 
         const response = result.response?.text ? result.response.text() : "";
         const data = parseJSON(response);
-        const biases = data?.biases || [];
+        let biases = data?.biases || [];
+
+        // Educational Insight (Dynamic Retrieval)
+        // For HIGH/CRITICAL biases, fetch scientific context
+        const severeBiases = biases.filter((b: any) =>
+            (b.severity === 'high' || b.severity === 'critical') && b.biasType
+        );
+
+        if (severeBiases.length > 0) {
+            console.log(`Fetching educational insights for ${severeBiases.length} severe biases...`);
+
+            // Allow up to 3 parallel searches to avoid rate limits
+            const insightPromises = severeBiases.slice(0, 3).map(async (bias: any) => {
+                try {
+                    const searchResult = await getGroundedModel().generateContent([
+                        `You are a Cognitive Psychology Tutor.
+                        TASK: Find a specific scientific study or "HBR" (Harvard Business Review) article that explains the following bias: "${bias.biasType}".
+                        
+                        OUTPUT JSON:
+                        {
+                            "title": "The Hidden Traps in Decision Making (HBR)",
+                            "summary": "1-sentence explanation of why this bias occurs based on the study.",
+                            "sourceUrl": "https://hbr.org/..."
+                        }`,
+                        `Bias: ${bias.biasType}`
+                    ]);
+
+                    const insightText = searchResult.response.text();
+                    const insightData = parseJSON(insightText);
+
+                    // Extract Source
+                    const metadata = searchResult.response.candidates?.[0]?.groundingMetadata;
+                    const searchSource = metadata?.groundingChunks?.find((c: { web?: { uri?: string } }) => c.web?.uri)?.web?.uri;
+
+                    if (insightData) {
+                        bias.researchInsight = {
+                            ...insightData,
+                            sourceUrl: insightData.sourceUrl || searchSource || ""
+                        };
+                    }
+                } catch (e) {
+                    console.error(`Failed to fetch insight for ${bias.biasType}`, e);
+                }
+            });
+
+            await Promise.all(insightPromises);
+        }
 
         return { biasAnalysis: biases };
     } catch (e) {
@@ -122,10 +168,11 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
 }
 
 export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditState>> {
-    console.log("--- Noise Judge Node (Gemini x3) ---");
+    console.log("--- Noise Judge Node (Gemini x3 + Benchmarking) ---");
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
+        // Parallel Judges for Noise Scoring
         const promises = [1, 2, 3].map(() =>
             withTimeout(getModel().generateContent([
                 NOISE_JUDGE_PROMPT,
@@ -135,22 +182,71 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         );
 
         const results = await Promise.all(promises);
+
+        let extractedBenchmarks: any[] = [];
         const scores = results.map(r => {
             const text = r.response?.text ? r.response.text() : "";
             const data = parseJSON(text);
+            // Capture benchmarks from the first successful judge
+            if (data?.benchmarks?.length > 0 && extractedBenchmarks.length === 0) {
+                extractedBenchmarks = data.benchmarks;
+            }
             return typeof data?.score === 'number' ? data.score : 0;
         });
 
+        // Calculate Stats
         const validScores = scores.filter(s => typeof s === 'number' && isFinite(s));
-        if (validScores.length === 0) return { noiseScores: [], noiseStats: { mean: 0, stdDev: 0, variance: 0 } };
-
-        const mean = validScores.reduce((a, b) => a + b, 0) / validScores.length;
-        const variance = validScores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / validScores.length;
+        const mean = validScores.length > 0 ? validScores.reduce((a, b) => a + b, 0) / validScores.length : 0;
+        const variance = validScores.length > 0 ? validScores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / validScores.length : 0;
         const stdDev = Math.sqrt(variance);
+
+        // Dynamic Retrieval: Verify Benchmarks if found
+        let noiseBenchmarks = [];
+        if (extractedBenchmarks.length > 0) {
+            console.log(`Verifying ${extractedBenchmarks.length} benchmarks with Google Search...`);
+            const benchmarkResult = await getGroundedModel().generateContent([
+                `You are a Market Research validator.
+                TASK:
+                1. Take the provided internal metrics.
+                2. Use Google Search to find EXTERNAL consensus data for 2024/2025.
+                3. Compare internal vs external.
+                
+                METRICS TO VERIFY:
+                ${JSON.stringify(extractedBenchmarks)}
+
+                OUTPUT JSON:
+                [
+                    {
+                        "metric": "Projected Market Growth",
+                        "documentValue": "15%",
+                        "marketValue": "12% (Gartner Report)",
+                        "variance": "Medium",
+                        "explanation": "Document is slightly optimistic compared to industry avg.",
+                        "sourceUrl": "https://..."
+                    }
+                ]`,
+                `Context: Global Market`
+            ]);
+
+            const benchmarkText = benchmarkResult.response.text();
+            noiseBenchmarks = parseJSON(benchmarkText) || [];
+
+            // Add sources from metadata
+            const metadata = benchmarkResult.response.candidates?.[0]?.groundingMetadata;
+            const searchSources: string[] = metadata?.groundingChunks
+                ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
+                .filter((u: unknown): u is string => typeof u === 'string') || [];
+
+            noiseBenchmarks = noiseBenchmarks.map((b: any, i: number) => ({
+                ...b,
+                sourceUrl: b.sourceUrl || searchSources[i % searchSources.length]
+            }));
+        }
 
         return {
             noiseScores: validScores,
-            noiseStats: { mean: Number(mean.toFixed(1)), stdDev: Number(stdDev.toFixed(1)), variance: Number(variance.toFixed(1)) }
+            noiseStats: { mean: Number(mean.toFixed(1)), stdDev: Number(stdDev.toFixed(1)), variance: Number(variance.toFixed(1)) },
+            noiseBenchmarks
         };
     } catch (e) {
         console.error("Noise Judges failed", e);
@@ -316,9 +412,14 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     const logicScore = state.logicalAnalysis?.score || 100;
     const logicPenalty = (100 - logicScore) * 0.4;
 
+    // 5. Echo Chamber Penalty (Cognitive Diversity)
+    // If blindSpotGap is low (0 = Tunnel Vision), penalty increases.
+    const diversityScore = state.cognitiveAnalysis?.blindSpotGap || 100;
+    const diversityPenalty = (100 - diversityScore) * 0.3;
+
     // Calculate Base
     const baseScore = 100;
-    let overallScore = baseScore - biasDeductions - noisePenalty - trustPenalty - logicPenalty;
+    let overallScore = baseScore - biasDeductions - noisePenalty - trustPenalty - logicPenalty - diversityPenalty;
 
     // Clamp 0-100
     overallScore = Math.max(0, Math.min(100, Math.round(overallScore)));
@@ -338,6 +439,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             sentiment: state.sentimentAnalysis,
             logicalAnalysis: state.logicalAnalysis,
             swotAnalysis: state.swotAnalysis,
+            cognitiveAnalysis: state.cognitiveAnalysis,
             speakers: [],
             createdAt: new Date(),
             analyses: []
@@ -384,6 +486,43 @@ export async function strategicInsightNode(state: AuditState): Promise<Partial<A
         return { swotAnalysis: data };
     } catch (e) {
         console.error("Strategic Insight Node failed", e);
+        return {};
+    }
+}
+
+export async function cognitiveDiversityNode(state: AuditState): Promise<Partial<AuditState>> {
+    console.log("--- Cognitive Diversity Node (Red Team) ---");
+    const content = truncateText(state.structuredContent || state.originalContent);
+
+    try {
+        console.log("Searching for counter-arguments...");
+        const result = await getGroundedModel().generateContent([
+            COGNITIVE_DIVERSITY_PROMPT,
+            `Text to Analysis:\n${content}`
+        ]);
+
+        const text = result.response.text();
+        const data = parseJSON(text);
+
+        // Extract Search Sources from Grounding Metadata
+        const metadata = result.response.candidates?.[0]?.groundingMetadata;
+        const searchSources: string[] = metadata?.groundingChunks
+            ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
+            .filter((u: unknown): u is string => typeof u === 'string') || [];
+
+        console.log(`Found ${searchSources.length} external perspectives.`);
+
+        // Inject search sources into counter-arguments if missing
+        if (data && data.counterArguments) {
+            data.counterArguments = data.counterArguments.map((arg: any, index: number) => ({
+                ...arg,
+                sourceUrl: arg.sourceUrl || searchSources[index % searchSources.length]
+            }));
+        }
+
+        return { cognitiveAnalysis: data };
+    } catch (e) {
+        console.error("Cognitive Diversity Node failed", e);
         return {};
     }
 }
