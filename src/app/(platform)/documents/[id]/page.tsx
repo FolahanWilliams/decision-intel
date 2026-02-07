@@ -18,6 +18,7 @@ import { BiasInstance } from '@prisma/client';
 import { ResearchInsight, SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, InstitutionalMemoryResult, ComplianceResult } from '@/types';
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
+import { BiasHeatmap } from '@/components/BiasHeatmap';
 
 
 interface VerificationSource {
@@ -695,51 +696,54 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
                     {/* Tab Content */}
                     {activeTab === 'overview' && (
-                        /* Biases List (Existing) - We can keep the Simulator here or move it. 
-                           For now, let's keep the Simulator in its own tab or side-by-side?
-                           The original design had Simulator as "Left Column: Editor/Simulator". 
-                           Let's put the Content Editor in the "Simulator" tab and keep Biases in Overview. 
-                        */
-                        <div className="card">
-                            <div className="card-header"><h3 className="flex items-center gap-2"><Brain size={16} /> Detected Biases</h3></div>
-                            <div className="card-body">
-                                {biases.length === 0 ? (
-                                    <div className="text-center p-8 text-muted">No cognitive biases detected.</div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {biases.map((bias, i) => (
-                                            <div key={i} className={`p-4 rounded-lg border bg-card/50 ${bias.severity === 'critical' ? 'border-red-500/20 bg-red-500/5' : 'border-border'}`}>
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <div>
-                                                        <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${bias.severity === 'critical' ? 'bg-red-500/20 text-red-400' : 'bg-slate-700 text-slate-300'}`}>{bias.biasType}</span>
-                                                    </div>
-                                                    <span className="text-xs text-muted capitalize">{bias.severity} Severity</span>
-                                                </div>
-                                                <p className="text-sm italic text-slate-300 border-l-2 border-slate-700 pl-3 my-2">&quot;{bias.excerpt}&quot;</p>
-                                                <p className="text-sm text-slate-400 mb-3">{bias.explanation}</p>
+                        <div className="flex flex-col gap-lg">
+                            {/* NEW: Bias Heatmap */}
+                            <div className="h-[600px]">
+                                <BiasHeatmap content={document.content} biases={biases} />
+                            </div>
 
-                                                {/* Educational Insight */}
-                                                {(bias as unknown as ExtendedBiasInstance).researchInsight && (
-                                                    <div className="mt-3 p-3 rounded bg-blue-500/10 border border-blue-500/20">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <Lightbulb className="w-4 h-4 text-blue-400" />
-                                                            <span className="text-xs font-semibold text-blue-300">Scientific Insight</span>
+                            {/* Biases List (Existing) */}
+                            <div className="card">
+                                <div className="card-header"><h3 className="flex items-center gap-2"><Brain size={16} /> Bias Details</h3></div>
+                                <div className="card-body">
+                                    {biases.length === 0 ? (
+                                        <div className="text-center p-8 text-muted">No cognitive biases detected.</div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {biases.map((bias, i) => (
+                                                <div key={i} className={`p-4 rounded-lg border bg-card/50 ${bias.severity === 'critical' ? 'border-red-500/20 bg-red-500/5' : 'border-border'}`}>
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${bias.severity === 'critical' ? 'bg-red-500/20 text-red-400' : 'bg-slate-700 text-slate-300'}`}>{bias.biasType}</span>
                                                         </div>
-                                                        <a
-                                                            href={(bias as unknown as ExtendedBiasInstance).researchInsight.sourceUrl}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-sm font-medium text-blue-300 hover:text-blue-200 block mb-1"
-                                                        >
-                                                            {(bias as unknown as ExtendedBiasInstance).researchInsight.title} <ExternalLink size={10} className="inline ml-1" />
-                                                        </a>
-                                                        <p className="text-xs text-slate-400">{(bias as unknown as ExtendedBiasInstance).researchInsight.summary}</p>
+                                                        <span className="text-xs text-muted capitalize">{bias.severity} Severity</span>
                                                     </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                                    <p className="text-sm italic text-slate-300 border-l-2 border-slate-700 pl-3 my-2">&quot;{bias.excerpt}&quot;</p>
+                                                    <p className="text-sm text-slate-400 mb-3">{bias.explanation}</p>
+
+                                                    {/* Educational Insight */}
+                                                    {(bias as unknown as ExtendedBiasInstance).researchInsight && (
+                                                        <div className="mt-3 p-3 rounded bg-blue-500/10 border border-blue-500/20">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <Lightbulb className="w-4 h-4 text-blue-400" />
+                                                                <span className="text-xs font-semibold text-blue-300">Scientific Insight</span>
+                                                            </div>
+                                                            <a
+                                                                href={(bias as unknown as ExtendedBiasInstance).researchInsight.sourceUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-sm font-medium text-blue-300 hover:text-blue-200 block mb-1"
+                                                            >
+                                                                {(bias as unknown as ExtendedBiasInstance).researchInsight.title} <ExternalLink size={10} className="inline ml-1" />
+                                                            </a>
+                                                            <p className="text-xs text-slate-400">{(bias as unknown as ExtendedBiasInstance).researchInsight.summary}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
