@@ -1,4 +1,4 @@
-import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, ResearchInsight } from '@/types';
+import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
 export interface AuditState {
