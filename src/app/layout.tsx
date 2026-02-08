@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 import { ClerkProvider } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 import { ToastProvider } from "@/components/ui/ToastContext";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function RootLayout({
   children,
@@ -31,9 +32,16 @@ export default function RootLayout({
     >
       <html lang="en">
         <body className="antialiased min-h-screen">
-          <ToastProvider>
-            {children}
-          </ToastProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ToastProvider>
+              {children}
+            </ToastProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

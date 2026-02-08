@@ -11,7 +11,7 @@ export default function PlatformLayout({
             <Ticker />
             <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
                 <Sidebar />
-                <main style={{ flex: 1, overflowY: 'auto', background: 'var(--bg-primary)' }}>
+                <main style={{ flex: 1, overflowY: 'auto' }} className="bg-primary text-primary transition-colors duration-300">
                     {children}
                 </main>
             </div>

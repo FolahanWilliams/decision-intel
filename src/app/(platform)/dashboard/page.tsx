@@ -298,14 +298,24 @@ export default function Dashboard() {
               height: '4px',
               background: 'var(--bg-secondary)',
               borderRadius: 'var(--radius-sm)',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              position: 'relative',
+              boxShadow: 'inset 0 0 5px rgba(0,0,0,0.5)'
             }}>
               <div style={{
                 width: `${currentProgress}%`,
                 height: '100%',
                 background: 'var(--accent-gradient)',
-                transition: 'width 0.3s ease-out'
+                transition: 'width 0.3s ease-out',
+                boxShadow: '0 0 10px var(--accent-primary)'
               }} />
+            </div>
+
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[10px] font-bold text-accent-primary uppercase tracking-[0.2em] animate-pulse">
+                SCANN_IN_PROGRESS
+              </span>
+              <span className="text-[10px] text-muted font-mono">[{currentProgress}%]</span>
             </div>
 
             {/* Step list */}
@@ -361,6 +371,11 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
+
+            {/* Premium Scanner Effect Overlays */}
+            <div className="scanner-line" />
+            <div className="absolute inset-0 pixel-grid opacity-20 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-accent-primary/5 to-transparent animate-pulse-glow pointer-events-none" />
           </div>
         ) : (
           <div className="flex flex-col items-center gap-md">
