@@ -19,6 +19,12 @@ import { ResearchInsight, SwotAnalysisResult, LogicalAnalysisResult, CognitiveAn
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 import { BiasHeatmap } from '@/components/BiasHeatmap';
+import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
+import { RiskHeatMap } from '@/components/visualizations/RiskHeatMap';
+import { StakeholderMap } from '@/components/visualizations/StakeholderMap';
+import { QualityGauge } from '@/components/visualizations/QualityMetrics';
+import { DecisionTimeline } from '@/components/visualizations/DecisionTimeline';
+import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 
 
 interface VerificationSource {
@@ -400,7 +406,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         </p>
                     </div>
                 </div>
-                
+
                 <div className="flex items-center gap-sm">
                     {document.status === 'complete' && (
                         <span className="flex items-center gap-sm text-sm text-success">
@@ -408,7 +414,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             Complete
                         </span>
                     )}
-                    
+
                     {analysis && (
                         <div className="flex gap-sm">
                             <button
@@ -430,62 +436,31 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
             </header>
 
-            {/* Compact Stats Bar */}
+            {/* Compact Stats Bar - REPLACED BY EXECUTIVE SUMMARY */}
             {analysis && (
-                <div className="flex flex-wrap gap-md mb-xl p-md bg-secondary/50 rounded-lg">
-                    {/* Quality Score */}
-                    <div className="flex items-center gap-sm">
-                        <span className="text-sm text-muted">Quality:</span>
-                        <span 
-                            className="text-lg font-bold"
-                            style={{
-                                color: analysis.overallScore >= 70 ? 'var(--success)' :
-                                    analysis.overallScore >= 40 ? 'var(--warning)' : 'var(--error)'
-                            }}
-                        >
-                            {Math.round(analysis.overallScore)}/100
-                        </span>
-                    </div>
-                    
-                    <div className="w-px h-6 bg-border" />
-                    
-                    {/* Noise */}
-                    <div className="flex items-center gap-sm">
-                        <span className="text-sm text-muted">Noise:</span>
-                        <span className="text-sm">{Math.round(analysis.noiseScore)}%</span>
-                    </div>
-                    
-                    <div className="w-px h-6 bg-border" />
-                    
-                    {/* Fact Check */}
-                    <div className="flex items-center gap-sm">
-                        <span className="text-sm text-muted">Truth:</span>
-                        <span className="text-sm">
-                            {analysis.factCheck ? `${Math.round(analysis.factCheck.score)}%` : '--'}
-                        </span>
-                    </div>
-                    
-                    <div className="w-px h-6 bg-border" />
-                    
-                    {/* Biases */}
-                    <div className="flex items-center gap-sm">
-                        <span className="text-sm text-muted">Biases:</span>
-                        <span className="text-sm">{biases.length}</span>
-                    </div>
-                    
-                    <div className="flex-1" />
-                    
-                    {/* Re-scan Button */}
-                    <button
-                        onClick={runLiveScan}
-                        disabled={isScanning}
-                        className="btn btn-primary btn-sm flex items-center gap-sm"
-                    >
-                        {isScanning ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-                        Re-scan
-                    </button>
+                <div className="mb-xl">
+                    <ExecutiveSummary
+                        overallScore={analysis.overallScore}
+                        noiseScore={analysis.noiseScore}
+                        biasCount={biases.length}
+                        riskLevel={analysis.overallScore < 50 ? 'critical' : analysis.overallScore < 70 ? 'high' : analysis.overallScore < 85 ? 'medium' : 'low'}
+                        summary={analysis.summary}
+                        verdict={analysis.overallScore > 80 ? 'APPROVED' : analysis.overallScore < 60 ? 'REJECTED' : 'MIXED'}
+                    />
                 </div>
             )}
+
+            {/* Re-scan Button (Moved actions here) */}
+            <div className="flex justify-end gap-md mb-lg">
+                <button
+                    onClick={runLiveScan}
+                    disabled={isScanning}
+                    className="btn btn-primary flex items-center gap-sm"
+                >
+                    {isScanning ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+                    Run Live Audit
+                </button>
+            </div>
 
             {/* Summary & Live Stream */}
             <div className="grid grid-3 mb-xl">
@@ -664,11 +639,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                                    activeTab === tab.id 
-                                        ? 'text-accent-primary border-accent-primary bg-accent-primary/5' 
-                                        : 'text-muted border-transparent hover:text-primary hover:border-border'
-                                }`}
+                                className={`flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${activeTab === tab.id
+                                    ? 'text-accent-primary border-accent-primary bg-accent-primary/5'
+                                    : 'text-muted border-transparent hover:text-primary hover:border-border'
+                                    }`}
                             >
                                 <tab.icon size={14} />
                                 {tab.label}
@@ -679,9 +653,44 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     {/* Tab Content */}
                     {activeTab === 'overview' && (
                         <div className="flex flex-col gap-lg">
-                            {/* NEW: Bias Heatmap */}
-                            <div className="h-[600px]">
+                            {/* NEW: Bias Heatmap & Network */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg h-[500px]">
                                 <BiasHeatmap content={document.content} biases={biases} />
+                                <div className="card">
+                                    <div className="card-header">
+                                        <h4>Bias Network Map</h4>
+                                    </div>
+                                    <div className="card-body h-full">
+                                        <BiasNetwork biases={biases.map(b => ({ ...b, id: b.id || Math.random().toString(), category: 'Cognitive' }))} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Decision Timeline & Risk Heatmap */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg mt-lg">
+                                <div className="card">
+                                    <div className="card-header">
+                                        <h4>Decision Timeline</h4>
+                                    </div>
+                                    <div className="card-body">
+                                        <DecisionTimeline events={[
+                                            { id: '1', date: new Date(document.uploadedAt).toLocaleDateString(), title: 'Document Uploaded', description: 'Initial file ingestion.', type: 'info', status: 'completed' },
+                                            { id: '2', date: new Date(analysis?.createdAt || Date.now()).toLocaleDateString(), title: 'AI Audit Completed', description: 'Deep scan for biases and noise.', type: 'decision', status: 'completed' },
+                                        ]} />
+                                    </div>
+                                </div>
+                                <div className="card">
+                                    <div className="card-header">
+                                        <h4>Risk Landscape</h4>
+                                    </div>
+                                    <div className="card-body">
+                                        <RiskHeatMap risks={biases.map(b => ({
+                                            category: b.biasType,
+                                            impact: b.severity === 'critical' ? 90 : b.severity === 'high' ? 70 : b.severity === 'medium' ? 50 : 30,
+                                            probability: 60
+                                        }))} />
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Biases List (Existing) */}
@@ -746,7 +755,23 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         <div className="card">
                             <div className="card-body">
                                 {analysis?.noiseStats ? (
-                                    <NoiseJudge analysis={{ ...analysis.noiseStats, benchmarks: analysis.noiseBenchmarks, score: analysis.noiseScore }} />
+                                    <div className="space-y-8">
+                                        <div className="flex justify-center gap-10">
+                                            <QualityGauge
+                                                value={analysis.noiseScore}
+                                                label="Noise Level"
+                                                color="#ef4444"
+                                                maxValue={100}
+                                            />
+                                            <QualityGauge
+                                                value={100 - analysis.noiseScore}
+                                                label="Consistency"
+                                                color="#10b981"
+                                                maxValue={100}
+                                            />
+                                        </div>
+                                        <NoiseJudge analysis={{ ...analysis.noiseStats, benchmarks: analysis.noiseBenchmarks, score: analysis.noiseScore }} />
+                                    </div>
                                 ) : (
                                     <div className="text-center p-8 text-muted">No noise analysis available.</div>
                                 )}
@@ -782,7 +807,25 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         <div className="card">
                             <div className="card-body">
                                 {analysis?.simulation ? (
-                                    <BoardroomSimulator simulation={analysis.simulation} />
+                                    <div className="space-y-6">
+                                        <BoardroomSimulator simulation={analysis.simulation} />
+                                        <div className="card border-t border-border mt-6">
+                                            <div className="card-header">
+                                                <h4>Stakeholder Alignment Map</h4>
+                                            </div>
+                                            <div className="card-body">
+                                                <StakeholderMap stakeholders={analysis.simulation.twins?.map((t: any) => ({
+                                                    id: t.name,
+                                                    name: t.name,
+                                                    role: t.role,
+                                                    influence: Math.round((t.confidence || 0.5) * 100),
+                                                    interest: 70,
+                                                    stance: t.vote === 'APPROVE' ? 'supportive' : t.vote === 'REJECT' ? 'opposed' : 'neutral',
+                                                    keyConcerns: [t.feedback?.substring(0, 50) + '...']
+                                                })) || []} />
+                                            </div>
+                                        </div>
+                                    </div>
                                 ) : (
                                     <div className="text-center p-8 text-muted">Run &quot;Live Scan&quot; to convene the Virtual Board.</div>
                                 )}

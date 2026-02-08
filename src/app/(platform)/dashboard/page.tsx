@@ -5,6 +5,7 @@ import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Sh
 import Link from 'next/link';
 import { SSEReader } from '@/lib/sse';
 import { RiskTrendChart } from './RiskTrendChart';
+import { ComparativeAnalysis, TrendOverlay } from '@/components/visualizations/ComparativeAnalysis';
 
 interface UploadedDoc {
   id: string;
@@ -301,15 +302,15 @@ export default function Dashboard() {
               <span className="text-sm font-medium">Analyzing document...</span>
               <span className="text-sm text-muted">{currentProgress}%</span>
             </div>
-            
+
             {/* Progress Bar */}
             <div className="h-1 bg-secondary rounded-full overflow-hidden mb-md">
-              <div 
+              <div
                 className="h-full bg-accent-primary transition-all duration-300"
                 style={{ width: `${currentProgress}%` }}
               />
             </div>
-            
+
             {/* Current Step Only */}
             {analysisSteps.find(s => s.status === 'running') && (
               <div className="flex items-center gap-sm text-sm">
@@ -326,7 +327,7 @@ export default function Dashboard() {
         <div className="mb-lg p-md rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-sm">
           <AlertTriangle size={18} className="text-red-500 shrink-0" />
           <span className="text-red-400 text-sm">{error}</span>
-          <button 
+          <button
             onClick={() => setError(null)}
             className="ml-auto text-red-500/60 hover:text-red-500"
           >
@@ -338,7 +339,7 @@ export default function Dashboard() {
       {/* Risk Trend - Collapsible */}
       {uploadedDocs.some(d => d.score !== undefined) && (
         <div className="card mb-xl">
-          <button 
+          <button
             onClick={() => setShowTrend(!showTrend)}
             className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
           >
@@ -349,8 +350,8 @@ export default function Dashboard() {
                 ({uploadedDocs.filter(d => d.score !== undefined).length} analyzed)
               </span>
             </h3>
-            <ChevronRight 
-              size={18} 
+            <ChevronRight
+              size={18}
               className={`text-muted transition-transform ${showTrend ? 'rotate-90' : ''}`}
             />
           </button>
@@ -369,6 +370,51 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Comparative Analysis */}
+      {uploadedDocs.filter(d => d.status === 'complete').length > 1 && (
+        <div className="mb-xl">
+          <div className="flex items-center justify-between mb-md">
+            <h2 className="text-lg font-semibold">Comparative Intelligence</h2>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+            <div className="lg:col-span-2 card">
+              <div className="card-header">
+                <h3>Document Benchmark</h3>
+              </div>
+              <div className="card-body">
+                <ComparativeAnalysis documents={uploadedDocs.filter(d => d.status === 'complete').map(doc => ({
+                  id: doc.id,
+                  title: doc.filename,
+                  date: new Date(doc.uploadedAt).toLocaleDateString(),
+                  scores: {
+                    quality: doc.score || 0,
+                    risk: doc.score ? (100 - doc.score) : 50,
+                    bias: 0, // Dashboard doesn't have this data yet, defaulting
+                    clarity: 0 // Dashboard doesn't have this data yet, defaulting
+                  }
+                }))} />
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-header">
+                <h3>Quality Trend</h3>
+              </div>
+              <div className="card-body">
+                <TrendOverlay data={uploadedDocs
+                  .filter(d => d.status === 'complete' && d.score !== undefined)
+                  .map(doc => ({
+                    date: doc.uploadedAt,
+                    score: doc.score || 0,
+                    documentId: doc.id
+                  }))
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                } />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Documents List */}
       <div className="card">
         <div className="card-header flex items-center justify-between">
@@ -380,7 +426,7 @@ export default function Dashboard() {
               </span>
             )}
           </div>
-          
+
           {/* Compact Search & Filter */}
           <div className="flex items-center gap-sm">
             <div className="relative">
@@ -401,7 +447,7 @@ export default function Dashboard() {
                 </button>
               )}
             </div>
-            
+
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
@@ -441,7 +487,7 @@ export default function Dashboard() {
                     <FileText size={18} className="text-accent-primary shrink-0" />
                     <span className="truncate">{doc.filename}</span>
                   </div>
-                  
+
                   <div className="flex items-center gap-md shrink-0">
                     {doc.status === 'analyzing' && (
                       <span className="flex items-center gap-sm text-sm text-muted">
@@ -449,11 +495,11 @@ export default function Dashboard() {
                         Analyzing
                       </span>
                     )}
-                    
+
                     {doc.status === 'complete' && (
                       <>
                         {doc.score !== undefined && (
-                          <span 
+                          <span
                             className="text-sm font-medium"
                             style={{
                               color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
@@ -462,15 +508,15 @@ export default function Dashboard() {
                             {Math.round(doc.score)}%
                           </span>
                         )}
-                        <Link 
-                          href={`/documents/${doc.id}`} 
+                        <Link
+                          href={`/documents/${doc.id}`}
                           className="text-sm text-accent-primary hover:underline"
                         >
                           View →
                         </Link>
                       </>
                     )}
-                    
+
                     <button
                       onClick={() => setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })}
                       className="p-1.5 text-muted hover:text-error transition-colors"
