@@ -73,7 +73,13 @@ export async function analyzeDocument(
                     compliance: (result.compliance ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     preMortem: (result.preMortem ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     sentiment: (result.sentiment ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    speakers: result.speakers || []
+                    speakers: result.speakers || [],
+                    // Phase 4 Extensions
+                    logicalAnalysis: (result.logicalAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    swotAnalysis: (result.swotAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    cognitiveAnalysis: (result.cognitiveAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    simulation: (result.simulation ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    institutionalMemory: (result.institutionalMemory ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue
                 }
             });
         } catch (dbError: any) {

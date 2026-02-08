@@ -16,7 +16,7 @@ interface DocumentWithRisk {
     analyses: {
         overallScore: number;
         noiseScore: number;
-        biases: { severity: string }[];
+        biases: { severity: string; biasType: string }[];
         factCheck?: { score: number };
     }[];
 }
@@ -124,6 +124,19 @@ export default function RiskAuditsPage() {
             console.error('Delete failed:', err);
         } finally {
             setDeleting(false);
+        }
+    };
+
+    // Export handler
+    const handleExportReport = async () => {
+        if (!documents || documents.length === 0 || !summary) return;
+
+        try {
+            const { AggregatePdfGenerator } = await import('@/lib/reports/aggregate-pdf-generator');
+            const generator = new AggregatePdfGenerator();
+            generator.generateRiskReport(documents, summary);
+        } catch (err) {
+            console.error('Failed to generate report:', err);
         }
     };
 
@@ -399,12 +412,12 @@ export default function RiskAuditsPage() {
                         </div>
                     </div>
                 </Link>
-                <div className="card">
+                <div className="card" onClick={handleExportReport} style={{ cursor: 'pointer' }}>
                     <div className="card-body flex items-center gap-md">
                         <CheckCircle size={24} style={{ color: 'var(--success)' }} />
                         <div>
                             <div style={{ fontWeight: 600 }}>Export Report</div>
-                            <div className="text-xs text-muted">Coming soon</div>
+                            <div className="text-xs text-muted">Generate PDF Summary</div>
                         </div>
                     </div>
                 </div>

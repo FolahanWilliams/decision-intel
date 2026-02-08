@@ -30,7 +30,7 @@ export async function GET(request: Request) {
                     ...(detailed && {
                         noiseScore: true,
                         biases: {
-                            select: { severity: true }
+                            select: { severity: true, biasType: true }
                         },
                         factCheck: true
                     })
