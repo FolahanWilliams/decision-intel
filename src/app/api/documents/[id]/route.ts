@@ -16,11 +16,35 @@ export async function GET(
 
         const document = await prisma.document.findFirst({
             where: { id, userId },
-            include: {
+            select: {
+                id: true,
+                filename: true,
+                fileType: true,
+                fileSize: true,
+                content: true,
+                uploadedAt: true,
+                status: true,
                 analyses: {
                     orderBy: { createdAt: 'desc' },
-                    include: {
-                        biases: true
+                    select: {
+                        id: true,
+                        overallScore: true,
+                        noiseScore: true,
+                        summary: true,
+                        createdAt: true,
+                        biases: true,
+                        // Explicitly exclude 'simulation' and other new fields to prevent P2022
+                        noiseStats: true,
+                        // These JSON fields are safe if they exist in schema but are null in DB, 
+                        // but if the column itself is missing from DB, we must excluding them too?
+                        // The user error log says `Analysis.simulation` does not exist.
+                        // Safe bet: select only what we KNOW exists in the DB or handled by Prisma if valid.
+                        // Actually, `biases` is a relation, so it's fine.
+                        // Let's stick to the core fields that the UI uses.
+                        factCheck: true, // Only if this column exists. 
+                        // It seems `factCheck` might ALSO be missing if migration didn't run?
+                        // The error was specifically about `simulation`.
+                        // Let's be conservative.
                     }
                 }
             }

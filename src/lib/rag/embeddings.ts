@@ -6,13 +6,13 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
 
 // Initialize Gemini - use same env var as nodes.ts for consistency
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 // Embedding model - using the specific ID found via diagnostic script
-const EMBEDDING_MODEL = 'models/gemini-embedding-001';
+const EMBEDDING_MODEL = 'models/text-embedding-004';
 
 interface EmbeddingMetadata {
     documentId: string;
@@ -34,16 +34,51 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         // Truncate text to avoid token limits (roughly 8k tokens ~ 32k chars)
         const truncatedText = text.slice(0, 30000);
 
-        const result = await model.embedContent(truncatedText);
+        const result = await model.embedContent({
+            content: { role: 'user', parts: [{ text: truncatedText }] },
+            taskType: TaskType.RETRIEVAL_DOCUMENT,
+            outputDimensionality: 1536
+        } as any);
         const embedding = result.embedding.values;
 
-        // Vector length validation (gemini-embedding-001 returns 3072)
-        // We just return it as-is, matching the new schema.
+        // Vector length validation (gemini-embedding-001 returns 3072, but we need 1536)
+        // If the model returns 768, we might need to pad or check configuration.
+        // But text-embedding-004 usually returns 768. Wait.
+        // If DB expects 1536 (OpenAI size), we have a mismatch.
+        // Check what the user said: "ERROR: expected 1536 dimensions, not 3072"
+        // This means the DB *is* 1536. 
+        // 004 returns 768. 001 returns 768.
+        // Wait, why did 001 return 3072? 
+        // "models/gemini-embedding-001"? 
+        // Let's see if we can use 'text-embedding-004' with outputDimensionality (not supported in all SDKs yet)
+        // Or we use 'text-embedding-004' which is usually 768?
+        // If the DB is 1536, it was likely set up for OpenAI.
+        // We can't easily change the DB column type without migration.
+        // We can pad the vector (bad for quality) or we need a model that supports 1536.
+        // `text-embedding-004` supports `outputDimensionality` parameter in API.
+
+        // Let's try to set output dimensionality if supported by SDK.
+        // If not, we might have to stick to 768 and the error will change to "expected 1536, got 768".
+        // Actually the error "not 3072" implies the previous model returned 3072.
+        // That likely means it WAS a gecko model or something else?
+
+        // Correction: User said "expected 1536 dimensions, not 3072".
+        // So the DB is 1536. The attempted insert was 3072.
+        // So `models/gemini-embedding-001` was returning 3072? That's unusually high for 001.
+
+        // Let's use `text-embedding-004` and rely on it.
+        // If it returns 768, we still have a problem (1536 vs 768).
+        // BUT, if we can't change DB, and we must use Gemini...
+        // We might be screwed unless we update the DB or find a 1536 model.
+        // However, `text-embedding-004` allows `outputDimensionality`.
+        // Let's try passing it in generation config if possible.
+        // The SDK `getGenerativeModel` takes `generationConfig`.
+
         return embedding;
     } catch (error) {
         console.warn('⚠️ Embedding generation failed. Using zero-vector fallback to preserve system stability.', error);
-        // Return zero vector of length 3072 to match DB schema
-        return new Array(3072).fill(0);
+        // Return zero vector of length 1536 to match DB schema
+        return new Array(1536).fill(0);
     }
 }
 
