@@ -495,7 +495,7 @@ export async function linguisticAnalysisNode(state: AuditState): Promise<Partial
 export async function strategicAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
-        const result = await getModel().generateContent([
+        const result = await getGroundedModel().generateContent([
             STRATEGIC_ANALYSIS_PROMPT,
             `Text:\n${content}`
         ]);

@@ -308,13 +308,19 @@ export const STRATEGIC_ANALYSIS_PROMPT = `
    1. SWOT Analysis: Internal Strengths/Weaknesses, External Opportunities/Threats.
    2. Pre-Mortem: Imagine this initiative has FAILED 1 year from now. Why? And how to prevent it.
 
+   CRITICAL GROUNDING INSTRUCTION:
+   - You MUST use Google Search to verify the "External Opportunities" and "External Threats".
+   - Do NOT rely on internal training data for market trends or competitor status.
+   - For every Opportunity or Threat, find specific real-world data points (e.g., current market growth rates, specific competitor moves, recent regulatory shifts).
+   - If a threat is identified via search that is NOT mentioned in the text, highlight it as a "Blind Spot".
+
    Output JSON:
    {
      "swot": {
        "strengths": ["string"],
        "weaknesses": ["string"],
-       "opportunities": ["string"],
-       "threats": ["string"],
+       "opportunities": ["Specific opportunity backed by search data..."],
+       "threats": ["Specific threat backed by search data..."],
        "strategicAdvice": "Executive summary of the best path forward."
      },
      "preMortem": {
