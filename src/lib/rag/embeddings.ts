@@ -6,10 +6,13 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
 
+// Initialize Gemini - use same env var as nodes.ts for consistency
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
-// OpenAI Embedding Model (1536 dimensions)
-const OPENAI_EMBEDDING_MODEL = 'text-embedding-3-small';
+// Embedding model - using gemini-embedding-001 which supports dimensionality reduction
+const EMBEDDING_MODEL = 'models/gemini-embedding-001';
 
 interface EmbeddingMetadata {
     documentId: string;
@@ -22,41 +25,21 @@ interface EmbeddingMetadata {
 }
 
 /**
- * Generate an embedding vector for text content using OpenAI
+ * Generate an embedding vector for text content using Gemini
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-        console.warn('⚠️ OPENAI_API_KEY not found. Using zero-vector fallback.');
-        return new Array(1536).fill(0);
-    }
-
     try {
-        // Truncate text to avoid token limits (approx 8k tokens)
-        // OpenAI text-embedding-3-small has an 8191 token limit.
-        // A safe char limit is around 30k characters.
+        const model = genAI.getGenerativeModel({ model: EMBEDDING_MODEL });
+
+        // Truncate text to avoid token limits (roughly 8k tokens ~ 32k chars)
         const truncatedText = text.slice(0, 30000);
 
-        const response = await fetch('https://api.openai.com/v1/embeddings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: OPENAI_EMBEDDING_MODEL,
-                input: truncatedText,
-                encoding_format: 'float'
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(`OpenAI API Error: ${response.status} ${response.statusText} - ${JSON.stringify(error)}`);
-        }
-
-        const data = await response.json();
-        const embedding = data.data[0].embedding;
+        const result = await model.embedContent({
+            content: { role: 'user', parts: [{ text: truncatedText }] },
+            taskType: TaskType.RETRIEVAL_DOCUMENT,
+            outputDimensionality: 1536
+        } as any);
+        const embedding = result.embedding.values;
 
         return embedding;
     } catch (error) {
