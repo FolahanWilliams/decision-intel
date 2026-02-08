@@ -23,32 +23,39 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
                 <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                         <linearGradient id="scoreVars" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                         </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
                     <XAxis
                         dataKey="date"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 11, fill: '#64748B' }}
+                        tick={{ fontSize: 11, fill: '#a3a3a3' }}
                         dy={10}
                     />
                     <YAxis
                         domain={[0, 100]}
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 11, fill: '#64748B' }}
+                        tick={{ fontSize: 11, fill: '#a3a3a3' }}
                     />
                     <Tooltip
-                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                        itemStyle={{ color: '#1e293b', fontWeight: 600 }}
+                        contentStyle={{
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            backgroundColor: 'rgba(20,20,20,0.8)',
+                            backdropFilter: 'blur(8px)',
+                            color: '#e5e5e5'
+                        }}
+                        itemStyle={{ color: '#f59e0b', fontWeight: 600 }}
+                        labelStyle={{ color: '#a3a3a3', marginBottom: '4px' }}
                     />
                     <Area
                         type="monotone"
                         dataKey="score"
-                        stroke="#6366f1"
+                        stroke="#f59e0b"
                         strokeWidth={2}
                         fillOpacity={1}
                         fill="url(#scoreVars)"
