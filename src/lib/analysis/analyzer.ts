@@ -189,7 +189,6 @@ export async function runAnalysis(
         'logicalFallacyScanner': 'Logical Analysis',
         'strategicInsight': 'SWOT Analysis',
         'cognitiveDiversity': 'Cognitive Diversity (Red Team)',
-        'marketData': 'Macroeconomic Context (BigQuery)',
         'riskScorer': 'Final Risk Scoring'
     };
 
