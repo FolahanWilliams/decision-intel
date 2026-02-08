@@ -44,19 +44,19 @@ export default function RiskAuditsPage() {
     useEffect(() => {
         const fetchRiskData = async () => {
             try {
-                const res = await fetch('/api/documents');
+                // Optimized: Fetch all data in one request with ?detailed=true
+                const res = await fetch('/api/documents?detailed=true');
                 if (res.ok) {
                     const docs = await res.json();
 
-                    // Fetch full details for each document
-                    const detailedDocs = await Promise.all(
-                        docs.map(async (doc: { id: string }) => {
-                            const detailRes = await fetch(`/api/documents/${doc.id}`);
-                            return detailRes.ok ? detailRes.json() : null;
-                        })
-                    );
+                    // Filter for docs that have analysis data
+                    // The API now returns the structure we need directly
+                    const validDocs = docs.filter((d: any) => d.analyses && d.analyses.length > 0);
 
-                    const validDocs = detailedDocs.filter(d => d && d.analyses?.length > 0);
+                    // Map to expected internal format if needed, or use as is
+                    // The API returns analyses: [{ overallScore, noiseScore, ... }]
+                    // which matches our DocumentWithRisk interface (mostly)
+
                     setDocuments(validDocs);
 
                     // Calculate risk summary
