@@ -5,7 +5,7 @@ import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Sh
 import Link from 'next/link';
 import { SSEReader } from '@/lib/sse';
 import { RiskTrendChart } from './RiskTrendChart';
-import { ComparativeAnalysis, TrendOverlay } from '@/components/visualizations/ComparativeAnalysis';
+import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnalysis';
 
 interface UploadedDoc {
   id: string;
@@ -258,16 +258,13 @@ export default function Dashboard() {
   return (
     <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
       {/* Simple Header */}
-      <header className="flex items-center justify-between mb-xl">
+      <div className="mb-xl">
         <h1 className="text-2xl font-bold">
           <span className="bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">
             Dashboard
           </span>
         </h1>
-        <div className="text-sm text-muted">
-          {uploadedDocs.length} document{uploadedDocs.length !== 1 ? 's' : ''}
-        </div>
-      </header>
+      </div>
 
       {/* Upload Zone - Compact */}
       {!uploading ? (
@@ -376,40 +373,22 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-md">
             <h2 className="text-lg font-semibold">Comparative Intelligence</h2>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
-            <div className="lg:col-span-2 card">
-              <div className="card-header">
-                <h3>Document Benchmark</h3>
-              </div>
-              <div className="card-body">
-                <ComparativeAnalysis documents={uploadedDocs.filter(d => d.status === 'complete').map(doc => ({
-                  id: doc.id,
-                  title: doc.filename,
-                  date: new Date(doc.uploadedAt).toLocaleDateString(),
-                  scores: {
-                    quality: doc.score || 0,
-                    risk: doc.score ? (100 - doc.score) : 50,
-                    bias: 0, // Dashboard doesn't have this data yet, defaulting
-                    clarity: 0 // Dashboard doesn't have this data yet, defaulting
-                  }
-                }))} />
-              </div>
+          <div className="card">
+            <div className="card-header">
+              <h3>Document Benchmark</h3>
             </div>
-            <div className="card">
-              <div className="card-header">
-                <h3>Quality Trend</h3>
-              </div>
-              <div className="card-body">
-                <TrendOverlay data={uploadedDocs
-                  .filter(d => d.status === 'complete' && d.score !== undefined)
-                  .map(doc => ({
-                    date: doc.uploadedAt,
-                    score: doc.score || 0,
-                    documentId: doc.id
-                  }))
-                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                } />
-              </div>
+            <div className="card-body">
+              <ComparativeAnalysis documents={uploadedDocs.filter(d => d.status === 'complete').map(doc => ({
+                id: doc.id,
+                title: doc.filename,
+                date: new Date(doc.uploadedAt).toLocaleDateString(),
+                scores: {
+                  quality: doc.score || 0,
+                  risk: doc.score ? (100 - doc.score) : 50,
+                  bias: 0, // Dashboard doesn't have this data yet, defaulting
+                  clarity: 0 // Dashboard doesn't have this data yet, defaulting
+                }
+              }))} />
             </div>
           </div>
         </div>
