@@ -189,7 +189,6 @@ export async function runAnalysis(
         'logicalFallacyScanner': 'Logical Analysis',
         'strategicInsight': 'SWOT Analysis',
         'cognitiveDiversity': 'Cognitive Diversity (Red Team)',
-        'discoverySearch': 'Deep Search Verification (Vertex AI)',
         'marketData': 'Macroeconomic Context (BigQuery)',
         'riskScorer': 'Final Risk Scoring'
     };
