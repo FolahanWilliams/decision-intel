@@ -73,9 +73,6 @@ export async function analyzeDocument(
                     compliance: (result.compliance ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     preMortem: (result.preMortem ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     sentiment: (result.sentiment ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    cognitiveAnalysis: (result.cognitiveAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    simulation: (result.simulation ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    institutionalMemory: (result.institutionalMemory ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     speakers: result.speakers || []
                 }
             });
@@ -203,6 +200,7 @@ export async function runAnalysis(
             { version: 'v2' }
         );
 
+        // Capture the final output from the root graph end event
         for await (const event of eventStream) {
             // Track node start events
             if (event.event === 'on_chain_start' && event.name && NODE_LABELS[event.name]) {
@@ -211,45 +209,49 @@ export async function runAnalysis(
             }
 
             // Track node end events
-            if (event.event === 'on_chain_end' && event.name && NODE_LABELS[event.name]) {
-                completedNodes.add(event.name);
-                const label = NODE_LABELS[event.name];
-                const progress = Math.round((completedNodes.size / totalNodes) * 80) + 10;
-                sendStep(label, 'complete', progress);
+            if (event.event === 'on_chain_end') {
+                // Check for root graph completion
+                if (event.name === 'LangGraph') {
+                    result = event.data.output;
+                }
+                else if (event.name && NODE_LABELS[event.name]) {
+                    completedNodes.add(event.name);
+                    const label = NODE_LABELS[event.name];
+                    const progress = Math.round((completedNodes.size / totalNodes) * 80) + 10;
+                    sendStep(label, 'complete', progress);
 
-                // Send bias detection updates specifically
-                if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
-                    const biases = event.data.output.biasAnalysis;
-                    for (const bias of biases) {
-                        if (bias.found && onProgress) {
-                            onProgress({
-                                type: 'bias',
-                                biasType: bias.biasType,
-                                progress,
-                                result: { found: true, severity: bias.severity }
-                            });
+                    // Send bias detection updates specifically
+                    if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
+                        const biases = event.data.output.biasAnalysis;
+                        for (const bias of biases) {
+                            if (bias.found && onProgress) {
+                                onProgress({
+                                    type: 'bias',
+                                    biasType: bias.biasType,
+                                    progress,
+                                    result: { found: true, severity: bias.severity }
+                                });
+                            }
                         }
                     }
-                }
 
-                // Send noise analysis updates
-                if (event.name === 'noiseJudge' && event.data?.output?.noiseStats) {
-                    if (onProgress) {
-                        onProgress({
-                            type: 'noise',
-                            progress,
-                            result: { score: event.data.output.noiseStats.mean }
-                        });
+                    // Send noise analysis updates
+                    if (event.name === 'noiseJudge' && event.data?.output?.noiseStats) {
+                        if (onProgress) {
+                            onProgress({
+                                type: 'noise',
+                                progress,
+                                result: { score: event.data.output.noiseStats.mean }
+                            });
+                        }
                     }
                 }
             }
         }
 
-        // Get final result after stream completes
-        result = await auditGraph.invoke({
-            originalContent: content,
-            documentId: documentId,
-        });
+        if (!result) {
+            throw new Error("Stream ended without returning a final result");
+        }
 
     } catch (error) {
         console.error('Streaming error, falling back to invoke:', error);

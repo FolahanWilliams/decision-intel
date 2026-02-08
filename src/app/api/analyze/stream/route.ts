@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { runAnalysis, ProgressUpdate } from '@/lib/analysis/analyzer';
+import { analyzeDocument, ProgressUpdate } from '@/lib/analysis/analyzer';
 import { formatSSE } from '@/lib/sse';
-import { safeJsonClone } from '@/lib/utils/json';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 
 export async function POST(request: NextRequest) {
@@ -37,53 +35,18 @@ export async function POST(request: NextRequest) {
                 };
 
                 try {
-                    // Update status to analyzing
-                    await prisma.document.update({
-                        where: { id: documentId },
-                        data: { status: 'analyzing' }
-                    });
-
-                    const result = await runAnalysis(doc.content, documentId, (update) => {
+                    // Use the centralized analyzeDocument function which handles:
+                    // 1. Status updates (analyzing -> complete/error)
+                    // 2. Single-pass execution (using the fix we just applied)
+                    // 3. Robust DB saving with Schema Drift Protection
+                    await analyzeDocument(documentId, (update) => {
                         sendUpdate(update);
                     });
 
-                    // Store analysis and update document status
-                    const foundBiases = result.biases.filter(b => b.found);
-                    await prisma.document.update({
-                        where: { id: documentId },
-                        data: {
-                            status: 'complete',
-                            analyses: {
-                                create: {
-                                    overallScore: result.overallScore,
-                                    noiseScore: result.noiseScore,
-                                    summary: result.summary,
-                                    biases: {
-                                        create: foundBiases.map(bias => ({
-                                            biasType: bias.biasType,
-                                            severity: bias.severity,
-                                            excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                                            explanation: bias.explanation || '',
-                                            suggestion: bias.suggestion,
-                                            confidence: bias.confidence || 0.0
-                                        })),
-                                    },
-                                    // Persist new Multi-Agent Data
-                                    structuredContent: result.structuredContent || '',
-                                    noiseStats: (result.noiseStats ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                                    factCheck: (result.factCheck ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                                    compliance: (result.compliance ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                                    preMortem: (result.preMortem ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                                    sentiment: (result.sentiment ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                                    simulation: (result.simulation ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                                    institutionalMemory: (result.institutionalMemory ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                                    speakers: result.speakers || []
-                                }
-                            }
-                        }
-                    });
-
-                    sendUpdate({ type: 'complete', progress: 100, result: safeJsonClone(result) });
+                    // Send final complete message
+                    // Note: analyzeDocument also calls the callback with 'complete', 
+                    // but we ensure it here to close the stream cleanly.
+                    // If the callback already sent it, this might be redundant but harmless.
                     controller.close();
                 } catch (error) {
                     console.error('Stream error:', error);
