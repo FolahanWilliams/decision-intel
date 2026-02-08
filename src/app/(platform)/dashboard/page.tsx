@@ -323,11 +323,19 @@ export default function Dashboard() {
               {analysisSteps.map((step, idx) => (
                 <div
                   key={step.name}
-                  className="flex items-center gap-md animate-fade-in"
+                  className={`flex items-center gap-md animate-fade-in ${step.status === 'running' ? 'active-step' : ''}`}
                   style={{
                     animationDelay: `${idx * 0.1}s`,
                     opacity: step.status === 'pending' ? 0.4 : 1,
-                    transition: 'opacity 0.3s ease'
+                    transition: 'all 0.4s ease',
+                    padding: 'var(--spacing-sm) var(--spacing-md)',
+                    background: step.status === 'running'
+                      ? 'rgba(255, 159, 10, 0.05)'
+                      : 'transparent',
+                    borderLeft: step.status === 'running'
+                      ? '3px solid var(--accent-primary)'
+                      : '3px solid transparent',
+                    marginLeft: step.status === 'running' ? '-3px' : '0'
                   }}
                 >
                   <div style={{
@@ -340,13 +348,16 @@ export default function Dashboard() {
                     background: step.status === 'complete'
                       ? 'rgba(16, 185, 129, 0.2)'
                       : step.status === 'running'
-                        ? 'rgba(99, 102, 241, 0.2)'
+                        ? 'var(--accent-primary)'
                         : 'var(--bg-secondary)',
                     color: step.status === 'complete'
                       ? 'var(--success)'
                       : step.status === 'running'
-                        ? 'var(--accent-primary)'
-                        : 'var(--text-muted)'
+                        ? '#000'
+                        : 'var(--text-muted)',
+                    boxShadow: step.status === 'running'
+                      ? '0 0 15px rgba(255, 159, 10, 0.4)'
+                      : 'none'
                   }}>
                     {step.status === 'running' ? (
                       <Loader2 size={14} className="animate-spin" />
@@ -372,10 +383,7 @@ export default function Dashboard() {
               ))}
             </div>
 
-            {/* Premium Scanner Effect Overlays */}
-            <div className="scanner-line" />
-            <div className="absolute inset-0 pixel-grid opacity-20 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-accent-primary/5 to-transparent animate-pulse-glow pointer-events-none" />
+            {/* Premium Scanner Effect Overlays Removed as requested */}
           </div>
         ) : (
           <div className="flex flex-col items-center gap-md">
