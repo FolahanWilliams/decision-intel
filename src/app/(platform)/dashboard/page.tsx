@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, Filter, X } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, Filter, X, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { SSEReader } from '@/lib/sse';
 import { RiskTrendChart } from './RiskTrendChart';
@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [showTrend, setShowTrend] = useState(false);
 
   // Delete confirmation state
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; docId: string; filename: string }>({
@@ -256,309 +257,225 @@ export default function Dashboard() {
 
   return (
     <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
-      {/* Header */}
+      {/* Simple Header */}
       <header className="flex items-center justify-between mb-xl">
-        <div>
-          <h1 style={{ marginBottom: 'var(--spacing-xs)' }}>
-            <span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Decision Intel
-            </span>
-          </h1>
-          <p>Audit decisions for cognitive bias and noise</p>
-        </div>
-        <nav className="flex gap-md">
-          <Link href="/dashboard" className="btn btn-secondary">
+        <h1 className="text-2xl font-bold">
+          <span className="bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">
             Dashboard
-          </Link>
-        </nav>
+          </span>
+        </h1>
+        <div className="text-sm text-muted">
+          {uploadedDocs.length} document{uploadedDocs.length !== 1 ? 's' : ''}
+        </div>
       </header>
 
-      {/* Upload Zone */}
-      <div
-        className={`upload-zone mb-xl ${isDragOver ? 'dragover' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => document.getElementById('file-input')?.click()}
-      >
-        <input
-          type="file"
-          id="file-input"
-          hidden
-          accept=".pdf,.txt,.md,.doc,.docx"
-          onChange={handleFileSelect}
-          disabled={uploading}
-        />
-
-        {uploading ? (
-          <div className="flex flex-col items-center gap-lg" style={{ width: '100%', maxWidth: '400px' }}>
-            {/* Progress bar */}
-            <div style={{
-              width: '100%',
-              height: '4px',
-              background: 'var(--bg-secondary)',
-              borderRadius: 'var(--radius-sm)',
-              overflow: 'hidden',
-              position: 'relative',
-              boxShadow: 'inset 0 0 5px rgba(0,0,0,0.5)'
-            }}>
-              <div style={{
-                width: `${currentProgress}%`,
-                height: '100%',
-                background: 'var(--accent-gradient)',
-                transition: 'width 0.3s ease-out',
-                boxShadow: '0 0 10px var(--accent-primary)'
-              }} />
-            </div>
-
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[10px] font-bold text-accent-primary uppercase tracking-[0.2em] animate-pulse">
-                SCANN_IN_PROGRESS
-              </span>
-              <span className="text-[10px] text-muted font-mono">[{currentProgress}%]</span>
-            </div>
-
-            {/* Step list */}
-            <div className="flex flex-col gap-sm" style={{ width: '100%' }}>
-              {analysisSteps.map((step, idx) => (
-                <div
-                  key={step.name}
-                  className={`flex items-center gap-md animate-fade-in ${step.status === 'running' ? 'active-step' : ''}`}
-                  style={{
-                    animationDelay: `${idx * 0.1}s`,
-                    opacity: step.status === 'pending' ? 0.4 : 1,
-                    transition: 'all 0.4s ease',
-                    padding: 'var(--spacing-sm) var(--spacing-md)',
-                    background: step.status === 'running'
-                      ? 'rgba(255, 159, 10, 0.05)'
-                      : 'transparent',
-                    borderLeft: step.status === 'running'
-                      ? '3px solid var(--accent-primary)'
-                      : '3px solid transparent',
-                    marginLeft: step.status === 'running' ? '-3px' : '0'
-                  }}
-                >
-                  <div style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: step.status === 'complete'
-                      ? 'rgba(16, 185, 129, 0.2)'
-                      : step.status === 'running'
-                        ? 'var(--accent-primary)'
-                        : 'var(--bg-secondary)',
-                    color: step.status === 'complete'
-                      ? 'var(--success)'
-                      : step.status === 'running'
-                        ? '#000'
-                        : 'var(--text-muted)',
-                    boxShadow: step.status === 'running'
-                      ? '0 0 15px rgba(255, 159, 10, 0.4)'
-                      : 'none'
-                  }}>
-                    {step.status === 'running' ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : step.status === 'complete' ? (
-                      <CheckCircle size={14} />
-                    ) : (
-                      step.icon
-                    )}
-                  </div>
-                  <span style={{
-                    fontSize: '0.875rem',
-                    color: step.status === 'running'
-                      ? 'var(--text-primary)'
-                      : step.status === 'complete'
-                        ? 'var(--success)'
-                        : 'var(--text-muted)',
-                    fontWeight: step.status === 'running' ? 500 : 400
-                  }}>
-                    {step.name}
-                    {step.status === 'running' && '...'}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Premium Scanner Effect Overlays Removed as requested */}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-md">
-            <Upload size={48} style={{ color: 'var(--accent-primary)' }} />
+      {/* Upload Zone - Compact */}
+      {!uploading ? (
+        <div
+          className={`upload-zone mb-xl ${isDragOver ? 'dragover' : ''}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => document.getElementById('file-input')?.click()}
+        >
+          <input
+            type="file"
+            id="file-input"
+            hidden
+            accept=".pdf,.txt,.md,.doc,.docx"
+            onChange={handleFileSelect}
+          />
+          <div className="flex items-center gap-md">
+            <Upload size={32} className="text-accent-primary" />
             <div>
-              <p style={{ color: 'var(--text-primary)', fontWeight: 500, marginBottom: 'var(--spacing-xs)' }}>
-                Drop your decision document here
-              </p>
-              <p style={{ fontSize: '0.875rem' }}>
-                or click to browse • PDF, TXT, MD, DOC, DOCX
-              </p>
+              <p className="font-medium">Drop document here or click to browse</p>
+              <p className="text-sm text-muted">PDF, TXT, MD, DOC, DOCX</p>
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Risk Trend & Error Message */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Trend Chart */}
-        <div className="lg:col-span-2 card">
-          <div className="card-header pb-2">
-            <h3 className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-indigo-500" />
-              Decision Quality Trend
-            </h3>
-          </div>
-          <div className="card-body pt-0">
-            <RiskTrendChart data={[...uploadedDocs]
-              .filter(d => d.score !== undefined)
-              .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
-              .map(d => ({
-                date: new Date(d.uploadedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-                score: d.score || 0
-              }))
-            } />
           </div>
         </div>
-
-        {/* Error Message Area */}
-        {error && (
-          <div className="card border-red-500/50 bg-red-500/10 h-fit">
-            <div className="card-body flex items-start gap-3">
-              <AlertTriangle size={20} className="text-red-500 shrink-0 mt-0.5" />
-              <span className="text-red-400 text-sm font-medium">{error}</span>
+      ) : (
+        /* Analysis Progress - Compact */
+        <div className="card mb-xl">
+          <div className="card-body">
+            {/* Progress Header */}
+            <div className="flex items-center justify-between mb-md">
+              <span className="text-sm font-medium">Analyzing document...</span>
+              <span className="text-sm text-muted">{currentProgress}%</span>
             </div>
+            
+            {/* Progress Bar */}
+            <div className="h-1 bg-secondary rounded-full overflow-hidden mb-md">
+              <div 
+                className="h-full bg-accent-primary transition-all duration-300"
+                style={{ width: `${currentProgress}%` }}
+              />
+            </div>
+            
+            {/* Current Step Only */}
+            {analysisSteps.find(s => s.status === 'running') && (
+              <div className="flex items-center gap-sm text-sm">
+                <Loader2 size={14} className="animate-spin text-accent-primary" />
+                <span>{analysisSteps.find(s => s.status === 'running')?.name}</span>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Recently uploaded / Saved documents */}
+      {/* Error Message - Compact */}
+      {error && (
+        <div className="mb-lg p-md rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-sm">
+          <AlertTriangle size={18} className="text-red-500 shrink-0" />
+          <span className="text-red-400 text-sm">{error}</span>
+          <button 
+            onClick={() => setError(null)}
+            className="ml-auto text-red-500/60 hover:text-red-500"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* Risk Trend - Collapsible */}
+      {uploadedDocs.some(d => d.score !== undefined) && (
+        <div className="card mb-xl">
+          <button 
+            onClick={() => setShowTrend(!showTrend)}
+            className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+          >
+            <h3 className="flex items-center gap-2 text-base">
+              <BarChart3 size={18} className="text-indigo-500" />
+              Decision Quality Trend
+              <span className="text-xs text-muted font-normal">
+                ({uploadedDocs.filter(d => d.score !== undefined).length} analyzed)
+              </span>
+            </h3>
+            <ChevronRight 
+              size={18} 
+              className={`text-muted transition-transform ${showTrend ? 'rotate-90' : ''}`}
+            />
+          </button>
+          {showTrend && (
+            <div className="card-body pt-0">
+              <RiskTrendChart data={[...uploadedDocs]
+                .filter(d => d.score !== undefined)
+                .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
+                .map(d => ({
+                  date: new Date(d.uploadedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                  score: d.score || 0
+                }))
+              } />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Documents List */}
       <div className="card">
         <div className="card-header flex items-center justify-between">
-          <h3>Your Documents</h3>
           <div className="flex items-center gap-md">
-            {/* Search Input */}
-            <div style={{ position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <h3 className="text-base">Documents</h3>
+            {uploadedDocs.length > 0 && (
+              <span className="text-xs text-muted">
+                {filteredDocs.length} of {uploadedDocs.length}
+              </span>
+            )}
+          </div>
+          
+          {/* Compact Search & Filter */}
+          <div className="flex items-center gap-sm">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
               <input
                 type="text"
-                placeholder="Search documents..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  padding: '8px 12px 8px 36px',
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  width: 200
-                }}
+                className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border rounded-md w-40 focus:w-56 transition-all"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
                 >
                   <X size={14} />
                 </button>
               )}
             </div>
-            {/* Filter Button */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`btn btn-ghost flex items-center gap-sm ${showFilters ? 'active' : ''}`}
-              style={{ fontSize: '12px', padding: '8px 12px', background: showFilters ? 'rgba(99, 102, 241, 0.1)' : 'transparent' }}
+            
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as any)}
+              className="px-3 py-1.5 text-sm bg-primary border border-border rounded-md"
             >
-              <Filter size={14} />
-              Filter
-            </button>
+              <option value="all">All Status</option>
+              <option value="complete">Complete</option>
+              <option value="analyzing">Analyzing</option>
+              <option value="pending">Pending</option>
+            </select>
           </div>
         </div>
 
-        {/* Filter Options */}
-        {showFilters && (
-          <div style={{ padding: 'var(--spacing-md)', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-tertiary)' }}>
-            <div className="flex items-center gap-md">
-              <span className="text-xs text-muted">Status:</span>
-              {(['all', 'complete', 'analyzing', 'pending'] as const).map(status => (
-                <button
-                  key={status}
-                  onClick={() => setStatusFilter(status)}
-                  className={`btn ${statusFilter === status ? 'btn-primary' : 'btn-ghost'}`}
-                  style={{ fontSize: '11px', padding: '4px 10px', textTransform: 'capitalize' }}
-                >
-                  {status === 'all' ? 'All' : status}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="card-body">
+        <div className="card-body p-0">
           {loadingDocs ? (
-            <div className="flex items-center justify-center gap-md" style={{ padding: 'var(--spacing-xl)' }}>
-              <Loader2 size={20} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
-              <span className="text-muted">Loading documents...</span>
+            <div className="flex items-center justify-center gap-md p-xl">
+              <Loader2 size={20} className="animate-spin text-accent-primary" />
+              <span className="text-muted">Loading...</span>
             </div>
           ) : uploadedDocs.length === 0 ? (
-            <div className="text-center text-muted" style={{ padding: 'var(--spacing-xl)' }}>
-              No documents yet. Upload your first document above.
+            <div className="text-center text-muted p-xl">
+              No documents yet
             </div>
           ) : filteredDocs.length === 0 ? (
-            <div className="text-center text-muted" style={{ padding: 'var(--spacing-xl)' }}>
-              No documents match your search or filter.
+            <div className="text-center text-muted p-xl">
+              No matches found
             </div>
           ) : (
-            <div className="flex flex-col gap-md">
+            <div className="divide-y divide-border">
               {filteredDocs.map((doc, idx) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between animate-fade-in"
-                  style={{
-                    padding: 'var(--spacing-md)',
-                    background: 'var(--bg-secondary)',
-                    borderRadius: 'var(--radius-md)',
-                    animationDelay: `${idx * 0.05}s`
-                  }}
+                  className="flex items-center justify-between p-md hover:bg-secondary/50 transition-colors animate-fade-in"
+                  style={{ animationDelay: `${idx * 0.03}s` }}
                 >
-                  <div className="flex items-center gap-md">
-                    <FileText size={20} style={{ color: 'var(--accent-primary)' }} />
-                    <span>{doc.filename}</span>
+                  <div className="flex items-center gap-md min-w-0">
+                    <FileText size={18} className="text-accent-primary shrink-0" />
+                    <span className="truncate">{doc.filename}</span>
                   </div>
-                  <div className="flex items-center gap-md">
+                  
+                  <div className="flex items-center gap-md shrink-0">
                     {doc.status === 'analyzing' && (
-                      <span className="badge badge-analyzing flex items-center gap-sm">
+                      <span className="flex items-center gap-sm text-sm text-muted">
                         <Loader2 size={12} className="animate-spin" />
                         Analyzing
                       </span>
                     )}
+                    
                     {doc.status === 'complete' && (
                       <>
-                        <span className="badge badge-complete flex items-center gap-sm">
-                          <CheckCircle size={12} />
-                          Complete
-                        </span>
                         {doc.score !== undefined && (
-                          <span style={{
-                            fontWeight: 600,
-                            color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
-                          }}>
+                          <span 
+                            className="text-sm font-medium"
+                            style={{
+                              color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                            }}
+                          >
                             {Math.round(doc.score)}%
                           </span>
                         )}
-                        <Link href={`/documents/${doc.id}`} className="btn btn-ghost" style={{ fontSize: '0.75rem' }}>
-                          View Details →
+                        <Link 
+                          href={`/documents/${doc.id}`} 
+                          className="text-sm text-accent-primary hover:underline"
+                        >
+                          View →
                         </Link>
                       </>
                     )}
-                    {/* Delete Button */}
+                    
                     <button
                       onClick={() => setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })}
-                      className="btn btn-ghost"
-                      style={{ padding: '6px', color: 'var(--text-muted)' }}
-                      title="Delete document"
+                      className="p-1.5 text-muted hover:text-error transition-colors"
+                      title="Delete"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -572,37 +489,32 @@ export default function Dashboard() {
 
       {/* Delete Confirmation Modal */}
       {deleteModal.open && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0, 0, 0, 0.75)', display: 'flex',
-          alignItems: 'center', justifyContent: 'center', zIndex: 1000
-        }}>
-          <div className="card" style={{ maxWidth: 400, width: '90%' }}>
-            <div className="card-header">
-              <h3 className="flex items-center gap-sm">
-                <AlertTriangle size={20} style={{ color: 'var(--error)' }} />
-                Delete Document
-              </h3>
-            </div>
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50">
+          <div className="card w-full max-w-sm mx-4">
             <div className="card-body">
-              <p className="mb-lg">
-                Are you sure you want to delete <strong>{deleteModal.filename}</strong>? This action cannot be undone.
-              </p>
-              <div className="flex items-center gap-md justify-end">
+              <div className="flex items-start gap-sm mb-lg">
+                <AlertTriangle size={20} className="text-error shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-medium mb-xs">Delete Document?</h3>
+                  <p className="text-sm text-muted">
+                    {deleteModal.filename} will be permanently removed.
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-sm">
                 <button
                   onClick={() => setDeleteModal({ open: false, docId: '', filename: '' })}
-                  className="btn btn-ghost"
+                  className="btn btn-ghost text-sm"
                   disabled={deleting}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="btn"
-                  style={{ background: 'var(--error)', color: '#fff' }}
+                  className="btn bg-error text-white text-sm"
                   disabled={deleting}
                 >
-                  {deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete'}
+                  {deleting ? <Loader2 size={14} className="animate-spin" /> : 'Delete'}
                 </button>
               </div>
             </div>
@@ -610,59 +522,14 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Features */}
-      <div className="grid grid-3 mt-xl">
-        <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <div className="card-body">
-            <div style={{
-              width: 48, height: 48, borderRadius: 'var(--radius-md)',
-              background: 'rgba(99, 102, 241, 0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: 'var(--spacing-md)'
-            }}>
-              <FileText size={24} style={{ color: 'var(--accent-primary)' }} />
-            </div>
-            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Document Ingestion</h4>
-            <p style={{ fontSize: '0.875rem' }}>
-              Upload PDFs, meeting notes, memos, and emails for instant analysis.
-            </p>
-          </div>
+      {/* Empty state helper - only show when no documents */}
+      {uploadedDocs.length === 0 && !loadingDocs && (
+        <div className="text-center text-muted mt-xl p-xl">
+          <FileText size={48} className="mx-auto mb-md opacity-30" />
+          <p className="mb-sm">Upload your first document to get started</p>
+          <p className="text-sm opacity-60">We support PDF, TXT, MD, DOC, and DOCX files</p>
         </div>
-
-        <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <div className="card-body">
-            <div style={{
-              width: 48, height: 48, borderRadius: 'var(--radius-md)',
-              background: 'rgba(139, 92, 246, 0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: 'var(--spacing-md)'
-            }}>
-              <AlertTriangle size={24} style={{ color: 'var(--accent-secondary)' }} />
-            </div>
-            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Bias Detection</h4>
-            <p style={{ fontSize: '0.875rem' }}>
-              AI-powered detection of 15 cognitive biases with severity scoring.
-            </p>
-          </div>
-        </div>
-
-        <div className="card animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          <div className="card-body">
-            <div style={{
-              width: 48, height: 48, borderRadius: 'var(--radius-md)',
-              background: 'rgba(16, 185, 129, 0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: 'var(--spacing-md)'
-            }}>
-              <CheckCircle size={24} style={{ color: 'var(--success)' }} />
-            </div>
-            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Actionable Insights</h4>
-            <p style={{ fontSize: '0.875rem' }}>
-              Get specific recommendations to improve decision quality.
-            </p>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

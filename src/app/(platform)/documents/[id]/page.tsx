@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
     ArrowLeft, FileText, AlertTriangle, CheckCircle, XCircle,
     Loader2, ChevronRight, Lightbulb, Download, Table,
-    Terminal, PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink, Brain
+    PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink, Brain
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';
@@ -387,123 +387,103 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
     return (
         <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
-            {/* Header */}
+            {/* Clean Header */}
             <header className="flex items-center justify-between mb-xl">
                 <div className="flex items-center gap-md">
-                    <Link href="/dashboard" className="btn btn-ghost">
+                    <Link href="/dashboard" className="btn btn-ghost p-2">
                         <ArrowLeft size={20} />
                     </Link>
                     <div>
-                        <div className="flex items-center gap-md mb-sm">
-                            <FileText size={24} style={{ color: 'var(--accent-primary)' }} />
-                            <h1>{document.filename}</h1>
-                        </div>
-                        <p>
-                            Uploaded {new Date(document.uploadedAt).toLocaleString()} •
-                            {(document.fileSize / 1024).toFixed(1)} KB
+                        <h1 className="text-xl font-semibold">{document.filename}</h1>
+                        <p className="text-sm text-muted">
+                            {new Date(document.uploadedAt).toLocaleDateString()} • {(document.fileSize / 1024).toFixed(1)} KB
                         </p>
                     </div>
                 </div>
-                <span className={`badge badge-${document.status}`} style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
-                    {document.status === 'complete' && <CheckCircle size={14} style={{ marginRight: 6 }} />}
-                    {document.status}
-                </span>
-                <div className="flex gap-sm ml-md">
-                    <button
-                        onClick={runLiveScan}
-                        disabled={isScanning}
-                        className="btn btn-primary flex items-center gap-sm"
-                        style={{ background: 'var(--accent-secondary)', borderColor: 'var(--accent-secondary)' }}
-                    >
-                        {isScanning ? <Loader2 size={16} className="animate-spin" /> : <Terminal size={16} />}
-                        LIVE SCAN
-                    </button>
+                
+                <div className="flex items-center gap-sm">
+                    {document.status === 'complete' && (
+                        <span className="flex items-center gap-sm text-sm text-success">
+                            <CheckCircle size={16} />
+                            Complete
+                        </span>
+                    )}
+                    
                     {analysis && (
-                        <>
+                        <div className="flex gap-sm">
                             <button
                                 onClick={handleExport}
-                                className="btn btn-secondary flex items-center gap-sm"
-                                style={{ fontSize: '0.875rem' }}
+                                className="btn btn-secondary btn-sm flex items-center gap-sm"
                             >
-                                <Download size={16} />
-                                Export PDF
+                                <Download size={14} />
+                                PDF
                             </button>
                             <button
                                 onClick={handleCsvExport}
-                                className="btn btn-secondary flex items-center gap-sm"
-                                style={{ fontSize: '0.875rem' }}
+                                className="btn btn-secondary btn-sm flex items-center gap-sm"
                             >
-                                <Table size={16} />
-                                Export CSV
+                                <Table size={14} />
+                                CSV
                             </button>
-                        </>
+                        </div>
                     )}
                 </div>
             </header>
 
-            {/* Analysis Summary */}
+            {/* Compact Stats Bar */}
             {analysis && (
-                <div className="grid grid-2 lg:grid-4 mb-xl gap-md">
-                    {/* 1. Decision Quality */}
-                    <div className="card animate-fade-in">
-                        <div className="card-body text-center p-md">
-                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Decision Quality</div>
-                            <div style={{
-                                fontSize: '2.5rem', fontWeight: 800,
+                <div className="flex flex-wrap gap-md mb-xl p-md bg-secondary/50 rounded-lg">
+                    {/* Quality Score */}
+                    <div className="flex items-center gap-sm">
+                        <span className="text-sm text-muted">Quality:</span>
+                        <span 
+                            className="text-lg font-bold"
+                            style={{
                                 color: analysis.overallScore >= 70 ? 'var(--success)' :
                                     analysis.overallScore >= 40 ? 'var(--warning)' : 'var(--error)'
-                            }}>
-                                {Math.round(analysis.overallScore)}
-                            </div>
-                            <div className="text-xs text-muted">out of 100</div>
-                        </div>
+                            }}
+                        >
+                            {Math.round(analysis.overallScore)}/100
+                        </span>
                     </div>
-
-                    {/* 2. Noise & Variance */}
-                    <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                        <div className="card-body text-center p-md">
-                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Noise Risk</div>
-                            <div style={{
-                                fontSize: '2.5rem', fontWeight: 800,
-                                color: analysis.noiseScore <= 30 ? 'var(--success)' :
-                                    analysis.noiseScore <= 60 ? 'var(--warning)' : 'var(--error)'
-                            }}>
-                                {Math.round(analysis.noiseScore)}%
-                            </div>
-                            <div className="text-xs text-muted">
-                                {analysis.noiseStats ? `σ=${analysis.noiseStats.stdDev} (3 Judges)` : 'Unknown Variance'}
-                            </div>
-                        </div>
+                    
+                    <div className="w-px h-6 bg-border" />
+                    
+                    {/* Noise */}
+                    <div className="flex items-center gap-sm">
+                        <span className="text-sm text-muted">Noise:</span>
+                        <span className="text-sm">{Math.round(analysis.noiseScore)}%</span>
                     </div>
-
-                    {/* 3. Logical Fact Check */}
-                    <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                        <div className="card-body text-center p-md">
-                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Truth Score</div>
-                            <div style={{
-                                fontSize: '2.5rem', fontWeight: 800,
-                                color: (analysis.factCheck?.score || 0) >= 80 ? 'var(--success)' : 'var(--warning)'
-                            }}>
-                                {analysis.factCheck ? Math.round(analysis.factCheck.score) : '--'}%
-                            </div>
-                            <div className="text-xs text-muted">
-                                {analysis.factCheck?.flags.length || 0} Flags Detected
-                            </div>
-                        </div>
+                    
+                    <div className="w-px h-6 bg-border" />
+                    
+                    {/* Fact Check */}
+                    <div className="flex items-center gap-sm">
+                        <span className="text-sm text-muted">Truth:</span>
+                        <span className="text-sm">
+                            {analysis.factCheck ? `${Math.round(analysis.factCheck.score)}%` : '--'}
+                        </span>
                     </div>
-
-                    {/* 4. Bias & Compliance */}
-                    <div className="card animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                        <div className="card-body text-center p-md">
-                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Compliance</div>
-                            <div className={`badge ${analysis.compliance?.status === 'FAIL' ? 'badge-critical' : analysis.compliance?.status === 'WARN' ? 'badge-warning' : 'badge-success'}`} style={{ fontSize: '1.25rem', margin: '0.5rem 0' }}>
-                                {analysis.compliance?.status || 'PENDING'}
-                            </div>
-                            <div className="text-xs text-muted">
-                                {biases.length} Biases Detected
-                            </div>
-                        </div>
+                    
+                    <div className="w-px h-6 bg-border" />
+                    
+                    {/* Biases */}
+                    <div className="flex items-center gap-sm">
+                        <span className="text-sm text-muted">Biases:</span>
+                        <span className="text-sm">{biases.length}</span>
                     </div>
+                    
+                    <div className="flex-1" />
+                    
+                    {/* Re-scan Button */}
+                    <button
+                        onClick={runLiveScan}
+                        disabled={isScanning}
+                        className="btn btn-primary btn-sm flex items-center gap-sm"
+                    >
+                        {isScanning ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                        Re-scan
+                    </button>
                 </div>
             )}
 
@@ -672,50 +652,28 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 {/* Left Column: Analysis Views */}
                 <div className="flex flex-col gap-lg">
 
-                    {/* Tabs Header */}
-                    <div className="flex items-center gap-md border-b border-border mb-md">
-                        <button
-                            onClick={() => setActiveTab('overview')}
-                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'overview' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
-                        >
-                            Overview & Biases
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('logic')}
-                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'logic' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
-                        >
-                            Logical Fallacies
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('swot')}
-                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'swot' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
-                        >
-                            Strategic SWOT
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('noise')}
-                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'noise' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
-                        >
-                            Noise & Benchmarks
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('simulator')}
-                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'simulator' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
-                        >
-                            Simulator
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('boardroom')}
-                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'boardroom' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
-                        >
-                            Virtual Board
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('red-team')}
-                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'red-team' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
-                        >
-                            Red Team (Diversity)
-                        </button>
+                    {/* Clean Tabs */}
+                    <div className="flex flex-wrap gap-xs border-b border-border mb-lg">
+                        {[
+                            { id: 'overview', label: 'Overview', icon: Brain },
+                            { id: 'logic', label: 'Logic', icon: CheckCircle },
+                            { id: 'swot', label: 'SWOT', icon: Lightbulb },
+                            { id: 'noise', label: 'Noise', icon: Info },
+                            { id: 'simulator', label: 'Simulator', icon: PlayCircle },
+                        ].map(tab => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as any)}
+                                className={`flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                                    activeTab === tab.id 
+                                        ? 'text-accent-primary border-accent-primary bg-accent-primary/5' 
+                                        : 'text-muted border-transparent hover:text-primary hover:border-border'
+                                }`}
+                            >
+                                <tab.icon size={14} />
+                                {tab.label}
+                            </button>
+                        ))}
                     </div>
 
                     {/* Tab Content */}
