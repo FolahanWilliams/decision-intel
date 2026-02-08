@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
     ArrowLeft, FileText, AlertTriangle, CheckCircle, XCircle,
     Loader2, ChevronRight, Lightbulb, Download, Table,
-    PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink, Brain
+    Terminal, PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink, Brain
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';

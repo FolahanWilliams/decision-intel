@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, Filter, X, ChevronRight } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { SSEReader } from '@/lib/sse';
 import { RiskTrendChart } from './RiskTrendChart';
@@ -42,7 +42,6 @@ export default function Dashboard() {
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>('all');
-  const [showFilters, setShowFilters] = useState(false);
   const [showTrend, setShowTrend] = useState(false);
 
   // Delete confirmation state
