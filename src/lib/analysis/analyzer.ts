@@ -98,7 +98,8 @@ export async function analyzeDocument(
                                 confidence: bias.confidence || 0.0
                             }))
                         }
-                    }
+                    },
+                    select: { id: true } // Only return ID to avoid selecting non-existent columns (P2022)
                 });
             } else {
                 throw dbError; // Rethrow other errors
