@@ -6,6 +6,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel }
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, COGNITIVE_DIVERSITY_PROMPT, INSTITUTIONAL_MEMORY_PROMPT, COMPLIANCE_CHECKER_PROMPT, LINGUISTIC_ANALYSIS_PROMPT, STRATEGIC_ANALYSIS_PROMPT } from "./prompts";
 import { searchSimilarDocuments } from "../rag/embeddings";
 import { executeDataRequests, DataRequest } from "../tools/financial";
+import { getRequiredEnvVar } from '../env';
 
 // ============================================================
 // AI MODEL CONFIGURATION
@@ -18,11 +19,8 @@ let groundedModelInstance: GenerativeModel | null = null;
 function getModel(): GenerativeModel {
     if (modelInstance) return modelInstance;
 
-    if (!process.env.GOOGLE_API_KEY) {
-        throw new Error("Missing GOOGLE_API_KEY env variable");
-    }
-
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+    const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
+    const genAI = new GoogleGenerativeAI(apiKey);
     // Using gemini-3-flash-preview - cost-effective model for analysis tasks
     modelInstance = genAI.getGenerativeModel({
         model: "models/gemini-3-flash-preview",
@@ -45,11 +43,8 @@ function getModel(): GenerativeModel {
 function getGroundedModel(): GenerativeModel {
     if (groundedModelInstance) return groundedModelInstance;
 
-    if (!process.env.GOOGLE_API_KEY) {
-        throw new Error("Missing GOOGLE_API_KEY env variable");
-    }
-
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+    const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
+    const genAI = new GoogleGenerativeAI(apiKey);
     groundedModelInstance = genAI.getGenerativeModel({
         model: "models/gemini-3-flash-preview",
         tools: [
@@ -289,9 +284,8 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         const analysisText = analysisResult.response?.text ? analysisResult.response.text() : "";
         const analysis = parseJSON(analysisText);
 
-        const primaryTicker = analysis?.primaryTicker || null;
-        if (primaryTicker) console.log(`Identified primary ticker: ${primaryTicker}`);
         const companyName = analysis?.primaryTopic || null;
+        if (companyName) console.log(`Identified primary topic: ${companyName}`);
         const claims = analysis?.claims || [];
         const dataRequests = analysis?.dataRequests || [];
 

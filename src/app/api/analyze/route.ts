@@ -4,7 +4,7 @@ import { BiasDetectionResult } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 
-const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY;
+const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY?.trim();
 
 // Allow longer processing times for AI analysis
 export const maxDuration = 300;
@@ -24,12 +24,11 @@ export async function POST(request: NextRequest) {
         const apiKey = request.headers.get('x-extension-key');
         let effectiveUserId = userId;
 
-        // Secure check: ensure EXTENSION_API_KEY is defined before comparing
-        if (!effectiveUserId && EXTENSION_API_KEY && apiKey === EXTENSION_API_KEY) {
-            // Check if EXTENSION_API_KEY is empty or default
-            if (EXTENSION_API_KEY.trim().length === 0) {
-                console.error('Security Risk: EXTENSION_API_KEY is empty.');
-                return NextResponse.json({ error: 'Server Configuration Error' }, { status: 500 });
+        // Secure check: ensure EXTENSION_API_KEY is defined and not empty before comparing
+        if (!effectiveUserId && EXTENSION_API_KEY && EXTENSION_API_KEY.length > 0) {
+            if (apiKey !== EXTENSION_API_KEY) {
+                console.error('Unauthorized: Invalid API key provided');
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
             }
             const extUserId = request.headers.get('x-extension-user-id');
             effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';
@@ -106,9 +105,7 @@ export async function POST(request: NextRequest) {
             errorMessage.includes('blocked');
 
         if (isHealableError) {
-            if (isHealableError) {
-                console.warn(`⚠️ Healable error detected: ${errorMessage}`);
-            }
+            console.warn(`⚠️ Healable error detected: ${errorMessage}`);
         }
 
         return NextResponse.json({

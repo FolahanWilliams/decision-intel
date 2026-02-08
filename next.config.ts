@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
       }
     ];
   },
-  serverExternalPackages: ['pdf-parse'],
+  // Note: pdf-parse removed - not in dependencies
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',

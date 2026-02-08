@@ -247,15 +247,20 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             });
 
             // Log Audit Event (Non-blocking)
-            fetch('/api/audit', {
-                method: 'POST',
-                body: JSON.stringify({
+            try {
+                const auditPayload = JSON.stringify({
                     action: 'EXPORT_PDF',
                     resource: 'Document',
                     resourceId: document.id,
                     details: { filename: document.filename }
-                })
-            }).catch(e => console.error('Audit log failed', e));
+                });
+                fetch('/api/audit', {
+                    method: 'POST',
+                    body: auditPayload
+                }).catch(e => console.error('Audit log failed', e));
+            } catch (stringifyError) {
+                console.error('Failed to stringify audit payload:', stringifyError);
+            }
 
             showToast('PDF report generated successfully', 'success');
         } catch (error) {
@@ -639,7 +644,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                                     style={{ color: 'var(--accent-primary)' }}
                                                 >
                                                     <ExternalLink size={10} />
-                                                    Evidence Source: {new URL(v.sourceUrl).hostname}
+                                                    Evidence Source: {(() => {
+                                                        try {
+                                                            return new URL(v.sourceUrl).hostname;
+                                                        } catch {
+                                                            return 'External Source';
+                                                        }
+                                                    })()}
                                                 </a>
                                             )}
                                         </div>

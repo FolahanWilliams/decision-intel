@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { safeJsonClone } from '@/lib/utils/json';
-import { Document, Prisma } from '@prisma/client';
+import { toPrismaJson } from '@/lib/utils/prisma-json';
+import { Document } from '@prisma/client';
 
 export interface ProgressUpdate {
     type: 'step' | 'bias' | 'noise' | 'summary' | 'complete' | 'error';
@@ -35,12 +36,7 @@ export async function analyzeDocument(
         documentId = document.id;
     }
 
-    // Update status to analyzing
-    await prisma.document.update({
-        where: { id: documentId },
-        data: { status: 'analyzing' }
-    });
-
+    // Run analysis within a transaction for atomicity
     try {
         const result = await runAnalysis(document.content, documentId, (update) => {
             if (onProgress) onProgress(update);
@@ -49,46 +45,16 @@ export async function analyzeDocument(
         // Store analysis in database with Schema Drift Protection
         const foundBiases = result.biases.filter(b => b.found);
 
-        try {
-            await prisma.analysis.create({
-                data: {
-                    documentId,
-                    overallScore: result.overallScore,
-                    noiseScore: result.noiseScore,
-                    summary: result.summary,
-                    biases: {
-                        create: foundBiases.map(bias => ({
-                            biasType: bias.biasType,
-                            severity: bias.severity,
-                            excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                            explanation: bias.explanation || '',
-                            suggestion: bias.suggestion || '',
-                            confidence: bias.confidence || 0.0
-                        }))
-                    },
-                    // New Fields (May cause P2022 if DB not migrated)
-                    structuredContent: result.structuredContent || '',
-                    noiseStats: (result.noiseStats ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    factCheck: (result.factCheck ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    compliance: (result.compliance ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    preMortem: (result.preMortem ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    sentiment: (result.sentiment ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    speakers: result.speakers || [],
-                    // Phase 4 Extensions
-                    logicalAnalysis: (result.logicalAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    swotAnalysis: (result.swotAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    cognitiveAnalysis: (result.cognitiveAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    simulation: (result.simulation ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    institutionalMemory: (result.institutionalMemory ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue
-                }
+        // Use transaction to ensure atomicity
+        await prisma.$transaction(async (tx) => {
+            // Update status to analyzing
+            await tx.document.update({
+                where: { id: documentId },
+                data: { status: 'analyzing' }
             });
-        } catch (dbError: any) {
-            // Check for "Column does not exist" error (P2021, P2022)
-            if (dbError.code === 'P2021' || dbError.code === 'P2022' || dbError.message?.includes('does not exist')) {
-                console.warn('⚠️ Schema drift detected. Retrying save with CORE fields only.', dbError.code);
 
-                // Fallback: Save only what the old schema supports
-                await prisma.analysis.create({
+            try {
+                await tx.analysis.create({
                     data: {
                         documentId,
                         overallScore: result.overallScore,
@@ -103,19 +69,58 @@ export async function analyzeDocument(
                                 suggestion: bias.suggestion || '',
                                 confidence: bias.confidence || 0.0
                             }))
-                        }
-                    },
-                    select: { id: true } // Only return ID to avoid selecting non-existent columns (P2022)
+                        },
+                        // New Fields (May cause P2022 if DB not migrated)
+                        structuredContent: result.structuredContent || '',
+                        noiseStats: toPrismaJson(result.noiseStats),
+                        factCheck: toPrismaJson(result.factCheck),
+                        compliance: toPrismaJson(result.compliance),
+                        preMortem: toPrismaJson(result.preMortem),
+                        sentiment: toPrismaJson(result.sentiment),
+                        speakers: result.speakers || [],
+                        // Phase 4 Extensions
+                        logicalAnalysis: toPrismaJson(result.logicalAnalysis),
+                        swotAnalysis: toPrismaJson(result.swotAnalysis),
+                        cognitiveAnalysis: toPrismaJson(result.cognitiveAnalysis),
+                        simulation: toPrismaJson(result.simulation),
+                        institutionalMemory: toPrismaJson(result.institutionalMemory)
+                    }
                 });
-            } else {
-                throw dbError; // Rethrow other errors
-            }
-        }
+            } catch (dbError: any) {
+                // Check for "Column does not exist" error (P2021, P2022)
+                if (dbError.code === 'P2021' || dbError.code === 'P2022' || dbError.message?.includes('does not exist')) {
+                    console.warn('⚠️ Schema drift detected. Retrying save with CORE fields only.', dbError.code);
 
-        // Update document status
-        await prisma.document.update({
-            where: { id: documentId },
-            data: { status: 'complete' }
+                    // Fallback: Save only what the old schema supports
+                    await tx.analysis.create({
+                        data: {
+                            documentId,
+                            overallScore: result.overallScore,
+                            noiseScore: result.noiseScore,
+                            summary: result.summary,
+                            biases: {
+                                create: foundBiases.map(bias => ({
+                                    biasType: bias.biasType,
+                                    severity: bias.severity,
+                                    excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                                    explanation: bias.explanation || '',
+                                    suggestion: bias.suggestion || '',
+                                    confidence: bias.confidence || 0.0
+                                }))
+                            }
+                        },
+                        select: { id: true } // Only return ID to avoid selecting non-existent columns (P2022)
+                    });
+                } else {
+                    throw dbError; // Rethrow other errors
+                }
+            }
+
+            // Update document status to complete
+            await tx.document.update({
+                where: { id: documentId },
+                data: { status: 'complete' }
+            });
         });
 
         // Store embedding for RAG (non-blocking)

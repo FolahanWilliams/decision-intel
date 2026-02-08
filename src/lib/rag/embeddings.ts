@@ -7,9 +7,17 @@
 
 import { prisma } from '@/lib/prisma';
 import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
+import { getRequiredEnvVar } from '@/lib/env';
 
-// Initialize Gemini - use same env var as nodes.ts for consistency
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
+// Lazy initialization of Gemini client
+let genAI: GoogleGenerativeAI | null = null;
+function getGenAI(): GoogleGenerativeAI {
+    if (!genAI) {
+        const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
+        genAI = new GoogleGenerativeAI(apiKey);
+    }
+    return genAI;
+}
 
 // Embedding model - using gemini-embedding-001 which supports dimensionality reduction
 const EMBEDDING_MODEL = 'models/gemini-embedding-001';
@@ -29,7 +37,7 @@ interface EmbeddingMetadata {
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
     try {
-        const model = genAI.getGenerativeModel({ model: EMBEDDING_MODEL });
+        const model = getGenAI().getGenerativeModel({ model: EMBEDDING_MODEL });
 
         // Truncate text to avoid token limits (roughly 8k tokens ~ 32k chars)
         const truncatedText = text.slice(0, 30000);
@@ -41,11 +49,17 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         } as any);
         const embedding = result.embedding.values;
 
+        // Validate embedding
+        if (!embedding || !Array.isArray(embedding) || embedding.length !== 1536) {
+            throw new Error(`Invalid embedding generated: expected 1536 dimensions, got ${embedding?.length}`);
+        }
+
         return embedding;
     } catch (error) {
-        console.warn('⚠️ Embedding generation failed. Using zero-vector fallback to preserve system stability.', error);
-        // Return zero vector of length 1536 to match DB schema
-        return new Array(1536).fill(0);
+        console.error('❌ Embedding generation failed:', error);
+        // CRITICAL: Do not return zero vectors silently - this causes incorrect similarity search results
+        // Instead, throw the error to let the caller handle it appropriately
+        throw new Error(`Failed to generate embedding: ${error instanceof Error ? error.message : String(error)}`);
     }
 }
 
@@ -97,14 +111,19 @@ export async function storeAnalysisEmbedding(
         };
 
         // Use raw SQL for vector insertion since Prisma doesn't natively support vectors
+        // SECURITY: Using Prisma's parameterized queries which safely escape all inputs
+        // The embedding vector is converted to a string representation but passed as a parameter
+        const embeddingString = `[${embedding.join(',')}]`;
+        const metadataJson = JSON.stringify(metadata);
+        
         await prisma.$executeRaw`
             INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
             VALUES (
                 gen_random_uuid()::text,
                 ${documentId},
                 ${text},
-                ${`[${embedding.join(',')}]`}::vector,
-                ${JSON.stringify(metadata)}::jsonb
+                ${embeddingString}::vector,
+                ${metadataJson}::jsonb
             )
         `;
 
