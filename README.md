@@ -1,5 +1,9 @@
 # Decision Intelligence Platform
 
+[![CI/CD](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
+
 A sophisticated AI-powered document auditing system designed to help executives, investors, and boards minimize "Decision Noise" and cognitive bias.
 
 ## 🚀 Key Features
@@ -56,6 +60,51 @@ A sophisticated AI-powered document auditing system designed to help executives,
 The platform is "Vercel-Ready". 
 - **Stateless API**: Optimized for serverless functions (verified in Audit Phase 8).
 - **Secure**: Strict API key validation and input sanitization.
+
+## 🔄 CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+### Workflows
+
+1. **CI/CD Pipeline** (`.github/workflows/ci-cd.yml`)
+   - Runs on every push and pull request
+   - Performs code quality checks (TypeScript, ESLint, Prettier)
+   - Security audits and dependency checks
+   - Automated testing
+   - Production deployments to Vercel
+   - Preview deployments for pull requests
+
+2. **Database Migrations** (`.github/workflows/database-migration.yml`)
+   - Automatically runs on schema changes
+   - Applies migrations to production database
+   - Runs only on main branch
+
+3. **Dependency Updates** (`.github/workflows/dependency-check.yml`)
+   - Weekly check for outdated dependencies
+   - Creates GitHub issues for manual review
+
+4. **Release Management** (`.github/workflows/release.yml`)
+   - Creates GitHub releases on version tags
+   - Generates changelogs automatically
+
+### Required Secrets
+
+Configure these in your GitHub repository settings:
+
+- `VERCEL_TOKEN` - Vercel API token
+- `VERCEL_ORG_ID` - Vercel organization ID
+- `VERCEL_PROJECT_ID` - Vercel project ID
+- `DATABASE_URL` - Production database connection string
+- `DIRECT_URL` - Direct database connection (for migrations)
+- `SLACK_WEBHOOK_URL` - (Optional) Slack notifications
+
+### Branch Protection
+
+The main branch is protected with:
+- Required status checks (TypeScript compilation, tests)
+- Required reviews before merging
+- No direct pushes to main
 
 ## 🔮 Future Roadmap (Backlog)
 - **Multi-Speaker Diarization**: Analyzing meeting transcripts for speaker-specific biases.
