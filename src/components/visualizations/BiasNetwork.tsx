@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 interface BiasNode {
   id: string;
@@ -58,6 +58,8 @@ const categoryColors: Record<string, string> = {
 };
 
 export function BiasNetwork({ biases }: BiasNetworkProps) {
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+
   const { nodes, connections } = useMemo(() => {
     if (!biases || biases.length === 0) {
       return { nodes: [], connections: [] };
@@ -67,8 +69,8 @@ export function BiasNetwork({ biases }: BiasNetworkProps) {
     const nodeList: BiasNode[] = biases.map((bias, index) => {
       // Calculate position in a circular layout
       const angle = (index / biases.length) * 2 * Math.PI - Math.PI / 2;
-      const radius = 150;
-      
+      const radius = 120; // Slightly smaller radius to fit padding
+
       return {
         id: bias.biasType,
         name: bias.biasType,
@@ -85,14 +87,14 @@ export function BiasNetwork({ biases }: BiasNetworkProps) {
       const related = biasRelationships[node.id] || [];
       related.forEach((relatedBias, idx) => {
         const targetNode = nodeList.find(n => n.id === relatedBias || n.name === relatedBias);
-        if (targetNode && !connectionList.find(c => 
+        if (targetNode && !connectionList.find(c =>
           (c.from === node.id && c.to === targetNode.id) ||
           (c.from === targetNode.id && c.to === node.id)
         )) {
           connectionList.push({
             from: node.id,
             to: targetNode.id,
-            strength: 0.7 - (idx * 0.1),
+            strength: 0.8 - (idx * 0.15), // Stranger visual strength differentiation
           });
         }
       });
@@ -109,100 +111,173 @@ export function BiasNetwork({ biases }: BiasNetworkProps) {
     );
   }
 
+  const selectedNode = selectedNodeId ? nodes.find(n => n.id === selectedNodeId) : null;
+
   return (
-    <div className="relative">
-      <svg width="400" height="400" className="mx-auto">
-        {/* Draw connections */}
-        {connections.map((conn, idx) => {
-          const fromNode = nodes.find(n => n.id === conn.from);
-          const toNode = nodes.find(n => n.id === conn.to);
-          if (!fromNode || !toNode) return null;
+    <div className="flex flex-col h-full">
+      <div className="relative flex-1 min-h-[400px] flex items-center justify-center bg-gradient-to-b from-transparent to-black/20 rounded-lg">
+        <svg viewBox="0 0 400 400" className="w-full h-full max-w-[500px] max-h-[500px]">
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="28" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#666" fillOpacity="0.5" />
+            </marker>
+          </defs>
 
-          return (
-            <line
-              key={idx}
-              x1={fromNode.x}
-              y1={fromNode.y}
-              x2={toNode.x}
-              y2={toNode.y}
-              stroke="rgba(255,255,255,0.2)"
-              strokeWidth={conn.strength * 3}
-              strokeDasharray="4,4"
-            />
-          );
-        })}
+          {/* Draw connections */}
+          {connections.map((conn, idx) => {
+            const fromNode = nodes.find(n => n.id === conn.from);
+            const toNode = nodes.find(n => n.id === conn.to);
+            if (!fromNode || !toNode) return null;
 
-        {/* Draw nodes */}
-        {nodes.map((node, idx) => (
-          <g key={node.id}>
-            {/* Node circle */}
-            <circle
-              cx={node.x}
-              cy={node.y}
-              r={25}
-              fill={severityColors[node.severity]}
-              fillOpacity={0.2}
-              stroke={severityColors[node.severity]}
-              strokeWidth={2}
-              className="cursor-pointer transition-all hover:fill-opacity-40"
-            />
-            
-            {/* Category indicator */}
-            <circle
-              cx={node.x + 15}
-              cy={node.y - 15}
-              r={6}
-              fill={categoryColors[node.category]}
-            />
+            const isRelated = selectedNodeId
+              ? (conn.from === selectedNodeId || conn.to === selectedNodeId)
+              : true;
 
-            {/* Label */}
-            <text
-              x={node.x}
-              y={node.y + 40}
-              textAnchor="middle"
-              fill="rgba(255,255,255,0.8)"
-              fontSize="10"
-              fontWeight="500"
-            >
-              {node.name.length > 15 ? node.name.substring(0, 15) + '...' : node.name}
-            </text>
-          </g>
-        ))}
-      </svg>
+            const opacity = selectedNodeId ? (isRelated ? 0.8 : 0.1) : 0.4;
+            const width = isRelated ? conn.strength * 4 : 1;
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-4 mt-4 justify-center text-xs">
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500" />
-          <span className="text-muted">Low</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500" />
-          <span className="text-muted">Medium</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500" />
-          <span className="text-muted">High</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-red-600/20 border border-red-600" />
-          <span className="text-muted">Critical</span>
-        </div>
+            return (
+              <line
+                key={idx}
+                x1={fromNode.x}
+                y1={fromNode.y}
+                x2={toNode.x}
+                y2={toNode.y}
+                stroke="currentColor"
+                className={isRelated ? "text-accent-primary" : "text-muted"}
+                strokeOpacity={opacity}
+                strokeWidth={width}
+                strokeDasharray={isRelated ? "none" : "4,4"}
+              />
+            );
+          })}
+
+          {/* Draw nodes */}
+          {nodes.map((node, idx) => {
+            const isSelected = selectedNodeId === node.id;
+            const isDimmed = selectedNodeId && !isSelected &&
+              !connections.some(c => (c.from === selectedNodeId && c.to === node.id) || (c.from === node.id && c.to === selectedNodeId));
+
+            return (
+              <g
+                key={node.id}
+                onClick={() => setSelectedNodeId(isSelected ? null : node.id)}
+                className="cursor-pointer transition-all duration-300"
+                style={{ opacity: isDimmed ? 0.2 : 1 }}
+              >
+                {/* Glow effect for selected */}
+                {isSelected && (
+                  <circle
+                    cx={node.x}
+                    cy={node.y}
+                    r={35}
+                    fill={severityColors[node.severity]}
+                    fillOpacity={0.1}
+                    className="animate-pulse"
+                  />
+                )}
+
+                {/* Node circle */}
+                <circle
+                  cx={node.x}
+                  cy={node.y}
+                  r={isSelected ? 28 : 24}
+                  fill={severityColors[node.severity]}
+                  fillOpacity={0.2}
+                  stroke={severityColors[node.severity]}
+                  strokeWidth={isSelected ? 3 : 2}
+                  className="transition-all duration-300 hover:fill-opacity-40"
+                />
+
+                {/* Category indicator dot */}
+                <circle
+                  cx={node.x + (isSelected ? 18 : 15)}
+                  cy={node.y - (isSelected ? 18 : 15)}
+                  r={6}
+                  fill={categoryColors[node.category]}
+                  stroke="#1a1a1a"
+                  strokeWidth={2}
+                />
+
+                {/* Icon/Letter */}
+                <text
+                  x={node.x}
+                  y={node.y}
+                  dy="0.3em"
+                  textAnchor="middle"
+                  fill="rgba(255,255,255,0.9)"
+                  fontSize="14"
+                  fontWeight="bold"
+                  pointerEvents="none"
+                >
+                  {node.name.charAt(0)}
+                </text>
+
+                {/* Label */}
+                <text
+                  x={node.x}
+                  y={node.y + 45}
+                  textAnchor="middle"
+                  fill={isSelected ? "#fff" : "rgba(255,255,255,0.7)"}
+                  fontSize={isSelected ? "12" : "10"}
+                  fontWeight={isSelected ? "700" : "500"}
+                  className="select-none pointer-events-none"
+                >
+                  {node.name.length > 20 && !isSelected ? node.name.substring(0, 18) + '...' : node.name}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+
+        {/* Instructions Overlay if nothing selected */}
+        {!selectedNodeId && (
+          <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
+            <span className="text-[10px] text-muted bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm border border-white/5">
+              Click a node to explore relationships
+            </span>
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-wrap gap-4 mt-2 justify-center text-xs">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-indigo-500" />
-          <span className="text-muted">Cognitive</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-pink-500" />
-          <span className="text-muted">Emotional</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-violet-500" />
-          <span className="text-muted">Social</span>
-        </div>
+      {/* Details Panel */}
+      <div className={`mt-4 transition-all duration-300 ${selectedNodeId ? 'opacity-100 max-h-48' : 'opacity-50 max-h-12 overflow-hidden'}`}>
+        {selectedNode ? (
+          <div className="p-4 rounded-lg bg-secondary/40 border border-border">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-semibold text-lg flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: severityColors[selectedNode.severity] }} />
+                {selectedNode.name}
+              </h4>
+              <span className="text-xs px-2 py-0.5 rounded-full border border-white/10 uppercase" style={{ color: categoryColors[selectedNode.category] }}>
+                {selectedNode.category}
+              </span>
+            </div>
+            <p className="text-sm text-muted">
+              This bias is often linked to
+              {connections.filter(c => c.from === selectedNode.id || c.to === selectedNode.id).length > 0 ? (
+                <span className="text-foreground ml-1">
+                  {connections
+                    .filter(c => c.from === selectedNode.id || c.to === selectedNode.id)
+                    .map(c => {
+                      const otherId = c.from === selectedNode.id ? c.to : c.from;
+                      return nodes.find(n => n.id === otherId)?.name;
+                    })
+                    .join(', ')}
+                </span>
+              ) : (
+                <span className="italic ml-1">no other detected biases in this document</span>
+              )}.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-4 justify-center text-xs mt-2 border-t border-white/5 pt-4">
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500" /> <span className="text-muted">Low</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500" /> <span className="text-muted">Medium</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500" /> <span className="text-muted">High</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-600/20 border border-red-600" /> <span className="text-muted">Critical</span></div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-
+import { useState } from 'react';
 
 
 interface Bias {
@@ -15,45 +15,42 @@ interface BiasHeatmapProps {
 }
 
 export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
+    const [selectedBiasIndex, setSelectedBiasIndex] = useState<number | null>(null);
+
+    // Click outside handler could be added here for polish, but for now simple toggle is fine
+
     if (!content) return null;
 
     // Map severity to colors
-    const getSeverityColor = (severity: string) => {
+    const getSeverityColor = (severity: string, isSelected: boolean) => {
+        const base = isSelected ? 'ring-2 ring-offset-1 ring-offset-accents-2' : '';
         switch (severity.toLowerCase()) {
-            case 'critical': return 'bg-red-500/30 hover:bg-red-500/50 border-b-2 border-red-500 cursor-help';
-            case 'high': return 'bg-orange-500/30 hover:bg-orange-500/50 border-b-2 border-orange-500 cursor-help';
-            case 'medium': return 'bg-yellow-500/30 hover:bg-yellow-500/50 border-b-2 border-yellow-500 cursor-help';
-            default: return 'bg-blue-500/30 hover:bg-blue-500/50 border-b-2 border-blue-500 cursor-help';
+            case 'critical': return `${base} bg-red-500/30 hover:bg-red-500/50 border-b-2 border-red-500 cursor-help`;
+            case 'high': return `${base} bg-orange-500/30 hover:bg-orange-500/50 border-b-2 border-orange-500 cursor-help`;
+            case 'medium': return `${base} bg-yellow-500/30 hover:bg-yellow-500/50 border-b-2 border-yellow-500 cursor-help`;
+            default: return `${base} bg-blue-500/30 hover:bg-blue-500/50 border-b-2 border-blue-500 cursor-help`;
         }
     };
 
-    // We need to construct an array of text segments and bias objects
+    // Construct text segments
     let parts: { text: string; bias?: Bias }[] = [{ text: content }];
-
     biases.forEach(bias => {
         if (!bias.excerpt) return;
         const newParts: { text: string; bias?: Bias }[] = [];
-
         parts.forEach(part => {
             if (part.bias) {
-                newParts.push(part); // Already processed/highlighted
+                newParts.push(part);
             } else {
-                // Try to split this text part by the current bias excerpt
-                // Note: String.split(string) replaces ALL occurrences. 
-                // To be safer, we might want to split only the first one if we knew position, but we don't.
-                // For this MVP, highlighting all occurrences of the exact excerpt phrase is acceptable behavior 
-                // (if the phrase appears multiple times, it's likely biased multiple times).
                 const split = part.text.split(bias.excerpt);
                 if (split.length > 1) {
-                    // Found a match (or multiple)
                     split.forEach((fragment, i) => {
                         if (fragment) newParts.push({ text: fragment });
                         if (i < split.length - 1) {
-                            newParts.push({ text: bias.excerpt, bias: bias }); // Insert the highlight
+                            newParts.push({ text: bias.excerpt, bias: bias });
                         }
                     });
                 } else {
-                    newParts.push(part); // No match
+                    newParts.push(part);
                 }
             }
         });
@@ -75,19 +72,45 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                 </div>
             </div>
             <div className="card-body flex-1 overflow-y-auto" style={{ maxHeight: '600px' }}>
-                <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-wrap font-serif p-4 bg-muted/30 rounded-lg">
+                <div
+                    className="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-wrap font-serif p-4 bg-muted/30 rounded-lg relative"
+                    onClick={() => setSelectedBiasIndex(null)} // Click background to deselect
+                >
                     {parts.map((part, i) => (
                         part.bias ? (
-                            <div key={i} className="group inline relative">
-                                <span className={`px-0.5 rounded-sm transition-colors ${getSeverityColor(part.bias.severity)}`}>
+                            <div
+                                key={i}
+                                className="group inline relative"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedBiasIndex(selectedBiasIndex === i ? null : i);
+                                }}
+                            >
+                                <span className={`px-0.5 rounded-sm transition-all duration-200 ${getSeverityColor(part.bias.severity, selectedBiasIndex === i)}`}>
                                     {part.text}
                                 </span>
-                                {/* Custom CSS Tooltip */}
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-gray-900/95 text-white text-xs rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 backdrop-blur-sm border border-white/10">
-                                    <p className="font-bold text-yellow-400 mb-1">{part.bias.biasType}</p>
-                                    <p className="text-gray-300 mb-2">{part.bias.explanation}</p>
-                                    <div className="p-2 bg-white/10 rounded">
-                                        <span className="font-semibold text-blue-300 block mb-0.5">💡 Suggestion:</span>
+
+                                {/* Tooltip - Visible on Hover OR Selection */}
+                                <div className={`
+                                    absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-4 
+                                    bg-gray-900/95 text-white text-xs rounded-lg shadow-xl 
+                                    transition-all duration-200 pointer-events-none z-50 backdrop-blur-sm border border-white/10
+                                    ${selectedBiasIndex === i ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'}
+                                `}>
+                                    <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
+                                        <p className="font-bold text-yellow-400 text-sm">{part.bias.biasType}</p>
+                                        <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase font-bold
+                                            ${part.bias.severity === 'critical' ? 'bg-red-500/20 text-red-400' :
+                                                part.bias.severity === 'high' ? 'bg-orange-500/20 text-orange-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                                            {part.bias.severity}
+                                        </span>
+                                    </div>
+                                    <p className="text-gray-300 mb-3 italic">"{part.bias.excerpt}"</p>
+                                    <p className="text-gray-300 mb-3">{part.bias.explanation}</p>
+                                    <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-md">
+                                        <span className="font-semibold text-indigo-300 block mb-1 flex items-center gap-1">
+                                            <span>💡</span> Suggestion
+                                        </span>
                                         {part.bias.suggestion}
                                     </div>
                                     {/* Arrow */}
@@ -99,6 +122,11 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                         )
                     ))}
                 </div>
+            </div>
+
+            {/* Mobile Hint */}
+            <div className="p-2 text-center text-[10px] text-muted border-t border-border bg-secondary/20">
+                Tap highlighted text to pin details
             </div>
         </div>
     );

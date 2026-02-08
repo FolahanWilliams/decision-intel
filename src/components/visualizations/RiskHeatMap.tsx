@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 interface RiskHeatMapProps {
   risks: Array<{
@@ -14,20 +14,24 @@ interface RiskHeatMapProps {
 export function RiskHeatMap({ risks }: RiskHeatMapProps) {
   const gridSize = 5;
   const cellSize = 60;
+  const [selectedCell, setSelectedCell] = useState<{ impact: number; probability: number } | null>(
+    null
+  );
 
   const heatMapData = useMemo(() => {
-    const grid: (typeof risks[0] & { count: number })[][] = Array(gridSize)
+    const grid: (typeof risks[0] & { count: number; risks: typeof risks })[][] = Array(gridSize)
       .fill(null)
       .map(() => Array(gridSize).fill(null));
 
     risks.forEach(risk => {
       const impactIndex = Math.min(gridSize - 1, Math.floor((risk.impact / 100) * gridSize));
       const probIndex = Math.min(gridSize - 1, Math.floor((risk.probability / 100) * gridSize));
-      
+
       if (!grid[impactIndex][probIndex]) {
-        grid[impactIndex][probIndex] = { ...risk, count: 1 };
+        grid[impactIndex][probIndex] = { ...risk, count: 1, risks: [risk] };
       } else {
         grid[impactIndex][probIndex].count++;
+        grid[impactIndex][probIndex].risks.push(risk);
       }
     });
 
@@ -44,8 +48,22 @@ export function RiskHeatMap({ risks }: RiskHeatMapProps) {
   };
 
   const getOpacity = (count: number) => {
-    return Math.min(1, 0.3 + count * 0.2);
+    return Math.min(1, 0.4 + count * 0.15); // Adjusted opacity range
   };
+
+  const handleCellClick = (impactIndex: number, probIndex: number) => {
+    if (selectedCell?.impact === impactIndex && selectedCell?.probability === probIndex) {
+      setSelectedCell(null);
+    } else {
+      setSelectedCell({ impact: impactIndex, probability: probIndex });
+    }
+  };
+
+  const filteredRisks = useMemo(() => {
+    if (!selectedCell) return risks;
+    const cell = heatMapData[selectedCell.impact][selectedCell.probability];
+    return cell ? cell.risks : [];
+  }, [selectedCell, risks, heatMapData]);
 
   return (
     <div className="p-4">
@@ -59,13 +77,16 @@ export function RiskHeatMap({ risks }: RiskHeatMapProps) {
 
         <div>
           {/* Grid */}
-          <div 
-            className="grid gap-1"
+          <div
+            className="grid gap-1 relative"
             style={{
               gridTemplateColumns: `repeat(${gridSize}, ${cellSize}px)`,
               gridTemplateRows: `repeat(${gridSize}, ${cellSize}px)`,
             }}
           >
+            {/* Gradient Background for "Zones" */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-900/20 via-yellow-900/10 to-red-900/20 pointer-events-none rounded-lg" />
+
             {Array.from({ length: gridSize * gridSize }).map((_, idx) => {
               const row = Math.floor(idx / gridSize);
               const col = idx % gridSize;
@@ -73,23 +94,29 @@ export function RiskHeatMap({ risks }: RiskHeatMapProps) {
               const impact = ((gridSize - row) / gridSize) * 100;
               const probability = ((col + 1) / gridSize) * 100;
 
+              const isSelected = selectedCell?.impact === row && selectedCell?.probability === col;
+
               return (
                 <div
                   key={idx}
+                  onClick={() => handleCellClick(row, col)}
                   className={`
-                    relative rounded-md flex items-center justify-center
-                    transition-all duration-300 hover:scale-105
-                    ${cell ? getCellColor(impact, probability) : 'bg-secondary'}
+                    relative rounded-md flex items-center justify-center cursor-pointer
+                    transition-all duration-200 border border-transparent
+                    ${cell ? getCellColor(impact, probability) : 'hover:bg-white/5'}
+                    ${isSelected ? 'ring-2 ring-white scale-105 z-10 shadow-lg' : 'hover:scale-105 hover:z-10'}
                   `}
                   style={{
-                    opacity: cell ? getOpacity(cell.count) : 0.3,
+                    opacity: cell ? getOpacity(cell.count) : 0.1,
                   }}
-                  title={cell ? `${cell.category}: Impact ${Math.round(impact)}%, Probability ${Math.round(probability)}%` : 'No risks'}
+                  title={cell ? `${cell.count} Risks (Impact ${Math.round(impact)}%, Prob ${Math.round(probability)}%)` : 'No risks'}
                 >
                   {cell && (
-                    <span className="text-white font-bold text-sm">
-                      {cell.count > 1 ? cell.count : ''}
-                    </span>
+                    <div className="flex flex-col items-center">
+                      <span className="text-white font-bold text-lg drop-shadow-md">
+                        {cell.count}
+                      </span>
+                    </div>
                   )}
                 </div>
               );
@@ -115,42 +142,66 @@ export function RiskHeatMap({ risks }: RiskHeatMapProps) {
       {/* Legend */}
       <div className="flex justify-center gap-4 mt-6">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-emerald-700" />
+          <div className="w-3 h-3 rounded-full bg-emerald-700" />
           <span className="text-xs text-muted">Low</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-yellow-500" />
+          <div className="w-3 h-3 rounded-full bg-yellow-500" />
           <span className="text-xs text-muted">Medium</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-orange-500" />
+          <div className="w-3 h-3 rounded-full bg-orange-500" />
           <span className="text-xs text-muted">High</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-red-600" />
+          <div className="w-3 h-3 rounded-full bg-red-600" />
           <span className="text-xs text-muted">Critical</span>
         </div>
       </div>
 
       {/* Risk list */}
-      {risks.length > 0 && (
-        <div className="mt-6 space-y-2">
-          <h5 className="text-sm font-medium mb-2">Identified Risks</h5>
-          {risks.slice(0, 5).map((risk, idx) => (
-            <div key={idx} className="flex items-center justify-between p-2 rounded bg-secondary/50 text-sm">
-              <span className="truncate flex-1">{risk.category}</span>
-              <span className="text-xs text-muted ml-2">
-                I:{Math.round(risk.impact)}% P:{Math.round(risk.probability)}%
-              </span>
-            </div>
-          ))}
-          {risks.length > 5 && (
-            <p className="text-xs text-muted text-center">
-              +{risks.length - 5} more risks
-            </p>
+      <div className="mt-6 space-y-2">
+        <div className="flex items-center justify-between mb-2">
+          <h5 className="text-sm font-medium">
+            {selectedCell ? 'Risks in Selected Zone' : 'All Identified Risks'}
+          </h5>
+          {selectedCell && (
+            <button
+              onClick={() => setSelectedCell(null)}
+              className="text-xs text-accent-primary hover:underline"
+            >
+              Show All
+            </button>
           )}
         </div>
-      )}
+
+        {filteredRisks.length > 0 ? (
+          <div className="max-h-60 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+            {filteredRisks.map((risk, idx) => (
+              <div key={idx} className="p-3 rounded bg-secondary/30 border border-white/5 hover:bg-secondary/50 transition-colors">
+                <div className="flex items-start justify-between mb-1">
+                  <span className="font-medium text-sm text-foreground/90">{risk.category}</span>
+                  <div className="flex gap-1">
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-muted`}>
+                      I: {Math.round(risk.impact)}%
+                    </span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-muted`}>
+                      P: {Math.round(risk.probability)}%
+                    </span>
+                  </div>
+                </div>
+                {risk.description && (
+                  <p className="text-xs text-muted line-clamp-2">{risk.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-muted text-sm border border-dashed border-white/10 rounded">
+            No risks found in this zone.
+          </div>
+        )}
+      </div>
     </div>
   );
 }
