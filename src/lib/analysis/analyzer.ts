@@ -77,7 +77,7 @@ export async function analyzeDocument(
                     // Phase 4 Extensions
                     logicalAnalysis: (result.logicalAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     swotAnalysis: (result.swotAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    cognitiveAnalysis: (result.cognitiveAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
+                    cognitiveAnalysis: (result.cognitiveAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue as any,
                     simulation: (result.simulation ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     institutionalMemory: (result.institutionalMemory ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue
                 }
@@ -189,6 +189,7 @@ export async function runAnalysis(
         'logicalFallacyScanner': 'Logical Analysis',
         'strategicInsight': 'SWOT Analysis',
         'cognitiveDiversity': 'Cognitive Diversity (Red Team)',
+        'discoverySearch': 'Deep Search Verification (Vertex AI)',
         'marketData': 'Macroeconomic Context (BigQuery)',
         'riskScorer': 'Final Risk Scoring'
     };

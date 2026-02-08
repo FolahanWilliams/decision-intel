@@ -23,8 +23,14 @@ export interface AuditState {
         score: number;
         flags: string[];
         searchSources?: string[];
+        primaryTopic?: string;
         summary?: string;
-        verifications?: { claim: string; result: string; source?: string }[];
+        verifications?: Array<{
+            claim: string;
+            verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE';
+            explanation: string;
+            sourceUrl?: string;
+        }>;
     };
     preMortem?: {
         failureScenarios: string[];

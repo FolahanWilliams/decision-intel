@@ -1,6 +1,7 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
 import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, complianceMapperNode, cognitiveDiversityNode, decisionTwinNode, memoryRecallNode, linguisticAnalysisNode, strategicAnalysisNode } from "./nodes";
 import { marketDataNode } from "./market_data";
+import { discoverySearchNode } from "./discovery";
 import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
@@ -91,6 +92,7 @@ const workflow = new StateGraph(GraphState)
     .addNode("cognitiveDiversity", cognitiveDiversityNode)
     .addNode("decisionTwin", decisionTwinNode)
     .addNode("memoryRecall", memoryRecallNode)
+    .addNode("discoverySearch", discoverySearchNode)
     .addNode("linguisticAnalysis", linguisticAnalysisNode)
     .addNode("strategicAnalysis", strategicAnalysisNode)
     .addNode("marketData", marketDataNode)
@@ -104,6 +106,7 @@ const workflow = new StateGraph(GraphState)
     .addEdge("structurer", "factChecker")
     .addEdge("structurer", "complianceMapper")
     .addEdge("structurer", "cognitiveDiversity")
+    .addEdge("structurer", "discoverySearch")
     .addEdge("structurer", "decisionTwin")
     .addEdge("structurer", "memoryRecall")
     .addEdge("structurer", "linguisticAnalysis")
@@ -115,6 +118,7 @@ const workflow = new StateGraph(GraphState)
     .addEdge("factChecker", "riskScorer")
     .addEdge("complianceMapper", "riskScorer")
     .addEdge("cognitiveDiversity", "riskScorer")
+    .addEdge("discoverySearch", "riskScorer")
     .addEdge("decisionTwin", "riskScorer")
     .addEdge("memoryRecall", "riskScorer")
     .addEdge("linguisticAnalysis", "riskScorer")
