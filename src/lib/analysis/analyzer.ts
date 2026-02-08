@@ -77,7 +77,7 @@ export async function analyzeDocument(
                     // Phase 4 Extensions
                     logicalAnalysis: (result.logicalAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     swotAnalysis: (result.swotAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
-                    cognitiveAnalysis: (result.cognitiveAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue as any,
+                    cognitiveAnalysis: (result.cognitiveAnalysis ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     simulation: (result.simulation ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
                     institutionalMemory: (result.institutionalMemory ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue
                 }
