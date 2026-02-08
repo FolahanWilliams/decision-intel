@@ -36,6 +36,7 @@ interface Verification {
     verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE';
     explanation: string;
     source?: VerificationSource;
+    sourceUrl?: string;
 }
 
 interface FactCheck {
@@ -382,308 +383,328 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     return (
         <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
             {/* Header */}
-            <header className="flex items-center justify-between mb-8 relative z-10">
-                <div className="flex items-center gap-4">
-                    <Link href="/dashboard" className="w-10 h-10 rounded-full flex items-center justify-center bg-neutral-800/50 hover:bg-neutral-700/50 text-neutral-400 hover:text-white transition-all border border-neutral-800 hover:border-neutral-600">
+            <header className="flex items-center justify-between mb-xl">
+                <div className="flex items-center gap-md">
+                    <Link href="/dashboard" className="btn btn-ghost">
                         <ArrowLeft size={20} />
                     </Link>
                     <div>
-                        <div className="flex items-center gap-3 mb-1">
-                            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
-                                <FileText size={20} />
-                            </div>
-                            <h1 className="text-2xl font-bold tracking-tight text-white">{document.filename}</h1>
+                        <div className="flex items-center gap-md mb-sm">
+                            <FileText size={24} style={{ color: 'var(--accent-primary)' }} />
+                            <h1>{document.filename}</h1>
                         </div>
-                        <p className="text-sm text-neutral-400 flex items-center gap-2">
-                            <span>Uploaded {new Date(document.uploadedAt).toLocaleString()}</span>
-                            <span className="w-1 h-1 rounded-full bg-neutral-700"></span>
-                            <span>{(document.fileSize / 1024).toFixed(1)} KB</span>
+                        <p>
+                            Uploaded {new Date(document.uploadedAt).toLocaleString()} •
+                            {(document.fileSize / 1024).toFixed(1)} KB
                         </p>
                     </div>
                 </div>
-
-                <div className="flex items-center gap-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center gap-2
-                        ${document.status === 'complete' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
-                            'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
-                        {document.status === 'complete' && <CheckCircle size={12} />}
-                        {document.status.toUpperCase()}
-                    </span>
-
-                    <div className="h-6 w-px bg-neutral-800 mx-2"></div>
-
+                <span className={`badge badge-${document.status}`} style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+                    {document.status === 'complete' && <CheckCircle size={14} style={{ marginRight: 6 }} />}
+                    {document.status}
+                </span>
+                <div className="flex gap-sm ml-md">
                     <button
                         onClick={runLiveScan}
                         disabled={isScanning}
-                        className="btn bg-indigo-600 hover:bg-indigo-500 text-white border-0 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-all"
+                        className="btn btn-primary flex items-center gap-sm"
+                        style={{ background: 'var(--accent-secondary)', borderColor: 'var(--accent-secondary)' }}
                     >
-                        {isScanning ? <Loader2 size={16} className="animate-spin mr-2" /> : <Terminal size={16} className="mr-2" />}
+                        {isScanning ? <Loader2 size={16} className="animate-spin" /> : <Terminal size={16} />}
                         LIVE SCAN
                     </button>
                     {analysis && (
-                        <div className="flex gap-2">
+                        <>
                             <button
                                 onClick={handleExport}
-                                className="btn btn-ghost hover:bg-neutral-800 text-neutral-300"
-                                title="Export PDF"
+                                className="btn btn-secondary flex items-center gap-sm"
+                                style={{ fontSize: '0.875rem' }}
                             >
-                                <Download size={18} />
+                                <Download size={16} />
+                                Export PDF
                             </button>
                             <button
                                 onClick={handleCsvExport}
-                                className="btn btn-ghost hover:bg-neutral-800 text-neutral-300"
-                                title="Export CSV"
+                                className="btn btn-secondary flex items-center gap-sm"
+                                style={{ fontSize: '0.875rem' }}
                             >
-                                <Table size={18} />
+                                <Table size={16} />
+                                Export CSV
                             </button>
-                        </div>
+                        </>
                     )}
                 </div>
             </header>
 
             {/* Analysis Summary */}
             {analysis && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-2 lg:grid-4 mb-xl gap-md">
                     {/* 1. Decision Quality */}
-                    <div className="card bg-neutral-900/40 border-neutral-800 backdrop-blur-sm">
-                        <div className="card-body text-center p-6 relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-emerald-300 opacity-50"></div>
-                            <div className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">Decision Quality</div>
-                            <div className={`text-4xl font-bold mb-1 ${analysis.overallScore >= 70 ? 'text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]' : analysis.overallScore >= 40 ? 'text-amber-400' : 'text-red-400'}`}>
+                    <div className="card animate-fade-in">
+                        <div className="card-body text-center p-md">
+                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Decision Quality</div>
+                            <div style={{
+                                fontSize: '2.5rem', fontWeight: 800,
+                                color: analysis.overallScore >= 70 ? 'var(--success)' :
+                                    analysis.overallScore >= 40 ? 'var(--warning)' : 'var(--error)'
+                            }}>
                                 {Math.round(analysis.overallScore)}
                             </div>
-                            <div className="text-xs text-neutral-500">out of 100</div>
+                            <div className="text-xs text-muted">out of 100</div>
                         </div>
                     </div>
 
-                    {/* 2. Noise Risk */}
-                    <div className="card bg-neutral-900/40 border-neutral-800 backdrop-blur-sm">
-                        <div className="card-body text-center p-6 relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-indigo-300 opacity-50"></div>
-                            <div className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">Noise Risk</div>
-                            <div className={`text-4xl font-bold mb-1 ${analysis.noiseScore <= 30 ? 'text-emerald-400' : analysis.noiseScore <= 60 ? 'text-amber-400' : 'text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.3)]'}`}>
+                    {/* 2. Noise & Variance */}
+                    <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                        <div className="card-body text-center p-md">
+                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Noise Risk</div>
+                            <div style={{
+                                fontSize: '2.5rem', fontWeight: 800,
+                                color: analysis.noiseScore <= 30 ? 'var(--success)' :
+                                    analysis.noiseScore <= 60 ? 'var(--warning)' : 'var(--error)'
+                            }}>
                                 {Math.round(analysis.noiseScore)}%
                             </div>
-                            <div className="text-xs text-neutral-500">
+                            <div className="text-xs text-muted">
                                 {analysis.noiseStats ? `σ=${analysis.noiseStats.stdDev} (3 Judges)` : 'Unknown Variance'}
                             </div>
                         </div>
                     </div>
 
-                    {/* 3. Truth Score */}
-                    <div className="card bg-neutral-900/40 border-neutral-800 backdrop-blur-sm">
-                        <div className="card-body text-center p-6 relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-300 opacity-50"></div>
-                            <div className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">Truth Score</div>
-                            <div className={`text-4xl font-bold mb-1 ${(analysis.factCheck?.score || 0) >= 80 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    {/* 3. Logical Fact Check */}
+                    <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                        <div className="card-body text-center p-md">
+                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Truth Score</div>
+                            <div style={{
+                                fontSize: '2.5rem', fontWeight: 800,
+                                color: (analysis.factCheck?.score || 0) >= 80 ? 'var(--success)' : 'var(--warning)'
+                            }}>
                                 {analysis.factCheck ? Math.round(analysis.factCheck.score) : '--'}%
                             </div>
-                            <div className="text-xs text-neutral-500">
+                            <div className="text-xs text-muted">
                                 {analysis.factCheck?.flags.length || 0} Flags Detected
                             </div>
                         </div>
                     </div>
 
-                    {/* 4. Compliance */}
-                    <div className="card bg-neutral-900/40 border-neutral-800 backdrop-blur-sm">
-                        <div className="card-body text-center p-6 relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-300 opacity-50"></div>
-                            <div className="text-xs font-semibold text-neutral-400 uppercase tracking-widest mb-3">Compliance</div>
-                            <div className={`text-xl font-bold my-2 px-3 py-1 rounded-full inline-block border ${analysis.compliance?.status === 'FAIL' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
-                                analysis.compliance?.status === 'WARN' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
-                                    'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                                }`}>
+                    {/* 4. Bias & Compliance */}
+                    <div className="card animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                        <div className="card-body text-center p-md">
+                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Compliance</div>
+                            <div className={`badge ${analysis.compliance?.status === 'FAIL' ? 'badge-critical' : analysis.compliance?.status === 'WARN' ? 'badge-warning' : 'badge-success'}`} style={{ fontSize: '1.25rem', margin: '0.5rem 0' }}>
                                 {analysis.compliance?.status || 'PENDING'}
                             </div>
-                            <div className="text-xs text-neutral-500 mt-1">
+                            <div className="text-xs text-muted">
                                 {biases.length} Biases Detected
                             </div>
                         </div>
                     </div>
                 </div>
-            )
-            }
+            )}
 
             {/* Summary & Live Stream */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div className="lg:col-span-2">
+            <div className="grid grid-3 mb-xl">
+                <div className="col-span-2">
                     {analysis?.summary ? (
-                        <div className="card h-full bg-neutral-900/40 border-neutral-800 pb-0">
-                            <div className="card-header border-b border-neutral-800/50 pb-4">
-                                <h3 className="text-lg font-semibold text-white">Executive Summary</h3>
+                        <div className="card h-full animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                            <div className="card-header">
+                                <h3>Executive Summary</h3>
                             </div>
-                            <div className="card-body pt-4">
-                                <p className="text-neutral-300 leading-relaxed text-base">{analysis.summary}</p>
+                            <div className="card-body">
+                                <p style={{ fontSize: '1rem', lineHeight: 1.6 }}>{analysis.summary}</p>
                             </div>
                         </div>
                     ) : (
-                        <div className="card h-full flex items-center justify-center p-12 bg-neutral-900/20 border-neutral-800 border-dashed">
-                            <p className="text-neutral-500">Initiate LIVE SCAN to generate audit summary.</p>
+                        <div className="card h-full flex items-center justify-center p-xl">
+                            <p className="text-muted">Initiate LIVE SCAN to generate audit summary.</p>
                         </div>
                     )}
                 </div>
 
                 {/* Scan Terminal */}
-                <div className="card bg-black border-neutral-800 shadow-inner overflow-hidden flex flex-col h-[300px] lg:h-auto">
-                    <div className="bg-neutral-900/80 border-b border-neutral-800 px-4 py-2 flex items-center justify-between">
-                        <h3 className="flex items-center gap-2 text-xs font-mono text-neutral-400">
-                            <Terminal size={12} /> LIVE_SCAN_FEED
+                <div className="card animate-fade-in" style={{ animationDelay: '0.4s', background: '#050505' }}>
+                    <div className="card-header" style={{ background: '#111' }}>
+                        <h3 className="flex items-center gap-sm text-xs">
+                            <Terminal size={14} /> LIVE_SCAN_FEED
                         </h3>
-                        <div className="flex gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-red-500/50"></div>
-                            <div className="w-2 h-2 rounded-full bg-amber-500/50"></div>
-                            <div className="w-2 h-2 rounded-full bg-emerald-500/50"></div>
-                        </div>
                     </div>
-                    <div className="p-4 overflow-y-auto font-mono text-xs flex-1 custom-scrollbar bg-[url('/grid-pattern.svg')]">
+                    <div className="card-body" style={{ padding: 'var(--spacing-md)', fontSize: '10px', height: '200px', overflowY: 'auto', fontFamily: 'monospace' }}>
                         {isScanning || isSimulating ? (
-                            <div className="mb-4">
-                                <div className="h-0.5 bg-neutral-800 w-full mb-2 overflow-hidden rounded-full">
-                                    <div className="h-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)] transition-all duration-300 ease-out" style={{ width: `${scanProgress}%` }} />
+                            <div className="mb-md">
+                                <div style={{ height: '2px', background: '#222', width: '100%', marginBottom: '4px' }}>
+                                    <div style={{ height: '100%', background: 'var(--accent-primary)', width: `${scanProgress}%`, transition: 'width 0.3s' }} />
                                 </div>
-                                <div className="text-indigo-400 font-bold">TASK_PROGRESS: {Math.round(scanProgress)}%</div>
+                                <div className="text-muted">TASK_PROGRESS: {scanProgress}%</div>
                             </div>
                         ) : null}
 
-                        <div className="flex flex-col gap-1.5">
-                            {
-                                streamLogs.map((log, i) => (
-                                    <div key={i} className={`flex gap-2 ${log.type === 'bias' ? 'text-red-400' : log.type === 'success' ? 'text-emerald-400' : 'text-neutral-400'}`}>
-                                        <span className="text-neutral-600 shrink-0">[{new Date().toLocaleTimeString([], { hour12: false })}]</span>
-                                        <span>{log.msg}</span>
-                                    </div>
-                                ))
-                            }
-                        </div>
+                        {
+                            streamLogs.map((log, i) => (
+                                <div key={i} style={{ marginBottom: '4px', color: log.type === 'bias' ? 'var(--error)' : log.type === 'success' ? 'var(--success)' : 'var(--text-secondary)' }}>
+                                    <span style={{ color: '#444' }}>[{new Date().toLocaleTimeString([], { hour12: false })}]</span> {log.msg}
+                                </div>
+                            ))
+                        }
                     </div>
                 </div>
             </div>
 
             {/* Financial Fact Check Verifications */}
-            {
-                analysis?.factCheck && (
-                    <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                        <div className="card-header flex items-center justify-between">
-                            <h3 className="flex items-center gap-sm">
-                                <CheckCircle size={18} style={{ color: 'var(--accent-primary)' }} />
-                                Financial Fact Check
-                                {analysis.factCheck.primaryCompany && (
-                                    <span className="badge badge-secondary" style={{ marginLeft: '8px', fontSize: '10px' }}>
-                                        {analysis.factCheck.primaryCompany.name} ({analysis.factCheck.primaryCompany.ticker})
-                                    </span>
-                                )}
-                            </h3>
-                            {analysis.factCheck.dataFetchedAt && (
-                                <span className="text-xs text-muted">
-                                    Data fetched: {new Date(analysis.factCheck.dataFetchedAt).toLocaleString()}
+            {analysis?.factCheck && (
+                <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                    <div className="card-header flex items-center justify-between">
+                        <h3 className="flex items-center gap-sm">
+                            <CheckCircle size={18} style={{ color: 'var(--accent-primary)' }} />
+                            Financial Fact Check
+                            {analysis.factCheck.primaryCompany && (
+                                <span className="badge badge-secondary" style={{ marginLeft: '8px', fontSize: '10px' }}>
+                                    {analysis.factCheck.primaryCompany.name} ({analysis.factCheck.primaryCompany.ticker})
                                 </span>
                             )}
-                        </div>
-                        {/* Search Grounding Sources */}
-                        {analysis.factCheck.searchSources && analysis.factCheck.searchSources.length > 0 && (
-                            <div style={{ padding: '12px 16px', background: 'rgba(66, 133, 244, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
-                                <div className="flex items-center gap-sm" style={{ fontSize: '11px', fontWeight: 600, marginBottom: '8px', color: 'var(--accent-primary)' }}>
-                                    <ExternalLink size={12} />
-                                    VERIFIED WITH GOOGLE SEARCH GROUNDING:
-                                </div>
-                                <div className="flex flex-wrap gap-sm">
-                                    {analysis.factCheck.searchSources.map((source, i) => {
-                                        try {
-                                            return (
-                                                <a key={i} href={source} target="_blank" rel="noopener noreferrer"
-                                                    className="badge hover:opacity-80 transition-opacity"
-                                                    style={{
-                                                        textDecoration: 'none',
-                                                        background: 'var(--bg-card)',
-                                                        border: '1px solid var(--border-color)',
-                                                        color: 'var(--text-primary)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '4px',
-                                                        maxWidth: '100%'
-                                                    }}>
-                                                    <span style={{ opacity: 0.7 }}>Source {i + 1}:</span>
-                                                    <span style={{ fontWeight: 500 }}>{new URL(source).hostname}</span>
-                                                    <ExternalLink size={10} style={{ opacity: 0.5 }} />
-                                                </a>
-                                            );
-                                        } catch { return null; }
-                                    })}
-                                </div>
-                            </div>
+                        </h3>
+                        {analysis.factCheck.dataFetchedAt && (
+                            <span className="text-xs text-muted">
+                                Data fetched: {new Date(analysis.factCheck.dataFetchedAt).toLocaleString()}
+                            </span>
                         )}
-                        <div className="card-body" style={{ padding: 0 }}>
-                            {analysis.factCheck.verifications && analysis.factCheck.verifications.length > 0 ? (
-                                analysis.factCheck.verifications.map((v, idx) => (
-                                    <div
-                                        key={idx}
-                                        style={{
-                                            padding: '16px',
-                                            borderBottom: idx < (analysis.factCheck?.verifications?.length || 0) - 1 ? '1px solid var(--border-color)' : 'none'
-                                        }}
-                                    >
-                                        <div className="flex items-start gap-md">
-                                            {/* Status Icon */}
-                                            <div style={{ marginTop: '2px' }}>
-                                                {v.verdict?.toUpperCase() === 'VERIFIED' ? (
-                                                    <CheckCircle size={16} className="text-success" />
-                                                ) : v.verdict?.toUpperCase() === 'CONTRADICTED' ? (
-                                                    <XCircle size={16} className="text-error" />
-                                                ) : (
-                                                    <HelpCircle size={16} className="text-warning" />
-                                                )}
+                    </div>
+                    {/* Search Grounding Sources */}
+                    {analysis.factCheck.searchSources && analysis.factCheck.searchSources.length > 0 && (
+                        <div style={{ padding: '12px 16px', background: 'rgba(66, 133, 244, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
+                            <div className="flex items-center gap-sm" style={{ fontSize: '11px', fontWeight: 600, marginBottom: '8px', color: 'var(--accent-primary)' }}>
+                                <ExternalLink size={12} />
+                                VERIFIED WITH GOOGLE SEARCH GROUNDING:
+                            </div>
+                            <div className="flex flex-wrap gap-sm">
+                                {analysis.factCheck.searchSources.map((source, i) => {
+                                    try {
+                                        return (
+                                            <a key={i} href={source} target="_blank" rel="noopener noreferrer"
+                                                className="badge hover:opacity-80 transition-opacity"
+                                                style={{
+                                                    textDecoration: 'none',
+                                                    background: 'rgba(255, 255, 255, 0.05)',
+                                                    border: '1px solid var(--border-color)',
+                                                    color: 'var(--text-primary)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px',
+                                                    maxWidth: '100%'
+                                                }}>
+                                                <span style={{ opacity: 0.7 }}>General Source {i + 1}:</span>
+                                                <span style={{ fontWeight: 500 }}>{new URL(source).hostname}</span>
+                                                <ExternalLink size={10} style={{ opacity: 0.5 }} />
+                                            </a>
+                                        );
+                                    } catch { return null; }
+                                })}
+                            </div>
+                        </div>
+                    )}
+                    <div className="card-body" style={{ padding: 0 }}>
+                        {analysis.factCheck.verifications && analysis.factCheck.verifications.length > 0 ? (
+                            analysis.factCheck.verifications.map((v, idx) => (
+                                <div
+                                    key={idx}
+                                    style={{
+                                        padding: '16px',
+                                        borderBottom: idx < (analysis.factCheck?.verifications?.length || 0) - 1 ? '1px solid var(--border-color)' : 'none'
+                                    }}
+                                >
+                                    <div className="flex items-start gap-md">
+                                        {/* Status Icon */}
+                                        <div style={{ marginTop: '2px' }}>
+                                            {v.verdict?.toUpperCase() === 'VERIFIED' ? (
+                                                <CheckCircle size={16} className="text-success" />
+                                            ) : v.verdict?.toUpperCase() === 'CONTRADICTED' ? (
+                                                <XCircle size={16} className="text-error" />
+                                            ) : (
+                                                <HelpCircle size={16} className="text-warning" />
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <p style={{ fontSize: '13px', fontWeight: 500, marginBottom: '4px', color: '#eee' }}>&quot;{v.claim}&quot;</p>
+                                            <div style={{ fontSize: '10px', fontWeight: 700, marginBottom: '6px', color: v.verdict?.toUpperCase() === 'VERIFIED' ? 'var(--success)' : v.verdict?.toUpperCase() === 'CONTRADICTED' ? 'var(--error)' : 'var(--warning)' }}>
+                                                {v.verdict?.toUpperCase()}
                                             </div>
-                                            <div className="flex-1">
-                                                <p style={{ fontSize: '13px', fontWeight: 500, marginBottom: '4px', color: '#eee' }}>&quot;{v.claim}&quot;</p>
-                                                <div style={{ fontSize: '10px', fontWeight: 700, marginBottom: '6px', color: v.verdict?.toUpperCase() === 'VERIFIED' ? 'var(--success)' : v.verdict?.toUpperCase() === 'CONTRADICTED' ? 'var(--error)' : 'var(--warning)' }}>
-                                                    {v.verdict?.toUpperCase()}
-                                                </div>
-                                                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                                    {v.explanation}
-                                                </p>
-                                            </div>
+                                            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '8px' }}>
+                                                {v.explanation}
+                                            </p>
+                                            {v.sourceUrl && (
+                                                <a
+                                                    href={v.sourceUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-xs text-[10px] text-accent-primary hover:underline"
+                                                    style={{ color: 'var(--accent-primary)' }}
+                                                >
+                                                    <ExternalLink size={10} />
+                                                    Evidence Source: {new URL(v.sourceUrl).hostname}
+                                                </a>
+                                            )}
                                         </div>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="p-xl text-center text-muted">
-                                    <p>No specific financial claims were isolated for verification.</p>
                                 </div>
-                            )}
-                        </div>
+                            ))
+                        ) : (
+                            <div className="p-xl text-center text-muted">
+                                <p>No specific financial claims were isolated for verification.</p>
+                            </div>
+                        )}
                     </div>
-                )
-            }
+                </div>
+            )}
 
 
             {/* Bias, Logic & Simulator Tabs */}
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr_350px] gap-8">
+            <div className="grid" style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}>
                 {/* Left Column: Analysis Views */}
-                <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-lg">
 
                     {/* Tabs Header */}
-                    <div className="flex items-center gap-2 border-b border-neutral-800 mb-6 overflow-x-auto pb-1 no-scrollbar">
-                        {[
-                            { id: 'overview', label: 'Overview & Biases' },
-                            { id: 'logic', label: 'Logical Fallacies' },
-                            { id: 'swot', label: 'Strategic SWOT' },
-                            { id: 'noise', label: 'Noise & Benchmarks' },
-                            { id: 'simulator', label: 'Simulator' },
-                            { id: 'boardroom', label: 'Virtual Board' },
-                            { id: 'red-team', label: 'Red Team' }
-                        ].map(tab => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
-                                className={`px-4 py-2 text-sm font-medium transition-all relative whitespace-nowrap
-                                    ${activeTab === tab.id ? 'text-indigo-400' : 'text-neutral-500 hover:text-neutral-300'}`}
-                            >
-                                {tab.label}
-                                {activeTab === tab.id && (
-                                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
-                                )}
-                            </button>
-                        ))}
+                    <div className="flex items-center gap-md border-b border-border mb-md">
+                        <button
+                            onClick={() => setActiveTab('overview')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'overview' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Overview & Biases
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('logic')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'logic' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Logical Fallacies
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('swot')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'swot' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Strategic SWOT
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('noise')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'noise' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Noise & Benchmarks
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('simulator')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'simulator' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Simulator
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('boardroom')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'boardroom' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Virtual Board
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('red-team')}
+                            className={`pb-2 px-1 text-sm font-medium transition-colors ${activeTab === 'red-team' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Red Team (Diversity)
+                        </button>
                     </div>
 
                     {/* Tab Content */}
@@ -1234,22 +1255,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             }
 
             {/* Regulatory Horizon Widget */}
-            {
-                analysis?.compliance && (
-                    <div className="mb-xl">
-                        <RegulatoryHorizonWidget compliance={analysis.compliance} />
-                    </div>
-                )
-            }
+            {analysis?.compliance && (
+                <div className="mb-xl">
+                    <RegulatoryHorizonWidget compliance={analysis.compliance} />
+                </div>
+            )}
 
             {/* Institutional Memory Widget */}
-            {
-                analysis?.institutionalMemory && (
-                    <div className="mb-xl">
-                        <InstitutionalMemoryWidget memory={analysis.institutionalMemory} />
-                    </div>
-                )
-            }
-        </div >
+            {analysis?.institutionalMemory && (
+                <div className="mb-xl">
+                    <InstitutionalMemoryWidget memory={analysis.institutionalMemory} />
+                </div>
+            )}
+        </div>
     );
 }

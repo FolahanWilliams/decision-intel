@@ -1,24 +1,62 @@
+
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
-import { ShieldCheck, Download, Search } from 'lucide-react';
+import { ShieldCheck, Download, Search, FileText, LogIn } from 'lucide-react';
 import { format } from 'date-fns';
+import AuditFilters from './AuditFilters';
+import Link from 'next/link';
 
-async function getAuditLogs() {
-    const { userId } = await auth();
-    if (!userId) return [];
+// Helper to get logs with filters
+async function getAuditLogs(
+    userId: string,
+    page: number = 1,
+    action?: string,
+    search?: string
+) {
+    const pageSize = 20;
+    const skip = (page - 1) * pageSize;
 
-    return await prisma.auditLog.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: 50
-    });
+    const where: any = { userId };
+
+    if (action) {
+        where.action = action;
+    }
+
+    if (search) {
+        where.OR = [
+            { resource: { contains: search, mode: 'insensitive' } },
+            // Note: details is JSON, simple contains might not work for all DBs, 
+            // but Prisma supports filters on JSON. For simplicity, searching resource or action here.
+            { action: { contains: search, mode: 'insensitive' } }
+        ];
+    }
+
+    const [logs, total] = await Promise.all([
+        prisma.auditLog.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+            take: pageSize,
+            skip
+        }),
+        prisma.auditLog.count({ where })
+    ]);
+
+    return { logs, total, totalPages: Math.ceil(total / pageSize) };
 }
 
-export default async function AuditLogPage() {
-    const logs = await getAuditLogs();
+export default async function AuditLogPage({
+    searchParams
+}: {
+    searchParams: { page?: string, action?: string, search?: string }
+}) {
+    const { userId } = await auth();
+    if (!userId) return <div>Unauthorized</div>;
+
+    const page = Number(searchParams.page) || 1;
+    const { logs, totalPages } = await getAuditLogs(userId, page, searchParams.action, searchParams.search);
 
     return (
         <div className="container py-8">
@@ -32,6 +70,8 @@ export default async function AuditLogPage() {
                     Track all access, analysis, and export events for compliance verification.
                 </p>
             </header>
+
+            <AuditFilters />
 
             <div className="card">
                 <div className="p-0">
@@ -48,7 +88,7 @@ export default async function AuditLogPage() {
                             {logs.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                                        No audit events recorded yet.
+                                        No audit events found.
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -61,6 +101,8 @@ export default async function AuditLogPage() {
                                             <div className="flex items-center gap-2">
                                                 {log.action === 'EXPORT_PDF' && <Download size={14} className="text-blue-500" />}
                                                 {log.action === 'SCAN_DOCUMENT' && <Search size={14} className="text-green-500" />}
+                                                {log.action === 'VIEW_DOCUMENT' && <FileText size={14} className="text-orange-500" />}
+                                                {log.action === 'LOGIN' && <LogIn size={14} className="text-purple-500" />}
                                                 <span className="font-medium text-sm">{log.action}</span>
                                             </div>
                                         </TableCell>
@@ -78,6 +120,27 @@ export default async function AuditLogPage() {
                         </TableBody>
                     </Table>
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 p-4 border-t border-border">
+                        <Link
+                            href={`?page=${Math.max(1, page - 1)}`}
+                            className={`btn btn-ghost ${page <= 1 ? 'pointer-events-none opacity-50' : ''}`}
+                        >
+                            Previous
+                        </Link>
+                        <span className="text-sm text-muted-foreground">
+                            Page {page} of {totalPages}
+                        </span>
+                        <Link
+                            href={`?page=${Math.min(totalPages, page + 1)}`}
+                            className={`btn btn-ghost ${page >= totalPages ? 'pointer-events-none opacity-50' : ''}`}
+                        >
+                            Next
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -25,6 +25,13 @@ export interface AnalysisResult {
     factCheck?: {
         score: number;
         flags: string[];
+        verifications?: Array<{
+            claim: string;
+            verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE';
+            explanation: string;
+            sourceUrl?: string;
+        }>;
+        searchSources?: string[];
     };
     compliance?: ComplianceResult;
     preMortem?: {

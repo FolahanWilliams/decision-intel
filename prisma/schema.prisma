@@ -82,7 +82,7 @@ model DecisionEmbedding {
   documentId String
   document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
   content String @db.Text
-  embedding Unsupported("vector(3072)")?
+  embedding Unsupported("vector(1536)")?
   metadata Json?
 
   @@index([documentId])
@@ -107,3 +107,22 @@ model AuditLog {
 }
 
 
+
+model UserSettings {
+  id        String   @id @default(cuid())
+  userId    String   @unique // One settings profile per user
+  
+  // Notification Preferences
+  emailNotifications Boolean @default(true)
+  analysisAlerts     Boolean @default(true)
+  weeklyDigest       Boolean @default(false)
+  
+  // Display Preferences
+  darkMode          Boolean @default(true)
+  compactView       Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}

@@ -265,11 +265,21 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
-        // PASS 1: Identify Claims (using Standard Model)
+        // PASS 1: Identify Claims (General Purpose)
         const analysisResult = await getModel().generateContent([
-            `You are a Financial Analyst. Identify claims and data needs.
-            Return JSON: { "primaryTicker": "ABNB", "companyName": "Airbnb", "claims": [...], "dataRequests": [...] }
-            See previous instructions for schema.`,
+            `You are an Expert Fact Checker. Identify specific factual claims that can be verified externally.
+            These can be financial, technical, historical, or statistical.
+            
+            Return JSON: 
+            { 
+                "primaryTopic": "string", 
+                "claims": [
+                    { "id": 1, "claim": "Exact quote or statement", "category": "technical|financial|historical" }
+                ],
+                "dataRequests": [
+                    { "ticker": "Optional ticker", "dataType": "price|profile|news", "reason": "why", "claimToVerify": "related claim" }
+                ]
+            }`,
             `Document:\n${content}`
         ]);
 
@@ -277,7 +287,8 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         const analysis = parseJSON(analysisText);
 
         const primaryTicker = analysis?.primaryTicker || null;
-        const companyName = analysis?.companyName || null;
+        if (primaryTicker) console.log(`Identified primary ticker: ${primaryTicker}`);
+        const companyName = analysis?.primaryTopic || null;
         const claims = analysis?.claims || [];
         const dataRequests = analysis?.dataRequests || [];
 
@@ -322,15 +333,17 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
             Return valid JSON matching this schema:
             {
                 "score": 0-100,
+                "summary": "overall verification summary",
                 "verifications": [
                     { 
                         "claim": "string", 
                         "verdict": "VERIFIED" | "CONTRADICTED" | "UNVERIFIABLE", 
-                        "explanation": "string including search source citations" 
+                        "explanation": "concise rationale",
+                        "sourceUrl": "EXACT URL used for this specific claim"
                     }
                 ]
             }`,
-            `Primary Company: ${companyName}`
+            `Topic: ${companyName}`
         ]);
 
         const verificationText = verificationResult.response?.text ? verificationResult.response.text() : "";
@@ -348,11 +361,15 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         const enrichedResult = {
             score: verification?.score || 0,
             summary: verification?.summary || "Verification completed",
-            verifications: verification?.verifications || [],
-            primaryCompany: { ticker: primaryTicker, name: companyName },
+            verifications: (verification?.verifications || []).map((v: any, i: number) => ({
+                ...v,
+                // Fallback to general search sources if specific URL missing
+                sourceUrl: v.sourceUrl || searchSources[i % searchSources.length] || ""
+            })),
+            primaryTopic: companyName,
             dataFetchedAt: new Date().toISOString(),
             flags: [],
-            searchSources: searchSources // New Field: Actable Sources!
+            searchSources
         };
 
         return { factCheckResult: enrichedResult };

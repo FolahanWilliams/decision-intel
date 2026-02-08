@@ -257,34 +257,25 @@ export default function Dashboard() {
   return (
     <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
       {/* Header */}
-      <header className="flex items-center justify-between mb-xl relative z-10">
+      <header className="flex items-center justify-between mb-xl">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2">
-            <span style={{
-              background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              textShadow: '0 0 30px rgba(245, 158, 11, 0.3)'
-            }}>
+          <h1 style={{ marginBottom: 'var(--spacing-xs)' }}>
+            <span style={{ background: 'var(--accent-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Decision Intel
             </span>
           </h1>
-          <p className="text-secondary text-lg">Audit infrastructure for cognitive bias and noise</p>
+          <p>Audit decisions for cognitive bias and noise</p>
         </div>
         <nav className="flex gap-md">
-          {/* Add user profile or other nav items here later */}
+          <Link href="/dashboard" className="btn btn-secondary">
+            Dashboard
+          </Link>
         </nav>
       </header>
 
       {/* Upload Zone */}
       <div
-        className={`upload-zone mb-xl relative overflow-hidden transition-all duration-300 ${isDragOver ? 'border-amber-500 bg-amber-500/10' : 'border-neutral-800 hover:border-neutral-700'}`}
-        style={{
-          backdropFilter: 'blur(10px)',
-          borderRadius: 'var(--radius-xl)',
-          border: '1px dashed var(--border-color)',
-          background: isDragOver ? 'rgba(245, 158, 11, 0.05)' : 'rgba(20, 20, 20, 0.4)'
-        }}
+        className={`upload-zone mb-xl ${isDragOver ? 'dragover' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -300,42 +291,70 @@ export default function Dashboard() {
         />
 
         {uploading ? (
-          <div className="flex flex-col items-center gap-lg w-full max-w-md mx-auto relative z-10">
+          <div className="flex flex-col items-center gap-lg" style={{ width: '100%', maxWidth: '400px' }}>
             {/* Progress bar */}
-            <div className="w-full h-1 bg-neutral-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-amber-500 to-amber-300 transition-all duration-300 ease-out box-shadow-glow"
-                style={{ width: `${currentProgress}%`, boxShadow: '0 0 10px rgba(245, 158, 11, 0.5)' }}
-              />
+            <div style={{
+              width: '100%',
+              height: '4px',
+              background: 'var(--bg-secondary)',
+              borderRadius: 'var(--radius-sm)',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                width: `${currentProgress}%`,
+                height: '100%',
+                background: 'var(--accent-gradient)',
+                transition: 'width 0.3s ease-out'
+              }} />
             </div>
 
             {/* Step list */}
-            <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-col gap-sm" style={{ width: '100%' }}>
               {analysisSteps.map((step, idx) => (
                 <div
                   key={step.name}
-                  className="flex items-center gap-3 animate-fade-in"
+                  className="flex items-center gap-md animate-fade-in"
                   style={{
                     animationDelay: `${idx * 0.1}s`,
-                    opacity: step.status === 'pending' ? 0.3 : 1,
+                    opacity: step.status === 'pending' ? 0.4 : 1,
                     transition: 'opacity 0.3s ease'
                   }}
                 >
-                  <div className={`
-                    w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300
-                    ${step.status === 'complete' ? 'bg-emerald-500/20 text-emerald-500' :
-                      step.status === 'running' ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' :
-                        'bg-neutral-800 text-neutral-600'}
-                  `}>
+                  <div style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: step.status === 'complete'
+                      ? 'rgba(16, 185, 129, 0.2)'
+                      : step.status === 'running'
+                        ? 'rgba(99, 102, 241, 0.2)'
+                        : 'var(--bg-secondary)',
+                    color: step.status === 'complete'
+                      ? 'var(--success)'
+                      : step.status === 'running'
+                        ? 'var(--accent-primary)'
+                        : 'var(--text-muted)'
+                  }}>
                     {step.status === 'running' ? (
-                      <Loader2 size={12} className="animate-spin" />
+                      <Loader2 size={14} className="animate-spin" />
                     ) : step.status === 'complete' ? (
-                      <CheckCircle size={12} />
+                      <CheckCircle size={14} />
                     ) : (
                       step.icon
                     )}
                   </div>
-                  <span className={`text-sm ${step.status === 'running' ? 'text-amber-500 font-medium' : step.status === 'complete' ? 'text-emerald-400' : 'text-neutral-500'}`}>
+                  <span style={{
+                    fontSize: '0.875rem',
+                    color: step.status === 'running'
+                      ? 'var(--text-primary)'
+                      : step.status === 'complete'
+                        ? 'var(--success)'
+                        : 'var(--text-muted)',
+                    fontWeight: step.status === 'running' ? 500 : 400
+                  }}>
                     {step.name}
                     {step.status === 'running' && '...'}
                   </span>
@@ -344,15 +363,13 @@ export default function Dashboard() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-6 py-12 relative z-10">
-            <div className="w-16 h-16 rounded-full bg-neutral-900/50 flex items-center justify-center border border-neutral-800 group-hover:border-amber-500/50 transition-colors">
-              <Upload size={24} className="text-neutral-400 group-hover:text-amber-500 transition-colors" />
-            </div>
-            <div className="text-center">
-              <p className="text-white font-medium text-lg mb-2">
+          <div className="flex flex-col items-center gap-md">
+            <Upload size={48} style={{ color: 'var(--accent-primary)' }} />
+            <div>
+              <p style={{ color: 'var(--text-primary)', fontWeight: 500, marginBottom: 'var(--spacing-xs)' }}>
                 Drop your decision document here
               </p>
-              <p className="text-sm text-neutral-500">
+              <p style={{ fontSize: '0.875rem' }}>
                 or click to browse • PDF, TXT, MD, DOC, DOCX
               </p>
             </div>
@@ -571,28 +588,57 @@ export default function Dashboard() {
       )}
 
       {/* Features */}
-      {/* Features - Modern Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-        {[
-          { icon: <FileText size={20} />, title: "Rapid Ingestion", desc: "Upload PDFs, meeting notes, memos, and emails for instant analysis.", color: "indigo" },
-          { icon: <Brain size={20} />, title: "Bias Detection", desc: "AI-powered detection of 15 cognitive biases with severity scoring.", color: "amber" },
-          { icon: <CheckCircle size={20} />, title: "Actionable Insights", desc: "Get specific recommendations to improve decision quality.", color: "emerald" }
-        ].map((feature, i) => (
-          <div key={i} className="card group hover:-translate-y-1 transition-transform duration-300">
-            <div className="card-body">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 transition-colors
-                ${feature.color === 'indigo' ? 'bg-indigo-500/10 text-indigo-500 group-hover:bg-indigo-500/20' :
-                  feature.color === 'amber' ? 'bg-amber-500/10 text-amber-500 group-hover:bg-amber-500/20' :
-                    'bg-emerald-500/10 text-emerald-500 group-hover:bg-emerald-500/20'}`}>
-                {feature.icon}
-              </div>
-              <h4 className="text-white font-semibold mb-2">{feature.title}</h4>
-              <p className="text-sm text-neutral-400 leading-relaxed">
-                {feature.desc}
-              </p>
+      <div className="grid grid-3 mt-xl">
+        <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="card-body">
+            <div style={{
+              width: 48, height: 48, borderRadius: 'var(--radius-md)',
+              background: 'rgba(99, 102, 241, 0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 'var(--spacing-md)'
+            }}>
+              <FileText size={24} style={{ color: 'var(--accent-primary)' }} />
             </div>
+            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Document Ingestion</h4>
+            <p style={{ fontSize: '0.875rem' }}>
+              Upload PDFs, meeting notes, memos, and emails for instant analysis.
+            </p>
           </div>
-        ))}
+        </div>
+
+        <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <div className="card-body">
+            <div style={{
+              width: 48, height: 48, borderRadius: 'var(--radius-md)',
+              background: 'rgba(139, 92, 246, 0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 'var(--spacing-md)'
+            }}>
+              <AlertTriangle size={24} style={{ color: 'var(--accent-secondary)' }} />
+            </div>
+            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Bias Detection</h4>
+            <p style={{ fontSize: '0.875rem' }}>
+              AI-powered detection of 15 cognitive biases with severity scoring.
+            </p>
+          </div>
+        </div>
+
+        <div className="card animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div className="card-body">
+            <div style={{
+              width: 48, height: 48, borderRadius: 'var(--radius-md)',
+              background: 'rgba(16, 185, 129, 0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 'var(--spacing-md)'
+            }}>
+              <CheckCircle size={24} style={{ color: 'var(--success)' }} />
+            </div>
+            <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>Actionable Insights</h4>
+            <p style={{ fontSize: '0.875rem' }}>
+              Get specific recommendations to improve decision quality.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
