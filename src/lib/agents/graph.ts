@@ -1,5 +1,6 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
 import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, complianceMapperNode, cognitiveDiversityNode, decisionTwinNode, memoryRecallNode, linguisticAnalysisNode, strategicAnalysisNode } from "./nodes";
+import { marketDataNode } from "./market_data";
 import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
 import { BaseMessage } from "@langchain/core/messages";
 
@@ -92,6 +93,7 @@ const workflow = new StateGraph(GraphState)
     .addNode("memoryRecall", memoryRecallNode)
     .addNode("linguisticAnalysis", linguisticAnalysisNode)
     .addNode("strategicAnalysis", strategicAnalysisNode)
+    .addNode("marketData", marketDataNode)
     .addNode("riskScorer", riskScorerNode)
 
     .setEntryPoint("gdprAnonymizer")
@@ -106,6 +108,7 @@ const workflow = new StateGraph(GraphState)
     .addEdge("structurer", "memoryRecall")
     .addEdge("structurer", "linguisticAnalysis")
     .addEdge("structurer", "strategicAnalysis")
+    .addEdge("structurer", "marketData")
 
     .addEdge("biasDetective", "riskScorer")
     .addEdge("noiseJudge", "riskScorer")
@@ -116,6 +119,7 @@ const workflow = new StateGraph(GraphState)
     .addEdge("memoryRecall", "riskScorer")
     .addEdge("linguisticAnalysis", "riskScorer")
     .addEdge("strategicAnalysis", "riskScorer")
+    .addEdge("marketData", "riskScorer")
 
 
     .addEdge("riskScorer", END);

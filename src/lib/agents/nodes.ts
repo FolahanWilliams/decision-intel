@@ -105,9 +105,11 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
     try {
         const content = truncateText(state.structuredContent || state.originalContent);
 
-        const result = await withTimeout(getModel().generateContent([
+        // Use Grounded Model for primary detection to allow real-world context verification
+        const result = await withTimeout(getGroundedModel().generateContent([
             BIAS_DETECTIVE_PROMPT,
-            `Text to Analyze: \n<input_text>\n${content} \n </input_text>`
+            `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
+            `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.`
         ]));
 
         const response = result.response?.text ? result.response.text() : "";
@@ -265,8 +267,9 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
-        // PASS 1: Identify Claims (General Purpose)
-        const analysisResult = await getModel().generateContent([
+        // PASS 1: Identify Claims + Grounded Verification
+        // Use Grounded Model here so it can identify which claims NEED searching immediately
+        const analysisResult = await getGroundedModel().generateContent([
             `You are an Expert Fact Checker. Identify specific factual claims that can be verified externally.
             These can be financial, technical, historical, or statistical.
             
