@@ -69,6 +69,7 @@ jobs:
         continue-on-error: true
 
       - name: Check for secrets in code
+        if: github.event_name == 'pull_request'
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
