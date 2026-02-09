@@ -131,13 +131,12 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          # These are placeholder values for build time
-          # Real values will be injected at runtime via Vercel/SST/etc
-          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
-          DIRECT_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
-          GOOGLE_API_KEY: __PLACEHOLDER_GOOGLE_API_KEY__
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: __PLACEHOLDER_CLERK_KEY__
-          CLERK_SECRET_KEY: __PLACEHOLDER_CLERK_SECRET__
+          # Real values injected from GitHub Secrets
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
