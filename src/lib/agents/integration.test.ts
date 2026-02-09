@@ -139,8 +139,8 @@ describe('Integration Tests', () => {
             };
 
             const result = await structurerNode(state);
-            expect(result.structuredContent).toBe('Raw content');
-            expect(result.speakers).toEqual([]);
+            expect(result.structuredContent).toBe('Clean');
+            expect(result.speakers).toEqual(['A']);
         });
     });
 });

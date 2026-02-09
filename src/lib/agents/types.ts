@@ -4,6 +4,7 @@ import { BaseMessage } from "@langchain/core/messages";
 export interface AuditState {
     // Input
     documentId: string;
+    userId: string;
     originalContent: string;
 
     // Internal Processing

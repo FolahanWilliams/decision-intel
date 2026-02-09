@@ -95,7 +95,7 @@ export async function analyzeDocument(
 
     // Run analysis within a transaction for atomicity
     try {
-        const result = await runAnalysis(document.content, documentId, (update) => {
+        const result = await runAnalysis(document.content, documentId, document.userId, (update) => {
             if (onProgress) onProgress(update);
         });
 
@@ -228,6 +228,7 @@ export async function getGraph() {
 export async function runAnalysis(
     content: string,
     documentId: string,
+    userId: string,
     onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
 
@@ -238,19 +239,19 @@ export async function runAnalysis(
         if (onProgress) onProgress({ type: 'step', step, status, progress });
     };
 
-    // Map agent node names to human-readable labels
+    // Map agent node names to human-readable labels (must match graph.ts nodes)
     const NODE_LABELS: Record<string, string> = {
         'gdprAnonymizer': 'Privacy Protection',
         'structurer': 'Document Parsing',
         'biasDetective': 'Bias Detection',
         'noiseJudge': 'Noise Analysis',
         'factChecker': 'Financial Fact Check',
-        'preMortemAnalyzer': 'Pre-Mortem Analysis',
         'complianceMapper': 'Compliance Check',
-        'sentimentAnalyzer': 'Sentiment Analysis',
-        'logicalFallacyScanner': 'Logical Analysis',
-        'strategicInsight': 'SWOT Analysis',
         'cognitiveDiversity': 'Cognitive Diversity (Red Team)',
+        'decisionTwin': 'Decision Simulation',
+        'memoryRecall': 'Institutional Memory',
+        'linguisticAnalysis': 'Sentiment & Logic Analysis',
+        'strategicAnalysis': 'Strategic Analysis',
         'riskScorer': 'Final Risk Scoring'
     };
 
@@ -265,7 +266,7 @@ export async function runAnalysis(
     try {
         // Use streamEvents for real-time node tracking
         const eventStream = auditGraph.streamEvents(
-            { originalContent: content, documentId: documentId },
+            { originalContent: content, documentId: documentId, userId: userId },
             { version: 'v2' }
         );
 
@@ -336,6 +337,7 @@ export async function runAnalysis(
             auditGraph.invoke({
                 originalContent: content,
                 documentId: documentId,
+                userId: userId,
             }),
             timeoutPromise
         ]) as any;

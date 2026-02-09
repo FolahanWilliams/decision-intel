@@ -65,11 +65,12 @@ describe('runAnalysis', () => {
 
     streamEventsMock.mockReturnValue(mockStream());
 
-    const result = await runAnalysis('test content', 'test-doc-id');
+    const result = await runAnalysis('test content', 'test-doc-id', 'test-user-id');
 
     expect(streamEventsMock).toHaveBeenCalledWith(expect.objectContaining({
       originalContent: 'test content',
-      documentId: 'test-doc-id'
+      documentId: 'test-doc-id',
+      userId: 'test-user-id'
     }), expect.anything());
 
     // Should NOT call invoke anymore in the happy path

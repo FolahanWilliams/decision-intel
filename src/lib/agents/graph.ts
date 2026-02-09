@@ -9,6 +9,10 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x ?? "",
         default: () => "",
     }),
+    userId: Annotation<string>({
+        reducer: (x, y) => y ?? x ?? "",
+        default: () => "",
+    }),
     originalContent: Annotation<string>({
         reducer: (x, y) => y ?? x ?? "",
         default: () => "",

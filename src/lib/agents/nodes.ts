@@ -3,10 +3,22 @@ import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult, BiasDetectionResult, NoiseBenchmark } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
-import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, COGNITIVE_DIVERSITY_PROMPT, INSTITUTIONAL_MEMORY_PROMPT, COMPLIANCE_CHECKER_PROMPT, LINGUISTIC_ANALYSIS_PROMPT, STRATEGIC_ANALYSIS_PROMPT } from "./prompts";
+import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, COGNITIVE_DIVERSITY_PROMPT, INSTITUTIONAL_MEMORY_PROMPT, COMPLIANCE_CHECKER_PROMPT, LINGUISTIC_ANALYSIS_PROMPT, STRATEGIC_ANALYSIS_PROMPT, STRUCTURER_PROMPT } from "./prompts";
 import { searchSimilarDocuments } from "../rag/embeddings";
 import { executeDataRequests, DataRequest } from "../tools/financial";
-import { getRequiredEnvVar } from '../env';
+import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+
+// Severity levels for bias detection - use these instead of hardcoded strings
+const SEVERITY_LEVELS = {
+    LOW: 'low',
+    MEDIUM: 'medium',
+    HIGH: 'high',
+    CRITICAL: 'critical'
+} as const;
 
 // ============================================================
 // AI MODEL CONFIGURATION
@@ -21,9 +33,10 @@ function getModel(): GenerativeModel {
 
     const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Using gemini-3-flash-preview - cost-effective model for analysis tasks
+    // Allow model selection via env var, fallback to gemini-3-flash-preview
+    const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
     modelInstance = genAI.getGenerativeModel({
-        model: "models/gemini-3-flash-preview",
+        model: modelName,
         generationConfig: {
             responseMimeType: "application/json",
             maxOutputTokens: 16384
@@ -45,8 +58,10 @@ function getGroundedModel(): GenerativeModel {
 
     const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
     const genAI = new GoogleGenerativeAI(apiKey);
+    // Allow model selection via env var, fallback to gemini-3-flash-preview
+    const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
     groundedModelInstance = genAI.getGenerativeModel({
-        model: "models/gemini-3-flash-preview",
+        model: modelName,
         tools: [
             // @ts-expect-error - googleSearch is supported in v1beta but missing in some SDK types
             { googleSearch: {} }
@@ -88,9 +103,33 @@ function truncateText(text: string): string {
 // ============================================================
 
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
+    const content = state.structuredContent || state.originalContent;
 
+    try {
+        console.log("Running document structuring...");
+
+        const result = await withTimeout(getModel().generateContent([
+            STRUCTURER_PROMPT,
+            `<input_text>\n${content}\n</input_text>`
+        ]));
+
+        const responseText = result.response?.text ? result.response.text() : "";
+        const data = parseJSON(responseText);
+
+        if (data?.structuredContent) {
+            console.log(`Structuring complete. Identified ${data.speakers?.length || 0} speakers.`);
+            return {
+                structuredContent: data.structuredContent,
+                speakers: data.speakers || []
+            };
+        }
+    } catch (e) {
+        console.error("Structurer node failed:", e instanceof Error ? e.message : String(e));
+    }
+
+    // Fallback: return content as-is
     return {
-        structuredContent: state.structuredContent || state.originalContent,
+        structuredContent: content,
         speakers: []
     };
 }
@@ -114,7 +153,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
         // Educational Insight (Dynamic Retrieval)
         // For HIGH/CRITICAL biases, fetch scientific context
         const severeBiases = biases.filter((b: BiasDetectionResult) =>
-            (b.severity === 'high' || b.severity === 'critical') && b.biasType
+            (b.severity === SEVERITY_LEVELS.HIGH || b.severity === SEVERITY_LEVELS.CRITICAL) && b.biasType
         );
 
         if (severeBiases.length > 0) {
@@ -252,8 +291,64 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
 }
 
 export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<AuditState>> {
+    const content = state.originalContent;
 
-    return { structuredContent: state.originalContent };
+    try {
+        console.log("Running GDPR Anonymization...");
+
+        // Use the model to identify and redact PII
+        const result = await withTimeout(getModel().generateContent([
+            `You are a GDPR Privacy Compliance Expert.
+            
+            TASK: Identify and redact ALL Personally Identifiable Information (PII) from the text below.
+            
+            PII to redact includes:
+            - Full names of individuals (e.g., "John Smith" -> "[PERSON_1]")
+            - Email addresses (e.g., "john@example.com" -> "[EMAIL_1]")
+            - Phone numbers (e.g., "+1-555-0123" -> "[PHONE_1]")
+            - Physical addresses (e.g., "123 Main St" -> "[ADDRESS_1]")
+            - Company names (e.g., "Acme Corp" -> "[COMPANY_1]")
+            - Job titles with names (e.g., "CEO John" -> "CEO [PERSON_1]")
+            - IP addresses (e.g., "192.168.1.1" -> "[IP_1]")
+            - SSN/National ID numbers
+            - Financial account numbers
+            
+            INSTRUCTIONS:
+            1. Replace each PII instance with a numbered placeholder in format [TYPE_NUMBER]
+            2. Maintain the structure and meaning of the document
+            3. DO NOT redact generic terms like "the company", "our team", etc.
+            4. Return the complete redacted text
+            
+            OUTPUT FORMAT: Return ONLY valid JSON.
+            {
+                "structuredContent": "redacted text with [PLACEHOLDERS]",
+                "redactions": [
+                    {"type": "PERSON", "index": 1, "original": "John Smith"},
+                    {"type": "EMAIL", "index": 1, "original": "john@example.com"}
+                ]
+            }`,
+            `Text to anonymize:\n${content}`
+        ]));
+
+        const responseText = result.response?.text ? result.response.text() : "";
+        const data = parseJSON(responseText);
+
+        if (data?.structuredContent) {
+            console.log(`GDPR Anonymization complete. Redacted ${data.redactions?.length || 0} PII instances.`);
+            return {
+                structuredContent: data.structuredContent,
+                speakers: [] // Will be populated by structurer node
+            };
+        }
+    } catch (e) {
+        console.error("GDPR Anonymizer failed:", e instanceof Error ? e.message : String(e));
+    }
+
+    // Fallback: return original content if anonymization fails
+    return {
+        structuredContent: state.originalContent,
+        speakers: []
+    };
 }
 
 // Fact Checker Node with Two-Pass Architecture and Search Grounding
@@ -579,9 +674,9 @@ export async function memoryRecallNode(state: AuditState): Promise<Partial<Audit
 
     try {
         // 1. Vector Search for Similar Docs
-        // Using "system" or "global" as userId wildcard since we lack context here.
-        // In a real app, this should come from state.
-        const similarDocs = await searchSimilarDocuments(content, "system", 3);
+        // Use the userId from state to ensure proper user isolation in RAG search
+        const userId = state.userId || 'system';
+        const similarDocs = await searchSimilarDocuments(content, userId, 3);
 
         // 2. LLM Analysis
         const result = await withTimeout(getModel().generateContent([
