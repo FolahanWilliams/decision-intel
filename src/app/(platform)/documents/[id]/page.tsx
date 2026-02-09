@@ -661,12 +661,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                         <h4>Bias Network Map</h4>
                                     </div>
                                     <div className="card-body h-full">
-                                        <BiasNetwork biases={biases.map(b => ({ ...b, id: b.id || Math.random().toString(), category: 'Cognitive' }))} />
+                                        <BiasNetwork biases={biases.map(b => ({ ...b, id: b.id || Math.random().toString(), category: 'cognitive' }))} />
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Decision Timeline & Risk Heatmap */}
+                            {/* Decision Timeline & Risk HeatMap */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg mt-lg">
                                 <div className="card">
                                     <div className="card-header">

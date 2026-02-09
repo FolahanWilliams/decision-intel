@@ -57,7 +57,7 @@ const categoryColors: Record<string, string> = {
   social: '#8b5cf6',
 };
 
-export function BiasNetwork({ biases }: BiasNetworkProps) {
+export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   const { nodes, connections } = useMemo(() => {
@@ -75,7 +75,7 @@ export function BiasNetwork({ biases }: BiasNetworkProps) {
         id: bias.biasType,
         name: bias.biasType,
         severity: (bias.severity as any) || 'medium',
-        category: (bias.category as any) || 'cognitive',
+        category: (bias.category as any)?.toLowerCase() || 'cognitive',
         x: 200 + Math.cos(angle) * radius,
         y: 200 + Math.sin(angle) * radius,
       };

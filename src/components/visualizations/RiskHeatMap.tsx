@@ -11,7 +11,7 @@ interface RiskHeatMapProps {
   }>;
 }
 
-export function RiskHeatMap({ risks }: RiskHeatMapProps) {
+export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
   const gridSize = 5;
   const cellSize = 60;
   const [selectedCell, setSelectedCell] = useState<{ impact: number; probability: number } | null>(

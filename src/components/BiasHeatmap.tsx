@@ -19,7 +19,7 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
 
     // Click outside handler could be added here for polish, but for now simple toggle is fine
 
-    if (!content) return null;
+    if (!content || !biases) return null;
 
     // Map severity to colors
     const getSeverityColor = (severity: string, isSelected: boolean) => {
