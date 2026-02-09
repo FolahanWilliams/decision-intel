@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 
         // Upload to Supabase
         const { error: uploadError } = await supabase.storage
-            .from('pdf')
+            .from(process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf')
             .upload(storagePath, buffer, {
                 contentType: file.type,
                 upsert: false

@@ -4,6 +4,8 @@ import { safeJsonClone } from '@/lib/utils/json';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { Document } from '@prisma/client';
 
+import { z } from 'zod';
+
 export interface ProgressUpdate {
     type: 'step' | 'bias' | 'noise' | 'summary' | 'complete' | 'error';
     step?: string;
@@ -13,6 +15,61 @@ export interface ProgressUpdate {
     message?: string;
     progress: number;
 }
+
+// Zod Schemas for Data Validation
+const NoiseStatsSchema = z.object({
+    mean: z.number().default(0),
+    stdDev: z.number().default(0),
+    variance: z.number().default(0)
+}).default({ mean: 0, stdDev: 0, variance: 0 });
+
+const FactCheckSchema = z.object({
+    score: z.number().default(0),
+    summary: z.string().default('Unavailable'),
+    verifications: z.array(z.any()).default([]),
+    flags: z.array(z.string()).default([])
+}).default({ score: 0, summary: 'Unavailable', verifications: [], flags: [] });
+
+const ComplianceSchema = z.object({
+    status: z.string().default('WARN'),
+    riskScore: z.number().default(0),
+    summary: z.string().default('Compliance check unavailable'),
+    regulations: z.array(z.any()).default([])
+}).default({ status: 'WARN', riskScore: 0, summary: 'Compliance check unavailable', regulations: [] });
+
+const SentimentSchema = z.object({
+    score: z.number().default(0),
+    label: z.string().default('Neutral')
+}).default({ score: 0, label: 'Neutral' });
+
+const LogicalSchema = z.object({
+    score: z.number().default(100),
+    fallacies: z.array(z.any()).default([])
+}).default({ score: 100, fallacies: [] });
+
+const SwotSchema = z.object({
+    strengths: z.array(z.string()).default([]),
+    weaknesses: z.array(z.string()).default([]),
+    opportunities: z.array(z.string()).default([]),
+    threats: z.array(z.string()).default([]),
+    advice: z.string().default('')
+}).optional();
+
+const CognitiveSchema = z.object({
+    blindSpotGap: z.number().default(0),
+    counterArguments: z.array(z.any()).default([])
+}).optional();
+
+const SimulationSchema = z.object({
+    overallVerdict: z.string().default('Neutral'),
+    twins: z.array(z.any()).default([])
+}).optional();
+
+const MemorySchema = z.object({
+    recallScore: z.number().default(0),
+    similarEvents: z.array(z.any()).default([])
+}).optional();
+
 
 export async function analyzeDocument(
     documentOrId: string | Document,
@@ -72,19 +129,19 @@ export async function analyzeDocument(
                         },
                         // New Fields (May cause P2022 if DB not migrated)
                         structuredContent: result.structuredContent || '',
-                        noiseStats: toPrismaJson(result.noiseStats),
-                        factCheck: toPrismaJson(result.factCheck),
-                        compliance: toPrismaJson(result.compliance),
+                        noiseStats: toPrismaJson(NoiseStatsSchema.parse(result.noiseStats || {})),
+                        factCheck: toPrismaJson(FactCheckSchema.parse(result.factCheck || {})),
+                        compliance: toPrismaJson(ComplianceSchema.parse(result.compliance || {})),
                         preMortem: toPrismaJson(result.preMortem),
-                        sentiment: toPrismaJson(result.sentiment),
+                        sentiment: toPrismaJson(SentimentSchema.parse(result.sentiment || {})),
                         speakers: result.speakers || [],
                         // Phase 4 Extensions
-                        logicalAnalysis: toPrismaJson(result.logicalAnalysis),
-                        swotAnalysis: toPrismaJson(result.swotAnalysis),
-                        cognitiveAnalysis: toPrismaJson(result.cognitiveAnalysis),
-                        simulation: toPrismaJson(result.simulation),
-                        institutionalMemory: toPrismaJson(result.institutionalMemory)
-                    }
+                        logicalAnalysis: toPrismaJson(LogicalSchema.parse(result.logicalAnalysis || {})),
+                        swotAnalysis: toPrismaJson(SwotSchema.parse(result.swotAnalysis || undefined)),
+                        cognitiveAnalysis: toPrismaJson(CognitiveSchema.parse(result.cognitiveAnalysis || undefined)),
+                        simulation: toPrismaJson(SimulationSchema.parse(result.simulation || undefined)),
+                        institutionalMemory: toPrismaJson(MemorySchema.parse(result.institutionalMemory || undefined))
+                    } as any // Cast to any to bypass potential P2022 strict typing if schema drift protection is active
                 });
             } catch (dbError: any) {
                 // Check for "Column does not exist" error (P2021, P2022)
@@ -159,7 +216,7 @@ export async function analyzeDocument(
 // Lazy singleton for the graph
 let graphInstance: typeof import('@/lib/agents/graph').auditGraph | null = null;
 
-async function getGraph() {
+export async function getGraph() {
     if (!graphInstance) {
         // Lazy load graph to avoid circular deps or init issues
         const { auditGraph } = await import('@/lib/agents/graph');

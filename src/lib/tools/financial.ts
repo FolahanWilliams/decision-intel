@@ -34,16 +34,16 @@ export interface StockQuote {
 export interface IncomeStatement {
     date: string;
     symbol: string;
-    revenue: number;
-    costOfRevenue: number;
-    grossProfit: number;
-    grossProfitRatio: number;
-    operatingIncome: number;
-    operatingIncomeRatio: number;
-    netIncome: number;
-    netIncomeRatio: number;
-    eps: number;
-    epsdiluted: number;
+    revenue: number | null;
+    costOfRevenue: number | null;
+    grossProfit: number | null;
+    grossProfitRatio: number | null;
+    operatingIncome: number | null;
+    operatingIncomeRatio: number | null;
+    netIncome: number | null;
+    netIncomeRatio: number | null;
+    eps: number | null;
+    epsdiluted: number | null;
 }
 
 export interface SectorPerformance {
@@ -136,16 +136,16 @@ export async function getIncomeStatement(ticker: string, apiKey: string): Promis
     return {
         date: 'TTM (Trailing Twelve Months)',
         symbol: ticker,
-        revenue: 0, // Finnhub metrics doesn't always have raw revenue TTM absolute
-        costOfRevenue: 0,
-        grossProfit: 0,
-        grossProfitRatio: 0,
-        operatingIncome: 0,
-        operatingIncomeRatio: 0,
-        netIncome: 0,
-        netIncomeRatio: 0,
-        eps: metrics.epsTTM || 0,
-        epsdiluted: metrics.epsTTM || 0
+        revenue: null, // Finnhub metrics doesn't always have raw revenue TTM absolute
+        costOfRevenue: null,
+        grossProfit: null,
+        grossProfitRatio: null,
+        operatingIncome: null,
+        operatingIncomeRatio: null,
+        netIncome: null,
+        netIncomeRatio: null,
+        eps: metrics.epsTTM || null,
+        epsdiluted: metrics.epsTTM || null
     };
 }
 

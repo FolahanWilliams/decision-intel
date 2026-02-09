@@ -489,10 +489,10 @@ export async function linguisticAnalysisNode(state: AuditState): Promise<Partial
 export async function strategicAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
-        const result = await getGroundedModel().generateContent([
+        const result = await withTimeout(getGroundedModel().generateContent([
             STRATEGIC_ANALYSIS_PROMPT,
             `Text:\n${content}`
-        ]);
+        ]));
         const data = parseJSON(result.response.text());
         return {
             swotAnalysis: data?.swot,
@@ -508,15 +508,14 @@ export async function strategicAnalysisNode(state: AuditState): Promise<Partial<
 }
 
 export async function cognitiveDiversityNode(state: AuditState): Promise<Partial<AuditState>> {
-
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
         console.log("Searching for counter-arguments...");
-        const result = await getGroundedModel().generateContent([
+        const result = await withTimeout(getGroundedModel().generateContent([
             COGNITIVE_DIVERSITY_PROMPT,
             `Text to Analysis:\n${content}`
-        ]);
+        ]));
 
         const text = result.response.text();
         const data = parseJSON(text);
@@ -540,7 +539,7 @@ export async function cognitiveDiversityNode(state: AuditState): Promise<Partial
         return { cognitiveAnalysis: data };
     } catch (e) {
         console.error("Cognitive Diversity Node failed", e);
-        return {};
+        return { cognitiveAnalysis: undefined };
     }
 }
 
@@ -552,7 +551,7 @@ export async function decisionTwinNode(state: AuditState): Promise<Partial<Audit
 
         console.log("Running Decision Twin Simulation with Live Market Data...");
 
-        const result = await getGroundedModel().generateContent([
+        const result = await withTimeout(getGroundedModel().generateContent([
             DECISION_TWIN_PROMPT,
             `Proposal to Vote On:\n${content}`,
             `CRITICAL INSTRUCTION:
@@ -563,7 +562,7 @@ export async function decisionTwinNode(state: AuditState): Promise<Partial<Audit
             3. Macroeconomic risks relevant to this proposal.
             
             Cite these specific data points in their "rationale".`
-        ]);
+        ]));
 
         const text = result.response.text();
         const data = parseJSON(text);
@@ -585,11 +584,11 @@ export async function memoryRecallNode(state: AuditState): Promise<Partial<Audit
         const similarDocs = await searchSimilarDocuments(content, "system", 3);
 
         // 2. LLM Analysis
-        const result = await getModel().generateContent([
+        const result = await withTimeout(getModel().generateContent([
             INSTITUTIONAL_MEMORY_PROMPT,
             `Current Document Summary:\n${content.slice(0, 2000)}`,
             `Similar Past Cases Found:\n${JSON.stringify(similarDocs)}`
-        ]);
+        ]));
 
         const text = result.response.text();
         const data = parseJSON(text);
