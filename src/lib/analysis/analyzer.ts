@@ -129,18 +129,18 @@ export async function analyzeDocument(
                         },
                         // New Fields (May cause P2022 if DB not migrated)
                         structuredContent: result.structuredContent || '',
-                        noiseStats: toPrismaJson(NoiseStatsSchema.parse(result.noiseStats || {})),
-                        factCheck: toPrismaJson(FactCheckSchema.parse(result.factCheck || {})),
-                        compliance: toPrismaJson(ComplianceSchema.parse(result.compliance || {})),
+                        noiseStats: toPrismaJson(NoiseStatsSchema.safeParse(result.noiseStats).success ? result.noiseStats : NoiseStatsSchema.parse({})),
+                        factCheck: toPrismaJson(FactCheckSchema.safeParse(result.factCheck).success ? result.factCheck : FactCheckSchema.parse({})),
+                        compliance: toPrismaJson(ComplianceSchema.safeParse(result.compliance).success ? result.compliance : ComplianceSchema.parse({})),
                         preMortem: toPrismaJson(result.preMortem),
-                        sentiment: toPrismaJson(SentimentSchema.parse(result.sentiment || {})),
+                        sentiment: toPrismaJson(SentimentSchema.safeParse(result.sentiment).success ? result.sentiment : SentimentSchema.parse({})),
                         speakers: result.speakers || [],
                         // Phase 4 Extensions
-                        logicalAnalysis: toPrismaJson(LogicalSchema.parse(result.logicalAnalysis || {})),
-                        swotAnalysis: toPrismaJson(SwotSchema.parse(result.swotAnalysis || undefined)),
-                        cognitiveAnalysis: toPrismaJson(CognitiveSchema.parse(result.cognitiveAnalysis || undefined)),
-                        simulation: toPrismaJson(SimulationSchema.parse(result.simulation || undefined)),
-                        institutionalMemory: toPrismaJson(MemorySchema.parse(result.institutionalMemory || undefined))
+                        logicalAnalysis: toPrismaJson(LogicalSchema.safeParse(result.logicalAnalysis).success ? result.logicalAnalysis : LogicalSchema.parse({})),
+                        swotAnalysis: toPrismaJson(SwotSchema.safeParse(result.swotAnalysis).data),
+                        cognitiveAnalysis: toPrismaJson(CognitiveSchema.safeParse(result.cognitiveAnalysis).data),
+                        simulation: toPrismaJson(SimulationSchema.safeParse(result.simulation).data),
+                        institutionalMemory: toPrismaJson(MemorySchema.safeParse(result.institutionalMemory).data)
                     } as any // Cast to any to bypass potential P2022 strict typing if schema drift protection is active
                 });
             } catch (dbError: any) {

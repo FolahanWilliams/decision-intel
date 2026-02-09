@@ -1,2 +1,1 @@
--- Create HNSW index for vector search optimization
-CREATE INDEX ON "DecisionEmbedding" USING hnsw (embedding vector_cosine_ops);
+CREATE INDEX IF NOT EXISTS "DecisionEmbedding_embedding_idx" ON "DecisionEmbedding" USING hnsw (embedding vector_cosine_ops);

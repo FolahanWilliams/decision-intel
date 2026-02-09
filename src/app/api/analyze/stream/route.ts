@@ -207,18 +207,18 @@ export async function POST(request: NextRequest) {
                                     },
                                     // New Fields
                                     structuredContent: result.finalReport.structuredContent || '',
-                                    noiseStats: toPrismaJson(NoiseStatsSchema.parse(result.finalReport.noiseStats || {})),
-                                    factCheck: toPrismaJson(FactCheckSchema.parse(result.finalReport.factCheck || {})),
-                                    compliance: toPrismaJson(ComplianceSchema.parse(result.finalReport.compliance || {})),
+                                    noiseStats: toPrismaJson(NoiseStatsSchema.safeParse(result.finalReport.noiseStats).success ? result.finalReport.noiseStats : NoiseStatsSchema.parse({})),
+                                    factCheck: toPrismaJson(FactCheckSchema.safeParse(result.finalReport.factCheck).success ? result.finalReport.factCheck : FactCheckSchema.parse({})),
+                                    compliance: toPrismaJson(ComplianceSchema.safeParse(result.finalReport.compliance).success ? result.finalReport.compliance : ComplianceSchema.parse({})),
                                     preMortem: toPrismaJson(result.finalReport.preMortem),
-                                    sentiment: toPrismaJson(SentimentSchema.parse(result.finalReport.sentiment || {})),
+                                    sentiment: toPrismaJson(SentimentSchema.safeParse(result.finalReport.sentiment).success ? result.finalReport.sentiment : SentimentSchema.parse({})),
                                     speakers: result.finalReport.speakers || [],
                                     // Phase 4 Extensions
-                                    logicalAnalysis: toPrismaJson(LogicalSchema.parse(result.finalReport.logicalAnalysis || {})),
-                                    swotAnalysis: toPrismaJson(SwotSchema.parse(result.finalReport.swotAnalysis || undefined)),
-                                    cognitiveAnalysis: toPrismaJson(CognitiveSchema.parse(result.finalReport.cognitiveAnalysis || undefined)),
-                                    simulation: toPrismaJson(SimulationSchema.parse(result.finalReport.simulation || undefined)),
-                                    institutionalMemory: toPrismaJson(MemorySchema.parse(result.finalReport.institutionalMemory || undefined))
+                                    logicalAnalysis: toPrismaJson(LogicalSchema.safeParse(result.finalReport.logicalAnalysis).success ? result.finalReport.logicalAnalysis : LogicalSchema.parse({})),
+                                    swotAnalysis: toPrismaJson(SwotSchema.safeParse(result.finalReport.swotAnalysis).data),
+                                    cognitiveAnalysis: toPrismaJson(CognitiveSchema.safeParse(result.finalReport.cognitiveAnalysis).data),
+                                    simulation: toPrismaJson(SimulationSchema.safeParse(result.finalReport.simulation).data),
+                                    institutionalMemory: toPrismaJson(MemorySchema.safeParse(result.finalReport.institutionalMemory).data)
                                 } as any
                             });
                         } catch (dbError: any) {
