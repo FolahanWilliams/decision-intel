@@ -34,9 +34,9 @@ async function main() {
                 const result = await model.embedContent("Hello world");
                 const vector = result.embedding.values;
                 console.log(`✅ SUCCESS: ${modelName} returned vector of length ${vector.length}`);
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error(`❌ FAILED: ${modelName}`);
-                console.error(`   Error: ${error.message?.split('\n')[0]}`);
+                console.error(`   Error: ${error instanceof Error ? error.message.split('\n')[0] : String(error)}`);
             }
         }
 

@@ -453,7 +453,7 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         const enrichedResult = {
             score: verification?.score || 0,
             summary: verification?.summary || "Verification completed",
-            verifications: (verification?.verifications || []).map((v: any, i: number) => ({
+            verifications: (verification?.verifications || []).map((v: { sourceUrl?: string }, i: number) => ({
                 ...v,
                 // Fallback to general search sources if specific URL missing
                 sourceUrl: v.sourceUrl || searchSources[i % searchSources.length] || ""

@@ -140,13 +140,15 @@ export async function analyzeDocument(
                         swotAnalysis: toPrismaJson(SwotSchema.safeParse(result.swotAnalysis).data),
                         cognitiveAnalysis: toPrismaJson(CognitiveSchema.safeParse(result.cognitiveAnalysis).data),
                         simulation: toPrismaJson(SimulationSchema.safeParse(result.simulation).data),
-                        institutionalMemory: toPrismaJson(MemorySchema.safeParse(result.institutionalMemory).data)
-                    } as any // Cast to any to bypass potential P2022 strict typing if schema drift protection is active
+                        institutionalMemory: toPrismaJson(MemorySchema.safeParse(result.institutionalMemory).data),
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required: schema drift protection demands flexible Prisma data shape
+                    } as any
                 });
-            } catch (dbError: any) {
+            } catch (dbError: unknown) {
                 // Check for "Column does not exist" error (P2021, P2022)
-                if (dbError.code === 'P2021' || dbError.code === 'P2022' || dbError.message?.includes('does not exist')) {
-                    console.warn('⚠️ Schema drift detected. Retrying save with CORE fields only.', dbError.code);
+                const prismaError = dbError as { code?: string; message?: string };
+                if (prismaError.code === 'P2021' || prismaError.code === 'P2022' || prismaError.message?.includes('does not exist')) {
+                    console.warn('⚠️ Schema drift detected. Retrying save with CORE fields only.', prismaError.code);
 
                     // Fallback: Save only what the old schema supports
                     await tx.analysis.create({
@@ -345,7 +347,7 @@ export async function runAnalysis(
                 userId: userId,
             }),
             timeoutPromise
-        ]) as any;
+        ]) as { finalReport: Record<string, unknown> };
     }
 
     sendStep('Finalizing report', 'running', 95);

@@ -74,8 +74,8 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
       return {
         id: bias.biasType,
         name: bias.biasType,
-        severity: (bias.severity as any) || 'medium',
-        category: (bias.category as any)?.toLowerCase() || 'cognitive',
+        severity: (bias.severity as BiasNode['severity']) || 'medium',
+        category: ((bias.category as string)?.toLowerCase() as BiasNode['category']) || 'cognitive',
         x: 200 + Math.cos(angle) * radius,
         y: 200 + Math.sin(angle) * radius,
       };
@@ -83,9 +83,9 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
 
     // Create connections based on relationships
     const connectionList: BiasConnection[] = [];
-    nodeList.forEach((node, i) => {
+    nodeList.forEach((node, _i) => {
       const related = biasRelationships[node.id] || [];
-      related.forEach((relatedBias, idx) => {
+      related.forEach((relatedBias, _idx) => {
         const targetNode = nodeList.find(n => n.id === relatedBias || n.name === relatedBias);
         if (targetNode && !connectionList.find(c =>
           (c.from === node.id && c.to === targetNode.id) ||
@@ -94,7 +94,7 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
           connectionList.push({
             from: node.id,
             to: targetNode.id,
-            strength: 0.8 - (idx * 0.15), // Stranger visual strength differentiation
+            strength: 0.8 - (_idx * 0.15), // Stranger visual strength differentiation
           });
         }
       });
@@ -153,7 +153,7 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
           })}
 
           {/* Draw nodes */}
-          {nodes.map((node, idx) => {
+          {nodes.map((node) => {
             const isSelected = selectedNodeId === node.id;
             const isDimmed = selectedNodeId && !isSelected &&
               !connections.some(c => (c.from === selectedNodeId && c.to === node.id) || (c.from === node.id && c.to === selectedNodeId));

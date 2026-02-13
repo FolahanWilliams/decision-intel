@@ -16,9 +16,8 @@ const { mockGetFinancialContext } = vi.hoisted(() => {
 vi.mock('../tools/financial', () => ({
     getFinancialContext: mockGetFinancialContext,
     executeDataRequests: vi.fn(async (requests) => {
-        const results: Record<string, any> = {};
+        const results: Record<string, unknown> = {};
         for (const req of requests) {
-            // @ts-ignore
             results[req.dataType] = await mockGetFinancialContext(req.ticker);
         }
         return results;

@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => {
   const DB_LATENCY = 50;
   return {
     document: {
-      findFirst: vi.fn().mockResolvedValue({ id: 'doc_123', content: 'test content' }),
+      findFirst: vi.fn().mockResolvedValue({ id: 'doc_123', userId: 'user_123', content: 'test content' }),
       update: vi.fn().mockImplementation(async () => {
         await delay(DB_LATENCY);
         return { id: 'doc_123' };
@@ -43,8 +43,7 @@ vi.mock('@clerk/nextjs/server', () => ({
 }));
 
 vi.mock('@/lib/analysis/analyzer', () => ({
-  runAnalysis: vi.fn().mockImplementation(async (content, documentId, onProgress) => {
-    // Simulate some work/progress
+  runAnalysis: vi.fn().mockImplementation(async (content: string, documentId: string, onProgress: (u: unknown) => void) => {
     if (onProgress) onProgress({ type: 'progress', progress: 50 });
     return {
       overallScore: 85,
@@ -58,10 +57,38 @@ vi.mock('@/lib/analysis/analyzer', () => ({
       speakers: []
     };
   }),
+  getGraph: vi.fn().mockResolvedValue({
+    streamEvents: vi.fn().mockImplementation(async function* () {
+      yield { event: 'on_chain_start', name: 'structurer' };
+      yield { event: 'on_chain_end', name: 'structurer', data: {} };
+      yield {
+        event: 'on_chain_end',
+        name: 'LangGraph',
+        data: {
+          output: {
+            finalReport: {
+              overallScore: 85,
+              noiseScore: 10,
+              summary: 'Test summary',
+              biases: [],
+              structuredContent: '',
+              noiseStats: { mean: 0, stdDev: 0, variance: 0 },
+              factCheck: { score: 0, summary: 'N/A', verifications: [], flags: [] },
+              compliance: { status: 'WARN', riskScore: 0, summary: 'N/A', regulations: [] },
+              speakers: []
+            }
+          }
+        }
+      };
+    })
+  })
 }));
 
 vi.mock('@/lib/prisma', () => ({
-  prisma: mocks
+  prisma: {
+    ...mocks,
+    $transaction: vi.fn().mockImplementation(async (cb: (tx: typeof mocks) => Promise<unknown>) => cb(mocks))
+  }
 }));
 
 vi.mock('@/lib/sse', () => ({
@@ -70,6 +97,14 @@ vi.mock('@/lib/sse', () => ({
 
 vi.mock('@/lib/utils/json', () => ({
   safeJsonClone: (obj: unknown) => obj
+}));
+
+vi.mock('@/lib/utils/prisma-json', () => ({
+  toPrismaJson: (obj: unknown) => obj
+}));
+
+vi.mock('@/lib/utils/error', () => ({
+  getSafeErrorMessage: (err: unknown) => err instanceof Error ? err.message : String(err)
 }));
 
 // Import after mocks

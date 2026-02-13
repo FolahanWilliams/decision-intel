@@ -59,7 +59,7 @@ export function ComparativeAnalysis({ documents }: DocumentComparisonProps) {
                         {value}
                       </span>
                       <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden w-24">
-                        <div 
+                        <div
                           className={`h-full rounded-full ${metric.color} opacity-80`}
                           style={{ width: `${(value / 100) * 100}%` }}
                         />
@@ -92,12 +92,12 @@ export function TrendOverlay({ data }: TrendOverlayProps) {
 
   const points = useMemo(() => {
     if (data.length < 2) return '';
-    
+
     const minDate = Math.min(...data.map(d => new Date(d.date).getTime()));
     const maxDate = Math.max(...data.map(d => new Date(d.date).getTime()));
     const timeRange = maxDate - minDate || 1;
 
-    return data.map((d, i) => {
+    return data.map((d, _i) => {
       const x = padding + ((new Date(d.date).getTime() - minDate) / timeRange) * (width - 2 * padding);
       const y = height - padding - (d.score / 100) * (height - 2 * padding);
       return `${x},${y}`;

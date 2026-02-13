@@ -16,11 +16,6 @@ export const maxDuration = 300;
 export async function POST(request: NextRequest) {
     try {
         const { userId } = await auth();
-        // ... (auth logic kept same by replacing outer block, but let's be careful with replacement scope)
-        // Actually, I should use a smaller replacement scope or be very careful.
-        // Let's replace the whole try/catch block of the POST function.
-
-        // ... (auth parts)
         const apiKey = request.headers.get('x-extension-key');
         let effectiveUserId = userId;
 

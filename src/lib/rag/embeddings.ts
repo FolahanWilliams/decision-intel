@@ -46,6 +46,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
             content: { role: 'user', parts: [{ text: truncatedText }] },
             taskType: TaskType.RETRIEVAL_DOCUMENT,
             outputDimensionality: 1536
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- outputDimensionality not yet in SDK types
         } as any);
         const embedding = result.embedding.values;
 
@@ -115,7 +116,7 @@ export async function storeAnalysisEmbedding(
         // The embedding vector is converted to a string representation but passed as a parameter
         const embeddingString = `[${embedding.join(',')}]`;
         const metadataJson = JSON.stringify(metadata);
-        
+
         await prisma.$executeRaw`
             INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
             VALUES (

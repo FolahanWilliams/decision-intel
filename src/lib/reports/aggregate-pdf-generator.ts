@@ -144,7 +144,7 @@ export class AggregatePdfGenerator {
         const highPct = Math.round((summary.highRiskCount / total) * 100);
 
         // Simple bar visualization
-        let x = 20;
+        const x = 20;
         const width = 170;
         const height = 15;
         const y = startY + 10;

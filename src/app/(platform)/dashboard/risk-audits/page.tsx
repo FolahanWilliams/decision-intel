@@ -51,7 +51,7 @@ export default function RiskAuditsPage() {
 
                     // Filter for docs that have analysis data
                     // The API now returns the structure we need directly
-                    const validDocs = docs.filter((d: any) => d.analyses && d.analyses.length > 0);
+                    const validDocs = docs.filter((d: DocumentWithRisk) => d.analyses && d.analyses.length > 0);
 
                     // Map to expected internal format if needed, or use as is
                     // The API returns analyses: [{ overallScore, noiseScore, ... }]

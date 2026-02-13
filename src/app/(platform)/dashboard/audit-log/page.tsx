@@ -19,7 +19,7 @@ async function getAuditLogs(
     const pageSize = 20;
     const skip = (page - 1) * pageSize;
 
-    const where: any = { userId };
+    const where: Record<string, unknown> = { userId };
 
     if (action) {
         where.action = action;

@@ -29,7 +29,7 @@ export function DecisionTimeline({ events }: DecisionTimelineProps) {
 
     return (
         <div className="relative pl-6 border-l border-border/50 space-y-8 my-4">
-            {events.map((event, index) => (
+            {events.map((event, _index) => (
                 <div key={event.id} className="relative group">
                     {/* Timeline Node */}
                     <div className="absolute -left-[29px] top-1 bg-background p-1 border border-border rounded-full group-hover:border-accent-primary group-hover:scale-110 transition-all">

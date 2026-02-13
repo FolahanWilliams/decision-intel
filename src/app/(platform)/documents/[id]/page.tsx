@@ -185,7 +185,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
 
-    const [activeTab, setActiveTab] = useState<'overview' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team' | 'boardroom'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'biases' | 'factcheck' | 'compliance' | 'cognitive' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team' | 'boardroom'>('overview');
 
     const { showToast } = useToast();
 
@@ -638,7 +638,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         ].map(tab => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
+                                onClick={() => setActiveTab(tab.id as typeof activeTab)}
                                 className={`flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${activeTab === tab.id
                                     ? 'text-accent-primary border-accent-primary bg-accent-primary/5'
                                     : 'text-muted border-transparent hover:text-primary hover:border-border'
@@ -814,7 +814,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                                 <h4>Stakeholder Alignment Map</h4>
                                             </div>
                                             <div className="card-body">
-                                                <StakeholderMap stakeholders={analysis.simulation.twins?.map((t: any) => ({
+                                                <StakeholderMap stakeholders={analysis.simulation.twins?.map((t: { name: string; role: string; confidence?: number; vote?: string; feedback?: string }) => ({
                                                     id: t.name,
                                                     name: t.name,
                                                     role: t.role,

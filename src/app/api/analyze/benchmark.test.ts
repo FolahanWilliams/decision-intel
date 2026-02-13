@@ -73,13 +73,35 @@ vi.mock('@/lib/agents/graph', () => ({
                 summary: 'Test summary',
                 biases: []
             }
+        }),
+        streamEvents: vi.fn().mockImplementation(async function* () {
+            yield { event: 'on_chain_start', name: 'structurer' };
+            yield { event: 'on_chain_end', name: 'structurer', data: {} };
+            yield {
+                event: 'on_chain_end',
+                name: 'LangGraph',
+                data: {
+                    output: {
+                        finalReport: {
+                            overallScore: 85,
+                            noiseScore: 10,
+                            summary: 'Test summary',
+                            biases: [],
+                            structuredContent: '',
+                            noiseStats: { mean: 0, stdDev: 0, variance: 0 },
+                            factCheck: { score: 0, summary: 'N/A', verifications: [], flags: [] },
+                            compliance: { status: 'WARN', riskScore: 0, summary: 'N/A', regulations: [] },
+                            speakers: []
+                        }
+                    }
+                }
+            };
         })
     }
 }));
 
-vi.mock('@/lib/prisma', () => ({
-    prisma: mocks
-}));
+// Prisma mock is already defined above (lines 56-61) with $transaction support.
+// Do NOT re-declare it here — vitest uses the last mock, which would strip $transaction.
 
 vi.mock('@/lib/utils/json', () => ({
     safeJsonClone: (obj: unknown) => obj

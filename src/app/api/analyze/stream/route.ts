@@ -122,11 +122,11 @@ export async function POST(request: NextRequest) {
 
                     const auditGraph = await getGraph();
                     const eventStream = auditGraph.streamEvents(
-                        { originalContent: doc.content, documentId: documentId },
+                        { originalContent: doc.content, documentId: documentId, userId: userId },
                         { version: 'v2' }
                     );
 
-                    let result: any = null;
+                    let result: Record<string, unknown> | null = null;
 
                     for await (const event of eventStream) {
                         // Track node start events
@@ -185,62 +185,65 @@ export async function POST(request: NextRequest) {
                     result.finalReport = safeJsonClone(result.finalReport);
 
                     // Save to DB
-                    const foundBiases = (result.finalReport.biases || []).filter((b: any) => b.found);
+                    const report = result.finalReport as Record<string, unknown>;
+                    const foundBiases = ((report.biases as Array<Record<string, unknown>>) || []).filter((b) => b.found);
 
                     await prisma.$transaction(async (tx) => {
                         try {
                             await tx.analysis.create({
                                 data: {
                                     documentId,
-                                    overallScore: result.finalReport.overallScore || 0,
-                                    noiseScore: result.finalReport.noiseScore || 0,
-                                    summary: result.finalReport.summary || '',
+                                    overallScore: (report.overallScore as number) || 0,
+                                    noiseScore: (report.noiseScore as number) || 0,
+                                    summary: (report.summary as string) || '',
                                     biases: {
-                                        create: foundBiases.map((bias: any) => ({
-                                            biasType: bias.biasType,
-                                            severity: bias.severity,
+                                        create: foundBiases.map((bias) => ({
+                                            biasType: bias.biasType as string,
+                                            severity: bias.severity as string,
                                             excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                                            explanation: bias.explanation || '',
-                                            suggestion: bias.suggestion || '',
-                                            confidence: bias.confidence || 0.0
+                                            explanation: (bias.explanation as string) || '',
+                                            suggestion: (bias.suggestion as string) || '',
+                                            confidence: (bias.confidence as number) || 0.0
                                         }))
                                     },
                                     // New Fields
-                                    structuredContent: result.finalReport.structuredContent || '',
-                                    noiseStats: toPrismaJson(NoiseStatsSchema.safeParse(result.finalReport.noiseStats).success ? result.finalReport.noiseStats : NoiseStatsSchema.parse({})),
-                                    factCheck: toPrismaJson(FactCheckSchema.safeParse(result.finalReport.factCheck).success ? result.finalReport.factCheck : FactCheckSchema.parse({})),
-                                    compliance: toPrismaJson(ComplianceSchema.safeParse(result.finalReport.compliance).success ? result.finalReport.compliance : ComplianceSchema.parse({})),
-                                    preMortem: toPrismaJson(result.finalReport.preMortem),
-                                    sentiment: toPrismaJson(SentimentSchema.safeParse(result.finalReport.sentiment).success ? result.finalReport.sentiment : SentimentSchema.parse({})),
-                                    speakers: result.finalReport.speakers || [],
+                                    structuredContent: (report.structuredContent as string) || '',
+                                    noiseStats: toPrismaJson(NoiseStatsSchema.safeParse(report.noiseStats).success ? report.noiseStats : NoiseStatsSchema.parse({})),
+                                    factCheck: toPrismaJson(FactCheckSchema.safeParse(report.factCheck).success ? report.factCheck : FactCheckSchema.parse({})),
+                                    compliance: toPrismaJson(ComplianceSchema.safeParse(report.compliance).success ? report.compliance : ComplianceSchema.parse({})),
+                                    preMortem: toPrismaJson(report.preMortem),
+                                    sentiment: toPrismaJson(SentimentSchema.safeParse(report.sentiment).success ? report.sentiment : SentimentSchema.parse({})),
+                                    speakers: (report.speakers as string[]) || [],
                                     // Phase 4 Extensions
-                                    logicalAnalysis: toPrismaJson(LogicalSchema.safeParse(result.finalReport.logicalAnalysis).success ? result.finalReport.logicalAnalysis : LogicalSchema.parse({})),
-                                    swotAnalysis: toPrismaJson(SwotSchema.safeParse(result.finalReport.swotAnalysis).data),
-                                    cognitiveAnalysis: toPrismaJson(CognitiveSchema.safeParse(result.finalReport.cognitiveAnalysis).data),
-                                    simulation: toPrismaJson(SimulationSchema.safeParse(result.finalReport.simulation).data),
-                                    institutionalMemory: toPrismaJson(MemorySchema.safeParse(result.finalReport.institutionalMemory).data)
+                                    logicalAnalysis: toPrismaJson(LogicalSchema.safeParse(report.logicalAnalysis).success ? report.logicalAnalysis : LogicalSchema.parse({})),
+                                    swotAnalysis: toPrismaJson(SwotSchema.safeParse(report.swotAnalysis).data),
+                                    cognitiveAnalysis: toPrismaJson(CognitiveSchema.safeParse(report.cognitiveAnalysis).data),
+                                    simulation: toPrismaJson(SimulationSchema.safeParse(report.simulation).data),
+                                    institutionalMemory: toPrismaJson(MemorySchema.safeParse(report.institutionalMemory).data)
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required: schema drift protection demands flexible Prisma data shape
                                 } as any
                             });
-                        } catch (dbError: any) {
+                        } catch (dbError: unknown) {
                             // Check for "Column does not exist" error (P2021, P2022)
-                            if (dbError.code === 'P2021' || dbError.code === 'P2022' || dbError.message?.includes('does not exist')) {
-                                console.warn('⚠️ Schema drift detected. Retrying save with CORE fields only.', dbError.code);
+                            const prismaError = dbError as { code?: string; message?: string };
+                            if (prismaError.code === 'P2021' || prismaError.code === 'P2022' || prismaError.message?.includes('does not exist')) {
+                                console.warn('⚠️ Schema drift detected. Retrying save with CORE fields only.', prismaError.code);
 
                                 // Fallback: Save only what the old schema supports
                                 await tx.analysis.create({
                                     data: {
                                         documentId,
-                                        overallScore: result.finalReport.overallScore,
-                                        noiseScore: result.finalReport.noiseScore,
-                                        summary: result.finalReport.summary,
+                                        overallScore: (report.overallScore as number) || 0,
+                                        noiseScore: (report.noiseScore as number) || 0,
+                                        summary: (report.summary as string) || '',
                                         biases: {
-                                            create: foundBiases.map((bias: any) => ({
-                                                biasType: bias.biasType,
-                                                severity: bias.severity,
+                                            create: foundBiases.map((bias) => ({
+                                                biasType: bias.biasType as string,
+                                                severity: bias.severity as string,
                                                 excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                                                explanation: bias.explanation || '',
-                                                suggestion: bias.suggestion || '',
-                                                confidence: bias.confidence || 0.0
+                                                explanation: (bias.explanation as string) || '',
+                                                suggestion: (bias.suggestion as string) || '',
+                                                confidence: (bias.confidence as number) || 0.0
                                             }))
                                         }
                                     },
@@ -263,13 +266,13 @@ export async function POST(request: NextRequest) {
                         await storeAnalysisEmbedding(
                             documentId,
                             doc.filename,
-                            result.finalReport.summary,
-                            foundBiases.map((b: any) => ({
-                                biasType: b.biasType,
-                                severity: b.severity,
-                                explanation: b.explanation || ''
+                            (report.summary as string) || '',
+                            foundBiases.map((b) => ({
+                                biasType: b.biasType as string,
+                                severity: b.severity as string,
+                                explanation: (b.explanation as string) || ''
                             })),
-                            result.finalReport.overallScore
+                            (report.overallScore as number) || 0
                         );
                     } catch (embError) {
                         console.warn('Embedding storage failed:', embError);
