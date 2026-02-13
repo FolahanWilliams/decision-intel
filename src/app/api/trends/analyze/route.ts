@@ -89,8 +89,16 @@ export async function POST(_: Request) {
             analysis = JSON.parse(responseText);
         } catch {
             // Fallback if model returns Markdown block
-            const cleanText = responseText.replace(/```json/g, '').replace(/```/g, '');
-            analysis = JSON.parse(cleanText);
+            try {
+                const cleanText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+                analysis = JSON.parse(cleanText);
+            } catch {
+                console.error('Failed to parse Gemini response:', responseText.slice(0, 200));
+                return NextResponse.json(
+                    { error: 'Market analysis returned an unparseable response. Please try again.' },
+                    { status: 502 }
+                );
+            }
         }
 
         // Extract Sources from Grounding Metadata
@@ -107,7 +115,7 @@ export async function POST(_: Request) {
     } catch (error) {
         console.error('Market Analyst failed:', error);
         return NextResponse.json(
-            { error: 'Analysis failed', details: String(error) },
+            { error: 'Market analysis failed' },
             { status: 500 }
         );
     }

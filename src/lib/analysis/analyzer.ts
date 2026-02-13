@@ -26,7 +26,7 @@ const NoiseStatsSchema = z.object({
 const FactCheckSchema = z.object({
     score: z.number().default(0),
     summary: z.string().default('Unavailable'),
-    verifications: z.array(z.any()).default([]),
+    verifications: z.array(z.record(z.string(), z.unknown())).default([]),
     flags: z.array(z.string()).default([])
 }).default({ score: 0, summary: 'Unavailable', verifications: [], flags: [] });
 
@@ -34,7 +34,7 @@ const ComplianceSchema = z.object({
     status: z.string().default('WARN'),
     riskScore: z.number().default(0),
     summary: z.string().default('Compliance check unavailable'),
-    regulations: z.array(z.any()).default([])
+    regulations: z.array(z.record(z.string(), z.unknown())).default([])
 }).default({ status: 'WARN', riskScore: 0, summary: 'Compliance check unavailable', regulations: [] });
 
 const SentimentSchema = z.object({
@@ -44,7 +44,7 @@ const SentimentSchema = z.object({
 
 const LogicalSchema = z.object({
     score: z.number().default(100),
-    fallacies: z.array(z.any()).default([])
+    fallacies: z.array(z.record(z.string(), z.unknown())).default([])
 }).default({ score: 100, fallacies: [] });
 
 const SwotSchema = z.object({
@@ -57,17 +57,17 @@ const SwotSchema = z.object({
 
 const CognitiveSchema = z.object({
     blindSpotGap: z.number().default(0),
-    counterArguments: z.array(z.any()).default([])
+    counterArguments: z.array(z.record(z.string(), z.unknown())).default([])
 }).optional();
 
 const SimulationSchema = z.object({
     overallVerdict: z.string().default('Neutral'),
-    twins: z.array(z.any()).default([])
+    twins: z.array(z.record(z.string(), z.unknown())).default([])
 }).optional();
 
 const MemorySchema = z.object({
     recallScore: z.number().default(0),
-    similarEvents: z.array(z.any()).default([])
+    similarEvents: z.array(z.record(z.string(), z.unknown())).default([])
 }).optional();
 
 

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
+import { toPrismaJson } from '@/lib/utils/prisma-json';
 
 export type AuditAction =
     | 'VIEW_DOCUMENT'
@@ -31,8 +32,7 @@ export async function logAudit(params: AuditLogParams) {
                 action: params.action,
                 resource: params.resource,
                 resourceId: params.resourceId,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                details: (params.details as any) || {},
+                details: toPrismaJson(params.details || {}),
                 userAgent: 'server-action', // Can be enhanced with headers() if needed
             }
         });

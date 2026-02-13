@@ -126,7 +126,7 @@ export async function GET(request: Request) {
     } catch (error) {
         console.error('Error fetching trends:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch trends', details: error instanceof Error ? error.message : String(error) },
+            { error: 'Failed to fetch trends' },
             { status: 500 }
         );
     }
