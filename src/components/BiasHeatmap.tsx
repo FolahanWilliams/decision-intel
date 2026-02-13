@@ -105,7 +105,7 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                                             {part.bias.severity}
                                         </span>
                                     </div>
-                                    <p className="text-gray-300 mb-3 italic">"{part.bias.excerpt}"</p>
+                                    <p className="text-gray-300 mb-3 italic">&quot;{part.bias.excerpt}&quot;</p>
                                     <p className="text-gray-300 mb-3">{part.bias.explanation}</p>
                                     <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-md">
                                         <span className="font-semibold text-indigo-300 block mb-1 flex items-center gap-1">

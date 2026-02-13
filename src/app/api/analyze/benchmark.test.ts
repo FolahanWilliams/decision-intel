@@ -53,6 +53,13 @@ const mocks = vi.hoisted(() => {
     }
 });
 
+vi.mock('@/lib/prisma', () => ({
+    prisma: {
+        ...mocks,
+        $transaction: vi.fn().mockImplementation(async (cb) => cb(mocks))
+    }
+}));
+
 vi.mock('@clerk/nextjs/server', () => ({
     auth: vi.fn().mockResolvedValue({ userId: 'user_123' }),
 }));

@@ -255,64 +255,68 @@ export async function runAnalysis(
         'riskScorer': 'Final Risk Scoring'
     };
 
-    // Track completed nodes for progress calculation
-    const completedNodes = new Set<string>();
-    const totalNodes = Object.keys(NODE_LABELS).length;
-
     // Initial step
     sendStep('Initializing audit pipeline', 'running', 5);
 
     let result;
     try {
-        // Use streamEvents for real-time node tracking
-        const eventStream = auditGraph.streamEvents(
-            { originalContent: content, documentId: documentId, userId: userId },
-            { version: 'v2' }
-        );
+        // Use streamEvents for real-time node tracking (Check if method exists for test resilience)
+        const eventStream = (typeof auditGraph.streamEvents === 'function')
+            ? auditGraph.streamEvents(
+                { originalContent: content, documentId: documentId, userId: userId },
+                { version: 'v2' }
+            )
+            : null;
 
-        // Capture the final output from the root graph end event
-        for await (const event of eventStream) {
-            // Track node start events
-            if (event.event === 'on_chain_start' && event.name && NODE_LABELS[event.name]) {
-                const label = NODE_LABELS[event.name];
-                sendStep(label, 'running', Math.round((completedNodes.size / totalNodes) * 80) + 10);
-            }
+        if (eventStream) {
+            // Track completed nodes for progress calculation
+            const completedNodes = new Set<string>();
+            const totalNodes = Object.keys(NODE_LABELS).length;
 
-            // Track node end events
-            if (event.event === 'on_chain_end') {
-                // Check for root graph completion
-                if (event.name === 'LangGraph') {
-                    result = event.data.output;
-                }
-                else if (event.name && NODE_LABELS[event.name]) {
-                    completedNodes.add(event.name);
+            // Capture the final output from the root graph end event
+            for await (const event of eventStream) {
+                // Track node start events
+                if (event.event === 'on_chain_start' && event.name && NODE_LABELS[event.name]) {
                     const label = NODE_LABELS[event.name];
-                    const progress = Math.round((completedNodes.size / totalNodes) * 80) + 10;
-                    sendStep(label, 'complete', progress);
+                    sendStep(label, 'running', Math.round((completedNodes.size / totalNodes) * 80) + 10);
+                }
 
-                    // Send bias detection updates specifically
-                    if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
-                        const biases = event.data.output.biasAnalysis;
-                        for (const bias of biases) {
-                            if (bias.found && onProgress) {
-                                onProgress({
-                                    type: 'bias',
-                                    biasType: bias.biasType,
-                                    progress,
-                                    result: { found: true, severity: bias.severity }
-                                });
+                // Track node end events
+                if (event.event === 'on_chain_end') {
+                    // Check for root graph completion
+                    if (event.name === 'LangGraph') {
+                        result = event.data.output;
+                    }
+                    else if (event.name && NODE_LABELS[event.name]) {
+                        completedNodes.add(event.name);
+                        const label = NODE_LABELS[event.name];
+                        const progress = Math.round((completedNodes.size / totalNodes) * 80) + 10;
+                        sendStep(label, 'complete', progress);
+
+                        // Send bias detection updates specifically
+                        if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
+                            const biases = event.data.output.biasAnalysis;
+                            for (const bias of biases) {
+                                if (bias.found && onProgress) {
+                                    onProgress({
+                                        type: 'bias',
+                                        biasType: bias.biasType,
+                                        progress,
+                                        result: { found: true, severity: bias.severity }
+                                    });
+                                }
                             }
                         }
-                    }
 
-                    // Send noise analysis updates
-                    if (event.name === 'noiseJudge' && event.data?.output?.noiseStats) {
-                        if (onProgress) {
-                            onProgress({
-                                type: 'noise',
-                                progress,
-                                result: { score: event.data.output.noiseStats.mean }
-                            });
+                        // Send noise analysis updates
+                        if (event.name === 'noiseJudge' && event.data?.output?.noiseStats) {
+                            if (onProgress) {
+                                onProgress({
+                                    type: 'noise',
+                                    progress,
+                                    result: { score: event.data.output.noiseStats.mean }
+                                });
+                            }
                         }
                     }
                 }
@@ -320,7 +324,8 @@ export async function runAnalysis(
         }
 
         if (!result) {
-            throw new Error("Stream ended without returning a final result");
+            // Fallback to non-streaming invoke if stream didn't yield result
+            throw new Error("Stream did not return a final result");
         }
 
     } catch (error) {

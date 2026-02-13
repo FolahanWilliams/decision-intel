@@ -29,7 +29,7 @@ export function InstitutionalMemoryWidget({ memory }: InstitutionalMemoryWidgetP
             <div className="card-body space-y-4 pt-4">
                 {/* Strategic Advice */}
                 <div className="bg-surface-hover/50 p-3 rounded-md text-sm italic text-muted border border-border/50">
-                    "{memory.strategicAdvice}"
+                    &quot;{memory.strategicAdvice}&quot;
                 </div>
 
                 {/* Similar Cases List */}
