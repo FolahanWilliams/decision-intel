@@ -39,6 +39,7 @@ describe('riskScorerNode', () => {
     it('should correctly aggregate scores and include new fields', async () => {
         const state: AuditState = {
             documentId: 'doc-1',
+            userId: 'test-user',
             originalContent: 'test content',
             biasAnalysis: [],
             noiseStats: { mean: 80, stdDev: 2, variance: 4 },
@@ -72,6 +73,7 @@ describe('riskScorerNode', () => {
     it('should handle missing fields gracefully', async () => {
         const state: AuditState = {
             documentId: 'doc-1',
+            userId: 'test-user',
             originalContent: 'test content',
             // Missing compliance, preMortem, sentimentAnalysis
         };
@@ -107,6 +109,7 @@ describe('linguisticAnalysisNode', () => {
 
         const state: AuditState = {
             documentId: 'doc-1',
+            userId: 'test-user',
             originalContent: 'I am very happy and logical.',
             structuredContent: '',
             biasAnalysis: [],
@@ -124,6 +127,7 @@ describe('linguisticAnalysisNode', () => {
 
         const state: AuditState = {
             documentId: 'doc-1',
+            userId: 'test-user',
             originalContent: 'content',
             structuredContent: '',
             biasAnalysis: [],

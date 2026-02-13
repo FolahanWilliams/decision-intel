@@ -82,6 +82,7 @@ describe('Integration Tests', () => {
 
             const state: AuditState = {
                 documentId: 'doc-1',
+                userId: 'test-user',
                 originalContent: 'Apple is doing well.',
             };
 
@@ -117,6 +118,7 @@ describe('Integration Tests', () => {
 
             const state: AuditState = {
                 documentId: 'doc-1',
+                userId: 'test-user',
                 originalContent: 'No stocks here.',
             };
 
@@ -135,6 +137,7 @@ describe('Integration Tests', () => {
 
             const state: AuditState = {
                 documentId: 'doc-1',
+                userId: 'test-user',
                 originalContent: 'Raw content',
             };
 

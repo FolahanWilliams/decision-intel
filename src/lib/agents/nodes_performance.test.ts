@@ -82,6 +82,7 @@ describe('factCheckerNode Performance', () => {
 
         const state: AuditState = {
             documentId: 'doc-1',
+            userId: 'test-user',
             originalContent: 'Apple and Microsoft are tech companies.',
             biasAnalysis: [],
             noiseStats: { mean: 0, stdDev: 0, variance: 0 },
