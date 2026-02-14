@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { auth } from '@clerk/nextjs/server';
 import { parseFile } from '@/lib/utils/file-parser';
 import { getSafeErrorMessage } from '@/lib/utils/error';
+import { createHash } from 'crypto';
 
 export async function POST(request: NextRequest) {
     try {
@@ -47,6 +48,37 @@ export async function POST(request: NextRequest) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
+        // Generate SHA-256 hash for semantic caching
+        const contentHash = createHash('sha256').update(buffer).digest('hex');
+
+        // Check if document already exists (Semantic Caching)
+        const existingDoc = await prisma.document.findUnique({
+            where: { contentHash },
+            include: { 
+                analyses: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                    include: {
+                        biases: true
+                    }
+                }
+            }
+        });
+
+        if (existingDoc) {
+            console.log('🎯 Cache hit: Document already analyzed', existingDoc.id);
+            
+            // Return cached result with the existing document ID and analysis
+            return NextResponse.json({
+                id: existingDoc.id,
+                filename: existingDoc.filename,
+                status: existingDoc.status,
+                cached: true,
+                message: 'Document already analyzed (Cached)',
+                analysis: existingDoc.analyses[0] || null
+            });
+        }
+
         // Extract text content
         let content = '';
 
@@ -87,7 +119,7 @@ export async function POST(request: NextRequest) {
             console.error('Supabase Storage Upload Error:', uploadError);
             throw new Error(`Storage Upload Failed: ${uploadError.message}`);
         }
-        // Store in database
+        // Store in database with content hash for future caching
         const document = await prisma.document.create({
             data: {
                 userId,
@@ -95,6 +127,7 @@ export async function POST(request: NextRequest) {
                 fileType: file.type || 'text/plain',
                 fileSize: file.size,
                 content,
+                contentHash, // Save hash for semantic caching
                 status: 'pending'
             }
         });

@@ -11,23 +11,25 @@ datasource db {
 }
 
 model Document {
-  id         String     @id @default(cuid())
-  userId     String   // Clerk User ID
-  orgId      String?  // Clerk Organization ID
-  filename   String
-  fileType   String
-  fileSize   Int
-  content    String     @db.Text
-  status     String     @default("pending")
+  id          String     @id @default(cuid())
+  userId      String   // Clerk User ID
+  orgId       String?  // Clerk Organization ID
+  filename    String
+  fileType    String
+  fileSize    Int
+  content     String     @db.Text
+  contentHash String?    @unique // For semantic caching - deduplication
+  status      String     @default("pending")
   
-  uploadedAt DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  uploadedAt  DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   
-  analyses   Analysis[]
-  embeddings DecisionEmbedding[]
+  analyses    Analysis[]
+  embeddings  DecisionEmbedding[]
 
   @@index([userId])
   @@index([updatedAt]) // For sorting by recent
+  @@index([contentHash]) // For cache lookups
 }
 
 model Analysis {
