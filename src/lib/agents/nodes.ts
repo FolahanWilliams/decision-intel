@@ -1,4 +1,3 @@
-
 import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult, BiasDetectionResult, NoiseBenchmark } from '../../types';
@@ -7,6 +6,8 @@ import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, COGNITIVE_DIVERSITY_PROMPT, 
 import { searchSimilarDocuments } from "../rag/embeddings";
 import { executeDataRequests, DataRequest } from "../tools/financial";
 import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
+import { withRetry, smartTruncate, batchProcess } from '../utils/resilience';
+import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
 
 // ============================================================
 // CONSTANTS
@@ -93,9 +94,14 @@ async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS):
 
 // Text truncation to prevent timeouts on large documents
 const MAX_INPUT_CHARS = 25000; // ~6K tokens
+
+/**
+ * Truncate text while preserving sentence boundaries and context
+ * @param text Text to truncate
+ * @returns Truncated text with context preservation
+ */
 function truncateText(text: string): string {
-    if (text.length <= MAX_INPUT_CHARS) return text;
-    return text.slice(0, MAX_INPUT_CHARS) + "\n\n[... text truncated for analysis ...]";
+    return smartTruncate(text, MAX_INPUT_CHARS);
 }
 
 // ============================================================
@@ -139,18 +145,23 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
     try {
         const content = truncateText(state.structuredContent || state.originalContent);
 
-        // Use Grounded Model for primary detection to allow real-world context verification
-        const result = await withTimeout(getGroundedModel().generateContent([
-            BIAS_DETECTIVE_PROMPT,
-            `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
-            `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.`
-        ]));
+        // Use Grounded Model for primary detection with retry logic
+        const result = await withRetry(
+            () => withTimeout(getGroundedModel().generateContent([
+                BIAS_DETECTIVE_PROMPT,
+                `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
+                `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.`
+            ])),
+            2, // 2 retries
+            1000, // 1 second base delay
+            10000 // 10 second max delay
+        );
 
         const response = result.response?.text ? result.response.text() : "";
         const data = parseJSON(response);
         const biases = data?.biases || [];
 
-        // Educational Insight (Dynamic Retrieval)
+        // Educational Insight (Dynamic Retrieval) with caching
         // For HIGH/CRITICAL biases, fetch scientific context
         const severeBiases = biases.filter((b: BiasDetectionResult) =>
             (b.severity === SEVERITY_LEVELS.HIGH || b.severity === SEVERITY_LEVELS.CRITICAL) && b.biasType
@@ -159,41 +170,60 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
         if (severeBiases.length > 0) {
             console.log(`Fetching educational insights for ${severeBiases.length} severe biases...`);
 
-            // Allow up to 3 parallel searches to avoid rate limits
-            const insightPromises = severeBiases.slice(0, 3).map(async (bias: BiasDetectionResult) => {
-                try {
-                    const searchResult = await getGroundedModel().generateContent([
-                        `You are a Cognitive Psychology Tutor.
-                        TASK: Find a specific scientific study or "HBR" (Harvard Business Review) article that explains the following bias: "${bias.biasType}".
-                        
-                        OUTPUT JSON:
-                        {
-                            "title": "The Hidden Traps in Decision Making (HBR)",
-                            "summary": "1-sentence explanation of why this bias occurs based on the study.",
-                            "sourceUrl": "https://hbr.org/..."
-                        }`,
-                        `Bias: ${bias.biasType}`
-                    ]);
-
-                    const insightText = searchResult.response.text();
-                    const insightData = parseJSON(insightText);
-
-                    // Extract Source
-                    const metadata = searchResult.response.candidates?.[0]?.groundingMetadata;
-                    const searchSource = metadata?.groundingChunks?.find((c: { web?: { uri?: string } }) => c.web?.uri)?.web?.uri;
-
-                    if (insightData) {
-                        bias.researchInsight = {
-                            ...insightData,
-                            sourceUrl: insightData.sourceUrl || searchSource || ""
-                        };
+            // Process insights with concurrency control and caching
+            await batchProcess(
+                severeBiases.slice(0, 3),
+                async (bias: BiasDetectionResult) => {
+                    // Check cache first
+                    const cachedInsight = await getCachedBiasInsight(bias.biasType);
+                    if (cachedInsight) {
+                        console.log(`Cache hit for bias insight: ${bias.biasType}`);
+                        bias.researchInsight = JSON.parse(cachedInsight);
+                        return;
                     }
-                } catch (e) {
-                    console.error(`Failed to fetch insight for ${bias.biasType}`, e);
-                }
-            });
 
-            await Promise.all(insightPromises);
+                    try {
+                        const searchResult = await withRetry(
+                            () => withTimeout(getGroundedModel().generateContent([
+                                `You are a Cognitive Psychology Tutor.
+                                TASK: Find a specific scientific study or "HBR" (Harvard Business Review) article that explains the following bias: "${bias.biasType}".
+                                
+                                OUTPUT JSON:
+                                {
+                                    "title": "The Hidden Traps in Decision Making (HBR)",
+                                    "summary": "1-sentence explanation of why this bias occurs based on the study.",
+                                    "sourceUrl": "https://hbr.org/..."
+                                }`,
+                                `Bias: ${bias.biasType}`
+                            ]), 30000), // 30 second timeout for insights
+                            2, // 2 retries
+                            1000,
+                            5000
+                        );
+
+                        const insightText = searchResult.response.text();
+                        const insightData = parseJSON(insightText);
+
+                        // Extract Source
+                        const metadata = searchResult.response.candidates?.[0]?.groundingMetadata;
+                        const searchSource = metadata?.groundingChunks?.find((c: { web?: { uri?: string } }) => c.web?.uri)?.web?.uri;
+
+                        if (insightData) {
+                            const researchInsight = {
+                                ...insightData,
+                                sourceUrl: insightData.sourceUrl || searchSource || ""
+                            };
+                            bias.researchInsight = researchInsight;
+                            
+                            // Cache the insight for future use
+                            await cacheBiasInsight(bias.biasType, JSON.stringify(researchInsight));
+                        }
+                    } catch (e) {
+                        console.error(`Failed to fetch insight for ${bias.biasType}`, e);
+                    }
+                },
+                2 // Process 2 at a time to avoid rate limits
+            );
         }
 
         return { biasAnalysis: biases };
@@ -475,10 +505,20 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
         console.log("Running Compliance Check with Google Search Grounding...");
-        const result = await getGroundedModel().generateContent([
-            COMPLIANCE_CHECKER_PROMPT,
-            `Document Content:\n${content}`
-        ]);
+        
+        // Add timeout wrapper and retry logic
+        const result = await withRetry(
+            () => withTimeout(
+                getGroundedModel().generateContent([
+                    COMPLIANCE_CHECKER_PROMPT,
+                    `Document Content:\n${content}`
+                ]),
+                60000 // 60 second timeout for compliance
+            ),
+            2, // 2 retries
+            1000, // 1 second base delay
+            5000 // 5 second max delay
+        );
 
         const text = result.response.text();
         const data = parseJSON(text);
@@ -563,10 +603,20 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
 export async function linguisticAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
-        const result = await getModel().generateContent([
-            LINGUISTIC_ANALYSIS_PROMPT,
-            `Text:\n${content}`
-        ]);
+        // Add timeout wrapper and retry logic
+        const result = await withRetry(
+            () => withTimeout(
+                getModel().generateContent([
+                    LINGUISTIC_ANALYSIS_PROMPT,
+                    `Text:\n${content}`
+                ]),
+                45000 // 45 second timeout for linguistic analysis
+            ),
+            2, // 2 retries
+            1000, // 1 second base delay
+            5000 // 5 second max delay
+        );
+        
         const data = parseJSON(result.response.text());
         return {
             sentimentAnalysis: data?.sentiment || { score: 0, label: 'Neutral' },

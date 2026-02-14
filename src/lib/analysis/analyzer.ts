@@ -3,6 +3,8 @@ import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { safeJsonClone } from '@/lib/utils/json';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { Document } from '@prisma/client';
+import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/lib/utils/cache';
+import { validateContent } from '@/lib/utils/resilience';
 
 import { z } from 'zod';
 
@@ -91,6 +93,24 @@ export async function analyzeDocument(
     } else {
         document = documentOrId;
         documentId = document.id;
+    }
+
+    // Validate content before analysis
+    const validation = validateContent(document.content);
+    if (!validation.valid) {
+        throw new Error(validation.error);
+    }
+
+    // Check cache first
+    const cacheKey = generateAnalysisCacheKey(document.content, document.userId);
+    const cached = await getCachedAnalysis(cacheKey);
+    
+    if (cached) {
+        console.log('✅ Cache hit for analysis:', cacheKey.substring(0, 16));
+        if (onProgress) {
+            onProgress({ type: 'step', step: 'Retrieved from cache', status: 'complete', progress: 100 });
+        }
+        return cached as unknown as AnalysisResult;
     }
 
     // Run analysis within a transaction for atomicity
@@ -198,6 +218,13 @@ export async function analyzeDocument(
             );
         } catch (embeddingError) {
             console.warn('Failed to store embedding (non-critical):', embeddingError);
+        }
+
+        // Cache the result for future use (non-blocking)
+        try {
+            await cacheAnalysis(cacheKey, result as unknown as Record<string, unknown>);
+        } catch (cacheError) {
+            console.warn('Failed to cache analysis (non-critical):', cacheError);
         }
 
         if (onProgress) {
