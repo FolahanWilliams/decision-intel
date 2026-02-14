@@ -46,10 +46,6 @@ export default function RiskAuditsPage() {
         return (rawDocs as DocumentWithRisk[]).filter(d => d.analyses && d.analyses.length > 0);
     }, [rawDocs]);
 
-    const summary = useMemo(() => {
-        return calculateRiskSummary(documents);
-    }, [documents]);
-
     const calculateRiskSummary = (docs: DocumentWithRisk[]): RiskSummary => {
         let highRisk = 0, mediumRisk = 0, lowRisk = 0, criticalBiases = 0;
         let totalScore = 0;
@@ -78,6 +74,10 @@ export default function RiskAuditsPage() {
             criticalBiases
         };
     };
+
+    const summary = useMemo(() => {
+        return calculateRiskSummary(documents);
+    }, [documents]);
 
     const getRiskLevel = (score: number): { label: string; color: string; bg: string } => {
         if (score < 40) return { label: 'HIGH RISK', color: 'var(--error)', bg: 'rgba(239, 68, 68, 0.1)' };
