@@ -80,14 +80,14 @@ function CustomContent({ x, y, width, height, name, count, index }: TreemapConte
 export function BiasTreemap({ data }: BiasTreemapProps) {
     if (!data || data.length === 0) {
         return (
-            <div className="card h-full">
+            <div className="card card-glow h-full">
                 <div className="card-header">
-                    <h3 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         Bias Landscape
                     </h3>
                 </div>
                 <div className="card-body flex items-center justify-center" style={{ height: 320 }}>
-                    <p className="text-muted text-sm">No biases detected yet</p>
+                    <p className="text-muted" style={{ fontSize: '11px', fontFamily: 'JetBrains Mono, monospace' }}>NO DATA</p>
                 </div>
             </div>
         );
@@ -101,12 +101,12 @@ export function BiasTreemap({ data }: BiasTreemapProps) {
     }));
 
     return (
-        <div className="card h-full">
+        <div className="card card-glow h-full">
             <div className="card-header flex items-center justify-between">
-                <h3 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Bias Landscape
                 </h3>
-                <span className="text-xs text-muted">
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
                     {data.reduce((s, d) => s + d.count, 0)} total
                 </span>
             </div>
@@ -120,10 +120,11 @@ export function BiasTreemap({ data }: BiasTreemapProps) {
                     >
                         <Tooltip
                             contentStyle={{
-                                background: 'var(--bg-card)',
+                                background: 'var(--bg-secondary)',
                                 border: '1px solid var(--border-color)',
-                                borderRadius: '4px',
-                                fontSize: '12px',
+                                borderRadius: '0',
+                                fontSize: '11px',
+                                fontFamily: 'JetBrains Mono, monospace',
                             }}
                             formatter={(value: number | undefined) => [`${value ?? 0} occurrences`, 'Count']}
                         />

@@ -21,9 +21,9 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
 
     if (total === 0) {
         return (
-            <div className="card h-full">
+            <div className="card card-glow h-full">
                 <div className="card-header">
-                    <h3 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         Fact Verification
                     </h3>
                 </div>
@@ -64,10 +64,11 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
                             />
                             <Tooltip
                                 contentStyle={{
-                                    background: 'var(--bg-card)',
+                                    background: 'var(--bg-secondary)',
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '4px',
-                                    fontSize: '12px',
+                                    borderRadius: '0',
+                                    fontSize: '11px',
+                                    fontFamily: 'JetBrains Mono, monospace',
                                 }}
                                 formatter={(value: number | undefined) => [`${value ?? 0} (${Math.round(((value ?? 0) / total) * 100)}%)`, 'Claims']}
                             />

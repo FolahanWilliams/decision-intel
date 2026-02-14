@@ -103,9 +103,9 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
     };
 
     return (
-        <div className="card h-full">
+        <div className="card card-glow h-full">
             <div className="card-header">
-                <h3 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Sentiment Pulse
                 </h3>
             </div>

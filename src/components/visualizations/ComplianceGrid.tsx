@@ -15,7 +15,7 @@ export function ComplianceGrid({ data }: ComplianceGridProps) {
         return (
             <div className="card">
                 <div className="card-header">
-                    <h3 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                         Compliance Scorecard
                     </h3>
                 </div>
