@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useDocuments } from '@/hooks/useDocuments';
 import Link from 'next/link';
 import {
     ShieldAlert, FileText, AlertTriangle, CheckCircle,
@@ -31,9 +32,8 @@ interface RiskSummary {
 }
 
 export default function RiskAuditsPage() {
-    const [documents, setDocuments] = useState<DocumentWithRisk[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [summary, setSummary] = useState<RiskSummary | null>(null);
+    // SWR: cached document list with detailed analysis data
+    const { documents: rawDocs, isLoading: loading, mutate: mutateDocs } = useDocuments(true);
 
     // Delete state
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; docId: string; filename: string }>({
@@ -41,36 +41,14 @@ export default function RiskAuditsPage() {
     });
     const [deleting, setDeleting] = useState(false);
 
-    useEffect(() => {
-        const fetchRiskData = async () => {
-            try {
-                // Optimized: Fetch all data in one request with ?detailed=true
-                const res = await fetch('/api/documents?detailed=true');
-                if (res.ok) {
-                    const docs = await res.json();
+    // Derived: filter to docs with analyses and compute summary
+    const documents = useMemo(() => {
+        return (rawDocs as DocumentWithRisk[]).filter(d => d.analyses && d.analyses.length > 0);
+    }, [rawDocs]);
 
-                    // Filter for docs that have analysis data
-                    // The API now returns the structure we need directly
-                    const validDocs = docs.filter((d: DocumentWithRisk) => d.analyses && d.analyses.length > 0);
-
-                    // Map to expected internal format if needed, or use as is
-                    // The API returns analyses: [{ overallScore, noiseScore, ... }]
-                    // which matches our DocumentWithRisk interface (mostly)
-
-                    setDocuments(validDocs);
-
-                    // Calculate risk summary
-                    const summary = calculateRiskSummary(validDocs);
-                    setSummary(summary);
-                }
-            } catch (err) {
-                console.error('Failed to fetch risk data:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchRiskData();
-    }, []);
+    const summary = useMemo(() => {
+        return calculateRiskSummary(documents);
+    }, [documents]);
 
     const calculateRiskSummary = (docs: DocumentWithRisk[]): RiskSummary => {
         let highRisk = 0, mediumRisk = 0, lowRisk = 0, criticalBiases = 0;
@@ -107,17 +85,15 @@ export default function RiskAuditsPage() {
         return { label: 'LOW RISK', color: 'var(--success)', bg: 'rgba(34, 197, 94, 0.1)' };
     };
 
-    // Delete handler
+    // Delete handler — uses SWR mutate for cache invalidation
     const handleDelete = async () => {
         if (!deleteModal.docId) return;
         setDeleting(true);
         try {
             const res = await fetch(`/api/documents/${deleteModal.docId}`, { method: 'DELETE' });
             if (res.ok) {
-                setDocuments(prev => prev.filter(d => d.id !== deleteModal.docId));
-                // Recalculate summary
-                const newDocs = documents.filter(d => d.id !== deleteModal.docId);
-                setSummary(calculateRiskSummary(newDocs));
+                // Revalidate the SWR cache — derived state will update automatically
+                await mutateDocs();
                 setDeleteModal({ open: false, docId: '', filename: '' });
             }
         } catch (err) {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3 } from 'lucide-react';
 
 export default function Sidebar() {
     const pathname = usePathname();
@@ -39,6 +39,7 @@ export default function Sidebar() {
                     Analysis
                 </div>
                 <NavItem href="/dashboard/trends" icon={<Activity size={18} />} label="Historical Trends" active={pathname === '/dashboard/trends'} />
+                <NavItem href="/dashboard/insights" icon={<BarChart3 size={18} />} label="Visual Insights" active={pathname === '/dashboard/insights'} />
                 <NavItem href="/dashboard/risk-audits" icon={<ShieldAlert size={18} />} label="Risk Audits" active={pathname === '/dashboard/risk-audits'} />
 
                 <div style={{ fontSize: '11px', color: '#666', padding: '16px 12px 8px', textTransform: 'uppercase' }}>

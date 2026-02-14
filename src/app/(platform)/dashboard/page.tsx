@@ -1,25 +1,13 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { SSEReader } from '@/lib/sse';
+import { useDocuments } from '@/hooks/useDocuments';
+import { useAnalysisStream } from '@/hooks/useAnalysisStream';
 import { RiskTrendChart } from './RiskTrendChart';
 import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnalysis';
 
-interface UploadedDoc {
-  id: string;
-  filename: string;
-  status: string;
-  score?: number;
-  uploadedAt: string;
-}
-
-interface AnalysisStep {
-  name: string;
-  status: 'pending' | 'running' | 'complete';
-  icon: React.ReactNode;
-}
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -34,11 +22,7 @@ const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
 export default function Dashboard() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [uploadedDocs, setUploadedDocs] = useState<UploadedDoc[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [analysisSteps, setAnalysisSteps] = useState<AnalysisStep[]>([]);
-  const [currentProgress, setCurrentProgress] = useState(0);
-  const [loadingDocs, setLoadingDocs] = useState(true);
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,23 +35,18 @@ export default function Dashboard() {
   });
   const [deleting, setDeleting] = useState(false);
 
-  // Fetch existing documents on page load
-  useEffect(() => {
-    const fetchDocuments = async () => {
-      try {
-        const res = await fetch('/api/documents');
-        if (res.ok) {
-          const docs = await res.json();
-          setUploadedDocs(docs);
-        }
-      } catch (err) {
-        console.error('Failed to fetch documents:', err);
-      } finally {
-        setLoadingDocs(false);
-      }
-    };
-    fetchDocuments();
-  }, []);
+  // SWR: cached document list with auto-revalidation
+  const { documents: uploadedDocs, isLoading: loadingDocs, mutate: mutateDocs } = useDocuments();
+
+  // SSE: streaming analysis with typed events, auto-retry, AbortController cleanup
+  const {
+    startAnalysis,
+    steps: analysisSteps,
+    progress: currentProgress,
+    error: streamError,
+  } = useAnalysisStream({
+    stepNames: ANALYSIS_STEPS.map(s => s.name),
+  });
 
   // Filtered documents based on search and status
   const filteredDocs = useMemo(() => {
@@ -78,14 +57,18 @@ export default function Dashboard() {
     });
   }, [uploadedDocs, searchQuery, statusFilter]);
 
-  // Delete document handler
+  // Delete document handler — uses SWR mutate for cache invalidation
   const handleDelete = async () => {
     if (!deleteModal.docId) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/documents/${deleteModal.docId}`, { method: 'DELETE' });
       if (res.ok) {
-        setUploadedDocs(prev => prev.filter(d => d.id !== deleteModal.docId));
+        // Optimistically remove from cache, then revalidate
+        await mutateDocs(
+          (current) => current?.filter(d => d.id !== deleteModal.docId),
+          { revalidate: true }
+        );
         setDeleteModal({ open: false, docId: '', filename: '' });
       } else {
         setError('Failed to delete document');
@@ -140,99 +123,42 @@ export default function Dashboard() {
 
       const uploadData = await uploadRes.json();
 
-      // Add to list with pending status
-      setUploadedDocs(prev => [
-        { id: uploadData.id, filename: uploadData.filename, status: 'analyzing', uploadedAt: new Date().toISOString() },
-        ...prev
-      ]);
+      // Optimistically add to SWR cache with analyzing status
+      await mutateDocs(
+        (current) => [
+          { id: uploadData.id, filename: uploadData.filename, status: 'analyzing', uploadedAt: new Date().toISOString() },
+          ...(current ?? [])
+        ],
+        { revalidate: false }
+      );
 
-      // Use streaming endpoint to prevent timeout
-      const analyzeRes = await fetch('/api/analyze/stream', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentId: uploadData.id }),
-      });
+      // Stream analysis via the hook (auto-retry, typed events, AbortController cleanup)
+      const finalResult = await startAnalysis(uploadData.id);
 
-      // For SSE streams, check if we got a response body
-      // Note: SSE always returns 200, errors come through the stream
-      if (!analyzeRes.body) {
-        throw new Error('No response body from analysis endpoint');
+      if (finalResult) {
+        // Update SWR cache with the completed result
+        await mutateDocs(
+          (current) => current?.map(doc =>
+            doc.id === uploadData.id
+              ? { ...doc, status: 'complete', score: finalResult?.overallScore as number }
+              : doc
+          ),
+          { revalidate: true }
+        );
+      } else if (streamError) {
+        throw new Error(streamError);
       }
-
-      // Initialize analysis steps
-      setAnalysisSteps(ANALYSIS_STEPS.map(s => ({ ...s, status: 'pending' as const })));
-
-      // Read the stream for progress updates
-      const reader = analyzeRes.body.getReader();
-      const decoder = new TextDecoder();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let finalResult: any = null;
-      let streamError: Error | null = null;
-
-      const sseReader = new SSEReader();
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          sseReader.processChunk(chunk, (data: unknown) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const update = data as any;
-
-            // Handle step progress updates
-            if (update.type === 'step' && update.step) {
-              setCurrentProgress(update.progress || 0);
-              setAnalysisSteps(prev => prev.map(s => ({
-                ...s,
-                status: s.name === update.step
-                  ? update.status
-                  : s.status === 'complete' ? 'complete' : s.status
-              })));
-            }
-
-            // Check for error messages in the SSE stream
-            if (update.type === 'error') {
-              streamError = new Error(update.message || 'Analysis failed');
-            }
-
-            if (update.type === 'complete' && update.result) {
-              finalResult = update.result;
-              // Mark all steps complete
-              setAnalysisSteps(prev => prev.map(s => ({ ...s, status: 'complete' as const })));
-            }
-          });
-        }
-      } catch {
-        console.error('Stream read error occurred.');
-        streamError = new Error('Connection lost during analysis. Please try again.');
-      }
-
-      // Check if we got an error from the stream
-      if (streamError) {
-        throw streamError;
-      }
-
-      // Check if we got a valid result
-      if (!finalResult) {
-        throw new Error('Analysis completed but no result received');
-      }
-
-      // Update status with final result
-      setUploadedDocs(prev => prev.map(doc =>
-        doc.id === uploadData.id
-          ? { ...doc, status: 'complete', score: finalResult?.overallScore }
-          : doc
-      ));
     } catch (err) {
       console.error('Upload/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
-      // Display actual error message (sanitized by backend)
       setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
 
-      // Mark as error in list
-      setUploadedDocs(prev => prev.map(doc =>
-        doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc
-      ));
+      // Mark as error in SWR cache
+      await mutateDocs(
+        (current) => current?.map(doc =>
+          doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc
+        ),
+        { revalidate: false }
+      );
     } finally {
       setUploading(false);
     }

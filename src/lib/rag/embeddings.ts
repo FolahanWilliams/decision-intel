@@ -87,7 +87,125 @@ ${biasText || 'No biases detected'}
 }
 
 /**
- * Store an embedding for a document analysis
+ * Input type for batch embedding storage
+ */
+export interface EmbeddingInput {
+    documentId: string;
+    filename: string;
+    summary: string;
+    biases: Array<{ biasType: string; severity: string; explanation: string }>;
+    score: number;
+    analysisId?: string;
+}
+
+/**
+ * Store embeddings for multiple document analyses in a single batch INSERT.
+ * Generates embeddings in parallel (fault-tolerant) and inserts all successful
+ * results in one multi-row SQL statement.
+ * 
+ * @returns Number of embeddings successfully stored
+ */
+export async function storeAnalysisEmbeddingsBatch(
+    items: EmbeddingInput[]
+): Promise<number> {
+    if (items.length === 0) return 0;
+
+    try {
+        // Generate all embeddings in parallel (fault-tolerant)
+        const embeddingResults = await Promise.allSettled(
+            items.map(async (item) => {
+                const text = createAnalysisEmbeddingText(
+                    item.filename, item.summary, item.biases, item.score
+                );
+                const embedding = await generateEmbedding(text);
+
+                const metadata: EmbeddingMetadata = {
+                    documentId: item.documentId,
+                    analysisId: item.analysisId,
+                    filename: item.filename,
+                    overallScore: item.score,
+                    biasCount: item.biases.length,
+                    primaryBiases: item.biases.slice(0, 3).map(b => b.biasType),
+                    createdAt: new Date().toISOString()
+                };
+
+                return { text, embedding, metadata, documentId: item.documentId };
+            })
+        );
+
+        // Filter to successful results only
+        const successful = embeddingResults
+            .filter((r): r is PromiseFulfilledResult<{ text: string; embedding: number[]; metadata: EmbeddingMetadata; documentId: string }> =>
+                r.status === 'fulfilled'
+            )
+            .map(r => r.value);
+
+        const failed = embeddingResults.filter(r => r.status === 'rejected').length;
+        if (failed > 0) {
+            console.warn(`⚠️ ${failed}/${items.length} embedding generations failed`);
+        }
+
+        if (successful.length === 0) {
+            console.warn('All embedding generations failed, skipping storage');
+            return 0;
+        }
+
+        // Build multi-row INSERT with parameterized values
+        // For a single item, use the simple tagged template (fully parameterized)
+        if (successful.length === 1) {
+            const { text, embedding, metadata, documentId } = successful[0];
+            const embeddingString = `[${embedding.join(',')}]`;
+            const metadataJson = JSON.stringify(metadata);
+
+            await prisma.$executeRaw`
+                INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
+                VALUES (
+                    gen_random_uuid()::text,
+                    ${documentId},
+                    ${text},
+                    ${embeddingString}::vector,
+                    ${metadataJson}::jsonb
+                )
+                ON CONFLICT (id) DO NOTHING
+            `;
+        } else {
+            // For multiple items, build a batch insert
+            // Each value set is individually parameterized via tagged template literals
+            // We use $executeRawUnsafe here because Prisma tagged templates don't support dynamic row counts
+            const values: string[] = [];
+            const params: unknown[] = [];
+            let paramIndex = 1;
+
+            for (const { text, embedding, metadata, documentId } of successful) {
+                const embeddingString = `[${embedding.join(',')}]`;
+                const metadataJson = JSON.stringify(metadata);
+
+                values.push(`(gen_random_uuid()::text, $${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}::vector, $${paramIndex + 3}::jsonb)`);
+                params.push(documentId, text, embeddingString, metadataJson);
+                paramIndex += 4;
+            }
+
+            const sql = `
+                INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
+                VALUES ${values.join(', ')}
+                ON CONFLICT (id) DO NOTHING
+            `;
+
+            await prisma.$executeRawUnsafe(sql, ...params);
+        }
+
+        console.log(`✅ Stored ${successful.length} embedding(s) in batch`);
+        return successful.length;
+    } catch (error) {
+        console.error('Failed to store embeddings batch:', error);
+        // Don't throw - embedding storage is non-critical
+        return 0;
+    }
+}
+
+/**
+ * Store an embedding for a single document analysis.
+ * Thin wrapper around storeAnalysisEmbeddingsBatch for backward compatibility.
  */
 export async function storeAnalysisEmbedding(
     documentId: string,
@@ -97,42 +215,9 @@ export async function storeAnalysisEmbedding(
     score: number,
     analysisId?: string
 ): Promise<void> {
-    try {
-        const text = createAnalysisEmbeddingText(filename, summary, biases, score);
-        const embedding = await generateEmbedding(text);
-
-        const metadata: EmbeddingMetadata = {
-            documentId,
-            analysisId,
-            filename,
-            overallScore: score,
-            biasCount: biases.length,
-            primaryBiases: biases.slice(0, 3).map(b => b.biasType),
-            createdAt: new Date().toISOString()
-        };
-
-        // Use raw SQL for vector insertion since Prisma doesn't natively support vectors
-        // SECURITY: Using Prisma's parameterized queries which safely escape all inputs
-        // The embedding vector is converted to a string representation but passed as a parameter
-        const embeddingString = `[${embedding.join(',')}]`;
-        const metadataJson = JSON.stringify(metadata);
-
-        await prisma.$executeRaw`
-            INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
-            VALUES (
-                gen_random_uuid()::text,
-                ${documentId},
-                ${text},
-                ${embeddingString}::vector,
-                ${metadataJson}::jsonb
-            )
-        `;
-
-        console.log(`Stored embedding for document ${documentId}`);
-    } catch (error) {
-        console.error('Failed to store embedding:', error);
-        // Don't throw - embedding storage is non-critical
-    }
+    await storeAnalysisEmbeddingsBatch([{
+        documentId, filename, summary, biases, score, analysisId
+    }]);
 }
 
 /**

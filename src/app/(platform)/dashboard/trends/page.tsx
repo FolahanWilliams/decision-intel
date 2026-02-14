@@ -1,43 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useTrends } from '@/hooks/useTrends';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, Cell, LineChart, Line
 } from 'recharts';
 import { Download, TrendingUp, TrendingDown, RefreshCw, AlertTriangle } from 'lucide-react';
 
-interface TrendDataPoint {
-    date: string;
-    score: number;
-    noise: number;
-    volume: number;
-}
-
-interface BiasDataPoint {
-    name: string;
-    value: number;
-}
-
-interface TrendsStats {
-    totalAnalyses: number;
-    avgScore: number;
-    highScore: number;
-    lowScore: number;
-    latestScore: number;
-    avgNoise: number;
-    totalBiases: number;
-    trend: number;
-}
-
-interface TrendsData {
-    trendData: TrendDataPoint[];
-    biasDistribution: BiasDataPoint[];
-    stats: TrendsStats;
-    range: string;
-    startDate: string;
-    endDate: string;
-}
 
 interface MarketAnalysis {
     summary: string;
@@ -47,9 +17,8 @@ interface MarketAnalysis {
 
 export default function TrendsPage() {
     const [timeRange, setTimeRange] = useState('1M');
-    const [data, setData] = useState<TrendsData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { trends: data, isLoading: loading, error: trendsError, mutate: mutateTrends } = useTrends(timeRange);
+    const error = trendsError?.message ?? null;
     const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
 
@@ -67,27 +36,6 @@ export default function TrendsPage() {
             setAnalyzing(false);
         }
     };
-
-    const fetchTrends = async (range: string) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await fetch(`/api/trends?range=${range}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch trends');
-            }
-            const result = await response.json();
-            setData(result);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load trends');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchTrends(timeRange);
-    }, [timeRange]);
 
     const handleRangeChange = (range: string) => {
         setTimeRange(range);
@@ -181,7 +129,7 @@ export default function TrendsPage() {
                 <div className="card mb-xl" style={{ borderColor: 'var(--error)' }}>
                     <div className="card-body" style={{ textAlign: 'center', padding: 'var(--spacing-xl)' }}>
                         <p style={{ color: 'var(--error)' }}>{error}</p>
-                        <button className="btn btn-primary mt-md" onClick={() => fetchTrends(timeRange)}>
+                        <button className="btn btn-primary mt-md" onClick={() => mutateTrends()}>
                             Retry
                         </button>
                     </div>
