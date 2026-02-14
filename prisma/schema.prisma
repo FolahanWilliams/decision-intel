@@ -128,3 +128,19 @@ model UserSettings {
 
   @@index([userId])
 }
+
+// Rate limiting table - replaces Redis for cost savings
+model RateLimit {
+  id        String   @id @default(cuid())
+  identifier String  // IP address or user ID
+  route     String   // API route being limited
+  count     Int      @default(0) // Number of requests made
+  resetAt   DateTime // When the rate limit window resets
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([identifier, route])
+  @@index([identifier])
+  @@index([resetAt])
+}
