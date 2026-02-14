@@ -169,29 +169,27 @@ export async function storeAnalysisEmbeddingsBatch(
                 ON CONFLICT (id) DO NOTHING
             `;
         } else {
-            // For multiple items, build a batch insert
-            // Each value set is individually parameterized via tagged template literals
-            // We use $executeRawUnsafe here because Prisma tagged templates don't support dynamic row counts
-            const values: string[] = [];
-            const params: unknown[] = [];
-            let paramIndex = 1;
-
-            for (const { text, embedding, metadata, documentId } of successful) {
+            // For multiple items, use transaction with individual inserts
+            // This is safer than building dynamic SQL strings
+            const inserts = successful.map(({ text, embedding, metadata, documentId }) => {
                 const embeddingString = `[${embedding.join(',')}]`;
                 const metadataJson = JSON.stringify(metadata);
-
-                values.push(`(gen_random_uuid()::text, $${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}::vector, $${paramIndex + 3}::jsonb)`);
-                params.push(documentId, text, embeddingString, metadataJson);
-                paramIndex += 4;
-            }
-
-            const sql = `
-                INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
-                VALUES ${values.join(', ')}
-                ON CONFLICT (id) DO NOTHING
-            `;
-
-            await prisma.$executeRawUnsafe(sql, ...params);
+                
+                return prisma.$executeRaw`
+                    INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
+                    VALUES (
+                        gen_random_uuid()::text,
+                        ${documentId},
+                        ${text},
+                        ${embeddingString}::vector,
+                        ${metadataJson}::jsonb
+                    )
+                    ON CONFLICT (id) DO NOTHING
+                `;
+            });
+            
+            // Execute all inserts within a transaction
+            await prisma.$transaction(inserts);
         }
 
         console.log(`✅ Stored ${successful.length} embedding(s) in batch`);

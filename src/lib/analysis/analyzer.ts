@@ -337,17 +337,22 @@ export async function runAnalysis(
 
         // Add timeout to fallback invocation (25 seconds max for serverless safety)
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Analysis timed out")), 25000)
+            setTimeout(() => reject(new Error("Analysis timed out after 25 seconds")), 25000)
         );
 
-        result = await Promise.race([
-            auditGraph.invoke({
-                originalContent: content,
-                documentId: documentId,
-                userId: userId,
-            }),
-            timeoutPromise
-        ]) as { finalReport: Record<string, unknown> };
+        try {
+            result = await Promise.race([
+                auditGraph.invoke({
+                    originalContent: content,
+                    documentId: documentId,
+                    userId: userId,
+                }),
+                timeoutPromise
+            ]) as { finalReport: Record<string, unknown> };
+        } catch (timeoutError) {
+            console.error('Analysis timeout:', timeoutError);
+            throw new Error("Analysis timed out. Please try again or contact support if the issue persists.");
+        }
     }
 
     sendStep('Finalizing report', 'running', 95);

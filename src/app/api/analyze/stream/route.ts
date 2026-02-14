@@ -69,12 +69,12 @@ const NODE_LABELS: Record<string, string> = {
     'biasDetective': 'Bias Detection',
     'noiseJudge': 'Noise Analysis',
     'factChecker': 'Financial Fact Check',
-    'preMortemAnalyzer': 'Pre-Mortem Analysis',
+    'strategicAnalysis': 'Strategic Analysis',
     'complianceMapper': 'Compliance Check',
-    'sentimentAnalyzer': 'Sentiment Analysis',
-    'logicalFallacyScanner': 'Logical Analysis',
-    'strategicInsight': 'SWOT Analysis',
+    'linguisticAnalysis': 'Linguistic Analysis',
     'cognitiveDiversity': 'Cognitive Diversity (Red Team)',
+    'decisionTwin': 'Decision Simulation',
+    'memoryRecall': 'Institutional Memory',
     'riskScorer': 'Final Risk Scoring'
 };
 

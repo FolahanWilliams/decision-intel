@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useInView, AnimatePresence } from 'framer-motion';
 import { 
@@ -56,6 +56,28 @@ export default function LandingPage() {
     if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
     return `$${value}`;
   };
+
+  // Memoize random values for visualizations to prevent unnecessary re-renders
+  const chaosLines = useMemo(() => [...Array(8)].map(() => ({
+    startY: 50 + Math.random() * 20,
+    controlX: 100 + Math.random() * 100,
+    controlY: Math.random() * 100,
+    endY: 50 + Math.random() * 40
+  })), []);
+
+  const chaosPoints = useMemo(() => [...Array(20)].map(() => ({
+    left: 20 + Math.random() * 60,
+    top: 20 + Math.random() * 60
+  })), []);
+
+  const orderPoints = useMemo(() => [...Array(15)].map((_, i) => {
+    const angle = (i / 15) * Math.PI * 2;
+    const radius = 30 + Math.random() * 20;
+    return {
+      left: 50 + Math.cos(angle) * radius,
+      top: 50 + Math.sin(angle) * radius
+    };
+  }), []);
 
   const heroRef = useRef(null);
   const problemRef = useRef(null);
@@ -353,10 +375,10 @@ export default function LandingPage() {
                   
                   {/* Chaotic Lines */}
                   <AnimatePresence>
-                    {activeDemo === 'chaos' && [...Array(8)].map((_, i) => (
+                    {activeDemo === 'chaos' && chaosLines.map((line, i) => (
                       <motion.path
                         key={i}
-                        d={`M 0 ${50 + Math.random() * 20} Q ${100 + Math.random() * 100} ${Math.random() * 100}, 100% ${50 + Math.random() * 40}`}
+                        d={`M 0 ${line.startY} Q ${line.controlX} ${line.controlY}, 100% ${line.endY}`}
                         fill="none"
                         stroke="#ef4444"
                         strokeWidth="2"
@@ -373,13 +395,13 @@ export default function LandingPage() {
                 
                 {/* Scatter Points */}
                 <AnimatePresence>
-                  {activeDemo === 'chaos' && [...Array(20)].map((_, i) => (
+                  {activeDemo === 'chaos' && chaosPoints.map((point, i) => (
                     <motion.div
                       key={i}
                       className="absolute w-3 h-3 rounded-full bg-red-500"
                       style={{
-                        left: `${20 + Math.random() * 60}%`,
-                        top: `${20 + Math.random() * 60}%`,
+                        left: `${point.left}%`,
+                        top: `${point.top}%`,
                       }}
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 0.8 }}
@@ -459,23 +481,19 @@ export default function LandingPage() {
                 
                 {/* Clustered Points */}
                 <AnimatePresence>
-                  {activeDemo === 'order' && [...Array(15)].map((_, i) => {
-                    const angle = (i / 15) * Math.PI * 2;
-                    const radius = 30 + Math.random() * 20;
-                    return (
-                      <motion.div
-                        key={i}
-                        className="absolute w-3 h-3 rounded-full bg-green-500"
-                        style={{
-                          left: `calc(50% + ${Math.cos(angle) * radius}px)`,
-                          top: `calc(50% + ${Math.sin(angle) * radius}px)`,
-                        }}
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 0.9 }}
-                        transition={{ delay: 0.5 + i * 0.03 }}
-                      />
-                    );
-                  })}
+                  {activeDemo === 'order' && orderPoints.map((point, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-3 h-3 rounded-full bg-green-500"
+                      style={{
+                        left: `calc(50% + ${(point.left - 50) * 2}px)`,
+                        top: `calc(50% + ${(point.top - 50) * 2}px)`,
+                      }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 0.9 }}
+                      transition={{ delay: 0.5 + i * 0.03 }}
+                    />
+                  ))}
                 </AnimatePresence>
               </div>
 
