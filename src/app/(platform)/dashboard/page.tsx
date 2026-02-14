@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
@@ -259,6 +259,96 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Currently Analyzing Section */}
+      {uploadedDocs.filter(d => d.status === 'analyzing').length > 0 && (
+        <div className="mb-xl">
+          <h2 className="text-lg font-semibold flex items-center gap-2 mb-md">
+            <Loader2 size={18} className="animate-spin text-accent-primary" />
+            Currently Analyzing
+          </h2>
+          <div className="space-y-3">
+            {uploadedDocs
+              .filter(d => d.status === 'analyzing')
+              .map((doc) => (
+                <div
+                  key={doc.id}
+                  className="card border-accent-primary/30 bg-accent-primary/5"
+                >
+                  <div className="card-body flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileText size={20} className="text-accent-primary" />
+                      <div>
+                        <span className="font-medium">{doc.filename}</span>
+                        <p className="text-xs text-muted mt-0.5">
+                          Analysis in progress... Results will appear here when complete
+                        </p>
+                      </div>
+                    </div>
+                    <Loader2 size={18} className="animate-spin text-accent-primary" />
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Analyses Section */}
+      {uploadedDocs.filter(d => d.status === 'complete').length > 0 && (
+        <div className="mb-xl">
+          <div className="flex items-center justify-between mb-md">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <CheckCircle size={18} className="text-green-500" />
+              Recent Analyses
+            </h2>
+            <Link 
+              href="#documents"
+              className="text-sm text-accent-primary hover:underline flex items-center gap-1"
+            >
+              View All <ChevronRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {uploadedDocs
+              .filter(d => d.status === 'complete')
+              .slice(0, 6)
+              .map((doc, idx) => (
+                <Link
+                  key={doc.id}
+                  href={`/documents/${doc.id}`}
+                  className="card group hover:border-accent-primary transition-all"
+                >
+                  <div className="card-body">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <FileText size={18} className="text-accent-primary" />
+                        <span className="font-medium text-sm truncate max-w-[150px]">
+                          {doc.filename}
+                        </span>
+                      </div>
+                      {doc.score !== undefined && (
+                        <span
+                          className="text-sm font-bold"
+                          style={{
+                            color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                          }}
+                        >
+                          {Math.round(doc.score)}%
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted">
+                      <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
+                      <span className="flex items-center gap-1 group-hover:text-accent-primary transition-colors">
+                        View Analysis <ArrowRight size={12} />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Risk Trend - Collapsible */}
       {uploadedDocs.some(d => d.score !== undefined) && (
         <div className="card mb-xl">
@@ -321,7 +411,7 @@ export default function Dashboard() {
       )}
 
       {/* Documents List */}
-      <div className="card">
+      <div id="documents" className="card">
         <div className="card-header flex items-center justify-between">
           <div className="flex items-center gap-md">
             <h3 className="text-base">Documents</h3>
@@ -404,20 +494,32 @@ export default function Dashboard() {
                     {doc.status === 'complete' && (
                       <>
                         {doc.score !== undefined && (
-                          <span
-                            className="text-sm font-medium"
-                            style={{
-                              color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
-                            }}
-                          >
-                            {Math.round(doc.score)}%
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 h-2 rounded-full bg-white/10 overflow-hidden">
+                              <div 
+                                className="h-full rounded-full transition-all"
+                                style={{
+                                  width: `${doc.score}%`,
+                                  backgroundColor: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                                }}
+                              />
+                            </div>
+                            <span
+                              className="text-sm font-bold min-w-[36px]"
+                              style={{
+                                color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                              }}
+                            >
+                              {Math.round(doc.score)}%
+                            </span>
+                          </div>
                         )}
                         <Link
                           href={`/documents/${doc.id}`}
-                          className="text-sm text-accent-primary hover:underline"
+                          className="btn btn-primary btn-sm flex items-center gap-2"
                         >
-                          View →
+                          <BarChart3 size={14} />
+                          View Analysis
                         </Link>
                       </>
                     )}
