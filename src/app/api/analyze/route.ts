@@ -3,6 +3,7 @@ import { analyzeDocument } from '@/lib/analysis/analyzer';
 import { BiasDetectionResult } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY?.trim();
 
@@ -15,6 +16,25 @@ export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
     try {
+        // Check rate limit first
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+                   request.headers.get('x-real-ip') || 
+                   "anonymous";
+        
+        const rateLimitResult = await checkRateLimit(ip, '/api/analyze');
+        
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { 
+                    error: "Rate limit exceeded. You can analyze up to 5 documents per hour.",
+                    limit: rateLimitResult.limit,
+                    reset: rateLimitResult.reset,
+                    remaining: 0
+                }, 
+                { status: 429 }
+            );
+        }
+
         const { userId } = await auth();
         const apiKey = request.headers.get('x-extension-key');
         let effectiveUserId = userId;

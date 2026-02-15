@@ -6,9 +6,29 @@ import { auth } from '@clerk/nextjs/server';
 import { parseFile } from '@/lib/utils/file-parser';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { createHash } from 'crypto';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 export async function POST(request: NextRequest) {
     try {
+        // Check rate limit first
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+                   request.headers.get('x-real-ip') || 
+                   "anonymous";
+        
+        const rateLimitResult = await checkRateLimit(ip, '/api/upload');
+        
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { 
+                    error: "Rate limit exceeded. You can analyze up to 5 documents per hour.",
+                    limit: rateLimitResult.limit,
+                    reset: rateLimitResult.reset,
+                    remaining: 0
+                }, 
+                { status: 429 }
+            );
+        }
+
         const { userId } = await auth();
 
         if (!userId) {

@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { safeJsonClone } from '@/lib/utils/json';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { z } from 'zod';
 
 // Reuse schemas from analyzer (or move to shared file)
@@ -80,6 +81,25 @@ const NODE_LABELS: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
     try {
+        // Check rate limit first
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+                   request.headers.get('x-real-ip') || 
+                   "anonymous";
+        
+        const rateLimitResult = await checkRateLimit(ip, '/api/analyze/stream');
+        
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { 
+                    error: "Rate limit exceeded. You can analyze up to 5 documents per hour.",
+                    limit: rateLimitResult.limit,
+                    reset: rateLimitResult.reset,
+                    remaining: 0
+                }, 
+                { status: 429 }
+            );
+        }
+
         const { userId } = await auth();
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
