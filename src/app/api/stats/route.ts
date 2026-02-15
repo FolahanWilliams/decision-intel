@@ -40,26 +40,27 @@ export async function GET() {
             }),
 
             // 4. Top 5 biases by count (raw SQL GROUP BY — no full table scan)
-            prisma.$queryRaw<Array<{ biasType: string; count: bigint }>>`
+            // Using $queryRawUnsafe because PgBouncer doesn't support prepared statements
+            prisma.$queryRawUnsafe<Array<{ biasType: string; count: bigint }>>(`
                 SELECT bi."biasType", COUNT(*)::bigint as count
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON a.id = bi."analysisId"
                 JOIN "Document" d ON d.id = a."documentId"
-                WHERE d."userId" = ${userId}
+                WHERE d."userId" = '${userId}'
                 GROUP BY bi."biasType"
                 ORDER BY count DESC
                 LIMIT 5
-            `,
+            `),
 
             // 5. Severity distribution (raw SQL GROUP BY)
-            prisma.$queryRaw<Array<{ severity: string; count: bigint }>>`
+            prisma.$queryRawUnsafe<Array<{ severity: string; count: bigint }>>(`
                 SELECT bi.severity, COUNT(*)::bigint as count
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON a.id = bi."analysisId"
                 JOIN "Document" d ON d.id = a."documentId"
-                WHERE d."userId" = ${userId}
+                WHERE d."userId" = '${userId}'
                 GROUP BY bi.severity
-            `,
+            `),
 
             // 6. Recent documents (already limited to 5)
             prisma.document.findMany({

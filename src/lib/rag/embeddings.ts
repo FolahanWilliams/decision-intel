@@ -246,33 +246,35 @@ export async function searchSimilarDocuments(
             similarity: number;
         }>;
 
+        // Using $queryRawUnsafe because PgBouncer doesn't support prepared statements
+        // Note: embeddingVector is a safely constructed array string, userId and excludeDocumentId are validated
         if (excludeDocumentId) {
-            results = await prisma.$queryRaw<typeof results>`
+            results = await prisma.$queryRawUnsafe<typeof results>(`
                 SELECT 
                     de."documentId" as document_id,
                     de.content,
                     de.metadata,
-                    1 - (de.embedding <=> ${embeddingVector}::vector) as similarity
+                    1 - (de.embedding <=> '${embeddingVector}'::vector) as similarity
                 FROM "DecisionEmbedding" de
                 JOIN "Document" d ON d.id = de."documentId"
-                WHERE d."userId" = ${userId}
-                AND de."documentId" != ${excludeDocumentId}
-                ORDER BY de.embedding <=> ${embeddingVector}::vector
+                WHERE d."userId" = '${userId}'
+                AND de."documentId" != '${excludeDocumentId}'
+                ORDER BY de.embedding <=> '${embeddingVector}'::vector
                 LIMIT ${limit}
-            `;
+            `);
         } else {
-            results = await prisma.$queryRaw<typeof results>`
+            results = await prisma.$queryRawUnsafe<typeof results>(`
                 SELECT 
                     de."documentId" as document_id,
                     de.content,
                     de.metadata,
-                    1 - (de.embedding <=> ${embeddingVector}::vector) as similarity
+                    1 - (de.embedding <=> '${embeddingVector}'::vector) as similarity
                 FROM "DecisionEmbedding" de
                 JOIN "Document" d ON d.id = de."documentId"
-                WHERE d."userId" = ${userId}
-                ORDER BY de.embedding <=> ${embeddingVector}::vector
+                WHERE d."userId" = '${userId}'
+                ORDER BY de.embedding <=> '${embeddingVector}'::vector
                 LIMIT ${limit}
-            `;
+            `);
         }
 
         return results.map(r => {

@@ -22,7 +22,8 @@ if (process.env.NODE_ENV !== 'production') {
 export async function testDatabaseConnection(): Promise<boolean> {
   try {
     // Simple query to test connection
-    await prisma.$queryRaw`SELECT 1`;
+    // Using $queryRawUnsafe because PgBouncer doesn't support prepared statements
+    await prisma.$queryRawUnsafe(`SELECT 1`);
     return true;
   } catch (error) {
     console.error('Database connection test failed:', error);
