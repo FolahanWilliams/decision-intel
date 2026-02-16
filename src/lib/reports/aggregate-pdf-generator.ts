@@ -208,8 +208,8 @@ export class AggregatePdfGenerator {
             .slice(0, 10); // Top 10
 
         // Check if we need a new page
-        // @ts-expect-error - jsPDF types for autotable state are incomplete
-        let startY = this.doc.lastAutoTable ? this.doc.lastAutoTable.finalY + 30 : 150;
+        const docWithTable = this.doc as jsPDF & { lastAutoTable?: { finalY: number } };
+        let startY = docWithTable.lastAutoTable ? docWithTable.lastAutoTable.finalY + 30 : 150;
 
         if (startY > 220) {
             this.doc.addPage();

@@ -188,8 +188,7 @@ export class PdfGenerator {
             }
         });
 
-        // @ts-expect-error - jsPDF types for autotable state are incomplete
-        return this.doc.lastAutoTable.finalY + 20;
+        return (this.doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 20;
     }
 
     private addSourcesAppendix(sources: string[] | undefined, startY: number): number {
