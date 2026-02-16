@@ -4,9 +4,13 @@
 
 import Redis from 'ioredis';
 import { hashContent } from './resilience';
+import { createLogger } from './logger';
+
+const log = createLogger('Cache');
 
 // Redis client singleton
 let redisClient: Redis | null = null;
+let cacheStatusLogged = false;
 
 /**
  * Get or create Redis client instance
@@ -21,7 +25,10 @@ export function getRedisClient(): Redis | null {
   const redisUrl = process.env.REDIS_URL;
   
   if (!redisUrl) {
-    console.warn('⚠️  REDIS_URL not configured - caching disabled');
+    if (!cacheStatusLogged) {
+      log.warn('REDIS_URL not configured — caching disabled');
+      cacheStatusLogged = true;
+    }
     return null;
   }
   
@@ -37,16 +44,17 @@ export function getRedisClient(): Redis | null {
     });
     
     redisClient.on('error', (err) => {
-      console.error('Redis error:', err.message);
+      log.error('Redis error: ' + err.message);
     });
     
     redisClient.on('connect', () => {
-      console.log('✅ Redis connected');
+      log.info('Redis connected');
+      cacheStatusLogged = true;
     });
     
     return redisClient;
   } catch (error) {
-    console.error('Failed to create Redis client:', error);
+    log.error('Failed to create Redis client:', error);
     return null;
   }
 }
@@ -85,12 +93,12 @@ export async function getCachedAnalysis(contentHash: string): Promise<Record<str
   try {
     const cached = await redis.get(`${CACHE_KEYS.ANALYSIS}${contentHash}`);
     if (cached) {
-      console.log('✅ Cache hit for analysis:', contentHash.substring(0, 8));
+      log.debug('Cache hit for analysis: ' + contentHash.substring(0, 8));
       return JSON.parse(cached);
     }
     return null;
   } catch (error) {
-    console.error('Redis get error:', error);
+    log.error('Redis get error:', error);
     return null;
   }
 }
@@ -115,9 +123,9 @@ export async function cacheAnalysis(
       ttl,
       JSON.stringify(analysis)
     );
-    console.log('✅ Analysis cached:', contentHash.substring(0, 8));
+    log.debug('Analysis cached: ' + contentHash.substring(0, 8));
   } catch (error) {
-    console.error('Redis set error:', error);
+    log.error('Redis set error:', error);
   }
 }
 
@@ -137,7 +145,7 @@ export async function getCachedEmbedding(textHash: string): Promise<number[] | n
     }
     return null;
   } catch (error) {
-    console.error('Redis embedding get error:', error);
+    log.error('Redis embedding get error:', error);
     return null;
   }
 }
@@ -161,7 +169,7 @@ export async function cacheEmbedding(
       JSON.stringify(embedding)
     );
   } catch (error) {
-    console.error('Redis embedding set error:', error);
+    log.error('Redis embedding set error:', error);
   }
 }
 
@@ -177,7 +185,7 @@ export async function getCachedBiasInsight(biasType: string): Promise<string | n
   try {
     return await redis.get(`${CACHE_KEYS.BIAS_INSIGHT}${biasType}`);
   } catch (error) {
-    console.error('Redis bias insight get error:', error);
+    log.error('Redis bias insight get error:', error);
     return null;
   }
 }
@@ -201,7 +209,7 @@ export async function cacheBiasInsight(
       insight
     );
   } catch (error) {
-    console.error('Redis bias insight set error:', error);
+    log.error('Redis bias insight set error:', error);
   }
 }
 
@@ -225,7 +233,7 @@ export async function getCachedFinancialData(
     }
     return null;
   } catch (error) {
-    console.error('Redis financial data get error:', error);
+    log.error('Redis financial data get error:', error);
     return null;
   }
 }
@@ -251,7 +259,7 @@ export async function cacheFinancialData(
       JSON.stringify(data)
     );
   } catch (error) {
-    console.error('Redis financial data set error:', error);
+    log.error('Redis financial data set error:', error);
   }
 }
 
@@ -266,10 +274,10 @@ export async function clearAnalysisCache(): Promise<void> {
     const keys = await redis.keys(`${CACHE_KEYS.ANALYSIS}*`);
     if (keys.length > 0) {
       await redis.del(...keys);
-      console.log(`✅ Cleared ${keys.length} cached analyses`);
+      log.info(`Cleared ${keys.length} cached analyses`);
     }
   } catch (error) {
-    console.error('Failed to clear analysis cache:', error);
+    log.error('Failed to clear analysis cache:', error);
   }
 }
 
@@ -306,7 +314,7 @@ export async function getCacheStats(): Promise<{
       financialData: financialData.length,
     };
   } catch (error) {
-    console.error('Failed to get cache stats:', error);
+    log.error('Failed to get cache stats:', error);
     return null;
   }
 }

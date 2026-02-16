@@ -7,6 +7,9 @@ import { parseFile } from '@/lib/utils/file-parser';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { createHash } from 'crypto';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('UploadRoute');
 
 export async function POST(request: NextRequest) {
     try {
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (existingDoc) {
-            console.log('🎯 Cache hit: Document already analyzed', existingDoc.id);
+            log.info('Cache hit: Document already analyzed ' + existingDoc.id);
             
             // Return cached result with the existing document ID and analysis
             return NextResponse.json({
@@ -105,7 +108,7 @@ export async function POST(request: NextRequest) {
         try {
             content = await parseFile(buffer, file.type, file.name);
         } catch (error) {
-            console.error('File Parse Error:', error);
+            log.error('File Parse Error:', error);
             return NextResponse.json({
                 error: getSafeErrorMessage(error)
             }, { status: 400 });
@@ -136,7 +139,7 @@ export async function POST(request: NextRequest) {
             });
 
         if (uploadError) {
-            console.error('Supabase Storage Upload Error:', uploadError);
+            log.error('Supabase Storage Upload Error:', uploadError);
             throw new Error(`Storage Upload Failed: ${uploadError.message}`);
         }
         // Store in database with content hash for future caching
@@ -159,7 +162,7 @@ export async function POST(request: NextRequest) {
             message: 'Document uploaded successfully'
         });
     } catch (error) {
-        console.error('Upload error:', getSafeErrorMessage(error));
+        log.error('Upload error: ' + getSafeErrorMessage(error));
         return NextResponse.json(
             { error: getSafeErrorMessage(error) },
             { status: 500 }
@@ -196,7 +199,7 @@ export async function GET() {
 
         return NextResponse.json(documents);
     } catch (error) {
-        console.error('Error fetching documents:', error);
+        log.error('Error fetching documents:', error);
         return NextResponse.json(
             { error: 'Failed to fetch documents' },
             { status: 500 }

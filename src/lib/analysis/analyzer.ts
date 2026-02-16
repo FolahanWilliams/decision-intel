@@ -5,8 +5,11 @@ import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { Document } from '@prisma/client';
 import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/lib/utils/cache';
 import { validateContent } from '@/lib/utils/resilience';
+import { createLogger } from '@/lib/utils/logger';
 
 import { z } from 'zod';
+
+const log = createLogger('Analyzer');
 
 export interface ProgressUpdate {
     type: 'step' | 'bias' | 'noise' | 'summary' | 'complete' | 'error';
@@ -106,7 +109,7 @@ export async function analyzeDocument(
     const cached = await getCachedAnalysis(cacheKey);
     
     if (cached) {
-        console.log('✅ Cache hit for analysis:', cacheKey.substring(0, 16));
+        log.info('Cache hit for analysis: ' + cacheKey.substring(0, 16));
         if (onProgress) {
             onProgress({ type: 'step', step: 'Retrieved from cache', status: 'complete', progress: 100 });
         }
@@ -168,7 +171,7 @@ export async function analyzeDocument(
                 // Check for "Column does not exist" error (P2021, P2022)
                 const prismaError = dbError as { code?: string; message?: string };
                 if (prismaError.code === 'P2021' || prismaError.code === 'P2022' || prismaError.message?.includes('does not exist')) {
-                    console.warn('⚠️ Schema drift detected. Retrying save with CORE fields only.', prismaError.code);
+                    log.warn('Schema drift detected. Retrying save with CORE fields only: ' + prismaError.code);
 
                     // Fallback: Save only what the old schema supports
                     await tx.analysis.create({
@@ -217,14 +220,14 @@ export async function analyzeDocument(
                 result.overallScore
             );
         } catch (embeddingError) {
-            console.warn('Failed to store embedding (non-critical):', embeddingError);
+            log.warn('Failed to store embedding (non-critical): ' + (embeddingError instanceof Error ? embeddingError.message : String(embeddingError)));
         }
 
         // Cache the result for future use (non-blocking)
         try {
             await cacheAnalysis(cacheKey, result as unknown as Record<string, unknown>);
         } catch (cacheError) {
-            console.warn('Failed to cache analysis (non-critical):', cacheError);
+            log.warn('Failed to cache analysis (non-critical): ' + (cacheError instanceof Error ? cacheError.message : String(cacheError)));
         }
 
         if (onProgress) {
@@ -358,13 +361,14 @@ export async function runAnalysis(
         }
 
     } catch (error) {
-        console.error('Streaming error, falling back to invoke:', error);
+        log.error('Streaming error, falling back to invoke:', error);
         // Fallback to non-streaming invoke if streaming fails
         sendStep('Processing document', 'running', 50);
 
-        // Add timeout to fallback invocation (25 seconds max for serverless safety)
+        // Fallback timeout: aligned with maxDuration (300s) minus overhead
+        const FALLBACK_TIMEOUT_MS = 240000; // 240 seconds
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Analysis timed out after 25 seconds")), 25000)
+            setTimeout(() => reject(new Error(`Analysis timed out after ${FALLBACK_TIMEOUT_MS / 1000} seconds`)), FALLBACK_TIMEOUT_MS)
         );
 
         try {
@@ -377,7 +381,7 @@ export async function runAnalysis(
                 timeoutPromise
             ]) as { finalReport: Record<string, unknown> };
         } catch (timeoutError) {
-            console.error('Analysis timeout:', timeoutError);
+            log.error('Analysis timeout:', timeoutError);
             throw new Error("Analysis timed out. Please try again or contact support if the issue persists.");
         }
     }

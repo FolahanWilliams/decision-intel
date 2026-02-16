@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('InsightsRoute');
 
 export async function GET() {
     try {
@@ -212,7 +215,7 @@ export async function GET() {
 
         return NextResponse.json(payload);
     } catch (error) {
-        console.error('[Insights API] Error:', error);
+        log.error('Error:', error);
         return NextResponse.json({ error: 'Failed to generate insights' }, { status: 500 });
     }
 }

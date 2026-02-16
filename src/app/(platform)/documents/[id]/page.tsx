@@ -25,6 +25,7 @@ import { StakeholderMap } from '@/components/visualizations/StakeholderMap';
 import { QualityGauge } from '@/components/visualizations/QualityMetrics';
 import { DecisionTimeline } from '@/components/visualizations/DecisionTimeline';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 
 interface VerificationSource {
@@ -438,6 +439,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
             {/* Compact Stats Bar - REPLACED BY EXECUTIVE SUMMARY */}
             {analysis && (
+                <ErrorBoundary sectionName="Executive Summary">
                 <div className="mb-xl">
                     <ExecutiveSummary
                         overallScore={analysis.overallScore}
@@ -448,6 +450,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         verdict={analysis.overallScore > 80 ? 'APPROVED' : analysis.overallScore < 60 ? 'REJECTED' : 'MIXED'}
                     />
                 </div>
+                </ErrorBoundary>
             )}
 
             {/* Re-scan Button (Moved actions here) */}
@@ -654,6 +657,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     {activeTab === 'overview' && (
                         <div className="flex flex-col gap-lg">
                             {/* NEW: Bias Heatmap & Network */}
+                            <ErrorBoundary sectionName="Bias Visualizations">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg h-[500px]">
                                 <BiasHeatmap content={document.content} biases={biases} />
                                 <div className="card">
@@ -665,8 +669,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                     </div>
                                 </div>
                             </div>
+                            </ErrorBoundary>
 
                             {/* Decision Timeline & Risk HeatMap */}
+                            <ErrorBoundary sectionName="Decision Timeline & Risk Map">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg mt-lg">
                                 <div className="card">
                                     <div className="card-header">
@@ -692,6 +698,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                     </div>
                                 </div>
                             </div>
+                            </ErrorBoundary>
 
                             {/* Biases List (Existing) */}
                             <div className="card">
@@ -752,6 +759,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     )}
 
                     {activeTab === 'noise' && (
+                        <ErrorBoundary sectionName="Noise Analysis">
                         <div className="card">
                             <div className="card-body">
                                 {analysis?.noiseStats ? (
@@ -777,9 +785,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 )}
                             </div>
                         </div>
+                        </ErrorBoundary>
                     )}
 
                     {activeTab === 'swot' && (
+                        <ErrorBoundary sectionName="SWOT Analysis">
                         <div className="card">
                             <div className="card-body">
                                 {analysis?.swotAnalysis ? (
@@ -789,9 +799,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 )}
                             </div>
                         </div>
+                        </ErrorBoundary>
                     )}
 
                     {activeTab === 'red-team' && (
+                        <ErrorBoundary sectionName="Red Team Analysis">
                         <div className="card">
                             <div className="card-body">
                                 {analysis?.cognitiveAnalysis ? (
@@ -801,9 +813,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 )}
                             </div>
                         </div>
+                        </ErrorBoundary>
                     )}
 
                     {activeTab === 'boardroom' && (
+                        <ErrorBoundary sectionName="Boardroom Simulation">
                         <div className="card">
                             <div className="card-body">
                                 {analysis?.simulation ? (
@@ -831,6 +845,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 )}
                             </div>
                         </div>
+                        </ErrorBoundary>
                     )}
 
 

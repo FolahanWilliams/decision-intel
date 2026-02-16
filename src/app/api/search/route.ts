@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { searchSimilarDocuments, getContextualInsights } from '@/lib/rag/embeddings';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('SearchRoute');
 
 /**
  * POST /api/search
@@ -35,7 +38,7 @@ export async function POST(request: NextRequest) {
             count: results.length
         });
     } catch (error) {
-        console.error('Search API error:', error);
+        log.error('Search API error:', error);
         return NextResponse.json({ error: 'Search failed' }, { status: 500 });
     }
 }
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest) {
             ...insights
         });
     } catch (error) {
-        console.error('Context API error:', error);
+        log.error('Context API error:', error);
         return NextResponse.json({ error: 'Failed to get context' }, { status: 500 });
     }
 }

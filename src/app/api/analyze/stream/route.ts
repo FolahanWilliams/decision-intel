@@ -7,7 +7,10 @@ import { getSafeErrorMessage } from '@/lib/utils/error';
 import { safeJsonClone } from '@/lib/utils/json';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
+
+const log = createLogger('StreamRoute');
 
 // Reuse schemas from analyzer (or move to shared file)
 const NoiseStatsSchema = z.object({
@@ -247,7 +250,7 @@ export async function POST(request: NextRequest) {
                             // Check for "Column does not exist" error (P2021, P2022)
                             const prismaError = dbError as { code?: string; message?: string };
                             if (prismaError.code === 'P2021' || prismaError.code === 'P2022' || prismaError.message?.includes('does not exist')) {
-                                console.warn('⚠️ Schema drift detected. Retrying save with CORE fields only.', prismaError.code);
+                                log.warn('Schema drift detected. Retrying save with CORE fields only: ' + prismaError.code);
 
                                 // Fallback: Save only what the old schema supports
                                 await tx.analysis.create({
@@ -295,7 +298,7 @@ export async function POST(request: NextRequest) {
                             (report.overallScore as number) || 0
                         );
                     } catch (embError) {
-                        console.warn('Embedding storage failed:', embError);
+                        log.warn('Embedding storage failed: ' + (embError instanceof Error ? embError.message : String(embError)));
                     }
 
                     // Send final complete
@@ -303,7 +306,7 @@ export async function POST(request: NextRequest) {
                     controller.close();
 
                 } catch (error) {
-                    console.error('Stream processing error:', error);
+                    log.error('Stream processing error:', error);
                     await prisma.document.update({
                         where: { id: documentId },
                         data: { status: 'error' }
@@ -324,7 +327,7 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('API Error:', error);
+        log.error('API Error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

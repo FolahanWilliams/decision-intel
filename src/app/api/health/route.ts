@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { testDatabaseConnection } from '@/lib/prisma';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('HealthRoute');
 
 export async function GET() {
   try {
@@ -24,7 +27,7 @@ export async function GET() {
       database: 'connected'
     });
   } catch (error) {
-    console.error('Health check error:', error);
+    log.error('Health check error:', error);
     return NextResponse.json(
       { 
         status: 'error', 
