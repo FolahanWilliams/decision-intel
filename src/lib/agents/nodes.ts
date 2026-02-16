@@ -596,16 +596,15 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
                 biases: [],
                 noiseStats: { mean: 0, stdDev: 0, variance: 0 },
                 factCheck: { score: 0, flags: ['Anonymization failure — fact check skipped'] },
-                compliance: { status: 'ERROR', details: 'Skipped due to anonymization failure.' },
-                preMortem: undefined,
-                sentiment: undefined,
-                logicalAnalysis: undefined,
-                swotAnalysis: undefined,
-                cognitiveAnalysis: undefined,
-                speakers: [],
-                createdAt: new Date(),
-                analyses: []
-            } as AnalysisResult
+                compliance: {
+                    status: 'FAIL',
+                    riskScore: 100,
+                    summary: 'Skipped due to anonymization failure.',
+                    regulations: [],
+                    searchQueries: []
+                },
+                speakers: []
+            } satisfies AnalysisResult
         };
     }
 
@@ -662,17 +661,21 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Trust Score: ${trustScore}%.`,
             biases: state.biasAnalysis || [],
             noiseStats: state.noiseStats,
-            factCheck: state.factCheckResult,
-            compliance: state.compliance || { status: 'WARN', details: 'Compliance check unavailable.' },
+            factCheck: state.factCheckResult ?? undefined,
+            compliance: state.compliance || {
+                status: 'WARN',
+                riskScore: 50,
+                summary: 'Compliance check unavailable.',
+                regulations: [],
+                searchQueries: []
+            },
             preMortem: state.preMortem,
             sentiment: state.sentimentAnalysis,
             logicalAnalysis: state.logicalAnalysis,
             swotAnalysis: state.swotAnalysis,
             cognitiveAnalysis: state.cognitiveAnalysis,
-            speakers: [],
-            createdAt: new Date(),
-            analyses: []
-        } as AnalysisResult
+            speakers: []
+        } satisfies AnalysisResult
     };
 }
 

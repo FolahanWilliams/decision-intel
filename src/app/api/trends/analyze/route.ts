@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, type Tool } from "@google/generative-ai";
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('TrendsAnalyzeRoute');
@@ -14,8 +14,7 @@ function getMarketAnalystModel() {
     return genAI.getGenerativeModel({
         model: "gemini-3-flash-preview", // Fast, Supports Tools
         tools: [
-            // @ts-expect-error - Google Search Tool
-            { googleSearch: {} }
+            { googleSearch: {} } as Tool
         ],
         generationConfig: {
             responseMimeType: "application/json",
