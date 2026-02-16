@@ -62,7 +62,6 @@ function createModelInstance(options: ModelOptions = {}): GenerativeModel {
 
     const tools = options.grounded
         ? [
-            // @ts-expect-error - googleSearch is supported in v1beta but missing in some SDK types
             { googleSearch: {} }
         ]
         : undefined;
