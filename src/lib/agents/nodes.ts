@@ -1,7 +1,7 @@
 import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult, BiasDetectionResult, NoiseBenchmark } from '../../types';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel, type Tool } from "@google/generative-ai";
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, COGNITIVE_DIVERSITY_PROMPT, INSTITUTIONAL_MEMORY_PROMPT, COMPLIANCE_CHECKER_PROMPT, LINGUISTIC_ANALYSIS_PROMPT, STRATEGIC_ANALYSIS_PROMPT, STRUCTURER_PROMPT } from "./prompts";
 import { searchSimilarDocuments } from "../rag/embeddings";
 import { executeDataRequests, DataRequest } from "../tools/financial";
@@ -62,7 +62,7 @@ function createModelInstance(options: ModelOptions = {}): GenerativeModel {
 
     const tools = options.grounded
         ? [
-            { googleSearch: {} }
+            { googleSearch: {} } as Tool
         ]
         : undefined;
 
