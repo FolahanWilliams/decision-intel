@@ -8,10 +8,13 @@ import { executeDataRequests, DataRequest } from "../tools/financial";
 import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
 import { withRetry, smartTruncate, batchProcess } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
+import { createLogger } from '../utils/logger';
 
 // ============================================================
 // CONSTANTS
 // ============================================================
+
+const log = createLogger('Agents');
 
 // Severity levels for bias detection - use these instead of hardcoded strings
 const SEVERITY_LEVELS = {
@@ -25,62 +28,86 @@ const SEVERITY_LEVELS = {
 // AI MODEL CONFIGURATION
 // ============================================================
 
-// Lazy singleton for the standard model (Fast, no tools)
-let modelInstance: GenerativeModel | null = null;
-let groundedModelInstance: GenerativeModel | null = null;
+type SafetyLevel = 'relaxed' | 'standard';
 
-function getModel(): GenerativeModel {
-    if (modelInstance) return modelInstance;
+interface ModelOptions {
+    grounded?: boolean;
+    /**
+     * 'relaxed' — BLOCK_NONE. Required for bias detection, compliance checking,
+     *   and other nodes that must analyse potentially harmful content in documents.
+     * 'standard' — BLOCK_MEDIUM_AND_ABOVE. Suitable for simulation/creative nodes.
+     */
+    safetyLevel?: SafetyLevel;
+}
 
+function createModelInstance(options: ModelOptions = {}): GenerativeModel {
     const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Allow model selection via env var, fallback to gemini-3-flash-preview
     const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-    modelInstance = genAI.getGenerativeModel({
-        model: modelName,
-        generationConfig: {
-            responseMimeType: "application/json",
-            maxOutputTokens: 16384
-        },
-        safetySettings: [
+
+    const safetySettings = options.safetyLevel === 'standard'
+        ? [
+            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE }
+        ]
+        : [
+            // Relaxed: needed to analyse documents containing sensitive language
             { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
             { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
             { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
             { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
-        ]
-    });
+        ];
 
+    const tools = options.grounded
+        ? [
+            // @ts-expect-error - googleSearch is supported in v1beta but missing in some SDK types
+            { googleSearch: {} }
+        ]
+        : undefined;
+
+    return genAI.getGenerativeModel({
+        model: modelName,
+        ...(tools ? { tools } : {}),
+        generationConfig: {
+            responseMimeType: "application/json",
+            maxOutputTokens: 16384
+        },
+        safetySettings
+    });
+}
+
+// Lazy singletons
+let modelInstance: GenerativeModel | null = null;
+let groundedModelInstance: GenerativeModel | null = null;
+let standardSafetyGroundedInstance: GenerativeModel | null = null;
+
+function getModel(): GenerativeModel {
+    if (!modelInstance) {
+        modelInstance = createModelInstance({ safetyLevel: 'relaxed' });
+    }
     return modelInstance;
 }
 
-// Grounded Model (With Google Search capability)
 function getGroundedModel(): GenerativeModel {
-    if (groundedModelInstance) return groundedModelInstance;
-
-    const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-    const genAI = new GoogleGenerativeAI(apiKey);
-    // Allow model selection via env var, fallback to gemini-3-flash-preview
-    const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-    groundedModelInstance = genAI.getGenerativeModel({
-        model: modelName,
-        tools: [
-            // @ts-expect-error - googleSearch is supported in v1beta but missing in some SDK types
-            { googleSearch: {} }
-        ],
-        generationConfig: {
-            responseMimeType: "application/json",
-            maxOutputTokens: 16384
-        },
-        safetySettings: [
-            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
-        ]
-    });
-
+    if (!groundedModelInstance) {
+        groundedModelInstance = createModelInstance({ grounded: true, safetyLevel: 'relaxed' });
+    }
     return groundedModelInstance;
 }
+
+/** Model with standard safety filters — used for simulation/creative nodes. */
+function getStandardSafetyGroundedModel(): GenerativeModel {
+    if (!standardSafetyGroundedInstance) {
+        standardSafetyGroundedInstance = createModelInstance({ grounded: true, safetyLevel: 'standard' });
+    }
+    return standardSafetyGroundedInstance;
+}
+
+// ============================================================
+// SHARED UTILITIES
+// ============================================================
 
 // Timeout wrapper for LLM calls to prevent hanging
 const LLM_TIMEOUT_MS = 90000; // 90 seconds - increased for complex analysis
@@ -95,13 +122,31 @@ async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS):
 // Text truncation to prevent timeouts on large documents
 const MAX_INPUT_CHARS = 25000; // ~6K tokens
 
-/**
- * Truncate text while preserving sentence boundaries and context
- * @param text Text to truncate
- * @returns Truncated text with context preservation
- */
 function truncateText(text: string): string {
     return smartTruncate(text, MAX_INPUT_CHARS);
+}
+
+/**
+ * Extract verified search source URLs from Gemini grounding metadata.
+ * Consolidates the duplicated metadata extraction pattern used by multiple nodes.
+ */
+function extractSearchSources(
+    response: { candidates?: Array<{ groundingMetadata?: { groundingChunks?: Array<{ web?: { uri?: string } }> } }> }
+): string[] {
+    const metadata = response.candidates?.[0]?.groundingMetadata;
+    return metadata?.groundingChunks
+        ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
+        .filter((u: unknown): u is string => typeof u === 'string') || [];
+}
+
+/**
+ * Wrap external (untrusted) data in clearly delimited XML blocks before
+ * embedding it in an LLM prompt. This reduces the surface area for prompt
+ * injection by making it unambiguous where external data starts and ends.
+ */
+function sanitizeForPrompt(data: unknown, label: string = 'external_data'): string {
+    const json = JSON.stringify(data, null, 2);
+    return `<${label}>\n${json}\n</${label}>`;
 }
 
 // ============================================================
@@ -112,7 +157,7 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
     const content = state.structuredContent || state.originalContent;
 
     try {
-        console.log("Running document structuring...");
+        log.info("Running document structuring...");
 
         const result = await withTimeout(getModel().generateContent([
             STRUCTURER_PROMPT,
@@ -123,14 +168,14 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
         const data = parseJSON(responseText);
 
         if (data?.structuredContent) {
-            console.log(`Structuring complete. Identified ${data.speakers?.length || 0} speakers.`);
+            log.info(`Structuring complete. Identified ${data.speakers?.length || 0} speakers.`);
             return {
                 structuredContent: data.structuredContent,
                 speakers: data.speakers || []
             };
         }
     } catch (e) {
-        console.error("Structurer node failed:", e instanceof Error ? e.message : String(e));
+        log.error("Structurer node failed:", e instanceof Error ? e.message : String(e));
     }
 
     // Fallback: return content as-is
@@ -168,7 +213,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
         );
 
         if (severeBiases.length > 0) {
-            console.log(`Fetching educational insights for ${severeBiases.length} severe biases...`);
+            log.info(`Fetching educational insights for ${severeBiases.length} severe biases...`);
 
             // Process insights with concurrency control and caching
             await batchProcess(
@@ -177,7 +222,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
                     // Check cache first
                     const cachedInsight = await getCachedBiasInsight(bias.biasType);
                     if (cachedInsight) {
-                        console.log(`Cache hit for bias insight: ${bias.biasType}`);
+                        log.debug(`Cache hit for bias insight: ${bias.biasType}`);
                         bias.researchInsight = JSON.parse(cachedInsight);
                         return;
                     }
@@ -187,7 +232,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
                             () => withTimeout(getGroundedModel().generateContent([
                                 `You are a Cognitive Psychology Tutor.
                                 TASK: Find a specific scientific study or "HBR" (Harvard Business Review) article that explains the following bias: "${bias.biasType}".
-                                
+
                                 OUTPUT JSON:
                                 {
                                     "title": "The Hidden Traps in Decision Making (HBR)",
@@ -205,8 +250,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
                         const insightData = parseJSON(insightText);
 
                         // Extract Source
-                        const metadata = searchResult.response.candidates?.[0]?.groundingMetadata;
-                        const searchSource = metadata?.groundingChunks?.find((c: { web?: { uri?: string } }) => c.web?.uri)?.web?.uri;
+                        const searchSource = extractSearchSources(searchResult.response)[0];
 
                         if (insightData) {
                             const researchInsight = {
@@ -214,12 +258,12 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
                                 sourceUrl: insightData.sourceUrl || searchSource || ""
                             };
                             bias.researchInsight = researchInsight;
-                            
+
                             // Cache the insight for future use
                             await cacheBiasInsight(bias.biasType, JSON.stringify(researchInsight));
                         }
                     } catch (e) {
-                        console.error(`Failed to fetch insight for ${bias.biasType}`, e);
+                        log.error(`Failed to fetch insight for ${bias.biasType}`, e);
                     }
                 },
                 2 // Process 2 at a time to avoid rate limits
@@ -228,7 +272,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
 
         return { biasAnalysis: biases };
     } catch (e) {
-        console.error("Bias Detective failed:", e instanceof Error ? e.message : String(e));
+        log.error("Bias Detective failed:", e instanceof Error ? e.message : String(e));
         return { biasAnalysis: [] };
     }
 }
@@ -269,16 +313,16 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         // Dynamic Retrieval: Verify Benchmarks if found
         let noiseBenchmarks = [];
         if (extractedBenchmarks.length > 0) {
-            console.log(`Verifying ${extractedBenchmarks.length} benchmarks with Google Search...`);
+            log.info(`Verifying ${extractedBenchmarks.length} benchmarks with Google Search...`);
             const benchmarkResult = await getGroundedModel().generateContent([
                 `You are a Market Research validator.
                 TASK:
                 1. Take the provided internal metrics.
                 2. Use Google Search to find EXTERNAL consensus data for 2024/2025.
                 3. Compare internal vs external.
-                
+
                 METRICS TO VERIFY:
-                ${JSON.stringify(extractedBenchmarks)}
+                ${sanitizeForPrompt(extractedBenchmarks, 'internal_metrics')}
 
                 OUTPUT JSON:
                 [
@@ -298,10 +342,7 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
             noiseBenchmarks = parseJSON(benchmarkText) || [];
 
             // Add sources from metadata
-            const metadata = benchmarkResult.response.candidates?.[0]?.groundingMetadata;
-            const searchSources: string[] = metadata?.groundingChunks
-                ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
-                .filter((u: unknown): u is string => typeof u === 'string') || [];
+            const searchSources = extractSearchSources(benchmarkResult.response);
 
             noiseBenchmarks = noiseBenchmarks.map((b: NoiseBenchmark, i: number) => ({
                 ...b,
@@ -315,7 +356,7 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
             noiseBenchmarks
         };
     } catch (e) {
-        console.error("Noise Judges failed", e);
+        log.error("Noise Judges failed", e);
         return { noiseScores: [], noiseStats: { mean: 0, stdDev: 0, variance: 0 } };
     }
 }
@@ -324,14 +365,14 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     const content = state.originalContent;
 
     try {
-        console.log("Running GDPR Anonymization...");
+        log.info("Running GDPR Anonymization...");
 
         // Use the model to identify and redact PII
         const result = await withTimeout(getModel().generateContent([
             `You are a GDPR Privacy Compliance Expert.
-            
+
             TASK: Identify and redact ALL Personally Identifiable Information (PII) from the text below.
-            
+
             PII to redact includes:
             - Full names of individuals (e.g., "John Smith" -> "[PERSON_1]")
             - Email addresses (e.g., "john@example.com" -> "[EMAIL_1]")
@@ -342,13 +383,13 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
             - IP addresses (e.g., "192.168.1.1" -> "[IP_1]")
             - SSN/National ID numbers
             - Financial account numbers
-            
+
             INSTRUCTIONS:
             1. Replace each PII instance with a numbered placeholder in format [TYPE_NUMBER]
             2. Maintain the structure and meaning of the document
             3. DO NOT redact generic terms like "the company", "our team", etc.
             4. Return the complete redacted text
-            
+
             OUTPUT FORMAT: Return ONLY valid JSON.
             {
                 "structuredContent": "redacted text with [PLACEHOLDERS]",
@@ -364,19 +405,26 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
         const data = parseJSON(responseText);
 
         if (data?.structuredContent) {
-            console.log(`GDPR Anonymization complete. Redacted ${data.redactions?.length || 0} PII instances.`);
+            log.info(`GDPR Anonymization complete. Redacted ${data.redactions?.length || 0} PII instances.`);
             return {
+                anonymizationStatus: 'success',
                 structuredContent: data.structuredContent,
                 speakers: [] // Will be populated by structurer node
             };
         }
+
+        // LLM returned unexpected shape — treat as failure
+        log.error("GDPR Anonymizer returned invalid response shape");
     } catch (e) {
-        console.error("GDPR Anonymizer failed:", e instanceof Error ? e.message : String(e));
+        log.error("GDPR Anonymizer failed:", e instanceof Error ? e.message : String(e));
     }
 
-    // Fallback: return original content if anonymization fails
+    // SECURITY: Do NOT pass original PII through the pipeline on failure.
+    // Set a placeholder and mark anonymization as failed so the graph can
+    // short-circuit to riskScorer with an error report.
     return {
-        structuredContent: state.originalContent,
+        anonymizationStatus: 'failed',
+        structuredContent: '[REDACTION_FAILED — content withheld to protect PII]',
         speakers: []
     };
 }
@@ -392,10 +440,10 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         const analysisResult = await getGroundedModel().generateContent([
             `You are an Expert Fact Checker. Identify specific factual claims that can be verified externally.
             These can be financial, technical, historical, or statistical.
-            
-            Return JSON: 
-            { 
-                "primaryTopic": "string", 
+
+            Return JSON:
+            {
+                "primaryTopic": "string",
                 "claims": [
                     { "id": 1, "claim": "Exact quote or statement", "category": "technical|financial|historical" }
                 ],
@@ -410,7 +458,7 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         const analysis = parseJSON(analysisText);
 
         const companyName = analysis?.primaryTopic || null;
-        if (companyName) console.log(`Identified primary topic: ${companyName}`);
+        if (companyName) log.info(`Identified primary topic: ${companyName}`);
         const claims = analysis?.claims || [];
         const dataRequests = analysis?.dataRequests || [];
 
@@ -435,31 +483,32 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         }
 
         // PASS 2: Verify with Grounding (Using Grounded Model)
-        console.log("Verifying with Google Search Grounding...");
+        // External data is wrapped in XML delimiters to prevent prompt injection
+        log.info("Verifying with Google Search Grounding...");
         const verificationResult = await getGroundedModel().generateContent([
             `You are a Financial Fact Checker with access to Google Search.
 
             CORE INSTRUCTION:
-            1. ANALYZE the "REAL-TIME FINANCIAL DATA" provided below.
+            1. ANALYZE the "REAL-TIME FINANCIAL DATA" provided below inside <financial_data> tags.
             2. IF A CLAIM IS NOT FULLY SUPPORTED by that data, you **MUST** use Google Search to verify it.
-            3. **NEVER** mark a claim as "UNVERIFIABLE" due to "missing data" without searching first. 
+            3. **NEVER** mark a claim as "UNVERIFIABLE" due to "missing data" without searching first.
             4. **EXAMPLE**: If claim is "Revenue dropped 80% in 2020" and API data is empty for 2020, DELETE the excuse "data provided is insufficient" and SEARCH "Airbnb 2020 revenue drop".
             5. Cite your sources (Search or API).
 
             CLAIMS TO VERIFY:
-            ${JSON.stringify(claims, null, 2)}
+            ${sanitizeForPrompt(claims, 'claims')}
 
             REAL-TIME FINANCIAL DATA (Finnhub):
-            ${JSON.stringify(fetchedData, null, 2)}
-            
+            ${sanitizeForPrompt(fetchedData, 'financial_data')}
+
             Return valid JSON matching this schema:
             {
                 "score": 0-100,
                 "summary": "overall verification summary",
                 "verifications": [
-                    { 
-                        "claim": "string", 
-                        "verdict": "VERIFIED" | "CONTRADICTED" | "UNVERIFIABLE", 
+                    {
+                        "claim": "string",
+                        "verdict": "VERIFIED" | "CONTRADICTED" | "UNVERIFIABLE",
                         "explanation": "concise rationale",
                         "sourceUrl": "EXACT URL used for this specific claim"
                     }
@@ -472,15 +521,12 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
         const verification = parseJSON(verificationText);
 
         // Extract Search Sources (Grounding Metadata)
-        // Extract Search Sources (Grounding Metadata)
-        const metadata = verificationResult.response.candidates?.[0]?.groundingMetadata;
-        const searchSources: string[] = metadata?.groundingChunks
-            ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
-            .filter((u: unknown): u is string => typeof u === 'string') || [];
+        const searchSources = extractSearchSources(verificationResult.response);
 
-        console.log(`Found ${searchSources.length} search sources.`);
+        log.info(`Found ${searchSources.length} search sources.`);
 
         const enrichedResult = {
+            status: 'success' as const,
             score: verification?.score || 0,
             summary: verification?.summary || "Verification completed",
             verifications: (verification?.verifications || []).map((v: { sourceUrl?: string }, i: number) => ({
@@ -496,16 +542,17 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
 
         return { factCheckResult: enrichedResult };
     } catch (e) {
-        console.error("Fact Checker failed", e);
-        return { factCheckResult: { score: 0, flags: ["Error: Fact Check Unavailable"] } };
+        log.error("Fact Checker failed", e);
+        // Return explicit error status so risk scorer can distinguish failure from low score
+        return { factCheckResult: { status: 'error', score: 0, flags: ["Error: Fact Check Unavailable"] } };
     }
 }
 
 export async function complianceMapperNode(state: AuditState): Promise<Partial<AuditState>> {
     const content = truncateText(state.structuredContent || state.originalContent);
     try {
-        console.log("Running Compliance Check with Google Search Grounding...");
-        
+        log.info("Running Compliance Check with Google Search Grounding...");
+
         // Add timeout wrapper and retry logic
         const result = await withRetry(
             () => withTimeout(
@@ -525,7 +572,7 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
 
         return { compliance: data };
     } catch (e) {
-        console.error("Compliance Node failed", e);
+        log.error("Compliance Node failed", e);
         return {
             compliance: {
                 status: "WARN",
@@ -539,6 +586,30 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
 }
 
 export async function riskScorerNode(state: AuditState): Promise<Partial<AuditState>> {
+    // SECURITY: If GDPR anonymization failed, short-circuit with error report
+    if (state.anonymizationStatus === 'failed') {
+        log.warn("Anonymization failed — generating error report without analysing PII content");
+        return {
+            finalReport: {
+                overallScore: 0,
+                noiseScore: 0,
+                summary: 'Analysis aborted: GDPR anonymization failed. Document content was not processed to protect PII.',
+                biases: [],
+                noiseStats: { mean: 0, stdDev: 0, variance: 0 },
+                factCheck: { score: 0, flags: ['Anonymization failure — fact check skipped'] },
+                compliance: { status: 'ERROR', details: 'Skipped due to anonymization failure.' },
+                preMortem: undefined,
+                sentiment: undefined,
+                logicalAnalysis: undefined,
+                swotAnalysis: undefined,
+                cognitiveAnalysis: undefined,
+                speakers: [],
+                createdAt: new Date(),
+                analyses: []
+            } as AnalysisResult
+        };
+    }
+
     // 1. Bias Deductions (Weighted by Severity)
     const biasDeductions = (state.biasAnalysis || []).reduce((acc: number, b: { severity?: string }) => {
         const severityScores: Record<string, number> = {
@@ -556,9 +627,15 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     const noisePenalty = (state.noiseStats?.stdDev || 0) * 5;
 
     // 3. Trust Penalty (Fact Check)
-    // If Truth Score is low, decision quality suffers proportionally.
-    // If Truth=0, Penalty = 30 points.
-    const trustScore = state.factCheckResult?.score || 100;
+    // Distinguish between successful check (use score) and error/null (neutral penalty).
+    const factCheck = state.factCheckResult;
+    let trustScore: number;
+    if (!factCheck || factCheck.status === 'error') {
+        // Unknown trust — apply moderate penalty instead of assuming perfect (100)
+        trustScore = 50;
+    } else {
+        trustScore = factCheck.score;
+    }
     const trustPenalty = (100 - trustScore) * 0.3;
 
     // 4. Logic Penalty
@@ -577,7 +654,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     // Clamp 0-100
     overallScore = Math.max(0, Math.min(100, Math.round(overallScore)));
 
-    console.log(`Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) = ${overallScore}`);
+    log.info(`Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) = ${overallScore}`);
 
     return {
         finalReport: {
@@ -616,14 +693,14 @@ export async function linguisticAnalysisNode(state: AuditState): Promise<Partial
             1000, // 1 second base delay
             5000 // 5 second max delay
         );
-        
+
         const data = parseJSON(result.response.text());
         return {
             sentimentAnalysis: data?.sentiment || { score: 0, label: 'Neutral' },
             logicalAnalysis: data?.logicalAnalysis || { score: 100, fallacies: [] }
         };
     } catch (e) {
-        console.error("Linguistic Analysis Node failed", e);
+        log.error("Linguistic Analysis Node failed", e);
         return {
             sentimentAnalysis: { score: 0, label: 'Neutral' },
             logicalAnalysis: { score: 100, fallacies: [] }
@@ -644,7 +721,7 @@ export async function strategicAnalysisNode(state: AuditState): Promise<Partial<
             preMortem: data?.preMortem
         };
     } catch (e) {
-        console.error("Strategic Analysis Node failed", e);
+        log.error("Strategic Analysis Node failed", e);
         return {
             swotAnalysis: undefined,
             preMortem: undefined
@@ -656,7 +733,7 @@ export async function cognitiveDiversityNode(state: AuditState): Promise<Partial
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
-        console.log("Searching for counter-arguments...");
+        log.info("Searching for counter-arguments...");
         const result = await withTimeout(getGroundedModel().generateContent([
             COGNITIVE_DIVERSITY_PROMPT,
             `Text to Analysis:\n${content}`
@@ -666,12 +743,9 @@ export async function cognitiveDiversityNode(state: AuditState): Promise<Partial
         const data = parseJSON(text);
 
         // Extract Search Sources from Grounding Metadata
-        const metadata = result.response.candidates?.[0]?.groundingMetadata;
-        const searchSources: string[] = metadata?.groundingChunks
-            ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
-            .filter((u: unknown): u is string => typeof u === 'string') || [];
+        const searchSources = extractSearchSources(result.response);
 
-        console.log(`Found ${searchSources.length} external perspectives.`);
+        log.info(`Found ${searchSources.length} external perspectives.`);
 
         // Inject search sources into counter-arguments if missing
         if (data && data.counterArguments) {
@@ -683,7 +757,7 @@ export async function cognitiveDiversityNode(state: AuditState): Promise<Partial
 
         return { cognitiveAnalysis: data };
     } catch (e) {
-        console.error("Cognitive Diversity Node failed", e);
+        log.error("Cognitive Diversity Node failed", e);
         return { cognitiveAnalysis: undefined };
     }
 }
@@ -694,9 +768,10 @@ export async function decisionTwinNode(state: AuditState): Promise<Partial<Audit
     try {
         const { DECISION_TWIN_PROMPT } = await import('./prompts');
 
-        console.log("Running Decision Twin Simulation with Live Market Data...");
+        log.info("Running Decision Twin Simulation with Live Market Data...");
 
-        const result = await withTimeout(getGroundedModel().generateContent([
+        // Use standard safety model — simulation is creative, not analytical
+        const result = await withTimeout(getStandardSafetyGroundedModel().generateContent([
             DECISION_TWIN_PROMPT,
             `Proposal to Vote On:\n${content}`,
             `CRITICAL INSTRUCTION:
@@ -705,7 +780,7 @@ export async function decisionTwinNode(state: AuditState): Promise<Partial<Audit
             1. Current market volatility (VIX, Bond Yields).
             2. Recent competitor announcements.
             3. Macroeconomic risks relevant to this proposal.
-            
+
             Cite these specific data points in their "rationale".`
         ]));
 
@@ -714,7 +789,7 @@ export async function decisionTwinNode(state: AuditState): Promise<Partial<Audit
 
         return { simulation: data };
     } catch (e) {
-        console.error("Decision Twin Node failed", e);
+        log.error("Decision Twin Node failed", e);
         return { simulation: undefined };
     }
 }
@@ -732,7 +807,7 @@ export async function memoryRecallNode(state: AuditState): Promise<Partial<Audit
         const result = await withTimeout(getModel().generateContent([
             INSTITUTIONAL_MEMORY_PROMPT,
             `Current Document Summary:\n${content.slice(0, 2000)}`,
-            `Similar Past Cases Found:\n${JSON.stringify(similarDocs)}`
+            `Similar Past Cases Found:\n${sanitizeForPrompt(similarDocs, 'past_cases')}`
         ]));
 
         const text = result.response.text();
@@ -740,7 +815,7 @@ export async function memoryRecallNode(state: AuditState): Promise<Partial<Audit
 
         return { institutionalMemory: data };
     } catch (e) {
-        console.error("Memory Recall Node failed", e);
+        log.error("Memory Recall Node failed", e);
         return { institutionalMemory: undefined };
     }
 }

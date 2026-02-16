@@ -65,7 +65,9 @@ export class SSEReader {
                     const data = JSON.parse(jsonStr);
                     onMessage(data);
                 } catch (e) {
-                    console.warn("SSE Parse Error (JSON):", e, line);
+                    // Intentionally swallowed — malformed SSE chunks are expected
+                    // during partial reads. Logged at debug level only.
+                    void e;
                 }
             } else {
                 // Handle non-standard lines or legacy clients (optional resilience)

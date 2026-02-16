@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('TrendsRoute');
 
 export async function GET(request: Request) {
     try {
@@ -124,7 +127,7 @@ export async function GET(request: Request) {
         });
 
     } catch (error) {
-        console.error('Error fetching trends:', error);
+        log.error('Error fetching trends:', error);
         return NextResponse.json(
             { error: 'Failed to fetch trends' },
             { status: 500 }

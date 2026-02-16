@@ -2,6 +2,10 @@
  * Utility functions for AI analysis resilience and performance
  */
 
+import { createLogger } from './logger';
+
+const log = createLogger('Resilience');
+
 /**
  * Execute a function with retry logic and exponential backoff
  * @param fn The function to execute
@@ -34,7 +38,7 @@ export async function withRetry<T>(
       const jitter = Math.random() * 0.3 * exponentialDelay; // Add 0-30% jitter
       const delay = exponentialDelay + jitter;
       
-      console.warn(`Attempt ${attempt + 1} failed, retrying in ${Math.round(delay)}ms...`, lastError.message);
+      log.warn(`Attempt ${attempt + 1} failed, retrying in ${Math.round(delay)}ms... ${lastError.message}`);
       await sleep(delay);
     }
   }

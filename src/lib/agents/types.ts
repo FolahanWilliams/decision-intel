@@ -1,11 +1,13 @@
 import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
-import { BaseMessage } from "@langchain/core/messages";
 
 export interface AuditState {
     // Input
     documentId: string;
     userId: string;
     originalContent: string;
+
+    // Pipeline safety — set by GDPR anonymizer to gate downstream processing
+    anonymizationStatus?: 'success' | 'failed';
 
     // Internal Processing
     structuredContent?: string;
@@ -21,6 +23,7 @@ export interface AuditState {
     };
     noiseBenchmarks?: NoiseBenchmark[];
     factCheckResult?: {
+        status: 'success' | 'error';
         score: number;
         flags: string[];
         searchSources?: string[];
@@ -32,7 +35,7 @@ export interface AuditState {
             explanation: string;
             sourceUrl?: string;
         }>;
-    };
+    } | null;
     preMortem?: {
         failureScenarios: string[];
         preventiveMeasures: string[];
@@ -50,10 +53,6 @@ export interface AuditState {
     simulation?: SimulationResult;
     institutionalMemory?: InstitutionalMemoryResult;
 
-
     // Final Output
     finalReport?: AnalysisResult;
-
-    // LangChain specific (optional for conversation history)
-    messages?: BaseMessage[];
 }

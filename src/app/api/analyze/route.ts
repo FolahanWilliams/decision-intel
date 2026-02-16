@@ -4,6 +4,9 @@ import { BiasDetectionResult } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('AnalyzeRoute');
 
 const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY?.trim();
 
@@ -42,7 +45,7 @@ export async function POST(request: NextRequest) {
         // Secure check: ensure EXTENSION_API_KEY is defined and not empty before comparing
         if (!effectiveUserId && EXTENSION_API_KEY && EXTENSION_API_KEY.length > 0) {
             if (apiKey !== EXTENSION_API_KEY) {
-                console.error('Unauthorized: Invalid API key provided');
+                log.error('Unauthorized: Invalid API key provided');
                 return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
             }
             const extUserId = request.headers.get('x-extension-user-id');
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
         }
 
         if (!effectiveUserId) {
-            console.error('Unified Auth Failed: No Session ID and Invalid API Key');
+            log.error('Unified Auth Failed: No Session ID and Invalid API Key');
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
         try {
             body = await request.json();
         } catch (parseError) {
-            console.error('Request body parse error:', parseError);
+            log.error('Request body parse error:', parseError);
             return NextResponse.json({ error: 'Invalid or missing request body' }, { status: 400 });
         }
 
@@ -107,7 +110,7 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('Analysis error:', error);
+        log.error('Analysis error:', error);
         // Sanitize error message to prevent prompt injection into Jules
         let errorMessage = error instanceof Error ? error.message : String(error);
         errorMessage = errorMessage.slice(0, 200).replace(/[<>]/g, ''); // Truncate and remove basic HTML/XML tags
@@ -120,7 +123,7 @@ export async function POST(request: NextRequest) {
             errorMessage.includes('blocked');
 
         if (isHealableError) {
-            console.warn(`⚠️ Healable error detected: ${errorMessage}`);
+            log.warn('Healable error detected: ' + errorMessage);
         }
 
         return NextResponse.json({

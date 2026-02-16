@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('DocumentsRoute');
 
 // GET /api/documents - List all documents for the current user
 export async function GET(request: Request) {
@@ -68,7 +71,7 @@ export async function GET(request: Request) {
 
         return NextResponse.json(transformedDocs);
     } catch (error) {
-        console.error('Error fetching documents:', error);
+        log.error('Error fetching documents:', error);
         return NextResponse.json(
             { error: 'Failed to fetch documents' },
             { status: 500 }

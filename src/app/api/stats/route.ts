@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('StatsRoute');
 
 export async function GET() {
     try {
@@ -103,7 +106,7 @@ export async function GET() {
             }))
         });
     } catch (error) {
-        console.error('Error fetching stats:', error);
+        log.error('Error fetching stats:', error);
         return NextResponse.json(
             { error: 'Failed to fetch stats' },
             { status: 500 }

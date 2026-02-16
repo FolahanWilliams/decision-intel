@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('TrendsAnalyzeRoute');
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
@@ -57,7 +60,7 @@ export async function POST(_: Request) {
         }
 
         // 2. Perform Market Analysis (Grounded)
-        console.log(`Running Market Analysis for: ${activeTickers.join(', ')}`);
+        log.info('Running Market Analysis for: ' + activeTickers.join(', '));
         const model = getMarketAnalystModel();
 
         const prompt = `
@@ -93,7 +96,7 @@ export async function POST(_: Request) {
                 const cleanText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
                 analysis = JSON.parse(cleanText);
             } catch {
-                console.error('Failed to parse Gemini response:', responseText.slice(0, 200));
+                log.error('Failed to parse Gemini response: ' + responseText.slice(0, 200));
                 return NextResponse.json(
                     { error: 'Market analysis returned an unparseable response. Please try again.' },
                     { status: 502 }
@@ -113,7 +116,7 @@ export async function POST(_: Request) {
         });
 
     } catch (error) {
-        console.error('Market Analyst failed:', error);
+        log.error('Market Analyst failed:', error);
         return NextResponse.json(
             { error: 'Market analysis failed' },
             { status: 500 }

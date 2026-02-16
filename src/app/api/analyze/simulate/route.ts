@@ -3,6 +3,9 @@ import { runAnalysis } from '@/lib/analysis/analyzer';
 import { auth } from '@clerk/nextjs/server';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('SimulateRoute');
 
 export async function POST(request: NextRequest) {
     try {
@@ -40,7 +43,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(result);
     } catch (error) {
-        console.error('Simulation error:', error);
+        log.error('Simulation error:', error);
         return NextResponse.json(
             { error: getSafeErrorMessage(error) },
             { status: 500 }
