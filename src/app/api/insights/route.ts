@@ -47,26 +47,26 @@ export async function GET() {
             }),
 
             // Bias type distribution (grouped)
-            // Using $queryRawUnsafe because PgBouncer doesn't support prepared statements
-            prisma.$queryRawUnsafe<{ biasType: string; count: bigint }[]>(`
+            // Using $queryRaw tagged template (parameterized) — safe against SQL injection.
+            prisma.$queryRaw<{ biasType: string; count: bigint }[]>`
                 SELECT bi."biasType", COUNT(*)::bigint as count
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON bi."analysisId" = a.id
                 JOIN "Document" d ON a."documentId" = d.id
-                WHERE d."userId" = '${userId}'
+                WHERE d."userId" = ${userId}
                 GROUP BY bi."biasType"
                 ORDER BY count DESC
-            `),
+            `,
 
             // Severity distribution
-            prisma.$queryRawUnsafe<{ severity: string; count: bigint }[]>(`
+            prisma.$queryRaw<{ severity: string; count: bigint }[]>`
                 SELECT bi."severity", COUNT(*)::bigint as count
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON bi."analysisId" = a.id
                 JOIN "Document" d ON a."documentId" = d.id
-                WHERE d."userId" = '${userId}'
+                WHERE d."userId" = ${userId}
                 GROUP BY bi."severity"
-            `),
+            `,
         ]);
 
         const n = analyses.length;

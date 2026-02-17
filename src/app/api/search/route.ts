@@ -25,11 +25,21 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Query is required' }, { status: 400 });
         }
 
+        const MAX_QUERY_LENGTH = 10_000;
+        if (typeof query !== 'string' || query.length > MAX_QUERY_LENGTH) {
+            return NextResponse.json(
+                { error: `Query must be a string of at most ${MAX_QUERY_LENGTH} characters` },
+                { status: 400 }
+            );
+        }
+
+        const safeLimit = Math.max(1, Math.min(20, Number(limit) || 5));
+
         const results = await searchSimilarDocuments(
             query,
             userId,
-            limit,
-            documentId // Exclude this document from results if provided
+            safeLimit,
+            typeof documentId === 'string' ? documentId : undefined
         );
 
         return NextResponse.json({
@@ -61,6 +71,15 @@ export async function GET(request: NextRequest) {
         if (!documentId || !content) {
             return NextResponse.json(
                 { error: 'documentId and content are required' },
+                { status: 400 }
+            );
+        }
+
+        // Prevent excessively large content from DoS-ing the embedding API.
+        const MAX_CONTENT_LENGTH = 30_000;
+        if (content.length > MAX_CONTENT_LENGTH) {
+            return NextResponse.json(
+                { error: `content must be at most ${MAX_CONTENT_LENGTH} characters` },
                 { status: 400 }
             );
         }

@@ -15,16 +15,11 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    try {
-        // Check authentication for protected routes
-        if (isProtectedRoute(req)) await auth.protect();
-        
-        // Continue to the next middleware/handler
-        return NextResponse.next();
-    } catch (error) {
-        console.error('Middleware error:', error);
-        return NextResponse.next();
-    }
+    // auth.protect() throws a redirect response on auth failure.
+    // Do NOT wrap in try/catch — catching and returning NextResponse.next()
+    // would silently bypass authentication on protected routes.
+    if (isProtectedRoute(req)) await auth.protect();
+    return NextResponse.next();
 });
 
 export const config = {

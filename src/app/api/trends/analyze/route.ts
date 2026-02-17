@@ -2,15 +2,15 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 import { GoogleGenerativeAI, type Tool } from "@google/generative-ai";
+import { getRequiredEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('TrendsAnalyzeRoute');
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
-
-// Helper to get Grounded Model
+// Helper to get Grounded Model — initialised lazily so the missing-key error
+// surfaces at request time with a clear message rather than at module load.
 function getMarketAnalystModel() {
+    const genAI = new GoogleGenerativeAI(getRequiredEnvVar('GOOGLE_API_KEY'));
     return genAI.getGenerativeModel({
         model: "gemini-3-flash-preview", // Fast, Supports Tools
         tools: [
