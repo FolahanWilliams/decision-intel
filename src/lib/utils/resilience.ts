@@ -2,6 +2,7 @@
  * Utility functions for AI analysis resilience and performance
  */
 
+import { createHash } from 'crypto';
 import { createLogger } from './logger';
 
 const log = createLogger('Resilience');
@@ -74,19 +75,14 @@ export async function withTimeout<T>(
 }
 
 /**
- * Calculate content hash for caching purposes
- * Uses a simple but fast hashing algorithm suitable for text content
+ * Calculate content hash for caching purposes.
+ * Uses SHA-256 to avoid the high collision probability of a 32-bit checksum,
+ * which could cause incorrect cached results to be served for different documents.
  * @param content The content to hash
- * @returns Hash string
+ * @returns First 32 hex characters of SHA-256 digest
  */
 export function hashContent(content: string): string {
-  let hash = 0;
-  for (let i = 0; i < content.length; i++) {
-    const char = content.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return Math.abs(hash).toString(36);
+  return createHash('sha256').update(content).digest('hex').slice(0, 32);
 }
 
 /**
@@ -198,33 +194,43 @@ export function validateContent(content: string): { valid: boolean; error?: stri
 }
 
 /**
- * Batch process an array with concurrency control
+ * Batch process an array with concurrency control.
+ *
+ * Previous implementation had a bug: after Promise.race() it removed the
+ * *newly added* promise from the pool (via findIndex) instead of the one
+ * that just completed, breaking the concurrency limit and risking the pool
+ * never draining. Fixed by using a Set whose entries self-delete via
+ * `finally`, so Promise.race() always races the actual in-flight set.
+ *
  * @param items Array of items to process
  * @param processor Function to process each item
  * @param concurrency Maximum concurrent operations (default: 3)
- * @returns Array of results
+ * @returns Array of results (index-aligned with input)
  */
 export async function batchProcess<T, R>(
   items: T[],
   processor: (item: T) => Promise<R>,
   concurrency: number = 3
 ): Promise<R[]> {
-  const results: R[] = [];
-  const executing: Promise<void>[] = [];
-  
+  const results: R[] = new Array(items.length);
+  const executing = new Set<Promise<void>>();
+
   for (let i = 0; i < items.length; i++) {
-    const promise = processor(items[i]).then(result => {
-      results[i] = result;
-    });
-    
-    executing.push(promise);
-    
-    if (executing.length >= concurrency) {
+    const index = i;
+    // Wrap so the promise removes itself from the Set when done (success or error).
+    let promise!: Promise<void>;
+    promise = processor(items[index])
+      .then(result => { results[index] = result; })
+      .finally(() => { executing.delete(promise); });
+
+    executing.add(promise);
+
+    if (executing.size >= concurrency) {
+      // Wait for at least one slot to free before adding the next item.
       await Promise.race(executing);
-      executing.splice(executing.findIndex(p => p === promise), 1);
     }
   }
-  
+
   await Promise.all(executing);
   return results;
 }

@@ -142,9 +142,16 @@ function extractSearchSources(
  * Wrap external (untrusted) data in clearly delimited XML blocks before
  * embedding it in an LLM prompt. This reduces the surface area for prompt
  * injection by making it unambiguous where external data starts and ends.
+ *
+ * XML special characters are escaped so that crafted data cannot break out
+ * of the delimiter tags (e.g. a value of "</external_data>inject..." would
+ * otherwise prematurely close the block).
  */
 function sanitizeForPrompt(data: unknown, label: string = 'external_data'): string {
-    const json = JSON.stringify(data, null, 2);
+    const json = JSON.stringify(data, null, 2)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
     return `<${label}>\n${json}\n</${label}>`;
 }
 
@@ -345,7 +352,8 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
 
             noiseBenchmarks = noiseBenchmarks.map((b: NoiseBenchmark, i: number) => ({
                 ...b,
-                sourceUrl: b.sourceUrl || searchSources[i % searchSources.length]
+                // Guard against empty searchSources: modulo by 0 produces NaN.
+                sourceUrl: b.sourceUrl || (searchSources.length > 0 ? searchSources[i % searchSources.length] : undefined)
             }));
         }
 

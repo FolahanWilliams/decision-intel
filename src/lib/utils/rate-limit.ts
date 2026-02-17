@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { createLogger } from './logger';
 
 const log = createLogger('RateLimit');
@@ -46,89 +47,49 @@ export async function checkRateLimit(
   const failMode = config.failMode ?? 'open';
 
   try {
-    // Clean up old expired rate limit entries (older than window)
-    // Run this in the background, don't await
+    // Clean up old expired rate limit entries in the background.
+    // Fire-and-forget: logging is best-effort; failure does not block the request.
     prisma.rateLimit.deleteMany({
-      where: {
-        resetAt: {
-          lt: windowStart,
-        },
-      },
-    }).catch((err: Error) => log.warn('Rate limit cleanup error: ' + err.message));
+      where: { resetAt: { lt: windowStart } },
+    }).catch((err: unknown) => log.warn('Rate limit cleanup error: ' + (err instanceof Error ? err.message : String(err))));
 
-    // Find or create rate limit entry
-    let rateLimit = await prisma.rateLimit.findUnique({
-      where: {
-        identifier_route: {
-          identifier,
-          route,
-        },
-      },
-    });
+    const resetAt = new Date(now.getTime() + config.windowMs);
 
-    // If no entry exists or it has expired, create a new one
-    if (!rateLimit || rateLimit.resetAt < now) {
-      const resetAt = new Date(now.getTime() + config.windowMs);
+    // Atomically upsert and increment the counter in a single statement,
+    // handling the window-expiry reset inline. This eliminates the TOCTOU
+    // race condition present in a read-then-write approach.
+    type RateLimitRow = { count: number; reset_at: Date };
+    const rows = await prisma.$queryRaw<RateLimitRow[]>(Prisma.sql`
+      INSERT INTO "RateLimit" (id, identifier, route, count, "resetAt", "updatedAt")
+      VALUES (gen_random_uuid(), ${identifier}, ${route}, 1, ${resetAt}, ${now})
+      ON CONFLICT (identifier, route) DO UPDATE
+        SET
+          count     = CASE WHEN "RateLimit"."resetAt" < ${now} THEN 1
+                          ELSE "RateLimit".count + 1 END,
+          "resetAt" = CASE WHEN "RateLimit"."resetAt" < ${now} THEN ${resetAt}
+                          ELSE "RateLimit"."resetAt" END,
+          "updatedAt" = ${now}
+      RETURNING count, "resetAt" as reset_at
+    `);
 
-      rateLimit = await prisma.rateLimit.upsert({
-        where: {
-          identifier_route: {
-            identifier,
-            route,
-          },
-        },
-        update: {
-          count: 1,
-          resetAt,
-          updatedAt: now,
-        },
-        create: {
-          identifier,
-          route,
-          count: 1,
-          resetAt,
-        },
-      });
+    const row = rows[0];
+    const currentCount = row?.count ?? 1;
+    const currentResetAt = row?.reset_at ?? resetAt;
 
-      return {
-        success: true,
-        limit: config.maxRequests,
-        remaining: config.maxRequests - 1,
-        reset: Math.floor(resetAt.getTime() / 1000),
-      };
-    }
-
-    // Check if limit exceeded
-    if (rateLimit.count >= config.maxRequests) {
+    if (currentCount > config.maxRequests) {
       return {
         success: false,
         limit: config.maxRequests,
         remaining: 0,
-        reset: Math.floor(rateLimit.resetAt.getTime() / 1000),
+        reset: Math.floor(currentResetAt.getTime() / 1000),
       };
     }
-
-    // Increment count
-    const updated = await prisma.rateLimit.update({
-      where: {
-        identifier_route: {
-          identifier,
-          route,
-        },
-      },
-      data: {
-        count: {
-          increment: 1,
-        },
-        updatedAt: now,
-      },
-    });
 
     return {
       success: true,
       limit: config.maxRequests,
-      remaining: config.maxRequests - updated.count,
-      reset: Math.floor(updated.resetAt.getTime() / 1000),
+      remaining: Math.max(0, config.maxRequests - currentCount),
+      reset: Math.floor(currentResetAt.getTime() / 1000),
     };
   } catch (error) {
     log.error('Rate limit check failed (failMode=' + failMode + '):', error);

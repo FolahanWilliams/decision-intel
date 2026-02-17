@@ -219,6 +219,27 @@ export async function storeAnalysisEmbedding(
 }
 
 /**
+ * Validate that a string only contains characters safe for SQL interpolation.
+ * Used for values that must be embedded in $queryRawUnsafe due to PgBouncer
+ * not supporting prepared statements with pgvector casts.
+ */
+function assertSafeId(value: string, fieldName: string): void {
+    // Clerk user IDs: user_xxx / org_xxx / cuid-style alphanumeric + underscore
+    if (!/^[a-zA-Z0-9_|-]+$/.test(value)) {
+        throw new Error(`Invalid ${fieldName} format`);
+    }
+}
+
+/**
+ * Validate that an embedding vector string only contains floats/brackets/commas.
+ */
+function assertSafeEmbeddingVector(vec: string): void {
+    if (!/^\[[-\d.,eE\s]+\]$/.test(vec)) {
+        throw new Error('Invalid embedding vector format');
+    }
+}
+
+/**
  * Search for similar documents using cosine similarity
  */
 export async function searchSimilarDocuments(
@@ -237,8 +258,13 @@ export async function searchSimilarDocuments(
         const queryEmbedding = await generateEmbedding(queryText);
         const embeddingVector = `[${queryEmbedding.join(',')}]`;
 
-        // Use separate queries for with/without exclusion to avoid SQL injection
-        // and ensure proper parameterization
+        // Validate all values that will be interpolated into raw SQL.
+        // $queryRawUnsafe is required here because PgBouncer does not support
+        // prepared statements with pgvector ::vector casts.
+        assertSafeEmbeddingVector(embeddingVector);
+        assertSafeId(userId, 'userId');
+        const safeLimit = Math.max(1, Math.min(50, Math.floor(limit)));
+
         let results: Array<{
             document_id: string;
             content: string;
@@ -246,11 +272,10 @@ export async function searchSimilarDocuments(
             similarity: number;
         }>;
 
-        // Using $queryRawUnsafe because PgBouncer doesn't support prepared statements
-        // Note: embeddingVector is a safely constructed array string, userId and excludeDocumentId are validated
         if (excludeDocumentId) {
+            assertSafeId(excludeDocumentId, 'excludeDocumentId');
             results = await prisma.$queryRawUnsafe<typeof results>(`
-                SELECT 
+                SELECT
                     de."documentId" as document_id,
                     de.content,
                     de.metadata,
@@ -260,11 +285,11 @@ export async function searchSimilarDocuments(
                 WHERE d."userId" = '${userId}'
                 AND de."documentId" != '${excludeDocumentId}'
                 ORDER BY de.embedding <=> '${embeddingVector}'::vector
-                LIMIT ${limit}
+                LIMIT ${safeLimit}
             `);
         } else {
             results = await prisma.$queryRawUnsafe<typeof results>(`
-                SELECT 
+                SELECT
                     de."documentId" as document_id,
                     de.content,
                     de.metadata,
@@ -273,7 +298,7 @@ export async function searchSimilarDocuments(
                 JOIN "Document" d ON d.id = de."documentId"
                 WHERE d."userId" = '${userId}'
                 ORDER BY de.embedding <=> '${embeddingVector}'::vector
-                LIMIT ${limit}
+                LIMIT ${safeLimit}
             `);
         }
 
