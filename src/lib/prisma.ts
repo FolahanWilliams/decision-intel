@@ -20,8 +20,35 @@ const globalForPrisma = globalThis as unknown as {
 // DATABASE_URL contains an SSL mode, which preserves encryption while
 // accepting the provider's internal certificate authority.
 const prismaClientSingleton = () => {
-  const connectionString = process.env.DATABASE_URL ?? '';
-  const needsSsl = /sslmode=(require|verify-ca|verify-full|prefer)/.test(connectionString);
+  const rawUrl = process.env.DATABASE_URL ?? '';
+
+  // pg ≥ 8.12 / pg-connection-string ≥ 2.8 changed SSL mode semantics so
+  // that 'require', 'prefer', and 'verify-ca' are parsed as 'verify-full'.
+  // That causes "self-signed certificate in certificate chain" (P1011) on
+  // managed providers (Supabase, Neon, Railway) whose CA isn't in the system
+  // trust store.
+  //
+  // Root cause: even when we pass ssl:{rejectUnauthorized:false} to Pool,
+  // pg-connection-string re-parses the sslmode in the connection string and
+  // overwrites our ssl config with rejectUnauthorized:true.
+  //
+  // Fix: strip sslmode from the URL entirely so pg-connection-string never
+  // touches the ssl config, then pass ssl:{rejectUnauthorized:false} directly.
+  // Transport encryption is still enforced; only CA chain verification is
+  // skipped (the provider's internal CA is not in the system trust store).
+  let connectionString = rawUrl;
+  let needsSsl = false;
+
+  try {
+    const url = new URL(rawUrl);
+    const sslMode = url.searchParams.get('sslmode');
+    needsSsl = sslMode !== null;
+    url.searchParams.delete('sslmode');
+    connectionString = url.toString();
+  } catch {
+    // Malformed URL — fall back to the raw string; ssl will not be forced.
+    needsSsl = /[?&]sslmode=/.test(rawUrl);
+  }
 
   const pool = new Pool({
     connectionString,
