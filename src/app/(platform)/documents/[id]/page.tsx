@@ -5,7 +5,8 @@ import Link from 'next/link';
 import {
     ArrowLeft, FileText, AlertTriangle, CheckCircle, XCircle,
     Loader2, ChevronRight, Lightbulb, Download, Table,
-    Terminal, PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink, Brain
+    Terminal, PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink, Brain,
+    Users, Vote
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';
@@ -185,10 +186,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     const [streamLogs, setStreamLogs] = useState<{ msg: string, type: 'info' | 'bias' | 'success' }[]>([]);
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
+    const [isExportingPdf, setIsExportingPdf] = useState(false);
+    const [isExportingCsv, setIsExportingCsv] = useState(false);
 
     const [activeTab, setActiveTab] = useState<'overview' | 'biases' | 'factcheck' | 'compliance' | 'cognitive' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team' | 'boardroom'>('overview');
 
     const { showToast } = useToast();
+
+    // Draft key for simulator localStorage persistence
+    const draftKey = `simulator_draft_${resolvedParams.id}`;
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -197,7 +203,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 if (!res.ok) throw new Error('Document not found');
                 const data = await res.json();
                 setDocument(data);
-                setEditableContent(data.content);
+                // Restore simulator draft if one exists, otherwise use original content
+                const savedDraft = localStorage.getItem(`simulator_draft_${data.id}`);
+                setEditableContent(savedDraft ?? data.content);
                 if (data.analyses?.[0]?.biases?.[0]) {
                     setSelectedBias(data.analyses[0].biases[0]);
                 }
@@ -211,7 +219,24 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         fetchDocument();
     }, [resolvedParams.id]);
 
+    // Esc closes the bias detail modal
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setSelectedBias(null);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
+    // Persist simulator draft to localStorage (debounced 500ms)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (editableContent) {
+                localStorage.setItem(draftKey, editableContent);
+            }
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [editableContent, draftKey]);
 
     if (loading) {
         return (
@@ -242,9 +267,20 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     const analysis = document.analyses?.[0];
     const biases = analysis?.biases || [];
 
+    // Derived index for prev/next navigation in the bias modal
+    const selectedBiasIndex = selectedBias
+        ? biases.findIndex(b => b.id === selectedBias.id)
+        : -1;
+
+    // Clear selected bias whenever the active tab changes
+    const handleTabChange = (tabId: typeof activeTab) => {
+        setActiveTab(tabId);
+        setSelectedBias(null);
+    };
+
     const handleExport = async () => {
         if (!document || !analysis) return;
-
+        setIsExportingPdf(true);
         try {
             const { PdfGenerator } = await import('@/lib/reports/pdf-generator');
             const generator = new PdfGenerator();
@@ -273,12 +309,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         } catch (error) {
             console.error('Failed to generate PDF:', error);
             showToast('Failed to generate PDF report', 'error');
+        } finally {
+            setIsExportingPdf(false);
         }
     };
 
     const handleCsvExport = async () => {
         if (!document || !analysis) return;
-
+        setIsExportingCsv(true);
         try {
             const { CsvGenerator } = await import('@/lib/reports/csv-generator');
             const generator = new CsvGenerator();
@@ -287,6 +325,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         } catch (error) {
             console.error('Failed to generate CSV:', error);
             showToast('Failed to generate CSV report', 'error');
+        } finally {
+            setIsExportingCsv(false);
         }
     };
 
@@ -420,16 +460,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         <div className="flex gap-sm">
                             <button
                                 onClick={handleExport}
+                                disabled={isExportingPdf}
                                 className="btn btn-secondary btn-sm flex items-center gap-sm"
                             >
-                                <Download size={14} />
+                                {isExportingPdf ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                                 PDF
                             </button>
                             <button
                                 onClick={handleCsvExport}
+                                disabled={isExportingCsv}
                                 className="btn btn-secondary btn-sm flex items-center gap-sm"
                             >
-                                <Table size={14} />
+                                {isExportingCsv ? <Loader2 size={14} className="animate-spin" /> : <Table size={14} />}
                                 CSV
                             </button>
                         </div>
@@ -637,11 +679,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             { id: 'logic', label: 'Logic', icon: CheckCircle },
                             { id: 'swot', label: 'SWOT', icon: Lightbulb },
                             { id: 'noise', label: 'Noise', icon: Info },
+                            ...(analysis?.cognitiveAnalysis ? [{ id: 'red-team' as const, label: 'Red Team', icon: Users }] : []),
+                            ...(analysis?.simulation ? [{ id: 'boardroom' as const, label: 'Boardroom', icon: Vote }] : []),
                             { id: 'simulator', label: 'Simulator', icon: PlayCircle },
                         ].map(tab => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                                onClick={() => handleTabChange(tab.id as typeof activeTab)}
                                 className={`flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${activeTab === tab.id
                                     ? 'text-accent-primary border-accent-primary bg-accent-primary/5'
                                     : 'text-muted border-transparent hover:text-primary hover:border-border'
@@ -855,15 +899,29 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 <h3 className="flex items-center gap-sm">
                                     <Info size={16} /> &quot;WHAT-IF&quot; SIMULATOR (MODIFIABLE)
                                 </h3>
-                                <button
-                                    onClick={runSimulation}
-                                    disabled={isSimulating}
-                                    className="btn btn-secondary"
-                                    style={{ padding: '2px 8px', fontSize: '10px' }}
-                                >
-                                    {isSimulating ? <Loader2 size={12} className="animate-spin" /> : <PlayCircle size={12} />}
-                                    SIMULATE SCAN
-                                </button>
+                                <div className="flex items-center gap-sm">
+                                    <button
+                                        onClick={() => {
+                                            setEditableContent(document.content);
+                                            localStorage.removeItem(draftKey);
+                                            setSimulationResult(null);
+                                        }}
+                                        className="btn btn-ghost"
+                                        style={{ padding: '2px 8px', fontSize: '10px' }}
+                                        title="Discard draft and restore original document"
+                                    >
+                                        Reset
+                                    </button>
+                                    <button
+                                        onClick={runSimulation}
+                                        disabled={isSimulating || !editableContent.trim()}
+                                        className="btn btn-secondary"
+                                        style={{ padding: '2px 8px', fontSize: '10px' }}
+                                    >
+                                        {isSimulating ? <Loader2 size={12} className="animate-spin" /> : <PlayCircle size={12} />}
+                                        SIMULATE SCAN
+                                    </button>
+                                </div>
                             </div>
                             <div className="card-body" style={{ padding: 0 }}>
                                 <textarea
@@ -883,6 +941,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                         outline: 'none'
                                     }}
                                 />
+                                {!editableContent.trim() && (
+                                    <p className="text-xs text-muted px-6 py-2">
+                                        Document content is empty — paste or type content to simulate.
+                                    </p>
+                                )}
                             </div>
                         </div>
                     )}
@@ -1131,22 +1194,62 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
             </div>
 
-            {/* Bias Detail Lightbox (at bottom or floating) */}
-            {
-                selectedBias && (
-                    <div className="card mt-xl" style={{ border: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}20` }}>
-                        <div className="card-header flex items-center justify-between" style={{ borderBottom: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}30` }}>
+            {/* Bias Detail Modal — fixed overlay, keyboard-dismissible, prev/next navigation */}
+            {selectedBias && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                    style={{ background: 'rgba(0,0,0,0.8)' }}
+                    onClick={() => setSelectedBias(null)}
+                >
+                    <div
+                        className="card w-full max-w-3xl"
+                        style={{
+                            border: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}30`,
+                            maxHeight: '90vh',
+                            overflowY: 'auto',
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        {/* Modal header with prev/next navigation */}
+                        <div className="card-header flex items-center justify-between" style={{ borderBottom: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}30`, position: 'sticky', top: 0, background: 'var(--bg-secondary)', zIndex: 10 }}>
                             <div className="flex items-center gap-md">
-                                <AlertTriangle
-                                    size={20}
-                                    style={{ color: SEVERITY_COLORS[selectedBias.severity] }}
-                                />
+                                <AlertTriangle size={20} style={{ color: SEVERITY_COLORS[selectedBias.severity] }} />
                                 <h3>{selectedBias.biasType}</h3>
                                 <span className={`badge badge-${selectedBias.severity}`} style={{ marginLeft: 'var(--spacing-sm)' }}>
                                     {selectedBias.severity.toUpperCase()}
                                 </span>
                             </div>
-                            <button onClick={() => setSelectedBias(null)} className="btn btn-ghost" style={{ padding: 0 }}>CLOSE</button>
+                            <div className="flex items-center gap-sm">
+                                <button
+                                    onClick={() => setSelectedBias(biases[selectedBiasIndex - 1])}
+                                    disabled={selectedBiasIndex <= 0}
+                                    className="btn btn-ghost"
+                                    style={{ padding: '2px 8px', fontSize: '11px' }}
+                                    aria-label="Previous bias"
+                                >
+                                    ← Prev
+                                </button>
+                                <span className="text-xs text-muted" style={{ minWidth: '3rem', textAlign: 'center' }}>
+                                    {selectedBiasIndex + 1} of {biases.length}
+                                </span>
+                                <button
+                                    onClick={() => setSelectedBias(biases[selectedBiasIndex + 1])}
+                                    disabled={selectedBiasIndex >= biases.length - 1}
+                                    className="btn btn-ghost"
+                                    style={{ padding: '2px 8px', fontSize: '11px' }}
+                                    aria-label="Next bias"
+                                >
+                                    Next →
+                                </button>
+                                <button
+                                    onClick={() => setSelectedBias(null)}
+                                    className="btn btn-ghost"
+                                    style={{ padding: '2px 8px', fontSize: '13px', marginLeft: '4px' }}
+                                    aria-label="Close"
+                                >
+                                    ✕
+                                </button>
+                            </div>
                         </div>
 
                         <div className="card-body" style={{ padding: 0 }}>
@@ -1262,8 +1365,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             </div>
                         </div>
                     </div>
-                )
-            }
+                </div>
+            )}
 
             {/* No biases */}
             {
