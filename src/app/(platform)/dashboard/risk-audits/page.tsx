@@ -8,6 +8,7 @@ import {
     Loader2, TrendingUp, TrendingDown, ArrowRight,
     AlertCircle, Shield, BarChart3, Trash2
 } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface DocumentWithRisk {
     id: string;
@@ -32,8 +33,8 @@ interface RiskSummary {
 }
 
 export default function RiskAuditsPage() {
-    // SWR: cached document list with detailed analysis data
-    const { documents: rawDocs, isLoading: loading, mutate: mutateDocs } = useDocuments(true);
+    // SWR: cached document list with detailed analysis data (limit=100 to fetch all for risk summary)
+    const { documents: rawDocs, isLoading: loading, mutate: mutateDocs } = useDocuments(true, 1, 100);
 
     // Delete state
     const [deleteModal, setDeleteModal] = useState<{ open: boolean; docId: string; filename: string }>({
@@ -118,9 +119,40 @@ export default function RiskAuditsPage() {
 
     if (loading) {
         return (
-            <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
-                <div className="flex items-center justify-center" style={{ minHeight: '60vh' }}>
-                    <Loader2 size={48} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+            <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
+                <div className="grid grid-4 mb-xl gap-md">
+                    {[0, 1, 2, 3].map(i => (
+                        <div key={i} className="card animate-pulse">
+                            <div className="card-body text-center p-md">
+                                <div className="h-3 w-24 rounded bg-white/10 mx-auto mb-sm" />
+                                <div className="h-10 w-16 rounded bg-white/10 mx-auto mb-sm" />
+                                <div className="h-3 w-16 rounded bg-white/10 mx-auto" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div className="card animate-pulse">
+                    <div className="card-header">
+                        <div className="h-4 w-40 rounded bg-white/10" />
+                    </div>
+                    <div className="card-body" style={{ padding: 0 }}>
+                        {[0, 1, 2].map(i => (
+                            <div key={i} className="flex items-center justify-between p-lg" style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                <div className="flex items-center gap-lg">
+                                    <div className="w-12 h-12 rounded bg-white/10" />
+                                    <div>
+                                        <div className="h-4 w-40 rounded bg-white/10 mb-sm" />
+                                        <div className="h-3 w-24 rounded bg-white/10" />
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-xl">
+                                    <div className="h-8 w-12 rounded bg-white/10" />
+                                    <div className="h-8 w-12 rounded bg-white/10" />
+                                    <div className="h-8 w-20 rounded bg-white/10" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         );
@@ -141,6 +173,7 @@ export default function RiskAuditsPage() {
 
             {/* Risk Summary Cards */}
             {summary && (
+                <ErrorBoundary sectionName="Risk Summary">
                 <div className="grid grid-4 mb-xl gap-md">
                     <div className="card animate-fade-in">
                         <div className="card-body text-center p-md">
@@ -192,10 +225,12 @@ export default function RiskAuditsPage() {
                         </div>
                     </div>
                 </div>
+                </ErrorBoundary>
             )}
 
             {/* Risk Distribution */}
             {summary && summary.totalDocuments > 0 && (
+                <ErrorBoundary sectionName="Risk Distribution">
                 <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.4s' }}>
                     <div className="card-header">
                         <h3 className="flex items-center gap-sm">
@@ -250,9 +285,11 @@ export default function RiskAuditsPage() {
                         </div>
                     </div>
                 </div>
+                </ErrorBoundary>
             )}
 
             {/* Documents List */}
+            <ErrorBoundary sectionName="Document Risk Assessment">
             <div className="card animate-fade-in" style={{ animationDelay: '0.5s' }}>
                 <div className="card-header">
                     <h3 className="flex items-center gap-sm">
@@ -367,6 +404,7 @@ export default function RiskAuditsPage() {
                     )}
                 </div>
             </div>
+            </ErrorBoundary>
 
             {/* Quick Actions */}
             <div className="grid grid-3 mt-xl gap-md">

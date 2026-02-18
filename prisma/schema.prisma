@@ -52,9 +52,11 @@ model Analysis {
   simulation      Json?       // Stores { overallVerdict, twins }
   institutionalMemory Json?   // Stores { recallScore, similarEvents, strategicAdvice }
   
+  modelVersion String?        // Gemini model used to produce this analysis
+
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
-  
+
   biases       BiasInstance[]
 
   @@index([documentId])

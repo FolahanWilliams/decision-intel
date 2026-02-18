@@ -16,6 +16,9 @@ export async function GET(request: Request) {
 
         const { searchParams } = new URL(request.url);
         const detailed = searchParams.get('detailed') === 'true';
+        const page = Math.max(1, Number(searchParams.get('page')) || 1);
+        const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 10));
+        const skip = (page - 1) * limit;
 
         // Select fields based on detail level
         const select = {
@@ -41,11 +44,17 @@ export async function GET(request: Request) {
             }
         } as const;
 
-        const documents = await prisma.document.findMany({
-            where: { userId },
-            orderBy: { uploadedAt: 'desc' },
-            select
-        });
+        const where = { userId };
+        const [documents, total] = await Promise.all([
+            prisma.document.findMany({
+                where,
+                orderBy: { uploadedAt: 'desc' },
+                skip,
+                take: limit,
+                select
+            }),
+            prisma.document.count({ where })
+        ]);
 
         // Transform to include score from latest analysis
         const transformedDocs = documents.map(doc => {
@@ -69,7 +78,12 @@ export async function GET(request: Request) {
             };
         });
 
-        return NextResponse.json(transformedDocs);
+        return NextResponse.json({
+            documents: transformedDocs,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+        });
     } catch (error) {
         log.error('Error fetching documents:', error);
         return NextResponse.json(

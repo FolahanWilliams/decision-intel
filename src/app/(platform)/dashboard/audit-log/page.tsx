@@ -61,14 +61,27 @@ export default async function AuditLogPage({
     return (
         <div className="container py-8">
             <header className="mb-8">
-                <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                    <ShieldCheck size={20} />
-                    <span className="text-sm font-medium">GOVERNANCE & COMPLIANCE</span>
+                <div className="flex items-start justify-between">
+                    <div>
+                        <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                            <ShieldCheck size={20} />
+                            <span className="text-sm font-medium">GOVERNANCE & COMPLIANCE</span>
+                        </div>
+                        <h1 className="text-3xl font-bold tracking-tight">Audit Log</h1>
+                        <p className="text-muted-foreground mt-2">
+                            Track all access, analysis, and export events for compliance verification.
+                        </p>
+                    </div>
+                    <a
+                        href="/api/audit?export=csv"
+                        download
+                        className="btn btn-secondary flex items-center gap-2 mt-1"
+                        style={{ flexShrink: 0 }}
+                    >
+                        <Download size={14} />
+                        Export CSV
+                    </a>
                 </div>
-                <h1 className="text-3xl font-bold tracking-tight">Audit Log</h1>
-                <p className="text-muted-foreground mt-2">
-                    Track all access, analysis, and export events for compliance verification.
-                </p>
             </header>
 
             <AuditFilters />

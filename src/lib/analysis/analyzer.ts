@@ -140,6 +140,7 @@ export async function analyzeDocument(
                         overallScore: result.overallScore,
                         noiseScore: result.noiseScore,
                         summary: result.summary,
+                        modelVersion: process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview',
                         biases: {
                             create: foundBiases.map(bias => ({
                                 biasType: bias.biasType,

@@ -28,6 +28,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>('all');
   const [showTrend, setShowTrend] = useState(false);
+  const [docsPage, setDocsPage] = useState(1);
 
   // Delete confirmation state
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; docId: string; filename: string }>({
@@ -36,7 +37,7 @@ export default function Dashboard() {
   const [deleting, setDeleting] = useState(false);
 
   // SWR: cached document list with auto-revalidation
-  const { documents: uploadedDocs, isLoading: loadingDocs, mutate: mutateDocs } = useDocuments();
+  const { documents: uploadedDocs, total: totalDocs, totalPages: docsTotalPages, isLoading: loadingDocs, mutate: mutateDocs } = useDocuments(false, docsPage);
 
   // SSE: streaming analysis with typed events, auto-retry, AbortController cleanup
   const {
@@ -44,6 +45,7 @@ export default function Dashboard() {
     steps: analysisSteps,
     progress: currentProgress,
     error: streamError,
+    timedOut: streamTimedOut,
   } = useAnalysisStream({
     stepNames: ANALYSIS_STEPS.map(s => s.name),
   });
@@ -66,7 +68,7 @@ export default function Dashboard() {
       if (res.ok) {
         // Optimistically remove from cache, then revalidate
         await mutateDocs(
-          (current) => current?.filter(d => d.id !== deleteModal.docId),
+          (current) => current ? { ...current, documents: current.documents.filter(d => d.id !== deleteModal.docId) } : current,
           { revalidate: true }
         );
         setDeleteModal({ open: false, docId: '', filename: '' });
@@ -125,10 +127,9 @@ export default function Dashboard() {
 
       // Optimistically add to SWR cache with analyzing status
       await mutateDocs(
-        (current) => [
-          { id: uploadData.id, filename: uploadData.filename, status: 'analyzing', uploadedAt: new Date().toISOString() },
-          ...(current ?? [])
-        ],
+        (current) => current
+          ? { ...current, documents: [{ id: uploadData.id, filename: uploadData.filename, status: 'analyzing', uploadedAt: new Date().toISOString() }, ...current.documents] }
+          : current,
         { revalidate: false }
       );
 
@@ -138,11 +139,9 @@ export default function Dashboard() {
       if (finalResult) {
         // Update SWR cache with the completed result
         await mutateDocs(
-          (current) => current?.map(doc =>
-            doc.id === uploadData.id
-              ? { ...doc, status: 'complete', score: finalResult?.overallScore as number }
-              : doc
-          ),
+          (current) => current
+            ? { ...current, documents: current.documents.map(doc => doc.id === uploadData.id ? { ...doc, status: 'complete', score: finalResult?.overallScore as number } : doc) }
+            : current,
           { revalidate: true }
         );
       } else if (streamError) {
@@ -154,9 +153,9 @@ export default function Dashboard() {
 
       // Mark as error in SWR cache
       await mutateDocs(
-        (current) => current?.map(doc =>
-          doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc
-        ),
+        (current) => current
+          ? { ...current, documents: current.documents.map(doc => doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc) }
+          : current,
         { revalidate: false }
       );
     } finally {
@@ -242,6 +241,16 @@ export default function Dashboard() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Stream timed out banner */}
+      {streamTimedOut && !uploading && (
+        <div className="mb-lg p-md rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center gap-sm">
+          <AlertTriangle size={18} className="text-yellow-500 shrink-0" />
+          <span className="text-yellow-400 text-sm">
+            Analysis is taking longer than expected. The server may still be processing — refresh the page or try again.
+          </span>
         </div>
       )}
 
@@ -415,9 +424,9 @@ export default function Dashboard() {
         <div className="card-header flex items-center justify-between">
           <div className="flex items-center gap-md">
             <h3 className="text-base">Documents</h3>
-            {uploadedDocs.length > 0 && (
+            {totalDocs > 0 && (
               <span className="text-xs text-muted">
-                {filteredDocs.length} of {uploadedDocs.length}
+                {filteredDocs.length} shown · {totalDocs} total
               </span>
             )}
           </div>
@@ -458,9 +467,19 @@ export default function Dashboard() {
 
         <div className="card-body p-0">
           {loadingDocs ? (
-            <div className="flex items-center justify-center gap-md p-xl">
-              <Loader2 size={20} className="animate-spin text-accent-primary" />
-              <span className="text-muted">Loading...</span>
+            <div className="divide-y divide-border">
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} className="flex items-center justify-between p-md animate-pulse">
+                  <div className="flex items-center gap-md">
+                    <div className="w-5 h-5 rounded bg-white/10" />
+                    <div className="h-4 w-48 rounded bg-white/10" />
+                  </div>
+                  <div className="flex items-center gap-md">
+                    <div className="h-3 w-20 rounded bg-white/10" />
+                    <div className="h-7 w-24 rounded bg-white/10" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : uploadedDocs.length === 0 ? (
             <div className="text-center text-muted p-xl">
@@ -538,6 +557,29 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Documents Paginator */}
+      {docsTotalPages > 1 && (
+        <div className="flex items-center justify-center gap-sm mt-md">
+          <button
+            onClick={() => setDocsPage(p => Math.max(1, p - 1))}
+            disabled={docsPage <= 1}
+            className="btn btn-ghost text-sm"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-muted">
+            Page {docsPage} of {docsTotalPages}
+          </span>
+          <button
+            onClick={() => setDocsPage(p => Math.min(docsTotalPages, p + 1))}
+            disabled={docsPage >= docsTotalPages}
+            className="btn btn-ghost text-sm"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteModal.open && (

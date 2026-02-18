@@ -13,16 +13,29 @@ interface UploadedDoc {
     uploadedAt: string;
 }
 
-/**
- * SWR hook for fetching the user's document list.
- * Caches results and automatically deduplicates concurrent requests.
- * 
- * @param detailed If true, fetches the detailed view (?detailed=true)
- */
-export function useDocuments(detailed = false) {
-    const url = detailed ? '/api/documents?detailed=true' : '/api/documents';
+interface DocumentsResponse {
+    documents: UploadedDoc[];
+    total: number;
+    page: number;
+    totalPages: number;
+}
 
-    const { data, error, isLoading, mutate } = useSWR<UploadedDoc[]>(
+/**
+ * SWR hook for fetching the user's document list with pagination.
+ * Caches results keyed by page so different pages are cached independently.
+ *
+ * @param detailed If true, fetches the detailed view (?detailed=true)
+ * @param page     Page number (1-based, default 1)
+ * @param limit    Number of documents per page (default 10, max 100)
+ */
+export function useDocuments(detailed = false, page = 1, limit = 10) {
+    const params = new URLSearchParams();
+    if (detailed) params.set('detailed', 'true');
+    params.set('page', String(page));
+    params.set('limit', String(limit));
+    const url = `/api/documents?${params.toString()}`;
+
+    const { data, error, isLoading, mutate } = useSWR<DocumentsResponse>(
         url,
         fetcher,
         {
@@ -32,7 +45,9 @@ export function useDocuments(detailed = false) {
     );
 
     return {
-        documents: data ?? [],
+        documents: data?.documents ?? [],
+        total: data?.total ?? 0,
+        totalPages: data?.totalPages ?? 1,
         isLoading,
         error,
         mutate, // Expose mutate for optimistic updates on upload/delete
