@@ -4,6 +4,13 @@ import { useState, useCallback, useRef } from 'react';
 import { SSEReader } from '@/lib/sse';
 
 // ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+/** Abort the stream and surface an error after this duration. */
+const STREAM_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
@@ -50,9 +57,11 @@ export function useAnalysisStream(options: StreamOptions) {
     const [error, setError] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [result, setResult] = useState<StreamResult | null>(null);
+    const [timedOut, setTimedOut] = useState(false);
 
     const abortRef = useRef<AbortController | null>(null);
     const retryCountRef = useRef(0);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Initialize steps to "pending"
     const resetSteps = useCallback(() => {
@@ -60,6 +69,7 @@ export function useAnalysisStream(options: StreamOptions) {
         setProgress(0);
         setError(null);
         setResult(null);
+        setTimedOut(false);
     }, [stepNames]);
 
     /**
@@ -148,10 +158,13 @@ export function useAnalysisStream(options: StreamOptions) {
 
     /**
      * Start an analysis with automatic retry on network failure.
+     * Aborts automatically after STREAM_TIMEOUT_MS and sets timedOut=true
+     * if all retries are exhausted.
      */
     const startAnalysis = useCallback(async (documentId: string): Promise<StreamResult | null> => {
-        // Cancel any in-flight analysis
+        // Cancel any in-flight analysis and clear previous timeout
         abortRef.current?.abort();
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
         const controller = new AbortController();
         abortRef.current = controller;
@@ -160,6 +173,12 @@ export function useAnalysisStream(options: StreamOptions) {
         resetSteps();
         setIsAnalyzing(true);
         setError(null);
+        setTimedOut(false);
+
+        // Arm the global timeout — aborts the controller after STREAM_TIMEOUT_MS
+        timeoutRef.current = setTimeout(() => {
+            controller.abort();
+        }, STREAM_TIMEOUT_MS);
 
         const attemptStream = async (): Promise<StreamResult | null> => {
             try {
@@ -167,7 +186,13 @@ export function useAnalysisStream(options: StreamOptions) {
                 setResult(streamResult);
                 return streamResult;
             } catch (err) {
-                if ((err as Error).name === 'AbortError') return null;
+                if ((err as Error).name === 'AbortError') {
+                    // Distinguish timeout-abort (retries exhausted) from user cancel
+                    if (retryCountRef.current >= maxRetries) {
+                        setTimedOut(true);
+                    }
+                    return null;
+                }
 
                 // Retry on network-level errors (not application errors like "Analysis failed")
                 const isNetworkError = (err as Error).message === 'Connection lost during analysis';
@@ -179,6 +204,8 @@ export function useAnalysisStream(options: StreamOptions) {
                     return attemptStream();
                 }
 
+                // All retries used — treat as timed out for the UI
+                if (isNetworkError) setTimedOut(true);
                 throw err;
             }
         };
@@ -191,6 +218,10 @@ export function useAnalysisStream(options: StreamOptions) {
             return null;
         } finally {
             setIsAnalyzing(false);
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
         }
     }, [readStream, resetSteps, maxRetries]);
 
@@ -199,6 +230,10 @@ export function useAnalysisStream(options: StreamOptions) {
      */
     const cancelAnalysis = useCallback(() => {
         abortRef.current?.abort();
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
         setIsAnalyzing(false);
     }, []);
 
@@ -210,5 +245,7 @@ export function useAnalysisStream(options: StreamOptions) {
         error,
         isAnalyzing,
         result,
+        /** True when the stream was aborted due to timeout or exhausted retries. */
+        timedOut,
     };
 }

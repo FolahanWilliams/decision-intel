@@ -7,6 +7,7 @@ import {
     BarChart, Bar, Cell, LineChart, Line
 } from 'recharts';
 import { Download, TrendingUp, TrendingDown, RefreshCw, AlertTriangle } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 
 interface MarketAnalysis {
@@ -116,12 +117,28 @@ export default function TrendsPage() {
 
             {/* Loading State */}
             {loading && (
-                <div className="card mb-xl">
-                    <div className="card-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 400 }}>
-                        <RefreshCw size={24} className="spin" style={{ color: 'var(--accent-primary)' }} />
-                        <span style={{ marginLeft: '12px' }}>Loading trends...</span>
+                <>
+                    <div className="card mb-xl animate-pulse">
+                        <div className="card-header">
+                            <div className="h-4 w-48 rounded bg-white/10" />
+                        </div>
+                        <div className="card-body" style={{ height: 400, display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'flex-end', padding: '24px' }}>
+                            {[80, 60, 90, 50, 70, 85, 65, 75, 55, 95].map((h, i) => (
+                                <div key={i} className="rounded bg-white/10" style={{ height: `${h}%`, width: `${100 / 10 - 1}%`, display: 'inline-block', marginRight: '1%' }} />
+                            ))}
+                        </div>
                     </div>
-                </div>
+                    <div className="grid grid-2 gap-md mb-xl">
+                        {[0, 1].map(i => (
+                            <div key={i} className="card animate-pulse">
+                                <div className="card-header">
+                                    <div className="h-4 w-36 rounded bg-white/10" />
+                                </div>
+                                <div className="card-body" style={{ height: 250, background: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 8px, transparent 8px, transparent 16px)' }} />
+                            </div>
+                        ))}
+                    </div>
+                </>
             )}
 
             {/* Error State */}
@@ -227,6 +244,7 @@ export default function TrendsPage() {
             {!loading && !error && data && data.trendData.length > 0 && (
                 <>
                     {/* Main Chart - "Stock" Style */}
+                    <ErrorBoundary sectionName="Decision Quality Index">
                     <div className="card mb-xl">
                         <div className="card-header flex justify-between">
                             <div className="flex items-center gap-md">
@@ -248,7 +266,7 @@ export default function TrendsPage() {
                         </div>
                         <div className="card-body" style={{ height: 400, padding: 0 }}>
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={data.trendData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                                <AreaChart data={data.trendData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }} >
                                     <defs>
                                         <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.3} />
@@ -297,6 +315,7 @@ export default function TrendsPage() {
                             </ResponsiveContainer>
                         </div>
                     </div>
+                    </ErrorBoundary>
 
                     {/* Stats Row */}
                     <div className="grid grid-4 mb-xl gap-md">
@@ -344,6 +363,7 @@ export default function TrendsPage() {
 
                     <div className="grid grid-2">
                         {/* Noise Volatility */}
+                        <ErrorBoundary sectionName="Noise Volatility">
                         <div className="card">
                             <div className="card-header">
                                 <h3>Noise Volatility</h3>
@@ -371,8 +391,10 @@ export default function TrendsPage() {
                                 </ResponsiveContainer>
                             </div>
                         </div>
+                        </ErrorBoundary>
 
                         {/* Bias Distribution */}
+                        <ErrorBoundary sectionName="Bias Distribution">
                         <div className="card">
                             <div className="card-header">
                                 <h3>Bias Frequency Distribution</h3>
@@ -411,9 +433,11 @@ export default function TrendsPage() {
                                 )}
                             </div>
                         </div>
+                        </ErrorBoundary>
                     </div>
 
                     {/* Volume Chart */}
+                    <ErrorBoundary sectionName="Analysis Volume">
                     <div className="card mt-xl">
                         <div className="card-header">
                             <h3>Analysis Volume</h3>
@@ -437,6 +461,7 @@ export default function TrendsPage() {
                             </ResponsiveContainer>
                         </div>
                     </div>
+                    </ErrorBoundary>
                 </>
             )}
         </div>

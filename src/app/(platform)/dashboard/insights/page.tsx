@@ -15,6 +15,7 @@ import {
     Brain, Activity, ShieldCheck, AlertTriangle, RefreshCw, BarChart3,
     Terminal, Cpu, Zap
 } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 /* ── Reusable sub-components ─────────────────────────────────── */
 
@@ -338,10 +339,14 @@ export default function InsightsPage() {
             <SectionLabel index={2}>DECISION HEALTH</SectionLabel>
             <div className="grid grid-2 gap-md" style={{ marginBottom: 'var(--spacing-lg)' }}>
                 <div className="animate-slide-up card-glow" style={{ animationDelay: '0.3s' }}>
-                    <DecisionRadar data={insights.radar} />
+                    <ErrorBoundary sectionName="Decision Radar">
+                        <DecisionRadar data={insights.radar} />
+                    </ErrorBoundary>
                 </div>
                 <div className="animate-slide-up card-glow" style={{ animationDelay: '0.36s' }}>
-                    <BiasTreemap data={insights.biasTreemap} severityMap={insights.biasSeverity} />
+                    <ErrorBoundary sectionName="Bias Treemap">
+                        <BiasTreemap data={insights.biasTreemap} severityMap={insights.biasSeverity} />
+                    </ErrorBoundary>
                 </div>
             </div>
 
@@ -349,13 +354,19 @@ export default function InsightsPage() {
             <SectionLabel index={3}>ANALYSIS MATRIX</SectionLabel>
             <div className="grid grid-3 gap-md" style={{ marginBottom: 'var(--spacing-lg)' }}>
                 <div className="animate-slide-up card-glow" style={{ animationDelay: '0.42s' }}>
-                    <SwotQuadrant data={insights.swot} />
+                    <ErrorBoundary sectionName="SWOT Quadrant">
+                        <SwotQuadrant data={insights.swot} />
+                    </ErrorBoundary>
                 </div>
                 <div className="animate-slide-up card-glow" style={{ animationDelay: '0.48s' }}>
-                    <FactVerificationBar data={insights.factVerification} />
+                    <ErrorBoundary sectionName="Fact Verification">
+                        <FactVerificationBar data={insights.factVerification} />
+                    </ErrorBoundary>
                 </div>
                 <div className="animate-slide-up card-glow" style={{ animationDelay: '0.54s' }}>
-                    <SentimentGauge score={insights.sentiment.score} label={insights.sentiment.label} />
+                    <ErrorBoundary sectionName="Sentiment Gauge">
+                        <SentimentGauge score={insights.sentiment.score} label={insights.sentiment.label} />
+                    </ErrorBoundary>
                 </div>
             </div>
 
@@ -363,110 +374,116 @@ export default function InsightsPage() {
             <SectionLabel index={4}>DISTRIBUTIONS</SectionLabel>
             <div className="grid grid-2 gap-md" style={{ marginBottom: 'var(--spacing-lg)' }}>
                 {/* Score Distribution Histogram */}
-                <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.6s' }}>
-                    <div className="card-header">
-                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
-                            <BarChart3 size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-primary)' }} />
-                            SCORE DISTRIBUTION
-                        </h3>
+                <ErrorBoundary sectionName="Score Distribution">
+                    <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.6s' }}>
+                        <div className="card-header">
+                            <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                                <BarChart3 size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-primary)' }} />
+                                SCORE DISTRIBUTION
+                            </h3>
+                        </div>
+                        <div className="card-body" style={{ height: 250 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={insights.scoreDistribution}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.04)" />
+                                    <XAxis
+                                        dataKey="range"
+                                        tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                    />
+                                    <YAxis
+                                        tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                        allowDecimals={false}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            background: 'var(--bg-secondary)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '0',
+                                            fontSize: '11px',
+                                            fontFamily: 'JetBrains Mono, monospace',
+                                        }}
+                                        formatter={(value: number | undefined) => [`${value ?? 0} analyses`, 'Count']}
+                                    />
+                                    <Bar dataKey="count" radius={[0, 0, 0, 0]}>
+                                        {insights.scoreDistribution.map((entry, i) => (
+                                            <Cell key={i} fill={getScoreBucketColor(entry.range)} fillOpacity={0.75} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
-                    <div className="card-body" style={{ height: 250 }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={insights.scoreDistribution}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.04)" />
-                                <XAxis
-                                    dataKey="range"
-                                    tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
-                                    axisLine={false}
-                                    tickLine={false}
-                                />
-                                <YAxis
-                                    tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
-                                    axisLine={false}
-                                    tickLine={false}
-                                    allowDecimals={false}
-                                />
-                                <Tooltip
-                                    contentStyle={{
-                                        background: 'var(--bg-secondary)',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: '0',
-                                        fontSize: '11px',
-                                        fontFamily: 'JetBrains Mono, monospace',
-                                    }}
-                                    formatter={(value: number | undefined) => [`${value ?? 0} analyses`, 'Count']}
-                                />
-                                <Bar dataKey="count" radius={[0, 0, 0, 0]}>
-                                    {insights.scoreDistribution.map((entry, i) => (
-                                        <Cell key={i} fill={getScoreBucketColor(entry.range)} fillOpacity={0.75} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                </ErrorBoundary>
 
                 {/* Noise vs Quality Scatter */}
-                <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.66s' }}>
-                    <div className="card-header">
-                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
-                            <Activity size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-secondary)' }} />
-                            NOISE vs QUALITY CORRELATION
-                        </h3>
+                <ErrorBoundary sectionName="Noise vs Quality">
+                    <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.66s' }}>
+                        <div className="card-header">
+                            <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                                <Activity size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-secondary)' }} />
+                                NOISE vs QUALITY CORRELATION
+                            </h3>
+                        </div>
+                        <div className="card-body" style={{ height: 250 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <ScatterChart>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                                    <XAxis
+                                        dataKey="overallScore"
+                                        type="number"
+                                        domain={[0, 100]}
+                                        name="Quality"
+                                        tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                        axisLine={false}
+                                        label={{ value: 'Quality ▸', position: 'insideBottom', offset: -5, fill: 'var(--text-muted)', fontSize: 9 }}
+                                    />
+                                    <YAxis
+                                        dataKey="noiseScore"
+                                        type="number"
+                                        domain={[0, 100]}
+                                        name="Noise"
+                                        tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                        axisLine={false}
+                                        label={{ value: '▴ Noise', angle: -90, position: 'insideLeft', fill: 'var(--text-muted)', fontSize: 9 }}
+                                    />
+                                    <ZAxis range={[50, 140]} />
+                                    <Tooltip
+                                        contentStyle={{
+                                            background: 'var(--bg-secondary)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '0',
+                                            fontSize: '11px',
+                                            fontFamily: 'JetBrains Mono, monospace',
+                                        }}
+                                        formatter={(value: number | undefined, name: string | undefined) => [
+                                            `${value ?? 0}`,
+                                            name === 'overallScore' ? 'Quality' : 'Noise'
+                                        ]}
+                                    />
+                                    <Scatter
+                                        data={insights.scatterData}
+                                        fill="var(--accent-secondary)"
+                                        fillOpacity={0.7}
+                                        stroke="var(--accent-secondary)"
+                                        strokeWidth={1}
+                                    />
+                                </ScatterChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
-                    <div className="card-body" style={{ height: 250 }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <ScatterChart>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                                <XAxis
-                                    dataKey="overallScore"
-                                    type="number"
-                                    domain={[0, 100]}
-                                    name="Quality"
-                                    tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
-                                    axisLine={false}
-                                    label={{ value: 'Quality ▸', position: 'insideBottom', offset: -5, fill: 'var(--text-muted)', fontSize: 9 }}
-                                />
-                                <YAxis
-                                    dataKey="noiseScore"
-                                    type="number"
-                                    domain={[0, 100]}
-                                    name="Noise"
-                                    tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
-                                    axisLine={false}
-                                    label={{ value: '▴ Noise', angle: -90, position: 'insideLeft', fill: 'var(--text-muted)', fontSize: 9 }}
-                                />
-                                <ZAxis range={[50, 140]} />
-                                <Tooltip
-                                    contentStyle={{
-                                        background: 'var(--bg-secondary)',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: '0',
-                                        fontSize: '11px',
-                                        fontFamily: 'JetBrains Mono, monospace',
-                                    }}
-                                    formatter={(value: number | undefined, name: string | undefined) => [
-                                        `${value ?? 0}`,
-                                        name === 'overallScore' ? 'Quality' : 'Noise'
-                                    ]}
-                                />
-                                <Scatter
-                                    data={insights.scatterData}
-                                    fill="var(--accent-secondary)"
-                                    fillOpacity={0.7}
-                                    stroke="var(--accent-secondary)"
-                                    strokeWidth={1}
-                                />
-                            </ScatterChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                </ErrorBoundary>
             </div>
 
             {/* ── [05] COMPLIANCE ──────────────────────────────── */}
             <SectionLabel index={5}>COMPLIANCE</SectionLabel>
             <div className="animate-slide-up card-glow" style={{ animationDelay: '0.72s' }}>
-                <ComplianceGrid data={insights.complianceGrid} />
+                <ErrorBoundary sectionName="Compliance Grid">
+                    <ComplianceGrid data={insights.complianceGrid} />
+                </ErrorBoundary>
             </div>
 
             {/* ── Footer timestamp ────────────────────────────── */}

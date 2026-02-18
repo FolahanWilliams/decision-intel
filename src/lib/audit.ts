@@ -8,7 +8,8 @@ export type AuditAction =
     | 'EXPORT_PDF'
     | 'EXPORT_CSV'
     | 'SIMULATE_SCENARIO'
-    | 'SEARCH_MARKET_TRENDS';
+    | 'SEARCH_MARKET_TRENDS'
+    | 'DELETE_ACCOUNT_DATA';
 
 export interface AuditLogParams {
     action: AuditAction;

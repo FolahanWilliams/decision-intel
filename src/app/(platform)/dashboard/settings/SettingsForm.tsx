@@ -3,10 +3,11 @@
 import { useState, useTransition, useEffect } from 'react';
 import {
     Settings, Bell, User, Shield, Moon,
-    Save, CheckCircle, Loader2
+    Save, CheckCircle, Loader2, Trash2, AlertTriangle
 } from 'lucide-react';
 import { updateUserSettings, UserSettingsData } from '@/app/actions/settings';
 import { useTheme } from 'next-themes';
+import { useRouter } from 'next/navigation';
 
 interface SettingsFormProps {
     initialSettings: UserSettingsData;
@@ -27,11 +28,34 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
     const [isPending, startTransition] = useTransition();
     const [saved, setSaved] = useState(false);
     const { setTheme } = useTheme();
+    const router = useRouter();
+
+    // Delete account state
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     // Sync theme with state
     useEffect(() => {
         setTheme(darkMode ? 'dark' : 'light');
     }, [darkMode, setTheme]);
+
+    const handleDeleteAccount = async () => {
+        setDeleting(true);
+        setDeleteError(null);
+        try {
+            const res = await fetch('/api/user', { method: 'DELETE' });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.error || 'Failed to delete account data');
+            }
+            // Sign out and redirect to home
+            router.push('/sign-in');
+        } catch (err) {
+            setDeleteError(err instanceof Error ? err.message : 'An error occurred');
+            setDeleting(false);
+        }
+    };
 
     const handleSave = () => {
         startTransition(async () => {
@@ -224,6 +248,80 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                     {isPending ? 'Saving...' : 'Save Changes'}
                 </button>
             </div>
+
+            {/* Danger Zone */}
+            <div className="card mt-xl animate-fade-in" style={{ animationDelay: '0.5s', borderColor: 'var(--error)' }}>
+                <div className="card-header" style={{ borderBottomColor: 'rgba(239,68,68,0.3)' }}>
+                    <h3 className="flex items-center gap-sm" style={{ color: 'var(--error)' }}>
+                        <AlertTriangle size={18} />
+                        Danger Zone
+                    </h3>
+                </div>
+                <div className="card-body">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <div style={{ fontWeight: 500, marginBottom: '4px' }}>Delete all my data</div>
+                            <div className="text-xs text-muted">
+                                Permanently removes all your documents, analyses, audit logs, and settings. This cannot be undone.
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setShowDeleteModal(true)}
+                            className="btn flex items-center gap-sm"
+                            style={{ background: 'transparent', borderColor: 'var(--error)', color: 'var(--error)', flexShrink: 0, marginLeft: '24px' }}
+                        >
+                            <Trash2 size={14} />
+                            Delete my data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Delete confirmation modal */}
+            {showDeleteModal && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.8)', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                }}>
+                    <div className="card" style={{ maxWidth: 440, width: '90%', borderColor: 'var(--error)' }}>
+                        <div className="card-header">
+                            <h3 className="flex items-center gap-sm" style={{ color: 'var(--error)' }}>
+                                <AlertTriangle size={20} />
+                                Delete all account data?
+                            </h3>
+                        </div>
+                        <div className="card-body">
+                            <p className="text-sm mb-lg" style={{ lineHeight: 1.6 }}>
+                                This will permanently erase <strong>all your documents, analyses, audit logs, and settings</strong>. You will be signed out immediately. This action <strong>cannot be undone</strong>.
+                            </p>
+                            {deleteError && (
+                                <p className="text-sm mb-lg" style={{ color: 'var(--error)' }}>
+                                    {deleteError}
+                                </p>
+                            )}
+                            <div className="flex items-center justify-end gap-sm">
+                                <button
+                                    onClick={() => { setShowDeleteModal(false); setDeleteError(null); }}
+                                    className="btn btn-ghost"
+                                    disabled={deleting}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDeleteAccount}
+                                    className="btn flex items-center gap-sm"
+                                    style={{ background: 'var(--error)', color: '#fff', borderColor: 'var(--error)' }}
+                                    disabled={deleting}
+                                >
+                                    {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                                    {deleting ? 'Deleting...' : 'Yes, delete everything'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
