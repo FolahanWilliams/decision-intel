@@ -43,7 +43,7 @@ describe('riskScorerNode', () => {
             originalContent: 'test content',
             biasAnalysis: [],
             noiseStats: { mean: 80, stdDev: 2, variance: 4 },
-            factCheckResult: { score: 90, flags: [] },
+            factCheckResult: { status: 'success' as const, score: 90, flags: [] },
             compliance: {
                 status: 'WARN',
                 riskScore: 50,
@@ -85,10 +85,11 @@ describe('riskScorerNode', () => {
         if (!report) return;
 
         // Check defaults
-        expect(report.compliance).toEqual({ status: 'WARN', details: 'Compliance check unavailable.' });
+        expect(report.compliance).toEqual({ status: 'WARN', riskScore: 50, summary: 'Compliance check unavailable.', regulations: [], searchQueries: [] });
         expect(report.preMortem).toBeUndefined();
         expect(report.sentiment).toBeUndefined();
-        expect(report.overallScore).toBe(100);
+        // No factCheckResult → trustScore defaults to 50, penalty = (100-50)*0.3 = 15
+        expect(report.overallScore).toBe(85);
     });
 });
 

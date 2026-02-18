@@ -107,6 +107,15 @@ vi.mock('@/lib/utils/json', () => ({
     safeJsonClone: (obj: unknown) => obj
 }));
 
+vi.mock('@/lib/analysis/analyzer', () => ({
+    analyzeDocument: vi.fn().mockResolvedValue({
+        overallScore: 85,
+        noiseScore: 10,
+        summary: 'Test summary',
+        biases: []
+    })
+}));
+
 import { POST } from './route';
 
 describe('Performance Benchmark', () => {
