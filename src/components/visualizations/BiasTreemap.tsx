@@ -77,7 +77,7 @@ function CustomContent({ x, y, width, height, name, count, index }: TreemapConte
     );
 }
 
-export function BiasTreemap({ data }: BiasTreemapProps) {
+export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
     if (!data || data.length === 0) {
         return (
             <div className="card card-glow h-full">
@@ -106,9 +106,30 @@ export function BiasTreemap({ data }: BiasTreemapProps) {
                 <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Bias Landscape
                 </h3>
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
-                    {data.reduce((s, d) => s + d.count, 0)} total
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {severityMap && Object.keys(severityMap).length > 0 && (
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                            {(['critical', 'high', 'medium', 'low'] as const)
+                                .filter(s => (severityMap[s] ?? 0) > 0)
+                                .map(s => (
+                                    <span key={s} style={{
+                                        fontSize: '9px',
+                                        fontFamily: 'JetBrains Mono, monospace',
+                                        padding: '1px 5px',
+                                        border: `1px solid ${SEVERITY_COLORS[s]}40`,
+                                        color: SEVERITY_COLORS[s],
+                                        background: `${SEVERITY_COLORS[s]}10`,
+                                    }}>
+                                        {s[0].toUpperCase()}: {severityMap[s]}
+                                    </span>
+                                ))
+                            }
+                        </div>
+                    )}
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
+                        {data.reduce((s, d) => s + d.count, 0)} total
+                    </span>
+                </div>
             </div>
             <div className="card-body" style={{ height: 320 }}>
                 <ResponsiveContainer width="100%" height="100%">

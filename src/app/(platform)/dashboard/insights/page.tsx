@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import Link from 'next/link';
 import { useInsights } from '@/hooks/useInsights';
 import { DecisionRadar } from '@/components/visualizations/DecisionRadar';
 import { BiasTreemap } from '@/components/visualizations/BiasTreemap';
@@ -9,7 +11,7 @@ import { SentimentGauge } from '@/components/visualizations/SentimentGauge';
 import { ComplianceGrid } from '@/components/visualizations/ComplianceGrid';
 import {
     BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell,
-    ScatterChart, Scatter, CartesianGrid, ZAxis,
+    ScatterChart, Scatter, CartesianGrid, ZAxis, LabelList, ReferenceArea,
 } from 'recharts';
 import {
     Brain, Activity, ShieldCheck, AlertTriangle, RefreshCw, BarChart3,
@@ -195,6 +197,7 @@ const getScoreBucketColor = (range: string) => {
 
 export default function InsightsPage() {
     const { insights, isLoading, error, mutate } = useInsights();
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     if (isLoading) return <LoadingSkeleton />;
 
@@ -247,6 +250,13 @@ export default function InsightsPage() {
                         }}>
                             {'>'} <span className="terminal-cursor">RUN ANALYSIS TO BEGIN</span>
                         </div>
+                        <Link
+                            href="/dashboard"
+                            className="btn btn-primary"
+                            style={{ marginTop: '16px', fontSize: '11px' }}
+                        >
+                            Go to Dashboard
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -322,8 +332,17 @@ export default function InsightsPage() {
                         </span>
                     </div>
                 </div>
-                <button className="btn btn-secondary" onClick={() => mutate()} style={{ fontSize: '10px' }}>
-                    <RefreshCw size={12} /> REFRESH
+                <button
+                    className="btn btn-secondary"
+                    disabled={isRefreshing}
+                    onClick={async () => {
+                        setIsRefreshing(true);
+                        try { await mutate(); } finally { setIsRefreshing(false); }
+                    }}
+                    style={{ fontSize: '10px' }}
+                >
+                    <RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
+                    {isRefreshing ? 'REFRESHING...' : 'REFRESH'}
                 </button>
             </div>
 
@@ -408,10 +427,20 @@ export default function InsightsPage() {
                                         }}
                                         formatter={(value: number | undefined) => [`${value ?? 0} analyses`, 'Count']}
                                     />
-                                    <Bar dataKey="count" radius={[0, 0, 0, 0]}>
+                                    <Bar dataKey="count" radius={[2, 2, 0, 0]}>
                                         {insights.scoreDistribution.map((entry, i) => (
                                             <Cell key={i} fill={getScoreBucketColor(entry.range)} fillOpacity={0.75} />
                                         ))}
+                                        <LabelList
+                                            dataKey="count"
+                                            position="top"
+                                            style={{
+                                                fill: 'var(--text-muted)',
+                                                fontSize: 9,
+                                                fontFamily: 'JetBrains Mono, monospace',
+                                            }}
+                                            formatter={(v) => Number(v) > 0 ? String(v) : ''}
+                                        />
                                     </Bar>
                                 </BarChart>
                             </ResponsiveContainer>
@@ -464,6 +493,22 @@ export default function InsightsPage() {
                                             name === 'overallScore' ? 'Quality' : 'Noise'
                                         ]}
                                     />
+                                    <ReferenceArea
+                                        x1={70} x2={100} y1={0} y2={30}
+                                        fill="var(--success)"
+                                        fillOpacity={0.06}
+                                        stroke="var(--success)"
+                                        strokeOpacity={0.2}
+                                        strokeDasharray="4 4"
+                                        label={{
+                                            value: 'TARGET ZONE',
+                                            position: 'insideTopRight',
+                                            fill: 'var(--success)',
+                                            fontSize: 8,
+                                            fontFamily: 'JetBrains Mono, monospace',
+                                            opacity: 0.6,
+                                        }}
+                                    />
                                     <Scatter
                                         data={insights.scatterData}
                                         fill="var(--accent-secondary)"
@@ -473,6 +518,20 @@ export default function InsightsPage() {
                                     />
                                 </ScatterChart>
                             </ResponsiveContainer>
+                        </div>
+                        <div style={{
+                            padding: '6px 16px 10px',
+                            fontSize: '9px',
+                            color: 'var(--text-muted)',
+                            fontFamily: 'JetBrains Mono, monospace',
+                            display: 'flex',
+                            gap: '16px',
+                            borderTop: '1px solid var(--border-color)',
+                        }}>
+                            <span>
+                                <span style={{ color: 'var(--accent-secondary)' }}>●</span> = one analysis
+                            </span>
+                            <span style={{ color: 'var(--success)', opacity: 0.7 }}>■ target zone (high quality, low noise)</span>
                         </div>
                     </div>
                 </ErrorBoundary>

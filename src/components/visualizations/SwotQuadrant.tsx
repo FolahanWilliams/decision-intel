@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 interface SwotQuadrantProps {
     data: {
         strengths: string[];
@@ -17,6 +19,7 @@ const QUADRANTS = [
 ] as const;
 
 export function SwotQuadrant({ data }: SwotQuadrantProps) {
+    const [expandedKey, setExpandedKey] = useState<string | null>(null);
     const isEmpty = !data.strengths.length && !data.weaknesses.length && !data.opportunities.length && !data.threats.length;
 
     if (isEmpty) {
@@ -49,6 +52,8 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                 }}>
                     {QUADRANTS.map(q => {
                         const items = data[q.key as keyof typeof data] || [];
+                        const isExpanded = expandedKey === q.key;
+                        const visibleItems = isExpanded ? items : items.slice(0, 4);
                         return (
                             <div
                                 key={q.key}
@@ -80,7 +85,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                                     padding: 0,
                                     listStyle: 'none',
                                 }}>
-                                    {items.slice(0, 4).map((item, i) => (
+                                    {visibleItems.map((item, i) => (
                                         <li
                                             key={i}
                                             style={{
@@ -102,8 +107,18 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                                         </li>
                                     ))}
                                     {items.length > 4 && (
-                                        <li style={{ fontSize: '10px', color: 'var(--text-muted)', paddingLeft: '10px', marginTop: '4px' }}>
-                                            +{items.length - 4} more
+                                        <li
+                                            onClick={() => setExpandedKey(isExpanded ? null : q.key)}
+                                            style={{
+                                                fontSize: '10px',
+                                                color: 'var(--accent-primary)',
+                                                paddingLeft: '10px',
+                                                marginTop: '4px',
+                                                cursor: 'pointer',
+                                                userSelect: 'none',
+                                            }}
+                                        >
+                                            {isExpanded ? '↑ show less' : `+${items.length - 4} more`}
                                         </li>
                                     )}
                                 </ul>
