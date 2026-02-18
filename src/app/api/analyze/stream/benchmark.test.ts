@@ -118,13 +118,15 @@ describe('Performance Benchmark', () => {
   it('measures execution time of POST handler', async () => {
     const req = {
       json: async () => ({ documentId: 'doc_123' }),
+      headers: { get: () => null },
     } as unknown as NextRequest;
 
     const start = performance.now();
     const response = await POST(req);
 
     // Consume stream to ensure all async work completes
-    const reader = response.body?.getReader();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const reader = (response.body as any)?.getReader?.();
     if (reader) {
       while (true) {
         const { done } = await reader.read();
