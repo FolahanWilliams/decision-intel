@@ -43,6 +43,11 @@ export async function GET() {
                     sentiment: true,
                     logicalAnalysis: true,
                     swotAnalysis: true,
+                    // New fields for deeper insights
+                    createdAt: true,
+                    preMortem: true,
+                    simulation: true,
+                    cognitiveAnalysis: true,
                 },
             }),
 
@@ -92,6 +97,23 @@ export async function GET() {
 
         // --- 8. Scatter data ---
         const scatterData: { id: string; overallScore: number; noiseScore: number }[] = [];
+
+        // --- 9. Logic fallacy frequency ---
+        const fallacyMap = new Map<string, { count: number; severity: string }>();
+
+        // --- 10. Decision twin votes ---
+        const twinVotes = { approve: 0, reject: 0, revise: 0 };
+
+        // --- 11. Cognitive blind spots ---
+        let totalBlindSpotGap = 0, blindSpotGapCount = 0;
+        const blindSpotFreq = new Map<string, number>();
+
+        // --- 12. Pre-mortem failure scenarios ---
+        const failureFreq = new Map<string, number>();
+
+        // --- 13. Weekly quality trend (last 8 weeks) ---
+        const eightWeeksAgo = new Date(Date.now() - 56 * 24 * 60 * 60 * 1000);
+        const weeklyMap = new Map<string, { scores: number[]; noise: number[] }>();
 
         for (const a of analyses) {
             totalOverall += a.overallScore;
@@ -148,11 +170,104 @@ export async function GET() {
                 for (const o of swot.opportunities || []) swotAgg.opportunities.set(o, (swotAgg.opportunities.get(o) || 0) + 1);
                 for (const t of swot.threats || []) swotAgg.threats.set(t, (swotAgg.threats.get(t) || 0) + 1);
             }
+
+            // Logic fallacies
+            const laFull = a.logicalAnalysis as { score?: number; fallacies?: { name?: string; severity?: string }[] } | null;
+            if (laFull?.fallacies) {
+                const severityOrder: Record<string, number> = { critical: 3, high: 2, medium: 1, low: 0 };
+                for (const f of laFull.fallacies) {
+                    const name = f.name || 'Unknown Fallacy';
+                    const sev = f.severity || 'low';
+                    const existing = fallacyMap.get(name);
+                    if (existing) {
+                        existing.count++;
+                        if ((severityOrder[sev] ?? 0) > (severityOrder[existing.severity] ?? 0)) existing.severity = sev;
+                    } else {
+                        fallacyMap.set(name, { count: 1, severity: sev });
+                    }
+                }
+            }
+
+            // Decision twin votes
+            const sim = a.simulation as { twins?: { vote?: string }[] } | null;
+            if (sim?.twins) {
+                for (const twin of sim.twins) {
+                    const vote = (twin.vote || '').toUpperCase();
+                    if (vote === 'APPROVE') twinVotes.approve++;
+                    else if (vote === 'REJECT') twinVotes.reject++;
+                    else if (vote === 'REVISE') twinVotes.revise++;
+                }
+            }
+
+            // Cognitive blind spots
+            const cog = a.cognitiveAnalysis as { blindSpotGap?: number; blindSpots?: { name?: string }[] } | null;
+            if (cog?.blindSpotGap != null) { totalBlindSpotGap += cog.blindSpotGap; blindSpotGapCount++; }
+            if (cog?.blindSpots) {
+                for (const spot of cog.blindSpots) {
+                    if (spot.name) blindSpotFreq.set(spot.name, (blindSpotFreq.get(spot.name) || 0) + 1);
+                }
+            }
+
+            // Pre-mortem failure scenarios (string[])
+            const pm = a.preMortem as { failureScenarios?: string[] } | null;
+            if (pm?.failureScenarios) {
+                for (const scenario of pm.failureScenarios) {
+                    const key = scenario.slice(0, 100).trim();
+                    if (key) failureFreq.set(key, (failureFreq.get(key) || 0) + 1);
+                }
+            }
+
+            // Weekly trend
+            if (new Date(a.createdAt) >= eightWeeksAgo) {
+                const d = new Date(a.createdAt);
+                const weekStart = new Date(d);
+                weekStart.setDate(d.getDate() - d.getDay()); // Sunday-based week start
+                const weekKey = weekStart.toISOString().split('T')[0];
+                if (!weeklyMap.has(weekKey)) weeklyMap.set(weekKey, { scores: [], noise: [] });
+                const w = weeklyMap.get(weekKey)!;
+                w.scores.push(a.overallScore);
+                w.noise.push(a.noiseScore);
+            }
         }
 
         // Helper: top N from map
         const topN = (m: Map<string, number>, limit = 5) =>
             [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit).map(([text]) => text);
+
+        // Derived: weekly trend
+        const weeklyTrend = [...weeklyMap.entries()]
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([week, d]) => ({
+                week: week.slice(5), // "MM-DD" for display
+                avgScore: Math.round(d.scores.reduce((s, v) => s + v, 0) / d.scores.length),
+                avgNoise: Math.round(d.noise.reduce((s, v) => s + v, 0) / d.noise.length),
+                count: d.scores.length,
+            }));
+        const trendDelta = weeklyTrend.length >= 2
+            ? weeklyTrend[weeklyTrend.length - 1].avgScore - weeklyTrend[0].avgScore
+            : 0;
+
+        // Derived: fallacy frequency
+        const fallacyFrequency = [...fallacyMap.entries()]
+            .sort(([, a], [, b]) => b.count - a.count)
+            .slice(0, 8)
+            .map(([name, { count, severity }]) => ({ name, count, severity }));
+
+        // Derived: failure scenarios
+        const topFailureScenarios = [...failureFreq.entries()]
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 5)
+            .map(([text, count]) => ({ text, count }));
+
+        // Derived: blind spots
+        const topBlindSpots = [...blindSpotFreq.entries()]
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 5)
+            .map(([name]) => name);
+        const avgBlindSpotGap = blindSpotGapCount > 0 ? Math.round(totalBlindSpotGap / blindSpotGapCount) : 0;
+
+        // Derived: twin vote totals
+        const decisionTwinVotes = { ...twinVotes, total: twinVotes.approve + twinVotes.reject + twinVotes.revise };
 
         const payload = {
             empty: false,
@@ -207,6 +322,19 @@ export async function GET() {
 
             // 8. Scatter
             scatterData,
+
+            // 9. Performance trajectory
+            weeklyTrend,
+            trendDelta,
+
+            // 10. Risk signals
+            fallacyFrequency,
+            topFailureScenarios,
+
+            // 11. Boardroom consensus
+            decisionTwinVotes,
+            avgBlindSpotGap,
+            topBlindSpots,
 
             // Summary stats
             totalAnalyses: n,

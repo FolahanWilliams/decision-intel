@@ -12,10 +12,11 @@ import { ComplianceGrid } from '@/components/visualizations/ComplianceGrid';
 import {
     BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell,
     ScatterChart, Scatter, CartesianGrid, ZAxis, LabelList, ReferenceArea,
+    AreaChart, Area,
 } from 'recharts';
 import {
     Brain, Activity, ShieldCheck, AlertTriangle, RefreshCw, BarChart3,
-    Terminal, Cpu, Zap
+    Terminal, Cpu, Zap, TrendingUp,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -61,13 +62,14 @@ function SectionLabel({ children, index }: { children: string; index: number }) 
     );
 }
 
-function StatCard({ label, value, icon, color, suffix, delay }: {
+function StatCard({ label, value, icon, color, suffix, delay, trend }: {
     label: string;
     value: number;
     icon: React.ReactNode;
     color: string;
     suffix?: string;
     delay: number;
+    trend?: number;
 }) {
     return (
         <div
@@ -125,6 +127,17 @@ function StatCard({ label, value, icon, color, suffix, delay }: {
                     }}>
                         {label}
                     </div>
+                    {trend !== undefined && trend !== 0 && (
+                        <div style={{
+                            fontSize: '9px',
+                            color: trend > 0 ? 'var(--success)' : 'var(--error)',
+                            fontFamily: 'JetBrains Mono, monospace',
+                            marginTop: '2px',
+                            letterSpacing: '0.05em',
+                        }}>
+                            {trend > 0 ? '↑' : '↓'} {Math.abs(trend)} pts this period
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -271,6 +284,7 @@ export default function InsightsPage() {
             icon: <Brain size={16} />,
             color: insights.radar.quality >= 70 ? 'var(--success)' : insights.radar.quality >= 50 ? 'var(--warning)' : 'var(--error)',
             suffix: '/100',
+            trend: insights.trendDelta,
         },
         {
             label: 'Noise Index',
@@ -354,8 +368,116 @@ export default function InsightsPage() {
                 ))}
             </div>
 
-            {/* ── [02] DECISION HEALTH ────────────────────────── */}
-            <SectionLabel index={2}>DECISION HEALTH</SectionLabel>
+            {/* ── [02] PERFORMANCE TRAJECTORY ─────────────────── */}
+            <SectionLabel index={2}>PERFORMANCE TRAJECTORY</SectionLabel>
+            <div className="animate-slide-up card card-glow" style={{ animationDelay: '0.28s', marginBottom: 'var(--spacing-lg)' }}>
+                <div className="card-header flex items-center justify-between">
+                    <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                        <TrendingUp size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-primary)' }} />
+                        QUALITY &amp; NOISE OVER TIME
+                    </h3>
+                    {insights.trendDelta !== 0 && (
+                        <div style={{
+                            fontSize: '10px',
+                            fontFamily: 'JetBrains Mono, monospace',
+                            padding: '2px 8px',
+                            border: `1px solid ${insights.trendDelta >= 0 ? 'var(--success)' : 'var(--error)'}40`,
+                            color: insights.trendDelta >= 0 ? 'var(--success)' : 'var(--error)',
+                            background: `${insights.trendDelta >= 0 ? 'var(--success)' : 'var(--error)'}08`,
+                        }}>
+                            {insights.trendDelta >= 0 ? '↑' : '↓'} {Math.abs(insights.trendDelta)} pts TREND
+                        </div>
+                    )}
+                </div>
+                {insights.weeklyTrend.length > 1 ? (
+                    <>
+                        <div className="card-body" style={{ height: 200 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={insights.weeklyTrend}>
+                                    <defs>
+                                        <linearGradient id="qualityGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--success)" stopOpacity={0.15} />
+                                            <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="noiseGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--error)" stopOpacity={0.12} />
+                                            <stop offset="95%" stopColor="var(--error)" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.04)" />
+                                    <XAxis
+                                        dataKey="week"
+                                        tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                        axisLine={false} tickLine={false}
+                                    />
+                                    <YAxis
+                                        domain={[0, 100]}
+                                        tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                        axisLine={false} tickLine={false}
+                                        width={28}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            background: 'var(--bg-secondary)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '0',
+                                            fontSize: '11px',
+                                            fontFamily: 'JetBrains Mono, monospace',
+                                        }}
+                                        formatter={(value: number | undefined, name: string | undefined) => [
+                                            `${value ?? 0}`,
+                                            name === 'avgScore' ? 'Quality' : 'Noise'
+                                        ]}
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="avgScore"
+                                        stroke="var(--success)"
+                                        strokeWidth={1.5}
+                                        fill="url(#qualityGrad)"
+                                        dot={false}
+                                        activeDot={{ r: 3, fill: 'var(--success)' }}
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="avgNoise"
+                                        stroke="var(--error)"
+                                        strokeWidth={1.5}
+                                        fill="url(#noiseGrad)"
+                                        dot={false}
+                                        activeDot={{ r: 3, fill: 'var(--error)' }}
+                                        strokeDasharray="4 4"
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div style={{
+                            padding: '6px 16px 10px',
+                            fontSize: '9px',
+                            color: 'var(--text-muted)',
+                            fontFamily: 'JetBrains Mono, monospace',
+                            display: 'flex',
+                            gap: '16px',
+                            borderTop: '1px solid var(--border-color)',
+                        }}>
+                            <span><span style={{ color: 'var(--success)' }}>—</span> Quality Score</span>
+                            <span><span style={{ color: 'var(--error)' }}>- -</span> Noise Level</span>
+                            <span style={{ marginLeft: 'auto' }}>
+                                {insights.weeklyTrend.reduce((s, w) => s + w.count, 0)} analyses in period
+                            </span>
+                        </div>
+                    </>
+                ) : (
+                    <div className="card-body flex items-center justify-center" style={{ height: 120 }}>
+                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
+                            NOT ENOUGH DATA — run more analyses to see trajectory
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* ── [03] DECISION HEALTH ────────────────────────── */}
+            <SectionLabel index={3}>DECISION HEALTH</SectionLabel>
             <div className="grid grid-2 gap-md" style={{ marginBottom: 'var(--spacing-lg)' }}>
                 <div className="animate-slide-up card-glow" style={{ animationDelay: '0.3s' }}>
                     <ErrorBoundary sectionName="Decision Radar">
@@ -369,8 +491,8 @@ export default function InsightsPage() {
                 </div>
             </div>
 
-            {/* ── [03] ANALYSIS MATRIX ────────────────────────── */}
-            <SectionLabel index={3}>ANALYSIS MATRIX</SectionLabel>
+            {/* ── [04] ANALYSIS MATRIX ────────────────────────── */}
+            <SectionLabel index={4}>ANALYSIS MATRIX</SectionLabel>
             <div className="grid grid-3 gap-md" style={{ marginBottom: 'var(--spacing-lg)' }}>
                 <div className="animate-slide-up card-glow" style={{ animationDelay: '0.42s' }}>
                     <ErrorBoundary sectionName="SWOT Quadrant">
@@ -389,8 +511,8 @@ export default function InsightsPage() {
                 </div>
             </div>
 
-            {/* ── [04] DISTRIBUTIONS ──────────────────────────── */}
-            <SectionLabel index={4}>DISTRIBUTIONS</SectionLabel>
+            {/* ── [05] DISTRIBUTIONS ──────────────────────────── */}
+            <SectionLabel index={5}>DISTRIBUTIONS</SectionLabel>
             <div className="grid grid-2 gap-md" style={{ marginBottom: 'var(--spacing-lg)' }}>
                 {/* Score Distribution Histogram */}
                 <ErrorBoundary sectionName="Score Distribution">
@@ -537,8 +659,276 @@ export default function InsightsPage() {
                 </ErrorBoundary>
             </div>
 
-            {/* ── [05] COMPLIANCE ──────────────────────────────── */}
-            <SectionLabel index={5}>COMPLIANCE</SectionLabel>
+            {/* ── [06] RISK SIGNALS ────────────────────────────── */}
+            <SectionLabel index={6}>RISK SIGNALS</SectionLabel>
+            <div className="grid grid-2 gap-md" style={{ marginBottom: 'var(--spacing-lg)' }}>
+
+                {/* Logical Fallacy Frequency */}
+                <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.64s' }}>
+                    <div className="card-header">
+                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                            <AlertTriangle size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--warning)' }} />
+                            LOGIC FALLACY FREQUENCY
+                        </h3>
+                    </div>
+                    {insights.fallacyFrequency.length > 0 ? (
+                        <div className="card-body" style={{ height: 260 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                    data={insights.fallacyFrequency}
+                                    layout="vertical"
+                                    margin={{ left: 8, right: 24, top: 4, bottom: 4 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.04)" />
+                                    <XAxis
+                                        type="number"
+                                        tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                        axisLine={false} tickLine={false} allowDecimals={false}
+                                    />
+                                    <YAxis
+                                        type="category" dataKey="name" width={120}
+                                        tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                        axisLine={false} tickLine={false}
+                                        tickFormatter={(v: string) => v.length > 18 ? v.slice(0, 16) + '…' : v}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            background: 'var(--bg-secondary)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: '0', fontSize: '11px',
+                                            fontFamily: 'JetBrains Mono, monospace',
+                                        }}
+                                        formatter={(value: number | undefined) => [`${value ?? 0} occurrences`, 'Count']}
+                                    />
+                                    <Bar dataKey="count" radius={[0, 2, 2, 0]}>
+                                        {insights.fallacyFrequency.map((entry, i) => (
+                                            <Cell
+                                                key={i}
+                                                fill={
+                                                    entry.severity === 'high' || entry.severity === 'critical'
+                                                        ? 'var(--error)'
+                                                        : entry.severity === 'medium'
+                                                        ? 'var(--warning)'
+                                                        : 'var(--accent-secondary)'
+                                                }
+                                                fillOpacity={0.7}
+                                            />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    ) : (
+                        <div className="card-body flex items-center justify-center" style={{ height: 260 }}>
+                            <p style={{ fontSize: '11px', color: 'var(--success)', fontFamily: 'JetBrains Mono, monospace' }}>
+                                ✓ NO FALLACIES DETECTED
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Pre-Mortem Failure Scenarios */}
+                <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.7s' }}>
+                    <div className="card-header">
+                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                            <ShieldCheck size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--error)' }} />
+                            TOP FAILURE SCENARIOS
+                        </h3>
+                        <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
+                            from pre-mortem analysis
+                        </span>
+                    </div>
+                    <div className="card-body" style={{ padding: 'var(--spacing-sm)', height: 260, overflowY: 'auto' }}>
+                        {insights.topFailureScenarios.length > 0 ? (
+                            <ol style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                                {insights.topFailureScenarios.map((item, i) => (
+                                    <li key={i} style={{
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        gap: '10px',
+                                        padding: '10px 12px',
+                                        marginBottom: '4px',
+                                        background: 'var(--bg-secondary)',
+                                        border: '1px solid var(--border-color)',
+                                    }}>
+                                        <span style={{
+                                            fontSize: '10px',
+                                            fontWeight: 700,
+                                            fontFamily: 'JetBrains Mono, monospace',
+                                            color: 'var(--error)',
+                                            minWidth: '18px',
+                                            lineHeight: 1.6,
+                                        }}>
+                                            {String(i + 1).padStart(2, '0')}
+                                        </span>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontSize: '11px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                                {item.text.length > 120 ? item.text.slice(0, 117) + '…' : item.text}
+                                            </div>
+                                            {item.count > 1 && (
+                                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: '2px' }}>
+                                                    flagged in {item.count} analyses
+                                                </div>
+                                            )}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ol>
+                        ) : (
+                            <div className="flex items-center justify-center h-full">
+                                <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
+                                    NO PRE-MORTEM DATA
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* ── [07] BOARDROOM CONSENSUS ─────────────────────── */}
+            <SectionLabel index={7}>BOARDROOM CONSENSUS</SectionLabel>
+            <div className="grid grid-2 gap-md" style={{ marginBottom: 'var(--spacing-lg)' }}>
+
+                {/* Decision Twin Vote Distribution */}
+                <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.76s' }}>
+                    <div className="card-header flex items-center justify-between">
+                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                            <Brain size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-primary)' }} />
+                            DECISION TWIN VOTES
+                        </h3>
+                        {insights.decisionTwinVotes.total > 0 && (
+                            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
+                                {insights.decisionTwinVotes.total} total votes
+                            </span>
+                        )}
+                    </div>
+                    {insights.decisionTwinVotes.total > 0 ? (
+                        <>
+                            <div className="card-body" style={{ height: 200 }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={[
+                                        { label: 'APPROVE', count: insights.decisionTwinVotes.approve },
+                                        { label: 'REVISE', count: insights.decisionTwinVotes.revise },
+                                        { label: 'REJECT', count: insights.decisionTwinVotes.reject },
+                                    ]}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.04)" />
+                                        <XAxis
+                                            dataKey="label"
+                                            tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                            axisLine={false} tickLine={false}
+                                        />
+                                        <YAxis
+                                            tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
+                                            axisLine={false} tickLine={false} allowDecimals={false}
+                                        />
+                                        <Tooltip
+                                            contentStyle={{
+                                                background: 'var(--bg-secondary)',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '0', fontSize: '11px',
+                                                fontFamily: 'JetBrains Mono, monospace',
+                                            }}
+                                            formatter={(value: number | undefined) => [`${value ?? 0} votes`, 'Count']}
+                                        />
+                                        <Bar dataKey="count" radius={[2, 2, 0, 0]}>
+                                            {['#30d158', '#ffd60a', '#ff453a'].map((fill, i) => (
+                                                <Cell key={i} fill={fill} fillOpacity={0.75} />
+                                            ))}
+                                            <LabelList
+                                                dataKey="count"
+                                                position="top"
+                                                style={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono, monospace' }}
+                                                formatter={(v) => Number(v) > 0 ? String(v) : ''}
+                                            />
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div style={{
+                                padding: '6px 16px 10px',
+                                fontSize: '9px',
+                                color: 'var(--text-muted)',
+                                fontFamily: 'JetBrains Mono, monospace',
+                                borderTop: '1px solid var(--border-color)',
+                            }}>
+                                Simulated votes from Fiscal Conservative · Aggressive Growth · Compliance Guard personas
+                            </div>
+                        </>
+                    ) : (
+                        <div className="card-body flex items-center justify-center" style={{ height: 200 }}>
+                            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>NO SIMULATION DATA</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Cognitive Blind Spots */}
+                <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.82s' }}>
+                    <div className="card-header flex items-center justify-between">
+                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                            <Activity size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--warning)' }} />
+                            COGNITIVE BLIND SPOTS
+                        </h3>
+                        {insights.avgBlindSpotGap > 0 && (
+                            <div style={{
+                                fontSize: '10px',
+                                fontFamily: 'JetBrains Mono, monospace',
+                                color: insights.avgBlindSpotGap < 50 ? 'var(--error)' : insights.avgBlindSpotGap < 80 ? 'var(--warning)' : 'var(--success)',
+                            }}>
+                                {insights.avgBlindSpotGap}/100 diversity
+                            </div>
+                        )}
+                    </div>
+                    <div className="card-body" style={{ padding: 'var(--spacing-md)' }}>
+                        {insights.avgBlindSpotGap > 0 && (
+                            <div style={{ marginBottom: '16px' }}>
+                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                                    avg cognitive diversity score
+                                </div>
+                                <div style={{ height: '4px', background: 'var(--bg-secondary)', position: 'relative' }}>
+                                    <div style={{
+                                        position: 'absolute',
+                                        left: 0, top: 0, height: '100%',
+                                        width: `${insights.avgBlindSpotGap}%`,
+                                        background: insights.avgBlindSpotGap < 50 ? 'var(--error)' : insights.avgBlindSpotGap < 80 ? 'var(--warning)' : 'var(--success)',
+                                        transition: 'width 0.4s ease',
+                                    }} />
+                                </div>
+                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: '3px' }}>
+                                    {insights.avgBlindSpotGap < 50 ? 'Tunnel Vision Detected' : insights.avgBlindSpotGap < 80 ? 'Moderate Perspective Diversity' : 'Balanced Perspectives'}
+                                </div>
+                            </div>
+                        )}
+                        {insights.topBlindSpots.length > 0 ? (
+                            <>
+                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                                    most common blind spots
+                                </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                    {insights.topBlindSpots.map((spot, i) => (
+                                        <span key={i} style={{
+                                            fontSize: '10px',
+                                            fontFamily: 'JetBrains Mono, monospace',
+                                            padding: '3px 8px',
+                                            border: '1px solid rgba(255,214,10,0.3)',
+                                            color: 'var(--warning)',
+                                            background: 'rgba(255,214,10,0.06)',
+                                        }}>
+                                            {spot}
+                                        </span>
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
+                                NO BLIND SPOT DATA
+                            </p>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* ── [08] COMPLIANCE ──────────────────────────────── */}
+            <SectionLabel index={8}>COMPLIANCE</SectionLabel>
             <div className="animate-slide-up card-glow" style={{ animationDelay: '0.72s' }}>
                 <ErrorBoundary sectionName="Compliance Grid">
                     <ComplianceGrid data={insights.complianceGrid} />
