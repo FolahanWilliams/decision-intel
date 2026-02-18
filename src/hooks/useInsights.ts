@@ -25,6 +25,16 @@ export interface InsightsPayload {
     scatterData: { id: string; overallScore: number; noiseScore: number }[];
     totalAnalyses: number;
     totalBiases: number;
+    // Performance trajectory
+    weeklyTrend: { week: string; avgScore: number; avgNoise: number; count: number }[];
+    trendDelta: number;
+    // Risk signals
+    fallacyFrequency: { name: string; count: number; severity: string }[];
+    topFailureScenarios: { text: string; count: number }[];
+    // Boardroom consensus
+    decisionTwinVotes: { approve: number; reject: number; revise: number; total: number };
+    avgBlindSpotGap: number;
+    topBlindSpots: string[];
 }
 
 const fetcher = (url: string) => fetch(url).then(r => {
