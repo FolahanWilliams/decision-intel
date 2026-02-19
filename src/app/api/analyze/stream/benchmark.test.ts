@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => {
   const DB_LATENCY = 50;
   return {
     document: {
-      findFirst: vi.fn().mockResolvedValue({ id: 'doc_123', userId: 'user_123', content: 'test content' }),
+      findFirst: vi.fn().mockResolvedValue({ id: 'doc_123', userId: 'user_123', content: 'This is a test content that needs to be at least fifty characters long to pass the validation check.' }),
       update: vi.fn().mockImplementation(async () => {
         await delay(DB_LATENCY);
         return { id: 'doc_123' };
@@ -17,6 +17,12 @@ const mocks = vi.hoisted(() => {
         await delay(DB_LATENCY);
         return { id: 'analysis_123' };
       }),
+    },
+    rateLimit: {
+      deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({ count: 1, resetAt: new Date(Date.now() + 3600000) }),
+      update: vi.fn().mockResolvedValue({ count: 2, resetAt: new Date(Date.now() + 3600000) }),
     }
   }
 });
@@ -124,9 +130,12 @@ describe('Performance Benchmark', () => {
     const start = performance.now();
     const response = await POST(req);
 
+    if ((response as unknown as { status: number }).status !== 200) {
+      console.error('Stream test failed with status:', (response as unknown as { status: number }).status, response.body);
+    }
+
     // Consume stream to ensure all async work completes
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const reader = (response.body as any)?.getReader?.();
+    const reader = typeof response.body?.getReader === 'function' ? response.body.getReader() : null;
     if (reader) {
       while (true) {
         const { done } = await reader.read();

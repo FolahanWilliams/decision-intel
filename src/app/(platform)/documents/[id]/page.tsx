@@ -482,16 +482,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             {/* Compact Stats Bar - REPLACED BY EXECUTIVE SUMMARY */}
             {analysis && (
                 <ErrorBoundary sectionName="Executive Summary">
-                <div className="mb-xl">
-                    <ExecutiveSummary
-                        overallScore={analysis.overallScore}
-                        noiseScore={analysis.noiseScore}
-                        biasCount={biases.length}
-                        riskLevel={analysis.overallScore < 50 ? 'critical' : analysis.overallScore < 70 ? 'high' : analysis.overallScore < 85 ? 'medium' : 'low'}
-                        summary={analysis.summary}
-                        verdict={analysis.overallScore > 80 ? 'APPROVED' : analysis.overallScore < 60 ? 'REJECTED' : 'MIXED'}
-                    />
-                </div>
+                    <div className="mb-xl">
+                        <ExecutiveSummary
+                            overallScore={analysis.overallScore}
+                            noiseScore={analysis.noiseScore}
+                            biasCount={biases.length}
+                            riskLevel={analysis.overallScore < 50 ? 'critical' : analysis.overallScore < 70 ? 'high' : analysis.overallScore < 85 ? 'medium' : 'low'}
+                            summary={analysis.summary}
+                            verdict={analysis.overallScore > 80 ? 'APPROVED' : analysis.overallScore < 60 ? 'REJECTED' : 'MIXED'}
+                        />
+                    </div>
                 </ErrorBoundary>
             )}
 
@@ -702,46 +702,46 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         <div className="flex flex-col gap-lg">
                             {/* NEW: Bias Heatmap & Network */}
                             <ErrorBoundary sectionName="Bias Visualizations">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg h-[500px]">
-                                <BiasHeatmap content={document.content} biases={biases} />
-                                <div className="card">
-                                    <div className="card-header">
-                                        <h4>Bias Network Map</h4>
-                                    </div>
-                                    <div className="card-body h-full">
-                                        <BiasNetwork biases={biases.map(b => ({ ...b, id: b.id || Math.random().toString(), category: 'cognitive' }))} />
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg h-[500px]">
+                                    <BiasHeatmap content={document.content} biases={biases} />
+                                    <div className="card">
+                                        <div className="card-header">
+                                            <h4>Bias Network Map</h4>
+                                        </div>
+                                        <div className="card-body h-full">
+                                            <BiasNetwork biases={biases.map(b => ({ ...b, id: b.id || Math.random().toString(), category: 'cognitive' }))} />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             </ErrorBoundary>
 
                             {/* Decision Timeline & Risk HeatMap */}
                             <ErrorBoundary sectionName="Decision Timeline & Risk Map">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg mt-lg">
-                                <div className="card">
-                                    <div className="card-header">
-                                        <h4>Decision Timeline</h4>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg mt-lg">
+                                    <div className="card">
+                                        <div className="card-header">
+                                            <h4>Decision Timeline</h4>
+                                        </div>
+                                        <div className="card-body">
+                                            <DecisionTimeline events={[
+                                                { id: '1', date: new Date(document.uploadedAt).toLocaleDateString(), title: 'Document Uploaded', description: 'Initial file ingestion.', type: 'info', status: 'completed' },
+                                                { id: '2', date: new Date(analysis?.createdAt || Date.now()).toLocaleDateString(), title: 'AI Audit Completed', description: 'Deep scan for biases and noise.', type: 'decision', status: 'completed' },
+                                            ]} />
+                                        </div>
                                     </div>
-                                    <div className="card-body">
-                                        <DecisionTimeline events={[
-                                            { id: '1', date: new Date(document.uploadedAt).toLocaleDateString(), title: 'Document Uploaded', description: 'Initial file ingestion.', type: 'info', status: 'completed' },
-                                            { id: '2', date: new Date(analysis?.createdAt || Date.now()).toLocaleDateString(), title: 'AI Audit Completed', description: 'Deep scan for biases and noise.', type: 'decision', status: 'completed' },
-                                        ]} />
+                                    <div className="card">
+                                        <div className="card-header">
+                                            <h4>Risk Landscape</h4>
+                                        </div>
+                                        <div className="card-body">
+                                            <RiskHeatMap risks={biases.map(b => ({
+                                                category: b.biasType,
+                                                impact: b.severity === 'critical' ? 90 : b.severity === 'high' ? 70 : b.severity === 'medium' ? 50 : 30,
+                                                probability: 60
+                                            }))} />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="card">
-                                    <div className="card-header">
-                                        <h4>Risk Landscape</h4>
-                                    </div>
-                                    <div className="card-body">
-                                        <RiskHeatMap risks={biases.map(b => ({
-                                            category: b.biasType,
-                                            impact: b.severity === 'critical' ? 90 : b.severity === 'high' ? 70 : b.severity === 'medium' ? 50 : 30,
-                                            probability: 60
-                                        }))} />
-                                    </div>
-                                </div>
-                            </div>
                             </ErrorBoundary>
 
                             {/* Biases List (Existing) */}
@@ -804,91 +804,91 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
                     {activeTab === 'noise' && (
                         <ErrorBoundary sectionName="Noise Analysis">
-                        <div className="card">
-                            <div className="card-body">
-                                {analysis?.noiseStats ? (
-                                    <div className="space-y-8">
-                                        <div className="flex justify-center gap-10">
-                                            <QualityGauge
-                                                value={analysis.noiseScore}
-                                                label="Noise Level"
-                                                color="#ef4444"
-                                                maxValue={100}
-                                            />
-                                            <QualityGauge
-                                                value={100 - analysis.noiseScore}
-                                                label="Consistency"
-                                                color="#10b981"
-                                                maxValue={100}
-                                            />
+                            <div className="card">
+                                <div className="card-body">
+                                    {analysis?.noiseStats ? (
+                                        <div className="space-y-8">
+                                            <div className="flex justify-center gap-10">
+                                                <QualityGauge
+                                                    value={analysis.noiseScore}
+                                                    label="Noise Level"
+                                                    color="#ef4444"
+                                                    maxValue={100}
+                                                />
+                                                <QualityGauge
+                                                    value={100 - analysis.noiseScore}
+                                                    label="Consistency"
+                                                    color="#10b981"
+                                                    maxValue={100}
+                                                />
+                                            </div>
+                                            <NoiseJudge analysis={{ ...analysis.noiseStats, benchmarks: analysis.noiseBenchmarks, score: analysis.noiseScore }} />
                                         </div>
-                                        <NoiseJudge analysis={{ ...analysis.noiseStats, benchmarks: analysis.noiseBenchmarks, score: analysis.noiseScore }} />
-                                    </div>
-                                ) : (
-                                    <div className="text-center p-8 text-muted">No noise analysis available.</div>
-                                )}
+                                    ) : (
+                                        <div className="text-center p-8 text-muted">No noise analysis available.</div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
                         </ErrorBoundary>
                     )}
 
                     {activeTab === 'swot' && (
                         <ErrorBoundary sectionName="SWOT Analysis">
-                        <div className="card">
-                            <div className="card-body">
-                                {analysis?.swotAnalysis ? (
-                                    <SwotMatrix data={analysis.swotAnalysis} />
-                                ) : (
-                                    <div className="text-center p-8 text-muted">No SWOT analysis data available.</div>
-                                )}
+                            <div className="card">
+                                <div className="card-body">
+                                    {analysis?.swotAnalysis ? (
+                                        <SwotMatrix data={analysis.swotAnalysis} />
+                                    ) : (
+                                        <div className="text-center p-8 text-muted">No SWOT analysis data available.</div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
                         </ErrorBoundary>
                     )}
 
                     {activeTab === 'red-team' && (
                         <ErrorBoundary sectionName="Red Team Analysis">
-                        <div className="card">
-                            <div className="card-body">
-                                {analysis?.cognitiveAnalysis ? (
-                                    <RedTeamView analysis={analysis.cognitiveAnalysis} />
-                                ) : (
-                                    <div className="text-center p-8 text-muted">No cognitive diversity analysis available.</div>
-                                )}
+                            <div className="card">
+                                <div className="card-body">
+                                    {analysis?.cognitiveAnalysis ? (
+                                        <RedTeamView analysis={analysis.cognitiveAnalysis} />
+                                    ) : (
+                                        <div className="text-center p-8 text-muted">No cognitive diversity analysis available.</div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
                         </ErrorBoundary>
                     )}
 
                     {activeTab === 'boardroom' && (
                         <ErrorBoundary sectionName="Boardroom Simulation">
-                        <div className="card">
-                            <div className="card-body">
-                                {analysis?.simulation ? (
-                                    <div className="space-y-6">
-                                        <BoardroomSimulator simulation={analysis.simulation} />
-                                        <div className="card border-t border-border mt-6">
-                                            <div className="card-header">
-                                                <h4>Stakeholder Alignment Map</h4>
-                                            </div>
-                                            <div className="card-body">
-                                                <StakeholderMap stakeholders={analysis.simulation.twins?.map((t: { name: string; role: string; confidence?: number; vote?: string; feedback?: string }) => ({
-                                                    id: t.name,
-                                                    name: t.name,
-                                                    role: t.role,
-                                                    influence: Math.round((t.confidence || 0.5) * 100),
-                                                    interest: 70,
-                                                    stance: t.vote === 'APPROVE' ? 'supportive' : t.vote === 'REJECT' ? 'opposed' : 'neutral',
-                                                    keyConcerns: [t.feedback?.substring(0, 50) + '...']
-                                                })) || []} />
+                            <div className="card">
+                                <div className="card-body">
+                                    {analysis?.simulation ? (
+                                        <div className="space-y-6">
+                                            <BoardroomSimulator simulation={analysis.simulation} />
+                                            <div className="card border-t border-border mt-6">
+                                                <div className="card-header">
+                                                    <h4>Stakeholder Alignment Map</h4>
+                                                </div>
+                                                <div className="card-body">
+                                                    <StakeholderMap stakeholders={analysis.simulation.twins?.map((t: { name: string; role: string; confidence?: number; vote?: string; feedback?: string }) => ({
+                                                        id: t.name,
+                                                        name: t.name,
+                                                        role: t.role,
+                                                        influence: Math.round((t.confidence || 0.5) * 100),
+                                                        interest: 70,
+                                                        stance: t.vote === 'APPROVE' ? 'supportive' : t.vote === 'REJECT' ? 'opposed' : 'neutral',
+                                                        keyConcerns: [t.feedback?.substring(0, 50) + '...']
+                                                    })) || []} />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className="text-center p-8 text-muted">Run &quot;Live Scan&quot; to convene the Virtual Board.</div>
-                                )}
+                                    ) : (
+                                        <div className="text-center p-8 text-muted">Run &quot;Live Scan&quot; to convene the Virtual Board.</div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
                         </ErrorBoundary>
                     )}
 

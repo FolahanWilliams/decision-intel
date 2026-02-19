@@ -23,7 +23,7 @@ function getMarketAnalystModel() {
     });
 }
 
-export async function POST(_: Request) {
+export async function POST() {
     try {
         const { userId } = await auth();
         if (!userId) {

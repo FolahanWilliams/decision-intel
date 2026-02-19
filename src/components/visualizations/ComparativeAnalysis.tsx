@@ -97,7 +97,7 @@ export function TrendOverlay({ data }: TrendOverlayProps) {
     const maxDate = Math.max(...data.map(d => new Date(d.date).getTime()));
     const timeRange = maxDate - minDate || 1;
 
-    return data.map((d, _i) => {
+    return data.map((d) => {
       const x = padding + ((new Date(d.date).getTime() - minDate) / timeRange) * (width - 2 * padding);
       const y = height - padding - (d.score / 100) * (height - 2 * padding);
       return `${x},${y}`;

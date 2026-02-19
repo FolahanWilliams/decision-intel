@@ -171,6 +171,7 @@ export default function Dashboard() {
     if (files.length > 0) {
       await uploadAndAnalyze(files[0]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -309,7 +310,7 @@ export default function Dashboard() {
               <CheckCircle size={18} className="text-green-500" />
               Recent Analyses
             </h2>
-            <Link 
+            <Link
               href="#documents"
               className="text-sm text-accent-primary hover:underline flex items-center gap-1"
             >
@@ -320,7 +321,7 @@ export default function Dashboard() {
             {uploadedDocs
               .filter(d => d.status === 'complete')
               .slice(0, 6)
-              .map((doc, idx) => (
+              .map((doc) => (
                 <Link
                   key={doc.id}
                   href={`/documents/${doc.id}`}
@@ -515,7 +516,7 @@ export default function Dashboard() {
                         {doc.score !== undefined && (
                           <div className="flex items-center gap-2">
                             <div className="w-16 h-2 rounded-full bg-white/10 overflow-hidden">
-                              <div 
+                              <div
                                 className="h-full rounded-full transition-all"
                                 style={{
                                   width: `${doc.score}%`,

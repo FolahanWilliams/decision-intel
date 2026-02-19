@@ -241,21 +241,21 @@ export async function batchProcess<T, R>(
  * @param ttlMs Time to live in milliseconds
  * @returns Memoized function
  */
-export function memoizeWithTTL<T extends (...args: any[]) => any>(
+export function memoizeWithTTL<T extends (...args: unknown[]) => ReturnType<T>>(
   fn: T,
   ttlMs: number
 ): T {
   const cache = new Map<string, { value: ReturnType<T>; expiry: number }>();
-  
-  return ((...args: any[]) => {
+
+  return ((...args: unknown[]) => {
     const key = JSON.stringify(args);
     const cached = cache.get(key);
-    
+
     if (cached && cached.expiry > Date.now()) {
       return cached.value;
     }
-    
-    const result = fn(...args);
+
+    const result = fn(...args) as ReturnType<T>;
     cache.set(key, { value: result, expiry: Date.now() + ttlMs });
     return result;
   }) as T;

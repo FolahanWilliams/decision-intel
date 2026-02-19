@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 import { createLogger } from '@/lib/utils/logger';
@@ -52,8 +53,13 @@ export async function GET() {
             }),
 
             // Bias type distribution (grouped)
+<<<<<<< Updated upstream
             // Using $queryRaw tagged template (parameterized) — safe against SQL injection.
             prisma.$queryRaw<{ biasType: string; count: bigint }[]>`
+=======
+            // Parameterized queries to prevent SQL injection
+            prisma.$queryRaw<{ biasType: string; count: bigint }[]>(Prisma.sql`
+>>>>>>> Stashed changes
                 SELECT bi."biasType", COUNT(*)::bigint as count
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON bi."analysisId" = a.id
@@ -64,7 +70,11 @@ export async function GET() {
             `,
 
             // Severity distribution
+<<<<<<< Updated upstream
             prisma.$queryRaw<{ severity: string; count: bigint }[]>`
+=======
+            prisma.$queryRaw<{ severity: string; count: bigint }[]>(Prisma.sql`
+>>>>>>> Stashed changes
                 SELECT bi."severity", COUNT(*)::bigint as count
                 FROM "BiasInstance" bi
                 JOIN "Analysis" a ON bi."analysisId" = a.id

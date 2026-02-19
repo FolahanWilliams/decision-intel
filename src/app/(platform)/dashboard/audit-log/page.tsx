@@ -50,13 +50,14 @@ async function getAuditLogs(
 export default async function AuditLogPage({
     searchParams
 }: {
-    searchParams: { page?: string, action?: string, search?: string }
+    searchParams: Promise<{ page?: string, action?: string, search?: string }>
 }) {
     const { userId } = await auth();
     if (!userId) return <div>Unauthorized</div>;
 
-    const page = Number(searchParams.page) || 1;
-    const { logs, totalPages } = await getAuditLogs(userId, page, searchParams.action, searchParams.search);
+    const resolvedParams = await searchParams;
+    const page = Number(resolvedParams.page) || 1;
+    const { logs, totalPages } = await getAuditLogs(userId, page, resolvedParams.action, resolvedParams.search);
 
     return (
         <div className="container py-8">

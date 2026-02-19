@@ -83,9 +83,9 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
 
     // Create connections based on relationships
     const connectionList: BiasConnection[] = [];
-    nodeList.forEach((node, _i) => {
+    nodeList.forEach((node) => {
       const related = biasRelationships[node.id] || [];
-      related.forEach((relatedBias, _idx) => {
+      related.forEach((relatedBias, idx) => {
         const targetNode = nodeList.find(n => n.id === relatedBias || n.name === relatedBias);
         if (targetNode && !connectionList.find(c =>
           (c.from === node.id && c.to === targetNode.id) ||
@@ -94,7 +94,7 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
           connectionList.push({
             from: node.id,
             to: targetNode.id,
-            strength: 0.8 - (_idx * 0.15), // Stranger visual strength differentiation
+            strength: 0.8 - (idx * 0.15), // Stranger visual strength differentiation
           });
         }
       });

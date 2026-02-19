@@ -94,8 +94,11 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
   useEffect(() => {
     if (!simulation?.twins) return;
     
-    setRevealedVotes(0);
-    setShowConsensus(false);
+    // Use setTimeout to avoid synchronous setState in effect
+    const initTimer = setTimeout(() => {
+      setRevealedVotes(0);
+      setShowConsensus(false);
+    }, 0);
     
     const timer1 = setTimeout(() => setRevealedVotes(1), 600);
     const timer2 = setTimeout(() => setRevealedVotes(2), 1200);
@@ -103,6 +106,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
     const timer4 = setTimeout(() => setShowConsensus(true), 2400);
     
     return () => {
+      clearTimeout(initTimer);
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
@@ -352,7 +356,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       transition={{ delay: 0.2 }}
                       className="relative"
                     >
-                      <div className="absolute -top-2 -left-1 text-4xl text-white/10 font-serif">"</div>
+                      <div className="absolute -top-2 -left-1 text-4xl text-white/10 font-serif">&quot;</div>
                       <p className="text-sm text-gray-300 italic leading-relaxed pl-3 border-l-2 border-white/10">
                         {twin.rationale}
                       </p>

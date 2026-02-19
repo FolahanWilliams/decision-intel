@@ -29,11 +29,11 @@ const mocks = vi.hoisted(() => {
         document: {
             findFirst: vi.fn().mockImplementation(async () => {
                 await delay(DB_LATENCY);
-                return { id: 'doc_123', userId: 'user_123', content: 'test content' };
+                return { id: 'doc_123', userId: 'user_123', content: 'This is a test content that needs to be at least fifty characters long to pass the validation check.' };
             }),
             findUnique: vi.fn().mockImplementation(async () => {
                 await delay(DB_LATENCY);
-                return { id: 'doc_123', userId: 'user_123', content: 'test content' };
+                return { id: 'doc_123', userId: 'user_123', content: 'This is a test content that needs to be at least fifty characters long to pass the validation check.' };
             }),
             update: vi.fn().mockImplementation(async () => {
                 await delay(DB_LATENCY);
@@ -49,6 +49,12 @@ const mocks = vi.hoisted(() => {
                 await delay(DB_LATENCY);
                 return { id: 'analysis_123' };
             }),
+        },
+        rateLimit: {
+            deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
+            findUnique: vi.fn().mockResolvedValue(null),
+            upsert: vi.fn().mockResolvedValue({ count: 1, resetAt: new Date(Date.now() + 3600000) }),
+            update: vi.fn().mockResolvedValue({ count: 2, resetAt: new Date(Date.now() + 3600000) }),
         }
     }
 });
@@ -138,6 +144,9 @@ describe('Performance Benchmark', () => {
 
         console.log(`Execution time: ${(end - start).toFixed(2)}ms`);
 
+        if (response.status !== 200) {
+            console.error('Test failed with status:', response.status, json);
+        }
         expect(response.status).toBe(200);
         expect(json.success).toBe(true);
 
