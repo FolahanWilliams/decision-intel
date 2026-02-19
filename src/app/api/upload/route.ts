@@ -162,7 +162,12 @@ export async function POST(request: NextRequest) {
             message: 'Document uploaded successfully'
         });
     } catch (error) {
-        log.error('Upload error: ' + getSafeErrorMessage(error));
+        // Log the raw code + message internally so Vercel logs show the real
+        // cause (e.g. P2022 schema drift) while the client only receives the
+        // sanitised message.
+        const rawCode = (error as { code?: string }).code ?? 'none';
+        const rawMsg  = error instanceof Error ? error.message : String(error);
+        log.error(`Upload error [code=${rawCode}]: ${rawMsg}`);
         return NextResponse.json(
             { error: getSafeErrorMessage(error) },
             { status: 500 }
