@@ -2,6 +2,16 @@ export function getSafeErrorMessage(error: unknown): string {
     if (error instanceof Error) {
         // Allow-list safe error messages that don't contain PII
         const msg = error.message;
+        // Prisma and pg surface a .code property — check it first so that
+        // error messages containing incidental words like "database" don't
+        // get misclassified (e.g. P2022 "does not exist in the current
+        // database" was previously returned as "Database unreachable").
+        const code = (error as { code?: string }).code;
+        if (code) {
+            if (code.startsWith('P1')) return 'Database unreachable';           // connectivity / TLS
+            if (code.startsWith('P2')) return 'Database schema error (run migrations)'; // query / schema
+            if (code === 'ENOTFOUND' || code === 'ECONNREFUSED') return 'Database unreachable';
+        }
 
         // Parse errors
         if (msg.includes('JSON')) return 'Invalid document format (JSON parse error)';
@@ -19,9 +29,8 @@ export function getSafeErrorMessage(error: unknown): string {
         if (msg.includes('Bucket')) return 'Storage bucket not found or inaccessible';
         if (msg.includes('storage')) return 'File storage error';
 
-        // Database errors (Prisma)
-        if (msg.includes('Prisma') || msg.includes('P2')) return 'Database connection error';
-        if (msg.includes('database') || msg.includes('ENOTFOUND')) return 'Database unreachable';
+        // Database errors — message-level fallbacks (no Prisma code available)
+        if (msg.includes('ENOTFOUND') || msg.includes('ECONNREFUSED')) return 'Database unreachable';
         if (msg.includes('connect')) return 'Failed to connect to database';
 
         // Auth errors
