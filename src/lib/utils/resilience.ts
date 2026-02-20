@@ -22,28 +22,28 @@ export async function withRetry<T>(
   maxDelay: number = 30000
 ): Promise<T> {
   let lastError: Error | undefined;
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       // Don't retry on the last attempt
       if (attempt === maxRetries) {
         throw lastError;
       }
-      
+
       // Calculate exponential backoff delay with jitter
       const exponentialDelay = Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
       const jitter = Math.random() * 0.3 * exponentialDelay; // Add 0-30% jitter
       const delay = exponentialDelay + jitter;
-      
+
       log.warn(`Attempt ${attempt + 1} failed, retrying in ${Math.round(delay)}ms... ${lastError.message}`);
       await sleep(delay);
     }
   }
-  
+
   throw lastError;
 }
 
@@ -70,7 +70,7 @@ export async function withTimeout<T>(
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
   });
-  
+
   return Promise.race([fn(), timeoutPromise]);
 }
 
@@ -100,22 +100,22 @@ export function smartTruncate(
   if (text.length <= maxChars) {
     return text;
   }
-  
+
   // Define sentence ending patterns
   const sentenceEndings = /[.!?]+\s+/g;
-  
+
   // Find all sentence boundaries
   const matches: Array<{ index: number; length: number }> = [];
   let match;
   while ((match = sentenceEndings.exec(text)) !== null) {
     matches.push({ index: match.index + match[0].length, length: match[0].length });
   }
-  
+
   // If no sentence boundaries found, fall back to word boundary
   if (matches.length === 0) {
     return truncateAtWordBoundary(text, maxChars);
   }
-  
+
   // Find the last complete sentence that fits within maxChars
   let lastValidIndex = 0;
   for (const m of matches) {
@@ -129,14 +129,14 @@ export function smartTruncate(
       break;
     }
   }
-  
+
   // If we couldn't find a valid sentence boundary, try word boundary
   if (lastValidIndex === 0) {
     return truncateAtWordBoundary(text, maxChars);
   }
-  
+
   const truncated = text.substring(0, lastValidIndex).trim();
-  return truncated + "\n\n[Content truncated for analysis - " + 
+  return truncated + "\n\n[Content truncated for analysis - " +
     `${Math.round((truncated.length / text.length) * 100)}% of original processed]`;
 }
 
@@ -152,12 +152,12 @@ function truncateAtWordBoundary(text: string, maxChars: number): string {
   while (truncateIndex > 0 && text[truncateIndex] !== ' ') {
     truncateIndex--;
   }
-  
+
   // If no space found, just cut at maxChars
   if (truncateIndex === 0) {
     truncateIndex = maxChars;
   }
-  
+
   const truncated = text.substring(0, truncateIndex).trim();
   return truncated + "\n\n[Content truncated for analysis - " +
     `${Math.round((truncated.length / text.length) * 100)}% of original processed]`;
@@ -171,25 +171,25 @@ function truncateAtWordBoundary(text: string, maxChars: number): string {
 export function validateContent(content: string): { valid: boolean; error?: string } {
   const MIN_CONTENT_LENGTH = 50;
   const MAX_CONTENT_LENGTH = 100000;
-  
+
   if (!content || content.trim().length === 0) {
     return { valid: false, error: "Content is empty" };
   }
-  
+
   if (content.length < MIN_CONTENT_LENGTH) {
-    return { 
-      valid: false, 
-      error: `Content too short (${content.length} chars). Minimum ${MIN_CONTENT_LENGTH} characters required for meaningful analysis.` 
+    return {
+      valid: false,
+      error: `Content too short (${content.length} chars). Minimum ${MIN_CONTENT_LENGTH} characters required for meaningful analysis.`
     };
   }
-  
+
   if (content.length > MAX_CONTENT_LENGTH) {
-    return { 
-      valid: false, 
-      error: `Content too long (${content.length} chars). Maximum ${MAX_CONTENT_LENGTH} characters supported.` 
+    return {
+      valid: false,
+      error: `Content too long (${content.length} chars). Maximum ${MAX_CONTENT_LENGTH} characters supported.`
     };
   }
-  
+
   return { valid: true };
 }
 
@@ -218,8 +218,7 @@ export async function batchProcess<T, R>(
   for (let i = 0; i < items.length; i++) {
     const index = i;
     // Wrap so the promise removes itself from the Set when done (success or error).
-    let promise!: Promise<void>;
-    promise = processor(items[index])
+    const promise: Promise<void> = processor(items[index])
       .then(result => { results[index] = result; })
       .finally(() => { executing.delete(promise); });
 

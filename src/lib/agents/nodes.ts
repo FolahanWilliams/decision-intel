@@ -2,7 +2,7 @@ import { AuditState } from "./types";
 import { parseJSON } from '../utils/json';
 import { AnalysisResult, BiasDetectionResult, NoiseBenchmark } from '../../types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel, type Tool } from "@google/generative-ai";
-import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, COGNITIVE_DIVERSITY_PROMPT, INSTITUTIONAL_MEMORY_PROMPT, COMPLIANCE_CHECKER_PROMPT, LINGUISTIC_ANALYSIS_PROMPT, STRATEGIC_ANALYSIS_PROMPT, STRUCTURER_PROMPT } from "./prompts";
+import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from "./prompts";
 import { searchSimilarDocuments } from "../rag/embeddings";
 import { executeDataRequests, DataRequest } from "../tools/financial";
 import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
@@ -436,40 +436,43 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     };
 }
 
-// Fact Checker Node with Two-Pass Architecture and Search Grounding
-export async function factCheckerNode(state: AuditState): Promise<Partial<AuditState>> {
+// ============================================================
+// VERIFICATION SUPER-NODE (factChecker + complianceMapper)
+// ============================================================
 
+export async function verificationNode(state: AuditState): Promise<Partial<AuditState>> {
     const content = truncateText(state.structuredContent || state.originalContent);
 
     try {
-        // PASS 1: Identify Claims + Grounded Verification
-        // Use Grounded Model here so it can identify which claims NEED searching immediately
-        const analysisResult = await getGroundedModel().generateContent([
-            `You are an Expert Fact Checker. Identify specific factual claims that can be verified externally.
-            These can be financial, technical, historical, or statistical.
+        log.info("Running combined Fact Check + Compliance verification...");
 
-            Return JSON:
-            {
-                "primaryTopic": "string",
-                "claims": [
-                    { "id": 1, "claim": "Exact quote or statement", "category": "technical|financial|historical" }
-                ],
-                "dataRequests": [
-                    { "ticker": "Optional ticker", "dataType": "price|profile|news", "reason": "why", "claimToVerify": "related claim" }
-                ]
-            }`,
-            `Document:\n${content}`
-        ]);
+        // Import super-prompt
+        const { VERIFICATION_SUPER_PROMPT } = await import('./prompts');
 
-        const analysisText = analysisResult.response?.text ? analysisResult.response.text() : "";
-        const analysis = parseJSON(analysisText);
+        // Single grounded LLM call for both fact-check and compliance
+        const result = await withRetry(
+            () => withTimeout(
+                getGroundedModel().generateContent([
+                    VERIFICATION_SUPER_PROMPT,
+                    `Document to analyze:\n<input_text>\n${content}\n</input_text>`
+                ]),
+                90000 // 90 second timeout for combined verification
+            ),
+            2, // 2 retries
+            1000,
+            10000
+        );
 
-        const companyName = analysis?.primaryTopic || null;
+        const responseText = result.response?.text ? result.response.text() : "";
+        const data = parseJSON(responseText);
+
+        // Extract fact-check result
+        const factCheckData = data?.factCheck;
+        const companyName = factCheckData?.primaryTopic || null;
         if (companyName) log.info(`Identified primary topic: ${companyName}`);
-        const claims = analysis?.claims || [];
-        const dataRequests = analysis?.dataRequests || [];
 
-        // Fetch Data (Finnhub)
+        // Fetch financial data if needed (preserves Finnhub integration)
+        const dataRequests = factCheckData?.dataRequests || [];
         let fetchedData: Record<string, unknown> = {};
         if (dataRequests.length > 0) {
             const validRequests: DataRequest[] = dataRequests
@@ -481,106 +484,86 @@ export async function factCheckerNode(state: AuditState): Promise<Partial<AuditS
                     claimToVerify: r.claimToVerify
                 }));
 
-            // Deduplicate requests by ticker to save API calls
             const uniqueRequests = Array.from(new Map(validRequests.map(item => [item.ticker, item])).values());
-
             if (uniqueRequests.length > 0) {
                 fetchedData = await executeDataRequests(uniqueRequests);
             }
         }
 
-        // PASS 2: Verify with Grounding (Using Grounded Model)
-        // External data is wrapped in XML delimiters to prevent prompt injection
-        log.info("Verifying with Google Search Grounding...");
-        const verificationResult = await getGroundedModel().generateContent([
-            `You are a Financial Fact Checker with access to Google Search.
+        // If financial data was fetched, do a verification pass
+        let enrichedFactCheck;
+        if (Object.keys(fetchedData).length > 0 && factCheckData?.verifications?.length > 0) {
+            log.info("Refining fact-check with Finnhub financial data...");
+            const refinementResult = await withTimeout(getGroundedModel().generateContent([
+                `You are a Financial Fact Checker. Refine the verification verdicts below using the REAL-TIME FINANCIAL DATA provided.
+                If a claim was marked UNVERIFIABLE but the data now supports or contradicts it, update the verdict.
 
-            CORE INSTRUCTION:
-            1. ANALYZE the "REAL-TIME FINANCIAL DATA" provided below inside <financial_data> tags.
-            2. IF A CLAIM IS NOT FULLY SUPPORTED by that data, you **MUST** use Google Search to verify it.
-            3. **NEVER** mark a claim as "UNVERIFIABLE" due to "missing data" without searching first.
-            4. **EXAMPLE**: If claim is "Revenue dropped 80% in 2020" and API data is empty for 2020, DELETE the excuse "data provided is insufficient" and SEARCH "Airbnb 2020 revenue drop".
-            5. Cite your sources (Search or API).
+                CURRENT VERIFICATIONS:
+                ${sanitizeForPrompt(factCheckData.verifications, 'verifications')}
 
-            CLAIMS TO VERIFY:
-            ${sanitizeForPrompt(claims, 'claims')}
+                REAL-TIME FINANCIAL DATA (Finnhub):
+                ${sanitizeForPrompt(fetchedData, 'financial_data')}
 
-            REAL-TIME FINANCIAL DATA (Finnhub):
-            ${sanitizeForPrompt(fetchedData, 'financial_data')}
+                Return valid JSON: { "score": 0-100, "verifications": [...updated...] }`,
+                `Topic: ${companyName}`
+            ]), 45000);
 
-            Return valid JSON matching this schema:
-            {
-                "score": 0-100,
-                "summary": "overall verification summary",
-                "verifications": [
-                    {
-                        "claim": "string",
-                        "verdict": "VERIFIED" | "CONTRADICTED" | "UNVERIFIABLE",
-                        "explanation": "concise rationale",
-                        "sourceUrl": "EXACT URL used for this specific claim"
-                    }
-                ]
-            }`,
-            `Topic: ${companyName}`
-        ]);
+            const refinedText = refinementResult.response?.text ? refinementResult.response.text() : "";
+            const refined = parseJSON(refinedText);
 
-        const verificationText = verificationResult.response?.text ? verificationResult.response.text() : "";
-        const verification = parseJSON(verificationText);
+            if (refined?.verifications) {
+                const searchSources = extractSearchSources(refinementResult.response);
+                enrichedFactCheck = {
+                    status: 'success' as const,
+                    score: refined.score || factCheckData.score || 0,
+                    summary: factCheckData.summary || "Verification completed",
+                    verifications: refined.verifications.map((v: { sourceUrl?: string }, i: number) => ({
+                        ...v,
+                        sourceUrl: v.sourceUrl || (searchSources.length > 0 ? searchSources[i % searchSources.length] : "")
+                    })),
+                    primaryTopic: companyName,
+                    flags: [],
+                    searchSources
+                };
+            }
+        }
 
-        // Extract Search Sources (Grounding Metadata)
-        const searchSources = extractSearchSources(verificationResult.response);
+        // Fall back to the initial fact-check if no refinement was needed
+        if (!enrichedFactCheck) {
+            const searchSources = extractSearchSources(result.response);
+            enrichedFactCheck = {
+                status: 'success' as const,
+                score: factCheckData?.score || 0,
+                summary: factCheckData?.summary || "Verification completed",
+                verifications: (factCheckData?.verifications || []).map((v: { sourceUrl?: string }, i: number) => ({
+                    ...v,
+                    sourceUrl: v.sourceUrl || (searchSources.length > 0 ? searchSources[i % searchSources.length] : "")
+                })),
+                primaryTopic: companyName,
+                flags: [],
+                searchSources
+            };
+        }
 
-        log.info(`Found ${searchSources.length} search sources.`);
-
-        const enrichedResult = {
-            status: 'success' as const,
-            score: verification?.score || 0,
-            summary: verification?.summary || "Verification completed",
-            verifications: (verification?.verifications || []).map((v: { sourceUrl?: string }, i: number) => ({
-                ...v,
-                // Fallback to general search sources if specific URL missing
-                sourceUrl: v.sourceUrl || searchSources[i % searchSources.length] || ""
-            })),
-            primaryTopic: companyName,
-            dataFetchedAt: new Date().toISOString(),
-            flags: [],
-            searchSources
+        // Extract compliance result
+        const complianceData = data?.compliance || {
+            status: "WARN",
+            riskScore: 50,
+            summary: "Compliance data unavailable from combined analysis.",
+            regulations: [],
+            searchQueries: []
         };
 
-        return { factCheckResult: enrichedResult };
-    } catch (e) {
-        log.error("Fact Checker failed", e);
-        // Return explicit error status so risk scorer can distinguish failure from low score
-        return { factCheckResult: { status: 'error', score: 0, flags: ["Error: Fact Check Unavailable"] } };
-    }
-}
+        log.info(`Verification complete. Fact score: ${enrichedFactCheck.score}, Compliance: ${complianceData.status}`);
 
-export async function complianceMapperNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
-    try {
-        log.info("Running Compliance Check with Google Search Grounding...");
-
-        // Add timeout wrapper and retry logic
-        const result = await withRetry(
-            () => withTimeout(
-                getGroundedModel().generateContent([
-                    COMPLIANCE_CHECKER_PROMPT,
-                    `Document Content:\n${content}`
-                ]),
-                60000 // 60 second timeout for compliance
-            ),
-            2, // 2 retries
-            1000, // 1 second base delay
-            5000 // 5 second max delay
-        );
-
-        const text = result.response.text();
-        const data = parseJSON(text);
-
-        return { compliance: data };
-    } catch (e) {
-        log.error("Compliance Node failed", e);
         return {
+            factCheckResult: enrichedFactCheck,
+            compliance: complianceData
+        };
+    } catch (e) {
+        log.error("Verification Node failed:", e instanceof Error ? e.message : String(e));
+        return {
+            factCheckResult: { status: 'error', score: 0, flags: ["Error: Verification Unavailable"] },
             compliance: {
                 status: "WARN",
                 riskScore: 50,
@@ -591,6 +574,123 @@ export async function complianceMapperNode(state: AuditState): Promise<Partial<A
         };
     }
 }
+
+// ============================================================
+// DEEP ANALYSIS SUPER-NODE (linguistic + strategic + cognitiveDiversity)
+// ============================================================
+
+export async function deepAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
+    const content = truncateText(state.structuredContent || state.originalContent);
+
+    try {
+        log.info("Running deep multi-dimensional analysis (sentiment, logic, SWOT, cognitive diversity)...");
+
+        const { DEEP_ANALYSIS_SUPER_PROMPT } = await import('./prompts');
+
+        const result = await withRetry(
+            () => withTimeout(
+                getGroundedModel().generateContent([
+                    DEEP_ANALYSIS_SUPER_PROMPT,
+                    `Text to analyze:\n<input_text>\n${content}\n</input_text>`
+                ]),
+                90000 // 90 second timeout
+            ),
+            2,
+            1000,
+            10000
+        );
+
+        const responseText = result.response?.text ? result.response.text() : "";
+        const data = parseJSON(responseText);
+
+        // Extract search sources for counter-arguments
+        const searchSources = extractSearchSources(result.response);
+
+        // Enrich counter-arguments with search sources
+        const cognitiveData = data?.cognitiveAnalysis;
+        if (cognitiveData?.counterArguments) {
+            cognitiveData.counterArguments = cognitiveData.counterArguments.map(
+                (arg: { sourceUrl?: string }, index: number) => ({
+                    ...arg,
+                    sourceUrl: arg.sourceUrl || (searchSources.length > 0 ? searchSources[index % searchSources.length] : undefined)
+                })
+            );
+        }
+
+        log.info(`Deep analysis complete. Sentiment: ${data?.sentiment?.label || 'N/A'}, Logic score: ${data?.logicalAnalysis?.score ?? 'N/A'}, BlindSpotGap: ${cognitiveData?.blindSpotGap ?? 'N/A'}`);
+
+        return {
+            sentimentAnalysis: data?.sentiment || { score: 0, label: 'Neutral' },
+            logicalAnalysis: data?.logicalAnalysis || { score: 100, fallacies: [] },
+            swotAnalysis: data?.swot,
+            preMortem: data?.preMortem,
+            cognitiveAnalysis: cognitiveData
+        };
+    } catch (e) {
+        log.error("Deep Analysis Node failed:", e instanceof Error ? e.message : String(e));
+        return {
+            sentimentAnalysis: { score: 0, label: 'Neutral' },
+            logicalAnalysis: { score: 100, fallacies: [] },
+            swotAnalysis: undefined,
+            preMortem: undefined,
+            cognitiveAnalysis: undefined
+        };
+    }
+}
+
+// ============================================================
+// SIMULATION SUPER-NODE (decisionTwin + memoryRecall)
+// ============================================================
+
+export async function simulationNode(state: AuditState): Promise<Partial<AuditState>> {
+    const content = truncateText(state.structuredContent || state.originalContent);
+
+    try {
+        log.info("Running boardroom simulation with institutional memory...");
+
+        // Step 1: RAG vector search for similar past documents
+        const userId = state.userId || 'system';
+        let similarDocs: unknown[] = [];
+        try {
+            similarDocs = await searchSimilarDocuments(content, userId, 3);
+            log.info(`Found ${similarDocs.length} similar past cases for context.`);
+        } catch (ragError) {
+            log.warn("RAG search failed, proceeding without institutional memory:", ragError instanceof Error ? ragError.message : String(ragError));
+        }
+
+        // Step 2: Combined simulation + memory prompt
+        const { SIMULATION_SUPER_PROMPT } = await import('./prompts');
+
+        const result = await withTimeout(
+            getStandardSafetyGroundedModel().generateContent([
+                SIMULATION_SUPER_PROMPT,
+                `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
+                `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}`
+            ]),
+            90000
+        );
+
+        const text = result.response?.text ? result.response.text() : "";
+        const data = parseJSON(text);
+
+        log.info(`Simulation complete. Verdict: ${data?.simulation?.overallVerdict || 'N/A'}, Memory recall: ${data?.institutionalMemory?.recallScore ?? 'N/A'}`);
+
+        return {
+            simulation: data?.simulation,
+            institutionalMemory: data?.institutionalMemory
+        };
+    } catch (e) {
+        log.error("Simulation Node failed:", e instanceof Error ? e.message : String(e));
+        return {
+            simulation: undefined,
+            institutionalMemory: undefined
+        };
+    }
+}
+
+// ============================================================
+// RISK SCORER (unchanged — aggregates all state into final report)
+// ============================================================
 
 export async function riskScorerNode(state: AuditState): Promise<Partial<AuditState>> {
     // SECURITY: If GDPR anonymization failed, short-circuit with error report
@@ -687,145 +787,3 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     };
 }
 
-export async function linguisticAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
-    try {
-        // Add timeout wrapper and retry logic
-        const result = await withRetry(
-            () => withTimeout(
-                getModel().generateContent([
-                    LINGUISTIC_ANALYSIS_PROMPT,
-                    `Text:\n${content}`
-                ]),
-                45000 // 45 second timeout for linguistic analysis
-            ),
-            2, // 2 retries
-            1000, // 1 second base delay
-            5000 // 5 second max delay
-        );
-
-        const data = parseJSON(result.response.text());
-        return {
-            sentimentAnalysis: data?.sentiment || { score: 0, label: 'Neutral' },
-            logicalAnalysis: data?.logicalAnalysis || { score: 100, fallacies: [] }
-        };
-    } catch (e) {
-        log.error("Linguistic Analysis Node failed", e);
-        return {
-            sentimentAnalysis: { score: 0, label: 'Neutral' },
-            logicalAnalysis: { score: 100, fallacies: [] }
-        };
-    }
-}
-
-export async function strategicAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
-    try {
-        const result = await withTimeout(getGroundedModel().generateContent([
-            STRATEGIC_ANALYSIS_PROMPT,
-            `Text:\n${content}`
-        ]));
-        const data = parseJSON(result.response.text());
-        return {
-            swotAnalysis: data?.swot,
-            preMortem: data?.preMortem
-        };
-    } catch (e) {
-        log.error("Strategic Analysis Node failed", e);
-        return {
-            swotAnalysis: undefined,
-            preMortem: undefined
-        };
-    }
-}
-
-export async function cognitiveDiversityNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
-
-    try {
-        log.info("Searching for counter-arguments...");
-        const result = await withTimeout(getGroundedModel().generateContent([
-            COGNITIVE_DIVERSITY_PROMPT,
-            `Text to Analysis:\n${content}`
-        ]));
-
-        const text = result.response.text();
-        const data = parseJSON(text);
-
-        // Extract Search Sources from Grounding Metadata
-        const searchSources = extractSearchSources(result.response);
-
-        log.info(`Found ${searchSources.length} external perspectives.`);
-
-        // Inject search sources into counter-arguments if missing
-        if (data && data.counterArguments) {
-            data.counterArguments = data.counterArguments.map((arg: { sourceUrl?: string }, index: number) => ({
-                ...arg,
-                sourceUrl: arg.sourceUrl || searchSources[index % searchSources.length]
-            }));
-        }
-
-        return { cognitiveAnalysis: data };
-    } catch (e) {
-        log.error("Cognitive Diversity Node failed", e);
-        return { cognitiveAnalysis: undefined };
-    }
-}
-
-export async function decisionTwinNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
-
-    try {
-        const { DECISION_TWIN_PROMPT } = await import('./prompts');
-
-        log.info("Running Decision Twin Simulation with Live Market Data...");
-
-        // Use standard safety model — simulation is creative, not analytical
-        const result = await withTimeout(getStandardSafetyGroundedModel().generateContent([
-            DECISION_TWIN_PROMPT,
-            `Proposal to Vote On:\n${content}`,
-            `CRITICAL INSTRUCTION:
-            You have access to Google Search.
-            BEFORE voting, the "Adversarial CFO" and "Market Skeptic" MUST search for:
-            1. Current market volatility (VIX, Bond Yields).
-            2. Recent competitor announcements.
-            3. Macroeconomic risks relevant to this proposal.
-
-            Cite these specific data points in their "rationale".`
-        ]));
-
-        const text = result.response.text();
-        const data = parseJSON(text);
-
-        return { simulation: data };
-    } catch (e) {
-        log.error("Decision Twin Node failed", e);
-        return { simulation: undefined };
-    }
-}
-
-export async function memoryRecallNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
-
-    try {
-        // 1. Vector Search for Similar Docs
-        // Use the userId from state to ensure proper user isolation in RAG search
-        const userId = state.userId || 'system';
-        const similarDocs = await searchSimilarDocuments(content, userId, 3);
-
-        // 2. LLM Analysis
-        const result = await withTimeout(getModel().generateContent([
-            INSTITUTIONAL_MEMORY_PROMPT,
-            `Current Document Summary:\n${content.slice(0, 2000)}`,
-            `Similar Past Cases Found:\n${sanitizeForPrompt(similarDocs, 'past_cases')}`
-        ]));
-
-        const text = result.response.text();
-        const data = parseJSON(text);
-
-        return { institutionalMemory: data };
-    } catch (e) {
-        log.error("Memory Recall Node failed", e);
-        return { institutionalMemory: undefined };
-    }
-}

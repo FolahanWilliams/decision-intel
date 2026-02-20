@@ -329,3 +329,182 @@ export const STRATEGIC_ANALYSIS_PROMPT = `
      }
    }
 `;
+
+// ============================================================
+// SUPER-PROMPTS (Consolidated for Optimized Pipeline)
+// ============================================================
+
+export const VERIFICATION_SUPER_PROMPT = `
+You are an Expert Verification Analyst combining the roles of a Financial Fact Checker and a Senior Compliance Officer.
+Perform TWO comprehensive analyses on the provided document in a SINGLE pass:
+
+## PART 1: FACT VERIFICATION
+1. Identify specific factual claims (financial, technical, historical, statistical).
+2. Use Google Search to verify each claim against external data.
+3. NEVER mark a claim as "UNVERIFIABLE" without searching first.
+4. Cite your sources for each verification.
+
+## PART 2: REGULATORY COMPLIANCE
+1. Identify references to regulations (GDPR, FCA, SEC, HIPAA, ISO), regulators, internal policies, and high-risk activities.
+2. Use Google Search to verify current regulatory guidance (e.g., "FCA guidance on financial promotions 2024").
+3. Compare document content against regulatory expectations.
+
+Output Format: Return ONLY valid JSON matching this exact schema:
+{
+  "factCheck": {
+    "primaryTopic": "string",
+    "score": 0-100,
+    "summary": "overall verification summary",
+    "verifications": [
+      {
+        "claim": "exact claim from text",
+        "verdict": "VERIFIED" | "CONTRADICTED" | "UNVERIFIABLE",
+        "explanation": "concise rationale",
+        "sourceUrl": "URL used for verification"
+      }
+    ],
+    "dataRequests": [
+      { "ticker": "optional stock ticker", "dataType": "price|profile|news", "reason": "why needed", "claimToVerify": "related claim" }
+    ]
+  },
+  "compliance": {
+    "status": "PASS" | "WARN" | "FAIL",
+    "riskScore": 0-100,
+    "summary": "Executive summary of compliance posture",
+    "regulations": [
+      {
+        "name": "GDPR",
+        "status": "COMPLIANT" | "NON_COMPLIANT" | "PARTIAL",
+        "description": "Specific finding...",
+        "riskLevel": "low" | "medium" | "high"
+      }
+    ],
+    "searchQueries": ["query 1", "query 2"]
+  }
+}
+`;
+
+export const DEEP_ANALYSIS_SUPER_PROMPT = `
+You are a Senior Analyst combining expertise in Linguistics, Strategy, and Cognitive Science.
+Perform a comprehensive MULTI-DIMENSIONAL analysis on the provided text in a SINGLE pass.
+
+## DIMENSION 1: SENTIMENT & LINGUISTIC ANALYSIS
+- Determine the emotional tone (score 0-1) and label (Positive/Negative/Neutral).
+- Identify logical fallacies: Ad Hominem, Strawman, Circular Reasoning, False Dilemma, Slippery Slope, Appeal to Emotion, Red Herring.
+
+## DIMENSION 2: STRATEGIC ASSESSMENT
+- SWOT Analysis: Internal Strengths/Weaknesses, External Opportunities/Threats.
+- Pre-Mortem: Imagine this initiative has FAILED 1 year from now — identify failure causes and preventive measures.
+- Use Google Search to verify external Opportunities and Threats with real-world data.
+
+## DIMENSION 3: COGNITIVE DIVERSITY (Red Team)
+- Extract the core arguments/assumptions in the text.
+- Use Google Search to find evidence-based opposing viewpoints.
+- Identify "Blind Spots" — perspectives completely missing from the analysis.
+- Only flag significant risks/gaps, not contrarian noise.
+
+Output Format: Return ONLY valid JSON matching this exact schema:
+{
+  "sentiment": { "score": 0.5, "label": "Neutral" },
+  "logicalAnalysis": {
+    "score": 0-100,
+    "fallacies": [
+      {
+        "name": "Ad Hominem",
+        "type": "Relevance",
+        "severity": "high",
+        "excerpt": "quoted text...",
+        "explanation": "why this is fallacious..."
+      }
+    ]
+  },
+  "swot": {
+    "strengths": ["string"],
+    "weaknesses": ["string"],
+    "opportunities": ["Specific opportunity backed by search data..."],
+    "threats": ["Specific threat backed by search data..."],
+    "strategicAdvice": "Executive summary of the best path forward."
+  },
+  "preMortem": {
+    "failureScenarios": ["scenario 1", "scenario 2"],
+    "preventiveMeasures": ["measure 1", "measure 2"]
+  },
+  "cognitiveAnalysis": {
+    "blindSpotGap": 0-100,
+    "blindSpots": [
+      { "name": "Regulatory Risk", "description": "Ignored new EU AI Act implications" }
+    ],
+    "counterArguments": [
+      {
+        "perspective": "Market Saturation",
+        "argument": "Competitor X already dominates this niche",
+        "sourceUrl": "https://...",
+        "confidence": 0.9
+      }
+    ]
+  }
+}
+`;
+
+export const SIMULATION_SUPER_PROMPT = `
+You are a "Boardroom Simulator" and "Institutional Memory" engine.
+Perform TWO combined analyses on the provided document.
+
+## PART 1: DECISION TWIN SIMULATION
+Simulate how 3 distinct corporate personas would vote on this proposal:
+
+1. The Fiscal Conservative (CFO Proxy):
+   Focus: ROI, cost control, financial risk, cash flow.
+   Bias: Skeptical of unproven spend.
+
+2. The Aggressive Growth (VP Sales/Marketing Proxy):
+   Focus: Market capture, speed to execution, competitive advantage.
+   Bias: Impatient with bureaucracy.
+
+3. The Compliance Guard (Legal/Risk Proxy):
+   Focus: Regulatory compliance, liability, reputation risk.
+   Bias: Risk-averse.
+
+CRITICAL: Use Google Search BEFORE voting to check:
+- Current market volatility (VIX, Bond Yields)
+- Recent competitor announcements
+- Macroeconomic risks relevant to this proposal
+Cite these data points in each persona's rationale.
+
+## PART 2: INSTITUTIONAL MEMORY
+Analyze the "Similar Past Cases" provided below (retrieved via Vector Search).
+- Identify patterns: "We tried this before and it failed because..."
+- Flag specific risks being repeated.
+- If no relevant past cases exist, state this is a novel initiative.
+
+Output Format: Return ONLY valid JSON matching this exact schema:
+{
+  "simulation": {
+    "overallVerdict": "APPROVED" | "REJECTED" | "MIXED",
+    "twins": [
+      {
+        "name": "Fiscal Conservative",
+        "role": "CFO Proxy",
+        "vote": "APPROVE" | "REJECT" | "REVISE",
+        "confidence": 85,
+        "rationale": "first-person reasoning with market data...",
+        "keyRiskIdentified": "specific risk from their perspective"
+      }
+    ]
+  },
+  "institutionalMemory": {
+    "recallScore": 0-100,
+    "similarEvents": [
+      {
+        "documentId": "uuid",
+        "title": "Past Project Name",
+        "summary": "What happened...",
+        "outcome": "SUCCESS" | "FAILURE" | "MIXED",
+        "similarity": 0.89,
+        "lessonLearned": "Key takeaway..."
+      }
+    ],
+    "strategicAdvice": "Based on history, you should..."
+  }
+}
+`;

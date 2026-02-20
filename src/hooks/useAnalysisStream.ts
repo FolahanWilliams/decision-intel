@@ -16,6 +16,7 @@ const STREAM_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 export interface AnalysisStep {
     name: string;
+    description?: string;
     status: 'pending' | 'running' | 'complete';
     icon?: React.ReactNode;
 }
@@ -106,14 +107,31 @@ export function useAnalysisStream(options: StreamOptions) {
                         case 'step': {
                             const stepName = update.step as string;
                             const stepStatus = update.status as 'running' | 'complete';
+                            const stepDesc = update.description as string | undefined;
                             setProgress(Math.max(0, Number(update.progress) || 0));
 
-                            setSteps(prev => prev.map(s => ({
-                                ...s,
-                                status: s.name === stepName
-                                    ? stepStatus
-                                    : s.status === 'complete' ? 'complete' : s.status
-                            })));
+                            setSteps(prev => {
+                                // Find if step already exists
+                                const existingIndex = prev.findIndex(s => s.name === stepName);
+
+                                if (existingIndex >= 0) {
+                                    // Update existing step
+                                    const next = [...prev];
+                                    next[existingIndex] = {
+                                        ...next[existingIndex],
+                                        status: stepStatus,
+                                        ...(stepDesc && { description: stepDesc })
+                                    };
+                                    return next;
+                                }
+
+                                // Add new step dynamically
+                                return [...prev, {
+                                    name: stepName,
+                                    description: stepDesc,
+                                    status: stepStatus
+                                }];
+                            });
                             break;
                         }
 

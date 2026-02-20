@@ -5,7 +5,7 @@ vi.hoisted(() => {
     process.env.GOOGLE_API_KEY = 'test-key';
 });
 
-import { factCheckerNode } from './nodes';
+import { verificationNode } from './nodes';
 import { AuditState } from './types';
 
 // Hoist mocks for GoogleGenerativeAI
@@ -61,11 +61,15 @@ describe('factCheckerNode Performance', () => {
         mockGenerateContent.mockResolvedValueOnce({
             response: {
                 text: () => JSON.stringify({
-                    dataRequests: [
-                        { ticker: "AAPL", dataType: "financials", reason: "test", claimToVerify: "A" },
-                        { ticker: "AAPL", dataType: "financials", reason: "test", claimToVerify: "A" },
-                        { ticker: "MSFT", dataType: "financials", reason: "test", claimToVerify: "M" }
-                    ]
+                    factCheck: {
+                        dataRequests: [
+                            { ticker: "AAPL", dataType: "financials", reason: "test", claimToVerify: "A" },
+                            { ticker: "AAPL", dataType: "financials", reason: "test", claimToVerify: "A" },
+                            { ticker: "AAPL", dataType: "financials", reason: "test", claimToVerify: "A" },
+                            { ticker: "MSFT", dataType: "financials", reason: "test", claimToVerify: "M" }
+                        ],
+                        verifications: [{ claim: 'A', verdict: 'UNVERIFIABLE', explanation: 'Needs data' }]
+                    }
                 })
             }
         });
@@ -73,7 +77,7 @@ describe('factCheckerNode Performance', () => {
         // 2. Mock Fact Check Result (Final step)
         mockGenerateContent.mockResolvedValueOnce({
             response: {
-                text: () => JSON.stringify({ score: 100, flags: [] })
+                text: () => JSON.stringify({ factCheck: { score: 100, flags: [], verifications: [{ claim: 'A', verdict: "VERIFIED" }] } })
             }
         });
 
@@ -89,7 +93,7 @@ describe('factCheckerNode Performance', () => {
             speakers: []
         };
 
-        await factCheckerNode(state);
+        await verificationNode(state);
 
         // Expect 2 calls because duplicate "AAPL" is deduplicated
         expect(mockGetFinancialContext).toHaveBeenCalledTimes(2);

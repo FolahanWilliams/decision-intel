@@ -14,6 +14,7 @@ const log = createLogger('Analyzer');
 export interface ProgressUpdate {
     type: 'step' | 'bias' | 'noise' | 'summary' | 'complete' | 'error';
     step?: string;
+    description?: string;
     status?: 'running' | 'complete' | 'error';
     biasType?: string;
     result?: unknown;
@@ -107,7 +108,7 @@ export async function analyzeDocument(
     // Check cache first
     const cacheKey = generateAnalysisCacheKey(document.content, document.userId);
     const cached = await getCachedAnalysis(cacheKey);
-    
+
     if (cached) {
         log.info('Cache hit for analysis: ' + cacheKey.substring(0, 16));
         if (onProgress) {

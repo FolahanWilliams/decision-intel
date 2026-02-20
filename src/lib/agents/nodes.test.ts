@@ -4,7 +4,7 @@ vi.hoisted(() => {
     process.env.GOOGLE_API_KEY = 'test-key';
 });
 
-import { riskScorerNode, linguisticAnalysisNode } from './nodes';
+import { riskScorerNode, deepAnalysisNode } from './nodes';
 import { AuditState } from './types';
 
 // Hoist mocks
@@ -93,7 +93,7 @@ describe('riskScorerNode', () => {
     });
 });
 
-describe('linguisticAnalysisNode', () => {
+describe('deepAnalysisNode', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -103,7 +103,8 @@ describe('linguisticAnalysisNode', () => {
             response: {
                 text: () => JSON.stringify({
                     sentiment: { score: 0.8, label: 'Positive' },
-                    logicalAnalysis: { score: 100, fallacies: [] }
+                    logicalAnalysis: { score: 100, fallacies: [] },
+                    cognitiveAnalysis: { blindSpotGap: 30, counterArguments: [] }
                 })
             }
         });
@@ -118,7 +119,7 @@ describe('linguisticAnalysisNode', () => {
             speakers: []
         };
 
-        const result = await linguisticAnalysisNode(state);
+        const result = await deepAnalysisNode(state);
         expect(result.sentimentAnalysis).toEqual({ score: 0.8, label: 'Positive' });
         expect(result.logicalAnalysis).toEqual({ score: 100, fallacies: [] });
     });
@@ -136,7 +137,7 @@ describe('linguisticAnalysisNode', () => {
             speakers: []
         };
 
-        const result = await linguisticAnalysisNode(state);
+        const result = await deepAnalysisNode(state);
         expect(result.sentimentAnalysis).toEqual({ score: 0, label: 'Neutral' });
         expect(result.logicalAnalysis).toEqual({ score: 100, fallacies: [] });
     });

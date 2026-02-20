@@ -66,39 +66,35 @@ const MemorySchema = z.object({
     similarEvents: z.array(z.record(z.string(), z.unknown())).default([])
 }).optional();
 
-// Map agent node names to human-readable labels
-const NODE_LABELS: Record<string, string> = {
-    'gdprAnonymizer': 'Privacy Protection',
-    'structurer': 'Document Parsing',
-    'biasDetective': 'Bias Detection',
-    'noiseJudge': 'Noise Analysis',
-    'factChecker': 'Financial Fact Check',
-    'strategicAnalysis': 'Strategic Analysis',
-    'complianceMapper': 'Compliance Check',
-    'linguisticAnalysis': 'Linguistic Analysis',
-    'cognitiveDiversity': 'Cognitive Diversity (Red Team)',
-    'decisionTwin': 'Decision Simulation',
-    'memoryRecall': 'Institutional Memory',
-    'riskScorer': 'Final Risk Scoring'
+// Map agent node names to human-readable labels with dynamic descriptions
+const NODE_LABELS: Record<string, { label: string; description: string }> = {
+    'gdprAnonymizer': { label: 'Privacy Shield', description: 'Scanning for personal data and applying GDPR redactions…' },
+    'structurer': { label: 'Document Intelligence', description: 'Parsing structure, identifying speakers and key sections…' },
+    'biasDetective': { label: 'Bias Detection', description: 'Analyzing for 15 cognitive biases with research verification…' },
+    'noiseJudge': { label: 'Noise Analysis', description: 'Running 3 independent judges to measure decision consistency…' },
+    'verificationNode': { label: 'Fact & Compliance Check', description: 'Verifying claims via Google Search and checking regulatory compliance…' },
+    'deepAnalysisNode': { label: 'Deep Analysis', description: 'Performing sentiment, logic, SWOT, and cognitive diversity analysis…' },
+    'simulationNode': { label: 'Boardroom Simulation', description: 'Running decision twin simulation with institutional memory…' },
+    'riskScorer': { label: 'Risk Scoring', description: 'Calculating final decision quality score…' },
 };
 
 export async function POST(request: NextRequest) {
     try {
         // Check rate limit first
-        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-                   request.headers.get('x-real-ip') || 
-                   "anonymous";
-        
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+            request.headers.get('x-real-ip') ||
+            "anonymous";
+
         const rateLimitResult = await checkRateLimit(ip, '/api/analyze/stream');
-        
+
         if (!rateLimitResult.success) {
             return NextResponse.json(
-                { 
+                {
                     error: "Rate limit exceeded. You can analyze up to 5 documents per hour.",
                     limit: rateLimitResult.limit,
                     reset: rateLimitResult.reset,
                     remaining: 0
-                }, 
+                },
                 { status: 429 }
             );
         }
@@ -154,10 +150,11 @@ export async function POST(request: NextRequest) {
                     for await (const event of eventStream) {
                         // Track node start events
                         if (event.event === 'on_chain_start' && event.name && NODE_LABELS[event.name]) {
-                            const label = NODE_LABELS[event.name];
+                            const { label, description } = NODE_LABELS[event.name];
                             sendUpdate({
                                 type: 'step',
                                 step: label,
+                                description,
                                 status: 'running',
                                 progress: Math.round((completedNodes.size / totalNodes) * 80) + 10
                             });
@@ -169,9 +166,9 @@ export async function POST(request: NextRequest) {
                                 result = event.data.output;
                             } else if (event.name && NODE_LABELS[event.name]) {
                                 completedNodes.add(event.name);
-                                const label = NODE_LABELS[event.name];
+                                const { label, description } = NODE_LABELS[event.name];
                                 const progress = Math.round((completedNodes.size / totalNodes) * 80) + 10;
-                                sendUpdate({ type: 'step', step: label, status: 'complete', progress });
+                                sendUpdate({ type: 'step', step: label, description, status: 'complete', progress });
 
                                 // Send bias detection updates
                                 if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {

@@ -1,5 +1,5 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
-import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, factCheckerNode, complianceMapperNode, cognitiveDiversityNode, decisionTwinNode, memoryRecallNode, linguisticAnalysisNode, strategicAnalysisNode } from "./nodes";
+import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, verificationNode, deepAnalysisNode, simulationNode } from "./nodes";
 import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
 
 // Define the State using Annotation.Root
@@ -91,19 +91,17 @@ function routeAfterAnonymization(state: typeof GraphState.State): string {
     return 'structurer';
 }
 
-// Graph Definition
+// Graph Definition — Optimized Super-Node Architecture
+// Before: 9 parallel nodes after structurer
+// After:  5 parallel super-nodes after structurer (~40% fewer LLM calls)
 const workflow = new StateGraph(GraphState)
     .addNode("gdprAnonymizer", gdprAnonymizerNode)
     .addNode("structurer", structurerNode)
     .addNode("biasDetective", biasDetectiveNode)
     .addNode("noiseJudge", noiseJudgeNode)
-    .addNode("factChecker", factCheckerNode)
-    .addNode("complianceMapper", complianceMapperNode)
-    .addNode("cognitiveDiversity", cognitiveDiversityNode)
-    .addNode("decisionTwin", decisionTwinNode)
-    .addNode("memoryRecall", memoryRecallNode)
-    .addNode("linguisticAnalysis", linguisticAnalysisNode)
-    .addNode("strategicAnalysis", strategicAnalysisNode)
+    .addNode("verificationNode", verificationNode)        // factChecker + complianceMapper
+    .addNode("deepAnalysisNode", deepAnalysisNode)        // linguistic + strategic + cognitiveDiversity
+    .addNode("simulationNode", simulationNode)            // decisionTwin + memoryRecall
     .addNode("riskScorer", riskScorerNode)
 
     .setEntryPoint("gdprAnonymizer")
@@ -115,27 +113,21 @@ const workflow = new StateGraph(GraphState)
         riskScorer: "riskScorer",
     })
 
+    // Fan-out: structurer → 5 parallel super-nodes
     .addEdge("structurer", "biasDetective")
     .addEdge("structurer", "noiseJudge")
-    .addEdge("structurer", "factChecker")
-    .addEdge("structurer", "complianceMapper")
-    .addEdge("structurer", "cognitiveDiversity")
-    .addEdge("structurer", "decisionTwin")
-    .addEdge("structurer", "memoryRecall")
-    .addEdge("structurer", "linguisticAnalysis")
-    .addEdge("structurer", "strategicAnalysis")
+    .addEdge("structurer", "verificationNode")
+    .addEdge("structurer", "deepAnalysisNode")
+    .addEdge("structurer", "simulationNode")
 
+    // Fan-in: 5 super-nodes → riskScorer
     .addEdge("biasDetective", "riskScorer")
     .addEdge("noiseJudge", "riskScorer")
-    .addEdge("factChecker", "riskScorer")
-    .addEdge("complianceMapper", "riskScorer")
-    .addEdge("cognitiveDiversity", "riskScorer")
-    .addEdge("decisionTwin", "riskScorer")
-    .addEdge("memoryRecall", "riskScorer")
-    .addEdge("linguisticAnalysis", "riskScorer")
-    .addEdge("strategicAnalysis", "riskScorer")
-
+    .addEdge("verificationNode", "riskScorer")
+    .addEdge("deepAnalysisNode", "riskScorer")
+    .addEdge("simulationNode", "riskScorer")
 
     .addEdge("riskScorer", END);
 
 export const auditGraph = workflow.compile();
+

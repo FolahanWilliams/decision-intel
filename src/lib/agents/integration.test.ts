@@ -4,7 +4,7 @@ vi.hoisted(() => {
     process.env.GOOGLE_API_KEY = 'test-key';
 });
 
-import { factCheckerNode, structurerNode } from './nodes';
+import { verificationNode, structurerNode } from './nodes';
 import { AuditState } from './types';
 import * as financialTools from '../tools/financial';
 
@@ -57,16 +57,18 @@ describe('Integration Tests', () => {
         vi.clearAllMocks();
     });
 
-    describe('factCheckerNode', () => {
+    describe('verificationNode', () => {
         it('should extract tickers, fetch context, and verify claims', async () => {
             // Mock Step 1: Extract Tickers
             mockGenerateContent.mockResolvedValueOnce({
                 response: {
                     text: () => JSON.stringify({
-                        primaryTicker: 'AAPL',
-                        companyName: 'Apple',
-                        claims: ['Apple is doing well.'],
-                        dataRequests: [{ ticker: 'AAPL', dataType: 'financials', reason: 'Verify performance', claimToVerify: 'Apple is doing well.' }]
+                        factCheck: {
+                            primaryTopic: 'Apple',
+                            claims: ['Apple is doing well.'],
+                            dataRequests: [{ ticker: 'AAPL', dataType: 'financials', reason: 'Verify performance', claimToVerify: 'Apple is doing well.' }],
+                            verifications: [{ claim: 'Apple is doing well.', verdict: 'UNVERIFIABLE', explanation: 'Needs data' }]
+                        }
                     })
                 }
             });
@@ -76,7 +78,7 @@ describe('Integration Tests', () => {
 
             // Mock Step 3: Verify Claims
             mockGenerateContent.mockResolvedValueOnce({
-                response: { text: () => JSON.stringify({ score: 95, flags: [] }) }
+                response: { text: () => JSON.stringify({ score: 95, verifications: [] }) }
             });
 
             const state: AuditState = {
@@ -85,7 +87,7 @@ describe('Integration Tests', () => {
                 originalContent: 'Apple is doing well.',
             };
 
-            const result = await factCheckerNode(state);
+            const result = await verificationNode(state);
 
             // Check calls
             expect(mockGenerateContent).toHaveBeenCalledTimes(2);
@@ -105,14 +107,9 @@ describe('Integration Tests', () => {
         });
 
         it('should handle no tickers found', async () => {
-            // Mock Step 1: No tickers
+            // Mock Step 1: No tickers, provides final verification directly
             mockGenerateContent.mockResolvedValueOnce({
-                response: { text: () => JSON.stringify({ tickers: [] }) }
-            });
-
-            // Mock Step 3: Verify Claims (skips Step 2)
-            mockGenerateContent.mockResolvedValueOnce({
-                response: { text: () => JSON.stringify({ score: 100, flags: [] }) }
+                response: { text: () => JSON.stringify({ factCheck: { score: 100, flags: [], dataRequests: [] } }) }
             });
 
             const state: AuditState = {
@@ -121,7 +118,7 @@ describe('Integration Tests', () => {
                 originalContent: 'No stocks here.',
             };
 
-            const result = await factCheckerNode(state);
+            const result = await verificationNode(state);
 
             expect(financialTools.getFinancialContext).not.toHaveBeenCalled();
             expect(result.factCheckResult).toMatchObject({ score: 100, flags: [] });
