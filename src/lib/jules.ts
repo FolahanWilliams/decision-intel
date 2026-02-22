@@ -1,7 +1,13 @@
 // Jules API Client
 
 const JULES_API_BASE = 'https://jules.googleapis.com/v1alpha';
-const JULES_API_KEY = process.env.JULES_API_KEY || '';
+function getJulesApiKey(): string {
+    const key = process.env.JULES_API_KEY;
+    if (!key) {
+        throw new Error('Missing required environment variable: JULES_API_KEY');
+    }
+    return key;
+}
 
 /**
  * Jules API Client
@@ -13,7 +19,7 @@ export const jules = {
      */
     async listSources() {
         return fetch(`${JULES_API_BASE}/sources`, {
-            headers: { 'x-goog-api-key': JULES_API_KEY }
+            headers: { 'x-goog-api-key': getJulesApiKey() }
         }).then(r => r.json());
     },
 
@@ -32,7 +38,7 @@ export const jules = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-goog-api-key': JULES_API_KEY
+                'x-goog-api-key': getJulesApiKey()
             },
             body: JSON.stringify({
                 prompt,
@@ -51,7 +57,7 @@ export const jules = {
      */
     async listActivities(sessionId: string) {
         return fetch(`${JULES_API_BASE}/sessions/${sessionId}/activities?pageSize=30`, {
-            headers: { 'x-goog-api-key': JULES_API_KEY }
+            headers: { 'x-goog-api-key': getJulesApiKey() }
         }).then(r => r.json());
     },
 
@@ -63,7 +69,7 @@ export const jules = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-goog-api-key': JULES_API_KEY
+                'x-goog-api-key': getJulesApiKey()
             },
             body: JSON.stringify({ prompt: message })
         }).then(r => r.json());

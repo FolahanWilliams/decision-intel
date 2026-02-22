@@ -252,11 +252,12 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
                             5000
                         );
 
-                        const insightText = searchResult.response.text();
+                        const insightText = searchResult.response?.text ? searchResult.response.text() : "";
                         const insightData = parseJSON(insightText);
 
                         // Extract Source
-                        const searchSource = extractSearchSources(searchResult.response)[0];
+                        const searchSources = searchResult.response ? extractSearchSources(searchResult.response) : [];
+                        const searchSource = searchSources[0];
 
                         if (insightData) {
                             const researchInsight = {

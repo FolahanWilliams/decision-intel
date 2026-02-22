@@ -142,15 +142,19 @@ export async function POST(request: NextRequest) {
             log.error('Supabase Storage Upload Error:', uploadError);
             throw new Error(`Storage Upload Failed: ${uploadError.message}`);
         }
-        // Store in database with content hash for future caching
-        const document = await prisma.document.create({
-            data: {
+        // Store in database with content hash for future caching.
+        // Use upsert to handle race conditions where concurrent uploads
+        // of the same content could bypass the earlier findUnique check.
+        const document = await prisma.document.upsert({
+            where: { contentHash },
+            update: {},
+            create: {
                 userId,
                 filename: file.name,
                 fileType: file.type || 'text/plain',
                 fileSize: file.size,
                 content,
-                contentHash, // Save hash for semantic caching
+                contentHash,
                 status: 'pending'
             }
         });
