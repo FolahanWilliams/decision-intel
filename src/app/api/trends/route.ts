@@ -40,7 +40,8 @@ export async function GET(request: Request) {
                 break;
         }
 
-        // Fetch all analyses for user within date range
+        // Fetch analyses for user within date range (capped to prevent unbounded memory usage)
+        const MAX_ANALYSES = 500;
         const analyses = await prisma.analysis.findMany({
             where: {
                 document: { userId },
@@ -50,7 +51,8 @@ export async function GET(request: Request) {
                 biases: true,
                 document: { select: { filename: true, uploadedAt: true } }
             },
-            orderBy: { createdAt: 'asc' }
+            orderBy: { createdAt: 'asc' },
+            take: MAX_ANALYSES
         });
 
         // Group analyses by date for the chart

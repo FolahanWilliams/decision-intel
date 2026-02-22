@@ -98,7 +98,7 @@ export async function POST() {
                 log.error('Failed to parse Gemini response: ' + responseText.slice(0, 200));
                 return NextResponse.json(
                     { error: 'Market analysis returned an unparseable response. Please try again.' },
-                    { status: 502 }
+                    { status: 500 }
                 );
             }
         }

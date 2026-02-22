@@ -21,8 +21,11 @@ export function toPrismaJson<T>(value: T | null | undefined): Prisma.NullableJso
         const parsed = JSON.parse(serialized);
         return parsed as Prisma.InputJsonValue;
     } catch (error) {
-        console.error('Failed to serialize value to JSON:', error);
-        return Prisma.NullableJsonNullValueInput.DbNull;
+        // Throw instead of silently returning DbNull to prevent data loss.
+        // Callers should handle the error explicitly if they want fallback behavior.
+        throw new Error(
+            `Failed to serialize value to JSON: ${error instanceof Error ? error.message : String(error)}`
+        );
     }
 }
 

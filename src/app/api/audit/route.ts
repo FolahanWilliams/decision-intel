@@ -13,7 +13,12 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const body = (await req.json()) as AuditLogParams;
+        let body: AuditLogParams;
+        try {
+            body = (await req.json()) as AuditLogParams;
+        } catch {
+            return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
+        }
         await logAudit(body);
         return NextResponse.json({ success: true });
     } catch (error) {

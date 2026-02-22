@@ -21,7 +21,10 @@ const globalForPrisma = globalThis as unknown as {
 // DATABASE_URL contains an SSL mode, which preserves encryption while
 // accepting the provider's internal certificate authority.
 const prismaClientSingleton = () => {
-  const rawUrl = process.env.DATABASE_URL ?? '';
+  const rawUrl = process.env.DATABASE_URL;
+  if (!rawUrl) {
+    throw new Error('Missing required environment variable: DATABASE_URL');
+  }
 
   // pg ≥ 8.12 / pg-connection-string ≥ 2.8 changed SSL mode semantics so
   // that 'require', 'prefer', and 'verify-ca' are parsed as 'verify-full'.
