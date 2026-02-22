@@ -9,6 +9,7 @@ import {
     AlertCircle, Shield, BarChart3, Trash2
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface DocumentWithRisk {
     id: string;
@@ -160,6 +161,10 @@ export default function RiskAuditsPage() {
 
     return (
         <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Risk Audits' },
+            ]} />
             {/* Header */}
             <header className="mb-xl">
                 <div className="flex items-center gap-md mb-sm">

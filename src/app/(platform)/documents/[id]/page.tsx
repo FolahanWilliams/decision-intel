@@ -1,33 +1,34 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, useCallback, use, lazy, Suspense } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
-    ArrowLeft, FileText, AlertTriangle, CheckCircle, XCircle,
+    ArrowLeft, FileText, AlertTriangle, CheckCircle,
     Loader2, ChevronRight, Lightbulb, Download, Table,
-    Terminal, PlayCircle, Info, RefreshCw, HelpCircle, ExternalLink, Brain,
+    Terminal, PlayCircle, Info, RefreshCw, Brain,
     Users, Vote
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';
-import { SwotMatrix } from './SwotMatrix';
-import { FallacyList } from './FallacyList';
-import { RedTeamView } from './RedTeamView';
-import { NoiseJudge } from './NoiseJudge';
-import { BoardroomSimulator } from './BoardroomSimulator';
-import { BiasInstance } from '@prisma/client';
-import { ResearchInsight, SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, InstitutionalMemoryResult, ComplianceResult } from '@/types';
-import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
-import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
-import { BiasHeatmap } from '@/components/BiasHeatmap';
-import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
-import { RiskHeatMap } from '@/components/visualizations/RiskHeatMap';
-import { StakeholderMap } from '@/components/visualizations/StakeholderMap';
-import { QualityGauge } from '@/components/visualizations/QualityMetrics';
-import { DecisionTimeline } from '@/components/visualizations/DecisionTimeline';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { BiasDetailModal } from './BiasDetailModal';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
+import { BiasInstance } from '@prisma/client';
+import { SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, InstitutionalMemoryResult, ComplianceResult } from '@/types';
+import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
+import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
 
+// Lazy-loaded tab components
+const OverviewTab = lazy(() => import('./tabs/OverviewTab').then(m => ({ default: m.OverviewTab })));
+const LogicTab = lazy(() => import('./tabs/LogicTab').then(m => ({ default: m.LogicTab })));
+const SwotTab = lazy(() => import('./tabs/SwotTab').then(m => ({ default: m.SwotTab })));
+const NoiseTab = lazy(() => import('./tabs/NoiseTab').then(m => ({ default: m.NoiseTab })));
+const RedTeamTab = lazy(() => import('./tabs/RedTeamTab').then(m => ({ default: m.RedTeamTab })));
+const BoardroomTab = lazy(() => import('./tabs/BoardroomTab').then(m => ({ default: m.BoardroomTab })));
+const SimulatorTab = lazy(() => import('./tabs/SimulatorTab').then(m => ({ default: m.SimulatorTab })));
 
 interface VerificationSource {
     ticker?: string;
@@ -63,7 +64,6 @@ interface Analysis {
     summary: string;
     createdAt: string;
     biases: BiasInstance[];
-    // Extended fields
     noiseStats?: { mean: number; stdDev: number; variance: number };
     noiseBenchmarks?: NoiseBenchmark[];
     factCheck?: FactCheck;
@@ -80,6 +80,7 @@ interface Analysis {
             confidence: number;
             rationale: string;
             keyRiskIdentified?: string;
+            feedback?: string;
         }>;
     };
     institutionalMemory?: InstitutionalMemoryResult;
@@ -96,105 +97,42 @@ interface Document {
     analyses: Analysis[];
 }
 
-const SEVERITY_COLORS: Record<string, string> = {
-    low: 'var(--severity-low)',
-    medium: 'var(--severity-medium)',
-    high: 'var(--severity-high)',
-    critical: 'var(--severity-critical)'
-};
+type TabId = 'overview' | 'biases' | 'factcheck' | 'compliance' | 'cognitive' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team' | 'boardroom';
 
-// Helper function to get bias definitions for AI reasoning explanation
-function getBiasDefinition(biasType: string): string {
-    const definitions: Record<string, string> = {
-        'Confirmation Bias': 'A cognitive bias where individuals favor information that confirms their pre-existing beliefs while ignoring contradictory evidence. The AI detected linguistic patterns suggesting the author is selectively presenting evidence that supports a predetermined conclusion.',
-        'Anchoring Bias': 'The tendency to rely too heavily on the first piece of information encountered (the "anchor") when making decisions. The AI identified initial figures or statements that appear to disproportionately influence subsequent reasoning.',
-        'Sunk Cost Fallacy': 'The tendency to continue investing in something because of previously invested resources, rather than future value. The AI detected language justifying continued investment based on past spending rather than prospective returns.',
-        'Overconfidence Bias': 'Excessive confidence in one\'s own answers, beliefs, or abilities without adequate evidence. The AI identified absolute language, certainty claims, or dismissal of risks without supporting data.',
-        'Groupthink': 'A psychological phenomenon where the desire for harmony leads to irrational decision-making. The AI detected patterns of unanimous agreement, suppression of dissenting views, or pressure to conform.',
-        'Authority Bias': 'The tendency to attribute greater accuracy to opinions of an authority figure. The AI identified deference to titles, positions, or status over evidence and logical reasoning.',
-        'Bandwagon Effect': 'The tendency to follow trends or adopt beliefs because others do. The AI detected reasoning based on popularity or peer behavior rather than independent analysis.',
-        'Loss Aversion': 'The tendency to prefer avoiding losses over acquiring equivalent gains. The AI identified disproportionate focus on potential losses compared to potential gains.',
-        'Availability Heuristic': 'Overweighting easily recalled or recent events when making decisions. The AI detected references to memorable or recent events without proportional consideration of base rates.',
-        'Hindsight Bias': 'The tendency to believe, after an event occurs, that one would have predicted or expected it. The AI identified post-hoc rationalization or claims of foreknowledge about past outcomes.',
-        'Planning Fallacy': 'The tendency to underestimate time, costs, or complexity of future tasks. The AI detected optimistic projections without adequate consideration of potential obstacles.',
-        'Status Quo Bias': 'A preference for the current state of affairs and resistance to change. The AI identified language favoring existing conditions without objective comparison to alternatives.',
-        'Framing Effect': 'Drawing different conclusions from the same information depending on how it\'s presented. The AI detected selective presentation of information that may influence perception.',
-        'Selective Perception': 'Filtering information based on expectations or desires. The AI identified patterns of interpreting data in ways that align with predetermined expectations.',
-        'Recency Bias': 'Overweighting recent events over historical patterns. The AI detected disproportionate emphasis on recent data while ignoring longer-term trends.'
-    };
-    return definitions[biasType] || `${biasType} is a cognitive distortion that can lead to flawed decision-making. The AI detected patterns in the text that match this bias profile.`;
-}
-
-// Helper function to explain how the AI detected the bias
-function getDetectionMethodology(biasType: string, excerpt: string): string {
-    const methods: Record<string, string> = {
-        'Confirmation Bias': 'Analyzed text for one-sided evidence presentation, absence of counterarguments, and selective data citation patterns.',
-        'Anchoring Bias': 'Identified initial numeric values or statements that subsequent analysis appears tethered to, with insufficient adjustment.',
-        'Sunk Cost Fallacy': 'Scanned for references to past investments (time, money, effort) used to justify future decisions rather than forward-looking analysis.',
-        'Overconfidence Bias': 'Detected absolute language ("certainly", "definitely", "will"), dismissal of uncertainty, and lack of hedging or risk acknowledgment.',
-        'Groupthink': 'Identified consensus language without documented debate, unanimous approval patterns, and absence of dissenting viewpoints.',
-        'Authority Bias': 'Found citations of authority figures, titles, or credentials as primary justification rather than evidence-based reasoning.',
-        'Bandwagon Effect': 'Detected reasoning based on market trends, competitor actions, or "everyone is doing it" justifications.',
-        'Loss Aversion': 'Analyzed risk language asymmetry—identifying disproportionate focus on potential losses vs. equivalent gains.',
-        'Availability Heuristic': 'Identified references to recent, memorable, or emotionally salient events without base rate consideration.',
-        'Hindsight Bias': 'Detected post-event language claiming predictability ("we knew", "it was obvious", "as expected").',
-        'Planning Fallacy': 'Analyzed projections for optimistic bias, absence of contingency buffers, and historical accuracy of similar estimates.',
-        'Status Quo Bias': 'Identified resistance language, risk framing of change, and insufficient comparative analysis of alternatives.',
-        'Framing Effect': 'Detected selective presentation of statistics, emphasis patterns, and language that could influence perception.',
-        'Selective Perception': 'Analyzed interpretation patterns for consistency with stated expectations or desired outcomes.',
-        'Recency Bias': 'Compared temporal weighting of evidence—identifying overemphasis on recent vs. historical data.'
-    };
-    const wordCount = excerpt.split(' ').length;
-    return `${methods[biasType] || 'Applied psycholinguistic pattern matching to identify cognitive distortion markers.'} The flagged excerpt (${wordCount} words) triggered this detection with high confidence.`;
-}
-
-// Helper function to assess impact based on bias type and severity
-function getImpactAssessment(biasType: string, severity: string): string {
-    const severityImpacts: Record<string, string> = {
-        'low': 'Minor impact on decision quality. May slightly skew perception but unlikely to cause significant harm if addressed.',
-        'medium': 'Moderate impact on decision quality. Could lead to suboptimal outcomes if not corrected. Warrants attention in review process.',
-        'high': 'Significant impact on decision quality. High probability of leading to flawed conclusions. Requires immediate attention and correction.',
-        'critical': 'Severe impact on decision quality. This bias pattern could fundamentally undermine the validity of the analysis and lead to catastrophic outcomes.'
-    };
-
-    const biasRisks: Record<string, string> = {
-        'Confirmation Bias': 'May cause rejection of valid counterevidence and missed opportunities.',
-        'Overconfidence Bias': 'Can lead to inadequate risk preparation and unexpected failures.',
-        'Sunk Cost Fallacy': 'May perpetuate losing investments and delay necessary pivots.',
-        'Groupthink': 'Suppresses innovation and can lead to catastrophic blind spots.',
-        'Hindsight Bias': 'Prevents learning from experience and distorts future planning.',
-        'Planning Fallacy': 'Leads to budget overruns, missed deadlines, and resource misallocation.'
-    };
-
-    return `${severityImpacts[severity] || severityImpacts['medium']} ${biasRisks[biasType] || 'This bias type can distort judgment and lead to flawed decision-making.'}`;
-}
-
-// Local extension to include runtime-only fields like researchInsight
-interface ExtendedBiasInstance extends BiasInstance {
-    researchInsight: ResearchInsight;
-}
+const VALID_TABS: TabId[] = ['overview', 'logic', 'swot', 'noise', 'red-team', 'boardroom', 'simulator'];
 
 export default function DocumentAnalysisPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
     const [document, setDocument] = useState<Document | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedBias, setSelectedBias] = useState<BiasInstance | null>(null);
-    const [editableContent, setEditableContent] = useState('');
-    const [isSimulating, setIsSimulating] = useState(false);
-    const [simulationResult, setSimulationResult] = useState<Analysis | null>(null);
     const [streamLogs, setStreamLogs] = useState<{ msg: string, type: 'info' | 'bias' | 'success' }[]>([]);
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
     const [isExportingPdf, setIsExportingPdf] = useState(false);
     const [isExportingCsv, setIsExportingCsv] = useState(false);
 
-    const [activeTab, setActiveTab] = useState<'overview' | 'biases' | 'factcheck' | 'compliance' | 'cognitive' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team' | 'boardroom'>('overview');
+    // URL-based tab state (#7)
+    const tabFromUrl = searchParams.get('tab') as TabId | null;
+    const activeTab: TabId = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : 'overview';
 
     const { showToast } = useToast();
 
-    // Draft key for simulator localStorage persistence
-    const draftKey = `simulator_draft_${resolvedParams.id}`;
+    const handleTabChange = useCallback((tabId: TabId) => {
+        setSelectedBias(null);
+        const params = new URLSearchParams(searchParams.toString());
+        if (tabId === 'overview') {
+            params.delete('tab');
+        } else {
+            params.set('tab', tabId);
+        }
+        const qs = params.toString();
+        router.push(`/documents/${resolvedParams.id}${qs ? `?${qs}` : ''}`, { scroll: false });
+    }, [router, resolvedParams.id, searchParams]);
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -203,11 +141,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 if (!res.ok) throw new Error('Document not found');
                 const data = await res.json();
                 setDocument(data);
-                // Restore simulator draft if one exists, otherwise use original content
-                const savedDraft = localStorage.getItem(`simulator_draft_${data.id}`);
-                setEditableContent(savedDraft ?? data.content);
                 if (data.analyses?.[0]?.biases?.[0]) {
-                    setSelectedBias(data.analyses[0].biases[0]);
+                    setSelectedBias(null); // Don't auto-select
                 }
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load document');
@@ -215,68 +150,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 setLoading(false);
             }
         };
-
         fetchDocument();
     }, [resolvedParams.id]);
-
-    // Esc closes the bias detail modal
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setSelectedBias(null);
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
-
-    // Persist simulator draft to localStorage (debounced 500ms)
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (editableContent) {
-                localStorage.setItem(draftKey, editableContent);
-            }
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [editableContent, draftKey]);
-
-    if (loading) {
-        return (
-            <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
-                <div className="flex items-center justify-center" style={{ minHeight: '60vh' }}>
-                    <Loader2 size={48} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
-                </div>
-            </div>
-        );
-    }
-
-    if (error || !document) {
-        return (
-            <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
-                <div className="card">
-                    <div className="card-body flex flex-col items-center gap-md">
-                        <AlertTriangle size={48} style={{ color: 'var(--error)' }} />
-                        <p style={{ color: 'var(--error)' }}>{error || 'Document not found'}</p>
-                        <Link href="/" className="btn btn-primary">
-                            Back to Home
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    const analysis = document.analyses?.[0];
-    const biases = analysis?.biases || [];
-
-    // Derived index for prev/next navigation in the bias modal
-    const selectedBiasIndex = selectedBias
-        ? biases.findIndex(b => b.id === selectedBias.id)
-        : -1;
-
-    // Clear selected bias whenever the active tab changes
-    const handleTabChange = (tabId: typeof activeTab) => {
-        setActiveTab(tabId);
-        setSelectedBias(null);
-    };
 
     const handleExport = async () => {
         if (!document || !analysis) return;
@@ -284,12 +159,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         try {
             const { PdfGenerator } = await import('@/lib/reports/pdf-generator');
             const generator = new PdfGenerator();
-            generator.generateReport({
-                filename: document.filename,
-                analysis: analysis
-            });
-
-            // Log Audit Event (Non-blocking)
+            generator.generateReport({ filename: document.filename, analysis });
             try {
                 const auditPayload = JSON.stringify({
                     action: 'EXPORT_PDF',
@@ -304,7 +174,6 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             } catch (stringifyError) {
                 console.error('Failed to stringify audit payload:', stringifyError);
             }
-
             showToast('PDF report generated successfully', 'success');
         } catch (error) {
             console.error('Failed to generate PDF:', error);
@@ -327,38 +196,6 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             showToast('Failed to generate CSV report', 'error');
         } finally {
             setIsExportingCsv(false);
-        }
-    };
-
-    const runSimulation = async () => {
-        if (!editableContent.trim()) return;
-        setIsSimulating(true);
-        setStreamLogs([{ msg: 'Initializing simulation environment...', type: 'info' }]);
-        setScanProgress(5);
-
-        try {
-            const res = await fetch('/api/analyze/simulate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: editableContent })
-            });
-
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Simulation failed');
-            }
-            const data = await res.json();
-
-            setSimulationResult(data);
-            setScanProgress(100);
-            setStreamLogs(prev => [...prev, { msg: 'Simulation complete. Score Delta calculated.', type: 'success' }]);
-            showToast('Simulation complete', 'success');
-        } catch (err) {
-            const msg = err instanceof Error ? err.message : 'Simulation failed';
-            setStreamLogs(prev => [...prev, { msg: `ERROR: ${msg}`, type: 'bias' }]);
-            showToast(msg, 'error');
-        } finally {
-            setIsSimulating(false);
         }
     };
 
@@ -388,39 +225,20 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 const chunk = decoder.decode(value);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 sseReader.processChunk(chunk, (update: any) => {
-                    // Handle step updates (agent-level progress)
                     if (update.type === 'step') {
                         const icon = update.status === 'complete' ? '✓' : '►';
                         const color = update.status === 'complete' ? 'success' : 'info';
-                        setStreamLogs(prev => [...prev, {
-                            msg: `${icon} ${update.step}`,
-                            type: color
-                        }]);
+                        setStreamLogs(prev => [...prev, { msg: `${icon} ${update.step}`, type: color }]);
                     } else if (update.type === 'bias' && update.result.found) {
-                        setStreamLogs(prev => [...prev, {
-                            msg: `⚠ BIAS: ${update.biasType} (${update.result.severity.toUpperCase()})`,
-                            type: 'bias'
-                        }]);
+                        setStreamLogs(prev => [...prev, { msg: `⚠ BIAS: ${update.biasType} (${update.result.severity.toUpperCase()})`, type: 'bias' }]);
                     } else if (update.type === 'noise') {
-                        setStreamLogs(prev => [...prev, {
-                            msg: `◐ NOISE: ${Math.round(update.result.score)}% variance detected`,
-                            type: 'info'
-                        }]);
+                        setStreamLogs(prev => [...prev, { msg: `◐ NOISE: ${Math.round(update.result.score)}% variance detected`, type: 'info' }]);
                     } else if (update.type === 'complete') {
-                        setStreamLogs(prev => [...prev, {
-                            msg: '✓ Analysis complete. Results saved.',
-                            type: 'success'
-                        }]);
+                        setStreamLogs(prev => [...prev, { msg: '✓ Analysis complete. Results saved.', type: 'success' }]);
                         setDocument(prev => prev ? { ...prev, analyses: [update.result, ...prev.analyses], status: 'complete' } : null);
                     }
-
-                    if (typeof update.progress === 'number') {
-                        setScanProgress(update.progress);
-                    }
-
-                    if (update.type === 'error') {
-                        throw new Error(update.message || 'Analysis failed during stream');
-                    }
+                    if (typeof update.progress === 'number') setScanProgress(update.progress);
+                    if (update.type === 'error') throw new Error(update.message || 'Analysis failed during stream');
                 });
             }
         } catch (err) {
@@ -432,12 +250,51 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         }
     };
 
+    if (loading) return <PageSkeleton rows={6} />;
+
+    if (error || !document) {
+        return (
+            <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
+                <div className="card">
+                    <div className="card-body flex flex-col items-center gap-md">
+                        <AlertTriangle size={48} style={{ color: 'var(--error)' }} />
+                        <p style={{ color: 'var(--error)' }}>{error || 'Document not found'}</p>
+                        <Link href="/dashboard" className="btn btn-primary">
+                            Back to Dashboard
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const analysis = document.analyses?.[0];
+    const biases = analysis?.biases || [];
+    const selectedBiasIndex = selectedBias ? biases.findIndex(b => b.id === selectedBias.id) : -1;
+
+    const TAB_CONFIG = [
+        { id: 'overview' as const, label: 'Overview', icon: Brain },
+        { id: 'logic' as const, label: 'Logic', icon: CheckCircle },
+        { id: 'swot' as const, label: 'SWOT', icon: Lightbulb },
+        { id: 'noise' as const, label: 'Noise', icon: Info },
+        ...(analysis?.cognitiveAnalysis ? [{ id: 'red-team' as const, label: 'Red Team', icon: Users }] : []),
+        ...(analysis?.simulation ? [{ id: 'boardroom' as const, label: 'Boardroom', icon: Vote }] : []),
+        { id: 'simulator' as const, label: 'Simulator', icon: PlayCircle },
+    ];
+
     return (
         <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
-            {/* Clean Header */}
+            {/* Breadcrumbs (#11) */}
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Documents', href: '/dashboard' },
+                { label: document.filename },
+            ]} />
+
+            {/* Header */}
             <header className="flex items-center justify-between mb-xl">
                 <div className="flex items-center gap-md">
-                    <Link href="/dashboard" className="btn btn-ghost p-2">
+                    <Link href="/dashboard" className="btn btn-ghost p-2" aria-label="Back to dashboard">
                         <ArrowLeft size={20} />
                     </Link>
                     <div>
@@ -450,18 +307,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
                 <div className="flex items-center gap-sm">
                     {document.status === 'complete' && (
-                        <span className="flex items-center gap-sm text-sm text-success">
-                            <CheckCircle size={16} />
-                            Complete
+                        <span className="flex items-center gap-sm text-sm" style={{ color: 'var(--success)' }}>
+                            <CheckCircle size={16} /> Complete
                         </span>
                     )}
-
                     {analysis && (
                         <div className="flex gap-sm">
                             <button
                                 onClick={handleExport}
                                 disabled={isExportingPdf}
                                 className="btn btn-secondary btn-sm flex items-center gap-sm"
+                                aria-label="Export as PDF"
                             >
                                 {isExportingPdf ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
                                 PDF
@@ -470,6 +326,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 onClick={handleCsvExport}
                                 disabled={isExportingCsv}
                                 className="btn btn-secondary btn-sm flex items-center gap-sm"
+                                aria-label="Export as CSV"
                             >
                                 {isExportingCsv ? <Loader2 size={14} className="animate-spin" /> : <Table size={14} />}
                                 CSV
@@ -479,7 +336,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
             </header>
 
-            {/* Compact Stats Bar - REPLACED BY EXECUTIVE SUMMARY */}
+            {/* Executive Summary */}
             {analysis && (
                 <ErrorBoundary sectionName="Executive Summary">
                     <div className="mb-xl">
@@ -495,7 +352,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </ErrorBoundary>
             )}
 
-            {/* Re-scan Button (Moved actions here) */}
+            {/* Re-scan Button */}
             <div className="flex justify-end gap-md mb-lg">
                 <button
                     onClick={runLiveScan}
@@ -512,9 +369,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 <div className="col-span-2">
                     {analysis?.summary ? (
                         <div className="card h-full animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                            <div className="card-header">
-                                <h3>Executive Summary</h3>
-                            </div>
+                            <div className="card-header"><h3>Executive Summary</h3></div>
                             <div className="card-body">
                                 <p style={{ fontSize: '1rem', lineHeight: 1.6 }}>{analysis.summary}</p>
                             </div>
@@ -527,34 +382,31 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
 
                 {/* Scan Terminal */}
-                <div className="card animate-fade-in" style={{ animationDelay: '0.4s', background: '#050505' }}>
-                    <div className="card-header" style={{ background: '#111' }}>
+                <div className="card animate-fade-in" style={{ animationDelay: '0.4s', background: 'var(--bg-card)' }}>
+                    <div className="card-header" style={{ background: 'var(--bg-secondary)' }}>
                         <h3 className="flex items-center gap-sm text-xs">
                             <Terminal size={14} /> LIVE_SCAN_FEED
                         </h3>
                     </div>
                     <div className="card-body" style={{ padding: 'var(--spacing-md)', fontSize: '10px', height: '200px', overflowY: 'auto', fontFamily: 'monospace' }}>
-                        {isScanning || isSimulating ? (
+                        {(isScanning) && (
                             <div className="mb-md">
-                                <div style={{ height: '2px', background: '#222', width: '100%', marginBottom: '4px' }}>
-                                    <div style={{ height: '100%', background: 'var(--accent-primary)', width: `${scanProgress}%`, transition: 'width 0.3s' }} />
+                                <div style={{ height: '2px', background: 'var(--bg-tertiary)', width: '100%', marginBottom: '4px' }}>
+                                    <div style={{ height: '100%', background: 'var(--accent-primary)', width: `${scanProgress}%`, transition: 'width 0.3s' }} role="progressbar" aria-valuenow={scanProgress} aria-valuemin={0} aria-valuemax={100} />
                                 </div>
                                 <div className="text-muted">TASK_PROGRESS: {scanProgress}%</div>
                             </div>
-                        ) : null}
-
-                        {
-                            streamLogs.map((log, i) => (
-                                <div key={i} style={{ marginBottom: '4px', color: log.type === 'bias' ? 'var(--error)' : log.type === 'success' ? 'var(--success)' : 'var(--text-secondary)' }}>
-                                    <span style={{ color: '#444' }}>[{new Date().toLocaleTimeString([], { hour12: false })}]</span> {log.msg}
-                                </div>
-                            ))
-                        }
+                        )}
+                        {streamLogs.map((log, i) => (
+                            <div key={i} style={{ marginBottom: '4px', color: log.type === 'bias' ? 'var(--error)' : log.type === 'success' ? 'var(--success)' : 'var(--text-secondary)' }}>
+                                <span style={{ color: 'var(--text-muted)' }}>[{new Date().toLocaleTimeString([], { hour12: false })}]</span> {log.msg}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
 
-            {/* Financial Fact Check Verifications */}
+            {/* Financial Fact Check */}
             {analysis?.factCheck && (
                 <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
                     <div className="card-header flex items-center justify-between">
@@ -573,11 +425,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             </span>
                         )}
                     </div>
-                    {/* Search Grounding Sources */}
                     {analysis.factCheck.searchSources && analysis.factCheck.searchSources.length > 0 && (
                         <div style={{ padding: '12px 16px', background: 'rgba(66, 133, 244, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
                             <div className="flex items-center gap-sm" style={{ fontSize: '11px', fontWeight: 600, marginBottom: '8px', color: 'var(--accent-primary)' }}>
-                                <ExternalLink size={12} />
+                                <FileText size={12} />
                                 VERIFIED WITH GOOGLE SEARCH GROUNDING:
                             </div>
                             <div className="flex flex-wrap gap-sm">
@@ -596,9 +447,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                                     gap: '4px',
                                                     maxWidth: '100%'
                                                 }}>
-                                                <span style={{ opacity: 0.7 }}>General Source {i + 1}:</span>
+                                                <span style={{ opacity: 0.7 }}>Source {i + 1}:</span>
                                                 <span style={{ fontWeight: 500 }}>{new URL(source).hostname}</span>
-                                                <ExternalLink size={10} style={{ opacity: 0.5 }} />
                                             </a>
                                         );
                                     } catch { return null; }
@@ -609,26 +459,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     <div className="card-body" style={{ padding: 0 }}>
                         {analysis.factCheck.verifications && analysis.factCheck.verifications.length > 0 ? (
                             analysis.factCheck.verifications.map((v, idx) => (
-                                <div
-                                    key={idx}
-                                    style={{
-                                        padding: '16px',
-                                        borderBottom: idx < (analysis.factCheck?.verifications?.length || 0) - 1 ? '1px solid var(--border-color)' : 'none'
-                                    }}
-                                >
+                                <div key={idx} style={{ padding: '16px', borderBottom: idx < (analysis.factCheck?.verifications?.length || 0) - 1 ? '1px solid var(--border-color)' : 'none' }}>
                                     <div className="flex items-start gap-md">
-                                        {/* Status Icon */}
                                         <div style={{ marginTop: '2px' }}>
                                             {v.verdict?.toUpperCase() === 'VERIFIED' ? (
-                                                <CheckCircle size={16} className="text-success" />
+                                                <CheckCircle size={16} style={{ color: 'var(--success)' }} aria-label="Verified" />
                                             ) : v.verdict?.toUpperCase() === 'CONTRADICTED' ? (
-                                                <XCircle size={16} className="text-error" />
+                                                <AlertTriangle size={16} style={{ color: 'var(--error)' }} aria-label="Contradicted" />
                                             ) : (
-                                                <HelpCircle size={16} className="text-warning" />
+                                                <Info size={16} style={{ color: 'var(--warning)' }} aria-label="Unverifiable" />
                                             )}
                                         </div>
                                         <div className="flex-1">
-                                            <p style={{ fontSize: '13px', fontWeight: 500, marginBottom: '4px', color: '#eee' }}>&quot;{v.claim}&quot;</p>
+                                            <p style={{ fontSize: '13px', fontWeight: 500, marginBottom: '4px', color: 'var(--text-primary)' }}>&quot;{v.claim}&quot;</p>
                                             <div style={{ fontSize: '10px', fontWeight: 700, marginBottom: '6px', color: v.verdict?.toUpperCase() === 'VERIFIED' ? 'var(--success)' : v.verdict?.toUpperCase() === 'CONTRADICTED' ? 'var(--error)' : 'var(--warning)' }}>
                                                 {v.verdict?.toUpperCase()}
                                             </div>
@@ -636,21 +479,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                                 {v.explanation}
                                             </p>
                                             {v.sourceUrl && (
-                                                <a
-                                                    href={v.sourceUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center gap-xs text-[10px] text-accent-primary hover:underline"
-                                                    style={{ color: 'var(--accent-primary)' }}
-                                                >
-                                                    <ExternalLink size={10} />
-                                                    Evidence Source: {(() => {
-                                                        try {
-                                                            return new URL(v.sourceUrl).hostname;
-                                                        } catch {
-                                                            return 'External Source';
-                                                        }
-                                                    })()}
+                                                <a href={v.sourceUrl} target="_blank" rel="noopener noreferrer"
+                                                    className="flex items-center gap-xs text-[10px]"
+                                                    style={{ color: 'var(--accent-primary)' }}>
+                                                    <FileText size={10} />
+                                                    Evidence Source: {(() => { try { return new URL(v.sourceUrl).hostname; } catch { return 'External Source'; } })()}
                                                 </a>
                                             )}
                                         </div>
@@ -666,30 +499,22 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
             )}
 
-
-            {/* Bias, Logic & Simulator Tabs */}
+            {/* Tabs + Content */}
             <div className="grid" style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}>
-                {/* Left Column: Analysis Views */}
                 <div className="flex flex-col gap-lg">
-
-                    {/* Clean Tabs */}
-                    <div className="flex flex-wrap gap-xs border-b border-border mb-lg">
-                        {[
-                            { id: 'overview', label: 'Overview', icon: Brain },
-                            { id: 'logic', label: 'Logic', icon: CheckCircle },
-                            { id: 'swot', label: 'SWOT', icon: Lightbulb },
-                            { id: 'noise', label: 'Noise', icon: Info },
-                            ...(analysis?.cognitiveAnalysis ? [{ id: 'red-team' as const, label: 'Red Team', icon: Users }] : []),
-                            ...(analysis?.simulation ? [{ id: 'boardroom' as const, label: 'Boardroom', icon: Vote }] : []),
-                            { id: 'simulator', label: 'Simulator', icon: PlayCircle },
-                        ].map(tab => (
+                    {/* Tab Bar */}
+                    <div className="flex flex-wrap gap-xs border-b border-border mb-lg" role="tablist" aria-label="Analysis tabs">
+                        {TAB_CONFIG.map(tab => (
                             <button
                                 key={tab.id}
-                                onClick={() => handleTabChange(tab.id as typeof activeTab)}
+                                role="tab"
+                                aria-selected={activeTab === tab.id}
+                                aria-controls={`tabpanel-${tab.id}`}
+                                onClick={() => handleTabChange(tab.id)}
                                 className={`flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${activeTab === tab.id
                                     ? 'text-accent-primary border-accent-primary bg-accent-primary/5'
                                     : 'text-muted border-transparent hover:text-primary hover:border-border'
-                                    }`}
+                                }`}
                             >
                                 <tab.icon size={14} />
                                 {tab.label}
@@ -697,457 +522,43 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         ))}
                     </div>
 
-                    {/* Tab Content */}
-                    {activeTab === 'overview' && (
-                        <div className="flex flex-col gap-lg">
-                            {/* NEW: Bias Heatmap & Network */}
-                            <ErrorBoundary sectionName="Bias Visualizations">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg h-[500px]">
-                                    <BiasHeatmap content={document.content} biases={biases} />
-                                    <div className="card">
-                                        <div className="card-header">
-                                            <h4>Bias Network Map</h4>
-                                        </div>
-                                        <div className="card-body h-full">
-                                            <BiasNetwork biases={biases.map(b => ({ ...b, id: b.id || Math.random().toString(), category: 'cognitive' }))} />
-                                        </div>
-                                    </div>
-                                </div>
-                            </ErrorBoundary>
-
-                            {/* Decision Timeline & Risk HeatMap */}
-                            <ErrorBoundary sectionName="Decision Timeline & Risk Map">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg mt-lg">
-                                    <div className="card">
-                                        <div className="card-header">
-                                            <h4>Decision Timeline</h4>
-                                        </div>
-                                        <div className="card-body">
-                                            <DecisionTimeline events={[
-                                                { id: '1', date: new Date(document.uploadedAt).toLocaleDateString(), title: 'Document Uploaded', description: 'Initial file ingestion.', type: 'info', status: 'completed' },
-                                                { id: '2', date: new Date(analysis?.createdAt || Date.now()).toLocaleDateString(), title: 'AI Audit Completed', description: 'Deep scan for biases and noise.', type: 'decision', status: 'completed' },
-                                            ]} />
-                                        </div>
-                                    </div>
-                                    <div className="card">
-                                        <div className="card-header">
-                                            <h4>Risk Landscape</h4>
-                                        </div>
-                                        <div className="card-body">
-                                            <RiskHeatMap risks={biases.map(b => ({
-                                                category: b.biasType,
-                                                impact: b.severity === 'critical' ? 90 : b.severity === 'high' ? 70 : b.severity === 'medium' ? 50 : 30,
-                                                probability: 60
-                                            }))} />
-                                        </div>
-                                    </div>
-                                </div>
-                            </ErrorBoundary>
-
-                            {/* Biases List (Existing) */}
-                            <div className="card">
-                                <div className="card-header"><h3 className="flex items-center gap-2"><Brain size={16} /> Bias Details</h3></div>
-                                <div className="card-body">
-                                    {biases.length === 0 ? (
-                                        <div className="text-center p-8 text-muted">No cognitive biases detected.</div>
-                                    ) : (
-                                        <div className="space-y-4">
-                                            {biases.map((bias, i) => (
-                                                <div key={i} className={`p-4 rounded-lg border bg-card/50 ${bias.severity === 'critical' ? 'border-red-500/20 bg-red-500/5' : 'border-border'}`}>
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <div>
-                                                            <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${bias.severity === 'critical' ? 'bg-red-500/20 text-red-400' : 'bg-slate-700 text-slate-300'}`}>{bias.biasType}</span>
-                                                        </div>
-                                                        <span className="text-xs text-muted capitalize">{bias.severity} Severity</span>
-                                                    </div>
-                                                    <p className="text-sm italic text-slate-300 border-l-2 border-slate-700 pl-3 my-2">&quot;{bias.excerpt}&quot;</p>
-                                                    <p className="text-sm text-slate-400 mb-3">{bias.explanation}</p>
-
-                                                    {/* Educational Insight */}
-                                                    {(bias as unknown as ExtendedBiasInstance).researchInsight && (
-                                                        <div className="mt-3 p-3 rounded bg-blue-500/10 border border-blue-500/20">
-                                                            <div className="flex items-center gap-2 mb-1">
-                                                                <Lightbulb className="w-4 h-4 text-blue-400" />
-                                                                <span className="text-xs font-semibold text-blue-300">Scientific Insight</span>
-                                                            </div>
-                                                            <a
-                                                                href={(bias as unknown as ExtendedBiasInstance).researchInsight.sourceUrl}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="text-sm font-medium text-blue-300 hover:text-blue-200 block mb-1"
-                                                            >
-                                                                {(bias as unknown as ExtendedBiasInstance).researchInsight.title} <ExternalLink size={10} className="inline ml-1" />
-                                                            </a>
-                                                            <p className="text-xs text-slate-400">{(bias as unknown as ExtendedBiasInstance).researchInsight.summary}</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'logic' && (
-                        <div className="card">
-                            <div className="card-body">
-                                {analysis?.logicalAnalysis ? (
-                                    <FallacyList data={analysis.logicalAnalysis} />
-                                ) : (
-                                    <div className="text-center p-8 text-muted">No logical analysis data available.</div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'noise' && (
-                        <ErrorBoundary sectionName="Noise Analysis">
-                            <div className="card">
-                                <div className="card-body">
-                                    {analysis?.noiseStats ? (
-                                        <div className="space-y-8">
-                                            <div className="flex justify-center gap-10">
-                                                <QualityGauge
-                                                    value={analysis.noiseScore}
-                                                    label="Noise Level"
-                                                    color="#ef4444"
-                                                    maxValue={100}
-                                                />
-                                                <QualityGauge
-                                                    value={100 - analysis.noiseScore}
-                                                    label="Consistency"
-                                                    color="#10b981"
-                                                    maxValue={100}
-                                                />
-                                            </div>
-                                            <NoiseJudge analysis={{ ...analysis.noiseStats, benchmarks: analysis.noiseBenchmarks, score: analysis.noiseScore }} />
-                                        </div>
-                                    ) : (
-                                        <div className="text-center p-8 text-muted">No noise analysis available.</div>
-                                    )}
-                                </div>
-                            </div>
-                        </ErrorBoundary>
-                    )}
-
-                    {activeTab === 'swot' && (
-                        <ErrorBoundary sectionName="SWOT Analysis">
-                            <div className="card">
-                                <div className="card-body">
-                                    {analysis?.swotAnalysis ? (
-                                        <SwotMatrix data={analysis.swotAnalysis} />
-                                    ) : (
-                                        <div className="text-center p-8 text-muted">No SWOT analysis data available.</div>
-                                    )}
-                                </div>
-                            </div>
-                        </ErrorBoundary>
-                    )}
-
-                    {activeTab === 'red-team' && (
-                        <ErrorBoundary sectionName="Red Team Analysis">
-                            <div className="card">
-                                <div className="card-body">
-                                    {analysis?.cognitiveAnalysis ? (
-                                        <RedTeamView analysis={analysis.cognitiveAnalysis} />
-                                    ) : (
-                                        <div className="text-center p-8 text-muted">No cognitive diversity analysis available.</div>
-                                    )}
-                                </div>
-                            </div>
-                        </ErrorBoundary>
-                    )}
-
-                    {activeTab === 'boardroom' && (
-                        <ErrorBoundary sectionName="Boardroom Simulation">
-                            <div className="card">
-                                <div className="card-body">
-                                    {analysis?.simulation ? (
-                                        <div className="space-y-6">
-                                            <BoardroomSimulator simulation={analysis.simulation} />
-                                            <div className="card border-t border-border mt-6">
-                                                <div className="card-header">
-                                                    <h4>Stakeholder Alignment Map</h4>
-                                                </div>
-                                                <div className="card-body">
-                                                    <StakeholderMap stakeholders={analysis.simulation.twins?.map((t: { name: string; role: string; confidence?: number; vote?: string; feedback?: string }) => ({
-                                                        id: t.name,
-                                                        name: t.name,
-                                                        role: t.role,
-                                                        influence: Math.round((t.confidence || 0.5) * 100),
-                                                        interest: 70,
-                                                        stance: t.vote === 'APPROVE' ? 'supportive' : t.vote === 'REJECT' ? 'opposed' : 'neutral',
-                                                        keyConcerns: [t.feedback?.substring(0, 50) + '...']
-                                                    })) || []} />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="text-center p-8 text-muted">Run &quot;Live Scan&quot; to convene the Virtual Board.</div>
-                                    )}
-                                </div>
-                            </div>
-                        </ErrorBoundary>
-                    )}
-
-
-                    {activeTab === 'simulator' && (
-                        <div className="card">
-                            <div className="card-header justify-between">
-                                <h3 className="flex items-center gap-sm">
-                                    <Info size={16} /> &quot;WHAT-IF&quot; SIMULATOR (MODIFIABLE)
-                                </h3>
-                                <div className="flex items-center gap-sm">
-                                    <button
-                                        onClick={() => {
-                                            setEditableContent(document.content);
-                                            localStorage.removeItem(draftKey);
-                                            setSimulationResult(null);
-                                        }}
-                                        className="btn btn-ghost"
-                                        style={{ padding: '2px 8px', fontSize: '10px' }}
-                                        title="Discard draft and restore original document"
-                                    >
-                                        Reset
-                                    </button>
-                                    <button
-                                        onClick={runSimulation}
-                                        disabled={isSimulating || !editableContent.trim()}
-                                        className="btn btn-secondary"
-                                        style={{ padding: '2px 8px', fontSize: '10px' }}
-                                    >
-                                        {isSimulating ? <Loader2 size={12} className="animate-spin" /> : <PlayCircle size={12} />}
-                                        SIMULATE SCAN
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="card-body" style={{ padding: 0 }}>
-                                <textarea
-                                    value={editableContent}
-                                    onChange={(e) => setEditableContent(e.target.value)}
-                                    style={{
-                                        width: '100%',
-                                        minHeight: '400px',
-                                        background: '#0a0a0a',
-                                        color: '#eee',
-                                        border: 'none',
-                                        padding: '24px',
-                                        fontSize: '14px',
-                                        lineHeight: '1.8',
-                                        fontFamily: 'inherit',
-                                        resize: 'vertical',
-                                        outline: 'none'
-                                    }}
+                    {/* Tab Panels (lazy loaded) */}
+                    <div role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={activeTab}>
+                        <Suspense fallback={<CardSkeleton lines={5} />}>
+                            {activeTab === 'overview' && (
+                                <OverviewTab
+                                    documentContent={document.content}
+                                    biases={biases}
+                                    uploadedAt={document.uploadedAt}
+                                    analysisCreatedAt={analysis?.createdAt}
                                 />
-                                {!editableContent.trim() && (
-                                    <p className="text-xs text-muted px-6 py-2">
-                                        Document content is empty — paste or type content to simulate.
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Simulation Result - Structured Comparison View (Only show if result exists AND we are in simulator tab) */}
-                    {simulationResult && activeTab === 'simulator' && (
-                        <div className="card" style={{ borderColor: 'var(--accent-secondary)', background: 'rgba(10, 132, 255, 0.03)' }}>
-                            <div className="card-header justify-between" style={{ background: 'rgba(10, 132, 255, 0.1)' }}>
-                                <h3 className="flex items-center gap-sm" style={{ color: 'var(--accent-secondary)' }}>
-                                    <CheckCircle size={16} />
-                                    SIMULATION RESULTS
-                                </h3>
-                                <button onClick={() => setSimulationResult(null)} className="btn btn-ghost" style={{ padding: '4px 8px', fontSize: '11px' }}>
-                                    <RefreshCw size={12} /> Clear
-                                </button>
-                            </div>
-                            <div className="card-body" style={{ padding: 'var(--spacing-lg)' }}>
-                                {/* Score Comparison - Visual Gauge */}
-                                <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: 'var(--spacing-xl)',
-                                    marginBottom: 'var(--spacing-lg)',
-                                    padding: 'var(--spacing-lg)',
-                                    background: 'var(--bg-secondary)',
-                                    borderRadius: 'var(--radius-md)'
-                                }}>
-                                    {/* Before Score */}
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>ORIGINAL</div>
-                                        <div style={{
-                                            fontSize: '2.5rem',
-                                            fontWeight: 800,
-                                            color: 'var(--text-secondary)'
-                                        }}>
-                                            {analysis ? Math.round(analysis.overallScore) : '--'}
-                                        </div>
-                                    </div>
-
-                                    {/* Arrow + Delta */}
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{
-                                            fontSize: '24px',
-                                            color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--error)'
-                                        }}>
-                                            →
-                                        </div>
-                                        <div style={{
-                                            fontSize: '14px',
-                                            fontWeight: 700,
-                                            padding: '4px 12px',
-                                            borderRadius: 'var(--radius-sm)',
-                                            background: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                            color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--error)'
-                                        }}>
-                                            {simulationResult.overallScore > (analysis?.overallScore || 0) ? '+' : ''}{Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} pts
-                                        </div>
-                                    </div>
-
-                                    {/* After Score */}
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>PROJECTED</div>
-                                        <div style={{
-                                            fontSize: '2.5rem',
-                                            fontWeight: 800,
-                                            color: simulationResult.overallScore >= 70 ? 'var(--success)' : simulationResult.overallScore >= 40 ? 'var(--warning)' : 'var(--error)'
-                                        }}>
-                                            {Math.round(simulationResult.overallScore)}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Metrics Comparison Table */}
-                                <table style={{
-                                    width: '100%',
-                                    borderCollapse: 'collapse',
-                                    marginBottom: 'var(--spacing-lg)'
-                                }}>
-                                    <thead>
-                                        <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                            <th style={{ textAlign: 'left', padding: '8px 0', fontSize: '11px', color: 'var(--text-muted)' }}>METRIC</th>
-                                            <th style={{ textAlign: 'center', padding: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>ORIGINAL</th>
-                                            <th style={{ textAlign: 'center', padding: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>PROJECTED</th>
-                                            <th style={{ textAlign: 'center', padding: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>CHANGE</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                            <td style={{ padding: '12px 0', fontSize: '13px' }}>Decision Quality Score</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{analysis ? Math.round(analysis.overallScore) : '--'}</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{Math.round(simulationResult.overallScore)}</td>
-                                            <td style={{
-                                                textAlign: 'center',
-                                                fontWeight: 600,
-                                                color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--error)'
-                                            }}>
-                                                {simulationResult.overallScore > (analysis?.overallScore || 0) ? '↑' : '↓'} {Math.abs(Math.round(simulationResult.overallScore - (analysis?.overallScore || 0)))}
-                                            </td>
-                                        </tr>
-                                        <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                            <td style={{ padding: '12px 0', fontSize: '13px' }}>Cognitive Biases</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{analysis?.biases.length || 0}</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{simulationResult.biases.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found !== false).length}</td>
-                                            <td style={{
-                                                textAlign: 'center',
-                                                fontWeight: 600,
-                                                color: simulationResult.biases.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found !== false).length < (analysis?.biases.length || 0) ? 'var(--success)' : 'var(--error)'
-                                            }}>
-                                                {simulationResult.biases.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found !== false).length < (analysis?.biases.length || 0) ? '↓' : '↑'} {Math.abs(simulationResult.biases.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found !== false).length - (analysis?.biases.length || 0))}
-                                            </td>
-                                        </tr>
-                                        <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                            <td style={{ padding: '12px 0', fontSize: '13px' }}>Noise Level</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{analysis ? Math.round(analysis.noiseScore) : '--'}%</td>
-                                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{Math.round(simulationResult.noiseScore)}%</td>
-                                            <td style={{
-                                                textAlign: 'center',
-                                                fontWeight: 600,
-                                                color: simulationResult.noiseScore < (analysis?.noiseScore || 0) ? 'var(--success)' : 'var(--error)'
-                                            }}>
-                                                {simulationResult.noiseScore < (analysis?.noiseScore || 0) ? '↓' : '↑'} {Math.abs(Math.round(simulationResult.noiseScore - (analysis?.noiseScore || 0)))}%
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Bias Changes Detail (Only if simulation exists) */}
-                    {simulationResult && simulationResult.biases && simulationResult.biases.length > 0 && activeTab === 'simulator' && (
-                        <div>
-                            <div style={{
-                                fontSize: '11px',
-                                color: 'var(--text-muted)',
-                                marginBottom: 'var(--spacing-sm)',
-                                textTransform: 'uppercase'
-                            }}>
-                                Bias Analysis
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {simulationResult.biases.slice(0, 5).map((bias: BiasInstance, idx: number) => (
-                                    <div
-                                        key={idx}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            padding: '8px 12px',
-                                            background: 'var(--bg-tertiary)',
-                                            borderRadius: 'var(--radius-sm)',
-                                            borderLeft: `3px solid ${(bias as BiasInstance & { found?: boolean }).found === false ? 'var(--success)' : SEVERITY_COLORS[bias.severity as keyof typeof SEVERITY_COLORS] || 'var(--warning)'}`
-                                        }}
-                                    >
-                                        <span style={{ fontSize: '13px' }}>{bias.biasType}</span>
-                                        <span style={{
-                                            fontSize: '10px',
-                                            padding: '2px 8px',
-                                            borderRadius: 'var(--radius-sm)',
-                                            background: (bias as BiasInstance & { found?: boolean }).found === false ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                            color: (bias as BiasInstance & { found?: boolean }).found === false ? 'var(--success)' : 'var(--error)'
-                                        }}>
-                                            {(bias as BiasInstance & { found?: boolean }).found === false ? '✓ RESOLVED' : 'STILL PRESENT'}
-                                        </span>
-                                    </div>
-                                ))}
-                                {simulationResult.biases.length > 5 && (
-                                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>
-                                        +{simulationResult.biases.length - 5} more biases...
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Summary Insight (Only if simulation exists) */}
-                    {simulationResult && activeTab === 'simulator' && (
-                        <div style={{
-                            marginTop: 'var(--spacing-lg)',
-                            padding: 'var(--spacing-md)',
-                            background: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                            borderRadius: 'var(--radius-md)',
-                            borderLeft: `3px solid ${simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--warning)'}`
-                        }}>
-                            <div style={{ fontSize: '11px', fontWeight: 600, marginBottom: '4px', color: simulationResult.overallScore > (analysis?.overallScore || 0) ? 'var(--success)' : 'var(--warning)' }}>
-                                {simulationResult.overallScore > (analysis?.overallScore || 0) ? '✓ IMPROVEMENTS DETECTED' : '⚠ NEEDS MORE WORK'}
-                            </div>
-                            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                                {simulationResult.overallScore > (analysis?.overallScore || 0)
-                                    ? `Your edits improved the decision quality by ${Math.round(simulationResult.overallScore - (analysis?.overallScore || 0))} points. ${simulationResult.biases?.filter((b: BiasInstance) => (b as BiasInstance & { found?: boolean }).found === false).length || 0} biases were addressed.`
-                                    : `The edits didn't improve the score. Focus on addressing the remaining biases and reducing noise in the document.`
-                                }
-                            </div>
-                        </div>
-                    )}
-
+                            )}
+                            {activeTab === 'logic' && <LogicTab logicalAnalysis={analysis?.logicalAnalysis} />}
+                            {activeTab === 'swot' && <SwotTab swotAnalysis={analysis?.swotAnalysis} />}
+                            {activeTab === 'noise' && analysis && (
+                                <NoiseTab
+                                    noiseScore={analysis.noiseScore}
+                                    noiseStats={analysis.noiseStats}
+                                    noiseBenchmarks={analysis.noiseBenchmarks}
+                                />
+                            )}
+                            {activeTab === 'red-team' && <RedTeamTab cognitiveAnalysis={analysis?.cognitiveAnalysis} />}
+                            {activeTab === 'boardroom' && <BoardroomTab simulation={analysis?.simulation} />}
+                            {activeTab === 'simulator' && (
+                                <SimulatorTab
+                                    documentContent={document.content}
+                                    documentId={document.id}
+                                    originalScore={analysis?.overallScore}
+                                    originalNoiseScore={analysis?.noiseScore}
+                                    originalBiasCount={biases.length}
+                                />
+                            )}
+                        </Suspense>
+                    </div>
                 </div>
 
-                {/* Right Column: Bias List & Stats */}
+                {/* Right Column: Bias Sidebar */}
                 <div className="flex flex-col gap-lg">
-                    {/* Scores in sidebar for simulation comparison */}
                     <div className="card">
                         <div className="card-body p-md flex justify-around">
                             <div className="text-center">
@@ -1162,14 +573,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     </div>
 
                     <div className="card" style={{ alignSelf: 'start', width: '100%' }}>
-                        <div className="card-header">
-                            <h3>Detected Biases</h3>
-                        </div>
-                        <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                        <div className="card-header"><h3>Detected Biases</h3></div>
+                        <div style={{ maxHeight: '60vh', overflowY: 'auto' }} role="list" aria-label="Detected biases">
                             {biases.length > 0 ? biases.map((bias, idx) => (
                                 <div
                                     key={bias.id}
+                                    role="listitem"
+                                    tabIndex={0}
                                     onClick={() => setSelectedBias(bias)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedBias(bias); } }}
                                     style={{
                                         padding: 'var(--spacing-md)',
                                         borderBottom: idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
@@ -1184,6 +596,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                     </div>
                                     <span className={`badge badge-${bias.severity}`} style={{ marginTop: 'var(--spacing-xs)', fontSize: '9px' }}>
                                         {bias.severity}
+                                        <span className="sr-only"> severity</span>
                                     </span>
                                 </div>
                             )) : (
@@ -1194,204 +607,37 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
             </div>
 
-            {/* Bias Detail Modal — fixed overlay, keyboard-dismissible, prev/next navigation */}
+            {/* Bias Detail Modal (accessible) */}
             {selectedBias && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
-                    style={{ background: 'rgba(0,0,0,0.8)' }}
-                    onClick={() => setSelectedBias(null)}
-                >
-                    <div
-                        className="card w-full max-w-3xl"
-                        style={{
-                            border: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}30`,
-                            maxHeight: '90vh',
-                            overflowY: 'auto',
-                        }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        {/* Modal header with prev/next navigation */}
-                        <div className="card-header flex items-center justify-between" style={{ borderBottom: `1px solid ${SEVERITY_COLORS[selectedBias.severity]}30`, position: 'sticky', top: 0, background: 'var(--bg-secondary)', zIndex: 10 }}>
-                            <div className="flex items-center gap-md">
-                                <AlertTriangle size={20} style={{ color: SEVERITY_COLORS[selectedBias.severity] }} />
-                                <h3>{selectedBias.biasType}</h3>
-                                <span className={`badge badge-${selectedBias.severity}`} style={{ marginLeft: 'var(--spacing-sm)' }}>
-                                    {selectedBias.severity.toUpperCase()}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-sm">
-                                <button
-                                    onClick={() => setSelectedBias(biases[selectedBiasIndex - 1])}
-                                    disabled={selectedBiasIndex <= 0}
-                                    className="btn btn-ghost"
-                                    style={{ padding: '2px 8px', fontSize: '11px' }}
-                                    aria-label="Previous bias"
-                                >
-                                    ← Prev
-                                </button>
-                                <span className="text-xs text-muted" style={{ minWidth: '3rem', textAlign: 'center' }}>
-                                    {selectedBiasIndex + 1} of {biases.length}
-                                </span>
-                                <button
-                                    onClick={() => setSelectedBias(biases[selectedBiasIndex + 1])}
-                                    disabled={selectedBiasIndex >= biases.length - 1}
-                                    className="btn btn-ghost"
-                                    style={{ padding: '2px 8px', fontSize: '11px' }}
-                                    aria-label="Next bias"
-                                >
-                                    Next →
-                                </button>
-                                <button
-                                    onClick={() => setSelectedBias(null)}
-                                    className="btn btn-ghost"
-                                    style={{ padding: '2px 8px', fontSize: '13px', marginLeft: '4px' }}
-                                    aria-label="Close"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        </div>
+                <BiasDetailModal
+                    bias={selectedBias}
+                    biases={biases}
+                    currentIndex={selectedBiasIndex}
+                    onClose={() => setSelectedBias(null)}
+                    onNavigate={setSelectedBias}
+                />
+            )}
 
-                        <div className="card-body" style={{ padding: 0 }}>
-                            {/* Section 1: Bias Definition */}
-                            <div style={{ padding: 'var(--spacing-lg)', background: 'rgba(99, 102, 241, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
-                                <div className="flex items-center gap-sm mb-sm">
-                                    <Info size={14} style={{ color: 'var(--accent-primary)' }} />
-                                    <h4 className="text-xs text-muted uppercase">What is {selectedBias.biasType}?</h4>
-                                </div>
-                                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                                    {getBiasDefinition(selectedBias.biasType)}
-                                </p>
-                            </div>
-
-                            <div className="grid grid-2">
-                                {/* Section 2: Evidence Found */}
-                                <div style={{ padding: 'var(--spacing-lg)', borderRight: '1px solid var(--border-color)' }}>
-                                    <h4 className="text-xs text-muted mb-md uppercase flex items-center gap-sm">
-                                        <FileText size={14} />
-                                        Evidence Detected
-                                    </h4>
-                                    <blockquote style={{
-                                        padding: 'var(--spacing-md)',
-                                        background: '#0a0a0a',
-                                        borderLeft: `4px solid ${SEVERITY_COLORS[selectedBias.severity]}`,
-                                        fontSize: '13px',
-                                        fontStyle: 'italic',
-                                        marginBottom: 'var(--spacing-md)'
-                                    }}>
-                                        &quot;{selectedBias.excerpt}&quot;
-                                    </blockquote>
-
-                                    {/* AI Detection Methodology */}
-                                    <div style={{
-                                        padding: 'var(--spacing-md)',
-                                        background: 'rgba(255, 159, 10, 0.05)',
-                                        border: '1px solid rgba(255, 159, 10, 0.2)',
-                                        borderRadius: 'var(--radius-sm)'
-                                    }}>
-                                        <div className="flex items-center gap-sm mb-sm">
-                                            <Terminal size={12} style={{ color: 'var(--warning)' }} />
-                                            <span className="text-xs font-bold uppercase" style={{ color: 'var(--warning)' }}>AI Detection Method</span>
-                                        </div>
-                                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                            {getDetectionMethodology(selectedBias.biasType, selectedBias.excerpt)}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Section 3: AI Analysis */}
-                                <div style={{ padding: 'var(--spacing-lg)' }}>
-                                    <h4 className="text-xs text-muted mb-md uppercase flex items-center gap-sm">
-                                        <AlertTriangle size={14} />
-                                        AI Analysis
-                                    </h4>
-                                    <p className="mb-lg" style={{ fontSize: '13px', lineHeight: 1.6 }}>{selectedBias.explanation}</p>
-
-                                    {/* Why This Matters */}
-                                    <div style={{
-                                        padding: 'var(--spacing-md)',
-                                        background: 'rgba(239, 68, 68, 0.05)',
-                                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                                        borderRadius: 'var(--radius-sm)',
-                                        marginBottom: 'var(--spacing-md)'
-                                    }}>
-                                        <div className="flex items-center gap-sm mb-sm">
-                                            <AlertTriangle size={12} style={{ color: 'var(--error)' }} />
-                                            <span className="text-xs font-bold uppercase" style={{ color: 'var(--error)' }}>Impact Assessment</span>
-                                        </div>
-                                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                            {getImpactAssessment(selectedBias.biasType, selectedBias.severity)}
-                                        </p>
-                                    </div>
-
-                                    {/* Correction Recommendation */}
-                                    <div style={{
-                                        padding: 'var(--spacing-md)',
-                                        background: 'rgba(48, 209, 88, 0.05)',
-                                        border: '1px solid var(--success)',
-                                        borderRadius: 'var(--radius-sm)'
-                                    }}>
-                                        <div className="flex items-center gap-sm mb-sm">
-                                            <Lightbulb size={14} style={{ color: 'var(--success)' }} />
-                                            <span className="text-xs font-bold uppercase" style={{ color: 'var(--success)' }}>Recommended Correction</span>
-                                        </div>
-                                        <p style={{ fontSize: '13px', lineHeight: 1.5 }}>{selectedBias.suggestion}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Section 4: Confidence & Methodology Footer */}
-                            <div style={{
-                                padding: 'var(--spacing-md) var(--spacing-lg)',
-                                background: 'var(--bg-secondary)',
-                                borderTop: '1px solid var(--border-color)',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <div className="flex items-center gap-lg">
-                                    <div>
-                                        <span className="text-xs text-muted">Detection Model: </span>
-                                        <span className="text-xs" style={{ color: 'var(--accent-primary)' }}>Gemini 3 Pro</span>
-                                    </div>
-                                    <div>
-                                        <span className="text-xs text-muted">Analysis Type: </span>
-                                        <span className="text-xs">Psycholinguistic Pattern Matching</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-md">
-                                    <span className="text-xs text-muted">Severity assessed based on language intensity and decision impact potential</span>
-                                </div>
-                            </div>
-                        </div>
+            {/* No biases celebration */}
+            {biases.length === 0 && analysis && (
+                <div className="card animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                    <div className="card-body flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-2xl)' }}>
+                        <CheckCircle size={64} style={{ color: 'var(--success)' }} />
+                        <h3 style={{ color: 'var(--success)' }}>No Cognitive Biases Detected!</h3>
+                        <p style={{ textAlign: 'center', maxWidth: 500 }}>
+                            This document appears to demonstrate sound decision-making practices
+                            without significant cognitive bias patterns.
+                        </p>
                     </div>
                 </div>
             )}
 
-            {/* No biases */}
-            {
-                biases.length === 0 && analysis && (
-                    <div className="card animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                        <div className="card-body flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-2xl)' }}>
-                            <CheckCircle size={64} style={{ color: 'var(--success)' }} />
-                            <h3 style={{ color: 'var(--success)' }}>No Cognitive Biases Detected!</h3>
-                            <p style={{ textAlign: 'center', maxWidth: 500 }}>
-                                This document appears to demonstrate sound decision-making practices
-                                without significant cognitive bias patterns.
-                            </p>
-                        </div>
-                    </div>
-                )
-            }
-
-            {/* Regulatory Horizon Widget */}
+            {/* Regulatory & Institutional Memory Widgets */}
             {analysis?.compliance && (
                 <div className="mb-xl">
                     <RegulatoryHorizonWidget compliance={analysis.compliance} />
                 </div>
             )}
-
-            {/* Institutional Memory Widget */}
             {analysis?.institutionalMemory && (
                 <div className="mb-xl">
                     <InstitutionalMemoryWidget memory={analysis.institutionalMemory} />

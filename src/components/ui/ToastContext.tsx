@@ -24,10 +24,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         const id = Math.random().toString(36).substring(2, 9);
         setToasts((prev) => [...prev, { id, message, type }]);
 
-        // Auto remove after 3s
+        // Errors/warnings persist longer (8s) so users can read them; success/info auto-dismiss at 3s
+        const duration = type === 'error' || type === 'warning' ? 8000 : 3000;
         setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== id));
-        }, 3000);
+        }, duration);
     }, []);
 
     const removeToast = (id: string) => {
@@ -38,6 +39,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <ToastContext.Provider value={{ showToast }}>
             {children}
             <div
+                role="status"
+                aria-live="polite"
+                aria-label="Notifications"
                 style={{
                     position: 'fixed',
                     bottom: '24px',
@@ -76,6 +80,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
                         <button
                             onClick={() => removeToast(toast.id)}
+                            aria-label="Dismiss notification"
                             style={{
                                 background: 'transparent',
                                 border: 'none',

@@ -42,7 +42,8 @@ export default function AuditFilters() {
                 <input
                     type="text"
                     placeholder="Search resources or details..."
-                    className="w-full pl-10 pr-4 py-2 rounded-md border border-border bg-background"
+                    aria-label="Search audit log"
+                    className="w-full pl-10 pr-4 py-2 border border-border bg-background"
                     onChange={(e) => handleSearch(e.target.value)}
                     defaultValue={searchParams.get('search') || ''}
                 />
@@ -52,7 +53,8 @@ export default function AuditFilters() {
             <div className="relative min-w-[200px]">
                 <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 <select
-                    className="w-full pl-10 pr-4 py-2 rounded-md border border-border bg-background appearance-none cursor-pointer"
+                    aria-label="Filter by action type"
+                    className="w-full pl-10 pr-4 py-2 border border-border bg-background appearance-none cursor-pointer"
                     onChange={(e) => handleActionFilter(e.target.value)}
                     defaultValue={searchParams.get('action') || ''}
                 >

@@ -8,10 +8,18 @@ export default function PlatformLayout({
 }) {
     return (
         <>
+            <a href="#main-content" className="skip-nav">
+                Skip to main content
+            </a>
             <Ticker />
             <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
                 <Sidebar />
-                <main style={{ flex: 1, overflowY: 'auto' }} className="bg-primary text-primary transition-colors duration-300">
+                <main
+                    id="main-content"
+                    tabIndex={-1}
+                    style={{ flex: 1, overflowY: 'auto' }}
+                    className="bg-primary text-primary transition-colors duration-300"
+                >
                     {children}
                 </main>
             </div>
