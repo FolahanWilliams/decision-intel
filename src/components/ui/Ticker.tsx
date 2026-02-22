@@ -1,22 +1,23 @@
 'use client';
 
-
-
 export default function Ticker() {
     return (
-        <div style={{
-            background: '#1a1a1a',
-            borderBottom: '1px solid #333',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            fontFamily: 'JetBrains Mono, monospace',
-            fontSize: '12px'
-        }}>
+        <div
+            role="marquee"
+            aria-label="System metrics ticker"
+            style={{
+                background: 'var(--bg-tertiary)',
+                borderBottom: '1px solid var(--border-color)',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '12px'
+            }}
+        >
             <div className="ticker-track">
-                {/* Simulated Ticker Items */}
                 <TickerItem label="AVG DECISION SCORE" value="85.4" change="+2.1%" up />
                 <TickerItem label="NOISE INDEX" value="42.0" change="-1.5%" down />
                 <TickerItem label="BIAS DETECTED" value="12" change="+3" bad />
@@ -45,15 +46,14 @@ export default function Ticker() {
 }
 
 function TickerItem({ label, value, change, up, down, bad }: { label: string, value: string, change?: string, up?: boolean, down?: boolean, bad?: boolean }) {
-    const color = up || down ? '#30d158' : bad ? '#ff453a' : '#e0e0e0';
-    // If down is true (meaning noise reduction), it's good (green). If bad is true (bias increase), it's red.
+    const color = up || down ? 'var(--success)' : bad ? 'var(--error)' : 'var(--text-primary)';
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: '#888' }}>{label}</span>
-            <span style={{ color: '#fff', fontWeight: 'bold' }}>{value}</span>
+            <span style={{ color: 'var(--text-muted)' }}>{label}</span>
+            <span style={{ color: 'var(--text-highlight)', fontWeight: 'bold' }}>{value}</span>
             {change && (
-                <span style={{ color }}>{change}</span>
+                <span style={{ color }} aria-label={`Change: ${change}`}>{change}</span>
             )}
         </div>
-    )
+    );
 }

@@ -8,6 +8,7 @@ import {
 } from 'recharts';
 import { Download, TrendingUp, TrendingDown, RefreshCw, AlertTriangle } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 
 interface MarketAnalysis {
@@ -79,6 +80,10 @@ export default function TrendsPage() {
 
     return (
         <div className="container" style={{ paddingTop: 'var(--spacing-lg)', paddingBottom: 'var(--spacing-2xl)', maxWidth: '100%' }}>
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Historical Trends' },
+            ]} />
             {/* Header */}
             <div className="flex items-center justify-between mb-xl pb-md" style={{ borderBottom: '1px solid var(--border-color)' }}>
                 <div>

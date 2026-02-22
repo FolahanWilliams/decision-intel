@@ -1,4 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;600&display=swap');
+@import "tailwindcss";
+
+/* Bridge Tailwind v4 theme tokens to CSS custom properties so both systems agree */
+@theme {
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-full: 9999px; /* Keep full for avatars/dots */
+
+  --color-accent-primary: #ff9f0a;
+  --color-accent-secondary: #0a84ff;
+  --color-success: #30d158;
+  --color-warning: #ffd60a;
+  --color-error: #ff453a;
+  --color-info: #64d2ff;
+  --color-muted: #555555;
+  --color-border: #333333;
+}
 
 :root {
   /* Default Dark Mode (Term) */
@@ -535,4 +556,41 @@ tr:hover td {
   .grid-4 { grid-template-columns: 1fr; }
   .grid-3 { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* Accessibility: Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scanner-line,
+  .ticker-track {
+    animation: none !important;
+  }
+}
+
+/* Skip navigation link for keyboard users */
+.skip-nav {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--accent-primary);
+  color: #000;
+  padding: 8px 16px;
+  z-index: 100;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-nav:focus {
+  top: 0;
+}
+
+/* Focus ring for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }

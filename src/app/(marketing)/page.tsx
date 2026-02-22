@@ -196,7 +196,7 @@ export default function LandingPage() {
             animate={problemInView ? { opacity: 1, y: 0 } : {}}
             className="mb-16 border-l-4 border-[#ff453a] pl-6"
           >
-            <h2 className="text-3xl md:text-4xl text-[#ffffff] mb-2 tracking-tight font-sans">SYSTEM_FAILURE: DECISION NOISE</h2>
+            <h2 className="text-3xl md:text-4xl text-[#ffffff] mb-2 tracking-tight">SYSTEM_FAILURE: DECISION NOISE</h2>
             <p className="text-[#a0a0a0] max-w-2xl text-sm font-sans">
               Different experts evaluating identical data produce wildly varying outputs. Human inconsistency is a silent tax destroying profit margins.
             </p>
@@ -292,7 +292,7 @@ export default function LandingPage() {
             animate={featuresInView ? { opacity: 1, y: 0 } : {}}
             className="mb-16 border-l-4 border-[#ff9f0a] pl-6"
           >
-            <h2 className="text-3xl md:text-4xl text-[#ffffff] mb-2 tracking-tight font-sans">PLATFORM_MODULES</h2>
+            <h2 className="text-3xl md:text-4xl text-[#ffffff] mb-2 tracking-tight">PLATFORM_MODULES</h2>
             <p className="text-[#a0a0a0] text-sm font-sans">Enterprise-grade tools for cognitive auditing.</p>
           </motion.div>
 
@@ -309,7 +309,7 @@ export default function LandingPage() {
                 <div className="p-3 bg-[#ff9f0a]/10 border border-[#ff9f0a]/30 w-12 h-12 flex items-center justify-center mb-6">
                   <Brain className="w-6 h-6 text-[#ff9f0a]" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3 text-[#ffffff] font-sans">Cognitive Bias Engine</h3>
+                <h3 className="text-2xl font-bold mb-3 text-[#ffffff]">Cognitive Bias Engine</h3>
                 <p className="text-[#a0a0a0] text-sm max-w-md font-sans leading-relaxed">
                   Advanced argumentation mining algorithms parse unstructured text to identify 15+ logical fallacies and cognitive distortions including confirmation bias, anchoring, and groupthink.
                 </p>
@@ -343,7 +343,7 @@ export default function LandingPage() {
                 </div>
                 <span className="badge badge-medium tracking-widest">NOISE_AUDIT</span>
               </div>
-              <h3 className="text-xl font-bold mb-2 text-[#ffffff] font-sans">Statistical Jury</h3>
+              <h3 className="text-xl font-bold mb-2 text-[#ffffff]">Statistical Jury</h3>
               <p className="text-[#a0a0a0] text-sm font-sans leading-relaxed">
                 Simulates multiple independent assessments (LLM instances) to measure variance and identify Decision Noise. Output precise standard deviations.
               </p>
@@ -357,7 +357,7 @@ export default function LandingPage() {
               className="card card-glow col-span-1 md:col-span-1 lg:col-span-1 bg-[#1a1a1a] p-8 flex flex-col items-center text-center justify-center border-[#333333]"
             >
               <Zap className="w-8 h-8 text-[#ffd60a] mb-4" />
-              <h3 className="text-lg font-bold mb-2 text-[#ffffff] font-sans">Sub-second<br />Analysis</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#ffffff]">Sub-second<br />Analysis</h3>
               <p className="text-[#a0a0a0] text-xs font-sans">High-performance edge computing infrastructure.</p>
             </motion.div>
 
@@ -369,7 +369,7 @@ export default function LandingPage() {
               className="card card-glow col-span-1 md:col-span-1 lg:col-span-1 bg-[#050505] p-8 flex flex-col items-center text-center justify-center pixel-grid"
             >
               <Shield className="w-8 h-8 text-[#30d158] mb-4" />
-              <h3 className="text-lg font-bold mb-2 text-[#ffffff] font-sans">FCA & GDPR<br />Ready</h3>
+              <h3 className="text-lg font-bold mb-2 text-[#ffffff]">FCA & GDPR<br />Ready</h3>
               <p className="text-[#a0a0a0] text-xs font-sans">Consumer Duty mapping and automated PII sanitization.</p>
             </motion.div>
           </div>
@@ -384,7 +384,7 @@ export default function LandingPage() {
             animate={roiInView ? { opacity: 1, y: 0 } : {}}
             className="mb-16 border-l-4 border-[#0a84ff] pl-6"
           >
-            <h2 className="text-3xl md:text-4xl text-[#ffffff] mb-2 tracking-tight font-sans">ROI_SCENARIO_TESTBED</h2>
+            <h2 className="text-3xl md:text-4xl text-[#ffffff] mb-2 tracking-tight">ROI_SCENARIO_TESTBED</h2>
             <p className="text-[#a0a0a0] text-sm font-sans">Model the financial impact of unmitigated decision variance.</p>
           </motion.div>
 
@@ -450,7 +450,7 @@ export default function LandingPage() {
               transition={{ delay: 0.1 }}
               className="md:col-span-3 card bg-[#000000] border-[#0a84ff]/30 p-8 relative overflow-hidden flex flex-col justify-center"
             >
-              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none text-9xl font-bold font-sans">
+              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none text-9xl font-bold">
                 $
               </div>
               <div className="space-y-8 relative z-10">

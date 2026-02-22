@@ -8,6 +8,7 @@ import {
 import { updateUserSettings, UserSettingsData } from '@/app/actions/settings';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/ToastContext';
 
 interface SettingsFormProps {
     initialSettings: UserSettingsData;
@@ -29,6 +30,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
     const [saved, setSaved] = useState(false);
     const { setTheme } = useTheme();
     const router = useRouter();
+    const { showToast } = useToast();
 
     // Delete account state
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -68,10 +70,11 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                     compactView
                 });
                 setSaved(true);
+                showToast('Settings saved successfully', 'success');
                 setTimeout(() => setSaved(false), 2000);
             } catch (error) {
                 console.error("Failed to save settings:", error);
-                // Optionally handle error state here
+                showToast('Failed to save settings', 'error');
             }
         });
     };
@@ -279,24 +282,32 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
 
             {/* Delete confirmation modal */}
             {showDeleteModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.8)', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
-                    <div className="card" style={{ maxWidth: 440, width: '90%', borderColor: 'var(--error)' }}>
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="delete-modal-title"
+                    aria-describedby="delete-modal-desc"
+                    style={{
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(0,0,0,0.8)', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                    }}
+                    onClick={() => { if (!deleting) { setShowDeleteModal(false); setDeleteError(null); } }}
+                    onKeyDown={(e) => { if (e.key === 'Escape' && !deleting) { setShowDeleteModal(false); setDeleteError(null); } }}
+                >
+                    <div className="card" style={{ maxWidth: 440, width: '90%', borderColor: 'var(--error)' }} onClick={e => e.stopPropagation()}>
                         <div className="card-header">
-                            <h3 className="flex items-center gap-sm" style={{ color: 'var(--error)' }}>
+                            <h3 id="delete-modal-title" className="flex items-center gap-sm" style={{ color: 'var(--error)' }}>
                                 <AlertTriangle size={20} />
                                 Delete all account data?
                             </h3>
                         </div>
                         <div className="card-body">
-                            <p className="text-sm mb-lg" style={{ lineHeight: 1.6 }}>
+                            <p id="delete-modal-desc" className="text-sm mb-lg" style={{ lineHeight: 1.6 }}>
                                 This will permanently erase <strong>all your documents, analyses, audit logs, and settings</strong>. You will be signed out immediately. This action <strong>cannot be undone</strong>.
                             </p>
                             {deleteError && (
-                                <p className="text-sm mb-lg" style={{ color: 'var(--error)' }}>
+                                <p className="text-sm mb-lg" role="alert" style={{ color: 'var(--error)' }}>
                                     {deleteError}
                                 </p>
                             )}
@@ -337,13 +348,18 @@ function ToggleOption({
     checked: boolean;
     onChange: (value: boolean) => void
 }) {
+    const id = label.replace(/\s+/g, '-').toLowerCase();
     return (
         <div className="flex items-center justify-between">
             <div>
-                <div style={{ fontWeight: 500, marginBottom: '2px' }}>{label}</div>
-                <div className="text-xs text-muted">{description}</div>
+                <div id={`${id}-label`} style={{ fontWeight: 500, marginBottom: '2px' }}>{label}</div>
+                <div id={`${id}-desc`} className="text-xs text-muted">{description}</div>
             </div>
             <button
+                role="switch"
+                aria-checked={checked}
+                aria-labelledby={`${id}-label`}
+                aria-describedby={`${id}-desc`}
                 onClick={() => onChange(!checked)}
                 style={{
                     width: 48,

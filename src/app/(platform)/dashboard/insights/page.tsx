@@ -19,6 +19,7 @@ import {
     Terminal, Cpu, Zap, TrendingUp,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 /* ── Reusable sub-components ─────────────────────────────────── */
 
@@ -309,6 +310,10 @@ export default function InsightsPage() {
 
     return (
         <div className="container" style={{ paddingTop: 'var(--spacing-lg)', paddingBottom: 'var(--spacing-2xl)', maxWidth: '100%' }}>
+            <Breadcrumbs items={[
+                { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Visual Insights' },
+            ]} />
             {/* ── Header ──────────────────────────────────────── */}
             <div
                 className="animate-slide-up"

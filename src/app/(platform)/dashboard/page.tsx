@@ -7,6 +7,7 @@ import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
 import { RiskTrendChart } from './RiskTrendChart';
 import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnalysis';
+import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
 
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
@@ -191,6 +192,9 @@ export default function Dashboard() {
           </span>
         </h1>
       </div>
+
+      {/* Onboarding Guide for new users */}
+      <OnboardingGuide />
 
       {/* Upload Zone - Compact */}
       {!uploading ? (
@@ -439,9 +443,10 @@ export default function Dashboard() {
               <input
                 type="text"
                 placeholder="Search..."
+                aria-label="Search documents"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border rounded-md w-40 focus:w-56 transition-all"
+                className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border w-40 focus:w-56 transition-all"
               />
               {searchQuery && (
                 <button
@@ -455,8 +460,9 @@ export default function Dashboard() {
 
             <select
               value={statusFilter}
+              aria-label="Filter by status"
               onChange={(e) => setStatusFilter(e.target.value as 'all' | 'complete' | 'analyzing' | 'pending')}
-              className="px-3 py-1.5 text-sm bg-primary border border-border rounded-md"
+              className="px-3 py-1.5 text-sm bg-primary border border-border"
             >
               <option value="all">All Status</option>
               <option value="complete">Complete</option>
@@ -584,8 +590,15 @@ export default function Dashboard() {
 
       {/* Delete Confirmation Modal */}
       {deleteModal.open && (
-        <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50">
-          <div className="card w-full max-w-sm mx-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Delete document confirmation"
+          className="fixed inset-0 bg-black/75 flex items-center justify-center z-50"
+          onClick={() => { if (!deleting) setDeleteModal({ open: false, docId: '', filename: '' }); }}
+          onKeyDown={(e) => { if (e.key === 'Escape' && !deleting) setDeleteModal({ open: false, docId: '', filename: '' }); }}
+        >
+          <div className="card w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
             <div className="card-body">
               <div className="flex items-start gap-sm mb-lg">
                 <AlertTriangle size={20} className="text-error shrink-0 mt-0.5" />
