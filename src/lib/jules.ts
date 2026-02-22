@@ -2,9 +2,9 @@
 
 const JULES_API_BASE = 'https://jules.googleapis.com/v1alpha';
 function getJulesApiKey(): string {
-    const key = process.env.getJulesApiKey();
+    const key = process.env.JULES_API_KEY;
     if (!key) {
-        throw new Error('Missing required environment variable: getJulesApiKey()');
+        throw new Error('Missing required environment variable: JULES_API_KEY');
     }
     return key;
 }
