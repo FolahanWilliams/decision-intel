@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, BarChart3, Shield, X, ArrowRight } from 'lucide-react';
 
 const STEPS = [
@@ -26,13 +26,13 @@ const STEPS = [
 
 const STORAGE_KEY = 'decision-intel-onboarding-dismissed';
 
-function getInitialDismissed() {
-    if (typeof window === 'undefined') return true;
-    return !!localStorage.getItem(STORAGE_KEY);
-}
-
 export function OnboardingGuide() {
-    const [dismissed, setDismissed] = useState(getInitialDismissed);
+    // Start dismissed to avoid flash; useEffect reveals if not yet dismissed
+    const [dismissed, setDismissed] = useState(true);
+
+    useEffect(() => {
+        if (!localStorage.getItem(STORAGE_KEY)) setDismissed(false);
+    }, []);
     const [currentStep, setCurrentStep] = useState(0);
 
     const handleDismiss = () => {
