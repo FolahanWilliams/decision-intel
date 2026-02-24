@@ -129,6 +129,18 @@ model UserSettings {
   @@index([userId])
 }
 
+// Cache table - replaces Redis for cost savings
+// TTL is enforced via expiresAt; expired rows are filtered on read and
+// cleaned up lazily on write or via /api/cache/cleanup.
+model CacheEntry {
+  key       String   @id
+  value     String   @db.Text
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
 // Rate limiting table - replaces Redis for cost savings
 model RateLimit {
   id        String   @id @default(cuid())

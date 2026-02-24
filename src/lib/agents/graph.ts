@@ -1,6 +1,6 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
 import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, verificationNode, deepAnalysisNode, simulationNode } from "./nodes";
-import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
+import { AnalysisResult, BiasDetectionResult, NoiseBenchmark, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
 
 // Define the State using Annotation.Root
 const GraphState = Annotation.Root({
@@ -39,6 +39,10 @@ const GraphState = Annotation.Root({
     noiseStats: Annotation<{ mean: number; stdDev: number; variance: number }>({
         reducer: (x, y) => y ?? x,
         default: () => ({ mean: 0, stdDev: 0, variance: 0 }),
+    }),
+    noiseBenchmarks: Annotation<NoiseBenchmark[]>({
+        reducer: (x, y) => y ?? x,
+        default: () => [],
     }),
     factCheckResult: Annotation<{ status: 'success' | 'error'; score: number; flags: string[] } | null>({
         reducer: (x, y) => y ?? x,
@@ -82,13 +86,14 @@ const GraphState = Annotation.Root({
     }),
 });
 
-// Routing function: if GDPR anonymization failed, skip all analysis nodes
-// and go straight to riskScorer which will generate an error report.
+// Routing function: only allow content into the analysis pipeline when
+// anonymization explicitly succeeded.  Any other status (failed, undefined,
+// unexpected value) short-circuits to riskScorer to prevent PII leakage.
 function routeAfterAnonymization(state: typeof GraphState.State): string {
-    if (state.anonymizationStatus === 'failed') {
-        return 'riskScorer';
+    if (state.anonymizationStatus === 'success') {
+        return 'structurer';
     }
-    return 'structurer';
+    return 'riskScorer';
 }
 
 // Graph Definition — Optimized Super-Node Architecture

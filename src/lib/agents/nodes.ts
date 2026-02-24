@@ -160,7 +160,12 @@ function sanitizeForPrompt(data: unknown, label: string = 'external_data'): stri
 // ============================================================
 
 export async function structurerNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = state.structuredContent || state.originalContent;
+    // SECURITY: Only use anonymized content. If structuredContent is empty the
+    // graph routing guard should have prevented us from reaching this node.
+    if (!state.structuredContent) {
+        throw new Error('structurerNode: structuredContent is empty — anonymization may have been bypassed');
+    }
+    const content = state.structuredContent;
 
     try {
         log.info("Running document structuring...");
@@ -194,7 +199,8 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
 export async function biasDetectiveNode(state: AuditState): Promise<Partial<AuditState>> {
 
     try {
-        const content = truncateText(state.structuredContent || state.originalContent);
+        // SECURITY: Never fall back to originalContent — only use anonymized content
+        const content = truncateText(state.structuredContent || '');
 
         // Use Grounded Model for primary detection with retry logic
         const result = await withRetry(
@@ -286,7 +292,8 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
 
 export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditState>> {
 
-    const content = truncateText(state.structuredContent || state.originalContent);
+    // SECURITY: Never fall back to originalContent — only use anonymized content
+    const content = truncateText(state.structuredContent || '');
 
     try {
         // Parallel Judges for Noise Scoring
@@ -442,7 +449,8 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
 // ============================================================
 
 export async function verificationNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
+    // SECURITY: Never fall back to originalContent — only use anonymized content
+    const content = truncateText(state.structuredContent || '');
 
     try {
         log.info("Running combined Fact Check + Compliance verification...");
@@ -516,7 +524,7 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
                 const searchSources = extractSearchSources(refinementResult.response);
                 enrichedFactCheck = {
                     status: 'success' as const,
-                    score: refined.score || factCheckData.score || 0,
+                    score: typeof refined.score === 'number' ? refined.score : (typeof factCheckData.score === 'number' ? factCheckData.score : 50),
                     summary: factCheckData.summary || "Verification completed",
                     verifications: refined.verifications.map((v: { sourceUrl?: string }, i: number) => ({
                         ...v,
@@ -534,7 +542,7 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
             const searchSources = extractSearchSources(result.response);
             enrichedFactCheck = {
                 status: 'success' as const,
-                score: factCheckData?.score || 0,
+                score: typeof factCheckData?.score === 'number' ? factCheckData.score : 50,
                 summary: factCheckData?.summary || "Verification completed",
                 verifications: (factCheckData?.verifications || []).map((v: { sourceUrl?: string }, i: number) => ({
                     ...v,
@@ -581,7 +589,8 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
 // ============================================================
 
 export async function deepAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
+    // SECURITY: Never fall back to originalContent — only use anonymized content
+    const content = truncateText(state.structuredContent || '');
 
     try {
         log.info("Running deep multi-dimensional analysis (sentiment, logic, SWOT, cognitive diversity)...");
@@ -644,7 +653,8 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
 // ============================================================
 
 export async function simulationNode(state: AuditState): Promise<Partial<AuditState>> {
-    const content = truncateText(state.structuredContent || state.originalContent);
+    // SECURITY: Never fall back to originalContent — only use anonymized content
+    const content = truncateText(state.structuredContent || '');
 
     try {
         log.info("Running boardroom simulation with institutional memory...");
@@ -768,8 +778,10 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             overallScore,
             noiseScore: Math.min(100, (state.noiseStats?.stdDev || 0) * 10),
             summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Trust Score: ${trustScore}%.`,
+            structuredContent: state.structuredContent,
             biases: state.biasAnalysis || [],
             noiseStats: state.noiseStats,
+            noiseBenchmarks: state.noiseBenchmarks,
             factCheck: state.factCheckResult ?? undefined,
             compliance: state.compliance || {
                 status: 'WARN',
@@ -783,6 +795,8 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             logicalAnalysis: state.logicalAnalysis,
             swotAnalysis: state.swotAnalysis,
             cognitiveAnalysis: state.cognitiveAnalysis,
+            simulation: state.simulation ?? undefined,
+            institutionalMemory: state.institutionalMemory ?? undefined,
             speakers: []
         } satisfies AnalysisResult
     };

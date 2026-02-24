@@ -1,61 +1,25 @@
 /**
- * Redis configuration and caching utilities
+ * Supabase/Postgres-backed caching utilities
+ *
+ * Replaces the previous ioredis/Redis implementation with a `CacheEntry`
+ * table managed by Prisma.  TTL is enforced via the `expiresAt` column:
+ *   - Reads filter out expired rows and lazily delete them.
+ *   - Writes upsert with a new `expiresAt` and probabilistically prune
+ *     other expired rows (~1% of writes) so the table stays compact.
+ *   - A dedicated /api/cache/cleanup endpoint handles scheduled bulk pruning.
  */
 
-import Redis from 'ioredis';
+import { prisma } from '@/lib/prisma';
 import { hashContent } from './resilience';
 import { createLogger } from './logger';
 
 const log = createLogger('Cache');
 
-// Redis client singleton
-let redisClient: Redis | null = null;
 let cacheStatusLogged = false;
-
-/**
- * Get or create Redis client instance
- * @returns Redis client or null if not configured
- */
-export function getRedisClient(): Redis | null {
-  if (redisClient) {
-    return redisClient;
-  }
-  
-  // Check if Redis URL is configured
-  const redisUrl = process.env.REDIS_URL;
-  
-  if (!redisUrl) {
-    if (!cacheStatusLogged) {
-      log.warn('REDIS_URL not configured — caching disabled');
-      cacheStatusLogged = true;
-    }
-    return null;
-  }
-  
-  try {
-    redisClient = new Redis(redisUrl, {
-      retryStrategy: (times) => {
-        const delay = Math.min(times * 50, 2000);
-        return delay;
-      },
-      maxRetriesPerRequest: 3,
-      enableReadyCheck: true,
-      lazyConnect: true,
-    });
-    
-    redisClient.on('error', (err) => {
-      log.error('Redis error: ' + err.message);
-    });
-    
-    redisClient.on('connect', () => {
-      log.info('Redis connected');
-      cacheStatusLogged = true;
-    });
-    
-    return redisClient;
-  } catch (error) {
-    log.error('Failed to create Redis client:', error);
-    return null;
+function logCacheReady() {
+  if (!cacheStatusLogged) {
+    log.info('Cache backed by Supabase/Postgres (CacheEntry table)');
+    cacheStatusLogged = true;
   }
 }
 
@@ -74,245 +38,192 @@ export const CACHE_KEYS = {
  * Cache TTL values in seconds
  */
 export const CACHE_TTL = {
-  ANALYSIS: 7 * 24 * 60 * 60, // 7 days
-  EMBEDDING: 30 * 24 * 60 * 60, // 30 days
+  ANALYSIS: 7 * 24 * 60 * 60,      // 7 days
+  EMBEDDING: 30 * 24 * 60 * 60,    // 30 days
   BIAS_INSIGHT: 30 * 24 * 60 * 60, // 30 days (research doesn't change often)
-  FINANCIAL_DATA: 60 * 60, // 1 hour (stock data changes frequently)
-  RATE_LIMIT: 60, // 1 minute
+  FINANCIAL_DATA: 60 * 60,          // 1 hour (stock data changes frequently)
+  RATE_LIMIT: 60,                   // 1 minute
 } as const;
 
-/**
- * Get cached analysis result
- * @param contentHash Hash of the document content
- * @returns Cached analysis or null
- */
-export async function getCachedAnalysis(contentHash: string): Promise<Record<string, unknown> | null> {
-  const redis = getRedisClient();
-  if (!redis) return null;
-  
+// ---------------------------------------------------------------------------
+// Low-level helpers
+// ---------------------------------------------------------------------------
+
+async function cacheGet(key: string): Promise<string | null> {
+  logCacheReady();
   try {
-    const cached = await redis.get(`${CACHE_KEYS.ANALYSIS}${contentHash}`);
-    if (cached) {
-      log.debug('Cache hit for analysis: ' + contentHash.substring(0, 8));
-      return JSON.parse(cached);
+    const entry = await prisma.cacheEntry.findUnique({
+      where: { key },
+      select: { value: true, expiresAt: true },
+    });
+    if (!entry) return null;
+    if (entry.expiresAt <= new Date()) {
+      // Lazy delete of expired entry — fire and forget
+      prisma.cacheEntry.delete({ where: { key } }).catch(() => null);
+      return null;
     }
-    return null;
+    return entry.value;
   } catch (error) {
-    log.error('Redis get error:', error);
+    log.error('Cache get error:', error);
     return null;
   }
 }
 
+async function cacheSet(key: string, value: string, ttlSeconds: number): Promise<void> {
+  logCacheReady();
+  const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
+  try {
+    await prisma.cacheEntry.upsert({
+      where: { key },
+      update: { value, expiresAt },
+      create: { key, value, expiresAt },
+    });
+    // Probabilistic cleanup: ~1% of writes trigger expired-row pruning
+    if (Math.random() < 0.01) {
+      pruneExpiredEntries().catch(() => null);
+    }
+  } catch (error) {
+    log.error('Cache set error:', error);
+  }
+}
+
+/**
+ * Delete all expired cache entries. Called probabilistically on writes and
+ * by the /api/cache/cleanup endpoint.
+ */
+export async function pruneExpiredEntries(): Promise<number> {
+  const result = await prisma.cacheEntry.deleteMany({
+    where: { expiresAt: { lte: new Date() } },
+  });
+  if (result.count > 0) {
+    log.debug(`Pruned ${result.count} expired cache entries`);
+  }
+  return result.count;
+}
+
+// ---------------------------------------------------------------------------
+// Public API — identical surface to the previous Redis implementation
+// ---------------------------------------------------------------------------
+
+/**
+ * @deprecated No-op kept for backwards compatibility. Cache is always active
+ * via Postgres; there is no optional Redis client to retrieve.
+ */
+export function getRedisClient(): null {
+  return null;
+}
+
+/**
+ * Get cached analysis result
+ */
+export async function getCachedAnalysis(contentHash: string): Promise<Record<string, unknown> | null> {
+  const raw = await cacheGet(`${CACHE_KEYS.ANALYSIS}${contentHash}`);
+  if (raw) {
+    log.debug('Cache hit for analysis: ' + contentHash.substring(0, 8));
+    return JSON.parse(raw);
+  }
+  return null;
+}
+
 /**
  * Cache analysis result
- * @param contentHash Hash of the document content
- * @param analysis The analysis result to cache
- * @param ttl Time to live in seconds (default: 7 days)
  */
 export async function cacheAnalysis(
   contentHash: string,
   analysis: Record<string, unknown>,
   ttl: number = CACHE_TTL.ANALYSIS
 ): Promise<void> {
-  const redis = getRedisClient();
-  if (!redis) return;
-  
-  try {
-    await redis.setex(
-      `${CACHE_KEYS.ANALYSIS}${contentHash}`,
-      ttl,
-      JSON.stringify(analysis)
-    );
-    log.debug('Analysis cached: ' + contentHash.substring(0, 8));
-  } catch (error) {
-    log.error('Redis set error:', error);
-  }
+  await cacheSet(`${CACHE_KEYS.ANALYSIS}${contentHash}`, JSON.stringify(analysis), ttl);
+  log.debug('Analysis cached: ' + contentHash.substring(0, 8));
 }
 
 /**
  * Get cached embedding
- * @param textHash Hash of the text
- * @returns Cached embedding or null
  */
 export async function getCachedEmbedding(textHash: string): Promise<number[] | null> {
-  const redis = getRedisClient();
-  if (!redis) return null;
-  
-  try {
-    const cached = await redis.get(`${CACHE_KEYS.EMBEDDING}${textHash}`);
-    if (cached) {
-      return JSON.parse(cached);
-    }
-    return null;
-  } catch (error) {
-    log.error('Redis embedding get error:', error);
-    return null;
-  }
+  const raw = await cacheGet(`${CACHE_KEYS.EMBEDDING}${textHash}`);
+  return raw ? (JSON.parse(raw) as number[]) : null;
 }
 
 /**
  * Cache embedding
- * @param textHash Hash of the text
- * @param embedding The embedding vector
  */
-export async function cacheEmbedding(
-  textHash: string,
-  embedding: number[]
-): Promise<void> {
-  const redis = getRedisClient();
-  if (!redis) return;
-  
-  try {
-    await redis.setex(
-      `${CACHE_KEYS.EMBEDDING}${textHash}`,
-      CACHE_TTL.EMBEDDING,
-      JSON.stringify(embedding)
-    );
-  } catch (error) {
-    log.error('Redis embedding set error:', error);
-  }
+export async function cacheEmbedding(textHash: string, embedding: number[]): Promise<void> {
+  await cacheSet(`${CACHE_KEYS.EMBEDDING}${textHash}`, JSON.stringify(embedding), CACHE_TTL.EMBEDDING);
 }
 
 /**
  * Get cached bias research insight
- * @param biasType The type of bias
- * @returns Cached insight or null
  */
 export async function getCachedBiasInsight(biasType: string): Promise<string | null> {
-  const redis = getRedisClient();
-  if (!redis) return null;
-  
-  try {
-    return await redis.get(`${CACHE_KEYS.BIAS_INSIGHT}${biasType}`);
-  } catch (error) {
-    log.error('Redis bias insight get error:', error);
-    return null;
-  }
+  return cacheGet(`${CACHE_KEYS.BIAS_INSIGHT}${biasType}`);
 }
 
 /**
  * Cache bias research insight
- * @param biasType The type of bias
- * @param insight The research insight
  */
-export async function cacheBiasInsight(
-  biasType: string,
-  insight: string
-): Promise<void> {
-  const redis = getRedisClient();
-  if (!redis) return;
-  
-  try {
-    await redis.setex(
-      `${CACHE_KEYS.BIAS_INSIGHT}${biasType}`,
-      CACHE_TTL.BIAS_INSIGHT,
-      insight
-    );
-  } catch (error) {
-    log.error('Redis bias insight set error:', error);
-  }
+export async function cacheBiasInsight(biasType: string, insight: string): Promise<void> {
+  await cacheSet(`${CACHE_KEYS.BIAS_INSIGHT}${biasType}`, insight, CACHE_TTL.BIAS_INSIGHT);
 }
 
 /**
  * Get cached financial data
- * @param ticker Stock ticker symbol
- * @param dataType Type of financial data
- * @returns Cached data or null
  */
 export async function getCachedFinancialData(
   ticker: string,
   dataType: string
 ): Promise<unknown | null> {
-  const redis = getRedisClient();
-  if (!redis) return null;
-  
-  try {
-    const cached = await redis.get(`${CACHE_KEYS.FINANCIAL_DATA}${ticker}:${dataType}`);
-    if (cached) {
-      return JSON.parse(cached);
-    }
-    return null;
-  } catch (error) {
-    log.error('Redis financial data get error:', error);
-    return null;
-  }
+  const raw = await cacheGet(`${CACHE_KEYS.FINANCIAL_DATA}${ticker}:${dataType}`);
+  return raw ? JSON.parse(raw) : null;
 }
 
 /**
  * Cache financial data
- * @param ticker Stock ticker symbol
- * @param dataType Type of financial data
- * @param data The financial data
  */
 export async function cacheFinancialData(
   ticker: string,
   dataType: string,
   data: unknown
 ): Promise<void> {
-  const redis = getRedisClient();
-  if (!redis) return;
-  
-  try {
-    await redis.setex(
-      `${CACHE_KEYS.FINANCIAL_DATA}${ticker}:${dataType}`,
-      CACHE_TTL.FINANCIAL_DATA,
-      JSON.stringify(data)
-    );
-  } catch (error) {
-    log.error('Redis financial data set error:', error);
-  }
+  await cacheSet(
+    `${CACHE_KEYS.FINANCIAL_DATA}${ticker}:${dataType}`,
+    JSON.stringify(data),
+    CACHE_TTL.FINANCIAL_DATA
+  );
 }
 
 /**
- * Clear all analysis cache (useful for testing/admin)
+ * Clear all analysis cache entries
  */
 export async function clearAnalysisCache(): Promise<void> {
-  const redis = getRedisClient();
-  if (!redis) return;
-  
   try {
-    const keys = await redis.keys(`${CACHE_KEYS.ANALYSIS}*`);
-    if (keys.length > 0) {
-      await redis.del(...keys);
-      log.info(`Cleared ${keys.length} cached analyses`);
-    }
+    const result = await prisma.cacheEntry.deleteMany({
+      where: { key: { startsWith: CACHE_KEYS.ANALYSIS } },
+    });
+    log.info(`Cleared ${result.count} cached analyses`);
   } catch (error) {
     log.error('Failed to clear analysis cache:', error);
   }
 }
 
 /**
- * Get cache statistics
- * @returns Cache stats or null if Redis unavailable
+ * Get cache statistics (non-expired entries only)
  */
-export async function getCacheStats(): Promise<{ 
-  analyses: number; 
+export async function getCacheStats(): Promise<{
+  analyses: number;
   embeddings: number;
   biasInsights: number;
   financialData: number;
 } | null> {
-  const redis = getRedisClient();
-  if (!redis) return null;
-  
   try {
-    const [
-      analyses,
-      embeddings,
-      biasInsights,
-      financialData
-    ] = await Promise.all([
-      redis.keys(`${CACHE_KEYS.ANALYSIS}*`),
-      redis.keys(`${CACHE_KEYS.EMBEDDING}*`),
-      redis.keys(`${CACHE_KEYS.BIAS_INSIGHT}*`),
-      redis.keys(`${CACHE_KEYS.FINANCIAL_DATA}*`),
+    const now = new Date();
+    const [analyses, embeddings, biasInsights, financialData] = await Promise.all([
+      prisma.cacheEntry.count({ where: { key: { startsWith: CACHE_KEYS.ANALYSIS },    expiresAt: { gt: now } } }),
+      prisma.cacheEntry.count({ where: { key: { startsWith: CACHE_KEYS.EMBEDDING },   expiresAt: { gt: now } } }),
+      prisma.cacheEntry.count({ where: { key: { startsWith: CACHE_KEYS.BIAS_INSIGHT },expiresAt: { gt: now } } }),
+      prisma.cacheEntry.count({ where: { key: { startsWith: CACHE_KEYS.FINANCIAL_DATA },expiresAt: { gt: now } } }),
     ]);
-    
-    return {
-      analyses: analyses.length,
-      embeddings: embeddings.length,
-      biasInsights: biasInsights.length,
-      financialData: financialData.length,
-    };
+    return { analyses, embeddings, biasInsights, financialData };
   } catch (error) {
     log.error('Failed to get cache stats:', error);
     return null;
@@ -320,14 +231,9 @@ export async function getCacheStats(): Promise<{
 }
 
 /**
- * Generate cache key for analysis based on content and user settings
- * This ensures different settings produce different cache keys
- * @param content Document content
- * @param userId User ID for user-specific caching
- * @returns Cache key
+ * Generate cache key for analysis based on content and optional user ID
  */
 export function generateAnalysisCacheKey(content: string, userId?: string): string {
   const contentHash = hashContent(content);
-  // Include userId in key if provided for user-specific analysis settings
   return userId ? `${contentHash}:${userId}` : contentHash;
 }
