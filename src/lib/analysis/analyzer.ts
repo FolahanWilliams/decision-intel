@@ -63,6 +63,10 @@ const SwotSchema = z.object({
 
 const CognitiveSchema = z.object({
     blindSpotGap: z.number().default(0),
+    blindSpots: z.array(z.object({
+        name: z.string(),
+        description: z.string()
+    })).default([]),
     counterArguments: z.array(z.record(z.string(), z.unknown())).default([])
 }).optional();
 
@@ -155,6 +159,7 @@ export async function analyzeDocument(
                         // New Fields (May cause P2022 if DB not migrated)
                         structuredContent: result.structuredContent || '',
                         noiseStats: toPrismaJson(NoiseStatsSchema.safeParse(result.noiseStats).success ? result.noiseStats : NoiseStatsSchema.parse({})),
+                        noiseBenchmarks: toPrismaJson(result.noiseBenchmarks ?? []),
                         factCheck: toPrismaJson(FactCheckSchema.safeParse(result.factCheck).success ? result.factCheck : FactCheckSchema.parse({})),
                         compliance: toPrismaJson(ComplianceSchema.safeParse(result.compliance).success ? result.compliance : ComplianceSchema.parse({})),
                         preMortem: toPrismaJson(result.preMortem),

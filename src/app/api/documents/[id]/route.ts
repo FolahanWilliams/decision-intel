@@ -37,6 +37,7 @@ export async function GET(
                         createdAt: true,
                         biases: true,
                         noiseStats: true,
+                        noiseBenchmarks: true,
                         factCheck: true,
                         compliance: true,
                         preMortem: true,
