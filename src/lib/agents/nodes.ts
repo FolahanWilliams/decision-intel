@@ -778,8 +778,10 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             overallScore,
             noiseScore: Math.min(100, (state.noiseStats?.stdDev || 0) * 10),
             summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Trust Score: ${trustScore}%.`,
+            structuredContent: state.structuredContent,
             biases: state.biasAnalysis || [],
             noiseStats: state.noiseStats,
+            noiseBenchmarks: state.noiseBenchmarks,
             factCheck: state.factCheckResult ?? undefined,
             compliance: state.compliance || {
                 status: 'WARN',
@@ -793,6 +795,8 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             logicalAnalysis: state.logicalAnalysis,
             swotAnalysis: state.swotAnalysis,
             cognitiveAnalysis: state.cognitiveAnalysis,
+            simulation: state.simulation ?? undefined,
+            institutionalMemory: state.institutionalMemory ?? undefined,
             speakers: []
         } satisfies AnalysisResult
     };

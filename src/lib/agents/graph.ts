@@ -1,6 +1,6 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
 import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, verificationNode, deepAnalysisNode, simulationNode } from "./nodes";
-import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
+import { AnalysisResult, BiasDetectionResult, NoiseBenchmark, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
 
 // Define the State using Annotation.Root
 const GraphState = Annotation.Root({
@@ -39,6 +39,10 @@ const GraphState = Annotation.Root({
     noiseStats: Annotation<{ mean: number; stdDev: number; variance: number }>({
         reducer: (x, y) => y ?? x,
         default: () => ({ mean: 0, stdDev: 0, variance: 0 }),
+    }),
+    noiseBenchmarks: Annotation<NoiseBenchmark[]>({
+        reducer: (x, y) => y ?? x,
+        default: () => [],
     }),
     factCheckResult: Annotation<{ status: 'success' | 'error'; score: number; flags: string[] } | null>({
         reducer: (x, y) => y ?? x,

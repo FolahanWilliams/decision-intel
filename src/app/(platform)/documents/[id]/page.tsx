@@ -522,36 +522,58 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         ))}
                     </div>
 
-                    {/* Tab Panels (lazy loaded) */}
+                    {/* Tab Panels (lazy loaded, each wrapped in ErrorBoundary) */}
                     <div role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={activeTab}>
                         <Suspense fallback={<CardSkeleton lines={5} />}>
                             {activeTab === 'overview' && (
-                                <OverviewTab
-                                    documentContent={document.content}
-                                    biases={biases}
-                                    uploadedAt={document.uploadedAt}
-                                    analysisCreatedAt={analysis?.createdAt}
-                                />
+                                <ErrorBoundary sectionName="Overview">
+                                    <OverviewTab
+                                        documentContent={document.content}
+                                        biases={biases}
+                                        uploadedAt={document.uploadedAt}
+                                        analysisCreatedAt={analysis?.createdAt}
+                                    />
+                                </ErrorBoundary>
                             )}
-                            {activeTab === 'logic' && <LogicTab logicalAnalysis={analysis?.logicalAnalysis} />}
-                            {activeTab === 'swot' && <SwotTab swotAnalysis={analysis?.swotAnalysis} />}
+                            {activeTab === 'logic' && (
+                                <ErrorBoundary sectionName="Logic Analysis">
+                                    <LogicTab logicalAnalysis={analysis?.logicalAnalysis} />
+                                </ErrorBoundary>
+                            )}
+                            {activeTab === 'swot' && (
+                                <ErrorBoundary sectionName="SWOT Analysis">
+                                    <SwotTab swotAnalysis={analysis?.swotAnalysis} />
+                                </ErrorBoundary>
+                            )}
                             {activeTab === 'noise' && analysis && (
-                                <NoiseTab
-                                    noiseScore={analysis.noiseScore}
-                                    noiseStats={analysis.noiseStats}
-                                    noiseBenchmarks={analysis.noiseBenchmarks}
-                                />
+                                <ErrorBoundary sectionName="Noise Analysis">
+                                    <NoiseTab
+                                        noiseScore={analysis.noiseScore}
+                                        noiseStats={analysis.noiseStats}
+                                        noiseBenchmarks={analysis.noiseBenchmarks}
+                                    />
+                                </ErrorBoundary>
                             )}
-                            {activeTab === 'red-team' && <RedTeamTab cognitiveAnalysis={analysis?.cognitiveAnalysis} />}
-                            {activeTab === 'boardroom' && <BoardroomTab simulation={analysis?.simulation} />}
+                            {activeTab === 'red-team' && (
+                                <ErrorBoundary sectionName="Red Team">
+                                    <RedTeamTab cognitiveAnalysis={analysis?.cognitiveAnalysis} />
+                                </ErrorBoundary>
+                            )}
+                            {activeTab === 'boardroom' && (
+                                <ErrorBoundary sectionName="Boardroom Simulation">
+                                    <BoardroomTab simulation={analysis?.simulation} />
+                                </ErrorBoundary>
+                            )}
                             {activeTab === 'simulator' && (
-                                <SimulatorTab
-                                    documentContent={document.content}
-                                    documentId={document.id}
-                                    originalScore={analysis?.overallScore}
-                                    originalNoiseScore={analysis?.noiseScore}
-                                    originalBiasCount={biases.length}
-                                />
+                                <ErrorBoundary sectionName="What-If Simulator">
+                                    <SimulatorTab
+                                        documentContent={document.content}
+                                        documentId={document.id}
+                                        originalScore={analysis?.overallScore}
+                                        originalNoiseScore={analysis?.noiseScore}
+                                        originalBiasCount={biases.length}
+                                    />
+                                </ErrorBoundary>
                             )}
                         </Suspense>
                     </div>
