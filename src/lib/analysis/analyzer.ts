@@ -130,15 +130,18 @@ export async function analyzeDocument(
         // Store analysis in database with Schema Drift Protection
         const foundBiases = result.biases.filter(b => b.found);
 
-        // Use transaction to ensure atomicity
-        await prisma.$transaction(async (tx) => {
-            // Update status to analyzing
-            await tx.document.update({
-                where: { id: documentId },
-                data: { status: 'analyzing' }
-            });
+        // Try saving with ALL fields first. If the DB is missing newer
+        // columns (schema drift / P2022), the transaction is poisoned —
+        // PostgreSQL rejects every subsequent command in the same transaction
+        // block. So the fallback MUST run in a separate transaction.
+        await prisma.document.update({
+            where: { id: documentId },
+            data: { status: 'analyzing' }
+        });
 
-            try {
+        let schemaDrift = false;
+        try {
+            await prisma.$transaction(async (tx) => {
                 await tx.analysis.create({
                     data: {
                         documentId,
@@ -174,43 +177,50 @@ export async function analyzeDocument(
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required: schema drift protection demands flexible Prisma data shape
                     } as any
                 });
-            } catch (dbError: unknown) {
-                // Check for "Column does not exist" error (P2021, P2022)
-                const prismaError = dbError as { code?: string; message?: string };
-                if (prismaError.code === 'P2021' || prismaError.code === 'P2022' || prismaError.message?.includes('does not exist')) {
-                    log.warn('Schema drift detected. Retrying save with CORE fields only: ' + prismaError.code);
 
-                    // Fallback: Save only what the old schema supports
-                    await tx.analysis.create({
-                        data: {
-                            documentId,
-                            overallScore: result.overallScore,
-                            noiseScore: result.noiseScore,
-                            summary: result.summary,
-                            biases: {
-                                create: foundBiases.map(bias => ({
-                                    biasType: bias.biasType,
-                                    severity: bias.severity,
-                                    excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                                    explanation: bias.explanation || '',
-                                    suggestion: bias.suggestion || '',
-                                    confidence: bias.confidence || 0.0
-                                }))
-                            }
-                        },
-                        select: { id: true } // Only return ID to avoid selecting non-existent columns (P2022)
-                    });
-                } else {
-                    throw dbError; // Rethrow other errors
-                }
-            }
-
-            // Update document status to complete
-            await tx.document.update({
-                where: { id: documentId },
-                data: { status: 'complete' }
+                await tx.document.update({
+                    where: { id: documentId },
+                    data: { status: 'complete' }
+                });
             });
-        });
+        } catch (dbError: unknown) {
+            const prismaError = dbError as { code?: string; message?: string };
+            if (prismaError.code === 'P2021' || prismaError.code === 'P2022' || prismaError.message?.includes('does not exist')) {
+                log.warn('Schema drift detected. Retrying save with CORE fields only: ' + prismaError.code);
+                schemaDrift = true;
+            } else {
+                throw dbError;
+            }
+        }
+
+        if (schemaDrift) {
+            await prisma.$transaction(async (tx) => {
+                await tx.analysis.create({
+                    data: {
+                        documentId,
+                        overallScore: result.overallScore,
+                        noiseScore: result.noiseScore,
+                        summary: result.summary,
+                        biases: {
+                            create: foundBiases.map(bias => ({
+                                biasType: bias.biasType,
+                                severity: bias.severity,
+                                excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                                explanation: bias.explanation || '',
+                                suggestion: bias.suggestion || '',
+                                confidence: bias.confidence || 0.0
+                            }))
+                        }
+                    },
+                    select: { id: true }
+                });
+
+                await tx.document.update({
+                    where: { id: documentId },
+                    data: { status: 'complete' }
+                });
+            });
+        }
 
         // Store embedding for RAG (non-blocking)
         try {
