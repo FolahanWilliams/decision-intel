@@ -82,13 +82,14 @@ const GraphState = Annotation.Root({
     }),
 });
 
-// Routing function: if GDPR anonymization failed, skip all analysis nodes
-// and go straight to riskScorer which will generate an error report.
+// Routing function: only allow content into the analysis pipeline when
+// anonymization explicitly succeeded.  Any other status (failed, undefined,
+// unexpected value) short-circuits to riskScorer to prevent PII leakage.
 function routeAfterAnonymization(state: typeof GraphState.State): string {
-    if (state.anonymizationStatus === 'failed') {
-        return 'riskScorer';
+    if (state.anonymizationStatus === 'success') {
+        return 'structurer';
     }
-    return 'structurer';
+    return 'riskScorer';
 }
 
 // Graph Definition — Optimized Super-Node Architecture
