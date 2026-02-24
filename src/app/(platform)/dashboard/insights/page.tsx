@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useInsights } from '@/hooks/useInsights';
 import { DecisionRadar } from '@/components/visualizations/DecisionRadar';
@@ -212,6 +212,11 @@ const getScoreBucketColor = (range: string) => {
 export default function InsightsPage() {
     const { insights, isLoading, error, mutate } = useInsights();
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [refreshTime, setRefreshTime] = useState('');
+
+    useEffect(() => {
+        setRefreshTime(new Date().toISOString().replace('T', ' ').slice(0, 19));
+    }, [insights]);
 
     if (isLoading) return <LoadingSkeleton />;
 
@@ -949,7 +954,7 @@ export default function InsightsPage() {
                 letterSpacing: '0.1em',
                 fontFamily: 'JetBrains Mono, monospace',
             }}>
-                LAST REFRESH: {new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC
+                LAST REFRESH: {refreshTime || '—'} UTC
                 <span style={{ margin: '0 8px', color: 'var(--border-color)' }}>│</span>
                 <ShieldCheck size={10} style={{ display: 'inline', verticalAlign: 'middle', color: 'var(--success)' }} />
                 {' '}SYSTEM NOMINAL

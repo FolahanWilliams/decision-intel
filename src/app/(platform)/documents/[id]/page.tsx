@@ -110,7 +110,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedBias, setSelectedBias] = useState<BiasInstance | null>(null);
-    const [streamLogs, setStreamLogs] = useState<{ msg: string, type: 'info' | 'bias' | 'success' }[]>([]);
+    const [streamLogs, setStreamLogs] = useState<{ msg: string, type: 'info' | 'bias' | 'success', ts: string }[]>([]);
     const [isScanning, setIsScanning] = useState(false);
     const [scanProgress, setScanProgress] = useState(0);
     const [isExportingPdf, setIsExportingPdf] = useState(false);
@@ -224,7 +224,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     const runLiveScan = async () => {
         if (!document) return;
         setIsScanning(true);
-        setStreamLogs([{ msg: 'Establishing secure stream...', type: 'info' }]);
+        setStreamLogs([{ msg: 'Establishing secure stream...', type: 'info', ts: new Date().toLocaleTimeString([], { hour12: false }) }]);
         setScanProgress(0);
 
         try {
@@ -247,16 +247,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 const chunk = decoder.decode(value);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 sseReader.processChunk(chunk, (update: any) => {
+                    const ts = new Date().toLocaleTimeString([], { hour12: false });
                     if (update.type === 'step') {
                         const icon = update.status === 'complete' ? '✓' : '►';
                         const color = update.status === 'complete' ? 'success' : 'info';
-                        setStreamLogs(prev => [...prev, { msg: `${icon} ${update.step}`, type: color }]);
+                        setStreamLogs(prev => [...prev, { msg: `${icon} ${update.step}`, type: color, ts }]);
                     } else if (update.type === 'bias' && update.result.found) {
-                        setStreamLogs(prev => [...prev, { msg: `⚠ BIAS: ${update.biasType} (${update.result.severity.toUpperCase()})`, type: 'bias' }]);
+                        setStreamLogs(prev => [...prev, { msg: `⚠ BIAS: ${update.biasType} (${update.result.severity.toUpperCase()})`, type: 'bias', ts }]);
                     } else if (update.type === 'noise') {
-                        setStreamLogs(prev => [...prev, { msg: `◐ NOISE: ${Math.round(update.result.score)}% variance detected`, type: 'info' }]);
+                        setStreamLogs(prev => [...prev, { msg: `◐ NOISE: ${Math.round(update.result.score)}% variance detected`, type: 'info', ts }]);
                     } else if (update.type === 'complete') {
-                        setStreamLogs(prev => [...prev, { msg: '✓ Analysis complete. Results saved.', type: 'success' }]);
+                        setStreamLogs(prev => [...prev, { msg: '✓ Analysis complete. Results saved.', type: 'success', ts }]);
                         setDocument(prev => prev ? { ...prev, analyses: [update.result, ...prev.analyses], status: 'complete' } : null);
                     }
                     if (typeof update.progress === 'number') setScanProgress(update.progress);
@@ -265,7 +266,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             }
         } catch (err) {
             const msg = err instanceof Error ? err.message : 'Live scan failed';
-            setStreamLogs(prev => [...prev, { msg: `CRITICAL_ERROR: ${msg}`, type: 'bias' }]);
+            setStreamLogs(prev => [...prev, { msg: `CRITICAL_ERROR: ${msg}`, type: 'bias', ts: new Date().toLocaleTimeString([], { hour12: false }) }]);
             showToast(msg, 'error');
         } finally {
             setIsScanning(false);
@@ -421,7 +422,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         )}
                         {streamLogs.map((log, i) => (
                             <div key={i} style={{ marginBottom: '4px', color: log.type === 'bias' ? 'var(--error)' : log.type === 'success' ? 'var(--success)' : 'var(--text-secondary)' }}>
-                                <span style={{ color: 'var(--text-muted)' }}>[{new Date().toLocaleTimeString([], { hour12: false })}]</span> {log.msg}
+                                <span style={{ color: 'var(--text-muted)' }}>[{log.ts}]</span> {log.msg}
                             </div>
                         ))}
                     </div>

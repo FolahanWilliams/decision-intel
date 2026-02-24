@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Info, PlayCircle, Loader2, RefreshCw, CheckCircle } from 'lucide-react';
 import { BiasInstance } from '@prisma/client';
 import { useToast } from '@/components/ui/ToastContext';
@@ -29,12 +29,13 @@ interface SimulatorTabProps {
 
 export function SimulatorTab({ documentContent, documentId, originalScore, originalNoiseScore, originalBiasCount }: SimulatorTabProps) {
     const draftKey = `simulator_draft_${documentId}`;
-    const [editableContent, setEditableContent] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem(draftKey) ?? documentContent;
-        }
-        return documentContent;
-    });
+    const [editableContent, setEditableContent] = useState(documentContent);
+
+    // Hydration-safe: restore draft from localStorage after mount
+    useEffect(() => {
+        const saved = localStorage.getItem(draftKey);
+        if (saved) setEditableContent(saved);
+    }, [draftKey]);
     const [isSimulating, setIsSimulating] = useState(false);
     const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
     const { showToast } = useToast();
