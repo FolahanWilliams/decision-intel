@@ -144,6 +144,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 if (data.analyses?.[0]?.biases?.[0]) {
                     setSelectedBias(null); // Don't auto-select
                 }
+                // Log document view for audit trail (fire and forget)
+                fetch('/api/audit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'VIEW_DOCUMENT',
+                        resource: 'Document',
+                        resourceId: data.id,
+                        details: { filename: data.filename }
+                    })
+                }).catch(() => {});
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load document');
             } finally {

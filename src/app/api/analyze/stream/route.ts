@@ -8,6 +8,7 @@ import { safeJsonClone } from '@/lib/utils/json';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
+import { logAudit } from '@/lib/audit';
 import { z } from 'zod';
 
 const log = createLogger('StreamRoute');
@@ -53,6 +54,10 @@ const SwotSchema = z.object({
 
 const CognitiveSchema = z.object({
     blindSpotGap: z.number().default(0),
+    blindSpots: z.array(z.object({
+        name: z.string(),
+        description: z.string()
+    })).default([]),
     counterArguments: z.array(z.record(z.string(), z.unknown())).default([])
 }).optional();
 
@@ -235,6 +240,7 @@ export async function POST(request: NextRequest) {
                                     // New Fields
                                     structuredContent: (report.structuredContent as string) || '',
                                     noiseStats: toPrismaJson(NoiseStatsSchema.safeParse(report.noiseStats).success ? report.noiseStats : NoiseStatsSchema.parse({})),
+                                    noiseBenchmarks: toPrismaJson(report.noiseBenchmarks ?? []),
                                     factCheck: toPrismaJson(FactCheckSchema.safeParse(report.factCheck).success ? report.factCheck : FactCheckSchema.parse({})),
                                     compliance: toPrismaJson(ComplianceSchema.safeParse(report.compliance).success ? report.compliance : ComplianceSchema.parse({})),
                                     preMortem: toPrismaJson(report.preMortem),
@@ -303,6 +309,14 @@ export async function POST(request: NextRequest) {
                     } catch (embError) {
                         log.warn('Embedding storage failed: ' + (embError instanceof Error ? embError.message : String(embError)));
                     }
+
+                    // Log audit event (fire and forget)
+                    logAudit({
+                        action: 'SCAN_DOCUMENT',
+                        resource: 'Document',
+                        resourceId: documentId,
+                        details: { filename: doc.filename, overallScore: (report.overallScore as number) || 0 }
+                    }).catch(() => {});
 
                     // Send final complete
                     sendUpdate({ type: 'complete', progress: 100, result: result.finalReport });

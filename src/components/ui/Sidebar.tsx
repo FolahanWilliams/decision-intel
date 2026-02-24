@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X, ClipboardList } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 
 export default function Sidebar() {
@@ -158,6 +158,7 @@ export default function Sidebar() {
                         </div>
                     )}
                     {collapsed && <div style={{ height: '16px' }} />}
+                    <NavItem href="/dashboard/audit-log" icon={<ClipboardList size={18} />} label="Audit Log" active={pathname === '/dashboard/audit-log'} collapsed={collapsed} onNavigate={closeMobile} />
                     <NavItem href="/dashboard/settings" icon={<Settings size={18} />} label="Settings" active={pathname === '/dashboard/settings'} collapsed={collapsed} onNavigate={closeMobile} />
                 </nav>
 
