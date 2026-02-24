@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
+import { logAudit } from '@/lib/audit';
 
 const log = createLogger('SimulateRoute');
 
@@ -46,6 +47,12 @@ export async function POST(request: NextRequest) {
 
         // Run analysis in simulation mode (no DB storage)
         const result = await runAnalysis(content, "simulate", userId);
+
+        logAudit({
+            action: 'SIMULATE_SCENARIO',
+            resource: 'Simulation',
+            details: { contentLength: content.length }
+        }).catch(() => {});
 
         return NextResponse.json(result);
     } catch (error) {

@@ -594,3 +594,33 @@ tr:hover td {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
+
+/* Compact View Mode — tighter spacing and smaller text */
+[data-compact="true"] .container {
+  padding-left: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
+}
+[data-compact="true"] .card-body {
+  padding: var(--spacing-md);
+}
+[data-compact="true"] .card-header {
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+[data-compact="true"] h1 {
+  font-size: 1.35rem;
+}
+[data-compact="true"] h2 {
+  font-size: 1.2rem;
+}
+[data-compact="true"] h3 {
+  font-size: 1rem;
+}
+[data-compact="true"] .mb-xl {
+  margin-bottom: var(--spacing-lg);
+}
+[data-compact="true"] .score-value {
+  font-size: 2.5rem;
+}
+[data-compact="true"] .upload-zone {
+  padding: var(--spacing-lg);
+}

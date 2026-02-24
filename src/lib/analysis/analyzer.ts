@@ -416,10 +416,3 @@ export async function runAnalysis(
 
     return finalReport;
 }
-
-export function calculateRiskLevel(score: number): 'low' | 'medium' | 'high' | 'critical' {
-    if (score >= 80) return 'low';
-    if (score >= 60) return 'medium';
-    if (score >= 40) return 'high';
-    return 'critical';
-}

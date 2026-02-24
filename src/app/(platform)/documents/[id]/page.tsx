@@ -144,6 +144,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 if (data.analyses?.[0]?.biases?.[0]) {
                     setSelectedBias(null); // Don't auto-select
                 }
+                // Log document view for audit trail (fire and forget)
+                fetch('/api/audit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'VIEW_DOCUMENT',
+                        resource: 'Document',
+                        resourceId: data.id,
+                        details: { filename: data.filename }
+                    })
+                }).catch(() => {});
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load document');
             } finally {
@@ -169,8 +180,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 });
                 fetch('/api/audit', {
                     method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: auditPayload
-                }).catch(e => console.error('Audit log failed', e));
+                }).catch(() => {});
             } catch (stringifyError) {
                 console.error('Failed to stringify audit payload:', stringifyError);
             }
@@ -190,6 +202,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             const { CsvGenerator } = await import('@/lib/reports/csv-generator');
             const generator = new CsvGenerator();
             generator.generateReport(document.filename, analysis);
+            fetch('/api/audit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'EXPORT_CSV',
+                    resource: 'Document',
+                    resourceId: document.id,
+                    details: { filename: document.filename }
+                })
+            }).catch(() => {});
             showToast('CSV export generated successfully', 'success');
         } catch (error) {
             console.error('Failed to generate CSV:', error);

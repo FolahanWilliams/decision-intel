@@ -1,5 +1,7 @@
-
 import { getFinnhubProfile, getFinnhubQuote, getFinnhubMetrics, getFinnhubPeers } from './finnhub';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('Financial');
 
 // Domain Types (matching original interface)
 export interface StockProfile {
@@ -100,7 +102,7 @@ export async function getEnrichedFinancialContext(
         return context;
 
     } catch (e) {
-        console.error("Finnhub Enriched Fetch Error", e);
+        log.error('Enriched Fetch Error:', e);
         return { error: `Failed to fetch enriched data for ${ticker}` };
     }
 }
@@ -152,7 +154,7 @@ export async function getIncomeStatement(ticker: string, apiKey: string): Promis
 export async function getQuarterlyIncomeStatement(ticker: string, _: string): Promise<object | null> {
     // Finnhub Free does not support historical quarterly data via simple API.
     // Returning null to indicate unavailablity (Fact Checker will define as UNVERIFIABLE)
-    console.warn(`Quarterly history not supported on Finnhub Free Tier for ${ticker}`);
+    log.warn(`Quarterly history not supported on Finnhub Free Tier for ${ticker}`);
     return null;
 }
 
@@ -217,7 +219,7 @@ export interface DataRequest {
 export async function executeDataRequest(request: DataRequest): Promise<{ request: DataRequest; data: unknown; error?: string }> {
     const apiKey = process.env.FINNHUB_API_KEY;
     if (!apiKey) {
-        console.error("CRITICAL: FINNHUB_API_KEY is missing in environment variables");
+        log.error('FINNHUB_API_KEY is missing in environment variables');
         return { request, data: null, error: "Configuration Error: Missing FINNHUB_API_KEY" };
     }
 
@@ -255,14 +257,14 @@ export async function executeDataRequest(request: DataRequest): Promise<{ reques
 
         return { request, data };
     } catch (e) {
-        console.error(`Data request failed for ${request.ticker}:${request.dataType}`, e);
+        log.error(`Data request failed for ${request.ticker}:${request.dataType}`, e);
         return { request, data: null, error: String(e) };
     }
 }
 
 // Execute multiple data requests in parallel
 export async function executeDataRequests(requests: DataRequest[]): Promise<Record<string, unknown>> {
-    console.log(`Executing ${requests.length} data requests...`);
+    log.info(`Executing ${requests.length} data requests...`);
 
     const results = await Promise.all(requests.map(executeDataRequest));
 
