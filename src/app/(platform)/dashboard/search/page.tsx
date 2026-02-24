@@ -7,11 +7,10 @@ import { useToast } from '@/components/ui/ToastContext';
 
 interface SearchResult {
     documentId: string;
-    title: string;
-    summary: string;
+    filename: string;
     similarity: number;
-    overallScore?: number;
-    biasCount?: number;
+    score: number;
+    biases: string[];
 }
 
 export default function SearchPage() {
@@ -131,12 +130,12 @@ export default function SearchPage() {
                                         <div className="flex items-center gap-sm mb-sm">
                                             <FileText size={16} style={{ color: 'var(--accent-primary)' }} />
                                             <span style={{ fontWeight: 600, fontSize: '14px' }}>
-                                                {result.title || result.documentId}
+                                                {result.filename || result.documentId}
                                             </span>
                                         </div>
-                                        {result.summary && (
+                                        {result.biases.length > 0 && (
                                             <p className="text-sm text-muted" style={{ lineHeight: 1.5, marginBottom: '8px' }}>
-                                                {result.summary.length > 200 ? result.summary.slice(0, 200) + '...' : result.summary}
+                                                Biases: {result.biases.join(', ')}
                                             </p>
                                         )}
                                         <div className="flex items-center gap-md text-xs">
@@ -144,9 +143,9 @@ export default function SearchPage() {
                                                 <TrendingUp size={12} />
                                                 {Math.round(result.similarity * 100)}% match
                                             </span>
-                                            {typeof result.overallScore === 'number' && (
+                                            {typeof result.score === 'number' && result.score > 0 && (
                                                 <span className="badge badge-secondary">
-                                                    Score: {Math.round(result.overallScore)}
+                                                    Score: {Math.round(result.score)}
                                                 </span>
                                             )}
                                         </div>

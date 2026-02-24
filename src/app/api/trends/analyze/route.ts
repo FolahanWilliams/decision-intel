@@ -4,6 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import { GoogleGenerativeAI, type Tool } from "@google/generative-ai";
 import { getRequiredEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
+import { logAudit } from '@/lib/audit';
 
 const log = createLogger('TrendsAnalyzeRoute');
 
@@ -108,6 +109,12 @@ export async function POST() {
         const searchSources = metadata?.groundingChunks
             ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
             .filter((u: unknown): u is string => typeof u === 'string') || [];
+
+        logAudit({
+            action: 'SEARCH_MARKET_TRENDS',
+            resource: 'MarketAnalysis',
+            details: { tickers: activeTickers }
+        }).catch(() => {});
 
         return NextResponse.json({
             ...analysis,

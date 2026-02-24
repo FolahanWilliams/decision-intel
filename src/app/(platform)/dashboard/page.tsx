@@ -38,7 +38,7 @@ export default function Dashboard() {
   const [deleting, setDeleting] = useState(false);
 
   // SWR: cached document list with auto-revalidation
-  const { documents: uploadedDocs, total: totalDocs, totalPages: docsTotalPages, isLoading: loadingDocs, mutate: mutateDocs } = useDocuments(false, docsPage);
+  const { documents: uploadedDocs, total: totalDocs, totalPages: docsTotalPages, isLoading: loadingDocs, mutate: mutateDocs } = useDocuments(true, docsPage);
 
   // SSE: streaming analysis with typed events, auto-retry, AbortController cleanup
   const {
@@ -408,17 +408,23 @@ export default function Dashboard() {
               <h3>Document Benchmark</h3>
             </div>
             <div className="card-body">
-              <ComparativeAnalysis documents={uploadedDocs.filter(d => d.status === 'complete').map(doc => ({
-                id: doc.id,
-                title: doc.filename,
-                date: new Date(doc.uploadedAt).toLocaleDateString(),
-                scores: {
-                  quality: doc.score || 0,
-                  risk: doc.score ? (100 - doc.score) : 50,
-                  bias: 0, // Dashboard doesn't have this data yet, defaulting
-                  clarity: 0 // Dashboard doesn't have this data yet, defaulting
-                }
-              }))} />
+              <ComparativeAnalysis documents={uploadedDocs.filter(d => d.status === 'complete').map(doc => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- detailed view returns analyses array
+                const a = (doc as any).analyses?.[0];
+                const biasCount = a?.biases?.length ?? 0;
+                const noiseScore = a?.noiseScore ?? 50;
+                return {
+                  id: doc.id,
+                  title: doc.filename,
+                  date: new Date(doc.uploadedAt).toLocaleDateString(),
+                  scores: {
+                    quality: doc.score || 0,
+                    risk: doc.score ? (100 - doc.score) : 50,
+                    bias: Math.min(biasCount * 10, 100),
+                    clarity: Math.max(0, 100 - noiseScore)
+                  }
+                };
+              })} />
             </div>
           </div>
         </div>
