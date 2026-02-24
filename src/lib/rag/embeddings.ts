@@ -8,6 +8,9 @@
 import { prisma } from '@/lib/prisma';
 import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
 import { getRequiredEnvVar } from '@/lib/env';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('Embeddings');
 
 // Lazy initialization of Gemini client
 let genAI: GoogleGenerativeAI | null = null;
@@ -57,7 +60,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
         return embedding;
     } catch (error) {
-        console.error('❌ Embedding generation failed:', error);
+        log.error('Embedding generation failed:', error);
         // CRITICAL: Do not return zero vectors silently - this causes incorrect similarity search results
         // Instead, throw the error to let the caller handle it appropriately
         throw new Error(`Failed to generate embedding: ${error instanceof Error ? error.message : String(error)}`);
@@ -142,11 +145,11 @@ export async function storeAnalysisEmbeddingsBatch(
 
         const failed = embeddingResults.filter(r => r.status === 'rejected').length;
         if (failed > 0) {
-            console.warn(`⚠️ ${failed}/${items.length} embedding generations failed`);
+            log.warn(`${failed}/${items.length} embedding generations failed`);
         }
 
         if (successful.length === 0) {
-            console.warn('All embedding generations failed, skipping storage');
+            log.warn('All embedding generations failed, skipping storage');
             return 0;
         }
 
@@ -192,10 +195,10 @@ export async function storeAnalysisEmbeddingsBatch(
             await prisma.$transaction(inserts);
         }
 
-        console.log(`✅ Stored ${successful.length} embedding(s) in batch`);
+        log.info(`Stored ${successful.length} embedding(s) in batch`);
         return successful.length;
     } catch (error) {
-        console.error('Failed to store embeddings batch:', error);
+        log.error('Failed to store embeddings batch:', error);
         // Don't throw - embedding storage is non-critical
         return 0;
     }
@@ -313,7 +316,7 @@ export async function searchSimilarDocuments(
             };
         });
     } catch (error) {
-        console.error('Semantic search failed:', error);
+        log.error('Semantic search failed:', error);
         return [];
     }
 }

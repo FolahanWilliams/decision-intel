@@ -1,5 +1,8 @@
 import mammoth from 'mammoth';
 import { extractText } from 'unpdf';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('FileParser');
 
 /**
  * Parses the content of a file buffer based on its MIME type or filename extension.
@@ -27,7 +30,7 @@ export async function parseFile(buffer: Buffer, mimeType: string, filename: stri
         try {
             const result = await mammoth.extractRawText({ buffer });
             if (!result.value.trim()) {
-                console.warn(`DOCX parsing yielded empty text for ${filename}. Messages:`, result.messages);
+                log.warn(`DOCX parsing yielded empty text for ${filename}. Messages: ${JSON.stringify(result.messages)}`);
             }
             return result.value;
         } catch (error) {

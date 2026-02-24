@@ -1,6 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('Prisma');
 
 
 const globalForPrisma = globalThis as unknown as {
@@ -78,7 +81,7 @@ export async function testDatabaseConnection(): Promise<boolean> {
     await prisma.$queryRaw`SELECT 1`;
     return true;
   } catch (error) {
-    console.error('Database connection test failed:', error);
+    log.error('Database connection test failed:', error);
     return false;
   }
 }

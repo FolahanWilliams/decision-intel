@@ -1,6 +1,9 @@
 /**
  * JSON Utilities for Robust Parsing and Serialization
  */
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('JSON');
 
 /**
  * Parses JSON from a string, handling balanced braces/brackets and ignoring surrounding text.
@@ -11,7 +14,7 @@ export const parseJSON = (text: string): any | null => {
     if (!text) return null;
     const start = text.search(/[\{\[]/);
     if (start === -1) {
-        console.error("JSON Parse Error: no opening brace/bracket found. Raw (500 chars):", text.slice(0, 500));
+        log.error('JSON Parse Error: no opening brace/bracket found. Raw (500 chars): ' + text.slice(0, 500));
         return null;
     }
     const opening = text[start];
@@ -45,13 +48,13 @@ export const parseJSON = (text: string): any | null => {
                 try {
                     return JSON.parse(candidate);
                 } catch (e) {
-                    console.error("JSON Parse Error: candidate failed to parse", e, "Raw (500 chars):", text.slice(0, 500));
+                    log.error('JSON Parse Error: candidate failed to parse. Raw (500 chars): ' + text.slice(0, 500), e);
                     return null;
                 }
             }
         }
     }
-    console.error("JSON Parse Error: no balanced JSON found. Raw (500 chars):", text.slice(0, 500));
+    log.error('JSON Parse Error: no balanced JSON found. Raw (500 chars): ' + text.slice(0, 500));
     return null;
 };
 

@@ -1,6 +1,7 @@
 
+import { createLogger } from '@/lib/utils/logger';
 
-
+const log = createLogger('Finnhub');
 const BASE_URL = 'https://finnhub.io/api/v1';
 
 // Finnhub Response Types
@@ -83,13 +84,13 @@ async function fetchFinnhub<T>(endpoint: string, apiKey: string, params: Record<
         const res = await fetch(`${BASE_URL}${endpoint}?${query}`);
 
         if (!res.ok) {
-            console.error(`Finnhub API Error ${res.status}: ${res.statusText}`);
+            log.error(`API Error ${res.status}: ${res.statusText}`);
             return null;
         }
 
         return await res.json() as T;
     } catch (e) {
-        console.error(`Finnhub Fetch Error:`, e);
+        log.error('Fetch Error:', e);
         return null;
     }
 }

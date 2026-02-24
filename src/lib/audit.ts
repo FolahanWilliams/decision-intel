@@ -1,6 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('Audit');
 
 export type AuditAction =
     | 'VIEW_DOCUMENT'
@@ -23,7 +26,7 @@ export async function logAudit(params: AuditLogParams) {
         const { userId } = await auth();
 
         if (!userId) {
-            console.warn(`[Audit] Unauthenticated action: ${params.action}`);
+            log.warn(`Unauthenticated action: ${params.action}`);
             return;
         }
 
@@ -38,9 +41,9 @@ export async function logAudit(params: AuditLogParams) {
             }
         });
 
-        console.log(`[Audit] ${params.action} by ${userId}`);
+        log.info(`${params.action} by ${userId}`);
     } catch (error) {
-        console.error('[Audit] Failed to log action:', error);
+        log.error('Failed to log action:', error);
         // Fail open - don't block the user if logging fails
     }
 }
