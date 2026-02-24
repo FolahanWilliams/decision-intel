@@ -135,6 +135,7 @@ describe('Integration Tests', () => {
                 documentId: 'doc-1',
                 userId: 'test-user',
                 originalContent: 'Raw content',
+                structuredContent: 'Raw content',  // set by anonymizer node before structurer runs
             };
 
             const result = await structurerNode(state);
