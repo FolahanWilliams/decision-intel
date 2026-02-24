@@ -42,6 +42,7 @@ model Analysis {
   structuredContent String?      @db.Text
   speakers     String[]
   noiseStats   Json?          // Stores { mean, stdDev, variance }
+  noiseBenchmarks Json?       // Stores [{ metric, documentValue, marketValue, variance, explanation }]
   factCheck    Json?          // Stores { score, flags }
   compliance   Json?          // Stores { status, details }
   preMortem    Json?          // Stores { failureScenarios, preventiveMeasures }
