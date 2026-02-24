@@ -23,6 +23,8 @@ const OPTIONAL_ENV_VARS = [
     'CLERK_SECRET_KEY',
     'FINNHUB_API_KEY',
     'GEMINI_MODEL_NAME',
+    'JULES_API_KEY',     // CI build-failure debugging via Jules
+    'ALLOWED_ORIGIN',    // CORS; falls back to production Vercel URL
 ];
 
 /**
