@@ -75,30 +75,42 @@ export async function POST(request: NextRequest) {
         const contentHash = createHash('sha256').update(buffer).digest('hex');
 
         // Check if document already exists (Semantic Caching)
-        const existingDoc = await prisma.document.findUnique({
-            where: { contentHash },
-            include: { 
-                analyses: {
-                    orderBy: { createdAt: 'desc' },
-                    take: 1,
-                    include: {
-                        biases: true
+        // Wrapped in schema-drift protection: if contentHash column doesn't
+        // exist yet (migration pending) we skip the cache check gracefully.
+        let existingDoc: Awaited<ReturnType<typeof prisma.document.findUnique>> & { analyses?: unknown[] } | null = null;
+        try {
+            existingDoc = await prisma.document.findUnique({
+                where: { contentHash },
+                include: {
+                    analyses: {
+                        orderBy: { createdAt: 'desc' },
+                        take: 1,
+                        include: {
+                            biases: true
+                        }
                     }
                 }
+            });
+        } catch (cacheErr: unknown) {
+            const code = (cacheErr as { code?: string }).code;
+            if (code === 'P2021' || code === 'P2022') {
+                log.warn('Schema drift: contentHash column missing, skipping cache check (' + code + ')');
+            } else {
+                throw cacheErr;
             }
-        });
+        }
 
         if (existingDoc) {
             log.info('Cache hit: Document already analyzed ' + existingDoc.id);
-            
+
             // Return cached result with the existing document ID and analysis
             return NextResponse.json({
                 id: existingDoc.id,
-                filename: existingDoc.filename,
-                status: existingDoc.status,
+                filename: (existingDoc as { filename: string }).filename,
+                status: (existingDoc as { status: string }).status,
                 cached: true,
                 message: 'Document already analyzed (Cached)',
-                analysis: existingDoc.analyses[0] || null
+                analysis: (existingDoc.analyses as unknown[])?.[0] || null
             });
         }
 
@@ -145,19 +157,40 @@ export async function POST(request: NextRequest) {
         // Store in database with content hash for future caching.
         // Use upsert to handle race conditions where concurrent uploads
         // of the same content could bypass the earlier findUnique check.
-        const document = await prisma.document.upsert({
-            where: { contentHash },
-            update: {},
-            create: {
-                userId,
-                filename: file.name,
-                fileType: file.type || 'text/plain',
-                fileSize: file.size,
-                content,
-                contentHash,
-                status: 'pending'
+        // Falls back to plain create if contentHash column is missing (schema drift).
+        let document;
+        try {
+            document = await prisma.document.upsert({
+                where: { contentHash },
+                update: {},
+                create: {
+                    userId,
+                    filename: file.name,
+                    fileType: file.type || 'text/plain',
+                    fileSize: file.size,
+                    content,
+                    contentHash,
+                    status: 'pending'
+                }
+            });
+        } catch (dbError: unknown) {
+            const code = (dbError as { code?: string }).code;
+            if (code === 'P2021' || code === 'P2022') {
+                log.warn('Schema drift: contentHash column missing, falling back to create (' + code + ')');
+                document = await prisma.document.create({
+                    data: {
+                        userId,
+                        filename: file.name,
+                        fileType: file.type || 'text/plain',
+                        fileSize: file.size,
+                        content,
+                        status: 'pending'
+                    }
+                });
+            } else {
+                throw dbError;
             }
-        });
+        }
 
         return NextResponse.json({
             id: document.id,
