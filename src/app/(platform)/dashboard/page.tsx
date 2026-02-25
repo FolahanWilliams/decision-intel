@@ -125,10 +125,19 @@ export default function Dashboard() {
 
       const uploadData = await uploadRes.json();
 
-      // Optimistically add to SWR cache with analyzing status.
       // Use a default empty state when current is undefined (e.g. if
       // the initial fetch failed due to schema drift or network error).
       const emptyState = { documents: [], total: 0, page: 1, totalPages: 1 };
+
+      // If the server returned a cached result, skip streaming and
+      // directly revalidate the SWR cache so the existing document
+      // (with its completed analysis) appears immediately.
+      if (uploadData.cached) {
+        await mutateDocs(undefined, { revalidate: true });
+        return;
+      }
+
+      // Optimistically add to SWR cache with analyzing status.
       await mutateDocs(
         (current) => {
           const base = current ?? emptyState;
