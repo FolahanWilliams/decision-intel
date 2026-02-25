@@ -77,10 +77,10 @@ export async function POST(request: NextRequest) {
         // Check if document already exists (Semantic Caching)
         // Wrapped in schema-drift protection: if contentHash column doesn't
         // exist yet (migration pending) we skip the cache check gracefully.
-        let existingDoc: Awaited<ReturnType<typeof prisma.document.findUnique>> & { analyses?: unknown[] } | null = null;
+        let existingDoc: Awaited<ReturnType<typeof prisma.document.findFirst>> & { analyses?: unknown[] } | null = null;
         try {
-            existingDoc = await prisma.document.findUnique({
-                where: { contentHash },
+            existingDoc = await prisma.document.findFirst({
+                where: { contentHash, userId },
                 include: {
                     analyses: {
                         orderBy: { createdAt: 'desc' },
@@ -155,15 +155,14 @@ export async function POST(request: NextRequest) {
             throw new Error(`Storage Upload Failed: ${uploadError.message}`);
         }
         // Store in database with content hash for future caching.
-        // Use upsert to handle race conditions where concurrent uploads
-        // of the same content could bypass the earlier findUnique check.
+        // Always create a new document row per user. The earlier findFirst
+        // already checked for same-user duplicates, so reaching here means
+        // this user doesn't own a copy yet.
         // Falls back to plain create if contentHash column is missing (schema drift).
         let document;
         try {
-            document = await prisma.document.upsert({
-                where: { contentHash },
-                update: {},
-                create: {
+            document = await prisma.document.create({
+                data: {
                     userId,
                     filename: file.name,
                     fileType: file.type || 'text/plain',
@@ -177,6 +176,19 @@ export async function POST(request: NextRequest) {
             const code = (dbError as { code?: string }).code;
             if (code === 'P2021' || code === 'P2022') {
                 log.warn('Schema drift: contentHash column missing, falling back to create (' + code + ')');
+                document = await prisma.document.create({
+                    data: {
+                        userId,
+                        filename: file.name,
+                        fileType: file.type || 'text/plain',
+                        fileSize: file.size,
+                        content,
+                        status: 'pending'
+                    }
+                });
+            } else if (code === 'P2002') {
+                // Unique constraint violation on contentHash — another user
+                // already has this hash. Safe to ignore: create without hash.
                 document = await prisma.document.create({
                     data: {
                         userId,
