@@ -126,11 +126,15 @@ export default function Dashboard() {
 
       const uploadData = await uploadRes.json();
 
-      // Optimistically add to SWR cache with analyzing status
+      // Optimistically add to SWR cache with analyzing status.
+      // Use a default empty state when current is undefined (e.g. if
+      // the initial fetch failed due to schema drift or network error).
+      const emptyState = { documents: [], total: 0, page: 1, totalPages: 1 };
       await mutateDocs(
-        (current) => current
-          ? { ...current, documents: [{ id: uploadData.id, filename: uploadData.filename, status: 'analyzing', uploadedAt: new Date().toISOString() }, ...current.documents] }
-          : current,
+        (current) => {
+          const base = current ?? emptyState;
+          return { ...base, documents: [{ id: uploadData.id, filename: uploadData.filename, status: 'analyzing', uploadedAt: new Date().toISOString() }, ...base.documents] };
+        },
         { revalidate: false }
       );
 
@@ -140,24 +144,29 @@ export default function Dashboard() {
       if (finalResult) {
         // Update SWR cache with the completed result
         await mutateDocs(
-          (current) => current
-            ? { ...current, documents: current.documents.map(doc => doc.id === uploadData.id ? { ...doc, status: 'complete', score: finalResult?.overallScore as number } : doc) }
-            : current,
+          (current) => {
+            const base = current ?? emptyState;
+            return { ...base, documents: base.documents.map(doc => doc.id === uploadData.id ? { ...doc, status: 'complete', score: finalResult?.overallScore as number } : doc) };
+          },
           { revalidate: true }
         );
-      } else if (streamError) {
-        throw new Error(streamError);
+      } else {
+        // Stream ended without a result (timeout, disconnect, or error).
+        // Always revalidate so the SWR cache picks up whatever state the
+        // server left the document in (complete, error, or still analyzing).
+        await mutateDocs(undefined, { revalidate: true });
       }
     } catch (err) {
       console.error('Upload/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
       setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
 
-      // Mark as error in SWR cache
+      // Mark as error in SWR cache and revalidate to sync with server state
       await mutateDocs(
-        (current) => current
-          ? { ...current, documents: current.documents.map(doc => doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc) }
-          : current,
-        { revalidate: false }
+        (current) => {
+          if (!current) return current;
+          return { ...current, documents: current.documents.map(doc => doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc) };
+        },
+        { revalidate: true }
       );
     } finally {
       setUploading(false);
