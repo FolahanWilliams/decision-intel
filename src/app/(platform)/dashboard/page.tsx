@@ -45,7 +45,6 @@ export default function Dashboard() {
     startAnalysis,
     steps: analysisSteps,
     progress: currentProgress,
-    error: streamError,
     timedOut: streamTimedOut,
   } = useAnalysisStream({
     stepNames: ANALYSIS_STEPS.map(s => s.name),
