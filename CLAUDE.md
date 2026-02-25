@@ -2,10 +2,10 @@
 
 ## Git Workflow
 
-**Always rebase before pushing.** This keeps feature branches linear on top of main and prevents "behind and ahead" divergence on PRs.
+**Always rebase onto the latest `origin/main` before every push.** This is mandatory — PRs that are "behind main" cause merge conflicts and CI failures. Every push must result in a branch that is strictly ahead of main, never behind.
 
 ```bash
-# Before every push:
+# Before EVERY push — no exceptions:
 git fetch origin main
 git rebase origin/main
 # Then push (force-with-lease is safe for rebased feature branches):
@@ -15,6 +15,8 @@ git push --force-with-lease -u origin <branch-name>
 - Never merge main into a feature branch — always rebase onto it.
 - If rebase has conflicts, resolve them one commit at a time, then `git rebase --continue`.
 - Never use `git push --force` (bare). Use `--force-with-lease` to protect against overwriting others' work.
+- Before opening or updating a PR, verify the branch is not behind main: `git log --oneline origin/main..HEAD` should show only your commits, and `git log --oneline HEAD..origin/main` should be empty.
+- If your branch has fallen behind (e.g. main received new merges), rebase again before pushing.
 
 ## Project Overview
 
