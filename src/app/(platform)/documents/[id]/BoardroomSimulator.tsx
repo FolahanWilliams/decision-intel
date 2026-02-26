@@ -194,30 +194,37 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
           <div className="mt-6 flex items-center gap-4">
             <span className="text-xs text-gray-500 uppercase tracking-wider">Vote Distribution</span>
             <div className="flex-1 flex gap-1 h-3 rounded-full overflow-hidden bg-white/5">
-              {voteCounts['APPROVE'] > 0 && (
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(voteCounts['APPROVE'] / 3) * 100}%` }}
-                  transition={{ delay: 2.5, duration: 0.5 }}
-                  className="h-full bg-green-500"
-                />
-              )}
-              {voteCounts['REVISE'] > 0 && (
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(voteCounts['REVISE'] / 3) * 100}%` }}
-                  transition={{ delay: 2.6, duration: 0.5 }}
-                  className="h-full bg-yellow-500"
-                />
-              )}
-              {voteCounts['REJECT'] > 0 && (
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(voteCounts['REJECT'] / 3) * 100}%` }}
-                  transition={{ delay: 2.7, duration: 0.5 }}
-                  className="h-full bg-red-500"
-                />
-              )}
+              {(() => {
+                const totalTwins = simulation.twins?.length || 1;
+                return (
+                  <>
+                    {voteCounts['APPROVE'] > 0 && (
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(voteCounts['APPROVE'] / totalTwins) * 100}%` }}
+                        transition={{ delay: 2.5, duration: 0.5 }}
+                        className="h-full bg-green-500"
+                      />
+                    )}
+                    {voteCounts['REVISE'] > 0 && (
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(voteCounts['REVISE'] / totalTwins) * 100}%` }}
+                        transition={{ delay: 2.6, duration: 0.5 }}
+                        className="h-full bg-yellow-500"
+                      />
+                    )}
+                    {voteCounts['REJECT'] > 0 && (
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(voteCounts['REJECT'] / totalTwins) * 100}%` }}
+                        transition={{ delay: 2.7, duration: 0.5 }}
+                        className="h-full bg-red-500"
+                      />
+                    )}
+                  </>
+                );
+              })()}
             </div>
             <div className="flex gap-3 text-xs">
               {voteCounts['APPROVE'] > 0 && (

@@ -513,7 +513,7 @@ export default function Dashboard() {
                 placeholder="Search..."
                 aria-label="Search documents"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); setDocsPage(1); }}
                 className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border w-40 focus:w-56 transition-all"
               />
               {searchQuery && (
@@ -529,7 +529,7 @@ export default function Dashboard() {
             <select
               value={statusFilter}
               aria-label="Filter by status"
-              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'complete' | 'analyzing' | 'pending')}
+              onChange={(e) => { setStatusFilter(e.target.value as 'all' | 'complete' | 'analyzing' | 'pending'); setDocsPage(1); }}
               className="px-3 py-1.5 text-sm bg-primary border border-border"
             >
               <option value="all">All Status</option>

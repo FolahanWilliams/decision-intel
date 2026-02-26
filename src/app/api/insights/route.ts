@@ -139,15 +139,18 @@ export async function GET() {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Schema drift fallback returns fewer columns
         for (const a of analyses as any[]) {
-            totalOverall += a.overallScore;
-            totalNoise += a.noiseScore;
+            const overallScore = a.overallScore ?? 0;
+            const noiseScore = a.noiseScore ?? 0;
+
+            totalOverall += overallScore;
+            totalNoise += noiseScore;
 
             // Score distribution
-            const bucket = Math.min(9, Math.floor(a.overallScore / 10));
+            const bucket = Math.min(9, Math.floor(overallScore / 10));
             scoreBuckets[bucket]++;
 
             // Scatter
-            scatterData.push({ id: a.documentId, overallScore: a.overallScore, noiseScore: a.noiseScore });
+            scatterData.push({ id: a.documentId, overallScore, noiseScore });
 
             // Fact check
             const fc = a.factCheck as { score?: number; verifications?: { verdict?: string }[] } | null;
@@ -248,8 +251,8 @@ export async function GET() {
                 const weekKey = weekStart.toISOString().split('T')[0];
                 if (!weeklyMap.has(weekKey)) weeklyMap.set(weekKey, { scores: [], noise: [] });
                 const w = weeklyMap.get(weekKey)!;
-                w.scores.push(a.overallScore);
-                w.noise.push(a.noiseScore);
+                w.scores.push(overallScore);
+                w.noise.push(noiseScore);
             }
         }
 
@@ -298,7 +301,7 @@ export async function GET() {
             // 1. Radar
             radar: {
                 quality: n > 0 ? Math.round(totalOverall / n) : 0,
-                consistency: n > 0 ? Math.round(100 - totalNoise / n) : 0,
+                consistency: n > 0 ? Math.max(0, Math.min(100, Math.round(100 - totalNoise / n))) : 0,
                 factAccuracy: factCount > 0 ? Math.round(totalFact / factCount) : 0,
                 logic: logicCount > 0 ? Math.round(totalLogic / logicCount) : 0,
                 compliance: complianceCount > 0 ? Math.round(totalCompliance / complianceCount) : 0,

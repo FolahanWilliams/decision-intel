@@ -24,15 +24,18 @@ const FactCheckSchema = z.object({
     score: z.number().default(0),
     summary: z.string().default('Unavailable'),
     verifications: z.array(z.record(z.string(), z.unknown())).default([]),
-    flags: z.array(z.string()).default([])
-}).default({ score: 0, summary: 'Unavailable', verifications: [], flags: [] });
+    flags: z.array(z.string()).default([]),
+    primaryTopic: z.string().optional(),
+    searchSources: z.array(z.string()).optional(),
+}).passthrough().default({ score: 0, summary: 'Unavailable', verifications: [], flags: [] });
 
 const ComplianceSchema = z.object({
     status: z.string().default('WARN'),
     riskScore: z.number().default(0),
     summary: z.string().default('Compliance check unavailable'),
-    regulations: z.array(z.record(z.string(), z.unknown())).default([])
-}).default({ status: 'WARN', riskScore: 0, summary: 'Compliance check unavailable', regulations: [] });
+    regulations: z.array(z.record(z.string(), z.unknown())).default([]),
+    searchQueries: z.array(z.string()).optional(),
+}).passthrough().default({ status: 'WARN', riskScore: 0, summary: 'Compliance check unavailable', regulations: [] });
 
 const SentimentSchema = z.object({
     score: z.number().default(0),
@@ -261,10 +264,10 @@ export async function POST(request: NextRequest) {
                                     speakers: (report.speakers as string[]) || [],
                                     // Phase 4 Extensions
                                     logicalAnalysis: toPrismaJson(LogicalSchema.safeParse(report.logicalAnalysis).success ? report.logicalAnalysis : LogicalSchema.parse({})),
-                                    swotAnalysis: toPrismaJson(SwotSchema.safeParse(report.swotAnalysis).data),
-                                    cognitiveAnalysis: toPrismaJson(CognitiveSchema.safeParse(report.cognitiveAnalysis).data),
-                                    simulation: toPrismaJson(SimulationSchema.safeParse(report.simulation).data),
-                                    institutionalMemory: toPrismaJson(MemorySchema.safeParse(report.institutionalMemory).data)
+                                    swotAnalysis: toPrismaJson(report.swotAnalysis ? (SwotSchema.safeParse(report.swotAnalysis).success ? report.swotAnalysis : undefined) : undefined),
+                                    cognitiveAnalysis: toPrismaJson(report.cognitiveAnalysis ? (CognitiveSchema.safeParse(report.cognitiveAnalysis).success ? report.cognitiveAnalysis : undefined) : undefined),
+                                    simulation: toPrismaJson(report.simulation ? (SimulationSchema.safeParse(report.simulation).success ? report.simulation : undefined) : undefined),
+                                    institutionalMemory: toPrismaJson(report.institutionalMemory ? (MemorySchema.safeParse(report.institutionalMemory).success ? report.institutionalMemory : undefined) : undefined)
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required: schema drift protection demands flexible Prisma data shape
                                 } as any
                             });

@@ -9,6 +9,7 @@ import {
 import { Download, TrendingUp, TrendingDown, RefreshCw, AlertTriangle } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { useToast } from '@/components/ui/ToastContext';
 
 
 interface MarketAnalysis {
@@ -23,16 +24,21 @@ export default function TrendsPage() {
     const error = trendsError?.message ?? null;
     const [marketAnalysis, setMarketAnalysis] = useState<MarketAnalysis | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
+    const { showToast } = useToast();
 
     const analyzeMarket = async () => {
         setAnalyzing(true);
         try {
             const res = await fetch('/api/trends/analyze', { method: 'POST' });
-            if (res.ok) {
-                const data = await res.json();
-                setMarketAnalysis(data);
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || `Market analysis failed (${res.status})`);
             }
+            const result = await res.json();
+            setMarketAnalysis(result);
         } catch (e) {
+            const msg = e instanceof Error ? e.message : 'Market analysis failed';
+            showToast(msg, 'error');
             console.error(e);
         } finally {
             setAnalyzing(false);
@@ -221,22 +227,26 @@ export default function TrendsPage() {
                                         Verified Sources:
                                     </div>
                                     <div className="flex flex-wrap gap-sm">
-                                        {marketAnalysis.searchSources.map((source, i) => (
-                                            <a key={i} href={source} target="_blank" rel="noopener noreferrer"
-                                                className="badge hover:opacity-80"
-                                                style={{
-                                                    textDecoration: 'none',
-                                                    background: 'var(--bg-secondary)',
-                                                    color: 'var(--text-secondary)',
-                                                    fontSize: '10px',
-                                                    maxWidth: '250px',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap'
-                                                }}>
-                                                {new URL(source).hostname}
-                                            </a>
-                                        ))}
+                                        {marketAnalysis.searchSources.map((source, i) => {
+                                            try {
+                                                return (
+                                                    <a key={i} href={source} target="_blank" rel="noopener noreferrer"
+                                                        className="badge hover:opacity-80"
+                                                        style={{
+                                                            textDecoration: 'none',
+                                                            background: 'var(--bg-secondary)',
+                                                            color: 'var(--text-secondary)',
+                                                            fontSize: '10px',
+                                                            maxWidth: '250px',
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis',
+                                                            whiteSpace: 'nowrap'
+                                                        }}>
+                                                        {new URL(source).hostname}
+                                                    </a>
+                                                );
+                                            } catch { return null; }
+                                        })}
                                     </div>
                                 </div>
                             )}
