@@ -53,6 +53,7 @@ interface FactCheck {
     flags: string[];
     verifications?: Verification[];
     primaryCompany?: { ticker: string; name: string };
+    primaryTopic?: string;
     dataFetchedAt?: string;
     searchSources?: string[];
 }
@@ -457,9 +458,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         <h3 className="flex items-center gap-sm">
                             <CheckCircle size={18} style={{ color: 'var(--accent-primary)' }} />
                             Financial Fact Check
-                            {analysis.factCheck.primaryCompany && (
+                            {(analysis.factCheck.primaryCompany || analysis.factCheck.primaryTopic) && (
                                 <span className="badge badge-secondary" style={{ marginLeft: '8px', fontSize: '10px' }}>
-                                    {analysis.factCheck.primaryCompany.name} ({analysis.factCheck.primaryCompany.ticker})
+                                    {analysis.factCheck.primaryCompany
+                                        ? `${analysis.factCheck.primaryCompany.name} (${analysis.factCheck.primaryCompany.ticker})`
+                                        : analysis.factCheck.primaryTopic}
                                 </span>
                             )}
                         </h3>
@@ -616,6 +619,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                         originalScore={analysis?.overallScore}
                                         originalNoiseScore={analysis?.noiseScore}
                                         originalBiasCount={biases.length}
+                                        originalBiasTypes={biases.map(b => b.biasType)}
                                     />
                                 </ErrorBoundary>
                             )}

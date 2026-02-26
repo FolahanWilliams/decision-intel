@@ -32,26 +32,34 @@ export async function POST() {
         }
 
         // 1. Gather Context (What is the user interested in?)
-        // Fetch last 10 analyses to get unique tickers
+        // Fetch last 10 analyses to extract topics/tickers from factCheck
         const recentAnalyses = await prisma.analysis.findMany({
             where: { document: { userId } },
             orderBy: { createdAt: 'desc' },
             take: 10,
-            select: { factCheck: true } // Assuming we stored primaryCompany here
+            select: { factCheck: true, summary: true }
         });
 
-        // Extract Tickers
-        const tickers = new Set<string>();
+        // Extract topics — the verificationNode stores primaryTopic as
+        // a plain string (e.g. "Apple", "Tesla Motors"), not as an object.
+        // Also check the legacy primaryCompany.ticker path for backwards compat.
+        const topics = new Set<string>();
         recentAnalyses.forEach(a => {
-            const fc = a.factCheck as unknown as { primaryCompany: { ticker: string } }; // Type assertion since it's JSON
-            if (fc?.primaryCompany?.ticker) {
-                tickers.add(fc.primaryCompany.ticker);
+            const fc = a.factCheck as Record<string, unknown> | null;
+            if (!fc) return;
+            // New format: primaryTopic (string)
+            if (typeof fc.primaryTopic === 'string' && fc.primaryTopic.trim()) {
+                topics.add(fc.primaryTopic.trim());
             }
+            // Legacy format: primaryCompany { ticker, name }
+            const pc = fc.primaryCompany as { ticker?: string; name?: string } | undefined;
+            if (pc?.ticker) topics.add(pc.ticker);
+            else if (pc?.name) topics.add(pc.name);
         });
 
-        const activeTickers = Array.from(tickers).slice(0, 3); // Top 3
+        const activeTopics = Array.from(topics).slice(0, 3); // Top 3
 
-        if (activeTickers.length === 0) {
+        if (activeTopics.length === 0) {
             return NextResponse.json({
                 summary: "No sufficient data to generate market intelligence. Upload documents with financial data first.",
                 risks: [],
@@ -60,12 +68,12 @@ export async function POST() {
         }
 
         // 2. Perform Market Analysis (Grounded)
-        log.info('Running Market Analysis for: ' + activeTickers.join(', '));
+        log.info('Running Market Analysis for: ' + activeTopics.join(', '));
         const model = getMarketAnalystModel();
 
         const prompt = `
         You are an AI Market Intelligence Analyst.
-        Target Companies: ${activeTickers.join(', ')}.
+        Target Companies: ${activeTopics.join(', ')}.
 
         TASK:
         1. Search for the LATEST major market news, regulatory threats, and macroeconomic trends affecting these companies/sectors.
@@ -113,7 +121,7 @@ export async function POST() {
         logAudit({
             action: 'SEARCH_MARKET_TRENDS',
             resource: 'MarketAnalysis',
-            details: { tickers: activeTickers }
+            details: { tickers: activeTopics }
         }).catch(() => {});
 
         return NextResponse.json({
