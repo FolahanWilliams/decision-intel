@@ -268,7 +268,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         setStreamLogs(prev => [...prev, { msg: `◐ NOISE: ${Math.round(update.result.score)}% variance detected`, type: 'info', ts }]);
                     } else if (update.type === 'complete') {
                         setStreamLogs(prev => [...prev, { msg: '✓ Analysis complete. Results saved.', type: 'success', ts }]);
-                        setDocument(prev => prev ? { ...prev, analyses: [update.result, ...prev.analyses], status: 'complete' } : null);
+                        // Re-fetch from API to get the full record with DB-generated
+                        // fields (id, createdAt, BiasInstance IDs) instead of injecting
+                        // the raw finalReport which is missing those fields.
+                        fetch(`/api/documents/${document.id}`)
+                            .then(r => r.ok ? r.json() : null)
+                            .then(data => { if (data) setDocument(data); })
+                            .catch(() => {});
                     } else if (update.type === 'error') {
                         streamError = update.message || 'Analysis failed during stream';
                     }

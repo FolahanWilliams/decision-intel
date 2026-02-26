@@ -58,7 +58,7 @@ const SwotSchema = z.object({
     weaknesses: z.array(z.string()).default([]),
     opportunities: z.array(z.string()).default([]),
     threats: z.array(z.string()).default([]),
-    advice: z.string().default('')
+    strategicAdvice: z.string().default('')
 }).optional();
 
 const CognitiveSchema = z.object({

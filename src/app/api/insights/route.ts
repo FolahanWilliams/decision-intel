@@ -24,14 +24,12 @@ export async function GET() {
             return NextResponse.json({ empty: true });
         }
 
-        // Run all aggregation queries in parallel
-        const [
-            analyses,
-            biasDistribution,
-            severityCounts,
-        ] = await Promise.all([
-            // Full analyses with JSON fields for radar, sentiment, compliance, SWOT, fact-check
-            prisma.analysis.findMany({
+        // Run all aggregation queries in parallel.
+        // Schema drift protection: if extended columns are missing,
+        // fall back to core-only fields so the page still loads.
+        let analysesQuery;
+        try {
+            analysesQuery = await prisma.analysis.findMany({
                 where: { documentId: { in: docIds } },
                 select: {
                     id: true,
@@ -43,13 +41,37 @@ export async function GET() {
                     sentiment: true,
                     logicalAnalysis: true,
                     swotAnalysis: true,
-                    // New fields for deeper insights
                     createdAt: true,
                     preMortem: true,
                     simulation: true,
                     cognitiveAnalysis: true,
                 },
-            }),
+            });
+        } catch (fetchErr: unknown) {
+            const code = (fetchErr as { code?: string }).code;
+            if (code === 'P2021' || code === 'P2022') {
+                log.warn('Schema drift in insights: falling back to core fields (' + code + ')');
+                analysesQuery = await prisma.analysis.findMany({
+                    where: { documentId: { in: docIds } },
+                    select: {
+                        id: true,
+                        documentId: true,
+                        overallScore: true,
+                        noiseScore: true,
+                        createdAt: true,
+                    },
+                });
+            } else {
+                throw fetchErr;
+            }
+        }
+
+        const [
+            analyses,
+            biasDistribution,
+            severityCounts,
+        ] = await Promise.all([
+            Promise.resolve(analysesQuery),
 
             // Bias type distribution (grouped)
             // Using $queryRaw tagged template (parameterized) — safe against SQL injection.
@@ -115,7 +137,8 @@ export async function GET() {
         const eightWeeksAgo = new Date(Date.now() - 56 * 24 * 60 * 60 * 1000);
         const weeklyMap = new Map<string, { scores: number[]; noise: number[] }>();
 
-        for (const a of analyses) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Schema drift fallback returns fewer columns
+        for (const a of analyses as any[]) {
             totalOverall += a.overallScore;
             totalNoise += a.noiseScore;
 
