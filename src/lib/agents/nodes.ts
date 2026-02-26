@@ -779,7 +779,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             noiseScore: Math.min(100, (state.noiseStats?.stdDev || 0) * 10),
             summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Trust Score: ${trustScore}%.`,
             structuredContent: state.structuredContent,
-            biases: state.biasAnalysis || [],
+            biases: (state.biasAnalysis || []).map(b => ({ ...b, found: true })),
             noiseStats: state.noiseStats,
             noiseBenchmarks: state.noiseBenchmarks,
             factCheck: state.factCheckResult ?? undefined,
