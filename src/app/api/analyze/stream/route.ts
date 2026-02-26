@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
                                 if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
                                     const biases = event.data.output.biasAnalysis;
                                     for (const bias of biases) {
-                                        if (bias.found) {
+                                        if (bias.biasType) {
                                             sendUpdate({
                                                 type: 'bias',
                                                 biasType: bias.biasType,
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
 
                     // Save to DB
                     const report = result.finalReport as Record<string, unknown>;
-                    const foundBiases = ((report.biases as Array<Record<string, unknown>>) || []).filter((b) => b.found);
+                    const detectedBiases = (report.biases as Array<Record<string, unknown>>) || [];
 
                     // Try saving with ALL fields first. If the DB is missing
                     // newer columns (schema drift / P2022), the transaction is
@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
                                     noiseScore: (report.noiseScore as number) || 0,
                                     summary: (report.summary as string) || '',
                                     biases: {
-                                        create: foundBiases.map((bias) => ({
+                                        create: detectedBiases.map((bias) => ({
                                             biasType: bias.biasType as string,
                                             severity: bias.severity as string,
                                             excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
@@ -293,7 +293,7 @@ export async function POST(request: NextRequest) {
                                     noiseScore: (report.noiseScore as number) || 0,
                                     summary: (report.summary as string) || '',
                                     biases: {
-                                        create: foundBiases.map((bias) => ({
+                                        create: detectedBiases.map((bias) => ({
                                             biasType: bias.biasType as string,
                                             severity: bias.severity as string,
                                             excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
@@ -320,7 +320,7 @@ export async function POST(request: NextRequest) {
                             documentId,
                             doc.filename,
                             (report.summary as string) || '',
-                            foundBiases.map((b) => ({
+                            detectedBiases.map((b) => ({
                                 biasType: b.biasType as string,
                                 severity: b.severity as string,
                                 explanation: (b.explanation as string) || ''

@@ -346,7 +346,7 @@ export async function runAnalysis(
                         if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
                             const biases = event.data.output.biasAnalysis;
                             for (const bias of biases) {
-                                if (bias.found && onProgress) {
+                                if (bias.biasType && onProgress) {
                                     onProgress({
                                         type: 'bias',
                                         biasType: bias.biasType,
