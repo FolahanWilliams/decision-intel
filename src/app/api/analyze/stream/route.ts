@@ -129,11 +129,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
 
-        // Guard against duplicate analysis — don't re-run for documents
-        // that are already complete or have an analysis in flight.
-        if (doc.status === 'complete') {
-            return NextResponse.json({ error: 'Document already analyzed', status: doc.status }, { status: 409 });
-        }
+        // Guard against concurrent analysis — block if one is already in
+        // flight, but allow re-analysis of completed documents (e.g. "Run
+        // Live Audit" on the detail page).
         if (doc.status === 'analyzing') {
             return NextResponse.json({ error: 'Analysis already in progress', status: doc.status }, { status: 409 });
         }

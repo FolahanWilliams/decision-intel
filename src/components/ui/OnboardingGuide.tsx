@@ -7,7 +7,7 @@ const STEPS = [
     {
         icon: Upload,
         title: 'Upload a Document',
-        description: 'Start by uploading a PDF, TXT, MD, DOC, or DOCX file for analysis.',
+        description: 'Start by uploading a PDF, TXT, MD, or DOCX file for analysis.',
         action: 'Use the upload zone above',
     },
     {

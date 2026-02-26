@@ -39,7 +39,7 @@ export function useDocuments(detailed = false, page = 1, limit = 10) {
         url,
         fetcher,
         {
-            revalidateOnFocus: false,
+            revalidateOnFocus: true,
             dedupingInterval: 5000, // Don't re-fetch within 5 seconds
         }
     );
