@@ -129,6 +129,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
 
+        // Guard against duplicate analysis — don't re-run for documents
+        // that are already complete or have an analysis in flight.
+        if (doc.status === 'complete') {
+            return NextResponse.json({ error: 'Document already analyzed', status: doc.status }, { status: 409 });
+        }
+        if (doc.status === 'analyzing') {
+            return NextResponse.json({ error: 'Analysis already in progress', status: doc.status }, { status: 409 });
+        }
+
         const encoder = new TextEncoder();
         const stream = new ReadableStream({
             async start(controller) {
@@ -338,10 +347,14 @@ export async function POST(request: NextRequest) {
 
                 } catch (error) {
                     log.error('Stream processing error:', error);
-                    await prisma.document.update({
-                        where: { id: documentId },
-                        data: { status: 'error' }
-                    });
+                    try {
+                        await prisma.document.update({
+                            where: { id: documentId },
+                            data: { status: 'error' }
+                        });
+                    } catch (updateErr) {
+                        log.error('Failed to update document status to error:', updateErr);
+                    }
                     const errorMessage = getSafeErrorMessage(error);
                     sendUpdate({ type: 'error', message: errorMessage, progress: 0 });
                     controller.close();

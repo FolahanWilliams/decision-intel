@@ -84,6 +84,15 @@ export function useAnalysisStream(options: StreamOptions) {
             signal,
         });
 
+        if (!res.ok) {
+            let errorMessage = `Analysis failed (${res.status})`;
+            try {
+                const errorData = await res.json();
+                errorMessage = errorData.error || errorMessage;
+            } catch { /* ignore parse errors */ }
+            throw new Error(errorMessage);
+        }
+
         if (!res.body) {
             throw new Error('No response body from analysis endpoint');
         }
