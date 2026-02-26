@@ -797,7 +797,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             cognitiveAnalysis: state.cognitiveAnalysis,
             simulation: state.simulation ?? undefined,
             institutionalMemory: state.institutionalMemory ?? undefined,
-            speakers: []
+            speakers: state.speakers || []
         } satisfies AnalysisResult
     };
 }

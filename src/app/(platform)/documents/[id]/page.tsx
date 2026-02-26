@@ -53,6 +53,7 @@ interface FactCheck {
     flags: string[];
     verifications?: Verification[];
     primaryCompany?: { ticker: string; name: string };
+    primaryTopic?: string;
     dataFetchedAt?: string;
     searchSources?: string[];
 }
@@ -268,7 +269,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         setStreamLogs(prev => [...prev, { msg: `◐ NOISE: ${Math.round(update.result.score)}% variance detected`, type: 'info', ts }]);
                     } else if (update.type === 'complete') {
                         setStreamLogs(prev => [...prev, { msg: '✓ Analysis complete. Results saved.', type: 'success', ts }]);
-                        setDocument(prev => prev ? { ...prev, analyses: [update.result, ...prev.analyses], status: 'complete' } : null);
+                        // Re-fetch from API to get the full record with DB-generated
+                        // fields (id, createdAt, BiasInstance IDs) instead of injecting
+                        // the raw finalReport which is missing those fields.
+                        fetch(`/api/documents/${document.id}`)
+                            .then(r => r.ok ? r.json() : null)
+                            .then(data => { if (data) setDocument(data); })
+                            .catch(() => {});
                     } else if (update.type === 'error') {
                         streamError = update.message || 'Analysis failed during stream';
                     }
@@ -451,9 +458,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         <h3 className="flex items-center gap-sm">
                             <CheckCircle size={18} style={{ color: 'var(--accent-primary)' }} />
                             Financial Fact Check
-                            {analysis.factCheck.primaryCompany && (
+                            {(analysis.factCheck.primaryCompany || analysis.factCheck.primaryTopic) && (
                                 <span className="badge badge-secondary" style={{ marginLeft: '8px', fontSize: '10px' }}>
-                                    {analysis.factCheck.primaryCompany.name} ({analysis.factCheck.primaryCompany.ticker})
+                                    {analysis.factCheck.primaryCompany
+                                        ? `${analysis.factCheck.primaryCompany.name} (${analysis.factCheck.primaryCompany.ticker})`
+                                        : analysis.factCheck.primaryTopic}
                                 </span>
                             )}
                         </h3>
@@ -610,6 +619,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                         originalScore={analysis?.overallScore}
                                         originalNoiseScore={analysis?.noiseScore}
                                         originalBiasCount={biases.length}
+                                        originalBiasTypes={biases.map(b => b.biasType)}
                                     />
                                 </ErrorBoundary>
                             )}

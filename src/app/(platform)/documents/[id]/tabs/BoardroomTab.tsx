@@ -38,10 +38,10 @@ export function BoardroomTab({ simulation }: BoardroomTabProps) {
                                         id: t.name,
                                         name: t.name,
                                         role: t.role,
-                                        influence: Math.round((t.confidence || 0.5) * 100),
+                                        influence: Math.round(t.confidence || 50),
                                         interest: 70,
                                         stance: t.vote === 'APPROVE' ? 'supportive' : t.vote === 'REJECT' ? 'opposed' : 'neutral',
-                                        keyConcerns: [t.feedback?.substring(0, 50) + '...']
+                                        keyConcerns: [t.keyRiskIdentified || t.rationale?.substring(0, 80) || 'No specific concerns noted'].filter(Boolean)
                                     })) || []} />
                                 </div>
                             </div>

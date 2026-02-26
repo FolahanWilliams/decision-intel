@@ -722,7 +722,7 @@ export default function Dashboard() {
         <div className="text-center text-muted mt-xl p-xl">
           <FileText size={48} className="mx-auto mb-md opacity-30" />
           <p className="mb-sm">Upload your first document to get started</p>
-          <p className="text-sm opacity-60">We support PDF, TXT, MD, DOC, and DOCX files</p>
+          <p className="text-sm opacity-60">We support PDF, TXT, MD, and DOCX files</p>
         </div>
       )}
     </div>
