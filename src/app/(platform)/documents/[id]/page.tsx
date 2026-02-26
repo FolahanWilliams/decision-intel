@@ -234,11 +234,21 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 body: JSON.stringify({ documentId: document.id })
             });
 
+            if (!response.ok) {
+                let errorMessage = `Analysis failed (${response.status})`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || errorMessage;
+                } catch { /* ignore parse errors */ }
+                throw new Error(errorMessage);
+            }
+
             const reader = response.body?.getReader();
             if (!reader) throw new Error('Failed to start stream');
 
             const decoder = new TextDecoder();
             const sseReader = new SSEReader();
+            let streamError: string | null = null;
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -259,10 +269,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     } else if (update.type === 'complete') {
                         setStreamLogs(prev => [...prev, { msg: '✓ Analysis complete. Results saved.', type: 'success', ts }]);
                         setDocument(prev => prev ? { ...prev, analyses: [update.result, ...prev.analyses], status: 'complete' } : null);
+                    } else if (update.type === 'error') {
+                        streamError = update.message || 'Analysis failed during stream';
                     }
                     if (typeof update.progress === 'number') setScanProgress(update.progress);
-                    if (update.type === 'error') throw new Error(update.message || 'Analysis failed during stream');
                 });
+            }
+
+            if (streamError) {
+                throw new Error(streamError);
             }
         } catch (err) {
             const msg = err instanceof Error ? err.message : 'Live scan failed';

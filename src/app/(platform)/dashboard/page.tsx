@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight, ArrowRight } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight, ArrowRight, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
@@ -43,6 +43,7 @@ export default function Dashboard() {
   // SSE: streaming analysis with typed events, auto-retry, AbortController cleanup
   const {
     startAnalysis,
+    cancelAnalysis,
     steps: analysisSteps,
     progress: currentProgress,
     timedOut: streamTimedOut,
@@ -181,6 +182,42 @@ export default function Dashboard() {
     }
   };
 
+  const retryAnalysis = async (docId: string) => {
+    setError(null);
+    setUploading(true);
+    const emptyState = { documents: [], total: 0, page: 1, totalPages: 1 };
+
+    try {
+      await mutateDocs(
+        (current) => {
+          const base = current ?? emptyState;
+          return { ...base, documents: base.documents.map(doc => doc.id === docId ? { ...doc, status: 'analyzing' } : doc) };
+        },
+        { revalidate: false }
+      );
+
+      const finalResult = await startAnalysis(docId);
+
+      if (finalResult) {
+        await mutateDocs(
+          (current) => {
+            const base = current ?? emptyState;
+            return { ...base, documents: base.documents.map(doc => doc.id === docId ? { ...doc, status: 'complete', score: finalResult?.overallScore as number } : doc) };
+          },
+          { revalidate: true }
+        );
+      } else {
+        await mutateDocs(undefined, { revalidate: true });
+      }
+    } catch (err) {
+      console.error('Retry analysis error:', err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
+      await mutateDocs(undefined, { revalidate: true });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
@@ -226,14 +263,14 @@ export default function Dashboard() {
             type="file"
             id="file-input"
             hidden
-            accept=".pdf,.txt,.md,.doc,.docx"
+            accept=".pdf,.txt,.md,.docx"
             onChange={handleFileSelect}
           />
           <div className="flex items-center gap-md">
             <Upload size={32} className="text-accent-primary" />
             <div>
               <p className="font-medium">Drop document here or click to browse</p>
-              <p className="text-sm text-muted">PDF, TXT, MD, DOC, DOCX</p>
+              <p className="text-sm text-muted">PDF, TXT, MD, DOCX</p>
             </div>
           </div>
         </div>
@@ -255,13 +292,21 @@ export default function Dashboard() {
               />
             </div>
 
-            {/* Current Step Only */}
-            {analysisSteps.find(s => s.status === 'running') && (
-              <div className="flex items-center gap-sm text-sm">
-                <Loader2 size={14} className="animate-spin text-accent-primary" />
-                <span>{analysisSteps.find(s => s.status === 'running')?.name}</span>
-              </div>
-            )}
+            {/* Current Step + Cancel */}
+            <div className="flex items-center justify-between">
+              {analysisSteps.find(s => s.status === 'running') && (
+                <div className="flex items-center gap-sm text-sm">
+                  <Loader2 size={14} className="animate-spin text-accent-primary" />
+                  <span>{analysisSteps.find(s => s.status === 'running')?.name}</span>
+                </div>
+              )}
+              <button
+                onClick={() => { cancelAnalysis(); setUploading(false); }}
+                className="text-xs text-muted hover:text-error transition-colors ml-auto"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -538,6 +583,25 @@ export default function Dashboard() {
                         <Loader2 size={12} className="animate-spin" />
                         Analyzing
                       </span>
+                    )}
+
+                    {(doc.status === 'error' || doc.status === 'pending') && (
+                      <div className="flex items-center gap-sm">
+                        {doc.status === 'error' && (
+                          <span className="text-xs text-error">Failed</span>
+                        )}
+                        {doc.status === 'pending' && (
+                          <span className="text-xs text-muted">Pending</span>
+                        )}
+                        <button
+                          onClick={() => retryAnalysis(doc.id)}
+                          disabled={uploading}
+                          className="btn btn-ghost btn-sm flex items-center gap-1 text-xs"
+                        >
+                          <RefreshCw size={12} />
+                          {doc.status === 'error' ? 'Retry' : 'Analyze'}
+                        </button>
+                      </div>
                     )}
 
                     {doc.status === 'complete' && (
