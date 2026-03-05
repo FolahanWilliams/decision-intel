@@ -5,6 +5,9 @@ import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Sh
 import Link from 'next/link';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('Dashboard');
 import { RiskTrendChart } from './RiskTrendChart';
 import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnalysis';
 import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
@@ -77,7 +80,7 @@ export default function Dashboard() {
         setError('Failed to delete document');
       }
     } catch (err) {
-      console.error('Delete failed:', err);
+      log.error('Delete failed:', err);
       setError('Failed to delete document');
     } finally {
       setDeleting(false);
@@ -166,7 +169,7 @@ export default function Dashboard() {
         await mutateDocs(undefined, { revalidate: true });
       }
     } catch (err) {
-      console.error('Upload/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
+      log.error('Upload/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
       setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
 
       // Mark as error in SWR cache and revalidate to sync with server state
@@ -210,7 +213,7 @@ export default function Dashboard() {
         await mutateDocs(undefined, { revalidate: true });
       }
     } catch (err) {
-      console.error('Retry analysis error:', err instanceof Error ? err.message : 'Unknown error');
+      log.error('Retry analysis error:', err instanceof Error ? err.message : 'Unknown error');
       setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
       await mutateDocs(undefined, { revalidate: true });
     } finally {

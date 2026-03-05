@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, startTransition } from 'react';
 import { Upload, BarChart3, Shield, X, ArrowRight } from 'lucide-react';
 
 const STEPS = [
@@ -31,7 +31,7 @@ export function OnboardingGuide() {
     const [dismissed, setDismissed] = useState(true);
 
     useEffect(() => {
-        if (!localStorage.getItem(STORAGE_KEY)) setDismissed(false);
+        if (!localStorage.getItem(STORAGE_KEY)) startTransition(() => setDismissed(false));
     }, []);
     const [currentStep, setCurrentStep] = useState(0);
 

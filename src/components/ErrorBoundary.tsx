@@ -1,6 +1,9 @@
 'use client';
 
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('ErrorBoundary');
 
 interface ErrorBoundaryProps {
     children: ReactNode;
@@ -34,8 +37,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     componentDidCatch(error: Error, info: ErrorInfo) {
-        console.error(
-            `[ErrorBoundary] ${this.props.sectionName ?? 'Unknown section'} crashed:`,
+        log.error(
+            `${this.props.sectionName ?? 'Unknown section'} crashed:`,
             error,
             info.componentStack,
         );

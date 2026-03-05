@@ -10,6 +10,9 @@ import { Download, TrendingUp, TrendingDown, RefreshCw, AlertTriangle } from 'lu
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useToast } from '@/components/ui/ToastContext';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('Trends');
 
 
 interface MarketAnalysis {
@@ -39,7 +42,7 @@ export default function TrendsPage() {
         } catch (e) {
             const msg = e instanceof Error ? e.message : 'Market analysis failed';
             showToast(msg, 'error');
-            console.error(e);
+            log.error('Market analysis failed', e);
         } finally {
             setAnalyzing(false);
         }
