@@ -10,6 +10,9 @@ import {
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('RiskAudits');
 
 interface DocumentWithRisk {
     id: string;
@@ -99,7 +102,7 @@ export default function RiskAuditsPage() {
                 setDeleteModal({ open: false, docId: '', filename: '' });
             }
         } catch (err) {
-            console.error('Delete failed:', err);
+            log.error('Delete failed:', err);
         } finally {
             setDeleting(false);
         }
@@ -114,7 +117,7 @@ export default function RiskAuditsPage() {
             const generator = new AggregatePdfGenerator();
             generator.generateRiskReport(documents, summary);
         } catch (err) {
-            console.error('Failed to generate report:', err);
+            log.error('Failed to generate report:', err);
         }
     };
 

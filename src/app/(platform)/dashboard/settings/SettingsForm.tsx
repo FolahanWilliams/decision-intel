@@ -9,6 +9,9 @@ import { updateUserSettings, UserSettingsData } from '@/app/actions/settings';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/ToastContext';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('Settings');
 
 interface SettingsFormProps {
     initialSettings: UserSettingsData;
@@ -73,7 +76,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                 showToast('Settings saved successfully', 'success');
                 setTimeout(() => setSaved(false), 2000);
             } catch (error) {
-                console.error("Failed to save settings:", error);
+                log.error('Failed to save settings:', error);
                 showToast('Failed to save settings', 'error');
             }
         });

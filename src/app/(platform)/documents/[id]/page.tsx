@@ -12,6 +12,9 @@ import {
 import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -185,11 +188,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     body: auditPayload
                 }).catch(() => {});
             } catch (stringifyError) {
-                console.error('Failed to stringify audit payload:', stringifyError);
+                log.error('Failed to stringify audit payload:', stringifyError);
             }
             showToast('PDF report generated successfully', 'success');
         } catch (error) {
-            console.error('Failed to generate PDF:', error);
+            log.error('Failed to generate PDF:', error);
             showToast('Failed to generate PDF report', 'error');
         } finally {
             setIsExportingPdf(false);
@@ -215,7 +218,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             }).catch(() => {});
             showToast('CSV export generated successfully', 'success');
         } catch (error) {
-            console.error('Failed to generate CSV:', error);
+            log.error('Failed to generate CSV:', error);
             showToast('Failed to generate CSV report', 'error');
         } finally {
             setIsExportingCsv(false);

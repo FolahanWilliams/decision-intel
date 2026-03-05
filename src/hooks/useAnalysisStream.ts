@@ -2,6 +2,9 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { SSEReader } from '@/lib/sse';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('AnalysisStream');
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -226,7 +229,7 @@ export function useAnalysisStream(options: StreamOptions) {
                 if (isNetworkError && retryCountRef.current < maxRetries) {
                     retryCountRef.current++;
                     const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 4000);
-                    console.warn(`SSE retry ${retryCountRef.current}/${maxRetries} in ${delay}ms`);
+                    log.warn(`SSE retry ${retryCountRef.current}/${maxRetries} in ${delay}ms`);
                     await new Promise(r => setTimeout(r, delay));
                     return attemptStream();
                 }

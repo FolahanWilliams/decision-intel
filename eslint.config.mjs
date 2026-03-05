@@ -10,6 +10,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated agent skill files:
+    ".agent/**",
+    // Script files:
+    "scripts/**",
   ]),
   {
     files: ["src/app/(platform)/documents/[id]/page.tsx"],
