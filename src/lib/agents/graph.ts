@@ -1,6 +1,7 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
-import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, verificationNode, deepAnalysisNode, simulationNode } from "./nodes";
+import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, verificationNode, deepAnalysisNode, simulationNode, intelligenceNode } from "./nodes";
 import { AnalysisResult, BiasDetectionResult, NoiseBenchmark, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
+import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
 
 // Define the State using Annotation.Root
 const GraphState = Annotation.Root({
@@ -84,6 +85,10 @@ const GraphState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => null,
     }),
+    intelligenceContext: Annotation<IntelligenceContext | undefined>({
+        reducer: (x, y) => y ?? x,
+        default: () => undefined,
+    }),
 });
 
 // Routing function: only allow content into the analysis pipeline when
@@ -96,12 +101,12 @@ function routeAfterAnonymization(state: typeof GraphState.State): string {
     return 'riskScorer';
 }
 
-// Graph Definition — Optimized Super-Node Architecture
-// Before: 9 parallel nodes after structurer
-// After:  5 parallel super-nodes after structurer (~40% fewer LLM calls)
+// Graph Definition — Optimized Super-Node Architecture with Intelligence Layer
+// Flow: gdprAnonymizer → structurer → intelligenceGatherer → 5 parallel analysis nodes → riskScorer
 const workflow = new StateGraph(GraphState)
     .addNode("gdprAnonymizer", gdprAnonymizerNode)
     .addNode("structurer", structurerNode)
+    .addNode("intelligenceGatherer", intelligenceNode)    // Web intelligence context assembly
     .addNode("biasDetective", biasDetectiveNode)
     .addNode("noiseJudge", noiseJudgeNode)
     .addNode("verificationNode", verificationNode)        // factChecker + complianceMapper
@@ -118,12 +123,15 @@ const workflow = new StateGraph(GraphState)
         riskScorer: "riskScorer",
     })
 
-    // Fan-out: structurer → 5 parallel super-nodes
-    .addEdge("structurer", "biasDetective")
-    .addEdge("structurer", "noiseJudge")
-    .addEdge("structurer", "verificationNode")
-    .addEdge("structurer", "deepAnalysisNode")
-    .addEdge("structurer", "simulationNode")
+    // structurer → intelligence gathering (extracts topics + assembles context)
+    .addEdge("structurer", "intelligenceGatherer")
+
+    // Fan-out: intelligenceGatherer → 5 parallel super-nodes (all receive context via state)
+    .addEdge("intelligenceGatherer", "biasDetective")
+    .addEdge("intelligenceGatherer", "noiseJudge")
+    .addEdge("intelligenceGatherer", "verificationNode")
+    .addEdge("intelligenceGatherer", "deepAnalysisNode")
+    .addEdge("intelligenceGatherer", "simulationNode")
 
     // Fan-in: 5 super-nodes → riskScorer
     .addEdge("biasDetective", "riskScorer")

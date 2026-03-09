@@ -142,6 +142,83 @@ model CacheEntry {
   @@index([expiresAt])
 }
 
+// ─── Web Intelligence Layer ───────────────────────────────────────────────
+
+model NewsArticle {
+  id             String   @id @default(cuid())
+  title          String
+  link           String   @unique
+  source         String        // e.g. "HBR", "Reuters"
+  feedCategory   String        // e.g. "psychology", "regulatory", "business"
+  description    String   @db.Text
+  publishedAt    DateTime
+  expiresAt      DateTime      // 48h TTL — cleaned by cron
+  extractedTopics String[]     // Gemini-classified topics
+  biasTypes       String[]     // Applicable bias types (e.g. "anchoring", "groupthink")
+  industrySector  String?      // e.g. "Technology", "Finance"
+  relevanceScore  Float  @default(0) // 0-1 relevance to decision-making
+
+  createdAt DateTime @default(now())
+
+  @@index([feedCategory])
+  @@index([expiresAt])
+  @@index([publishedAt])
+  @@index([relevanceScore])
+}
+
+model ResearchCache {
+  id           String   @id @default(cuid())
+  paperTitle   String
+  authors      String[]
+  year         Int?
+  abstract     String   @db.Text
+  doi          String?  @unique
+  sourceUrl    String?
+  biasTypes    String[]        // Which bias types this paper covers
+  citationCount Int     @default(0)
+  source       String          // "semantic_scholar" | "google_scholar"
+
+  createdAt DateTime @default(now())
+  expiresAt DateTime           // 30-day TTL
+
+  @@index([biasTypes])
+  @@index([expiresAt])
+}
+
+model CaseStudy {
+  id          String   @id @default(cuid())
+  company     String          // e.g. "Enron", "Nokia"
+  title       String
+  year        Int?
+  summary     String   @db.Text
+  biasTypes   String[]        // e.g. ["groupthink", "overconfidence"]
+  outcome     String          // e.g. "bankruptcy", "market_loss"
+  lessons     String   @db.Text
+  industry    String?
+  embedding   Unsupported("vector(1536)")?
+
+  createdAt DateTime @default(now())
+
+  @@index([biasTypes])
+  @@index([industry])
+}
+
+model IntelligenceSync {
+  id          String   @id @default(cuid())
+  syncType    String          // "rss" | "research" | "full"
+  status      String          // "success" | "partial" | "error"
+  feedsProcessed Int  @default(0)
+  articlesAdded  Int  @default(0)
+  articlesExpired Int @default(0)
+  errors      Json?           // Array of error descriptions
+  durationMs  Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([syncType])
+  @@index([createdAt])
+}
+
 // Rate limiting table - replaces Redis for cost savings
 model RateLimit {
   id        String   @id @default(cuid())

@@ -1,4 +1,5 @@
 import { AnalysisResult, BiasDetectionResult, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
+import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
 
 export interface AuditState {
     // Input
@@ -12,6 +13,9 @@ export interface AuditState {
     // Internal Processing
     structuredContent?: string;
     speakers?: string[];
+
+    // Web Intelligence Context — assembled after structuring, consumed by analysis nodes
+    intelligenceContext?: IntelligenceContext;
 
     // Agent Outputs
     biasAnalysis?: BiasDetectionResult[];
