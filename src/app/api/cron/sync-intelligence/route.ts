@@ -13,8 +13,10 @@ const CRON_SECRET = process.env.CRON_SECRET?.trim();
 
 /**
  * GET /api/cron/sync-intelligence — Scheduled intelligence sync.
- * Intended for Vercel Cron (every 6 hours). Syncs RSS feeds,
- * cleans expired articles and research cache, logs sync metadata.
+ * Runs once daily via Vercel Cron (Hobby plan compatible).
+ * Syncs RSS feeds, cleans expired articles and research cache,
+ * logs sync metadata. Stale data between syncs is handled by
+ * on-demand lazy sync in the context builder.
  *
  * Protected by CRON_SECRET header to prevent unauthorized triggers.
  */
