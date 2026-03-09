@@ -117,9 +117,13 @@ export async function DELETE(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        await prisma.document.deleteMany({
+        const { count } = await prisma.document.deleteMany({
             where: { id, userId }
         });
+
+        if (count === 0) {
+            return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {

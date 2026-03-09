@@ -124,8 +124,11 @@ export async function POST() {
             details: { tickers: activeTopics }
         }).catch(() => {});
 
+        // Only forward expected fields to the client — the LLM may return
+        // arbitrary keys that could break the frontend or leak prompt details.
         return NextResponse.json({
-            ...analysis,
+            summary: typeof analysis.summary === 'string' ? analysis.summary : '',
+            impactAssessment: Array.isArray(analysis.impactAssessment) ? analysis.impactAssessment : [],
             searchSources
         });
 
