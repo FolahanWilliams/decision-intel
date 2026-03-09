@@ -135,8 +135,16 @@ export async function POST(request: NextRequest) {
         // Guard against concurrent analysis — block if one is already in
         // flight, but allow re-analysis of completed documents (e.g. "Run
         // Live Audit" on the detail page).
+        // If a document has been stuck in 'analyzing' for more than 10
+        // minutes the previous run likely timed out or crashed — allow a
+        // fresh attempt instead of returning 409 forever.
         if (doc.status === 'analyzing') {
-            return NextResponse.json({ error: 'Analysis already in progress', status: doc.status }, { status: 409 });
+            const STALE_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutes
+            const elapsed = Date.now() - new Date(doc.updatedAt).getTime();
+            if (elapsed < STALE_THRESHOLD_MS) {
+                return NextResponse.json({ error: 'Analysis already in progress', status: doc.status }, { status: 409 });
+            }
+            log.warn(`Document ${documentId} stuck in 'analyzing' for ${Math.round(elapsed / 60000)}m — allowing re-analysis`);
         }
 
         const encoder = new TextEncoder();
