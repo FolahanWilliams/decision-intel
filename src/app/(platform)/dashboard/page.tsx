@@ -101,6 +101,11 @@ export default function Dashboard() {
     setError(null);
     setUploading(true);
 
+    // Default empty state when SWR cache is undefined (e.g. if the
+    // initial fetch failed due to schema drift or network error).
+    // Declared outside try/catch so the catch handler can reference it.
+    const emptyState = { documents: [], total: 0, page: 1, totalPages: 1 };
+
     try {
       // Upload file
       const formData = new FormData();
@@ -128,10 +133,6 @@ export default function Dashboard() {
       }
 
       const uploadData = await uploadRes.json();
-
-      // Use a default empty state when current is undefined (e.g. if
-      // the initial fetch failed due to schema drift or network error).
-      const emptyState = { documents: [], total: 0, page: 1, totalPages: 1 };
 
       // If the server returned a cached result, skip streaming and
       // directly revalidate the SWR cache so the existing document
@@ -175,8 +176,8 @@ export default function Dashboard() {
       // Mark as error in SWR cache and revalidate to sync with server state
       await mutateDocs(
         (current) => {
-          if (!current) return current;
-          return { ...current, documents: current.documents.map(doc => doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc) };
+          const base = current ?? emptyState;
+          return { ...base, documents: base.documents.map(doc => doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc) };
         },
         { revalidate: true }
       );
@@ -237,6 +238,8 @@ export default function Dashboard() {
     if (files && files.length > 0) {
       await uploadAndAnalyze(files[0]);
     }
+    // Reset so the same file can be re-selected (otherwise onChange won't fire)
+    e.target.value = '';
   };
 
   return (
