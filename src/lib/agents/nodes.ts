@@ -9,6 +9,7 @@ import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
 import { withRetry, smartTruncate, batchProcess } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
 import { createLogger } from '../utils/logger';
+import { assembleContext, formatContextForPrompt } from '../intelligence/contextBuilder';
 
 // ============================================================
 // CONSTANTS
@@ -196,18 +197,78 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
     };
 }
 
+// ============================================================
+// INTELLIGENCE GATHERING NODE
+// Runs after structurer, before analysis nodes. Extracts topics
+// and industry from structured content, then assembles external
+// intelligence context for all downstream nodes.
+// ============================================================
+
+export async function intelligenceNode(state: AuditState): Promise<Partial<AuditState>> {
+    try {
+        log.info('Gathering web intelligence context...');
+        const content = truncateText(state.structuredContent || '');
+
+        // Quick extraction: ask Gemini to identify topics, industry, and companies
+        const extractionResult = await withTimeout(getModel().generateContent([
+            `Extract key metadata from this document for intelligence gathering.
+Return JSON:
+{
+    "topics": ["topic1", "topic2"],
+    "industry": "sector name or null",
+    "companies": ["company1", "company2"],
+    "biasKeywords": ["keyword relevant to cognitive biases"]
+}
+Keep it concise — max 5 items per array.`,
+            `<input_text>\n${content.slice(0, 8000)}\n</input_text>`
+        ]), 30000);
+
+        const extractionText = extractionResult.response?.text ? extractionResult.response.text() : '{}';
+        const extracted = parseJSON(extractionText) || {};
+
+        const topics: string[] = Array.isArray(extracted.topics) ? extracted.topics : [];
+        const industry: string | undefined = typeof extracted.industry === 'string' ? extracted.industry : undefined;
+        const companies: string[] = Array.isArray(extracted.companies) ? extracted.companies : [];
+        const biasKeywords: string[] = Array.isArray(extracted.biasKeywords) ? extracted.biasKeywords : [];
+
+        // Assemble intelligence context from all sources
+        const intelligenceContext = await assembleContext({
+            biasTypes: biasKeywords,
+            industry,
+            topics,
+            companies,
+        });
+
+        log.info(`Intelligence gathered: news=${intelligenceContext.meta.sources.newsCount}, ` +
+            `research=${intelligenceContext.meta.sources.researchCount}, ` +
+            `cases=${intelligenceContext.meta.sources.caseStudyCount}, ` +
+            `macro=${intelligenceContext.meta.sources.macroIndicators}`);
+
+        return { intelligenceContext };
+    } catch (e) {
+        log.warn('Intelligence node failed (non-fatal):', e instanceof Error ? e.message : String(e));
+        return { intelligenceContext: undefined };
+    }
+}
+
 export async function biasDetectiveNode(state: AuditState): Promise<Partial<AuditState>> {
 
     try {
         // SECURITY: Never fall back to originalContent — only use anonymized content
         const content = truncateText(state.structuredContent || '');
 
+        // Inject intelligence context if available
+        const intelContext = state.intelligenceContext ? formatContextForPrompt(state.intelligenceContext) : '';
+        const intelPrompt = intelContext
+            ? `\n\nEXTERNAL INTELLIGENCE CONTEXT (use to validate claims and identify biases):\n${sanitizeForPrompt(intelContext, 'intelligence_context')}`
+            : '';
+
         // Use Grounded Model for primary detection with retry logic
         const result = await withRetry(
             () => withTimeout(getGroundedModel().generateContent([
                 BIAS_DETECTIVE_PROMPT,
                 `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
-                `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.`
+                `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.${intelPrompt}`
             ])),
             2, // 2 retries
             1000, // 1 second base delay
@@ -296,11 +357,21 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
     const content = truncateText(state.structuredContent || '');
 
     try {
+        // Inject macro/industry context for better benchmark comparison
+        const macroContext = state.intelligenceContext?.macro?.summary || '';
+        const benchmarkContext = state.intelligenceContext?.industryBenchmarks
+            ?.slice(0, 4)
+            .map(b => `${b.metric}: ${b.value} (${b.source})`)
+            .join('; ') || '';
+        const contextSuffix = (macroContext || benchmarkContext)
+            ? `\n\nEXTERNAL BENCHMARKS FOR COMPARISON:\n${macroContext ? `Macro: ${macroContext}\n` : ''}${benchmarkContext ? `Industry: ${benchmarkContext}` : ''}`
+            : '';
+
         // Parallel Judges for Noise Scoring
         const promises = [1, 2, 3].map(() =>
             withTimeout(getModel().generateContent([
                 NOISE_JUDGE_PROMPT,
-                `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>`,
+                `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
                 `\n(Random Seed: ${Math.random()})`
             ]))
         );
@@ -458,12 +529,20 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
         // Import super-prompt
         const { VERIFICATION_SUPER_PROMPT } = await import('./prompts');
 
+        // Inject news context for better fact-checking
+        const newsContext = state.intelligenceContext?.news?.slice(0, 5)
+            .map(n => `- [${n.source}] ${n.title}`)
+            .join('\n') || '';
+        const verificationIntelPrompt = newsContext
+            ? `\n\nRECENT RELEVANT NEWS (cross-reference claims against these):\n${sanitizeForPrompt(newsContext, 'recent_news')}`
+            : '';
+
         // Single grounded LLM call for both fact-check and compliance
         const result = await withRetry(
             () => withTimeout(
                 getGroundedModel().generateContent([
                     VERIFICATION_SUPER_PROMPT,
-                    `Document to analyze:\n<input_text>\n${content}\n</input_text>`
+                    `Document to analyze:\n<input_text>\n${content}\n</input_text>${verificationIntelPrompt}`
                 ]),
                 90000 // 90 second timeout for combined verification
             ),
@@ -597,11 +676,19 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
 
         const { DEEP_ANALYSIS_SUPER_PROMPT } = await import('./prompts');
 
+        // Inject case studies and research for better strategic analysis
+        const caseContext = state.intelligenceContext?.caseStudies?.slice(0, 3)
+            .map(c => `- ${c.company} (${c.year ?? 'n/a'}): ${c.outcome}. Biases: ${c.biasTypes.join(', ')}. Lesson: ${c.lessons.slice(0, 150)}`)
+            .join('\n') || '';
+        const deepIntelPrompt = caseContext
+            ? `\n\nHISTORICAL CASE STUDIES (use as reference for SWOT, pre-mortem, and cognitive diversity):\n${sanitizeForPrompt(caseContext, 'case_studies')}`
+            : '';
+
         const result = await withRetry(
             () => withTimeout(
                 getGroundedModel().generateContent([
                     DEEP_ANALYSIS_SUPER_PROMPT,
-                    `Text to analyze:\n<input_text>\n${content}\n</input_text>`
+                    `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}`
                 ]),
                 90000 // 90 second timeout
             ),
@@ -672,11 +759,17 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
         // Step 2: Combined simulation + memory prompt
         const { SIMULATION_SUPER_PROMPT } = await import('./prompts');
 
+        // Build intelligence brief for decision twins
+        const intelBrief = state.intelligenceContext ? formatContextForPrompt(state.intelligenceContext) : '';
+        const intelBlock = intelBrief && intelBrief !== 'No external intelligence context available.'
+            ? `\n\nExternal Intelligence Brief:\n${sanitizeForPrompt(intelBrief, 'intelligence_brief')}`
+            : '';
+
         const result = await withTimeout(
             getStandardSafetyGroundedModel().generateContent([
                 SIMULATION_SUPER_PROMPT,
                 `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
-                `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}`
+                `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}`
             ]),
             90000
         );
@@ -797,7 +890,17 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             cognitiveAnalysis: state.cognitiveAnalysis,
             simulation: state.simulation ?? undefined,
             institutionalMemory: state.institutionalMemory ?? undefined,
-            speakers: state.speakers || []
+            speakers: state.speakers || [],
+            intelligenceContext: state.intelligenceContext ? {
+                newsCount: state.intelligenceContext.meta.sources.newsCount,
+                researchCount: state.intelligenceContext.meta.sources.researchCount,
+                caseStudyCount: state.intelligenceContext.meta.sources.caseStudyCount,
+                macroSummary: state.intelligenceContext.macro?.summary || '',
+                industryBenchmarkCount: state.intelligenceContext.meta.sources.industryBenchmarks,
+                assembledAt: state.intelligenceContext.meta.assembledAt,
+                topNews: state.intelligenceContext.news.slice(0, 3).map(n => ({ title: n.title, source: n.source, link: n.link })),
+                topCaseStudies: state.intelligenceContext.caseStudies.slice(0, 3).map(c => ({ company: c.company, outcome: c.outcome, biasTypes: c.biasTypes })),
+            } : undefined,
         } satisfies AnalysisResult
     };
 }

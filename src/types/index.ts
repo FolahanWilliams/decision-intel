@@ -49,7 +49,19 @@ export interface AnalysisResult {
     cognitiveAnalysis?: CognitiveAnalysisResult;
     simulation?: SimulationResult;
     institutionalMemory?: InstitutionalMemoryResult;
+    intelligenceContext?: IntelligenceContextSummary;
+}
 
+/** Lightweight summary of intelligence context stored with analysis results */
+export interface IntelligenceContextSummary {
+    newsCount: number;
+    researchCount: number;
+    caseStudyCount: number;
+    macroSummary: string;
+    industryBenchmarkCount: number;
+    assembledAt: string;
+    topNews?: Array<{ title: string; source: string; link: string }>;
+    topCaseStudies?: Array<{ company: string; outcome: string; biasTypes: string[] }>;
 }
 
 export interface SimulationResult {
