@@ -177,6 +177,7 @@ export async function analyzeDocument(
                         cognitiveAnalysis: toPrismaJson(result.cognitiveAnalysis ? (CognitiveSchema.safeParse(result.cognitiveAnalysis).success ? result.cognitiveAnalysis : undefined) : undefined),
                         simulation: toPrismaJson(result.simulation ? (SimulationSchema.safeParse(result.simulation).success ? result.simulation : undefined) : undefined),
                         institutionalMemory: toPrismaJson(result.institutionalMemory ? (MemorySchema.safeParse(result.institutionalMemory).success ? result.institutionalMemory : undefined) : undefined),
+                        intelligenceContext: toPrismaJson(result.intelligenceContext || undefined),
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required: schema drift protection demands flexible Prisma data shape
                     } as any
                 });

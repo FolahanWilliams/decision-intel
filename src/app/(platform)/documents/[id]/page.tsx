@@ -7,7 +7,7 @@ import {
     ArrowLeft, FileText, AlertTriangle, CheckCircle,
     Loader2, ChevronRight, Lightbulb, Download, Table,
     Terminal, PlayCircle, Info, RefreshCw, Brain,
-    Users, Vote
+    Users, Vote, Globe
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';
@@ -20,7 +20,7 @@ import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
 import { BiasInstance } from '@prisma/client';
-import { SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, InstitutionalMemoryResult, ComplianceResult } from '@/types';
+import { SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, InstitutionalMemoryResult, ComplianceResult, IntelligenceContextSummary } from '@/types';
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
 
@@ -32,6 +32,7 @@ const NoiseTab = lazy(() => import('./tabs/NoiseTab').then(m => ({ default: m.No
 const RedTeamTab = lazy(() => import('./tabs/RedTeamTab').then(m => ({ default: m.RedTeamTab })));
 const BoardroomTab = lazy(() => import('./tabs/BoardroomTab').then(m => ({ default: m.BoardroomTab })));
 const SimulatorTab = lazy(() => import('./tabs/SimulatorTab').then(m => ({ default: m.SimulatorTab })));
+const IntelligenceTab = lazy(() => import('./tabs/IntelligenceTab').then(m => ({ default: m.IntelligenceTab })));
 
 interface VerificationSource {
     ticker?: string;
@@ -88,6 +89,7 @@ interface Analysis {
         }>;
     };
     institutionalMemory?: InstitutionalMemoryResult;
+    intelligenceContext?: IntelligenceContextSummary;
 }
 
 interface Document {
@@ -101,9 +103,9 @@ interface Document {
     analyses: Analysis[];
 }
 
-type TabId = 'overview' | 'biases' | 'factcheck' | 'compliance' | 'cognitive' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team' | 'boardroom';
+type TabId = 'overview' | 'biases' | 'factcheck' | 'compliance' | 'cognitive' | 'logic' | 'swot' | 'noise' | 'simulator' | 'red-team' | 'boardroom' | 'intelligence';
 
-const VALID_TABS: TabId[] = ['overview', 'logic', 'swot', 'noise', 'red-team', 'boardroom', 'simulator'];
+const VALID_TABS: TabId[] = ['overview', 'logic', 'swot', 'noise', 'red-team', 'boardroom', 'simulator', 'intelligence'];
 
 export default function DocumentAnalysisPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
@@ -328,6 +330,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         ...(analysis?.cognitiveAnalysis ? [{ id: 'red-team' as const, label: 'Red Team', icon: Users }] : []),
         ...(analysis?.simulation ? [{ id: 'boardroom' as const, label: 'Boardroom', icon: Vote }] : []),
         { id: 'simulator' as const, label: 'Simulator', icon: PlayCircle },
+        ...(analysis?.intelligenceContext ? [{ id: 'intelligence' as const, label: 'Intelligence', icon: Globe }] : []),
     ];
 
     return (
@@ -624,6 +627,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                         originalBiasCount={biases.length}
                                         originalBiasTypes={biases.map(b => b.biasType)}
                                     />
+                                </ErrorBoundary>
+                            )}
+                            {activeTab === 'intelligence' && (
+                                <ErrorBoundary sectionName="Intelligence Context">
+                                    <IntelligenceTab intelligenceContext={analysis?.intelligenceContext} />
                                 </ErrorBoundary>
                             )}
                         </Suspense>

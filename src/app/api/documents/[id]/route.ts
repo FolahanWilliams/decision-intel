@@ -52,6 +52,7 @@ export async function GET(
                             cognitiveAnalysis: true,
                             simulation: true,
                             institutionalMemory: true,
+                            intelligenceContext: true,
                             speakers: true
                         }
                     }
