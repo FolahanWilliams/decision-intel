@@ -43,6 +43,7 @@ vi.mock('@/lib/utils/file-parser', () => ({
 const mockDocCreate = vi.fn();
 const mockDocFindFirst = vi.fn();
 const mockDocFindMany = vi.fn();
+const mockDocDelete = vi.fn();
 
 vi.mock('@/lib/prisma', () => ({
     prisma: {
@@ -50,6 +51,7 @@ vi.mock('@/lib/prisma', () => ({
             create: (...args: unknown[]) => mockDocCreate(...args),
             findFirst: (...args: unknown[]) => mockDocFindFirst(...args),
             findMany: (...args: unknown[]) => mockDocFindMany(...args),
+            delete: (...args: unknown[]) => mockDocDelete(...args),
         },
     },
 }));
@@ -76,7 +78,7 @@ function createMockRequest(file?: File) {
     const formData = new FormData();
     if (file) formData.append('file', file);
 
-    const req = new NextRequest() as NextRequest & { formData: () => Promise<FormData> };
+    const req = new NextRequest('http://localhost/api/upload') as NextRequest & { formData: () => Promise<FormData> };
     req.formData = async () => formData;
     return req;
 }
