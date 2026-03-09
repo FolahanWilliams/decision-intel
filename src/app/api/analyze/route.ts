@@ -96,7 +96,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
 
-        // Reset error count on success
+        // analyzeDocument handles the full status lifecycle internally:
+        // pending → analyzing → complete (or → error on failure)
         const result = await analyzeDocument(doc);
 
         return NextResponse.json({

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import path from 'path';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 import { createLogger } from '@/lib/utils/logger';
@@ -117,12 +118,39 @@ export async function DELETE(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { count } = await prisma.document.deleteMany({
-            where: { id, userId }
+        // Fetch the document first so we know the filename (for the
+        // storage path) and can verify it exists before deleting.
+        const doc = await prisma.document.findFirst({
+            where: { id, userId },
+            select: { id: true, filename: true }
         });
 
-        if (count === 0) {
+        if (!doc) {
             return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+        }
+
+        // Delete from DB (cascades to analyses, biases, embeddings)
+        await prisma.document.delete({ where: { id } });
+
+        // Clean up Supabase storage (fire-and-forget).
+        // Storage path matches the upload convention: ${userId}/${documentId}${ext}
+        try {
+            const { getServiceSupabase } = await import('@/lib/supabase');
+            const supabase = getServiceSupabase();
+            const ext = path.extname(doc.filename);
+            const storagePath = `${userId}/${doc.id}${ext}`;
+            const bucket = process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf';
+
+            const { error: removeError } = await supabase.storage
+                .from(bucket)
+                .remove([storagePath]);
+
+            if (removeError) {
+                log.warn(`Storage cleanup failed for ${storagePath}: ${removeError.message}`);
+            }
+        } catch (storageErr) {
+            // Don't fail the request — the DB record is already gone.
+            log.warn('Storage cleanup error:', storageErr);
         }
 
         return NextResponse.json({ success: true });
