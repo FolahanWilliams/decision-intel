@@ -9,12 +9,13 @@
  * → returns a unified context envelope.
  */
 
-import { searchNews, type NewsSearchOptions } from '@/lib/news/newsService';
+import { searchNews, syncAllFeeds, type NewsSearchOptions } from '@/lib/news/newsService';
 import { findResearchForBiases, type ResearchPaper } from '@/lib/research/scholarSearch';
 import { matchCaseStudies, type CaseStudyMatch } from '@/lib/research/caseStudyMatcher';
 import { getMacroSnapshot, getIndustryBenchmarks, type MacroSnapshot, type IndustryBenchmark } from '@/lib/tools/macroContext';
 import { withTimeout as utilTimeout } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
+import { prisma } from '@/lib/prisma';
 
 const log = createLogger('ContextBuilder');
 
@@ -67,6 +68,39 @@ export interface IntelligenceContext {
     };
 }
 
+// ─── On-Demand Lazy Sync ─────────────────────────────────────────────────────
+// Between daily cron runs, data can become stale. This ensures fresh news
+// is available by triggering a lightweight sync if the DB is empty or stale.
+
+const STALE_THRESHOLD_MS = 12 * 60 * 60 * 1000; // 12 hours — triggers lazy sync halfway between daily crons
+let lastLazySyncAttempt = 0; // Prevent hammering — at most once per 30 min per process
+const LAZY_SYNC_COOLDOWN_MS = 30 * 60 * 1000;
+
+async function ensureFreshNews(): Promise<void> {
+    // Cooldown: don't attempt lazy sync more than once per 30 minutes
+    if (Date.now() - lastLazySyncAttempt < LAZY_SYNC_COOLDOWN_MS) return;
+
+    try {
+        // Check if we have any recent articles
+        const recentArticle = await prisma.newsArticle.findFirst({
+            where: { createdAt: { gt: new Date(Date.now() - STALE_THRESHOLD_MS) } },
+            select: { id: true },
+        });
+
+        if (recentArticle) return; // Data is fresh enough
+
+        log.info('News data is stale or empty — triggering on-demand sync...');
+        lastLazySyncAttempt = Date.now();
+
+        // Run sync with a tight timeout so it doesn't block analysis too long
+        await utilTimeout(() => syncAllFeeds(), 30_000, 'On-demand news sync timeout');
+        log.info('On-demand news sync completed');
+    } catch (err) {
+        // Non-fatal: if lazy sync fails, we proceed with whatever cached data exists
+        log.warn('On-demand news sync failed (non-fatal):', err instanceof Error ? err.message : String(err));
+    }
+}
+
 // ─── Context Assembly ────────────────────────────────────────────────────────
 
 /**
@@ -79,6 +113,9 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
     const errors: string[] = [];
 
     const { biasTypes, industry, topics } = request;
+
+    // Ensure news data is fresh (lazy sync if stale)
+    await ensureFreshNews();
 
     // Fan out to all intelligence sources in parallel
     const [newsResult, researchResult, caseStudyResult, macroResult, benchmarkResult] =
