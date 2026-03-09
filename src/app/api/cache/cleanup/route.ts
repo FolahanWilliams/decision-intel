@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 import { pruneExpiredEntries, getCacheStats } from '@/lib/utils/cache';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('CacheCleanup');
+
+/** Constant-time string comparison to prevent timing attacks. */
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
 
 /**
  * POST /api/cache/cleanup
@@ -19,7 +26,8 @@ export async function POST(request: Request) {
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret) {
     const auth = request.headers.get('authorization') ?? '';
-    if (auth !== `Bearer ${cronSecret}`) {
+    const expected = `Bearer ${cronSecret}`;
+    if (!safeCompare(auth, expected)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
   }

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 import { auth } from '@clerk/nextjs/server';
 import { parseFile } from '@/lib/utils/file-parser';
 import { getSafeErrorMessage } from '@/lib/utils/error';
@@ -130,34 +129,10 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Document appears to be empty' }, { status: 400 });
         }
 
-        // Initialize Supabase Admin (Bypass RLS for upload)
-        const { getServiceSupabase } = await import('@/lib/supabase');
-        const supabase = getServiceSupabase();
-
-        const fileId = uuidv4();
-        const ext = path.extname(file.name);
-        // Sanitize filename for storage path
-        const safeFilename = fileId + ext;
-        const storagePath = `${userId}/${safeFilename}`;
-
-
-
-        // Upload to Supabase
-        const { error: uploadError } = await supabase.storage
-            .from(process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf')
-            .upload(storagePath, buffer, {
-                contentType: file.type,
-                upsert: false
-            });
-
-        if (uploadError) {
-            log.error('Supabase Storage Upload Error:', uploadError);
-            throw new Error(`Storage Upload Failed: ${uploadError.message}`);
-        }
         // Store in database with content hash for future caching.
-        // Always create a new document row per user. The earlier findFirst
-        // already checked for same-user duplicates, so reaching here means
-        // this user doesn't own a copy yet.
+        // Created BEFORE the storage upload so we can use the document's
+        // cuid as the storage filename, making the path deterministic for
+        // later deletion: ${userId}/${document.id}${ext}
         // Falls back to plain create if contentHash column is missing (schema drift).
         let document;
         try {
@@ -202,6 +177,30 @@ export async function POST(request: NextRequest) {
             } else {
                 throw dbError;
             }
+        }
+
+        // Upload to Supabase storage using document.id as the filename
+        // so we can reconstruct the path on delete without extra DB columns.
+        const { getServiceSupabase } = await import('@/lib/supabase');
+        const supabase = getServiceSupabase();
+
+        const ext = path.extname(file.name);
+        const storagePath = `${userId}/${document.id}${ext}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from(process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf')
+            .upload(storagePath, buffer, {
+                contentType: file.type,
+                upsert: false
+            });
+
+        if (uploadError) {
+            // Clean up the DB record since the storage upload failed
+            log.error('Supabase Storage Upload Error:', uploadError);
+            await prisma.document.delete({ where: { id: document.id } }).catch(
+                (e) => log.error('Failed to clean up DB after storage error:', e)
+            );
+            throw new Error(`Storage Upload Failed: ${uploadError.message}`);
         }
 
         return NextResponse.json({

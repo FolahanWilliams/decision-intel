@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from 'vitest';
 
 // ---------------------------------------------------------------------------
 // We test the hook logic by importing the module and verifying the
