@@ -56,7 +56,7 @@ export function IntelligenceTab({ intelligenceContext }: IntelligenceTabProps) {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {ctx.topNews.map((n, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                                <span style={{ fontSize: '10px', color: 'var(--text-muted)', minWidth: '20px', fontFamily: 'JetBrains Mono, monospace' }}>
+                                <span style={{ fontSize: '10px', color: 'var(--text-muted)', minWidth: '20px', fontFamily: "'JetBrains Mono', monospace" }}>
                                     {String(i + 1).padStart(2, '0')}
                                 </span>
                                 <div style={{ flex: 1 }}>
@@ -131,7 +131,7 @@ function MiniStat({ icon, label, value, color }: { icon: React.ReactNode; label:
         <div className="card" style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ color, flexShrink: 0 }}>{icon}</div>
             <div>
-                <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>
+                <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'JetBrains Mono', monospace" }}>
                     {value}
                 </div>
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X, ClipboardList, Search, Globe } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X, ClipboardList, Search, Globe, ChevronLeft } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useIntelligenceStatus } from '@/hooks/useIntelligence';
 
@@ -12,10 +12,8 @@ export default function Sidebar() {
     const { status: intelStatus } = useIntelligenceStatus();
     const [mobileOpen, setMobileOpen] = useState(false);
 
-    // Close on navigation — wrap in callback to pass to NavItem
     const closeMobile = useCallback(() => setMobileOpen(false), []);
 
-    // Close on Escape
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && mobileOpen) setMobileOpen(false);
@@ -24,30 +22,33 @@ export default function Sidebar() {
         return () => window.removeEventListener('keydown', handleKey);
     }, [mobileOpen]);
 
-    const sidebarWidth = collapsed ? '64px' : '240px';
+    const sidebarWidth = collapsed ? '72px' : '260px';
 
     return (
         <>
-            {/* Mobile hamburger trigger */}
+            {/* Mobile hamburger */}
             <button
                 className="md:hidden"
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open navigation menu"
                 style={{
                     position: 'fixed',
-                    top: '36px',
-                    left: '8px',
+                    top: '52px',
+                    left: '12px',
                     zIndex: 60,
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
+                    background: 'var(--glass-bg)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid var(--glass-border)',
+                    borderRadius: '10px',
                     color: 'var(--text-primary)',
-                    padding: '6px',
+                    padding: '8px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                 }}
             >
-                <Menu size={20} />
+                <Menu size={18} />
             </button>
 
             {/* Mobile overlay */}
@@ -57,7 +58,8 @@ export default function Sidebar() {
                     style={{
                         position: 'fixed',
                         inset: 0,
-                        background: 'rgba(0,0,0,0.6)',
+                        background: 'rgba(0,0,0,0.5)',
+                        backdropFilter: 'blur(4px)',
                         zIndex: 69,
                     }}
                     onClick={() => setMobileOpen(false)}
@@ -73,30 +75,37 @@ export default function Sidebar() {
                 style={{
                     width: sidebarWidth,
                     minWidth: sidebarWidth,
-                    borderRight: '1px solid var(--border-color)',
+                    borderRight: '1px solid var(--glass-border)',
                     display: 'flex',
                     flexDirection: 'column',
                     background: 'var(--bg-secondary)',
-                    height: 'calc(100vh - 32px)',
+                    height: 'calc(100vh - 44px)',
                     position: 'sticky',
-                    top: '32px',
-                    transition: 'width 0.2s ease, min-width 0.2s ease',
+                    top: '44px',
+                    transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                     overflow: 'hidden',
                 }}
             >
-                <div style={{ padding: collapsed ? '16px 8px' : '24px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                {/* Brand */}
+                <div style={{
+                    padding: collapsed ? '16px 12px' : '24px 20px',
+                    borderBottom: '1px solid var(--glass-border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    minHeight: '72px',
+                }}>
                     {!collapsed && (
                         <div>
-                            <div style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '-0.5px' }}>
-                                <span style={{ color: 'var(--text-highlight)' }}>DECISION</span>
-                                <span style={{ color: 'var(--accent-primary)' }}>INTEL</span>
+                            <div style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '-0.5px' }}>
+                                <span style={{ color: 'var(--text-highlight)' }}>Decision</span>
+                                <span style={{ color: 'var(--accent-primary)', marginLeft: '4px' }}>Intel</span>
                             </div>
-                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px', letterSpacing: '1px' }}>
-                                TERMINAL v1.2
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                Intelligence Platform
                             </div>
                         </div>
                     )}
-                    {/* Collapse toggle (desktop) + close (mobile) */}
                     <button
                         onClick={() => {
                             if (mobileOpen) setMobileOpen(false);
@@ -105,18 +114,19 @@ export default function Sidebar() {
                         aria-label={mobileOpen ? 'Close navigation' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                         className="hidden md:flex"
                         style={{
-                            background: 'transparent',
-                            border: 'none',
+                            background: 'var(--glass-bg)',
+                            border: '1px solid var(--glass-border)',
+                            borderRadius: '8px',
                             color: 'var(--text-muted)',
                             cursor: 'pointer',
-                            padding: '4px',
+                            padding: '6px',
                             display: 'flex',
                             alignItems: 'center',
+                            transition: 'all 0.15s',
                         }}
                     >
-                        {mobileOpen ? <X size={18} /> : <Menu size={16} />}
+                        {mobileOpen ? <X size={16} /> : collapsed ? <Menu size={14} /> : <ChevronLeft size={14} />}
                     </button>
-                    {/* Mobile close button */}
                     {mobileOpen && (
                         <button
                             onClick={() => setMobileOpen(false)}
@@ -135,9 +145,15 @@ export default function Sidebar() {
                     )}
                 </div>
 
-                <nav style={{ padding: collapsed ? '8px' : '16px', flex: 1 }}>
+                <nav style={{ padding: collapsed ? '12px 8px' : '16px 12px', flex: 1, overflowY: 'auto' }}>
                     {!collapsed && (
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', padding: '0 12px 8px', textTransform: 'uppercase' }}>
+                        <div style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            color: 'var(--text-muted)',
+                            padding: '0 10px 8px',
+                            letterSpacing: '0.05em',
+                        }}>
                             Platform
                         </div>
                     )}
@@ -145,11 +161,17 @@ export default function Sidebar() {
                     <NavItem href="/" icon={<FileText size={18} />} label="Documents" active={(pathname === '/' || pathname.startsWith('/documents')) && !pathname.includes('trends')} collapsed={collapsed} onNavigate={closeMobile} />
 
                     {!collapsed && (
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', padding: '16px 12px 8px', textTransform: 'uppercase' }}>
+                        <div style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            color: 'var(--text-muted)',
+                            padding: '20px 10px 8px',
+                            letterSpacing: '0.05em',
+                        }}>
                             Analysis
                         </div>
                     )}
-                    {collapsed && <div style={{ height: '16px' }} />}
+                    {collapsed && <div style={{ height: '20px' }} />}
                     <NavItem href="/dashboard/trends" icon={<Activity size={18} />} label="Historical Trends" active={pathname === '/dashboard/trends'} collapsed={collapsed} onNavigate={closeMobile} />
                     <NavItem href="/dashboard/insights" icon={<BarChart3 size={18} />} label="Visual Insights" active={pathname === '/dashboard/insights'} collapsed={collapsed} onNavigate={closeMobile} />
                     <NavItem href="/dashboard/risk-audits" icon={<ShieldAlert size={18} />} label="Risk Audits" active={pathname === '/dashboard/risk-audits'} collapsed={collapsed} onNavigate={closeMobile} />
@@ -167,18 +189,42 @@ export default function Sidebar() {
                     <NavItem href="/dashboard/search" icon={<Search size={18} />} label="Search" active={pathname === '/dashboard/search'} collapsed={collapsed} onNavigate={closeMobile} />
 
                     {!collapsed && (
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', padding: '16px 12px 8px', textTransform: 'uppercase' }}>
+                        <div style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            color: 'var(--text-muted)',
+                            padding: '20px 10px 8px',
+                            letterSpacing: '0.05em',
+                        }}>
                             System
                         </div>
                     )}
-                    {collapsed && <div style={{ height: '16px' }} />}
+                    {collapsed && <div style={{ height: '20px' }} />}
                     <NavItem href="/dashboard/audit-log" icon={<ClipboardList size={18} />} label="Audit Log" active={pathname === '/dashboard/audit-log'} collapsed={collapsed} onNavigate={closeMobile} />
                     <NavItem href="/dashboard/settings" icon={<Settings size={18} />} label="Settings" active={pathname === '/dashboard/settings'} collapsed={collapsed} onNavigate={closeMobile} />
                 </nav>
 
-                <div style={{ padding: collapsed ? '8px' : '16px', borderTop: '1px solid var(--border-color)' }}>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: collapsed ? 'center' : 'left' }}>
-                        {collapsed ? '' : 'Status: '}<span style={{ color: 'var(--success)' }}>{collapsed ? '●' : 'ONLINE'}</span>
+                <div style={{
+                    padding: collapsed ? '12px' : '16px 20px',
+                    borderTop: '1px solid var(--glass-border)',
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '12px',
+                        color: 'var(--text-muted)',
+                        justifyContent: collapsed ? 'center' : 'flex-start',
+                    }}>
+                        <span style={{
+                            width: '7px',
+                            height: '7px',
+                            borderRadius: '50%',
+                            background: 'var(--success)',
+                            boxShadow: '0 0 6px rgba(34, 197, 94, 0.4)',
+                            flexShrink: 0,
+                        }} />
+                        {!collapsed && <span>Online</span>}
                     </div>
                 </div>
             </aside>
@@ -192,12 +238,13 @@ export default function Sidebar() {
                         height: 100vh !important;
                         z-index: 70;
                         transform: translateX(-100%);
-                        transition: transform 0.2s ease;
-                        width: 240px !important;
-                        min-width: 240px !important;
+                        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        width: 260px !important;
+                        min-width: 260px !important;
                     }
                     aside[role="navigation"].sidebar-mobile-open {
                         transform: translateX(0);
+                        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4);
                     }
                 }
             `}</style>
@@ -217,28 +264,35 @@ function NavItem({ href, icon, label, active, collapsed, onNavigate, badge }: { 
                 alignItems: 'center',
                 justifyContent: collapsed ? 'center' : 'flex-start',
                 gap: collapsed ? '0' : '12px',
-                padding: collapsed ? '10px' : '10px 12px',
+                padding: collapsed ? '10px' : '9px 12px',
                 color: active ? 'var(--text-highlight)' : 'var(--text-secondary)',
-                background: active ? 'rgba(255, 159, 10, 0.1)' : 'transparent',
-                borderLeft: active ? '3px solid var(--accent-primary)' : '3px solid transparent',
-                marginBottom: '4px',
-                fontSize: '13px',
-                fontWeight: 500,
+                background: active ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
+                borderRadius: '10px',
+                marginBottom: '2px',
+                fontSize: '13.5px',
+                fontWeight: active ? 600 : 400,
                 textDecoration: 'none',
-                transition: 'all 0.1s'
+                transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
         >
-            <span style={{ color: active ? 'var(--accent-primary)' : 'inherit', flexShrink: 0, position: 'relative' }}>
+            <span style={{
+                color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
+                flexShrink: 0,
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+            }}>
                 {icon}
                 {badge && (
                     <span style={{
-                        position: 'absolute', top: '-2px', right: '-2px',
-                        width: '6px', height: '6px', borderRadius: '50%',
+                        position: 'absolute', top: '-3px', right: '-3px',
+                        width: '7px', height: '7px', borderRadius: '50%',
                         background: badge.color,
+                        boxShadow: `0 0 6px ${badge.color}`,
                     }} />
                 )}
             </span>
-            {!collapsed && label}
+            {!collapsed && <span>{label}</span>}
         </Link>
     );
 }

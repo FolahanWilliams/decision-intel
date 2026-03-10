@@ -195,7 +195,7 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
                   cy={node.y - (isSelected ? 18 : 15)}
                   r={6}
                   fill={categoryColors[node.category]}
-                  stroke="#1a1a1a"
+                  stroke="var(--bg-primary)"
                   strokeWidth={2}
                 />
 

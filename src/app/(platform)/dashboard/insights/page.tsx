@@ -31,33 +31,30 @@ function SectionLabel({ children, index }: { children: string; index: number }) 
                 animationDelay: `${index * 0.08}s`,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '10px',
                 marginBottom: 'var(--spacing-md)',
                 marginTop: index > 0 ? 'var(--spacing-xl)' : undefined,
             }}
         >
             <span style={{
                 color: 'var(--accent-primary)',
-                fontSize: '10px',
-                fontWeight: 700,
-                letterSpacing: '0.15em',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '11px',
+                fontWeight: 600,
+                fontFamily: "'JetBrains Mono', monospace",
             }}>
-                [{String(index).padStart(2, '0')}]
+                {String(index).padStart(2, '0')}
             </span>
             <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--text-muted)',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
             }}>
                 {children}
             </span>
             <div style={{
                 flex: 1,
                 height: '1px',
-                background: 'linear-gradient(to right, var(--border-color), transparent)',
+                background: 'linear-gradient(to right, var(--glass-border), transparent)',
             }} />
         </div>
     );
@@ -74,7 +71,7 @@ function StatCard({ label, value, icon, color, suffix, delay, trend }: {
 }) {
     return (
         <div
-            className="card card-glow scanline-overlay animate-slide-up"
+            className="card card-glow animate-slide-up"
             style={{ animationDelay: `${delay}s`, overflow: 'hidden' }}
         >
             <div style={{
@@ -84,47 +81,46 @@ function StatCard({ label, value, icon, color, suffix, delay, trend }: {
                 width: '100%',
                 height: '2px',
                 background: `linear-gradient(to right, transparent, ${color}, transparent)`,
-                opacity: 0.6,
+                opacity: 0.4,
             }} />
             <div className="card-body" style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 'var(--spacing-md)',
-                padding: '14px 18px',
+                padding: '16px 20px',
             }}>
                 <div style={{
-                    width: 36,
-                    height: 36,
-                    border: `1px solid ${color}40`,
+                    width: 40,
+                    height: 40,
+                    borderRadius: '10px',
+                    border: `1px solid ${color}30`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: color,
-                    background: `${color}08`,
+                    background: `${color}10`,
                 }}>
                     {icon}
                 </div>
                 <div>
-                    <div className="data-value" style={{
-                        fontSize: '22px',
+                    <div style={{
+                        fontSize: '24px',
                         fontWeight: 700,
                         color,
                         lineHeight: 1,
-                        fontFamily: 'JetBrains Mono, monospace',
+                        fontFamily: "'JetBrains Mono', monospace",
                     }}>
                         {value}
                         {suffix && (
-                            <span style={{ fontSize: '11px', opacity: 0.5, marginLeft: '2px' }}>
+                            <span style={{ fontSize: '12px', opacity: 0.5, marginLeft: '2px' }}>
                                 {suffix}
                             </span>
                         )}
                     </div>
                     <div style={{
-                        fontSize: '9px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
+                        fontSize: '11px',
                         color: 'var(--text-muted)',
-                        marginTop: '3px',
+                        marginTop: '4px',
                     }}>
                         {label}
                     </div>
@@ -132,7 +128,7 @@ function StatCard({ label, value, icon, color, suffix, delay, trend }: {
                         <div style={{
                             fontSize: '9px',
                             color: trend > 0 ? 'var(--success)' : 'var(--error)',
-                            fontFamily: 'JetBrains Mono, monospace',
+                            fontFamily: "'JetBrains Mono', monospace",
                             marginTop: '2px',
                             letterSpacing: '0.05em',
                         }}>
@@ -227,7 +223,7 @@ export default function InsightsPage() {
                 <div className="card" style={{ borderColor: 'var(--error)' }}>
                     <div className="card-body" style={{ textAlign: 'center', padding: 'var(--spacing-xl)' }}>
                         <AlertTriangle size={32} style={{ color: 'var(--error)', margin: '0 auto 12px' }} />
-                        <p style={{ color: 'var(--error)', marginBottom: '12px', fontFamily: 'JetBrains Mono, monospace', fontSize: '12px' }}>
+                        <p style={{ color: 'var(--error)', marginBottom: '12px', fontFamily: "'JetBrains Mono', monospace", fontSize: '12px' }}>
                             ERR::INSIGHTS_FETCH_FAILED
                         </p>
                         <button className="btn btn-primary" onClick={() => mutate()}>
@@ -257,7 +253,7 @@ export default function InsightsPage() {
                             fontSize: '11px',
                             maxWidth: '360px',
                             lineHeight: 1.7,
-                            fontFamily: 'JetBrains Mono, monospace',
+                            fontFamily: "'JetBrains Mono', monospace",
                         }}>
                             No analyses detected. Upload and scan documents to populate cross-document intelligence visualizations.
                         </p>
@@ -348,7 +344,7 @@ export default function InsightsPage() {
                         color: 'var(--text-muted)',
                         letterSpacing: '0.1em',
                         textTransform: 'uppercase',
-                        fontFamily: 'JetBrains Mono, monospace',
+                        fontFamily: "'JetBrains Mono', monospace",
                     }}>
                         CROSS-DOCUMENT INTELLIGENCE
                         <span style={{ color: 'var(--accent-primary)', marginLeft: '8px' }}>
@@ -389,7 +385,7 @@ export default function InsightsPage() {
                     {insights.trendDelta !== 0 && (
                         <div style={{
                             fontSize: '10px',
-                            fontFamily: 'JetBrains Mono, monospace',
+                            fontFamily: "'JetBrains Mono', monospace",
                             padding: '2px 8px',
                             border: `1px solid ${insights.trendDelta >= 0 ? 'var(--success)' : 'var(--error)'}40`,
                             color: insights.trendDelta >= 0 ? 'var(--success)' : 'var(--error)',
@@ -429,10 +425,10 @@ export default function InsightsPage() {
                                     <Tooltip
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
-                                            border: '1px solid var(--border-color)',
-                                            borderRadius: '0',
+                                            border: '1px solid var(--glass-border)',
+                                            borderRadius: '12px',
                                             fontSize: '11px',
-                                            fontFamily: 'JetBrains Mono, monospace',
+                                            fontFamily: "'JetBrains Mono', monospace",
                                         }}
                                         formatter={(value: number | undefined, name: string | undefined) => [
                                             `${value ?? 0}`,
@@ -465,7 +461,7 @@ export default function InsightsPage() {
                             padding: '6px 16px 10px',
                             fontSize: '9px',
                             color: 'var(--text-muted)',
-                            fontFamily: 'JetBrains Mono, monospace',
+                            fontFamily: "'JetBrains Mono', monospace",
                             display: 'flex',
                             gap: '16px',
                             borderTop: '1px solid var(--border-color)',
@@ -552,10 +548,10 @@ export default function InsightsPage() {
                                     <Tooltip
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
-                                            border: '1px solid var(--border-color)',
-                                            borderRadius: '0',
+                                            border: '1px solid var(--glass-border)',
+                                            borderRadius: '12px',
                                             fontSize: '11px',
-                                            fontFamily: 'JetBrains Mono, monospace',
+                                            fontFamily: "'JetBrains Mono', monospace",
                                         }}
                                         formatter={(value: number | undefined) => [`${value ?? 0} analyses`, 'Count']}
                                     />
@@ -569,7 +565,7 @@ export default function InsightsPage() {
                                             style={{
                                                 fill: 'var(--text-muted)',
                                                 fontSize: 9,
-                                                fontFamily: 'JetBrains Mono, monospace',
+                                                fontFamily: "'JetBrains Mono', monospace",
                                             }}
                                             formatter={(v) => Number(v) > 0 ? String(v) : ''}
                                         />
@@ -615,10 +611,10 @@ export default function InsightsPage() {
                                     <Tooltip
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
-                                            border: '1px solid var(--border-color)',
-                                            borderRadius: '0',
+                                            border: '1px solid var(--glass-border)',
+                                            borderRadius: '12px',
                                             fontSize: '11px',
-                                            fontFamily: 'JetBrains Mono, monospace',
+                                            fontFamily: "'JetBrains Mono', monospace",
                                         }}
                                         formatter={(value: number | undefined, name: string | undefined) => [
                                             `${value ?? 0}`,
@@ -637,7 +633,7 @@ export default function InsightsPage() {
                                             position: 'insideTopRight',
                                             fill: 'var(--success)',
                                             fontSize: 8,
-                                            fontFamily: 'JetBrains Mono, monospace',
+                                            fontFamily: "'JetBrains Mono', monospace",
                                             opacity: 0.6,
                                         }}
                                     />
@@ -655,7 +651,7 @@ export default function InsightsPage() {
                             padding: '6px 16px 10px',
                             fontSize: '9px',
                             color: 'var(--text-muted)',
-                            fontFamily: 'JetBrains Mono, monospace',
+                            fontFamily: "'JetBrains Mono', monospace",
                             display: 'flex',
                             gap: '16px',
                             borderTop: '1px solid var(--border-color)',
@@ -704,9 +700,9 @@ export default function InsightsPage() {
                                     <Tooltip
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
-                                            border: '1px solid var(--border-color)',
-                                            borderRadius: '0', fontSize: '11px',
-                                            fontFamily: 'JetBrains Mono, monospace',
+                                            border: '1px solid var(--glass-border)',
+                                            borderRadius: '12px', fontSize: '11px',
+                                            fontFamily: "'JetBrains Mono', monospace",
                                         }}
                                         formatter={(value: number | undefined) => [`${value ?? 0} occurrences`, 'Count']}
                                     />
@@ -759,12 +755,12 @@ export default function InsightsPage() {
                                         padding: '10px 12px',
                                         marginBottom: '4px',
                                         background: 'var(--bg-secondary)',
-                                        border: '1px solid var(--border-color)',
+                                        border: '1px solid var(--glass-border)',
                                     }}>
                                         <span style={{
                                             fontSize: '10px',
                                             fontWeight: 700,
-                                            fontFamily: 'JetBrains Mono, monospace',
+                                            fontFamily: "'JetBrains Mono', monospace",
                                             color: 'var(--error)',
                                             minWidth: '18px',
                                             lineHeight: 1.6,
@@ -776,7 +772,7 @@ export default function InsightsPage() {
                                                 {item.text.length > 120 ? item.text.slice(0, 117) + '…' : item.text}
                                             </div>
                                             {item.count > 1 && (
-                                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: '2px' }}>
+                                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: "'JetBrains Mono', monospace", marginTop: '2px' }}>
                                                     flagged in {item.count} analyses
                                                 </div>
                                             )}
@@ -834,9 +830,9 @@ export default function InsightsPage() {
                                         <Tooltip
                                             contentStyle={{
                                                 background: 'var(--bg-secondary)',
-                                                border: '1px solid var(--border-color)',
-                                                borderRadius: '0', fontSize: '11px',
-                                                fontFamily: 'JetBrains Mono, monospace',
+                                                border: '1px solid var(--glass-border)',
+                                                borderRadius: '12px', fontSize: '11px',
+                                                fontFamily: "'JetBrains Mono', monospace",
                                             }}
                                             formatter={(value: number | undefined) => [`${value ?? 0} votes`, 'Count']}
                                         />
@@ -858,7 +854,7 @@ export default function InsightsPage() {
                                 padding: '6px 16px 10px',
                                 fontSize: '9px',
                                 color: 'var(--text-muted)',
-                                fontFamily: 'JetBrains Mono, monospace',
+                                fontFamily: "'JetBrains Mono', monospace",
                                 borderTop: '1px solid var(--border-color)',
                             }}>
                                 Simulated votes from Fiscal Conservative · Aggressive Growth · Compliance Guard personas
@@ -881,7 +877,7 @@ export default function InsightsPage() {
                         {insights.avgBlindSpotGap > 0 && (
                             <div style={{
                                 fontSize: '10px',
-                                fontFamily: 'JetBrains Mono, monospace',
+                                fontFamily: "'JetBrains Mono', monospace",
                                 color: insights.avgBlindSpotGap < 50 ? 'var(--error)' : insights.avgBlindSpotGap < 80 ? 'var(--warning)' : 'var(--success)',
                             }}>
                                 {insights.avgBlindSpotGap}/100 diversity
@@ -891,7 +887,7 @@ export default function InsightsPage() {
                     <div className="card-body" style={{ padding: 'var(--spacing-md)' }}>
                         {insights.avgBlindSpotGap > 0 && (
                             <div style={{ marginBottom: '16px' }}>
-                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: "'JetBrains Mono', monospace", marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                                     avg cognitive diversity score
                                 </div>
                                 <div style={{ height: '4px', background: 'var(--bg-secondary)', position: 'relative' }}>
@@ -903,21 +899,21 @@ export default function InsightsPage() {
                                         transition: 'width 0.4s ease',
                                     }} />
                                 </div>
-                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginTop: '3px' }}>
+                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: "'JetBrains Mono', monospace", marginTop: '3px' }}>
                                     {insights.avgBlindSpotGap < 50 ? 'Tunnel Vision Detected' : insights.avgBlindSpotGap < 80 ? 'Moderate Perspective Diversity' : 'Balanced Perspectives'}
                                 </div>
                             </div>
                         )}
                         {insights.topBlindSpots.length > 0 ? (
                             <>
-                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: "'JetBrains Mono', monospace", marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                                     most common blind spots
                                 </div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                                     {insights.topBlindSpots.map((spot, i) => (
                                         <span key={i} style={{
                                             fontSize: '10px',
-                                            fontFamily: 'JetBrains Mono, monospace',
+                                            fontFamily: "'JetBrains Mono', monospace",
                                             padding: '3px 8px',
                                             border: '1px solid rgba(255,214,10,0.3)',
                                             color: 'var(--warning)',
@@ -952,7 +948,7 @@ export default function InsightsPage() {
                 fontSize: '9px',
                 color: 'var(--text-muted)',
                 letterSpacing: '0.1em',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: "'JetBrains Mono', monospace",
             }}>
                 LAST REFRESH: {refreshTime || '—'} UTC
                 <span style={{ margin: '0 8px', color: 'var(--border-color)' }}>│</span>

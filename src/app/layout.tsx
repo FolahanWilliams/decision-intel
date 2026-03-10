@@ -22,11 +22,12 @@ export default function RootLayout({
       appearance={{
         baseTheme: dark,
         variables: {
-          colorPrimary: '#ff9f0a',
-          colorBackground: '#050505',
-          colorText: '#e0e0e0',
-          colorInputBackground: '#111111',
-          colorInputText: '#e0e0e0'
+          colorPrimary: '#f59e0b',
+          colorBackground: '#10101c',
+          colorText: '#e2e8f0',
+          colorInputBackground: '#161625',
+          colorInputText: '#e2e8f0',
+          borderRadius: '12px',
         }
       }}
     >

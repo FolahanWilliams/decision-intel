@@ -21,8 +21,13 @@ export default async function PlatformLayout({
                 <main
                     id="main-content"
                     tabIndex={-1}
-                    style={{ flex: 1, overflowY: 'auto' }}
-                    className="bg-primary text-primary transition-colors duration-300"
+                    style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        background: 'var(--bg-primary)',
+                        color: 'var(--text-primary)',
+                        transition: 'background 0.3s, color 0.3s',
+                    }}
                 >
                     {children}
                 </main>

@@ -12,7 +12,7 @@ function SkeletonBlock({ className = '', style }: SkeletonProps) {
             role="status"
             aria-label="Loading"
             style={{
-                borderRadius: 0,
+                borderRadius: '12px',
                 ...style,
             }}
         />

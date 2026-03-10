@@ -5,9 +5,9 @@ interface ComplianceGridProps {
 }
 
 const STATUS_CONFIG = {
-    pass: { label: 'PASS', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)' },
-    warn: { label: 'WARN', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)' },
-    fail: { label: 'FAIL', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' },
+    pass: { label: 'Pass', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.12)' },
+    warn: { label: 'Warn', color: '#eab308', bg: 'rgba(234, 179, 8, 0.12)' },
+    fail: { label: 'Fail', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' },
 };
 
 export function ComplianceGrid({ data }: ComplianceGridProps) {
@@ -15,9 +15,7 @@ export function ComplianceGrid({ data }: ComplianceGridProps) {
         return (
             <div className="card">
                 <div className="card-header">
-                    <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                        Compliance Scorecard
-                    </h3>
+                    <h3 style={{ fontSize: '13px' }}>Compliance Scorecard</h3>
                 </div>
                 <div className="card-body flex items-center justify-center" style={{ height: 120 }}>
                     <p className="text-muted text-sm">No compliance data available</p>
@@ -29,20 +27,16 @@ export function ComplianceGrid({ data }: ComplianceGridProps) {
     return (
         <div className="card">
             <div className="card-header">
-                <h3 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Compliance Scorecard
-                </h3>
+                <h3 style={{ fontSize: '13px' }}>Compliance Scorecard</h3>
             </div>
             <div className="card-body" style={{ padding: 0 }}>
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: `1fr repeat(3, 70px)`,
-                    fontSize: '11px',
-                    borderBottom: '1px solid var(--border-color)',
-                    padding: '8px 16px',
+                    fontSize: '12px',
+                    borderBottom: '1px solid var(--glass-border)',
+                    padding: '10px 16px',
                     color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
                     fontWeight: 600,
                 }}>
                     <span>Regulation</span>
@@ -61,7 +55,7 @@ export function ComplianceGrid({ data }: ComplianceGridProps) {
                                 display: 'grid',
                                 gridTemplateColumns: `1fr repeat(3, 70px)`,
                                 padding: '10px 16px',
-                                borderBottom: i < data.length - 1 ? '1px solid var(--border-color)' : 'none',
+                                borderBottom: i < data.length - 1 ? '1px solid var(--glass-border)' : 'none',
                                 background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
                                 alignItems: 'center',
                             }}
@@ -74,16 +68,16 @@ export function ComplianceGrid({ data }: ComplianceGridProps) {
                                     background: config.color,
                                     boxShadow: `0 0 6px ${config.color}40`,
                                 }} />
-                                <span style={{ fontSize: '12px', fontWeight: 500 }}>{reg.name}</span>
+                                <span style={{ fontSize: '13px', fontWeight: 500 }}>{reg.name}</span>
                             </div>
                             {(['pass', 'warn', 'fail'] as const).map(status => (
                                 <div key={status} style={{ textAlign: 'center' }}>
                                     {reg[status] > 0 ? (
                                         <span style={{
                                             display: 'inline-block',
-                                            padding: '2px 8px',
-                                            borderRadius: '10px',
-                                            fontSize: '11px',
+                                            padding: '2px 10px',
+                                            borderRadius: '9999px',
+                                            fontSize: '12px',
                                             fontWeight: 600,
                                             background: STATUS_CONFIG[status].bg,
                                             color: STATUS_CONFIG[status].color,
@@ -91,7 +85,7 @@ export function ComplianceGrid({ data }: ComplianceGridProps) {
                                             {reg[status]}
                                         </span>
                                     ) : (
-                                        <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>—</span>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>—</span>
                                     )}
                                 </div>
                             ))}

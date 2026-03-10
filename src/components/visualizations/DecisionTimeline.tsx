@@ -39,7 +39,7 @@ export function DecisionTimeline({ events }: DecisionTimelineProps) {
                     <div className="space-y-1">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-mono text-muted">{event.date}</span>
-                            <span className="text-[10px] uppercase tracking-widest text-muted/50 border border-border px-2 rounded-full">
+                            <span className="text-[10px] tracking-wide text-muted/50 border border-border px-2 rounded-full">
                                 {event.type}
                             </span>
                         </div>

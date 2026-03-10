@@ -4,36 +4,36 @@ export default function Ticker() {
     return (
         <div
             role="marquee"
-            aria-label="System metrics ticker"
+            aria-label="System metrics"
             style={{
-                background: 'var(--bg-tertiary)',
-                borderBottom: '1px solid var(--border-color)',
-                height: '32px',
+                background: 'var(--bg-secondary)',
+                borderBottom: '1px solid var(--glass-border)',
+                height: '44px',
                 display: 'flex',
                 alignItems: 'center',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
-                fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '12px'
+                fontSize: '13px',
+                fontFamily: 'Inter, sans-serif',
             }}
         >
             <div className="ticker-track">
-                <TickerItem label="AVG DECISION SCORE" value="85.4" change="+2.1%" up />
-                <TickerItem label="NOISE INDEX" value="42.0" change="-1.5%" down />
-                <TickerItem label="BIAS DETECTED" value="12" change="+3" bad />
-                <TickerItem label="SYSTEM STATUS" value="OPERATIONAL" />
-                <TickerItem label="DOCUMENTS PROCESSED" value="1,240" />
-                <TickerItem label="AVG DECISION SCORE" value="85.4" change="+2.1%" up />
-                <TickerItem label="NOISE INDEX" value="42.0" change="-1.5%" down />
-                <TickerItem label="BIAS DETECTED" value="12" change="+3" bad />
-                <TickerItem label="SYSTEM STATUS" value="OPERATIONAL" />
-                <TickerItem label="DOCUMENTS PROCESSED" value="1,240" />
+                <TickerItem label="Decision Score" value="85.4" change="+2.1%" up />
+                <TickerItem label="Noise Index" value="42.0" change="-1.5%" down />
+                <TickerItem label="Biases Detected" value="12" change="+3" bad />
+                <TickerItem label="Status" value="Operational" />
+                <TickerItem label="Documents" value="1,240" />
+                <TickerItem label="Decision Score" value="85.4" change="+2.1%" up />
+                <TickerItem label="Noise Index" value="42.0" change="-1.5%" down />
+                <TickerItem label="Biases Detected" value="12" change="+3" bad />
+                <TickerItem label="Status" value="Operational" />
+                <TickerItem label="Documents" value="1,240" />
             </div>
             <style jsx>{`
                 .ticker-track {
                     display: flex;
-                    gap: 32px;
-                    animation: slide 20s linear infinite;
+                    gap: 40px;
+                    animation: slide 25s linear infinite;
                     padding-left: 20px;
                 }
                 @keyframes slide {
@@ -46,13 +46,26 @@ export default function Ticker() {
 }
 
 function TickerItem({ label, value, change, up, down, bad }: { label: string, value: string, change?: string, up?: boolean, down?: boolean, bad?: boolean }) {
-    const color = up || down ? 'var(--success)' : bad ? 'var(--error)' : 'var(--text-primary)';
+    const changeColor = up ? 'var(--success)' : down ? 'var(--success)' : bad ? 'var(--error)' : 'var(--text-muted)';
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: 'var(--text-muted)' }}>{label}</span>
-            <span style={{ color: 'var(--text-highlight)', fontWeight: 'bold' }}>{value}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{label}</span>
+            <span style={{
+                color: 'var(--text-highlight)',
+                fontWeight: 600,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '12px',
+            }}>{value}</span>
             {change && (
-                <span style={{ color }} aria-label={`Change: ${change}`}>{change}</span>
+                <span style={{
+                    color: changeColor,
+                    fontSize: '11px',
+                    fontWeight: 500,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    background: bad ? 'rgba(239, 68, 68, 0.1)' : up || down ? 'rgba(34, 197, 94, 0.1)' : 'transparent',
+                    padding: '1px 6px',
+                    borderRadius: '4px',
+                }} aria-label={`Change: ${change}`}>{change}</span>
             )}
         </div>
     );

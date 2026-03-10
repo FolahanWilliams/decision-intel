@@ -58,7 +58,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                         key={toast.id}
                         className="animate-fade-in"
                         style={{
-                            background: 'rgba(30, 41, 59, 0.95)',
+                            background: 'rgba(16, 16, 28, 0.9)',
                             backdropFilter: 'blur(12px)',
                             border: '1px solid rgba(255, 255, 255, 0.1)',
                             borderRadius: '12px',

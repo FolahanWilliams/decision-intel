@@ -23,9 +23,7 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
         return (
             <div className="card card-glow h-full">
                 <div className="card-header">
-                    <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                        Fact Verification
-                    </h3>
+                    <h3 style={{ fontSize: '13px' }}>Fact Verification</h3>
                 </div>
                 <div className="card-body flex items-center justify-center" style={{ height: 200 }}>
                     <p className="text-muted text-sm">No fact-check data available</p>
@@ -43,13 +41,10 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
     return (
         <div className="card h-full">
             <div className="card-header flex items-center justify-between">
-                <h3 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Fact Verification
-                </h3>
+                <h3 style={{ fontSize: '13px' }}>Fact Verification</h3>
                 <span className="text-xs text-muted">{total} claims</span>
             </div>
             <div className="card-body">
-                {/* Visual bar */}
                 <div style={{ height: 120, marginBottom: '16px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData} layout="vertical" barSize={28}>
@@ -58,21 +53,20 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
                                 dataKey="name"
                                 type="category"
                                 width={90}
-                                tick={{ fill: 'var(--text-secondary)', fontSize: 11 }}
+                                tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
                                 axisLine={false}
                                 tickLine={false}
                             />
                             <Tooltip
                                 contentStyle={{
                                     background: 'var(--bg-secondary)',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '0',
-                                    fontSize: '11px',
-                                    fontFamily: 'JetBrains Mono, monospace',
+                                    border: '1px solid var(--glass-border)',
+                                    borderRadius: '12px',
+                                    fontSize: '12px',
                                 }}
                                 formatter={(value: number | undefined) => [`${value ?? 0} (${Math.round(((value ?? 0) / total) * 100)}%)`, 'Claims']}
                             />
-                            <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                            <Bar dataKey="value" radius={[0, 6, 6, 0]}>
                                 {chartData.map((entry, i) => (
                                     <Cell key={i} fill={entry.color} fillOpacity={0.8} />
                                 ))}
@@ -81,14 +75,13 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Legend percentages */}
                 <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                     {chartData.map(d => (
                         <div key={d.name} style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '18px', fontWeight: 700, color: d.color }}>
+                            <div style={{ fontSize: '20px', fontWeight: 700, color: d.color, fontFamily: "'JetBrains Mono', monospace" }}>
                                 {Math.round((d.value / total) * 100)}%
                             </div>
-                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                                 {d.name}
                             </div>
                         </div>
