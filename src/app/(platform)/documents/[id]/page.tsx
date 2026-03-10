@@ -436,7 +436,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 <div className="card animate-fade-in" style={{ animationDelay: '0.4s', background: 'var(--bg-card)' }}>
                     <div className="card-header" style={{ background: 'var(--bg-secondary)' }}>
                         <h3 className="flex items-center gap-sm text-xs">
-                            <Terminal size={14} /> LIVE_SCAN_FEED
+                            <Terminal size={14} /> Live Scan Feed
                         </h3>
                     </div>
                     <div className="card-body" style={{ padding: 'var(--spacing-md)', fontSize: '10px', height: '200px', overflowY: 'auto', fontFamily: 'monospace' }}>
@@ -445,7 +445,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 <div style={{ height: '2px', background: 'var(--bg-tertiary)', width: '100%', marginBottom: '4px' }}>
                                     <div style={{ height: '100%', background: 'var(--accent-primary)', width: `${scanProgress}%`, transition: 'width 0.3s' }} role="progressbar" aria-valuenow={scanProgress} aria-valuemin={0} aria-valuemax={100} />
                                 </div>
-                                <div className="text-muted">TASK_PROGRESS: {scanProgress}%</div>
+                                <div className="text-muted">Progress: {scanProgress}%</div>
                             </div>
                         )}
                         {streamLogs.map((log, i) => (

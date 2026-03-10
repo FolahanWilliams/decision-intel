@@ -185,7 +185,7 @@ export default function RiskAuditsPage() {
                 <div className="grid grid-4 mb-xl gap-md">
                     <div className="card animate-fade-in">
                         <div className="card-body text-center p-md">
-                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Total Documents</div>
+                            <div className="text-xs text-muted mb-sm font-medium">Total Documents</div>
                             <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
                                 {summary.totalDocuments}
                             </div>
@@ -195,7 +195,7 @@ export default function RiskAuditsPage() {
 
                     <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
                         <div className="card-body text-center p-md">
-                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Average Score</div>
+                            <div className="text-xs text-muted mb-sm font-medium">Average Score</div>
                             <div style={{
                                 fontSize: '2.5rem', fontWeight: 800,
                                 color: summary.averageScore >= 70 ? 'var(--success)' :
@@ -215,7 +215,7 @@ export default function RiskAuditsPage() {
 
                     <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
                         <div className="card-body text-center p-md">
-                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">High Risk Items</div>
+                            <div className="text-xs text-muted mb-sm font-medium">High Risk Items</div>
                             <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--error)' }}>
                                 {summary.highRiskCount}
                             </div>
@@ -225,7 +225,7 @@ export default function RiskAuditsPage() {
 
                     <div className="card animate-fade-in" style={{ animationDelay: '0.3s' }}>
                         <div className="card-body text-center p-md">
-                            <div className="text-xs text-muted uppercase tracking-wider mb-sm">Critical Biases</div>
+                            <div className="text-xs text-muted mb-sm font-medium">Critical Biases</div>
                             <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--warning)' }}>
                                 {summary.criticalBiases}
                             </div>

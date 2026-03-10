@@ -266,6 +266,23 @@ pre {
   box-shadow: var(--shadow-sm);
 }
 
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+  color: var(--text-primary);
+}
+
+.btn-sm {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+}
+
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -417,6 +434,8 @@ tr:hover td {
 .gap-sm { gap: var(--spacing-sm); }
 .gap-md { gap: var(--spacing-md); }
 .mb-xl { margin-bottom: var(--spacing-xl); }
+.ml-md { margin-left: var(--spacing-md); }
+.mt-md { margin-top: var(--spacing-md); }
 
 /* ═══════════════════════════════════════════
    Animations — Smooth & Refined
@@ -444,6 +463,10 @@ tr:hover td {
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .animate-slide-up {

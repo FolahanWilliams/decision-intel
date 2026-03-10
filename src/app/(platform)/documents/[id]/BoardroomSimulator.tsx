@@ -138,7 +138,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#111] to-[#0a0a0a]"
+        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)]"
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
@@ -173,7 +173,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                   animate={{ scale: 1, opacity: 1 }}
                   className="text-right"
                 >
-                  <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Board Consensus</div>
+                  <div className="text-xs text-gray-500 tracking-wide mb-1">Board Consensus</div>
                   <motion.div 
                     className="flex items-center gap-3 px-4 py-2 rounded-xl font-bold text-lg"
                     style={{ 
@@ -192,7 +192,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
 
           {/* Vote Tally Bar */}
           <div className="mt-6 flex items-center gap-4">
-            <span className="text-xs text-gray-500 uppercase tracking-wider">Vote Distribution</span>
+            <span className="text-xs text-gray-500 tracking-wide">Vote Distribution</span>
             <div className="flex-1 flex gap-1 h-3 rounded-full overflow-hidden bg-white/5">
               {(() => {
                 const totalTwins = simulation.twins?.length || 1;
@@ -382,7 +382,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                     >
                       <div className="flex items-center gap-2 mb-2">
                         <Target size={12} style={{ color: config.color }} />
-                        <span className="text-xs uppercase tracking-wider text-gray-500">
+                        <span className="text-xs tracking-wide text-gray-500">
                           Key {twin.vote === 'APPROVE' ? 'Opportunity' : 'Concern'}
                         </span>
                       </div>
@@ -423,7 +423,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#111] to-[#0a0a0a] p-6"
+            className="rounded-2xl border border-white/10 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)] p-6"
           >
             <div className="flex items-center gap-3 mb-4">
               <Brain size={20} className="text-orange-500" />

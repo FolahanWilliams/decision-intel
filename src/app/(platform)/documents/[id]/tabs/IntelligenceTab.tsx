@@ -37,7 +37,7 @@ export function IntelligenceTab({ intelligenceContext }: IntelligenceTabProps) {
             {/* Macro Summary */}
             {ctx.macroSummary && ctx.macroSummary !== 'Macro data temporarily unavailable.' && (
                 <div className="card" style={{ padding: '16px', borderLeft: '3px solid var(--accent-primary)' }}>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '6px' }}>
                         Macro Environment
                     </div>
                     <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -49,7 +49,7 @@ export function IntelligenceTab({ intelligenceContext }: IntelligenceTabProps) {
             {/* Top News */}
             {ctx.topNews && ctx.topNews.length > 0 && (
                 <div className="card" style={{ padding: '16px' }}>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}>
                         <Newspaper size={12} style={{ display: 'inline', marginRight: '4px' }} />
                         News Referenced During Analysis
                     </div>
@@ -82,13 +82,13 @@ export function IntelligenceTab({ intelligenceContext }: IntelligenceTabProps) {
             {/* Top Case Studies */}
             {ctx.topCaseStudies && ctx.topCaseStudies.length > 0 && (
                 <div className="card" style={{ padding: '16px' }}>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '12px' }}>
                         <Database size={12} style={{ display: 'inline', marginRight: '4px' }} />
                         Historical Parallels Matched
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {ctx.topCaseStudies.map((c, i) => (
-                            <div key={i} style={{ padding: '12px', background: 'var(--bg-secondary)', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
+                            <div key={i} style={{ padding: '12px', background: 'var(--bg-secondary)', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                                     <span style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-primary)' }}>
                                         {c.company}
@@ -134,7 +134,7 @@ function MiniStat({ icon, label, value, color }: { icon: React.ReactNode; label:
                 <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'JetBrains Mono', monospace" }}>
                     {value}
                 </div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
                     {label}
                 </div>
             </div>

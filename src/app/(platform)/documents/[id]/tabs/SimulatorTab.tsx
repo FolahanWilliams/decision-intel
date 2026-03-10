@@ -268,7 +268,7 @@ export function SimulatorTab({ documentContent, documentId, originalScore, origi
 
                 return (
                     <div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: 'var(--spacing-sm)', textTransform: 'uppercase' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: 'var(--spacing-sm)', fontWeight: 500 }}>
                             Bias Analysis — {resolved.length} resolved, {stillPresent.length} remaining{newBiases.length > 0 ? `, ${newBiases.length} new` : ''}
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

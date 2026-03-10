@@ -106,8 +106,6 @@ export function OnboardingGuide() {
                                 fontSize: '11px',
                                 fontWeight: 600,
                                 color: index === currentStep ? 'var(--text-highlight)' : 'var(--text-muted)',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
                             }}>
                                 {step.title}
                             </span>
