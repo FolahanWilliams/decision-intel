@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X, ClipboardList, Search } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X, ClipboardList, Search, Globe } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
+import { useIntelligenceStatus } from '@/hooks/useIntelligence';
 
 export default function Sidebar() {
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
+    const { status: intelStatus } = useIntelligenceStatus();
     const [mobileOpen, setMobileOpen] = useState(false);
 
     // Close on navigation — wrap in callback to pass to NavItem
@@ -151,6 +153,17 @@ export default function Sidebar() {
                     <NavItem href="/dashboard/trends" icon={<Activity size={18} />} label="Historical Trends" active={pathname === '/dashboard/trends'} collapsed={collapsed} onNavigate={closeMobile} />
                     <NavItem href="/dashboard/insights" icon={<BarChart3 size={18} />} label="Visual Insights" active={pathname === '/dashboard/insights'} collapsed={collapsed} onNavigate={closeMobile} />
                     <NavItem href="/dashboard/risk-audits" icon={<ShieldAlert size={18} />} label="Risk Audits" active={pathname === '/dashboard/risk-audits'} collapsed={collapsed} onNavigate={closeMobile} />
+                    <NavItem
+                        href="/dashboard/intelligence"
+                        icon={<Globe size={18} />}
+                        label="Intelligence"
+                        active={pathname === '/dashboard/intelligence'}
+                        collapsed={collapsed}
+                        onNavigate={closeMobile}
+                        badge={intelStatus ? {
+                            color: intelStatus.freshness === 'fresh' ? 'var(--success)' : intelStatus.freshness === 'stale' ? 'var(--warning)' : 'var(--error)',
+                        } : undefined}
+                    />
                     <NavItem href="/dashboard/search" icon={<Search size={18} />} label="Search" active={pathname === '/dashboard/search'} collapsed={collapsed} onNavigate={closeMobile} />
 
                     {!collapsed && (
@@ -192,7 +205,7 @@ export default function Sidebar() {
     );
 }
 
-function NavItem({ href, icon, label, active, collapsed, onNavigate }: { href: string, icon: React.ReactNode, label: string, active?: boolean, collapsed?: boolean, onNavigate?: () => void }) {
+function NavItem({ href, icon, label, active, collapsed, onNavigate, badge }: { href: string, icon: React.ReactNode, label: string, active?: boolean, collapsed?: boolean, onNavigate?: () => void, badge?: { color: string } }) {
     return (
         <Link
             href={href}
@@ -215,7 +228,16 @@ function NavItem({ href, icon, label, active, collapsed, onNavigate }: { href: s
                 transition: 'all 0.1s'
             }}
         >
-            <span style={{ color: active ? 'var(--accent-primary)' : 'inherit', flexShrink: 0 }}>{icon}</span>
+            <span style={{ color: active ? 'var(--accent-primary)' : 'inherit', flexShrink: 0, position: 'relative' }}>
+                {icon}
+                {badge && (
+                    <span style={{
+                        position: 'absolute', top: '-2px', right: '-2px',
+                        width: '6px', height: '6px', borderRadius: '50%',
+                        background: badge.color,
+                    }} />
+                )}
+            </span>
             {!collapsed && label}
         </Link>
     );
