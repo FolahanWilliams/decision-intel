@@ -3,15 +3,19 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useInView } from 'framer-motion';
-import { Brain, AlertTriangle, Shield, Zap, Activity, Terminal } from 'lucide-react';
+import { Brain, AlertTriangle, Shield, Zap, Activity, BarChart3 } from 'lucide-react';
 
 // Scroll Progress
 function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 h-[2px] bg-[#ff9f0a] origin-left z-50"
-      style={{ scaleX: scrollYProgress, boxShadow: '0 0 10px rgba(255, 159, 10, 0.5)' }}
+      className="fixed top-0 left-0 right-0 h-[2px] origin-left z-50"
+      style={{
+        scaleX: scrollYProgress,
+        background: 'linear-gradient(90deg, #f59e0b, #fbbf24)',
+        boxShadow: '0 0 12px rgba(245, 158, 11, 0.4)',
+      }}
     />
   );
 }
@@ -42,49 +46,68 @@ export default function LandingPage() {
   const roiInView = useInView(roiRef, { once: true, margin: "-100px" });
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#e0e0e0] font-mono overflow-x-hidden selection:bg-[#ff9f0a]/30 selection:text-white">
+    <div className="min-h-screen overflow-x-hidden selection:bg-amber-500/30 selection:text-white"
+      style={{
+        background: 'var(--bg-primary)',
+        color: 'var(--text-secondary)',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      }}
+    >
       <ScrollProgress />
 
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="fixed top-0 left-0 right-0 z-40 bg-[#050505]/80 backdrop-blur-xl border-b border-[#333333]"
+        className="fixed top-0 left-0 right-0 z-40"
+        style={{
+          background: 'rgba(10, 10, 18, 0.7)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+        }}
       >
         <div className="container mx-auto py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 bg-[#ff9f0a]/10 border border-[#ff9f0a]/30">
-              <Brain className="w-6 h-6 text-[#ff9f0a]" />
+            <div style={{
+              padding: '8px',
+              background: 'rgba(245, 158, 11, 0.1)',
+              borderRadius: '12px',
+              border: '1px solid rgba(245, 158, 11, 0.2)',
+            }}>
+              <Brain className="w-5 h-5" style={{ color: '#f59e0b' }} />
             </div>
-            <span className="font-bold text-lg tracking-widest text-[#ffffff]">NEUROAUDIT_</span>
+            <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+              Decision Intel
+            </span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-xs font-bold tracking-widest text-[#a0a0a0]">
-            <a href="#problem" className="hover:text-[#ff9f0a] hover:tracking-[0.2em] transition-all duration-300">SYSTEM_ERROR</a>
-            <a href="#solution" className="hover:text-[#ff9f0a] hover:tracking-[0.2em] transition-all duration-300">PROTOCOL</a>
-            <a href="#features" className="hover:text-[#ff9f0a] hover:tracking-[0.2em] transition-all duration-300">MODULES</a>
+          <div className="hidden md:flex items-center gap-8" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            <a href="#problem" className="hover:text-amber-400 transition-colors duration-300">The Problem</a>
+            <a href="#solution" className="hover:text-amber-400 transition-colors duration-300">Solution</a>
+            <a href="#features" className="hover:text-amber-400 transition-colors duration-300">Features</a>
           </div>
-          <div className="flex gap-4">
-            <Link
-              href="/sign-in"
-              className="btn btn-secondary text-xs"
-            >
-              [ LOGIN ]
+          <div className="flex gap-3">
+            <Link href="/sign-in" className="btn btn-secondary" style={{ fontSize: '0.85rem', borderRadius: '10px' }}>
+              Sign In
             </Link>
-            <Link
-              href="/sign-up"
-              className="btn btn-primary text-xs"
-            >
-              [ INITIALIZE ]
+            <Link href="/sign-up" className="btn btn-primary" style={{ fontSize: '0.85rem', borderRadius: '10px' }}>
+              Get Started
             </Link>
           </div>
         </div>
       </motion.nav>
 
       {/* Hero Section */}
-      <section ref={heroRef} className="min-h-screen flex items-center pt-24 relative overflow-hidden bg-[#000000]">
-        <div className="absolute inset-0 pixel-grid opacity-20" />
-        <div className="scanner-line opacity-30" />
-        <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-[#ff9f0a]/5 rounded-full blur-[100px] pointer-events-none" />
+      <section ref={heroRef} className="min-h-screen flex items-center pt-24 relative overflow-hidden"
+        style={{ background: 'var(--bg-primary)' }}
+      >
+        {/* Ambient glow */}
+        <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] rounded-full blur-[120px] pointer-events-none"
+          style={{ background: 'rgba(245, 158, 11, 0.04)' }}
+        />
+        <div className="absolute bottom-1/4 right-1/4 w-[30vw] h-[30vw] rounded-full blur-[100px] pointer-events-none"
+          style={{ background: 'rgba(59, 130, 246, 0.03)' }}
+        />
 
         <div className="container relative z-10">
           <div className="max-w-5xl mx-auto">
@@ -93,21 +116,46 @@ export default function LandingPage() {
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={heroInView ? { opacity: 1, x: 0 } : {}}
-                  className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-[#ff9f0a]/30 bg-[#ff9f0a]/10 text-[#ff9f0a] text-xs font-bold tracking-widest"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '6px 14px',
+                    marginBottom: '24px',
+                    borderRadius: '9999px',
+                    background: 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid rgba(245, 158, 11, 0.2)',
+                    color: '#f59e0b',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                  }}
                 >
-                  <Terminal className="w-3 h-3" />
-                  <span>v2.0_ONLINE</span>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px rgba(34,197,94,0.5)' }} />
+                  <span>Now Available</span>
                 </motion.div>
 
                 <motion.h1
                   initial={{ opacity: 0, y: 30 }}
                   animate={heroInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: 0.1 }}
-                  className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 border-l-0 pl-0 text-[#ffffff] tracking-tight font-sans"
+                  style={{
+                    fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                    fontWeight: 800,
+                    lineHeight: 1.1,
+                    marginBottom: '24px',
+                    color: 'var(--text-primary)',
+                    letterSpacing: '-0.03em',
+                  }}
                 >
-                  QUANTIFY
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#ff9f0a] to-[#ffd60a] py-2">
-                    DECISION NOISE.
+                  Quantify
+                  <span className="block" style={{
+                    background: 'linear-gradient(135deg, #f59e0b, #fbbf24, #f59e0b)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    paddingTop: '4px',
+                    paddingBottom: '4px',
+                  }}>
+                    Decision Noise.
                   </span>
                 </motion.h1>
 
@@ -115,9 +163,17 @@ export default function LandingPage() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={heroInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: 0.2 }}
-                  className="text-lg text-[#a0a0a0] mb-8 leading-relaxed max-w-xl font-sans"
+                  style={{
+                    fontSize: '1.1rem',
+                    color: 'var(--text-muted)',
+                    marginBottom: '32px',
+                    lineHeight: 1.7,
+                    maxWidth: '540px',
+                  }}
                 >
-                  Cognitive biases and inconsistencies silently drain <span className="text-[#ff453a] font-bold">12-15%</span> of revenue. Deploy our AI audit engine to detect, measure, and eliminate human error in critical processes.
+                  Cognitive biases and inconsistencies silently drain{' '}
+                  <span style={{ color: '#ef4444', fontWeight: 700 }}>12–15%</span> of revenue.
+                  Deploy our AI audit engine to detect, measure, and eliminate human error in critical decisions.
                 </motion.p>
 
                 <motion.div
@@ -126,17 +182,15 @@ export default function LandingPage() {
                   transition={{ delay: 0.3 }}
                   className="flex flex-wrap items-center gap-4"
                 >
-                  <Link
-                    href="/sign-up"
-                    className="btn btn-primary text-sm py-3 px-8 glow"
+                  <Link href="/sign-up" className="btn btn-primary glow"
+                    style={{ padding: '14px 32px', fontSize: '0.9rem', borderRadius: '12px' }}
                   >
-                    DEPLOY PROTOCOL_
+                    Start Free Trial
                   </Link>
-                  <a
-                    href="#problem"
-                    className="btn btn-secondary text-sm py-3 px-8"
+                  <a href="#problem" className="btn btn-secondary"
+                    style={{ padding: '14px 32px', fontSize: '0.9rem', borderRadius: '12px' }}
                   >
-                    VIEW SECRETS
+                    See How It Works
                   </a>
                 </motion.div>
 
@@ -144,10 +198,11 @@ export default function LandingPage() {
                   initial={{ opacity: 0 }}
                   animate={heroInView ? { opacity: 1 } : {}}
                   transition={{ delay: 0.4 }}
-                  className="mt-8 flex gap-4 text-xs font-bold text-[#555555]"
+                  className="mt-8 flex gap-6"
+                  style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}
                 >
-                  <span>STATUS: <span className="text-[#30d158]">OPERATIONAL</span></span>
-                  <span>LATENCY: <span className="text-[#0a84ff] animate-pulse">12ms</span></span>
+                  <span>Status: <span style={{ color: '#22c55e', fontWeight: 600 }}>Operational</span></span>
+                  <span>Latency: <span style={{ color: '#3b82f6', fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>12ms</span></span>
                 </motion.div>
               </div>
 
@@ -157,29 +212,55 @@ export default function LandingPage() {
                 transition={{ delay: 0.3 }}
                 className="hidden md:block"
               >
-                <div className="card card-glow border-[#333333] p-0 overflow-hidden relative group">
-                  <div className="scanline-overlay" />
-                  <div className="card-header border-b border-[#333333] bg-[#0a0a0a]">
-                    <h3 className="text-xs text-[#a0a0a0] flex items-center gap-2 tracking-widest uppercase">
-                      <Activity className="w-4 h-4 text-[#ff9f0a]" />
-                      LIVE_AUDIT_STREAM
-                    </h3>
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 40px rgba(0, 0, 0, 0.3), 0 0 80px rgba(245, 158, 11, 0.03)',
+                }}>
+                  <div style={{
+                    padding: '14px 20px',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                  }}>
+                    <div className="flex items-center gap-2" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      <Activity className="w-4 h-4" style={{ color: '#f59e0b' }} />
+                      Live Analysis Feed
+                    </div>
                     <div className="flex gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#ff453a]"></div>
-                      <div className="w-2 h-2 rounded-full bg-[#ffd60a]"></div>
-                      <div className="w-2 h-2 rounded-full bg-[#30d158]"></div>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }} />
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#fbbf24' }} />
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }} />
                     </div>
                   </div>
-                  <div className="p-6 bg-[#050505] font-mono text-xs text-[#a0a0a0] space-y-2">
-                    <p><span className="text-[#555555]">[14:02:41]</span> <span className="text-[#0a84ff]">SYS:</span> Ingesting document stream...</p>
-                    <p><span className="text-[#555555]">[14:02:42]</span> <span className="text-[#0a84ff]">AI:</span> Scanning for cognitive anomalies...</p>
-                    <p className="pl-4 border-l border-[#333333] my-2">
-                      <span className="text-[#ff9f0a]">&gt; WARNING:</span> Confirmatory Bias detected (Confidence: 94%)<br />
-                      <span className="text-[#ff9f0a]">&gt; WARNING:</span> Groupthink indicators present in Section 3
-                    </p>
-                    <p><span className="text-[#555555]">[14:02:43]</span> <span className="text-[#0a84ff]">SYS:</span> Calculating noise baseline...</p>
-                    <p><span className="text-[#555555]">[14:02:43]</span> <span className="text-[#30d158]">RES:</span> Overall Decision Quality: <span className="text-[#ffffff] font-bold">42/100</span></p>
-                    <p className="text-[#ffffff] mt-4 terminal-cursor">Awaiting next instruction...</p>
+                  <div style={{
+                    padding: '24px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: '0.75rem',
+                    color: 'var(--text-muted)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                  }}>
+                    <p><span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>14:02:41</span> <span style={{ color: '#3b82f6' }}>SYS</span> Ingesting document stream...</p>
+                    <p><span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>14:02:42</span> <span style={{ color: '#3b82f6' }}>AI</span> Scanning for cognitive anomalies...</p>
+                    <div style={{
+                      padding: '10px 14px',
+                      margin: '4px 0',
+                      borderLeft: '2px solid rgba(245, 158, 11, 0.4)',
+                      background: 'rgba(245, 158, 11, 0.04)',
+                      borderRadius: '0 8px 8px 0',
+                    }}>
+                      <span style={{ color: '#f59e0b' }}>Warning:</span> Confirmatory Bias detected (94% confidence)<br />
+                      <span style={{ color: '#f59e0b' }}>Warning:</span> Groupthink indicators in Section 3
+                    </div>
+                    <p><span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>14:02:43</span> <span style={{ color: '#3b82f6' }}>SYS</span> Calculating noise baseline...</p>
+                    <p><span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>14:02:43</span> <span style={{ color: '#22c55e' }}>RES</span> Overall Decision Quality: <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>42/100</span></p>
                   </div>
                 </div>
               </motion.div>
@@ -189,94 +270,138 @@ export default function LandingPage() {
       </section>
 
       {/* Problem Section */}
-      <section id="problem" ref={problemRef} className="py-32 bg-[#050505] relative border-t border-[#333333]">
+      <section id="problem" ref={problemRef} className="py-32 relative"
+        style={{ background: 'var(--bg-primary)', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}
+      >
         <div className="container relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={problemInView ? { opacity: 1, y: 0 } : {}}
-            className="mb-16 border-l-4 border-[#ff453a] pl-6"
+            className="mb-16"
+            style={{ borderLeft: '3px solid #ef4444', paddingLeft: '24px' }}
           >
-            <h2 className="text-3xl md:text-4xl text-[#ffffff] mb-2 tracking-tight">SYSTEM_FAILURE: DECISION NOISE</h2>
-            <p className="text-[#a0a0a0] max-w-2xl text-sm font-sans">
-              Different experts evaluating identical data produce wildly varying outputs. Human inconsistency is a silent tax destroying profit margins.
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: 'var(--text-primary)', marginBottom: '8px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+              The Hidden Cost of Decision Noise
+            </h2>
+            <p style={{ color: 'var(--text-muted)', maxWidth: '640px', fontSize: '0.95rem', lineHeight: 1.7 }}>
+              Different experts evaluating identical data produce wildly varying outputs.
+              Human inconsistency is a silent tax destroying profit margins.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Without NeuroAudit */}
+            {/* Without Decision Intel */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={problemInView ? { opacity: 1, x: 0 } : {}}
-              className={`card cursor-pointer transition-all duration-300 ${activeDemo === 'chaos'
-                ? 'border-[#ff453a] shadow-[0_0_20px_rgba(255,69,58,0.1)] bg-[#0a0000]'
-                : 'border-[#333333] hover:border-[#ff453a]/50'
-                }`}
+              className="cursor-pointer transition-all duration-300"
               onClick={() => setActiveDemo('chaos')}
+              style={{
+                background: activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.04)' : 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                border: activeDemo === 'chaos' ? '1px solid rgba(239, 68, 68, 0.2)' : '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                boxShadow: activeDemo === 'chaos' ? '0 8px 32px rgba(239, 68, 68, 0.08)' : '0 4px 16px rgba(0, 0, 0, 0.2)',
+                overflow: 'hidden',
+              }}
             >
-              <div className="card-header border-b border-[#ff453a]/20 bg-transparent flex justify-between">
+              <div style={{
+                padding: '20px 24px',
+                borderBottom: '1px solid rgba(239, 68, 68, 0.1)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
                 <div className="flex items-center gap-3">
-                  <AlertTriangle className="w-5 h-5 text-[#ff453a]" />
-                  <h3 className="text-lg text-[#ff453a] font-mono tracking-widest">UNMANAGED_PROCESS</h3>
+                  <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />
+                  <h3 style={{ fontSize: '1.1rem', color: '#ef4444', fontWeight: 700 }}>Without Decision Intel</h3>
                 </div>
-                {activeDemo === 'chaos' && <span className="badge badge-critical animate-pulse">ACTIVE</span>}
+                {activeDemo === 'chaos' && (
+                  <span style={{
+                    fontSize: '0.7rem', fontWeight: 700, padding: '4px 10px',
+                    borderRadius: '9999px', background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444',
+                  }}>Active</span>
+                )}
               </div>
 
-              <div className="p-8 space-y-4 font-mono text-sm">
-                <div className="flex items-start gap-3 p-3 bg-[#ff453a]/5 border border-[#ff453a]/10">
-                  <span className="text-[#ff453a] font-bold">ERR</span>
-                  <span className="text-[#a0a0a0]">High variance across similar critical decisions</span>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-[#ff453a]/5 border border-[#ff453a]/10">
-                  <span className="text-[#ff453a] font-bold">ERR</span>
-                  <span className="text-[#a0a0a0]">Undetected cognitive biases steering outcomes</span>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-[#ff453a]/5 border border-[#ff453a]/10">
-                  <span className="text-[#ff453a] font-bold">ERR</span>
-                  <span className="text-[#a0a0a0]">No visibility or measurability of decision quality</span>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-[#ff453a]/5 border border-[#ff453a]/10">
-                  <span className="text-[#ff453a] font-bold">FTL</span>
-                  <span className="text-[#ffffff]">12-15% of EBITDA lost to systematic errors</span>
-                </div>
+              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {[
+                  'High variance across similar critical decisions',
+                  'Undetected cognitive biases steering outcomes',
+                  'No visibility or measurability of decision quality',
+                  '12–15% of EBITDA lost to systematic errors',
+                ].map((text, i) => (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px',
+                    background: 'rgba(239, 68, 68, 0.04)', borderRadius: '10px',
+                    border: '1px solid rgba(239, 68, 68, 0.08)',
+                  }}>
+                    <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '0.75rem', flexShrink: 0, fontFamily: "'JetBrains Mono', monospace" }}>
+                      {i === 3 ? 'FTL' : 'ERR'}
+                    </span>
+                    <span style={{ fontSize: '0.9rem', color: i === 3 ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                      {text}
+                    </span>
+                  </div>
+                ))}
               </div>
             </motion.div>
 
-            {/* With NeuroAudit */}
+            {/* With Decision Intel */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={problemInView ? { opacity: 1, x: 0 } : {}}
               transition={{ delay: 0.1 }}
-              className={`card cursor-pointer transition-all duration-300 ${activeDemo === 'order'
-                ? 'border-[#30d158] shadow-[0_0_20px_rgba(48,209,88,0.1)] bg-[#000a00]'
-                : 'border-[#333333] hover:border-[#30d158]/50'
-                }`}
+              className="cursor-pointer transition-all duration-300"
               onClick={() => setActiveDemo('order')}
+              style={{
+                background: activeDemo === 'order' ? 'rgba(34, 197, 94, 0.04)' : 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                border: activeDemo === 'order' ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                boxShadow: activeDemo === 'order' ? '0 8px 32px rgba(34, 197, 94, 0.08)' : '0 4px 16px rgba(0, 0, 0, 0.2)',
+                overflow: 'hidden',
+              }}
             >
-              <div className="card-header border-b border-[#30d158]/20 bg-transparent flex justify-between">
+              <div style={{
+                padding: '20px 24px',
+                borderBottom: '1px solid rgba(34, 197, 94, 0.1)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
                 <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-[#30d158]" />
-                  <h3 className="text-lg text-[#30d158] font-mono tracking-widest">NEUROAUDIT_PROTOCOL</h3>
+                  <Shield className="w-5 h-5" style={{ color: '#22c55e' }} />
+                  <h3 style={{ fontSize: '1.1rem', color: '#22c55e', fontWeight: 700 }}>With Decision Intel</h3>
                 </div>
-                {activeDemo === 'order' && <span className="badge badge-complete animate-pulse">ACTIVE</span>}
+                {activeDemo === 'order' && (
+                  <span style={{
+                    fontSize: '0.7rem', fontWeight: 700, padding: '4px 10px',
+                    borderRadius: '9999px', background: 'rgba(34, 197, 94, 0.12)', color: '#22c55e',
+                  }}>Active</span>
+                )}
               </div>
 
-              <div className="p-8 space-y-4 font-mono text-sm">
-                <div className="flex items-start gap-3 p-3 bg-[#30d158]/5 border border-[#30d158]/10">
-                  <span className="text-[#30d158] font-bold">SYS</span>
-                  <span className="text-[#a0a0a0]">Consistent, objectively scored decision criteria</span>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-[#30d158]/5 border border-[#30d158]/10">
-                  <span className="text-[#30d158] font-bold">SYS</span>
-                  <span className="text-[#a0a0a0]">15+ bias signatures detected automatically</span>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-[#30d158]/5 border border-[#30d158]/10">
-                  <span className="text-[#30d158] font-bold">SYS</span>
-                  <span className="text-[#a0a0a0]">Quantifiable metrics generated for every review</span>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-[#30d158]/5 border border-[#30d158]/10">
-                  <span className="text-[#30d158] font-bold">OPT</span>
-                  <span className="text-[#ffffff]">Up to 60% reduction in measured variance</span>
-                </div>
+              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {[
+                  'Consistent, objectively scored decision criteria',
+                  '15+ bias signatures detected automatically',
+                  'Quantifiable metrics generated for every review',
+                  'Up to 60% reduction in measured variance',
+                ].map((text, i) => (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '14px',
+                    background: 'rgba(34, 197, 94, 0.04)', borderRadius: '10px',
+                    border: '1px solid rgba(34, 197, 94, 0.08)',
+                  }}>
+                    <span style={{ color: '#22c55e', fontWeight: 700, fontSize: '0.75rem', flexShrink: 0, fontFamily: "'JetBrains Mono', monospace" }}>
+                      {i === 3 ? 'OPT' : 'SYS'}
+                    </span>
+                    <span style={{ fontSize: '0.9rem', color: i === 3 ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                      {text}
+                    </span>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </div>
@@ -284,108 +409,191 @@ export default function LandingPage() {
       </section>
 
       {/* Features - Bento Grid */}
-      <section id="features" ref={featuresRef} className="py-32 bg-[#000000] border-t border-[#333333] relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,159,10,0.05)_0%,transparent_70%)] pointer-events-none" />
+      <section id="features" ref={featuresRef} className="py-32 relative"
+        style={{ background: 'var(--bg-primary)', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}
+      >
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(circle at center, rgba(245, 158, 11, 0.03) 0%, transparent 70%)' }}
+        />
         <div className="container relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={featuresInView ? { opacity: 1, y: 0 } : {}}
-            className="mb-16 border-l-4 border-[#ff9f0a] pl-6"
+            className="mb-16"
+            style={{ borderLeft: '3px solid #f59e0b', paddingLeft: '24px' }}
           >
-            <h2 className="text-3xl md:text-4xl text-[#ffffff] mb-2 tracking-tight">PLATFORM_MODULES</h2>
-            <p className="text-[#a0a0a0] text-sm font-sans">Enterprise-grade tools for cognitive auditing.</p>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: 'var(--text-primary)', marginBottom: '8px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+              Platform Features
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+              Enterprise-grade tools for cognitive auditing.
+            </p>
           </motion.div>
 
-          {/* Bento Grid layout */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-
-            {/* Large Feature 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
+            {/* Large Feature: Cognitive Bias Engine */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
-              className="card card-glow col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-[#111111] flex flex-col justify-between overflow-hidden relative"
+              className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2"
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
-              <div className="p-8 z-10 relative">
-                <div className="p-3 bg-[#ff9f0a]/10 border border-[#ff9f0a]/30 w-12 h-12 flex items-center justify-center mb-6">
-                  <Brain className="w-6 h-6 text-[#ff9f0a]" />
+              <div style={{ padding: '32px', zIndex: 1 }}>
+                <div style={{
+                  width: '48px', height: '48px', borderRadius: '14px',
+                  background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px',
+                }}>
+                  <Brain className="w-6 h-6" style={{ color: '#f59e0b' }} />
                 </div>
-                <h3 className="text-2xl font-bold mb-3 text-[#ffffff]">Cognitive Bias Engine</h3>
-                <p className="text-[#a0a0a0] text-sm max-w-md font-sans leading-relaxed">
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '12px', color: 'var(--text-primary)' }}>
+                  Cognitive Bias Engine
+                </h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '400px', lineHeight: 1.7 }}>
                   Advanced argumentation mining algorithms parse unstructured text to identify 15+ logical fallacies and cognitive distortions including confirmation bias, anchoring, and groupthink.
                 </p>
               </div>
-              <div className="mt-8 px-8 pb-0 z-10">
-                <div className="border-t border-l border-r border-[#333333] bg-[#050505] p-4 font-mono text-xs rounded-t-sm relative h-32 overflow-hidden shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
-                  <div className="scanline-overlay"></div>
-                  <div className="flex justify-between items-center mb-3 border-b border-[#333333] pb-2">
-                    <span className="text-[#555555]">ANALYSIS_RESULTS.JSON</span>
-                    <span className="badge badge-high tracking-widest">BIAS_DETECTED</span>
+              <div style={{ padding: '0 32px', paddingBottom: 0, zIndex: 1 }}>
+                <div style={{
+                  borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderLeft: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRight: '1px solid rgba(255, 255, 255, 0.06)',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  padding: '16px',
+                  borderRadius: '12px 12px 0 0',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '0.75rem',
+                  height: '128px',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                  }}>
+                    <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>analysis_results.json</span>
+                    <span style={{
+                      fontSize: '0.65rem', fontWeight: 700, padding: '2px 8px',
+                      borderRadius: '9999px', background: 'rgba(245, 158, 11, 0.12)', color: '#f59e0b',
+                    }}>Bias Detected</span>
                   </div>
-                  <div className="text-[#a0a0a0] leading-relaxed">
-                    <span className="text-[#0a84ff]">&quot;biasType&quot;</span>: <span className="text-[#ff9f0a]">&quot;Confirmation Bias&quot;</span>,<br />
-                    <span className="text-[#0a84ff]">&quot;severity&quot;</span>: <span className="text-[#ff9f0a]">&quot;HIGH&quot;</span>,<br />
-                    <span className="text-[#0a84ff]">&quot;confidence&quot;</span>: <span className="text-[#30d158]">0.94</span>
+                  <div style={{ color: 'var(--text-muted)', lineHeight: 1.8 }}>
+                    <span style={{ color: '#3b82f6' }}>&quot;biasType&quot;</span>: <span style={{ color: '#f59e0b' }}>&quot;Confirmation Bias&quot;</span>,<br />
+                    <span style={{ color: '#3b82f6' }}>&quot;severity&quot;</span>: <span style={{ color: '#f59e0b' }}>&quot;HIGH&quot;</span>,<br />
+                    <span style={{ color: '#3b82f6' }}>&quot;confidence&quot;</span>: <span style={{ color: '#22c55e' }}>0.94</span>
                   </div>
                 </div>
               </div>
             </motion.div>
 
-            {/* Smaller Feature 1 */}
+            {/* Statistical Jury */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.1 }}
-              className="card card-glow col-span-1 md:col-span-1 lg:col-span-2 bg-[#050505] p-8"
+              className="col-span-1 md:col-span-1 lg:col-span-2"
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '32px',
+              }}
             >
-              <div className="flex items-start justify-between mb-6">
-                <div className="p-2 bg-[#0a84ff]/10 border border-[#0a84ff]/30">
-                  <Activity className="w-5 h-5 text-[#0a84ff]" />
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <div style={{
+                  padding: '10px', borderRadius: '12px',
+                  background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)',
+                }}>
+                  <Activity className="w-5 h-5" style={{ color: '#3b82f6' }} />
                 </div>
-                <span className="badge badge-medium tracking-widest">NOISE_AUDIT</span>
+                <span style={{
+                  fontSize: '0.7rem', fontWeight: 600, padding: '4px 10px',
+                  borderRadius: '9999px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6',
+                }}>Noise Audit</span>
               </div>
-              <h3 className="text-xl font-bold mb-2 text-[#ffffff]">Statistical Jury</h3>
-              <p className="text-[#a0a0a0] text-sm font-sans leading-relaxed">
-                Simulates multiple independent assessments (LLM instances) to measure variance and identify Decision Noise. Output precise standard deviations.
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>
+                Statistical Jury
+              </h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.7 }}>
+                Simulates multiple independent assessments to measure variance and identify Decision Noise. Outputs precise standard deviations.
               </p>
             </motion.div>
 
-            {/* Smaller Feature 2 */}
+            {/* Sub-second Analysis */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.2 }}
-              className="card card-glow col-span-1 md:col-span-1 lg:col-span-1 bg-[#1a1a1a] p-8 flex flex-col items-center text-center justify-center border-[#333333]"
+              className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center text-center justify-center"
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '32px',
+              }}
             >
-              <Zap className="w-8 h-8 text-[#ffd60a] mb-4" />
-              <h3 className="text-lg font-bold mb-2 text-[#ffffff]">Sub-second<br />Analysis</h3>
-              <p className="text-[#a0a0a0] text-xs font-sans">High-performance edge computing infrastructure.</p>
+              <Zap className="w-8 h-8 mb-4" style={{ color: '#fbbf24' }} />
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>
+                Sub-second<br />Analysis
+              </h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                High-performance edge computing infrastructure.
+              </p>
             </motion.div>
 
-            {/* Smaller Feature 3 */}
+            {/* FCA & GDPR */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.3 }}
-              className="card card-glow col-span-1 md:col-span-1 lg:col-span-1 bg-[#050505] p-8 flex flex-col items-center text-center justify-center pixel-grid"
+              className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center text-center justify-center"
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '32px',
+              }}
             >
-              <Shield className="w-8 h-8 text-[#30d158] mb-4" />
-              <h3 className="text-lg font-bold mb-2 text-[#ffffff]">FCA & GDPR<br />Ready</h3>
-              <p className="text-[#a0a0a0] text-xs font-sans">Consumer Duty mapping and automated PII sanitization.</p>
+              <Shield className="w-8 h-8 mb-4" style={{ color: '#22c55e' }} />
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>
+                FCA & GDPR<br />Ready
+              </h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                Consumer Duty mapping and automated PII sanitization.
+              </p>
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* ROI Calculator */}
-      <section ref={roiRef} className="py-32 bg-[#050505] border-t border-[#333333]">
+      <section ref={roiRef} className="py-32"
+        style={{ background: 'var(--bg-primary)', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}
+      >
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={roiInView ? { opacity: 1, y: 0 } : {}}
-            className="mb-16 border-l-4 border-[#0a84ff] pl-6"
+            className="mb-16"
+            style={{ borderLeft: '3px solid #3b82f6', paddingLeft: '24px' }}
           >
-            <h2 className="text-3xl md:text-4xl text-[#ffffff] mb-2 tracking-tight">ROI_SCENARIO_TESTBED</h2>
-            <p className="text-[#a0a0a0] text-sm font-sans">Model the financial impact of unmitigated decision variance.</p>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', color: 'var(--text-primary)', marginBottom: '8px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+              ROI Calculator
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+              Model the financial impact of unmitigated decision variance.
+            </p>
           </motion.div>
 
           <div className="max-w-6xl mx-auto grid md:grid-cols-5 gap-8">
@@ -393,19 +601,33 @@ export default function LandingPage() {
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={roiInView ? { opacity: 1, x: 0 } : {}}
-              className="md:col-span-2 card p-8 bg-[#111111]"
+              className="md:col-span-2"
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '32px',
+              }}
             >
-              <div className="space-y-8">
-                <div className="pb-4 border-b border-[#333333]">
-                  <h4 className="text-[#0a84ff] mb-2 flex items-center gap-2">
-                    <Terminal className="w-4 h-4" />
-                    INPUT_PARAMETERS
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <div style={{ paddingBottom: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                  <h4 style={{ color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
+                    <BarChart3 className="w-4 h-4" />
+                    Input Parameters
                   </h4>
                 </div>
                 <div>
-                  <label className="flex justify-between text-xs text-[#a0a0a0] mb-4 font-bold tracking-widest">
-                    <span>ANNUAL_DECISIONS</span>
-                    <span className="text-[#ffffff] bg-[#333333] px-2 py-1">{annualDecisions.toLocaleString()}</span>
+                  <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px', fontWeight: 600 }}>
+                    <span>Annual Decisions</span>
+                    <span style={{
+                      color: 'var(--text-primary)',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      padding: '4px 10px',
+                      borderRadius: '8px',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '0.75rem',
+                    }}>{annualDecisions.toLocaleString()}</span>
                   </label>
                   <input
                     type="range"
@@ -414,15 +636,22 @@ export default function LandingPage() {
                     step="100"
                     value={annualDecisions}
                     onChange={(e) => setAnnualDecisions(Number(e.target.value))}
-                    className="w-full h-1 bg-[#333333] appearance-none cursor-pointer outline-none"
-                    style={{ accentColor: '#0a84ff' }}
+                    className="w-full h-1 appearance-none cursor-pointer outline-none"
+                    style={{ accentColor: '#3b82f6', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px' }}
                   />
                 </div>
 
                 <div>
-                  <label className="flex justify-between text-xs text-[#a0a0a0] mb-4 font-bold tracking-widest">
-                    <span>AVG_DECISION_VALUE</span>
-                    <span className="text-[#ffffff] bg-[#333333] px-2 py-1">{formatCurrency(avgDecisionValue)}</span>
+                  <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px', fontWeight: 600 }}>
+                    <span>Avg Decision Value</span>
+                    <span style={{
+                      color: 'var(--text-primary)',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      padding: '4px 10px',
+                      borderRadius: '8px',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '0.75rem',
+                    }}>{formatCurrency(avgDecisionValue)}</span>
                   </label>
                   <input
                     type="range"
@@ -431,13 +660,23 @@ export default function LandingPage() {
                     step="1000"
                     value={avgDecisionValue}
                     onChange={(e) => setAvgDecisionValue(Number(e.target.value))}
-                    className="w-full h-1 bg-[#333333] appearance-none cursor-pointer outline-none"
-                    style={{ accentColor: '#0a84ff' }}
+                    className="w-full h-1 appearance-none cursor-pointer outline-none"
+                    style={{ accentColor: '#3b82f6', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px' }}
                   />
                 </div>
 
-                <div className="p-4 bg-[#050505] border border-[#333333] text-xs text-[#555555] font-mono leading-relaxed">
-                  {`// ALGORITHM: Baseline noise tax derived from Kahneman et al.`}<br />
+                <div style={{
+                  padding: '14px',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '10px',
+                  fontSize: '0.75rem',
+                  color: 'var(--text-muted)',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  lineHeight: 1.6,
+                  opacity: 0.7,
+                }}>
+                  {`// Baseline noise tax derived from Kahneman et al.`}<br />
                   const NOISE_TAX = 0.12;
                 </div>
               </div>
@@ -448,40 +687,69 @@ export default function LandingPage() {
               initial={{ opacity: 0, x: 50 }}
               animate={roiInView ? { opacity: 1, x: 0 } : {}}
               transition={{ delay: 0.1 }}
-              className="md:col-span-3 card bg-[#000000] border-[#0a84ff]/30 p-8 relative overflow-hidden flex flex-col justify-center"
+              className="md:col-span-3 relative overflow-hidden flex flex-col justify-center"
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(59, 130, 246, 0.15)',
+                borderRadius: '16px',
+                padding: '32px',
+                boxShadow: '0 8px 40px rgba(0, 0, 0, 0.2)',
+              }}
             >
-              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none text-9xl font-bold">
+              <div style={{ position: 'absolute', top: 0, right: 0, padding: '16px', opacity: 0.03, pointerEvents: 'none', fontSize: '10rem', fontWeight: 800 }}>
                 $
               </div>
-              <div className="space-y-8 relative z-10">
-                <div className="flex items-center gap-4 border-b border-[#333333] pb-4">
-                  <div className="w-2 h-2 rounded-full animate-pulse bg-[#0a84ff]"></div>
-                  <span className="text-[#a0a0a0] font-bold text-xs tracking-widest">PROJECTION_OUTPUT</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', position: 'relative', zIndex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: '16px' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6', boxShadow: '0 0 8px rgba(59, 130, 246, 0.5)' }} />
+                  <span style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.85rem' }}>Projection Output</span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-8 pt-4">
+                <div className="grid grid-cols-2 gap-8">
                   <div>
-                    <div className="text-xs text-[#ff453a] mb-2 tracking-widest font-bold">ESTIMATED_LOSS</div>
-                    <div className="text-4xl lg:text-5xl font-bold text-[#ffffff] data-value">
+                    <div style={{ fontSize: '0.8rem', color: '#ef4444', marginBottom: '8px', fontWeight: 600 }}>
+                      Estimated Annual Loss
+                    </div>
+                    <div style={{
+                      fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 800, color: 'var(--text-primary)',
+                      fontFamily: "'JetBrains Mono', monospace",
+                    }}>
                       {formatCurrency(potentialLoss)}
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-xs text-[#30d158] mb-2 tracking-widest font-bold">RECOVERABLE_VALUE_60%</div>
-                    <div className="text-4xl lg:text-5xl font-bold text-[#30d158] data-value" style={{ textShadow: '0 0 20px rgba(48,209,88,0.4)' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#22c55e', marginBottom: '8px', fontWeight: 600 }}>
+                      Recoverable Value (60%)
+                    </div>
+                    <div style={{
+                      fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 800, color: '#22c55e',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      textShadow: '0 0 20px rgba(34, 197, 94, 0.3)',
+                    }}>
                       {formatCurrency(potentialSavings)}
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-8 mt-8 border-t border-[#333333]">
+                <div style={{ paddingTop: '24px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
                   <Link
                     href="/sign-up"
-                    className="btn btn-primary w-full py-4 text-sm tracking-widest glow"
-                    style={{ background: '#0a84ff', color: 'black', borderColor: '#0a84ff' }}
+                    className="btn btn-primary w-full glow"
+                    style={{
+                      padding: '16px',
+                      fontSize: '0.9rem',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                      color: 'white',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      display: 'block',
+                      textAlign: 'center',
+                      fontWeight: 600,
+                    }}
                   >
-                    [ INITIALIZE_TRIAL ]
+                    Start Free Trial
                   </Link>
                 </div>
               </div>
@@ -491,18 +759,20 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-[#000000] border-t border-[#333333] relative z-10">
+      <footer className="py-8 relative z-10"
+        style={{ background: 'var(--bg-primary)', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}
+      >
         <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 font-mono">
-            <div className="flex items-center gap-2 border border-[#333333] px-3 py-1 bg-[#111111]">
-              <div className="w-2 h-2 bg-[#ff9f0a]"></div>
-              <span className="font-bold text-[#ffffff] text-xs tracking-widest">NEUROAUDIT</span>
-              <span className="text-xs text-[#555555] ml-2">v2.0.4 - © 2025</span>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3" style={{ padding: '8px 16px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
+              <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.85rem' }}>Decision Intel</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '8px' }}>v2.0 · © 2025</span>
             </div>
-            <div className="flex items-center gap-6 text-xs text-[#555555] tracking-widest">
-              <a href="#" className="hover:text-[#ff9f0a] transition-colors">PRIVACY</a>
-              <a href="#" className="hover:text-[#ff9f0a] transition-colors">TERMS</a>
-              <a href="#" className="hover:text-[#ff9f0a] transition-colors">API_DOCS</a>
+            <div className="flex items-center gap-6" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              <a href="#" className="hover:text-amber-400 transition-colors">Privacy</a>
+              <a href="#" className="hover:text-amber-400 transition-colors">Terms</a>
+              <a href="#" className="hover:text-amber-400 transition-colors">API Docs</a>
             </div>
           </div>
         </div>

@@ -12,10 +12,10 @@ interface SwotQuadrantProps {
 }
 
 const QUADRANTS = [
-    { key: 'strengths', label: 'Strengths', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.08)', borderColor: 'rgba(34, 197, 94, 0.3)', icon: '💪' },
-    { key: 'weaknesses', label: 'Weaknesses', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.08)', borderColor: 'rgba(239, 68, 68, 0.3)', icon: '⚠️' },
-    { key: 'opportunities', label: 'Opportunities', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.08)', borderColor: 'rgba(59, 130, 246, 0.3)', icon: '🚀' },
-    { key: 'threats', label: 'Threats', color: '#f97316', bg: 'rgba(249, 115, 22, 0.08)', borderColor: 'rgba(249, 115, 22, 0.3)', icon: '🔥' },
+    { key: 'strengths', label: 'Strengths', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.06)', borderColor: 'rgba(34, 197, 94, 0.2)', icon: '💪' },
+    { key: 'weaknesses', label: 'Weaknesses', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.06)', borderColor: 'rgba(239, 68, 68, 0.2)', icon: '⚠️' },
+    { key: 'opportunities', label: 'Opportunities', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.06)', borderColor: 'rgba(59, 130, 246, 0.2)', icon: '🚀' },
+    { key: 'threats', label: 'Threats', color: '#f97316', bg: 'rgba(249, 115, 22, 0.06)', borderColor: 'rgba(249, 115, 22, 0.2)', icon: '🔥' },
 ] as const;
 
 export function SwotQuadrant({ data }: SwotQuadrantProps) {
@@ -26,9 +26,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
         return (
             <div className="card card-glow h-full">
                 <div className="card-header">
-                    <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                        SWOT Analysis
-                    </h3>
+                    <h3 style={{ fontSize: '13px' }}>SWOT Analysis</h3>
                 </div>
                 <div className="card-body flex items-center justify-center" style={{ minHeight: 280 }}>
                     <p className="text-muted text-sm">No SWOT data available</p>
@@ -40,15 +38,13 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
     return (
         <div className="card h-full">
             <div className="card-header">
-                <h3 style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    SWOT Analysis
-                </h3>
+                <h3 style={{ fontSize: '13px' }}>SWOT Analysis</h3>
             </div>
             <div className="card-body" style={{ padding: 'var(--spacing-sm)' }}>
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gap: '6px',
+                    gap: '8px',
                 }}>
                     {QUADRANTS.map(q => {
                         const items = data[q.key as keyof typeof data] || [];
@@ -60,18 +56,16 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                                 style={{
                                     background: q.bg,
                                     border: `1px solid ${q.borderColor}`,
-                                    borderRadius: 'var(--radius-sm)',
-                                    padding: '12px',
+                                    borderRadius: '12px',
+                                    padding: '14px',
                                     minHeight: '130px',
                                 }}
                             >
                                 <div style={{
-                                    fontSize: '10px',
-                                    fontWeight: 700,
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.08em',
+                                    fontSize: '12px',
+                                    fontWeight: 600,
                                     color: q.color,
-                                    marginBottom: '8px',
+                                    marginBottom: '10px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '6px',
@@ -89,11 +83,11 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                                         <li
                                             key={i}
                                             style={{
-                                                fontSize: '11px',
+                                                fontSize: '12px',
                                                 color: 'var(--text-secondary)',
-                                                lineHeight: 1.5,
+                                                lineHeight: 1.6,
                                                 marginBottom: '3px',
-                                                paddingLeft: '10px',
+                                                paddingLeft: '12px',
                                                 position: 'relative',
                                             }}
                                         >
@@ -110,9 +104,9 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                                         <li
                                             onClick={() => setExpandedKey(isExpanded ? null : q.key)}
                                             style={{
-                                                fontSize: '10px',
+                                                fontSize: '11px',
                                                 color: 'var(--accent-primary)',
-                                                paddingLeft: '10px',
+                                                paddingLeft: '12px',
                                                 marginTop: '4px',
                                                 cursor: 'pointer',
                                                 userSelect: 'none',

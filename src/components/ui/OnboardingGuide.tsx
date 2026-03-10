@@ -49,7 +49,7 @@ export function OnboardingGuide() {
             role="region"
             aria-label="Getting started guide"
         >
-            <div className="card-header" style={{ background: 'rgba(255, 159, 10, 0.05)' }}>
+            <div className="card-header" style={{ background: 'rgba(245, 158, 11, 0.06)' }}>
                 <h3 style={{ color: 'var(--accent-primary)', fontSize: '12px' }}>
                     GETTING_STARTED
                 </h3>
@@ -81,7 +81,7 @@ export function OnboardingGuide() {
                                 alignItems: 'center',
                                 gap: '8px',
                                 padding: 'var(--spacing-md)',
-                                background: index === currentStep ? 'rgba(255, 159, 10, 0.1)' : 'transparent',
+                                background: index === currentStep ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
                                 border: index === currentStep ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
                                 cursor: 'pointer',
                                 color: 'inherit',

@@ -42,32 +42,34 @@ function CustomContent({ x, y, width, height, name, count, index }: TreemapConte
                 y={y}
                 width={width}
                 height={height}
-                rx={4}
+                rx={8}
                 fill={color}
-                fillOpacity={0.2}
+                fillOpacity={0.15}
                 stroke={color}
-                strokeWidth={1.5}
-                strokeOpacity={0.6}
+                strokeWidth={1}
+                strokeOpacity={0.4}
             />
             {width > 60 && height > 35 && (
                 <>
                     <text
-                        x={x + 8}
-                        y={y + 16}
+                        x={x + 10}
+                        y={y + 18}
                         fill="var(--text-primary)"
-                        fontSize={10}
-                        fontWeight={600}
+                        fontSize={11}
+                        fontWeight={500}
+                        fontFamily="Inter, sans-serif"
                     >
                         {(name || '').length > Math.floor(width / 7)
                             ? (name || '').slice(0, Math.floor(width / 7)) + '…'
                             : name}
                     </text>
                     <text
-                        x={x + 8}
-                        y={y + 30}
+                        x={x + 10}
+                        y={y + 34}
                         fill={color}
-                        fontSize={14}
+                        fontSize={15}
                         fontWeight={700}
+                        fontFamily="'JetBrains Mono', monospace"
                     >
                         {count}
                     </text>
@@ -82,12 +84,10 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
         return (
             <div className="card card-glow h-full">
                 <div className="card-header">
-                    <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                        Bias Landscape
-                    </h3>
+                    <h3 style={{ fontSize: '13px' }}>Bias Landscape</h3>
                 </div>
                 <div className="card-body flex items-center justify-center" style={{ height: 320 }}>
-                    <p className="text-muted" style={{ fontSize: '11px', fontFamily: 'JetBrains Mono, monospace' }}>NO DATA</p>
+                    <p className="text-muted" style={{ fontSize: '12px' }}>No data</p>
                 </div>
             </div>
         );
@@ -103,9 +103,7 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
     return (
         <div className="card card-glow h-full">
             <div className="card-header flex items-center justify-between">
-                <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                    Bias Landscape
-                </h3>
+                <h3 style={{ fontSize: '13px' }}>Bias Landscape</h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {severityMap && Object.keys(severityMap).length > 0 && (
                         <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
@@ -113,12 +111,11 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
                                 .filter(s => (severityMap[s] ?? 0) > 0)
                                 .map(s => (
                                     <span key={s} style={{
-                                        fontSize: '9px',
-                                        fontFamily: 'JetBrains Mono, monospace',
-                                        padding: '1px 5px',
-                                        border: `1px solid ${SEVERITY_COLORS[s]}40`,
+                                        fontSize: '10px',
+                                        padding: '2px 8px',
+                                        borderRadius: '9999px',
                                         color: SEVERITY_COLORS[s],
-                                        background: `${SEVERITY_COLORS[s]}10`,
+                                        background: `${SEVERITY_COLORS[s]}15`,
                                     }}>
                                         {s[0].toUpperCase()}: {severityMap[s]}
                                     </span>
@@ -126,7 +123,7 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
                             }
                         </div>
                     )}
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                         {data.reduce((s, d) => s + d.count, 0)} total
                     </span>
                 </div>
@@ -142,10 +139,9 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
                         <Tooltip
                             contentStyle={{
                                 background: 'var(--bg-secondary)',
-                                border: '1px solid var(--border-color)',
-                                borderRadius: '0',
-                                fontSize: '11px',
-                                fontFamily: 'JetBrains Mono, monospace',
+                                border: '1px solid var(--glass-border)',
+                                borderRadius: '12px',
+                                fontSize: '12px',
                             }}
                             formatter={(value: number | undefined) => [`${value ?? 0} occurrences`, 'Count']}
                         />

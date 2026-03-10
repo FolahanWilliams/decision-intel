@@ -69,25 +69,25 @@ export function ExecutiveSummary({
                     <div className="p-4 rounded-lg bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
                         <Brain className="w-8 h-8 text-purple-400 mb-2" />
                         <span className="text-2xl font-bold">{biasCount}</span>
-                        <span className="text-xs text-muted uppercase tracking-wider">Cognitive Biases</span>
+                        <span className="text-xs text-muted tracking-wide">Cognitive Biases</span>
                     </div>
 
                     <div className="p-4 rounded-lg bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
                         <Activity className="w-8 h-8 text-blue-400 mb-2" />
                         <span className="text-2xl font-bold">{noiseScore.toFixed(1)}</span>
-                        <span className="text-xs text-muted uppercase tracking-wider">Noise Score</span>
+                        <span className="text-xs text-muted tracking-wide">Noise Score</span>
                     </div>
 
                     <div className="p-4 rounded-lg bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
                         <AlertTriangle className={`w-8 h-8 mb-2 ${getRiskColor(riskLevel)}`} />
                         <span className={`text-2xl font-bold capitalize ${getRiskColor(riskLevel)}`}>{riskLevel}</span>
-                        <span className="text-xs text-muted uppercase tracking-wider">Risk Level</span>
+                        <span className="text-xs text-muted tracking-wide">Risk Level</span>
                     </div>
                 </div>
             </div>
 
             <div className="p-6 rounded-lg bg-secondary/10 border border-border">
-                <h3 className="text-sm font-medium text-muted uppercase tracking-wider mb-3">Analysis Synthesis</h3>
+                <h3 className="text-sm font-medium text-muted tracking-wide mb-3">Analysis Synthesis</h3>
                 <p className="leading-relaxed text-foreground/90">{summary}</p>
             </div>
         </div>

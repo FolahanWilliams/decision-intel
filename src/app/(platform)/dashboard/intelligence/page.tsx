@@ -29,26 +29,23 @@ function SectionLabel({ children, index }: { children: string; index: number }) 
         >
             <span style={{
                 color: 'var(--accent-primary)',
-                fontSize: '10px',
-                fontWeight: 700,
-                letterSpacing: '0.15em',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '11px',
+                fontWeight: 600,
+                fontFamily: "'JetBrains Mono', monospace",
             }}>
-                [{String(index).padStart(2, '0')}]
+                {String(index).padStart(2, '0')}
             </span>
             <span style={{
-                fontSize: '10px',
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--text-muted)',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
             }}>
                 {children}
             </span>
             <div style={{
                 flex: 1,
                 height: '1px',
-                background: 'linear-gradient(to right, var(--border-color), transparent)',
+                background: 'linear-gradient(to right, var(--glass-border), transparent)',
             }} />
         </div>
     );
@@ -72,10 +69,9 @@ function FreshnessBadge({ freshness, hoursOld }: { freshness: string; hoursOld: 
             padding: '2px 8px',
             fontSize: '10px',
             fontWeight: 700,
-            letterSpacing: '0.1em',
             color: config.color,
-            border: `1px solid ${config.color}`,
-            borderRadius: '2px',
+            background: `${config.color}12`,
+            borderRadius: '9999px',
         }}>
             <Icon size={10} />
             {config.label}
@@ -106,10 +102,10 @@ function StatCard({ label, value, icon, color, delay }: {
                     {icon}
                 </div>
                 <div>
-                    <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>
+                    <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'JetBrains Mono', monospace" }}>
                         {value}
                     </div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)',  }}>
                         {label}
                     </div>
                 </div>
@@ -168,8 +164,7 @@ function ArticleCard({ article, delay }: { article: NewsArticle; delay: number }
                 <span style={{
                     fontSize: '10px', padding: '2px 6px', borderRadius: '2px',
                     background: `${catColor}15`, color: catColor, fontWeight: 600,
-                    textTransform: 'uppercase', letterSpacing: '0.05em',
-                }}>
+                                    }}>
                     {article.feedCategory}
                 </span>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -453,7 +448,7 @@ function MacroSection() {
                         <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
                             {ind.name}
                         </div>
-                        <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>
+                        <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'JetBrains Mono', monospace" }}>
                             {ind.value}
                         </div>
                         <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>

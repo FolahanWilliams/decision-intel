@@ -215,7 +215,7 @@ export default function TrendsPage() {
                                         borderLeft: `3px solid ${impact.status === 'High' ? 'var(--error)' : impact.status === 'Medium' ? 'var(--warning)' : 'var(--success)'}`
                                     }}>
                                         <div className="flex justify-between mb-xs">
-                                            <span style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{impact.category}</span>
+                                            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{impact.category}</span>
                                             <span className={`badge ${impact.status === 'High' ? 'badge-critical' : 'badge-secondary'}`} style={{ fontSize: '9px' }}>{impact.status} impact</span>
                                         </div>
                                         <p style={{ fontSize: '12px', fontWeight: 500 }}>{impact.details}</p>
@@ -226,7 +226,7 @@ export default function TrendsPage() {
                             {/* Sources */}
                             {marketAnalysis.searchSources?.length > 0 && (
                                 <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
-                                    <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '8px' }}>
                                         Verified Sources:
                                     </div>
                                     <div className="flex flex-wrap gap-sm">
@@ -311,8 +311,7 @@ export default function TrendsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-card)',
                                             border: '1px solid var(--border-color)',
-                                            borderRadius: 0,
-                                            fontFamily: 'JetBrains Mono'
+                                            borderRadius: '12px',
                                         }}
                                         itemStyle={{ color: 'var(--text-primary)' }}
                                         labelFormatter={(label) => `Date: ${label}`}
@@ -342,7 +341,7 @@ export default function TrendsPage() {
                                 <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>
                                     {data.stats.avgScore}
                                 </div>
-                                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                                     Avg Score
                                 </div>
                             </div>
@@ -352,7 +351,7 @@ export default function TrendsPage() {
                                 <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--accent-secondary)' }}>
                                     {data.stats.avgNoise}%
                                 </div>
-                                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                                     Avg Noise
                                 </div>
                             </div>
@@ -362,7 +361,7 @@ export default function TrendsPage() {
                                 <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--error)' }}>
                                     {data.stats.totalBiases}
                                 </div>
-                                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                                     Total Biases
                                 </div>
                             </div>
@@ -372,7 +371,7 @@ export default function TrendsPage() {
                                 <div style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--success)' }}>
                                     {data.stats.totalAnalyses}
                                 </div>
-                                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                                     Analyses
                                 </div>
                             </div>
@@ -393,8 +392,8 @@ export default function TrendsPage() {
                                         <XAxis dataKey="date" hide />
                                         <YAxis hide domain={[0, 100]} />
                                         <Tooltip
-                                            cursor={{ stroke: '#333' }}
-                                            contentStyle={{ background: '#000', border: '1px solid #333' }}
+                                            cursor={{ stroke: 'var(--glass-border)' }}
+                                            contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
                                             labelFormatter={(label) => `Date: ${label}`}
                                             formatter={(value) => [`${value}%`, 'Noise Level']}
                                         />
@@ -431,7 +430,7 @@ export default function TrendsPage() {
                                                 tickLine={false}
                                             />
                                             <Tooltip
-                                                contentStyle={{ background: '#000', border: '1px solid #333' }}
+                                                contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
                                                 formatter={(value) => [`${value} occurrences`, 'Count']}
                                             />
                                             <Bar dataKey="value" fill="var(--error)" barSize={16}>
@@ -470,7 +469,7 @@ export default function TrendsPage() {
                                         fontSize={10}
                                     />
                                     <Tooltip
-                                        contentStyle={{ background: '#000', border: '1px solid #333' }}
+                                        contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
                                         labelFormatter={(label) => `Date: ${label}`}
                                         formatter={(value) => [`${value} documents`, 'Analyzed']}
                                     />

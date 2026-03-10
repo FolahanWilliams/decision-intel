@@ -39,11 +39,11 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
 
         // Background arc
         const gradient = ctx.createLinearGradient(cx - radius, cy, cx + radius, cy);
-        gradient.addColorStop(0, '#ef4444');      // Negative (left)
-        gradient.addColorStop(0.35, '#eab308');     // Warning
-        gradient.addColorStop(0.5, '#6b7280');      // Neutral (center)
-        gradient.addColorStop(0.65, '#22c55e');     // Positive
-        gradient.addColorStop(1, '#10b981');        // Strong positive (right)
+        gradient.addColorStop(0, '#ef4444');
+        gradient.addColorStop(0.35, '#eab308');
+        gradient.addColorStop(0.5, '#6b7280');
+        gradient.addColorStop(0.65, '#22c55e');
+        gradient.addColorStop(1, '#10b981');
 
         ctx.beginPath();
         ctx.arc(cx, cy, radius, startAngle, endAngle);
@@ -77,19 +77,19 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
         ctx.moveTo(cx, cy);
         ctx.lineTo(nx, ny);
         ctx.lineWidth = 2.5;
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.lineCap = 'round';
         ctx.stroke();
 
         // Center dot
         ctx.beginPath();
         ctx.arc(cx, cy, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.fill();
 
         // Score text
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 20px system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.font = "bold 20px 'Inter', system-ui, sans-serif";
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillText(`${Math.round(score)}`, cx, cy + 12);
@@ -105,19 +105,15 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
     return (
         <div className="card card-glow h-full">
             <div className="card-header">
-                <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                    Sentiment Pulse
-                </h3>
+                <h3 style={{ fontSize: '13px' }}>Sentiment Pulse</h3>
             </div>
             <div className="card-body flex flex-col items-center justify-center" style={{ minHeight: 200 }}>
                 <canvas ref={canvasRef} />
                 <div style={{
                     marginTop: '-4px',
-                    fontSize: '12px',
+                    fontSize: '13px',
                     fontWeight: 600,
                     color: getColor(),
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
                 }}>
                     {label}
                 </div>
