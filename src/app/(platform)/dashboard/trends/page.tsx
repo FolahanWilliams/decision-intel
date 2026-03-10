@@ -310,7 +310,6 @@ export default function TrendsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-card)',
                                             border: '1px solid var(--border-color)',
-                                            borderRadius: '12px',
                                         }}
                                         itemStyle={{ color: 'var(--text-primary)' }}
                                         labelFormatter={(label) => `Date: ${label}`}
@@ -392,7 +391,7 @@ export default function TrendsPage() {
                                         <YAxis hide domain={[0, 100]} />
                                         <Tooltip
                                             cursor={{ stroke: 'var(--glass-border)' }}
-                                            contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
+                                            contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
                                             labelFormatter={(label) => `Date: ${label}`}
                                             formatter={(value) => [`${value}%`, 'Noise Level']}
                                         />
@@ -429,7 +428,7 @@ export default function TrendsPage() {
                                                 tickLine={false}
                                             />
                                             <Tooltip
-                                                contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
+                                                contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
                                                 formatter={(value) => [`${value} occurrences`, 'Count']}
                                             />
                                             <Bar dataKey="value" fill="var(--error)" barSize={16}>
@@ -468,7 +467,7 @@ export default function TrendsPage() {
                                         fontSize={10}
                                     />
                                     <Tooltip
-                                        contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
+                                        contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
                                         labelFormatter={(label) => `Date: ${label}`}
                                         formatter={(value) => [`${value} documents`, 'Analyzed']}
                                     />
