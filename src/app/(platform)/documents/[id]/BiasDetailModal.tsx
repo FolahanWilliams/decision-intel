@@ -112,7 +112,7 @@ export function BiasDetailModal({ bias, biases, currentIndex, onClose, onNavigat
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay"
             role="dialog"
             aria-modal="true"
             aria-label={`Bias detail: ${bias.biasType}`}
@@ -121,7 +121,7 @@ export function BiasDetailModal({ bias, biases, currentIndex, onClose, onNavigat
         >
             <div
                 ref={modalRef}
-                className="card w-full max-w-3xl"
+                className="card w-full max-w-3xl modal-content"
                 style={{
                     border: `1px solid ${color}30`,
                     maxHeight: '90vh',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 interface SentimentGaugeProps {
     score: number;     // -100 to 100, or 0 to 100
@@ -9,10 +9,25 @@ interface SentimentGaugeProps {
 
 export function SentimentGauge({ score, label }: SentimentGaugeProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [canvasSize, setCanvasSize] = useState(200);
 
     // Normalize: sentiment might be 0-100 or already -100 to 100
     // Treat 0-100 where 50 = neutral
     const normalizedAngle = Math.max(0, Math.min(100, score));
+
+    const updateSize = useCallback(() => {
+        if (containerRef.current) {
+            const width = containerRef.current.clientWidth;
+            setCanvasSize(Math.min(240, Math.max(140, width - 40)));
+        }
+    }, []);
+
+    useEffect(() => {
+        updateSize();
+        window.addEventListener('resize', updateSize);
+        return () => window.removeEventListener('resize', updateSize);
+    }, [updateSize]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -21,7 +36,7 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
         if (!ctx) return;
 
         const dpr = window.devicePixelRatio || 1;
-        const size = 200;
+        const size = canvasSize;
         canvas.width = size * dpr;
         canvas.height = (size * 0.65) * dpr;
         canvas.style.width = `${size}px`;
@@ -94,12 +109,12 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
         ctx.textBaseline = 'top';
         ctx.fillText(`${Math.round(score)}`, cx, cy + 12);
 
-    }, [score, normalizedAngle]);
+    }, [score, normalizedAngle, canvasSize]);
 
     const getColor = () => {
-        if (score >= 65) return '#22c55e';
-        if (score >= 40) return '#6b7280';
-        return '#ef4444';
+        if (score >= 65) return 'var(--success)';
+        if (score >= 40) return 'var(--text-muted)';
+        return 'var(--error)';
     };
 
     return (
@@ -107,7 +122,7 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
             <div className="card-header">
                 <h3 style={{ fontSize: '13px' }}>Sentiment Pulse</h3>
             </div>
-            <div className="card-body flex flex-col items-center justify-center" style={{ minHeight: 200 }}>
+            <div ref={containerRef} className="card-body flex flex-col items-center justify-center" style={{ minHeight: 200 }}>
                 <canvas ref={canvasRef} />
                 <div style={{
                     marginTop: '-4px',

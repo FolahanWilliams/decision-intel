@@ -23,10 +23,10 @@ export function ExecutiveSummary({
 
     const getRiskColor = (level: string) => {
         switch (level) {
-            case 'low': return 'text-emerald-400';
-            case 'medium': return 'text-yellow-400';
-            case 'high': return 'text-orange-400';
-            case 'critical': return 'text-red-400';
+            case 'low': return 'text-success';
+            case 'medium': return 'text-warning';
+            case 'high': return 'text-accent-primary';
+            case 'critical': return 'text-error';
             default: return 'text-muted';
         }
     };
@@ -34,9 +34,9 @@ export function ExecutiveSummary({
     const getVerdictBadge = (verdict?: string) => {
         if (!verdict) return null;
         const styles = {
-            APPROVED: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-            REJECTED: 'bg-red-500/20 text-red-400 border-red-500/30',
-            MIXED: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+            APPROVED: 'bg-success/20 text-success border-success/30',
+            REJECTED: 'bg-error/20 text-error border-error/30',
+            MIXED: 'bg-warning/20 text-warning border-warning/30',
         };
         return (
             <span className={`px-3 py-1 rounded-full text-xs font-bold border ${styles[verdict as keyof typeof styles] || ''}`}>
@@ -67,13 +67,13 @@ export function ExecutiveSummary({
 
                 <div className="md:col-span-3 grid grid-cols-3 gap-4">
                     <div className="p-4 rounded-lg bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
-                        <Brain className="w-8 h-8 text-purple-400 mb-2" />
+                        <Brain className="w-8 h-8 text-accent-secondary mb-2" />
                         <span className="text-2xl font-bold">{biasCount}</span>
                         <span className="text-xs text-muted tracking-wide">Cognitive Biases</span>
                     </div>
 
                     <div className="p-4 rounded-lg bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
-                        <Activity className="w-8 h-8 text-blue-400 mb-2" />
+                        <Activity className="w-8 h-8 text-accent-secondary mb-2" />
                         <span className="text-2xl font-bold">{noiseScore.toFixed(1)}</span>
                         <span className="text-xs text-muted tracking-wide">Noise Score</span>
                     </div>

@@ -40,11 +40,11 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
 
   const getCellColor = (impact: number, probability: number) => {
     const riskScore = (impact * probability) / 100;
-    if (riskScore >= 70) return 'bg-red-600';
-    if (riskScore >= 50) return 'bg-orange-500';
-    if (riskScore >= 30) return 'bg-yellow-500';
-    if (riskScore >= 15) return 'bg-emerald-500';
-    return 'bg-emerald-700';
+    if (riskScore >= 70) return 'bg-error';
+    if (riskScore >= 50) return 'bg-accent-primary';
+    if (riskScore >= 30) return 'bg-warning';
+    if (riskScore >= 15) return 'bg-success';
+    return 'bg-success/70';
   };
 
   const getOpacity = (count: number) => {
@@ -85,7 +85,7 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
             }}
           >
             {/* Gradient Background for "Zones" */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-900/20 via-yellow-900/10 to-red-900/20 pointer-events-none rounded-lg" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-success/10 via-warning/5 to-error/10 pointer-events-none rounded-lg" />
 
             {Array.from({ length: gridSize * gridSize }).map((_, idx) => {
               const row = Math.floor(idx / gridSize);
@@ -99,7 +99,17 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
               return (
                 <div
                   key={idx}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={cell ? `${cell.count} risks, Impact ${Math.round(impact)}%, Probability ${Math.round(probability)}%` : 'No risks'}
+                  aria-pressed={isSelected}
                   onClick={() => handleCellClick(row, col)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCellClick(row, col);
+                    }
+                  }}
                   className={`
                     relative rounded-md flex items-center justify-center cursor-pointer
                     transition-all duration-200 border border-transparent
@@ -142,19 +152,19 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
       {/* Legend */}
       <div className="flex justify-center gap-4 mt-6">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-emerald-700" />
+          <div className="w-3 h-3 rounded-full bg-success/70" />
           <span className="text-xs text-muted">Low</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-yellow-500" />
+          <div className="w-3 h-3 rounded-full bg-warning" />
           <span className="text-xs text-muted">Medium</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-orange-500" />
+          <div className="w-3 h-3 rounded-full bg-accent-primary" />
           <span className="text-xs text-muted">High</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-red-600" />
+          <div className="w-3 h-3 rounded-full bg-error" />
           <span className="text-xs text-muted">Critical</span>
         </div>
       </div>
@@ -244,10 +254,10 @@ export function RiskTimeline({ risks }: RiskTimelineProps) {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-600';
-      case 'high': return 'bg-orange-500';
-      case 'medium': return 'bg-yellow-500';
-      default: return 'bg-emerald-500';
+      case 'critical': return 'bg-error';
+      case 'high': return 'bg-accent-primary';
+      case 'medium': return 'bg-warning';
+      default: return 'bg-success';
     }
   };
 
@@ -309,10 +319,10 @@ interface RiskSummaryProps {
 
 export function RiskSummary({ totalRisks, criticalRisks, highRisks, mitigatedRisks }: RiskSummaryProps) {
   const stats = [
-    { label: 'Total Risks', value: totalRisks, color: 'text-blue-400' },
-    { label: 'Critical', value: criticalRisks, color: 'text-red-400' },
-    { label: 'High', value: highRisks, color: 'text-orange-400' },
-    { label: 'Mitigated', value: mitigatedRisks, color: 'text-emerald-400' },
+    { label: 'Total Risks', value: totalRisks, color: 'text-info' },
+    { label: 'Critical', value: criticalRisks, color: 'text-error' },
+    { label: 'High', value: highRisks, color: 'text-accent-primary' },
+    { label: 'Mitigated', value: mitigatedRisks, color: 'text-success' },
   ];
 
   return (

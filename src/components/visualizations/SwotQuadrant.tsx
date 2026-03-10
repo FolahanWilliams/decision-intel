@@ -102,7 +102,16 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                                     ))}
                                     {items.length > 4 && (
                                         <li
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-expanded={isExpanded}
                                             onClick={() => setExpandedKey(isExpanded ? null : q.key)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    setExpandedKey(isExpanded ? null : q.key);
+                                                }
+                                            }}
                                             style={{
                                                 fontSize: '11px',
                                                 color: 'var(--accent-primary)',
@@ -110,6 +119,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                                                 marginTop: '4px',
                                                 cursor: 'pointer',
                                                 userSelect: 'none',
+                                                borderRadius: '4px',
                                             }}
                                         >
                                             {isExpanded ? '↑ show less' : `+${items.length - 4} more`}
