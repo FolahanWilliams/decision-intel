@@ -24,7 +24,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         const id = Math.random().toString(36).substring(2, 9);
         setToasts((prev) => [...prev, { id, message, type }]);
 
-        // Errors/warnings persist longer (8s) so users can read them; success/info auto-dismiss at 3s
         const duration = type === 'error' || type === 'warning' ? 8000 : 3000;
         setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -50,7 +49,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '12px',
-                    pointerEvents: 'none' // Allow clicking through container
+                    pointerEvents: 'none'
                 }}
             >
                 {toasts.map((toast) => (
@@ -58,23 +57,20 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                         key={toast.id}
                         className="animate-fade-in"
                         style={{
-                            background: 'rgba(16, 16, 28, 0.9)',
-                            backdropFilter: 'blur(12px)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            borderRadius: '12px',
+                            background: 'var(--bg-secondary)',
+                            border: '1px solid var(--border-color)',
                             padding: '16px',
                             minWidth: '300px',
-                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '12px',
-                            pointerEvents: 'auto', // Re-enable pointer events for toasts
-                            color: 'white'
+                            pointerEvents: 'auto',
+                            color: 'var(--text-primary)'
                         }}
                     >
-                        {toast.type === 'success' && <CheckCircle size={20} className="text-emerald-500" style={{ color: '#10b981' }} />}
-                        {toast.type === 'error' && <AlertTriangle size={20} className="text-red-500" style={{ color: '#ef4444' }} />}
-                        {toast.type === 'info' && <Info size={20} className="text-blue-500" style={{ color: '#3b82f6' }} />}
+                        {toast.type === 'success' && <CheckCircle size={20} style={{ color: 'var(--success)' }} />}
+                        {toast.type === 'error' && <AlertTriangle size={20} style={{ color: 'var(--error)' }} />}
+                        {toast.type === 'info' && <Info size={20} style={{ color: 'var(--accent-primary)' }} />}
 
                         <span style={{ fontSize: '0.9rem', flex: 1 }}>{toast.message}</span>
 
@@ -84,7 +80,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                             style={{
                                 background: 'transparent',
                                 border: 'none',
-                                color: 'rgba(255,255,255,0.5)',
+                                color: 'var(--text-muted)',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center'

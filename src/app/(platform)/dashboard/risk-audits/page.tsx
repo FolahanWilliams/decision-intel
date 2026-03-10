@@ -128,31 +128,31 @@ export default function RiskAuditsPage() {
                     {[0, 1, 2, 3].map(i => (
                         <div key={i} className="card animate-pulse">
                             <div className="card-body text-center p-md">
-                                <div className="h-3 w-24 rounded bg-white/10 mx-auto mb-sm" />
-                                <div className="h-10 w-16 rounded bg-white/10 mx-auto mb-sm" />
-                                <div className="h-3 w-16 rounded bg-white/10 mx-auto" />
+                                <div className="h-3 w-24 bg-white/10 mx-auto mb-sm" />
+                                <div className="h-10 w-16 bg-white/10 mx-auto mb-sm" />
+                                <div className="h-3 w-16 bg-white/10 mx-auto" />
                             </div>
                         </div>
                     ))}
                 </div>
                 <div className="card animate-pulse">
                     <div className="card-header">
-                        <div className="h-4 w-40 rounded bg-white/10" />
+                        <div className="h-4 w-40 bg-white/10" />
                     </div>
                     <div className="card-body" style={{ padding: 0 }}>
                         {[0, 1, 2].map(i => (
                             <div key={i} className="flex items-center justify-between p-lg" style={{ borderBottom: '1px solid var(--border-color)' }}>
                                 <div className="flex items-center gap-lg">
-                                    <div className="w-12 h-12 rounded bg-white/10" />
+                                    <div className="w-12 h-12 bg-white/10" />
                                     <div>
-                                        <div className="h-4 w-40 rounded bg-white/10 mb-sm" />
-                                        <div className="h-3 w-24 rounded bg-white/10" />
+                                        <div className="h-4 w-40 bg-white/10 mb-sm" />
+                                        <div className="h-3 w-24 bg-white/10" />
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-xl">
-                                    <div className="h-8 w-12 rounded bg-white/10" />
-                                    <div className="h-8 w-12 rounded bg-white/10" />
-                                    <div className="h-8 w-20 rounded bg-white/10" />
+                                    <div className="h-8 w-12 bg-white/10" />
+                                    <div className="h-8 w-12 bg-white/10" />
+                                    <div className="h-8 w-20 bg-white/10" />
                                 </div>
                             </div>
                         ))}
@@ -247,7 +247,7 @@ export default function RiskAuditsPage() {
                         </h3>
                     </div>
                     <div className="card-body">
-                        <div style={{ display: 'flex', height: '40px', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', height: '40px', overflow: 'hidden' }}>
                             {summary.highRiskCount > 0 && (
                                 <div style={{
                                     flex: summary.highRiskCount,
@@ -338,7 +338,6 @@ export default function RiskAuditsPage() {
                                         <div style={{
                                             width: 48,
                                             height: 48,
-                                            borderRadius: 'var(--radius-md)',
                                             background: 'var(--bg-primary)',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -357,7 +356,6 @@ export default function RiskAuditsPage() {
                                                     padding: '2px 8px',
                                                     background: risk.color,
                                                     color: '#fff',
-                                                    borderRadius: 'var(--radius-sm)',
                                                     fontWeight: 600
                                                 }}>
                                                     {risk.label}

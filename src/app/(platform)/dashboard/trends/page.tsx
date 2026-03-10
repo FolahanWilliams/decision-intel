@@ -134,11 +134,11 @@ export default function TrendsPage() {
                 <>
                     <div className="card mb-xl animate-pulse">
                         <div className="card-header">
-                            <div className="h-4 w-48 rounded bg-white/10" />
+                            <div className="h-4 w-48 bg-white/10" />
                         </div>
                         <div className="card-body" style={{ height: 400, display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'flex-end', padding: '24px' }}>
                             {[80, 60, 90, 50, 70, 85, 65, 75, 55, 95].map((h, i) => (
-                                <div key={i} className="rounded bg-white/10" style={{ height: `${h}%`, width: `${100 / 10 - 1}%`, display: 'inline-block', marginRight: '1%' }} />
+                                <div key={i} className="bg-white/10" style={{ height: `${h}%`, width: `${100 / 10 - 1}%`, display: 'inline-block', marginRight: '1%' }} />
                             ))}
                         </div>
                     </div>
@@ -146,7 +146,7 @@ export default function TrendsPage() {
                         {[0, 1].map(i => (
                             <div key={i} className="card animate-pulse">
                                 <div className="card-header">
-                                    <div className="h-4 w-36 rounded bg-white/10" />
+                                    <div className="h-4 w-36 bg-white/10" />
                                 </div>
                                 <div className="card-body" style={{ height: 250, background: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 8px, transparent 8px, transparent 16px)' }} />
                             </div>
@@ -211,7 +211,6 @@ export default function TrendsPage() {
                                     <div key={i} style={{
                                         padding: '12px',
                                         background: 'var(--bg-tertiary)',
-                                        borderRadius: 'var(--radius-sm)',
                                         borderLeft: `3px solid ${impact.status === 'High' ? 'var(--error)' : impact.status === 'Medium' ? 'var(--warning)' : 'var(--success)'}`
                                     }}>
                                         <div className="flex justify-between mb-xs">
@@ -311,7 +310,6 @@ export default function TrendsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-card)',
                                             border: '1px solid var(--border-color)',
-                                            borderRadius: '12px',
                                         }}
                                         itemStyle={{ color: 'var(--text-primary)' }}
                                         labelFormatter={(label) => `Date: ${label}`}
@@ -393,7 +391,7 @@ export default function TrendsPage() {
                                         <YAxis hide domain={[0, 100]} />
                                         <Tooltip
                                             cursor={{ stroke: 'var(--glass-border)' }}
-                                            contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
+                                            contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
                                             labelFormatter={(label) => `Date: ${label}`}
                                             formatter={(value) => [`${value}%`, 'Noise Level']}
                                         />
@@ -430,7 +428,7 @@ export default function TrendsPage() {
                                                 tickLine={false}
                                             />
                                             <Tooltip
-                                                contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
+                                                contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
                                                 formatter={(value) => [`${value} occurrences`, 'Count']}
                                             />
                                             <Bar dataKey="value" fill="var(--error)" barSize={16}>
@@ -469,7 +467,7 @@ export default function TrendsPage() {
                                         fontSize={10}
                                     />
                                     <Tooltip
-                                        contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
+                                        contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
                                         labelFormatter={(label) => `Date: ${label}`}
                                         formatter={(value) => [`${value} documents`, 'Analyzed']}
                                     />

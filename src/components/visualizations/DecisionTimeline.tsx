@@ -32,14 +32,14 @@ export function DecisionTimeline({ events }: DecisionTimelineProps) {
             {events.map((event) => (
                 <div key={event.id} className="relative group">
                     {/* Timeline Node */}
-                    <div className="absolute -left-[29px] top-1 bg-background p-1 border border-border rounded-full group-hover:border-accent-primary group-hover:scale-110 transition-all">
+                    <div className="absolute -left-[29px] top-1 bg-background p-1 border border-border  group-hover:border-accent-primary group-hover:scale-110 transition-all">
                         {getIcon(event.type, event.status)}
                     </div>
 
                     <div className="space-y-1">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-mono text-muted">{event.date}</span>
-                            <span className="text-[10px] tracking-wide text-muted/50 border border-border px-2 rounded-full">
+                            <span className="text-[10px] tracking-wide text-muted/50 border border-border px-2 ">
                                 {event.type}
                             </span>
                         </div>

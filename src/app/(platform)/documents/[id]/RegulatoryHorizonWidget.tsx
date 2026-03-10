@@ -42,7 +42,7 @@ export function RegulatoryHorizonWidget({ compliance }: RegulatoryHorizonWidgetP
 
             <div className="card-body">
                 {/* Executive Summary */}
-                <div className="bg-surface-hover p-4 rounded-md mb-6 border border-border/50">
+                <div className="bg-surface-hover p-4 mb-6 border border-border/50">
                     <h4 className="text-xs font-bold uppercase text-muted mb-2">Executive Summary</h4>
                     <p className="text-sm leading-relaxed">{compliance.summary}</p>
                 </div>
@@ -67,7 +67,7 @@ export function RegulatoryHorizonWidget({ compliance }: RegulatoryHorizonWidgetP
                             <ShieldCheck size={14} /> Regulatory Frameworks Analyzed
                         </h4>
                         {compliance.regulations.map((reg, idx) => (
-                            <div key={idx} className="flex items-start gap-4 p-3 rounded bg-surface border border-border hover:border-cyan-500/30 transition-colors">
+                            <div key={idx} className="flex items-start gap-4 p-3 bg-surface border border-border hover:border-cyan-500/30 transition-colors">
                                 <div className="mt-1">
                                     {reg.status === 'COMPLIANT' ? <CheckCircle size={16} className="text-success" /> :
                                         reg.status === 'NON_COMPLIANT' ? <XCircle size={16} className="text-error" /> :
@@ -96,7 +96,7 @@ export function RegulatoryHorizonWidget({ compliance }: RegulatoryHorizonWidgetP
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {compliance.searchQueries.map((query, idx) => (
-                                <span key={idx} className="px-2 py-1 rounded-lg bg-surface-hover text-[10px] border border-border/50 flex items-center gap-1">
+                                <span key={idx} className="px-2 py-1 bg-surface-hover text-[10px] border border-border/50 flex items-center gap-1">
                                     {query} <ExternalLink size={8} className="opacity-50" />
                                 </span>
                             ))}

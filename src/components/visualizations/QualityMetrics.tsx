@@ -88,7 +88,7 @@ export function ScoreCard({ title, score, trend, trendValue, description, severi
   const colorClass = colors[severity];
 
   return (
-    <div className={`p-4 rounded-lg border ${colorClass}`}>
+    <div className={`p-4  border ${colorClass}`}>
       <div className="flex items-start justify-between mb-2">
         <h4 className="text-sm font-medium opacity-80">{title}</h4>
         {trend && (
@@ -123,9 +123,9 @@ export function MetricBar({ label, value, maxValue = 100, color, showValue = tru
         <span className="text-muted">{label}</span>
         {showValue && <span className="font-medium">{value}</span>}
       </div>
-      <div className="h-2 bg-secondary rounded-full overflow-hidden">
+      <div className="h-2 bg-secondary  overflow-hidden">
         <div 
-          className="h-full rounded-full transition-all duration-700 ease-out"
+          className="h-full  transition-all duration-700 ease-out"
           style={{ width: `${percentage}%`, backgroundColor: color }}
         />
       </div>

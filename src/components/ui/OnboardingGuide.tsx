@@ -27,7 +27,6 @@ const STEPS = [
 const STORAGE_KEY = 'decision-intel-onboarding-dismissed';
 
 export function OnboardingGuide() {
-    // Start dismissed to avoid flash; useEffect reveals if not yet dismissed
     const [dismissed, setDismissed] = useState(true);
 
     useEffect(() => {
@@ -49,9 +48,9 @@ export function OnboardingGuide() {
             role="region"
             aria-label="Getting started guide"
         >
-            <div className="card-header" style={{ background: 'rgba(245, 158, 11, 0.06)' }}>
-                <h3 style={{ color: 'var(--accent-primary)', fontSize: '12px' }}>
-                    GETTING_STARTED
+            <div className="card-header" style={{ background: 'rgba(99, 102, 241, 0.06)' }}>
+                <h3 style={{ color: 'var(--accent-primary)', fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    Getting Started
                 </h3>
                 <button
                     onClick={handleDismiss}
@@ -81,7 +80,7 @@ export function OnboardingGuide() {
                                 alignItems: 'center',
                                 gap: '8px',
                                 padding: 'var(--spacing-md)',
-                                background: index === currentStep ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
+                                background: index === currentStep ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
                                 border: index === currentStep ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
                                 cursor: 'pointer',
                                 color: 'inherit',
@@ -96,7 +95,7 @@ export function OnboardingGuide() {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 background: index <= currentStep ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-                                color: index <= currentStep ? '#000' : 'var(--text-muted)',
+                                color: index <= currentStep ? '#fff' : 'var(--text-muted)',
                                 fontSize: '12px',
                                 fontWeight: 700,
                             }}>

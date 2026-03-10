@@ -36,11 +36,8 @@ export default function Sidebar() {
                     top: '52px',
                     left: '12px',
                     zIndex: 60,
-                    background: 'var(--glass-bg)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    border: '1px solid var(--glass-border)',
-                    borderRadius: '10px',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
                     color: 'var(--text-primary)',
                     padding: '8px',
                     cursor: 'pointer',
@@ -58,8 +55,7 @@ export default function Sidebar() {
                     style={{
                         position: 'fixed',
                         inset: 0,
-                        background: 'rgba(0,0,0,0.5)',
-                        backdropFilter: 'blur(4px)',
+                        background: 'rgba(0,0,0,0.6)',
                         zIndex: 69,
                     }}
                     onClick={() => setMobileOpen(false)}
@@ -75,7 +71,7 @@ export default function Sidebar() {
                 style={{
                     width: sidebarWidth,
                     minWidth: sidebarWidth,
-                    borderRight: '1px solid var(--glass-border)',
+                    borderRight: '1px solid var(--border-color)',
                     display: 'flex',
                     flexDirection: 'column',
                     background: 'var(--bg-secondary)',
@@ -89,7 +85,7 @@ export default function Sidebar() {
                 {/* Brand */}
                 <div style={{
                     padding: collapsed ? '16px 12px' : '24px 20px',
-                    borderBottom: '1px solid var(--glass-border)',
+                    borderBottom: '1px solid var(--border-color)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -101,7 +97,7 @@ export default function Sidebar() {
                                 <span style={{ color: 'var(--text-highlight)' }}>Decision</span>
                                 <span style={{ color: 'var(--accent-primary)', marginLeft: '4px' }}>Intel</span>
                             </div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                                 Intelligence Platform
                             </div>
                         </div>
@@ -114,9 +110,8 @@ export default function Sidebar() {
                         aria-label={mobileOpen ? 'Close navigation' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                         className="hidden md:flex"
                         style={{
-                            background: 'var(--glass-bg)',
-                            border: '1px solid var(--glass-border)',
-                            borderRadius: '8px',
+                            background: 'var(--bg-tertiary)',
+                            border: '1px solid var(--border-color)',
                             color: 'var(--text-muted)',
                             cursor: 'pointer',
                             padding: '6px',
@@ -148,10 +143,12 @@ export default function Sidebar() {
                 <nav style={{ padding: collapsed ? '12px 8px' : '16px 12px', flex: 1, overflowY: 'auto' }}>
                     {!collapsed && (
                         <div style={{
-                            fontSize: '11px',
+                            fontSize: '10px',
                             fontWeight: 600,
                             color: 'var(--text-muted)',
                             padding: '0 10px 8px',
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
                         }}>
                             Platform
                         </div>
@@ -161,10 +158,12 @@ export default function Sidebar() {
 
                     {!collapsed && (
                         <div style={{
-                            fontSize: '11px',
+                            fontSize: '10px',
                             fontWeight: 600,
                             color: 'var(--text-muted)',
                             padding: '20px 10px 8px',
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
                         }}>
                             Analysis
                         </div>
@@ -188,10 +187,12 @@ export default function Sidebar() {
 
                     {!collapsed && (
                         <div style={{
-                            fontSize: '11px',
+                            fontSize: '10px',
                             fontWeight: 600,
                             color: 'var(--text-muted)',
                             padding: '20px 10px 8px',
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
                         }}>
                             System
                         </div>
@@ -203,7 +204,7 @@ export default function Sidebar() {
 
                 <div style={{
                     padding: collapsed ? '12px' : '16px 20px',
-                    borderTop: '1px solid var(--glass-border)',
+                    borderTop: '1px solid var(--border-color)',
                 }}>
                     <div style={{
                         display: 'flex',
@@ -216,9 +217,7 @@ export default function Sidebar() {
                         <span style={{
                             width: '7px',
                             height: '7px',
-                            borderRadius: '50%',
                             background: 'var(--success)',
-                            boxShadow: '0 0 6px rgba(34, 197, 94, 0.4)',
                             flexShrink: 0,
                         }} />
                         {!collapsed && <span>Online</span>}
@@ -241,7 +240,6 @@ export default function Sidebar() {
                     }
                     aside[role="navigation"].sidebar-mobile-open {
                         transform: translateX(0);
-                        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4);
                     }
                 }
             `}</style>
@@ -263,8 +261,8 @@ function NavItem({ href, icon, label, active, collapsed, onNavigate, badge }: { 
                 gap: collapsed ? '0' : '12px',
                 padding: collapsed ? '10px' : '9px 12px',
                 color: active ? 'var(--text-highlight)' : 'var(--text-secondary)',
-                background: active ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
-                borderRadius: '10px',
+                background: active ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                borderLeft: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
                 marginBottom: '2px',
                 fontSize: '13.5px',
                 fontWeight: active ? 600 : 400,
@@ -283,9 +281,8 @@ function NavItem({ href, icon, label, active, collapsed, onNavigate, badge }: { 
                 {badge && (
                     <span style={{
                         position: 'absolute', top: '-3px', right: '-3px',
-                        width: '7px', height: '7px', borderRadius: '50%',
+                        width: '7px', height: '7px',
                         background: badge.color,
-                        boxShadow: `0 0 6px ${badge.color}`,
                     }} />
                 )}
             </span>

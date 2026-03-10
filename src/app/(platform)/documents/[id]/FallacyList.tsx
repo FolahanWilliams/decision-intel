@@ -6,8 +6,8 @@ import { AlertOctagon, Info } from 'lucide-react';
 export function FallacyList({ data }: { data: LogicalAnalysisResult }) {
     if (!data || data.fallacies.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 text-center border border-dashed border-border rounded-xl">
-                <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center mb-3">
+            <div className="flex flex-col items-center justify-center p-8 text-center border border-dashed border-border">
+                <div className="w-12 h-12 bg-emerald-500/10 flex items-center justify-center mb-3">
                     <Info className="w-6 h-6 text-emerald-500" />
                 </div>
                 <h4 className="font-medium">No Fallacies Detected</h4>
@@ -38,10 +38,10 @@ export function FallacyList({ data }: { data: LogicalAnalysisResult }) {
             </div>
 
             {data.fallacies.map((f, i) => (
-                <div key={i} className={`p-4 rounded-lg border ${severityColor(f.severity).split(' ')[2]} bg-card`}>
+                <div key={i} className={`p-4 border ${severityColor(f.severity).split(' ')[2]} bg-card`}>
                     <div className="flex items-start justify-between gap-4 mb-2">
                         <div>
-                            <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mb-1 ${severityColor(f.severity)}`}>
+                            <span className={`inline-block px-2 py-0.5 text-xs font-medium mb-1 ${severityColor(f.severity)}`}>
                                 {f.severity}
                             </span>
                             <h4 className="font-semibold text-foreground">{f.name}</h4>

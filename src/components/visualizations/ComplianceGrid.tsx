@@ -64,10 +64,8 @@ export function ComplianceGrid({ data }: ComplianceGridProps) {
                                 <div style={{
                                     width: 8,
                                     height: 8,
-                                    borderRadius: '50%',
-                                    background: config.color,
-                                    boxShadow: `0 0 6px ${config.color}40`,
-                                }} />
+                                                                        background: config.color,
+                                                                    }} />
                                 <span style={{ fontSize: '13px', fontWeight: 500 }}>{reg.name}</span>
                             </div>
                             {(['pass', 'warn', 'fail'] as const).map(status => (
@@ -76,8 +74,7 @@ export function ComplianceGrid({ data }: ComplianceGridProps) {
                                         <span style={{
                                             display: 'inline-block',
                                             padding: '2px 10px',
-                                            borderRadius: '9999px',
-                                            fontSize: '12px',
+                                                                                        fontSize: '12px',
                                             fontWeight: 600,
                                             background: STATUS_CONFIG[status].bg,
                                             color: STATUS_CONFIG[status].color,

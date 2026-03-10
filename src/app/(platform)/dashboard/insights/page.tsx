@@ -92,7 +92,6 @@ function StatCard({ label, value, icon, color, suffix, delay, trend }: {
                 <div style={{
                     width: 40,
                     height: 40,
-                    borderRadius: '10px',
                     border: `1px solid ${color}30`,
                     display: 'flex',
                     alignItems: 'center',
@@ -421,7 +420,6 @@ export default function InsightsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
                                             border: '1px solid var(--glass-border)',
-                                            borderRadius: '12px',
                                             fontSize: '11px',
                                             fontFamily: "'JetBrains Mono', monospace",
                                         }}
@@ -544,7 +542,6 @@ export default function InsightsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
                                             border: '1px solid var(--glass-border)',
-                                            borderRadius: '12px',
                                             fontSize: '11px',
                                             fontFamily: "'JetBrains Mono', monospace",
                                         }}
@@ -607,7 +604,6 @@ export default function InsightsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
                                             border: '1px solid var(--glass-border)',
-                                            borderRadius: '12px',
                                             fontSize: '11px',
                                             fontFamily: "'JetBrains Mono', monospace",
                                         }}
@@ -696,7 +692,7 @@ export default function InsightsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
                                             border: '1px solid var(--glass-border)',
-                                            borderRadius: '12px', fontSize: '11px',
+                                            fontSize: '11px',
                                             fontFamily: "'JetBrains Mono', monospace",
                                         }}
                                         formatter={(value: number | undefined) => [`${value ?? 0} occurrences`, 'Count']}
@@ -826,7 +822,7 @@ export default function InsightsPage() {
                                             contentStyle={{
                                                 background: 'var(--bg-secondary)',
                                                 border: '1px solid var(--glass-border)',
-                                                borderRadius: '12px', fontSize: '11px',
+                                                fontSize: '11px',
                                                 fontFamily: "'JetBrains Mono', monospace",
                                             }}
                                             formatter={(value: number | undefined) => [`${value ?? 0} votes`, 'Count']}

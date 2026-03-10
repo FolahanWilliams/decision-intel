@@ -7,7 +7,7 @@ export default function Ticker() {
             aria-label="System metrics"
             style={{
                 background: 'var(--bg-secondary)',
-                borderBottom: '1px solid var(--glass-border)',
+                borderBottom: '1px solid var(--border-color)',
                 height: '44px',
                 display: 'flex',
                 alignItems: 'center',
@@ -62,9 +62,8 @@ function TickerItem({ label, value, change, up, down, bad }: { label: string, va
                     fontSize: '11px',
                     fontWeight: 500,
                     fontFamily: "'JetBrains Mono', monospace",
-                    background: bad ? 'rgba(239, 68, 68, 0.1)' : up || down ? 'rgba(34, 197, 94, 0.1)' : 'transparent',
+                    background: bad ? 'rgba(185, 28, 28, 0.1)' : up || down ? 'rgba(34, 197, 94, 0.1)' : 'transparent',
                     padding: '1px 6px',
-                    borderRadius: '4px',
                 }} aria-label={`Change: ${change}`}>{change}</span>
             )}
         </div>

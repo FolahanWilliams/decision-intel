@@ -75,7 +75,6 @@ export default function SearchPage() {
                                 padding: 'var(--spacing-md)',
                                 background: 'var(--bg-secondary)',
                                 border: '1px solid var(--border-color)',
-                                borderRadius: 'var(--radius-sm)',
                                 color: 'var(--text-primary)',
                                 fontSize: '14px',
                             }}

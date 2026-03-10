@@ -88,13 +88,13 @@ export function IntelligenceTab({ intelligenceContext }: IntelligenceTabProps) {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {ctx.topCaseStudies.map((c, i) => (
-                            <div key={i} style={{ padding: '12px', background: 'var(--bg-secondary)', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
+                            <div key={i} style={{ padding: '12px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                                     <span style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-primary)' }}>
                                         {c.company}
                                     </span>
                                     <span style={{
-                                        fontSize: '10px', padding: '2px 6px', borderRadius: '2px',
+                                        fontSize: '10px', padding: '2px 6px',
                                         background: c.outcome.toLowerCase().includes('fail') ? 'rgba(255,82,82,0.1)' : 'rgba(76,175,80,0.1)',
                                         color: c.outcome.toLowerCase().includes('fail') ? 'var(--error)' : 'var(--success)',
                                         fontWeight: 600,
@@ -105,7 +105,7 @@ export function IntelligenceTab({ intelligenceContext }: IntelligenceTabProps) {
                                 <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                                     {c.biasTypes.map(b => (
                                         <span key={b} style={{
-                                            fontSize: '10px', padding: '1px 5px', borderRadius: '2px',
+                                            fontSize: '10px', padding: '1px 5px',
                                             border: '1px solid var(--border-color)', color: 'var(--text-muted)',
                                         }}>
                                             {b}

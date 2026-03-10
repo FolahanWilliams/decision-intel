@@ -56,8 +56,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                                 style={{
                                     background: q.bg,
                                     border: `1px solid ${q.borderColor}`,
-                                    borderRadius: '12px',
-                                    padding: '14px',
+                                                                        padding: '14px',
                                     minHeight: '130px',
                                 }}
                             >
@@ -119,8 +118,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                                                 marginTop: '4px',
                                                 cursor: 'pointer',
                                                 userSelect: 'none',
-                                                borderRadius: '4px',
-                                            }}
+                                                                                            }}
                                         >
                                             {isExpanded ? '↑ show less' : `+${items.length - 4} more`}
                                         </li>

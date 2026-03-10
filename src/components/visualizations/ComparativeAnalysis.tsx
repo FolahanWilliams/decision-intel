@@ -58,9 +58,9 @@ export function ComparativeAnalysis({ documents }: DocumentComparisonProps) {
                       <span className={`font-bold ${isHighest ? 'text-accent-primary' : 'text-muted-foreground'}`}>
                         {value}
                       </span>
-                      <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden w-24">
+                      <div className="flex-1 h-1.5 bg-secondary  overflow-hidden w-24">
                         <div
-                          className={`h-full rounded-full ${metric.color} opacity-80`}
+                          className={`h-full  ${metric.color} opacity-80`}
                           style={{ width: `${(value / 100) * 100}%` }}
                         />
                       </div>
@@ -105,7 +105,7 @@ export function TrendOverlay({ data }: TrendOverlayProps) {
   }, [data]);
 
   return (
-    <div className="w-full overflow-hidden bg-secondary/10 rounded-lg border border-border p-4">
+    <div className="w-full overflow-hidden bg-secondary/10  border border-border p-4">
       <h4 className="text-sm font-medium mb-4 flex items-center gap-2">
         <BarChart2 size={16} />
         Decision Quality Trend

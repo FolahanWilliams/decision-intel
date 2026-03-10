@@ -11,15 +11,12 @@ function SkeletonBlock({ className = '', style }: SkeletonProps) {
             className={`skeleton ${className}`}
             role="status"
             aria-label="Loading"
-            style={{
-                borderRadius: '12px',
-                ...style,
-            }}
+            style={style}
         />
     );
 }
 
-/** Standardized page-level loading skeleton matching the terminal aesthetic */
+/** Standardized page-level loading skeleton */
 export function PageSkeleton({ rows = 5 }: { rows?: number }) {
     return (
         <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
@@ -85,7 +82,7 @@ export function ChartSkeleton({ height = 240 }: { height?: number }) {
                 <SkeletonBlock style={{ width: '120px', height: '13px' }} />
             </div>
             <div className="card-body flex items-center justify-center" style={{ minHeight: height }}>
-                <SkeletonBlock style={{ width: '80%', height: '70%', borderRadius: '8px' }} />
+                <SkeletonBlock style={{ width: '80%', height: '70%' }} />
             </div>
         </div>
     );
@@ -101,7 +98,7 @@ export function TreemapSkeleton() {
             </div>
             <div className="card-body" style={{ height: 'clamp(240px, 30vw, 360px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '8px', padding: '16px' }}>
                 {[...Array(4)].map((_, i) => (
-                    <SkeletonBlock key={i} style={{ width: '100%', height: '100%', borderRadius: '8px' }} />
+                    <SkeletonBlock key={i} style={{ width: '100%', height: '100%' }} />
                 ))}
             </div>
         </div>
@@ -112,7 +109,7 @@ export function TreemapSkeleton() {
 export function GaugeSkeleton({ size = 120 }: { size?: number }) {
     return (
         <div className="flex flex-col items-center">
-            <SkeletonBlock style={{ width: size, height: size, borderRadius: '50%' }} />
+            <SkeletonBlock style={{ width: size, height: size }} />
             <SkeletonBlock style={{ width: '80px', height: '14px', marginTop: '8px' }} />
         </div>
     );

@@ -63,7 +63,6 @@ export function DecisionRadar({ data }: DecisionRadarProps) {
                             contentStyle={{
                                 background: 'var(--bg-secondary)',
                                 border: '1px solid var(--glass-border)',
-                                borderRadius: '12px',
                                 fontSize: '12px',
                             }}
                             formatter={(value: number | undefined) => [`${value ?? 0}/100`, 'Score']}

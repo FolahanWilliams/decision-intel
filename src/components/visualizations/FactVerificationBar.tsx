@@ -61,12 +61,11 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
                                 contentStyle={{
                                     background: 'var(--bg-secondary)',
                                     border: '1px solid var(--glass-border)',
-                                    borderRadius: '12px',
                                     fontSize: '12px',
                                 }}
                                 formatter={(value: number | undefined) => [`${value ?? 0} (${Math.round(((value ?? 0) / total) * 100)}%)`, 'Claims']}
                             />
-                            <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                            <Bar dataKey="value" radius={[0, 0, 0, 0]}>
                                 {chartData.map((entry, i) => (
                                     <Cell key={i} fill={entry.color} fillOpacity={0.8} />
                                 ))}

@@ -58,7 +58,7 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
     });
 
     return (
-        <div className="card h-full border-l-4 border-l-accent-primary shadow-sm flex flex-col">
+        <div className="card h-full border-l-4 border-l-accent-primary  flex flex-col">
             <div className="card-header pb-2">
                 <div className="flex justify-between items-center">
                     <h3 className="text-lg font-bold flex items-center gap-2">
@@ -73,7 +73,7 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
             </div>
             <div className="card-body flex-1 overflow-y-auto" style={{ maxHeight: '600px' }}>
                 <div
-                    className="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-wrap font-serif p-4 bg-muted/30 rounded-lg relative"
+                    className="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-wrap font-serif p-4 bg-muted/30  relative"
                     onClick={() => setSelectedBiasIndex(null)} // Click background to deselect
                 >
                     {parts.map((part, i) => (
@@ -97,15 +97,14 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                                     }
                                 }}
                             >
-                                <span className={`px-0.5 rounded-sm transition-all duration-200 ${getSeverityColor(part.bias.severity, selectedBiasIndex === i)}`}>
+                                <span className={`px-0.5  transition-all duration-200 ${getSeverityColor(part.bias.severity, selectedBiasIndex === i)}`}>
                                     {part.text}
                                 </span>
 
                                 {/* Tooltip - Visible on Hover OR Selection */}
                                 <div className={`
                                     absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-4 
-                                    bg-secondary text-foreground text-xs rounded-lg shadow-xl
-                                    transition-all duration-200 pointer-events-none z-50 backdrop-blur-sm border border-white/10
+                                    bg-secondary text-foreground text-xs                                      transition-all duration-200 pointer-events-none z-50  border border-white/10
                                     ${selectedBiasIndex === i ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'}
                                 `}>
                                     <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
@@ -118,7 +117,7 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                                     </div>
                                     <p className="text-muted mb-3 italic">&quot;{part.bias.excerpt}&quot;</p>
                                     <p className="text-muted mb-3">{part.bias.explanation}</p>
-                                    <div className="p-3 bg-accent-primary/10 border border-accent-primary/20 rounded-md">
+                                    <div className="p-3 bg-accent-primary/10 border border-accent-primary/20 ">
                                         <span className="font-semibold text-accent-primary block mb-1 flex items-center gap-1">
                                             <span>💡</span> Suggestion
                                         </span>
