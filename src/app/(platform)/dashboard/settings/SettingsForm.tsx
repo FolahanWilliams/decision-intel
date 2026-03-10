@@ -106,7 +106,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                 <div className="card-body">
                     <div className="grid grid-2 gap-lg">
                         <div>
-                            <label className="text-xs text-muted uppercase tracking-wider mb-xs block">Email</label>
+                            <label className="text-xs text-muted mb-xs font-medium block">Email</label>
                             <div style={{
                                 padding: 'var(--spacing-md)',
                                 background: 'var(--bg-secondary)',
@@ -117,7 +117,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                             </div>
                         </div>
                         <div>
-                            <label className="text-xs text-muted uppercase tracking-wider mb-xs block">Plan</label>
+                            <label className="text-xs text-muted mb-xs font-medium block">Plan</label>
                             <div style={{
                                 padding: 'var(--spacing-md)',
                                 background: 'var(--bg-secondary)',

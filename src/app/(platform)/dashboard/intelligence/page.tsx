@@ -325,13 +325,11 @@ export default function IntelligencePage() {
                             style={{
                                 padding: '4px 12px',
                                 fontSize: '11px',
-                                fontWeight: 600,
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
+                                fontWeight: 500,
                                 background: categoryFilter === cat ? 'var(--accent-primary)' : 'var(--bg-secondary)',
                                 color: categoryFilter === cat ? 'var(--bg-primary)' : 'var(--text-muted)',
-                                border: `1px solid ${categoryFilter === cat ? 'var(--accent-primary)' : 'var(--border-color)'}`,
-                                borderRadius: '2px',
+                                border: `1px solid ${categoryFilter === cat ? 'var(--accent-primary)' : 'var(--glass-border)'}`,
+                                borderRadius: '9999px',
                                 cursor: 'pointer',
                                 transition: 'all 0.1s',
                             }}
@@ -445,7 +443,7 @@ function MacroSection() {
                         className="card animate-slide-up"
                         style={{ animationDelay: `${0.05 * i}s`, padding: '14px' }}
                     >
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '4px' }}>
                             {ind.name}
                         </div>
                         <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'JetBrains Mono', monospace" }}>

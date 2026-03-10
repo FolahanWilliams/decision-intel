@@ -92,11 +92,11 @@ export function RegulatoryHorizonWidget({ compliance }: RegulatoryHorizonWidgetP
                     <div className="mt-6 pt-4 border-t border-border/50">
                         <div className="flex items-center gap-2 text-xs text-muted mb-2">
                             <Search size={12} />
-                            <span className="uppercase font-semibold">Live Verification Searches Performed</span>
+                            <span className="font-semibold">Live Verification Searches Performed</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {compliance.searchQueries.map((query, idx) => (
-                                <span key={idx} className="px-2 py-1 rounded bg-surface-hover text-[10px] font-mono border border-border/50 flex items-center gap-1">
+                                <span key={idx} className="px-2 py-1 rounded-lg bg-surface-hover text-[10px] border border-border/50 flex items-center gap-1">
                                     {query} <ExternalLink size={8} className="opacity-50" />
                                 </span>
                             ))}

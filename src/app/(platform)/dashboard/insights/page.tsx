@@ -16,7 +16,7 @@ import {
 } from 'recharts';
 import {
     Brain, Activity, ShieldCheck, AlertTriangle, RefreshCw, BarChart3,
-    Terminal, Cpu, Zap, TrendingUp,
+    Cpu, Zap, TrendingUp,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -126,11 +126,10 @@ function StatCard({ label, value, icon, color, suffix, delay, trend }: {
                     </div>
                     {trend !== undefined && trend !== 0 && (
                         <div style={{
-                            fontSize: '9px',
+                            fontSize: '10px',
                             color: trend > 0 ? 'var(--success)' : 'var(--error)',
                             fontFamily: "'JetBrains Mono', monospace",
                             marginTop: '2px',
-                            letterSpacing: '0.05em',
                         }}>
                             {trend > 0 ? '↑' : '↓'} {Math.abs(trend)} pts this period
                         </div>
@@ -244,26 +243,25 @@ export default function InsightsPage() {
                         <h1 style={{ fontSize: '1.25rem', marginBottom: '4px', border: 'none', padding: 0 }}>Visual Insights</h1>
                     </div>
                 </div>
-                <div className="card pixel-grid">
+                <div className="card">
                     <div className="card-body flex flex-col items-center" style={{ padding: 'var(--spacing-2xl) var(--spacing-xl)', textAlign: 'center' }}>
-                        <Terminal size={40} style={{ color: 'var(--text-muted)', marginBottom: '16px' }} />
-                        <h3 style={{ fontSize: '13px', marginBottom: '8px', color: 'var(--text-secondary)' }}>AWAITING DATA INPUT</h3>
+                        <BarChart3 size={40} style={{ color: 'var(--text-muted)', marginBottom: '16px', opacity: 0.5 }} />
+                        <h3 style={{ fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)', fontWeight: 600 }}>Awaiting Data</h3>
                         <p style={{
                             color: 'var(--text-muted)',
-                            fontSize: '11px',
+                            fontSize: '13px',
                             maxWidth: '360px',
                             lineHeight: 1.7,
-                            fontFamily: "'JetBrains Mono', monospace",
                         }}>
                             No analyses detected. Upload and scan documents to populate cross-document intelligence visualizations.
                         </p>
                         <div style={{
                             marginTop: '20px',
-                            fontSize: '10px',
+                            fontSize: '12px',
                             color: 'var(--accent-primary)',
-                            letterSpacing: '0.1em',
+                            fontWeight: 600,
                         }}>
-                            {'>'} <span className="terminal-cursor">RUN ANALYSIS TO BEGIN</span>
+                            Run an analysis to get started
                         </div>
                         <Link
                             href="/dashboard"
@@ -340,15 +338,12 @@ export default function InsightsPage() {
                         </h1>
                     </div>
                     <div style={{
-                        fontSize: '10px',
+                        fontSize: '12px',
                         color: 'var(--text-muted)',
-                        letterSpacing: '0.1em',
-                        textTransform: 'uppercase',
-                        fontFamily: "'JetBrains Mono', monospace",
                     }}>
-                        CROSS-DOCUMENT INTELLIGENCE
-                        <span style={{ color: 'var(--accent-primary)', marginLeft: '8px' }}>
-                            ● {insights.totalAnalyses} ANALYSES LOADED
+                        Cross-document intelligence
+                        <span style={{ color: 'var(--accent-primary)', marginLeft: '8px', fontWeight: 600 }}>
+                            · {insights.totalAnalyses} analyses loaded
                         </span>
                     </div>
                 </div>
@@ -378,7 +373,7 @@ export default function InsightsPage() {
             <SectionLabel index={2}>PERFORMANCE TRAJECTORY</SectionLabel>
             <div className="animate-slide-up card card-glow" style={{ animationDelay: '0.28s', marginBottom: 'var(--spacing-lg)' }}>
                 <div className="card-header flex items-center justify-between">
-                    <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                    <h3 style={{ fontSize: '12px', fontWeight: 600 }}>
                         <TrendingUp size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-primary)' }} />
                         QUALITY &amp; NOISE OVER TIME
                     </h3>
@@ -524,7 +519,7 @@ export default function InsightsPage() {
                 <ErrorBoundary sectionName="Score Distribution">
                     <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.6s' }}>
                         <div className="card-header">
-                            <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                            <h3 style={{ fontSize: '12px', fontWeight: 600 }}>
                                 <BarChart3 size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-primary)' }} />
                                 SCORE DISTRIBUTION
                             </h3>
@@ -580,7 +575,7 @@ export default function InsightsPage() {
                 <ErrorBoundary sectionName="Noise vs Quality">
                     <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.66s' }}>
                         <div className="card-header">
-                            <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                            <h3 style={{ fontSize: '12px', fontWeight: 600 }}>
                                 <Activity size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-secondary)' }} />
                                 NOISE vs QUALITY CORRELATION
                             </h3>
@@ -672,7 +667,7 @@ export default function InsightsPage() {
                 {/* Logical Fallacy Frequency */}
                 <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.64s' }}>
                     <div className="card-header">
-                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                        <h3 style={{ fontSize: '12px', fontWeight: 600 }}>
                             <AlertTriangle size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--warning)' }} />
                             LOGIC FALLACY FREQUENCY
                         </h3>
@@ -736,7 +731,7 @@ export default function InsightsPage() {
                 {/* Pre-Mortem Failure Scenarios */}
                 <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.7s' }}>
                     <div className="card-header">
-                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                        <h3 style={{ fontSize: '12px', fontWeight: 600 }}>
                             <ShieldCheck size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--error)' }} />
                             TOP FAILURE SCENARIOS
                         </h3>
@@ -798,7 +793,7 @@ export default function InsightsPage() {
                 {/* Decision Twin Vote Distribution */}
                 <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.76s' }}>
                     <div className="card-header flex items-center justify-between">
-                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                        <h3 style={{ fontSize: '12px', fontWeight: 600 }}>
                             <Brain size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--accent-primary)' }} />
                             DECISION TWIN VOTES
                         </h3>
@@ -870,7 +865,7 @@ export default function InsightsPage() {
                 {/* Cognitive Blind Spots */}
                 <div className="card card-glow animate-slide-up" style={{ animationDelay: '0.82s' }}>
                     <div className="card-header flex items-center justify-between">
-                        <h3 style={{ fontSize: '11px', letterSpacing: '0.08em' }}>
+                        <h3 style={{ fontSize: '12px', fontWeight: 600 }}>
                             <Activity size={14} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle', color: 'var(--warning)' }} />
                             COGNITIVE BLIND SPOTS
                         </h3>
@@ -887,8 +882,8 @@ export default function InsightsPage() {
                     <div className="card-body" style={{ padding: 'var(--spacing-md)' }}>
                         {insights.avgBlindSpotGap > 0 && (
                             <div style={{ marginBottom: '16px' }}>
-                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: "'JetBrains Mono', monospace", marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                                    avg cognitive diversity score
+                                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 500 }}>
+                                    Avg cognitive diversity score
                                 </div>
                                 <div style={{ height: '4px', background: 'var(--bg-secondary)', position: 'relative' }}>
                                     <div style={{
@@ -906,8 +901,8 @@ export default function InsightsPage() {
                         )}
                         {insights.topBlindSpots.length > 0 ? (
                             <>
-                                <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: "'JetBrains Mono', monospace", marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                                    most common blind spots
+                                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '8px', fontWeight: 500 }}>
+                                    Most common blind spots
                                 </div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                                     {insights.topBlindSpots.map((spot, i) => (
@@ -945,15 +940,13 @@ export default function InsightsPage() {
             <div style={{
                 marginTop: 'var(--spacing-xl)',
                 textAlign: 'center',
-                fontSize: '9px',
+                fontSize: '11px',
                 color: 'var(--text-muted)',
-                letterSpacing: '0.1em',
-                fontFamily: "'JetBrains Mono', monospace",
             }}>
-                LAST REFRESH: {refreshTime || '—'} UTC
-                <span style={{ margin: '0 8px', color: 'var(--border-color)' }}>│</span>
+                Last refresh: {refreshTime || '—'} UTC
+                <span style={{ margin: '0 8px', color: 'var(--border-color)' }}>·</span>
                 <ShieldCheck size={10} style={{ display: 'inline', verticalAlign: 'middle', color: 'var(--success)' }} />
-                {' '}SYSTEM NOMINAL
+                {' '}System nominal
             </div>
         </div>
     );

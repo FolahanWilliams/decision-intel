@@ -21,7 +21,7 @@ export function InstitutionalMemoryWidget({ memory }: InstitutionalMemoryWidgetP
             <div className="card-header flex items-center gap-2 pb-2 border-b border-border/50">
                 <History className="w-5 h-5 text-purple-500" />
                 <h3 className="text-lg font-semibold">Institutional Memory</h3>
-                <span className="ml-auto text-xs font-mono text-muted bg-surface-hover px-2 py-0.5 rounded-full">
+                <span className="ml-auto text-xs text-muted bg-surface-hover px-2 py-0.5 rounded-full" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                     Recall: {memory.recallScore}%
                 </span>
             </div>
@@ -34,7 +34,7 @@ export function InstitutionalMemoryWidget({ memory }: InstitutionalMemoryWidgetP
 
                 {/* Similar Cases List */}
                 <div className="space-y-3">
-                    <h4 className="text-xs uppercase tracking-wider font-semibold text-muted">Similar Past Decisions</h4>
+                    <h4 className="text-xs font-semibold text-muted">Similar Past Decisions</h4>
                     {memory.similarEvents.length === 0 ? (
                         <p className="text-sm text-muted">No similar historical cases found.</p>
                     ) : (

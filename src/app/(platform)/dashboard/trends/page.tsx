@@ -97,7 +97,7 @@ export default function TrendsPage() {
             <div className="flex items-center justify-between mb-xl pb-md" style={{ borderBottom: '1px solid var(--border-color)' }}>
                 <div>
                     <h1 style={{ fontSize: '1.5rem', marginBottom: '4px', border: 'none', padding: 0 }}>Historical Analysis</h1>
-                    <p style={{ fontSize: '11px', textTransform: 'uppercase' }}>
+                    <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                         Decision Quality Trends & Patterns
                         {data && data.stats.totalAnalyses > 0 && (
                             <span style={{ marginLeft: '8px', color: 'var(--accent-primary)' }}>

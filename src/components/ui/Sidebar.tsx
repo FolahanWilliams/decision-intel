@@ -152,7 +152,6 @@ export default function Sidebar() {
                             fontWeight: 600,
                             color: 'var(--text-muted)',
                             padding: '0 10px 8px',
-                            letterSpacing: '0.05em',
                         }}>
                             Platform
                         </div>
@@ -166,7 +165,6 @@ export default function Sidebar() {
                             fontWeight: 600,
                             color: 'var(--text-muted)',
                             padding: '20px 10px 8px',
-                            letterSpacing: '0.05em',
                         }}>
                             Analysis
                         </div>
@@ -194,7 +192,6 @@ export default function Sidebar() {
                             fontWeight: 600,
                             color: 'var(--text-muted)',
                             padding: '20px 10px 8px',
-                            letterSpacing: '0.05em',
                         }}>
                             System
                         </div>

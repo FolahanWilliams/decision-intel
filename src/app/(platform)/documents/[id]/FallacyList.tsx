@@ -41,7 +41,7 @@ export function FallacyList({ data }: { data: LogicalAnalysisResult }) {
                 <div key={i} className={`p-4 rounded-lg border ${severityColor(f.severity).split(' ')[2]} bg-card`}>
                     <div className="flex items-start justify-between gap-4 mb-2">
                         <div>
-                            <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium uppercase tracking-wider mb-1 ${severityColor(f.severity)}`}>
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mb-1 ${severityColor(f.severity)}`}>
                                 {f.severity}
                             </span>
                             <h4 className="font-semibold text-foreground">{f.name}</h4>
