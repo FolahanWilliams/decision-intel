@@ -66,7 +66,7 @@ export default async function AuditLogPage({
                     <div>
                         <div className="flex items-center gap-2 text-muted-foreground mb-2">
                             <ShieldCheck size={20} />
-                            <span className="text-sm font-medium">GOVERNANCE & COMPLIANCE</span>
+                            <span className="text-sm font-medium">Governance & Compliance</span>
                         </div>
                         <h1 className="text-3xl font-bold tracking-tight">Audit Log</h1>
                         <p className="text-muted-foreground mt-2">

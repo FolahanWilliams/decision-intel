@@ -293,7 +293,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             }
         } catch (err) {
             const msg = err instanceof Error ? err.message : 'Live scan failed';
-            setStreamLogs(prev => [...prev, { msg: `CRITICAL_ERROR: ${msg}`, type: 'bias', ts: new Date().toLocaleTimeString([], { hour12: false }) }]);
+            setStreamLogs(prev => [...prev, { msg: `Error: ${msg}`, type: 'bias', ts: new Date().toLocaleTimeString([], { hour12: false }) }]);
             showToast(msg, 'error');
         } finally {
             setIsScanning(false);
@@ -482,7 +482,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         <div style={{ padding: '12px 16px', background: 'rgba(66, 133, 244, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
                             <div className="flex items-center gap-sm" style={{ fontSize: '11px', fontWeight: 600, marginBottom: '8px', color: 'var(--accent-primary)' }}>
                                 <FileText size={12} />
-                                VERIFIED WITH GOOGLE SEARCH GROUNDING:
+                                Verified with Google Search Grounding
                             </div>
                             <div className="flex flex-wrap gap-sm">
                                 {analysis.factCheck.searchSources.map((source, i) => {
@@ -643,11 +643,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     <div className="card">
                         <div className="card-body p-md flex justify-around">
                             <div className="text-center">
-                                <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>CURRENT_DQ</div>
+                                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>Decision Quality</div>
                                 <div style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>{analysis ? Math.round(analysis.overallScore) : '--'}</div>
                             </div>
                             <div className="text-center">
-                                <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>CURRENT_NOISE</div>
+                                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>Noise Score</div>
                                 <div style={{ color: 'var(--accent-secondary)', fontWeight: 700 }}>{analysis ? Math.round(analysis.noiseScore) : '--'}</div>
                             </div>
                         </div>
@@ -681,7 +681,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                     </span>
                                 </div>
                             )) : (
-                                <div className="p-xl text-center text-muted text-xs">NO_DATA_AVAILABLE</div>
+                                <div className="p-xl text-center text-muted text-xs">No data available</div>
                             )}
                         </div>
                     </div>
