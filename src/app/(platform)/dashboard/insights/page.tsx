@@ -420,7 +420,6 @@ export default function InsightsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
                                             border: '1px solid var(--glass-border)',
-                                            borderRadius: '12px',
                                             fontSize: '11px',
                                             fontFamily: "'JetBrains Mono', monospace",
                                         }}
@@ -543,7 +542,6 @@ export default function InsightsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
                                             border: '1px solid var(--glass-border)',
-                                            borderRadius: '12px',
                                             fontSize: '11px',
                                             fontFamily: "'JetBrains Mono', monospace",
                                         }}
@@ -606,7 +604,6 @@ export default function InsightsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
                                             border: '1px solid var(--glass-border)',
-                                            borderRadius: '12px',
                                             fontSize: '11px',
                                             fontFamily: "'JetBrains Mono', monospace",
                                         }}
@@ -695,7 +692,7 @@ export default function InsightsPage() {
                                         contentStyle={{
                                             background: 'var(--bg-secondary)',
                                             border: '1px solid var(--glass-border)',
-                                            borderRadius: '12px', fontSize: '11px',
+                                            fontSize: '11px',
                                             fontFamily: "'JetBrains Mono', monospace",
                                         }}
                                         formatter={(value: number | undefined) => [`${value ?? 0} occurrences`, 'Count']}
@@ -825,7 +822,7 @@ export default function InsightsPage() {
                                             contentStyle={{
                                                 background: 'var(--bg-secondary)',
                                                 border: '1px solid var(--glass-border)',
-                                                borderRadius: '12px', fontSize: '11px',
+                                                fontSize: '11px',
                                                 fontFamily: "'JetBrains Mono', monospace",
                                             }}
                                             formatter={(value: number | undefined) => [`${value ?? 0} votes`, 'Count']}
