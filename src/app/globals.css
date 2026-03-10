@@ -278,9 +278,18 @@ pre {
   color: var(--text-primary);
 }
 
+.btn-ghost:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .btn-sm {
   padding: 0.3rem 0.75rem;
   font-size: 0.75rem;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .btn:disabled {
@@ -572,6 +581,60 @@ tr:hover td {
 }
 [data-compact="true"] .card-body { padding: var(--spacing-md); }
 [data-compact="true"] .card-header { padding: var(--spacing-sm) var(--spacing-md); }
+
+/* ═══════════════════════════════════════════
+   Modal Overlay
+   ═══════════════════════════════════════════ */
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInModal {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-overlay {
+  animation: fadeInOverlay 0.2s ease-out forwards;
+}
+
+.modal-content {
+  animation: slideInModal 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ═══════════════════════════════════════════
+   Interactive — touch-friendly tap target
+   ═══════════════════════════════════════════ */
+.interactive {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all var(--transition-fast);
+}
+
+.interactive:hover {
+  background: var(--bg-card-hover);
+}
+
+.interactive:active {
+  transform: scale(0.98);
+}
+
+/* ═══════════════════════════════════════════
+   Visualization label — standardized
+   ═══════════════════════════════════════════ */
+.viz-label {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.viz-section-header {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
 [data-compact="true"] h1 { font-size: 1.35rem; }
 [data-compact="true"] h2 { font-size: 1.2rem; }
 [data-compact="true"] h3 { font-size: 1rem; }

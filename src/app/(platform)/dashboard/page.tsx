@@ -319,9 +319,9 @@ export default function Dashboard() {
 
       {/* Stream timed out banner */}
       {streamTimedOut && !uploading && (
-        <div className="mb-lg p-md rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center gap-sm">
-          <AlertTriangle size={18} className="text-yellow-500 shrink-0" />
-          <span className="text-yellow-400 text-sm">
+        <div className="mb-lg p-md rounded-lg bg-warning/10 border border-warning/30 flex items-center gap-sm">
+          <AlertTriangle size={18} className="text-warning shrink-0" />
+          <span className="text-warning text-sm">
             Analysis is taking longer than expected. The server may still be processing — refresh the page or try again.
           </span>
         </div>
@@ -329,12 +329,12 @@ export default function Dashboard() {
 
       {/* Error Message - Compact */}
       {error && (
-        <div className="mb-lg p-md rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-sm">
-          <AlertTriangle size={18} className="text-red-500 shrink-0" />
-          <span className="text-red-400 text-sm">{error}</span>
+        <div className="mb-lg p-md rounded-lg bg-error/10 border border-error/30 flex items-center gap-sm">
+          <AlertTriangle size={18} className="text-error shrink-0" />
+          <span className="text-error text-sm">{error}</span>
           <button
             onClick={() => setError(null)}
-            className="ml-auto text-red-500/60 hover:text-red-500"
+            className="ml-auto text-error/60 hover:text-error"
           >
             <X size={16} />
           </button>
@@ -687,11 +687,11 @@ export default function Dashboard() {
           role="dialog"
           aria-modal="true"
           aria-label="Delete document confirmation"
-          className="fixed inset-0 bg-black/75 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 modal-overlay"
           onClick={() => { if (!deleting) setDeleteModal({ open: false, docId: '', filename: '' }); }}
           onKeyDown={(e) => { if (e.key === 'Escape' && !deleting) setDeleteModal({ open: false, docId: '', filename: '' }); }}
         >
-          <div className="card w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
+          <div className="card w-full max-w-sm mx-4 modal-content" onClick={e => e.stopPropagation()}>
             <div className="card-body">
               <div className="flex items-start gap-sm mb-lg">
                 <AlertTriangle size={20} className="text-error shrink-0 mt-0.5" />

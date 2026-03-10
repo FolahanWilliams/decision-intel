@@ -77,4 +77,45 @@ export function CardSkeleton({ lines = 3 }: { lines?: number }) {
     );
 }
 
+/** Skeleton for chart/gauge visualizations */
+export function ChartSkeleton({ height = 240 }: { height?: number }) {
+    return (
+        <div className="card card-glow h-full">
+            <div className="card-header">
+                <SkeletonBlock style={{ width: '120px', height: '13px' }} />
+            </div>
+            <div className="card-body flex items-center justify-center" style={{ minHeight: height }}>
+                <SkeletonBlock style={{ width: '80%', height: '70%', borderRadius: '8px' }} />
+            </div>
+        </div>
+    );
+}
+
+/** Skeleton for treemap visualizations */
+export function TreemapSkeleton() {
+    return (
+        <div className="card card-glow h-full">
+            <div className="card-header flex items-center justify-between">
+                <SkeletonBlock style={{ width: '100px', height: '13px' }} />
+                <SkeletonBlock style={{ width: '60px', height: '13px' }} />
+            </div>
+            <div className="card-body" style={{ height: 'clamp(240px, 30vw, 360px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: '8px', padding: '16px' }}>
+                {[...Array(4)].map((_, i) => (
+                    <SkeletonBlock key={i} style={{ width: '100%', height: '100%', borderRadius: '8px' }} />
+                ))}
+            </div>
+        </div>
+    );
+}
+
+/** Skeleton for gauge/radial visualizations */
+export function GaugeSkeleton({ size = 120 }: { size?: number }) {
+    return (
+        <div className="flex flex-col items-center">
+            <SkeletonBlock style={{ width: size, height: size, borderRadius: '50%' }} />
+            <SkeletonBlock style={{ width: '80px', height: '14px', marginTop: '8px' }} />
+        </div>
+    );
+}
+
 export { SkeletonBlock };

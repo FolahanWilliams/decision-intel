@@ -19,10 +19,10 @@ interface DocumentComparisonProps {
 
 export function ComparativeAnalysis({ documents }: DocumentComparisonProps) {
   const metrics = [
-    { key: 'quality', label: 'Decision Quality', color: 'bg-emerald-500' },
-    { key: 'risk', label: 'Risk Level', color: 'bg-red-500' },
-    { key: 'bias', label: 'Bias Count', color: 'bg-orange-500' },
-    { key: 'clarity', label: 'Clarity Score', color: 'bg-blue-500' },
+    { key: 'quality', label: 'Decision Quality', color: 'bg-success' },
+    { key: 'risk', label: 'Risk Level', color: 'bg-error' },
+    { key: 'bias', label: 'Bias Count', color: 'bg-accent-primary' },
+    { key: 'clarity', label: 'Clarity Score', color: 'bg-info' },
   ];
 
   return (

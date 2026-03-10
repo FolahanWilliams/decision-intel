@@ -79,10 +79,10 @@ interface ScoreCardProps {
 
 export function ScoreCard({ title, score, trend, trendValue, description, severity }: ScoreCardProps) {
   const colors = {
-    success: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
-    warning: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
-    error: 'text-red-400 border-red-500/30 bg-red-500/10',
-    info: 'text-blue-400 border-blue-500/30 bg-blue-500/10',
+    success: 'text-success border-success/30 bg-success/10',
+    warning: 'text-warning border-warning/30 bg-warning/10',
+    error: 'text-error border-error/30 bg-error/10',
+    info: 'text-info border-info/30 bg-info/10',
   };
 
   const colorClass = colors[severity];
@@ -92,7 +92,7 @@ export function ScoreCard({ title, score, trend, trendValue, description, severi
       <div className="flex items-start justify-between mb-2">
         <h4 className="text-sm font-medium opacity-80">{title}</h4>
         {trend && (
-          <span className={`text-xs ${trend === 'up' ? 'text-emerald-400' : trend === 'down' ? 'text-red-400' : 'text-muted'}`}>
+          <span className={`text-xs ${trend === 'up' ? 'text-success' : trend === 'down' ? 'text-error' : 'text-muted'}`}>
             {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'} {trendValue}
           </span>
         )}

@@ -25,10 +25,10 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
     const getSeverityColor = (severity: string, isSelected: boolean) => {
         const base = isSelected ? 'ring-2 ring-offset-1 ring-offset-accents-2' : '';
         switch (severity.toLowerCase()) {
-            case 'critical': return `${base} bg-red-500/30 hover:bg-red-500/50 border-b-2 border-red-500 cursor-help`;
-            case 'high': return `${base} bg-orange-500/30 hover:bg-orange-500/50 border-b-2 border-orange-500 cursor-help`;
-            case 'medium': return `${base} bg-yellow-500/30 hover:bg-yellow-500/50 border-b-2 border-yellow-500 cursor-help`;
-            default: return `${base} bg-blue-500/30 hover:bg-blue-500/50 border-b-2 border-blue-500 cursor-help`;
+            case 'critical': return `${base} bg-error/30 hover:bg-error/50 border-b-2 border-error cursor-help`;
+            case 'high': return `${base} bg-accent-primary/30 hover:bg-accent-primary/50 border-b-2 border-accent-primary cursor-help`;
+            case 'medium': return `${base} bg-warning/30 hover:bg-warning/50 border-b-2 border-warning cursor-help`;
+            default: return `${base} bg-info/30 hover:bg-info/50 border-b-2 border-info cursor-help`;
         }
     };
 
@@ -58,16 +58,16 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
     });
 
     return (
-        <div className="card h-full border-l-4 border-l-indigo-500 dark:border-l-indigo-400 shadow-sm flex flex-col">
+        <div className="card h-full border-l-4 border-l-accent-primary shadow-sm flex flex-col">
             <div className="card-header pb-2">
                 <div className="flex justify-between items-center">
                     <h3 className="text-lg font-bold flex items-center gap-2">
                         <span className="text-2xl">🔥</span> Cognitive Bias Heatmap
                     </h3>
                     <div className="flex gap-2">
-                        <span className="badge badge-error bg-red-500/10 text-red-600 border-red-200">Critical</span>
-                        <span className="badge badge-warning bg-orange-500/10 text-orange-600 border-orange-200">High</span>
-                        <span className="badge badge-warning bg-yellow-500/10 text-yellow-600 border-yellow-200">Med</span>
+                        <span className="badge badge-error bg-error/10 text-error border-error/30">Critical</span>
+                        <span className="badge badge-warning bg-accent-primary/10 text-accent-primary border-accent-primary/30">High</span>
+                        <span className="badge badge-warning bg-warning/10 text-warning border-warning/30">Med</span>
                     </div>
                 </div>
             </div>
@@ -81,9 +81,20 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                             <div
                                 key={i}
                                 className="group inline relative"
+                                role="button"
+                                tabIndex={0}
+                                aria-label={`${part.bias.biasType} bias (${part.bias.severity})`}
+                                aria-expanded={selectedBiasIndex === i}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setSelectedBiasIndex(selectedBiasIndex === i ? null : i);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setSelectedBiasIndex(selectedBiasIndex === i ? null : i);
+                                    }
                                 }}
                             >
                                 <span className={`px-0.5 rounded-sm transition-all duration-200 ${getSeverityColor(part.bias.severity, selectedBiasIndex === i)}`}>
@@ -93,28 +104,28 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
                                 {/* Tooltip - Visible on Hover OR Selection */}
                                 <div className={`
                                     absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-4 
-                                    bg-gray-900/95 text-white text-xs rounded-lg shadow-xl 
+                                    bg-secondary text-foreground text-xs rounded-lg shadow-xl
                                     transition-all duration-200 pointer-events-none z-50 backdrop-blur-sm border border-white/10
                                     ${selectedBiasIndex === i ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'}
                                 `}>
                                     <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
-                                        <p className="font-bold text-yellow-400 text-sm">{part.bias.biasType}</p>
+                                        <p className="font-bold text-warning text-sm">{part.bias.biasType}</p>
                                         <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase font-bold
-                                            ${part.bias.severity === 'critical' ? 'bg-red-500/20 text-red-400' :
-                                                part.bias.severity === 'high' ? 'bg-orange-500/20 text-orange-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                                            ${part.bias.severity === 'critical' ? 'bg-error/20 text-error' :
+                                                part.bias.severity === 'high' ? 'bg-accent-primary/20 text-accent-primary' : 'bg-warning/20 text-warning'}`}>
                                             {part.bias.severity}
                                         </span>
                                     </div>
-                                    <p className="text-gray-300 mb-3 italic">&quot;{part.bias.excerpt}&quot;</p>
-                                    <p className="text-gray-300 mb-3">{part.bias.explanation}</p>
-                                    <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-md">
-                                        <span className="font-semibold text-indigo-300 block mb-1 flex items-center gap-1">
+                                    <p className="text-muted mb-3 italic">&quot;{part.bias.excerpt}&quot;</p>
+                                    <p className="text-muted mb-3">{part.bias.explanation}</p>
+                                    <div className="p-3 bg-accent-primary/10 border border-accent-primary/20 rounded-md">
+                                        <span className="font-semibold text-accent-primary block mb-1 flex items-center gap-1">
                                             <span>💡</span> Suggestion
                                         </span>
                                         {part.bias.suggestion}
                                     </div>
                                     {/* Arrow */}
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-gray-900/95"></div>
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-secondary"></div>
                                 </div>
                             </div>
                         ) : (

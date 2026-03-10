@@ -59,16 +59,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         // Default fallback UI
         const sectionLabel = this.props.sectionName ?? 'This section';
         return (
-            <div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950 p-4">
-                <h3 className="text-sm font-semibold text-red-700 dark:text-red-400">
+            <div className="rounded-lg border border-error/20 bg-error/5 p-4">
+                <h3 className="text-sm font-semibold text-error">
                     {sectionLabel} encountered an error
                 </h3>
-                <p className="mt-1 text-xs text-red-600 dark:text-red-500">
+                <p className="mt-1 text-xs text-error/80">
                     {error.message}
                 </p>
                 <button
                     onClick={this.reset}
-                    className="mt-2 text-xs underline text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    className="mt-2 text-xs underline text-error/70 hover:text-error"
                 >
                     Try again
                 </button>

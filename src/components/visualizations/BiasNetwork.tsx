@@ -45,16 +45,16 @@ const biasRelationships: Record<string, string[]> = {
 };
 
 const severityColors: Record<string, string> = {
-  low: '#10b981',
-  medium: '#f59e0b',
-  high: '#ef4444',
-  critical: '#dc2626',
+  low: 'var(--success)',
+  medium: 'var(--warning)',
+  high: 'var(--error)',
+  critical: 'var(--error)',
 };
 
 const categoryColors: Record<string, string> = {
-  cognitive: '#6366f1',
-  emotional: '#ec4899',
-  social: '#8b5cf6',
+  cognitive: 'var(--accent-primary)',
+  emotional: 'var(--accent-secondary)',
+  social: 'var(--accent-secondary)',
 };
 
 export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
@@ -161,9 +161,19 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
             return (
               <g
                 key={node.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`${node.name} bias, severity: ${node.severity}, category: ${node.category}`}
+                aria-pressed={isSelected}
                 onClick={() => setSelectedNodeId(isSelected ? null : node.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedNodeId(isSelected ? null : node.id);
+                  }
+                }}
                 className="cursor-pointer transition-all duration-300"
-                style={{ opacity: isDimmed ? 0.2 : 1 }}
+                style={{ opacity: isDimmed ? 0.2 : 1, outline: 'none' }}
               >
                 {/* Glow effect for selected */}
                 {isSelected && (
@@ -272,10 +282,10 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
           </div>
         ) : (
           <div className="flex flex-wrap gap-4 justify-center text-xs mt-2 border-t border-white/5 pt-4">
-            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500" /> <span className="text-muted">Low</span></div>
-            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500" /> <span className="text-muted">Medium</span></div>
-            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500" /> <span className="text-muted">High</span></div>
-            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-red-600/20 border border-red-600" /> <span className="text-muted">Critical</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-success/20 border border-success" /> <span className="text-muted">Low</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-warning/20 border border-warning" /> <span className="text-muted">Medium</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-error/20 border border-error" /> <span className="text-muted">High</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-error/20 border border-error" /> <span className="text-muted">Critical</span></div>
           </div>
         )}
       </div>

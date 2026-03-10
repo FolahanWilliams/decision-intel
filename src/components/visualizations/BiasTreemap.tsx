@@ -8,10 +8,10 @@ interface BiasTreemapProps {
 }
 
 const SEVERITY_COLORS = {
-    critical: '#ef4444',
-    high: '#f97316',
-    medium: '#eab308',
-    low: '#22c55e',
+    critical: 'var(--error)',
+    high: 'var(--accent-primary)',
+    medium: 'var(--warning)',
+    low: 'var(--success)',
 };
 
 interface TreemapContentProps {
@@ -86,7 +86,7 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
                 <div className="card-header">
                     <h3 style={{ fontSize: '13px' }}>Bias Landscape</h3>
                 </div>
-                <div className="card-body flex items-center justify-center" style={{ height: 320 }}>
+                <div className="card-body flex items-center justify-center" style={{ minHeight: 200 }}>
                     <p className="text-muted" style={{ fontSize: '12px' }}>No data</p>
                 </div>
             </div>
@@ -128,7 +128,7 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
                     </span>
                 </div>
             </div>
-            <div className="card-body" style={{ height: 320 }}>
+            <div className="card-body" style={{ height: 'clamp(240px, 30vw, 360px)' }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <Treemap
                         data={treemapData}
