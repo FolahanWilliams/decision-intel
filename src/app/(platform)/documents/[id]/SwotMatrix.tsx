@@ -16,9 +16,9 @@ export function SwotMatrix({ data }: { data: SwotAnalysisResult }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {sections.map((s) => (
-                <div key={s.title} className="p-4 rounded-xl border border-border bg-card/50">
+                <div key={s.title} className="p-4 border border-border bg-card/50">
                     <div className="flex items-center gap-2 mb-3">
-                        <div className={`p-2 rounded-lg ${s.bg}`}>
+                        <div className={`p-2 ${s.bg}`}>
                             <s.icon className={`w-5 h-5 ${s.color}`} />
                         </div>
                         <h4 className="font-semibold">{s.title}</h4>
@@ -26,14 +26,14 @@ export function SwotMatrix({ data }: { data: SwotAnalysisResult }) {
                     <ul className="space-y-2">
                         {s.items.map((item, i) => (
                             <li key={i} className="text-sm text-muted-foreground flex gap-2">
-                                <span className={`mt-1.5 w-1.5 h-1.5 rounded-full bg-current opacity-50 shrink-0`} />
+                                <span className={`mt-1.5 w-1.5 h-1.5 bg-current opacity-50 shrink-0`} />
                                 {item}
                             </li>
                         ))}
                     </ul>
                 </div>
             ))}
-            <div className="md:col-span-2 mt-4 p-4 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 border border-indigo-500/30">
+            <div className="md:col-span-2 mt-4 p-4 bg-gradient-to-r from-slate-900 to-slate-800 border border-indigo-500/30">
                 <h4 className="text-indigo-400 font-semibold mb-2 flex items-center gap-2">
                     <Target className="w-4 h-4" /> Strategic Advice
                 </h4>

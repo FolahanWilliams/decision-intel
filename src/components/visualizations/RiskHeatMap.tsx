@@ -85,7 +85,7 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
             }}
           >
             {/* Gradient Background for "Zones" */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-success/10 via-warning/5 to-error/10 pointer-events-none rounded-lg" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-success/10 via-warning/5 to-error/10 pointer-events-none " />
 
             {Array.from({ length: gridSize * gridSize }).map((_, idx) => {
               const row = Math.floor(idx / gridSize);
@@ -111,10 +111,10 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
                     }
                   }}
                   className={`
-                    relative rounded-md flex items-center justify-center cursor-pointer
+                    relative  flex items-center justify-center cursor-pointer
                     transition-all duration-200 border border-transparent
                     ${cell ? getCellColor(impact, probability) : 'hover:bg-white/5'}
-                    ${isSelected ? 'ring-2 ring-white scale-105 z-10 shadow-lg' : 'hover:scale-105 hover:z-10'}
+                    ${isSelected ? 'ring-2 ring-white scale-105 z-10 ' : 'hover:scale-105 hover:z-10'}
                   `}
                   style={{
                     opacity: cell ? getOpacity(cell.count) : 0.1,
@@ -152,19 +152,19 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
       {/* Legend */}
       <div className="flex justify-center gap-4 mt-6">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-success/70" />
+          <div className="w-3 h-3  bg-success/70" />
           <span className="text-xs text-muted">Low</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-warning" />
+          <div className="w-3 h-3  bg-warning" />
           <span className="text-xs text-muted">Medium</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-accent-primary" />
+          <div className="w-3 h-3  bg-accent-primary" />
           <span className="text-xs text-muted">High</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-error" />
+          <div className="w-3 h-3  bg-error" />
           <span className="text-xs text-muted">Critical</span>
         </div>
       </div>
@@ -188,14 +188,14 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
         {filteredRisks.length > 0 ? (
           <div className="max-h-60 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
             {filteredRisks.map((risk, idx) => (
-              <div key={idx} className="p-3 rounded bg-secondary/30 border border-white/5 hover:bg-secondary/50 transition-colors">
+              <div key={idx} className="p-3  bg-secondary/30 border border-white/5 hover:bg-secondary/50 transition-colors">
                 <div className="flex items-start justify-between mb-1">
                   <span className="font-medium text-sm text-foreground/90">{risk.category}</span>
                   <div className="flex gap-1">
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-muted`}>
+                    <span className={`text-[10px] px-1.5 py-0.5  bg-white/10 text-muted`}>
                       I: {Math.round(risk.impact)}%
                     </span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-muted`}>
+                    <span className={`text-[10px] px-1.5 py-0.5  bg-white/10 text-muted`}>
                       P: {Math.round(risk.probability)}%
                     </span>
                   </div>
@@ -207,7 +207,7 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted text-sm border border-dashed border-white/10 rounded">
+          <div className="text-center py-8 text-muted text-sm border border-dashed border-white/10 ">
             No risks found in this zone.
           </div>
         )}
@@ -274,7 +274,7 @@ export function RiskTimeline({ risks }: RiskTimelineProps) {
           return (
             <div key={period} className="relative pl-10">
               {/* Timeline dot */}
-              <div className="absolute left-2 top-2 w-4 h-4 rounded-full bg-accent-primary border-4 border-bg-primary" />
+              <div className="absolute left-2 top-2 w-4 h-4  bg-accent-primary border-4 border-bg-primary" />
 
               {/* Period label */}
               <div className="mb-2">
@@ -287,16 +287,16 @@ export function RiskTimeline({ risks }: RiskTimelineProps) {
                 {periodRisks.map((risk, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-lg bg-secondary/50 border border-border flex items-center justify-between"
+                    className="p-3  bg-secondary/50 border border-border flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-2 h-8 rounded-full ${getSeverityColor(risk.severity)}`} />
+                      <div className={`w-2 h-8  ${getSeverityColor(risk.severity)}`} />
                       <div>
                         <p className="text-sm font-medium">{risk.title}</p>
                         <p className="text-xs text-muted">{Math.round(risk.probability)}% probability</p>
                       </div>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${getSeverityColor(risk.severity)} text-white`}>
+                    <span className={`text-xs px-2 py-1  ${getSeverityColor(risk.severity)} text-white`}>
                       {risk.severity}
                     </span>
                   </div>
@@ -328,7 +328,7 @@ export function RiskSummary({ totalRisks, criticalRisks, highRisks, mitigatedRis
   return (
     <div className="grid grid-cols-4 gap-4">
       {stats.map((stat, idx) => (
-        <div key={idx} className="text-center p-3 rounded-lg bg-secondary/30">
+        <div key={idx} className="text-center p-3  bg-secondary/30">
           <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
           <p className="text-xs text-muted">{stat.label}</p>
         </div>

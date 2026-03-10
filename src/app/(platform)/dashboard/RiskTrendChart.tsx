@@ -42,7 +42,7 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
                         tick={{ fontSize: 11, fill: '#64748B' }}
                     />
                     <Tooltip
-                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ border: 'none' }}
                         itemStyle={{ color: '#1e293b', fontWeight: 600 }}
                     />
                     <Area

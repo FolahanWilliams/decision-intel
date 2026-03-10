@@ -45,11 +45,11 @@ export function NoiseJudge({ analysis }: { analysis: AnalysisResult['noiseStats'
                             <table className="w-full text-sm text-left">
                                 <thead className="text-xs text-muted-foreground uppercase bg-secondary/50">
                                     <tr>
-                                        <th className="px-4 py-3 rounded-tl-lg">Metric</th>
+                                        <th className="px-4 py-3">Metric</th>
                                         <th className="px-4 py-3">Document Value</th>
                                         <th className="px-4 py-3">Market Consensus</th>
                                         <th className="px-4 py-3">Variance</th>
-                                        <th className="px-4 py-3 rounded-tr-lg">Source</th>
+                                        <th className="px-4 py-3">Source</th>
                                     </tr>
                                 </thead>
                                 <tbody>

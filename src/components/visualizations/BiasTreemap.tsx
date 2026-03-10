@@ -42,7 +42,7 @@ function CustomContent({ x, y, width, height, name, count, index }: TreemapConte
                 y={y}
                 width={width}
                 height={height}
-                rx={8}
+                rx={0}
                 fill={color}
                 fillOpacity={0.15}
                 stroke={color}
@@ -113,7 +113,6 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
                                     <span key={s} style={{
                                         fontSize: '10px',
                                         padding: '2px 8px',
-                                        borderRadius: '9999px',
                                         color: SEVERITY_COLORS[s],
                                         background: `${SEVERITY_COLORS[s]}15`,
                                     }}>
@@ -140,7 +139,6 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
                             contentStyle={{
                                 background: 'var(--bg-secondary)',
                                 border: '1px solid var(--glass-border)',
-                                borderRadius: '12px',
                                 fontSize: '12px',
                             }}
                             formatter={(value: number | undefined) => [`${value ?? 0} occurrences`, 'Count']}

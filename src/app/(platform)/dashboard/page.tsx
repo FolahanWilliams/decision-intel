@@ -291,7 +291,7 @@ export default function Dashboard() {
             </div>
 
             {/* Progress Bar */}
-            <div className="h-1 bg-secondary rounded-full overflow-hidden mb-md">
+            <div className="h-1 bg-secondary overflow-hidden mb-md">
               <div
                 className="h-full bg-accent-primary transition-all duration-300"
                 style={{ width: `${currentProgress}%` }}
@@ -319,7 +319,7 @@ export default function Dashboard() {
 
       {/* Stream timed out banner */}
       {streamTimedOut && !uploading && (
-        <div className="mb-lg p-md rounded-lg bg-warning/10 border border-warning/30 flex items-center gap-sm">
+        <div className="mb-lg p-md bg-warning/10 border border-warning/30 flex items-center gap-sm">
           <AlertTriangle size={18} className="text-warning shrink-0" />
           <span className="text-warning text-sm">
             Analysis is taking longer than expected. The server may still be processing — refresh the page or try again.
@@ -329,7 +329,7 @@ export default function Dashboard() {
 
       {/* Error Message - Compact */}
       {error && (
-        <div className="mb-lg p-md rounded-lg bg-error/10 border border-error/30 flex items-center gap-sm">
+        <div className="mb-lg p-md bg-error/10 border border-error/30 flex items-center gap-sm">
           <AlertTriangle size={18} className="text-error shrink-0" />
           <span className="text-error text-sm">{error}</span>
           <button
@@ -552,12 +552,12 @@ export default function Dashboard() {
               {[0, 1, 2, 3].map(i => (
                 <div key={i} className="flex items-center justify-between p-md animate-pulse">
                   <div className="flex items-center gap-md">
-                    <div className="w-5 h-5 rounded bg-white/10" />
-                    <div className="h-4 w-48 rounded bg-white/10" />
+                    <div className="w-5 h-5 bg-white/10" />
+                    <div className="h-4 w-48 bg-white/10" />
                   </div>
                   <div className="flex items-center gap-md">
-                    <div className="h-3 w-20 rounded bg-white/10" />
-                    <div className="h-7 w-24 rounded bg-white/10" />
+                    <div className="h-3 w-20 bg-white/10" />
+                    <div className="h-7 w-24 bg-white/10" />
                   </div>
                 </div>
               ))}
@@ -614,9 +614,9 @@ export default function Dashboard() {
                       <>
                         {doc.score !== undefined && (
                           <div className="flex items-center gap-2">
-                            <div className="w-16 h-2 rounded-full bg-white/10 overflow-hidden">
+                            <div className="w-16 h-2 bg-white/10 overflow-hidden">
                               <div
-                                className="h-full rounded-full transition-all"
+                                className="h-full transition-all"
                                 style={{
                                   width: `${doc.score}%`,
                                   backgroundColor: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'

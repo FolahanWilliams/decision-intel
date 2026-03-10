@@ -32,7 +32,7 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
   };
 
   return (
-    <div className="relative aspect-square w-full max-w-lg mx-auto bg-secondary/20 rounded-lg border border-border p-8">
+    <div className="relative aspect-square w-full max-w-lg mx-auto bg-secondary/20  border border-border p-8">
       {/* Y-Axis Label */}
       <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-sm font-medium text-muted">
         Influence / Power
@@ -73,14 +73,13 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
             }}
           >
             <div className={`
-              w-4 h-4 rounded-full border-2 cursor-pointer shadow-lg
-              transition-transform duration-300 group-hover:scale-150
+              w-4 h-4  border-2 cursor-pointer               transition-transform duration-300 group-hover:scale-150
               ${getStanceColor(stakeholder.stance)}
             `} />
             
             {/* Tooltip */}
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 hidden group-hover:block z-50">
-              <div className="bg-popover text-popover-foreground text-xs rounded-md shadow-xl p-3 border border-border">
+              <div className="bg-popover text-popover-foreground text-xs   p-3 border border-border">
                 <p className="font-bold text-sm">{stakeholder.name}</p>
                 <p className="text-muted-foreground mb-2">{stakeholder.role}</p>
                 <div className="space-y-1">
@@ -98,17 +97,17 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
       </div>
 
       {/* Legend */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2 bg-background/80 p-2 rounded-md border border-border text-xs backdrop-blur-sm">
+      <div className="absolute top-4 right-4 flex flex-col gap-2 bg-background/80 p-2  border border-border text-xs backdrop-blur-sm">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="w-2 h-2  bg-emerald-500" />
           <span>Supportive</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-gray-500" />
+          <span className="w-2 h-2  bg-gray-500" />
           <span>Neutral</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-red-500" />
+          <span className="w-2 h-2  bg-red-500" />
           <span>Opposed</span>
         </div>
       </div>
@@ -135,7 +134,7 @@ export function AlignmentChart({ data }: AlignmentChartProps) {
               {item.alignment > 0 ? '+' : ''}{item.alignment}%
             </span>
           </div>
-          <div className="relative h-2 bg-secondary rounded-full overflow-hidden">
+          <div className="relative h-2 bg-secondary  overflow-hidden">
             {/* Center line */}
             <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-white/20 z-10" />
             

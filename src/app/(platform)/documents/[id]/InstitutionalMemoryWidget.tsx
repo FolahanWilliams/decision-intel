@@ -21,14 +21,14 @@ export function InstitutionalMemoryWidget({ memory }: InstitutionalMemoryWidgetP
             <div className="card-header flex items-center gap-2 pb-2 border-b border-border/50">
                 <History className="w-5 h-5 text-purple-500" />
                 <h3 className="text-lg font-semibold">Institutional Memory</h3>
-                <span className="ml-auto text-xs text-muted bg-surface-hover px-2 py-0.5 rounded-full" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                <span className="ml-auto text-xs text-muted bg-surface-hover px-2 py-0.5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                     Recall: {memory.recallScore}%
                 </span>
             </div>
 
             <div className="card-body space-y-4 pt-4">
                 {/* Strategic Advice */}
-                <div className="bg-surface-hover/50 p-3 rounded-md text-sm italic text-muted border border-border/50">
+                <div className="bg-surface-hover/50 p-3 text-sm italic text-muted border border-border/50">
                     &quot;{memory.strategicAdvice}&quot;
                 </div>
 
@@ -39,7 +39,7 @@ export function InstitutionalMemoryWidget({ memory }: InstitutionalMemoryWidgetP
                         <p className="text-sm text-muted">No similar historical cases found.</p>
                     ) : (
                         memory.similarEvents.map((event, idx) => (
-                            <div key={idx} className="group relative bg-surface p-3 rounded-md border border-border hover:border-purple-500/50 transition-colors">
+                            <div key={idx} className="group relative bg-surface p-3 border border-border hover:border-purple-500/50 transition-colors">
                                 <div className="flex justify-between items-start mb-1">
                                     <div className="flex items-center gap-2">
                                         <FileText className="w-3 h-3 text-muted" />
@@ -58,7 +58,7 @@ export function InstitutionalMemoryWidget({ memory }: InstitutionalMemoryWidgetP
                                     {event.date} • {Math.round(event.similarity * 100)}% Match
                                 </div>
 
-                                <div className="text-xs bg-surface-hover p-2 rounded text-foreground/80">
+                                <div className="text-xs bg-surface-hover p-2 text-foreground/80">
                                     <span className="font-semibold text-purple-400">Lesson:</span> {event.lessonLearned}
                                 </div>
                             </div>

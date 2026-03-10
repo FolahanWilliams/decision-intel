@@ -39,7 +39,7 @@ export function ExecutiveSummary({
             MIXED: 'bg-warning/20 text-warning border-warning/30',
         };
         return (
-            <span className={`px-3 py-1 rounded-full text-xs font-bold border ${styles[verdict as keyof typeof styles] || ''}`}>
+            <span className={`px-3 py-1 text-xs font-bold border ${styles[verdict as keyof typeof styles] || ''}`}>
                 {verdict}
             </span>
         );
@@ -66,19 +66,19 @@ export function ExecutiveSummary({
                 />
 
                 <div className="md:col-span-3 grid grid-cols-3 gap-4">
-                    <div className="p-4 rounded-lg bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
+                    <div className="p-4 bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
                         <Brain className="w-8 h-8 text-accent-secondary mb-2" />
                         <span className="text-2xl font-bold">{biasCount}</span>
                         <span className="text-xs text-muted tracking-wide">Cognitive Biases</span>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
+                    <div className="p-4 bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
                         <Activity className="w-8 h-8 text-accent-secondary mb-2" />
                         <span className="text-2xl font-bold">{noiseScore.toFixed(1)}</span>
                         <span className="text-xs text-muted tracking-wide">Noise Score</span>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
+                    <div className="p-4 bg-secondary/20 border border-border flex flex-col items-center justify-center text-center">
                         <AlertTriangle className={`w-8 h-8 mb-2 ${getRiskColor(riskLevel)}`} />
                         <span className={`text-2xl font-bold capitalize ${getRiskColor(riskLevel)}`}>{riskLevel}</span>
                         <span className="text-xs text-muted tracking-wide">Risk Level</span>
@@ -86,7 +86,7 @@ export function ExecutiveSummary({
                 </div>
             </div>
 
-            <div className="p-6 rounded-lg bg-secondary/10 border border-border">
+            <div className="p-6 bg-secondary/10 border border-border">
                 <h3 className="text-sm font-medium text-muted tracking-wide mb-3">Analysis Synthesis</h3>
                 <p className="leading-relaxed text-foreground/90">{summary}</p>
             </div>

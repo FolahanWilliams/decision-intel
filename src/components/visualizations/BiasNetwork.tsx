@@ -115,7 +115,7 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="relative flex-1 min-h-[400px] flex items-center justify-center bg-gradient-to-b from-transparent to-black/20 rounded-lg">
+      <div className="relative flex-1 min-h-[400px] flex items-center justify-center bg-gradient-to-b from-transparent to-black/20">
         <svg viewBox="0 0 400 400" className="w-full h-full max-w-[500px] max-h-[500px]">
           <defs>
             <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="28" refY="3.5" orient="auto">
@@ -243,7 +243,7 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
         {/* Instructions Overlay if nothing selected */}
         {!selectedNodeId && (
           <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
-            <span className="text-[10px] text-muted bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm border border-white/5">
+            <span className="text-[10px] text-muted bg-black/50 px-3 py-1 border border-white/5">
               Click a node to explore relationships
             </span>
           </div>
@@ -253,13 +253,13 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
       {/* Details Panel */}
       <div className={`mt-4 transition-all duration-300 ${selectedNodeId ? 'opacity-100 max-h-48' : 'opacity-50 max-h-12 overflow-hidden'}`}>
         {selectedNode ? (
-          <div className="p-4 rounded-lg bg-secondary/40 border border-border">
+          <div className="p-4 bg-secondary/40 border border-border">
             <div className="flex items-center justify-between mb-2">
               <h4 className="font-semibold text-lg flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: severityColors[selectedNode.severity] }} />
+                <span className="w-3 h-3" style={{ backgroundColor: severityColors[selectedNode.severity] }} />
                 {selectedNode.name}
               </h4>
-              <span className="text-xs px-2 py-0.5 rounded-full border border-white/10 uppercase" style={{ color: categoryColors[selectedNode.category] }}>
+              <span className="text-xs px-2 py-0.5 border border-white/10 uppercase" style={{ color: categoryColors[selectedNode.category] }}>
                 {selectedNode.category}
               </span>
             </div>
@@ -282,10 +282,10 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
           </div>
         ) : (
           <div className="flex flex-wrap gap-4 justify-center text-xs mt-2 border-t border-white/5 pt-4">
-            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-success/20 border border-success" /> <span className="text-muted">Low</span></div>
-            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-warning/20 border border-warning" /> <span className="text-muted">Medium</span></div>
-            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-error/20 border border-error" /> <span className="text-muted">High</span></div>
-            <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-error/20 border border-error" /> <span className="text-muted">Critical</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-success/20 border border-success" /> <span className="text-muted">Low</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-warning/20 border border-warning" /> <span className="text-muted">Medium</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-error/20 border border-error" /> <span className="text-muted">High</span></div>
+            <div className="flex items-center gap-2"><span className="w-3 h-3 bg-error/20 border border-error" /> <span className="text-muted">Critical</span></div>
           </div>
         )}
       </div>
@@ -327,7 +327,7 @@ export function BiasClusterChart({ biases }: BiasNetworkProps) {
         const color = colors[category as keyof typeof colors];
 
         return (
-          <div key={category} className={`p-4 rounded-lg border ${color.bg} ${color.border}`}>
+          <div key={category} className={`p-4 border ${color.bg} ${color.border}`}>
             <h4 className={`text-sm font-medium mb-3 capitalize ${color.text}`}>
               {category} Biases ({categoryBiases.length})
             </h4>
@@ -335,7 +335,7 @@ export function BiasClusterChart({ biases }: BiasNetworkProps) {
               {categoryBiases.map((bias, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-1 text-xs rounded-full bg-black/30 border border-white/10"
+                  className="px-2 py-1 text-xs bg-black/30 border border-white/10"
                   style={{
                     borderColor: severityColors[bias.severity as keyof typeof severityColors] + '40',
                     color: severityColors[bias.severity as keyof typeof severityColors],

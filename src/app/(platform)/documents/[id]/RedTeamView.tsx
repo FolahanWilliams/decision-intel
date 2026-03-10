@@ -23,7 +23,7 @@ export function RedTeamView({ analysis }: { analysis: CognitiveAnalysisResult })
                         <div className={`text-2xl font-bold ${gapColor}`}>{blindSpotGap}/100</div>
                         <p className="text-xs text-muted-foreground">{gapLabel}</p>
                         {/* Simple Progress Bar */}
-                        <div className="mt-2 h-2 w-full bg-secondary rounded-full overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
+                        <div className="mt-2 h-2 w-full bg-secondary overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
                             <div
                                 className={`h-full ${blindSpotGap < 50 ? 'bg-red-500' : blindSpotGap < 80 ? 'bg-yellow-500' : 'bg-green-500'}`}
                                 style={{ width: `${blindSpotGap}%`, background: blindSpotGap < 50 ? 'var(--error)' : blindSpotGap < 80 ? 'var(--warning)' : 'var(--success)' }}
@@ -45,7 +45,7 @@ export function RedTeamView({ analysis }: { analysis: CognitiveAnalysisResult })
                     </div>
                     <div className="card-body grid gap-4 md:grid-cols-2">
                         {blindSpots.map((spot, i) => (
-                            <div key={i} className="flex flex-col gap-1 p-3 border rounded-lg bg-orange-500/10 border-orange-200 dark:border-orange-900" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-secondary)' }}>
+                            <div key={i} className="flex flex-col gap-1 p-3 border bg-orange-500/10 border-orange-200 dark:border-orange-900" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-secondary)' }}>
                                 <span className="font-semibold text-orange-700 dark:text-orange-300">{spot.name}</span>
                                 <span className="text-sm text-muted-foreground">{spot.description}</span>
                             </div>

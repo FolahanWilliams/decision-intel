@@ -138,7 +138,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)]"
+        className="relative overflow-hidden border border-white/10 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)]"
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
@@ -151,7 +151,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
         <div className="relative p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="p-3 bg-white/5 border border-white/10">
                 <Building2 size={28} className="text-orange-500" />
               </div>
               <div>
@@ -175,7 +175,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                 >
                   <div className="text-xs text-gray-500 tracking-wide mb-1">Board Consensus</div>
                   <motion.div 
-                    className="flex items-center gap-3 px-4 py-2 rounded-xl font-bold text-lg"
+                    className="flex items-center gap-3 px-4 py-2 font-bold text-lg"
                     style={{ 
                       color: overallConfig.color,
                       backgroundColor: overallConfig.bgColor,
@@ -193,7 +193,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
           {/* Vote Tally Bar */}
           <div className="mt-6 flex items-center gap-4">
             <span className="text-xs text-gray-500 tracking-wide">Vote Distribution</span>
-            <div className="flex-1 flex gap-1 h-3 rounded-full overflow-hidden bg-white/5">
+            <div className="flex-1 flex gap-1 h-3 overflow-hidden bg-white/5">
               {(() => {
                 const totalTwins = simulation.twins?.length || 1;
                 return (
@@ -229,19 +229,19 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
             <div className="flex gap-3 text-xs">
               {voteCounts['APPROVE'] > 0 && (
                 <span className="flex items-center gap-1 text-green-400">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <div className="w-2 h-2 bg-green-500" />
                   {voteCounts['APPROVE']} Approve
                 </span>
               )}
               {voteCounts['REVISE'] > 0 && (
                 <span className="flex items-center gap-1 text-yellow-400">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                  <div className="w-2 h-2 bg-yellow-500" />
                   {voteCounts['REVISE']} Revise
                 </span>
               )}
               {voteCounts['REJECT'] > 0 && (
                 <span className="flex items-center gap-1 text-red-400">
-                  <div className="w-2 h-2 rounded-full bg-red-500" />
+                  <div className="w-2 h-2 bg-red-500" />
                   {voteCounts['REJECT']} Reject
                 </span>
               )}
@@ -265,7 +265,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.15 }}
               onClick={() => setSelectedTwin(isSelected ? null : idx)}
-              className={`relative rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden ${
+              className={`relative border transition-all duration-300 cursor-pointer overflow-hidden ${
                 isSelected ? 'ring-2 ring-orange-500/50' : ''
               }`}
               style={{
@@ -284,7 +284,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div 
-                      className="p-2.5 rounded-xl bg-white/5 border border-white/10"
+                      className="p-2.5 bg-white/5 border border-white/10"
                       style={{ color: config.color }}
                     >
                       {config.icon}
@@ -302,7 +302,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                         initial={{ scale: 0, rotate: -180 }}
                         animate={{ scale: 1, rotate: 0 }}
                         transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border"
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold border"
                         style={{
                           color: voteConfig.color,
                           backgroundColor: voteConfig.bgColor,
@@ -316,9 +316,9 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center"
+                        className="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center"
                       >
-                        <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white/60 animate-spin" />
+                        <div className="w-5 h-5 border-2 border-white/20 border-t-white/60 animate-spin" />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -338,12 +338,12 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                           {Math.round(twin.confidence)}%
                         </span>
                       </div>
-                      <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                      <div className="h-2 bg-white/10 overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${twin.confidence}%` }}
                           transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
-                          className="h-full rounded-full"
+                          className="h-full"
                           style={{ 
                             backgroundColor: config.color,
                             boxShadow: `0 0 10px ${config.color}50`
@@ -423,7 +423,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="rounded-2xl border border-white/10 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)] p-6"
+            className="border border-white/10 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)] p-6"
           >
             <div className="flex items-center gap-3 mb-4">
               <Brain size={20} className="text-orange-500" />

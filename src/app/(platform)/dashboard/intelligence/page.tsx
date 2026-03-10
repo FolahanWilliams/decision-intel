@@ -71,7 +71,6 @@ function FreshnessBadge({ freshness, hoursOld }: { freshness: string; hoursOld: 
             fontWeight: 700,
             color: config.color,
             background: `${config.color}12`,
-            borderRadius: '9999px',
         }}>
             <Icon size={10} />
             {config.label}
@@ -97,7 +96,7 @@ function StatCard({ label, value, icon, color, delay }: {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px' }}>
                 <div style={{
                     width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `${color}15`, borderRadius: '8px', color,
+                    background: `${color}15`, color,
                 }}>
                     {icon}
                 </div>
@@ -162,7 +161,7 @@ function ArticleCard({ article, delay }: { article: NewsArticle; delay: number }
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
                 <span style={{
-                    fontSize: '10px', padding: '2px 6px', borderRadius: '2px',
+                    fontSize: '10px', padding: '2px 6px',
                     background: `${catColor}15`, color: catColor, fontWeight: 600,
                                     }}>
                     {article.feedCategory}
@@ -175,7 +174,7 @@ function ArticleCard({ article, delay }: { article: NewsArticle; delay: number }
                 </span>
                 {article.biasTypes.slice(0, 3).map(b => (
                     <span key={b} style={{
-                        fontSize: '10px', padding: '1px 5px', borderRadius: '2px',
+                        fontSize: '10px', padding: '1px 5px',
                         border: '1px solid var(--border-color)', color: 'var(--text-muted)',
                     }}>
                         {b}
@@ -329,7 +328,6 @@ export default function IntelligencePage() {
                                 background: categoryFilter === cat ? 'var(--accent-primary)' : 'var(--bg-secondary)',
                                 color: categoryFilter === cat ? 'var(--bg-primary)' : 'var(--text-muted)',
                                 border: `1px solid ${categoryFilter === cat ? 'var(--accent-primary)' : 'var(--glass-border)'}`,
-                                borderRadius: '9999px',
                                 cursor: 'pointer',
                                 transition: 'all 0.1s',
                             }}

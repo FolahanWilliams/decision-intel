@@ -479,7 +479,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         )}
                     </div>
                     {analysis.factCheck.searchSources && analysis.factCheck.searchSources.length > 0 && (
-                        <div style={{ padding: '12px 16px', background: 'rgba(66, 133, 244, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
+                        <div style={{ padding: '12px 16px', background: 'rgba(99, 102, 241, 0.05)', borderBottom: '1px solid var(--border-color)' }}>
                             <div className="flex items-center gap-sm" style={{ fontSize: '11px', fontWeight: 600, marginBottom: '8px', color: 'var(--accent-primary)' }}>
                                 <FileText size={12} />
                                 Verified with Google Search Grounding
@@ -667,7 +667,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                         padding: 'var(--spacing-md)',
                                         borderBottom: idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
                                         cursor: 'pointer',
-                                        background: selectedBias?.id === bias.id ? 'rgba(255, 159, 10, 0.1)' : 'transparent',
+                                        background: selectedBias?.id === bias.id ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
                                         borderLeft: selectedBias?.id === bias.id ? '3px solid var(--accent-primary)' : '3px solid transparent'
                                     }}
                                 >

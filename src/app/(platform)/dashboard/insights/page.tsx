@@ -92,7 +92,6 @@ function StatCard({ label, value, icon, color, suffix, delay, trend }: {
                 <div style={{
                     width: 40,
                     height: 40,
-                    borderRadius: '10px',
                     border: `1px solid ${color}30`,
                     display: 'flex',
                     alignItems: 'center',

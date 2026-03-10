@@ -110,7 +110,6 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                             <div style={{
                                 padding: 'var(--spacing-md)',
                                 background: 'var(--bg-secondary)',
-                                borderRadius: 'var(--radius-sm)',
                                 color: 'var(--text-secondary)'
                             }}>
                                 {userEmail || 'Connected via Clerk'}
@@ -121,7 +120,6 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                             <div style={{
                                 padding: 'var(--spacing-md)',
                                 background: 'var(--bg-secondary)',
-                                borderRadius: 'var(--radius-sm)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 'var(--spacing-sm)'
@@ -129,7 +127,6 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                                 <span style={{
                                     background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
                                     padding: '2px 8px',
-                                    borderRadius: 'var(--radius-sm)',
                                     fontSize: '11px',
                                     fontWeight: 600
                                 }}>PRO</span>
@@ -213,7 +210,6 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                             padding: 'var(--spacing-md)',
                             background: 'rgba(34, 197, 94, 0.1)',
                             border: '1px solid rgba(34, 197, 94, 0.3)',
-                            borderRadius: 'var(--radius-md)'
                         }}>
                             <div className="flex items-center gap-sm mb-sm">
                                 <CheckCircle size={16} style={{ color: 'var(--success)' }} />
@@ -225,7 +221,6 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                             padding: 'var(--spacing-md)',
                             background: 'rgba(34, 197, 94, 0.1)',
                             border: '1px solid rgba(34, 197, 94, 0.3)',
-                            borderRadius: 'var(--radius-md)'
                         }}>
                             <div className="flex items-center gap-sm mb-sm">
                                 <CheckCircle size={16} style={{ color: 'var(--success)' }} />
@@ -367,7 +362,6 @@ function ToggleOption({
                 style={{
                     width: 48,
                     height: 26,
-                    borderRadius: 13,
                     background: checked ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
                     border: 'none',
                     cursor: 'pointer',
@@ -378,13 +372,11 @@ function ToggleOption({
                 <div style={{
                     width: 20,
                     height: 20,
-                    borderRadius: 10,
                     background: '#fff',
                     position: 'absolute',
                     top: 3,
                     left: checked ? 25 : 3,
-                    transition: 'left 0.2s',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                    transition: 'left 0.2s'
                 }} />
             </button>
         </div>
