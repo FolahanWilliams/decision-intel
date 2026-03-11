@@ -19,7 +19,14 @@ export default clerkMiddleware(async (auth, req) => {
     // auth.protect() throws a redirect response on auth failure.
     // Do NOT wrap in try/catch — catching and returning NextResponse.next()
     // would silently bypass authentication on protected routes.
-    if (isProtectedRoute(req)) await auth.protect();
+    
+    // Allow extension requests to bypass middleware protection so the route handler
+    // can authenticate them using the custom x-extension-key.
+    const isExtensionAnalyzeRequest = req.nextUrl.pathname.startsWith('/api/analyze') && req.headers.has('x-extension-key');
+    
+    if (isProtectedRoute(req) && !isExtensionAnalyzeRequest) {
+        await auth.protect();
+    }
     return NextResponse.next();
 });
 
