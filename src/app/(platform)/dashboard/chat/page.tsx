@@ -99,7 +99,7 @@ export default function ChatPage() {
                 }}
             >
                 {messages.length === 0 ? (
-                    <EmptyState />
+                    <EmptyState onSuggestionClick={setInput} />
                 ) : (
                     <div className="flex flex-col gap-md">
                         {messages.map((msg) => (
@@ -187,7 +187,7 @@ export default function ChatPage() {
     );
 }
 
-function EmptyState() {
+function EmptyState({ onSuggestionClick }: { onSuggestionClick: (text: string) => void }) {
     const suggestions = [
         'What cognitive biases appear most often in my documents?',
         'Summarise the riskiest decisions I\'ve analysed',
@@ -240,24 +240,7 @@ function EmptyState() {
                             textAlign: 'left',
                             transition: 'border-color 0.15s',
                         }}
-                        // Suggestions are inert when streaming
-                        onClick={() => {
-                            const input = document.querySelector(
-                                'textarea'
-                            ) as HTMLTextAreaElement | null;
-                            if (input) {
-                                // Use native setter to trigger React onChange
-                                const nativeSet = Object.getOwnPropertyDescriptor(
-                                    HTMLTextAreaElement.prototype,
-                                    'value'
-                                )?.set;
-                                nativeSet?.call(input, s);
-                                input.dispatchEvent(
-                                    new Event('input', { bubbles: true })
-                                );
-                                input.focus();
-                            }
-                        }}
+                        onClick={() => onSuggestionClick(s)}
                     >
                         {s}
                     </button>

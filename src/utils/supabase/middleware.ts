@@ -32,10 +32,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const isProtectedRoute = 
+  const isProtectedRoute =
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/documents') ||
-    (request.nextUrl.pathname.startsWith('/api') && !request.nextUrl.pathname.startsWith('/api/analyze'));
+    (request.nextUrl.pathname.startsWith('/api') &&
+     !request.nextUrl.pathname.startsWith('/api/analyze') &&
+     !request.nextUrl.pathname.startsWith('/api/auth'));
 
   // Allow extension requests to bypass middleware protection so the route handler
   // can authenticate them using the custom x-extension-key.
