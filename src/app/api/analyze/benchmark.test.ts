@@ -66,8 +66,10 @@ vi.mock('@/lib/prisma', () => ({
     }
 }));
 
-vi.mock('@clerk/nextjs/server', () => ({
-    auth: vi.fn().mockResolvedValue({ userId: 'user_123' }),
+vi.mock('@/utils/supabase/server', () => ({
+    createClient: () => Promise.resolve({
+        auth: { getUser: () => Promise.resolve({ data: { user: { id: 'user_123' } } }) },
+    }),
 }));
 
 vi.mock('@/lib/agents/graph', () => ({

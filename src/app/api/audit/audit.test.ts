@@ -38,9 +38,11 @@ vi.mock('next/server', () => {
     };
 });
 
-const mockAuth = vi.fn();
-vi.mock('@clerk/nextjs/server', () => ({
-    auth: () => mockAuth(),
+const mockGetUser = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+    createClient: () => Promise.resolve({
+        auth: { getUser: () => mockGetUser() },
+    }),
 }));
 
 const mockLogAudit = vi.fn();
@@ -61,7 +63,7 @@ import { POST, GET } from './route';
 
 beforeEach(() => {
     vi.clearAllMocks();
-    mockAuth.mockResolvedValue({ userId: 'user_123' });
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user_123' } } });
 });
 
 // ---------------------------------------------------------------------------
@@ -70,7 +72,7 @@ beforeEach(() => {
 
 describe('POST /api/audit', () => {
     it('returns 401 when unauthenticated', async () => {
-        mockAuth.mockResolvedValue({ userId: null });
+        mockGetUser.mockResolvedValue({ data: { user: null } });
 
         const req = new NextRequest('http://localhost/api/audit', {
             method: 'POST',
@@ -130,7 +132,7 @@ describe('POST /api/audit', () => {
 
 describe('GET /api/audit', () => {
     it('returns 401 when unauthenticated', async () => {
-        mockAuth.mockResolvedValue({ userId: null });
+        mockGetUser.mockResolvedValue({ data: { user: null } });
 
         const req = new NextRequest('http://localhost/api/audit?export=csv');
         const res = await GET(req);

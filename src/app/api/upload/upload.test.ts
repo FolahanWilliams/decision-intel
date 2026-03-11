@@ -25,9 +25,11 @@ vi.mock('next/server', () => ({
     },
 }));
 
-const mockAuth = vi.fn();
-vi.mock('@clerk/nextjs/server', () => ({
-    auth: () => mockAuth(),
+const mockGetUser = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+    createClient: () => Promise.resolve({
+        auth: { getUser: () => mockGetUser() },
+    }),
 }));
 
 const mockCheckRateLimit = vi.fn();
@@ -85,7 +87,7 @@ function createMockRequest(file?: File) {
 
 beforeEach(() => {
     vi.clearAllMocks();
-    mockAuth.mockResolvedValue({ userId: 'user_123' });
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user_123' } } });
     mockCheckRateLimit.mockResolvedValue({ success: true, limit: 5, remaining: 4, reset: Date.now() });
     mockDocFindFirst.mockResolvedValue(null); // no cache hit
     mockSupabaseUpload.mockResolvedValue({ error: null });
@@ -115,7 +117,7 @@ describe('POST /api/upload', () => {
     });
 
     it('returns 401 when unauthenticated', async () => {
-        mockAuth.mockResolvedValue({ userId: null });
+        mockGetUser.mockResolvedValue({ data: { user: null } });
 
         const req = createMockRequest(new File(['test'], 'test.txt', { type: 'text/plain' }));
         const res = await POST(req);
@@ -227,7 +229,7 @@ describe('POST /api/upload', () => {
 
 describe('GET /api/upload', () => {
     it('returns 401 when unauthenticated', async () => {
-        mockAuth.mockResolvedValue({ userId: null });
+        mockGetUser.mockResolvedValue({ data: { user: null } });
 
         const res = await GET();
         expect(res.status).toBe(401);

@@ -14,9 +14,11 @@ vi.mock('next/server', () => ({
     },
 }));
 
-const mockAuth = vi.fn();
-vi.mock('@clerk/nextjs/server', () => ({
-    auth: () => mockAuth(),
+const mockGetUser = vi.fn();
+vi.mock('@/utils/supabase/server', () => ({
+    createClient: () => Promise.resolve({
+        auth: { getUser: () => mockGetUser() },
+    }),
 }));
 
 const mockFindMany = vi.fn();
@@ -43,7 +45,7 @@ function makeRequest(url = 'http://localhost/api/documents') {
 
 beforeEach(() => {
     vi.clearAllMocks();
-    mockAuth.mockResolvedValue({ userId: 'user_123' });
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'user_123' } } });
 });
 
 // ---------------------------------------------------------------------------
@@ -52,7 +54,7 @@ beforeEach(() => {
 
 describe('GET /api/documents', () => {
     it('returns 401 when unauthenticated', async () => {
-        mockAuth.mockResolvedValue({ userId: null });
+        mockGetUser.mockResolvedValue({ data: { user: null } });
 
         const res = await GET(makeRequest());
         expect(res.status).toBe(401);
