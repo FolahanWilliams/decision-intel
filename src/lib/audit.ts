@@ -12,6 +12,7 @@ export type AuditAction =
     | 'EXPORT_CSV'
     | 'SIMULATE_SCENARIO'
     | 'SEARCH_MARKET_TRENDS'
+    | 'CHAT_MESSAGE'
     | 'DELETE_ACCOUNT_DATA';
 
 export interface AuditLogParams {
