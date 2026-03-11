@@ -1,6 +1,6 @@
 // CONFIGURATION
-// Create a vercel deployment (e.g. https://decision-intel.vercel.app) and update this URL
-const API_BASE_URL = 'https://decision-intel-ppj3.vercel.app';
+// Create a vercel deployment and update options page
+// Removed hardcoded API_BASE_URL
 
 document.addEventListener('DOMContentLoaded', () => {
     const analyzeBtn = document.getElementById('analyze-btn');
@@ -11,8 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMsg = document.getElementById('error-msg');
     const retryBtn = document.getElementById('retry-btn');
 
-    // API Endpoint (Localhost for dev)
-    const API_URL = `${API_BASE_URL}/api/analyze`;
 
     analyzeBtn.addEventListener('click', startAnalysis);
     retryBtn.addEventListener('click', () => {
@@ -47,8 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 3. Send to API
-            const storage = await chrome.storage.local.get('EXTENSION_API_KEY');
+            const storage = await chrome.storage.local.get(['EXTENSION_API_KEY', 'API_BASE_URL']);
             const apiKey = storage.EXTENSION_API_KEY; // Managed via options page
+            const apiBaseUrl = storage.API_BASE_URL || 'http://localhost:3000';
+            const API_URL = `${apiBaseUrl}/api/analyze`;
 
             if (!apiKey) throw new Error('Extension API Key not configured. Go to Options.');
 
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await apiResponse.json();
 
             // 4. Show Results
-            renderResults(result);
+            renderResults(result, apiBaseUrl);
             setView('results');
 
         } catch (err) {
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderResults(data) {
+    function renderResults(data, apiBaseUrl) {
         // Score
         document.getElementById('score-value').textContent = Math.round(data.overallScore) + "/100";
 
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Link to full report
         const reportBtn = document.getElementById('view-report-btn');
-        reportBtn.href = `${API_BASE_URL}/documents/${data.documentId}`;
+        reportBtn.href = `${apiBaseUrl}/documents/${data.documentId}`;
     }
 
     function setView(viewName) {
