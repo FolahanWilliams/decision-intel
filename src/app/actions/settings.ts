@@ -1,6 +1,6 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
@@ -13,7 +13,9 @@ export interface UserSettingsData {
 }
 
 export async function getUserSettings() {
-    const { userId } = await auth();
+    const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
     if (!userId) return null;
 
     let settings = await prisma.userSettings.findUnique({
@@ -33,7 +35,9 @@ export async function getUserSettings() {
 }
 
 export async function updateUserSettings(data: UserSettingsData) {
-    const { userId } = await auth();
+    const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
     if (!userId) throw new Error("Unauthorized");
 
     await prisma.userSettings.upsert({

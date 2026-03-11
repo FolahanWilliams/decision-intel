@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runAnalysis } from '@/lib/analysis/analyzer';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
@@ -29,7 +29,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

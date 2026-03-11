@@ -1,40 +1,15 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { updateSession } from '@/utils/supabase/middleware'
+import { NextRequest } from 'next/server'
 
-const isProtectedRoute = createRouteMatcher([
-    '/dashboard(.*)',
-    '/documents(.*)',
-    '/api/upload',
-    '/api/stats',
-    '/api/analyze(.*)',
-    '/api/insights',
-    '/api/trends(.*)',
-    '/api/audit',
-    '/api/documents(.*)',
-    '/api/search',
-    '/api/user',
-]);
-
-export default clerkMiddleware(async (auth, req) => {
-    // auth.protect() throws a redirect response on auth failure.
-    // Do NOT wrap in try/catch — catching and returning NextResponse.next()
-    // would silently bypass authentication on protected routes.
-    
-    // Allow extension requests to bypass middleware protection so the route handler
-    // can authenticate them using the custom x-extension-key.
-    const isExtensionAnalyzeRequest = req.nextUrl.pathname.startsWith('/api/analyze') && req.headers.has('x-extension-key');
-    
-    if (isProtectedRoute(req) && !isExtensionAnalyzeRequest) {
-        await auth.protect();
-    }
-    return NextResponse.next();
-});
+export async function middleware(request: NextRequest) {
+  return await updateSession(request)
+}
 
 export const config = {
-    matcher: [
-        // Skip Next.js internals and all static files, unless found in search params
-        '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-        // Always run for API routes
-        '/(api|trpc)(.*)',
-    ],
-};
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
+}

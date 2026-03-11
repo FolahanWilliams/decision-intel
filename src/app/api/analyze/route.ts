@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeDocument } from '@/lib/analysis/analyzer';
 import { BiasDetectionResult } from '@/types';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
@@ -38,7 +38,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
         const apiKey = request.headers.get('x-extension-key');
         let effectiveUserId = userId;
 

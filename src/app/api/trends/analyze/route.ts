@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { GoogleGenerativeAI, type Tool } from "@google/generative-ai";
 import { getRequiredEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
@@ -26,7 +26,9 @@ function getMarketAnalystModel() {
 
 export async function POST() {
     try {
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DocumentRoute');
@@ -12,7 +12,9 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
 
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -113,7 +115,9 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
 
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

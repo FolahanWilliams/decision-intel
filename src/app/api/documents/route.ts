@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DocumentsRoute');
@@ -23,7 +23,9 @@ const ANALYSIS_SELECT_CORE = {
 // GET /api/documents - List all documents for the current user
 export async function GET(request: Request) {
     try {
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
 
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

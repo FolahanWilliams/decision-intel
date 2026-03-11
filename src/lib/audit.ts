@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -23,7 +23,9 @@ export interface AuditLogParams {
 
 export async function logAudit(params: AuditLogParams) {
     try {
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
 
         if (!userId) {
             log.warn(`Unauthenticated action: ${params.action}`);

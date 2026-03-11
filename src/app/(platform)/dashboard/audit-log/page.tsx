@@ -1,6 +1,6 @@
 
 import { prisma } from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
@@ -52,7 +52,9 @@ export default async function AuditLogPage({
 }: {
     searchParams: Promise<{ page?: string, action?: string, search?: string }>
 }) {
-    const { userId } = await auth();
+    const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
     if (!userId) return <div>Unauthorized</div>;
 
     const resolvedParams = await searchParams;

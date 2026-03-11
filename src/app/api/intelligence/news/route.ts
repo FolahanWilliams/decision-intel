@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { searchNews } from '@/lib/news/newsService';
 import type { FeedCategory } from '@/config/newsFeeds';
 
@@ -9,7 +9,9 @@ import type { FeedCategory } from '@/config/newsFeeds';
  */
 export async function GET(request: NextRequest) {
     try {
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

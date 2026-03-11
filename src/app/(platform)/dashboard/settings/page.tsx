@@ -1,11 +1,12 @@
 
 import { getUserSettings } from '@/app/actions/settings';
 import SettingsForm from './SettingsForm';
-import { currentUser } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 
 export default async function SettingsPage() {
     const settings = await getUserSettings();
-    const user = await currentUser();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
     const defaultSettings = {
         emailNotifications: true,
@@ -18,7 +19,7 @@ export default async function SettingsPage() {
     return (
         <SettingsForm
             initialSettings={settings || defaultSettings}
-            userEmail={user?.emailAddresses[0]?.emailAddress}
+            userEmail={user?.email}
         />
     );
 }

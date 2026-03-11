@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -18,7 +18,9 @@ const log = createLogger('UserRoute');
  */
 export async function DELETE() {
     try {
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

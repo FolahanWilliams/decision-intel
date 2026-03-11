@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import path from 'path';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { parseFile } from '@/lib/utils/file-parser';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { createHash } from 'crypto';
@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { userId } = await auth();
+        const authClient = await createClient();
+        const { data: { user } } = await authClient.auth.getUser();
+        const userId = user?.id;
 
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -225,7 +227,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
     try {
-        const { userId } = await auth();
+        const authClient = await createClient();
+        const { data: { user } } = await authClient.auth.getUser();
+        const userId = user?.id;
 
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logAudit, AuditLogParams } from '@/lib/audit';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -8,7 +8,9 @@ const log = createLogger('AuditRoute');
 
 export async function POST(req: NextRequest) {
     try {
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
@@ -30,7 +32,9 @@ export async function POST(req: NextRequest) {
 /** GET /api/audit?export=csv — stream all audit events for the user as a CSV file. */
 export async function GET(req: NextRequest) {
     try {
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getGraph, ProgressUpdate } from '@/lib/analysis/analyzer';
 import { formatSSE } from '@/lib/sse';
-import { auth } from '@clerk/nextjs/server';
+import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { safeJsonClone } from '@/lib/utils/json';
@@ -107,7 +107,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { userId } = await auth();
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id;
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
