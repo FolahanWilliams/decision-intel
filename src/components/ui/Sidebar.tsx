@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X, ClipboardList, Search, Globe, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X, ClipboardList, Search, Globe, ChevronLeft, LogOut as LogOutIcon } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useIntelligenceStatus } from '@/hooks/useIntelligence';
 
@@ -202,6 +202,38 @@ export default function Sidebar() {
                     <NavItem href="/dashboard/settings" icon={<Settings size={18} />} label="Settings" active={pathname === '/dashboard/settings'} collapsed={collapsed} onNavigate={closeMobile} />
                 </nav>
 
+                <div style={{
+                    padding: collapsed ? '12px' : '12px 20px',
+                    borderTop: '1px solid var(--border-color)',
+                }}>
+                    <button
+                        onClick={async () => {
+                            const { createClient } = await import('@/utils/supabase/client');
+                            const supabase = createClient();
+                            await supabase.auth.signOut();
+                            window.location.href = '/login';
+                        }}
+                        title={collapsed ? 'Sign out' : undefined}
+                        aria-label="Sign out"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: collapsed ? 'center' : 'flex-start',
+                            gap: collapsed ? '0' : '12px',
+                            padding: collapsed ? '10px' : '9px 12px',
+                            width: '100%',
+                            color: 'var(--text-muted)',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '13.5px',
+                            transition: 'color 0.15s',
+                        }}
+                    >
+                        <LogOutIcon size={18} style={{ flexShrink: 0 }} />
+                        {!collapsed && <span>Sign Out</span>}
+                    </button>
+                </div>
                 <div style={{
                     padding: collapsed ? '12px' : '16px 20px',
                     borderTop: '1px solid var(--border-color)',

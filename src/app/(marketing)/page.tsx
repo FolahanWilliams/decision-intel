@@ -87,10 +87,10 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-amber-400 transition-colors duration-300">Features</a>
           </div>
           <div className="flex gap-3">
-            <Link href="/sign-in" className="btn btn-secondary" style={{ fontSize: '0.85rem', borderRadius: '10px' }}>
+            <Link href="/login" className="btn btn-secondary" style={{ fontSize: '0.85rem', borderRadius: '10px' }}>
               Sign In
             </Link>
-            <Link href="/sign-up" className="btn btn-primary" style={{ fontSize: '0.85rem', borderRadius: '10px' }}>
+            <Link href="/login" className="btn btn-primary" style={{ fontSize: '0.85rem', borderRadius: '10px' }}>
               Get Started
             </Link>
           </div>
@@ -182,7 +182,7 @@ export default function LandingPage() {
                   transition={{ delay: 0.3 }}
                   className="flex flex-wrap items-center gap-4"
                 >
-                  <Link href="/sign-up" className="btn btn-primary glow"
+                  <Link href="/login" className="btn btn-primary glow"
                     style={{ padding: '14px 32px', fontSize: '0.9rem', borderRadius: '12px' }}
                   >
                     Start Free Trial
@@ -735,7 +735,7 @@ export default function LandingPage() {
 
                 <div style={{ paddingTop: '24px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
                   <Link
-                    href="/sign-up"
+                    href="/login"
                     className="btn btn-primary w-full glow"
                     style={{
                       padding: '16px',

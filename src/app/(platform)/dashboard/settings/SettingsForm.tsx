@@ -55,7 +55,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                 throw new Error(data.error || 'Failed to delete account data');
             }
             // Sign out and redirect to home
-            router.push('/sign-in');
+            router.push('/login');
         } catch (err) {
             setDeleteError(err instanceof Error ? err.message : 'An error occurred');
             setDeleting(false);
@@ -112,7 +112,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                                 background: 'var(--bg-secondary)',
                                 color: 'var(--text-secondary)'
                             }}>
-                                {userEmail || 'Connected via Clerk'}
+                                {userEmail || 'Connected via Google'}
                             </div>
                         </div>
                         <div>
@@ -215,7 +215,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                                 <CheckCircle size={16} style={{ color: 'var(--success)' }} />
                                 <span className="text-xs font-bold" style={{ color: 'var(--success)' }}>Two-Factor Auth</span>
                             </div>
-                            <p className="text-xs text-muted">Enabled via Clerk</p>
+                            <p className="text-xs text-muted">Managed by Supabase</p>
                         </div>
                         <div style={{
                             padding: 'var(--spacing-md)',

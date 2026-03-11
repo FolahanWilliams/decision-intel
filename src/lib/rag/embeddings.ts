@@ -227,8 +227,8 @@ export async function storeAnalysisEmbedding(
  * not supporting prepared statements with pgvector casts.
  */
 function assertSafeId(value: string, fieldName: string): void {
-    // Clerk user IDs: user_xxx / org_xxx / cuid-style alphanumeric + underscore
-    if (!/^[a-zA-Z0-9_|-]+$/.test(value)) {
+    // Supabase user IDs: UUID format / alphanumeric + hyphen
+    if (!/^[a-zA-Z0-9_\-|]+$/.test(value)) {
         throw new Error(`Invalid ${fieldName} format`);
     }
 }
