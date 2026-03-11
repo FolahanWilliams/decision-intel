@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, FileText, Info, Terminal, Lightbulb } from 'lucide-react';
 import { BiasInstance } from '@prisma/client';
 
@@ -83,6 +83,34 @@ interface BiasDetailModalProps {
 export function BiasDetailModal({ bias, biases, currentIndex, onClose, onNavigate }: BiasDetailModalProps) {
     const modalRef = useRef<HTMLDivElement>(null);
     const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+    const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+    // @ts-ignore - assuming bias.userRating might exist if added to schema
+    const [userRating, setUserRating] = useState<number | null>((bias as any).userRating || null);
+
+    // Reset rating when navigating to a different bias
+    useEffect(() => {
+        // @ts-ignore
+        setUserRating((bias as any).userRating || null);
+    }, [bias]);
+
+    const handleFeedback = async (rating: number) => {
+        try {
+            setIsSubmittingFeedback(true);
+            const res = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'bias', id: bias.id, rating })
+            });
+            if (res.ok) {
+                setUserRating(rating);
+            }
+        } catch (error) {
+            console.error('Failed to submit feedback:', error);
+        } finally {
+            setIsSubmittingFeedback(false);
+        }
+    };
 
     // Focus trap + Escape to close
     useEffect(() => {
@@ -246,6 +274,44 @@ export function BiasDetailModal({ bias, biases, currentIndex, onClose, onNavigat
                                 </div>
                                 <p style={{ fontSize: '13px', lineHeight: 1.5 }}>{bias.suggestion}</p>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Feedback */}
+                    <div style={{
+                        padding: '12px var(--spacing-lg)',
+                        borderTop: '1px solid var(--border-color)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        background: 'rgba(99, 102, 241, 0.02)'
+                    }}>
+                        <span className="text-sm font-medium">Was this AI detection helpful?</span>
+                        <div className="flex gap-sm">
+                            <button 
+                                className={`btn btn-ghost`} 
+                                disabled={isSubmittingFeedback}
+                                onClick={() => handleFeedback(userRating === 1 ? 0 : 1)}
+                                style={{ 
+                                    color: userRating === 1 ? 'var(--success)' : 'inherit',
+                                    background: userRating === 1 ? 'rgba(48, 209, 88, 0.1)' : 'transparent',
+                                    border: userRating === 1 ? '1px solid rgba(48, 209, 88, 0.3)' : '1px solid transparent'
+                                }}
+                            >
+                                👍 Yes
+                            </button>
+                            <button 
+                                className={`btn btn-ghost`} 
+                                disabled={isSubmittingFeedback}
+                                onClick={() => handleFeedback(userRating === -1 ? 0 : -1)}
+                                style={{ 
+                                    color: userRating === -1 ? 'var(--error)' : 'inherit',
+                                    background: userRating === -1 ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
+                                    border: userRating === -1 ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid transparent'
+                                }}
+                            >
+                                👎 No
+                            </button>
                         </div>
                     </div>
 

@@ -256,6 +256,7 @@ export async function searchSimilarDocuments(
     score: number;
     similarity: number;
     biases: string[];
+    content: string;
 }>> {
     try {
         const queryEmbedding = await generateEmbedding(queryText);
@@ -312,7 +313,8 @@ export async function searchSimilarDocuments(
                 filename: meta?.filename || 'Unknown',
                 score: meta?.overallScore || 0,
                 similarity: Math.round(r.similarity * 100) / 100,
-                biases: meta?.primaryBiases || []
+                biases: meta?.primaryBiases || [],
+                content: r.content
             };
         });
     } catch (error) {
@@ -335,6 +337,7 @@ export async function getContextualInsights(
         score: number;
         similarity: number;
         biases: string[];
+        content: string;
     }>;
     patternInsights: string[];
 }> {

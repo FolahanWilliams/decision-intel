@@ -340,9 +340,10 @@ Perform TWO comprehensive analyses on the provided document in a SINGLE pass:
 
 ## PART 1: FACT VERIFICATION
 1. Identify specific factual claims (financial, technical, historical, statistical).
-2. Use Google Search to verify each claim against external data.
-3. NEVER mark a claim as "UNVERIFIABLE" without searching first.
-4. Cite your sources for each verification.
+2. Cross-reference claims against any provided INTERNAL COMPANY KNOWLEDGE precedents.
+3. Use Google Search to verify each claim against external data not covered internally.
+4. NEVER mark a claim as "UNVERIFIABLE" without searching first or checking internal knowledge.
+5. Cite your sources (Search URL or "Internal Knowledge") for each verification.
 
 ## PART 2: REGULATORY COMPLIANCE
 1. Identify references to regulations (GDPR, FCA, SEC, HIPAA, ISO), regulators, internal policies, and high-risk activities.

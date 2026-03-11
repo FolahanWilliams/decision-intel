@@ -76,6 +76,10 @@ interface Analysis {
     swotAnalysis?: SwotAnalysisResult;
     logicalAnalysis?: LogicalAnalysisResult;
     cognitiveAnalysis?: CognitiveAnalysisResult;
+    preMortem?: {
+        failureScenarios: string[];
+        preventiveMeasures: string[];
+    };
     simulation?: {
         overallVerdict: 'APPROVED' | 'REJECTED' | 'MIXED';
         twins: Array<{
@@ -609,7 +613,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             )}
                             {activeTab === 'red-team' && (
                                 <ErrorBoundary sectionName="Red Team">
-                                    <RedTeamTab cognitiveAnalysis={analysis?.cognitiveAnalysis} />
+                                    <RedTeamTab 
+                                        analysisId={analysis?.id}
+                                        cognitiveAnalysis={analysis?.cognitiveAnalysis}
+                                        preMortem={analysis?.preMortem}
+                                    />
                                 </ErrorBoundary>
                             )}
                             {activeTab === 'boardroom' && (

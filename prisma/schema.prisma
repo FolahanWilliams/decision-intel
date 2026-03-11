@@ -53,7 +53,9 @@ model Analysis {
   simulation      Json?       // Stores { overallVerdict, twins }
   institutionalMemory Json?   // Stores { recallScore, similarEvents, strategicAdvice }
   intelligenceContext Json?   // Stores { newsCount, researchCount, caseStudyCount, macroSummary, topNews, topCaseStudies }
+  metaVerdict     String?     @db.Text
 
+  preMortemRating Int?        // User rating of the failure scenarios
   modelVersion String?        // Gemini model used to produce this analysis
 
   createdAt    DateTime       @default(now())
@@ -74,6 +76,7 @@ model BiasInstance {
   explanation String   @db.Text
   suggestion  String   @db.Text
   confidence  Float?   @default(0.0)
+  userRating  Int?
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

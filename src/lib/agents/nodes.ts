@@ -529,6 +529,21 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
         // Import super-prompt
         const { VERIFICATION_SUPER_PROMPT } = await import('./prompts');
 
+        // Execute RAG query to pull internal company wiki/knowledge context
+        let internalKnowledgeContext = '';
+        if (state.userId) {
+            try {
+                log.info("Executing RAG query for internal knowledge...");
+                const similarDocs = await searchSimilarDocuments(content, state.userId, 3);
+                if (similarDocs && similarDocs.length > 0) {
+                    internalKnowledgeContext = `\n\nINTERNAL COMPANY KNOWLEDGE (cross-reference claims against these precedents):\n` +
+                        similarDocs.map((doc, i) => `[Document ${i + 1} Excerpt]: ${doc.content}`).join('\n\n');
+                }
+            } catch (ragError) {
+                log.warn(`Failed to execute RAG query: ${ragError instanceof Error ? ragError.message : String(ragError)}`);
+            }
+        }
+
         // Inject news context for better fact-checking
         const newsContext = state.intelligenceContext?.news?.slice(0, 5)
             .map(n => `- [${n.source}] ${n.title}`)
@@ -537,12 +552,15 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
             ? `\n\nRECENT RELEVANT NEWS (cross-reference claims against these):\n${sanitizeForPrompt(newsContext, 'recent_news')}`
             : '';
 
+        // Synthesize additional context
+        const additionalContext = `${internalKnowledgeContext}${verificationIntelPrompt}`;
+
         // Single grounded LLM call for both fact-check and compliance
         const result = await withRetry(
             () => withTimeout(
                 getGroundedModel().generateContent([
                     VERIFICATION_SUPER_PROMPT,
-                    `Document to analyze:\n<input_text>\n${content}\n</input_text>${verificationIntelPrompt}`
+                    `Document to analyze:\n<input_text>\n${content}\n</input_text>${additionalContext}`
                 ]),
                 90000 // 90 second timeout for combined verification
             ),
@@ -788,6 +806,60 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
         return {
             simulation: undefined,
             institutionalMemory: undefined
+        };
+    }
+}
+
+// ============================================================
+// META-JUDGE (Adversarial Debate Protocol)
+// ============================================================
+
+export async function metaJudgeNode(state: AuditState): Promise<Partial<AuditState>> {
+    const content = truncateText(state.structuredContent || '');
+
+    try {
+        log.info("Running Adversarial Meta-Judge Debate Protocol...");
+
+        const factVerifications = state.factCheckResult?.verifications || [];
+        const failureScenarios = state.preMortem?.failureScenarios || [];
+        const biasFindings = state.biasAnalysis || [];
+
+        // If nothing to debate, return quickly
+        if (failureScenarios.length === 0 && biasFindings.length === 0) {
+           return { metaVerdict: "No significant adversarial points detected; proposal cleared baseline checks." };
+        }
+
+        const result = await withTimeout(
+            getStandardSafetyGroundedModel().generateContent([
+                `You are the META-JUDGE in an adversarial review protocol.
+                TASK: Synthesize the findings from the Pre-Mortem (Pessimistic) and Fact-Check/Bias (Objective) nodes into a final executive summary.
+                
+                Document Proposal:
+                <input_text>\n${content}\n</input_text>
+                
+                Red Team (Pre-Mortem) Failure Scenarios:
+                ${sanitizeForPrompt(failureScenarios, 'failure_scenarios')}
+                
+                Objective Verifications & Biases:
+                ${sanitizeForPrompt({ factVerifications, biasFindings }, 'objective_findings')}
+                
+                INSTRUCTIONS:
+                Write a 2-3 paragraph "Meta Verdict" that directly addresses whether the Red Team's concerns are valid given the objective facts, and what the ultimate recommendation is.
+                Return ONLY the text of the verdict. No JSON.`,
+            ]),
+            60000
+        );
+
+        const verdict = result.response?.text ? result.response.text() : "Meta-Verdict could not be generated.";
+        log.info(`Meta-Judge complete.`);
+        
+        return {
+            metaVerdict: verdict
+        };
+    } catch (e) {
+        log.error("Meta Judge failed:", e instanceof Error ? e.message : String(e));
+        return {
+            metaVerdict: "Debate Protocol failed due to timeout or error."
         };
     }
 }

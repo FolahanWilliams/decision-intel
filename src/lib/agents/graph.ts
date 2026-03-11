@@ -1,5 +1,5 @@
 import { StateGraph, END, Annotation } from "@langchain/langgraph";
-import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, verificationNode, deepAnalysisNode, simulationNode, intelligenceNode } from "./nodes";
+import { structurerNode, biasDetectiveNode, noiseJudgeNode, riskScorerNode, gdprAnonymizerNode, verificationNode, deepAnalysisNode, simulationNode, intelligenceNode, metaJudgeNode } from "./nodes";
 import { AnalysisResult, BiasDetectionResult, NoiseBenchmark, LogicalAnalysisResult, SwotAnalysisResult, CognitiveAnalysisResult, SimulationResult, InstitutionalMemoryResult, ComplianceResult } from '@/types';
 import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
 
@@ -112,6 +112,7 @@ const workflow = new StateGraph(GraphState)
     .addNode("verificationNode", verificationNode)        // factChecker + complianceMapper
     .addNode("deepAnalysisNode", deepAnalysisNode)        // linguistic + strategic + cognitiveDiversity
     .addNode("simulationNode", simulationNode)            // decisionTwin + memoryRecall
+    .addNode("metaJudgeNode", metaJudgeNode)              // debate orchestration
     .addNode("riskScorer", riskScorerNode)
 
     .setEntryPoint("gdprAnonymizer")
@@ -133,12 +134,15 @@ const workflow = new StateGraph(GraphState)
     .addEdge("intelligenceGatherer", "deepAnalysisNode")
     .addEdge("intelligenceGatherer", "simulationNode")
 
-    // Fan-in: 5 super-nodes → riskScorer
-    .addEdge("biasDetective", "riskScorer")
-    .addEdge("noiseJudge", "riskScorer")
-    .addEdge("verificationNode", "riskScorer")
-    .addEdge("deepAnalysisNode", "riskScorer")
-    .addEdge("simulationNode", "riskScorer")
+    // Fan-in: 5 super-nodes → metaJudgeNode
+    .addEdge("biasDetective", "metaJudgeNode")
+    .addEdge("noiseJudge", "metaJudgeNode")
+    .addEdge("verificationNode", "metaJudgeNode")
+    .addEdge("deepAnalysisNode", "metaJudgeNode")
+    .addEdge("simulationNode", "metaJudgeNode")
+
+    // Meta Judge -> Final Risk Scorer
+    .addEdge("metaJudgeNode", "riskScorer")
 
     .addEdge("riskScorer", END);
 

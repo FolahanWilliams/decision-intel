@@ -56,6 +56,7 @@ export interface AuditState {
     cognitiveAnalysis?: CognitiveAnalysisResult;
     simulation?: SimulationResult;
     institutionalMemory?: InstitutionalMemoryResult;
+    metaVerdict?: string;
 
     // Final Output
     finalReport?: AnalysisResult;
