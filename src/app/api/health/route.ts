@@ -31,6 +31,8 @@ export async function GET() {
       cache: cacheStats
         ? { backend: 'postgres', ...cacheStats }
         : { backend: 'postgres', status: 'unavailable' },
+    }, {
+      headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' },
     });
   } catch (error) {
     log.error('Health check error:', error);

@@ -30,7 +30,7 @@ interface RateLimitConfig {
 const DEFAULT_CONFIG: RateLimitConfig = {
   windowMs: 60 * 60 * 1000, // 1 hour
   maxRequests: 5, // 5 requests per hour
-  failMode: 'open',
+  failMode: 'closed',
 };
 
 /**
@@ -152,10 +152,11 @@ export async function getRateLimitStatus(
     };
   } catch (error) {
     log.error('Rate limit status error:', error);
+    // Fail closed: deny on DB error to prevent bypass
     return {
-      success: true,
+      success: false,
       limit: config.maxRequests,
-      remaining: config.maxRequests,
+      remaining: 0,
       reset: Math.floor((now.getTime() + config.windowMs) / 1000),
     };
   }

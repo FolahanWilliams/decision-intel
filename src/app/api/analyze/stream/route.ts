@@ -24,6 +24,11 @@ import {
 
 const log = createLogger('StreamRoute');
 
+// Allow up to 240 seconds for the streaming analysis pipeline.
+// Without this, Vercel defaults to 25s which is far too short for
+// multi-agent LLM pipelines.
+export const maxDuration = 240;
+
 // Map agent node names to human-readable labels with dynamic descriptions
 const NODE_LABELS: Record<string, { label: string; description: string }> = {
     'gdprAnonymizer': { label: 'Privacy Shield', description: 'Scanning for personal data and applying GDPR redactions…' },

@@ -725,9 +725,11 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
             ? `\n\nHISTORICAL CASE STUDIES (use as reference for SWOT, pre-mortem, and cognitive diversity):\n${sanitizeForPrompt(caseContext, 'case_studies')}`
             : '';
 
+        // Deep analysis (sentiment, logic, SWOT) does not need relaxed safety
+        // settings — use standard safety to keep content moderation active.
         const result = await withRetry(
             () => withTimeout(
-                getGroundedModel().generateContent([
+                getStandardSafetyGroundedModel().generateContent([
                     DEEP_ANALYSIS_SUPER_PROMPT,
                     `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}`
                 ]),

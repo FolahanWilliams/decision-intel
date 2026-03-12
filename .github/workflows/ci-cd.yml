@@ -85,11 +85,9 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
-        continue-on-error: true
 
       - name: Check code formatting
         run: npx prettier --check "src/**/*.{ts,tsx}" --ignore-path .gitignore
-        continue-on-error: true
 
   # ============================================
   # Job 3: Security Audit (Parallel)

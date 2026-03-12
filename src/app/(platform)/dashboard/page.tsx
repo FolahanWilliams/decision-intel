@@ -13,6 +13,7 @@ const log = createClientLogger('Dashboard');
 import { RiskTrendChart } from './RiskTrendChart';
 import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnalysis';
 import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
@@ -511,14 +512,16 @@ export default function Dashboard() {
           </button>
           {showTrend && (
             <div className="card-body pt-0">
-              <RiskTrendChart data={[...uploadedDocs]
-                .filter(d => d.score !== undefined)
-                .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
-                .map(d => ({
-                  date: new Date(d.uploadedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-                  score: d.score || 0
-                }))
-              } />
+              <ErrorBoundary sectionName="Risk Trend Chart">
+                <RiskTrendChart data={[...uploadedDocs]
+                  .filter(d => d.score !== undefined)
+                  .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
+                  .map(d => ({
+                    date: new Date(d.uploadedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                    score: d.score || 0
+                  }))
+                } />
+              </ErrorBoundary>
             </div>
           )}
         </div>
@@ -535,6 +538,7 @@ export default function Dashboard() {
               <h3>Document Benchmark</h3>
             </div>
             <div className="card-body">
+              <ErrorBoundary sectionName="Comparative Analysis">
               <ComparativeAnalysis documents={uploadedDocs.filter(d => d.status === 'complete').map(doc => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- detailed view returns analyses array
                 const a = (doc as any).analyses?.[0];
@@ -552,6 +556,7 @@ export default function Dashboard() {
                   }
                 };
               })} />
+              </ErrorBoundary>
             </div>
           </div>
         </div>

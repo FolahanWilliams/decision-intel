@@ -1,9 +1,13 @@
 /**
  * Environment Variable Validation
- * 
+ *
  * Ensures all required environment variables are present and valid at runtime.
  * This prevents silent failures and provides clear error messages.
  */
+
+import { createLogger } from './utils/logger';
+
+const log = createLogger('Env');
 
 export interface EnvValidationResult {
     valid: boolean;
@@ -70,7 +74,7 @@ export function getRequiredEnvVar(name: string): string {
             throw new Error(`Missing required environment variable: ${name}`);
         }
         // Return placeholder for build time
-        console.warn(`⚠️ Missing environment variable ${name} - using placeholder for build`);
+        log.warn(`Missing environment variable ${name} - using placeholder for build`);
         return `__PLACEHOLDER_${name}__`;
     }
     return value;
@@ -91,13 +95,11 @@ export function assertEnvValid(): void {
     const result = validateEnv();
     
     if (!result.valid) {
-        console.error('❌ Missing required environment variables:');
-        result.missing.forEach(envVar => console.error(`  - ${envVar}`));
+        log.error(`Missing required environment variables: ${result.missing.join(', ')}`);
         throw new Error(`Missing required environment variables: ${result.missing.join(', ')}`);
     }
 
     if (result.warnings.length > 0) {
-        console.warn('⚠️ Environment variable warnings:');
-        result.warnings.forEach(warning => console.warn(`  - ${warning}`));
+        result.warnings.forEach(warning => log.warn(warning));
     }
 }
