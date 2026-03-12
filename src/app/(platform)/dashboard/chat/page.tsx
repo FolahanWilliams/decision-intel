@@ -24,7 +24,7 @@ export default function ChatPage() {
     );
 
     const completeDocs = useMemo(
-        () => documents.filter((d) => d.status === 'COMPLETE'),
+        () => documents.filter((d) => d.status === 'complete'),
         [documents]
     );
 

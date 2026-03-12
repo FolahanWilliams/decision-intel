@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { prisma } from '@/lib/prisma';
 import { searchSimilarDocuments, getContextualInsights } from '@/lib/rag/embeddings';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -82,6 +83,15 @@ export async function GET(request: NextRequest) {
                 { error: 'documentId and content are required' },
                 { status: 400 }
             );
+        }
+
+        // Verify the user owns the requested document
+        const doc = await prisma.document.findFirst({
+            where: { id: documentId, userId },
+            select: { id: true },
+        });
+        if (!doc) {
+            return NextResponse.json({ error: 'Document not found' }, { status: 404 });
         }
 
         // Prevent excessively large content from DoS-ing the embedding API.

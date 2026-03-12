@@ -58,7 +58,11 @@ export async function GET(req: NextRequest) {
         });
 
         const escape = (v: string | null | undefined) => {
-            const s = v ?? '';
+            let s = v ?? '';
+            // Prevent CSV formula injection: prefix dangerous leading chars with a single quote
+            if (/^[=+\-@\t\r]/.test(s)) {
+                s = `'${s}`;
+            }
             return s.includes(',') || s.includes('"') || s.includes('\n')
                 ? `"${s.replace(/"/g, '""')}"` : s;
         };

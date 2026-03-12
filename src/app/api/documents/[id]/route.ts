@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DocumentRoute');
@@ -121,6 +122,19 @@ export async function DELETE(
 
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Rate limit: 10 deletions per hour
+        const rateLimitResult = await checkRateLimit(userId, '/api/documents/delete', {
+            windowMs: 60 * 60 * 1000,
+            maxRequests: 10,
+            failMode: 'open',
+        });
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { error: 'Rate limit exceeded. Please try again later.' },
+                { status: 429, headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) } }
+            );
         }
 
         // Fetch the document first so we know the filename (for the

@@ -10,30 +10,25 @@ const log = createLogger('SimulateRoute');
 
 export async function POST(request: NextRequest) {
     try {
-        // Check rate limit first
-        const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-                   request.headers.get('x-real-ip') || 
-                   "anonymous";
-        
-        const rateLimitResult = await checkRateLimit(ip, '/api/analyze/simulate');
-        
-        if (!rateLimitResult.success) {
-            return NextResponse.json(
-                { 
-                    error: "Rate limit exceeded. You can analyze up to 5 documents per hour.",
-                    limit: rateLimitResult.limit,
-                    reset: rateLimitResult.reset,
-                    remaining: 0
-                }, 
-                { status: 429 }
-            );
-        }
-
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
         const userId = user?.id;
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Rate limit by authenticated user (not IP)
+        const rateLimitResult = await checkRateLimit(userId, '/api/analyze/simulate');
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                {
+                    error: "Rate limit exceeded. You can analyze up to 5 documents per hour.",
+                    limit: rateLimitResult.limit,
+                    reset: rateLimitResult.reset,
+                    remaining: 0
+                },
+                { status: 429 }
+            );
         }
 
         let body;
