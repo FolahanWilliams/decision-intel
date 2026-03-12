@@ -125,7 +125,7 @@ Real-time intelligence enrichment from external sources:
 ### Privacy & Security
 
 - **GDPR Anonymization** — PII is stripped *before* any AI analysis (names, emails, companies replaced with tokens)
-- **Clerk Authentication** — Enterprise-ready SSO with protected routes
+- **Supabase Authentication** — Enterprise-ready auth with protected routes
 - **Rate Limiting** — 5 documents/hour per user (Postgres-based, no Redis dependency)
 - **Audit Logging** — Every action recorded for compliance and forensics
 
@@ -264,7 +264,7 @@ src/
 │   │   ├── stats/                 # Dashboard analytics
 │   │   ├── cron/                  # Scheduled intelligence sync
 │   │   └── health/                # Health check
-│   └── sign-in/ sign-up/         # Clerk auth pages
+│   └── sign-in/ sign-up/         # Auth pages
 ├── lib/
 │   ├── analysis/                  # LangGraph pipeline orchestration
 │   │   └── analyzer.ts            # Main graph builder & execution
@@ -324,7 +324,7 @@ src/
 | **Database** | Supabase PostgreSQL | Primary data store with PgBouncer connection pooling |
 | **ORM** | Prisma 7.4 | Type-safe database access with migrations |
 | **Vector Search** | pgvector (1536-dim) | Semantic similarity search for embeddings |
-| **Authentication** | Clerk 6 | Enterprise SSO, protected routes, user management |
+| **Authentication** | Supabase Auth | Auth, protected routes, user management |
 | **UI Framework** | React 19 + TailwindCSS 4 | Component-based UI with utility-first styling |
 | **Charts** | Recharts 3 | 14 custom visualization components |
 | **Animations** | Framer Motion | Page transitions and interactive elements |
@@ -345,7 +345,6 @@ src/
 - **npm** >= 9.x
 - A **Supabase** project (free tier works) with pgvector extension enabled
 - A **Google AI** API key (Gemini access)
-- A **Clerk** application (free tier works)
 
 ### 1. Clone & Install
 
@@ -366,14 +365,6 @@ DIRECT_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabas
 
 # AI
 GOOGLE_API_KEY="your-gemini-api-key"
-
-# Authentication (Clerk)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
-CLERK_SECRET_KEY="sk_test_..."
-NEXT_PUBLIC_CLERK_SIGN_IN_URL="/sign-in"
-NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL="/dashboard"
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL="/dashboard"
 
 # External APIs (optional — enables enhanced fact-checking)
 FINNHUB_API_KEY="your-finnhub-key"
@@ -512,7 +503,7 @@ The platform is **Vercel-native** and optimized for serverless:
 - **PgBouncer connection pooling** — Handles concurrent serverless DB connections via Supabase
 - **Postgres-based caching** — No Redis dependency, simplifies infrastructure
 - **SSE streaming** — Real-time analysis progress (10MB body size limit configured)
-- **Edge-optimized** — Clerk middleware runs at the edge for fast auth checks
+- **Edge-optimized** — Auth middleware runs at the edge for fast auth checks
 
 ### Deploy to Vercel
 

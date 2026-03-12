@@ -10,8 +10,8 @@ datasource db {
 
 model Document {
   id          String     @id @default(cuid())
-  userId      String   // Clerk User ID
-  orgId       String?  // Clerk Organization ID
+  userId      String   // Supabase Auth User ID
+  orgId       String?  // Organization ID
   filename    String
   fileType    String
   fileSize    Int
@@ -97,8 +97,8 @@ model DecisionEmbedding {
 
 model AuditLog {
   id        String   @id @default(cuid())
-  userId    String   // Clerk User ID
-  orgId     String?  // Clerk Organization ID
+  userId    String   // Supabase Auth User ID
+  orgId     String?  // Organization ID
   action    String   // e.g. "EXPORT_PDF", "SCAN_DOCUMENT"
   resource  String   // e.g. "Document", "Analysis"
   resourceId String?

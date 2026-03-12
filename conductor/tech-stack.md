@@ -8,7 +8,7 @@
 ## Data Layer
 *   **Database**: PostgreSQL (Managed by Supabase)
 *   **ORM**: Prisma
-*   **Auth**: Clerk
+*   **Auth**: Supabase Auth
 
 ## AI & Autonomous Agents
 *   **LLM Provider**: Google Gemini 1.5 Pro / Gemini 3 Pro (Preview)
