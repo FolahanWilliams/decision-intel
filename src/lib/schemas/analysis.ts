@@ -38,9 +38,9 @@ export const SentimentSchema = z.object({
 }).default({ score: 0, label: 'Neutral' });
 
 export const LogicalSchema = z.object({
-    score: z.number().default(100),
+    score: z.number().default(50),
     fallacies: z.array(z.record(z.string(), z.unknown())).default([])
-}).default({ score: 100, fallacies: [] });
+}).default({ score: 50, fallacies: [] });
 
 export const SwotSchema = z.object({
     strengths: z.array(z.string()).default([]),

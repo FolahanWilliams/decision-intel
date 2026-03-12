@@ -4,6 +4,18 @@ import { createLogger } from '@/lib/utils/logger';
 const log = createLogger('Finnhub');
 const BASE_URL = 'https://finnhub.io/api/v1';
 
+/**
+ * Sanitize a string value from an external API response.
+ * Strips control characters, truncates to a reasonable length, and removes
+ * patterns commonly used in prompt injection attacks.
+ */
+function sanitizeApiString(value: unknown, maxLength: number = 200): string {
+    if (typeof value !== 'string') return '';
+    return value
+        .replace(/[\x00-\x1f\x7f]/g, '')  // strip control characters
+        .slice(0, maxLength);
+}
+
 // Finnhub Response Types
 interface FinnhubProfile {
     country: string;
@@ -101,12 +113,12 @@ export async function getFinnhubProfile(ticker: string, apiKey: string): Promise
     if (!data || !data.ticker) return null;
 
     return {
-        symbol: data.ticker,
+        symbol: sanitizeApiString(data.ticker, 10),
         price: 0, // Profile2 doesn't have price, handle upstream
-        companyName: data.name,
-        description: `Industry: ${data.finnhubIndustry}, Exchange: ${data.exchange}, IPO Date: ${data.ipo}, Phone: ${data.phone}, Website: ${data.weburl}`,
-        sector: data.finnhubIndustry, // Finnhub uses industry broadly
-        industry: data.finnhubIndustry,
+        companyName: sanitizeApiString(data.name, 100),
+        description: `Industry: ${sanitizeApiString(data.finnhubIndustry, 50)}, Exchange: ${sanitizeApiString(data.exchange, 20)}, IPO Date: ${sanitizeApiString(data.ipo, 12)}, Phone: ${sanitizeApiString(data.phone, 20)}, Website: ${sanitizeApiString(data.weburl, 100)}`,
+        sector: sanitizeApiString(data.finnhubIndustry, 50),
+        industry: sanitizeApiString(data.finnhubIndustry, 50),
         mktCap: data.marketCapitalization * 1000000, // Finnhub is in millions
         isEtf: false // Assumption
     };
