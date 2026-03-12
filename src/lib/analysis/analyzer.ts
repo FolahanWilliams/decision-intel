@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { safeJsonClone } from '@/lib/utils/json';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
@@ -7,7 +8,17 @@ import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/li
 import { validateContent } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
 
-import { z } from 'zod';
+import {
+    NoiseStatsSchema,
+    FactCheckSchema,
+    ComplianceSchema,
+    SentimentSchema,
+    LogicalSchema,
+    SwotSchema,
+    CognitiveSchema,
+    SimulationSchema,
+    MemorySchema,
+} from '@/lib/schemas/analysis';
 
 const log = createLogger('Analyzer');
 
@@ -21,67 +32,6 @@ export interface ProgressUpdate {
     message?: string;
     progress: number;
 }
-
-// Zod Schemas for Data Validation
-const NoiseStatsSchema = z.object({
-    mean: z.number().default(0),
-    stdDev: z.number().default(0),
-    variance: z.number().default(0)
-}).default({ mean: 0, stdDev: 0, variance: 0 });
-
-const FactCheckSchema = z.object({
-    score: z.number().default(0),
-    summary: z.string().default('Unavailable'),
-    verifications: z.array(z.record(z.string(), z.unknown())).default([]),
-    flags: z.array(z.string()).default([]),
-    primaryTopic: z.string().optional(),
-    searchSources: z.array(z.string()).optional(),
-}).passthrough().default({ score: 0, summary: 'Unavailable', verifications: [], flags: [] });
-
-const ComplianceSchema = z.object({
-    status: z.string().default('WARN'),
-    riskScore: z.number().default(0),
-    summary: z.string().default('Compliance check unavailable'),
-    regulations: z.array(z.record(z.string(), z.unknown())).default([]),
-    searchQueries: z.array(z.string()).optional(),
-}).passthrough().default({ status: 'WARN', riskScore: 0, summary: 'Compliance check unavailable', regulations: [] });
-
-const SentimentSchema = z.object({
-    score: z.number().default(0),
-    label: z.string().default('Neutral')
-}).default({ score: 0, label: 'Neutral' });
-
-const LogicalSchema = z.object({
-    score: z.number().default(100),
-    fallacies: z.array(z.record(z.string(), z.unknown())).default([])
-}).default({ score: 100, fallacies: [] });
-
-const SwotSchema = z.object({
-    strengths: z.array(z.string()).default([]),
-    weaknesses: z.array(z.string()).default([]),
-    opportunities: z.array(z.string()).default([]),
-    threats: z.array(z.string()).default([]),
-    strategicAdvice: z.string().default('')
-}).optional();
-
-const CognitiveSchema = z.object({
-    blindSpotGap: z.number().default(0),
-    blindSpots: z.array(z.object({
-        name: z.string(),
-        description: z.string()
-    })).default([]),
-    counterArguments: z.array(z.record(z.string(), z.unknown())).default([])
-}).optional();
-
-const SimulationSchema = z.object({
-    overallVerdict: z.string().default('Neutral'),
-    twins: z.array(z.record(z.string(), z.unknown())).default([])
-}).optional();
-
-const MemorySchema = z.object({
-    recallScore: z.number().default(0),
-    similarEvents: z.array(z.record(z.string(), z.unknown())).default([])
-}).optional();
 
 
 export async function analyzeDocument(
@@ -178,8 +128,7 @@ export async function analyzeDocument(
                         simulation: toPrismaJson(result.simulation ? (SimulationSchema.safeParse(result.simulation).success ? result.simulation : undefined) : undefined),
                         institutionalMemory: toPrismaJson(result.institutionalMemory ? (MemorySchema.safeParse(result.institutionalMemory).success ? result.institutionalMemory : undefined) : undefined),
                         intelligenceContext: toPrismaJson(result.intelligenceContext || undefined),
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required: schema drift protection demands flexible Prisma data shape
-                    } as any
+                    } satisfies Prisma.AnalysisUncheckedCreateInput
                 });
 
                 await tx.document.update({

@@ -124,7 +124,9 @@ export async function POST() {
             action: 'SEARCH_MARKET_TRENDS',
             resource: 'MarketAnalysis',
             details: { tickers: activeTopics }
-        }).catch(() => {});
+        }).catch((err: unknown) => {
+            log.warn('Audit log failed (non-critical): ' + (err instanceof Error ? err.message : String(err)));
+        });
 
         // Only forward expected fields to the client — the LLM may return
         // arbitrary keys that could break the frontend or leak prompt details.
