@@ -36,6 +36,9 @@ export function useChatStream(): UseChatStreamReturn {
     const [isStreaming, setIsStreaming] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const abortRef = useRef<AbortController | null>(null);
+    // Ref keeps the latest messages available inside the callback closure
+    const messagesRef = useRef<ChatMessage[]>(messages);
+    messagesRef.current = messages;
 
     const sendMessage = useCallback(async (text: string) => {
         const trimmed = text.trim();
@@ -55,8 +58,8 @@ export function useChatStream(): UseChatStreamReturn {
         setMessages((prev) => [...prev, userMsg, assistantMsg]);
         setIsStreaming(true);
 
-        // Build history from existing messages (exclude the new ones)
-        const history = messages
+        // Build history from the ref (always up-to-date, avoids stale closure)
+        const history = messagesRef.current
             .filter((m) => !m.isStreaming)
             .map((m) => ({ role: m.role, content: m.content }));
 
@@ -84,11 +87,11 @@ export function useChatStream(): UseChatStreamReturn {
             let sources: ChatSource[] = [];
 
             const processEvent = (data: unknown) => {
-                const event = data as Record<string, unknown>;
+                const event = data as { type: string; text?: string; sources?: ChatSource[]; message?: string };
                 if (event.type === 'sources') {
-                    sources = (event.sources as ChatSource[]) || [];
+                    sources = event.sources || [];
                 } else if (event.type === 'chunk') {
-                    accumulated += event.text as string;
+                    accumulated += event.text || '';
                     setMessages((prev) =>
                         prev.map((m) =>
                             m.id === assistantMsg.id
@@ -105,7 +108,7 @@ export function useChatStream(): UseChatStreamReturn {
                         )
                     );
                 } else if (event.type === 'error') {
-                    setError((event.message as string) || 'An error occurred');
+                    setError(event.message || 'An error occurred');
                 }
             };
 
@@ -116,10 +119,12 @@ export function useChatStream(): UseChatStreamReturn {
                 sseReader.processChunk(chunk, processEvent);
             }
 
-            // Ensure streaming flag is cleared
+            // Safety net: ensure streaming flag is cleared if 'done' event was missed
             setMessages((prev) =>
                 prev.map((m) =>
-                    m.id === assistantMsg.id ? { ...m, isStreaming: false } : m
+                    m.id === assistantMsg.id && m.isStreaming
+                        ? { ...m, isStreaming: false }
+                        : m
                 )
             );
         } catch (err) {
@@ -134,7 +139,7 @@ export function useChatStream(): UseChatStreamReturn {
             setIsStreaming(false);
             abortRef.current = null;
         }
-    }, [isStreaming, messages]);
+    }, [isStreaming]);
 
     const clearMessages = useCallback(() => {
         if (abortRef.current) abortRef.current.abort();

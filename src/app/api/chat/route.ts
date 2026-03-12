@@ -6,6 +6,7 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
+import { logAudit } from '@/lib/audit';
 
 const log = createLogger('ChatRoute');
 
@@ -188,6 +189,17 @@ export async function POST(request: NextRequest) {
                     controller.enqueue(
                         encoder.encode(formatSSE({ type: 'done' }))
                     );
+
+                    // Audit log (fire-and-forget)
+                    void logAudit({
+                        action: 'CHAT_MESSAGE',
+                        resource: 'chat',
+                        details: {
+                            messageLength: message.length,
+                            historyLength: safeHistory.length,
+                            sourcesReturned: sources.length,
+                        },
+                    });
                 } catch (err) {
                     log.error('Chat stream error:', err);
                     controller.enqueue(
