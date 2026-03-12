@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, FileText, Info, Terminal, Lightbulb } from 'lucide-react';
 import { BiasInstance } from '@/types';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('BiasDetailModal');
 
 const SEVERITY_COLORS: Record<string, string> = {
     low: 'var(--severity-low)',
@@ -106,7 +109,7 @@ export function BiasDetailModal({ bias, biases, currentIndex, onClose, onNavigat
                 setUserRating(rating);
             }
         } catch (error) {
-            console.error('Failed to submit feedback:', error);
+            log.error('Failed to submit feedback:', error);
         } finally {
             setIsSubmittingFeedback(false);
         }

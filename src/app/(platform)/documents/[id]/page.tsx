@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, use, lazy, Suspense } from 'react';
+import { useEffect, useState, useCallback, useRef, use, lazy, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -124,6 +124,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     const [scanProgress, setScanProgress] = useState(0);
     const [isExportingPdf, setIsExportingPdf] = useState(false);
     const [isExportingCsv, setIsExportingCsv] = useState(false);
+    const scanAbortRef = useRef<AbortController | null>(null);
 
     // URL-based tab state (#7)
     const tabFromUrl = searchParams.get('tab') as TabId | null;
@@ -172,6 +173,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         };
         fetchDocument();
     }, [resolvedParams.id]);
+
+    // Abort any in-flight scan stream on unmount
+    useEffect(() => {
+        return () => { scanAbortRef.current?.abort(); };
+    }, []);
 
     const handleExport = async () => {
         if (!document || !analysis) return;
@@ -232,6 +238,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
     const runLiveScan = async () => {
         if (!document) return;
+        // Abort any in-flight scan
+        scanAbortRef.current?.abort();
+        const controller = new AbortController();
+        scanAbortRef.current = controller;
+
         setIsScanning(true);
         setStreamLogs([{ msg: 'Establishing secure stream...', type: 'info', ts: new Date().toLocaleTimeString([], { hour12: false }) }]);
         setScanProgress(0);
@@ -240,7 +251,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             const response = await fetch('/api/analyze/stream', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ documentId: document.id })
+                body: JSON.stringify({ documentId: document.id }),
+                signal: controller.signal,
             });
 
             if (!response.ok) {
@@ -295,6 +307,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 throw new Error(streamError);
             }
         } catch (err) {
+            // Ignore abort errors (user navigated away or started a new scan)
+            if (err instanceof Error && err.name === 'AbortError') return;
             const msg = err instanceof Error ? err.message : 'Live scan failed';
             setStreamLogs(prev => [...prev, { msg: `Error: ${msg}`, type: 'bias', ts: new Date().toLocaleTimeString([], { hour12: false }) }]);
             showToast(msg, 'error');
