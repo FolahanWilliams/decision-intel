@@ -1,6 +1,6 @@
 'use client';
 
-import { BiasInstance } from '@prisma/client';
+import { BiasInstance } from '@/types';
 import { Brain, Lightbulb, ExternalLink } from 'lucide-react';
 import { BiasHeatmap } from '@/components/BiasHeatmap';
 import { BiasNetwork } from '@/components/visualizations/BiasNetwork';

@@ -19,8 +19,7 @@ import { BiasDetailModal } from './BiasDetailModal';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
-import { BiasInstance } from '@prisma/client';
-import { SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, InstitutionalMemoryResult, ComplianceResult, IntelligenceContextSummary } from '@/types';
+import { BiasInstance, SwotAnalysisResult, LogicalAnalysisResult, CognitiveAnalysisResult, NoiseBenchmark, InstitutionalMemoryResult, ComplianceResult, IntelligenceContextSummary } from '@/types';
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
 

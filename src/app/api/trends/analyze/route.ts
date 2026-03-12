@@ -46,7 +46,7 @@ export async function POST() {
         // a plain string (e.g. "Apple", "Tesla Motors"), not as an object.
         // Also check the legacy primaryCompany.ticker path for backwards compat.
         const topics = new Set<string>();
-        recentAnalyses.forEach(a => {
+        recentAnalyses.forEach((a: typeof recentAnalyses[number]) => {
             const fc = a.factCheck as Record<string, unknown> | null;
             if (!fc) return;
             // New format: primaryTopic (string)

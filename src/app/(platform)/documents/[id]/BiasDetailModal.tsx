@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, FileText, Info, Terminal, Lightbulb } from 'lucide-react';
-import { BiasInstance } from '@prisma/client';
+import { BiasInstance } from '@/types';
 
 const SEVERITY_COLORS: Record<string, string> = {
     low: 'var(--severity-low)',

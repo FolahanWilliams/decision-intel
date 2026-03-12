@@ -1,3 +1,14 @@
+export interface BiasInstance {
+    id: string;
+    biasType: string;
+    severity: string;
+    excerpt: string;
+    explanation: string;
+    suggestion: string;
+    confidence: number | null;
+    userRating?: number | null;
+}
+
 export interface BiasDetectionResult {
     biasType: string;
     found: boolean;

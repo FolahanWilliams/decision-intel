@@ -152,18 +152,21 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                             description="Receive email updates about your analyses"
                             checked={emailNotifications}
                             onChange={setEmailNotifications}
+                            disabled={isPending}
                         />
                         <ToggleOption
                             label="Analysis Alerts"
                             description="Get notified when document analysis completes"
                             checked={analysisAlerts}
                             onChange={setAnalysisAlerts}
+                            disabled={isPending}
                         />
                         <ToggleOption
                             label="Weekly Digest"
                             description="Receive a weekly summary of your risk assessments"
                             checked={weeklyDigest}
                             onChange={setWeeklyDigest}
+                            disabled={isPending}
                         />
                     </div>
                 </div>
@@ -184,12 +187,14 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                             description="Use dark theme (default)"
                             checked={darkMode}
                             onChange={setDarkMode}
+                            disabled={isPending}
                         />
                         <ToggleOption
                             label="Compact View"
                             description="Show more documents per page"
                             checked={compactView}
                             onChange={setCompactView}
+                            disabled={isPending}
                         />
                     </div>
                 </div>
@@ -339,12 +344,14 @@ function ToggleOption({
     label,
     description,
     checked,
-    onChange
+    onChange,
+    disabled = false
 }: {
     label: string;
     description: string;
     checked: boolean;
-    onChange: (value: boolean) => void
+    onChange: (value: boolean) => void;
+    disabled?: boolean;
 }) {
     const id = label.replace(/\s+/g, '-').toLowerCase();
     return (
@@ -358,13 +365,15 @@ function ToggleOption({
                 aria-checked={checked}
                 aria-labelledby={`${id}-label`}
                 aria-describedby={`${id}-desc`}
+                disabled={disabled}
                 onClick={() => onChange(!checked)}
                 style={{
                     width: 48,
                     height: 26,
                     background: checked ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
                     border: 'none',
-                    cursor: 'pointer',
+                    cursor: disabled ? 'not-allowed' : 'pointer',
+                    opacity: disabled ? 0.5 : 1,
                     position: 'relative',
                     transition: 'background 0.2s'
                 }}

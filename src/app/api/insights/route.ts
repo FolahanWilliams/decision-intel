@@ -20,7 +20,7 @@ export async function GET() {
             select: { id: true },
         });
 
-        const docIds = (await userDocIds).map(d => d.id);
+        const docIds = (await userDocIds).map((d: { id: string }) => d.id);
 
         if (docIds.length === 0) {
             return NextResponse.json({ empty: true });
@@ -311,12 +311,12 @@ export async function GET() {
             },
 
             // 2. Bias treemap
-            biasTreemap: biasDistribution.map(b => ({
+            biasTreemap: biasDistribution.map((b: { biasType: string; count: bigint }) => ({
                 name: b.biasType,
                 count: Number(b.count),
             })),
             biasSeverity: Object.fromEntries(
-                severityCounts.map(s => [s.severity, Number(s.count)])
+                severityCounts.map((s: { severity: string; count: bigint }) => [s.severity, Number(s.count)])
             ),
 
             // 3. SWOT
@@ -366,7 +366,7 @@ export async function GET() {
 
             // Summary stats
             totalAnalyses: n,
-            totalBiases: biasDistribution.reduce((sum, b) => sum + Number(b.count), 0),
+            totalBiases: biasDistribution.reduce((sum: number, b: { count: bigint }) => sum + Number(b.count), 0),
         };
 
         return NextResponse.json(payload);

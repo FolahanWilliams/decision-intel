@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { AnalysisResult, BiasDetectionResult } from '@/types';
 import { safeJsonClone } from '@/lib/utils/json';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
-import { Document } from '@prisma/client';
+type Document = NonNullable<Awaited<ReturnType<typeof prisma.document.findUnique>>>;
 import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/lib/utils/cache';
 import { validateContent } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
