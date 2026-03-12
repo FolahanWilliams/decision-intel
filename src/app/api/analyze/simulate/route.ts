@@ -49,7 +49,9 @@ export async function POST(request: NextRequest) {
             action: 'SIMULATE_SCENARIO',
             resource: 'Simulation',
             details: { contentLength: content.length }
-        }).catch(() => {});
+        }).catch((err: unknown) => {
+            log.warn('Audit log failed (non-critical): ' + (err instanceof Error ? err.message : String(err)));
+        });
 
         return NextResponse.json(result);
     } catch (error) {
