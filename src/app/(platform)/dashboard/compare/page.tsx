@@ -77,7 +77,7 @@ export default function ComparePage() {
     };
 
     const availableDocs = useMemo(
-        () => documents.filter((d) => d.status === 'COMPLETE' && !selectedIds.includes(d.id)),
+        () => documents.filter((d) => d.status === 'complete' && !selectedIds.includes(d.id)),
         [documents, selectedIds]
     );
 

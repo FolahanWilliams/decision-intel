@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('UserRoute');
@@ -23,6 +24,19 @@ export async function DELETE() {
         const userId = user?.id;
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Rate limit: 2 deletion attempts per hour
+        const rateLimitResult = await checkRateLimit(userId, '/api/user/delete', {
+            windowMs: 60 * 60 * 1000,
+            maxRequests: 2,
+            failMode: 'open',
+        });
+        if (!rateLimitResult.success) {
+            return NextResponse.json(
+                { error: 'Rate limit exceeded. Please try again later.' },
+                { status: 429, headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) } }
+            );
         }
 
         // Write the final audit entry BEFORE deleting (the record itself will

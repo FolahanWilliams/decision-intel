@@ -4,12 +4,21 @@ import { cleanExpiredResearch } from '@/lib/research/scholarSearch';
 import { prisma } from '@/lib/prisma';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { createLogger } from '@/lib/utils/logger';
+import { timingSafeEqual } from 'crypto';
 
 const log = createLogger('IntelligenceCron');
 
 export const maxDuration = 300; // 5 minutes for full sync
 
 const CRON_SECRET = process.env.CRON_SECRET?.trim();
+
+/** Constant-time comparison to prevent timing attacks on the cron secret. */
+function safeCompare(a: string, b: string): boolean {
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) return false;
+    return timingSafeEqual(bufA, bufB);
+}
 
 /**
  * GET /api/cron/sync-intelligence — Scheduled intelligence sync.
@@ -25,8 +34,8 @@ export async function GET(request: NextRequest) {
 
     // Verify cron secret (Vercel sends this in the Authorization header)
     if (CRON_SECRET) {
-        const authHeader = request.headers.get('authorization');
-        if (authHeader !== `Bearer ${CRON_SECRET}`) {
+        const authHeader = request.headers.get('authorization') ?? '';
+        if (!safeCompare(authHeader, `Bearer ${CRON_SECRET}`)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
     }
