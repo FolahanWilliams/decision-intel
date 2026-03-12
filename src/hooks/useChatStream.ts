@@ -18,6 +18,11 @@ export interface ChatSource {
     score: number;
 }
 
+interface UseChatStreamOptions {
+    /** When set, all RAG queries are scoped to this document only. */
+    pinnedDocumentId?: string;
+}
+
 interface UseChatStreamReturn {
     messages: ChatMessage[];
     isStreaming: boolean;
@@ -31,7 +36,7 @@ function nextId(): string {
     return `msg-${Date.now()}-${++messageCounter}`;
 }
 
-export function useChatStream(): UseChatStreamReturn {
+export function useChatStream(options?: UseChatStreamOptions): UseChatStreamReturn {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isStreaming, setIsStreaming] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -39,6 +44,8 @@ export function useChatStream(): UseChatStreamReturn {
     // Ref keeps the latest messages available inside the callback closure
     const messagesRef = useRef<ChatMessage[]>(messages);
     messagesRef.current = messages;
+
+    const pinnedDocumentId = options?.pinnedDocumentId;
 
     const sendMessage = useCallback(async (text: string) => {
         const trimmed = text.trim();
@@ -66,10 +73,15 @@ export function useChatStream(): UseChatStreamReturn {
         abortRef.current = new AbortController();
 
         try {
+            const body: Record<string, unknown> = { message: trimmed, history };
+            if (pinnedDocumentId) {
+                body.documentId = pinnedDocumentId;
+            }
+
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: trimmed, history }),
+                body: JSON.stringify(body),
                 signal: abortRef.current.signal,
             });
 
@@ -139,7 +151,7 @@ export function useChatStream(): UseChatStreamReturn {
             setIsStreaming(false);
             abortRef.current = null;
         }
-    }, [isStreaming]);
+    }, [isStreaming, pinnedDocumentId]);
 
     const clearMessages = useCallback(() => {
         if (abortRef.current) abortRef.current.abort();

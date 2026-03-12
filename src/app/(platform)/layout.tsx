@@ -1,6 +1,7 @@
 import Sidebar from "@/components/ui/Sidebar";
 import Ticker from "@/components/ui/Ticker";
 import { getUserSettings } from "@/app/actions/settings";
+import { AnalysisProgressProvider, AnalysisProgressFloat } from "@/components/ui/AnalysisProgressBar";
 
 export default async function PlatformLayout({
     children,
@@ -11,7 +12,7 @@ export default async function PlatformLayout({
     const isCompact = settings?.compactView ?? false;
 
     return (
-        <>
+        <AnalysisProgressProvider>
             <a href="#main-content" className="skip-nav">
                 Skip to main content
             </a>
@@ -32,6 +33,7 @@ export default async function PlatformLayout({
                     {children}
                 </main>
             </div>
-        </>
+            <AnalysisProgressFloat />
+        </AnalysisProgressProvider>
     );
 }

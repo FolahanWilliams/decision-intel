@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X, ClipboardList, Search, Globe, ChevronLeft, LogOut as LogOutIcon, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, Activity, ShieldAlert, BarChart3, Menu, X, ClipboardList, Search, Globe, ChevronLeft, LogOut as LogOutIcon, MessageSquare, GitCompareArrows } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useIntelligenceStatus } from '@/hooks/useIntelligence';
 
@@ -184,6 +184,7 @@ export default function Sidebar() {
                         } : undefined}
                     />
                     <NavItem href="/dashboard/search" icon={<Search size={18} />} label="Search" active={pathname === '/dashboard/search'} collapsed={collapsed} onNavigate={closeMobile} />
+                    <NavItem href="/dashboard/compare" icon={<GitCompareArrows size={18} />} label="Compare" active={pathname === '/dashboard/compare'} collapsed={collapsed} onNavigate={closeMobile} />
                     <NavItem href="/dashboard/chat" icon={<MessageSquare size={18} />} label="Chat" active={pathname === '/dashboard/chat'} collapsed={collapsed} onNavigate={closeMobile} />
 
                     {!collapsed && (

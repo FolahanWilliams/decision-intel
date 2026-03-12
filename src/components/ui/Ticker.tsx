@@ -1,5 +1,7 @@
 'use client';
 
+import { NotificationBell } from '@/components/ui/NotificationCenter';
+
 export default function Ticker() {
     return (
         <div
@@ -17,7 +19,7 @@ export default function Ticker() {
                 fontFamily: 'Inter, sans-serif',
             }}
         >
-            <div className="ticker-track">
+            <div className="ticker-track" style={{ flex: 1 }}>
                 <TickerItem label="Decision Score" value="85.4" change="+2.1%" up />
                 <TickerItem label="Noise Index" value="42.0" change="-1.5%" down />
                 <TickerItem label="Biases Detected" value="12" change="+3" bad />
@@ -28,6 +30,9 @@ export default function Ticker() {
                 <TickerItem label="Biases Detected" value="12" change="+3" bad />
                 <TickerItem label="Status" value="Operational" />
                 <TickerItem label="Documents" value="1,240" />
+            </div>
+            <div style={{ flexShrink: 0, padding: '0 12px', zIndex: 10 }}>
+                <NotificationBell />
             </div>
             <style jsx>{`
                 .ticker-track {

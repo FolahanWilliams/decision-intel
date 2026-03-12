@@ -1,15 +1,32 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, Send, Loader2, Trash2, FileText, ArrowRight } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { MessageSquare, Send, Loader2, Trash2, FileText, ArrowRight, Pin, PinOff, X } from 'lucide-react';
 import Link from 'next/link';
 import { useChatStream, type ChatMessage, type ChatSource } from '@/hooks/useChatStream';
+import { useDocuments } from '@/hooks/useDocuments';
 
 export default function ChatPage() {
-    const { messages, isStreaming, error, sendMessage, clearMessages } = useChatStream();
+    const { documents } = useDocuments(false, 1, 100);
+    const [pinnedDocId, setPinnedDocId] = useState<string | null>(null);
+    const [showPicker, setShowPicker] = useState(false);
+
+    const { messages, isStreaming, error, sendMessage, clearMessages } = useChatStream({
+        pinnedDocumentId: pinnedDocId || undefined,
+    });
     const [input, setInput] = useState('');
     const bottomRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    const pinnedDoc = useMemo(
+        () => documents.find((d) => d.id === pinnedDocId),
+        [documents, pinnedDocId]
+    );
+
+    const completeDocs = useMemo(
+        () => documents.filter((d) => d.status === 'COMPLETE'),
+        [documents]
+    );
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
@@ -20,6 +37,12 @@ export default function ChatPage() {
     useEffect(() => {
         inputRef.current?.focus();
     }, []);
+
+    // Clear messages when pinned doc changes
+    useEffect(() => {
+        clearMessages();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pinnedDocId]);
 
     const handleSubmit = useCallback(async () => {
         const text = input.trim();
@@ -70,25 +93,140 @@ export default function ChatPage() {
                         </p>
                     </div>
                 </div>
-                {messages.length > 0 && (
-                    <button
-                        onClick={clearMessages}
-                        className="btn flex items-center gap-xs"
-                        style={{
-                            background: 'var(--bg-tertiary)',
-                            border: '1px solid var(--border-color)',
-                            color: 'var(--text-muted)',
-                            fontSize: '12px',
-                            padding: '6px 12px',
-                            cursor: 'pointer',
-                        }}
-                        title="Clear conversation"
-                    >
-                        <Trash2 size={14} />
-                        Clear
-                    </button>
-                )}
+                <div className="flex items-center gap-sm">
+                    {/* Pin document button */}
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            onClick={() => setShowPicker(!showPicker)}
+                            className="btn flex items-center gap-xs"
+                            style={{
+                                background: pinnedDocId ? 'rgba(99, 102, 241, 0.1)' : 'var(--bg-tertiary)',
+                                border: `1px solid ${pinnedDocId ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                                color: pinnedDocId ? 'var(--accent-primary)' : 'var(--text-muted)',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                            }}
+                            title={pinnedDocId ? `Pinned: ${pinnedDoc?.filename}` : 'Pin a document'}
+                        >
+                            {pinnedDocId ? <PinOff size={14} /> : <Pin size={14} />}
+                            {pinnedDocId ? 'Pinned' : 'Pin doc'}
+                        </button>
+                        {showPicker && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    right: 0,
+                                    marginTop: '4px',
+                                    background: 'var(--bg-secondary)',
+                                    border: '1px solid var(--border-color)',
+                                    width: '300px',
+                                    maxHeight: '240px',
+                                    overflowY: 'auto',
+                                    zIndex: 20,
+                                }}
+                            >
+                                {pinnedDocId && (
+                                    <button
+                                        onClick={() => { setPinnedDocId(null); setShowPicker(false); }}
+                                        className="flex items-center gap-sm"
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px 12px',
+                                            background: 'transparent',
+                                            border: 'none',
+                                            borderBottom: '1px solid var(--border-color)',
+                                            color: 'var(--text-muted)',
+                                            fontSize: '13px',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                        }}
+                                    >
+                                        <X size={14} /> Unpin document (search all)
+                                    </button>
+                                )}
+                                {completeDocs.length === 0 && (
+                                    <div style={{ padding: '12px', fontSize: '13px', color: 'var(--text-muted)' }}>
+                                        No analysed documents
+                                    </div>
+                                )}
+                                {completeDocs.map((d) => (
+                                    <button
+                                        key={d.id}
+                                        onClick={() => { setPinnedDocId(d.id); setShowPicker(false); }}
+                                        className="flex items-center gap-sm"
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px 12px',
+                                            background: d.id === pinnedDocId ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                                            border: 'none',
+                                            borderBottom: '1px solid var(--border-color)',
+                                            color: 'var(--text-primary)',
+                                            fontSize: '13px',
+                                            cursor: 'pointer',
+                                            textAlign: 'left',
+                                        }}
+                                    >
+                                        <FileText size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                                        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {d.filename}
+                                        </span>
+                                        {d.id === pinnedDocId && <Pin size={12} style={{ color: 'var(--accent-primary)' }} />}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {messages.length > 0 && (
+                        <button
+                            onClick={clearMessages}
+                            className="btn flex items-center gap-xs"
+                            style={{
+                                background: 'var(--bg-tertiary)',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-muted)',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                            }}
+                            title="Clear conversation"
+                        >
+                            <Trash2 size={14} />
+                            Clear
+                        </button>
+                    )}
+                </div>
             </header>
+
+            {/* Pinned doc banner */}
+            {pinnedDoc && (
+                <div
+                    className="flex items-center gap-sm"
+                    style={{
+                        padding: '8px var(--spacing-md)',
+                        background: 'rgba(99, 102, 241, 0.06)',
+                        borderBottom: '1px solid var(--border-color)',
+                        fontSize: '12px',
+                        flexShrink: 0,
+                    }}
+                >
+                    <Pin size={12} style={{ color: 'var(--accent-primary)' }} />
+                    <span style={{ color: 'var(--text-secondary)' }}>
+                        Chatting about{' '}
+                        <Link href={`/documents/${pinnedDoc.id}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>
+                            {pinnedDoc.filename}
+                        </Link>
+                    </span>
+                    <button
+                        onClick={() => setPinnedDocId(null)}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', marginLeft: 'auto', display: 'flex', padding: '2px' }}
+                        aria-label="Unpin document"
+                    >
+                        <X size={14} />
+                    </button>
+                </div>
+            )}
 
             {/* Messages area */}
             <div
@@ -99,7 +237,7 @@ export default function ChatPage() {
                 }}
             >
                 {messages.length === 0 ? (
-                    <EmptyState onSuggestionClick={setInput} />
+                    <EmptyState onSuggestionClick={setInput} isPinned={!!pinnedDocId} pinnedFilename={pinnedDoc?.filename} />
                 ) : (
                     <div className="flex flex-col gap-md">
                         {messages.map((msg) => (
@@ -140,7 +278,7 @@ export default function ChatPage() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Ask about your documents, biases, decision patterns..."
+                        placeholder={pinnedDocId ? `Ask about ${pinnedDoc?.filename || 'this document'}...` : 'Ask about your documents, biases, decision patterns...'}
                         rows={1}
                         style={{
                             flex: 1,
@@ -180,20 +318,31 @@ export default function ChatPage() {
                         textAlign: 'center',
                     }}
                 >
-                    Responses are grounded in your analysed documents via semantic search.
+                    {pinnedDocId
+                        ? 'Responses are grounded in the pinned document\'s analysis.'
+                        : 'Responses are grounded in your analysed documents via semantic search.'}
                 </p>
             </div>
         </div>
     );
 }
 
-function EmptyState({ onSuggestionClick }: { onSuggestionClick: (text: string) => void }) {
-    const suggestions = [
+function EmptyState({ onSuggestionClick, isPinned, pinnedFilename }: { onSuggestionClick: (text: string) => void; isPinned: boolean; pinnedFilename?: string }) {
+    const globalSuggestions = [
         'What cognitive biases appear most often in my documents?',
         'Summarise the riskiest decisions I\'ve analysed',
         'Which documents had the lowest decision quality scores?',
         'What patterns do you see across my analyses?',
     ];
+
+    const pinnedSuggestions = [
+        `What are the main risks identified in this document?`,
+        `What cognitive biases were found?`,
+        `Summarise the key findings and recommendations`,
+        `What is the decision quality score and why?`,
+    ];
+
+    const suggestions = isPinned ? pinnedSuggestions : globalSuggestions;
 
     return (
         <div
@@ -212,14 +361,17 @@ function EmptyState({ onSuggestionClick }: { onSuggestionClick: (text: string) =
                         marginBottom: 'var(--spacing-sm)',
                     }}
                 >
-                    Ask anything about your documents
+                    {isPinned
+                        ? `Ask about ${pinnedFilename || 'this document'}`
+                        : 'Ask anything about your documents'}
                 </h2>
                 <p
                     className="text-muted"
                     style={{ fontSize: '13px', lineHeight: 1.6 }}
                 >
-                    This chat uses semantic search to find relevant document
-                    analyses and provides grounded answers with source citations.
+                    {isPinned
+                        ? 'All responses will be grounded in this specific document\'s analysis.'
+                        : 'This chat uses semantic search to find relevant document analyses and provides grounded answers with source citations.'}
                 </p>
             </div>
             <div
@@ -321,7 +473,7 @@ function SourcesList({ sources }: { sources: ChatSource[] }) {
                 {sources.map((src) => (
                     <Link
                         key={src.documentId}
-                        href={`/documents/${src.documentId}`}
+                        href={`/documents/${src.documentId}?tab=overview`}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -337,7 +489,7 @@ function SourcesList({ sources }: { sources: ChatSource[] }) {
                             className="text-muted"
                             style={{ fontSize: '11px' }}
                         >
-                            {Math.round(src.similarity * 100)}% match
+                            {Math.round(src.similarity * 100)}% match · Score {src.score}/100
                         </span>
                         <ArrowRight size={10} style={{ marginLeft: 'auto', opacity: 0.5 }} />
                     </Link>
