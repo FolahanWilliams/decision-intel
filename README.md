@@ -264,7 +264,7 @@ src/
 │   │   ├── stats/                 # Dashboard analytics
 │   │   ├── cron/                  # Scheduled intelligence sync
 │   │   └── health/                # Health check
-│   └── sign-in/ sign-up/         # Auth pages
+│   └── login/                    # Google OAuth login page
 ├── lib/
 │   ├── analysis/                  # LangGraph pipeline orchestration
 │   │   └── analyzer.ts            # Main graph builder & execution
@@ -324,7 +324,7 @@ src/
 | **Database** | Supabase PostgreSQL | Primary data store with PgBouncer connection pooling |
 | **ORM** | Prisma 7.4 | Type-safe database access with migrations |
 | **Vector Search** | pgvector (1536-dim) | Semantic similarity search for embeddings |
-| **Authentication** | Supabase Auth | Auth, protected routes, user management |
+| **Authentication** | Supabase Auth | Google OAuth, protected routes, user management |
 | **UI Framework** | React 19 + TailwindCSS 4 | Component-based UI with utility-first styling |
 | **Charts** | Recharts 3 | 14 custom visualization components |
 | **Animations** | Framer Motion | Page transitions and interactive elements |
@@ -362,6 +362,11 @@ Create a `.env` file in the project root:
 # Database (Supabase)
 DATABASE_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true"
 DIRECT_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+
+# Authentication (Supabase Auth — Google OAuth)
+NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 
 # AI
 GOOGLE_API_KEY="your-gemini-api-key"
