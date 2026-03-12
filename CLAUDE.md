@@ -20,7 +20,7 @@ git push --force-with-lease -u origin <branch-name>
 
 ## Project Overview
 
-Next.js 14 app (App Router) with Prisma ORM, Clerk auth, LangGraph AI pipeline, and Supabase Postgres.
+Next.js 14 app (App Router) with Prisma ORM, Supabase Auth, LangGraph AI pipeline, and Supabase Postgres.
 
 ## Commands
 

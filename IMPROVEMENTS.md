@@ -288,7 +288,7 @@ The pipeline runs tests but does not collect or report coverage metrics. There's
 - **SSE streaming end-to-end** — the `useAnalysisStream` hook has no tests
 - **PDF/CSV report generation** — no tests for export functionality
 - **Frontend components** — zero component tests for any visualization or page component
-- **Auth middleware** — no tests for Clerk integration or extension API key auth
+- **Auth middleware** — no tests for Supabase Auth integration or extension API key auth
 
 **Recommendation:** Prioritize testing for API routes (they are the system boundary) and the rate limiter. Add integration tests for the SSE streaming pipeline.
 

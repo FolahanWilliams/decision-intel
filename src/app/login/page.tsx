@@ -1,11 +1,22 @@
 'use client'
 
 import { createClient } from '@/utils/supabase/client'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { ShieldCheck, Brain, BarChart3, Search, Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  )
+}
+
+function LoginContent() {
   const [loading, setLoading] = useState(false)
+  const searchParams = useSearchParams()
+  const authError = searchParams.get('error')
 
   const handleGoogleLogin = async () => {
     setLoading(true)
@@ -144,6 +155,19 @@ export default function LoginPage() {
                 Sign in to continue to your dashboard
               </p>
             </div>
+
+            {authError && (
+              <div style={{
+                padding: '10px 14px',
+                marginBottom: '1rem',
+                fontSize: '13px',
+                color: '#ef4444',
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+              }}>
+                Sign-in failed. Please try again.
+              </div>
+            )}
 
             <button
               onClick={handleGoogleLogin}
