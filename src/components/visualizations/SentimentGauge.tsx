@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { InfoTooltip } from '@/components/ui/InfoTooltip';
 
 interface SentimentGaugeProps {
     score: number;     // -100 to 100, or 0 to 100
@@ -120,7 +121,10 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
     return (
         <div className="card card-glow h-full">
             <div className="card-header">
-                <h3 style={{ fontSize: '13px' }}>Sentiment Pulse</h3>
+                <h3 style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    Sentiment Pulse
+                    <InfoTooltip text="Measures the overall emotional tone of the document on a scale from negative (red) to positive (green). A neutral score suggests balanced language." />
+                </h3>
             </div>
             <div ref={containerRef} className="card-body flex flex-col items-center justify-center" style={{ minHeight: 200 }}>
                 <canvas ref={canvasRef} />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { InfoTooltip } from '@/components/ui/InfoTooltip';
 
 interface SwotQuadrantProps {
     data: {
@@ -26,7 +27,10 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
         return (
             <div className="card card-glow h-full">
                 <div className="card-header">
-                    <h3 style={{ fontSize: '13px' }}>SWOT Analysis</h3>
+                    <h3 style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    SWOT Analysis
+                    <InfoTooltip text="Strengths, Weaknesses, Opportunities, and Threats identified in the document. Helps evaluate the strategic position of the decision." />
+                </h3>
                 </div>
                 <div className="card-body flex items-center justify-center" style={{ minHeight: 280 }}>
                     <p className="text-muted text-sm">No SWOT data available</p>
@@ -38,7 +42,10 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
     return (
         <div className="card h-full">
             <div className="card-header">
-                <h3 style={{ fontSize: '13px' }}>SWOT Analysis</h3>
+                <h3 style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    SWOT Analysis
+                    <InfoTooltip text="Strengths, Weaknesses, Opportunities, and Threats identified in the document. Helps evaluate the strategic position of the decision." />
+                </h3>
             </div>
             <div className="card-body" style={{ padding: 'var(--spacing-sm)' }}>
                 <div style={{

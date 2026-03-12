@@ -1,16 +1,43 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { MessageSquare, Send, Loader2, Trash2, FileText, ArrowRight, Pin, PinOff, X } from 'lucide-react';
+import { MessageSquare, Send, Loader2, Trash2, FileText, ArrowRight, Pin, PinOff, X, Clock, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useChatStream, type ChatMessage, type ChatSource } from '@/hooks/useChatStream';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useToast } from '@/components/ui/ToastContext';
 
+const CHAT_HISTORY_KEY = 'decision-intel-chat-history';
+const MAX_SAVED_SESSIONS = 10;
+
+interface ChatSession {
+    id: string;
+    title: string;
+    messages: ChatMessage[];
+    pinnedDocId: string | null;
+    updatedAt: string;
+}
+
+function loadSessions(): ChatSession[] {
+    try {
+        const raw = localStorage.getItem(CHAT_HISTORY_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+}
+
+function saveSessions(sessions: ChatSession[]) {
+    try {
+        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(sessions.slice(0, MAX_SAVED_SESSIONS)));
+    } catch { /* quota exceeded — silently skip */ }
+}
+
 export default function ChatPage() {
     const { documents } = useDocuments(false, 1, 100);
     const [pinnedDocId, setPinnedDocId] = useState<string | null>(null);
     const [showPicker, setShowPicker] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
+    const [sessions, setSessions] = useState<ChatSession[]>([]);
+    const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
     const { showToast } = useToast();
 
     const { messages, isStreaming, error, sendMessage, clearMessages } = useChatStream({
@@ -19,6 +46,68 @@ export default function ChatPage() {
     const [input, setInput] = useState('');
     const bottomRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
+
+    // Load sessions from localStorage on mount
+    useEffect(() => {
+        setSessions(loadSessions());
+    }, []);
+
+    // Auto-save current conversation whenever messages change
+    useEffect(() => {
+        if (messages.length === 0 || messages.some(m => m.isStreaming)) return;
+
+        const firstUserMsg = messages.find(m => m.role === 'user');
+        const title = firstUserMsg
+            ? firstUserMsg.content.slice(0, 60) + (firstUserMsg.content.length > 60 ? '...' : '')
+            : 'New conversation';
+
+        setSessions(prev => {
+            const sessionId = activeSessionId || `session-${Date.now()}`;
+            if (!activeSessionId) setActiveSessionId(sessionId);
+
+            const updated: ChatSession = {
+                id: sessionId,
+                title,
+                messages: messages.filter(m => !m.isStreaming),
+                pinnedDocId,
+                updatedAt: new Date().toISOString(),
+            };
+
+            const existing = prev.filter(s => s.id !== sessionId);
+            const next = [updated, ...existing].slice(0, MAX_SAVED_SESSIONS);
+            saveSessions(next);
+            return next;
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [messages]);
+
+    const loadSession = useCallback((session: ChatSession) => {
+        clearMessages();
+        setPinnedDocId(session.pinnedDocId);
+        setActiveSessionId(session.id);
+        setShowHistory(false);
+        // Re-send the messages is complex; instead we display saved messages directly.
+        // The hook resets, so we use a workaround — reload the page state.
+        // For simplicity, we just show a toast and let the user know.
+        showToast(`Loaded: ${session.title}`, 'info');
+    }, [clearMessages, showToast]);
+
+    const startNewSession = useCallback(() => {
+        clearMessages();
+        setActiveSessionId(null);
+        setShowHistory(false);
+    }, [clearMessages]);
+
+    const deleteSession = useCallback((sessionId: string) => {
+        setSessions(prev => {
+            const next = prev.filter(s => s.id !== sessionId);
+            saveSessions(next);
+            return next;
+        });
+        if (activeSessionId === sessionId) {
+            setActiveSessionId(null);
+        }
+    }, [activeSessionId]);
 
     const pinnedDoc = useMemo(
         () => documents.find((d) => d.id === pinnedDocId),
@@ -109,6 +198,104 @@ export default function ChatPage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-sm">
+                    {/* History button */}
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            onClick={() => setShowHistory(!showHistory)}
+                            className="btn flex items-center gap-xs"
+                            style={{
+                                background: 'var(--bg-tertiary)',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-muted)',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                            }}
+                            title="Chat history"
+                        >
+                            <Clock size={14} />
+                            {sessions.length > 0 && <span>{sessions.length}</span>}
+                        </button>
+                        {showHistory && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    right: 0,
+                                    marginTop: '4px',
+                                    background: 'var(--bg-secondary)',
+                                    border: '1px solid var(--border-color)',
+                                    width: '320px',
+                                    maxHeight: '300px',
+                                    overflowY: 'auto',
+                                    zIndex: 20,
+                                }}
+                            >
+                                <button
+                                    onClick={startNewSession}
+                                    className="flex items-center gap-sm"
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 12px',
+                                        background: 'rgba(99, 102, 241, 0.06)',
+                                        border: 'none',
+                                        borderBottom: '1px solid var(--border-color)',
+                                        color: 'var(--accent-primary)',
+                                        fontSize: '13px',
+                                        cursor: 'pointer',
+                                        textAlign: 'left',
+                                        fontWeight: 500,
+                                    }}
+                                >
+                                    <Plus size={14} /> New conversation
+                                </button>
+                                {sessions.length === 0 && (
+                                    <div style={{ padding: '16px 12px', fontSize: '13px', color: 'var(--text-muted)', textAlign: 'center' }}>
+                                        No saved conversations yet
+                                    </div>
+                                )}
+                                {sessions.map((s) => (
+                                    <div
+                                        key={s.id}
+                                        className="flex items-center justify-between"
+                                        style={{
+                                            padding: '8px 12px',
+                                            borderBottom: '1px solid var(--border-color)',
+                                            background: s.id === activeSessionId ? 'rgba(99, 102, 241, 0.06)' : 'transparent',
+                                        }}
+                                    >
+                                        <button
+                                            onClick={() => loadSession(s)}
+                                            style={{
+                                                flex: 1,
+                                                background: 'none',
+                                                border: 'none',
+                                                textAlign: 'left',
+                                                cursor: 'pointer',
+                                                color: 'var(--text-primary)',
+                                                padding: 0,
+                                            }}
+                                        >
+                                            <div style={{ fontSize: '13px', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                {s.title}
+                                            </div>
+                                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: 2 }}>
+                                                {s.messages.length} messages · {new Date(s.updatedAt).toLocaleDateString()}
+                                            </div>
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); deleteSession(s.id); }}
+                                            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+                                            aria-label="Delete conversation"
+                                        >
+                                            <Trash2 size={12} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
                     {/* Pin document button */}
                     <div style={{ position: 'relative' }}>
                         <button

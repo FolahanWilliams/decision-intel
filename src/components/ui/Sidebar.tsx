@@ -141,6 +141,44 @@ export default function Sidebar() {
                 </div>
 
                 <nav style={{ padding: collapsed ? '12px 8px' : '16px 12px', flex: 1, overflowY: 'auto' }}>
+                    {/* Quick search shortcut */}
+                    <button
+                        onClick={() => {
+                            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }));
+                        }}
+                        title={collapsed ? 'Search (⌘K)' : undefined}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: collapsed ? 'center' : 'space-between',
+                            gap: '8px',
+                            width: '100%',
+                            padding: collapsed ? '8px' : '8px 12px',
+                            marginBottom: '12px',
+                            background: 'var(--bg-tertiary)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-muted)',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            transition: 'border-color 0.15s',
+                        }}
+                    >
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Search size={14} />
+                            {!collapsed && <span>Search...</span>}
+                        </span>
+                        {!collapsed && (
+                            <kbd style={{
+                                fontSize: '10px',
+                                padding: '1px 5px',
+                                background: 'var(--bg-secondary)',
+                                border: '1px solid var(--border-color)',
+                            }}>
+                                ⌘K
+                            </kbd>
+                        )}
+                    </button>
+
                     {!collapsed && (
                         <div style={{
                             fontSize: '10px',
@@ -283,45 +321,80 @@ export default function Sidebar() {
 }
 
 function NavItem({ href, icon, label, description, active, collapsed, onNavigate, badge }: { href: string, icon: React.ReactNode, label: string, description?: string, active?: boolean, collapsed?: boolean, onNavigate?: () => void, badge?: { color: string } }) {
+    const [showTooltip, setShowTooltip] = useState(false);
+
     return (
-        <Link
-            href={href}
-            onClick={onNavigate}
-            aria-current={active ? 'page' : undefined}
-            title={collapsed ? label : description}
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: collapsed ? 'center' : 'flex-start',
-                gap: collapsed ? '0' : '12px',
-                padding: collapsed ? '10px' : '9px 12px',
-                color: active ? 'var(--text-highlight)' : 'var(--text-secondary)',
-                background: active ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
-                borderLeft: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
-                marginBottom: '2px',
-                fontSize: '13.5px',
-                fontWeight: active ? 600 : 400,
-                textDecoration: 'none',
-                transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
-            }}
-        >
-            <span style={{
-                color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
-                flexShrink: 0,
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-            }}>
-                {icon}
-                {badge && (
-                    <span style={{
-                        position: 'absolute', top: '-3px', right: '-3px',
-                        width: '7px', height: '7px',
-                        background: badge.color,
-                    }} />
-                )}
-            </span>
-            {!collapsed && <span>{label}</span>}
-        </Link>
+        <div style={{ position: 'relative' }}>
+            <Link
+                href={href}
+                onClick={onNavigate}
+                aria-current={active ? 'page' : undefined}
+                aria-label={collapsed ? label : undefined}
+                onMouseEnter={() => collapsed && setShowTooltip(true)}
+                onMouseLeave={() => setShowTooltip(false)}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: collapsed ? 'center' : 'flex-start',
+                    gap: collapsed ? '0' : '12px',
+                    padding: collapsed ? '10px' : '9px 12px',
+                    color: active ? 'var(--text-highlight)' : 'var(--text-secondary)',
+                    background: active ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                    borderLeft: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
+                    marginBottom: '2px',
+                    fontSize: '13.5px',
+                    fontWeight: active ? 600 : 400,
+                    textDecoration: 'none',
+                    transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+            >
+                <span style={{
+                    color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
+                    flexShrink: 0,
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                }}>
+                    {icon}
+                    {badge && (
+                        <span style={{
+                            position: 'absolute', top: '-3px', right: '-3px',
+                            width: '7px', height: '7px',
+                            background: badge.color,
+                        }} />
+                    )}
+                </span>
+                {!collapsed && <span>{label}</span>}
+            </Link>
+            {/* Custom tooltip for collapsed sidebar */}
+            {collapsed && showTooltip && (
+                <div
+                    role="tooltip"
+                    style={{
+                        position: 'absolute',
+                        left: '100%',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        marginLeft: 8,
+                        padding: '6px 10px',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        color: 'var(--text-primary)',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        whiteSpace: 'nowrap',
+                        zIndex: 80,
+                        pointerEvents: 'none',
+                    }}
+                >
+                    {label}
+                    {description && (
+                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: 2 }}>
+                            {description}
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
     );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { Treemap, ResponsiveContainer, Tooltip } from 'recharts';
+import { InfoTooltip } from '@/components/ui/InfoTooltip';
 
 interface BiasTreemapProps {
     data: { name: string; count: number }[];
@@ -103,7 +104,10 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
     return (
         <div className="card card-glow h-full">
             <div className="card-header flex items-center justify-between">
-                <h3 style={{ fontSize: '13px' }}>Bias Landscape</h3>
+                <h3 style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    Bias Landscape
+                    <InfoTooltip text="Shows the distribution of cognitive biases found in the document. Larger tiles indicate more frequent bias types. Colors correspond to severity levels." />
+                </h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {severityMap && Object.keys(severityMap).length > 0 && (
                         <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>

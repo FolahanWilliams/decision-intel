@@ -339,15 +339,33 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     const biases = analysis?.biases || [];
     const selectedBiasIndex = selectedBias ? biases.findIndex(b => b.id === selectedBias.id) : -1;
 
-    const TAB_CONFIG = [
-        { id: 'overview' as const, label: 'Overview', icon: Brain },
-        { id: 'logic' as const, label: 'Logic', icon: CheckCircle },
-        { id: 'swot' as const, label: 'SWOT', icon: Lightbulb },
-        { id: 'noise' as const, label: 'Noise', icon: Info },
-        ...(analysis?.cognitiveAnalysis ? [{ id: 'red-team' as const, label: 'Red Team', icon: Users }] : []),
-        ...(analysis?.simulation ? [{ id: 'boardroom' as const, label: 'Boardroom', icon: Vote }] : []),
-        { id: 'simulator' as const, label: 'Simulator', icon: PlayCircle },
-        ...(analysis?.intelligenceContext ? [{ id: 'intelligence' as const, label: 'Intelligence', icon: Globe }] : []),
+    const TAB_GROUPS: { label: string; tabs: { id: TabId; label: string; icon: typeof Brain }[] }[] = [
+        {
+            label: 'Overview',
+            tabs: [
+                { id: 'overview', label: 'Overview', icon: Brain },
+            ],
+        },
+        {
+            label: 'Analysis',
+            tabs: [
+                { id: 'logic', label: 'Logic', icon: CheckCircle },
+                { id: 'swot', label: 'SWOT', icon: Lightbulb },
+                { id: 'noise', label: 'Noise', icon: Info },
+            ],
+        },
+        {
+            label: 'Scenarios',
+            tabs: [
+                ...(analysis?.cognitiveAnalysis ? [{ id: 'red-team' as const, label: 'Red Team', icon: Users }] : []),
+                ...(analysis?.simulation ? [{ id: 'boardroom' as const, label: 'Boardroom', icon: Vote }] : []),
+                { id: 'simulator' as const, label: 'Simulator', icon: PlayCircle },
+            ],
+        },
+        ...(analysis?.intelligenceContext ? [{
+            label: 'Context',
+            tabs: [{ id: 'intelligence' as const, label: 'Intelligence', icon: Globe }],
+        }] : []),
     ];
 
     return (
@@ -572,23 +590,39 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             {/* Tabs + Content */}
             <div className="grid" style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}>
                 <div className="flex flex-col gap-lg">
-                    {/* Tab Bar */}
-                    <div className="flex flex-wrap gap-xs border-b border-border mb-lg" role="tablist" aria-label="Analysis tabs">
-                        {TAB_CONFIG.map(tab => (
-                            <button
-                                key={tab.id}
-                                role="tab"
-                                aria-selected={activeTab === tab.id}
-                                aria-controls={`tabpanel-${tab.id}`}
-                                onClick={() => handleTabChange(tab.id)}
-                                className={`flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${activeTab === tab.id
-                                    ? 'text-accent-primary border-accent-primary bg-accent-primary/5'
-                                    : 'text-muted border-transparent hover:text-primary hover:border-border'
-                                }`}
-                            >
-                                <tab.icon size={14} />
-                                {tab.label}
-                            </button>
+                    {/* Tab Bar with group labels */}
+                    <div className="flex flex-wrap items-end gap-0 border-b border-border mb-lg" role="tablist" aria-label="Analysis tabs">
+                        {TAB_GROUPS.map((group, gi) => (
+                            <div key={group.label} className="flex items-end">
+                                {gi > 0 && (
+                                    <div style={{ width: 1, height: 24, background: 'var(--border-color)', margin: '0 4px', alignSelf: 'center' }} />
+                                )}
+                                <div className="flex flex-col">
+                                    {group.label !== 'Overview' && (
+                                        <span style={{ fontSize: '9px', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0 16px 2px', userSelect: 'none' }}>
+                                            {group.label}
+                                        </span>
+                                    )}
+                                    <div className="flex">
+                                        {group.tabs.map(tab => (
+                                            <button
+                                                key={tab.id}
+                                                role="tab"
+                                                aria-selected={activeTab === tab.id}
+                                                aria-controls={`tabpanel-${tab.id}`}
+                                                onClick={() => handleTabChange(tab.id)}
+                                                className={`flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${activeTab === tab.id
+                                                    ? 'text-accent-primary border-accent-primary bg-accent-primary/5'
+                                                    : 'text-muted border-transparent hover:text-primary hover:border-border'
+                                                }`}
+                                            >
+                                                <tab.icon size={14} />
+                                                {tab.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
 

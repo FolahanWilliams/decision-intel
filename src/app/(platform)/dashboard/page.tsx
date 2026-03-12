@@ -26,15 +26,22 @@ const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Finalizing report', icon: <CheckCircle size={16} /> },
 ];
 
+type DashboardView = 'upload' | 'browse';
+
 export default function Dashboard() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<DashboardView>('upload');
+
+  // Upload confirmation state
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>('all');
-  const [showTrend, setShowTrend] = useState<boolean | null>(null);
+  const [showTrend, setShowTrend] = useState(false);
+  const [showComparative, setShowComparative] = useState(false);
   const [docsPage, setDocsPage] = useState(1);
 
   // Delete confirmation state
@@ -68,12 +75,13 @@ export default function Dashboard() {
     }
   }, [currentProgress, analysisSteps, updateProgress]);
 
-  // Auto-expand trend chart when 3+ analyzed documents exist (only on first load)
+  // Auto-switch to browse view when user has documents
   useEffect(() => {
-    if (showTrend === null && uploadedDocs.filter(d => d.score !== undefined).length >= 3) {
-      setShowTrend(true);
+    if (uploadedDocs.length > 0 && !uploading) {
+      setActiveView('upload');
     }
-  }, [showTrend, uploadedDocs]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Filtered documents based on search and status
   const filteredDocs = useMemo(() => {
@@ -264,35 +272,61 @@ export default function Dashboard() {
     }
   };
 
-  const handleDrop = useCallback(async (e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
 
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
-      await uploadAndAnalyze(files[0]);
+      setPendingFile(files[0]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      await uploadAndAnalyze(files[0]);
+      setPendingFile(files[0]);
     }
     // Reset so the same file can be re-selected (otherwise onChange won't fire)
     e.target.value = '';
   };
 
+  const confirmUpload = async () => {
+    if (!pendingFile) return;
+    const file = pendingFile;
+    setPendingFile(null);
+    await uploadAndAnalyze(file);
+  };
+
   return (
     <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
-      {/* Simple Header */}
-      <div className="mb-xl">
+      {/* Header with view tabs */}
+      <div className="flex items-center justify-between mb-xl">
         <h1 className="text-2xl font-bold">
           <span className="bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">
             Dashboard
           </span>
         </h1>
+        <div className="flex items-center gap-xs border border-border p-1">
+          <button
+            onClick={() => setActiveView('upload')}
+            className={`px-4 py-1.5 text-sm font-medium transition-colors flex items-center gap-sm ${
+              activeView === 'upload' ? 'bg-accent-primary/10 text-accent-primary' : 'text-muted hover:text-primary'
+            }`}
+          >
+            <Upload size={14} />
+            Upload &amp; Monitor
+          </button>
+          <button
+            onClick={() => setActiveView('browse')}
+            className={`px-4 py-1.5 text-sm font-medium transition-colors flex items-center gap-sm ${
+              activeView === 'browse' ? 'bg-accent-primary/10 text-accent-primary' : 'text-muted hover:text-primary'
+            }`}
+          >
+            <Search size={14} />
+            Browse &amp; Analyze
+          </button>
+        </div>
       </div>
 
       {/* Stats overview row */}
@@ -309,71 +343,6 @@ export default function Dashboard() {
               <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-highlight)' }}>{stat.value}</div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Onboarding Guide for new users */}
-      <OnboardingGuide />
-
-      {/* Upload Zone - Compact */}
-      {!uploading ? (
-        <div
-          className={`upload-zone mb-xl ${isDragOver ? 'dragover' : ''}`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={() => document.getElementById('file-input')?.click()}
-        >
-          <input
-            type="file"
-            id="file-input"
-            hidden
-            accept=".pdf,.txt,.md,.docx"
-            disabled={uploading}
-            onChange={handleFileSelect}
-          />
-          <div className="flex items-center gap-md">
-            <Upload size={32} className="text-accent-primary" />
-            <div>
-              <p className="font-medium">Drop document here or click to browse</p>
-              <p className="text-sm text-muted">PDF, TXT, MD, DOCX</p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* Analysis Progress - Compact */
-        <div className="card mb-xl">
-          <div className="card-body">
-            {/* Progress Header */}
-            <div className="flex items-center justify-between mb-md">
-              <span className="text-sm font-medium">Analyzing document...</span>
-              <span className="text-sm text-muted">{currentProgress}%</span>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="h-1 bg-secondary overflow-hidden mb-md">
-              <div
-                className="h-full bg-accent-primary transition-all duration-300"
-                style={{ width: `${currentProgress}%` }}
-              />
-            </div>
-
-            {/* Current Step + Cancel */}
-            <div className="flex items-center justify-between">
-              {analysisSteps.find(s => s.status === 'running') && (
-                <div className="flex items-center gap-sm text-sm">
-                  <Loader2 size={14} className="animate-spin text-accent-primary" />
-                  <span>{analysisSteps.find(s => s.status === 'running')?.name}</span>
-                </div>
-              )}
-              <button
-                onClick={() => { cancelAnalysis(); setUploading(false); }}
-                className="text-xs text-muted hover:text-error transition-colors ml-auto"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
@@ -401,348 +370,526 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Currently Analyzing Section */}
-      {uploadedDocs.filter(d => d.status === 'analyzing').length > 0 && (
-        <div className="mb-xl">
-          <h2 className="text-lg font-semibold flex items-center gap-2 mb-md">
-            <Loader2 size={18} className="animate-spin text-accent-primary" />
-            Currently Analyzing
-          </h2>
-          <div className="space-y-3">
-            {uploadedDocs
-              .filter(d => d.status === 'analyzing')
-              .map((doc) => (
-                <div
-                  key={doc.id}
-                  className="card border-accent-primary/30 bg-accent-primary/5"
-                >
-                  <div className="card-body flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <FileText size={20} className="text-accent-primary" />
-                      <div>
-                        <span className="font-medium">{doc.filename}</span>
-                        <p className="text-xs text-muted mt-0.5">
-                          Analysis in progress... Results will appear here when complete
-                        </p>
-                      </div>
+      {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
+      {activeView === 'upload' && (
+        <>
+          {/* Onboarding Guide for new users */}
+          <OnboardingGuide />
+
+          {/* Upload Confirmation Modal */}
+          {pendingFile && !uploading && (
+            <div className="card mb-xl border-accent-primary/40 animate-fade-in">
+              <div className="card-header" style={{ background: 'rgba(99, 102, 241, 0.06)' }}>
+                <h3 className="flex items-center gap-sm text-sm">
+                  <FileText size={16} className="text-accent-primary" />
+                  Ready to Analyze
+                </h3>
+              </div>
+              <div className="card-body">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-md">
+                    <div
+                      style={{
+                        width: 48, height: 48,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)',
+                      }}
+                    >
+                      <FileText size={24} className="text-accent-primary" />
                     </div>
-                    <Loader2 size={18} className="animate-spin text-accent-primary" />
+                    <div>
+                      <p className="font-medium">{pendingFile.name}</p>
+                      <p className="text-xs text-muted">
+                        {(pendingFile.size / 1024).toFixed(1)} KB · {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-sm">
+                    <button
+                      onClick={() => setPendingFile(null)}
+                      className="btn btn-ghost text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={confirmUpload}
+                      className="btn btn-primary flex items-center gap-sm"
+                    >
+                      <Brain size={16} />
+                      Start Analysis
+                    </button>
                   </div>
                 </div>
-              ))}
-          </div>
-        </div>
-      )}
-
-      {/* Recent Analyses Section */}
-      {uploadedDocs.filter(d => d.status === 'complete').length > 0 && (
-        <div className="mb-xl">
-          <div className="flex items-center justify-between mb-md">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <CheckCircle size={18} className="text-green-500" />
-              Recent Analyses
-            </h2>
-            <Link
-              href="/"
-              className="text-sm text-accent-primary hover:underline flex items-center gap-1"
-            >
-              View All <ChevronRight size={14} />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {uploadedDocs
-              .filter(d => d.status === 'complete')
-              .slice(0, 6)
-              .map((doc) => (
-                <Link
-                  key={doc.id}
-                  href={`/documents/${doc.id}`}
-                  className="card group hover:border-accent-primary transition-all"
-                >
-                  <div className="card-body">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <FileText size={18} className="text-accent-primary" />
-                        <span className="font-medium text-sm truncate max-w-[150px]">
-                          {doc.filename}
-                        </span>
-                      </div>
-                      {doc.score !== undefined && (
-                        <span
-                          className="text-sm font-bold"
-                          style={{
-                            color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
-                          }}
-                        >
-                          {Math.round(doc.score)}%
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-muted">
-                      <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
-                      <span className="flex items-center gap-1 group-hover:text-accent-primary transition-colors">
-                        View Analysis <ArrowRight size={12} />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-          </div>
-        </div>
-      )}
-
-      {/* Risk Trend - Collapsible */}
-      {uploadedDocs.some(d => d.score !== undefined) && (
-        <div className="card mb-xl">
-          <button
-            onClick={() => setShowTrend(prev => !prev)}
-            className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
-          >
-            <h3 className="flex items-center gap-2 text-base">
-              <BarChart3 size={18} className="text-indigo-500" />
-              Decision Quality Trend
-              <span className="text-xs text-muted font-normal">
-                ({uploadedDocs.filter(d => d.score !== undefined).length} analyzed)
-              </span>
-            </h3>
-            <ChevronRight
-              size={18}
-              className={`text-muted transition-transform ${showTrend ? 'rotate-90' : ''}`}
-            />
-          </button>
-          {showTrend && (
-            <div className="card-body pt-0">
-              <ErrorBoundary sectionName="Risk Trend Chart">
-                <RiskTrendChart data={[...uploadedDocs]
-                  .filter(d => d.score !== undefined)
-                  .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
-                  .map(d => ({
-                    date: new Date(d.uploadedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-                    score: d.score || 0
-                  }))
-                } />
-              </ErrorBoundary>
+              </div>
             </div>
           )}
-        </div>
-      )}
 
-      {/* Comparative Analysis */}
-      {uploadedDocs.filter(d => d.status === 'complete').length > 1 && (
-        <div className="mb-xl">
-          <div className="flex items-center justify-between mb-md">
-            <h2 className="text-lg font-semibold">Comparative Intelligence</h2>
-          </div>
-          <div className="card">
-            <div className="card-header">
-              <h3>Document Benchmark</h3>
-            </div>
-            <div className="card-body">
-              <ErrorBoundary sectionName="Comparative Analysis">
-              <ComparativeAnalysis documents={uploadedDocs.filter(d => d.status === 'complete').map(doc => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- detailed view returns analyses array
-                const a = (doc as any).analyses?.[0];
-                const biasCount = a?.biases?.length ?? 0;
-                const noiseScore = a?.noiseScore ?? 50;
-                return {
-                  id: doc.id,
-                  title: doc.filename,
-                  date: new Date(doc.uploadedAt).toLocaleDateString(),
-                  scores: {
-                    quality: doc.score || 0,
-                    risk: doc.score ? (100 - doc.score) : 50,
-                    bias: Math.min(biasCount * 10, 100),
-                    clarity: Math.max(0, 100 - noiseScore)
-                  }
-                };
-              })} />
-              </ErrorBoundary>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Documents List */}
-      <div id="documents" className="card">
-        <div className="card-header flex items-center justify-between">
-          <div className="flex items-center gap-md">
-            <h3 className="text-base">Documents</h3>
-            {totalDocs > 0 && (
-              <span className="text-xs text-muted">
-                {filteredDocs.length} shown · {totalDocs} total
-              </span>
-            )}
-          </div>
-
-          {/* Compact Search & Filter */}
-          <div className="flex items-center gap-sm">
-            <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-              <input
-                type="text"
-                placeholder="Search..."
-                aria-label="Search documents"
-                value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setDocsPage(1); }}
-                className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border w-40 focus:w-56 transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-
-            <select
-              value={statusFilter}
-              aria-label="Filter by status"
-              onChange={(e) => { setStatusFilter(e.target.value as 'all' | 'complete' | 'analyzing' | 'pending'); setDocsPage(1); }}
-              className="px-3 py-1.5 text-sm bg-primary border border-border"
+          {/* Upload Zone - Compact */}
+          {!uploading && !pendingFile ? (
+            <div
+              className={`upload-zone mb-xl ${isDragOver ? 'dragover' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => document.getElementById('file-input')?.click()}
             >
-              <option value="all">All Status</option>
-              <option value="complete">Complete</option>
-              <option value="analyzing">Analyzing</option>
-              <option value="pending">Pending</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="card-body p-0">
-          {loadingDocs ? (
-            <div className="divide-y divide-border">
-              {[0, 1, 2, 3].map(i => (
-                <div key={i} className="flex items-center justify-between p-md animate-pulse">
-                  <div className="flex items-center gap-md">
-                    <div className="w-5 h-5 bg-white/10" />
-                    <div className="h-4 w-48 bg-white/10" />
-                  </div>
-                  <div className="flex items-center gap-md">
-                    <div className="h-3 w-20 bg-white/10" />
-                    <div className="h-7 w-24 bg-white/10" />
-                  </div>
+              <input
+                type="file"
+                id="file-input"
+                hidden
+                accept=".pdf,.txt,.md,.docx"
+                disabled={uploading}
+                onChange={handleFileSelect}
+              />
+              <div className="flex items-center gap-md">
+                <Upload size={32} className="text-accent-primary" />
+                <div>
+                  <p className="font-medium">Drop document here or click to browse</p>
+                  <p className="text-sm text-muted">PDF, TXT, MD, DOCX</p>
                 </div>
-              ))}
+              </div>
             </div>
-          ) : uploadedDocs.length === 0 ? (
-            <div className="text-center text-muted p-xl">
-              No documents yet
-            </div>
-          ) : filteredDocs.length === 0 ? (
-            <div className="text-center text-muted p-xl">
-              No matches found
-            </div>
-          ) : (
-            <div className="divide-y divide-border">
-              {filteredDocs.map((doc, idx) => (
-                <div
-                  key={doc.id}
-                  className="flex items-center justify-between p-md hover:bg-secondary/50 transition-colors animate-fade-in"
-                  style={{ animationDelay: `${idx * 0.03}s` }}
-                >
-                  <div className="flex items-center gap-md min-w-0">
-                    <FileText size={18} className="text-accent-primary shrink-0" />
-                    <span className="truncate">{doc.filename}</span>
-                  </div>
+          ) : uploading ? (
+            /* Analysis Progress - Compact */
+            <div className="card mb-xl">
+              <div className="card-body">
+                {/* Progress Header */}
+                <div className="flex items-center justify-between mb-md">
+                  <span className="text-sm font-medium">Analyzing document...</span>
+                  <span className="text-sm text-muted">{currentProgress}%</span>
+                </div>
 
-                  <div className="flex items-center gap-md shrink-0">
-                    {doc.status === 'analyzing' && (
-                      <span className="flex items-center gap-sm text-sm text-muted">
-                        <Loader2 size={12} className="animate-spin" />
-                        Analyzing
-                      </span>
-                    )}
+                {/* Progress Bar */}
+                <div className="h-1 bg-secondary overflow-hidden mb-md">
+                  <div
+                    className="h-full bg-accent-primary transition-all duration-300"
+                    style={{ width: `${currentProgress}%` }}
+                  />
+                </div>
 
-                    {(doc.status === 'error' || doc.status === 'pending') && (
-                      <div className="flex items-center gap-sm">
-                        {doc.status === 'error' && (
-                          <span className="text-xs text-error">Failed</span>
-                        )}
-                        {doc.status === 'pending' && (
-                          <span className="text-xs text-muted">Pending</span>
-                        )}
-                        <button
-                          onClick={() => retryAnalysis(doc.id)}
-                          disabled={uploading}
-                          className="btn btn-ghost btn-sm flex items-center gap-1 text-xs"
-                        >
-                          <RefreshCw size={12} />
-                          {doc.status === 'error' ? 'Retry' : 'Analyze'}
-                        </button>
+                {/* Current Step + Cancel */}
+                <div className="flex items-center justify-between">
+                  {analysisSteps.find(s => s.status === 'running') && (
+                    <div className="flex items-center gap-sm text-sm">
+                      <Loader2 size={14} className="animate-spin text-accent-primary" />
+                      <span>{analysisSteps.find(s => s.status === 'running')?.name}</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => { cancelAnalysis(); setUploading(false); }}
+                    className="text-xs text-muted hover:text-error transition-colors ml-auto"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {/* Currently Analyzing Section */}
+          {uploadedDocs.filter(d => d.status === 'analyzing').length > 0 && (
+            <div className="mb-xl">
+              <h2 className="text-lg font-semibold flex items-center gap-2 mb-md">
+                <Loader2 size={18} className="animate-spin text-accent-primary" />
+                Currently Analyzing
+              </h2>
+              <div className="space-y-3">
+                {uploadedDocs
+                  .filter(d => d.status === 'analyzing')
+                  .map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="card border-accent-primary/30 bg-accent-primary/5"
+                    >
+                      <div className="card-body flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <FileText size={20} className="text-accent-primary" />
+                          <div>
+                            <span className="font-medium">{doc.filename}</span>
+                            <p className="text-xs text-muted mt-0.5">
+                              Analysis in progress... Results will appear here when complete
+                            </p>
+                          </div>
+                        </div>
+                        <Loader2 size={18} className="animate-spin text-accent-primary" />
                       </div>
-                    )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
 
-                    {doc.status === 'complete' && (
-                      <>
-                        {doc.score !== undefined && (
+          {/* Recent Analyses Section */}
+          {uploadedDocs.filter(d => d.status === 'complete').length > 0 && (
+            <div className="mb-xl">
+              <div className="flex items-center justify-between mb-md">
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <CheckCircle size={18} className="text-green-500" />
+                  Recent Analyses
+                </h2>
+                <button
+                  onClick={() => setActiveView('browse')}
+                  className="text-sm text-accent-primary hover:underline flex items-center gap-1"
+                >
+                  View All <ChevronRight size={14} />
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {uploadedDocs
+                  .filter(d => d.status === 'complete')
+                  .slice(0, 6)
+                  .map((doc) => (
+                    <Link
+                      key={doc.id}
+                      href={`/documents/${doc.id}`}
+                      className="card group hover:border-accent-primary transition-all"
+                    >
+                      <div className="card-body">
+                        <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
-                            <div className="w-16 h-2 bg-white/10 overflow-hidden">
-                              <div
-                                className="h-full transition-all"
-                                style={{
-                                  width: `${doc.score}%`,
-                                  backgroundColor: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
-                                }}
-                              />
-                            </div>
+                            <FileText size={18} className="text-accent-primary" />
+                            <span className="font-medium text-sm truncate max-w-[150px]">
+                              {doc.filename}
+                            </span>
+                          </div>
+                          {doc.score !== undefined && (
                             <span
-                              className="text-sm font-bold min-w-[36px]"
+                              className="text-sm font-bold"
                               style={{
                                 color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
                               }}
                             >
                               {Math.round(doc.score)}%
                             </span>
-                          </div>
-                        )}
-                        <Link
-                          href={`/documents/${doc.id}`}
-                          className="btn btn-primary btn-sm flex items-center gap-2"
-                        >
-                          <BarChart3 size={14} />
-                          View Analysis
-                        </Link>
-                      </>
-                    )}
-
-                    <button
-                      onClick={() => setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })}
-                      className="p-1.5 text-muted hover:text-error transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-muted">
+                          <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
+                          <span className="flex items-center gap-1 group-hover:text-accent-primary transition-colors">
+                            View Analysis <ArrowRight size={12} />
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Documents Paginator */}
-      {docsTotalPages > 1 && (
-        <div className="flex items-center justify-center gap-sm mt-md">
-          <button
-            onClick={() => setDocsPage(p => Math.max(1, p - 1))}
-            disabled={docsPage <= 1}
-            className="btn btn-ghost text-sm"
-          >
-            Previous
-          </button>
-          <span className="text-sm text-muted">
-            Page {docsPage} of {docsTotalPages}
-          </span>
-          <button
-            onClick={() => setDocsPage(p => Math.min(docsTotalPages, p + 1))}
-            disabled={docsPage >= docsTotalPages}
-            className="btn btn-ghost text-sm"
-          >
-            Next
-          </button>
-        </div>
+          {/* Empty state - only show when no documents */}
+          {uploadedDocs.length === 0 && !loadingDocs && (
+            <div className="card animate-fade-in" style={{ padding: 'var(--spacing-2xl)' }}>
+              <div className="flex flex-col items-center gap-lg text-center">
+                <div style={{
+                  width: 80, height: 80,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)',
+                }}>
+                  <Upload size={36} style={{ color: 'var(--accent-primary)' }} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold mb-sm">Upload your first document</h2>
+                  <p className="text-sm text-muted" style={{ maxWidth: 420, margin: '0 auto' }}>
+                    Drop a PDF, TXT, MD, or DOCX file in the upload zone above. Our AI will scan for
+                    cognitive biases, decision noise, logical fallacies, and compliance risks.
+                  </p>
+                </div>
+                <button
+                  onClick={() => document.getElementById('file-input')?.click()}
+                  className="btn btn-primary flex items-center gap-sm"
+                >
+                  <Upload size={16} />
+                  Choose a File
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ═══════ BROWSE & ANALYZE VIEW ═══════ */}
+      {activeView === 'browse' && (
+        <>
+          {/* Risk Trend - Collapsible (collapsed by default) */}
+          {uploadedDocs.some(d => d.score !== undefined) && (
+            <div className="card mb-xl">
+              <button
+                onClick={() => setShowTrend(prev => !prev)}
+                className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+              >
+                <h3 className="flex items-center gap-2 text-base">
+                  <BarChart3 size={18} className="text-indigo-500" />
+                  Decision Quality Trend
+                  <span className="text-xs text-muted font-normal">
+                    ({uploadedDocs.filter(d => d.score !== undefined).length} analyzed)
+                  </span>
+                </h3>
+                <ChevronRight
+                  size={18}
+                  className={`text-muted transition-transform ${showTrend ? 'rotate-90' : ''}`}
+                />
+              </button>
+              {showTrend && (
+                <div className="card-body pt-0">
+                  <ErrorBoundary sectionName="Risk Trend Chart">
+                    <RiskTrendChart data={[...uploadedDocs]
+                      .filter(d => d.score !== undefined)
+                      .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
+                      .map(d => ({
+                        date: new Date(d.uploadedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                        score: d.score || 0
+                      }))
+                    } />
+                  </ErrorBoundary>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Comparative Analysis - Collapsible (collapsed by default) */}
+          {uploadedDocs.filter(d => d.status === 'complete').length > 1 && (
+            <div className="card mb-xl">
+              <button
+                onClick={() => setShowComparative(prev => !prev)}
+                className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+              >
+                <h3 className="flex items-center gap-2 text-base">
+                  <Scale size={18} className="text-indigo-500" />
+                  Comparative Intelligence
+                  <span className="text-xs text-muted font-normal">Document Benchmark</span>
+                </h3>
+                <ChevronRight
+                  size={18}
+                  className={`text-muted transition-transform ${showComparative ? 'rotate-90' : ''}`}
+                />
+              </button>
+              {showComparative && (
+                <div className="card-body">
+                  <ErrorBoundary sectionName="Comparative Analysis">
+                  <ComparativeAnalysis documents={uploadedDocs.filter(d => d.status === 'complete').map(doc => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- detailed view returns analyses array
+                    const a = (doc as any).analyses?.[0];
+                    const biasCount = a?.biases?.length ?? 0;
+                    const noiseScore = a?.noiseScore ?? 50;
+                    return {
+                      id: doc.id,
+                      title: doc.filename,
+                      date: new Date(doc.uploadedAt).toLocaleDateString(),
+                      scores: {
+                        quality: doc.score || 0,
+                        risk: doc.score ? (100 - doc.score) : 50,
+                        bias: Math.min(biasCount * 10, 100),
+                        clarity: Math.max(0, 100 - noiseScore)
+                      }
+                    };
+                  })} />
+                  </ErrorBoundary>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Documents List */}
+          <div id="documents" className="card">
+            <div className="card-header flex items-center justify-between">
+              <div className="flex items-center gap-md">
+                <h3 className="text-base">Documents</h3>
+                {totalDocs > 0 && (
+                  <span className="text-xs text-muted">
+                    {filteredDocs.length} shown · {totalDocs} total
+                  </span>
+                )}
+              </div>
+
+              {/* Compact Search & Filter */}
+              <div className="flex items-center gap-sm">
+                <div className="relative">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    aria-label="Search documents"
+                    value={searchQuery}
+                    onChange={(e) => { setSearchQuery(e.target.value); setDocsPage(1); }}
+                    className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border w-40 focus:w-56 transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+
+                <select
+                  value={statusFilter}
+                  aria-label="Filter by status"
+                  onChange={(e) => { setStatusFilter(e.target.value as 'all' | 'complete' | 'analyzing' | 'pending'); setDocsPage(1); }}
+                  className="px-3 py-1.5 text-sm bg-primary border border-border"
+                >
+                  <option value="all">All Status</option>
+                  <option value="complete">Complete</option>
+                  <option value="analyzing">Analyzing</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="card-body p-0">
+              {loadingDocs ? (
+                <div className="divide-y divide-border">
+                  {[0, 1, 2, 3].map(i => (
+                    <div key={i} className="flex items-center justify-between p-md animate-pulse">
+                      <div className="flex items-center gap-md">
+                        <div className="w-5 h-5 bg-white/10" />
+                        <div className="h-4 w-48 bg-white/10" />
+                      </div>
+                      <div className="flex items-center gap-md">
+                        <div className="h-3 w-20 bg-white/10" />
+                        <div className="h-7 w-24 bg-white/10" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : uploadedDocs.length === 0 ? (
+                <div className="flex flex-col items-center gap-md p-xl text-center">
+                  <FileText size={40} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
+                  <div>
+                    <p className="font-medium mb-xs">No documents yet</p>
+                    <p className="text-sm text-muted">Upload a document to start analyzing.</p>
+                  </div>
+                  <button
+                    onClick={() => setActiveView('upload')}
+                    className="btn btn-primary flex items-center gap-sm text-sm"
+                  >
+                    <Upload size={14} />
+                    Go to Upload
+                  </button>
+                </div>
+              ) : filteredDocs.length === 0 ? (
+                <div className="flex flex-col items-center gap-sm p-xl text-center">
+                  <Search size={32} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
+                  <p className="text-sm text-muted">No matches found</p>
+                  <button
+                    onClick={() => { setSearchQuery(''); setStatusFilter('all'); }}
+                    className="btn btn-ghost text-sm"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {filteredDocs.map((doc, idx) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center justify-between p-md hover:bg-secondary/50 transition-colors animate-fade-in"
+                      style={{ animationDelay: `${idx * 0.03}s` }}
+                    >
+                      <div className="flex items-center gap-md min-w-0">
+                        <FileText size={18} className="text-accent-primary shrink-0" />
+                        <span className="truncate">{doc.filename}</span>
+                      </div>
+
+                      <div className="flex items-center gap-md shrink-0">
+                        {doc.status === 'analyzing' && (
+                          <span className="flex items-center gap-sm text-sm text-muted">
+                            <Loader2 size={12} className="animate-spin" />
+                            Analyzing
+                          </span>
+                        )}
+
+                        {(doc.status === 'error' || doc.status === 'pending') && (
+                          <div className="flex items-center gap-sm">
+                            {doc.status === 'error' && (
+                              <span className="text-xs text-error">Failed</span>
+                            )}
+                            {doc.status === 'pending' && (
+                              <span className="text-xs text-muted">Pending</span>
+                            )}
+                            <button
+                              onClick={() => retryAnalysis(doc.id)}
+                              disabled={uploading}
+                              className="btn btn-ghost btn-sm flex items-center gap-1 text-xs"
+                            >
+                              <RefreshCw size={12} />
+                              {doc.status === 'error' ? 'Retry' : 'Analyze'}
+                            </button>
+                          </div>
+                        )}
+
+                        {doc.status === 'complete' && (
+                          <>
+                            {doc.score !== undefined && (
+                              <div className="flex items-center gap-2">
+                                <div className="w-16 h-2 bg-white/10 overflow-hidden">
+                                  <div
+                                    className="h-full transition-all"
+                                    style={{
+                                      width: `${doc.score}%`,
+                                      backgroundColor: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                                    }}
+                                  />
+                                </div>
+                                <span
+                                  className="text-sm font-bold min-w-[36px]"
+                                  style={{
+                                    color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                                  }}
+                                >
+                                  {Math.round(doc.score)}%
+                                </span>
+                              </div>
+                            )}
+                            <Link
+                              href={`/documents/${doc.id}`}
+                              className="btn btn-primary btn-sm flex items-center gap-2"
+                            >
+                              <BarChart3 size={14} />
+                              View Analysis
+                            </Link>
+                          </>
+                        )}
+
+                        <button
+                          onClick={() => setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })}
+                          className="p-1.5 text-muted hover:text-error transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Documents Paginator */}
+          {docsTotalPages > 1 && (
+            <div className="flex items-center justify-center gap-sm mt-md">
+              <button
+                onClick={() => setDocsPage(p => Math.max(1, p - 1))}
+                disabled={docsPage <= 1}
+                className="btn btn-ghost text-sm"
+              >
+                Previous
+              </button>
+              <span className="text-sm text-muted">
+                Page {docsPage} of {docsTotalPages}
+              </span>
+              <button
+                onClick={() => setDocsPage(p => Math.min(docsTotalPages, p + 1))}
+                disabled={docsPage >= docsTotalPages}
+                className="btn btn-ghost text-sm"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Delete Confirmation Modal */}
@@ -784,15 +931,6 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Empty state helper - only show when no documents */}
-      {uploadedDocs.length === 0 && !loadingDocs && (
-        <div className="text-center text-muted mt-xl p-xl">
-          <FileText size={48} className="mx-auto mb-md opacity-30" />
-          <p className="mb-sm">Upload your first document to get started</p>
-          <p className="text-sm opacity-60">We support PDF, TXT, MD, and DOCX files</p>
         </div>
       )}
     </div>

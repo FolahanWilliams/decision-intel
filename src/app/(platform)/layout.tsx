@@ -2,6 +2,7 @@ import Sidebar from "@/components/ui/Sidebar";
 import Ticker from "@/components/ui/Ticker";
 import { getUserSettings } from "@/app/actions/settings";
 import { AnalysisProgressProvider, AnalysisProgressFloat } from "@/components/ui/AnalysisProgressBar";
+import { CommandPalette } from "@/components/ui/CommandPalette";
 
 export default async function PlatformLayout({
     children,
@@ -34,6 +35,7 @@ export default async function PlatformLayout({
                 </main>
             </div>
             <AnalysisProgressFloat />
+            <CommandPalette />
         </AnalysisProgressProvider>
     );
 }
