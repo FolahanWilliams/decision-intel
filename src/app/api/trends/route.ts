@@ -96,27 +96,27 @@ export async function GET(request: Request) {
             .map(([name, value]) => ({ name, value }));
 
         // Calculate summary stats
-        const allScores = analyses.map(a => a.overallScore);
-        const allNoise = analyses.map(a => a.noiseScore);
+        const allScores = analyses.map((a: typeof analyses[number]) => a.overallScore);
+        const allNoise = analyses.map((a: typeof analyses[number]) => a.noiseScore);
 
         const stats = {
             totalAnalyses: analyses.length,
             avgScore: allScores.length > 0
-                ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length)
+                ? Math.round(allScores.reduce((a: number, b: number) => a + b, 0) / allScores.length)
                 : 0,
             highScore: allScores.length > 0 ? Math.round(Math.max(...allScores)) : 0,
             lowScore: allScores.length > 0 ? Math.round(Math.min(...allScores)) : 0,
             latestScore: allScores.length > 0 ? Math.round(allScores[allScores.length - 1]) : 0,
             avgNoise: allNoise.length > 0
-                ? Math.round(allNoise.reduce((a, b) => a + b, 0) / allNoise.length)
+                ? Math.round(allNoise.reduce((a: number, b: number) => a + b, 0) / allNoise.length)
                 : 0,
-            totalBiases: Object.values(biasCounts).reduce((a, b) => a + b, 0),
+            totalBiases: Object.values(biasCounts).reduce((a: number, b: number) => a + b, 0),
             // Calculate trend (comparing first half vs second half)
             trend: (() => {
                 if (allScores.length < 2) return 0;
                 const mid = Math.floor(allScores.length / 2);
-                const firstHalf = allScores.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
-                const secondHalf = allScores.slice(mid).reduce((a, b) => a + b, 0) / (allScores.length - mid);
+                const firstHalf = allScores.slice(0, mid).reduce((a: number, b: number) => a + b, 0) / mid;
+                const secondHalf = allScores.slice(mid).reduce((a: number, b: number) => a + b, 0) / (allScores.length - mid);
                 return Math.round((secondHalf - firstHalf) * 10) / 10;
             })()
         };

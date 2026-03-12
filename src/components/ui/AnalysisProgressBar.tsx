@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
 import { Loader2, CheckCircle, X, FileText } from 'lucide-react';
 import Link from 'next/link';
 
@@ -29,8 +29,17 @@ const AnalysisProgressContext = createContext<AnalysisProgressContextType | unde
 
 export function AnalysisProgressProvider({ children }: { children: ReactNode }) {
     const [activeAnalysis, setActiveAnalysis] = useState<ActiveAnalysis | null>(null);
+    const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Clean up any pending dismiss timer on unmount
+    useEffect(() => {
+        return () => {
+            if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
+        };
+    }, []);
 
     const startTracking = useCallback((documentId: string, filename: string) => {
+        if (dismissTimerRef.current) { clearTimeout(dismissTimerRef.current); dismissTimerRef.current = null; }
         setActiveAnalysis({
             documentId,
             filename,
@@ -51,14 +60,16 @@ export function AnalysisProgressProvider({ children }: { children: ReactNode }) 
     const completeTracking = useCallback((documentId: string) => {
         setActiveAnalysis((prev) => {
             if (!prev || prev.documentId !== documentId) return prev;
-            // Auto-dismiss after 5 seconds
-            setTimeout(() => {
-                setActiveAnalysis((current) =>
-                    current?.documentId === documentId && current.status === 'complete' ? null : current
-                );
-            }, 5000);
             return { ...prev, progress: 100, currentStep: 'Analysis complete', status: 'complete' };
         });
+        // Auto-dismiss after 8 seconds (outside the setState updater)
+        if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
+        dismissTimerRef.current = setTimeout(() => {
+            setActiveAnalysis((current) =>
+                current?.documentId === documentId && current.status === 'complete' ? null : current
+            );
+            dismissTimerRef.current = null;
+        }, 8000);
     }, []);
 
     const errorTracking = useCallback(() => {
@@ -147,6 +158,11 @@ export function AnalysisProgressFloat() {
 
             {/* Progress bar */}
             <div
+                role="progressbar"
+                aria-valuenow={Math.round(activeAnalysis.progress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={activeAnalysis.currentStep}
                 style={{
                     height: '3px',
                     background: 'var(--bg-tertiary)',

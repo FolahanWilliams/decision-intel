@@ -304,6 +304,7 @@ export default function Dashboard() {
             id="file-input"
             hidden
             accept=".pdf,.txt,.md,.docx"
+            disabled={uploading}
             onChange={handleFileSelect}
           />
           <div className="flex items-center gap-md">

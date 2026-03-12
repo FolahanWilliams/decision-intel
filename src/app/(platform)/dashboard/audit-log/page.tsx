@@ -108,7 +108,7 @@ export default async function AuditLogPage({
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                logs.map((log) => (
+                                logs.map((log: typeof logs[number]) => (
                                     <TableRow key={log.id}>
                                         <TableCell className="font-mono text-xs text-muted-foreground">
                                             {format(log.createdAt, 'MMM d, yyyy HH:mm:ss')}

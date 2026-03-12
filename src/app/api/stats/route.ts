@@ -94,7 +94,7 @@ export async function GET() {
                 avgOverallScore: Math.round(scoreAggregation._avg.overallScore ?? 0),
                 avgNoiseScore: Math.round(scoreAggregation._avg.noiseScore ?? 0)
             },
-            topBiases: topBiasesRaw.map(b => ({
+            topBiases: topBiasesRaw.map((b: { biasType: string; count: bigint }) => ({
                 name: b.biasType,
                 count: Number(b.count)
             })),

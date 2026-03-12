@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
                     reset: rateLimitResult.reset,
                     remaining: 0
                 },
-                { status: 429 }
+                { status: 429, headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) } }
             );
         }
 

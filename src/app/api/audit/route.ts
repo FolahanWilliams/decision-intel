@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
         };
 
         const header = 'id,action,resource,resourceId,ipAddress,createdAt\n';
-        const rows = logs.map(l =>
+        const rows = logs.map((l: typeof logs[number]) =>
             [l.id, l.action, l.resource, l.resourceId, l.ipAddress, l.createdAt.toISOString()]
                 .map(escape).join(',')
         ).join('\n');

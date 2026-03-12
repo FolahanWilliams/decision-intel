@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
                     reset: rateLimitResult.reset,
                     remaining: 0
                 },
-                { status: 429 }
+                { status: 429, headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) } }
             );
         }
 
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
             // Clean up the DB record since the storage upload failed
             log.error('Supabase Storage Upload Error:', uploadError);
             await prisma.document.delete({ where: { id: document.id } }).catch(
-                (e) => log.error('Failed to clean up DB after storage error:', e)
+                (e: unknown) => log.error('Failed to clean up DB after storage error:', e)
             );
             throw new Error(`Storage Upload Failed: ${uploadError.message}`);
         }
