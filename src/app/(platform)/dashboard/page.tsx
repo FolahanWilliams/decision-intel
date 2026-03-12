@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight, ArrowRight, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
+import { useNotifications } from '@/components/ui/NotificationCenter';
+import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('Dashboard');
@@ -40,6 +42,9 @@ export default function Dashboard() {
   });
   const [deleting, setDeleting] = useState(false);
 
+  const { addNotification } = useNotifications();
+  const { startTracking, updateProgress, completeTracking, errorTracking } = useAnalysisProgress();
+
   // SWR: cached document list with auto-revalidation
   const { documents: uploadedDocs, total: totalDocs, totalPages: docsTotalPages, isLoading: loadingDocs, mutate: mutateDocs } = useDocuments(true, docsPage);
 
@@ -53,6 +58,14 @@ export default function Dashboard() {
   } = useAnalysisStream({
     stepNames: ANALYSIS_STEPS.map(s => s.name),
   });
+
+  // Sync analysis progress to the global floating progress bar
+  useEffect(() => {
+    if (currentProgress > 0 && analysisSteps.length > 0) {
+      const runningStep = analysisSteps.find((s) => s.status === 'running');
+      updateProgress(currentProgress, runningStep?.name || 'Analyzing...');
+    }
+  }, [currentProgress, analysisSteps, updateProgress]);
 
   // Filtered documents based on search and status
   const filteredDocs = useMemo(() => {
@@ -152,14 +165,23 @@ export default function Dashboard() {
       );
 
       // Stream analysis via the hook (auto-retry, typed events, AbortController cleanup)
+      startTracking(uploadData.id, uploadData.filename);
       const finalResult = await startAnalysis(uploadData.id);
 
       if (finalResult) {
+        const score = finalResult?.overallScore as number;
+        completeTracking(uploadData.id);
+        addNotification({
+          type: score < 40 ? 'low_score' : 'analysis_complete',
+          title: score < 40 ? 'Low Score Alert' : 'Analysis Complete',
+          message: `${uploadData.filename} scored ${score}/100`,
+          href: `/documents/${uploadData.id}`,
+        });
         // Update SWR cache with the completed result
         await mutateDocs(
           (current) => {
             const base = current ?? emptyState;
-            return { ...base, documents: base.documents.map(doc => doc.id === uploadData.id ? { ...doc, status: 'complete', score: finalResult?.overallScore as number } : doc) };
+            return { ...base, documents: base.documents.map(doc => doc.id === uploadData.id ? { ...doc, status: 'complete', score } : doc) };
           },
           { revalidate: true }
         );
@@ -172,6 +194,7 @@ export default function Dashboard() {
     } catch (err) {
       log.error('Upload/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
       setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
+      errorTracking();
 
       // Mark as error in SWR cache and revalidate to sync with server state
       await mutateDocs(
@@ -200,13 +223,23 @@ export default function Dashboard() {
         { revalidate: false }
       );
 
+      const retryDoc = uploadedDocs.find((d) => d.id === docId);
+      startTracking(docId, retryDoc?.filename || 'Document');
       const finalResult = await startAnalysis(docId);
 
       if (finalResult) {
+        const retryScore = finalResult?.overallScore as number;
+        completeTracking(docId);
+        addNotification({
+          type: retryScore < 40 ? 'low_score' : 'analysis_complete',
+          title: retryScore < 40 ? 'Low Score Alert' : 'Analysis Complete',
+          message: `${retryDoc?.filename || 'Document'} scored ${retryScore}/100`,
+          href: `/documents/${docId}`,
+        });
         await mutateDocs(
           (current) => {
             const base = current ?? emptyState;
-            return { ...base, documents: base.documents.map(doc => doc.id === docId ? { ...doc, status: 'complete', score: finalResult?.overallScore as number } : doc) };
+            return { ...base, documents: base.documents.map(doc => doc.id === docId ? { ...doc, status: 'complete', score: retryScore } : doc) };
           },
           { revalidate: true }
         );
@@ -216,6 +249,7 @@ export default function Dashboard() {
     } catch (err) {
       log.error('Retry analysis error:', err instanceof Error ? err.message : 'Unknown error');
       setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
+      errorTracking();
       await mutateDocs(undefined, { revalidate: true });
     } finally {
       setUploading(false);

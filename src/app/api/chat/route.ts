@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
         }
 
-        const { message, history = [] } = body as { message: string; history?: ChatMessage[] };
+        const { message, history = [], documentId } = body as { message: string; history?: ChatMessage[]; documentId?: string };
 
         if (!message || typeof message !== 'string') {
             return NextResponse.json({ error: 'message is required' }, { status: 400 });
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
                   .slice(-MAX_HISTORY_LENGTH)
             : [];
 
-        // 1. RAG retrieval — search for relevant documents
+        // 1. RAG retrieval — search for relevant documents (or scope to pinned doc)
         let ragResults: Array<{
             documentId: string;
             filename: string;
@@ -133,7 +133,18 @@ export async function POST(request: NextRequest) {
         }> = [];
 
         try {
-            ragResults = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT);
+            if (documentId && typeof documentId === 'string') {
+                // Pinned mode: scope search to this specific document
+                const pinned = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT);
+                ragResults = pinned.filter((r) => r.documentId === documentId);
+                // If no embedding match, still try to include the pinned doc's embeddings
+                if (ragResults.length === 0) {
+                    const all = await searchSimilarDocuments('', userId, RAG_RESULT_LIMIT);
+                    ragResults = all.filter((r) => r.documentId === documentId);
+                }
+            } else {
+                ragResults = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT);
+            }
         } catch (err) {
             log.warn('RAG retrieval failed, proceeding without context:', err);
         }

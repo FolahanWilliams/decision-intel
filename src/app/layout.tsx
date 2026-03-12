@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 
 import { ToastProvider } from "@/components/ui/ToastContext";
 import { ThemeProvider } from "@/components/theme-provider";
+import { NotificationProvider } from "@/components/ui/NotificationCenter";
 
 export default function RootLayout({
   children,
@@ -24,9 +25,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ToastProvider>
-            {children}
-          </ToastProvider>
+          <NotificationProvider>
+            <ToastProvider>
+              {children}
+            </ToastProvider>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>
