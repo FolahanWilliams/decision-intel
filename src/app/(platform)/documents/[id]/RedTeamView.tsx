@@ -2,6 +2,9 @@ import { CognitiveAnalysisResult } from '@/types';
 import { AlertTriangle, ExternalLink, ShieldAlert, EyeOff, ThumbsUp, ThumbsDown, Loader2, Lightbulb } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/components/ui/ToastContext';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('RedTeamView');
 
 export function RedTeamView({ 
     analysisId,
@@ -36,7 +39,7 @@ export function RedTeamView({
             setFeedbackGiven(rating > 0 ? 'helpful' : 'unhelpful');
             showToast('Thank you for your feedback', 'success');
         } catch (error) {
-            console.error('Feedback error:', error);
+            log.error('Feedback error:', error);
             showToast('Failed to submit feedback', 'error');
         } finally {
             setIsSubmittingFeedback(false);
