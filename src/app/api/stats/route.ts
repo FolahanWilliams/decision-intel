@@ -106,6 +106,8 @@ export async function GET() {
                 uploadedAt: doc.uploadedAt,
                 score: doc.analyses[0]?.overallScore
             }))
+        }, {
+            headers: { 'Cache-Control': 'private, max-age=300, stale-while-revalidate=60' },
         });
     } catch (error) {
         log.error('Error fetching stats:', error);

@@ -491,16 +491,39 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
         const data = parseJSON(responseText);
 
         if (data?.structuredContent) {
-            log.info(`GDPR Anonymization complete. Redacted ${data.redactions?.length || 0} PII instances.`);
-            return {
-                anonymizationStatus: 'success',
-                structuredContent: data.structuredContent,
-                speakers: [] // Will be populated by structurer node
-            };
-        }
+            // SECURITY: Validate that the anonymizer actually redacted content.
+            // If the LLM echoes back the original text without redacting, that's
+            // a silent failure — treat it as failed to prevent PII leakage.
+            const hasRedactionPlaceholders = /\[(PERSON|EMAIL|PHONE|ADDRESS|COMPANY|IP|FINANCIAL)_\d+\]/.test(data.structuredContent);
+            const hasRedactionsList = Array.isArray(data.redactions) && data.redactions.length > 0;
 
-        // LLM returned unexpected shape — treat as failure
-        log.error("GDPR Anonymizer returned invalid response shape");
+            if (!hasRedactionPlaceholders && !hasRedactionsList) {
+                // Content may still contain PII — the LLM may have returned it
+                // verbatim. Only trust a "no PII found" result if the content is
+                // short enough that it plausibly contains no personal data.
+                const contentLength = (content || '').length;
+                if (contentLength > 200) {
+                    log.error("GDPR Anonymizer returned content with no redaction markers for a large document — treating as failure to protect PII");
+                } else {
+                    log.info("GDPR Anonymization complete. No PII detected in short document.");
+                    return {
+                        anonymizationStatus: 'success',
+                        structuredContent: data.structuredContent,
+                        speakers: []
+                    };
+                }
+            } else {
+                log.info(`GDPR Anonymization complete. Redacted ${data.redactions?.length || 0} PII instances.`);
+                return {
+                    anonymizationStatus: 'success',
+                    structuredContent: data.structuredContent,
+                    speakers: []
+                };
+            }
+        } else {
+            // LLM returned unexpected shape — treat as failure
+            log.error("GDPR Anonymizer returned invalid response shape");
+        }
     } catch (e) {
         log.error("GDPR Anonymizer failed:", e instanceof Error ? e.message : String(e));
     }
@@ -611,7 +634,7 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
                 ${sanitizeForPrompt(fetchedData, 'financial_data')}
 
                 Return valid JSON: { "score": 0-100, "verifications": [...updated...] }`,
-                `Topic: ${companyName}`
+                `Topic: ${sanitizeForPrompt(companyName, 'topic')}`
             ]), 45000);
 
             const refinedText = refinementResult.response?.text ? refinementResult.response.text() : "";
@@ -702,9 +725,11 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
             ? `\n\nHISTORICAL CASE STUDIES (use as reference for SWOT, pre-mortem, and cognitive diversity):\n${sanitizeForPrompt(caseContext, 'case_studies')}`
             : '';
 
+        // Deep analysis (sentiment, logic, SWOT) does not need relaxed safety
+        // settings — use standard safety to keep content moderation active.
         const result = await withRetry(
             () => withTimeout(
-                getGroundedModel().generateContent([
+                getStandardSafetyGroundedModel().generateContent([
                     DEEP_ANALYSIS_SUPER_PROMPT,
                     `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}`
                 ]),
@@ -736,7 +761,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
 
         return {
             sentimentAnalysis: data?.sentiment || { score: 0, label: 'Neutral' },
-            logicalAnalysis: data?.logicalAnalysis || { score: 100, fallacies: [] },
+            logicalAnalysis: data?.logicalAnalysis || { score: 50, fallacies: [] },
             swotAnalysis: data?.swot,
             preMortem: data?.preMortem,
             cognitiveAnalysis: cognitiveData
@@ -745,7 +770,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
         log.error("Deep Analysis Node failed:", e instanceof Error ? e.message : String(e));
         return {
             sentimentAnalysis: { score: 0, label: 'Neutral' },
-            logicalAnalysis: { score: 100, fallacies: [] },
+            logicalAnalysis: { score: 50, fallacies: [] },
             swotAnalysis: undefined,
             preMortem: undefined,
             cognitiveAnalysis: undefined
@@ -921,12 +946,15 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     const trustPenalty = (100 - trustScore) * 0.3;
 
     // 4. Logic Penalty
-    const logicScore = state.logicalAnalysis?.score || 100;
+    // Use ?? so that a genuine score of 0 is respected; default to 50 (moderate
+    // penalty) when the analysis is missing, instead of 100 (no penalty).
+    const logicScore = state.logicalAnalysis?.score ?? 50;
     const logicPenalty = (100 - logicScore) * 0.4;
 
     // 5. Echo Chamber Penalty (Cognitive Diversity)
     // If blindSpotGap is low (0 = Tunnel Vision), penalty increases.
-    const diversityScore = state.cognitiveAnalysis?.blindSpotGap || 100;
+    // Default to 50 when missing, not 100 (which would mean no penalty).
+    const diversityScore = state.cognitiveAnalysis?.blindSpotGap ?? 50;
     const diversityPenalty = (100 - diversityScore) * 0.3;
 
     // Calculate Base

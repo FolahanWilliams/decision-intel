@@ -66,13 +66,13 @@ describe('checkRateLimit', () => {
         expect(result.limit).toBe(10);
     });
 
-    it('fails open by default when DB errors', async () => {
+    it('fails closed by default when DB errors', async () => {
         mockQueryRaw.mockRejectedValue(new Error('DB connection lost'));
 
         const result = await checkRateLimit('127.0.0.1', '/api/upload');
 
-        expect(result.success).toBe(true);
-        expect(result.remaining).toBe(1);
+        expect(result.success).toBe(false);
+        expect(result.remaining).toBe(0);
     });
 
     it('fails closed when configured', async () => {
@@ -147,12 +147,12 @@ describe('getRateLimitStatus', () => {
         expect(result.remaining).toBe(0);
     });
 
-    it('returns success on DB error (fail-open)', async () => {
+    it('fails closed on DB error', async () => {
         mockFindUnique.mockRejectedValue(new Error('DB error'));
 
         const result = await getRateLimitStatus('127.0.0.1', '/api/upload');
 
-        expect(result.success).toBe(true);
-        expect(result.remaining).toBe(5);
+        expect(result.success).toBe(false);
+        expect(result.remaining).toBe(0);
     });
 });

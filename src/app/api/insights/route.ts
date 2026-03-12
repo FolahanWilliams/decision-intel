@@ -369,7 +369,9 @@ export async function GET() {
             totalBiases: biasDistribution.reduce((sum: number, b: { count: bigint }) => sum + Number(b.count), 0),
         };
 
-        return NextResponse.json(payload);
+        return NextResponse.json(payload, {
+            headers: { 'Cache-Control': 'private, max-age=300, stale-while-revalidate=60' },
+        });
     } catch (error) {
         log.error('Error:', error);
         return NextResponse.json({ error: 'Failed to generate insights' }, { status: 500 });
