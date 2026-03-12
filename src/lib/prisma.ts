@@ -69,11 +69,36 @@ const prismaClientSingleton = () => {
   });
 };
 
-export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
+// Lazy initialization — avoids crashing at build time when DATABASE_URL is
+// absent.  During `next build`, page-data collection imports API routes which
+// import this module.  If we eagerly call prismaClientSingleton() at the top
+// level the missing DATABASE_URL throws before the build can finish.
+//
+// Instead we only create the client on first actual use (i.e. at runtime).
+function createLazyPrisma(): PrismaClient {
+  if (process.env.DATABASE_URL) {
+    const client = globalForPrisma.prisma ?? prismaClientSingleton();
+    if (process.env.NODE_ENV !== 'production') {
+      globalForPrisma.prisma = client;
+    }
+    return client;
+  }
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
+  // Defer creation until runtime when the env var will be available.
+  const handler: ProxyHandler<PrismaClient> = {
+    get(_target, prop) {
+      if (!globalForPrisma.prisma) {
+        globalForPrisma.prisma = prismaClientSingleton();
+      }
+      const client = globalForPrisma.prisma;
+      const value = Reflect.get(client, prop);
+      return typeof value === 'function' ? value.bind(client) : value;
+    },
+  };
+  return new Proxy({} as PrismaClient, handler);
 }
+
+export const prisma = createLazyPrisma();
 
 // Helper function to test database connection
 export async function testDatabaseConnection(): Promise<boolean> {
@@ -88,5 +113,7 @@ export async function testDatabaseConnection(): Promise<boolean> {
 
 // Gracefully handle shutdown
 process.on('beforeExit', async () => {
-  await prisma.$disconnect();
+  if (globalForPrisma.prisma) {
+    await globalForPrisma.prisma.$disconnect();
+  }
 });
