@@ -759,7 +759,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
 
         return {
             sentimentAnalysis: data?.sentiment || { score: 0, label: 'Neutral' },
-            logicalAnalysis: data?.logicalAnalysis || { score: 100, fallacies: [] },
+            logicalAnalysis: data?.logicalAnalysis || { score: 50, fallacies: [] },
             swotAnalysis: data?.swot,
             preMortem: data?.preMortem,
             cognitiveAnalysis: cognitiveData
@@ -768,7 +768,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
         log.error("Deep Analysis Node failed:", e instanceof Error ? e.message : String(e));
         return {
             sentimentAnalysis: { score: 0, label: 'Neutral' },
-            logicalAnalysis: { score: 100, fallacies: [] },
+            logicalAnalysis: { score: 50, fallacies: [] },
             swotAnalysis: undefined,
             preMortem: undefined,
             cognitiveAnalysis: undefined
