@@ -5,11 +5,13 @@ import { MessageSquare, Send, Loader2, Trash2, FileText, ArrowRight, Pin, PinOff
 import Link from 'next/link';
 import { useChatStream, type ChatMessage, type ChatSource } from '@/hooks/useChatStream';
 import { useDocuments } from '@/hooks/useDocuments';
+import { useToast } from '@/components/ui/ToastContext';
 
 export default function ChatPage() {
     const { documents } = useDocuments(false, 1, 100);
     const [pinnedDocId, setPinnedDocId] = useState<string | null>(null);
     const [showPicker, setShowPicker] = useState(false);
+    const { showToast } = useToast();
 
     const { messages, isStreaming, error, sendMessage, clearMessages } = useChatStream({
         pinnedDocumentId: pinnedDocId || undefined,
@@ -38,9 +40,22 @@ export default function ChatPage() {
         inputRef.current?.focus();
     }, []);
 
-    // Clear messages when pinned doc changes
+    // Clear messages when pinned doc changes and notify user
+    const prevPinnedRef = useRef<string | null | undefined>(undefined);
     useEffect(() => {
+        if (prevPinnedRef.current === undefined) {
+            // Skip toast on initial mount
+            prevPinnedRef.current = pinnedDocId;
+            return;
+        }
         clearMessages();
+        if (pinnedDocId) {
+            const docName = documents.find(d => d.id === pinnedDocId)?.filename;
+            showToast(`Chat cleared — now chatting about ${docName || 'pinned document'}`, 'info');
+        } else if (prevPinnedRef.current) {
+            showToast('Document unpinned — searching all documents', 'info');
+        }
+        prevPinnedRef.current = pinnedDocId;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pinnedDocId]);
 

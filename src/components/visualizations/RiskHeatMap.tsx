@@ -13,7 +13,6 @@ interface RiskHeatMapProps {
 
 export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
   const gridSize = 5;
-  const cellSize = 60;
   const [selectedCell, setSelectedCell] = useState<{ impact: number; probability: number } | null>(
     null
   );
@@ -80,8 +79,11 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
           <div
             className="grid gap-1 relative"
             style={{
-              gridTemplateColumns: `repeat(${gridSize}, ${cellSize}px)`,
-              gridTemplateRows: `repeat(${gridSize}, ${cellSize}px)`,
+              gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+              gridTemplateRows: `repeat(${gridSize}, 1fr)`,
+              aspectRatio: '1',
+              maxWidth: '320px',
+              width: '100%',
             }}
           >
             {/* Gradient Background for "Zones" */}

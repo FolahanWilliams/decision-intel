@@ -1,8 +1,43 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { NotificationBell } from '@/components/ui/NotificationCenter';
 
+interface TickerStats {
+    avgScore: string;
+    avgNoise: string;
+    totalDocs: string;
+    analyzedDocs: string;
+}
+
+const DEFAULTS: TickerStats = {
+    avgScore: '—',
+    avgNoise: '—',
+    totalDocs: '—',
+    analyzedDocs: '—',
+};
+
 export default function Ticker() {
+    const [stats, setStats] = useState<TickerStats>(DEFAULTS);
+
+    useEffect(() => {
+        let cancelled = false;
+        fetch('/api/stats')
+            .then((r) => (r.ok ? r.json() : null))
+            .then((data) => {
+                if (cancelled || !data?.overview) return;
+                const o = data.overview;
+                setStats({
+                    avgScore: o.avgOverallScore != null ? String(o.avgOverallScore) : '—',
+                    avgNoise: o.avgNoiseScore != null ? String(o.avgNoiseScore) : '—',
+                    totalDocs: o.totalDocuments != null ? String(o.totalDocuments) : '—',
+                    analyzedDocs: o.documentsAnalyzed != null ? String(o.documentsAnalyzed) : '—',
+                });
+            })
+            .catch(() => {/* keep defaults */});
+        return () => { cancelled = true; };
+    }, []);
+
     return (
         <div
             role="marquee"
@@ -20,16 +55,17 @@ export default function Ticker() {
             }}
         >
             <div className="ticker-track" style={{ flex: 1 }}>
-                <TickerItem label="Decision Score" value="85.4" change="+2.1%" up />
-                <TickerItem label="Noise Index" value="42.0" change="-1.5%" down />
-                <TickerItem label="Biases Detected" value="12" change="+3" bad />
+                <TickerItem label="Avg Quality" value={stats.avgScore} />
+                <TickerItem label="Avg Noise" value={stats.avgNoise} />
+                <TickerItem label="Documents" value={stats.totalDocs} />
+                <TickerItem label="Analyzed" value={stats.analyzedDocs} />
                 <TickerItem label="Status" value="Operational" />
-                <TickerItem label="Documents" value="1,240" />
-                <TickerItem label="Decision Score" value="85.4" change="+2.1%" up />
-                <TickerItem label="Noise Index" value="42.0" change="-1.5%" down />
-                <TickerItem label="Biases Detected" value="12" change="+3" bad />
+                {/* Duplicate for seamless marquee loop */}
+                <TickerItem label="Avg Quality" value={stats.avgScore} />
+                <TickerItem label="Avg Noise" value={stats.avgNoise} />
+                <TickerItem label="Documents" value={stats.totalDocs} />
+                <TickerItem label="Analyzed" value={stats.analyzedDocs} />
                 <TickerItem label="Status" value="Operational" />
-                <TickerItem label="Documents" value="1,240" />
             </div>
             <div style={{ flexShrink: 0, padding: '0 12px', zIndex: 10 }}>
                 <NotificationBell />
@@ -50,8 +86,7 @@ export default function Ticker() {
     );
 }
 
-function TickerItem({ label, value, change, up, down, bad }: { label: string, value: string, change?: string, up?: boolean, down?: boolean, bad?: boolean }) {
-    const changeColor = up ? 'var(--success)' : down ? 'var(--success)' : bad ? 'var(--error)' : 'var(--text-muted)';
+function TickerItem({ label, value }: { label: string; value: string }) {
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{label}</span>
@@ -61,16 +96,6 @@ function TickerItem({ label, value, change, up, down, bad }: { label: string, va
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: '12px',
             }}>{value}</span>
-            {change && (
-                <span style={{
-                    color: changeColor,
-                    fontSize: '11px',
-                    fontWeight: 500,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    background: bad ? 'rgba(185, 28, 28, 0.1)' : up || down ? 'rgba(34, 197, 94, 0.1)' : 'transparent',
-                    padding: '1px 6px',
-                }} aria-label={`Change: ${change}`}>{change}</span>
-            )}
         </div>
     );
 }

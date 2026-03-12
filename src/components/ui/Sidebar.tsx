@@ -169,13 +169,14 @@ export default function Sidebar() {
                         </div>
                     )}
                     {collapsed && <div style={{ height: '20px' }} />}
-                    <NavItem href="/dashboard/trends" icon={<Activity size={18} />} label="Historical Trends" active={pathname === '/dashboard/trends'} collapsed={collapsed} onNavigate={closeMobile} />
-                    <NavItem href="/dashboard/insights" icon={<BarChart3 size={18} />} label="Visual Insights" active={pathname === '/dashboard/insights'} collapsed={collapsed} onNavigate={closeMobile} />
-                    <NavItem href="/dashboard/risk-audits" icon={<ShieldAlert size={18} />} label="Risk Audits" active={pathname === '/dashboard/risk-audits'} collapsed={collapsed} onNavigate={closeMobile} />
+                    <NavItem href="/dashboard/trends" icon={<Activity size={18} />} label="Historical Trends" description="Score trends over time" active={pathname === '/dashboard/trends'} collapsed={collapsed} onNavigate={closeMobile} />
+                    <NavItem href="/dashboard/insights" icon={<BarChart3 size={18} />} label="Visual Insights" description="Charts and bias breakdowns" active={pathname === '/dashboard/insights'} collapsed={collapsed} onNavigate={closeMobile} />
+                    <NavItem href="/dashboard/risk-audits" icon={<ShieldAlert size={18} />} label="Risk Audits" description="Compliance and risk reports" active={pathname === '/dashboard/risk-audits'} collapsed={collapsed} onNavigate={closeMobile} />
                     <NavItem
                         href="/dashboard/intelligence"
                         icon={<Globe size={18} />}
                         label="Intelligence"
+                        description="External news and market signals"
                         active={pathname === '/dashboard/intelligence'}
                         collapsed={collapsed}
                         onNavigate={closeMobile}
@@ -183,9 +184,9 @@ export default function Sidebar() {
                             color: intelStatus.freshness === 'fresh' ? 'var(--success)' : intelStatus.freshness === 'stale' ? 'var(--warning)' : 'var(--error)',
                         } : undefined}
                     />
-                    <NavItem href="/dashboard/search" icon={<Search size={18} />} label="Search" active={pathname === '/dashboard/search'} collapsed={collapsed} onNavigate={closeMobile} />
-                    <NavItem href="/dashboard/compare" icon={<GitCompareArrows size={18} />} label="Compare" active={pathname === '/dashboard/compare'} collapsed={collapsed} onNavigate={closeMobile} />
-                    <NavItem href="/dashboard/chat" icon={<MessageSquare size={18} />} label="Chat" active={pathname === '/dashboard/chat'} collapsed={collapsed} onNavigate={closeMobile} />
+                    <NavItem href="/dashboard/search" icon={<Search size={18} />} label="Search" description="Semantic search across documents" active={pathname === '/dashboard/search'} collapsed={collapsed} onNavigate={closeMobile} />
+                    <NavItem href="/dashboard/compare" icon={<GitCompareArrows size={18} />} label="Compare" description="Side-by-side document comparison" active={pathname === '/dashboard/compare'} collapsed={collapsed} onNavigate={closeMobile} />
+                    <NavItem href="/dashboard/chat" icon={<MessageSquare size={18} />} label="Chat" description="Ask questions about your documents" active={pathname === '/dashboard/chat'} collapsed={collapsed} onNavigate={closeMobile} />
 
                     {!collapsed && (
                         <div style={{
@@ -281,13 +282,13 @@ export default function Sidebar() {
     );
 }
 
-function NavItem({ href, icon, label, active, collapsed, onNavigate, badge }: { href: string, icon: React.ReactNode, label: string, active?: boolean, collapsed?: boolean, onNavigate?: () => void, badge?: { color: string } }) {
+function NavItem({ href, icon, label, description, active, collapsed, onNavigate, badge }: { href: string, icon: React.ReactNode, label: string, description?: string, active?: boolean, collapsed?: boolean, onNavigate?: () => void, badge?: { color: string } }) {
     return (
         <Link
             href={href}
             onClick={onNavigate}
             aria-current={active ? 'page' : undefined}
-            title={collapsed ? label : undefined}
+            title={collapsed ? label : description}
             style={{
                 display: 'flex',
                 alignItems: 'center',
