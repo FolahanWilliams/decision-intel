@@ -262,7 +262,7 @@ export default function ComparePage() {
                             </thead>
                             <tbody>
                                 {metrics.map((metric) => {
-                                    const values = comparisonDocs.map((d) => (d as Record<string, unknown>)[metric.key]);
+                                    const values = comparisonDocs.map((d) => (d as unknown as Record<string, unknown>)[metric.key]);
                                     const numericValues = values.filter((v): v is number => typeof v === 'number');
                                     const best = metric.higherBetter
                                         ? Math.max(...numericValues)
@@ -274,11 +274,11 @@ export default function ComparePage() {
                                                 {metric.label}
                                             </td>
                                             {comparisonDocs.map((doc) => {
-                                                const val = (doc as Record<string, unknown>)[metric.key];
+                                                const val = (doc as unknown as Record<string, unknown>)[metric.key];
                                                 const isBest = typeof val === 'number' && val === best && numericValues.length > 1;
                                                 return (
                                                     <td key={doc.id} style={{ padding: '12px', borderBottom: '1px solid var(--border-color)', fontWeight: isBest ? 600 : 400, color: isBest ? 'var(--accent-primary)' : 'var(--text-primary)' }}>
-                                                        {metric.format(val as number | string | null)}
+                                                        {metric.format(val as never)}
                                                     </td>
                                                 );
                                             })}
