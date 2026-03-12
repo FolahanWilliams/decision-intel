@@ -54,15 +54,18 @@ export function CommandPalette() {
         );
     }, [commands, query]);
 
-    // Reset selection when filter changes
-    useEffect(() => { setSelectedIndex(0); }, [filtered.length]);
+    // Clamp selectedIndex to valid range when filter changes
+    const clampedIndex = filtered.length > 0 ? Math.min(selectedIndex, filtered.length - 1) : 0;
 
     // Global keyboard shortcut
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                 e.preventDefault();
-                setOpen(prev => !prev);
+                setOpen(prev => {
+                    if (!prev) { setQuery(''); setSelectedIndex(0); }
+                    return !prev;
+                });
             }
             if (e.key === 'Escape' && open) {
                 setOpen(false);
@@ -75,8 +78,6 @@ export function CommandPalette() {
     // Focus input when opened
     useEffect(() => {
         if (open) {
-            setQuery('');
-            setSelectedIndex(0);
             setTimeout(() => inputRef.current?.focus(), 50);
         }
     }, [open]);
@@ -84,9 +85,9 @@ export function CommandPalette() {
     // Scroll selected item into view
     useEffect(() => {
         if (!listRef.current) return;
-        const item = listRef.current.children[selectedIndex] as HTMLElement;
+        const item = listRef.current.children[clampedIndex] as HTMLElement;
         item?.scrollIntoView({ block: 'nearest' });
-    }, [selectedIndex]);
+    }, [clampedIndex]);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'ArrowDown') {
@@ -95,11 +96,11 @@ export function CommandPalette() {
         } else if (e.key === 'ArrowUp') {
             e.preventDefault();
             setSelectedIndex(i => Math.max(i - 1, 0));
-        } else if (e.key === 'Enter' && filtered[selectedIndex]) {
+        } else if (e.key === 'Enter' && filtered[clampedIndex]) {
             e.preventDefault();
-            filtered[selectedIndex].action();
+            filtered[clampedIndex].action();
         }
-    }, [filtered, selectedIndex]);
+    }, [filtered, clampedIndex]);
 
     if (!open) return null;
 
@@ -135,7 +136,7 @@ export function CommandPalette() {
                         type="text"
                         placeholder="Search pages, actions..."
                         value={query}
-                        onChange={e => setQuery(e.target.value)}
+                        onChange={e => { setQuery(e.target.value); setSelectedIndex(0); }}
                         onKeyDown={handleKeyDown}
                         style={{
                             flex: 1,
@@ -172,7 +173,7 @@ export function CommandPalette() {
                             <button
                                 key={cmd.id}
                                 role="option"
-                                aria-selected={idx === selectedIndex}
+                                aria-selected={idx === clampedIndex}
                                 onClick={() => cmd.action()}
                                 onMouseEnter={() => setSelectedIndex(idx)}
                                 style={{
@@ -181,7 +182,7 @@ export function CommandPalette() {
                                     gap: 'var(--spacing-md)',
                                     width: '100%',
                                     padding: '10px var(--spacing-md)',
-                                    background: idx === selectedIndex ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                                    background: idx === clampedIndex ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
                                     border: 'none',
                                     cursor: 'pointer',
                                     color: 'var(--text-primary)',
@@ -189,7 +190,7 @@ export function CommandPalette() {
                                     fontSize: '13px',
                                 }}
                             >
-                                <span style={{ color: idx === selectedIndex ? 'var(--accent-primary)' : 'var(--text-muted)', flexShrink: 0 }}>
+                                <span style={{ color: idx === clampedIndex ? 'var(--accent-primary)' : 'var(--text-muted)', flexShrink: 0 }}>
                                     {cmd.icon}
                                 </span>
                                 <div style={{ flex: 1, minWidth: 0 }}>

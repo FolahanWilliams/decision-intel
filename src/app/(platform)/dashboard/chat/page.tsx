@@ -40,7 +40,7 @@ export default function ChatPage() {
     const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
     const { showToast } = useToast();
 
-    const { messages, isStreaming, error, sendMessage, clearMessages } = useChatStream({
+    const { messages, isStreaming, error, sendMessage, clearMessages, loadMessages } = useChatStream({
         pinnedDocumentId: pinnedDocId || undefined,
     });
     const [input, setInput] = useState('');
@@ -82,15 +82,12 @@ export default function ChatPage() {
     }, [messages]);
 
     const loadSession = useCallback((session: ChatSession) => {
-        clearMessages();
         setPinnedDocId(session.pinnedDocId);
         setActiveSessionId(session.id);
         setShowHistory(false);
-        // Re-send the messages is complex; instead we display saved messages directly.
-        // The hook resets, so we use a workaround — reload the page state.
-        // For simplicity, we just show a toast and let the user know.
+        loadMessages(session.messages);
         showToast(`Loaded: ${session.title}`, 'info');
-    }, [clearMessages, showToast]);
+    }, [loadMessages, showToast]);
 
     const startNewSession = useCallback(() => {
         clearMessages();
