@@ -33,7 +33,7 @@ export default function Dashboard() {
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>('all');
-  const [showTrend, setShowTrend] = useState(false);
+  const [showTrend, setShowTrend] = useState<boolean | null>(null);
   const [docsPage, setDocsPage] = useState(1);
 
   // Delete confirmation state
@@ -66,6 +66,13 @@ export default function Dashboard() {
       updateProgress(currentProgress, runningStep?.name || 'Analyzing...');
     }
   }, [currentProgress, analysisSteps, updateProgress]);
+
+  // Auto-expand trend chart when 3+ analyzed documents exist (only on first load)
+  useEffect(() => {
+    if (showTrend === null && uploadedDocs.filter(d => d.score !== undefined).length >= 3) {
+      setShowTrend(true);
+    }
+  }, [showTrend, uploadedDocs]);
 
   // Filtered documents based on search and status
   const filteredDocs = useMemo(() => {
@@ -287,6 +294,23 @@ export default function Dashboard() {
         </h1>
       </div>
 
+      {/* Stats overview row */}
+      {uploadedDocs.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-md mb-xl">
+          {[
+            { label: 'Total Documents', value: totalDocs },
+            { label: 'Analyzed', value: uploadedDocs.filter(d => d.status === 'complete').length },
+            { label: 'Avg Quality', value: (() => { const scored = uploadedDocs.filter(d => d.score !== undefined); return scored.length ? `${Math.round(scored.reduce((a, d) => a + (d.score || 0), 0) / scored.length)}%` : '—'; })() },
+            { label: 'Pending', value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending').length },
+          ].map((stat) => (
+            <div key={stat.label} className="card" style={{ padding: 'var(--spacing-md)' }}>
+              <div className="text-xs text-muted" style={{ marginBottom: '4px' }}>{stat.label}</div>
+              <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-highlight)' }}>{stat.value}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Onboarding Guide for new users */}
       <OnboardingGuide />
 
@@ -418,7 +442,7 @@ export default function Dashboard() {
               Recent Analyses
             </h2>
             <Link
-              href="#documents"
+              href="/"
               className="text-sm text-accent-primary hover:underline flex items-center gap-1"
             >
               View All <ChevronRight size={14} />
@@ -470,7 +494,7 @@ export default function Dashboard() {
       {uploadedDocs.some(d => d.score !== undefined) && (
         <div className="card mb-xl">
           <button
-            onClick={() => setShowTrend(!showTrend)}
+            onClick={() => setShowTrend(prev => !prev)}
             className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
           >
             <h3 className="flex items-center gap-2 text-base">
