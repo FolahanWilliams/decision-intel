@@ -115,6 +115,10 @@ vi.mock('@/lib/utils/json', () => ({
     safeJsonClone: (obj: unknown) => obj
 }));
 
+vi.mock('@/lib/utils/rate-limit', () => ({
+    checkRateLimit: vi.fn().mockResolvedValue({ success: true, limit: 5, remaining: 4, reset: Math.floor(Date.now() / 1000) + 3600 }),
+}));
+
 vi.mock('@/lib/analysis/analyzer', () => ({
     analyzeDocument: vi.fn().mockResolvedValue({
         overallScore: 85,

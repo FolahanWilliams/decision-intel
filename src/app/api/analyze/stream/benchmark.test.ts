@@ -115,6 +115,18 @@ vi.mock('@/lib/utils/error', () => ({
   getSafeErrorMessage: (err: unknown) => err instanceof Error ? err.message : String(err)
 }));
 
+vi.mock('@/lib/utils/rate-limit', () => ({
+  checkRateLimit: vi.fn().mockResolvedValue({ success: true, limit: 5, remaining: 4, reset: Math.floor(Date.now() / 1000) + 3600 }),
+}));
+
+vi.mock('@/lib/rag/embeddings', () => ({
+  storeAnalysisEmbedding: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/audit', () => ({
+  logAudit: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Import after mocks
 import { POST } from './route';
 
