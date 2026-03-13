@@ -322,6 +322,12 @@ pre {
   transform: translateY(-1px);
 }
 
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0);
+  background: var(--liquid-bg-strong);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset;
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
@@ -353,6 +359,26 @@ pre {
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+  color: #fff;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  box-shadow: 0 2px 12px rgba(239, 68, 68, 0.25);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-danger:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
 }
 
 /* ═══════════════════════════════════════════
