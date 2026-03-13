@@ -22,8 +22,8 @@ import { safeStringify } from './utils/json';
  * @returns String format: "data: <json>\n\n"
  */
 export function formatSSE(data: unknown): string {
-    const json = safeStringify(data);
-    return `data: ${json}\n\n`;
+  const json = safeStringify(data);
+  return `data: ${json}\n\n`;
 }
 
 // ----------------------------------------------------------------------
@@ -39,48 +39,48 @@ export function formatSSE(data: unknown): string {
  * - JSON Parsing safety
  */
 export class SSEReader {
-    private buffer: string = "";
+  private buffer: string = '';
 
-    /**
-     * Processes a raw text chunk from the stream.
-     * Invokes callback for each valid valid JSON message found.
-     */
-    processChunk(chunk: string, onMessage: (data: unknown) => void) {
-        this.buffer += chunk;
+  /**
+   * Processes a raw text chunk from the stream.
+   * Invokes callback for each valid valid JSON message found.
+   */
+  processChunk(chunk: string, onMessage: (data: unknown) => void) {
+    this.buffer += chunk;
 
-        // Split by double newline (SSE standard delimiter)
-        const parts = this.buffer.split("\n\n");
+    // Split by double newline (SSE standard delimiter)
+    const parts = this.buffer.split('\n\n');
 
-        // Keep the last part in the buffer (it might be incomplete)
-        // If the chunk ended with \n\n, the last part is empty string, which is fine.
-        this.buffer = parts.pop() || "";
+    // Keep the last part in the buffer (it might be incomplete)
+    // If the chunk ended with \n\n, the last part is empty string, which is fine.
+    this.buffer = parts.pop() || '';
 
-        for (const part of parts) {
-            const line = part.trim();
-            if (!line) continue;
+    for (const part of parts) {
+      const line = part.trim();
+      if (!line) continue;
 
-            if (line.startsWith("data: ")) {
-                const jsonStr = line.slice(6);
-                try {
-                    const data = JSON.parse(jsonStr);
-                    onMessage(data);
-                } catch (e) {
-                    // Intentionally swallowed — malformed SSE chunks are expected
-                    // during partial reads. Logged at debug level only.
-                    void e;
-                }
-            } else {
-                // Handle non-standard lines or legacy clients (optional resilience)
-                // Try parsing directly if it looks like JSON
-                if (line.startsWith("{") || line.startsWith("[")) {
-                    try {
-                        const data = JSON.parse(line);
-                        onMessage(data);
-                    } catch {
-                        // Ignore noise
-                    }
-                }
-            }
+      if (line.startsWith('data: ')) {
+        const jsonStr = line.slice(6);
+        try {
+          const data = JSON.parse(jsonStr);
+          onMessage(data);
+        } catch (e) {
+          // Intentionally swallowed — malformed SSE chunks are expected
+          // during partial reads. Logged at debug level only.
+          void e;
         }
+      } else {
+        // Handle non-standard lines or legacy clients (optional resilience)
+        // Try parsing directly if it looks like JSON
+        if (line.startsWith('{') || line.startsWith('[')) {
+          try {
+            const data = JSON.parse(line);
+            onMessage(data);
+          } catch {
+            // Ignore noise
+          }
+        }
+      }
     }
+  }
 }

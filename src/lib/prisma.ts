@@ -5,7 +5,6 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('Prisma');
 
-
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };

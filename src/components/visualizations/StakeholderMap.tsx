@@ -1,6 +1,5 @@
 'use client';
 
-
 interface Stakeholder {
   id: string;
   name: string;
@@ -25,9 +24,12 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
 
   const getStanceColor = (stance: string) => {
     switch (stance) {
-      case 'supportive': return 'bg-emerald-500 border-emerald-300';
-      case 'opposed': return 'bg-red-500 border-red-300';
-      default: return 'bg-gray-500 border-gray-300';
+      case 'supportive':
+        return 'bg-emerald-500 border-emerald-300';
+      case 'opposed':
+        return 'bg-red-500 border-red-300';
+      default:
+        return 'bg-gray-500 border-gray-300';
     }
   };
 
@@ -56,14 +58,12 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
               height: `${q.h}%`,
             }}
           >
-            <span className="text-sm font-bold text-muted/50 tracking-wide">
-              {q.label}
-            </span>
+            <span className="text-sm font-bold text-muted/50 tracking-wide">{q.label}</span>
           </div>
         ))}
 
         {/* Stakeholder Nodes */}
-        {stakeholders.map((stakeholder) => (
+        {stakeholders.map(stakeholder => (
           <div
             key={stakeholder.id}
             className="absolute group transform -translate-x-1/2 translate-y-1/2 hover:z-50"
@@ -72,11 +72,13 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
               bottom: `${stakeholder.influence}%`,
             }}
           >
-            <div className={`
+            <div
+              className={`
               w-4 h-4  border-2 cursor-pointer               transition-transform duration-300 group-hover:scale-150
               ${getStanceColor(stakeholder.stance)}
-            `} />
-            
+            `}
+            />
+
             {/* Tooltip */}
             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 hidden group-hover:block z-50">
               <div className="bg-popover text-popover-foreground text-xs   p-3 border border-border">
@@ -131,21 +133,22 @@ export function AlignmentChart({ data }: AlignmentChartProps) {
           <div className="flex justify-between text-sm">
             <span>{item.category}</span>
             <span className={item.alignment >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-              {item.alignment > 0 ? '+' : ''}{item.alignment}%
+              {item.alignment > 0 ? '+' : ''}
+              {item.alignment}%
             </span>
           </div>
           <div className="relative h-2 bg-secondary  overflow-hidden">
             {/* Center line */}
             <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-white/20 z-10" />
-            
+
             {/* Bar */}
-            <div 
+            <div
               className={`absolute top-0 bottom-0 transition-all duration-500 ${
                 item.alignment >= 0 ? 'bg-emerald-500 left-1/2' : 'bg-red-500 right-1/2'
               }`}
-              style={{ 
+              style={{
                 width: `${Math.abs(item.alignment) / 2}%`,
-                opacity: 0.5 + (item.importance / 200) // Opacity based on importance
+                opacity: 0.5 + item.importance / 200, // Opacity based on importance
               }}
             />
           </div>

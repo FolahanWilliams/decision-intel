@@ -49,13 +49,17 @@ export function ComparativeAnalysis({ documents }: DocumentComparisonProps) {
               </td>
               {documents.map(doc => {
                 const value = doc.scores[metric.key as keyof typeof doc.scores];
-                const maxVal = Math.max(...documents.map(d => d.scores[metric.key as keyof typeof d.scores]));
+                const maxVal = Math.max(
+                  ...documents.map(d => d.scores[metric.key as keyof typeof d.scores])
+                );
                 const isHighest = value === maxVal;
 
                 return (
                   <td key={doc.id} className="p-4 align-middle">
                     <div className="flex items-center gap-3">
-                      <span className={`font-bold ${isHighest ? 'text-accent-primary' : 'text-muted-foreground'}`}>
+                      <span
+                        className={`font-bold ${isHighest ? 'text-accent-primary' : 'text-muted-foreground'}`}
+                      >
                         {value}
                       </span>
                       <div className="flex-1 h-1.5 bg-secondary  overflow-hidden w-24">
@@ -97,11 +101,14 @@ export function TrendOverlay({ data }: TrendOverlayProps) {
     const maxDate = Math.max(...data.map(d => new Date(d.date).getTime()));
     const timeRange = maxDate - minDate || 1;
 
-    return data.map((d) => {
-      const x = padding + ((new Date(d.date).getTime() - minDate) / timeRange) * (width - 2 * padding);
-      const y = height - padding - (d.score / 100) * (height - 2 * padding);
-      return `${x},${y}`;
-    }).join(' ');
+    return data
+      .map(d => {
+        const x =
+          padding + ((new Date(d.date).getTime() - minDate) / timeRange) * (width - 2 * padding);
+        const y = height - padding - (d.score / 100) * (height - 2 * padding);
+        return `${x},${y}`;
+      })
+      .join(' ');
   }, [data]);
 
   return (
@@ -150,7 +157,9 @@ export function TrendOverlay({ data }: TrendOverlayProps) {
                 strokeWidth="2"
                 className="hover:r-6 transition-all cursor-pointer"
               >
-                <title>{data[i].score}% - {data[i].date}</title>
+                <title>
+                  {data[i].score}% - {data[i].date}
+                </title>
               </circle>
             );
           })}

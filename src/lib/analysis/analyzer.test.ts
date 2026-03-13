@@ -1,4 +1,3 @@
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { runAnalysis } from './analyzer';
 
@@ -9,13 +8,13 @@ const invokeMock = vi.fn();
 vi.mock('@/lib/agents/graph', () => ({
   auditGraph: {
     invoke: invokeMock, // Keep for fallback test if needed
-    streamEvents: streamEventsMock
-  }
+    streamEvents: streamEventsMock,
+  },
 }));
 
 // Mock safeJsonClone to be identity for simplicity
 vi.mock('@/lib/utils/json', () => ({
-  safeJsonClone: (obj: unknown) => obj
+  safeJsonClone: (obj: unknown) => obj,
 }));
 
 // Mock Prisma
@@ -27,8 +26,8 @@ vi.mock('@/lib/prisma', () => ({
     },
     analysis: {
       create: vi.fn(),
-    }
-  }
+    },
+  },
 }));
 
 describe('runAnalysis', () => {
@@ -48,7 +47,7 @@ describe('runAnalysis', () => {
       compliance: {},
       preMortem: {},
       sentiment: {},
-      speakers: []
+      speakers: [],
     };
 
     // Mock async generator for streamEvents
@@ -59,7 +58,7 @@ describe('runAnalysis', () => {
       yield {
         event: 'on_chain_end',
         name: 'LangGraph',
-        data: { output: { finalReport: mockReport } }
+        data: { output: { finalReport: mockReport } },
       };
     }
 
@@ -67,17 +66,22 @@ describe('runAnalysis', () => {
 
     const result = await runAnalysis('test content', 'test-doc-id', 'test-user-id');
 
-    expect(streamEventsMock).toHaveBeenCalledWith(expect.objectContaining({
-      originalContent: 'test content',
-      documentId: 'test-doc-id',
-      userId: 'test-user-id'
-    }), expect.anything());
+    expect(streamEventsMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        originalContent: 'test content',
+        documentId: 'test-doc-id',
+        userId: 'test-user-id',
+      }),
+      expect.anything()
+    );
 
     // Should NOT call invoke anymore in the happy path
     expect(invokeMock).not.toHaveBeenCalled();
 
-    expect(result).toEqual(expect.objectContaining({
-      overallScore: 90
-    }));
+    expect(result).toEqual(
+      expect.objectContaining({
+        overallScore: 90,
+      })
+    );
   });
 });

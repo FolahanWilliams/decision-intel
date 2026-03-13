@@ -7,84 +7,92 @@ import { createLogger } from '@/lib/utils/logger';
 const log = createLogger('AuditRoute');
 
 export async function POST(req: NextRequest) {
-    try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        const userId = user?.id;
-        if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        let body: AuditLogParams;
-        try {
-            body = (await req.json()) as AuditLogParams;
-        } catch {
-            return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
-        }
-        await logAudit(body);
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        log.error('Audit Log Error:', error);
-        return NextResponse.json({ error: 'Failed to log audit event' }, { status: 500 });
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    let body: AuditLogParams;
+    try {
+      body = (await req.json()) as AuditLogParams;
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
+    }
+    await logAudit(body);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    log.error('Audit Log Error:', error);
+    return NextResponse.json({ error: 'Failed to log audit event' }, { status: 500 });
+  }
 }
 
 /** GET /api/audit?export=csv — stream all audit events for the user as a CSV file. */
 export async function GET(req: NextRequest) {
-    try {
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        const userId = user?.id;
-        if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        const { searchParams } = new URL(req.url);
-        if (searchParams.get('export') !== 'csv') {
-            return NextResponse.json({ error: 'Only ?export=csv is supported' }, { status: 400 });
-        }
-
-        const logs = await prisma.auditLog.findMany({
-            where: { userId },
-            orderBy: { createdAt: 'desc' },
-            select: {
-                id: true,
-                action: true,
-                resource: true,
-                resourceId: true,
-                ipAddress: true,
-                createdAt: true,
-            }
-        });
-
-        const escape = (v: string | null | undefined) => {
-            let s = v ?? '';
-            // Prevent CSV formula injection: prefix dangerous leading chars with a single quote
-            if (/^[=+\-@\t\r]/.test(s)) {
-                s = `'${s}`;
-            }
-            return s.includes(',') || s.includes('"') || s.includes('\n')
-                ? `"${s.replace(/"/g, '""')}"` : s;
-        };
-
-        const header = 'id,action,resource,resourceId,ipAddress,createdAt\n';
-        const rows = logs.map((l: typeof logs[number]) =>
-            [l.id, l.action, l.resource, l.resourceId, l.ipAddress, l.createdAt.toISOString()]
-                .map(escape).join(',')
-        ).join('\n');
-
-        const csv = header + rows;
-        const today = new Date().toISOString().split('T')[0];
-
-        return new NextResponse(csv, {
-            status: 200,
-            headers: {
-                'Content-Type': 'text/csv; charset=utf-8',
-                'Content-Disposition': `attachment; filename="audit-log-${today}.csv"`,
-            },
-        });
-    } catch (error) {
-        log.error('Audit CSV Export Error:', error);
-        return NextResponse.json({ error: 'Failed to export audit log' }, { status: 500 });
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { searchParams } = new URL(req.url);
+    if (searchParams.get('export') !== 'csv') {
+      return NextResponse.json({ error: 'Only ?export=csv is supported' }, { status: 400 });
+    }
+
+    const logs = await prisma.auditLog.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        action: true,
+        resource: true,
+        resourceId: true,
+        ipAddress: true,
+        createdAt: true,
+      },
+    });
+
+    const escape = (v: string | null | undefined) => {
+      let s = v ?? '';
+      // Prevent CSV formula injection: prefix dangerous leading chars with a single quote
+      if (/^[=+\-@\t\r]/.test(s)) {
+        s = `'${s}`;
+      }
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g, '""')}"`
+        : s;
+    };
+
+    const header = 'id,action,resource,resourceId,ipAddress,createdAt\n';
+    const rows = logs
+      .map((l: (typeof logs)[number]) =>
+        [l.id, l.action, l.resource, l.resourceId, l.ipAddress, l.createdAt.toISOString()]
+          .map(escape)
+          .join(',')
+      )
+      .join('\n');
+
+    const csv = header + rows;
+    const today = new Date().toISOString().split('T')[0];
+
+    return new NextResponse(csv, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="audit-log-${today}.csv"`,
+      },
+    });
+  } catch (error) {
+    log.error('Audit CSV Export Error:', error);
+    return NextResponse.json({ error: 'Failed to export audit log' }, { status: 500 });
+  }
 }

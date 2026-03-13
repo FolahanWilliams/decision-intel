@@ -12,14 +12,14 @@ interface GaugeProps {
   sublabel?: string;
 }
 
-export function QualityGauge({ 
-  value, 
-  maxValue = 100, 
-  size = 120, 
+export function QualityGauge({
+  value,
+  maxValue = 100,
+  size = 120,
   strokeWidth = 10,
   label,
   color,
-  sublabel
+  sublabel,
 }: GaugeProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
@@ -77,7 +77,14 @@ interface ScoreCardProps {
   severity: 'success' | 'warning' | 'error' | 'info';
 }
 
-export function ScoreCard({ title, score, trend, trendValue, description, severity }: ScoreCardProps) {
+export function ScoreCard({
+  title,
+  score,
+  trend,
+  trendValue,
+  description,
+  severity,
+}: ScoreCardProps) {
   const colors = {
     success: 'text-success border-success/30 bg-success/10',
     warning: 'text-warning border-warning/30 bg-warning/10',
@@ -92,7 +99,9 @@ export function ScoreCard({ title, score, trend, trendValue, description, severi
       <div className="flex items-start justify-between mb-2">
         <h4 className="text-sm font-medium opacity-80">{title}</h4>
         {trend && (
-          <span className={`text-xs ${trend === 'up' ? 'text-success' : trend === 'down' ? 'text-error' : 'text-muted'}`}>
+          <span
+            className={`text-xs ${trend === 'up' ? 'text-success' : trend === 'down' ? 'text-error' : 'text-muted'}`}
+          >
             {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'} {trendValue}
           </span>
         )}
@@ -114,7 +123,13 @@ interface MetricBarProps {
   showValue?: boolean;
 }
 
-export function MetricBar({ label, value, maxValue = 100, color, showValue = true }: MetricBarProps) {
+export function MetricBar({
+  label,
+  value,
+  maxValue = 100,
+  color,
+  showValue = true,
+}: MetricBarProps) {
   const percentage = Math.min(100, Math.max(0, (value / maxValue) * 100));
 
   return (
@@ -124,7 +139,7 @@ export function MetricBar({ label, value, maxValue = 100, color, showValue = tru
         {showValue && <span className="font-medium">{value}</span>}
       </div>
       <div className="h-2 bg-secondary  overflow-hidden">
-        <div 
+        <div
           className="h-full  transition-all duration-700 ease-out"
           style={{ width: `${percentage}%`, backgroundColor: color }}
         />
@@ -154,7 +169,7 @@ export function QualityRadar({ data, size = 200 }: QualityRadarProps) {
 
     const centerX = size / 2;
     const centerY = size / 2;
-    const radius = (size / 2) - 30;
+    const radius = size / 2 - 30;
     const numPoints = data.length;
     const angleStep = (Math.PI * 2) / numPoints;
 
@@ -184,10 +199,7 @@ export function QualityRadar({ data, size = 200 }: QualityRadarProps) {
       ctx.beginPath();
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
       ctx.moveTo(centerX, centerY);
-      ctx.lineTo(
-        centerX + Math.cos(angle) * radius,
-        centerY + Math.sin(angle) * radius
-      );
+      ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
       ctx.stroke();
 
       // Draw labels
@@ -211,7 +223,7 @@ export function QualityRadar({ data, size = 200 }: QualityRadarProps) {
       const r = (point.value / 100) * radius;
       const x = centerX + Math.cos(angle) * r;
       const y = centerY + Math.sin(angle) * r;
-      
+
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
@@ -234,12 +246,5 @@ export function QualityRadar({ data, size = 200 }: QualityRadarProps) {
     });
   }, [data, size]);
 
-  return (
-    <canvas 
-      ref={canvasRef} 
-      width={size} 
-      height={size}
-      className="mx-auto"
-    />
-  );
+  return <canvas ref={canvasRef} width={size} height={size} className="mx-auto" />;
 }

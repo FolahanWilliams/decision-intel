@@ -11,51 +11,56 @@ const log = createLogger('JSON');
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const parseJSON = (text: string): any | null => {
-    if (!text) return null;
-    const start = text.search(/[\{\[]/);
-    if (start === -1) {
-        log.error('JSON Parse Error: no opening brace/bracket found. Raw (500 chars): ' + text.slice(0, 500));
-        return null;
-    }
-    const opening = text[start];
-    const closing = opening === "{" ? "}" : "]";
-
-    // Optimization: Attempt to parse the substring from the first opening brace to the last closing brace.
-    // This covers the common case where the text contains a single valid JSON object/array, optionally surrounded by text.
-    // It is significantly faster (native JSON.parse) than the manual state machine loop.
-    const end = text.lastIndexOf(closing);
-    if (end !== -1 && end > start) {
-        const candidate = text.slice(start, end + 1);
-        try {
-            return JSON.parse(candidate);
-        } catch {
-            // Fallback to robust parsing if optimistic attempt fails
-        }
-    }
-
-    let depth = 0;
-    let inString = false;
-    for (let i = start; i < text.length; i++) {
-        const ch = text[i];
-        const prev = text[i - 1];
-        if (ch === '"' && prev !== "\\") inString = !inString;
-        if (inString) continue;
-        if (ch === opening) depth++;
-        if (ch === closing) {
-            depth--;
-            if (depth === 0) {
-                const candidate = text.slice(start, i + 1);
-                try {
-                    return JSON.parse(candidate);
-                } catch (e) {
-                    log.error('JSON Parse Error: candidate failed to parse. Raw (500 chars): ' + text.slice(0, 500), e);
-                    return null;
-                }
-            }
-        }
-    }
-    log.error('JSON Parse Error: no balanced JSON found. Raw (500 chars): ' + text.slice(0, 500));
+  if (!text) return null;
+  const start = text.search(/[\{\[]/);
+  if (start === -1) {
+    log.error(
+      'JSON Parse Error: no opening brace/bracket found. Raw (500 chars): ' + text.slice(0, 500)
+    );
     return null;
+  }
+  const opening = text[start];
+  const closing = opening === '{' ? '}' : ']';
+
+  // Optimization: Attempt to parse the substring from the first opening brace to the last closing brace.
+  // This covers the common case where the text contains a single valid JSON object/array, optionally surrounded by text.
+  // It is significantly faster (native JSON.parse) than the manual state machine loop.
+  const end = text.lastIndexOf(closing);
+  if (end !== -1 && end > start) {
+    const candidate = text.slice(start, end + 1);
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      // Fallback to robust parsing if optimistic attempt fails
+    }
+  }
+
+  let depth = 0;
+  let inString = false;
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+    const prev = text[i - 1];
+    if (ch === '"' && prev !== '\\') inString = !inString;
+    if (inString) continue;
+    if (ch === opening) depth++;
+    if (ch === closing) {
+      depth--;
+      if (depth === 0) {
+        const candidate = text.slice(start, i + 1);
+        try {
+          return JSON.parse(candidate);
+        } catch (e) {
+          log.error(
+            'JSON Parse Error: candidate failed to parse. Raw (500 chars): ' + text.slice(0, 500),
+            e
+          );
+          return null;
+        }
+      }
+    }
+  }
+  log.error('JSON Parse Error: no balanced JSON found. Raw (500 chars): ' + text.slice(0, 500));
+  return null;
 };
 
 /**
@@ -63,32 +68,32 @@ export const parseJSON = (text: string): any | null => {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function safeStringify(obj: any): string {
-    const safeReplacer = () => {
-        const seen = new WeakSet();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (_key: any, value: any) => {
-            if (typeof value === 'bigint') {
-                return value.toString();
-            }
-            if (typeof value === "object" && value !== null) {
-                if (seen.has(value)) {
-                    return "[Circular]";
-                }
-                seen.add(value);
-            }
-            return value;
-        };
-    };
-
-    try {
-        return JSON.stringify(obj);
-    } catch {
-        try {
-            return JSON.stringify(obj, safeReplacer());
-        } catch {
-            return JSON.stringify({ type: 'error', message: 'Non-serializable payload' });
+  const safeReplacer = () => {
+    const seen = new WeakSet();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (_key: any, value: any) => {
+      if (typeof value === 'bigint') {
+        return value.toString();
+      }
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return '[Circular]';
         }
+        seen.add(value);
+      }
+      return value;
+    };
+  };
+
+  try {
+    return JSON.stringify(obj);
+  } catch {
+    try {
+      return JSON.stringify(obj, safeReplacer());
+    } catch {
+      return JSON.stringify({ type: 'error', message: 'Non-serializable payload' });
     }
+  }
 }
 
 /**
@@ -97,62 +102,66 @@ export function safeStringify(obj: any): string {
  * Optimized to use single-pass traversal instead of double serialization.
  */
 export function safeJsonClone<T>(obj: T): T {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const seen = new WeakSet<any>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const seen = new WeakSet<any>();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function clone(value: any): any {
-        // Primitives and null
-        if (value === null || typeof value !== 'object') {
-            if (typeof value === 'bigint') {
-                return value.toString();
-            }
-            if (typeof value === 'undefined' || typeof value === 'function' || typeof value === 'symbol') {
-                return undefined;
-            }
-            return value;
-        }
-
-        // Date
-        if (value instanceof Date) {
-            return value.toISOString();
-        }
-
-        // Handle .toJSON()
-        if (typeof value.toJSON === 'function') {
-            return clone(value.toJSON());
-        }
-
-        // Circular check
-        if (seen.has(value)) {
-            return "[Circular]";
-        }
-        seen.add(value);
-
-        // Array
-        if (Array.isArray(value)) {
-            const res = new Array(value.length);
-            for (let i = 0; i < value.length; i++) {
-                const v = clone(value[i]);
-                // JSON.stringify converts undefined/function/symbol in arrays to null
-                res[i] = (v === undefined) ? null : v;
-            }
-            return res as T;
-        }
-
-        // Plain Object
-        const res: Record<string, unknown> = {};
-        for (const key in value) {
-            if (Object.prototype.hasOwnProperty.call(value, key)) {
-                const v = clone(value[key]);
-                // JSON.stringify skips undefined properties
-                if (v !== undefined) {
-                    res[key] = v;
-                }
-            }
-        }
-        return res;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function clone(value: any): any {
+    // Primitives and null
+    if (value === null || typeof value !== 'object') {
+      if (typeof value === 'bigint') {
+        return value.toString();
+      }
+      if (
+        typeof value === 'undefined' ||
+        typeof value === 'function' ||
+        typeof value === 'symbol'
+      ) {
+        return undefined;
+      }
+      return value;
     }
 
-    return clone(obj);
+    // Date
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    // Handle .toJSON()
+    if (typeof value.toJSON === 'function') {
+      return clone(value.toJSON());
+    }
+
+    // Circular check
+    if (seen.has(value)) {
+      return '[Circular]';
+    }
+    seen.add(value);
+
+    // Array
+    if (Array.isArray(value)) {
+      const res = new Array(value.length);
+      for (let i = 0; i < value.length; i++) {
+        const v = clone(value[i]);
+        // JSON.stringify converts undefined/function/symbol in arrays to null
+        res[i] = v === undefined ? null : v;
+      }
+      return res as T;
+    }
+
+    // Plain Object
+    const res: Record<string, unknown> = {};
+    for (const key in value) {
+      if (Object.prototype.hasOwnProperty.call(value, key)) {
+        const v = clone(value[key]);
+        // JSON.stringify skips undefined properties
+        if (v !== undefined) {
+          res[key] = v;
+        }
+      }
+    }
+    return res;
+  }
+
+  return clone(obj);
 }

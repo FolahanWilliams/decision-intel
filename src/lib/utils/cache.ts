@@ -38,11 +38,11 @@ export const CACHE_KEYS = {
  * Cache TTL values in seconds
  */
 export const CACHE_TTL = {
-  ANALYSIS: 7 * 24 * 60 * 60,      // 7 days
-  EMBEDDING: 30 * 24 * 60 * 60,    // 30 days
+  ANALYSIS: 7 * 24 * 60 * 60, // 7 days
+  EMBEDDING: 30 * 24 * 60 * 60, // 30 days
   BIAS_INSIGHT: 30 * 24 * 60 * 60, // 30 days (research doesn't change often)
-  FINANCIAL_DATA: 60 * 60,          // 1 hour (stock data changes frequently)
-  RATE_LIMIT: 60,                   // 1 minute
+  FINANCIAL_DATA: 60 * 60, // 1 hour (stock data changes frequently)
+  RATE_LIMIT: 60, // 1 minute
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -116,7 +116,9 @@ export function getRedisClient(): null {
 /**
  * Get cached analysis result
  */
-export async function getCachedAnalysis(contentHash: string): Promise<Record<string, unknown> | null> {
+export async function getCachedAnalysis(
+  contentHash: string
+): Promise<Record<string, unknown> | null> {
   const raw = await cacheGet(`${CACHE_KEYS.ANALYSIS}${contentHash}`);
   if (raw) {
     log.debug('Cache hit for analysis: ' + contentHash.substring(0, 8));
@@ -149,7 +151,11 @@ export async function getCachedEmbedding(textHash: string): Promise<number[] | n
  * Cache embedding
  */
 export async function cacheEmbedding(textHash: string, embedding: number[]): Promise<void> {
-  await cacheSet(`${CACHE_KEYS.EMBEDDING}${textHash}`, JSON.stringify(embedding), CACHE_TTL.EMBEDDING);
+  await cacheSet(
+    `${CACHE_KEYS.EMBEDDING}${textHash}`,
+    JSON.stringify(embedding),
+    CACHE_TTL.EMBEDDING
+  );
 }
 
 /**
@@ -218,10 +224,18 @@ export async function getCacheStats(): Promise<{
   try {
     const now = new Date();
     const [analyses, embeddings, biasInsights, financialData] = await Promise.all([
-      prisma.cacheEntry.count({ where: { key: { startsWith: CACHE_KEYS.ANALYSIS },    expiresAt: { gt: now } } }),
-      prisma.cacheEntry.count({ where: { key: { startsWith: CACHE_KEYS.EMBEDDING },   expiresAt: { gt: now } } }),
-      prisma.cacheEntry.count({ where: { key: { startsWith: CACHE_KEYS.BIAS_INSIGHT },expiresAt: { gt: now } } }),
-      prisma.cacheEntry.count({ where: { key: { startsWith: CACHE_KEYS.FINANCIAL_DATA },expiresAt: { gt: now } } }),
+      prisma.cacheEntry.count({
+        where: { key: { startsWith: CACHE_KEYS.ANALYSIS }, expiresAt: { gt: now } },
+      }),
+      prisma.cacheEntry.count({
+        where: { key: { startsWith: CACHE_KEYS.EMBEDDING }, expiresAt: { gt: now } },
+      }),
+      prisma.cacheEntry.count({
+        where: { key: { startsWith: CACHE_KEYS.BIAS_INSIGHT }, expiresAt: { gt: now } },
+      }),
+      prisma.cacheEntry.count({
+        where: { key: { startsWith: CACHE_KEYS.FINANCIAL_DATA }, expiresAt: { gt: now } },
+      }),
     ]);
     return { analyses, embeddings, biasInsights, financialData };
   } catch (error) {

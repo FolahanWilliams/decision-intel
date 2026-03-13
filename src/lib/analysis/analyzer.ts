@@ -9,373 +9,432 @@ import { validateContent } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
 
 import {
-    NoiseStatsSchema,
-    FactCheckSchema,
-    ComplianceSchema,
-    SentimentSchema,
-    LogicalSchema,
-    SwotSchema,
-    CognitiveSchema,
-    SimulationSchema,
-    MemorySchema,
+  NoiseStatsSchema,
+  FactCheckSchema,
+  ComplianceSchema,
+  SentimentSchema,
+  LogicalSchema,
+  SwotSchema,
+  CognitiveSchema,
+  SimulationSchema,
+  MemorySchema,
 } from '@/lib/schemas/analysis';
 
 const log = createLogger('Analyzer');
 
 export interface ProgressUpdate {
-    type: 'step' | 'bias' | 'noise' | 'summary' | 'complete' | 'error';
-    step?: string;
-    description?: string;
-    status?: 'running' | 'complete' | 'error';
-    biasType?: string;
-    result?: unknown;
-    message?: string;
-    progress: number;
+  type: 'step' | 'bias' | 'noise' | 'summary' | 'complete' | 'error';
+  step?: string;
+  description?: string;
+  status?: 'running' | 'complete' | 'error';
+  biasType?: string;
+  result?: unknown;
+  message?: string;
+  progress: number;
 }
 
-
 export async function analyzeDocument(
-    documentOrId: string | Document,
-    onProgress?: (update: ProgressUpdate) => void
+  documentOrId: string | Document,
+  onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
-    let document: Document;
-    let documentId: string;
+  let document: Document;
+  let documentId: string;
 
-    if (typeof documentOrId === 'string') {
-        documentId = documentOrId;
-        const fetched = await prisma.document.findUnique({
-            where: { id: documentId }
-        });
+  if (typeof documentOrId === 'string') {
+    documentId = documentOrId;
+    const fetched = await prisma.document.findUnique({
+      where: { id: documentId },
+    });
 
-        if (!fetched) {
-            throw new Error(`Document ${documentId} not found`);
-        }
-        document = fetched;
-    } else {
-        document = documentOrId;
-        documentId = document.id;
+    if (!fetched) {
+      throw new Error(`Document ${documentId} not found`);
     }
+    document = fetched;
+  } else {
+    document = documentOrId;
+    documentId = document.id;
+  }
 
-    // Validate content before analysis
-    const validation = validateContent(document.content);
-    if (!validation.valid) {
-        throw new Error(validation.error);
+  // Validate content before analysis
+  const validation = validateContent(document.content);
+  if (!validation.valid) {
+    throw new Error(validation.error);
+  }
+
+  // Check cache first
+  const cacheKey = generateAnalysisCacheKey(document.content, document.userId);
+  const cached = await getCachedAnalysis(cacheKey);
+
+  if (cached) {
+    log.info('Cache hit for analysis: ' + cacheKey.substring(0, 16));
+    if (onProgress) {
+      onProgress({ type: 'step', step: 'Retrieved from cache', status: 'complete', progress: 100 });
     }
+    return cached as unknown as AnalysisResult;
+  }
 
-    // Check cache first
-    const cacheKey = generateAnalysisCacheKey(document.content, document.userId);
-    const cached = await getCachedAnalysis(cacheKey);
+  // Run analysis within a transaction for atomicity
+  try {
+    const result = await runAnalysis(document.content, documentId, document.userId, update => {
+      if (onProgress) onProgress(update);
+    });
 
-    if (cached) {
-        log.info('Cache hit for analysis: ' + cacheKey.substring(0, 16));
-        if (onProgress) {
-            onProgress({ type: 'step', step: 'Retrieved from cache', status: 'complete', progress: 100 });
-        }
-        return cached as unknown as AnalysisResult;
-    }
+    // Store analysis in database with Schema Drift Protection
+    const foundBiases = result.biases.filter(b => b.found);
 
-    // Run analysis within a transaction for atomicity
+    // Try saving with ALL fields first. If the DB is missing newer
+    // columns (schema drift / P2022), the transaction is poisoned —
+    // PostgreSQL rejects every subsequent command in the same transaction
+    // block. So the fallback MUST run in a separate transaction.
+    await prisma.document.update({
+      where: { id: documentId },
+      data: { status: 'analyzing' },
+    });
+
+    let schemaDrift = false;
     try {
-        const result = await runAnalysis(document.content, documentId, document.userId, (update) => {
-            if (onProgress) onProgress(update);
+      await prisma.$transaction(async tx => {
+        await tx.analysis.create({
+          data: {
+            documentId,
+            overallScore: result.overallScore,
+            noiseScore: result.noiseScore,
+            summary: result.summary,
+            modelVersion: process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview',
+            biases: {
+              create: foundBiases.map(bias => ({
+                biasType: bias.biasType,
+                severity: bias.severity,
+                excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                explanation: bias.explanation || '',
+                suggestion: bias.suggestion || '',
+                confidence: bias.confidence || 0.0,
+              })),
+            },
+            // New Fields (May cause P2022 if DB not migrated)
+            structuredContent: result.structuredContent || '',
+            noiseStats: toPrismaJson(
+              NoiseStatsSchema.safeParse(result.noiseStats).success
+                ? result.noiseStats
+                : NoiseStatsSchema.parse({})
+            ),
+            noiseBenchmarks: toPrismaJson(result.noiseBenchmarks ?? []),
+            factCheck: toPrismaJson(
+              FactCheckSchema.safeParse(result.factCheck).success
+                ? result.factCheck
+                : FactCheckSchema.parse({})
+            ),
+            compliance: toPrismaJson(
+              ComplianceSchema.safeParse(result.compliance).success
+                ? result.compliance
+                : ComplianceSchema.parse({})
+            ),
+            preMortem: toPrismaJson(result.preMortem),
+            sentiment: toPrismaJson(
+              SentimentSchema.safeParse(result.sentiment).success
+                ? result.sentiment
+                : SentimentSchema.parse({})
+            ),
+            speakers: result.speakers || [],
+            // Phase 4 Extensions
+            logicalAnalysis: toPrismaJson(
+              LogicalSchema.safeParse(result.logicalAnalysis).success
+                ? result.logicalAnalysis
+                : LogicalSchema.parse({})
+            ),
+            swotAnalysis: toPrismaJson(
+              result.swotAnalysis
+                ? SwotSchema.safeParse(result.swotAnalysis).success
+                  ? result.swotAnalysis
+                  : undefined
+                : undefined
+            ),
+            cognitiveAnalysis: toPrismaJson(
+              result.cognitiveAnalysis
+                ? CognitiveSchema.safeParse(result.cognitiveAnalysis).success
+                  ? result.cognitiveAnalysis
+                  : undefined
+                : undefined
+            ),
+            simulation: toPrismaJson(
+              result.simulation
+                ? SimulationSchema.safeParse(result.simulation).success
+                  ? result.simulation
+                  : undefined
+                : undefined
+            ),
+            institutionalMemory: toPrismaJson(
+              result.institutionalMemory
+                ? MemorySchema.safeParse(result.institutionalMemory).success
+                  ? result.institutionalMemory
+                  : undefined
+                : undefined
+            ),
+            intelligenceContext: toPrismaJson(result.intelligenceContext || undefined),
+          } satisfies Prisma.AnalysisUncheckedCreateInput,
         });
 
-        // Store analysis in database with Schema Drift Protection
-        const foundBiases = result.biases.filter(b => b.found);
-
-        // Try saving with ALL fields first. If the DB is missing newer
-        // columns (schema drift / P2022), the transaction is poisoned —
-        // PostgreSQL rejects every subsequent command in the same transaction
-        // block. So the fallback MUST run in a separate transaction.
-        await prisma.document.update({
-            where: { id: documentId },
-            data: { status: 'analyzing' }
+        await tx.document.update({
+          where: { id: documentId },
+          data: { status: 'complete' },
         });
-
-        let schemaDrift = false;
-        try {
-            await prisma.$transaction(async (tx) => {
-                await tx.analysis.create({
-                    data: {
-                        documentId,
-                        overallScore: result.overallScore,
-                        noiseScore: result.noiseScore,
-                        summary: result.summary,
-                        modelVersion: process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview',
-                        biases: {
-                            create: foundBiases.map(bias => ({
-                                biasType: bias.biasType,
-                                severity: bias.severity,
-                                excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                                explanation: bias.explanation || '',
-                                suggestion: bias.suggestion || '',
-                                confidence: bias.confidence || 0.0
-                            }))
-                        },
-                        // New Fields (May cause P2022 if DB not migrated)
-                        structuredContent: result.structuredContent || '',
-                        noiseStats: toPrismaJson(NoiseStatsSchema.safeParse(result.noiseStats).success ? result.noiseStats : NoiseStatsSchema.parse({})),
-                        noiseBenchmarks: toPrismaJson(result.noiseBenchmarks ?? []),
-                        factCheck: toPrismaJson(FactCheckSchema.safeParse(result.factCheck).success ? result.factCheck : FactCheckSchema.parse({})),
-                        compliance: toPrismaJson(ComplianceSchema.safeParse(result.compliance).success ? result.compliance : ComplianceSchema.parse({})),
-                        preMortem: toPrismaJson(result.preMortem),
-                        sentiment: toPrismaJson(SentimentSchema.safeParse(result.sentiment).success ? result.sentiment : SentimentSchema.parse({})),
-                        speakers: result.speakers || [],
-                        // Phase 4 Extensions
-                        logicalAnalysis: toPrismaJson(LogicalSchema.safeParse(result.logicalAnalysis).success ? result.logicalAnalysis : LogicalSchema.parse({})),
-                        swotAnalysis: toPrismaJson(result.swotAnalysis ? (SwotSchema.safeParse(result.swotAnalysis).success ? result.swotAnalysis : undefined) : undefined),
-                        cognitiveAnalysis: toPrismaJson(result.cognitiveAnalysis ? (CognitiveSchema.safeParse(result.cognitiveAnalysis).success ? result.cognitiveAnalysis : undefined) : undefined),
-                        simulation: toPrismaJson(result.simulation ? (SimulationSchema.safeParse(result.simulation).success ? result.simulation : undefined) : undefined),
-                        institutionalMemory: toPrismaJson(result.institutionalMemory ? (MemorySchema.safeParse(result.institutionalMemory).success ? result.institutionalMemory : undefined) : undefined),
-                        intelligenceContext: toPrismaJson(result.intelligenceContext || undefined),
-                    } satisfies Prisma.AnalysisUncheckedCreateInput
-                });
-
-                await tx.document.update({
-                    where: { id: documentId },
-                    data: { status: 'complete' }
-                });
-            });
-        } catch (dbError: unknown) {
-            const prismaError = dbError as { code?: string; message?: string };
-            if (prismaError.code === 'P2021' || prismaError.code === 'P2022' || prismaError.message?.includes('does not exist')) {
-                log.warn('Schema drift detected. Retrying save with CORE fields only: ' + prismaError.code);
-                schemaDrift = true;
-            } else {
-                throw dbError;
-            }
-        }
-
-        if (schemaDrift) {
-            await prisma.$transaction(async (tx) => {
-                await tx.analysis.create({
-                    data: {
-                        documentId,
-                        overallScore: result.overallScore,
-                        noiseScore: result.noiseScore,
-                        summary: result.summary,
-                        biases: {
-                            create: foundBiases.map(bias => ({
-                                biasType: bias.biasType,
-                                severity: bias.severity,
-                                excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
-                                explanation: bias.explanation || '',
-                                suggestion: bias.suggestion || '',
-                                confidence: bias.confidence || 0.0
-                            }))
-                        }
-                    },
-                    select: { id: true }
-                });
-
-                await tx.document.update({
-                    where: { id: documentId },
-                    data: { status: 'complete' }
-                });
-            });
-        }
-
-        // Store embedding for RAG (non-blocking)
-        try {
-            const { storeAnalysisEmbedding } = await import('@/lib/rag/embeddings');
-            await storeAnalysisEmbedding(
-                documentId,
-                document.filename,
-                result.summary,
-                foundBiases.map(b => ({
-                    biasType: b.biasType,
-                    severity: b.severity,
-                    explanation: b.explanation || ''
-                })),
-                result.overallScore
-            );
-        } catch (embeddingError) {
-            log.warn('Failed to store embedding (non-critical): ' + (embeddingError instanceof Error ? embeddingError.message : String(embeddingError)));
-        }
-
-        // Cache the result for future use (non-blocking)
-        try {
-            await cacheAnalysis(cacheKey, result as unknown as Record<string, unknown>);
-        } catch (cacheError) {
-            log.warn('Failed to cache analysis (non-critical): ' + (cacheError instanceof Error ? cacheError.message : String(cacheError)));
-        }
-
-        if (onProgress) {
-            onProgress({ type: 'complete', progress: 100, result });
-        }
-
-        return result;
-    } catch (error) {
-        // Update document status to error
-        await prisma.document.update({
-            where: { id: documentId },
-            data: { status: 'error' }
-        });
-        throw error;
+      });
+    } catch (dbError: unknown) {
+      const prismaError = dbError as { code?: string; message?: string };
+      if (
+        prismaError.code === 'P2021' ||
+        prismaError.code === 'P2022' ||
+        prismaError.message?.includes('does not exist')
+      ) {
+        log.warn('Schema drift detected. Retrying save with CORE fields only: ' + prismaError.code);
+        schemaDrift = true;
+      } else {
+        throw dbError;
+      }
     }
+
+    if (schemaDrift) {
+      await prisma.$transaction(async tx => {
+        await tx.analysis.create({
+          data: {
+            documentId,
+            overallScore: result.overallScore,
+            noiseScore: result.noiseScore,
+            summary: result.summary,
+            biases: {
+              create: foundBiases.map(bias => ({
+                biasType: bias.biasType,
+                severity: bias.severity,
+                excerpt: typeof bias.excerpt === 'string' ? bias.excerpt : '',
+                explanation: bias.explanation || '',
+                suggestion: bias.suggestion || '',
+                confidence: bias.confidence || 0.0,
+              })),
+            },
+          },
+          select: { id: true },
+        });
+
+        await tx.document.update({
+          where: { id: documentId },
+          data: { status: 'complete' },
+        });
+      });
+    }
+
+    // Store embedding for RAG (non-blocking)
+    try {
+      const { storeAnalysisEmbedding } = await import('@/lib/rag/embeddings');
+      await storeAnalysisEmbedding(
+        documentId,
+        document.filename,
+        result.summary,
+        foundBiases.map(b => ({
+          biasType: b.biasType,
+          severity: b.severity,
+          explanation: b.explanation || '',
+        })),
+        result.overallScore
+      );
+    } catch (embeddingError) {
+      log.warn(
+        'Failed to store embedding (non-critical): ' +
+          (embeddingError instanceof Error ? embeddingError.message : String(embeddingError))
+      );
+    }
+
+    // Cache the result for future use (non-blocking)
+    try {
+      await cacheAnalysis(cacheKey, result as unknown as Record<string, unknown>);
+    } catch (cacheError) {
+      log.warn(
+        'Failed to cache analysis (non-critical): ' +
+          (cacheError instanceof Error ? cacheError.message : String(cacheError))
+      );
+    }
+
+    if (onProgress) {
+      onProgress({ type: 'complete', progress: 100, result });
+    }
+
+    return result;
+  } catch (error) {
+    // Update document status to error
+    await prisma.document.update({
+      where: { id: documentId },
+      data: { status: 'error' },
+    });
+    throw error;
+  }
 }
 
 // Lazy singleton for the graph
 let graphInstance: typeof import('@/lib/agents/graph').auditGraph | null = null;
 
 export async function getGraph() {
-    if (!graphInstance) {
-        // Lazy load graph to avoid circular deps or init issues
-        const { auditGraph } = await import('@/lib/agents/graph');
-        graphInstance = auditGraph;
-    }
-    return graphInstance;
+  if (!graphInstance) {
+    // Lazy load graph to avoid circular deps or init issues
+    const { auditGraph } = await import('@/lib/agents/graph');
+    graphInstance = auditGraph;
+  }
+  return graphInstance;
 }
 
 export async function runAnalysis(
-    content: string,
-    documentId: string,
-    userId: string,
-    onProgress?: (update: ProgressUpdate) => void
+  content: string,
+  documentId: string,
+  userId: string,
+  onProgress?: (update: ProgressUpdate) => void
 ): Promise<AnalysisResult> {
+  const auditGraph = await getGraph();
 
-    const auditGraph = await getGraph();
+  // Send step-by-step progress updates
+  const sendStep = (step: string, status: 'running' | 'complete', progress: number) => {
+    if (onProgress) onProgress({ type: 'step', step, status, progress });
+  };
 
-    // Send step-by-step progress updates
-    const sendStep = (step: string, status: 'running' | 'complete', progress: number) => {
-        if (onProgress) onProgress({ type: 'step', step, status, progress });
-    };
+  // Map agent node names to human-readable labels (must match graph.ts nodes)
+  const NODE_LABELS: Record<string, string> = {
+    gdprAnonymizer: 'Privacy Protection',
+    structurer: 'Document Parsing',
+    biasDetective: 'Bias Detection',
+    noiseJudge: 'Noise Analysis',
+    factChecker: 'Financial Fact Check',
+    complianceMapper: 'Compliance Check',
+    cognitiveDiversity: 'Cognitive Diversity (Red Team)',
+    decisionTwin: 'Decision Simulation',
+    memoryRecall: 'Institutional Memory',
+    linguisticAnalysis: 'Sentiment & Logic Analysis',
+    strategicAnalysis: 'Strategic Analysis',
+    riskScorer: 'Final Risk Scoring',
+  };
 
-    // Map agent node names to human-readable labels (must match graph.ts nodes)
-    const NODE_LABELS: Record<string, string> = {
-        'gdprAnonymizer': 'Privacy Protection',
-        'structurer': 'Document Parsing',
-        'biasDetective': 'Bias Detection',
-        'noiseJudge': 'Noise Analysis',
-        'factChecker': 'Financial Fact Check',
-        'complianceMapper': 'Compliance Check',
-        'cognitiveDiversity': 'Cognitive Diversity (Red Team)',
-        'decisionTwin': 'Decision Simulation',
-        'memoryRecall': 'Institutional Memory',
-        'linguisticAnalysis': 'Sentiment & Logic Analysis',
-        'strategicAnalysis': 'Strategic Analysis',
-        'riskScorer': 'Final Risk Scoring'
-    };
+  // Initial step
+  sendStep('Initializing audit pipeline', 'running', 5);
 
-    // Initial step
-    sendStep('Initializing audit pipeline', 'running', 5);
+  let result;
+  try {
+    // Use streamEvents for real-time node tracking (Check if method exists for test resilience)
+    const eventStream =
+      typeof auditGraph.streamEvents === 'function'
+        ? auditGraph.streamEvents(
+            { originalContent: content, documentId: documentId, userId: userId },
+            { version: 'v2' }
+          )
+        : null;
 
-    let result;
-    try {
-        // Use streamEvents for real-time node tracking (Check if method exists for test resilience)
-        const eventStream = (typeof auditGraph.streamEvents === 'function')
-            ? auditGraph.streamEvents(
-                { originalContent: content, documentId: documentId, userId: userId },
-                { version: 'v2' }
-            )
-            : null;
+    if (eventStream) {
+      // Track completed nodes for progress calculation
+      const completedNodes = new Set<string>();
+      const totalNodes = Object.keys(NODE_LABELS).length;
 
-        if (eventStream) {
-            // Track completed nodes for progress calculation
-            const completedNodes = new Set<string>();
-            const totalNodes = Object.keys(NODE_LABELS).length;
+      // Capture the final output from the root graph end event
+      for await (const event of eventStream) {
+        // Track node start events
+        if (event.event === 'on_chain_start' && event.name && NODE_LABELS[event.name]) {
+          const label = NODE_LABELS[event.name];
+          sendStep(label, 'running', Math.round((completedNodes.size / totalNodes) * 80) + 10);
+        }
 
-            // Capture the final output from the root graph end event
-            for await (const event of eventStream) {
-                // Track node start events
-                if (event.event === 'on_chain_start' && event.name && NODE_LABELS[event.name]) {
-                    const label = NODE_LABELS[event.name];
-                    sendStep(label, 'running', Math.round((completedNodes.size / totalNodes) * 80) + 10);
+        // Track node end events
+        if (event.event === 'on_chain_end') {
+          // Check for root graph completion
+          if (event.name === 'LangGraph') {
+            result = event.data.output;
+          } else if (event.name && NODE_LABELS[event.name]) {
+            completedNodes.add(event.name);
+            const label = NODE_LABELS[event.name];
+            const progress = Math.round((completedNodes.size / totalNodes) * 80) + 10;
+            sendStep(label, 'complete', progress);
+
+            // Send bias detection updates specifically
+            if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
+              const biases = event.data.output.biasAnalysis;
+              for (const bias of biases) {
+                if (bias.biasType && onProgress) {
+                  onProgress({
+                    type: 'bias',
+                    biasType: bias.biasType,
+                    progress,
+                    result: { found: true, severity: bias.severity },
+                  });
                 }
-
-                // Track node end events
-                if (event.event === 'on_chain_end') {
-                    // Check for root graph completion
-                    if (event.name === 'LangGraph') {
-                        result = event.data.output;
-                    }
-                    else if (event.name && NODE_LABELS[event.name]) {
-                        completedNodes.add(event.name);
-                        const label = NODE_LABELS[event.name];
-                        const progress = Math.round((completedNodes.size / totalNodes) * 80) + 10;
-                        sendStep(label, 'complete', progress);
-
-                        // Send bias detection updates specifically
-                        if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
-                            const biases = event.data.output.biasAnalysis;
-                            for (const bias of biases) {
-                                if (bias.biasType && onProgress) {
-                                    onProgress({
-                                        type: 'bias',
-                                        biasType: bias.biasType,
-                                        progress,
-                                        result: { found: true, severity: bias.severity }
-                                    });
-                                }
-                            }
-                        }
-
-                        // Send noise analysis updates
-                        if (event.name === 'noiseJudge' && event.data?.output?.noiseStats) {
-                            if (onProgress) {
-                                onProgress({
-                                    type: 'noise',
-                                    progress,
-                                    result: { score: event.data.output.noiseStats.mean }
-                                });
-                            }
-                        }
-                    }
-                }
+              }
             }
+
+            // Send noise analysis updates
+            if (event.name === 'noiseJudge' && event.data?.output?.noiseStats) {
+              if (onProgress) {
+                onProgress({
+                  type: 'noise',
+                  progress,
+                  result: { score: event.data.output.noiseStats.mean },
+                });
+              }
+            }
+          }
         }
-
-        if (!result) {
-            // Fallback to non-streaming invoke if stream didn't yield result
-            throw new Error("Stream did not return a final result");
-        }
-
-    } catch (error) {
-        log.error('Streaming error, falling back to invoke:', error);
-        // Fallback to non-streaming invoke if streaming fails
-        sendStep('Processing document', 'running', 50);
-
-        // Fallback timeout: aligned with maxDuration (300s) minus overhead
-        const FALLBACK_TIMEOUT_MS = 240000; // 240 seconds
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error(`Analysis timed out after ${FALLBACK_TIMEOUT_MS / 1000} seconds`)), FALLBACK_TIMEOUT_MS)
-        );
-
-        try {
-            result = await Promise.race([
-                auditGraph.invoke({
-                    originalContent: content,
-                    documentId: documentId,
-                    userId: userId,
-                }),
-                timeoutPromise
-            ]) as { finalReport: Record<string, unknown> };
-        } catch (timeoutError) {
-            log.error('Analysis timeout:', timeoutError);
-            throw new Error("Analysis timed out. Please try again or contact support if the issue persists.");
-        }
+      }
     }
 
-    sendStep('Finalizing report', 'running', 95);
-
-    if (!result.finalReport) {
-        throw new Error("Audit Pipeline failed to generate a report");
+    if (!result) {
+      // Fallback to non-streaming invoke if stream didn't yield result
+      throw new Error('Stream did not return a final result');
     }
+  } catch (error) {
+    log.error('Streaming error, falling back to invoke:', error);
+    // Fallback to non-streaming invoke if streaming fails
+    sendStep('Processing document', 'running', 50);
 
-    // Ensure plain serializable object (removes Map, Set, Circular refs)
-    result.finalReport = safeJsonClone(result.finalReport);
+    // Fallback timeout: aligned with maxDuration (300s) minus overhead
+    const FALLBACK_TIMEOUT_MS = 240000; // 240 seconds
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(
+        () => reject(new Error(`Analysis timed out after ${FALLBACK_TIMEOUT_MS / 1000} seconds`)),
+        FALLBACK_TIMEOUT_MS
+      )
+    );
 
-    if (!result.finalReport) {
-        throw new Error("Report corrupted during normalization");
+    try {
+      result = (await Promise.race([
+        auditGraph.invoke({
+          originalContent: content,
+          documentId: documentId,
+          userId: userId,
+        }),
+        timeoutPromise,
+      ])) as { finalReport: Record<string, unknown> };
+    } catch (timeoutError) {
+      log.error('Analysis timeout:', timeoutError);
+      throw new Error(
+        'Analysis timed out. Please try again or contact support if the issue persists.'
+      );
     }
+  }
 
-    // Adapt to UI expected structure
-    // Ensure all biased findings are marked as "found"
-    const finalReport = {
-        ...result.finalReport,
-        overallScore: result.finalReport.overallScore || 0,
-        biases: (result.finalReport.biases || []).map((b: BiasDetectionResult) => ({ ...b, found: true }))
-    };
+  sendStep('Finalizing report', 'running', 95);
 
-    return finalReport;
+  if (!result.finalReport) {
+    throw new Error('Audit Pipeline failed to generate a report');
+  }
+
+  // Ensure plain serializable object (removes Map, Set, Circular refs)
+  result.finalReport = safeJsonClone(result.finalReport);
+
+  if (!result.finalReport) {
+    throw new Error('Report corrupted during normalization');
+  }
+
+  // Adapt to UI expected structure
+  // Ensure all biased findings are marked as "found"
+  const finalReport = {
+    ...result.finalReport,
+    overallScore: result.finalReport.overallScore || 0,
+    biases: (result.finalReport.biases || []).map((b: BiasDetectionResult) => ({
+      ...b,
+      found: true,
+    })),
+  };
+
+  return finalReport;
 }

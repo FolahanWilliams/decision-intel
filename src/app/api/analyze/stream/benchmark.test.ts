@@ -6,7 +6,12 @@ const mocks = vi.hoisted(() => {
   const DB_LATENCY = 50;
   return {
     document: {
-      findFirst: vi.fn().mockResolvedValue({ id: 'doc_123', userId: 'user_123', content: 'This is a test content that needs to be at least fifty characters long to pass the validation check.' }),
+      findFirst: vi.fn().mockResolvedValue({
+        id: 'doc_123',
+        userId: 'user_123',
+        content:
+          'This is a test content that needs to be at least fifty characters long to pass the validation check.',
+      }),
       update: vi.fn().mockImplementation(async () => {
         await delay(DB_LATENCY);
         return { id: 'doc_123' };
@@ -23,13 +28,13 @@ const mocks = vi.hoisted(() => {
       findUnique: vi.fn().mockResolvedValue(null),
       upsert: vi.fn().mockResolvedValue({ count: 1, resetAt: new Date(Date.now() + 3600000) }),
       update: vi.fn().mockResolvedValue({ count: 2, resetAt: new Date(Date.now() + 3600000) }),
-    }
-  }
+    },
+  };
 });
 
 vi.mock('next/server', () => {
   return {
-    NextRequest: class { },
+    NextRequest: class {},
     NextResponse: class {
       body: unknown;
       status: number;
@@ -40,31 +45,44 @@ vi.mock('next/server', () => {
       static json(body: unknown, options: { status?: number }) {
         return { body, status: options?.status || 200, json: async () => body };
       }
-    }
-  }
+    },
+  };
 });
 
 vi.mock('@/utils/supabase/server', () => ({
-  createClient: () => Promise.resolve({
-    auth: { getUser: () => Promise.resolve({ data: { user: { id: 'user_123' } } }) },
-  }),
+  createClient: () =>
+    Promise.resolve({
+      auth: { getUser: () => Promise.resolve({ data: { user: { id: 'user_123' } } }) },
+    }),
 }));
 
 vi.mock('@/lib/analysis/analyzer', () => ({
-  runAnalysis: vi.fn().mockImplementation(async (content: string, documentId: string, onProgress: (u: unknown) => void) => {
-    if (onProgress) onProgress({ type: 'progress', progress: 50 });
-    return {
-      overallScore: 85,
-      noiseScore: 10,
-      summary: 'Test summary',
-      biases: [{ found: true, biasType: 'TestBias', severity: 'High', excerpt: 'text', suggestion: 'fix' }],
-      structuredContent: '{}',
-      noiseStats: {},
-      factCheck: {},
-      compliance: {},
-      speakers: []
-    };
-  }),
+  runAnalysis: vi
+    .fn()
+    .mockImplementation(
+      async (content: string, documentId: string, onProgress: (u: unknown) => void) => {
+        if (onProgress) onProgress({ type: 'progress', progress: 50 });
+        return {
+          overallScore: 85,
+          noiseScore: 10,
+          summary: 'Test summary',
+          biases: [
+            {
+              found: true,
+              biasType: 'TestBias',
+              severity: 'High',
+              excerpt: 'text',
+              suggestion: 'fix',
+            },
+          ],
+          structuredContent: '{}',
+          noiseStats: {},
+          factCheck: {},
+          compliance: {},
+          speakers: [],
+        };
+      }
+    ),
   getGraph: vi.fn().mockResolvedValue({
     streamEvents: vi.fn().mockImplementation(async function* () {
       yield { event: 'on_chain_start', name: 'structurer' };
@@ -83,40 +101,47 @@ vi.mock('@/lib/analysis/analyzer', () => ({
               noiseStats: { mean: 0, stdDev: 0, variance: 0 },
               factCheck: { score: 0, summary: 'N/A', verifications: [], flags: [] },
               compliance: { status: 'WARN', riskScore: 0, summary: 'N/A', regulations: [] },
-              speakers: []
-            }
-          }
-        }
+              speakers: [],
+            },
+          },
+        },
       };
-    })
-  })
+    }),
+  }),
 }));
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     ...mocks,
-    $transaction: vi.fn().mockImplementation(async (cb: (tx: typeof mocks) => Promise<unknown>) => cb(mocks))
-  }
+    $transaction: vi
+      .fn()
+      .mockImplementation(async (cb: (tx: typeof mocks) => Promise<unknown>) => cb(mocks)),
+  },
 }));
 
 vi.mock('@/lib/sse', () => ({
-  formatSSE: (data: unknown) => JSON.stringify(data)
+  formatSSE: (data: unknown) => JSON.stringify(data),
 }));
 
 vi.mock('@/lib/utils/json', () => ({
-  safeJsonClone: (obj: unknown) => obj
+  safeJsonClone: (obj: unknown) => obj,
 }));
 
 vi.mock('@/lib/utils/prisma-json', () => ({
-  toPrismaJson: (obj: unknown) => obj
+  toPrismaJson: (obj: unknown) => obj,
 }));
 
 vi.mock('@/lib/utils/error', () => ({
-  getSafeErrorMessage: (err: unknown) => err instanceof Error ? err.message : String(err)
+  getSafeErrorMessage: (err: unknown) => (err instanceof Error ? err.message : String(err)),
 }));
 
 vi.mock('@/lib/utils/rate-limit', () => ({
-  checkRateLimit: vi.fn().mockResolvedValue({ success: true, limit: 5, remaining: 4, reset: Math.floor(Date.now() / 1000) + 3600 }),
+  checkRateLimit: vi.fn().mockResolvedValue({
+    success: true,
+    limit: 5,
+    remaining: 4,
+    reset: Math.floor(Date.now() / 1000) + 3600,
+  }),
 }));
 
 vi.mock('@/lib/rag/embeddings', () => ({
@@ -145,11 +170,16 @@ describe('Performance Benchmark', () => {
     const response = await POST(req);
 
     if ((response as unknown as { status: number }).status !== 200) {
-      console.error('Stream test failed with status:', (response as unknown as { status: number }).status, response.body);
+      console.error(
+        'Stream test failed with status:',
+        (response as unknown as { status: number }).status,
+        response.body
+      );
     }
 
     // Consume stream to ensure all async work completes
-    const reader = typeof response.body?.getReader === 'function' ? response.body.getReader() : null;
+    const reader =
+      typeof response.body?.getReader === 'function' ? response.body.getReader() : null;
     if (reader) {
       while (true) {
         const { done } = await reader.read();
