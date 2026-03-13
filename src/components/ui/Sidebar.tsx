@@ -38,11 +38,13 @@ export default function Sidebar() {
                     zIndex: 60,
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
                     color: 'var(--text-primary)',
                     padding: '8px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
+                    boxShadow: 'var(--shadow-sm)',
                 }}
             >
                 <Menu size={18} />
@@ -112,6 +114,7 @@ export default function Sidebar() {
                         style={{
                             background: 'var(--bg-tertiary)',
                             border: '1px solid var(--border-color)',
+                            borderRadius: 'var(--radius-md)',
                             color: 'var(--text-muted)',
                             cursor: 'pointer',
                             padding: '6px',
@@ -157,6 +160,7 @@ export default function Sidebar() {
                             marginBottom: '12px',
                             background: 'var(--bg-tertiary)',
                             border: '1px solid var(--border-color)',
+                            borderRadius: 'var(--radius-md)',
                             color: 'var(--text-muted)',
                             fontSize: '12px',
                             cursor: 'pointer',
@@ -173,6 +177,7 @@ export default function Sidebar() {
                                 padding: '1px 5px',
                                 background: 'var(--bg-secondary)',
                                 border: '1px solid var(--border-color)',
+                                borderRadius: '4px',
                             }}>
                                 ⌘K
                             </kbd>
@@ -291,6 +296,7 @@ export default function Sidebar() {
                             width: '7px',
                             height: '7px',
                             background: 'var(--success)',
+                            borderRadius: '50%',
                             flexShrink: 0,
                         }} />
                         {!collapsed && <span>Online</span>}
@@ -322,6 +328,7 @@ export default function Sidebar() {
 
 function NavItem({ href, icon, label, description, active, collapsed, onNavigate, badge }: { href: string, icon: React.ReactNode, label: string, description?: string, active?: boolean, collapsed?: boolean, onNavigate?: () => void, badge?: { color: string } }) {
     const [showTooltip, setShowTooltip] = useState(false);
+    const [hovered, setHovered] = useState(false);
 
     return (
         <div style={{ position: 'relative' }}>
@@ -330,17 +337,18 @@ function NavItem({ href, icon, label, description, active, collapsed, onNavigate
                 onClick={onNavigate}
                 aria-current={active ? 'page' : undefined}
                 aria-label={collapsed ? label : undefined}
-                onMouseEnter={() => collapsed && setShowTooltip(true)}
-                onMouseLeave={() => setShowTooltip(false)}
+                onMouseEnter={() => { setHovered(true); if (collapsed) setShowTooltip(true); }}
+                onMouseLeave={() => { setHovered(false); setShowTooltip(false); }}
                 style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: collapsed ? 'center' : 'flex-start',
                     gap: collapsed ? '0' : '12px',
                     padding: collapsed ? '10px' : '9px 12px',
-                    color: active ? 'var(--text-highlight)' : 'var(--text-secondary)',
-                    background: active ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                    color: active ? 'var(--text-highlight)' : hovered ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    background: active ? 'rgba(99, 102, 241, 0.1)' : hovered ? 'rgba(255, 255, 255, 0.04)' : 'transparent',
                     borderLeft: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
+                    borderRadius: '0 var(--radius-md) var(--radius-md) 0',
                     marginBottom: '2px',
                     fontSize: '13.5px',
                     fontWeight: active ? 600 : 400,
@@ -361,6 +369,7 @@ function NavItem({ href, icon, label, description, active, collapsed, onNavigate
                             position: 'absolute', top: '-3px', right: '-3px',
                             width: '7px', height: '7px',
                             background: badge.color,
+                            borderRadius: '50%',
                         }} />
                     )}
                 </span>
@@ -379,12 +388,14 @@ function NavItem({ href, icon, label, description, active, collapsed, onNavigate
                         padding: '6px 10px',
                         background: 'var(--bg-secondary)',
                         border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md)',
                         color: 'var(--text-primary)',
                         fontSize: '12px',
                         fontWeight: 500,
                         whiteSpace: 'nowrap',
                         zIndex: 80,
                         pointerEvents: 'none',
+                        boxShadow: 'var(--shadow-md)',
                     }}
                 >
                     {label}

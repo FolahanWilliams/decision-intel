@@ -477,8 +477,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     <div className="card-body" style={{ padding: 'var(--spacing-md)', fontSize: '10px', height: '200px', overflowY: 'auto', fontFamily: 'monospace' }}>
                         {(isScanning) && (
                             <div className="mb-md">
-                                <div style={{ height: '2px', background: 'var(--bg-tertiary)', width: '100%', marginBottom: '4px' }}>
-                                    <div style={{ height: '100%', background: 'var(--accent-primary)', width: `${scanProgress}%`, transition: 'width 0.3s' }} role="progressbar" aria-valuenow={scanProgress} aria-valuemin={0} aria-valuemax={100} />
+                                <div className="progress-bar" style={{ marginBottom: '4px' }}>
+                                    <div className="progress-bar-fill" style={{ width: `${scanProgress}%` }} role="progressbar" aria-valuenow={scanProgress} aria-valuemin={0} aria-valuemax={100} />
                                 </div>
                                 <div className="text-muted">Progress: {scanProgress}%</div>
                             </div>
