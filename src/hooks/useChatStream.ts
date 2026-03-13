@@ -29,6 +29,7 @@ interface UseChatStreamReturn {
     error: string | null;
     sendMessage: (text: string) => Promise<void>;
     clearMessages: () => void;
+    loadMessages: (msgs: ChatMessage[]) => void;
 }
 
 let messageCounter = 0;
@@ -160,5 +161,12 @@ export function useChatStream(options?: UseChatStreamOptions): UseChatStreamRetu
         setIsStreaming(false);
     }, []);
 
-    return { messages, isStreaming, error, sendMessage, clearMessages };
+    const loadMessages = useCallback((msgs: ChatMessage[]) => {
+        if (abortRef.current) abortRef.current.abort();
+        setMessages(msgs.map(m => ({ ...m, isStreaming: false })));
+        setError(null);
+        setIsStreaming(false);
+    }, []);
+
+    return { messages, isStreaming, error, sendMessage, clearMessages, loadMessages };
 }
