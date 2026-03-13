@@ -760,8 +760,8 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
         log.info(`Deep analysis complete. Sentiment: ${data?.sentiment?.label || 'N/A'}, Logic score: ${data?.logicalAnalysis?.score ?? 'N/A'}, BlindSpotGap: ${cognitiveData?.blindSpotGap ?? 'N/A'}`);
 
         return {
-            sentimentAnalysis: data?.sentiment || { score: 0, label: 'Neutral' },
-            logicalAnalysis: data?.logicalAnalysis || { score: 100, fallacies: [] },
+            sentimentAnalysis: data?.sentiment ?? { score: 0, label: 'Neutral' },
+            logicalAnalysis: data?.logicalAnalysis ?? { score: 100, fallacies: [] },
             swotAnalysis: data?.swot,
             preMortem: data?.preMortem,
             cognitiveAnalysis: cognitiveData
@@ -965,7 +965,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     // Clamp 0-100
     overallScore = Math.max(0, Math.min(100, Math.round(overallScore)));
 
-    log.info(`Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) = ${overallScore}`);
+    log.info(`Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) - Diversity(${diversityPenalty.toFixed(1)}) = ${overallScore}`);
 
     return {
         finalReport: {
