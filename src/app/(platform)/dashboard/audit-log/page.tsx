@@ -1,10 +1,9 @@
-
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
-import { ShieldCheck, Download, Search, FileText, LogIn } from 'lucide-react';
+import { ShieldCheck, Download, Search, FileText, LogIn, ClipboardList } from 'lucide-react';
 import { format } from 'date-fns';
 import AuditFilters from './AuditFilters';
 import Link from 'next/link';
@@ -90,27 +89,34 @@ export default async function AuditLogPage({
             <AuditFilters />
 
             <div className="card">
-                <div className="p-0">
+                {/* Desktop table view */}
+                <div className="hidden md:block p-0">
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Timestamp</TableHead>
-                                <TableHead>Action</TableHead>
-                                <TableHead>Resource</TableHead>
-                                <TableHead>Details</TableHead>
+                                <TableHead className="sticky top-0 bg-[var(--bg-card)] z-10">Timestamp</TableHead>
+                                <TableHead className="sticky top-0 bg-[var(--bg-card)] z-10">Action</TableHead>
+                                <TableHead className="sticky top-0 bg-[var(--bg-card)] z-10">Resource</TableHead>
+                                <TableHead className="sticky top-0 bg-[var(--bg-card)] z-10">Details</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {logs.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                                        No audit events found.
+                                    <TableCell colSpan={4} className="text-center py-12 text-muted-foreground">
+                                        <div className="flex flex-col items-center gap-3">
+                                            <ClipboardList size={40} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
+                                            <div>
+                                                <p className="font-medium mb-1">No audit events found</p>
+                                                <p className="text-sm">Events will appear here as you interact with the platform.</p>
+                                            </div>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 logs.map((log: typeof logs[number]) => (
                                     <TableRow key={log.id}>
-                                        <TableCell className="font-mono text-xs text-muted-foreground">
+                                        <TableCell className="font-mono text-xs text-muted-foreground whitespace-nowrap">
                                             {format(log.createdAt, 'MMM d, yyyy HH:mm:ss')}
                                         </TableCell>
                                         <TableCell>
@@ -135,6 +141,44 @@ export default async function AuditLogPage({
                             )}
                         </TableBody>
                     </Table>
+                </div>
+
+                {/* Mobile card view */}
+                <div className="md:hidden">
+                    {logs.length === 0 ? (
+                        <div className="flex flex-col items-center gap-3 py-12 px-4">
+                            <ClipboardList size={40} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
+                            <div className="text-center">
+                                <p className="font-medium mb-1 text-muted-foreground">No audit events found</p>
+                                <p className="text-sm text-muted-foreground">Events will appear here as you interact with the platform.</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-border">
+                            {logs.map((log: typeof logs[number]) => (
+                                <div key={log.id} className="p-4 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            {log.action === 'EXPORT_PDF' && <Download size={14} className="text-blue-500" />}
+                                            {log.action === 'SCAN_DOCUMENT' && <Search size={14} className="text-green-500" />}
+                                            {log.action === 'VIEW_DOCUMENT' && <FileText size={14} className="text-orange-500" />}
+                                            {log.action === 'LOGIN' && <LogIn size={14} className="text-purple-500" />}
+                                            <span className="font-medium text-sm">{log.action}</span>
+                                        </div>
+                                        <span className="badge badge-secondary text-xs">{log.resource}</span>
+                                    </div>
+                                    <div className="font-mono text-xs text-muted-foreground">
+                                        {format(log.createdAt, 'MMM d, yyyy HH:mm:ss')}
+                                    </div>
+                                    {log.details && (
+                                        <p className="text-xs text-muted-foreground break-words">
+                                            {JSON.stringify(log.details)}
+                                        </p>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Pagination */}

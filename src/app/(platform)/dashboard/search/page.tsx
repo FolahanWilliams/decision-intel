@@ -35,13 +35,22 @@ export default function SearchPage() {
 
             if (!res.ok) {
                 const data = await res.json().catch(() => ({}));
-                throw new Error(data.error || 'Search failed');
+                if (res.status === 429) {
+                    throw new Error('Search rate limit exceeded. Please wait a moment before trying again.');
+                }
+                if (res.status === 401) {
+                    throw new Error('Your session has expired. Please sign in again.');
+                }
+                throw new Error(data.error || `Search failed (${res.status}). Please try again.`);
             }
 
             const data = await res.json();
             setResults(data.results || []);
         } catch (err) {
-            showToast(err instanceof Error ? err.message : 'Search failed', 'error');
+            const message = err instanceof TypeError && err.message === 'Failed to fetch'
+                ? 'Network error. Check your connection and try again.'
+                : err instanceof Error ? err.message : 'Search failed. Please try again.';
+            showToast(message, 'error');
             setResults([]);
         } finally {
             setLoading(false);
