@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { BackToTop } from '@/components/ui/BackToTop';
 
 /* ── Reusable sub-components ─────────────────────────────────── */
 
@@ -944,6 +945,8 @@ export default function InsightsPage() {
                 <ShieldCheck size={10} style={{ display: 'inline', verticalAlign: 'middle', color: 'var(--success)' }} />
                 {' '}System nominal
             </div>
+
+            <BackToTop />
         </div>
     );
 }

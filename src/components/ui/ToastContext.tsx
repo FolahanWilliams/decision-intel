@@ -5,14 +5,20 @@ import { X, CheckCircle, AlertTriangle, Info } from 'lucide-react';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
 
+interface ToastAction {
+    label: string;
+    onClick: () => void;
+}
+
 interface Toast {
     id: string;
     message: string;
     type: ToastType;
+    action?: ToastAction;
 }
 
 interface ToastContextType {
-    showToast: (message: string, type?: ToastType) => void;
+    showToast: (message: string, type?: ToastType, action?: ToastAction) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -29,9 +35,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         };
     }, []);
 
-    const showToast = useCallback((message: string, type: ToastType = 'info') => {
+    const showToast = useCallback((message: string, type: ToastType = 'info', action?: ToastAction) => {
         const id = Math.random().toString(36).substring(2, 9);
-        setToasts((prev) => [...prev, { id, message, type }]);
+        setToasts((prev) => [...prev, { id, message, type, action }]);
 
         const duration = type === 'error' || type === 'warning' ? 8000 : 3000;
         const timer = setTimeout(() => {
@@ -86,6 +92,25 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                         {toast.type === 'info' && <Info size={20} style={{ color: 'var(--accent-primary)' }} />}
 
                         <span style={{ fontSize: '0.9rem', flex: 1 }}>{toast.message}</span>
+
+                        {toast.action && (
+                            <button
+                                onClick={() => { toast.action!.onClick(); removeToast(toast.id); }}
+                                style={{
+                                    background: 'transparent',
+                                    border: '1px solid var(--border-hover)',
+                                    borderRadius: 'var(--radius-sm)',
+                                    color: 'var(--accent-primary)',
+                                    cursor: 'pointer',
+                                    padding: '4px 10px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 500,
+                                    whiteSpace: 'nowrap',
+                                }}
+                            >
+                                {toast.action.label}
+                            </button>
+                        )}
 
                         <button
                             onClick={() => removeToast(toast.id)}

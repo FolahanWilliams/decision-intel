@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
     Search, LayoutDashboard, BarChart3, ShieldAlert,
     Globe, MessageSquare, GitCompareArrows, Settings, ClipboardList,
-    Activity, Upload,
+    Activity, Upload, Keyboard, X,
 } from 'lucide-react';
 
 interface CommandItem {
@@ -17,8 +17,17 @@ interface CommandItem {
     keywords?: string[];
 }
 
+const SHORTCUTS = [
+    { keys: ['⌘', 'K'], description: 'Open command palette' },
+    { keys: ['Shift', '?'], description: 'Show keyboard shortcuts' },
+    { keys: ['↑', '↓'], description: 'Navigate items' },
+    { keys: ['↵'], description: 'Select item / confirm' },
+    { keys: ['Esc'], description: 'Close dialog' },
+];
+
 export function CommandPalette() {
     const [open, setOpen] = useState(false);
+    const [showShortcuts, setShowShortcuts] = useState(false);
     const [query, setQuery] = useState('');
     const [selectedIndex, setSelectedIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -57,7 +66,7 @@ export function CommandPalette() {
     // Clamp selectedIndex to valid range when filter changes
     const clampedIndex = filtered.length > 0 ? Math.min(selectedIndex, filtered.length - 1) : 0;
 
-    // Global keyboard shortcut
+    // Global keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -67,13 +76,19 @@ export function CommandPalette() {
                     return !prev;
                 });
             }
-            if (e.key === 'Escape' && open) {
-                setOpen(false);
+            // Shift+? opens keyboard shortcuts help
+            if (e.shiftKey && e.key === '?' && !open) {
+                e.preventDefault();
+                setShowShortcuts(true);
+            }
+            if (e.key === 'Escape') {
+                if (showShortcuts) { setShowShortcuts(false); }
+                else if (open) { setOpen(false); }
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [open]);
+    }, [open, showShortcuts]);
 
     // Focus input when opened
     useEffect(() => {
@@ -102,7 +117,74 @@ export function CommandPalette() {
         }
     }, [filtered, clampedIndex]);
 
-    if (!open) return null;
+    if (!open && !showShortcuts) return null;
+
+    // Keyboard shortcuts help modal
+    if (showShortcuts) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-start justify-center" style={{ paddingTop: '20vh' }}>
+                <div className="fixed inset-0 bg-black/60" onClick={() => setShowShortcuts(false)} aria-hidden="true" />
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Keyboard shortcuts"
+                    className="relative w-full max-w-sm mx-4 animate-slide-up"
+                    style={{
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-xl)',
+                        overflow: 'hidden',
+                        boxShadow: 'var(--shadow-lg)',
+                    }}
+                >
+                    <div className="flex items-center justify-between" style={{ padding: 'var(--spacing-md)', borderBottom: '1px solid var(--border-color)' }}>
+                        <div className="flex items-center gap-sm">
+                            <Keyboard size={16} style={{ color: 'var(--accent-primary)' }} />
+                            <span style={{ fontWeight: 600, fontSize: '14px' }}>Keyboard Shortcuts</span>
+                        </div>
+                        <button
+                            onClick={() => setShowShortcuts(false)}
+                            aria-label="Close shortcuts"
+                            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                    <div style={{ padding: '8px 0' }}>
+                        {SHORTCUTS.map((shortcut) => (
+                            <div
+                                key={shortcut.description}
+                                className="flex items-center justify-between"
+                                style={{ padding: '8px var(--spacing-md)', fontSize: '13px' }}
+                            >
+                                <span style={{ color: 'var(--text-secondary)' }}>{shortcut.description}</span>
+                                <div className="flex items-center gap-1">
+                                    {shortcut.keys.map((key) => (
+                                        <kbd
+                                            key={key}
+                                            style={{
+                                                padding: '2px 8px',
+                                                background: 'var(--bg-tertiary)',
+                                                border: '1px solid var(--border-color)',
+                                                borderRadius: '4px',
+                                                fontSize: '11px',
+                                                fontFamily: 'inherit',
+                                                color: 'var(--text-primary)',
+                                                minWidth: 24,
+                                                textAlign: 'center' as const,
+                                            }}
+                                        >
+                                            {key}
+                                        </kbd>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div

@@ -322,6 +322,12 @@ pre {
   transform: translateY(-1px);
 }
 
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0);
+  background: var(--liquid-bg-strong);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset;
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
@@ -353,6 +359,26 @@ pre {
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+  color: #fff;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  box-shadow: 0 2px 12px rgba(239, 68, 68, 0.25);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-danger:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
 }
 
 /* ═══════════════════════════════════════════
@@ -494,10 +520,23 @@ input:focus, textarea:focus, select:focus {
   cursor: pointer;
 }
 
-.upload-zone:hover, .upload-zone.dragover {
+.upload-zone:hover {
   border-color: var(--accent-primary);
   background: rgba(99, 102, 241, 0.07);
   box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.15), var(--liquid-shadow);
+}
+
+.upload-zone.dragover {
+  border-color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.12);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3), var(--liquid-shadow-glow);
+  transform: scale(1.01);
+  animation: upload-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes upload-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3), var(--liquid-shadow-glow); }
+  50% { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), 0 0 24px rgba(99, 102, 241, 0.2); }
 }
 
 /* ═══════════════════════════════════════════

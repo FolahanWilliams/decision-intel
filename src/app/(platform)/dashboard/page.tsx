@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight, ArrowRight, RefreshCw, TrendingUp, Clock } from 'lucide-react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight, ArrowRight, RefreshCw, TrendingUp, Clock, CloudUpload } from 'lucide-react';
 import Link from 'next/link';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
 import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('Dashboard');
@@ -28,11 +29,44 @@ const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
 
 type DashboardView = 'upload' | 'browse';
 
+/** Map HTTP status codes and error patterns to user-friendly messages. */
+function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): string {
+  if (uploadRes) {
+    if (uploadRes.status === 429) {
+      return 'Rate limit exceeded. You can analyze up to 5 documents per hour. Please wait before trying again.';
+    }
+    if (uploadRes.status === 413) {
+      return 'File is too large. Please upload a document under 10 MB.';
+    }
+    if (uploadRes.status === 415) {
+      return 'Unsupported file type. Accepted formats: PDF, TXT, MD, DOCX.';
+    }
+    if (uploadRes.status === 401) {
+      return 'Your session has expired. Please sign in again.';
+    }
+    if (uploadRes.status >= 500) {
+      return 'A server error occurred. Our team has been notified — please try again later.';
+    }
+  }
+  if (err instanceof TypeError && err.message === 'Failed to fetch') {
+    return 'Network error. Check your internet connection and try again.';
+  }
+  if (err instanceof Error) {
+    // Pass through already-specific API messages
+    if (err.message.length > 10 && err.message.length < 200) return err.message;
+  }
+  return 'An unexpected error occurred during document analysis.';
+}
+
 export default function Dashboard() {
   const [isDragOver, setIsDragOver] = useState(false);
+  const [globalDrag, setGlobalDrag] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadPhase, setUploadPhase] = useState<'uploading' | 'analyzing'>('uploading');
   const [error, setError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<DashboardView>('upload');
+  const globalDragCounter = useRef(0);
 
   // Upload confirmation state
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -83,6 +117,45 @@ export default function Dashboard() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Global drag detection — show overlay when dragging files anywhere on the page
+  useEffect(() => {
+    const onDragEnter = (e: DragEvent) => {
+      e.preventDefault();
+      globalDragCounter.current++;
+      if (e.dataTransfer?.types.includes('Files')) {
+        setGlobalDrag(true);
+      }
+    };
+    const onDragLeave = (e: DragEvent) => {
+      e.preventDefault();
+      globalDragCounter.current--;
+      if (globalDragCounter.current <= 0) {
+        globalDragCounter.current = 0;
+        setGlobalDrag(false);
+      }
+    };
+    const onDragOver = (e: DragEvent) => { e.preventDefault(); };
+    const onDrop = (e: DragEvent) => {
+      e.preventDefault();
+      globalDragCounter.current = 0;
+      setGlobalDrag(false);
+      if (e.dataTransfer?.files.length && !uploading) {
+        setPendingFile(e.dataTransfer.files[0]);
+      }
+    };
+
+    document.addEventListener('dragenter', onDragEnter);
+    document.addEventListener('dragleave', onDragLeave);
+    document.addEventListener('dragover', onDragOver);
+    document.addEventListener('drop', onDrop);
+    return () => {
+      document.removeEventListener('dragenter', onDragEnter);
+      document.removeEventListener('dragleave', onDragLeave);
+      document.removeEventListener('dragover', onDragOver);
+      document.removeEventListener('drop', onDrop);
+    };
+  }, [uploading]);
+
   // Filtered documents based on search and status
   const filteredDocs = useMemo(() => {
     return uploadedDocs.filter(doc => {
@@ -129,6 +202,8 @@ export default function Dashboard() {
   const uploadAndAnalyze = async (file: File) => {
     setError(null);
     setUploading(true);
+    setUploadProgress(0);
+    setUploadPhase('uploading');
 
     // Default empty state when SWR cache is undefined (e.g. if the
     // initial fetch failed due to schema drift or network error).
@@ -136,32 +211,41 @@ export default function Dashboard() {
     const emptyState = { documents: [], total: 0, page: 1, totalPages: 1 };
 
     try {
-      // Upload file
+      // Upload file with XHR for progress tracking
       const formData = new FormData();
       formData.append('file', file);
 
-      const uploadRes = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+      const uploadData = await new Promise<{ id: string; filename: string; cached?: boolean }>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/upload');
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            setUploadProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try { resolve(JSON.parse(xhr.responseText)); }
+            catch { reject(new Error('Invalid server response')); }
+          } else {
+            let errorMessage: string | undefined;
+            try {
+              const data = JSON.parse(xhr.responseText);
+              errorMessage = data.error;
+            } catch { /* use status-based message */ }
+            const fakeRes = { status: xhr.status } as Response;
+            reject(new Error(errorMessage || getDetailedErrorMessage(null, fakeRes)));
+          }
+        };
+
+        xhr.onerror = () => reject(new TypeError('Failed to fetch'));
+        xhr.send(formData);
       });
 
-      if (!uploadRes.ok) {
-        let errorMessage;
-        try {
-          const errorText = await uploadRes.text();
-          try {
-            const data = JSON.parse(errorText);
-            errorMessage = data.error;
-          } catch {
-            errorMessage = errorText;
-          }
-        } catch {
-          errorMessage = 'Failed to read error response';
-        }
-        throw new Error(errorMessage || 'Upload failed');
-      }
-
-      const uploadData = await uploadRes.json();
+      setUploadPhase('analyzing');
+      setUploadProgress(0);
 
       // If the server returned a cached result, skip streaming and
       // directly revalidate the SWR cache so the existing document
@@ -209,7 +293,7 @@ export default function Dashboard() {
       }
     } catch (err) {
       log.error('Upload/Analysis error:', err instanceof Error ? err.message : 'Unknown error');
-      setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
+      setError(getDetailedErrorMessage(err));
       errorTracking();
 
       // Mark as error in SWR cache and revalidate to sync with server state
@@ -264,7 +348,7 @@ export default function Dashboard() {
       }
     } catch (err) {
       log.error('Retry analysis error:', err instanceof Error ? err.message : 'Unknown error');
-      setError(err instanceof Error ? err.message : 'An error occurred during document analysis');
+      setError(getDetailedErrorMessage(err));
       errorTracking();
       await mutateDocs(undefined, { revalidate: true });
     } finally {
@@ -451,7 +535,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Upload Zone - Compact */}
+          {/* Upload Zone - Enhanced with drag feedback */}
           {!uploading && !pendingFile ? (
             <div
               className={`upload-zone mb-xl ${isDragOver ? 'dragover' : ''}`}
@@ -459,6 +543,10 @@ export default function Dashboard() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => document.getElementById('file-input')?.click()}
+              role="button"
+              tabIndex={0}
+              aria-label="Upload document. Drop a file or click to browse."
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('file-input')?.click(); }}
             >
               <input
                 type="file"
@@ -469,31 +557,74 @@ export default function Dashboard() {
                 onChange={handleFileSelect}
               />
               <div className="flex items-center gap-md">
-                <Upload size={32} className="text-accent-primary" />
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 'var(--radius-lg)',
+                    background: isDragOver ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.08)',
+                    border: `1px solid ${isDragOver ? 'rgba(99, 102, 241, 0.4)' : 'rgba(99, 102, 241, 0.15)'}`,
+                    transition: 'all 0.2s ease',
+                    transform: isDragOver ? 'scale(1.1)' : 'scale(1)',
+                  }}
+                >
+                  {isDragOver ? (
+                    <CloudUpload size={24} className="text-accent-primary" />
+                  ) : (
+                    <Upload size={24} className="text-accent-primary" />
+                  )}
+                </div>
                 <div>
-                  <p className="font-medium">Drop document here or click to browse</p>
-                  <p className="text-sm text-muted">PDF, TXT, MD, DOCX</p>
+                  <p className="font-medium">
+                    {isDragOver ? 'Drop to upload' : 'Drop document here or click to browse'}
+                  </p>
+                  <p className="text-sm text-muted">PDF, TXT, MD, DOCX · Max 10 MB</p>
                 </div>
               </div>
             </div>
           ) : uploading ? (
             <div className="card mb-xl">
               <div className="card-body">
-                {/* Progress Header */}
+                {/* Progress Header — two-phase: uploading then analyzing */}
                 <div className="flex items-center justify-between mb-md">
                   <div className="flex items-center gap-sm">
-                    <Loader2 size={16} className="animate-spin text-accent-primary" />
-                    <span className="text-sm font-medium">Analyzing document...</span>
+                    {uploadPhase === 'uploading' ? (
+                      <CloudUpload size={16} className="text-accent-primary" />
+                    ) : (
+                      <Loader2 size={16} className="animate-spin text-accent-primary" />
+                    )}
+                    <span className="text-sm font-medium">
+                      {uploadPhase === 'uploading' ? 'Uploading document...' : 'Analyzing document...'}
+                    </span>
                   </div>
-                  <span className="text-sm font-semibold" style={{ color: 'var(--accent-primary)' }}>{currentProgress}%</span>
+                  <span className="text-sm font-semibold" style={{ color: 'var(--accent-primary)' }}>
+                    {uploadPhase === 'uploading' ? `${uploadProgress}%` : `${currentProgress}%`}
+                  </span>
                 </div>
 
                 {/* Progress Bar - Enhanced */}
                 <div className="progress-bar mb-md">
                   <div
                     className="progress-bar-fill"
-                    style={{ width: `${currentProgress}%` }}
+                    style={{
+                      width: `${uploadPhase === 'uploading' ? uploadProgress : currentProgress}%`,
+                      transition: 'width 0.3s ease',
+                    }}
                   />
+                </div>
+
+                {/* Phase indicator */}
+                <div className="flex items-center gap-md mb-md text-xs text-muted">
+                  <span className={uploadPhase === 'uploading' ? 'text-accent-primary font-medium' : 'text-success'}>
+                    {uploadPhase === 'analyzing' ? '✓ ' : ''}Upload
+                  </span>
+                  <span style={{ color: 'var(--border-hover)' }}>→</span>
+                  <span className={uploadPhase === 'analyzing' ? 'text-accent-primary font-medium' : ''}>
+                    Analysis
+                  </span>
                 </div>
 
                 {/* Analysis Steps */}
@@ -680,39 +811,18 @@ export default function Dashboard() {
 
           {/* Empty state - only show when no documents */}
           {uploadedDocs.length === 0 && !loadingDocs && (
-            <div className="card animate-fade-in" style={{ padding: 'var(--spacing-2xl)' }}>
-              <div className="flex flex-col items-center gap-lg text-center">
-                <div style={{
-                  width: 80, height: 80,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'rgba(99, 102, 241, 0.08)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
-                  borderRadius: 'var(--radius-xl)',
-                }}>
-                  <Upload size={36} style={{ color: 'var(--accent-primary)' }} />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold mb-sm">Upload your first document</h2>
-                  <p className="text-sm text-muted" style={{ maxWidth: 420, margin: '0 auto' }}>
-                    Drop a PDF, TXT, MD, or DOCX file in the upload zone above. Our AI will scan for
-                    cognitive biases, decision noise, logical fallacies, and compliance risks.
-                  </p>
-                </div>
-                <div className="flex flex-wrap justify-center gap-sm">
-                  {['Bias Detection', 'Noise Analysis', 'Fact Checking', 'Compliance'].map(feat => (
-                    <span key={feat} className="badge badge-complete" style={{ fontSize: '0.7rem' }}>
-                      {feat}
-                    </span>
-                  ))}
-                </div>
-                <button
-                  onClick={() => document.getElementById('file-input')?.click()}
-                  className="btn btn-primary flex items-center gap-sm"
-                >
-                  <Upload size={16} />
-                  Choose a File
-                </button>
-              </div>
+            <div className="card">
+              <EmptyState
+                icon={Upload}
+                title="Upload your first document"
+                description="Drop a PDF, TXT, MD, or DOCX file in the upload zone above. Our AI will scan for cognitive biases, decision noise, logical fallacies, and compliance risks."
+                badges={['Bias Detection', 'Noise Analysis', 'Fact Checking', 'Compliance']}
+                action={{
+                  label: 'Choose a File',
+                  onClick: () => document.getElementById('file-input')?.click(),
+                  icon: Upload,
+                }}
+              />
             </div>
           )}
         </>
@@ -865,20 +975,16 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : uploadedDocs.length === 0 ? (
-                <div className="flex flex-col items-center gap-md p-xl text-center">
-                  <FileText size={40} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
-                  <div>
-                    <p className="font-medium mb-xs">No documents yet</p>
-                    <p className="text-sm text-muted">Upload a document to start analyzing.</p>
-                  </div>
-                  <button
-                    onClick={() => setActiveView('upload')}
-                    className="btn btn-primary flex items-center gap-sm text-sm"
-                  >
-                    <Upload size={14} />
-                    Go to Upload
-                  </button>
-                </div>
+                <EmptyState
+                  icon={FileText}
+                  title="No documents yet"
+                  description="Upload a document to start analyzing for biases, noise, and compliance risks."
+                  action={{
+                    label: 'Go to Upload',
+                    onClick: () => setActiveView('upload'),
+                    icon: Upload,
+                  }}
+                />
               ) : filteredDocs.length === 0 ? (
                 <div className="flex flex-col items-center gap-sm p-xl text-center">
                   <Search size={32} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
@@ -1015,6 +1121,42 @@ export default function Dashboard() {
       )}
 
       {/* Delete Confirmation Modal */}
+      {/* Global drag overlay — appears when dragging files anywhere on the page */}
+      {globalDrag && !uploading && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 40,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(8, 11, 18, 0.85)',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          <div
+            className="animate-fade-in"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'var(--spacing-lg)',
+              padding: 'var(--spacing-2xl)',
+              border: '2px dashed var(--accent-primary)',
+              borderRadius: 'var(--radius-xl)',
+              background: 'rgba(99, 102, 241, 0.06)',
+            }}
+          >
+            <CloudUpload size={48} style={{ color: 'var(--accent-primary)' }} />
+            <div className="text-center">
+              <p className="font-semibold text-lg">Drop your document here</p>
+              <p className="text-sm text-muted mt-1">PDF, TXT, MD, DOCX · Max 10 MB</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {deleteModal.open && (
         <div
           role="dialog"
