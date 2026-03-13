@@ -125,7 +125,9 @@ export function CommandPalette() {
                 style={{
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-xl)',
                     overflow: 'hidden',
+                    boxShadow: 'var(--shadow-lg)',
                 }}
             >
                 {/* Search input */}
@@ -152,6 +154,7 @@ export function CommandPalette() {
                         padding: '2px 6px',
                         background: 'var(--bg-tertiary)',
                         border: '1px solid var(--border-color)',
+                        borderRadius: '4px',
                         color: 'var(--text-muted)',
                     }}>
                         ESC
@@ -180,13 +183,15 @@ export function CommandPalette() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: 'var(--spacing-md)',
-                                    width: '100%',
+                                    width: 'calc(100% - 8px)',
                                     padding: '10px var(--spacing-md)',
-                                    background: idx === clampedIndex ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                                    margin: '1px 4px',
+                                    background: idx === clampedIndex ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
                                     border: 'none',
+                                    borderRadius: 'var(--radius-md)',
                                     cursor: 'pointer',
                                     color: 'var(--text-primary)',
-                                    textAlign: 'left',
+                                    textAlign: 'left' as const,
                                     fontSize: '13px',
                                 }}
                             >

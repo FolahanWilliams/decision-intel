@@ -180,9 +180,12 @@ export function NotificationBell() {
                             maxHeight: '400px',
                             background: 'var(--bg-secondary)',
                             border: '1px solid var(--border-color)',
+                            borderRadius: 'var(--radius-lg)',
                             zIndex: 30,
                             display: 'flex',
                             flexDirection: 'column',
+                            boxShadow: 'var(--shadow-lg)',
+                            overflow: 'hidden',
                         }}
                     >
                         {/* Header */}

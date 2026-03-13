@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight, ArrowRight, RefreshCw } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight, ArrowRight, RefreshCw, TrendingUp, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
@@ -333,14 +333,41 @@ export default function Dashboard() {
       {uploadedDocs.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-md mb-xl">
           {[
-            { label: 'Total Documents', value: totalDocs },
-            { label: 'Analyzed', value: uploadedDocs.filter(d => d.status === 'complete').length },
-            { label: 'Avg Quality', value: (() => { const scored = uploadedDocs.filter(d => d.score !== undefined); return scored.length ? `${Math.round(scored.reduce((a, d) => a + (d.score || 0), 0) / scored.length)}%` : '—'; })() },
-            { label: 'Pending', value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending').length },
+            {
+              label: 'Total Documents',
+              value: totalDocs,
+              icon: <FileText size={16} />,
+              iconBg: 'rgba(99, 102, 241, 0.1)',
+              iconColor: 'var(--accent-primary)',
+            },
+            {
+              label: 'Analyzed',
+              value: uploadedDocs.filter(d => d.status === 'complete').length,
+              icon: <CheckCircle size={16} />,
+              iconBg: 'rgba(34, 197, 94, 0.1)',
+              iconColor: 'var(--success)',
+            },
+            {
+              label: 'Avg Quality',
+              value: (() => { const scored = uploadedDocs.filter(d => d.score !== undefined); return scored.length ? `${Math.round(scored.reduce((a, d) => a + (d.score || 0), 0) / scored.length)}%` : '—'; })(),
+              icon: <TrendingUp size={16} />,
+              iconBg: 'rgba(245, 158, 11, 0.1)',
+              iconColor: 'var(--warning)',
+            },
+            {
+              label: 'In Progress',
+              value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending').length,
+              icon: <Clock size={16} />,
+              iconBg: 'rgba(129, 140, 248, 0.1)',
+              iconColor: 'var(--accent-secondary)',
+            },
           ].map((stat) => (
-            <div key={stat.label} className="card" style={{ padding: 'var(--spacing-md)' }}>
-              <div className="text-xs text-muted" style={{ marginBottom: '4px' }}>{stat.label}</div>
-              <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-highlight)' }}>{stat.value}</div>
+            <div key={stat.label} className="stat-card">
+              <div className="stat-card-icon" style={{ background: stat.iconBg, color: stat.iconColor }}>
+                {stat.icon}
+              </div>
+              <div className="stat-card-value">{stat.value}</div>
+              <div className="stat-card-label">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -348,7 +375,7 @@ export default function Dashboard() {
 
       {/* Stream timed out banner */}
       {streamTimedOut && !uploading && (
-        <div className="mb-lg p-md bg-warning/10 border border-warning/30 flex items-center gap-sm">
+        <div className="mb-lg p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm">
           <AlertTriangle size={18} className="text-warning shrink-0" />
           <span className="text-warning text-sm">
             Analysis is taking longer than expected. The server may still be processing — refresh the page or try again.
@@ -358,7 +385,7 @@ export default function Dashboard() {
 
       {/* Error Message - Compact */}
       {error && (
-        <div className="mb-lg p-md bg-error/10 border border-error/30 flex items-center gap-sm">
+        <div className="mb-lg p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm">
           <AlertTriangle size={18} className="text-error shrink-0" />
           <span className="text-error text-sm">{error}</span>
           <button
@@ -450,36 +477,75 @@ export default function Dashboard() {
               </div>
             </div>
           ) : uploading ? (
-            /* Analysis Progress - Compact */
             <div className="card mb-xl">
               <div className="card-body">
                 {/* Progress Header */}
                 <div className="flex items-center justify-between mb-md">
-                  <span className="text-sm font-medium">Analyzing document...</span>
-                  <span className="text-sm text-muted">{currentProgress}%</span>
+                  <div className="flex items-center gap-sm">
+                    <Loader2 size={16} className="animate-spin text-accent-primary" />
+                    <span className="text-sm font-medium">Analyzing document...</span>
+                  </div>
+                  <span className="text-sm font-semibold" style={{ color: 'var(--accent-primary)' }}>{currentProgress}%</span>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="h-1 bg-secondary overflow-hidden mb-md">
+                {/* Progress Bar - Enhanced */}
+                <div className="progress-bar mb-md">
                   <div
-                    className="h-full bg-accent-primary transition-all duration-300"
+                    className="progress-bar-fill"
                     style={{ width: `${currentProgress}%` }}
                   />
                 </div>
 
-                {/* Current Step + Cancel */}
-                <div className="flex items-center justify-between">
-                  {analysisSteps.find(s => s.status === 'running') && (
-                    <div className="flex items-center gap-sm text-sm">
-                      <Loader2 size={14} className="animate-spin text-accent-primary" />
-                      <span>{analysisSteps.find(s => s.status === 'running')?.name}</span>
+                {/* Analysis Steps */}
+                <div className="grid grid-cols-3 md:grid-cols-7 gap-xs mt-md">
+                  {analysisSteps.map((step, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center gap-1 text-center"
+                      title={step.name}
+                    >
+                      <div
+                        style={{
+                          width: 28, height: 28,
+                          borderRadius: 'var(--radius-full)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: step.status === 'complete'
+                            ? 'rgba(34, 197, 94, 0.15)'
+                            : step.status === 'running'
+                              ? 'rgba(99, 102, 241, 0.15)'
+                              : 'var(--bg-tertiary)',
+                          border: `1px solid ${
+                            step.status === 'complete'
+                              ? 'rgba(34, 197, 94, 0.3)'
+                              : step.status === 'running'
+                                ? 'rgba(99, 102, 241, 0.4)'
+                                : 'var(--border-color)'
+                          }`,
+                          transition: 'all var(--transition-normal)',
+                        }}
+                      >
+                        {step.status === 'complete' ? (
+                          <CheckCircle size={14} style={{ color: 'var(--success)' }} />
+                        ) : step.status === 'running' ? (
+                          <Loader2 size={14} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+                        ) : (
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--border-hover)' }} />
+                        )}
+                      </div>
+                      <span className="text-xs text-muted hidden md:block" style={{ lineHeight: 1.2, maxWidth: 60 }}>
+                        {ANALYSIS_STEPS[i]?.name.split(' ').slice(0, 2).join(' ')}
+                      </span>
                     </div>
-                  )}
+                  ))}
+                </div>
+
+                {/* Cancel */}
+                <div className="flex justify-end mt-md">
                   <button
                     onClick={() => { cancelAnalysis(); setUploading(false); }}
-                    className="text-xs text-muted hover:text-error transition-colors ml-auto"
+                    className="text-xs text-muted hover:text-error transition-colors"
                   >
-                    Cancel
+                    Cancel analysis
                   </button>
                 </div>
               </div>
@@ -499,19 +565,32 @@ export default function Dashboard() {
                   .map((doc) => (
                     <div
                       key={doc.id}
-                      className="card border-accent-primary/30 bg-accent-primary/5"
+                      className="card border-accent-primary/30"
+                      style={{ background: 'rgba(99, 102, 241, 0.04)' }}
                     >
                       <div className="card-body flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <FileText size={20} className="text-accent-primary" />
+                          <div style={{
+                            width: 36, height: 36,
+                            borderRadius: 'var(--radius-md)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'rgba(99, 102, 241, 0.1)',
+                          }}>
+                            <FileText size={18} className="text-accent-primary" />
+                          </div>
                           <div>
-                            <span className="font-medium">{doc.filename}</span>
+                            <span className="font-medium text-sm">{doc.filename}</span>
                             <p className="text-xs text-muted mt-0.5">
-                              Analysis in progress... Results will appear here when complete
+                              Analysis in progress — results will appear when complete
                             </p>
                           </div>
                         </div>
-                        <Loader2 size={18} className="animate-spin text-accent-primary" />
+                        <div className="flex items-center gap-2">
+                          <div className="progress-bar" style={{ width: 80 }}>
+                            <div className="progress-bar-fill animate-pulse" style={{ width: '60%' }} />
+                          </div>
+                          <Loader2 size={16} className="animate-spin text-accent-primary shrink-0" />
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -542,19 +621,27 @@ export default function Dashboard() {
                     <Link
                       key={doc.id}
                       href={`/documents/${doc.id}`}
-                      className="card group hover:border-accent-primary transition-all"
+                      className="card group hover:border-accent-primary/50 transition-all"
+                      style={{ textDecoration: 'none' }}
                     >
                       <div className="card-body">
                         <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <FileText size={18} className="text-accent-primary" />
-                            <span className="font-medium text-sm truncate max-w-[150px]">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div style={{
+                              width: 32, height: 32, flexShrink: 0,
+                              borderRadius: 'var(--radius-md)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              background: 'rgba(99, 102, 241, 0.1)',
+                            }}>
+                              <FileText size={16} className="text-accent-primary" />
+                            </div>
+                            <span className="font-medium text-sm truncate max-w-[130px]">
                               {doc.filename}
                             </span>
                           </div>
                           {doc.score !== undefined && (
                             <span
-                              className="text-sm font-bold"
+                              className="text-sm font-bold shrink-0 ml-2"
                               style={{
                                 color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
                               }}
@@ -563,6 +650,21 @@ export default function Dashboard() {
                             </span>
                           )}
                         </div>
+                        {doc.score !== undefined && (
+                          <div className="progress-bar mb-2">
+                            <div
+                              className="progress-bar-fill"
+                              style={{
+                                width: `${doc.score}%`,
+                                background: doc.score >= 70
+                                  ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                  : doc.score >= 40
+                                    ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                    : 'linear-gradient(90deg, #ef4444, #dc2626)',
+                              }}
+                            />
+                          </div>
+                        )}
                         <div className="flex items-center justify-between text-xs text-muted">
                           <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
                           <span className="flex items-center gap-1 group-hover:text-accent-primary transition-colors">
@@ -583,7 +685,9 @@ export default function Dashboard() {
                 <div style={{
                   width: 80, height: 80,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'rgba(99, 102, 241, 0.08)', border: '1px solid rgba(99, 102, 241, 0.2)',
+                  background: 'rgba(99, 102, 241, 0.08)',
+                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                  borderRadius: 'var(--radius-xl)',
                 }}>
                   <Upload size={36} style={{ color: 'var(--accent-primary)' }} />
                 </div>
@@ -593,6 +697,13 @@ export default function Dashboard() {
                     Drop a PDF, TXT, MD, or DOCX file in the upload zone above. Our AI will scan for
                     cognitive biases, decision noise, logical fallacies, and compliance risks.
                   </p>
+                </div>
+                <div className="flex flex-wrap justify-center gap-sm">
+                  {['Bias Detection', 'Noise Analysis', 'Fact Checking', 'Compliance'].map(feat => (
+                    <span key={feat} className="badge badge-complete" style={{ fontSize: '0.7rem' }}>
+                      {feat}
+                    </span>
+                  ))}
                 </div>
                 <button
                   onClick={() => document.getElementById('file-input')?.click()}
@@ -788,13 +899,20 @@ export default function Dashboard() {
                       style={{ animationDelay: `${idx * 0.03}s` }}
                     >
                       <div className="flex items-center gap-md min-w-0">
-                        <FileText size={18} className="text-accent-primary shrink-0" />
-                        <span className="truncate">{doc.filename}</span>
+                        <div style={{
+                          width: 32, height: 32, flexShrink: 0,
+                          borderRadius: 'var(--radius-md)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: 'rgba(99, 102, 241, 0.08)',
+                        }}>
+                          <FileText size={16} className="text-accent-primary" />
+                        </div>
+                        <span className="truncate text-sm font-medium">{doc.filename}</span>
                       </div>
 
                       <div className="flex items-center gap-md shrink-0">
                         {doc.status === 'analyzing' && (
-                          <span className="flex items-center gap-sm text-sm text-muted">
+                          <span className="flex items-center gap-sm text-xs text-muted">
                             <Loader2 size={12} className="animate-spin" />
                             Analyzing
                           </span>
@@ -803,7 +921,7 @@ export default function Dashboard() {
                         {(doc.status === 'error' || doc.status === 'pending') && (
                           <div className="flex items-center gap-sm">
                             {doc.status === 'error' && (
-                              <span className="text-xs text-error">Failed</span>
+                              <span className="badge badge-critical">Failed</span>
                             )}
                             {doc.status === 'pending' && (
                               <span className="text-xs text-muted">Pending</span>
@@ -823,12 +941,16 @@ export default function Dashboard() {
                           <>
                             {doc.score !== undefined && (
                               <div className="flex items-center gap-2">
-                                <div className="w-16 h-2 bg-white/10 overflow-hidden">
+                                <div className="progress-bar" style={{ width: 64 }}>
                                   <div
-                                    className="h-full transition-all"
+                                    className="progress-bar-fill"
                                     style={{
                                       width: `${doc.score}%`,
-                                      backgroundColor: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                                      background: doc.score >= 70
+                                        ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                        : doc.score >= 40
+                                          ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                          : 'linear-gradient(90deg, #ef4444, #dc2626)',
                                     }}
                                   />
                                 </div>
@@ -854,7 +976,7 @@ export default function Dashboard() {
 
                         <button
                           onClick={() => setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })}
-                          className="p-1.5 text-muted hover:text-error transition-colors"
+                          className="p-1.5 text-muted hover:text-error transition-colors rounded"
                           title="Delete"
                         >
                           <Trash2 size={16} />
