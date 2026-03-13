@@ -18,7 +18,7 @@ export async function GET() {
 
         const snapshot = await getMacroSnapshot();
         return NextResponse.json(snapshot);
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { error: 'Failed to fetch macro data', indicators: [], summary: 'Macro data temporarily unavailable.' },
             { status: 500 }

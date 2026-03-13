@@ -11,7 +11,7 @@ export const maxDuration = 120; // RSS sync can take a while
  * POST /api/news/sync — Manually trigger a news feed sync.
  * Requires authentication. Returns sync results.
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
     try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();

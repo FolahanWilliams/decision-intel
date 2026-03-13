@@ -68,7 +68,7 @@ export async function GET() {
                 durationMs: latestSync.durationMs,
             } : null,
         });
-    } catch (error) {
+    } catch {
         // Schema drift — tables may not exist yet
         return NextResponse.json({
             freshness: 'empty',
