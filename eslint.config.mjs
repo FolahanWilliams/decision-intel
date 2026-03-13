@@ -14,11 +14,19 @@ const eslintConfig = defineConfig([
     ".agent/**",
     // Script files:
     "scripts/**",
+    // Browser extension (minified vendor bundles):
+    "extension/**",
+    "extension 2/**",
   ]),
   {
     files: ["src/app/(platform)/documents/[id]/page.tsx"],
     rules: {
       "react/no-unescaped-entities": "off"
+    }
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }]
     }
   },
   ...nextVitals,

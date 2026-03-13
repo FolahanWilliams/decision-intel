@@ -88,13 +88,13 @@ export function BiasDetailModal({ bias, biases, currentIndex, onClose, onNavigat
     const closeButtonRef = useRef<HTMLButtonElement>(null);
 
     const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-    // @ts-ignore - assuming bias.userRating might exist if added to schema
-    const [userRating, setUserRating] = useState<number | null>((bias as any).userRating || null);
+    // @ts-expect-error - bias.userRating might exist if added to schema
+    const [userRating, setUserRating] = useState<number | null>((bias as Record<string, unknown>).userRating as number | null);
 
     // Reset rating when navigating to a different bias
     useEffect(() => {
-        // @ts-ignore
-        setUserRating((bias as any).userRating || null);
+        // @ts-expect-error - bias.userRating might exist if added to schema
+        setUserRating((bias as Record<string, unknown>).userRating as number | null);
     }, [bias]);
 
     const handleFeedback = async (rating: number) => {
