@@ -1,9 +1,23 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import { Search, FileText, Loader2, ArrowRight, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/ToastContext';
+
+/** Highlight parts of text that match any word in the query. */
+function highlightMatch(text: string, query: string): ReactNode {
+    if (!query.trim()) return text;
+    const words = query.trim().split(/\s+/).filter(w => w.length > 1).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    if (words.length === 0) return text;
+    const regex = new RegExp(`(${words.join('|')})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, i) =>
+        regex.test(part) ? (
+            <mark key={i} style={{ background: 'rgba(99, 102, 241, 0.25)', color: 'inherit', padding: '0 1px', borderRadius: '2px' }}>{part}</mark>
+        ) : part
+    );
+}
 
 interface SearchResult {
     documentId: string;
@@ -138,12 +152,12 @@ export default function SearchPage() {
                                         <div className="flex items-center gap-sm mb-sm">
                                             <FileText size={16} style={{ color: 'var(--accent-primary)' }} />
                                             <span style={{ fontWeight: 600, fontSize: '14px' }}>
-                                                {result.filename || result.documentId}
+                                                {highlightMatch(result.filename || result.documentId, query)}
                                             </span>
                                         </div>
                                         {result.biases.length > 0 && (
                                             <p className="text-sm text-muted" style={{ lineHeight: 1.5, marginBottom: '8px' }}>
-                                                Biases: {result.biases.join(', ')}
+                                                Biases: {highlightMatch(result.biases.join(', '), query)}
                                             </p>
                                         )}
                                         <div className="flex items-center gap-md text-xs">
