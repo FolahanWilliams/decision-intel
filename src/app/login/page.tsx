@@ -35,6 +35,10 @@ function LoginContent() {
         minHeight: '100vh',
         display: 'flex',
         background: 'var(--bg-primary)',
+        backgroundImage: `
+          radial-gradient(ellipse 70% 55% at 15% 10%, rgba(99, 102, 241, 0.14) 0%, transparent 65%),
+          radial-gradient(ellipse 55% 60% at 85% 80%, rgba(168, 85, 247, 0.10) 0%, transparent 65%)
+        `,
       }}
     >
       {/* Left panel — branding & features */}
@@ -45,8 +49,11 @@ function LoginContent() {
           flexDirection: 'column',
           justifyContent: 'center',
           padding: '3rem',
-          borderRight: '1px solid var(--border-color)',
-          background: 'var(--bg-secondary)',
+          borderRight: '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(8, 11, 20, 0.60)',
+          backdropFilter: 'blur(40px) saturate(170%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(170%)',
+          boxShadow: '1px 0 0 rgba(255,255,255,0.06)',
         }}
         className="hidden md:flex"
       >
@@ -135,8 +142,12 @@ function LoginContent() {
           <div
             style={{
               padding: '2rem',
-              border: '1px solid var(--border-color)',
-              background: 'var(--bg-secondary)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(8, 11, 20, 0.65)',
+              backdropFilter: 'blur(40px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+              borderRadius: '20px',
+              boxShadow: '0 16px 56px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.08) inset',
             }}
           >
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
@@ -164,6 +175,7 @@ function LoginContent() {
                 color: '#ef4444',
                 background: 'rgba(239, 68, 68, 0.08)',
                 border: '1px solid rgba(239, 68, 68, 0.2)',
+                borderRadius: '10px',
               }}>
                 Sign-in failed. Please try again.
               </div>
@@ -182,11 +194,13 @@ function LoginContent() {
                 fontSize: '14px',
                 fontWeight: 600,
                 color: '#fff',
-                background: 'var(--accent-primary)',
-                border: '1px solid var(--accent-primary)',
+                background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
+                border: '1px solid rgba(99, 102, 241, 0.4)',
+                borderRadius: '9999px',
+                boxShadow: '0 4px 16px rgba(99, 102, 241, 0.35), 0 1px 0 rgba(255,255,255,0.12) inset',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.7 : 1,
-                transition: 'opacity 0.15s, background 0.15s',
+                transition: 'all 0.15s',
                 fontFamily: 'inherit',
               }}
             >
@@ -233,9 +247,12 @@ function Feature({ icon, title, description }: { icon: React.ReactNode; title: s
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(99, 102, 241, 0.1)',
-        border: '1px solid rgba(99, 102, 241, 0.2)',
+        background: 'rgba(99, 102, 241, 0.12)',
+        border: '1px solid rgba(99, 102, 241, 0.25)',
+        borderRadius: '10px',
+        backdropFilter: 'blur(8px)',
         color: 'var(--accent-primary)',
+        boxShadow: '0 1px 0 rgba(255,255,255,0.08) inset',
       }}>
         {icon}
       </div>

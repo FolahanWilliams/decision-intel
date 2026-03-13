@@ -90,6 +90,22 @@
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Liquid Glass — Apple-inspired translucent surfaces ── */
+  --liquid-bg: rgba(15, 19, 32, 0.55);
+  --liquid-bg-strong: rgba(8, 11, 20, 0.72);
+  --liquid-bg-hover: rgba(20, 26, 45, 0.68);
+  --liquid-border: rgba(255, 255, 255, 0.10);
+  --liquid-border-hover: rgba(255, 255, 255, 0.20);
+  --liquid-border-active: rgba(99, 102, 241, 0.55);
+  --liquid-specular: rgba(255, 255, 255, 0.07);
+  --liquid-shadow: 0 8px 32px rgba(0, 0, 0, 0.38), 0 2px 8px rgba(0, 0, 0, 0.22), 0 1px 0 rgba(255, 255, 255, 0.07) inset;
+  --liquid-shadow-hover: 0 14px 48px rgba(0, 0, 0, 0.48), 0 4px 16px rgba(0, 0, 0, 0.26), 0 1px 0 rgba(255, 255, 255, 0.11) inset;
+  --liquid-shadow-glow: 0 0 0 1px rgba(99, 102, 241, 0.35), 0 8px 32px rgba(99, 102, 241, 0.20);
+  --liquid-blur: 20px;
+  --liquid-blur-strong: 40px;
+  --liquid-radius: 16px;
+  --liquid-radius-xl: 20px;
 }
 
 .light {
@@ -118,6 +134,17 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+
+  /* Liquid Glass — light mode overrides */
+  --liquid-bg: rgba(255, 255, 255, 0.62);
+  --liquid-bg-strong: rgba(248, 250, 252, 0.82);
+  --liquid-bg-hover: rgba(255, 255, 255, 0.78);
+  --liquid-border: rgba(0, 0, 0, 0.08);
+  --liquid-border-hover: rgba(0, 0, 0, 0.14);
+  --liquid-specular: rgba(255, 255, 255, 0.80);
+  --liquid-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+  --liquid-shadow-hover: 0 14px 48px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.95) inset;
+  --liquid-shadow-glow: 0 0 0 1px rgba(79, 70, 229, 0.30), 0 8px 32px rgba(79, 70, 229, 0.16);
 }
 
 * {
@@ -129,6 +156,11 @@
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg-primary);
+  /* Ambient color blobs — give liquid glass depth and colour to refract */
+  background-image:
+    radial-gradient(ellipse 75% 55% at 12% 8%, rgba(99, 102, 241, 0.14) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 65% at 88% 78%, rgba(168, 85, 247, 0.10) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 45% at 52% 48%, rgba(245, 158, 11, 0.06) 0%, transparent 65%);
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
@@ -198,26 +230,29 @@ pre {
    Cards — Refined panels with depth
    ═══════════════════════════════════════════ */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  border-radius: var(--liquid-radius);
   position: relative;
-  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
-  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(var(--liquid-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(160%);
+  box-shadow: var(--liquid-shadow);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal), transform var(--transition-normal);
 }
 
 .card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
+  border-color: var(--liquid-border-hover);
+  box-shadow: var(--liquid-shadow-hover);
+  transform: translateY(-2px);
 }
 
 .card-header {
   padding: var(--spacing-md) var(--spacing-lg);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--liquid-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-radius: var(--liquid-radius) var(--liquid-radius) 0 0;
 }
 
 .card-header h3 {
@@ -230,8 +265,8 @@ pre {
 }
 
 .card-glow:hover {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 1px var(--accent-primary), var(--shadow-glow);
+  border-color: var(--liquid-border-active);
+  box-shadow: var(--liquid-shadow-hover), var(--liquid-shadow-glow);
 }
 
 /* ═══════════════════════════════════════════
@@ -249,38 +284,41 @@ pre {
   cursor: pointer;
   transition: all var(--transition-fast);
   letter-spacing: 0;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--liquid-border);
+  border-radius: var(--radius-full);
 }
 
 .btn-primary {
-  background: var(--accent-primary);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   color: #fff;
-  border: 1px solid var(--accent-primary);
-  box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.35), 0 1px 0 rgba(255, 255, 255, 0.15) inset;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #4f46e5;
-  border-color: #4f46e5;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  border-color: rgba(99, 102, 241, 0.6);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45), 0 1px 0 rgba(255, 255, 255, 0.2) inset;
   transform: translateY(-1px);
 }
 
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 1px 3px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
 }
 
 .btn-secondary {
-  background: var(--bg-secondary);
+  background: var(--liquid-bg);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--liquid-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 var(--liquid-specular) inset;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  border-color: var(--border-hover);
-  background: var(--bg-tertiary);
+  border-color: var(--liquid-border-hover);
+  background: var(--liquid-bg-hover);
   transform: translateY(-1px);
 }
 
@@ -291,13 +329,15 @@ pre {
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
+  background: var(--liquid-bg);
+  border-color: var(--liquid-border);
   color: var(--text-primary);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-ghost:active:not(:disabled) {
-  background: var(--bg-tertiary);
+  background: var(--liquid-bg-hover);
 }
 
 .btn-sm {
@@ -318,22 +358,37 @@ pre {
 /* ═══════════════════════════════════════════
    Form Elements
    ═══════════════════════════════════════════ */
-input, textarea, select {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 0.625rem 0.875rem;
+input, select {
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  border-radius: var(--radius-full);
+  padding: 0.625rem 1rem;
   font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   color: var(--text-highlight);
   transition: all var(--transition-fast);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+textarea {
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  border-radius: var(--liquid-radius);
+  padding: 0.625rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  color: var(--text-highlight);
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--accent-primary);
-  background: var(--bg-tertiary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  background: var(--liquid-bg-hover);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18), 0 1px 0 var(--liquid-specular) inset;
 }
 
 /* ═══════════════════════════════════════════
@@ -428,19 +483,21 @@ input:focus, textarea:focus, select:focus {
    Upload Zone
    ═══════════════════════════════════════════ */
 .upload-zone {
-  border: 2px dashed var(--border-color);
-  background: var(--bg-secondary);
+  border: 2px dashed var(--liquid-border-hover);
+  background: var(--liquid-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: var(--spacing-2xl);
   text-align: center;
   transition: all var(--transition-normal);
-  border-radius: var(--radius-lg);
+  border-radius: var(--liquid-radius-xl);
   cursor: pointer;
 }
 
 .upload-zone:hover, .upload-zone.dragover {
   border-color: var(--accent-primary);
-  background: rgba(99, 102, 241, 0.04);
-  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.1);
+  background: rgba(99, 102, 241, 0.07);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.15), var(--liquid-shadow);
 }
 
 /* ═══════════════════════════════════════════
@@ -509,6 +566,18 @@ tr:hover td {
   100% { background-position: 200% 0; }
 }
 
+@keyframes glassRefract {
+  0%   { opacity: 0.6; transform: translateX(-30%) skewX(-12deg); }
+  50%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(130%) skewX(-12deg); }
+}
+
+@keyframes floatUp {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
@@ -537,17 +606,21 @@ tr:hover td {
    Surface Utilities (glass & depth)
    ═══════════════════════════════════════════ */
 .glass {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border-radius: var(--radius-lg);
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  backdrop-filter: blur(var(--liquid-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(160%);
+  border-radius: var(--liquid-radius);
+  box-shadow: var(--liquid-shadow);
 }
 
 .glass-strong {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background: var(--liquid-bg-strong);
+  border: 1px solid var(--liquid-border);
+  backdrop-filter: blur(var(--liquid-blur-strong)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--liquid-blur-strong)) saturate(180%);
+  border-radius: var(--liquid-radius);
+  box-shadow: var(--liquid-shadow);
 }
 
 .glow {
@@ -556,21 +629,114 @@ tr:hover td {
 }
 
 /* ═══════════════════════════════════════════
+   Liquid Glass — Apple-inspired panels
+   ═══════════════════════════════════════════ */
+
+/* Floating glass card */
+.liquid-glass {
+  position: relative;
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  backdrop-filter: blur(var(--liquid-blur-strong)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--liquid-blur-strong)) saturate(180%);
+  border-radius: var(--liquid-radius-xl);
+  box-shadow: var(--liquid-shadow);
+  transition: all var(--transition-normal);
+  overflow: hidden;
+}
+
+.liquid-glass:hover {
+  border-color: var(--liquid-border-hover);
+  box-shadow: var(--liquid-shadow-hover);
+}
+
+/* Specular light sweep on hover */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--liquid-specular) 30%,
+    rgba(255, 255, 255, 0.14) 50%,
+    var(--liquid-specular) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Refraction shimmer sweep */
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 35%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+  animation: glassRefract 6s ease-in-out infinite;
+  animation-delay: calc(var(--refract-delay, 0) * 1s);
+}
+
+/* Stronger / elevated variant */
+.liquid-glass-float {
+  position: relative;
+  background: var(--liquid-bg-strong);
+  border: 1px solid var(--liquid-border);
+  backdrop-filter: blur(var(--liquid-blur-strong)) saturate(200%);
+  -webkit-backdrop-filter: blur(var(--liquid-blur-strong)) saturate(200%);
+  border-radius: var(--liquid-radius-xl);
+  box-shadow: var(--liquid-shadow-hover);
+  overflow: hidden;
+}
+
+/* Pill-shaped glass button / chip */
+.glass-pill {
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border-radius: var(--radius-full);
+  box-shadow: 0 1px 0 var(--liquid-specular) inset;
+  transition: all var(--transition-fast);
+}
+
+.glass-pill:hover {
+  background: var(--liquid-bg-hover);
+  border-color: var(--liquid-border-hover);
+}
+
+/* Animated float */
+.liquid-float {
+  animation: floatUp 4s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════
    Stat Cards — visual KPI cards
    ═══════════════════════════════════════════ */
 .stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  border-radius: var(--liquid-radius);
   padding: var(--spacing-lg);
   transition: all var(--transition-normal);
-  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(var(--liquid-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(160%);
+  box-shadow: var(--liquid-shadow);
 }
 
 .stat-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  border-color: var(--liquid-border-hover);
+  box-shadow: var(--liquid-shadow-hover);
+  transform: translateY(-2px);
 }
 
 .stat-card-icon {
@@ -674,9 +840,13 @@ tr:hover td {
 }
 
 .modal-content {
-  animation: slideInModal 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  animation: slideInModal 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  border-radius: var(--liquid-radius-xl);
+  background: var(--liquid-bg-strong);
+  border: 1px solid var(--liquid-border);
+  backdrop-filter: blur(var(--liquid-blur-strong)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--liquid-blur-strong)) saturate(180%);
+  box-shadow: var(--liquid-shadow-hover);
 }
 
 /* ═══════════════════════════════════════════
