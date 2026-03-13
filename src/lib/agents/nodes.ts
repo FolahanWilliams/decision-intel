@@ -761,7 +761,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
 
         return {
             sentimentAnalysis: data?.sentiment || { score: 0, label: 'Neutral' },
-            logicalAnalysis: data?.logicalAnalysis || { score: 50, fallacies: [] },
+            logicalAnalysis: data?.logicalAnalysis || { score: 100, fallacies: [] },
             swotAnalysis: data?.swot,
             preMortem: data?.preMortem,
             cognitiveAnalysis: cognitiveData
@@ -770,7 +770,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
         log.error("Deep Analysis Node failed:", e instanceof Error ? e.message : String(e));
         return {
             sentimentAnalysis: { score: 0, label: 'Neutral' },
-            logicalAnalysis: { score: 50, fallacies: [] },
+            logicalAnalysis: { score: 100, fallacies: [] },
             swotAnalysis: undefined,
             preMortem: undefined,
             cognitiveAnalysis: undefined
@@ -946,15 +946,16 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     const trustPenalty = (100 - trustScore) * 0.3;
 
     // 4. Logic Penalty
-    // Use ?? so that a genuine score of 0 is respected; default to 50 (moderate
-    // penalty) when the analysis is missing, instead of 100 (no penalty).
-    const logicScore = state.logicalAnalysis?.score ?? 50;
+    // Use ?? so that a genuine score of 0 is respected; default to 100 (no
+    // penalty) when the analysis is missing — absence of data should not
+    // artificially lower the overall score.
+    const logicScore = state.logicalAnalysis?.score ?? 100;
     const logicPenalty = (100 - logicScore) * 0.4;
 
     // 5. Echo Chamber Penalty (Cognitive Diversity)
     // If blindSpotGap is low (0 = Tunnel Vision), penalty increases.
-    // Default to 50 when missing, not 100 (which would mean no penalty).
-    const diversityScore = state.cognitiveAnalysis?.blindSpotGap ?? 50;
+    // Default to 100 when missing — absence of data should not penalise.
+    const diversityScore = state.cognitiveAnalysis?.blindSpotGap ?? 100;
     const diversityPenalty = (100 - diversityScore) * 0.3;
 
     // Calculate Base
