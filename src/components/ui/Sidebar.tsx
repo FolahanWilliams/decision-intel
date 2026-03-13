@@ -36,15 +36,17 @@ export default function Sidebar() {
                     top: '52px',
                     left: '12px',
                     zIndex: 60,
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--liquid-bg)',
+                    border: '1px solid var(--liquid-border)',
+                    borderRadius: 'var(--radius-full)',
                     color: 'var(--text-primary)',
                     padding: '8px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    boxShadow: 'var(--shadow-sm)',
+                    backdropFilter: 'blur(20px) saturate(160%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+                    boxShadow: 'var(--liquid-shadow)',
                 }}
             >
                 <Menu size={18} />
@@ -73,10 +75,12 @@ export default function Sidebar() {
                 style={{
                     width: sidebarWidth,
                     minWidth: sidebarWidth,
-                    borderRight: '1px solid var(--border-color)',
+                    borderRight: '1px solid var(--liquid-border)',
                     display: 'flex',
                     flexDirection: 'column',
-                    background: 'var(--bg-secondary)',
+                    background: 'var(--liquid-bg-strong)',
+                    backdropFilter: 'blur(40px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(40px) saturate(180%)',
                     height: 'calc(100vh - 44px)',
                     position: 'sticky',
                     top: '44px',
@@ -87,7 +91,7 @@ export default function Sidebar() {
                 {/* Brand */}
                 <div style={{
                     padding: collapsed ? '16px 12px' : '24px 20px',
-                    borderBottom: '1px solid var(--border-color)',
+                    borderBottom: '1px solid var(--liquid-border)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -112,15 +116,17 @@ export default function Sidebar() {
                         aria-label={mobileOpen ? 'Close navigation' : collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                         className="hidden md:flex"
                         style={{
-                            background: 'var(--bg-tertiary)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: 'var(--radius-md)',
+                            background: 'var(--liquid-bg)',
+                            border: '1px solid var(--liquid-border)',
+                            borderRadius: 'var(--radius-full)',
                             color: 'var(--text-muted)',
                             cursor: 'pointer',
                             padding: '6px',
                             display: 'flex',
                             alignItems: 'center',
                             transition: 'all 0.15s',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
                         }}
                     >
                         {mobileOpen ? <X size={16} /> : collapsed ? <Menu size={14} /> : <ChevronLeft size={14} />}
@@ -158,13 +164,15 @@ export default function Sidebar() {
                             width: '100%',
                             padding: collapsed ? '8px' : '8px 12px',
                             marginBottom: '12px',
-                            background: 'var(--bg-tertiary)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: 'var(--radius-md)',
+                            background: 'var(--liquid-bg)',
+                            border: '1px solid var(--liquid-border)',
+                            borderRadius: 'var(--radius-full)',
                             color: 'var(--text-muted)',
                             fontSize: '12px',
                             cursor: 'pointer',
                             transition: 'border-color 0.15s',
+                            backdropFilter: 'blur(12px)',
+                            WebkitBackdropFilter: 'blur(12px)',
                         }}
                     >
                         <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -175,9 +183,9 @@ export default function Sidebar() {
                             <kbd style={{
                                 fontSize: '10px',
                                 padding: '1px 5px',
-                                background: 'var(--bg-secondary)',
-                                border: '1px solid var(--border-color)',
-                                borderRadius: '4px',
+                                background: 'var(--liquid-bg)',
+                                border: '1px solid var(--liquid-border)',
+                                borderRadius: '6px',
                             }}>
                                 ⌘K
                             </kbd>
@@ -250,7 +258,7 @@ export default function Sidebar() {
 
                 <div style={{
                     padding: collapsed ? '12px' : '12px 20px',
-                    borderTop: '1px solid var(--border-color)',
+                    borderTop: '1px solid var(--liquid-border)',
                 }}>
                     <button
                         onClick={async () => {
@@ -282,7 +290,7 @@ export default function Sidebar() {
                 </div>
                 <div style={{
                     padding: collapsed ? '12px' : '16px 20px',
-                    borderTop: '1px solid var(--border-color)',
+                    borderTop: '1px solid var(--liquid-border)',
                 }}>
                     <div style={{
                         display: 'flex',
@@ -344,15 +352,26 @@ function NavItem({ href, icon, label, description, active, collapsed, onNavigate
                     alignItems: 'center',
                     justifyContent: collapsed ? 'center' : 'flex-start',
                     gap: collapsed ? '0' : '12px',
-                    padding: collapsed ? '10px' : '9px 12px',
+                    padding: collapsed ? '10px' : '8px 12px',
                     color: active ? 'var(--text-highlight)' : hovered ? 'var(--text-primary)' : 'var(--text-secondary)',
-                    background: active ? 'rgba(99, 102, 241, 0.1)' : hovered ? 'rgba(255, 255, 255, 0.04)' : 'transparent',
-                    borderLeft: active ? '2px solid var(--accent-primary)' : '2px solid transparent',
-                    borderRadius: '0 var(--radius-md) var(--radius-md) 0',
+                    background: active
+                        ? 'rgba(99, 102, 241, 0.14)'
+                        : hovered
+                        ? 'rgba(255, 255, 255, 0.06)'
+                        : 'transparent',
+                    border: active
+                        ? '1px solid rgba(99, 102, 241, 0.3)'
+                        : hovered
+                        ? '1px solid var(--liquid-border)'
+                        : '1px solid transparent',
+                    borderRadius: 'var(--radius-full)',
                     marginBottom: '2px',
                     fontSize: '13.5px',
                     fontWeight: active ? 600 : 400,
                     textDecoration: 'none',
+                    backdropFilter: active || hovered ? 'blur(12px)' : 'none',
+                    WebkitBackdropFilter: active || hovered ? 'blur(12px)' : 'none',
+                    boxShadow: active ? '0 1px 0 rgba(255,255,255,0.08) inset' : 'none',
                     transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}
             >
@@ -386,16 +405,18 @@ function NavItem({ href, icon, label, description, active, collapsed, onNavigate
                         transform: 'translateY(-50%)',
                         marginLeft: 8,
                         padding: '6px 10px',
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: 'var(--radius-md)',
+                        background: 'var(--liquid-bg-strong)',
+                        border: '1px solid var(--liquid-border)',
+                        backdropFilter: 'blur(20px) saturate(160%)',
+                        WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+                        borderRadius: 'var(--radius-full)',
                         color: 'var(--text-primary)',
                         fontSize: '12px',
                         fontWeight: 500,
                         whiteSpace: 'nowrap',
                         zIndex: 80,
                         pointerEvents: 'none',
-                        boxShadow: 'var(--shadow-md)',
+                        boxShadow: 'var(--liquid-shadow)',
                     }}
                 >
                     {label}

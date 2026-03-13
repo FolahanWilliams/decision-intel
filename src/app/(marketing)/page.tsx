@@ -61,19 +61,21 @@ export default function LandingPage() {
         animate={{ y: 0 }}
         className="fixed top-0 left-0 right-0 z-40"
         style={{
-          background: 'rgba(10, 10, 18, 0.7)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          background: 'rgba(8, 11, 20, 0.65)',
+          backdropFilter: 'blur(40px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.10)',
+          boxShadow: '0 1px 0 rgba(255,255,255,0.06) inset',
         }}
       >
         <div className="container mx-auto py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div style={{
               padding: '8px',
-              background: 'rgba(245, 158, 11, 0.1)',
-              borderRadius: '12px',
-              border: '1px solid rgba(245, 158, 11, 0.2)',
+              background: 'rgba(245, 158, 11, 0.12)',
+              borderRadius: '14px',
+              border: '1px solid rgba(245, 158, 11, 0.25)',
+              backdropFilter: 'blur(12px)',
             }}>
               <Brain className="w-5 h-5" style={{ color: '#f59e0b' }} />
             </div>
@@ -87,10 +89,10 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-amber-400 transition-colors duration-300">Features</a>
           </div>
           <div className="flex gap-3">
-            <Link href="/login" className="btn btn-secondary" style={{ fontSize: '0.85rem', borderRadius: '10px' }}>
+            <Link href="/login" className="btn btn-secondary" style={{ fontSize: '0.85rem' }}>
               Sign In
             </Link>
-            <Link href="/login" className="btn btn-primary" style={{ fontSize: '0.85rem', borderRadius: '10px' }}>
+            <Link href="/login" className="btn btn-primary" style={{ fontSize: '0.85rem' }}>
               Get Started
             </Link>
           </div>
@@ -101,12 +103,15 @@ export default function LandingPage() {
       <section ref={heroRef} className="min-h-screen flex items-center pt-24 relative overflow-hidden"
         style={{ background: 'var(--bg-primary)' }}
       >
-        {/* Ambient glow */}
-        <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] rounded-full blur-[120px] pointer-events-none"
-          style={{ background: 'rgba(245, 158, 11, 0.04)' }}
+        {/* Enhanced ambient glow for liquid glass effect */}
+        <div className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] rounded-full blur-[140px] pointer-events-none"
+          style={{ background: 'rgba(245, 158, 11, 0.07)' }}
         />
-        <div className="absolute bottom-1/4 right-1/4 w-[30vw] h-[30vw] rounded-full blur-[100px] pointer-events-none"
-          style={{ background: 'rgba(59, 130, 246, 0.03)' }}
+        <div className="absolute bottom-1/4 right-1/4 w-[35vw] h-[35vw] rounded-full blur-[120px] pointer-events-none"
+          style={{ background: 'rgba(99, 102, 241, 0.06)' }}
+        />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[30vw] rounded-full blur-[160px] pointer-events-none"
+          style={{ background: 'rgba(168, 85, 247, 0.04)' }}
         />
 
         <div className="container relative z-10">
@@ -123,8 +128,9 @@ export default function LandingPage() {
                     padding: '6px 14px',
                     marginBottom: '24px',
                     borderRadius: '9999px',
-                    background: 'rgba(245, 158, 11, 0.08)',
-                    border: '1px solid rgba(245, 158, 11, 0.2)',
+                    background: 'rgba(245, 158, 11, 0.10)',
+                    border: '1px solid rgba(245, 158, 11, 0.25)',
+                    backdropFilter: 'blur(12px)',
                     color: '#f59e0b',
                     fontSize: '0.8rem',
                     fontWeight: 600,
@@ -183,12 +189,12 @@ export default function LandingPage() {
                   className="flex flex-wrap items-center gap-4"
                 >
                   <Link href="/login" className="btn btn-primary glow"
-                    style={{ padding: '14px 32px', fontSize: '0.9rem', borderRadius: '12px' }}
+                    style={{ padding: '14px 32px', fontSize: '0.9rem' }}
                   >
                     Start Free Trial
                   </Link>
                   <a href="#problem" className="btn btn-secondary"
-                    style={{ padding: '14px 32px', fontSize: '0.9rem', borderRadius: '12px' }}
+                    style={{ padding: '14px 32px', fontSize: '0.9rem' }}
                   >
                     See How It Works
                   </a>
@@ -213,20 +219,21 @@ export default function LandingPage() {
                 className="hidden md:block"
               >
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '16px',
+                  background: 'rgba(8, 11, 20, 0.65)',
+                  backdropFilter: 'blur(40px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '20px',
                   overflow: 'hidden',
-                  boxShadow: '0 8px 40px rgba(0, 0, 0, 0.3), 0 0 80px rgba(245, 158, 11, 0.03)',
+                  boxShadow: '0 12px 48px rgba(0, 0, 0, 0.4), 0 0 100px rgba(245, 158, 11, 0.05), 0 1px 0 rgba(255,255,255,0.07) inset',
                 }}>
                   <div style={{
                     padding: '14px 20px',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    background: 'rgba(255, 255, 255, 0.02)',
+                    background: 'rgba(255, 255, 255, 0.03)',
                   }}>
                     <div className="flex items-center gap-2" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                       <Activity className="w-4 h-4" style={{ color: '#f59e0b' }} />
@@ -253,8 +260,8 @@ export default function LandingPage() {
                       padding: '10px 14px',
                       margin: '4px 0',
                       borderLeft: '2px solid rgba(245, 158, 11, 0.4)',
-                      background: 'rgba(245, 158, 11, 0.04)',
-                      borderRadius: '0 8px 8px 0',
+                      background: 'rgba(245, 158, 11, 0.05)',
+                      borderRadius: '0 10px 10px 0',
                     }}>
                       <span style={{ color: '#f59e0b' }}>Warning:</span> Confirmatory Bias detected (94% confidence)<br />
                       <span style={{ color: '#f59e0b' }}>Warning:</span> Groupthink indicators in Section 3
@@ -297,17 +304,20 @@ export default function LandingPage() {
               className="cursor-pointer transition-all duration-300"
               onClick={() => setActiveDemo('chaos')}
               style={{
-                background: activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.04)' : 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(20px)',
-                border: activeDemo === 'chaos' ? '1px solid rgba(239, 68, 68, 0.2)' : '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                boxShadow: activeDemo === 'chaos' ? '0 8px 32px rgba(239, 68, 68, 0.08)' : '0 4px 16px rgba(0, 0, 0, 0.2)',
+                background: activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.06)' : 'rgba(8, 11, 20, 0.55)',
+                backdropFilter: 'blur(24px) saturate(160%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+                border: activeDemo === 'chaos' ? '1px solid rgba(239, 68, 68, 0.25)' : '1px solid rgba(255, 255, 255, 0.10)',
+                borderRadius: '20px',
+                boxShadow: activeDemo === 'chaos'
+                  ? '0 12px 40px rgba(239, 68, 68, 0.12), 0 1px 0 rgba(255,255,255,0.06) inset'
+                  : '0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255,255,255,0.05) inset',
                 overflow: 'hidden',
               }}
             >
               <div style={{
                 padding: '20px 24px',
-                borderBottom: '1px solid rgba(239, 68, 68, 0.1)',
+                borderBottom: '1px solid rgba(239, 68, 68, 0.12)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -320,6 +330,7 @@ export default function LandingPage() {
                   <span style={{
                     fontSize: '0.7rem', fontWeight: 700, padding: '4px 10px',
                     borderRadius: '9999px', background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444',
+                    backdropFilter: 'blur(8px)',
                   }}>Active</span>
                 )}
               </div>
@@ -355,11 +366,14 @@ export default function LandingPage() {
               className="cursor-pointer transition-all duration-300"
               onClick={() => setActiveDemo('order')}
               style={{
-                background: activeDemo === 'order' ? 'rgba(34, 197, 94, 0.04)' : 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(20px)',
-                border: activeDemo === 'order' ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                boxShadow: activeDemo === 'order' ? '0 8px 32px rgba(34, 197, 94, 0.08)' : '0 4px 16px rgba(0, 0, 0, 0.2)',
+                background: activeDemo === 'order' ? 'rgba(34, 197, 94, 0.06)' : 'rgba(8, 11, 20, 0.55)',
+                backdropFilter: 'blur(24px) saturate(160%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+                border: activeDemo === 'order' ? '1px solid rgba(34, 197, 94, 0.25)' : '1px solid rgba(255, 255, 255, 0.10)',
+                borderRadius: '20px',
+                boxShadow: activeDemo === 'order'
+                  ? '0 12px 40px rgba(34, 197, 94, 0.12), 0 1px 0 rgba(255,255,255,0.06) inset'
+                  : '0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255,255,255,0.05) inset',
                 overflow: 'hidden',
               }}
             >
@@ -437,21 +451,24 @@ export default function LandingPage() {
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2"
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
+                background: 'rgba(8, 11, 20, 0.58)',
+                backdropFilter: 'blur(32px) saturate(170%)',
+                WebkitBackdropFilter: 'blur(32px) saturate(170%)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '20px',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
+                boxShadow: '0 12px 48px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.07) inset',
               }}
             >
               <div style={{ padding: '32px', zIndex: 1 }}>
                 <div style={{
                   width: '48px', height: '48px', borderRadius: '14px',
-                  background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)',
+                  background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.25)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px',
+                  backdropFilter: 'blur(8px)',
                 }}>
                   <Brain className="w-6 h-6" style={{ color: '#f59e0b' }} />
                 </div>
@@ -464,10 +481,10 @@ export default function LandingPage() {
               </div>
               <div style={{ padding: '0 32px', paddingBottom: 0, zIndex: 1 }}>
                 <div style={{
-                  borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-                  borderLeft: '1px solid rgba(255, 255, 255, 0.06)',
-                  borderRight: '1px solid rgba(255, 255, 255, 0.06)',
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+                  background: 'rgba(255, 255, 255, 0.03)',
                   padding: '16px',
                   borderRadius: '12px 12px 0 0',
                   fontFamily: "'JetBrains Mono', monospace",
@@ -501,11 +518,13 @@ export default function LandingPage() {
               transition={{ delay: 0.1 }}
               className="col-span-1 md:col-span-1 lg:col-span-2"
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
+                background: 'rgba(8, 11, 20, 0.55)',
+                backdropFilter: 'blur(24px) saturate(160%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+                border: '1px solid rgba(255, 255, 255, 0.10)',
+                borderRadius: '20px',
                 padding: '32px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -535,11 +554,13 @@ export default function LandingPage() {
               transition={{ delay: 0.2 }}
               className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center text-center justify-center"
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
+                background: 'rgba(8, 11, 20, 0.55)',
+                backdropFilter: 'blur(24px) saturate(160%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+                border: '1px solid rgba(255, 255, 255, 0.10)',
+                borderRadius: '20px',
                 padding: '32px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset',
               }}
             >
               <Zap className="w-8 h-8 mb-4" style={{ color: '#fbbf24' }} />
@@ -558,11 +579,13 @@ export default function LandingPage() {
               transition={{ delay: 0.3 }}
               className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center text-center justify-center"
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
+                background: 'rgba(8, 11, 20, 0.55)',
+                backdropFilter: 'blur(24px) saturate(160%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+                border: '1px solid rgba(255, 255, 255, 0.10)',
+                borderRadius: '20px',
                 padding: '32px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset',
               }}
             >
               <Shield className="w-8 h-8 mb-4" style={{ color: '#22c55e' }} />
@@ -603,11 +626,13 @@ export default function LandingPage() {
               animate={roiInView ? { opacity: 1, x: 0 } : {}}
               className="md:col-span-2"
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
+                background: 'rgba(8, 11, 20, 0.58)',
+                backdropFilter: 'blur(32px) saturate(170%)',
+                WebkitBackdropFilter: 'blur(32px) saturate(170%)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '20px',
                 padding: '32px',
+                boxShadow: '0 12px 48px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.07) inset',
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -689,12 +714,13 @@ export default function LandingPage() {
               transition={{ delay: 0.1 }}
               className="md:col-span-3 relative overflow-hidden flex flex-col justify-center"
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(59, 130, 246, 0.15)',
-                borderRadius: '16px',
+                background: 'rgba(8, 11, 20, 0.58)',
+                backdropFilter: 'blur(32px) saturate(170%)',
+                WebkitBackdropFilter: 'blur(32px) saturate(170%)',
+                border: '1px solid rgba(59, 130, 246, 0.22)',
+                borderRadius: '20px',
                 padding: '32px',
-                boxShadow: '0 8px 40px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 12px 48px rgba(0, 0, 0, 0.38), 0 0 40px rgba(59, 130, 246, 0.06), 0 1px 0 rgba(255,255,255,0.07) inset',
               }}
             >
               <div style={{ position: 'absolute', top: 0, right: 0, padding: '16px', opacity: 0.03, pointerEvents: 'none', fontSize: '10rem', fontWeight: 800 }}>
@@ -740,10 +766,10 @@ export default function LandingPage() {
                     style={{
                       padding: '16px',
                       fontSize: '0.9rem',
-                      borderRadius: '12px',
                       background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
                       color: 'white',
-                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      border: '1px solid rgba(59, 130, 246, 0.35)',
+                      boxShadow: '0 4px 20px rgba(59, 130, 246, 0.3), 0 1px 0 rgba(255,255,255,0.12) inset',
                       display: 'block',
                       textAlign: 'center',
                       fontWeight: 600,
@@ -760,11 +786,19 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="py-8 relative z-10"
-        style={{ background: 'var(--bg-primary)', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}
+        style={{ background: 'var(--bg-primary)', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}
       >
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3" style={{ padding: '8px 16px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+            <div className="flex items-center gap-3" style={{
+              padding: '8px 16px',
+              background: 'rgba(8, 11, 20, 0.55)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRadius: '9999px',
+              border: '1px solid rgba(255, 255, 255, 0.10)',
+              boxShadow: '0 1px 0 rgba(255,255,255,0.06) inset',
+            }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
               <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.85rem' }}>Decision Intel</span>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '8px' }}>v2.0 · © 2025</span>
