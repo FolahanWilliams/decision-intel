@@ -18,7 +18,7 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
   );
 
   const heatMapData = useMemo(() => {
-    const grid: (typeof risks[0] & { count: number; risks: typeof risks })[][] = Array(gridSize)
+    const grid: ((typeof risks)[0] & { count: number; risks: typeof risks })[][] = Array(gridSize)
       .fill(null)
       .map(() => Array(gridSize).fill(null));
 
@@ -69,7 +69,10 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
       <div className="flex items-end gap-8">
         {/* Y-axis label */}
         <div className="flex flex-col items-center">
-          <span className="text-xs text-muted mb-2" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
+          <span
+            className="text-xs text-muted mb-2"
+            style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+          >
             Impact
           </span>
         </div>
@@ -103,10 +106,14 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
                   key={idx}
                   role="button"
                   tabIndex={0}
-                  aria-label={cell ? `${cell.count} risks, Impact ${Math.round(impact)}%, Probability ${Math.round(probability)}%` : 'No risks'}
+                  aria-label={
+                    cell
+                      ? `${cell.count} risks, Impact ${Math.round(impact)}%, Probability ${Math.round(probability)}%`
+                      : 'No risks'
+                  }
                   aria-pressed={isSelected}
                   onClick={() => handleCellClick(row, col)}
-                  onKeyDown={(e) => {
+                  onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
                       handleCellClick(row, col);
@@ -121,7 +128,11 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
                   style={{
                     opacity: cell ? getOpacity(cell.count) : 0.1,
                   }}
-                  title={cell ? `${cell.count} Risks (Impact ${Math.round(impact)}%, Prob ${Math.round(probability)}%)` : 'No risks'}
+                  title={
+                    cell
+                      ? `${cell.count} Risks (Impact ${Math.round(impact)}%, Prob ${Math.round(probability)}%)`
+                      : 'No risks'
+                  }
                 >
                   {cell && (
                     <div className="flex flex-col items-center">
@@ -190,7 +201,10 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
         {filteredRisks.length > 0 ? (
           <div className="max-h-60 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
             {filteredRisks.map((risk, idx) => (
-              <div key={idx} className="p-3  bg-secondary/30 border border-white/5 hover:bg-secondary/50 transition-colors">
+              <div
+                key={idx}
+                className="p-3  bg-secondary/30 border border-white/5 hover:bg-secondary/50 transition-colors"
+              >
                 <div className="flex items-start justify-between mb-1">
                   <span className="font-medium text-sm text-foreground/90">{risk.category}</span>
                   <div className="flex gap-1">
@@ -256,10 +270,14 @@ export function RiskTimeline({ risks }: RiskTimelineProps) {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-error';
-      case 'high': return 'bg-accent-primary';
-      case 'medium': return 'bg-warning';
-      default: return 'bg-success';
+      case 'critical':
+        return 'bg-error';
+      case 'high':
+        return 'bg-accent-primary';
+      case 'medium':
+        return 'bg-warning';
+      default:
+        return 'bg-success';
     }
   };
 
@@ -269,7 +287,7 @@ export function RiskTimeline({ risks }: RiskTimelineProps) {
       <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
 
       <div className="space-y-6">
-        {timelineOrder.map((period) => {
+        {timelineOrder.map(period => {
           const periodRisks = groupedRisks[period];
           if (periodRisks.length === 0) return null;
 
@@ -281,7 +299,9 @@ export function RiskTimeline({ risks }: RiskTimelineProps) {
               {/* Period label */}
               <div className="mb-2">
                 <span className="text-sm font-medium capitalize">{period.replace('-', ' ')}</span>
-                <span className="text-xs text-muted ml-2">{timelineLabels[period as keyof typeof timelineLabels]}</span>
+                <span className="text-xs text-muted ml-2">
+                  {timelineLabels[period as keyof typeof timelineLabels]}
+                </span>
               </div>
 
               {/* Risks in this period */}
@@ -295,10 +315,14 @@ export function RiskTimeline({ risks }: RiskTimelineProps) {
                       <div className={`w-2 h-8  ${getSeverityColor(risk.severity)}`} />
                       <div>
                         <p className="text-sm font-medium">{risk.title}</p>
-                        <p className="text-xs text-muted">{Math.round(risk.probability)}% probability</p>
+                        <p className="text-xs text-muted">
+                          {Math.round(risk.probability)}% probability
+                        </p>
                       </div>
                     </div>
-                    <span className={`text-xs px-2 py-1  ${getSeverityColor(risk.severity)} text-white`}>
+                    <span
+                      className={`text-xs px-2 py-1  ${getSeverityColor(risk.severity)} text-white`}
+                    >
                       {risk.severity}
                     </span>
                   </div>
@@ -319,7 +343,12 @@ interface RiskSummaryProps {
   mitigatedRisks: number;
 }
 
-export function RiskSummary({ totalRisks, criticalRisks, highRisks, mitigatedRisks }: RiskSummaryProps) {
+export function RiskSummary({
+  totalRisks,
+  criticalRisks,
+  highRisks,
+  mitigatedRisks,
+}: RiskSummaryProps) {
   const stats = [
     { label: 'Total Risks', value: totalRisks, color: 'text-info' },
     { label: 'Critical', value: criticalRisks, color: 'text-error' },

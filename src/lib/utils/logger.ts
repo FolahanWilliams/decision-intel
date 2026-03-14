@@ -10,26 +10,26 @@
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 const LOG_LEVELS: Record<LogLevel, number> = {
-    debug: 0,
-    info: 1,
-    warn: 2,
-    error: 3,
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
 };
 
 function getMinLevel(): number {
-    const raw = (process.env.LOG_LEVEL || 'info').toLowerCase() as LogLevel;
-    return LOG_LEVELS[raw] ?? LOG_LEVELS.info;
+  const raw = (process.env.LOG_LEVEL || 'info').toLowerCase() as LogLevel;
+  return LOG_LEVELS[raw] ?? LOG_LEVELS.info;
 }
 
 function formatMessage(level: string, context: string, message: string): string {
-    return `[${level.toUpperCase()}] [${context}] ${message}`;
+  return `[${level.toUpperCase()}] [${context}] ${message}`;
 }
 
 export interface Logger {
-    debug: (message: string, ...args: unknown[]) => void;
-    info: (message: string, ...args: unknown[]) => void;
-    warn: (message: string, ...args: unknown[]) => void;
-    error: (message: string, ...args: unknown[]) => void;
+  debug: (message: string, ...args: unknown[]) => void;
+  info: (message: string, ...args: unknown[]) => void;
+  warn: (message: string, ...args: unknown[]) => void;
+  error: (message: string, ...args: unknown[]) => void;
 }
 
 /**
@@ -51,21 +51,21 @@ export interface Logger {
  * log.error('Delete failed', err);
  */
 export function createClientLogger(context: string): Logger {
-    const isProd = process.env.NODE_ENV === 'production';
-    return {
-        debug(message: string, ...args: unknown[]) {
-            if (!isProd) console.debug(formatMessage('debug', context, message), ...args);
-        },
-        info(message: string, ...args: unknown[]) {
-            if (!isProd) console.log(formatMessage('info', context, message), ...args);
-        },
-        warn(message: string, ...args: unknown[]) {
-            console.warn(formatMessage('warn', context, message), ...args);
-        },
-        error(message: string, ...args: unknown[]) {
-            console.error(formatMessage('error', context, message), ...args);
-        },
-    };
+  const isProd = process.env.NODE_ENV === 'production';
+  return {
+    debug(message: string, ...args: unknown[]) {
+      if (!isProd) console.debug(formatMessage('debug', context, message), ...args);
+    },
+    info(message: string, ...args: unknown[]) {
+      if (!isProd) console.log(formatMessage('info', context, message), ...args);
+    },
+    warn(message: string, ...args: unknown[]) {
+      console.warn(formatMessage('warn', context, message), ...args);
+    },
+    error(message: string, ...args: unknown[]) {
+      console.error(formatMessage('error', context, message), ...args);
+    },
+  };
 }
 
 /**
@@ -80,26 +80,26 @@ export function createClientLogger(context: string): Logger {
  * log.error('LLM call failed', error);
  */
 export function createLogger(context: string): Logger {
-    return {
-        debug(message: string, ...args: unknown[]) {
-            if (getMinLevel() <= LOG_LEVELS.debug) {
-                console.debug(formatMessage('debug', context, message), ...args);
-            }
-        },
-        info(message: string, ...args: unknown[]) {
-            if (getMinLevel() <= LOG_LEVELS.info) {
-                console.log(formatMessage('info', context, message), ...args);
-            }
-        },
-        warn(message: string, ...args: unknown[]) {
-            if (getMinLevel() <= LOG_LEVELS.warn) {
-                console.warn(formatMessage('warn', context, message), ...args);
-            }
-        },
-        error(message: string, ...args: unknown[]) {
-            if (getMinLevel() <= LOG_LEVELS.error) {
-                console.error(formatMessage('error', context, message), ...args);
-            }
-        },
-    };
+  return {
+    debug(message: string, ...args: unknown[]) {
+      if (getMinLevel() <= LOG_LEVELS.debug) {
+        console.debug(formatMessage('debug', context, message), ...args);
+      }
+    },
+    info(message: string, ...args: unknown[]) {
+      if (getMinLevel() <= LOG_LEVELS.info) {
+        console.log(formatMessage('info', context, message), ...args);
+      }
+    },
+    warn(message: string, ...args: unknown[]) {
+      if (getMinLevel() <= LOG_LEVELS.warn) {
+        console.warn(formatMessage('warn', context, message), ...args);
+      }
+    },
+    error(message: string, ...args: unknown[]) {
+      if (getMinLevel() <= LOG_LEVELS.error) {
+        console.error(formatMessage('error', context, message), ...args);
+      }
+    },
+  };
 }

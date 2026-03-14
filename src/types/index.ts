@@ -1,287 +1,288 @@
 export interface BiasInstance {
-    id: string;
-    biasType: string;
-    severity: string;
-    excerpt: string;
-    explanation: string;
-    suggestion: string;
-    confidence: number | null;
-    userRating?: number | null;
+  id: string;
+  biasType: string;
+  severity: string;
+  excerpt: string;
+  explanation: string;
+  suggestion: string;
+  confidence: number | null;
+  userRating?: number | null;
 }
 
 export interface BiasDetectionResult {
-    biasType: string;
-    found: boolean;
-    severity: 'low' | 'medium' | 'high' | 'critical';
-    excerpt: string;
-    explanation: string;
-    suggestion: string;
-    confidence?: number;
-    researchInsight?: ResearchInsight;
+  biasType: string;
+  found: boolean;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  excerpt: string;
+  explanation: string;
+  suggestion: string;
+  confidence?: number;
+  researchInsight?: ResearchInsight;
 }
 
 export interface AnalysisResult {
-    overallScore: number;
-    noiseScore: number;
-    summary: string;
-    structuredContent?: string;
-    biases: BiasDetectionResult[];
-    // New Fields for Multi-Agent Output
-    noiseStats?: {
-        mean: number;
-        stdDev: number;
-        variance: number;
-    };
-    noiseBenchmarks?: NoiseBenchmark[];
-    factCheck?: {
-        score: number;
-        flags: string[];
-        verifications?: Array<{
-            claim: string;
-            verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE';
-            explanation: string;
-            sourceUrl?: string;
-        }>;
-        searchSources?: string[];
-    };
-    compliance?: ComplianceResult;
-    preMortem?: {
-        failureScenarios: string[];
-        preventiveMeasures: string[];
-    };
-    sentiment?: {
-        score: number;
-        label: string;
-    };
-    speakers?: string[];
-    // Phase 4: Deep Logic Extensions
-    logicalAnalysis?: LogicalAnalysisResult;
-    swotAnalysis?: SwotAnalysisResult;
-    cognitiveAnalysis?: CognitiveAnalysisResult;
-    simulation?: SimulationResult;
-    institutionalMemory?: InstitutionalMemoryResult;
-    intelligenceContext?: IntelligenceContextSummary;
+  overallScore: number;
+  noiseScore: number;
+  summary: string;
+  structuredContent?: string;
+  biases: BiasDetectionResult[];
+  // New Fields for Multi-Agent Output
+  noiseStats?: {
+    mean: number;
+    stdDev: number;
+    variance: number;
+  };
+  noiseBenchmarks?: NoiseBenchmark[];
+  factCheck?: {
+    score: number;
+    flags: string[];
+    verifications?: Array<{
+      claim: string;
+      verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE';
+      explanation: string;
+      sourceUrl?: string;
+    }>;
+    searchSources?: string[];
+  };
+  compliance?: ComplianceResult;
+  preMortem?: {
+    failureScenarios: string[];
+    preventiveMeasures: string[];
+  };
+  sentiment?: {
+    score: number;
+    label: string;
+  };
+  speakers?: string[];
+  // Phase 4: Deep Logic Extensions
+  logicalAnalysis?: LogicalAnalysisResult;
+  swotAnalysis?: SwotAnalysisResult;
+  cognitiveAnalysis?: CognitiveAnalysisResult;
+  simulation?: SimulationResult;
+  institutionalMemory?: InstitutionalMemoryResult;
+  intelligenceContext?: IntelligenceContextSummary;
 }
 
 /** Lightweight summary of intelligence context stored with analysis results */
 export interface IntelligenceContextSummary {
-    newsCount: number;
-    researchCount: number;
-    caseStudyCount: number;
-    macroSummary: string;
-    industryBenchmarkCount: number;
-    assembledAt: string;
-    topNews?: Array<{ title: string; source: string; link: string }>;
-    topCaseStudies?: Array<{ company: string; outcome: string; biasTypes: string[] }>;
+  newsCount: number;
+  researchCount: number;
+  caseStudyCount: number;
+  macroSummary: string;
+  industryBenchmarkCount: number;
+  assembledAt: string;
+  topNews?: Array<{ title: string; source: string; link: string }>;
+  topCaseStudies?: Array<{ company: string; outcome: string; biasTypes: string[] }>;
 }
 
 export interface SimulationResult {
-    overallVerdict: 'APPROVED' | 'REJECTED' | 'MIXED';
-    twins: DecisionTwin[];
+  overallVerdict: 'APPROVED' | 'REJECTED' | 'MIXED';
+  twins: DecisionTwin[];
 }
 
 export interface DecisionTwin {
-    name: string;
-    role: string;
-    vote: 'APPROVE' | 'REJECT' | 'REVISE';
-    confidence: number;
-    rationale: string;
-    keyRiskIdentified?: string;
+  name: string;
+  role: string;
+  vote: 'APPROVE' | 'REJECT' | 'REVISE';
+  confidence: number;
+  rationale: string;
+  keyRiskIdentified?: string;
 }
 
 export interface InstitutionalMemoryResult {
-    recallScore: number; // 0-100 relevance
-    similarEvents: Array<{
-        documentId: string;
-        title: string;
-        date: string;
-        summary: string;
-        outcome: 'SUCCESS' | 'FAILURE' | 'MIXED';
-        similarity: number;
-        lessonLearned: string;
-    }>;
-    strategicAdvice: string;
+  recallScore: number; // 0-100 relevance
+  similarEvents: Array<{
+    documentId: string;
+    title: string;
+    date: string;
+    summary: string;
+    outcome: 'SUCCESS' | 'FAILURE' | 'MIXED';
+    similarity: number;
+    lessonLearned: string;
+  }>;
+  strategicAdvice: string;
 }
 
 export interface LogicalAnalysisResult {
-    score: number; // 0-100 (100 = Logical, 0 = Fallacious)
-    fallacies: Array<{
-        name: string;
-        type: string;
-        severity: 'low' | 'medium' | 'high';
-        excerpt: string;
-        explanation: string;
-    }>;
+  score: number; // 0-100 (100 = Logical, 0 = Fallacious)
+  fallacies: Array<{
+    name: string;
+    type: string;
+    severity: 'low' | 'medium' | 'high';
+    excerpt: string;
+    explanation: string;
+  }>;
 }
 
 export interface SwotAnalysisResult {
-    strengths: string[];
-    weaknesses: string[];
-    opportunities: string[];
-    threats: string[];
-    strategicAdvice: string;
+  strengths: string[];
+  weaknesses: string[];
+  opportunities: string[];
+  threats: string[];
+  strategicAdvice: string;
 }
 
 export interface CognitiveAnalysisResult {
-    blindSpotGap: number; // 0-100
-    blindSpots: Array<{
-        name: string;
-        description: string;
-    }>;
-    counterArguments: Array<{
-        perspective: string;
-        argument: string;
-        sourceUrl?: string;
-        confidence: number;
-    }>;
+  blindSpotGap: number; // 0-100
+  blindSpots: Array<{
+    name: string;
+    description: string;
+  }>;
+  counterArguments: Array<{
+    perspective: string;
+    argument: string;
+    sourceUrl?: string;
+    confidence: number;
+  }>;
 }
 
-
-
 export interface ComplianceResult {
-    status: 'PASS' | 'WARN' | 'FAIL';
-    riskScore: number;
-    summary: string;
-    regulations: Array<{
-        name: string;
-        status: 'COMPLIANT' | 'NON_COMPLIANT' | 'PARTIAL';
-        description: string;
-        riskLevel: 'low' | 'medium' | 'high' | 'critical';
-    }>;
-    searchQueries: string[];
+  status: 'PASS' | 'WARN' | 'FAIL';
+  riskScore: number;
+  summary: string;
+  regulations: Array<{
+    name: string;
+    status: 'COMPLIANT' | 'NON_COMPLIANT' | 'PARTIAL';
+    description: string;
+    riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  }>;
+  searchQueries: string[];
 }
 
 export interface ResearchInsight {
-    title: string;
-    summary: string;
-    sourceUrl: string;
+  title: string;
+  summary: string;
+  sourceUrl: string;
 }
 
 export interface NoiseBenchmark {
-    metric: string;
-    documentValue: string;
-    marketValue: string;
-    variance: 'Low' | 'Medium' | 'High';
-    explanation: string;
-    sourceUrl?: string;
+  metric: string;
+  documentValue: string;
+  marketValue: string;
+  variance: 'Low' | 'Medium' | 'High';
+  explanation: string;
+  sourceUrl?: string;
 }
 
 export interface DocumentWithAnalysis {
+  id: string;
+  filename: string;
+  fileType: string;
+  fileSize: number;
+  content: string;
+  uploadedAt: Date;
+  status: string;
+  analyses: Array<{
     id: string;
-    filename: string;
-    fileType: string;
-    fileSize: number;
-    content: string;
-    uploadedAt: Date;
-    status: string;
-    analyses: Array<{
-        id: string;
-        overallScore: number;
-        noiseScore: number;
-        summary: string;
-        createdAt: Date;
-        biases: Array<{
-            id: string;
-            biasType: string;
-            severity: string;
-            excerpt: string;
-            explanation: string;
-            suggestion: string;
-        }>;
+    overallScore: number;
+    noiseScore: number;
+    summary: string;
+    createdAt: Date;
+    biases: Array<{
+      id: string;
+      biasType: string;
+      severity: string;
+      excerpt: string;
+      explanation: string;
+      suggestion: string;
     }>;
+  }>;
 }
 
 export type BiasCategory =
-    | 'confirmation_bias'
-    | 'anchoring_bias'
-    | 'availability_heuristic'
-    | 'groupthink'
-    | 'authority_bias'
-    | 'bandwagon_effect'
-    | 'overconfidence_bias'
-    | 'hindsight_bias'
-    | 'planning_fallacy'
-    | 'loss_aversion'
-    | 'sunk_cost_fallacy'
-    | 'status_quo_bias'
-    | 'framing_effect'
-    | 'selective_perception'
-    | 'recency_bias';
+  | 'confirmation_bias'
+  | 'anchoring_bias'
+  | 'availability_heuristic'
+  | 'groupthink'
+  | 'authority_bias'
+  | 'bandwagon_effect'
+  | 'overconfidence_bias'
+  | 'hindsight_bias'
+  | 'planning_fallacy'
+  | 'loss_aversion'
+  | 'sunk_cost_fallacy'
+  | 'status_quo_bias'
+  | 'framing_effect'
+  | 'selective_perception'
+  | 'recency_bias';
 
-export const BIAS_CATEGORIES: Record<BiasCategory, { name: string; description: string; category: string }> = {
-    confirmation_bias: {
-        name: 'Confirmation Bias',
-        description: 'Favoring information that confirms pre-existing beliefs',
-        category: 'Judgment'
-    },
-    anchoring_bias: {
-        name: 'Anchoring Bias',
-        description: 'Over-relying on the first piece of information encountered',
-        category: 'Judgment'
-    },
-    availability_heuristic: {
-        name: 'Availability Heuristic',
-        description: 'Overweighting easily recalled information',
-        category: 'Judgment'
-    },
-    groupthink: {
-        name: 'Groupthink',
-        description: 'Conforming to group consensus over independent thinking',
-        category: 'Group Dynamics'
-    },
-    authority_bias: {
-        name: 'Authority Bias',
-        description: 'Attributing greater accuracy to authority figures',
-        category: 'Group Dynamics'
-    },
-    bandwagon_effect: {
-        name: 'Bandwagon Effect',
-        description: 'Adopting beliefs because others hold them',
-        category: 'Group Dynamics'
-    },
-    overconfidence_bias: {
-        name: 'Overconfidence Bias',
-        description: 'Excessive confidence in one\'s own answers',
-        category: 'Overconfidence'
-    },
-    hindsight_bias: {
-        name: 'Hindsight Bias',
-        description: 'Believing past events were predictable',
-        category: 'Overconfidence'
-    },
-    planning_fallacy: {
-        name: 'Planning Fallacy',
-        description: 'Underestimating time, costs, and risks',
-        category: 'Overconfidence'
-    },
-    loss_aversion: {
-        name: 'Loss Aversion',
-        description: 'Preferring to avoid losses over acquiring gains',
-        category: 'Risk Assessment'
-    },
-    sunk_cost_fallacy: {
-        name: 'Sunk Cost Fallacy',
-        description: 'Continuing due to past investment rather than future value',
-        category: 'Risk Assessment'
-    },
-    status_quo_bias: {
-        name: 'Status Quo Bias',
-        description: 'Preference for the current state of affairs',
-        category: 'Risk Assessment'
-    },
-    framing_effect: {
-        name: 'Framing Effect',
-        description: 'Drawing conclusions based on how information is presented',
-        category: 'Information'
-    },
-    selective_perception: {
-        name: 'Selective Perception',
-        description: 'Filtering information based on expectations',
-        category: 'Information'
-    },
-    recency_bias: {
-        name: 'Recency Bias',
-        description: 'Overweighting recent events over historical data',
-        category: 'Information'
-    }
+export const BIAS_CATEGORIES: Record<
+  BiasCategory,
+  { name: string; description: string; category: string }
+> = {
+  confirmation_bias: {
+    name: 'Confirmation Bias',
+    description: 'Favoring information that confirms pre-existing beliefs',
+    category: 'Judgment',
+  },
+  anchoring_bias: {
+    name: 'Anchoring Bias',
+    description: 'Over-relying on the first piece of information encountered',
+    category: 'Judgment',
+  },
+  availability_heuristic: {
+    name: 'Availability Heuristic',
+    description: 'Overweighting easily recalled information',
+    category: 'Judgment',
+  },
+  groupthink: {
+    name: 'Groupthink',
+    description: 'Conforming to group consensus over independent thinking',
+    category: 'Group Dynamics',
+  },
+  authority_bias: {
+    name: 'Authority Bias',
+    description: 'Attributing greater accuracy to authority figures',
+    category: 'Group Dynamics',
+  },
+  bandwagon_effect: {
+    name: 'Bandwagon Effect',
+    description: 'Adopting beliefs because others hold them',
+    category: 'Group Dynamics',
+  },
+  overconfidence_bias: {
+    name: 'Overconfidence Bias',
+    description: "Excessive confidence in one's own answers",
+    category: 'Overconfidence',
+  },
+  hindsight_bias: {
+    name: 'Hindsight Bias',
+    description: 'Believing past events were predictable',
+    category: 'Overconfidence',
+  },
+  planning_fallacy: {
+    name: 'Planning Fallacy',
+    description: 'Underestimating time, costs, and risks',
+    category: 'Overconfidence',
+  },
+  loss_aversion: {
+    name: 'Loss Aversion',
+    description: 'Preferring to avoid losses over acquiring gains',
+    category: 'Risk Assessment',
+  },
+  sunk_cost_fallacy: {
+    name: 'Sunk Cost Fallacy',
+    description: 'Continuing due to past investment rather than future value',
+    category: 'Risk Assessment',
+  },
+  status_quo_bias: {
+    name: 'Status Quo Bias',
+    description: 'Preference for the current state of affairs',
+    category: 'Risk Assessment',
+  },
+  framing_effect: {
+    name: 'Framing Effect',
+    description: 'Drawing conclusions based on how information is presented',
+    category: 'Information',
+  },
+  selective_perception: {
+    name: 'Selective Perception',
+    description: 'Filtering information based on expectations',
+    category: 'Information',
+  },
+  recency_bias: {
+    name: 'Recency Bias',
+    description: 'Overweighting recent events over historical data',
+    category: 'Information',
+  },
 };

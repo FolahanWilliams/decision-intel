@@ -39,7 +39,9 @@ export async function withRetry<T>(
       const jitter = Math.random() * 0.3 * exponentialDelay; // Add 0-30% jitter
       const delay = exponentialDelay + jitter;
 
-      log.warn(`Attempt ${attempt + 1} failed, retrying in ${Math.round(delay)}ms... ${lastError.message}`);
+      log.warn(
+        `Attempt ${attempt + 1} failed, retrying in ${Math.round(delay)}ms... ${lastError.message}`
+      );
       await sleep(delay);
     }
   }
@@ -65,7 +67,7 @@ export function sleep(ms: number): Promise<void> {
 export async function withTimeout<T>(
   fn: () => Promise<T>,
   timeoutMs: number,
-  errorMessage: string = "Operation timed out"
+  errorMessage: string = 'Operation timed out'
 ): Promise<T> {
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
@@ -136,8 +138,11 @@ export function smartTruncate(
   }
 
   const truncated = text.substring(0, lastValidIndex).trim();
-  return truncated + "\n\n[Content truncated for analysis - " +
-    `${Math.round((truncated.length / text.length) * 100)}% of original processed]`;
+  return (
+    truncated +
+    '\n\n[Content truncated for analysis - ' +
+    `${Math.round((truncated.length / text.length) * 100)}% of original processed]`
+  );
 }
 
 /**
@@ -159,8 +164,11 @@ function truncateAtWordBoundary(text: string, maxChars: number): string {
   }
 
   const truncated = text.substring(0, truncateIndex).trim();
-  return truncated + "\n\n[Content truncated for analysis - " +
-    `${Math.round((truncated.length / text.length) * 100)}% of original processed]`;
+  return (
+    truncated +
+    '\n\n[Content truncated for analysis - ' +
+    `${Math.round((truncated.length / text.length) * 100)}% of original processed]`
+  );
 }
 
 /**
@@ -173,20 +181,20 @@ export function validateContent(content: string): { valid: boolean; error?: stri
   const MAX_CONTENT_LENGTH = 100000;
 
   if (!content || content.trim().length === 0) {
-    return { valid: false, error: "Content is empty" };
+    return { valid: false, error: 'Content is empty' };
   }
 
   if (content.length < MIN_CONTENT_LENGTH) {
     return {
       valid: false,
-      error: `Content too short (${content.length} chars). Minimum ${MIN_CONTENT_LENGTH} characters required for meaningful analysis.`
+      error: `Content too short (${content.length} chars). Minimum ${MIN_CONTENT_LENGTH} characters required for meaningful analysis.`,
     };
   }
 
   if (content.length > MAX_CONTENT_LENGTH) {
     return {
       valid: false,
-      error: `Content too long (${content.length} chars). Maximum ${MAX_CONTENT_LENGTH} characters supported.`
+      error: `Content too long (${content.length} chars). Maximum ${MAX_CONTENT_LENGTH} characters supported.`,
     };
   }
 
@@ -219,8 +227,12 @@ export async function batchProcess<T, R>(
     const index = i;
     // Wrap so the promise removes itself from the Set when done (success or error).
     const promise: Promise<void> = processor(items[index])
-      .then(result => { results[index] = result; })
-      .finally(() => { executing.delete(promise); });
+      .then(result => {
+        results[index] = result;
+      })
+      .finally(() => {
+        executing.delete(promise);
+      });
 
     executing.add(promise);
 

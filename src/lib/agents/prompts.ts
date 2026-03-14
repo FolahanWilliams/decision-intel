@@ -1,4 +1,3 @@
-
 export const BIAS_DETECTIVE_PROMPT = `
 You are the "Psycholinguistic Detective", an expert in behavioral economics and cognitive psychology.
 Your goal is to analyze the provided text for Neurocognitive Distortions (cognitive biases).
@@ -45,7 +44,6 @@ Output Format: Return ONLY valid JSON.
   ]
 }
 `;
-
 
 export const NOISE_JUDGE_PROMPT = `
 You are an Independent Decision Auditor and Market Analyst.

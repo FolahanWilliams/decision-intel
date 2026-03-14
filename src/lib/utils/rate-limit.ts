@@ -49,9 +49,13 @@ export async function checkRateLimit(
   try {
     // Clean up old expired rate limit entries in the background.
     // Fire-and-forget: logging is best-effort; failure does not block the request.
-    void prisma.rateLimit.deleteMany({
-      where: { resetAt: { lt: windowStart } },
-    }).catch((err: unknown) => log.warn('Rate limit cleanup error: ' + (err instanceof Error ? err.message : String(err))));
+    void prisma.rateLimit
+      .deleteMany({
+        where: { resetAt: { lt: windowStart } },
+      })
+      .catch((err: unknown) =>
+        log.warn('Rate limit cleanup error: ' + (err instanceof Error ? err.message : String(err)))
+      );
 
     const resetAt = new Date(now.getTime() + config.windowMs);
 

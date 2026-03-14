@@ -7,177 +7,170 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DocumentRoute');
 
-export async function GET(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    try {
-        const { id } = await params;
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        const userId = user?.id;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
 
-        if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        // Try with all analysis fields first; fall back to core-only if
-        // extended columns don't exist yet (schema drift / P2022).
-        let document;
-        try {
-            document = await prisma.document.findFirst({
-                where: { id, userId },
-                select: {
-                    id: true,
-                    filename: true,
-                    fileType: true,
-                    fileSize: true,
-                    content: true,
-                    uploadedAt: true,
-                    status: true,
-                    analyses: {
-                        orderBy: { createdAt: 'desc' },
-                        select: {
-                            id: true,
-                            overallScore: true,
-                            noiseScore: true,
-                            summary: true,
-                            createdAt: true,
-                            biases: true,
-                            noiseStats: true,
-                            noiseBenchmarks: true,
-                            factCheck: true,
-                            compliance: true,
-                            preMortem: true,
-                            sentiment: true,
-                            logicalAnalysis: true,
-                            swotAnalysis: true,
-                            cognitiveAnalysis: true,
-                            simulation: true,
-                            institutionalMemory: true,
-                            intelligenceContext: true,
-                            speakers: true
-                        }
-                    }
-                }
-            });
-        } catch (fetchErr: unknown) {
-            const code = (fetchErr as { code?: string }).code;
-            if (code === 'P2021' || code === 'P2022') {
-                log.warn('Schema drift: falling back to core analysis fields (' + code + ')');
-                document = await prisma.document.findFirst({
-                    where: { id, userId },
-                    select: {
-                        id: true,
-                        filename: true,
-                        fileType: true,
-                        fileSize: true,
-                        content: true,
-                        uploadedAt: true,
-                        status: true,
-                        analyses: {
-                            orderBy: { createdAt: 'desc' },
-                            select: {
-                                id: true,
-                                overallScore: true,
-                                noiseScore: true,
-                                summary: true,
-                                createdAt: true,
-                                biases: true
-                            }
-                        }
-                    }
-                });
-            } else {
-                throw fetchErr;
-            }
-        }
-
-        if (!document) {
-            return NextResponse.json(
-                { error: 'Document not found' },
-                { status: 404 }
-            );
-        }
-
-        return NextResponse.json(document);
-    } catch (error) {
-        log.error('Error fetching document:', error);
-        return NextResponse.json(
-            { error: 'Failed to fetch document' },
-            { status: 500 }
-        );
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Try with all analysis fields first; fall back to core-only if
+    // extended columns don't exist yet (schema drift / P2022).
+    let document;
+    try {
+      document = await prisma.document.findFirst({
+        where: { id, userId },
+        select: {
+          id: true,
+          filename: true,
+          fileType: true,
+          fileSize: true,
+          content: true,
+          uploadedAt: true,
+          status: true,
+          analyses: {
+            orderBy: { createdAt: 'desc' },
+            select: {
+              id: true,
+              overallScore: true,
+              noiseScore: true,
+              summary: true,
+              createdAt: true,
+              biases: true,
+              noiseStats: true,
+              noiseBenchmarks: true,
+              factCheck: true,
+              compliance: true,
+              preMortem: true,
+              sentiment: true,
+              logicalAnalysis: true,
+              swotAnalysis: true,
+              cognitiveAnalysis: true,
+              simulation: true,
+              institutionalMemory: true,
+              intelligenceContext: true,
+              speakers: true,
+            },
+          },
+        },
+      });
+    } catch (fetchErr: unknown) {
+      const code = (fetchErr as { code?: string }).code;
+      if (code === 'P2021' || code === 'P2022') {
+        log.warn('Schema drift: falling back to core analysis fields (' + code + ')');
+        document = await prisma.document.findFirst({
+          where: { id, userId },
+          select: {
+            id: true,
+            filename: true,
+            fileType: true,
+            fileSize: true,
+            content: true,
+            uploadedAt: true,
+            status: true,
+            analyses: {
+              orderBy: { createdAt: 'desc' },
+              select: {
+                id: true,
+                overallScore: true,
+                noiseScore: true,
+                summary: true,
+                createdAt: true,
+                biases: true,
+              },
+            },
+          },
+        });
+      } else {
+        throw fetchErr;
+      }
+    }
+
+    if (!document) {
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(document);
+  } catch (error) {
+    log.error('Error fetching document:', error);
+    return NextResponse.json({ error: 'Failed to fetch document' }, { status: 500 });
+  }
 }
 
 export async function DELETE(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-    try {
-        const { id } = await params;
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        const userId = user?.id;
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
 
-        if (!userId) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
-        // Rate limit: 10 deletions per hour
-        const rateLimitResult = await checkRateLimit(userId, '/api/documents/delete', {
-            windowMs: 60 * 60 * 1000,
-            maxRequests: 10,
-            failMode: 'open',
-        });
-        if (!rateLimitResult.success) {
-            return NextResponse.json(
-                { error: 'Rate limit exceeded. Please try again later.' },
-                { status: 429, headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) } }
-            );
-        }
-
-        // Fetch the document first so we know the filename (for the
-        // storage path) and can verify it exists before deleting.
-        const doc = await prisma.document.findFirst({
-            where: { id, userId },
-            select: { id: true, filename: true }
-        });
-
-        if (!doc) {
-            return NextResponse.json({ error: 'Document not found' }, { status: 404 });
-        }
-
-        // Delete from DB (cascades to analyses, biases, embeddings)
-        await prisma.document.delete({ where: { id } });
-
-        // Clean up Supabase storage (fire-and-forget).
-        // Storage path matches the upload convention: ${userId}/${documentId}${ext}
-        try {
-            const { getServiceSupabase } = await import('@/lib/supabase');
-            const supabase = getServiceSupabase();
-            const ext = path.extname(doc.filename);
-            const storagePath = `${userId}/${doc.id}${ext}`;
-            const bucket = process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf';
-
-            const { error: removeError } = await supabase.storage
-                .from(bucket)
-                .remove([storagePath]);
-
-            if (removeError) {
-                log.warn(`Storage cleanup failed for ${storagePath}: ${removeError.message}`);
-            }
-        } catch (storageErr) {
-            // Don't fail the request — the DB record is already gone.
-            log.warn('Storage cleanup error:', storageErr);
-        }
-
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        log.error('Error deleting document:', error);
-        return NextResponse.json(
-            { error: 'Failed to delete document' },
-            { status: 500 }
-        );
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Rate limit: 10 deletions per hour
+    const rateLimitResult = await checkRateLimit(userId, '/api/documents/delete', {
+      windowMs: 60 * 60 * 1000,
+      maxRequests: 10,
+      failMode: 'open',
+    });
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) },
+        }
+      );
+    }
+
+    // Fetch the document first so we know the filename (for the
+    // storage path) and can verify it exists before deleting.
+    const doc = await prisma.document.findFirst({
+      where: { id, userId },
+      select: { id: true, filename: true },
+    });
+
+    if (!doc) {
+      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+    }
+
+    // Delete from DB (cascades to analyses, biases, embeddings)
+    await prisma.document.delete({ where: { id } });
+
+    // Clean up Supabase storage (fire-and-forget).
+    // Storage path matches the upload convention: ${userId}/${documentId}${ext}
+    try {
+      const { getServiceSupabase } = await import('@/lib/supabase');
+      const supabase = getServiceSupabase();
+      const ext = path.extname(doc.filename);
+      const storagePath = `${userId}/${doc.id}${ext}`;
+      const bucket = process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf';
+
+      const { error: removeError } = await supabase.storage.from(bucket).remove([storagePath]);
+
+      if (removeError) {
+        log.warn(`Storage cleanup failed for ${storagePath}: ${removeError.message}`);
+      }
+    } catch (storageErr) {
+      // Don't fail the request — the DB record is already gone.
+      log.warn('Storage cleanup error:', storageErr);
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    log.error('Error deleting document:', error);
+    return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });
+  }
 }

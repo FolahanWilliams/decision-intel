@@ -84,12 +84,8 @@ export function EmptyState({
         {/* Optional badges */}
         {badges && badges.length > 0 && (
           <div className="flex flex-wrap justify-center gap-sm">
-            {badges.map((badge) => (
-              <span
-                key={badge}
-                className="badge badge-complete"
-                style={{ fontSize: '0.7rem' }}
-              >
+            {badges.map(badge => (
+              <span key={badge} className="badge badge-complete" style={{ fontSize: '0.7rem' }}>
                 {badge}
               </span>
             ))}
@@ -100,18 +96,12 @@ export function EmptyState({
         {(action || secondaryAction) && (
           <div className="flex items-center gap-sm">
             {secondaryAction && (
-              <button
-                onClick={secondaryAction.onClick}
-                className="btn btn-ghost text-sm"
-              >
+              <button onClick={secondaryAction.onClick} className="btn btn-ghost text-sm">
                 {secondaryAction.label}
               </button>
             )}
             {action && (
-              <button
-                onClick={action.onClick}
-                className="btn btn-primary flex items-center gap-sm"
-              >
+              <button onClick={action.onClick} className="btn btn-primary flex items-center gap-sm">
                 {action.icon && <action.icon size={16} />}
                 {action.label}
               </button>

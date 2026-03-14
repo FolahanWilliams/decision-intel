@@ -9,40 +9,54 @@ const log = createLogger('FileParser');
  * Supports PDF, DOCX, and Plain Text.
  * Throws an error for legacy DOC files.
  */
-export async function parseFile(buffer: Buffer, mimeType: string, filename: string): Promise<string> {
-    const lowerFilename = filename.toLowerCase();
-    const isPdf = mimeType === 'application/pdf' || lowerFilename.endsWith('.pdf');
-    const isDocx = mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || lowerFilename.endsWith('.docx');
-    const isDoc = mimeType === 'application/msword' || lowerFilename.endsWith('.doc');
+export async function parseFile(
+  buffer: Buffer,
+  mimeType: string,
+  filename: string
+): Promise<string> {
+  const lowerFilename = filename.toLowerCase();
+  const isPdf = mimeType === 'application/pdf' || lowerFilename.endsWith('.pdf');
+  const isDocx =
+    mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+    lowerFilename.endsWith('.docx');
+  const isDoc = mimeType === 'application/msword' || lowerFilename.endsWith('.doc');
 
-    if (isPdf) {
-        try {
-            // unpdf is a pure JavaScript PDF parser that works in serverless environments
-            const { text } = await extractText(new Uint8Array(buffer));
-            // text is an array of strings (one per page), join them
-            return Array.isArray(text) ? text.join('\n') : text;
-        } catch (error) {
-            throw new Error(`Failed to parse PDF: ${error instanceof Error ? error.message : String(error)}`);
-        }
+  if (isPdf) {
+    try {
+      // unpdf is a pure JavaScript PDF parser that works in serverless environments
+      const { text } = await extractText(new Uint8Array(buffer));
+      // text is an array of strings (one per page), join them
+      return Array.isArray(text) ? text.join('\n') : text;
+    } catch (error) {
+      throw new Error(
+        `Failed to parse PDF: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
+  }
 
-    if (isDocx) {
-        try {
-            const result = await mammoth.extractRawText({ buffer });
-            if (!result.value.trim()) {
-                log.warn(`DOCX parsing yielded empty text for ${filename}. Messages: ${JSON.stringify(result.messages)}`);
-            }
-            return result.value;
-        } catch (error) {
-            throw new Error(`Failed to parse DOCX: ${error instanceof Error ? error.message : String(error)}`);
-        }
+  if (isDocx) {
+    try {
+      const result = await mammoth.extractRawText({ buffer });
+      if (!result.value.trim()) {
+        log.warn(
+          `DOCX parsing yielded empty text for ${filename}. Messages: ${JSON.stringify(result.messages)}`
+        );
+      }
+      return result.value;
+    } catch (error) {
+      throw new Error(
+        `Failed to parse DOCX: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
+  }
 
-    if (isDoc) {
-        throw new Error('Legacy Word Documents (DOC) are not supported. Please convert to DOCX or PDF.');
-    }
+  if (isDoc) {
+    throw new Error(
+      'Legacy Word Documents (DOC) are not supported. Please convert to DOCX or PDF.'
+    );
+  }
 
-    // Default to plain text
-    // Assuming UTF-8 for now.
-    return buffer.toString('utf-8');
+  // Default to plain text
+  // Assuming UTF-8 for now.
+  return buffer.toString('utf-8');
 }

@@ -1,6 +1,6 @@
 /**
  * RAG Embeddings Module
- * 
+ *
  * Generates embeddings for document analyses and performs semantic search
  * using Gemini's embedding model and PostgreSQL pgvector.
  */
@@ -15,72 +15,74 @@ const log = createLogger('Embeddings');
 // Lazy initialization of Gemini client
 let genAI: GoogleGenerativeAI | null = null;
 function getGenAI(): GoogleGenerativeAI {
-    if (!genAI) {
-        const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-        genAI = new GoogleGenerativeAI(apiKey);
-    }
-    return genAI;
+  if (!genAI) {
+    const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
+    genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return genAI;
 }
 
 // Embedding model - using gemini-embedding-001 which supports dimensionality reduction
 const EMBEDDING_MODEL = 'models/gemini-embedding-001';
 
 interface EmbeddingMetadata {
-    documentId: string;
-    analysisId?: string;
-    filename?: string;
-    overallScore?: number;
-    biasCount?: number;
-    primaryBiases?: string[];
-    createdAt: string;
+  documentId: string;
+  analysisId?: string;
+  filename?: string;
+  overallScore?: number;
+  biasCount?: number;
+  primaryBiases?: string[];
+  createdAt: string;
 }
 
 /**
  * Generate an embedding vector for text content using Gemini
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
-    try {
-        const model = getGenAI().getGenerativeModel({ model: EMBEDDING_MODEL });
+  try {
+    const model = getGenAI().getGenerativeModel({ model: EMBEDDING_MODEL });
 
-        // Truncate text to avoid token limits (roughly 8k tokens ~ 32k chars)
-        const truncatedText = text.slice(0, 30000);
+    // Truncate text to avoid token limits (roughly 8k tokens ~ 32k chars)
+    const truncatedText = text.slice(0, 30000);
 
-        const result = await model.embedContent({
-            content: { role: 'user', parts: [{ text: truncatedText }] },
-            taskType: TaskType.RETRIEVAL_DOCUMENT,
-            outputDimensionality: 1536
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- outputDimensionality not yet in SDK types
-        } as any);
-        const embedding = result.embedding.values;
+    const result = await model.embedContent({
+      content: { role: 'user', parts: [{ text: truncatedText }] },
+      taskType: TaskType.RETRIEVAL_DOCUMENT,
+      outputDimensionality: 1536,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- outputDimensionality not yet in SDK types
+    } as any);
+    const embedding = result.embedding.values;
 
-        // Validate embedding
-        if (!embedding || !Array.isArray(embedding) || embedding.length !== 1536) {
-            throw new Error(`Invalid embedding generated: expected 1536 dimensions, got ${embedding?.length}`);
-        }
-
-        return embedding;
-    } catch (error) {
-        log.error('Embedding generation failed:', error);
-        // CRITICAL: Do not return zero vectors silently - this causes incorrect similarity search results
-        // Instead, throw the error to let the caller handle it appropriately
-        throw new Error(`Failed to generate embedding: ${error instanceof Error ? error.message : String(error)}`);
+    // Validate embedding
+    if (!embedding || !Array.isArray(embedding) || embedding.length !== 1536) {
+      throw new Error(
+        `Invalid embedding generated: expected 1536 dimensions, got ${embedding?.length}`
+      );
     }
+
+    return embedding;
+  } catch (error) {
+    log.error('Embedding generation failed:', error);
+    // CRITICAL: Do not return zero vectors silently - this causes incorrect similarity search results
+    // Instead, throw the error to let the caller handle it appropriately
+    throw new Error(
+      `Failed to generate embedding: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 }
 
 /**
  * Create a rich text representation of an analysis for embedding
  */
 function createAnalysisEmbeddingText(
-    filename: string,
-    summary: string,
-    biases: Array<{ biasType: string; severity: string; explanation: string }>,
-    score: number
+  filename: string,
+  summary: string,
+  biases: Array<{ biasType: string; severity: string; explanation: string }>,
+  score: number
 ): string {
-    const biasText = biases.map(b =>
-        `${b.biasType} (${b.severity}): ${b.explanation}`
-    ).join('\n');
+  const biasText = biases.map(b => `${b.biasType} (${b.severity}): ${b.explanation}`).join('\n');
 
-    return `
+  return `
 Document: ${filename}
 Decision Quality Score: ${score}/100
 Summary: ${summary}
@@ -93,74 +95,82 @@ ${biasText || 'No biases detected'}
  * Input type for batch embedding storage
  */
 export interface EmbeddingInput {
-    documentId: string;
-    filename: string;
-    summary: string;
-    biases: Array<{ biasType: string; severity: string; explanation: string }>;
-    score: number;
-    analysisId?: string;
+  documentId: string;
+  filename: string;
+  summary: string;
+  biases: Array<{ biasType: string; severity: string; explanation: string }>;
+  score: number;
+  analysisId?: string;
 }
 
 /**
  * Store embeddings for multiple document analyses in a single batch INSERT.
  * Generates embeddings in parallel (fault-tolerant) and inserts all successful
  * results in one multi-row SQL statement.
- * 
+ *
  * @returns Number of embeddings successfully stored
  */
-export async function storeAnalysisEmbeddingsBatch(
-    items: EmbeddingInput[]
-): Promise<number> {
-    if (items.length === 0) return 0;
+export async function storeAnalysisEmbeddingsBatch(items: EmbeddingInput[]): Promise<number> {
+  if (items.length === 0) return 0;
 
-    try {
-        // Generate all embeddings in parallel (fault-tolerant)
-        const embeddingResults = await Promise.allSettled(
-            items.map(async (item) => {
-                const text = createAnalysisEmbeddingText(
-                    item.filename, item.summary, item.biases, item.score
-                );
-                const embedding = await generateEmbedding(text);
-
-                const metadata: EmbeddingMetadata = {
-                    documentId: item.documentId,
-                    analysisId: item.analysisId,
-                    filename: item.filename,
-                    overallScore: item.score,
-                    biasCount: item.biases.length,
-                    primaryBiases: item.biases.slice(0, 3).map(b => b.biasType),
-                    createdAt: new Date().toISOString()
-                };
-
-                return { text, embedding, metadata, documentId: item.documentId };
-            })
+  try {
+    // Generate all embeddings in parallel (fault-tolerant)
+    const embeddingResults = await Promise.allSettled(
+      items.map(async item => {
+        const text = createAnalysisEmbeddingText(
+          item.filename,
+          item.summary,
+          item.biases,
+          item.score
         );
+        const embedding = await generateEmbedding(text);
 
-        // Filter to successful results only
-        const successful = embeddingResults
-            .filter((r): r is PromiseFulfilledResult<{ text: string; embedding: number[]; metadata: EmbeddingMetadata; documentId: string }> =>
-                r.status === 'fulfilled'
-            )
-            .map(r => r.value);
+        const metadata: EmbeddingMetadata = {
+          documentId: item.documentId,
+          analysisId: item.analysisId,
+          filename: item.filename,
+          overallScore: item.score,
+          biasCount: item.biases.length,
+          primaryBiases: item.biases.slice(0, 3).map(b => b.biasType),
+          createdAt: new Date().toISOString(),
+        };
 
-        const failed = embeddingResults.filter(r => r.status === 'rejected').length;
-        if (failed > 0) {
-            log.warn(`${failed}/${items.length} embedding generations failed`);
-        }
+        return { text, embedding, metadata, documentId: item.documentId };
+      })
+    );
 
-        if (successful.length === 0) {
-            log.warn('All embedding generations failed, skipping storage');
-            return 0;
-        }
+    // Filter to successful results only
+    const successful = embeddingResults
+      .filter(
+        (
+          r
+        ): r is PromiseFulfilledResult<{
+          text: string;
+          embedding: number[];
+          metadata: EmbeddingMetadata;
+          documentId: string;
+        }> => r.status === 'fulfilled'
+      )
+      .map(r => r.value);
 
-        // Build multi-row INSERT with parameterized values
-        // For a single item, use the simple tagged template (fully parameterized)
-        if (successful.length === 1) {
-            const { text, embedding, metadata, documentId } = successful[0];
-            const embeddingString = `[${embedding.join(',')}]`;
-            const metadataJson = JSON.stringify(metadata);
+    const failed = embeddingResults.filter(r => r.status === 'rejected').length;
+    if (failed > 0) {
+      log.warn(`${failed}/${items.length} embedding generations failed`);
+    }
 
-            await prisma.$executeRaw`
+    if (successful.length === 0) {
+      log.warn('All embedding generations failed, skipping storage');
+      return 0;
+    }
+
+    // Build multi-row INSERT with parameterized values
+    // For a single item, use the simple tagged template (fully parameterized)
+    if (successful.length === 1) {
+      const { text, embedding, metadata, documentId } = successful[0];
+      const embeddingString = `[${embedding.join(',')}]`;
+      const metadataJson = JSON.stringify(metadata);
+
+      await prisma.$executeRaw`
                 INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
                 VALUES (
                     gen_random_uuid()::text,
@@ -171,14 +181,14 @@ export async function storeAnalysisEmbeddingsBatch(
                 )
                 ON CONFLICT (id) DO NOTHING
             `;
-        } else {
-            // For multiple items, use transaction with individual inserts
-            // This is safer than building dynamic SQL strings
-            const inserts = successful.map(({ text, embedding, metadata, documentId }) => {
-                const embeddingString = `[${embedding.join(',')}]`;
-                const metadataJson = JSON.stringify(metadata);
-                
-                return prisma.$executeRaw`
+    } else {
+      // For multiple items, use transaction with individual inserts
+      // This is safer than building dynamic SQL strings
+      const inserts = successful.map(({ text, embedding, metadata, documentId }) => {
+        const embeddingString = `[${embedding.join(',')}]`;
+        const metadataJson = JSON.stringify(metadata);
+
+        return prisma.$executeRaw`
                     INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
                     VALUES (
                         gen_random_uuid()::text,
@@ -189,19 +199,19 @@ export async function storeAnalysisEmbeddingsBatch(
                     )
                     ON CONFLICT (id) DO NOTHING
                 `;
-            });
-            
-            // Execute all inserts within a transaction
-            await prisma.$transaction(inserts);
-        }
+      });
 
-        log.info(`Stored ${successful.length} embedding(s) in batch`);
-        return successful.length;
-    } catch (error) {
-        log.error('Failed to store embeddings batch:', error);
-        // Don't throw - embedding storage is non-critical
-        return 0;
+      // Execute all inserts within a transaction
+      await prisma.$transaction(inserts);
     }
+
+    log.info(`Stored ${successful.length} embedding(s) in batch`);
+    return successful.length;
+  } catch (error) {
+    log.error('Failed to store embeddings batch:', error);
+    // Don't throw - embedding storage is non-critical
+    return 0;
+  }
 }
 
 /**
@@ -209,16 +219,23 @@ export async function storeAnalysisEmbeddingsBatch(
  * Thin wrapper around storeAnalysisEmbeddingsBatch for backward compatibility.
  */
 export async function storeAnalysisEmbedding(
-    documentId: string,
-    filename: string,
-    summary: string,
-    biases: Array<{ biasType: string; severity: string; explanation: string }>,
-    score: number,
-    analysisId?: string
+  documentId: string,
+  filename: string,
+  summary: string,
+  biases: Array<{ biasType: string; severity: string; explanation: string }>,
+  score: number,
+  analysisId?: string
 ): Promise<void> {
-    await storeAnalysisEmbeddingsBatch([{
-        documentId, filename, summary, biases, score, analysisId
-    }]);
+  await storeAnalysisEmbeddingsBatch([
+    {
+      documentId,
+      filename,
+      summary,
+      biases,
+      score,
+      analysisId,
+    },
+  ]);
 }
 
 /**
@@ -227,58 +244,60 @@ export async function storeAnalysisEmbedding(
  * not supporting prepared statements with pgvector casts.
  */
 function assertSafeId(value: string, fieldName: string): void {
-    // Supabase user IDs: UUID format / alphanumeric + hyphen
-    if (!/^[a-zA-Z0-9_\-|]+$/.test(value)) {
-        throw new Error(`Invalid ${fieldName} format`);
-    }
+  // Supabase user IDs: UUID format / alphanumeric + hyphen
+  if (!/^[a-zA-Z0-9_\-|]+$/.test(value)) {
+    throw new Error(`Invalid ${fieldName} format`);
+  }
 }
 
 /**
  * Validate that an embedding vector string only contains floats/brackets/commas.
  */
 function assertSafeEmbeddingVector(vec: string): void {
-    if (!/^\[[-\d.,eE\s]+\]$/.test(vec)) {
-        throw new Error('Invalid embedding vector format');
-    }
+  if (!/^\[[-\d.,eE\s]+\]$/.test(vec)) {
+    throw new Error('Invalid embedding vector format');
+  }
 }
 
 /**
  * Search for similar documents using cosine similarity
  */
 export async function searchSimilarDocuments(
-    queryText: string,
-    userId: string,
-    limit: number = 5,
-    excludeDocumentId?: string
-): Promise<Array<{
+  queryText: string,
+  userId: string,
+  limit: number = 5,
+  excludeDocumentId?: string
+): Promise<
+  Array<{
     documentId: string;
     filename: string;
     score: number;
     similarity: number;
     biases: string[];
     content: string;
-}>> {
-    try {
-        const queryEmbedding = await generateEmbedding(queryText);
-        const embeddingVector = `[${queryEmbedding.join(',')}]`;
+  }>
+> {
+  try {
+    const queryEmbedding = await generateEmbedding(queryText);
+    const embeddingVector = `[${queryEmbedding.join(',')}]`;
 
-        // Validate all values that will be interpolated into raw SQL.
-        // $queryRawUnsafe is required here because PgBouncer does not support
-        // prepared statements with pgvector ::vector casts.
-        assertSafeEmbeddingVector(embeddingVector);
-        assertSafeId(userId, 'userId');
-        const safeLimit = Math.max(1, Math.min(50, Math.floor(limit)));
+    // Validate all values that will be interpolated into raw SQL.
+    // $queryRawUnsafe is required here because PgBouncer does not support
+    // prepared statements with pgvector ::vector casts.
+    assertSafeEmbeddingVector(embeddingVector);
+    assertSafeId(userId, 'userId');
+    const safeLimit = Math.max(1, Math.min(50, Math.floor(limit)));
 
-        let results: Array<{
-            document_id: string;
-            content: string;
-            metadata: unknown;
-            similarity: number;
-        }>;
+    let results: Array<{
+      document_id: string;
+      content: string;
+      metadata: unknown;
+      similarity: number;
+    }>;
 
-        if (excludeDocumentId) {
-            assertSafeId(excludeDocumentId, 'excludeDocumentId');
-            results = await prisma.$queryRawUnsafe<typeof results>(`
+    if (excludeDocumentId) {
+      assertSafeId(excludeDocumentId, 'excludeDocumentId');
+      results = await prisma.$queryRawUnsafe<typeof results>(`
                 SELECT
                     de."documentId" as document_id,
                     de.content,
@@ -291,8 +310,8 @@ export async function searchSimilarDocuments(
                 ORDER BY de.embedding <=> '${embeddingVector}'::vector
                 LIMIT ${safeLimit}
             `);
-        } else {
-            results = await prisma.$queryRawUnsafe<typeof results>(`
+    } else {
+      results = await prisma.$queryRawUnsafe<typeof results>(`
                 SELECT
                     de."documentId" as document_id,
                     de.content,
@@ -304,82 +323,80 @@ export async function searchSimilarDocuments(
                 ORDER BY de.embedding <=> '${embeddingVector}'::vector
                 LIMIT ${safeLimit}
             `);
-        }
-
-        return results.map(r => {
-            const meta = r.metadata as EmbeddingMetadata;
-            return {
-                documentId: r.document_id,
-                filename: meta?.filename || 'Unknown',
-                score: meta?.overallScore || 0,
-                similarity: Math.round(r.similarity * 100) / 100,
-                biases: meta?.primaryBiases || [],
-                content: r.content
-            };
-        });
-    } catch (error) {
-        log.error('Semantic search failed:', error);
-        return [];
     }
+
+    return results.map(r => {
+      const meta = r.metadata as EmbeddingMetadata;
+      return {
+        documentId: r.document_id,
+        filename: meta?.filename || 'Unknown',
+        score: meta?.overallScore || 0,
+        similarity: Math.round(r.similarity * 100) / 100,
+        biases: meta?.primaryBiases || [],
+        content: r.content,
+      };
+    });
+  } catch (error) {
+    log.error('Semantic search failed:', error);
+    return [];
+  }
 }
 
 /**
  * Get contextual insights by comparing current document to historical patterns
  */
 export async function getContextualInsights(
-    documentId: string,
-    documentContent: string,
-    userId: string
+  documentId: string,
+  documentContent: string,
+  userId: string
 ): Promise<{
-    similarDocuments: Array<{
-        documentId: string;
-        filename: string;
-        score: number;
-        similarity: number;
-        biases: string[];
-        content: string;
-    }>;
-    patternInsights: string[];
+  similarDocuments: Array<{
+    documentId: string;
+    filename: string;
+    score: number;
+    similarity: number;
+    biases: string[];
+    content: string;
+  }>;
+  patternInsights: string[];
 }> {
-    // Find similar documents
-    const similar = await searchSimilarDocuments(
-        documentContent.slice(0, 5000), // Use first 5k chars for query
-        userId,
-        3,
-        documentId
+  // Find similar documents
+  const similar = await searchSimilarDocuments(
+    documentContent.slice(0, 5000), // Use first 5k chars for query
+    userId,
+    3,
+    documentId
+  );
+
+  // Generate pattern insights based on similar documents
+  const patternInsights: string[] = [];
+
+  if (similar.length > 0) {
+    const avgScore = similar.reduce((sum, d) => sum + d.score, 0) / similar.length;
+    patternInsights.push(
+      `Based on ${similar.length} similar document(s), the average decision quality score is ${Math.round(avgScore)}/100.`
     );
 
-    // Generate pattern insights based on similar documents
-    const patternInsights: string[] = [];
+    // Count bias frequencies
+    const biasFreq: Record<string, number> = {};
+    similar.forEach(d => {
+      d.biases.forEach(b => {
+        biasFreq[b] = (biasFreq[b] || 0) + 1;
+      });
+    });
 
-    if (similar.length > 0) {
-        const avgScore = similar.reduce((sum, d) => sum + d.score, 0) / similar.length;
-        patternInsights.push(
-            `Based on ${similar.length} similar document(s), the average decision quality score is ${Math.round(avgScore)}/100.`
-        );
+    const commonBiases = Object.entries(biasFreq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([bias]) => bias);
 
-        // Count bias frequencies
-        const biasFreq: Record<string, number> = {};
-        similar.forEach(d => {
-            d.biases.forEach(b => {
-                biasFreq[b] = (biasFreq[b] || 0) + 1;
-            });
-        });
-
-        const commonBiases = Object.entries(biasFreq)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3)
-            .map(([bias]) => bias);
-
-        if (commonBiases.length > 0) {
-            patternInsights.push(
-                `Common biases in similar documents: ${commonBiases.join(', ')}.`
-            );
-        }
+    if (commonBiases.length > 0) {
+      patternInsights.push(`Common biases in similar documents: ${commonBiases.join(', ')}.`);
     }
+  }
 
-    return {
-        similarDocuments: similar,
-        patternInsights
-    };
+  return {
+    similarDocuments: similar,
+    patternInsights,
+  };
 }

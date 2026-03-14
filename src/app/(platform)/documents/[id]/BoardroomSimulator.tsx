@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SimulationResult } from '@/types';
-import { 
-  Briefcase, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Briefcase,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
   TrendingUp,
   Minus,
   Building2,
@@ -16,7 +16,7 @@ import {
   Users,
   Target,
   Shield,
-  Brain
+  Brain,
 } from 'lucide-react';
 
 interface BoardroomSimulatorProps {
@@ -35,54 +35,61 @@ const PERSONA_CONFIG: Record<string, PersonaConfig> = {
   'Fiscal Conservative': {
     icon: <Briefcase size={28} />,
     color: '#3b82f6',
-    bgGradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)',
+    bgGradient:
+      'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)',
     borderColor: 'rgba(59, 130, 246, 0.3)',
-    description: 'Focuses on ROI, cost control, and financial risk'
+    description: 'Focuses on ROI, cost control, and financial risk',
   },
   'Aggressive Growth': {
     icon: <TrendingUp size={28} />,
     color: '#f59e0b',
-    bgGradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
+    bgGradient:
+      'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
     borderColor: 'rgba(245, 158, 11, 0.3)',
-    description: 'Prioritizes market capture and competitive advantage'
+    description: 'Prioritizes market capture and competitive advantage',
   },
   'Compliance Guard': {
     icon: <Shield size={28} />,
     color: '#10b981',
-    bgGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
+    bgGradient:
+      'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
     borderColor: 'rgba(16, 185, 129, 0.3)',
-    description: 'Ensures regulatory compliance and risk mitigation'
-  }
+    description: 'Ensures regulatory compliance and risk mitigation',
+  },
 };
 
 const VOTE_CONFIG = {
-  'APPROVE': { 
-    color: '#22c55e', 
+  APPROVE: {
+    color: '#22c55e',
     bgColor: 'rgba(34, 197, 94, 0.15)',
     borderColor: 'rgba(34, 197, 94, 0.4)',
     icon: <CheckCircle size={20} />,
-    label: 'APPROVES'
+    label: 'APPROVES',
   },
-  'REJECT': { 
-    color: '#ef4444', 
+  REJECT: {
+    color: '#ef4444',
     bgColor: 'rgba(239, 68, 68, 0.15)',
     borderColor: 'rgba(239, 68, 68, 0.4)',
     icon: <XCircle size={20} />,
-    label: 'REJECTS'
+    label: 'REJECTS',
   },
-  'REVISE': { 
-    color: '#f59e0b', 
+  REVISE: {
+    color: '#f59e0b',
     bgColor: 'rgba(245, 158, 11, 0.15)',
     borderColor: 'rgba(245, 158, 11, 0.4)',
     icon: <AlertTriangle size={20} />,
-    label: 'REQUESTS REVISION'
-  }
+    label: 'REQUESTS REVISION',
+  },
 };
 
 const OVERALL_CONFIG = {
-  'APPROVED': { color: '#22c55e', bgColor: 'rgba(34, 197, 94, 0.2)', icon: <CheckCircle size={32} /> },
-  'REJECTED': { color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.2)', icon: <XCircle size={32} /> },
-  'MIXED': { color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.2)', icon: <Minus size={32} /> }
+  APPROVED: {
+    color: '#22c55e',
+    bgColor: 'rgba(34, 197, 94, 0.2)',
+    icon: <CheckCircle size={32} />,
+  },
+  REJECTED: { color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.2)', icon: <XCircle size={32} /> },
+  MIXED: { color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.2)', icon: <Minus size={32} /> },
 };
 
 export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
@@ -93,18 +100,18 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
   // Sequential reveal animation
   useEffect(() => {
     if (!simulation?.twins) return;
-    
+
     // Use setTimeout to avoid synchronous setState in effect
     const initTimer = setTimeout(() => {
       setRevealedVotes(0);
       setShowConsensus(false);
     }, 0);
-    
+
     const timer1 = setTimeout(() => setRevealedVotes(1), 600);
     const timer2 = setTimeout(() => setRevealedVotes(2), 1200);
     const timer3 = setTimeout(() => setRevealedVotes(3), 1800);
     const timer4 = setTimeout(() => setShowConsensus(true), 2400);
-    
+
     return () => {
       clearTimeout(initTimer);
       clearTimeout(timer1);
@@ -125,27 +132,34 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
     );
   }
 
-  const voteCounts = simulation.twins?.reduce((acc, twin) => {
-    acc[twin.vote] = (acc[twin.vote] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>) || {};
+  const voteCounts =
+    simulation.twins?.reduce(
+      (acc, twin) => {
+        acc[twin.vote] = (acc[twin.vote] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    ) || {};
 
   const overallConfig = OVERALL_CONFIG[simulation.overallVerdict] || OVERALL_CONFIG['MIXED'];
 
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="relative overflow-hidden border border-white/10 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)]"
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-            backgroundSize: '24px 24px'
-          }} />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+              backgroundSize: '24px 24px',
+            }}
+          />
         </div>
 
         <div className="relative p-6">
@@ -174,12 +188,12 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                   className="text-right"
                 >
                   <div className="text-xs text-gray-500 tracking-wide mb-1">Board Consensus</div>
-                  <motion.div 
+                  <motion.div
                     className="flex items-center gap-3 px-4 py-2 font-bold text-lg"
-                    style={{ 
+                    style={{
                       color: overallConfig.color,
                       backgroundColor: overallConfig.bgColor,
-                      border: `1px solid ${overallConfig.color}40`
+                      border: `1px solid ${overallConfig.color}40`,
                     }}
                   >
                     {overallConfig.icon}
@@ -274,16 +288,13 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
               }}
             >
               {/* Top Color Bar */}
-              <div 
-                className="h-1 w-full"
-                style={{ backgroundColor: config.color }}
-              />
+              <div className="h-1 w-full" style={{ backgroundColor: config.color }} />
 
               <div className="p-5">
                 {/* Persona Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div 
+                    <div
                       className="p-2.5 bg-white/5 border border-white/10"
                       style={{ color: config.color }}
                     >
@@ -301,12 +312,12 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       <motion.div
                         initial={{ scale: 0, rotate: -180 }}
                         animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold border"
                         style={{
                           color: voteConfig.color,
                           backgroundColor: voteConfig.bgColor,
-                          borderColor: voteConfig.borderColor
+                          borderColor: voteConfig.borderColor,
                         }}
                       >
                         {voteConfig.icon}
@@ -342,11 +353,11 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${twin.confidence}%` }}
-                          transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+                          transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
                           className="h-full"
-                          style={{ 
+                          style={{
                             backgroundColor: config.color,
-                            boxShadow: `0 0 10px ${config.color}50`
+                            boxShadow: `0 0 10px ${config.color}50`,
                           }}
                         />
                       </div>
@@ -363,7 +374,9 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       transition={{ delay: 0.2 }}
                       className="relative"
                     >
-                      <div className="absolute -top-2 -left-1 text-4xl text-white/10 font-serif">&quot;</div>
+                      <div className="absolute -top-2 -left-1 text-4xl text-white/10 font-serif">
+                        &quot;
+                      </div>
                       <p className="text-sm text-gray-300 italic leading-relaxed pl-3 border-l-2 border-white/10">
                         {twin.rationale}
                       </p>
@@ -402,8 +415,8 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                     >
                       <span className="flex items-center gap-1">
                         {isSelected ? 'Show Less' : 'Click to Expand'}
-                        <ChevronRight 
-                          size={14} 
+                        <ChevronRight
+                          size={14}
                           className={`transition-transform ${isSelected ? 'rotate-90' : ''}`}
                         />
                       </span>
@@ -479,34 +492,48 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                 </h5>
                 <div className="space-y-3">
                   {(() => {
-                    const avgConfidence = simulation.twins.reduce((acc, t) => acc + t.confidence, 0) / simulation.twins.length;
+                    const avgConfidence =
+                      simulation.twins.reduce((acc, t) => acc + t.confidence, 0) /
+                      simulation.twins.length;
                     const minConfidence = Math.min(...simulation.twins.map(t => t.confidence));
-                    
+
                     return (
                       <>
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-500">Average Confidence</span>
-                          <span className={`font-mono font-bold ${
-                            avgConfidence > 75 ? 'text-green-400' : avgConfidence > 50 ? 'text-yellow-400' : 'text-red-400'
-                          }`}>
+                          <span
+                            className={`font-mono font-bold ${
+                              avgConfidence > 75
+                                ? 'text-green-400'
+                                : avgConfidence > 50
+                                  ? 'text-yellow-400'
+                                  : 'text-red-400'
+                            }`}
+                          >
                             {Math.round(avgConfidence)}%
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-500">Lowest Confidence</span>
-                          <span className={`font-mono font-bold ${
-                            minConfidence > 75 ? 'text-green-400' : minConfidence > 50 ? 'text-yellow-400' : 'text-red-400'
-                          }`}>
+                          <span
+                            className={`font-mono font-bold ${
+                              minConfidence > 75
+                                ? 'text-green-400'
+                                : minConfidence > 50
+                                  ? 'text-yellow-400'
+                                  : 'text-red-400'
+                            }`}
+                          >
                             {Math.round(minConfidence)}%
                           </span>
                         </div>
                         <div className="pt-2 border-t border-white/10">
                           <p className="text-xs text-gray-500">
-                            {avgConfidence > 80 
+                            {avgConfidence > 80
                               ? 'High confidence levels indicate strong conviction across all perspectives.'
                               : avgConfidence > 60
-                              ? 'Moderate confidence suggests some uncertainty in the decision.'
-                              : 'Low confidence indicates significant doubts and potential risks.'}
+                                ? 'Moderate confidence suggests some uncertainty in the decision.'
+                                : 'Low confidence indicates significant doubts and potential risks.'}
                           </p>
                         </div>
                       </>

@@ -1,7 +1,27 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { Upload, FileText, AlertTriangle, CheckCircle, Loader2, Brain, Scale, Shield, BarChart3, FileCheck, Trash2, Search, X, ChevronRight, ArrowRight, RefreshCw, TrendingUp, Clock, CloudUpload } from 'lucide-react';
+import {
+  Upload,
+  FileText,
+  AlertTriangle,
+  CheckCircle,
+  Loader2,
+  Brain,
+  Scale,
+  Shield,
+  BarChart3,
+  FileCheck,
+  Trash2,
+  Search,
+  X,
+  ChevronRight,
+  ArrowRight,
+  RefreshCw,
+  TrendingUp,
+  Clock,
+  CloudUpload,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
@@ -15,7 +35,6 @@ import { RiskTrendChart } from './RiskTrendChart';
 import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnalysis';
 import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -73,14 +92,22 @@ export default function Dashboard() {
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>(
+    'all'
+  );
   const [showTrend, setShowTrend] = useState(false);
   const [showComparative, setShowComparative] = useState(false);
   const [docsPage, setDocsPage] = useState(1);
 
   // Delete confirmation state
-  const [deleteModal, setDeleteModal] = useState<{ open: boolean; docId: string; filename: string }>({
-    open: false, docId: '', filename: ''
+  const [deleteModal, setDeleteModal] = useState<{
+    open: boolean;
+    docId: string;
+    filename: string;
+  }>({
+    open: false,
+    docId: '',
+    filename: '',
   });
   const [deleting, setDeleting] = useState(false);
 
@@ -88,7 +115,13 @@ export default function Dashboard() {
   const { startTracking, updateProgress, completeTracking, errorTracking } = useAnalysisProgress();
 
   // SWR: cached document list with auto-revalidation
-  const { documents: uploadedDocs, total: totalDocs, totalPages: docsTotalPages, isLoading: loadingDocs, mutate: mutateDocs } = useDocuments(true, docsPage);
+  const {
+    documents: uploadedDocs,
+    total: totalDocs,
+    totalPages: docsTotalPages,
+    isLoading: loadingDocs,
+    mutate: mutateDocs,
+  } = useDocuments(true, docsPage);
 
   // SSE: streaming analysis with typed events, auto-retry, AbortController cleanup
   const {
@@ -104,7 +137,7 @@ export default function Dashboard() {
   // Sync analysis progress to the global floating progress bar
   useEffect(() => {
     if (currentProgress > 0 && analysisSteps.length > 0) {
-      const runningStep = analysisSteps.find((s) => s.status === 'running');
+      const runningStep = analysisSteps.find(s => s.status === 'running');
       updateProgress(currentProgress, runningStep?.name || 'Analyzing...');
     }
   }, [currentProgress, analysisSteps, updateProgress]);
@@ -114,7 +147,7 @@ export default function Dashboard() {
     if (uploadedDocs.length > 0 && !uploading) {
       setActiveView('upload');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Global drag detection — show overlay when dragging files anywhere on the page
@@ -134,7 +167,9 @@ export default function Dashboard() {
         setGlobalDrag(false);
       }
     };
-    const onDragOver = (e: DragEvent) => { e.preventDefault(); };
+    const onDragOver = (e: DragEvent) => {
+      e.preventDefault();
+    };
     const onDrop = (e: DragEvent) => {
       e.preventDefault();
       globalDragCounter.current = 0;
@@ -174,7 +209,10 @@ export default function Dashboard() {
       if (res.ok) {
         // Optimistically remove from cache, then revalidate
         await mutateDocs(
-          (current) => current ? { ...current, documents: current.documents.filter(d => d.id !== deleteModal.docId) } : current,
+          current =>
+            current
+              ? { ...current, documents: current.documents.filter(d => d.id !== deleteModal.docId) }
+              : current,
           { revalidate: true }
         );
         setDeleteModal({ open: false, docId: '', filename: '' });
@@ -215,34 +253,41 @@ export default function Dashboard() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const uploadData = await new Promise<{ id: string; filename: string; cached?: boolean }>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/upload');
+      const uploadData = await new Promise<{ id: string; filename: string; cached?: boolean }>(
+        (resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/upload');
 
-        xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) {
-            setUploadProgress(Math.round((e.loaded / e.total) * 100));
-          }
-        };
+          xhr.upload.onprogress = e => {
+            if (e.lengthComputable) {
+              setUploadProgress(Math.round((e.loaded / e.total) * 100));
+            }
+          };
 
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try { resolve(JSON.parse(xhr.responseText)); }
-            catch { reject(new Error('Invalid server response')); }
-          } else {
-            let errorMessage: string | undefined;
-            try {
-              const data = JSON.parse(xhr.responseText);
-              errorMessage = data.error;
-            } catch { /* use status-based message */ }
-            const fakeRes = { status: xhr.status } as Response;
-            reject(new Error(errorMessage || getDetailedErrorMessage(null, fakeRes)));
-          }
-        };
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                resolve(JSON.parse(xhr.responseText));
+              } catch {
+                reject(new Error('Invalid server response'));
+              }
+            } else {
+              let errorMessage: string | undefined;
+              try {
+                const data = JSON.parse(xhr.responseText);
+                errorMessage = data.error;
+              } catch {
+                /* use status-based message */
+              }
+              const fakeRes = { status: xhr.status } as Response;
+              reject(new Error(errorMessage || getDetailedErrorMessage(null, fakeRes)));
+            }
+          };
 
-        xhr.onerror = () => reject(new TypeError('Failed to fetch'));
-        xhr.send(formData);
-      });
+          xhr.onerror = () => reject(new TypeError('Failed to fetch'));
+          xhr.send(formData);
+        }
+      );
 
       setUploadPhase('analyzing');
       setUploadProgress(0);
@@ -257,9 +302,20 @@ export default function Dashboard() {
 
       // Optimistically add to SWR cache with analyzing status.
       await mutateDocs(
-        (current) => {
+        current => {
           const base = current ?? emptyState;
-          return { ...base, documents: [{ id: uploadData.id, filename: uploadData.filename, status: 'analyzing', uploadedAt: new Date().toISOString() }, ...base.documents] };
+          return {
+            ...base,
+            documents: [
+              {
+                id: uploadData.id,
+                filename: uploadData.filename,
+                status: 'analyzing',
+                uploadedAt: new Date().toISOString(),
+              },
+              ...base.documents,
+            ],
+          };
         },
         { revalidate: false }
       );
@@ -279,9 +335,14 @@ export default function Dashboard() {
         });
         // Update SWR cache with the completed result
         await mutateDocs(
-          (current) => {
+          current => {
             const base = current ?? emptyState;
-            return { ...base, documents: base.documents.map(doc => doc.id === uploadData.id ? { ...doc, status: 'complete', score } : doc) };
+            return {
+              ...base,
+              documents: base.documents.map(doc =>
+                doc.id === uploadData.id ? { ...doc, status: 'complete', score } : doc
+              ),
+            };
           },
           { revalidate: true }
         );
@@ -298,9 +359,14 @@ export default function Dashboard() {
 
       // Mark as error in SWR cache and revalidate to sync with server state
       await mutateDocs(
-        (current) => {
+        current => {
           const base = current ?? emptyState;
-          return { ...base, documents: base.documents.map(doc => doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc) };
+          return {
+            ...base,
+            documents: base.documents.map(doc =>
+              doc.status === 'analyzing' ? { ...doc, status: 'error' } : doc
+            ),
+          };
         },
         { revalidate: true }
       );
@@ -316,14 +382,19 @@ export default function Dashboard() {
 
     try {
       await mutateDocs(
-        (current) => {
+        current => {
           const base = current ?? emptyState;
-          return { ...base, documents: base.documents.map(doc => doc.id === docId ? { ...doc, status: 'analyzing' } : doc) };
+          return {
+            ...base,
+            documents: base.documents.map(doc =>
+              doc.id === docId ? { ...doc, status: 'analyzing' } : doc
+            ),
+          };
         },
         { revalidate: false }
       );
 
-      const retryDoc = uploadedDocs.find((d) => d.id === docId);
+      const retryDoc = uploadedDocs.find(d => d.id === docId);
       startTracking(docId, retryDoc?.filename || 'Document');
       const finalResult = await startAnalysis(docId);
 
@@ -337,9 +408,14 @@ export default function Dashboard() {
           href: `/documents/${docId}`,
         });
         await mutateDocs(
-          (current) => {
+          current => {
             const base = current ?? emptyState;
-            return { ...base, documents: base.documents.map(doc => doc.id === docId ? { ...doc, status: 'complete', score: retryScore } : doc) };
+            return {
+              ...base,
+              documents: base.documents.map(doc =>
+                doc.id === docId ? { ...doc, status: 'complete', score: retryScore } : doc
+              ),
+            };
           },
           { revalidate: true }
         );
@@ -383,7 +459,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
+    <div
+      className="container"
+      style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
+    >
       {/* Header with view tabs */}
       <div className="flex items-center justify-between mb-xl">
         <h1 className="text-2xl font-bold">
@@ -395,7 +474,9 @@ export default function Dashboard() {
           <button
             onClick={() => setActiveView('upload')}
             className={`px-4 py-1.5 text-sm font-medium transition-colors flex items-center gap-sm ${
-              activeView === 'upload' ? 'bg-accent-primary/10 text-accent-primary' : 'text-muted hover:text-primary'
+              activeView === 'upload'
+                ? 'bg-accent-primary/10 text-accent-primary'
+                : 'text-muted hover:text-primary'
             }`}
           >
             <Upload size={14} />
@@ -404,7 +485,9 @@ export default function Dashboard() {
           <button
             onClick={() => setActiveView('browse')}
             className={`px-4 py-1.5 text-sm font-medium transition-colors flex items-center gap-sm ${
-              activeView === 'browse' ? 'bg-accent-primary/10 text-accent-primary' : 'text-muted hover:text-primary'
+              activeView === 'browse'
+                ? 'bg-accent-primary/10 text-accent-primary'
+                : 'text-muted hover:text-primary'
             }`}
           >
             <Search size={14} />
@@ -433,21 +516,30 @@ export default function Dashboard() {
             },
             {
               label: 'Avg Quality',
-              value: (() => { const scored = uploadedDocs.filter(d => d.score !== undefined); return scored.length ? `${Math.round(scored.reduce((a, d) => a + (d.score || 0), 0) / scored.length)}%` : '—'; })(),
+              value: (() => {
+                const scored = uploadedDocs.filter(d => d.score !== undefined);
+                return scored.length
+                  ? `${Math.round(scored.reduce((a, d) => a + (d.score || 0), 0) / scored.length)}%`
+                  : '—';
+              })(),
               icon: <TrendingUp size={16} />,
               iconBg: 'rgba(245, 158, 11, 0.1)',
               iconColor: 'var(--warning)',
             },
             {
               label: 'In Progress',
-              value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending').length,
+              value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
+                .length,
               icon: <Clock size={16} />,
               iconBg: 'rgba(129, 140, 248, 0.1)',
               iconColor: 'var(--accent-secondary)',
             },
-          ].map((stat) => (
+          ].map(stat => (
             <div key={stat.label} className="stat-card">
-              <div className="stat-card-icon" style={{ background: stat.iconBg, color: stat.iconColor }}>
+              <div
+                className="stat-card-icon"
+                style={{ background: stat.iconBg, color: stat.iconColor }}
+              >
                 {stat.icon}
               </div>
               <div className="stat-card-value">{stat.value}</div>
@@ -462,7 +554,8 @@ export default function Dashboard() {
         <div className="mb-lg p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm">
           <AlertTriangle size={18} className="text-warning shrink-0" />
           <span className="text-warning text-sm">
-            Analysis is taking longer than expected. The server may still be processing — refresh the page or try again.
+            Analysis is taking longer than expected. The server may still be processing — refresh
+            the page or try again.
           </span>
         </div>
       )}
@@ -472,10 +565,7 @@ export default function Dashboard() {
         <div className="mb-lg p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm">
           <AlertTriangle size={18} className="text-error shrink-0" />
           <span className="text-error text-sm">{error}</span>
-          <button
-            onClick={() => setError(null)}
-            className="ml-auto text-error/60 hover:text-error"
-          >
+          <button onClick={() => setError(null)} className="ml-auto text-error/60 hover:text-error">
             <X size={16} />
           </button>
         </div>
@@ -501,9 +591,13 @@ export default function Dashboard() {
                   <div className="flex items-center gap-md">
                     <div
                       style={{
-                        width: 48, height: 48,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)',
+                        width: 48,
+                        height: 48,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'var(--bg-tertiary)',
+                        border: '1px solid var(--border-color)',
                       }}
                     >
                       <FileText size={24} className="text-accent-primary" />
@@ -511,15 +605,13 @@ export default function Dashboard() {
                     <div>
                       <p className="font-medium">{pendingFile.name}</p>
                       <p className="text-xs text-muted">
-                        {(pendingFile.size / 1024).toFixed(1)} KB · {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
+                        {(pendingFile.size / 1024).toFixed(1)} KB ·{' '}
+                        {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-sm">
-                    <button
-                      onClick={() => setPendingFile(null)}
-                      className="btn btn-ghost text-sm"
-                    >
+                    <button onClick={() => setPendingFile(null)} className="btn btn-ghost text-sm">
                       Cancel
                     </button>
                     <button
@@ -546,7 +638,10 @@ export default function Dashboard() {
               role="button"
               tabIndex={0}
               aria-label="Upload document. Drop a file or click to browse."
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.getElementById('file-input')?.click(); }}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ')
+                  document.getElementById('file-input')?.click();
+              }}
             >
               <input
                 type="file"
@@ -565,7 +660,9 @@ export default function Dashboard() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: 'var(--radius-lg)',
-                    background: isDragOver ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.08)',
+                    background: isDragOver
+                      ? 'rgba(99, 102, 241, 0.15)'
+                      : 'rgba(99, 102, 241, 0.08)',
                     border: `1px solid ${isDragOver ? 'rgba(99, 102, 241, 0.4)' : 'rgba(99, 102, 241, 0.15)'}`,
                     transition: 'all 0.2s ease',
                     transform: isDragOver ? 'scale(1.1)' : 'scale(1)',
@@ -597,10 +694,15 @@ export default function Dashboard() {
                       <Loader2 size={16} className="animate-spin text-accent-primary" />
                     )}
                     <span className="text-sm font-medium">
-                      {uploadPhase === 'uploading' ? 'Uploading document...' : 'Analyzing document...'}
+                      {uploadPhase === 'uploading'
+                        ? 'Uploading document...'
+                        : 'Analyzing document...'}
                     </span>
                   </div>
-                  <span className="text-sm font-semibold" style={{ color: 'var(--accent-primary)' }}>
+                  <span
+                    className="text-sm font-semibold"
+                    style={{ color: 'var(--accent-primary)' }}
+                  >
                     {uploadPhase === 'uploading' ? `${uploadProgress}%` : `${currentProgress}%`}
                   </span>
                 </div>
@@ -618,11 +720,19 @@ export default function Dashboard() {
 
                 {/* Phase indicator */}
                 <div className="flex items-center gap-md mb-md text-xs text-muted">
-                  <span className={uploadPhase === 'uploading' ? 'text-accent-primary font-medium' : 'text-success'}>
+                  <span
+                    className={
+                      uploadPhase === 'uploading'
+                        ? 'text-accent-primary font-medium'
+                        : 'text-success'
+                    }
+                  >
                     {uploadPhase === 'analyzing' ? '✓ ' : ''}Upload
                   </span>
                   <span style={{ color: 'var(--border-hover)' }}>→</span>
-                  <span className={uploadPhase === 'analyzing' ? 'text-accent-primary font-medium' : ''}>
+                  <span
+                    className={uploadPhase === 'analyzing' ? 'text-accent-primary font-medium' : ''}
+                  >
                     Analysis
                   </span>
                 </div>
@@ -637,14 +747,18 @@ export default function Dashboard() {
                     >
                       <div
                         style={{
-                          width: 28, height: 28,
+                          width: 28,
+                          height: 28,
                           borderRadius: 'var(--radius-full)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          background: step.status === 'complete'
-                            ? 'rgba(34, 197, 94, 0.15)'
-                            : step.status === 'running'
-                              ? 'rgba(99, 102, 241, 0.15)'
-                              : 'var(--bg-tertiary)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background:
+                            step.status === 'complete'
+                              ? 'rgba(34, 197, 94, 0.15)'
+                              : step.status === 'running'
+                                ? 'rgba(99, 102, 241, 0.15)'
+                                : 'var(--bg-tertiary)',
                           border: `1px solid ${
                             step.status === 'complete'
                               ? 'rgba(34, 197, 94, 0.3)'
@@ -658,12 +772,26 @@ export default function Dashboard() {
                         {step.status === 'complete' ? (
                           <CheckCircle size={14} style={{ color: 'var(--success)' }} />
                         ) : step.status === 'running' ? (
-                          <Loader2 size={14} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+                          <Loader2
+                            size={14}
+                            className="animate-spin"
+                            style={{ color: 'var(--accent-primary)' }}
+                          />
                         ) : (
-                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--border-hover)' }} />
+                          <div
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: '50%',
+                              background: 'var(--border-hover)',
+                            }}
+                          />
                         )}
                       </div>
-                      <span className="text-xs text-muted hidden md:block" style={{ lineHeight: 1.2, maxWidth: 60 }}>
+                      <span
+                        className="text-xs text-muted hidden md:block"
+                        style={{ lineHeight: 1.2, maxWidth: 60 }}
+                      >
                         {ANALYSIS_STEPS[i]?.name.split(' ').slice(0, 2).join(' ')}
                       </span>
                     </div>
@@ -673,7 +801,10 @@ export default function Dashboard() {
                 {/* Cancel */}
                 <div className="flex justify-end mt-md">
                   <button
-                    onClick={() => { cancelAnalysis(); setUploading(false); }}
+                    onClick={() => {
+                      cancelAnalysis();
+                      setUploading(false);
+                    }}
                     className="text-xs text-muted hover:text-error transition-colors"
                   >
                     Cancel analysis
@@ -693,7 +824,7 @@ export default function Dashboard() {
               <div className="space-y-3">
                 {uploadedDocs
                   .filter(d => d.status === 'analyzing')
-                  .map((doc) => (
+                  .map(doc => (
                     <div
                       key={doc.id}
                       className="card border-accent-primary/30"
@@ -701,12 +832,17 @@ export default function Dashboard() {
                     >
                       <div className="card-body flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div style={{
-                            width: 36, height: 36,
-                            borderRadius: 'var(--radius-md)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'rgba(99, 102, 241, 0.1)',
-                          }}>
+                          <div
+                            style={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: 'var(--radius-md)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              background: 'rgba(99, 102, 241, 0.1)',
+                            }}
+                          >
                             <FileText size={18} className="text-accent-primary" />
                           </div>
                           <div>
@@ -718,9 +854,15 @@ export default function Dashboard() {
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="progress-bar" style={{ width: 80 }}>
-                            <div className="progress-bar-fill animate-pulse" style={{ width: '60%' }} />
+                            <div
+                              className="progress-bar-fill animate-pulse"
+                              style={{ width: '60%' }}
+                            />
                           </div>
-                          <Loader2 size={16} className="animate-spin text-accent-primary shrink-0" />
+                          <Loader2
+                            size={16}
+                            className="animate-spin text-accent-primary shrink-0"
+                          />
                         </div>
                       </div>
                     </div>
@@ -748,7 +890,7 @@ export default function Dashboard() {
                 {uploadedDocs
                   .filter(d => d.status === 'complete')
                   .slice(0, 6)
-                  .map((doc) => (
+                  .map(doc => (
                     <Link
                       key={doc.id}
                       href={`/documents/${doc.id}`}
@@ -758,12 +900,18 @@ export default function Dashboard() {
                       <div className="card-body">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2 min-w-0">
-                            <div style={{
-                              width: 32, height: 32, flexShrink: 0,
-                              borderRadius: 'var(--radius-md)',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              background: 'rgba(99, 102, 241, 0.1)',
-                            }}>
+                            <div
+                              style={{
+                                width: 32,
+                                height: 32,
+                                flexShrink: 0,
+                                borderRadius: 'var(--radius-md)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: 'rgba(99, 102, 241, 0.1)',
+                              }}
+                            >
                               <FileText size={16} className="text-accent-primary" />
                             </div>
                             <span className="font-medium text-sm truncate max-w-[130px]">
@@ -774,7 +922,12 @@ export default function Dashboard() {
                             <span
                               className="text-sm font-bold shrink-0 ml-2"
                               style={{
-                                color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                                color:
+                                  doc.score >= 70
+                                    ? 'var(--success)'
+                                    : doc.score >= 40
+                                      ? 'var(--warning)'
+                                      : 'var(--error)',
                               }}
                             >
                               {Math.round(doc.score)}%
@@ -787,11 +940,12 @@ export default function Dashboard() {
                               className="progress-bar-fill"
                               style={{
                                 width: `${doc.score}%`,
-                                background: doc.score >= 70
-                                  ? 'linear-gradient(90deg, #22c55e, #16a34a)'
-                                  : doc.score >= 40
-                                    ? 'linear-gradient(90deg, #f59e0b, #d97706)'
-                                    : 'linear-gradient(90deg, #ef4444, #dc2626)',
+                                background:
+                                  doc.score >= 70
+                                    ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                    : doc.score >= 40
+                                      ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                      : 'linear-gradient(90deg, #ef4444, #dc2626)',
                               }}
                             />
                           </div>
@@ -853,14 +1007,21 @@ export default function Dashboard() {
               {showTrend && (
                 <div className="card-body pt-0">
                   <ErrorBoundary sectionName="Risk Trend Chart">
-                    <RiskTrendChart data={[...uploadedDocs]
-                      .filter(d => d.score !== undefined)
-                      .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
-                      .map(d => ({
-                        date: new Date(d.uploadedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-                        score: d.score || 0
-                      }))
-                    } />
+                    <RiskTrendChart
+                      data={[...uploadedDocs]
+                        .filter(d => d.score !== undefined)
+                        .sort(
+                          (a, b) =>
+                            new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime()
+                        )
+                        .map(d => ({
+                          date: new Date(d.uploadedAt).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                          }),
+                          score: d.score || 0,
+                        }))}
+                    />
                   </ErrorBoundary>
                 </div>
               )}
@@ -887,23 +1048,27 @@ export default function Dashboard() {
               {showComparative && (
                 <div className="card-body">
                   <ErrorBoundary sectionName="Comparative Analysis">
-                  <ComparativeAnalysis documents={uploadedDocs.filter(d => d.status === 'complete').map(doc => {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- detailed view returns analyses array
-                    const a = (doc as any).analyses?.[0];
-                    const biasCount = a?.biases?.length ?? 0;
-                    const noiseScore = a?.noiseScore ?? 50;
-                    return {
-                      id: doc.id,
-                      title: doc.filename,
-                      date: new Date(doc.uploadedAt).toLocaleDateString(),
-                      scores: {
-                        quality: doc.score || 0,
-                        risk: doc.score ? (100 - doc.score) : 50,
-                        bias: Math.min(biasCount * 10, 100),
-                        clarity: Math.max(0, 100 - noiseScore)
-                      }
-                    };
-                  })} />
+                    <ComparativeAnalysis
+                      documents={uploadedDocs
+                        .filter(d => d.status === 'complete')
+                        .map(doc => {
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- detailed view returns analyses array
+                          const a = (doc as any).analyses?.[0];
+                          const biasCount = a?.biases?.length ?? 0;
+                          const noiseScore = a?.noiseScore ?? 50;
+                          return {
+                            id: doc.id,
+                            title: doc.filename,
+                            date: new Date(doc.uploadedAt).toLocaleDateString(),
+                            scores: {
+                              quality: doc.score || 0,
+                              risk: doc.score ? 100 - doc.score : 50,
+                              bias: Math.min(biasCount * 10, 100),
+                              clarity: Math.max(0, 100 - noiseScore),
+                            },
+                          };
+                        })}
+                    />
                   </ErrorBoundary>
                 </div>
               )}
@@ -925,13 +1090,19 @@ export default function Dashboard() {
               {/* Compact Search & Filter */}
               <div className="flex items-center gap-sm">
                 <div className="relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+                  <Search
+                    size={14}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                  />
                   <input
                     type="text"
                     placeholder="Search..."
                     aria-label="Search documents"
                     value={searchQuery}
-                    onChange={(e) => { setSearchQuery(e.target.value); setDocsPage(1); }}
+                    onChange={e => {
+                      setSearchQuery(e.target.value);
+                      setDocsPage(1);
+                    }}
                     className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border w-40 focus:w-56 transition-all"
                   />
                   {searchQuery && (
@@ -947,7 +1118,10 @@ export default function Dashboard() {
                 <select
                   value={statusFilter}
                   aria-label="Filter by status"
-                  onChange={(e) => { setStatusFilter(e.target.value as 'all' | 'complete' | 'analyzing' | 'pending'); setDocsPage(1); }}
+                  onChange={e => {
+                    setStatusFilter(e.target.value as 'all' | 'complete' | 'analyzing' | 'pending');
+                    setDocsPage(1);
+                  }}
                   className="px-3 py-1.5 text-sm bg-primary border border-border"
                 >
                   <option value="all">All Status</option>
@@ -990,7 +1164,10 @@ export default function Dashboard() {
                   <Search size={32} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
                   <p className="text-sm text-muted">No matches found</p>
                   <button
-                    onClick={() => { setSearchQuery(''); setStatusFilter('all'); }}
+                    onClick={() => {
+                      setSearchQuery('');
+                      setStatusFilter('all');
+                    }}
                     className="btn btn-ghost text-sm"
                   >
                     Clear filters
@@ -1005,12 +1182,18 @@ export default function Dashboard() {
                       style={{ animationDelay: `${idx * 0.03}s` }}
                     >
                       <div className="flex items-center gap-md min-w-0">
-                        <div style={{
-                          width: 32, height: 32, flexShrink: 0,
-                          borderRadius: 'var(--radius-md)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          background: 'rgba(99, 102, 241, 0.08)',
-                        }}>
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            flexShrink: 0,
+                            borderRadius: 'var(--radius-md)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: 'rgba(99, 102, 241, 0.08)',
+                          }}
+                        >
                           <FileText size={16} className="text-accent-primary" />
                         </div>
                         <span className="truncate text-sm font-medium">{doc.filename}</span>
@@ -1052,18 +1235,24 @@ export default function Dashboard() {
                                     className="progress-bar-fill"
                                     style={{
                                       width: `${doc.score}%`,
-                                      background: doc.score >= 70
-                                        ? 'linear-gradient(90deg, #22c55e, #16a34a)'
-                                        : doc.score >= 40
-                                          ? 'linear-gradient(90deg, #f59e0b, #d97706)'
-                                          : 'linear-gradient(90deg, #ef4444, #dc2626)',
+                                      background:
+                                        doc.score >= 70
+                                          ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                          : doc.score >= 40
+                                            ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                            : 'linear-gradient(90deg, #ef4444, #dc2626)',
                                     }}
                                   />
                                 </div>
                                 <span
                                   className="text-sm font-bold min-w-[36px]"
                                   style={{
-                                    color: doc.score >= 70 ? 'var(--success)' : doc.score >= 40 ? 'var(--warning)' : 'var(--error)'
+                                    color:
+                                      doc.score >= 70
+                                        ? 'var(--success)'
+                                        : doc.score >= 40
+                                          ? 'var(--warning)'
+                                          : 'var(--error)',
                                   }}
                                 >
                                   {Math.round(doc.score)}%
@@ -1081,7 +1270,9 @@ export default function Dashboard() {
                         )}
 
                         <button
-                          onClick={() => setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })}
+                          onClick={() =>
+                            setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })
+                          }
                           className="p-1.5 text-muted hover:text-error transition-colors rounded"
                           title="Delete"
                         >
@@ -1163,10 +1354,18 @@ export default function Dashboard() {
           aria-modal="true"
           aria-label="Delete document confirmation"
           className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 modal-overlay"
-          onClick={() => { if (!deleting) setDeleteModal({ open: false, docId: '', filename: '' }); }}
-          onKeyDown={(e) => { if (e.key === 'Escape' && !deleting) setDeleteModal({ open: false, docId: '', filename: '' }); }}
+          onClick={() => {
+            if (!deleting) setDeleteModal({ open: false, docId: '', filename: '' });
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Escape' && !deleting)
+              setDeleteModal({ open: false, docId: '', filename: '' });
+          }}
         >
-          <div className="card w-full max-w-sm mx-4 modal-content" onClick={e => e.stopPropagation()}>
+          <div
+            className="card w-full max-w-sm mx-4 modal-content"
+            onClick={e => e.stopPropagation()}
+          >
             <div className="card-body">
               <div className="flex items-start gap-sm mb-lg">
                 <AlertTriangle size={20} className="text-error shrink-0 mt-0.5" />

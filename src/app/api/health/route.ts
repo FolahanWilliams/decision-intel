@@ -15,7 +15,7 @@ export async function GET() {
         {
           status: 'error',
           message: 'Database connection failed',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 503 }
       );
@@ -23,24 +23,27 @@ export async function GET() {
 
     const cacheStats = await getCacheStats();
 
-    return NextResponse.json({
-      status: 'healthy',
-      message: 'All systems operational',
-      timestamp: new Date().toISOString(),
-      database: 'connected',
-      cache: cacheStats
-        ? { backend: 'postgres', ...cacheStats }
-        : { backend: 'postgres', status: 'unavailable' },
-    }, {
-      headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' },
-    });
+    return NextResponse.json(
+      {
+        status: 'healthy',
+        message: 'All systems operational',
+        timestamp: new Date().toISOString(),
+        database: 'connected',
+        cache: cacheStats
+          ? { backend: 'postgres', ...cacheStats }
+          : { backend: 'postgres', status: 'unavailable' },
+      },
+      {
+        headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' },
+      }
+    );
   } catch (error) {
     log.error('Health check error:', error);
     return NextResponse.json(
       {
         status: 'error',
         message: 'Health check failed',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       { status: 503 }
     );
