@@ -129,9 +129,9 @@ export function BiasDetailModal({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-  // @ts-expect-error - bias.userRating might exist if added to schema
   const [userRating, setUserRating] = useState<number | null>(
-    (bias as Record<string, unknown>).userRating as number | null
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (bias as any).userRating as number | null
   );
 
   // Reset rating when navigating to a different bias
