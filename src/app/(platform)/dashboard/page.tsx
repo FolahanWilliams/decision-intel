@@ -35,6 +35,7 @@ import { RiskTrendChart } from './RiskTrendChart';
 import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnalysis';
 import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { formatDate, formatDateShort } from '@/lib/constants/human-audit';
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -55,7 +56,7 @@ function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): str
       return 'Rate limit exceeded. You can analyze up to 5 documents per hour. Please wait before trying again.';
     }
     if (uploadRes.status === 413) {
-      return 'File is too large. Please upload a document under 10 MB.';
+      return 'File is too large. Please upload a document under 5 MB.';
     }
     if (uploadRes.status === 415) {
       return 'Unsupported file type. Accepted formats: PDF, TXT, MD, DOCX.';
@@ -90,7 +91,8 @@ export default function Dashboard() {
   // Upload confirmation state
   const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-  // Search and filter state
+  // Search and filter state (debounced for performance on large lists)
+  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>(
     'all'
@@ -98,6 +100,12 @@ export default function Dashboard() {
   const [showTrend, setShowTrend] = useState(false);
   const [showComparative, setShowComparative] = useState(false);
   const [docsPage, setDocsPage] = useState(1);
+
+  // Debounce search input → searchQuery (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchQuery(searchInput), 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // Delete confirmation state
   const [deleteModal, setDeleteModal] = useState<{
@@ -678,7 +686,7 @@ export default function Dashboard() {
                   <p className="font-medium">
                     {isDragOver ? 'Drop to upload' : 'Drop document here or click to browse'}
                   </p>
-                  <p className="text-sm text-muted">PDF, TXT, MD, DOCX · Max 10 MB</p>
+                  <p className="text-sm text-muted">PDF, TXT, MD, DOCX · Max 5 MB</p>
                 </div>
               </div>
             </div>
@@ -951,7 +959,7 @@ export default function Dashboard() {
                           </div>
                         )}
                         <div className="flex items-center justify-between text-xs text-muted">
-                          <span>{new Date(doc.uploadedAt).toLocaleDateString()}</span>
+                          <span>{formatDate(doc.uploadedAt)}</span>
                           <span className="flex items-center gap-1 group-hover:text-accent-primary transition-colors">
                             View Analysis <ArrowRight size={12} />
                           </span>
@@ -1015,10 +1023,7 @@ export default function Dashboard() {
                             new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime()
                         )
                         .map(d => ({
-                          date: new Date(d.uploadedAt).toLocaleDateString(undefined, {
-                            month: 'short',
-                            day: 'numeric',
-                          }),
+                          date: formatDateShort(d.uploadedAt),
                           score: d.score || 0,
                         }))}
                     />
@@ -1059,7 +1064,7 @@ export default function Dashboard() {
                           return {
                             id: doc.id,
                             title: doc.filename,
-                            date: new Date(doc.uploadedAt).toLocaleDateString(),
+                            date: formatDate(doc.uploadedAt),
                             scores: {
                               quality: doc.score || 0,
                               risk: doc.score ? 100 - doc.score : 50,
@@ -1098,16 +1103,19 @@ export default function Dashboard() {
                     type="text"
                     placeholder="Search..."
                     aria-label="Search documents"
-                    value={searchQuery}
+                    value={searchInput}
                     onChange={e => {
-                      setSearchQuery(e.target.value);
+                      setSearchInput(e.target.value);
                       setDocsPage(1);
                     }}
                     className="pl-8 pr-7 py-1.5 text-sm bg-primary border border-border w-40 focus:w-56 transition-all"
                   />
-                  {searchQuery && (
+                  {searchInput && (
                     <button
-                      onClick={() => setSearchQuery('')}
+                      onClick={() => {
+                        setSearchInput('');
+                        setSearchQuery('');
+                      }}
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
                     >
                       <X size={14} />
@@ -1165,6 +1173,7 @@ export default function Dashboard() {
                   <p className="text-sm text-muted">No matches found</p>
                   <button
                     onClick={() => {
+                      setSearchInput('');
                       setSearchQuery('');
                       setStatusFilter('all');
                     }}
@@ -1342,7 +1351,7 @@ export default function Dashboard() {
             <CloudUpload size={48} style={{ color: 'var(--accent-primary)' }} />
             <div className="text-center">
               <p className="font-semibold text-lg">Drop your document here</p>
-              <p className="text-sm text-muted mt-1">PDF, TXT, MD, DOCX · Max 10 MB</p>
+              <p className="text-sm text-muted mt-1">PDF, TXT, MD, DOCX · Max 5 MB</p>
             </div>
           </div>
         </div>
