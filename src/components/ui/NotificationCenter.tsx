@@ -84,9 +84,10 @@ export function useNotifications() {
 export function NotificationBell() {
   const { notifications, unreadCount, markRead, markAllRead, clearAll } = useNotifications();
   const [open, setOpen] = useState(false);
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(0);
 
   // Update every 10s when open so relative timestamps stay fresh
+  // (now is initialized to 0 to avoid hydration mismatch; handleToggle sets it on open)
   useEffect(() => {
     if (!open) return;
     const interval = setInterval(() => setNow(Date.now()), 10_000);
