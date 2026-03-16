@@ -35,9 +35,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ articles });
   } catch {
-    return NextResponse.json(
-      { error: 'News search failed', articles: [] },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: 'News search failed', articles: [] }, { status: 503 });
   }
 }

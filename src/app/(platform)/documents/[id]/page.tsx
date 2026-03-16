@@ -491,8 +491,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           <div>
             <h1 className="text-xl font-semibold">{document.filename}</h1>
             <p className="text-sm text-muted">
-              {formatDate(document.uploadedAt)} •{' '}
-              {(document.fileSize / 1024).toFixed(1)} KB
+              {formatDate(document.uploadedAt)} • {(document.fileSize / 1024).toFixed(1)} KB
             </p>
           </div>
         </div>
