@@ -53,7 +53,7 @@ function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: str
   useEffect(() => {
     if (inView) {
       const controls = animate(count, target, { duration: 2, ease: 'easeOut' });
-      return controls.stop;
+      return () => controls.stop();
     }
     return undefined;
   }, [inView, count, target]);
@@ -203,11 +203,27 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
     { label: 'FAQ', href: '#faq' },
   ];
 
+  // Body scroll lock + ESC key handler
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           <motion.div
+            key="mobile-nav-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -216,11 +232,15 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
             onClick={onClose}
           />
           <motion.div
+            key="mobile-nav-drawer"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className="fixed top-0 right-0 bottom-0 z-50 w-72"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
             style={{
               background: 'rgba(8, 11, 20, 0.95)',
               backdropFilter: 'blur(40px)',
@@ -228,7 +248,7 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
             }}
           >
             <div className="flex justify-end p-4">
-              <button onClick={onClose} style={{ color: 'var(--text-muted)' }}>
+              <button onClick={onClose} aria-label="Close menu" style={{ color: 'var(--text-muted)' }}>
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -304,14 +324,14 @@ function SectionDivider({ color = 'rgba(255,255,255,0.06)', variant = 'wave' }: 
   }
   if (variant === 'angle') {
     return (
-      <svg viewBox="0 0 1440 24" fill="none" className="w-full" style={{ display: 'block', marginTop: '-1px' }} preserveAspectRatio="none">
+      <svg viewBox="0 0 1440 24" fill="none" className="w-full" style={{ display: 'block' }} preserveAspectRatio="none">
         <path d="M0 24L720 0L1440 24V24H0V24Z" fill="var(--bg-primary)" />
-        <path d="M0 24L720 0L1440 24" stroke={color} strokeWidth="1" fill="none" />
+        <path d="M0 24L720 0L1440 24" stroke={color} vectorEffect="non-scaling-stroke" strokeWidth="1" fill="none" />
       </svg>
     );
   }
   return (
-    <svg viewBox="0 0 1440 40" fill="none" className="w-full" style={{ display: 'block', marginTop: '-1px' }} preserveAspectRatio="none">
+    <svg viewBox="0 0 1440 40" fill="none" className="w-full" style={{ display: 'block' }} preserveAspectRatio="none">
       <path
         d="M0 20C240 40 480 0 720 20C960 40 1200 0 1440 20V40H0V20Z"
         fill="var(--bg-primary)"
@@ -319,6 +339,7 @@ function SectionDivider({ color = 'rgba(255,255,255,0.06)', variant = 'wave' }: 
       <path
         d="M0 20C240 40 480 0 720 20C960 40 1200 0 1440 20"
         stroke={color}
+        vectorEffect="non-scaling-stroke"
         strokeWidth="1"
         fill="none"
       />
@@ -333,6 +354,15 @@ function FAQItem({ question, answer, isOpen, onToggle }: {
   isOpen: boolean;
   onToggle: () => void;
 }) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [measuredHeight, setMeasuredHeight] = useState(0);
+
+  useEffect(() => {
+    if (isOpen && contentRef.current) {
+      setMeasuredHeight(contentRef.current.scrollHeight);
+    }
+  }, [isOpen, answer]);
+
   return (
     <div
       style={{
@@ -344,6 +374,7 @@ function FAQItem({ question, answer, isOpen, onToggle }: {
       <button
         onClick={onToggle}
         className="w-full text-left"
+        aria-expanded={isOpen}
         style={{
           padding: '20px 24px',
           display: 'flex',
@@ -369,13 +400,15 @@ function FAQItem({ question, answer, isOpen, onToggle }: {
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
+            key="faq-content"
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
+            animate={{ height: measuredHeight || 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             style={{ overflow: 'hidden' }}
           >
             <div
+              ref={contentRef}
               style={{
                 padding: '0 24px 20px 24px',
                 fontSize: '0.88rem',
@@ -1572,6 +1605,7 @@ export default function LandingPage() {
                     step="100"
                     value={annualDecisions}
                     onChange={e => setAnnualDecisions(Number(e.target.value))}
+                    aria-label="Annual Decisions"
                     className="w-full h-1 appearance-none cursor-pointer outline-none"
                     style={{
                       accentColor: '#3b82f6',
@@ -1613,6 +1647,7 @@ export default function LandingPage() {
                     step="1000"
                     value={avgDecisionValue}
                     onChange={e => setAvgDecisionValue(Number(e.target.value))}
+                    aria-label="Average Decision Value"
                     className="w-full h-1 appearance-none cursor-pointer outline-none"
                     style={{
                       accentColor: '#3b82f6',
