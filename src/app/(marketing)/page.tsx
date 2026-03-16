@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion, useScroll, useInView, useMotionValue, useTransform, animate, AnimatePresence, useSpring } from 'framer-motion';
 import {
   Brain,
   AlertTriangle,
@@ -19,6 +19,9 @@ import {
   Twitter,
   Linkedin,
   Mail,
+  Menu,
+  X,
+  ChevronDown,
 } from 'lucide-react';
 
 // Scroll Progress
@@ -190,8 +193,209 @@ const glassCardLight = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset',
 } as const;
 
+// Mobile nav overlay
+function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const links = [
+    { label: 'The Problem', href: '#problem' },
+    { label: 'How It Works', href: '#solution' },
+    { label: 'Features', href: '#features' },
+    { label: 'ROI', href: '#roi' },
+    { label: 'FAQ', href: '#faq' },
+  ];
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50"
+            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed top-0 right-0 bottom-0 z-50 w-72"
+            style={{
+              background: 'rgba(8, 11, 20, 0.95)',
+              backdropFilter: 'blur(40px)',
+              borderLeft: '1px solid rgba(255,255,255,0.10)',
+            }}
+          >
+            <div className="flex justify-end p-4">
+              <button onClick={onClose} style={{ color: 'var(--text-muted)' }}>
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <nav className="flex flex-col gap-2 px-6">
+              {links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={onClose}
+                  className="hover:text-amber-400 transition-colors"
+                  style={{
+                    padding: '12px 16px',
+                    fontSize: '1rem',
+                    color: 'var(--text-secondary)',
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.03)',
+                  }}
+                >
+                  {link.label}
+                </a>
+              ))}
+              <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '12px 0' }} />
+              <Link
+                href="/login"
+                onClick={onClose}
+                className="btn btn-primary glow"
+                style={{ textAlign: 'center', padding: '14px', fontSize: '0.9rem' }}
+              >
+                Get Started
+              </Link>
+              <Link
+                href="/login"
+                onClick={onClose}
+                className="btn btn-secondary"
+                style={{ textAlign: 'center', padding: '14px', fontSize: '0.9rem' }}
+              >
+                Sign In
+              </Link>
+            </nav>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// SVG section divider
+function SectionDivider({ color = 'rgba(255,255,255,0.06)', variant = 'wave' }: { color?: string; variant?: 'wave' | 'angle' | 'glow' }) {
+  if (variant === 'glow') {
+    return (
+      <div className="relative" style={{ height: '2px' }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            top: '-8px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '40%',
+            height: '18px',
+            background: `radial-gradient(ellipse, ${color.replace('0.06', '0.12')}, transparent)`,
+            filter: 'blur(6px)',
+          }}
+        />
+      </div>
+    );
+  }
+  if (variant === 'angle') {
+    return (
+      <svg viewBox="0 0 1440 24" fill="none" className="w-full" style={{ display: 'block', marginTop: '-1px' }} preserveAspectRatio="none">
+        <path d="M0 24L720 0L1440 24V24H0V24Z" fill="var(--bg-primary)" />
+        <path d="M0 24L720 0L1440 24" stroke={color} strokeWidth="1" fill="none" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 1440 40" fill="none" className="w-full" style={{ display: 'block', marginTop: '-1px' }} preserveAspectRatio="none">
+      <path
+        d="M0 20C240 40 480 0 720 20C960 40 1200 0 1440 20V40H0V20Z"
+        fill="var(--bg-primary)"
+      />
+      <path
+        d="M0 20C240 40 480 0 720 20C960 40 1200 0 1440 20"
+        stroke={color}
+        strokeWidth="1"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+// FAQ Accordion item
+function FAQItem({ question, answer, isOpen, onToggle }: {
+  question: string;
+  answer: string;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div
+      style={{
+        ...glassCardLight,
+        borderRadius: '16px',
+        overflow: 'hidden',
+      }}
+    >
+      <button
+        onClick={onToggle}
+        className="w-full text-left"
+        style={{
+          padding: '20px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          background: 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        <span style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+          {question}
+        </span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          style={{ flexShrink: 0 }}
+        >
+          <ChevronDown className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+        </motion.div>
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div
+              style={{
+                padding: '0 24px 20px 24px',
+                fontSize: '0.88rem',
+                color: 'var(--text-muted)',
+                lineHeight: 1.7,
+              }}
+            >
+              {answer}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function LandingPage() {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [activeDemo, setActiveDemo] = useState<'chaos' | 'order'>('chaos');
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [annualDecisions, setAnnualDecisions] = useState(5000);
   const [avgDecisionValue, setAvgDecisionValue] = useState(10000);
 
@@ -211,6 +415,7 @@ export default function LandingPage() {
   const featuresRef = useRef(null);
   const socialRef = useRef(null);
   const roiRef = useRef(null);
+  const faqRef = useRef(null);
   const ctaRef = useRef(null);
 
   const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
@@ -219,7 +424,14 @@ export default function LandingPage() {
   const featuresInView = useInView(featuresRef, { once: true, margin: '-100px' });
   const socialInView = useInView(socialRef, { once: true, margin: '-100px' });
   const roiInView = useInView(roiRef, { once: true, margin: '-100px' });
+  const faqInView = useInView(faqRef, { once: true, margin: '-100px' });
   const ctaInView = useInView(ctaRef, { once: true, margin: '-100px' });
+
+  // Scroll-linked parallax for hero glows
+  const { scrollY } = useScroll();
+  const glowY1 = useSpring(useTransform(scrollY, [0, 800], [0, 120]), { stiffness: 50, damping: 20 });
+  const glowY2 = useSpring(useTransform(scrollY, [0, 800], [0, -80]), { stiffness: 50, damping: 20 });
+  const glowY3 = useSpring(useTransform(scrollY, [0, 800], [0, 60]), { stiffness: 50, damping: 20 });
 
   return (
     <div
@@ -231,6 +443,7 @@ export default function LandingPage() {
       }}
     >
       <ScrollProgress />
+      <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
 
       {/* Navigation */}
       <motion.nav
@@ -286,13 +499,21 @@ export default function LandingPage() {
               ROI
             </a>
           </div>
-          <div className="flex gap-3">
-            <Link href="/login" className="btn btn-secondary" style={{ fontSize: '0.85rem' }}>
+          <div className="flex items-center gap-3">
+            <Link href="/login" className="btn btn-secondary hidden sm:inline-flex" style={{ fontSize: '0.85rem' }}>
               Sign In
             </Link>
-            <Link href="/login" className="btn btn-primary" style={{ fontSize: '0.85rem' }}>
+            <Link href="/login" className="btn btn-primary hidden sm:inline-flex" style={{ fontSize: '0.85rem' }}>
               Get Started
             </Link>
+            <button
+              className="md:hidden p-2"
+              onClick={() => setMobileNavOpen(true)}
+              style={{ color: 'var(--text-secondary)' }}
+              aria-label="Open menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </motion.nav>
@@ -303,17 +524,17 @@ export default function LandingPage() {
         className="min-h-screen flex items-center pt-24 relative overflow-hidden"
         style={{ background: 'var(--bg-primary)' }}
       >
-        <div
+        <motion.div
           className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] rounded-full blur-[140px] pointer-events-none"
-          style={{ background: 'rgba(245, 158, 11, 0.07)' }}
+          style={{ background: 'rgba(245, 158, 11, 0.07)', y: glowY1 }}
         />
-        <div
+        <motion.div
           className="absolute bottom-1/4 right-1/4 w-[35vw] h-[35vw] rounded-full blur-[120px] pointer-events-none"
-          style={{ background: 'rgba(99, 102, 241, 0.06)' }}
+          style={{ background: 'rgba(99, 102, 241, 0.06)', y: glowY2 }}
         />
-        <div
+        <motion.div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[30vw] rounded-full blur-[160px] pointer-events-none"
-          style={{ background: 'rgba(168, 85, 247, 0.04)' }}
+          style={{ background: 'rgba(168, 85, 247, 0.04)', y: glowY3 }}
         />
 
         <div className="container relative z-10">
@@ -447,7 +668,7 @@ export default function LandingPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={heroInView ? { opacity: 1, scale: 1 } : {}}
                 transition={{ delay: 0.3 }}
-                className="hidden md:block"
+                className="mt-8 md:mt-0"
               >
                 <div
                   style={{
@@ -494,14 +715,13 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SectionDivider variant="glow" color="rgba(245, 158, 11, 0.15)" />
+
       {/* Social Proof Stats */}
       <section
         ref={socialRef}
         className="py-16 relative"
-        style={{
-          background: 'var(--bg-primary)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        }}
+        style={{ background: 'var(--bg-primary)' }}
       >
         <div className="container relative z-10">
           <motion.div
@@ -543,15 +763,14 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SectionDivider variant="wave" color="rgba(239, 68, 68, 0.15)" />
+
       {/* Problem Section */}
       <section
         id="problem"
         ref={problemRef}
         className="py-32 relative"
-        style={{
-          background: 'var(--bg-primary)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        }}
+        style={{ background: 'var(--bg-primary)' }}
       >
         <div className="container relative z-10">
           <motion.div
@@ -584,12 +803,56 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
+          {/* Mobile tab switcher */}
+          <div className="flex md:hidden gap-2 mb-6 max-w-6xl mx-auto">
+            <button
+              onClick={() => setActiveDemo('chaos')}
+              style={{
+                flex: 1,
+                padding: '10px 16px',
+                borderRadius: '12px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255,255,255,0.04)',
+                color: activeDemo === 'chaos' ? '#ef4444' : 'var(--text-muted)',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.08)',
+              }}
+            >
+              <AlertTriangle className="w-4 h-4 inline mr-2" />
+              Without
+            </button>
+            <button
+              onClick={() => setActiveDemo('order')}
+              style={{
+                flex: 1,
+                padding: '10px 16px',
+                borderRadius: '12px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeDemo === 'order' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255,255,255,0.04)',
+                color: activeDemo === 'order' ? '#22c55e' : 'var(--text-muted)',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: activeDemo === 'order' ? 'rgba(34, 197, 94, 0.25)' : 'rgba(255,255,255,0.08)',
+              }}
+            >
+              <Shield className="w-4 h-4 inline mr-2" />
+              With
+            </button>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {/* Without Decision Intel */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={problemInView ? { opacity: 1, x: 0 } : {}}
-              className="cursor-pointer transition-all duration-300"
+              className={`cursor-pointer transition-all duration-300 ${activeDemo !== 'chaos' ? 'hidden md:block' : ''}`}
               onClick={() => setActiveDemo('chaos')}
               style={{
                 background:
@@ -690,7 +953,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, x: 50 }}
               animate={problemInView ? { opacity: 1, x: 0 } : {}}
               transition={{ delay: 0.1 }}
-              className="cursor-pointer transition-all duration-300"
+              className={`cursor-pointer transition-all duration-300 ${activeDemo !== 'order' ? 'hidden md:block' : ''}`}
               onClick={() => setActiveDemo('order')}
               style={{
                 background:
@@ -788,15 +1051,14 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SectionDivider variant="angle" color="rgba(99, 102, 241, 0.2)" />
+
       {/* How It Works Section */}
       <section
         id="solution"
         ref={solutionRef}
         className="py-32 relative"
-        style={{
-          background: 'var(--bg-primary)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        }}
+        style={{ background: 'var(--bg-primary)' }}
       >
         <div
           className="absolute inset-0 pointer-events-none"
@@ -962,15 +1224,14 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SectionDivider variant="glow" color="rgba(245, 158, 11, 0.15)" />
+
       {/* Features - Bento Grid */}
       <section
         id="features"
         ref={featuresRef}
         className="py-32 relative"
-        style={{
-          background: 'var(--bg-primary)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        }}
+        style={{ background: 'var(--bg-primary)' }}
       >
         <div
           className="absolute inset-0 pointer-events-none"
@@ -1002,12 +1263,12 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
             {/* Large Feature: Cognitive Bias Engine */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
-              className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2"
+              className="col-span-1 md:col-span-2 lg:col-span-2 lg:row-span-2"
               style={{
                 ...glassCard,
                 overflow: 'hidden',
@@ -1114,7 +1375,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.1 }}
-              className="col-span-1 md:col-span-1 lg:col-span-2"
+              className="col-span-1 md:col-span-2 lg:col-span-2"
               style={{ ...glassCardLight, padding: '32px' }}
             >
               <div
@@ -1169,7 +1430,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.2 }}
-              className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center text-center justify-center"
+              className="col-span-1 flex flex-col items-center text-center justify-center"
               style={{ ...glassCardLight, padding: '32px' }}
             >
               <Zap className="w-8 h-8 mb-4" style={{ color: '#fbbf24' }} />
@@ -1195,7 +1456,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.3 }}
-              className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center text-center justify-center"
+              className="col-span-1 flex flex-col items-center text-center justify-center"
               style={{ ...glassCardLight, padding: '32px' }}
             >
               <Shield className="w-8 h-8 mb-4" style={{ color: '#22c55e' }} />
@@ -1219,15 +1480,14 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SectionDivider variant="wave" color="rgba(59, 130, 246, 0.15)" />
+
       {/* ROI Calculator */}
       <section
         id="roi"
         ref={roiRef}
         className="py-32"
-        style={{
-          background: 'var(--bg-primary)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        }}
+        style={{ background: 'var(--bg-primary)' }}
       >
         <div className="container mx-auto">
           <motion.div
@@ -1521,14 +1781,89 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <SectionDivider variant="angle" color="rgba(168, 85, 247, 0.15)" />
+
+      {/* FAQ Section */}
+      <section
+        id="faq"
+        ref={faqRef}
+        className="py-32 relative"
+        style={{ background: 'var(--bg-primary)' }}
+      >
+        <div className="container relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={faqInView ? { opacity: 1, y: 0 } : {}}
+            className="mb-16"
+            style={{ borderLeft: '3px solid #a855f7', paddingLeft: '24px' }}
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '8px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Frequently Asked Questions
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
+              Common questions about Decision Intel.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={faqInView ? { opacity: 1, y: 0 } : {}}
+            className="max-w-3xl mx-auto"
+            style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+          >
+            {[
+              {
+                q: 'How is my data protected?',
+                a: 'All documents are encrypted at rest (AES-256) and in transit (TLS 1.3). We run on SOC 2 Type II audited infrastructure, and PII is automatically detected and redacted before analysis. Your data is never used to train models and is deleted upon request.',
+              },
+              {
+                q: 'How long does integration take?',
+                a: 'Most teams are up and running in under 30 minutes. Upload documents directly through the dashboard, connect Slack with a single OAuth flow, or use our REST API. No infrastructure changes or IT involvement required.',
+              },
+              {
+                q: 'How accurate is the bias detection?',
+                a: 'Our cognitive bias engine achieves 89% precision and 92% recall across 15+ bias types, benchmarked against expert-annotated decision corpora. The statistical jury system cross-validates findings to minimize false positives.',
+              },
+              {
+                q: 'Does it work with our existing tools?',
+                a: 'Decision Intel integrates with Slack, Microsoft Teams, Google Workspace, and any system with a REST API. We support PDF, DOCX, TXT, and structured JSON ingestion. Custom connectors are available on Enterprise plans.',
+              },
+              {
+                q: 'What compliance standards do you support?',
+                a: 'We provide built-in mapping for FCA Consumer Duty, GDPR data protection requirements, and SOX compliance controls. Our audit trail generates regulator-ready reports with full decision lineage.',
+              },
+              {
+                q: 'Is there a free tier?',
+                a: 'Yes. The free tier includes up to 50 decision audits per month, basic bias detection, and noise scoring. No credit card required. Upgrade to Pro for unlimited audits, advanced analytics, and team collaboration.',
+              },
+            ].map((item, i) => (
+              <FAQItem
+                key={i}
+                question={item.q}
+                answer={item.a}
+                isOpen={openFAQ === i}
+                onToggle={() => setOpenFAQ(openFAQ === i ? null : i)}
+              />
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <SectionDivider variant="glow" color="rgba(245, 158, 11, 0.2)" />
+
       {/* Final CTA */}
       <section
         ref={ctaRef}
         className="py-32 relative overflow-hidden"
-        style={{
-          background: 'var(--bg-primary)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        }}
+        style={{ background: 'var(--bg-primary)' }}
       >
         <div
           className="absolute inset-0 pointer-events-none"
