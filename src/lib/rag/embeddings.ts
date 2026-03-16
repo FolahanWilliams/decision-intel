@@ -239,6 +239,52 @@ export async function storeAnalysisEmbedding(
 }
 
 /**
+ * Store an embedding for a human decision (Product B) for future RAG recall.
+ * Uses a metadata marker to distinguish from document embeddings.
+ */
+export async function storeHumanDecisionEmbedding(
+  decisionId: string,
+  content: string,
+  userId: string,
+  auditSummary?: string
+): Promise<void> {
+  try {
+    const embeddingText = auditSummary
+      ? `Human Decision (${decisionId}):\n${content}\n\nAudit Summary: ${auditSummary}`
+      : `Human Decision (${decisionId}):\n${content}`;
+
+    const embedding = await generateEmbedding(embeddingText);
+    const embeddingString = `[${embedding.join(',')}]`;
+    const metadata = JSON.stringify({
+      humanDecisionId: decisionId,
+      userId,
+      sourceType: 'human_decision',
+      createdAt: new Date().toISOString(),
+    });
+
+    // Store in DecisionEmbedding table — documentId is required by schema,
+    // so we use the decisionId as a synthetic reference. The metadata.sourceType
+    // field distinguishes human decisions from document embeddings in search.
+    await prisma.$executeRaw`
+      INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
+      VALUES (
+        gen_random_uuid()::text,
+        ${decisionId},
+        ${embeddingText},
+        ${embeddingString}::vector,
+        ${metadata}::jsonb
+      )
+      ON CONFLICT (id) DO NOTHING
+    `;
+
+    log.info(`Stored embedding for human decision ${decisionId}`);
+  } catch (error) {
+    log.error(`Failed to store human decision embedding for ${decisionId}:`, error);
+    // Non-critical — don't throw
+  }
+}
+
+/**
  * Validate that a string only contains characters safe for SQL interpolation.
  * Used for values that must be embedded in $queryRawUnsafe due to PgBouncer
  * not supporting prepared statements with pgvector casts.

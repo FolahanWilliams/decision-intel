@@ -11,17 +11,19 @@ import {
   BarChart3,
   TrendingUp,
   TrendingDown,
-  Users,
   Trash2,
   Loader2,
-  MessageSquare,
-  Mail,
-  Ticket,
   PenLine,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
+import {
+  SOURCE_ICONS,
+  SOURCE_LABELS,
+  getQualityLevel,
+  getBiasArray,
+} from '@/lib/constants/human-audit';
 
 const log = createClientLogger('CognitiveAudits');
 
@@ -33,29 +35,9 @@ interface AuditSummary {
   consensusFlags: number;
 }
 
-const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
-  slack: MessageSquare,
-  meeting_transcript: Users,
-  email: Mail,
-  jira: Ticket,
-  manual: PenLine,
-};
-
-const SOURCE_LABELS: Record<string, string> = {
-  slack: 'Slack',
-  meeting_transcript: 'Meeting',
-  email: 'Email',
-  jira: 'Jira',
-  manual: 'Manual',
-};
-
-function getBiasArray(biasFindings: unknown): { severity: string; biasType: string }[] {
-  if (Array.isArray(biasFindings)) return biasFindings;
-  return [];
-}
-
 export default function CognitiveAuditsPage() {
-  const { decisions, isLoading: loading, mutate } = useHumanDecisions(1, 100);
+  const [page, setPage] = useState(1);
+  const { decisions, total, totalPages, isLoading: loading, mutate } = useHumanDecisions(page, 20);
 
   const [deleteModal, setDeleteModal] = useState<{
     open: boolean;
@@ -64,7 +46,7 @@ export default function CognitiveAuditsPage() {
   }>({ open: false, id: '', label: '' });
   const [deleting, setDeleting] = useState(false);
 
-  const auditedDecisions = useMemo(() => {
+  const auditedDecisions: HumanDecisionSummary[] = useMemo(() => {
     return decisions.filter((d: HumanDecisionSummary) => d.cognitiveAudit !== null);
   }, [decisions]);
 
@@ -74,7 +56,7 @@ export default function CognitiveAuditsPage() {
     let totalBiases = 0;
     let consensusFlags = 0;
 
-    auditedDecisions.forEach(d => {
+    auditedDecisions.forEach((d: HumanDecisionSummary) => {
       const audit = d.cognitiveAudit;
       if (!audit) return;
 
@@ -94,12 +76,6 @@ export default function CognitiveAuditsPage() {
       consensusFlags,
     };
   }, [auditedDecisions]);
-
-  const getQualityLevel = (score: number) => {
-    if (score < 40) return { label: 'HIGH RISK', color: 'var(--error)', bg: 'rgba(239, 68, 68, 0.1)' };
-    if (score < 70) return { label: 'MODERATE', color: 'var(--warning)', bg: 'rgba(245, 158, 11, 0.1)' };
-    return { label: 'GOOD', color: 'var(--success)', bg: 'rgba(34, 197, 94, 0.1)' };
-  };
 
   const handleDelete = async () => {
     if (!deleteModal.id) return;
@@ -161,9 +137,19 @@ export default function CognitiveAuditsPage() {
       <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Cognitive Audits' }]} />
 
       <header className="mb-xl">
-        <div className="flex items-center gap-md mb-sm">
-          <BrainCircuit size={28} style={{ color: 'var(--accent-primary)' }} />
-          <h1>Cognitive Audits</h1>
+        <div className="flex items-center justify-between mb-sm">
+          <div className="flex items-center gap-md">
+            <BrainCircuit size={28} style={{ color: 'var(--accent-primary)' }} />
+            <h1>Cognitive Audits</h1>
+          </div>
+          <div className="flex items-center gap-sm">
+            <Link href="/dashboard/cognitive-audits/effectiveness" className="btn btn-secondary" style={{ fontSize: '13px' }}>
+              Effectiveness
+            </Link>
+            <Link href="/dashboard/cognitive-audits/submit" className="btn btn-primary" style={{ fontSize: '13px' }}>
+              + Submit Decision
+            </Link>
+          </div>
         </div>
         <p className="text-muted">Human decision quality analysis — bias detection, noise measurement, and behavioral nudges</p>
       </header>
@@ -280,7 +266,7 @@ export default function CognitiveAuditsPage() {
                 </p>
               </div>
             ) : (
-              decisions.map((decision, idx) => {
+              decisions.map((decision: HumanDecisionSummary, idx: number) => {
                 const audit = decision.cognitiveAudit;
                 const quality = audit ? getQualityLevel(audit.decisionQualityScore) : null;
                 const biases = audit ? getBiasArray(audit.biasFindings) : [];
@@ -389,6 +375,33 @@ export default function CognitiveAuditsPage() {
           </div>
         </div>
       </ErrorBoundary>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-lg mb-lg" style={{ fontSize: '13px' }}>
+          <span className="text-muted">
+            Page {page} of {totalPages} ({total} decisions)
+          </span>
+          <div className="flex items-center gap-sm">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="btn btn-secondary"
+              style={{ padding: '6px 12px', fontSize: '12px' }}
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="btn btn-secondary"
+              style={{ padding: '6px 12px', fontSize: '12px' }}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-3 mt-xl gap-md">

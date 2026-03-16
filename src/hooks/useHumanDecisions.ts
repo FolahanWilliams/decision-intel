@@ -61,10 +61,14 @@ export function useHumanDecisions(page = 1, limit = 20) {
   params.set('limit', String(limit));
   const url = `/api/human-decisions?${params.toString()}`;
 
-  const { data, error, isLoading, mutate } = useSWR<HumanDecisionsResponse>(url, fetcher, {
+  const swrResult = useSWR<HumanDecisionsResponse>(url, fetcher, {
     revalidateOnFocus: true,
     dedupingInterval: 5000,
+    // Auto-poll when any decision is still pending analysis
+    refreshInterval: (latestData: HumanDecisionsResponse | undefined) =>
+      latestData?.decisions.some(d => d.status === 'pending') ? 3000 : 0,
   });
+  const { data, error, isLoading, mutate } = swrResult;
 
   return {
     decisions: data?.decisions ?? [],
@@ -80,11 +84,18 @@ export function useHumanDecisions(page = 1, limit = 20) {
  * SWR hook for fetching a single human decision with full audit details.
  */
 export function useHumanDecision(id: string | null) {
-  const { data, error, isLoading, mutate } = useSWR<HumanDecisionSummary>(
+  const swrResult = useSWR<HumanDecisionSummary>(
     id ? `/api/human-decisions/${id}` : null,
     fetcher,
-    { revalidateOnFocus: true, dedupingInterval: 5000 }
+    {
+      revalidateOnFocus: true,
+      dedupingInterval: 5000,
+      // Auto-poll while decision is still pending
+      refreshInterval: (latestData: HumanDecisionSummary | undefined) =>
+        latestData?.status === 'pending' ? 3000 : 0,
+    }
   );
+  const { data, error, isLoading, mutate } = swrResult;
 
   return { decision: data ?? null, isLoading, error, mutate };
 }
