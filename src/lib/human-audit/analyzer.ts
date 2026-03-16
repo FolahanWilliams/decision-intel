@@ -10,9 +10,15 @@
  * only the input channel changes.
  */
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import {
+  GoogleGenerativeAI,
+  HarmCategory,
+  HarmBlockThreshold,
+  type GenerativeModel,
+} from '@google/generative-ai';
+import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
-import { withRetry } from '@/lib/utils/resilience';
+import { withRetry, validateContent, smartTruncate } from '@/lib/utils/resilience';
 import { parseJSON } from '@/lib/utils/json';
 import {
   BIAS_DETECTIVE_PROMPT,
@@ -26,7 +32,97 @@ import type { BiasDetectionResult } from '@/types';
 
 const log = createLogger('HumanAudit');
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
+// ─── AI Model Configuration (matches nodes.ts pattern) ──────────────────────
+
+let modelInstance: GenerativeModel | null = null;
+
+function getModel(): GenerativeModel {
+  if (!modelInstance) {
+    const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
+
+    modelInstance = genAI.getGenerativeModel({
+      model: modelName,
+      generationConfig: {
+        responseMimeType: 'application/json',
+        maxOutputTokens: 16384,
+      },
+      safetySettings: [
+        // Relaxed: human decisions may contain sensitive language (incident reports, etc.)
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      ],
+    });
+  }
+  return modelInstance;
+}
+
+// ─── GDPR Anonymization (reuses same approach as gdprAnonymizerNode) ─────────
+
+async function anonymizeContent(content: string): Promise<string> {
+  try {
+    const model = getModel();
+    const result = await withRetry(
+      async () => {
+        const response = await model.generateContent([
+          `You are a GDPR Privacy Compliance Expert.
+TASK: Identify and redact ALL Personally Identifiable Information (PII) from the text below.
+
+PII to redact includes:
+- Full names of individuals (e.g., "John Smith" -> "[PERSON_1]")
+- Email addresses (e.g., "john@example.com" -> "[EMAIL_1]")
+- Phone numbers (e.g., "+1-555-0123" -> "[PHONE_1]")
+- Physical addresses (e.g., "123 Main St" -> "[ADDRESS_1]")
+- Company names (e.g., "Acme Corp" -> "[COMPANY_1]")
+- Job titles with names (e.g., "CEO John" -> "CEO [PERSON_1]")
+- IP addresses (e.g., "192.168.1.1" -> "[IP_1]")
+- SSN/National ID numbers
+- Financial account numbers
+- Slack user IDs (e.g., "<@U12345>" -> "[USER_1]")
+
+INSTRUCTIONS:
+1. Replace each PII instance with a numbered placeholder in format [TYPE_NUMBER]
+2. Maintain the structure and meaning of the text
+3. DO NOT redact generic terms like "the company", "our team", etc.
+4. Return the complete redacted text
+
+OUTPUT FORMAT: Return ONLY valid JSON.
+{
+  "redactedContent": "redacted text with [PLACEHOLDERS]",
+  "redactionCount": 0
+}`,
+          `Text to anonymize:\n${content}`,
+        ]);
+        return response.response.text();
+      },
+      2, 1000
+    );
+
+    const parsed = parseJSON(result) as { redactedContent?: string; redactionCount?: number } | null;
+
+    if (parsed?.redactedContent) {
+      // Validate that redaction actually happened for substantial content
+      const hasPlaceholders = /\[(PERSON|EMAIL|PHONE|ADDRESS|COMPANY|IP|USER|FINANCIAL)_\d+\]/.test(
+        parsed.redactedContent
+      );
+      if (!hasPlaceholders && content.length > 200) {
+        log.warn('GDPR anonymizer returned no placeholders for substantial content — using original (may contain PII)');
+        return content;
+      }
+      log.info(`GDPR anonymization complete: ${parsed.redactionCount ?? 0} redactions`);
+      return parsed.redactedContent;
+    }
+  } catch (e) {
+    log.error('GDPR anonymization failed:', e instanceof Error ? e.message : String(e));
+  }
+
+  // On failure, still proceed but log the risk
+  log.warn('GDPR anonymization unavailable — proceeding with original content');
+  return content;
+}
 
 /** Adapted bias detection prompt for human conversational inputs */
 const HUMAN_BIAS_PROMPT = `
@@ -57,7 +153,25 @@ export async function analyzeHumanDecision(
 ): Promise<CognitiveAuditResult> {
   log.info(`Analyzing human decision from ${input.source}${input.channel ? ` (${input.channel})` : ''}`);
 
-  const content = input.content;
+  // Validate content length (matches existing validateContent pattern)
+  const validation = validateContent(input.content);
+  if (!validation.valid) {
+    log.warn(`Content validation failed: ${validation.error}`);
+    return {
+      decisionQualityScore: 0,
+      noiseScore: 50,
+      summary: `Analysis skipped: ${validation.error}`,
+      biasFindings: [],
+      teamConsensusFlag: false,
+      dissenterCount: 0,
+    };
+  }
+
+  // GDPR anonymization — strip PII before any LLM calls
+  const anonymizedContent = await anonymizeContent(input.content);
+
+  // Truncate if very long (same as existing pipeline)
+  const content = smartTruncate(anonymizedContent, 50000);
 
   // Run bias detection + noise jury + sentiment in parallel
   const [biasResult, noiseResult, sentimentResult] = await Promise.allSettled([
@@ -81,7 +195,7 @@ export async function analyzeHumanDecision(
     log.error('Sentiment analysis failed:', sentimentResult.reason);
   }
 
-  // Calculate decision quality score
+  // Calculate decision quality score (same formula as riskScorerNode)
   const biasDeductions = (biasData?.biases ?? []).reduce((sum, b) => {
     const weight = { low: 2, medium: 5, high: 10, critical: 20 }[b.severity] ?? 5;
     return sum + weight;
@@ -136,7 +250,7 @@ async function detectHumanBiases(
   content: string,
   input: HumanDecisionInput
 ): Promise<HumanBiasResult> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = getModel();
 
   const contextPrefix = [
     `Decision Source: ${input.source}`,
@@ -214,7 +328,7 @@ Return JSON with this schema:
 async function measureDecisionNoise(content: string): Promise<{
   noiseStats: { mean: number; stdDev: number; variance: number };
 }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = getModel();
 
   // Spawn 3 parallel judges (Kahneman's noise measurement methodology)
   const judgePromises = Array.from({ length: 3 }, (_, i) => {
@@ -269,7 +383,7 @@ ${content}
 async function analyzeSentiment(
   content: string
 ): Promise<{ score: number; label: 'Positive' | 'Negative' | 'Neutral' }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = getModel();
 
   const prompt = `Analyze the emotional temperature of this enterprise decision communication.
 Score from -1 (very negative/hostile) to +1 (very positive/enthusiastic).

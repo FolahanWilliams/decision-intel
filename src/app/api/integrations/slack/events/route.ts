@@ -20,10 +20,14 @@ import {
   slackEventToDecisionInput,
 } from '@/lib/integrations/slack/handler';
 import { prisma } from '@/lib/prisma';
-import { toPrismaStringArray } from '@/lib/utils/prisma-json';
+import { toPrismaStringArray, toPrismaJson } from '@/lib/utils/prisma-json';
 import { analyzeHumanDecision } from '@/lib/human-audit/analyzer';
 import { generateNudges } from '@/lib/nudges/engine';
-import { toPrismaJson } from '@/lib/utils/prisma-json';
+import {
+  BiasFindings,
+  CognitiveAuditNoiseStats,
+  CognitiveAuditSentiment,
+} from '@/lib/schemas/human-audit';
 import crypto from 'crypto';
 import type { SlackWebhookPayload } from '@/types/human-audit';
 
@@ -110,31 +114,68 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function processSlackDecision(decisionId: string, input: Parameters<typeof analyzeHumanDecision>[0]) {
+async function processSlackDecision(
+  decisionId: string,
+  input: Parameters<typeof analyzeHumanDecision>[0]
+) {
   try {
     const auditResult = await analyzeHumanDecision(input);
 
-    await prisma.$transaction(async (tx) => {
-      await tx.cognitiveAudit.create({
-        data: {
-          humanDecisionId: decisionId,
-          decisionQualityScore: auditResult.decisionQualityScore,
-          noiseScore: auditResult.noiseScore,
-          sentimentScore: auditResult.sentimentScore,
-          biasFindings: toPrismaJson(auditResult.biasFindings),
-          noiseStats: toPrismaJson(auditResult.noiseStats),
-          sentimentDetail: toPrismaJson(auditResult.sentimentDetail),
-          teamConsensusFlag: auditResult.teamConsensusFlag,
-          dissenterCount: auditResult.dissenterCount,
-          summary: auditResult.summary,
-        },
-      });
+    // Validate LLM outputs with Zod before persisting
+    const validatedBiases = BiasFindings.safeParse(auditResult.biasFindings).success
+      ? auditResult.biasFindings
+      : BiasFindings.parse([]);
+    const validatedNoiseStats = CognitiveAuditNoiseStats.safeParse(auditResult.noiseStats).success
+      ? auditResult.noiseStats
+      : CognitiveAuditNoiseStats.parse({});
+    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail).success
+      ? auditResult.sentimentDetail
+      : CognitiveAuditSentiment.parse({});
 
-      await tx.humanDecision.update({
-        where: { id: decisionId },
-        data: { status: 'analyzed' },
+    // Schema drift protection — separate fallback transaction
+    let schemaDrift = false;
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.cognitiveAudit.create({
+          data: {
+            humanDecisionId: decisionId,
+            decisionQualityScore: auditResult.decisionQualityScore,
+            noiseScore: auditResult.noiseScore,
+            sentimentScore: auditResult.sentimentScore,
+            biasFindings: toPrismaJson(validatedBiases),
+            noiseStats: toPrismaJson(validatedNoiseStats),
+            sentimentDetail: toPrismaJson(validatedSentiment),
+            teamConsensusFlag: auditResult.teamConsensusFlag,
+            dissenterCount: auditResult.dissenterCount,
+            summary: auditResult.summary,
+          },
+        });
+
+        await tx.humanDecision.update({
+          where: { id: decisionId },
+          data: { status: 'analyzed' },
+        });
       });
-    });
+    } catch (dbError: unknown) {
+      const prismaError = dbError as { code?: string; message?: string };
+      if (
+        prismaError.code === 'P2021' ||
+        prismaError.code === 'P2022' ||
+        prismaError.message?.includes('does not exist')
+      ) {
+        schemaDrift = true;
+        log.warn('Schema drift in Slack audit persistence: ' + prismaError.code);
+      } else {
+        throw dbError;
+      }
+    }
+
+    if (schemaDrift) {
+      await prisma.humanDecision
+        .update({ where: { id: decisionId }, data: { status: 'error' } })
+        .catch(() => {});
+      return;
+    }
 
     // Generate and persist nudges
     const nudges = generateNudges({ decision: input, auditResult });
