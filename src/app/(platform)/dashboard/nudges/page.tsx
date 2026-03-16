@@ -56,16 +56,22 @@ const SEVERITY_STYLES: Record<string, { color: string; bg: string }> = {
 
 export default function NudgesPage() {
   const [filterUnacknowledged, setFilterUnacknowledged] = useState(false);
-  const { nudges, isLoading: loading, mutate } = useNudges(filterUnacknowledged, 100);
+  // Always fetch all nudges for stats; filter display separately
+  const { nudges: allNudges, isLoading: loading, mutate } = useNudges(false, 100);
   const [acknowledging, setAcknowledging] = useState<string | null>(null);
 
+  const nudges = useMemo(() => {
+    if (!filterUnacknowledged) return allNudges;
+    return allNudges.filter(n => !n.acknowledgedAt);
+  }, [allNudges, filterUnacknowledged]);
+
   const stats = useMemo(() => {
-    const total = nudges.length;
-    const unacked = nudges.filter(n => !n.acknowledgedAt).length;
-    const helpful = nudges.filter(n => n.wasHelpful === true).length;
-    const notHelpful = nudges.filter(n => n.wasHelpful === false).length;
+    const total = allNudges.length;
+    const unacked = allNudges.filter(n => !n.acknowledgedAt).length;
+    const helpful = allNudges.filter(n => n.wasHelpful === true).length;
+    const notHelpful = allNudges.filter(n => n.wasHelpful === false).length;
     return { total, unacked, helpful, notHelpful };
-  }, [nudges]);
+  }, [allNudges]);
 
   const handleAcknowledge = async (nudgeId: string, wasHelpful: boolean) => {
     setAcknowledging(nudgeId);
