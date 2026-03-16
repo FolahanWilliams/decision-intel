@@ -276,7 +276,7 @@ export default function TrendsPage() {
               <div className="grid grid-3 gap-md mb-lg">
                 {marketAnalysis.impactAssessment?.map((impact, i) => (
                   <div
-                    key={i}
+                    key={`${impact.category}-${i}`}
                     style={{
                       padding: '12px',
                       background: 'var(--bg-tertiary)',
@@ -312,7 +312,7 @@ export default function TrendsPage() {
                       try {
                         return (
                           <a
-                            key={i}
+                            key={`source-${source}`}
                             href={source}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -533,7 +533,7 @@ export default function TrendsPage() {
                         <Bar dataKey="value" fill="var(--error)" barSize={16}>
                           {data.biasDistribution.map((entry, index) => (
                             <Cell
-                              key={`cell-${index}`}
+                              key={`cell-${entry.name}`}
                               fill={
                                 index % 2 === 0
                                   ? 'var(--accent-primary)'

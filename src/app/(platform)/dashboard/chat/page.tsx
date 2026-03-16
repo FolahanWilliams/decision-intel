@@ -95,7 +95,7 @@ export default function ChatPage() {
       return next;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+  }, [messages, activeSessionId, pinnedDocId]);
 
   const loadSession = useCallback(
     (session: ChatSession) => {
@@ -162,7 +162,7 @@ export default function ChatPage() {
     }
     prevPinnedRef.current = pinnedDocId;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pinnedDocId]);
+  }, [pinnedDocId, documents]);
 
   const handleSubmit = useCallback(async () => {
     const text = input.trim();
