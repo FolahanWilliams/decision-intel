@@ -1,9 +1,25 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useInView } from 'framer-motion';
-import { Brain, AlertTriangle, Shield, Zap, Activity, BarChart3 } from 'lucide-react';
+import { motion, useScroll, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
+import {
+  Brain,
+  AlertTriangle,
+  Shield,
+  Zap,
+  Activity,
+  BarChart3,
+  FileSearch,
+  TrendingUp,
+  ArrowRight,
+  CheckCircle2,
+  Target,
+  Github,
+  Twitter,
+  Linkedin,
+  Mail,
+} from 'lucide-react';
 
 // Scroll Progress
 function ScrollProgress() {
@@ -19,6 +35,160 @@ function ScrollProgress() {
     />
   );
 }
+
+// Animated counter for social proof stats
+function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, v => {
+    if (target >= 1000) return `${Math.round(v / 1000)}K`;
+    if (target >= 100) return Math.round(v).toString();
+    return v.toFixed(target < 10 ? 1 : 0);
+  });
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    if (inView) {
+      const controls = animate(count, target, { duration: 2, ease: 'easeOut' });
+      return controls.stop;
+    }
+    return undefined;
+  }, [inView, count, target]);
+
+  return (
+    <span ref={ref}>
+      <motion.span>{rounded}</motion.span>
+      {suffix}
+    </span>
+  );
+}
+
+// Typewriter lines for the hero terminal
+const terminalLines = [
+  { time: '14:02:41', tag: 'SYS', tagColor: '#3b82f6', text: 'Ingesting document stream...' },
+  { time: '14:02:42', tag: 'AI', tagColor: '#3b82f6', text: 'Scanning for cognitive anomalies...' },
+  {
+    time: '',
+    tag: '',
+    tagColor: '',
+    text: '',
+    isWarning: true,
+    warnings: [
+      'Warning: Confirmatory Bias detected (94% confidence)',
+      'Warning: Groupthink indicators in Section 3',
+    ],
+  },
+  { time: '14:02:43', tag: 'SYS', tagColor: '#3b82f6', text: 'Calculating noise baseline...' },
+  {
+    time: '14:02:43',
+    tag: 'RES',
+    tagColor: '#22c55e',
+    text: 'Overall Decision Quality: ',
+    highlight: '42/100',
+  },
+];
+
+function TypewriterTerminal() {
+  const [visibleLines, setVisibleLines] = useState(0);
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    if (!inView) return;
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setVisibleLines(i);
+      if (i >= terminalLines.length) clearInterval(interval);
+    }, 700);
+    return () => clearInterval(interval);
+  }, [inView]);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        padding: '24px',
+        fontFamily: "'JetBrains Mono', monospace",
+        fontSize: '0.75rem',
+        color: 'var(--text-muted)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        minHeight: '200px',
+      }}
+    >
+      {terminalLines.slice(0, visibleLines).map((line, idx) => {
+        if (line.isWarning) {
+          return (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                padding: '10px 14px',
+                margin: '4px 0',
+                borderLeft: '2px solid rgba(245, 158, 11, 0.4)',
+                background: 'rgba(245, 158, 11, 0.05)',
+                borderRadius: '0 10px 10px 0',
+              }}
+            >
+              {line.warnings?.map((w, wi) => (
+                <span key={wi}>
+                  <span style={{ color: '#f59e0b' }}>{w}</span>
+                  {wi < (line.warnings?.length ?? 0) - 1 && <br />}
+                </span>
+              ))}
+            </motion.div>
+          );
+        }
+        return (
+          <motion.p
+            key={idx}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>{line.time}</span>{' '}
+            <span style={{ color: line.tagColor }}>{line.tag}</span> {line.text}
+            {line.highlight && (
+              <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{line.highlight}</span>
+            )}
+          </motion.p>
+        );
+      })}
+      {visibleLines < terminalLines.length && (
+        <motion.span
+          animate={{ opacity: [1, 0] }}
+          transition={{ repeat: Infinity, duration: 0.8 }}
+          style={{ color: '#f59e0b' }}
+        >
+          ▊
+        </motion.span>
+      )}
+    </div>
+  );
+}
+
+// Glass card style helper
+const glassCard = {
+  background: 'rgba(8, 11, 20, 0.58)',
+  backdropFilter: 'blur(32px) saturate(170%)',
+  WebkitBackdropFilter: 'blur(32px) saturate(170%)',
+  border: '1px solid rgba(255, 255, 255, 0.12)',
+  borderRadius: '20px',
+  boxShadow: '0 12px 48px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.07) inset',
+} as const;
+
+const glassCardLight = {
+  background: 'rgba(8, 11, 20, 0.55)',
+  backdropFilter: 'blur(24px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+  border: '1px solid rgba(255, 255, 255, 0.10)',
+  borderRadius: '20px',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset',
+} as const;
 
 export default function LandingPage() {
   const [activeDemo, setActiveDemo] = useState<'chaos' | 'order'>('chaos');
@@ -37,13 +207,19 @@ export default function LandingPage() {
 
   const heroRef = useRef(null);
   const problemRef = useRef(null);
+  const solutionRef = useRef(null);
   const featuresRef = useRef(null);
+  const socialRef = useRef(null);
   const roiRef = useRef(null);
+  const ctaRef = useRef(null);
 
   const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
   const problemInView = useInView(problemRef, { once: true, margin: '-100px' });
+  const solutionInView = useInView(solutionRef, { once: true, margin: '-100px' });
   const featuresInView = useInView(featuresRef, { once: true, margin: '-100px' });
+  const socialInView = useInView(socialRef, { once: true, margin: '-100px' });
   const roiInView = useInView(roiRef, { once: true, margin: '-100px' });
+  const ctaInView = useInView(ctaRef, { once: true, margin: '-100px' });
 
   return (
     <div
@@ -101,10 +277,13 @@ export default function LandingPage() {
               The Problem
             </a>
             <a href="#solution" className="hover:text-amber-400 transition-colors duration-300">
-              Solution
+              How It Works
             </a>
             <a href="#features" className="hover:text-amber-400 transition-colors duration-300">
               Features
+            </a>
+            <a href="#roi" className="hover:text-amber-400 transition-colors duration-300">
+              ROI
             </a>
           </div>
           <div className="flex gap-3">
@@ -124,7 +303,6 @@ export default function LandingPage() {
         className="min-h-screen flex items-center pt-24 relative overflow-hidden"
         style={{ background: 'var(--bg-primary)' }}
       >
-        {/* Enhanced ambient glow for liquid glass effect */}
         <div
           className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] rounded-full blur-[140px] pointer-events-none"
           style={{ background: 'rgba(245, 158, 11, 0.07)' }}
@@ -213,7 +391,7 @@ export default function LandingPage() {
                   }}
                 >
                   Cognitive biases and inconsistencies silently drain{' '}
-                  <span style={{ color: '#ef4444', fontWeight: 700 }}>12–15%</span> of revenue.
+                  <span style={{ color: '#ef4444', fontWeight: 700 }}>12-15%</span> of revenue.
                   Deploy our AI audit engine to detect, measure, and eliminate human error in
                   critical decisions.
                 </motion.p>
@@ -229,10 +407,10 @@ export default function LandingPage() {
                     className="btn btn-primary glow"
                     style={{ padding: '14px 32px', fontSize: '0.9rem' }}
                   >
-                    Start Free Trial
+                    Start Free Trial <ArrowRight className="w-4 h-4 ml-2 inline" />
                   </Link>
                   <a
-                    href="#problem"
+                    href="#solution"
                     className="btn btn-secondary"
                     style={{ padding: '14px 32px', fontSize: '0.9rem' }}
                   >
@@ -273,11 +451,7 @@ export default function LandingPage() {
               >
                 <div
                   style={{
-                    background: 'rgba(8, 11, 20, 0.65)',
-                    backdropFilter: 'blur(40px) saturate(180%)',
-                    WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    borderRadius: '20px',
+                    ...glassCard,
                     overflow: 'hidden',
                     boxShadow:
                       '0 12px 48px rgba(0, 0, 0, 0.4), 0 0 100px rgba(245, 158, 11, 0.05), 0 1px 0 rgba(255,255,255,0.07) inset',
@@ -302,80 +476,70 @@ export default function LandingPage() {
                     </div>
                     <div className="flex gap-2">
                       <div
-                        style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          background: '#ef4444',
-                        }}
+                        style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }}
                       />
                       <div
-                        style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          background: '#fbbf24',
-                        }}
+                        style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#fbbf24' }}
                       />
                       <div
-                        style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          background: '#22c55e',
-                        }}
+                        style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }}
                       />
                     </div>
                   </div>
-                  <div
-                    style={{
-                      padding: '24px',
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: '0.75rem',
-                      color: 'var(--text-muted)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                    }}
-                  >
-                    <p>
-                      <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>14:02:41</span>{' '}
-                      <span style={{ color: '#3b82f6' }}>SYS</span> Ingesting document stream...
-                    </p>
-                    <p>
-                      <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>14:02:42</span>{' '}
-                      <span style={{ color: '#3b82f6' }}>AI</span> Scanning for cognitive
-                      anomalies...
-                    </p>
-                    <div
-                      style={{
-                        padding: '10px 14px',
-                        margin: '4px 0',
-                        borderLeft: '2px solid rgba(245, 158, 11, 0.4)',
-                        background: 'rgba(245, 158, 11, 0.05)',
-                        borderRadius: '0 10px 10px 0',
-                      }}
-                    >
-                      <span style={{ color: '#f59e0b' }}>Warning:</span> Confirmatory Bias detected
-                      (94% confidence)
-                      <br />
-                      <span style={{ color: '#f59e0b' }}>Warning:</span> Groupthink indicators in
-                      Section 3
-                    </div>
-                    <p>
-                      <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>14:02:43</span>{' '}
-                      <span style={{ color: '#3b82f6' }}>SYS</span> Calculating noise baseline...
-                    </p>
-                    <p>
-                      <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>14:02:43</span>{' '}
-                      <span style={{ color: '#22c55e' }}>RES</span> Overall Decision Quality:{' '}
-                      <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>42/100</span>
-                    </p>
-                  </div>
+                  <TypewriterTerminal />
                 </div>
               </motion.div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Social Proof Stats */}
+      <section
+        ref={socialRef}
+        className="py-16 relative"
+        style={{
+          background: 'var(--bg-primary)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+        }}
+      >
+        <div className="container relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={socialInView ? { opacity: 1, y: 0 } : {}}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+          >
+            {[
+              { value: 15000, suffix: '+', label: 'Decisions Audited', color: '#f59e0b' },
+              { value: 47, suffix: '%', label: 'Avg Noise Reduction', color: '#22c55e' },
+              { value: 15, suffix: '+', label: 'Bias Types Detected', color: '#3b82f6' },
+              { value: 2.4, suffix: 's', label: 'Avg Analysis Time', color: '#a855f7' },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={socialInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div
+                  style={{
+                    fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+                    fontWeight: 800,
+                    color: stat.color,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    lineHeight: 1,
+                    marginBottom: '8px',
+                  }}
+                >
+                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                </div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
@@ -483,7 +647,7 @@ export default function LandingPage() {
                   'High variance across similar critical decisions',
                   'Undetected cognitive biases steering outcomes',
                   'No visibility or measurability of decision quality',
-                  '12–15% of EBITDA lost to systematic errors',
+                  '12-15% of EBITDA lost to systematic errors',
                 ].map((text, i) => (
                   <div
                     key={i}
@@ -624,6 +788,180 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section
+        id="solution"
+        ref={solutionRef}
+        className="py-32 relative"
+        style={{
+          background: 'var(--bg-primary)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+        }}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.04) 0%, transparent 60%)',
+          }}
+        />
+        <div className="container relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={solutionInView ? { opacity: 1, y: 0 } : {}}
+            className="mb-16"
+            style={{ borderLeft: '3px solid #6366f1', paddingLeft: '24px' }}
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '8px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              How It Works
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
+              Three steps from noisy decisions to quantified intelligence.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                step: '01',
+                icon: FileSearch,
+                title: 'Upload & Ingest',
+                description:
+                  'Submit decision documents, meeting notes, or Slack threads. Our pipeline extracts structured decision data automatically.',
+                color: '#f59e0b',
+                details: ['PDF, DOCX, TXT support', 'Slack & API integrations', 'Batch processing'],
+              },
+              {
+                step: '02',
+                icon: Brain,
+                title: 'AI Cognitive Audit',
+                description:
+                  'Multi-agent AI pipeline scans for 15+ cognitive biases, runs a statistical jury for noise measurement, and scores decision quality.',
+                color: '#6366f1',
+                details: ['Bias detection engine', 'Noise quantification', 'Pre-mortem analysis'],
+              },
+              {
+                step: '03',
+                icon: TrendingUp,
+                title: 'Actionable Insights',
+                description:
+                  'Receive behavioral nudges, compliance reports, and historical trend analysis. Track improvement over time.',
+                color: '#22c55e',
+                details: ['Real-time nudges', 'Effectiveness tracking', 'ROI dashboards'],
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 40 }}
+                animate={solutionInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: i * 0.15 }}
+                style={{
+                  ...glassCardLight,
+                  padding: '32px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-10px',
+                    right: '-5px',
+                    fontSize: '6rem',
+                    fontWeight: 900,
+                    color: item.color,
+                    opacity: 0.06,
+                    lineHeight: 1,
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
+                  {item.step}
+                </div>
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '14px',
+                    background: `${item.color}18`,
+                    border: `1px solid ${item.color}40`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <item.icon className="w-5 h-5" style={{ color: item.color }} />
+                </div>
+                <div
+                  style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    color: item.color,
+                    marginBottom: '8px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  STEP {item.step}
+                </div>
+                <h3
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 700,
+                    marginBottom: '12px',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  {item.title}
+                </h3>
+                <p
+                  style={{
+                    color: 'var(--text-muted)',
+                    fontSize: '0.88rem',
+                    lineHeight: 1.7,
+                    marginBottom: '20px',
+                  }}
+                >
+                  {item.description}
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {item.details.map((detail, di) => (
+                    <div
+                      key={di}
+                      className="flex items-center gap-2"
+                      style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" style={{ color: item.color, flexShrink: 0 }} />
+                      {detail}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Connection line between steps (desktop) */}
+          <div
+            className="hidden md:flex items-center justify-center mt-8 gap-4"
+            style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}
+          >
+            <div style={{ width: '120px', height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", opacity: 0.5 }}>
+              Fully automated pipeline
+            </span>
+            <div style={{ width: '120px', height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+          </div>
+        </div>
+      </section>
+
       {/* Features - Bento Grid */}
       <section
         id="features"
@@ -671,16 +1009,11 @@ export default function LandingPage() {
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2"
               style={{
-                background: 'rgba(8, 11, 20, 0.58)',
-                backdropFilter: 'blur(32px) saturate(170%)',
-                WebkitBackdropFilter: 'blur(32px) saturate(170%)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '20px',
+                ...glassCard,
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                boxShadow: '0 12px 48px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.07) inset',
               }}
             >
               <div style={{ padding: '32px', zIndex: 1 }}>
@@ -782,15 +1115,7 @@ export default function LandingPage() {
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.1 }}
               className="col-span-1 md:col-span-1 lg:col-span-2"
-              style={{
-                background: 'rgba(8, 11, 20, 0.55)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255, 255, 255, 0.10)',
-                borderRadius: '20px',
-                padding: '32px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset',
-              }}
+              style={{ ...glassCardLight, padding: '32px' }}
             >
               <div
                 style={{
@@ -845,15 +1170,7 @@ export default function LandingPage() {
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.2 }}
               className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center text-center justify-center"
-              style={{
-                background: 'rgba(8, 11, 20, 0.55)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255, 255, 255, 0.10)',
-                borderRadius: '20px',
-                padding: '32px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset',
-              }}
+              style={{ ...glassCardLight, padding: '32px' }}
             >
               <Zap className="w-8 h-8 mb-4" style={{ color: '#fbbf24' }} />
               <h3
@@ -879,15 +1196,7 @@ export default function LandingPage() {
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.3 }}
               className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center text-center justify-center"
-              style={{
-                background: 'rgba(8, 11, 20, 0.55)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255, 255, 255, 0.10)',
-                borderRadius: '20px',
-                padding: '32px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset',
-              }}
+              style={{ ...glassCardLight, padding: '32px' }}
             >
               <Shield className="w-8 h-8 mb-4" style={{ color: '#22c55e' }} />
               <h3
@@ -912,6 +1221,7 @@ export default function LandingPage() {
 
       {/* ROI Calculator */}
       <section
+        id="roi"
         ref={roiRef}
         className="py-32"
         style={{
@@ -948,15 +1258,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, x: -50 }}
               animate={roiInView ? { opacity: 1, x: 0 } : {}}
               className="md:col-span-2"
-              style={{
-                background: 'rgba(8, 11, 20, 0.58)',
-                backdropFilter: 'blur(32px) saturate(170%)',
-                WebkitBackdropFilter: 'blur(32px) saturate(170%)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: '20px',
-                padding: '32px',
-                boxShadow: '0 12px 48px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.07) inset',
-              }}
+              style={{ ...glassCard, padding: '32px' }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 <div
@@ -1087,12 +1389,9 @@ export default function LandingPage() {
               transition={{ delay: 0.1 }}
               className="md:col-span-3 relative overflow-hidden flex flex-col justify-center"
               style={{
-                background: 'rgba(8, 11, 20, 0.58)',
-                backdropFilter: 'blur(32px) saturate(170%)',
-                WebkitBackdropFilter: 'blur(32px) saturate(170%)',
-                border: '1px solid rgba(59, 130, 246, 0.22)',
-                borderRadius: '20px',
+                ...glassCard,
                 padding: '32px',
+                border: '1px solid rgba(59, 130, 246, 0.22)',
                 boxShadow:
                   '0 12px 48px rgba(0, 0, 0, 0.38), 0 0 40px rgba(59, 130, 246, 0.06), 0 1px 0 rgba(255,255,255,0.07) inset',
               }}
@@ -1222,51 +1521,260 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Final CTA */}
+      <section
+        ref={ctaRef}
+        className="py-32 relative overflow-hidden"
+        style={{
+          background: 'var(--bg-primary)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+        }}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse at center, rgba(245, 158, 11, 0.06) 0%, transparent 60%)',
+          }}
+        />
+        <div className="container relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={ctaInView ? { opacity: 1, y: 0 } : {}}
+            className="max-w-3xl mx-auto text-center"
+          >
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 14px',
+                marginBottom: '24px',
+                borderRadius: '9999px',
+                background: 'rgba(245, 158, 11, 0.10)',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
+                color: '#f59e0b',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+              }}
+            >
+              <Target className="w-3.5 h-3.5" />
+              Ready to eliminate decision noise?
+            </div>
+            <h2
+              style={{
+                fontSize: 'clamp(2rem, 4vw, 3rem)',
+                fontWeight: 800,
+                color: 'var(--text-primary)',
+                marginBottom: '16px',
+                letterSpacing: '-0.03em',
+                lineHeight: 1.15,
+              }}
+            >
+              Stop leaving money on the table.
+              <br />
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Start auditing decisions today.
+              </span>
+            </h2>
+            <p
+              style={{
+                color: 'var(--text-muted)',
+                fontSize: '1.05rem',
+                lineHeight: 1.7,
+                marginBottom: '32px',
+                maxWidth: '560px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
+            >
+              Join teams using Decision Intel to quantify cognitive biases, reduce noise, and make
+              consistently better decisions.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/login"
+                className="btn btn-primary glow"
+                style={{
+                  padding: '16px 40px',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                }}
+              >
+                Get Started Free <ArrowRight className="w-4 h-4 ml-2 inline" />
+              </Link>
+              <a
+                href="#solution"
+                className="btn btn-secondary"
+                style={{ padding: '16px 32px', fontSize: '0.95rem' }}
+              >
+                Learn More
+              </a>
+            </div>
+            <div
+              className="flex items-center justify-center gap-6 mt-8"
+              style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}
+            >
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
+                No credit card required
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
+                Free tier available
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
+                SOC 2 compliant
+              </span>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer
-        className="py-8 relative z-10"
+        className="py-16 relative z-10"
         style={{
           background: 'var(--bg-primary)',
           borderTop: '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
         <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div
-              className="flex items-center gap-3"
-              style={{
-                padding: '8px 16px',
-                background: 'rgba(8, 11, 20, 0.55)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                borderRadius: '9999px',
-                border: '1px solid rgba(255, 255, 255, 0.10)',
-                boxShadow: '0 1px 0 rgba(255,255,255,0.06) inset',
-              }}
-            >
-              <div
-                style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }}
-              />
-              <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.85rem' }}>
-                Decision Intel
-              </span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '8px' }}>
-                v2.0 · © 2025
-              </span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  style={{
+                    padding: '6px',
+                    background: 'rgba(245, 158, 11, 0.12)',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(245, 158, 11, 0.25)',
+                  }}
+                >
+                  <Brain className="w-4 h-4" style={{ color: '#f59e0b' }} />
+                </div>
+                <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>
+                  Decision Intel
+                </span>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '240px' }}>
+                AI-powered cognitive auditing for better organizational decisions.
+              </p>
             </div>
-            <div
-              className="flex items-center gap-6"
-              style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}
-            >
-              <a href="#" className="hover:text-amber-400 transition-colors">
-                Privacy
-              </a>
-              <a href="#" className="hover:text-amber-400 transition-colors">
-                Terms
-              </a>
-              <a href="#" className="hover:text-amber-400 transition-colors">
-                API Docs
-              </a>
+
+            {/* Product */}
+            <div>
+              <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px', letterSpacing: '0.05em' }}>
+                PRODUCT
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {[
+                  { label: 'Features', href: '#features' },
+                  { label: 'ROI Calculator', href: '#roi' },
+                  { label: 'How It Works', href: '#solution' },
+                  { label: 'Pricing', href: '#' },
+                ].map((link, i) => (
+                  <a
+                    key={i}
+                    href={link.href}
+                    style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}
+                    className="hover:text-amber-400 transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px', letterSpacing: '0.05em' }}>
+                RESOURCES
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {[
+                  { label: 'API Documentation', href: '#' },
+                  { label: 'Research Papers', href: '#' },
+                  { label: 'Blog', href: '#' },
+                  { label: 'Support', href: '#' },
+                ].map((link, i) => (
+                  <a
+                    key={i}
+                    href={link.href}
+                    style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}
+                    className="hover:text-amber-400 transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px', letterSpacing: '0.05em' }}>
+                LEGAL
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {[
+                  { label: 'Privacy Policy', href: '#' },
+                  { label: 'Terms of Service', href: '#' },
+                  { label: 'Cookie Policy', href: '#' },
+                  { label: 'GDPR', href: '#' },
+                ].map((link, i) => (
+                  <a
+                    key={i}
+                    href={link.href}
+                    style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}
+                    className="hover:text-amber-400 transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div
+            style={{
+              paddingTop: '24px',
+              borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '16px',
+            }}
+          >
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              &copy; 2026 Decision Intel. All rights reserved.
+            </span>
+            <div className="flex items-center gap-4">
+              {[
+                { icon: Github, href: '#', label: 'GitHub' },
+                { icon: Twitter, href: '#', label: 'Twitter' },
+                { icon: Linkedin, href: '#', label: 'LinkedIn' },
+                { icon: Mail, href: '#', label: 'Email' },
+              ].map((social, i) => (
+                <a
+                  key={i}
+                  href={social.href}
+                  title={social.label}
+                  style={{ color: 'var(--text-muted)' }}
+                  className="hover:text-amber-400 transition-colors"
+                >
+                  <social.icon className="w-4 h-4" />
+                </a>
+              ))}
             </div>
           </div>
         </div>
