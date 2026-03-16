@@ -259,11 +259,16 @@ export async function analyzeDocument(
 
     return result;
   } catch (error) {
-    // Update document status to error
-    await prisma.document.update({
-      where: { id: documentId },
-      data: { status: 'error' },
-    });
+    // Update document status to error — wrapped in try/catch to prevent
+    // masking the original error if the DB update itself fails
+    try {
+      await prisma.document.update({
+        where: { id: documentId },
+        data: { status: 'error' },
+      });
+    } catch (statusError) {
+      log.error('Failed to set document error status:', statusError instanceof Error ? statusError.message : String(statusError));
+    }
     throw error;
   }
 }

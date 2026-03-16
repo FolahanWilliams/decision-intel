@@ -449,11 +449,15 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
       )
     );
 
-    const results = await Promise.all(promises);
+    const settled = await Promise.allSettled(promises);
 
     let extractedBenchmarks: NoiseBenchmark[] = [];
-    const scores = results.map(r => {
-      const text = r.response?.text ? r.response.text() : '';
+    const scores = settled.map(r => {
+      if (r.status === 'rejected') {
+        log.warn('Noise judge failed:', r.reason instanceof Error ? r.reason.message : String(r.reason));
+        return 0;
+      }
+      const text = r.value.response?.text ? r.value.response.text() : '';
       const data = parseJSON(text);
       // Capture benchmarks from the first successful judge
       if (data?.benchmarks?.length > 0 && extractedBenchmarks.length === 0) {
