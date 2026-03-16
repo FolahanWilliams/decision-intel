@@ -112,6 +112,30 @@ export interface LogicalAnalysisResult {
     excerpt: string;
     explanation: string;
   }>;
+  // Extended fields for human decision twin simulation
+  assumptions?: string[];
+  conclusion?: string;
+  verdict?: 'APPROVED' | 'REJECTED' | 'MIXED';
+  twins?: Array<{
+    name: string;
+    role: string;
+    vote: 'APPROVE' | 'REJECT' | 'REVISE';
+    confidence: number;
+    rationale: string;
+    keyRiskIdentified: string;
+  }>;
+  institutionalMemory?: {
+    recallScore: number;
+    similarEvents: Array<{
+      documentId?: string;
+      title: string;
+      summary: string;
+      outcome: string;
+      similarity: number;
+      lessonLearned: string;
+    }>;
+    strategicAdvice: string;
+  };
 }
 
 export interface SwotAnalysisResult {
