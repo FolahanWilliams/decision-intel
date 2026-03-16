@@ -23,12 +23,15 @@ import { parseJSON } from '@/lib/utils/json';
 import {
   BIAS_DETECTIVE_PROMPT,
   NOISE_JUDGE_PROMPT,
+  VERIFICATION_SUPER_PROMPT,
+  SIMULATION_SUPER_PROMPT,
 } from '@/lib/agents/prompts';
+import { searchSimilarDocuments } from '@/lib/rag/embeddings';
 import type {
   HumanDecisionInput,
   CognitiveAuditResult,
 } from '@/types/human-audit';
-import type { BiasDetectionResult } from '@/types';
+import type { BiasDetectionResult, ComplianceResult, LogicalAnalysisResult } from '@/types';
 
 const log = createLogger('HumanAudit');
 
@@ -149,7 +152,8 @@ Also detect:
  * on human communication that Product A runs on documents.
  */
 export async function analyzeHumanDecision(
-  input: HumanDecisionInput
+  input: HumanDecisionInput,
+  options?: { userId?: string }
 ): Promise<CognitiveAuditResult> {
   log.info(`Analyzing human decision from ${input.source}${input.channel ? ` (${input.channel})` : ''}`);
 
@@ -173,17 +177,24 @@ export async function analyzeHumanDecision(
   // Truncate if very long (same as existing pipeline)
   const content = smartTruncate(anonymizedContent, 50000);
 
-  // Run bias detection + noise jury + sentiment in parallel
-  const [biasResult, noiseResult, sentimentResult] = await Promise.allSettled([
+  // Determine which deep analyses to run based on decision type/source
+  const isHighStakes = input.decisionType === 'strategic' || input.source === 'meeting_transcript';
+  const runCompliance = true; // Always run compliance check
+  const runDecisionTwin = isHighStakes;
+
+  // Phase 1: Core analyses (always run in parallel)
+  const [biasResult, noiseResult, sentimentResult, complianceResult] = await Promise.allSettled([
     detectHumanBiases(content, input),
     measureDecisionNoise(content),
     analyzeSentiment(content),
+    runCompliance ? analyzeComplianceAndPreMortem(content, input) : Promise.resolve(null),
   ]);
 
   // Extract results with safe fallbacks
   const biasData = biasResult.status === 'fulfilled' ? biasResult.value : null;
   const noiseData = noiseResult.status === 'fulfilled' ? noiseResult.value : null;
   const sentimentData = sentimentResult.status === 'fulfilled' ? sentimentResult.value : null;
+  const complianceData = complianceResult.status === 'fulfilled' ? complianceResult.value : null;
 
   if (biasResult.status === 'rejected') {
     log.error('Bias detection failed:', biasResult.reason);
@@ -193,6 +204,19 @@ export async function analyzeHumanDecision(
   }
   if (sentimentResult.status === 'rejected') {
     log.error('Sentiment analysis failed:', sentimentResult.reason);
+  }
+  if (complianceResult.status === 'rejected') {
+    log.error('Compliance/pre-mortem analysis failed:', complianceResult.reason);
+  }
+
+  // Phase 2: Decision twin simulation (only for high-stakes decisions, runs after phase 1)
+  let simulationData: DecisionTwinResult | null = null;
+  if (runDecisionTwin) {
+    try {
+      simulationData = await simulateDecisionTwin(content, input, options?.userId);
+    } catch (e) {
+      log.error('Decision twin simulation failed:', e instanceof Error ? e.message : String(e));
+    }
   }
 
   // Calculate decision quality score (same formula as riskScorerNode)
@@ -205,9 +229,14 @@ export async function analyzeHumanDecision(
     ? noiseData.noiseStats.stdDev * 5
     : 0;
 
+  // Compliance violations add to deductions
+  const complianceDeductions = complianceData?.complianceResult
+    ? complianceData.complianceResult.regulations.filter(r => r.riskLevel === 'critical' || r.riskLevel === 'high').length * 8
+    : 0;
+
   const decisionQualityScore = Math.max(
     0,
-    Math.min(100, Math.round(100 - biasDeductions - noisePenalty))
+    Math.min(100, Math.round(100 - biasDeductions - noisePenalty - complianceDeductions))
   );
 
   const noiseScore = noiseData?.noiseStats
@@ -230,6 +259,9 @@ export async function analyzeHumanDecision(
     summary,
     biasFindings: biasData?.biases ?? [],
     noiseStats: noiseData?.noiseStats,
+    complianceResult: complianceData?.complianceResult ?? undefined,
+    preMortem: complianceData?.preMortem ?? undefined,
+    logicalAnalysis: simulationData?.logicalAnalysis ?? undefined,
     sentimentDetail: sentimentData
       ? { score: sentimentData.score, label: sentimentData.label }
       : undefined,
@@ -416,6 +448,225 @@ Return JSON only: { "score": 0.0, "label": "Neutral" }`;
     score > 0.2 ? 'Positive' : score < -0.2 ? 'Negative' : 'Neutral';
 
   return { score, label };
+}
+
+// ─── Compliance + Pre-Mortem Analysis ────────────────────────────────────────
+
+interface CompliancePreMortemResult {
+  complianceResult: ComplianceResult;
+  preMortem: {
+    failureScenarios: string[];
+    preventiveMeasures: string[];
+  };
+}
+
+async function analyzeComplianceAndPreMortem(
+  content: string,
+  input: HumanDecisionInput
+): Promise<CompliancePreMortemResult | null> {
+  const model = getModel();
+
+  const prompt = `${VERIFICATION_SUPER_PROMPT}
+
+CONTEXT: This is a HUMAN DECISION from ${input.source}${input.channel ? ` (${input.channel})` : ''}.
+Decision type: ${input.decisionType || 'general'}.
+
+Additionally, perform a Pre-Mortem analysis:
+Imagine this decision has FAILED 6 months from now. Identify:
+- Top 3 failure scenarios specific to this decision
+- Preventive measures for each scenario
+
+<decision_text>
+${content}
+</decision_text>
+
+Return JSON:
+{
+  "compliance": {
+    "overallStatus": "compliant" | "non_compliant" | "needs_review",
+    "findings": [{ "regulation": "...", "status": "compliant" | "violation" | "warning", "severity": "low" | "medium" | "high" | "critical", "detail": "...", "recommendation": "..." }],
+    "riskScore": 0-100
+  },
+  "preMortem": {
+    "failureScenarios": ["scenario 1", "scenario 2", "scenario 3"],
+    "preventiveMeasures": ["measure 1", "measure 2", "measure 3"]
+  }
+}`;
+
+  const result = await withRetry(
+    async () => {
+      const response = await model.generateContent(prompt);
+      return response.response.text();
+    },
+    2, 1000
+  );
+
+  const parsed = parseJSON(result) as {
+    compliance?: {
+      overallStatus?: string;
+      findings?: Array<{
+        regulation: string;
+        status: string;
+        severity: string;
+        detail: string;
+        recommendation: string;
+      }>;
+      riskScore?: number;
+    };
+    preMortem?: {
+      failureScenarios?: string[];
+      preventiveMeasures?: string[];
+    };
+  } | null;
+
+  if (!parsed) {
+    log.warn('Failed to parse compliance/pre-mortem result');
+    return null;
+  }
+
+  // Map to existing ComplianceResult interface
+  const statusMap: Record<string, 'PASS' | 'WARN' | 'FAIL'> = {
+    compliant: 'PASS',
+    non_compliant: 'FAIL',
+    needs_review: 'WARN',
+  };
+  const findingStatusMap: Record<string, 'COMPLIANT' | 'NON_COMPLIANT' | 'PARTIAL'> = {
+    compliant: 'COMPLIANT',
+    violation: 'NON_COMPLIANT',
+    warning: 'PARTIAL',
+  };
+
+  const complianceResult: ComplianceResult = {
+    status: statusMap[parsed.compliance?.overallStatus ?? ''] ?? 'WARN',
+    riskScore: Math.max(0, Math.min(100, parsed.compliance?.riskScore ?? 50)),
+    summary: (parsed.compliance?.findings ?? []).map(f => f.detail).filter(Boolean).join('; ') || 'No compliance issues detected.',
+    regulations: (parsed.compliance?.findings ?? []).map(f => ({
+      name: f.regulation || 'Unknown',
+      status: findingStatusMap[f.status] ?? 'PARTIAL',
+      description: f.detail || '',
+      riskLevel: (['low', 'medium', 'high', 'critical'].includes(f.severity) ? f.severity : 'medium') as 'low' | 'medium' | 'high' | 'critical',
+    })),
+    searchQueries: [],
+  };
+
+  const preMortem = {
+    failureScenarios: Array.isArray(parsed.preMortem?.failureScenarios)
+      ? parsed.preMortem!.failureScenarios
+      : [],
+    preventiveMeasures: Array.isArray(parsed.preMortem?.preventiveMeasures)
+      ? parsed.preMortem!.preventiveMeasures
+      : [],
+  };
+
+  return { complianceResult, preMortem };
+}
+
+// ─── Decision Twin Simulation ────────────────────────────────────────────────
+
+interface DecisionTwinResult {
+  logicalAnalysis: LogicalAnalysisResult;
+}
+
+async function simulateDecisionTwin(
+  content: string,
+  input: HumanDecisionInput,
+  userId?: string
+): Promise<DecisionTwinResult | null> {
+  const model = getModel();
+
+  // Fetch institutional memory via RAG if user ID is available
+  let similarCasesContext = 'No similar past cases available.';
+  if (userId) {
+    try {
+      const similarDocs = await searchSimilarDocuments(content, userId, 3);
+      if (similarDocs.length > 0) {
+        similarCasesContext = similarDocs
+          .map((doc, i) => `Past Case ${i + 1} (similarity: ${(doc.similarity * 100).toFixed(0)}%):\n${doc.content.slice(0, 2000)}`)
+          .join('\n\n');
+        log.info(`Institutional memory: found ${similarDocs.length} similar past decisions`);
+      }
+    } catch (e) {
+      log.warn('RAG search failed, proceeding without institutional memory:', e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  const prompt = `${SIMULATION_SUPER_PROMPT}
+
+CONTEXT: This is a HUMAN DECISION from ${input.source}.
+Decision type: ${input.decisionType || 'strategic'}.
+${input.participants?.length ? `Participants: ${input.participants.length} people` : ''}
+
+<decision_text>
+${content}
+</decision_text>
+
+<similar_past_cases>
+${similarCasesContext}
+</similar_past_cases>`;
+
+  const result = await withRetry(
+    async () => {
+      const response = await model.generateContent(prompt);
+      return response.response.text();
+    },
+    2, 1000
+  );
+
+  const parsed = parseJSON(result) as {
+    simulation?: {
+      overallVerdict?: string;
+      twins?: Array<{
+        name: string;
+        role: string;
+        vote: string;
+        confidence: number;
+        rationale: string;
+        keyRiskIdentified: string;
+      }>;
+    };
+    institutionalMemory?: {
+      recallScore?: number;
+      similarEvents?: Array<{
+        documentId?: string;
+        title: string;
+        summary: string;
+        outcome: string;
+        similarity: number;
+        lessonLearned: string;
+      }>;
+      strategicAdvice?: string;
+    };
+  } | null;
+
+  if (!parsed?.simulation) {
+    log.warn('Failed to parse decision twin simulation');
+    return null;
+  }
+
+  const logicalAnalysis: LogicalAnalysisResult = {
+    score: parsed.simulation.twins
+      ? Math.round(parsed.simulation.twins.reduce((sum, t) => sum + (t.confidence || 50), 0) / parsed.simulation.twins.length)
+      : 50,
+    fallacies: [],
+    assumptions: parsed.simulation.twins?.map(t => t.keyRiskIdentified).filter(Boolean) ?? [],
+    conclusion: parsed.institutionalMemory?.strategicAdvice ?? `Boardroom verdict: ${parsed.simulation.overallVerdict ?? 'MIXED'}`,
+    verdict: (parsed.simulation.overallVerdict as LogicalAnalysisResult['verdict']) ?? 'MIXED',
+    twins: parsed.simulation.twins?.map(t => ({
+      name: t.name,
+      role: t.role,
+      vote: t.vote as 'APPROVE' | 'REJECT' | 'REVISE',
+      confidence: t.confidence,
+      rationale: t.rationale,
+      keyRiskIdentified: t.keyRiskIdentified,
+    })),
+    institutionalMemory: parsed.institutionalMemory ? {
+      recallScore: parsed.institutionalMemory.recallScore ?? 0,
+      similarEvents: parsed.institutionalMemory.similarEvents ?? [],
+      strategicAdvice: parsed.institutionalMemory.strategicAdvice ?? '',
+    } : undefined,
+  };
+
+  return { logicalAnalysis };
 }
 
 // ─── Summary Generation ──────────────────────────────────────────────────────

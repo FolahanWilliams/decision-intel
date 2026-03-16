@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Run cognitive audit in the background (fire-and-forget for fast response)
-    runCognitiveAudit(humanDecision!.id, body).catch((err) => {
+    runCognitiveAudit(humanDecision!.id, body, user.id).catch((err) => {
       log.error(`Background audit failed for ${humanDecision!.id}:`, err);
     });
 
@@ -180,7 +180,8 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 100);
-    const offset = parseInt(searchParams.get('offset') || '0', 10);
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const offset = (page - 1) * limit;
     const source = searchParams.get('source');
 
     const where: Record<string, unknown> = { userId: user.id };
@@ -195,10 +196,14 @@ export async function GET(req: NextRequest) {
         include: {
           cognitiveAudit: {
             select: {
+              id: true,
               decisionQualityScore: true,
               noiseScore: true,
+              sentimentScore: true,
+              biasFindings: true,
               summary: true,
               teamConsensusFlag: true,
+              dissenterCount: true,
               createdAt: true,
             },
           },
@@ -208,7 +213,6 @@ export async function GET(req: NextRequest) {
               nudgeType: true,
               message: true,
               severity: true,
-              deliveredAt: true,
               acknowledgedAt: true,
             },
             orderBy: { createdAt: 'desc' },
@@ -219,7 +223,12 @@ export async function GET(req: NextRequest) {
       prisma.humanDecision.count({ where }),
     ]);
 
-    return NextResponse.json({ decisions, total, limit, offset });
+    return NextResponse.json({
+      decisions,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     log.error('Human Decision List error:', error);
     return NextResponse.json(
@@ -233,12 +242,13 @@ export async function GET(req: NextRequest) {
 
 async function runCognitiveAudit(
   decisionId: string,
-  input: HumanDecisionInput
+  input: HumanDecisionInput,
+  userId: string
 ) {
   try {
     log.info(`Starting cognitive audit for decision ${decisionId}`);
 
-    const auditResult = await analyzeHumanDecision(input);
+    const auditResult = await analyzeHumanDecision(input, { userId });
 
     // Validate LLM outputs with Zod before persisting (matches existing pattern)
     const validatedBiases = BiasFindings.safeParse(auditResult.biasFindings).success
