@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Analysis failed',
-        details: errorMessage,
+        details: isHealableError ? 'The document could not be processed. Please try again.' : 'An unexpected error occurred during analysis.',
       },
       { status: 500 }
     );

@@ -34,16 +34,19 @@ export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
 
-    // Verify Slack signature
+    // Verify Slack signature — require signing secret to prevent unsigned requests
     const signingSecret = process.env.SLACK_SIGNING_SECRET;
-    if (signingSecret) {
-      const signature = req.headers.get('x-slack-signature') || '';
-      const timestamp = req.headers.get('x-slack-request-timestamp') || '';
+    if (!signingSecret) {
+      log.error('SLACK_SIGNING_SECRET not configured — rejecting all Slack events');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+    }
 
-      if (!verifySlackSignature(signingSecret, signature, timestamp, rawBody)) {
-        log.warn('Invalid Slack signature — rejecting request');
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-      }
+    const signature = req.headers.get('x-slack-signature') || '';
+    const timestamp = req.headers.get('x-slack-request-timestamp') || '';
+
+    if (!verifySlackSignature(signingSecret, signature, timestamp, rawBody)) {
+      log.warn('Invalid Slack signature — rejecting request');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
     const payload: SlackWebhookPayload = JSON.parse(rawBody);

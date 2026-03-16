@@ -376,7 +376,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             // Re-fetch from API to get the full record with DB-generated
             // fields (id, createdAt, BiasInstance IDs) instead of injecting
             // the raw finalReport which is missing those fields.
-            fetch(`/api/documents/${document.id}`)
+            fetch(`/api/documents/${document.id}`, { signal: controller.signal })
               .then(r => (r.ok ? r.json() : null))
               .then(data => {
                 if (data) setDocument(data);

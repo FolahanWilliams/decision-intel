@@ -179,7 +179,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 100);
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const page = Math.max(1, Math.min(parseInt(searchParams.get('page') || '1', 10), 1000));
     const offset = (page - 1) * limit;
     const source = searchParams.get('source');
 

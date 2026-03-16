@@ -195,9 +195,9 @@ export function CommandPalette() {
 
   // Focus input when opened
   useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
+    if (!open) return;
+    const id = setTimeout(() => inputRef.current?.focus(), 50);
+    return () => clearTimeout(id);
   }, [open]);
 
   // Scroll selected item into view

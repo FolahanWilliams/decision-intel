@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { SSEReader } from '@/lib/sse';
 
 export interface ChatMessage {
@@ -170,6 +170,13 @@ export function useChatStream(options?: UseChatStreamOptions): UseChatStreamRetu
     setMessages(msgs.map(m => ({ ...m, isStreaming: false })));
     setError(null);
     setIsStreaming(false);
+  }, []);
+
+  // Abort any in-flight stream on unmount to prevent state updates after teardown
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+    };
   }, []);
 
   return { messages, isStreaming, error, sendMessage, clearMessages, loadMessages };

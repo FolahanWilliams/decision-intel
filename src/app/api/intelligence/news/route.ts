@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const industry = params.get('industry');
     const category = params.get('category') as FeedCategory | null;
     const query = params.get('q');
-    const limit = Math.min(parseInt(params.get('limit') || '20'), 50);
+    const limit = Math.min(parseInt(params.get('limit') || '20', 10), 50);
 
     const articles = await searchNews({
       biasTypes: biasType ? [biasType] : undefined,
@@ -34,7 +34,10 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({ articles });
-  } catch {
-    return NextResponse.json({ articles: [] });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'News search failed', articles: [] },
+      { status: 503 }
+    );
   }
 }
