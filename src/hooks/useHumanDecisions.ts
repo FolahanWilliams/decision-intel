@@ -105,7 +105,7 @@ export interface NudgeSummary {
   nudgeType: string;
   message: string;
   severity: string;
-  channel: string;
+  channel: string | null;
   triggerReason: string | null;
   acknowledgedAt: string | null;
   wasHelpful: boolean | null;

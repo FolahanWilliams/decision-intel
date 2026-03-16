@@ -22,6 +22,7 @@ import {
   SOURCE_ICONS,
   NUDGE_TYPE_LABELS,
   SEVERITY_STYLES,
+  formatDate,
 } from '@/lib/constants/human-audit';
 
 const log = createClientLogger('Nudges');
@@ -231,7 +232,7 @@ export default function NudgesPage() {
                               {SOURCE_LABELS[nudge.humanDecision.source] || nudge.humanDecision.source}
                               {nudge.humanDecision.channel && ` — ${nudge.humanDecision.channel}`}
                             </span>
-                            <span>{new Date(nudge.createdAt).toLocaleDateString()}</span>
+                            <span>{formatDate(nudge.createdAt)}</span>
                             {nudge.triggerReason && (
                               <span style={{ color: 'var(--text-muted)' }}>{nudge.triggerReason}</span>
                             )}
