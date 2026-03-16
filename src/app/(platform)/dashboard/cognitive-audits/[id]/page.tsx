@@ -1,7 +1,7 @@
 'use client';
 
 import { use, useMemo, useState } from 'react';
-import { useHumanDecision, useNudges, type NudgeSummary } from '@/hooks/useHumanDecisions';
+import { useHumanDecision } from '@/hooks/useHumanDecisions';
 import Link from 'next/link';
 import {
   BrainCircuit,
@@ -76,8 +76,7 @@ function getBiasArray(biasFindings: unknown): BiasItem[] {
   return [];
 }
 
-function NoiseStatsCards({ audit }: { audit: Record<string, unknown> }) {
-  const noiseStats = audit.noiseStats as { mean: number; stdDev: number; variance: number } | undefined;
+function NoiseStatsCards({ noiseStats }: { noiseStats: { mean: number; stdDev: number; variance: number } | null }) {
   if (!noiseStats) return null;
   return (
     <>
@@ -123,15 +122,12 @@ export default function CognitiveAuditDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { decision, isLoading: loading, error } = useHumanDecision(id);
-  const { nudges, mutate: mutateNudges } = useNudges(false, 100);
+  const { decision, isLoading: loading, error, mutate: mutateDecision } = useHumanDecision(id);
   const [acknowledging, setAcknowledging] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'biases' | 'noise' | 'nudges'>('biases');
 
-  // Filter nudges for this decision
-  const decisionNudges = useMemo(() => {
-    return nudges.filter((n: NudgeSummary) => n.humanDecision.id === id);
-  }, [nudges, id]);
+  // Use nudges from the decision response directly
+  const decisionNudges = decision?.nudges ?? [];
 
   const audit = decision?.cognitiveAudit ?? null;
   const biases = useMemo(() => getBiasArray(audit?.biasFindings), [audit]);
@@ -160,7 +156,7 @@ export default function CognitiveAuditDetailPage({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nudgeId, wasHelpful }),
       });
-      if (res.ok) await mutateNudges();
+      if (res.ok) await mutateDecision();
     } catch (err) {
       log.error('Acknowledge failed:', err);
     } finally {
@@ -261,7 +257,7 @@ export default function CognitiveAuditDetailPage({
           )}
           <span style={{
             padding: '2px 8px', fontSize: '10px', fontWeight: 600,
-            background: decision.status === 'completed' ? 'var(--success)' : 'var(--warning)',
+            background: decision.status === 'analyzed' ? 'var(--success)' : decision.status === 'error' ? 'var(--error)' : 'var(--warning)',
             color: '#fff',
           }}>
             {decision.status.toUpperCase()}
@@ -463,7 +459,7 @@ export default function CognitiveAuditDetailPage({
                         <div className="text-xs text-muted">/ 100 (higher = more consistent)</div>
                       </div>
                     </div>
-                    <NoiseStatsCards audit={audit} />
+                    <NoiseStatsCards noiseStats={audit.noiseStats as { mean: number; stdDev: number; variance: number } | null} />
                   </div>
 
                   <div className="mt-lg" style={{ padding: 'var(--spacing-md)', background: 'var(--bg-secondary)', fontSize: '13px', lineHeight: 1.6 }}>
@@ -485,7 +481,7 @@ export default function CognitiveAuditDetailPage({
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
-                      {decisionNudges.map((nudge: NudgeSummary) => {
+                      {decisionNudges.map((nudge) => {
                         const isAcking = acknowledging === nudge.id;
                         return (
                           <div
@@ -513,7 +509,7 @@ export default function CognitiveAuditDetailPage({
                                 </span>
                               </div>
                               <span className="text-xs text-muted">
-                                {new Date(nudge.createdAt).toLocaleString()}
+                                {nudge.createdAt ? new Date(nudge.createdAt).toLocaleString() : ''}
                               </span>
                             </div>
                             <p style={{ margin: '8px 0', fontSize: '14px', lineHeight: 1.5 }}>

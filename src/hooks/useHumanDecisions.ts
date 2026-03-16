@@ -6,6 +6,19 @@ const fetcher = (url: string) =>
     return res.json();
   });
 
+export interface HumanDecisionNudge {
+  id: string;
+  nudgeType: string;
+  message: string;
+  severity: string;
+  channel?: string;
+  triggerReason?: string | null;
+  acknowledgedAt: string | null;
+  wasHelpful?: boolean | null;
+  outcomeNotes?: string | null;
+  createdAt?: string;
+}
+
 export interface HumanDecisionSummary {
   id: string;
   source: string;
@@ -21,16 +34,15 @@ export interface HumanDecisionSummary {
     sentimentScore: number | null;
     summary: string;
     biasFindings: unknown;
+    noiseStats?: unknown;
+    complianceResult?: unknown;
+    preMortem?: unknown;
+    logicalAnalysis?: unknown;
+    sentimentDetail?: unknown;
     teamConsensusFlag: boolean;
     dissenterCount: number;
   } | null;
-  nudges: {
-    id: string;
-    nudgeType: string;
-    message: string;
-    severity: string;
-    acknowledgedAt: string | null;
-  }[];
+  nudges: HumanDecisionNudge[];
 }
 
 interface HumanDecisionsResponse {
