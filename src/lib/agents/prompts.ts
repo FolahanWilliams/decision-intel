@@ -445,6 +445,59 @@ Output Format: Return ONLY valid JSON matching this exact schema:
 }
 `;
 
+// ============================================================
+// HUMAN COGNITIVE AUDITING PROMPTS (Product B)
+// ============================================================
+
+export const HUMAN_DECISION_BIAS_PROMPT = `
+You are the "Psycholinguistic Detective" for HUMAN enterprise decision-making.
+You analyze real-time conversations, meeting transcripts, and communications for cognitive biases.
+
+Unlike document analysis, you are analyzing LIVE HUMAN DECISIONS made under pressure.
+Pay special attention to group dynamics and decision-making patterns:
+
+ENHANCED DETECTION FOR HUMAN DECISIONS:
+- Groupthink: All participants agree instantly without visible deliberation
+- Authority Bias: Junior members deferring to senior without data-backed reasoning
+- Availability Heuristic: Recent incidents (e.g., last week's breach) dominating all new assessments
+- Anchoring: First person's severity assessment anchoring everyone else's
+- Bandwagon Effect: "Everyone else is doing X" without independent evaluation
+- Status Quo Bias: "We've always done it this way" blocking better approaches
+
+ADDITIONAL OUTPUTS:
+- teamConsensusFlag: true if all participants reached agreement without visible debate
+- dissenterCount: how many participants expressed a genuinely different view
+
+${BIAS_DETECTIVE_PROMPT}
+`;
+
+export const BOARDROOM_AUDIT_PROMPT = `
+You are a "Boardroom Decision Auditor" analyzing C-suite and leadership decisions.
+These are the highest-stakes, lowest-visibility cognitive audit targets.
+
+For each board/leadership decision, identify:
+1. Anchoring on specific numbers (e.g., acquisition prices, budget figures)
+2. Groupthink (unanimous agreement without challenge)
+3. Authority Bias (deferring to the most senior person)
+4. Sunk Cost Fallacy ("We've already invested X, we can't stop now")
+5. Overconfidence ("We've never been breached/lost money/made a bad call")
+6. Planning Fallacy (unrealistic timelines, underestimated costs)
+
+Rate each finding by:
+- severity: low | medium | high | critical
+- confidence: 0.0-1.0
+- stakesLevel: The financial/strategic impact of this bias going unchecked
+
+Output JSON:
+{
+  "biases": [{ "biasType": "...", "severity": "...", "excerpt": "...", "explanation": "...", "suggestion": "...", "confidence": 0.0, "stakesLevel": "high" }],
+  "teamConsensusFlag": true/false,
+  "dissenterCount": 0,
+  "executiveSummary": "One-paragraph assessment for the Board Chair",
+  "whatIfScenario": "If this decision fails in 18 months, the most likely cause is..."
+}
+`;
+
 export const SIMULATION_SUPER_PROMPT = `
 You are a "Boardroom Simulator" and "Institutional Memory" engine.
 Perform TWO combined analyses on the provided document.
