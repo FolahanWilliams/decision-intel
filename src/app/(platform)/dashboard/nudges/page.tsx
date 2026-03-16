@@ -64,7 +64,10 @@ export default function NudgesPage() {
 
   if (loading) {
     return (
-      <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
+      <div
+        className="container"
+        style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
+      >
         <div className="grid grid-4 mb-xl gap-md">
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="card animate-pulse">
@@ -77,10 +80,16 @@ export default function NudgesPage() {
           ))}
         </div>
         <div className="card animate-pulse">
-          <div className="card-header"><div className="h-4 w-40 bg-white/10" /></div>
+          <div className="card-header">
+            <div className="h-4 w-40 bg-white/10" />
+          </div>
           <div className="card-body" style={{ padding: 0 }}>
             {[0, 1, 2].map(i => (
-              <div key={i} className="flex items-center justify-between p-lg" style={{ borderBottom: '1px solid var(--border-color)' }}>
+              <div
+                key={i}
+                className="flex items-center justify-between p-lg"
+                style={{ borderBottom: '1px solid var(--border-color)' }}
+              >
                 <div className="flex items-center gap-lg">
                   <div className="w-10 h-10 bg-white/10" />
                   <div>
@@ -101,7 +110,10 @@ export default function NudgesPage() {
   }
 
   return (
-    <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
+    <div
+      className="container"
+      style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
+    >
       <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Nudges' }]} />
 
       <header className="mb-xl">
@@ -109,7 +121,9 @@ export default function NudgesPage() {
           <Bell size={28} style={{ color: 'var(--warning)' }} />
           <h1>Behavioral Nudges</h1>
         </div>
-        <p className="text-muted">Thaler-inspired decision nudges generated from cognitive audits</p>
+        <p className="text-muted">
+          Thaler-inspired decision nudges generated from cognitive audits
+        </p>
       </header>
 
       {/* Stats */}
@@ -127,7 +141,13 @@ export default function NudgesPage() {
           <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <div className="card-body text-center p-md">
               <div className="text-xs text-muted mb-sm font-medium">Unacknowledged</div>
-              <div style={{ fontSize: '2.5rem', fontWeight: 800, color: stats.unacked > 0 ? 'var(--warning)' : 'var(--success)' }}>
+              <div
+                style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 800,
+                  color: stats.unacked > 0 ? 'var(--warning)' : 'var(--success)',
+                }}
+              >
                 {stats.unacked}
               </div>
               <div className="text-xs text-muted">Pending Review</div>
@@ -170,11 +190,16 @@ export default function NudgesPage() {
       <ErrorBoundary sectionName="Nudge List">
         <div className="card animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <div className="card-header">
-            <h3 className="flex items-center gap-sm"><Bell size={18} /> Decision Nudges</h3>
+            <h3 className="flex items-center gap-sm">
+              <Bell size={18} /> Decision Nudges
+            </h3>
           </div>
           <div className="card-body" style={{ padding: 0 }}>
             {nudges.length === 0 ? (
-              <div className="flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-2xl)' }}>
+              <div
+                className="flex flex-col items-center gap-md"
+                style={{ padding: 'var(--spacing-2xl)' }}
+              >
                 <AlertCircle size={48} style={{ color: 'var(--text-muted)' }} />
                 <p className="text-muted text-center">
                   {filterUnacknowledged
@@ -193,17 +218,24 @@ export default function NudgesPage() {
                     key={nudge.id}
                     style={{
                       padding: 'var(--spacing-lg)',
-                      borderBottom: idx < nudges.length - 1 ? '1px solid var(--border-color)' : 'none',
+                      borderBottom:
+                        idx < nudges.length - 1 ? '1px solid var(--border-color)' : 'none',
                       background: nudge.acknowledgedAt ? 'transparent' : severity.bg,
                     }}
                   >
                     <div className="flex items-start justify-between gap-lg">
                       <div className="flex items-start gap-md" style={{ flex: 1 }}>
-                        <div style={{
-                          width: 40, height: 40, minWidth: 40,
-                          background: 'var(--bg-primary)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
+                        <div
+                          style={{
+                            width: 40,
+                            height: 40,
+                            minWidth: 40,
+                            background: 'var(--bg-primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
                           <AlertTriangle size={20} style={{ color: severity.color }} />
                         </div>
                         <div style={{ flex: 1 }}>
@@ -211,14 +243,22 @@ export default function NudgesPage() {
                             <span style={{ fontWeight: 600, color: severity.color }}>
                               {NUDGE_TYPE_LABELS[nudge.nudgeType] || nudge.nudgeType}
                             </span>
-                            <span style={{
-                              fontSize: '10px', padding: '2px 8px',
-                              background: severity.color, color: '#fff', fontWeight: 600,
-                            }}>
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                padding: '2px 8px',
+                                background: severity.color,
+                                color: '#fff',
+                                fontWeight: 600,
+                              }}
+                            >
                               {nudge.severity.toUpperCase()}
                             </span>
                             {nudge.acknowledgedAt && (
-                              <span className="flex items-center gap-xs text-xs" style={{ color: 'var(--success)' }}>
+                              <span
+                                className="flex items-center gap-xs text-xs"
+                                style={{ color: 'var(--success)' }}
+                              >
                                 <CheckCircle size={12} /> Acknowledged
                               </span>
                             )}
@@ -229,12 +269,15 @@ export default function NudgesPage() {
                           <div className="flex items-center gap-md text-xs text-muted">
                             <span className="flex items-center gap-xs">
                               <SourceIcon size={12} />
-                              {SOURCE_LABELS[nudge.humanDecision.source] || nudge.humanDecision.source}
+                              {SOURCE_LABELS[nudge.humanDecision.source] ||
+                                nudge.humanDecision.source}
                               {nudge.humanDecision.channel && ` — ${nudge.humanDecision.channel}`}
                             </span>
                             <span>{formatDate(nudge.createdAt)}</span>
                             {nudge.triggerReason && (
-                              <span style={{ color: 'var(--text-muted)' }}>{nudge.triggerReason}</span>
+                              <span style={{ color: 'var(--text-muted)' }}>
+                                {nudge.triggerReason}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -246,16 +289,30 @@ export default function NudgesPage() {
                             <button
                               onClick={() => handleAcknowledge(nudge.id, true)}
                               className="btn btn-ghost"
-                              style={{ padding: '6px 12px', fontSize: '12px', color: 'var(--success)' }}
+                              style={{
+                                padding: '6px 12px',
+                                fontSize: '12px',
+                                color: 'var(--success)',
+                              }}
                               disabled={isAcking}
                               title="Helpful"
                             >
-                              {isAcking ? <Loader2 size={14} className="animate-spin" /> : <><ThumbsUp size={14} /> Helpful</>}
+                              {isAcking ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : (
+                                <>
+                                  <ThumbsUp size={14} /> Helpful
+                                </>
+                              )}
                             </button>
                             <button
                               onClick={() => handleAcknowledge(nudge.id, false)}
                               className="btn btn-ghost"
-                              style={{ padding: '6px 12px', fontSize: '12px', color: 'var(--text-muted)' }}
+                              style={{
+                                padding: '6px 12px',
+                                fontSize: '12px',
+                                color: 'var(--text-muted)',
+                              }}
                               disabled={isAcking}
                               title="Not relevant"
                             >
@@ -264,9 +321,12 @@ export default function NudgesPage() {
                           </>
                         ) : (
                           nudge.wasHelpful !== null && (
-                            <span className="flex items-center gap-xs text-xs" style={{
-                              color: nudge.wasHelpful ? 'var(--success)' : 'var(--text-muted)',
-                            }}>
+                            <span
+                              className="flex items-center gap-xs text-xs"
+                              style={{
+                                color: nudge.wasHelpful ? 'var(--success)' : 'var(--text-muted)',
+                              }}
+                            >
                               {nudge.wasHelpful ? <ThumbsUp size={12} /> : <ThumbsDown size={12} />}
                               {nudge.wasHelpful ? 'Helpful' : 'Dismissed'}
                             </span>

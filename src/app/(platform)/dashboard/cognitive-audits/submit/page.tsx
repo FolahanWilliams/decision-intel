@@ -3,13 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {
-  BrainCircuit,
-  ArrowLeft,
-  Loader2,
-  Send,
-  AlertCircle,
-} from 'lucide-react';
+import { BrainCircuit, ArrowLeft, Loader2, Send, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SOURCE_LABELS } from '@/lib/constants/human-audit';
 
@@ -59,7 +53,10 @@ export default function SubmitDecisionPage() {
       if (channel.trim()) body.channel = channel.trim();
       if (decisionType) body.decisionType = decisionType;
       if (participants.trim()) {
-        body.participants = participants.split(',').map(p => p.trim()).filter(Boolean);
+        body.participants = participants
+          .split(',')
+          .map(p => p.trim())
+          .filter(Boolean);
       }
 
       const res = await fetch('/api/human-decisions', {
@@ -85,12 +82,21 @@ export default function SubmitDecisionPage() {
   };
 
   return (
-    <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)', maxWidth: 720 }}>
-      <Breadcrumbs items={[
-        { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Cognitive Audits', href: '/dashboard/cognitive-audits' },
-        { label: 'Submit Decision' },
-      ]} />
+    <div
+      className="container"
+      style={{
+        paddingTop: 'var(--spacing-2xl)',
+        paddingBottom: 'var(--spacing-2xl)',
+        maxWidth: 720,
+      }}
+    >
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Cognitive Audits', href: '/dashboard/cognitive-audits' },
+          { label: 'Submit Decision' },
+        ]}
+      />
 
       <header className="mb-xl animate-fade-in">
         <div className="flex items-center gap-md mb-sm">
@@ -103,12 +109,16 @@ export default function SubmitDecisionPage() {
       </header>
 
       {error && (
-        <div className="flex items-center gap-sm mb-lg" style={{
-          padding: 'var(--spacing-md)',
-          background: 'rgba(239, 68, 68, 0.1)',
-          border: '1px solid var(--error)',
-          fontSize: '14px', color: 'var(--error)',
-        }}>
+        <div
+          className="flex items-center gap-sm mb-lg"
+          style={{
+            padding: 'var(--spacing-md)',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid var(--error)',
+            fontSize: '14px',
+            color: 'var(--error)',
+          }}
+        >
           <AlertCircle size={16} />
           {error}
         </div>
@@ -116,32 +126,46 @@ export default function SubmitDecisionPage() {
 
       <form onSubmit={handleSubmit}>
         <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
-
+          <div
+            className="card-body"
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}
+          >
             {/* Source */}
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}>
+              <label
+                style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}
+              >
                 Source
               </label>
               <select
                 value={source}
                 onChange={e => setSource(e.target.value)}
                 style={{
-                  width: '100%', padding: '10px 12px', fontSize: '14px',
-                  background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+                  width: '100%',
+                  padding: '10px 12px',
+                  fontSize: '14px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
                   color: 'var(--text-primary)',
                 }}
               >
                 {SOURCES.map(s => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Channel */}
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}>
-                Channel / Context <span className="text-muted" style={{ fontWeight: 400 }}>(optional)</span>
+              <label
+                style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}
+              >
+                Channel / Context{' '}
+                <span className="text-muted" style={{ fontWeight: 400 }}>
+                  (optional)
+                </span>
               </label>
               <input
                 type="text"
@@ -149,8 +173,11 @@ export default function SubmitDecisionPage() {
                 onChange={e => setChannel(e.target.value)}
                 placeholder="e.g. #incident-response, Board Meeting Q1"
                 style={{
-                  width: '100%', padding: '10px 12px', fontSize: '14px',
-                  background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+                  width: '100%',
+                  padding: '10px 12px',
+                  fontSize: '14px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
                   color: 'var(--text-primary)',
                 }}
               />
@@ -158,28 +185,43 @@ export default function SubmitDecisionPage() {
 
             {/* Decision Type */}
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}>
-                Decision Type <span className="text-muted" style={{ fontWeight: 400 }}>(optional)</span>
+              <label
+                style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}
+              >
+                Decision Type{' '}
+                <span className="text-muted" style={{ fontWeight: 400 }}>
+                  (optional)
+                </span>
               </label>
               <select
                 value={decisionType}
                 onChange={e => setDecisionType(e.target.value)}
                 style={{
-                  width: '100%', padding: '10px 12px', fontSize: '14px',
-                  background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+                  width: '100%',
+                  padding: '10px 12px',
+                  fontSize: '14px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
                   color: 'var(--text-primary)',
                 }}
               >
                 {DECISION_TYPES.map(t => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Participants */}
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}>
-                Participants <span className="text-muted" style={{ fontWeight: 400 }}>(comma-separated, optional)</span>
+              <label
+                style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}
+              >
+                Participants{' '}
+                <span className="text-muted" style={{ fontWeight: 400 }}>
+                  (comma-separated, optional)
+                </span>
               </label>
               <input
                 type="text"
@@ -187,8 +229,11 @@ export default function SubmitDecisionPage() {
                 onChange={e => setParticipants(e.target.value)}
                 placeholder="e.g. Alice, Bob, Charlie"
                 style={{
-                  width: '100%', padding: '10px 12px', fontSize: '14px',
-                  background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+                  width: '100%',
+                  padding: '10px 12px',
+                  fontSize: '14px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
                   color: 'var(--text-primary)',
                 }}
               />
@@ -196,7 +241,9 @@ export default function SubmitDecisionPage() {
 
             {/* Content */}
             <div>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}>
+              <label
+                style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}
+              >
                 Decision Content <span style={{ color: 'var(--error)' }}>*</span>
               </label>
               <textarea
@@ -205,14 +252,22 @@ export default function SubmitDecisionPage() {
                 placeholder="Paste the decision text, meeting transcript, or email thread here..."
                 rows={12}
                 style={{
-                  width: '100%', padding: '12px', fontSize: '14px', lineHeight: 1.6,
-                  background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)', resize: 'vertical', fontFamily: 'inherit',
+                  width: '100%',
+                  padding: '12px',
+                  fontSize: '14px',
+                  lineHeight: 1.6,
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  resize: 'vertical',
+                  fontFamily: 'inherit',
                 }}
                 required
               />
               <div className="text-xs text-muted mt-xs">
-                {content.length > 0 ? `${content.length} characters` : 'Minimum 20 characters recommended for meaningful analysis'}
+                {content.length > 0
+                  ? `${content.length} characters`
+                  : 'Minimum 20 characters recommended for meaningful analysis'}
               </div>
             </div>
           </div>
@@ -230,9 +285,13 @@ export default function SubmitDecisionPage() {
             style={{ minWidth: 180 }}
           >
             {submitting ? (
-              <><Loader2 size={16} className="animate-spin" /> Submitting...</>
+              <>
+                <Loader2 size={16} className="animate-spin" /> Submitting...
+              </>
             ) : (
-              <><Send size={16} /> Submit for Audit</>
+              <>
+                <Send size={16} /> Submit for Audit
+              </>
             )}
           </button>
         </div>

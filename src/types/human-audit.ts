@@ -65,8 +65,8 @@ export interface MeetingTranscriptInput {
 
 export interface CognitiveAuditResult {
   decisionQualityScore: number; // 0-100
-  noiseScore: number;           // 0-100
-  sentimentScore?: number;      // -1 to 1
+  noiseScore: number; // 0-100
+  sentimentScore?: number; // -1 to 1
   summary: string;
 
   biasFindings: BiasDetectionResult[];
@@ -120,12 +120,12 @@ export const NUDGE_TEMPLATES: Record<NudgeType, { icon: string; template: string
   anchor_alert: {
     icon: '\u{1F4A1}',
     template:
-      'You\'ve assessed {count} consecutive incidents with the same severity as the first. Consider reassessing independently.',
+      "You've assessed {count} consecutive incidents with the same severity as the first. Consider reassessing independently.",
   },
   dissent_prompt: {
     icon: '\u{1F504}',
     template:
-      'Unanimous agreement detected. Assigning a Devil\'s Advocate role to [{person}] for this decision.',
+      "Unanimous agreement detected. Assigning a Devil's Advocate role to [{person}] for this decision.",
   },
   base_rate_reminder: {
     icon: '\u{1F4CA}',

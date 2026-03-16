@@ -49,10 +49,7 @@ export function verifySlackSignature(
   const expectedSignature = `v0=${hmac.digest('hex')}`;
 
   try {
-    return crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature)
-    );
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
   } catch {
     return false;
   }
@@ -78,15 +75,13 @@ const DECISION_SIGNALS = [
  */
 export function isDecisionMessage(text: string): boolean {
   if (!text || text.length < 20) return false;
-  return DECISION_SIGNALS.some((pattern) => pattern.test(text));
+  return DECISION_SIGNALS.some(pattern => pattern.test(text));
 }
 
 /**
  * Classify the type of decision from message content.
  */
-export function classifyDecisionType(
-  text: string
-): HumanDecisionInput['decisionType'] {
+export function classifyDecisionType(text: string): HumanDecisionInput['decisionType'] {
   const lower = text.toLowerCase();
 
   if (/\b(p[0-4]|sev[0-4]|triage|classify)\b/.test(lower)) return 'triage';
@@ -102,9 +97,7 @@ export function classifyDecisionType(
 /**
  * Convert a Slack event into a HumanDecisionInput for the audit pipeline.
  */
-export function slackEventToDecisionInput(
-  payload: SlackWebhookPayload
-): HumanDecisionInput | null {
+export function slackEventToDecisionInput(payload: SlackWebhookPayload): HumanDecisionInput | null {
   const event = payload.event;
   if (!event || event.type !== 'message') return null;
   if (!isDecisionMessage(event.text)) return null;
@@ -125,10 +118,7 @@ export function slackEventToDecisionInput(
  * Format a nudge as a Slack message with Block Kit formatting.
  * Nudges are designed to feel like coaching, not surveillance.
  */
-export function formatNudgeForSlack(
-  nudge: NudgeDefinition,
-  threadTs?: string
-): SlackNudgePayload {
+export function formatNudgeForSlack(nudge: NudgeDefinition, threadTs?: string): SlackNudgePayload {
   const severityEmoji = {
     info: ':bulb:',
     warning: ':warning:',
@@ -184,9 +174,7 @@ export function formatNudgeForSlack(
  * Send a nudge to Slack via the Web API.
  * Uses the bot token stored in environment variables.
  */
-export async function deliverSlackNudge(
-  payload: SlackNudgePayload
-): Promise<boolean> {
+export async function deliverSlackNudge(payload: SlackNudgePayload): Promise<boolean> {
   const token = process.env.SLACK_BOT_TOKEN;
   if (!token) {
     log.warn('SLACK_BOT_TOKEN not configured, skipping Slack nudge delivery');

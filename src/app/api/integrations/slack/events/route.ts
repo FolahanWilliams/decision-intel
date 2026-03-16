@@ -15,10 +15,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
-import {
-  verifySlackSignature,
-  slackEventToDecisionInput,
-} from '@/lib/integrations/slack/handler';
+import { verifySlackSignature, slackEventToDecisionInput } from '@/lib/integrations/slack/handler';
 import { prisma } from '@/lib/prisma';
 import { toPrismaStringArray, toPrismaJson } from '@/lib/utils/prisma-json';
 import { analyzeHumanDecision } from '@/lib/human-audit/analyzer';
@@ -66,10 +63,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Deduplicate
-      const contentHash = crypto
-        .createHash('sha256')
-        .update(decisionInput.content)
-        .digest('hex');
+      const contentHash = crypto.createHash('sha256').update(decisionInput.content).digest('hex');
 
       const existing = await prisma.humanDecision.findUnique({
         where: { contentHash },
@@ -99,7 +93,7 @@ export async function POST(req: NextRequest) {
       });
 
       // Run audit in background (don't block Slack's 3-second timeout)
-      processSlackDecision(humanDecision.id, decisionInput).catch((err) => {
+      processSlackDecision(humanDecision.id, decisionInput).catch(err => {
         log.error(`Background Slack audit failed for ${humanDecision.id}:`, err);
       });
 
@@ -128,14 +122,15 @@ async function processSlackDecision(
     const validatedNoiseStats = CognitiveAuditNoiseStats.safeParse(auditResult.noiseStats).success
       ? auditResult.noiseStats
       : CognitiveAuditNoiseStats.parse({});
-    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail).success
+    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail)
+      .success
       ? auditResult.sentimentDetail
       : CognitiveAuditSentiment.parse({});
 
     // Schema drift protection — separate fallback transaction
     let schemaDrift = false;
     try {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async tx => {
         await tx.cognitiveAudit.create({
           data: {
             humanDecisionId: decisionId,
@@ -191,7 +186,7 @@ async function processSlackDecision(
             channel: 'slack',
           },
         })
-        .catch((err) => log.error('Nudge persist failed:', err));
+        .catch(err => log.error('Nudge persist failed:', err));
     }
 
     log.info(`Slack decision ${decisionId} audited: score=${auditResult.decisionQualityScore}`);

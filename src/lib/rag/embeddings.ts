@@ -288,7 +288,9 @@ export async function storeHumanDecisionEmbedding(
       ON CONFLICT (id) DO NOTHING
     `;
 
-    log.info(`Stored embedding for human decision ${decisionId} (linked to doc ${linkedDocumentId})`);
+    log.info(
+      `Stored embedding for human decision ${decisionId} (linked to doc ${linkedDocumentId})`
+    );
   } catch (error) {
     log.error(`Failed to store human decision embedding for ${decisionId}:`, error);
     // Non-critical — don't throw

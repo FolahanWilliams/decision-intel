@@ -5,13 +5,7 @@
  * used across the cognitive-audits list, detail, and nudges pages.
  */
 
-import {
-  MessageSquare,
-  Users,
-  Mail,
-  Ticket,
-  PenLine,
-} from 'lucide-react';
+import { MessageSquare, Users, Mail, Ticket, PenLine } from 'lucide-react';
 
 // ─── Source Metadata ────────────────────────────────────────────────────────
 
@@ -56,8 +50,10 @@ export const SEVERITY_STYLES: Record<string, { color: string; bg: string }> = {
 };
 
 export function getQualityLevel(score: number) {
-  if (score < 40) return { label: 'HIGH RISK', color: 'var(--error)', bg: 'rgba(239, 68, 68, 0.1)' };
-  if (score < 70) return { label: 'MODERATE', color: 'var(--warning)', bg: 'rgba(245, 158, 11, 0.1)' };
+  if (score < 40)
+    return { label: 'HIGH RISK', color: 'var(--error)', bg: 'rgba(239, 68, 68, 0.1)' };
+  if (score < 70)
+    return { label: 'MODERATE', color: 'var(--warning)', bg: 'rgba(245, 158, 11, 0.1)' };
   return { label: 'GOOD', color: 'var(--success)', bg: 'rgba(34, 197, 94, 0.1)' };
 }
 
@@ -73,7 +69,9 @@ export const NUDGE_TYPE_LABELS: Record<string, string> = {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-export function getBiasArray<T = { severity: string; biasType: string }>(biasFindings: unknown): T[] {
+export function getBiasArray<T = { severity: string; biasType: string }>(
+  biasFindings: unknown
+): T[] {
   if (Array.isArray(biasFindings)) return biasFindings;
   return [];
 }
@@ -103,6 +101,19 @@ export function formatDateShort(dateStr: string | undefined | null): string {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return '';
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
   return `${months[d.getUTCMonth()]} ${d.getUTCDate()}`;
 }
