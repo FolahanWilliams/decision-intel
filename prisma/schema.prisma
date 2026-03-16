@@ -223,6 +223,123 @@ model IntelligenceSync {
   @@index([createdAt])
 }
 
+// ─── Human Cognitive Auditing (Product B) ─────────────────────────────────
+
+model HumanDecision {
+  id           String   @id @default(cuid())
+  userId       String   // Supabase Auth User ID (who submitted/ingested)
+  orgId        String?  // Organization ID
+  source       String   // "slack" | "meeting_transcript" | "email" | "jira" | "manual"
+  sourceRef    String?  // External reference (Slack message ID, Jira ticket, etc.)
+  channel      String?  // Source channel (e.g., #incident-response, board-meeting)
+  decisionType String?  // "triage" | "escalation" | "approval" | "override" | "strategic" | "vendor_eval"
+  participants String[] // Anonymized participant identifiers
+  content      String   @db.Text // Anonymized decision text
+  contentHash  String?  @unique  // For deduplication
+
+  // Linked AI decision (bridges Product A ↔ Product B)
+  linkedAnalysisId String?  // If this human decision relates to an AI-audited document
+
+  status       String   @default("pending") // "pending" | "analyzed" | "error"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  cognitiveAudit CognitiveAudit?
+  nudges         Nudge[]
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([source])
+  @@index([channel])
+  @@index([createdAt])
+  @@index([contentHash])
+}
+
+model CognitiveAudit {
+  id              String   @id @default(cuid())
+  humanDecisionId String   @unique
+  humanDecision   HumanDecision @relation(fields: [humanDecisionId], references: [id], onDelete: Cascade)
+
+  // Scores
+  decisionQualityScore Float   // 0-100 overall quality
+  noiseScore           Float   // 0-100 consistency measure
+  sentimentScore       Float?  // -1 to 1
+
+  // Analysis outputs (JSON blobs)
+  biasFindings     Json?  // Array of bias detections (same schema as BiasDetectionResult)
+  noiseStats       Json?  // { mean, stdDev, variance }
+  complianceResult Json?  // ComplianceResult
+  preMortem        Json?  // { failureScenarios, preventiveMeasures }
+  logicalAnalysis  Json?  // LogicalAnalysisResult
+  sentimentDetail  Json?  // { score, label }
+
+  // Team-level aggregation metadata
+  teamConsensusFlag Boolean @default(false) // True if unanimous agreement detected
+  dissenterCount    Int     @default(0)     // Number of dissenting voices
+
+  summary         String  @db.Text
+  modelVersion    String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([humanDecisionId])
+  @@index([createdAt])
+}
+
+model Nudge {
+  id              String   @id @default(cuid())
+  humanDecisionId String?
+  humanDecision   HumanDecision? @relation(fields: [humanDecisionId], references: [id], onDelete: SetNull)
+
+  orgId           String?
+  targetUserId    String?  // Anonymized recipient (null = team-level nudge)
+  nudgeType       String   // "anchor_alert" | "dissent_prompt" | "base_rate_reminder" | "pre_mortem_trigger" | "noise_check"
+  triggerReason   String   @db.Text // What triggered this nudge
+  message         String   @db.Text // The nudge content shown to the user
+  severity        String   @default("info") // "info" | "warning" | "critical"
+
+  // Delivery
+  channel         String   @default("dashboard") // "dashboard" | "slack" | "email"
+  deliveredAt     DateTime?
+  acknowledgedAt  DateTime?
+
+  // Effectiveness tracking
+  wasHelpful      Boolean? // User feedback on the nudge
+  outcomeNotes    String?  @db.Text
+
+  createdAt       DateTime @default(now())
+
+  @@index([humanDecisionId])
+  @@index([orgId])
+  @@index([nudgeType])
+  @@index([targetUserId])
+  @@index([createdAt])
+}
+
+model TeamCognitiveProfile {
+  id              String   @id @default(cuid())
+  orgId           String
+  periodStart     DateTime
+  periodEnd       DateTime
+
+  // Aggregated metrics (anonymous — no individual attribution)
+  avgDecisionQuality Float
+  avgNoiseScore      Float
+  totalDecisions     Int    @default(0)
+  topBiases          Json   // Array of { biasType, frequency, avgSeverity }
+  consistencyTrend   Json?  // Array of { date, score } for sparkline
+  nudgeEffectiveness Json?  // { sent, acknowledged, helpfulRate }
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([orgId, periodStart, periodEnd])
+  @@index([orgId])
+  @@index([periodStart])
+}
+
 // Rate limiting table - replaces Redis for cost savings
 model RateLimit {
   id        String   @id @default(cuid())

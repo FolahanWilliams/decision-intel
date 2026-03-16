@@ -13,7 +13,13 @@ export type AuditAction =
   | 'SIMULATE_SCENARIO'
   | 'SEARCH_MARKET_TRENDS'
   | 'CHAT_MESSAGE'
-  | 'DELETE_ACCOUNT_DATA';
+  | 'DELETE_ACCOUNT_DATA'
+  // Human Cognitive Auditing (Product B)
+  | 'SUBMIT_HUMAN_DECISION'
+  | 'VIEW_COGNITIVE_AUDIT'
+  | 'ACKNOWLEDGE_NUDGE'
+  | 'SLACK_DECISION_INGESTED'
+  | 'MEETING_TRANSCRIPT_ANALYZED';
 
 export interface AuditLogParams {
   action: AuditAction;
