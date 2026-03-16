@@ -84,17 +84,17 @@ export function useNotifications() {
 export function NotificationBell() {
   const { notifications, unreadCount, markRead, markAllRead, clearAll } = useNotifications();
   const [open, setOpen] = useState(false);
-  // Tick counter forces re-render so timeAgo() recalculates with fresh Date.now()
-  const [, setTick] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
 
-  // Update every 30s when open so relative timestamps stay fresh
+  // Update every 10s when open so relative timestamps stay fresh
   useEffect(() => {
     if (!open) return;
-    const interval = setInterval(() => setTick(t => t + 1), 30_000);
+    const interval = setInterval(() => setNow(Date.now()), 10_000);
     return () => clearInterval(interval);
   }, [open]);
 
   const handleToggle = useCallback(() => {
+    setNow(Date.now());
     setOpen(prev => !prev);
   }, []);
 
@@ -121,8 +121,7 @@ export function NotificationBell() {
   };
 
   const timeAgo = (ts: number) => {
-    // Use live Date.now() for accuracy; `now` state forces periodic re-renders
-    const seconds = Math.floor((Date.now() - ts) / 1000);
+    const seconds = Math.floor((now - ts) / 1000);
     if (seconds < 60) return 'just now';
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;

@@ -308,7 +308,7 @@ export default function TrendsPage() {
                     Verified Sources:
                   </div>
                   <div className="flex flex-wrap gap-sm">
-                    {marketAnalysis.searchSources.map((source, i) => {
+                    {marketAnalysis.searchSources.map((source) => {
                       try {
                         return (
                           <a

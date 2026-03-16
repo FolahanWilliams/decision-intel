@@ -94,7 +94,6 @@ export default function ChatPage() {
       saveSessions(next);
       return next;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, activeSessionId, pinnedDocId]);
 
   const loadSession = useCallback(
