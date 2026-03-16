@@ -34,6 +34,7 @@ import {
   SEVERITY_COLORS,
   NUDGE_TYPE_LABELS,
   getBiasArray,
+  formatDate,
 } from '@/lib/constants/human-audit';
 
 const log = createClientLogger('CognitiveAuditDetail');
@@ -239,7 +240,7 @@ export default function CognitiveAuditDetailPage({
           </h1>
         </div>
         <div className="flex items-center gap-lg text-sm text-muted">
-          <span>{new Date(decision.createdAt).toLocaleString()}</span>
+          <span>{formatDate(decision.createdAt, true)}</span>
           {decision.decisionType && (
             <span style={{ color: 'var(--accent-secondary)', fontWeight: 600 }}>
               {decision.decisionType}
@@ -780,7 +781,7 @@ export default function CognitiveAuditDetailPage({
                                 </span>
                               </div>
                               <span className="text-xs text-muted">
-                                {nudge.createdAt ? new Date(nudge.createdAt).toLocaleString() : ''}
+                                {formatDate(nudge.createdAt, true)}
                               </span>
                             </div>
                             <p style={{ margin: '8px 0', fontSize: '14px', lineHeight: 1.5 }}>

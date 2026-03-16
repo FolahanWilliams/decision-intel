@@ -77,3 +77,32 @@ export function getBiasArray<T = { severity: string; biasType: string }>(biasFin
   if (Array.isArray(biasFindings)) return biasFindings;
   return [];
 }
+
+/**
+ * Format a date string into a locale-independent format safe for SSR.
+ * Avoids hydration mismatches from new Date().toLocaleString() in JSX.
+ */
+export function formatDate(dateStr: string | undefined | null, includeTime = false): string {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  if (!includeTime) return `${year}-${month}-${day}`;
+  const hours = String(d.getUTCHours()).padStart(2, '0');
+  const mins = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${mins}`;
+}
+
+/**
+ * Format a date string into short month + day (e.g. "Mar 16").
+ * UTC-based to avoid hydration mismatches.
+ */
+export function formatDateShort(dateStr: string | undefined | null): string {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[d.getUTCMonth()]} ${d.getUTCDate()}`;
+}

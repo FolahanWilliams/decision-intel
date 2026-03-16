@@ -68,6 +68,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch nudge stats for the period
     let nudges: Array<{ acknowledgedAt: Date | null; wasHelpful: boolean | null }>;
+    let nudgeDataAvailable = true;
     try {
       nudges = await prisma.nudge.findMany({
         where: {
@@ -79,7 +80,15 @@ export async function GET(req: NextRequest) {
           wasHelpful: true,
         },
       });
-    } catch {
+    } catch (dbError: unknown) {
+      const prismaError = dbError as { code?: string; message?: string };
+      if (
+        prismaError.code === 'P2021' ||
+        prismaError.code === 'P2022' ||
+        prismaError.message?.includes('does not exist')
+      ) {
+        nudgeDataAvailable = false;
+      }
       nudges = [];
     }
 
@@ -155,6 +164,7 @@ export async function GET(req: NextRequest) {
         notHelpful,
         pending,
         helpfulRate: acknowledged > 0 ? Math.round((helpful / acknowledged) * 100) : 0,
+        dataAvailable: nudgeDataAvailable,
       },
     });
   } catch (error) {

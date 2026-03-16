@@ -240,14 +240,28 @@ export async function storeAnalysisEmbedding(
 
 /**
  * Store an embedding for a human decision (Product B) for future RAG recall.
- * Uses a metadata marker to distinguish from document embeddings.
+ *
+ * NOTE: DecisionEmbedding has a FK constraint on documentId → Document.
+ * Human decisions only get embeddings when linked to an existing Document
+ * via `linkedAnalysisId`. Without a linked document, embedding storage is
+ * skipped (the FK constraint would reject synthetic IDs).
+ *
+ * A future migration should add a nullable `humanDecisionId` column to
+ * DecisionEmbedding to support standalone human decision embeddings.
  */
 export async function storeHumanDecisionEmbedding(
   decisionId: string,
   content: string,
   userId: string,
-  auditSummary?: string
+  auditSummary?: string,
+  linkedDocumentId?: string
 ): Promise<void> {
+  // DecisionEmbedding requires a valid documentId FK — skip if no linked document
+  if (!linkedDocumentId) {
+    log.info(`Skipping embedding for human decision ${decisionId} — no linked document`);
+    return;
+  }
+
   try {
     const embeddingText = auditSummary
       ? `Human Decision (${decisionId}):\n${content}\n\nAudit Summary: ${auditSummary}`
@@ -262,14 +276,11 @@ export async function storeHumanDecisionEmbedding(
       createdAt: new Date().toISOString(),
     });
 
-    // Store in DecisionEmbedding table — documentId is required by schema,
-    // so we use the decisionId as a synthetic reference. The metadata.sourceType
-    // field distinguishes human decisions from document embeddings in search.
     await prisma.$executeRaw`
       INSERT INTO "DecisionEmbedding" (id, "documentId", content, embedding, metadata)
       VALUES (
         gen_random_uuid()::text,
-        ${decisionId},
+        ${linkedDocumentId},
         ${embeddingText},
         ${embeddingString}::vector,
         ${metadata}::jsonb
@@ -277,7 +288,7 @@ export async function storeHumanDecisionEmbedding(
       ON CONFLICT (id) DO NOTHING
     `;
 
-    log.info(`Stored embedding for human decision ${decisionId}`);
+    log.info(`Stored embedding for human decision ${decisionId} (linked to doc ${linkedDocumentId})`);
   } catch (error) {
     log.error(`Failed to store human decision embedding for ${decisionId}:`, error);
     // Non-critical — don't throw

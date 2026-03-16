@@ -23,6 +23,7 @@ import {
   SOURCE_LABELS,
   getQualityLevel,
   getBiasArray,
+  formatDate,
 } from '@/lib/constants/human-audit';
 
 const log = createClientLogger('CognitiveAudits');
@@ -299,7 +300,7 @@ export default function CognitiveAuditsPage() {
                         </div>
                         <div className="flex items-center gap-md">
                           <span className="text-xs text-muted">
-                            {new Date(decision.createdAt).toLocaleDateString()}
+                            {formatDate(decision.createdAt)}
                           </span>
                           {decision.decisionType && (
                             <span className="text-xs" style={{ color: 'var(--accent-secondary)' }}>

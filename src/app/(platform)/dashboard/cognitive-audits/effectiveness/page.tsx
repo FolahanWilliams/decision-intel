@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { SOURCE_LABELS } from '@/lib/constants/human-audit';
+import { SOURCE_LABELS, formatDateShort } from '@/lib/constants/human-audit';
 
 const fetcher = (url: string) =>
   fetch(url).then(res => {
@@ -191,7 +191,7 @@ export default function EffectivenessPage() {
                         transition: 'height 0.3s ease',
                       }} title={`Week of ${week.week}: ${week.avgScore} avg (${week.count} decisions)`} />
                       <span style={{ fontSize: '9px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                        {new Date(week.week).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        {formatDateShort(week.week)}
                       </span>
                     </div>
                   );

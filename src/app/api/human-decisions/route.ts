@@ -218,7 +218,11 @@ export async function GET(req: NextRequest) {
               nudgeType: true,
               message: true,
               severity: true,
+              channel: true,
+              triggerReason: true,
               acknowledgedAt: true,
+              wasHelpful: true,
+              createdAt: true,
             },
             orderBy: { createdAt: 'desc' },
             take: 5,
@@ -330,7 +334,8 @@ async function runCognitiveAudit(
     }
 
     // Embed the decision content for future RAG recall (fire-and-forget)
-    storeHumanDecisionEmbedding(decisionId, input.content, userId, auditResult.summary)
+    // Only works when decision is linked to an existing Document (FK constraint)
+    storeHumanDecisionEmbedding(decisionId, input.content, userId, auditResult.summary, input.linkedAnalysisId)
       .catch((err) => log.error('Human decision embedding failed:', err));
 
     // Generate nudges
