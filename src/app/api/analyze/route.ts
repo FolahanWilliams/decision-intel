@@ -34,6 +34,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
       const extUserId = request.headers.get('x-extension-user-id');
+      // Validate extension user ID format — alphanumeric, hyphens, underscores only, max 128 chars
+      if (extUserId && !/^[a-zA-Z0-9_-]{1,128}$/.test(extUserId)) {
+        return NextResponse.json({ error: 'Invalid extension user ID format' }, { status: 400 });
+      }
       effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';
     }
 

@@ -12,12 +12,17 @@ export const maxDuration = 300; // 5 minutes for full sync
 
 const CRON_SECRET = process.env.CRON_SECRET?.trim();
 
-/** Constant-time comparison to prevent timing attacks on the cron secret. */
+/** Constant-time comparison to prevent timing attacks on the cron secret.
+ *  Pads the shorter buffer to avoid leaking length information. */
 function safeCompare(a: string, b: string): boolean {
   const bufA = Buffer.from(a);
   const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return timingSafeEqual(bufA, bufB);
+  const maxLen = Math.max(bufA.length, bufB.length);
+  const paddedA = Buffer.alloc(maxLen);
+  const paddedB = Buffer.alloc(maxLen);
+  bufA.copy(paddedA);
+  bufB.copy(paddedB);
+  return bufA.length === bufB.length && timingSafeEqual(paddedA, paddedB);
 }
 
 /**
@@ -119,10 +124,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     log.error('Intelligence cron failed:', error);
     return NextResponse.json(
-      {
-        error: 'Intelligence sync failed',
-        details: error instanceof Error ? error.message : String(error),
-      },
+      { error: 'Intelligence sync failed' },
       { status: 500 }
     );
   }

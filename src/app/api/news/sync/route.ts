@@ -49,10 +49,7 @@ export async function POST(_request: NextRequest) {
   } catch (error) {
     log.error('News sync failed:', error);
     return NextResponse.json(
-      {
-        error: 'News sync failed',
-        details: error instanceof Error ? error.message : String(error),
-      },
+      { error: 'News sync failed' },
       { status: 500 }
     );
   }
