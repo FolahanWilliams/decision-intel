@@ -10,8 +10,9 @@ const log = createClientLogger('AnalysisStream');
 // Constants
 // ---------------------------------------------------------------------------
 
-/** Abort the stream and surface an error after this duration. */
-const STREAM_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+/** Abort the stream and surface an error after this duration.
+ *  Matches the server-side `maxDuration` (240s) in /api/analyze/stream. */
+const STREAM_TIMEOUT_MS = 4 * 60 * 1000; // 4 minutes
 
 // ---------------------------------------------------------------------------
 // Types

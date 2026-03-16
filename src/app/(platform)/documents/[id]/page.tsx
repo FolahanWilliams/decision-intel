@@ -26,6 +26,7 @@ import { useToast } from '@/components/ui/ToastContext';
 import { SSEReader } from '@/lib/sse';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
+import { formatDate } from '@/lib/constants/human-audit';
 
 const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
@@ -490,7 +491,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           <div>
             <h1 className="text-xl font-semibold">{document.filename}</h1>
             <p className="text-sm text-muted">
-              {new Date(document.uploadedAt).toLocaleDateString()} •{' '}
+              {formatDate(document.uploadedAt)} •{' '}
               {(document.fileSize / 1024).toFixed(1)} KB
             </p>
           </div>
@@ -671,7 +672,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             </h3>
             {analysis.factCheck.dataFetchedAt && (
               <span className="text-xs text-muted">
-                Data fetched: {new Date(analysis.factCheck.dataFetchedAt).toLocaleString()}
+                Data fetched: {formatDate(analysis.factCheck.dataFetchedAt, true)}
               </span>
             )}
           </div>
