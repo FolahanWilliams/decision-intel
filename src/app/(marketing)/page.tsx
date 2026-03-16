@@ -2,7 +2,16 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useInView, useMotionValue, useTransform, animate, AnimatePresence, useSpring } from 'framer-motion';
+import {
+  motion,
+  useScroll,
+  useInView,
+  useMotionValue,
+  useTransform,
+  animate,
+  AnimatePresence,
+  useSpring,
+} from 'framer-motion';
 import {
   Brain,
   AlertTriangle,
@@ -156,7 +165,9 @@ function TypewriterTerminal() {
             <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>{line.time}</span>{' '}
             <span style={{ color: line.tagColor }}>{line.tag}</span> {line.text}
             {line.highlight && (
-              <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{line.highlight}</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
+                {line.highlight}
+              </span>
             )}
           </motion.p>
         );
@@ -248,12 +259,16 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
             }}
           >
             <div className="flex justify-end p-4">
-              <button onClick={onClose} aria-label="Close menu" style={{ color: 'var(--text-muted)' }}>
+              <button
+                onClick={onClose}
+                aria-label="Close menu"
+                style={{ color: 'var(--text-muted)' }}
+              >
                 <X className="w-6 h-6" />
               </button>
             </div>
             <nav className="flex flex-col gap-2 px-6">
-              {links.map((link) => (
+              {links.map(link => (
                 <a
                   key={link.href}
                   href={link.href}
@@ -270,7 +285,9 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                   {link.label}
                 </a>
               ))}
-              <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '12px 0' }} />
+              <div
+                style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '12px 0' }}
+              />
               <Link
                 href="/login"
                 onClick={onClose}
@@ -296,7 +313,13 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
 }
 
 // SVG section divider
-function SectionDivider({ color = 'rgba(255,255,255,0.06)', variant = 'wave' }: { color?: string; variant?: 'wave' | 'angle' | 'glow' }) {
+function SectionDivider({
+  color = 'rgba(255,255,255,0.06)',
+  variant = 'wave',
+}: {
+  color?: string;
+  variant?: 'wave' | 'angle' | 'glow';
+}) {
   if (variant === 'glow') {
     return (
       <div className="relative" style={{ height: '2px' }}>
@@ -324,18 +347,33 @@ function SectionDivider({ color = 'rgba(255,255,255,0.06)', variant = 'wave' }: 
   }
   if (variant === 'angle') {
     return (
-      <svg viewBox="0 0 1440 24" fill="none" className="w-full" style={{ display: 'block' }} preserveAspectRatio="none">
+      <svg
+        viewBox="0 0 1440 24"
+        fill="none"
+        className="w-full"
+        style={{ display: 'block' }}
+        preserveAspectRatio="none"
+      >
         <path d="M0 24L720 0L1440 24V24H0V24Z" fill="var(--bg-primary)" />
-        <path d="M0 24L720 0L1440 24" stroke={color} vectorEffect="non-scaling-stroke" strokeWidth="1" fill="none" />
+        <path
+          d="M0 24L720 0L1440 24"
+          stroke={color}
+          vectorEffect="non-scaling-stroke"
+          strokeWidth="1"
+          fill="none"
+        />
       </svg>
     );
   }
   return (
-    <svg viewBox="0 0 1440 40" fill="none" className="w-full" style={{ display: 'block' }} preserveAspectRatio="none">
-      <path
-        d="M0 20C240 40 480 0 720 20C960 40 1200 0 1440 20V40H0V20Z"
-        fill="var(--bg-primary)"
-      />
+    <svg
+      viewBox="0 0 1440 40"
+      fill="none"
+      className="w-full"
+      style={{ display: 'block' }}
+      preserveAspectRatio="none"
+    >
+      <path d="M0 20C240 40 480 0 720 20C960 40 1200 0 1440 20V40H0V20Z" fill="var(--bg-primary)" />
       <path
         d="M0 20C240 40 480 0 720 20C960 40 1200 0 1440 20"
         stroke={color}
@@ -348,7 +386,12 @@ function SectionDivider({ color = 'rgba(255,255,255,0.06)', variant = 'wave' }: 
 }
 
 // FAQ Accordion item
-function FAQItem({ question, answer, isOpen, onToggle }: {
+function FAQItem({
+  question,
+  answer,
+  isOpen,
+  onToggle,
+}: {
   question: string;
   answer: string;
   isOpen: boolean;
@@ -462,9 +505,18 @@ export default function LandingPage() {
 
   // Scroll-linked parallax for hero glows
   const { scrollY } = useScroll();
-  const glowY1 = useSpring(useTransform(scrollY, [0, 800], [0, 120]), { stiffness: 50, damping: 20 });
-  const glowY2 = useSpring(useTransform(scrollY, [0, 800], [0, -80]), { stiffness: 50, damping: 20 });
-  const glowY3 = useSpring(useTransform(scrollY, [0, 800], [0, 60]), { stiffness: 50, damping: 20 });
+  const glowY1 = useSpring(useTransform(scrollY, [0, 800], [0, 120]), {
+    stiffness: 50,
+    damping: 20,
+  });
+  const glowY2 = useSpring(useTransform(scrollY, [0, 800], [0, -80]), {
+    stiffness: 50,
+    damping: 20,
+  });
+  const glowY3 = useSpring(useTransform(scrollY, [0, 800], [0, 60]), {
+    stiffness: 50,
+    damping: 20,
+  });
 
   return (
     <div
@@ -533,10 +585,18 @@ export default function LandingPage() {
             </a>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="btn btn-secondary hidden sm:inline-flex" style={{ fontSize: '0.85rem' }}>
+            <Link
+              href="/login"
+              className="btn btn-secondary hidden sm:inline-flex"
+              style={{ fontSize: '0.85rem' }}
+            >
               Sign In
             </Link>
-            <Link href="/login" className="btn btn-primary hidden sm:inline-flex" style={{ fontSize: '0.85rem' }}>
+            <Link
+              href="/login"
+              className="btn btn-primary hidden sm:inline-flex"
+              style={{ fontSize: '0.85rem' }}
+            >
               Get Started
             </Link>
             <button
@@ -730,13 +790,28 @@ export default function LandingPage() {
                     </div>
                     <div className="flex gap-2">
                       <div
-                        style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' }}
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: '#ef4444',
+                        }}
                       />
                       <div
-                        style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#fbbf24' }}
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: '#fbbf24',
+                        }}
                       />
                       <div
-                        style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }}
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: '#22c55e',
+                        }}
                       />
                     </div>
                   </div>
@@ -848,11 +923,13 @@ export default function LandingPage() {
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
-                background: activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255,255,255,0.04)',
+                background:
+                  activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255,255,255,0.04)',
                 color: activeDemo === 'chaos' ? '#ef4444' : 'var(--text-muted)',
                 borderWidth: '1px',
                 borderStyle: 'solid',
-                borderColor: activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.08)',
+                borderColor:
+                  activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.08)',
               }}
             >
               <AlertTriangle className="w-4 h-4 inline mr-2" />
@@ -868,11 +945,13 @@ export default function LandingPage() {
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
-                background: activeDemo === 'order' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255,255,255,0.04)',
+                background:
+                  activeDemo === 'order' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255,255,255,0.04)',
                 color: activeDemo === 'order' ? '#22c55e' : 'var(--text-muted)',
                 borderWidth: '1px',
                 borderStyle: 'solid',
-                borderColor: activeDemo === 'order' ? 'rgba(34, 197, 94, 0.25)' : 'rgba(255,255,255,0.08)',
+                borderColor:
+                  activeDemo === 'order' ? 'rgba(34, 197, 94, 0.25)' : 'rgba(255,255,255,0.08)',
               }}
             >
               <Shield className="w-4 h-4 inline mr-2" />
@@ -1234,7 +1313,10 @@ export default function LandingPage() {
                       className="flex items-center gap-2"
                       style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" style={{ color: item.color, flexShrink: 0 }} />
+                      <CheckCircle2
+                        className="w-3.5 h-3.5"
+                        style={{ color: item.color, flexShrink: 0 }}
+                      />
                       {detail}
                     </div>
                   ))}
@@ -1516,12 +1598,7 @@ export default function LandingPage() {
       <SectionDivider variant="wave" color="rgba(59, 130, 246, 0.15)" />
 
       {/* ROI Calculator */}
-      <section
-        id="roi"
-        ref={roiRef}
-        className="py-32"
-        style={{ background: 'var(--bg-primary)' }}
-      >
+      <section id="roi" ref={roiRef} className="py-32" style={{ background: 'var(--bg-primary)' }}>
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -2031,18 +2108,35 @@ export default function LandingPage() {
                 >
                   <Brain className="w-4 h-4" style={{ color: '#f59e0b' }} />
                 </div>
-                <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>
+                <span
+                  style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}
+                >
                   Decision Intel
                 </span>
               </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '240px' }}>
+              <p
+                style={{
+                  fontSize: '0.8rem',
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.7,
+                  maxWidth: '240px',
+                }}
+              >
                 AI-powered cognitive auditing for better organizational decisions.
               </p>
             </div>
 
             {/* Product */}
             <div>
-              <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px', letterSpacing: '0.05em' }}>
+              <h4
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '16px',
+                  letterSpacing: '0.05em',
+                }}
+              >
                 PRODUCT
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -2066,7 +2160,15 @@ export default function LandingPage() {
 
             {/* Resources */}
             <div>
-              <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px', letterSpacing: '0.05em' }}>
+              <h4
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '16px',
+                  letterSpacing: '0.05em',
+                }}
+              >
                 RESOURCES
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -2090,7 +2192,15 @@ export default function LandingPage() {
 
             {/* Legal */}
             <div>
-              <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px', letterSpacing: '0.05em' }}>
+              <h4
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '16px',
+                  letterSpacing: '0.05em',
+                }}
+              >
                 LEGAL
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

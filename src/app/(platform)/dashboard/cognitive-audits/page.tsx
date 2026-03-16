@@ -69,9 +69,8 @@ export default function CognitiveAuditsPage() {
 
     return {
       totalDecisions: auditedDecisions.length,
-      avgQualityScore: auditedDecisions.length > 0
-        ? Math.round(totalScore / auditedDecisions.length)
-        : 0,
+      avgQualityScore:
+        auditedDecisions.length > 0 ? Math.round(totalScore / auditedDecisions.length) : 0,
       highRiskCount: highRisk,
       totalBiases,
       consensusFlags,
@@ -96,7 +95,10 @@ export default function CognitiveAuditsPage() {
 
   if (loading) {
     return (
-      <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
+      <div
+        className="container"
+        style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
+      >
         <div className="grid grid-4 mb-xl gap-md">
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="card animate-pulse">
@@ -109,10 +111,16 @@ export default function CognitiveAuditsPage() {
           ))}
         </div>
         <div className="card animate-pulse">
-          <div className="card-header"><div className="h-4 w-40 bg-white/10" /></div>
+          <div className="card-header">
+            <div className="h-4 w-40 bg-white/10" />
+          </div>
           <div className="card-body" style={{ padding: 0 }}>
             {[0, 1, 2].map(i => (
-              <div key={i} className="flex items-center justify-between p-lg" style={{ borderBottom: '1px solid var(--border-color)' }}>
+              <div
+                key={i}
+                className="flex items-center justify-between p-lg"
+                style={{ borderBottom: '1px solid var(--border-color)' }}
+              >
                 <div className="flex items-center gap-lg">
                   <div className="w-12 h-12 bg-white/10" />
                   <div>
@@ -134,8 +142,13 @@ export default function CognitiveAuditsPage() {
   }
 
   return (
-    <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}>
-      <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Cognitive Audits' }]} />
+    <div
+      className="container"
+      style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
+    >
+      <Breadcrumbs
+        items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Cognitive Audits' }]}
+      />
 
       <header className="mb-xl">
         <div className="flex items-center justify-between mb-sm">
@@ -144,15 +157,25 @@ export default function CognitiveAuditsPage() {
             <h1>Cognitive Audits</h1>
           </div>
           <div className="flex items-center gap-sm">
-            <Link href="/dashboard/cognitive-audits/effectiveness" className="btn btn-secondary" style={{ fontSize: '13px' }}>
+            <Link
+              href="/dashboard/cognitive-audits/effectiveness"
+              className="btn btn-secondary"
+              style={{ fontSize: '13px' }}
+            >
               Effectiveness
             </Link>
-            <Link href="/dashboard/cognitive-audits/submit" className="btn btn-primary" style={{ fontSize: '13px' }}>
+            <Link
+              href="/dashboard/cognitive-audits/submit"
+              className="btn btn-primary"
+              style={{ fontSize: '13px' }}
+            >
               + Submit Decision
             </Link>
           </div>
         </div>
-        <p className="text-muted">Human decision quality analysis — bias detection, noise measurement, and behavioral nudges</p>
+        <p className="text-muted">
+          Human decision quality analysis — bias detection, noise measurement, and behavioral nudges
+        </p>
       </header>
 
       {/* Summary Cards */}
@@ -171,17 +194,29 @@ export default function CognitiveAuditsPage() {
           <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <div className="card-body text-center p-md">
               <div className="text-xs text-muted mb-sm font-medium">Avg Quality</div>
-              <div style={{
-                fontSize: '2.5rem', fontWeight: 800,
-                color: summary.avgQualityScore >= 70 ? 'var(--success)' : summary.avgQualityScore >= 40 ? 'var(--warning)' : 'var(--error)',
-              }}>
+              <div
+                style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 800,
+                  color:
+                    summary.avgQualityScore >= 70
+                      ? 'var(--success)'
+                      : summary.avgQualityScore >= 40
+                        ? 'var(--warning)'
+                        : 'var(--error)',
+                }}
+              >
                 {summary.avgQualityScore}
               </div>
               <div className="text-xs text-muted flex items-center justify-center gap-xs">
                 {summary.avgQualityScore >= 50 ? (
-                  <><TrendingUp size={12} style={{ color: 'var(--success)' }} /> Good</>
+                  <>
+                    <TrendingUp size={12} style={{ color: 'var(--success)' }} /> Good
+                  </>
                 ) : (
-                  <><TrendingDown size={12} style={{ color: 'var(--error)' }} /> Needs Attention</>
+                  <>
+                    <TrendingDown size={12} style={{ color: 'var(--error)' }} /> Needs Attention
+                  </>
                 )}
               </div>
             </div>
@@ -204,7 +239,8 @@ export default function CognitiveAuditsPage() {
                 {summary.totalBiases}
               </div>
               <div className="text-xs text-muted">
-                {summary.consensusFlags > 0 && `${summary.consensusFlags} consensus flag${summary.consensusFlags > 1 ? 's' : ''}`}
+                {summary.consensusFlags > 0 &&
+                  `${summary.consensusFlags} consensus flag${summary.consensusFlags > 1 ? 's' : ''}`}
               </div>
             </div>
           </div>
@@ -216,30 +252,69 @@ export default function CognitiveAuditsPage() {
         <ErrorBoundary sectionName="Quality Distribution">
           <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <div className="card-header">
-              <h3 className="flex items-center gap-sm"><BarChart3 size={18} /> Quality Distribution</h3>
+              <h3 className="flex items-center gap-sm">
+                <BarChart3 size={18} /> Quality Distribution
+              </h3>
             </div>
             <div className="card-body">
               {(() => {
-                const high = auditedDecisions.filter(d => (d.cognitiveAudit?.decisionQualityScore ?? 0) < 40).length;
+                const high = auditedDecisions.filter(
+                  d => (d.cognitiveAudit?.decisionQualityScore ?? 0) < 40
+                ).length;
                 const med = auditedDecisions.filter(d => {
                   const s = d.cognitiveAudit?.decisionQualityScore ?? 0;
                   return s >= 40 && s < 70;
                 }).length;
-                const low = auditedDecisions.filter(d => (d.cognitiveAudit?.decisionQualityScore ?? 0) >= 70).length;
+                const low = auditedDecisions.filter(
+                  d => (d.cognitiveAudit?.decisionQualityScore ?? 0) >= 70
+                ).length;
                 return (
                   <div style={{ display: 'flex', height: '40px', overflow: 'hidden' }}>
                     {high > 0 && (
-                      <div style={{ flex: high, background: 'var(--error)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '12px', fontWeight: 600 }}>
+                      <div
+                        style={{
+                          flex: high,
+                          background: 'var(--error)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#fff',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                        }}
+                      >
                         High Risk ({high})
                       </div>
                     )}
                     {med > 0 && (
-                      <div style={{ flex: med, background: 'var(--warning)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontSize: '12px', fontWeight: 600 }}>
+                      <div
+                        style={{
+                          flex: med,
+                          background: 'var(--warning)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#000',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                        }}
+                      >
                         Moderate ({med})
                       </div>
                     )}
                     {low > 0 && (
-                      <div style={{ flex: low, background: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '12px', fontWeight: 600 }}>
+                      <div
+                        style={{
+                          flex: low,
+                          background: 'var(--success)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#fff',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                        }}
+                      >
                         Good ({low})
                       </div>
                     )}
@@ -255,14 +330,20 @@ export default function CognitiveAuditsPage() {
       <ErrorBoundary sectionName="Decision List">
         <div className="card animate-fade-in" style={{ animationDelay: '0.5s' }}>
           <div className="card-header">
-            <h3 className="flex items-center gap-sm"><BrainCircuit size={18} /> Human Decision Audits</h3>
+            <h3 className="flex items-center gap-sm">
+              <BrainCircuit size={18} /> Human Decision Audits
+            </h3>
           </div>
           <div className="card-body" style={{ padding: 0 }}>
             {decisions.length === 0 ? (
-              <div className="flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-2xl)' }}>
+              <div
+                className="flex flex-col items-center gap-md"
+                style={{ padding: 'var(--spacing-2xl)' }}
+              >
                 <AlertCircle size={48} style={{ color: 'var(--text-muted)' }} />
                 <p className="text-muted text-center">
-                  No human decisions audited yet.<br />
+                  No human decisions audited yet.
+                  <br />
                   Submit decisions via the API, Slack integration, or manual entry to get started.
                 </p>
               </div>
@@ -278,7 +359,8 @@ export default function CognitiveAuditsPage() {
                     key={decision.id}
                     style={{
                       padding: 'var(--spacing-lg)',
-                      borderBottom: idx < decisions.length - 1 ? '1px solid var(--border-color)' : 'none',
+                      borderBottom:
+                        idx < decisions.length - 1 ? '1px solid var(--border-color)' : 'none',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -286,12 +368,20 @@ export default function CognitiveAuditsPage() {
                     }}
                   >
                     <div className="flex items-center gap-lg">
-                      <div style={{
-                        width: 48, height: 48,
-                        background: 'var(--bg-primary)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
-                        <SourceIcon size={24} style={{ color: quality?.color ?? 'var(--text-muted)' }} />
+                      <div
+                        style={{
+                          width: 48,
+                          height: 48,
+                          background: 'var(--bg-primary)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <SourceIcon
+                          size={24}
+                          style={{ color: quality?.color ?? 'var(--text-muted)' }}
+                        />
                       </div>
                       <div>
                         <div style={{ fontWeight: 600, marginBottom: '4px' }}>
@@ -308,22 +398,43 @@ export default function CognitiveAuditsPage() {
                             </span>
                           )}
                           {decision.status === 'pending' && (
-                            <span style={{
-                              fontSize: '10px', padding: '2px 8px',
-                              background: 'var(--text-muted)', color: '#fff', fontWeight: 600,
-                            }}>PENDING</span>
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                padding: '2px 8px',
+                                background: 'var(--text-muted)',
+                                color: '#fff',
+                                fontWeight: 600,
+                              }}
+                            >
+                              PENDING
+                            </span>
                           )}
                           {quality && (
-                            <span style={{
-                              fontSize: '10px', padding: '2px 8px',
-                              background: quality.color, color: '#fff', fontWeight: 600,
-                            }}>{quality.label}</span>
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                padding: '2px 8px',
+                                background: quality.color,
+                                color: '#fff',
+                                fontWeight: 600,
+                              }}
+                            >
+                              {quality.label}
+                            </span>
                           )}
                           {audit?.teamConsensusFlag && (
-                            <span style={{
-                              fontSize: '10px', padding: '2px 8px',
-                              background: 'var(--warning)', color: '#000', fontWeight: 600,
-                            }}>CONSENSUS</span>
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                padding: '2px 8px',
+                                background: 'var(--warning)',
+                                color: '#000',
+                                fontWeight: 600,
+                              }}
+                            >
+                              CONSENSUS
+                            </span>
                           )}
                         </div>
                       </div>
@@ -334,7 +445,9 @@ export default function CognitiveAuditsPage() {
                         <>
                           <div className="text-center">
                             <div className="text-xs text-muted">Quality</div>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 700, color: quality?.color }}>
+                            <div
+                              style={{ fontSize: '1.5rem', fontWeight: 700, color: quality?.color }}
+                            >
                               {Math.round(audit.decisionQualityScore)}
                             </div>
                           </div>
@@ -347,7 +460,12 @@ export default function CognitiveAuditsPage() {
                           <div className="text-center">
                             <div className="text-xs text-muted">Biases</div>
                             <div className="flex items-center gap-xs">
-                              <AlertTriangle size={14} style={{ color: biases.length > 0 ? 'var(--warning)' : 'var(--text-muted)' }} />
+                              <AlertTriangle
+                                size={14}
+                                style={{
+                                  color: biases.length > 0 ? 'var(--warning)' : 'var(--text-muted)',
+                                }}
+                              />
                               <span style={{ fontWeight: 600 }}>{biases.length}</span>
                             </div>
                           </div>
@@ -361,7 +479,13 @@ export default function CognitiveAuditsPage() {
                         View Details <ArrowRight size={14} />
                       </Link>
                       <button
-                        onClick={() => setDeleteModal({ open: true, id: decision.id, label: `${SOURCE_LABELS[decision.source] || decision.source}${decision.channel ? ` — ${decision.channel}` : ''}` })}
+                        onClick={() =>
+                          setDeleteModal({
+                            open: true,
+                            id: decision.id,
+                            label: `${SOURCE_LABELS[decision.source] || decision.source}${decision.channel ? ` — ${decision.channel}` : ''}`,
+                          })
+                        }
                         className="btn btn-ghost"
                         style={{ padding: '8px', color: 'var(--text-muted)' }}
                         title="Delete decision"
@@ -437,11 +561,20 @@ export default function CognitiveAuditsPage() {
 
       {/* Delete Modal */}
       {deleteModal.open && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0, 0, 0, 0.75)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.75)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
           <div className="card" style={{ maxWidth: 400, width: '90%' }}>
             <div className="card-header">
               <h3 className="flex items-center gap-sm">
@@ -451,11 +584,23 @@ export default function CognitiveAuditsPage() {
             </div>
             <div className="card-body">
               <p className="mb-lg">
-                Are you sure you want to delete <strong>{deleteModal.label}</strong>? This will remove the decision, its cognitive audit, and all nudges.
+                Are you sure you want to delete <strong>{deleteModal.label}</strong>? This will
+                remove the decision, its cognitive audit, and all nudges.
               </p>
               <div className="flex items-center gap-md justify-end">
-                <button onClick={() => setDeleteModal({ open: false, id: '', label: '' })} className="btn btn-ghost" disabled={deleting}>Cancel</button>
-                <button onClick={handleDelete} className="btn" style={{ background: 'var(--error)', color: '#fff' }} disabled={deleting}>
+                <button
+                  onClick={() => setDeleteModal({ open: false, id: '', label: '' })}
+                  className="btn btn-ghost"
+                  disabled={deleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="btn"
+                  style={{ background: 'var(--error)', color: '#fff' }}
+                  disabled={deleting}
+                >
                   {deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete'}
                 </button>
               </div>

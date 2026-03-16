@@ -169,10 +169,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     log.error('Effectiveness API error:', error);
-    return NextResponse.json(
-      { error: getSafeErrorMessage(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getSafeErrorMessage(error) }, { status: 500 });
   }
 }
 

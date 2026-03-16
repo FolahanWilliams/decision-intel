@@ -83,10 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Deduplicate by content hash
-    const contentHash = crypto
-      .createHash('sha256')
-      .update(body.content)
-      .digest('hex');
+    const contentHash = crypto.createHash('sha256').update(body.content).digest('hex');
 
     const existing = await prisma.humanDecision.findUnique({
       where: { contentHash },
@@ -144,7 +141,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Run cognitive audit in the background (fire-and-forget for fast response)
-    runCognitiveAudit(humanDecision!.id, body, user.id).catch((err) => {
+    runCognitiveAudit(humanDecision!.id, body, user.id).catch(err => {
       log.error(`Background audit failed for ${humanDecision!.id}:`, err);
     });
 
@@ -166,10 +163,7 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
     log.error('Human Decision API error:', error);
-    return NextResponse.json(
-      { error: getSafeErrorMessage(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getSafeErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -240,20 +234,13 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     log.error('Human Decision List error:', error);
-    return NextResponse.json(
-      { error: getSafeErrorMessage(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getSafeErrorMessage(error) }, { status: 500 });
   }
 }
 
 // ─── Background Audit ────────────────────────────────────────────────────────
 
-async function runCognitiveAudit(
-  decisionId: string,
-  input: HumanDecisionInput,
-  userId: string
-) {
+async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, userId: string) {
   try {
     log.info(`Starting cognitive audit for decision ${decisionId}`);
 
@@ -266,29 +253,30 @@ async function runCognitiveAudit(
     const validatedNoiseStats = CognitiveAuditNoiseStats.safeParse(auditResult.noiseStats).success
       ? auditResult.noiseStats
       : CognitiveAuditNoiseStats.parse({});
-    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail).success
+    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail)
+      .success
       ? auditResult.sentimentDetail
       : CognitiveAuditSentiment.parse({});
     const validatedCompliance = auditResult.complianceResult
-      ? (CognitiveAuditCompliance.safeParse(auditResult.complianceResult).success
+      ? CognitiveAuditCompliance.safeParse(auditResult.complianceResult).success
         ? auditResult.complianceResult
-        : undefined)
+        : undefined
       : undefined;
     const validatedPreMortem = auditResult.preMortem
-      ? (CognitiveAuditPreMortem.safeParse(auditResult.preMortem).success
+      ? CognitiveAuditPreMortem.safeParse(auditResult.preMortem).success
         ? auditResult.preMortem
-        : undefined)
+        : undefined
       : undefined;
     const validatedLogicalAnalysis = auditResult.logicalAnalysis
-      ? (CognitiveAuditLogicalAnalysis.safeParse(auditResult.logicalAnalysis).success
+      ? CognitiveAuditLogicalAnalysis.safeParse(auditResult.logicalAnalysis).success
         ? auditResult.logicalAnalysis
-        : undefined)
+        : undefined
       : undefined;
 
     // Persist cognitive audit with schema drift protection
     let schemaDrift = false;
     try {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async tx => {
         await tx.cognitiveAudit.create({
           data: {
             humanDecisionId: decisionId,
@@ -300,7 +288,9 @@ async function runCognitiveAudit(
             sentimentDetail: toPrismaJson(validatedSentiment),
             complianceResult: validatedCompliance ? toPrismaJson(validatedCompliance) : undefined,
             preMortem: validatedPreMortem ? toPrismaJson(validatedPreMortem) : undefined,
-            logicalAnalysis: validatedLogicalAnalysis ? toPrismaJson(validatedLogicalAnalysis) : undefined,
+            logicalAnalysis: validatedLogicalAnalysis
+              ? toPrismaJson(validatedLogicalAnalysis)
+              : undefined,
             teamConsensusFlag: auditResult.teamConsensusFlag,
             dissenterCount: auditResult.dissenterCount,
             summary: auditResult.summary,
@@ -335,8 +325,13 @@ async function runCognitiveAudit(
 
     // Embed the decision content for future RAG recall (fire-and-forget)
     // Only works when decision is linked to an existing Document (FK constraint)
-    storeHumanDecisionEmbedding(decisionId, input.content, userId, auditResult.summary, input.linkedAnalysisId)
-      .catch((err) => log.error('Human decision embedding failed:', err));
+    storeHumanDecisionEmbedding(
+      decisionId,
+      input.content,
+      userId,
+      auditResult.summary,
+      input.linkedAnalysisId
+    ).catch(err => log.error('Human decision embedding failed:', err));
 
     // Generate nudges
     const nudges = generateNudges({
@@ -366,15 +361,17 @@ async function runCognitiveAudit(
           payload.channel = input.channel;
 
           deliverSlackNudge(payload)
-            .then(async (delivered) => {
+            .then(async delivered => {
               if (delivered) {
-                await prisma.nudge.update({
-                  where: { id: persisted.id },
-                  data: { deliveredAt: new Date() },
-                }).catch(() => {});
+                await prisma.nudge
+                  .update({
+                    where: { id: persisted.id },
+                    data: { deliveredAt: new Date() },
+                  })
+                  .catch(() => {});
               }
             })
-            .catch((err) => log.error('Slack nudge delivery failed:', err));
+            .catch(err => log.error('Slack nudge delivery failed:', err));
         }
       } catch (err) {
         log.error('Failed to persist nudge:', err);

@@ -27,10 +27,7 @@ import {
   SIMULATION_SUPER_PROMPT,
 } from '@/lib/agents/prompts';
 import { searchSimilarDocuments } from '@/lib/rag/embeddings';
-import type {
-  HumanDecisionInput,
-  CognitiveAuditResult,
-} from '@/types/human-audit';
+import type { HumanDecisionInput, CognitiveAuditResult } from '@/types/human-audit';
 import type { BiasDetectionResult, ComplianceResult, LogicalAnalysisResult } from '@/types';
 
 const log = createLogger('HumanAudit');
@@ -53,10 +50,22 @@ function getModel(): GenerativeModel {
       },
       safetySettings: [
         // Relaxed: human decisions may contain sensitive language (incident reports, etc.)
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
       ],
     });
   }
@@ -101,10 +110,14 @@ OUTPUT FORMAT: Return ONLY valid JSON.
         ]);
         return response.response.text();
       },
-      2, 1000
+      2,
+      1000
     );
 
-    const parsed = parseJSON(result) as { redactedContent?: string; redactionCount?: number } | null;
+    const parsed = parseJSON(result) as {
+      redactedContent?: string;
+      redactionCount?: number;
+    } | null;
 
     if (parsed?.redactedContent) {
       // Validate that redaction actually happened for substantial content
@@ -112,7 +125,9 @@ OUTPUT FORMAT: Return ONLY valid JSON.
         parsed.redactedContent
       );
       if (!hasPlaceholders && content.length > 200) {
-        log.warn('GDPR anonymizer returned no placeholders for substantial content — using original (may contain PII)');
+        log.warn(
+          'GDPR anonymizer returned no placeholders for substantial content — using original (may contain PII)'
+        );
         return content;
       }
       log.info(`GDPR anonymization complete: ${parsed.redactionCount ?? 0} redactions`);
@@ -155,7 +170,9 @@ export async function analyzeHumanDecision(
   input: HumanDecisionInput,
   options?: { userId?: string }
 ): Promise<CognitiveAuditResult> {
-  log.info(`Analyzing human decision from ${input.source}${input.channel ? ` (${input.channel})` : ''}`);
+  log.info(
+    `Analyzing human decision from ${input.source}${input.channel ? ` (${input.channel})` : ''}`
+  );
 
   // Validate content length (matches existing validateContent pattern)
   const validation = validateContent(input.content);
@@ -225,13 +242,13 @@ export async function analyzeHumanDecision(
     return sum + weight;
   }, 0);
 
-  const noisePenalty = noiseData?.noiseStats
-    ? noiseData.noiseStats.stdDev * 5
-    : 0;
+  const noisePenalty = noiseData?.noiseStats ? noiseData.noiseStats.stdDev * 5 : 0;
 
   // Compliance violations add to deductions
   const complianceDeductions = complianceData?.complianceResult
-    ? complianceData.complianceResult.regulations.filter(r => r.riskLevel === 'critical' || r.riskLevel === 'high').length * 8
+    ? complianceData.complianceResult.regulations.filter(
+        r => r.riskLevel === 'critical' || r.riskLevel === 'high'
+      ).length * 8
     : 0;
 
   const decisionQualityScore = Math.max(
@@ -288,9 +305,7 @@ async function detectHumanBiases(
     `Decision Source: ${input.source}`,
     input.channel ? `Channel: ${input.channel}` : null,
     input.decisionType ? `Decision Type: ${input.decisionType}` : null,
-    input.participants?.length
-      ? `Participants: ${input.participants.length} people`
-      : null,
+    input.participants?.length ? `Participants: ${input.participants.length} people` : null,
   ]
     .filter(Boolean)
     .join('\n');
@@ -317,7 +332,8 @@ Return JSON with this schema:
       const response = await model.generateContent(prompt);
       return response.response.text();
     },
-    2, 1000
+    2,
+    1000
   );
 
   const parsed = parseJSON(result) as {
@@ -338,7 +354,7 @@ Return JSON with this schema:
     return { biases: [], teamConsensusFlag: false, dissenterCount: 0 };
   }
 
-  const biases: BiasDetectionResult[] = parsed.biases.map((b) => ({
+  const biases: BiasDetectionResult[] = parsed.biases.map(b => ({
     biasType: b.biasType,
     found: true,
     severity: (['low', 'medium', 'high', 'critical'].includes(b.severity)
@@ -378,7 +394,8 @@ ${content}
         const response = await model.generateContent(prompt);
         return response.response.text();
       },
-      1, 1000
+      1,
+      1000
     );
   });
 
@@ -399,8 +416,7 @@ ${content}
   }
 
   const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
-  const variance =
-    scores.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) / scores.length;
+  const variance = scores.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) / scores.length;
   const stdDev = Math.sqrt(variance);
 
   return {
@@ -434,7 +450,8 @@ Return JSON only: { "score": 0.0, "label": "Neutral" }`;
       const response = await model.generateContent(prompt);
       return response.response.text();
     },
-    1, 1000
+    1,
+    1000
   );
 
   const parsed = parseJSON(result) as { score: number; label: string } | null;
@@ -444,8 +461,7 @@ Return JSON only: { "score": 0.0, "label": "Neutral" }`;
   }
 
   const score = Math.max(-1, Math.min(1, parsed.score));
-  const label =
-    score > 0.2 ? 'Positive' : score < -0.2 ? 'Negative' : 'Neutral';
+  const label = score > 0.2 ? 'Positive' : score < -0.2 ? 'Negative' : 'Neutral';
 
   return { score, label };
 }
@@ -498,7 +514,8 @@ Return JSON:
       const response = await model.generateContent(prompt);
       return response.response.text();
     },
-    2, 1000
+    2,
+    1000
   );
 
   const parsed = parseJSON(result) as {
@@ -539,12 +556,18 @@ Return JSON:
   const complianceResult: ComplianceResult = {
     status: statusMap[parsed.compliance?.overallStatus ?? ''] ?? 'WARN',
     riskScore: Math.max(0, Math.min(100, parsed.compliance?.riskScore ?? 50)),
-    summary: (parsed.compliance?.findings ?? []).map(f => f.detail).filter(Boolean).join('; ') || 'No compliance issues detected.',
+    summary:
+      (parsed.compliance?.findings ?? [])
+        .map(f => f.detail)
+        .filter(Boolean)
+        .join('; ') || 'No compliance issues detected.',
     regulations: (parsed.compliance?.findings ?? []).map(f => ({
       name: f.regulation || 'Unknown',
       status: findingStatusMap[f.status] ?? 'PARTIAL',
       description: f.detail || '',
-      riskLevel: (['low', 'medium', 'high', 'critical'].includes(f.severity) ? f.severity : 'medium') as 'low' | 'medium' | 'high' | 'critical',
+      riskLevel: (['low', 'medium', 'high', 'critical'].includes(f.severity)
+        ? f.severity
+        : 'medium') as 'low' | 'medium' | 'high' | 'critical',
     })),
     searchQueries: [],
   };
@@ -581,12 +604,18 @@ async function simulateDecisionTwin(
       const similarDocs = await searchSimilarDocuments(content, userId, 3);
       if (similarDocs.length > 0) {
         similarCasesContext = similarDocs
-          .map((doc, i) => `Past Case ${i + 1} (similarity: ${(doc.similarity * 100).toFixed(0)}%):\n${doc.content.slice(0, 2000)}`)
+          .map(
+            (doc, i) =>
+              `Past Case ${i + 1} (similarity: ${(doc.similarity * 100).toFixed(0)}%):\n${doc.content.slice(0, 2000)}`
+          )
           .join('\n\n');
         log.info(`Institutional memory: found ${similarDocs.length} similar past decisions`);
       }
     } catch (e) {
-      log.warn('RAG search failed, proceeding without institutional memory:', e instanceof Error ? e.message : String(e));
+      log.warn(
+        'RAG search failed, proceeding without institutional memory:',
+        e instanceof Error ? e.message : String(e)
+      );
     }
   }
 
@@ -609,7 +638,8 @@ ${similarCasesContext}
       const response = await model.generateContent(prompt);
       return response.response.text();
     },
-    2, 1000
+    2,
+    1000
   );
 
   const parsed = parseJSON(result) as {
@@ -645,11 +675,16 @@ ${similarCasesContext}
 
   const logicalAnalysis: LogicalAnalysisResult = {
     score: parsed.simulation.twins
-      ? Math.round(parsed.simulation.twins.reduce((sum, t) => sum + (t.confidence || 50), 0) / parsed.simulation.twins.length)
+      ? Math.round(
+          parsed.simulation.twins.reduce((sum, t) => sum + (t.confidence || 50), 0) /
+            parsed.simulation.twins.length
+        )
       : 50,
     fallacies: [],
     assumptions: parsed.simulation.twins?.map(t => t.keyRiskIdentified).filter(Boolean) ?? [],
-    conclusion: parsed.institutionalMemory?.strategicAdvice ?? `Boardroom verdict: ${parsed.simulation.overallVerdict ?? 'MIXED'}`,
+    conclusion:
+      parsed.institutionalMemory?.strategicAdvice ??
+      `Boardroom verdict: ${parsed.simulation.overallVerdict ?? 'MIXED'}`,
     verdict: (parsed.simulation.overallVerdict as LogicalAnalysisResult['verdict']) ?? 'MIXED',
     twins: parsed.simulation.twins?.map(t => ({
       name: t.name,
@@ -659,11 +694,13 @@ ${similarCasesContext}
       rationale: t.rationale,
       keyRiskIdentified: t.keyRiskIdentified,
     })),
-    institutionalMemory: parsed.institutionalMemory ? {
-      recallScore: parsed.institutionalMemory.recallScore ?? 0,
-      similarEvents: parsed.institutionalMemory.similarEvents ?? [],
-      strategicAdvice: parsed.institutionalMemory.strategicAdvice ?? '',
-    } : undefined,
+    institutionalMemory: parsed.institutionalMemory
+      ? {
+          recallScore: parsed.institutionalMemory.recallScore ?? 0,
+          similarEvents: parsed.institutionalMemory.similarEvents ?? [],
+          strategicAdvice: parsed.institutionalMemory.strategicAdvice ?? '',
+        }
+      : undefined,
   };
 
   return { logicalAnalysis };
@@ -680,32 +717,35 @@ function buildAuditSummary(
 ): string {
   const parts: string[] = [];
 
-  const sourceLabel = {
-    slack: 'Slack conversation',
-    meeting_transcript: 'meeting transcript',
-    email: 'email thread',
-    jira: 'ticket decision',
-    manual: 'manually submitted decision',
-  }[input.source] || 'decision';
+  const sourceLabel =
+    {
+      slack: 'Slack conversation',
+      meeting_transcript: 'meeting transcript',
+      email: 'email thread',
+      jira: 'ticket decision',
+      manual: 'manually submitted decision',
+    }[input.source] || 'decision';
 
   parts.push(
     `Cognitive audit of ${sourceLabel}${input.channel ? ` in ${input.channel}` : ''}: Decision Quality Score ${qualityScore}/100.`
   );
 
   if (biases.length > 0) {
-    const critical = biases.filter((b) => b.severity === 'critical' || b.severity === 'high');
+    const critical = biases.filter(b => b.severity === 'critical' || b.severity === 'high');
     if (critical.length > 0) {
       parts.push(
-        `${critical.length} high-severity bias${critical.length > 1 ? 'es' : ''} detected: ${critical.map((b) => b.biasType).join(', ')}.`
+        `${critical.length} high-severity bias${critical.length > 1 ? 'es' : ''} detected: ${critical.map(b => b.biasType).join(', ')}.`
       );
     } else {
-      parts.push(`${biases.length} cognitive bias${biases.length > 1 ? 'es' : ''} detected (moderate severity).`);
+      parts.push(
+        `${biases.length} cognitive bias${biases.length > 1 ? 'es' : ''} detected (moderate severity).`
+      );
     }
   }
 
   if (consensusFlag) {
     parts.push(
-      'Unanimous agreement detected — consider assigning a Devil\'s Advocate to challenge assumptions.'
+      "Unanimous agreement detected — consider assigning a Devil's Advocate to challenge assumptions."
     );
   }
 

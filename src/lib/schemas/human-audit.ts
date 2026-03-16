@@ -47,32 +47,32 @@ export const CognitiveAuditSentiment = z
 
 // ─── Phase 2 Field Schemas ──────────────────────────────────────────────────
 
-export const CognitiveAuditCompliance = z
-  .object({
-    status: z.enum(['PASS', 'WARN', 'FAIL']),
-    riskScore: z.number().min(0).max(100),
-    summary: z.string(),
-    regulations: z.array(
+export const CognitiveAuditCompliance = z.object({
+  status: z.enum(['PASS', 'WARN', 'FAIL']),
+  riskScore: z.number().min(0).max(100),
+  summary: z.string(),
+  regulations: z
+    .array(
       z.object({
         name: z.string(),
         status: z.enum(['COMPLIANT', 'NON_COMPLIANT', 'PARTIAL']),
         description: z.string(),
         riskLevel: z.enum(['low', 'medium', 'high', 'critical']),
       })
-    ).default([]),
-    searchQueries: z.array(z.string()).default([]),
-  });
+    )
+    .default([]),
+  searchQueries: z.array(z.string()).default([]),
+});
 
-export const CognitiveAuditPreMortem = z
-  .object({
-    failureScenarios: z.array(z.string()).default([]),
-    preventiveMeasures: z.array(z.string()).default([]),
-  });
+export const CognitiveAuditPreMortem = z.object({
+  failureScenarios: z.array(z.string()).default([]),
+  preventiveMeasures: z.array(z.string()).default([]),
+});
 
-export const CognitiveAuditLogicalAnalysis = z
-  .object({
-    score: z.number().min(0).max(100),
-    fallacies: z.array(
+export const CognitiveAuditLogicalAnalysis = z.object({
+  score: z.number().min(0).max(100),
+  fallacies: z
+    .array(
       z.object({
         name: z.string(),
         type: z.string(),
@@ -80,11 +80,13 @@ export const CognitiveAuditLogicalAnalysis = z
         excerpt: z.string(),
         explanation: z.string(),
       })
-    ).default([]),
-    assumptions: z.array(z.string()).optional(),
-    conclusion: z.string().optional(),
-    verdict: z.enum(['APPROVED', 'REJECTED', 'MIXED']).optional(),
-    twins: z.array(
+    )
+    .default([]),
+  assumptions: z.array(z.string()).optional(),
+  conclusion: z.string().optional(),
+  verdict: z.enum(['APPROVED', 'REJECTED', 'MIXED']).optional(),
+  twins: z
+    .array(
       z.object({
         name: z.string(),
         role: z.string(),
@@ -93,8 +95,10 @@ export const CognitiveAuditLogicalAnalysis = z
         rationale: z.string(),
         keyRiskIdentified: z.string(),
       })
-    ).optional(),
-    institutionalMemory: z.object({
+    )
+    .optional(),
+  institutionalMemory: z
+    .object({
       recallScore: z.number(),
       similarEvents: z.array(
         z.object({
@@ -107,5 +111,6 @@ export const CognitiveAuditLogicalAnalysis = z
         })
       ),
       strategicAdvice: z.string(),
-    }).optional(),
-  });
+    })
+    .optional(),
+});

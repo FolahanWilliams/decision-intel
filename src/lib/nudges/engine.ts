@@ -13,11 +13,7 @@
  */
 
 import { createLogger } from '@/lib/utils/logger';
-import type {
-  NudgeDefinition,
-  NudgeTriggerContext,
-  NudgeSeverity,
-} from '@/types/human-audit';
+import type { NudgeDefinition, NudgeTriggerContext, NudgeSeverity } from '@/types/human-audit';
 import type { BiasDetectionResult } from '@/types';
 
 const log = createLogger('NudgeEngine');
@@ -77,7 +73,7 @@ function checkAnchorPattern(
 ): NudgeDefinition | null {
   // Check if anchoring bias was detected with high confidence
   const anchoringBias = biases.find(
-    (b) =>
+    b =>
       b.biasType.toLowerCase().includes('anchoring') &&
       (b.severity === 'high' || b.severity === 'critical')
   );
@@ -111,33 +107,27 @@ function checkConsensusTrap(
   if (!auditResult.teamConsensusFlag) return null;
 
   // Groupthink detection: unanimous agreement + groupthink bias found
-  const groupthinkDetected = auditResult.biasFindings.some(
-    (b) => b.biasType.toLowerCase().includes('groupthink')
+  const groupthinkDetected = auditResult.biasFindings.some(b =>
+    b.biasType.toLowerCase().includes('groupthink')
   );
 
   const severity: NudgeSeverity =
-    groupthinkDetected && auditResult.dissenterCount === 0
-      ? 'warning'
-      : 'info';
+    groupthinkDetected && auditResult.dissenterCount === 0 ? 'warning' : 'info';
 
   return {
     nudgeType: 'dissent_prompt',
     triggerReason: `Unanimous agreement detected with ${auditResult.dissenterCount} dissenters. ${groupthinkDetected ? 'Groupthink bias also identified in the conversation.' : ''}`,
     message:
-      'Unanimous agreement detected in under 30 seconds. Consider assigning a Devil\'s Advocate role to challenge assumptions before finalizing.',
+      "Unanimous agreement detected in under 30 seconds. Consider assigning a Devil's Advocate role to challenge assumptions before finalizing.",
     severity,
     channel: 'dashboard',
   };
 }
 
-function checkBaseRateDivergence(
-  history?: NudgeTriggerContext['history']
-): NudgeDefinition | null {
+function checkBaseRateDivergence(history?: NudgeTriggerContext['history']): NudgeDefinition | null {
   if (!history?.historicalBaseRate || !history?.recentEscalationRate) return null;
 
-  const divergence = Math.abs(
-    history.recentEscalationRate - history.historicalBaseRate
-  );
+  const divergence = Math.abs(history.recentEscalationRate - history.historicalBaseRate);
 
   // Only nudge if escalation rate is significantly higher than base rate
   if (divergence < 15 || history.recentEscalationRate <= history.historicalBaseRate) {
@@ -153,9 +143,7 @@ function checkBaseRateDivergence(
   };
 }
 
-function checkPreMortemNeed(
-  context: NudgeTriggerContext
-): NudgeDefinition | null {
+function checkPreMortemNeed(context: NudgeTriggerContext): NudgeDefinition | null {
   const { decision, auditResult } = context;
 
   // Only trigger for high-stakes decision types
@@ -183,9 +171,7 @@ function checkPreMortemNeed(
   };
 }
 
-function checkNoiseLevel(
-  auditResult: NudgeTriggerContext['auditResult']
-): NudgeDefinition | null {
+function checkNoiseLevel(auditResult: NudgeTriggerContext['auditResult']): NudgeDefinition | null {
   if (!auditResult.noiseStats) return null;
 
   const { stdDev } = auditResult.noiseStats;
