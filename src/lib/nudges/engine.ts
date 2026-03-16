@@ -34,7 +34,7 @@ const log = createLogger('NudgeEngine');
  */
 export function generateNudges(context: NudgeTriggerContext): NudgeDefinition[] {
   const nudges: NudgeDefinition[] = [];
-  const { auditResult, history } = context;
+  const { auditResult, decision, history } = context;
 
   // 1. Anchor Alert — repeated same-severity assessments
   const anchorNudge = checkAnchorPattern(auditResult.biasFindings, history);
@@ -55,6 +55,15 @@ export function generateNudges(context: NudgeTriggerContext): NudgeDefinition[] 
   // 5. Noise Check — inconsistent responses to similar incidents
   const noiseNudge = checkNoiseLevel(auditResult);
   if (noiseNudge) nudges.push(noiseNudge);
+
+  // Escalate critical nudges from Slack decisions to Slack delivery
+  if (decision.source === 'slack' && decision.channel) {
+    for (const nudge of nudges) {
+      if (nudge.severity === 'critical') {
+        nudge.channel = 'slack';
+      }
+    }
+  }
 
   log.info(`Generated ${nudges.length} nudge(s) for decision`);
   return nudges;

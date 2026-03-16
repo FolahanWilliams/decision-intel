@@ -11,48 +11,20 @@ import {
   ThumbsUp,
   ThumbsDown,
   Loader2,
-  MessageSquare,
-  Users,
-  Mail,
-  Ticket,
   PenLine,
   Filter,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
+import {
+  SOURCE_LABELS,
+  SOURCE_ICONS,
+  NUDGE_TYPE_LABELS,
+  SEVERITY_STYLES,
+} from '@/lib/constants/human-audit';
 
 const log = createClientLogger('Nudges');
-
-const SOURCE_LABELS: Record<string, string> = {
-  slack: 'Slack',
-  meeting_transcript: 'Meeting',
-  email: 'Email',
-  jira: 'Jira',
-  manual: 'Manual',
-};
-
-const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
-  slack: MessageSquare,
-  meeting_transcript: Users,
-  email: Mail,
-  jira: Ticket,
-  manual: PenLine,
-};
-
-const NUDGE_TYPE_LABELS: Record<string, string> = {
-  anchor_alert: 'Anchor Alert',
-  dissent_prompt: 'Dissent Prompt',
-  base_rate_reminder: 'Base Rate Reminder',
-  pre_mortem_trigger: 'Pre-Mortem Trigger',
-  noise_check: 'Noise Check',
-};
-
-const SEVERITY_STYLES: Record<string, { color: string; bg: string }> = {
-  critical: { color: 'var(--error)', bg: 'rgba(239, 68, 68, 0.1)' },
-  warning: { color: 'var(--warning)', bg: 'rgba(245, 158, 11, 0.1)' },
-  info: { color: 'var(--accent-primary)', bg: 'rgba(99, 102, 241, 0.1)' },
-};
 
 export default function NudgesPage() {
   const [filterUnacknowledged, setFilterUnacknowledged] = useState(false);

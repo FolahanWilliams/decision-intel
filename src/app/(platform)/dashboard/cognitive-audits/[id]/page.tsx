@@ -1,7 +1,7 @@
 'use client';
 
 import { use, useMemo, useState } from 'react';
-import { useHumanDecision } from '@/hooks/useHumanDecisions';
+import { useHumanDecision, type HumanDecisionNudge } from '@/hooks/useHumanDecisions';
 import Link from 'next/link';
 import {
   BrainCircuit,
@@ -11,55 +11,32 @@ import {
   ThumbsUp,
   ThumbsDown,
   Loader2,
-  MessageSquare,
-  Users,
-  Mail,
-  Ticket,
   PenLine,
+  Users,
   Activity,
   BarChart3,
   Bell,
   Shield,
   Eye,
+  FileWarning,
+  Zap,
+  UserCheck,
+  BookOpen,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { QualityGauge } from '@/components/visualizations/QualityMetrics';
 import { SentimentGauge } from '@/components/visualizations/SentimentGauge';
 import { createClientLogger } from '@/lib/utils/logger';
+import {
+  SOURCE_LABELS_LONG as SOURCE_LABELS,
+  SOURCE_ICONS,
+  SEVERITY_COLORS,
+  NUDGE_TYPE_LABELS,
+  getBiasArray,
+} from '@/lib/constants/human-audit';
 
 const log = createClientLogger('CognitiveAuditDetail');
-
-const SOURCE_LABELS: Record<string, string> = {
-  slack: 'Slack Conversation',
-  meeting_transcript: 'Meeting Transcript',
-  email: 'Email Thread',
-  jira: 'Jira Ticket',
-  manual: 'Manual Submission',
-};
-
-const SOURCE_ICONS: Record<string, typeof MessageSquare> = {
-  slack: MessageSquare,
-  meeting_transcript: Users,
-  email: Mail,
-  jira: Ticket,
-  manual: PenLine,
-};
-
-const SEVERITY_COLORS: Record<string, string> = {
-  critical: 'var(--error)',
-  high: '#f97316',
-  medium: 'var(--warning)',
-  low: 'var(--success)',
-};
-
-const NUDGE_TYPE_LABELS: Record<string, string> = {
-  anchor_alert: 'Anchor Alert',
-  dissent_prompt: 'Dissent Prompt',
-  base_rate_reminder: 'Base Rate Reminder',
-  pre_mortem_trigger: 'Pre-Mortem Trigger',
-  noise_check: 'Noise Check',
-};
 
 interface BiasItem {
   biasType: string;
@@ -69,11 +46,6 @@ interface BiasItem {
   suggestion: string;
   confidence: number;
   found?: boolean;
-}
-
-function getBiasArray(biasFindings: unknown): BiasItem[] {
-  if (Array.isArray(biasFindings)) return biasFindings;
-  return [];
 }
 
 function NoiseStatsCards({ noiseStats }: { noiseStats: { mean: number; stdDev: number; variance: number } | null }) {
@@ -124,13 +96,13 @@ export default function CognitiveAuditDetailPage({
   const { id } = use(params);
   const { decision, isLoading: loading, error, mutate: mutateDecision } = useHumanDecision(id);
   const [acknowledging, setAcknowledging] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'biases' | 'noise' | 'nudges'>('biases');
+  const [activeTab, setActiveTab] = useState<'biases' | 'noise' | 'nudges' | 'compliance' | 'premortem' | 'twins'>('biases');
 
   // Use nudges from the decision response directly
-  const decisionNudges = decision?.nudges ?? [];
+  const decisionNudges: HumanDecisionNudge[] = decision?.nudges ?? [];
 
   const audit = decision?.cognitiveAudit ?? null;
-  const biases = useMemo(() => getBiasArray(audit?.biasFindings), [audit]);
+  const biases = useMemo(() => getBiasArray<BiasItem>(audit?.biasFindings), [audit]);
 
   const qualityColor = !audit
     ? 'var(--text-muted)'
@@ -172,6 +144,29 @@ export default function CognitiveAuditDetailPage({
   const sentimentLabel = sentimentScore != null
     ? sentimentScore > 60 ? 'Positive' : sentimentScore < 40 ? 'Negative' : 'Neutral'
     : 'N/A';
+
+  // Phase 2 data — typed from JSON blobs
+  const compliance = audit?.complianceResult as {
+    status: 'PASS' | 'WARN' | 'FAIL';
+    riskScore: number;
+    summary: string;
+    regulations: Array<{ name: string; status: 'COMPLIANT' | 'NON_COMPLIANT' | 'PARTIAL'; description: string; riskLevel: string }>;
+    searchQueries?: string[];
+  } | undefined;
+
+  const preMortem = audit?.preMortem as {
+    failureScenarios: string[];
+    preventiveMeasures: string[];
+  } | undefined;
+
+  const logicalAnalysis = audit?.logicalAnalysis as {
+    score: number;
+    verdict?: 'APPROVED' | 'REJECTED' | 'MIXED';
+    twins?: Array<{ name: string; role: string; vote: 'APPROVE' | 'REJECT' | 'REVISE'; confidence: number; rationale: string; keyRiskIdentified: string }>;
+    institutionalMemory?: { recallScore: number; similarEvents: Array<{ title: string; summary: string; outcome: string; similarity: number; lessonLearned: string }>; strategicAdvice: string };
+    assumptions?: string[];
+    conclusion?: string;
+  } | undefined;
 
   if (loading) {
     return (
@@ -343,6 +338,9 @@ export default function CognitiveAuditDetailPage({
                 {[
                   { key: 'biases' as const, label: 'Bias Detection', icon: Shield, count: biases.length },
                   { key: 'noise' as const, label: 'Noise Analysis', icon: Activity },
+                  { key: 'compliance' as const, label: 'Compliance', icon: FileWarning, count: compliance?.regulations?.length },
+                  { key: 'premortem' as const, label: 'Pre-Mortem', icon: Zap, count: preMortem?.failureScenarios?.length },
+                  { key: 'twins' as const, label: 'Decision Twins', icon: UserCheck, count: logicalAnalysis?.twins?.length },
                   { key: 'nudges' as const, label: 'Nudges', icon: Bell, count: decisionNudges.length },
                 ].map(tab => (
                   <button
@@ -471,6 +469,279 @@ export default function CognitiveAuditDetailPage({
                 </div>
               )}
 
+              {/* Compliance Tab */}
+              {activeTab === 'compliance' && (
+                <div>
+                  {!compliance ? (
+                    <div className="flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-xl)' }}>
+                      <FileWarning size={48} style={{ color: 'var(--text-muted)' }} />
+                      <p className="text-muted">No compliance analysis available for this decision.</p>
+                    </div>
+                  ) : (
+                    <div>
+                      {/* Status + Risk Score */}
+                      <div className="flex items-center gap-lg mb-lg">
+                        <span style={{
+                          padding: '6px 16px', fontWeight: 700, fontSize: '14px',
+                          background: compliance.status === 'PASS' ? 'var(--success)' : compliance.status === 'FAIL' ? 'var(--error)' : 'var(--warning)',
+                          color: compliance.status === 'WARN' ? '#000' : '#fff',
+                        }}>
+                          {compliance.status}
+                        </span>
+                        <div>
+                          <span className="text-xs text-muted">Risk Score: </span>
+                          <span style={{
+                            fontWeight: 700, fontSize: '1.25rem',
+                            color: compliance.riskScore >= 70 ? 'var(--error)' : compliance.riskScore >= 40 ? 'var(--warning)' : 'var(--success)',
+                          }}>
+                            {compliance.riskScore}/100
+                          </span>
+                        </div>
+                      </div>
+
+                      <p style={{ marginBottom: 'var(--spacing-lg)', lineHeight: 1.6, fontSize: '14px' }}>
+                        {compliance.summary}
+                      </p>
+
+                      {/* Regulations Table */}
+                      {compliance.regulations && compliance.regulations.length > 0 && (
+                        <div style={{ overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                            <thead>
+                              <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
+                                <th style={{ textAlign: 'left', padding: '8px 12px', fontWeight: 600 }}>Regulation</th>
+                                <th style={{ textAlign: 'center', padding: '8px 12px', fontWeight: 600 }}>Status</th>
+                                <th style={{ textAlign: 'center', padding: '8px 12px', fontWeight: 600 }}>Risk Level</th>
+                                <th style={{ textAlign: 'left', padding: '8px 12px', fontWeight: 600 }}>Description</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {compliance.regulations.map((reg, idx) => (
+                                <tr key={idx} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                  <td style={{ padding: '8px 12px', fontWeight: 600 }}>{reg.name}</td>
+                                  <td style={{ padding: '8px 12px', textAlign: 'center' }}>
+                                    <span style={{
+                                      padding: '2px 8px', fontSize: '10px', fontWeight: 600,
+                                      background: reg.status === 'COMPLIANT' ? 'var(--success)' : reg.status === 'NON_COMPLIANT' ? 'var(--error)' : 'var(--warning)',
+                                      color: reg.status === 'PARTIAL' ? '#000' : '#fff',
+                                    }}>
+                                      {reg.status}
+                                    </span>
+                                  </td>
+                                  <td style={{ padding: '8px 12px', textAlign: 'center' }}>
+                                    <span style={{
+                                      padding: '2px 8px', fontSize: '10px', fontWeight: 600,
+                                      background: SEVERITY_COLORS[reg.riskLevel] || 'var(--text-muted)',
+                                      color: '#fff',
+                                    }}>
+                                      {reg.riskLevel.toUpperCase()}
+                                    </span>
+                                  </td>
+                                  <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{reg.description}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Pre-Mortem Tab */}
+              {activeTab === 'premortem' && (
+                <div>
+                  {!preMortem || (preMortem.failureScenarios.length === 0 && preMortem.preventiveMeasures.length === 0) ? (
+                    <div className="flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-xl)' }}>
+                      <Zap size={48} style={{ color: 'var(--text-muted)' }} />
+                      <p className="text-muted">No pre-mortem analysis available for this decision.</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-xl)' }}>
+                      {/* Failure Scenarios */}
+                      <div>
+                        <h4 className="flex items-center gap-sm mb-md" style={{ color: 'var(--error)' }}>
+                          <AlertTriangle size={18} /> Failure Scenarios
+                        </h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                          {preMortem.failureScenarios.map((scenario, idx) => (
+                            <div key={idx} style={{
+                              padding: 'var(--spacing-md)',
+                              borderLeft: '3px solid var(--error)',
+                              background: 'rgba(239, 68, 68, 0.05)',
+                              fontSize: '14px', lineHeight: 1.5,
+                            }}>
+                              <span style={{ fontWeight: 600, color: 'var(--error)', marginRight: '8px' }}>
+                                {idx + 1}.
+                              </span>
+                              {scenario}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Preventive Measures */}
+                      <div>
+                        <h4 className="flex items-center gap-sm mb-md" style={{ color: 'var(--success)' }}>
+                          <Shield size={18} /> Preventive Measures
+                        </h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                          {preMortem.preventiveMeasures.map((measure, idx) => (
+                            <div key={idx} style={{
+                              padding: 'var(--spacing-md)',
+                              borderLeft: '3px solid var(--success)',
+                              background: 'rgba(34, 197, 94, 0.05)',
+                              fontSize: '14px', lineHeight: 1.5,
+                            }}>
+                              <span style={{ fontWeight: 600, color: 'var(--success)', marginRight: '8px' }}>
+                                {idx + 1}.
+                              </span>
+                              {measure}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Decision Twins Tab */}
+              {activeTab === 'twins' && (
+                <div>
+                  {!logicalAnalysis?.twins || logicalAnalysis.twins.length === 0 ? (
+                    <div className="flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-xl)' }}>
+                      <UserCheck size={48} style={{ color: 'var(--text-muted)' }} />
+                      <p className="text-muted">
+                        Decision twin simulation not available.
+                        <br />
+                        <span className="text-xs">Runs for strategic and meeting transcript decisions.</span>
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      {/* Verdict */}
+                      {logicalAnalysis.verdict && (
+                        <div className="flex items-center gap-lg mb-lg">
+                          <span style={{
+                            padding: '6px 16px', fontWeight: 700, fontSize: '14px',
+                            background: logicalAnalysis.verdict === 'APPROVED' ? 'var(--success)' : logicalAnalysis.verdict === 'REJECTED' ? 'var(--error)' : 'var(--warning)',
+                            color: logicalAnalysis.verdict === 'MIXED' ? '#000' : '#fff',
+                          }}>
+                            {logicalAnalysis.verdict}
+                          </span>
+                          <span className="text-muted text-sm">Overall verdict from {logicalAnalysis.twins.length} decision twins</span>
+                        </div>
+                      )}
+
+                      {/* Twin Cards */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--spacing-md)' }}>
+                        {logicalAnalysis.twins.map((twin, idx) => {
+                          const voteColor = twin.vote === 'APPROVE' ? 'var(--success)' : twin.vote === 'REJECT' ? 'var(--error)' : 'var(--warning)';
+                          return (
+                            <div key={idx} style={{
+                              border: `1px solid ${voteColor}`,
+                              padding: 'var(--spacing-lg)',
+                              background: `${voteColor}08`,
+                            }}>
+                              <div className="flex items-center justify-between mb-sm">
+                                <div>
+                                  <div style={{ fontWeight: 700, fontSize: '16px' }}>{twin.name}</div>
+                                  <div className="text-xs text-muted">{twin.role}</div>
+                                </div>
+                                <span style={{
+                                  padding: '4px 12px', fontWeight: 700, fontSize: '12px',
+                                  background: voteColor, color: twin.vote === 'REVISE' ? '#000' : '#fff',
+                                }}>
+                                  {twin.vote}
+                                </span>
+                              </div>
+
+                              {/* Confidence bar */}
+                              <div className="mb-sm">
+                                <div className="flex items-center justify-between text-xs mb-xs">
+                                  <span className="text-muted">Confidence</span>
+                                  <span style={{ fontWeight: 600 }}>{Math.round(twin.confidence * 100)}%</span>
+                                </div>
+                                <div style={{ height: 6, background: 'var(--bg-secondary)', overflow: 'hidden' }}>
+                                  <div style={{ width: `${twin.confidence * 100}%`, height: '100%', background: voteColor }} />
+                                </div>
+                              </div>
+
+                              <p style={{ fontSize: '13px', lineHeight: 1.5, margin: '8px 0' }}>
+                                {twin.rationale}
+                              </p>
+
+                              {twin.keyRiskIdentified && (
+                                <div style={{
+                                  padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)',
+                                  borderLeft: '3px solid var(--error)', fontSize: '12px',
+                                }}>
+                                  <strong>Key Risk:</strong> {twin.keyRiskIdentified}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Institutional Memory */}
+                      {logicalAnalysis.institutionalMemory && (
+                        <div className="mt-xl">
+                          <h4 className="flex items-center gap-sm mb-md">
+                            <BookOpen size={18} style={{ color: 'var(--accent-secondary)' }} />
+                            Institutional Memory
+                            <span className="text-xs text-muted" style={{ fontWeight: 400 }}>
+                              Recall Score: {logicalAnalysis.institutionalMemory.recallScore}%
+                            </span>
+                          </h4>
+
+                          {logicalAnalysis.institutionalMemory.similarEvents.length > 0 && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-md)' }}>
+                              {logicalAnalysis.institutionalMemory.similarEvents.map((event, idx) => (
+                                <div key={idx} style={{
+                                  padding: 'var(--spacing-md)',
+                                  border: '1px solid var(--border-color)',
+                                  fontSize: '13px',
+                                }}>
+                                  <div className="flex items-center justify-between mb-xs">
+                                    <span style={{ fontWeight: 600 }}>{event.title}</span>
+                                    <div className="flex items-center gap-sm">
+                                      <span style={{
+                                        padding: '2px 8px', fontSize: '10px', fontWeight: 600,
+                                        background: event.outcome === 'SUCCESS' ? 'var(--success)' : event.outcome === 'FAILURE' ? 'var(--error)' : 'var(--warning)',
+                                        color: event.outcome === 'MIXED' ? '#000' : '#fff',
+                                      }}>
+                                        {event.outcome}
+                                      </span>
+                                      <span className="text-xs text-muted">{Math.round(event.similarity * 100)}% similar</span>
+                                    </div>
+                                  </div>
+                                  <p className="text-muted mb-xs">{event.summary}</p>
+                                  <p style={{ color: 'var(--accent-secondary)' }}>
+                                    <strong>Lesson:</strong> {event.lessonLearned}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          <div style={{
+                            padding: 'var(--spacing-md)',
+                            background: 'rgba(99, 102, 241, 0.08)',
+                            borderLeft: '3px solid var(--accent-primary)',
+                            fontSize: '14px', lineHeight: 1.6,
+                          }}>
+                            <strong>Strategic Advice:</strong> {logicalAnalysis.institutionalMemory.strategicAdvice}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Nudges Tab */}
               {activeTab === 'nudges' && (
                 <div>
@@ -558,12 +829,23 @@ export default function CognitiveAuditDetailPage({
       )}
 
       {/* No audit yet */}
-      {!audit && (
+      {!audit && decision.status === 'pending' && (
         <div className="card animate-fade-in">
           <div className="card-body flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-2xl)' }}>
             <Loader2 size={48} style={{ color: 'var(--accent-primary)' }} className="animate-spin" />
-            <h3>Analysis In Progress</h3>
-            <p className="text-muted">The cognitive audit is still running. This page will update when results are available.</p>
+            <h3>Cognitive Audit In Progress</h3>
+            <p className="text-muted">
+              Analysis is running. This page will auto-refresh when results are available.
+            </p>
+          </div>
+        </div>
+      )}
+      {!audit && decision.status === 'error' && (
+        <div className="card animate-fade-in">
+          <div className="card-body flex flex-col items-center gap-md" style={{ padding: 'var(--spacing-2xl)' }}>
+            <AlertTriangle size={48} style={{ color: 'var(--error)' }} />
+            <h3>Analysis Failed</h3>
+            <p className="text-muted">The cognitive audit encountered an error. The decision can be resubmitted.</p>
           </div>
         </div>
       )}

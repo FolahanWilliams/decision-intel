@@ -15,12 +15,17 @@ import { createLogger } from '@/lib/utils/logger';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { analyzeHumanDecision } from '@/lib/human-audit/analyzer';
+import { storeHumanDecisionEmbedding } from '@/lib/rag/embeddings';
 import { generateNudges } from '@/lib/nudges/engine';
+import { formatNudgeForSlack, deliverSlackNudge } from '@/lib/integrations/slack/handler';
 import { logAudit } from '@/lib/audit';
 import {
   BiasFindings,
   CognitiveAuditNoiseStats,
   CognitiveAuditSentiment,
+  CognitiveAuditCompliance,
+  CognitiveAuditPreMortem,
+  CognitiveAuditLogicalAnalysis,
 } from '@/lib/schemas/human-audit';
 import crypto from 'crypto';
 import type { HumanDecisionInput } from '@/types/human-audit';
@@ -260,6 +265,21 @@ async function runCognitiveAudit(
     const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail).success
       ? auditResult.sentimentDetail
       : CognitiveAuditSentiment.parse({});
+    const validatedCompliance = auditResult.complianceResult
+      ? (CognitiveAuditCompliance.safeParse(auditResult.complianceResult).success
+        ? auditResult.complianceResult
+        : undefined)
+      : undefined;
+    const validatedPreMortem = auditResult.preMortem
+      ? (CognitiveAuditPreMortem.safeParse(auditResult.preMortem).success
+        ? auditResult.preMortem
+        : undefined)
+      : undefined;
+    const validatedLogicalAnalysis = auditResult.logicalAnalysis
+      ? (CognitiveAuditLogicalAnalysis.safeParse(auditResult.logicalAnalysis).success
+        ? auditResult.logicalAnalysis
+        : undefined)
+      : undefined;
 
     // Persist cognitive audit with schema drift protection
     let schemaDrift = false;
@@ -274,9 +294,9 @@ async function runCognitiveAudit(
             biasFindings: toPrismaJson(validatedBiases),
             noiseStats: toPrismaJson(validatedNoiseStats),
             sentimentDetail: toPrismaJson(validatedSentiment),
-            complianceResult: auditResult.complianceResult ? toPrismaJson(auditResult.complianceResult) : undefined,
-            preMortem: auditResult.preMortem ? toPrismaJson(auditResult.preMortem) : undefined,
-            logicalAnalysis: auditResult.logicalAnalysis ? toPrismaJson(auditResult.logicalAnalysis) : undefined,
+            complianceResult: validatedCompliance ? toPrismaJson(validatedCompliance) : undefined,
+            preMortem: validatedPreMortem ? toPrismaJson(validatedPreMortem) : undefined,
+            logicalAnalysis: validatedLogicalAnalysis ? toPrismaJson(validatedLogicalAnalysis) : undefined,
             teamConsensusFlag: auditResult.teamConsensusFlag,
             dissenterCount: auditResult.dissenterCount,
             summary: auditResult.summary,
@@ -309,16 +329,20 @@ async function runCognitiveAudit(
       return;
     }
 
+    // Embed the decision content for future RAG recall (fire-and-forget)
+    storeHumanDecisionEmbedding(decisionId, input.content, userId, auditResult.summary)
+      .catch((err) => log.error('Human decision embedding failed:', err));
+
     // Generate nudges
     const nudges = generateNudges({
       decision: input,
       auditResult,
     });
 
-    // Persist nudges (fire-and-forget)
+    // Persist nudges and deliver via Slack if applicable
     for (const nudge of nudges) {
-      await prisma.nudge
-        .create({
+      try {
+        const persisted = await prisma.nudge.create({
           data: {
             humanDecisionId: decisionId,
             nudgeType: nudge.nudgeType,
@@ -327,10 +351,29 @@ async function runCognitiveAudit(
             severity: nudge.severity,
             channel: nudge.channel,
           },
-        })
-        .catch((err) => {
-          log.error('Failed to persist nudge:', err);
         });
+
+        // Deliver critical Slack nudges back to the source channel
+        if (nudge.channel === 'slack' && input.channel) {
+          const sourceRef = input.sourceRef; // e.g. "C12345:1234567890.123456"
+          const threadTs = sourceRef?.includes(':') ? sourceRef.split(':')[1] : undefined;
+          const payload = formatNudgeForSlack(nudge, threadTs);
+          payload.channel = input.channel;
+
+          deliverSlackNudge(payload)
+            .then(async (delivered) => {
+              if (delivered) {
+                await prisma.nudge.update({
+                  where: { id: persisted.id },
+                  data: { deliveredAt: new Date() },
+                }).catch(() => {});
+              }
+            })
+            .catch((err) => log.error('Slack nudge delivery failed:', err));
+        }
+      } catch (err) {
+        log.error('Failed to persist nudge:', err);
+      }
     }
 
     log.info(
