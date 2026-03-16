@@ -72,6 +72,14 @@ export async function POST(request: NextRequest) {
 
     // Handle direct text analysis (from extension)
     if (!documentId && body.text) {
+      // Validate text length to prevent unbounded storage
+      const MAX_TEXT_LENGTH = 100_000;
+      if (typeof body.text !== 'string' || body.text.length > MAX_TEXT_LENGTH) {
+        return NextResponse.json(
+          { error: `Text must be a string of at most ${MAX_TEXT_LENGTH} characters` },
+          { status: 400 }
+        );
+      }
       const newDoc = await prisma.document.create({
         data: {
           userId: effectiveUserId,

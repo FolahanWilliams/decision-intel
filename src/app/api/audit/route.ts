@@ -23,6 +23,18 @@ export async function POST(req: NextRequest) {
     } catch {
       return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
+
+    // Validate action against known AuditAction values to prevent log injection
+    const VALID_ACTIONS: Set<string> = new Set([
+      'VIEW_DOCUMENT', 'SCAN_DOCUMENT', 'EXPORT_PDF', 'EXPORT_CSV',
+      'SIMULATE_SCENARIO', 'SEARCH_MARKET_TRENDS', 'CHAT_MESSAGE',
+      'DELETE_ACCOUNT_DATA', 'SUBMIT_HUMAN_DECISION', 'VIEW_COGNITIVE_AUDIT',
+      'ACKNOWLEDGE_NUDGE', 'SLACK_DECISION_INGESTED', 'MEETING_TRANSCRIPT_ANALYZED',
+    ]);
+    if (!body.action || !VALID_ACTIONS.has(body.action)) {
+      return NextResponse.json({ error: 'Invalid audit action' }, { status: 400 });
+    }
+
     await logAudit(body);
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -48,9 +60,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Only ?export=csv is supported' }, { status: 400 });
     }
 
+    // Cap at 10,000 rows to prevent unbounded memory usage for large audit histories
+    const MAX_EXPORT_ROWS = 10_000;
     const logs = await prisma.auditLog.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
+      take: MAX_EXPORT_ROWS,
       select: {
         id: true,
         action: true,
