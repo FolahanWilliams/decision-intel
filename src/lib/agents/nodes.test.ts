@@ -150,4 +150,41 @@ describe('deepAnalysisNode', () => {
     expect(result.sentimentAnalysis).toEqual({ score: 0, label: 'Neutral' });
     expect(result.logicalAnalysis).toEqual({ score: 100, fallacies: [] });
   });
+
+  it('should abort with defaults when anonymizationStatus is failed', async () => {
+    const state: AuditState = {
+      documentId: 'doc-1',
+      userId: 'test-user',
+      originalContent: 'PII content that should not be sent',
+      anonymizationStatus: 'failed',
+      structuredContent: '[REDACTION_FAILED]',
+      biasAnalysis: [],
+      noiseStats: { mean: 0, stdDev: 0, variance: 0 },
+      speakers: [],
+    };
+
+    const result = await deepAnalysisNode(state);
+    expect(result.sentimentAnalysis).toEqual({ score: 0, label: 'Neutral' });
+    expect(result.logicalAnalysis).toEqual({ score: 100, fallacies: [] });
+    expect(result.cognitiveAnalysis).toBeUndefined();
+    // LLM should never have been called
+    expect(mockGenerateContent).not.toHaveBeenCalled();
+  });
+
+  it('should abort with defaults when anonymizationStatus is undefined', async () => {
+    const state: AuditState = {
+      documentId: 'doc-1',
+      userId: 'test-user',
+      originalContent: 'content',
+      structuredContent: '',
+      biasAnalysis: [],
+      noiseStats: { mean: 0, stdDev: 0, variance: 0 },
+      speakers: [],
+    };
+
+    const result = await deepAnalysisNode(state);
+    expect(result.sentimentAnalysis).toEqual({ score: 0, label: 'Neutral' });
+    expect(result.logicalAnalysis).toEqual({ score: 100, fallacies: [] });
+    expect(mockGenerateContent).not.toHaveBeenCalled();
+  });
 });

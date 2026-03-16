@@ -641,6 +641,8 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
         status: 'error',
         score: 0,
         flags: ['Skipped: anonymization not confirmed'],
+        verifications: [],
+        searchSources: [],
       },
       compliance: {
         status: 'FAIL',
@@ -849,7 +851,13 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
   // SECURITY: Defense-in-depth — abort if anonymization didn't succeed.
   if (state.anonymizationStatus !== 'success') {
     log.warn('deepAnalysisNode: anonymization not confirmed — skipping to protect PII');
-    return {};
+    return {
+      sentimentAnalysis: { score: 0, label: 'Neutral' },
+      logicalAnalysis: { score: 100, fallacies: [] },
+      swotAnalysis: undefined,
+      preMortem: undefined,
+      cognitiveAnalysis: undefined,
+    };
   }
 
   // SECURITY: Never fall back to originalContent — only use anonymized content

@@ -145,6 +145,27 @@ describe('Integration Tests', () => {
       expect(financialTools.getFinancialContext).not.toHaveBeenCalled();
       expect(result.factCheckResult).toMatchObject({ score: 100, flags: [] });
     });
+
+    it('should abort without calling LLM when anonymizationStatus is failed', async () => {
+      const state: AuditState = {
+        documentId: 'doc-1',
+        userId: 'test-user',
+        originalContent: 'PII content',
+        anonymizationStatus: 'failed',
+        structuredContent: '[REDACTION_FAILED]',
+      };
+
+      const result = await verificationNode(state);
+
+      expect(mockGenerateContent).not.toHaveBeenCalled();
+      expect(mockGetFinancialContext).not.toHaveBeenCalled();
+      expect(result.factCheckResult).toMatchObject({
+        status: 'error',
+        score: 0,
+        flags: ['Skipped: anonymization not confirmed'],
+      });
+      expect(result.compliance).toMatchObject({ status: 'FAIL', riskScore: 100 });
+    });
   });
 
   describe('structurerNode', () => {
