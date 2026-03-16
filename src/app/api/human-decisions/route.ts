@@ -12,9 +12,16 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { toPrismaJson, toPrismaStringArray } from '@/lib/utils/prisma-json';
 import { createLogger } from '@/lib/utils/logger';
+import { getSafeErrorMessage } from '@/lib/utils/error';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { analyzeHumanDecision } from '@/lib/human-audit/analyzer';
 import { generateNudges } from '@/lib/nudges/engine';
 import { logAudit } from '@/lib/audit';
+import {
+  BiasFindings,
+  CognitiveAuditNoiseStats,
+  CognitiveAuditSentiment,
+} from '@/lib/schemas/human-audit';
 import crypto from 'crypto';
 import type { HumanDecisionInput } from '@/types/human-audit';
 
@@ -28,6 +35,23 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
     if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limiting (same budget as document uploads — 5/hour)
+    const rateLimitResult = await checkRateLimit(user.id, '/api/human-decisions');
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded. You can submit up to 5 decisions per hour.',
+          limit: rateLimitResult.limit,
+          reset: rateLimitResult.reset,
+          remaining: 0,
+        },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) },
+        }
+      );
     }
 
     let body: HumanDecisionInput;
@@ -91,8 +115,12 @@ export async function POST(req: NextRequest) {
         },
       });
     } catch (dbError: unknown) {
-      const code = (dbError as { code?: string })?.code;
-      if (code === 'P2021' || code === 'P2022') {
+      const prismaError = dbError as { code?: string; message?: string };
+      if (
+        prismaError.code === 'P2021' ||
+        prismaError.code === 'P2022' ||
+        prismaError.message?.includes('does not exist')
+      ) {
         schemaDrift = true;
       } else {
         throw dbError;
@@ -100,7 +128,6 @@ export async function POST(req: NextRequest) {
     }
 
     if (schemaDrift) {
-      // Schema drift: the HumanDecision table may not exist yet
       log.warn('Schema drift detected for HumanDecision — table may not be migrated yet');
       return NextResponse.json(
         {
@@ -112,14 +139,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Run cognitive audit in the background (fire-and-forget for fast response)
-    // The analysis updates the record status when complete
-    runCognitiveAudit(humanDecision!.id, body, user.id).catch((err) => {
+    runCognitiveAudit(humanDecision!.id, body).catch((err) => {
       log.error(`Background audit failed for ${humanDecision!.id}:`, err);
     });
 
-    // Audit log
+    // Audit log (fire-and-forget)
     logAudit({
-      action: 'SCAN_DOCUMENT',
+      action: 'SUBMIT_HUMAN_DECISION',
       resource: 'HumanDecision',
       resourceId: humanDecision!.id,
       details: { source: body.source, channel: body.channel },
@@ -136,7 +162,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     log.error('Human Decision API error:', error);
     return NextResponse.json(
-      { error: 'Failed to submit decision' },
+      { error: getSafeErrorMessage(error) },
       { status: 500 }
     );
   }
@@ -197,7 +223,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     log.error('Human Decision List error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch decisions' },
+      { error: getSafeErrorMessage(error) },
       { status: 500 }
     );
   }
@@ -207,14 +233,23 @@ export async function GET(req: NextRequest) {
 
 async function runCognitiveAudit(
   decisionId: string,
-  input: HumanDecisionInput,
-  _userId: string
+  input: HumanDecisionInput
 ) {
   try {
     log.info(`Starting cognitive audit for decision ${decisionId}`);
 
-    // Run the analysis
     const auditResult = await analyzeHumanDecision(input);
+
+    // Validate LLM outputs with Zod before persisting (matches existing pattern)
+    const validatedBiases = BiasFindings.safeParse(auditResult.biasFindings).success
+      ? auditResult.biasFindings
+      : BiasFindings.parse([]);
+    const validatedNoiseStats = CognitiveAuditNoiseStats.safeParse(auditResult.noiseStats).success
+      ? auditResult.noiseStats
+      : CognitiveAuditNoiseStats.parse({});
+    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail).success
+      ? auditResult.sentimentDetail
+      : CognitiveAuditSentiment.parse({});
 
     // Persist cognitive audit with schema drift protection
     let schemaDrift = false;
@@ -226,9 +261,9 @@ async function runCognitiveAudit(
             decisionQualityScore: auditResult.decisionQualityScore,
             noiseScore: auditResult.noiseScore,
             sentimentScore: auditResult.sentimentScore,
-            biasFindings: toPrismaJson(auditResult.biasFindings),
-            noiseStats: toPrismaJson(auditResult.noiseStats),
-            sentimentDetail: toPrismaJson(auditResult.sentimentDetail),
+            biasFindings: toPrismaJson(validatedBiases),
+            noiseStats: toPrismaJson(validatedNoiseStats),
+            sentimentDetail: toPrismaJson(validatedSentiment),
             teamConsensusFlag: auditResult.teamConsensusFlag,
             dissenterCount: auditResult.dissenterCount,
             summary: auditResult.summary,
@@ -241,17 +276,20 @@ async function runCognitiveAudit(
         });
       });
     } catch (dbError: unknown) {
-      const code = (dbError as { code?: string })?.code;
-      if (code === 'P2021' || code === 'P2022') {
+      const prismaError = dbError as { code?: string; message?: string };
+      if (
+        prismaError.code === 'P2021' ||
+        prismaError.code === 'P2022' ||
+        prismaError.message?.includes('does not exist')
+      ) {
         schemaDrift = true;
-        log.warn('Schema drift in cognitive audit persistence');
+        log.warn('Schema drift in cognitive audit persistence: ' + prismaError.code);
       } else {
         throw dbError;
       }
     }
 
     if (schemaDrift) {
-      // Mark decision as error if we can't persist the audit
       await prisma.humanDecision
         .update({ where: { id: decisionId }, data: { status: 'error' } })
         .catch(() => {});

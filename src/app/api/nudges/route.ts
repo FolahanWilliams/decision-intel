@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { getSafeErrorMessage } from '@/lib/utils/error';
+import { logAudit } from '@/lib/audit';
 
 const log = createLogger('NudgesAPI');
 
@@ -51,7 +53,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ nudges });
   } catch (error) {
     log.error('Nudges list error:', error);
-    return NextResponse.json({ error: 'Failed to fetch nudges' }, { status: 500 });
+    return NextResponse.json({ error: getSafeErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -98,9 +100,17 @@ export async function PATCH(req: NextRequest) {
       },
     });
 
+    // Audit log (fire-and-forget)
+    logAudit({
+      action: 'ACKNOWLEDGE_NUDGE',
+      resource: 'Nudge',
+      resourceId: body.nudgeId,
+      details: { wasHelpful: body.wasHelpful },
+    }).catch(() => {});
+
     return NextResponse.json({ acknowledged: true });
   } catch (error) {
     log.error('Nudge acknowledge error:', error);
-    return NextResponse.json({ error: 'Failed to acknowledge nudge' }, { status: 500 });
+    return NextResponse.json({ error: getSafeErrorMessage(error) }, { status: 500 });
   }
 }

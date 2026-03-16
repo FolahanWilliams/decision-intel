@@ -18,6 +18,8 @@ import {
   LogOut as LogOutIcon,
   MessageSquare,
   GitCompareArrows,
+  BrainCircuit,
+  Bell,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useIntelligenceStatus } from '@/hooks/useIntelligence';
@@ -352,6 +354,40 @@ export default function Sidebar() {
             label="Chat"
             description="Ask questions about your documents"
             active={pathname === '/dashboard/chat'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+
+          {!collapsed && (
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                padding: '20px 10px 8px',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Human Intelligence
+            </div>
+          )}
+          {collapsed && <div style={{ height: '20px' }} />}
+          <NavItem
+            href="/dashboard/cognitive-audits"
+            icon={<BrainCircuit size={18} />}
+            label="Cognitive Audits"
+            description="Audit human decisions"
+            active={pathname === '/dashboard/cognitive-audits'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/nudges"
+            icon={<Bell size={18} />}
+            label="Nudges"
+            description="Decision coaching alerts"
+            active={pathname === '/dashboard/nudges'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />

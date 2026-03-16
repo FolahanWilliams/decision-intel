@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { getSafeErrorMessage } from '@/lib/utils/error';
 import { logAudit } from '@/lib/audit';
 
 const log = createLogger('HumanDecisionDetail');
@@ -40,10 +41,17 @@ export async function GET(
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
+    // Audit log (fire-and-forget)
+    logAudit({
+      action: 'VIEW_COGNITIVE_AUDIT',
+      resource: 'HumanDecision',
+      resourceId: id,
+    }).catch(() => {});
+
     return NextResponse.json(decision);
   } catch (error) {
     log.error('Get human decision error:', error);
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: getSafeErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -83,6 +91,6 @@ export async function DELETE(
     return NextResponse.json({ deleted: true });
   } catch (error) {
     log.error('Delete human decision error:', error);
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: getSafeErrorMessage(error) }, { status: 500 });
   }
 }
