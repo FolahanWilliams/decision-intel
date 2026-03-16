@@ -653,181 +653,183 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
       {/* Financial Fact Check */}
       {analysis?.factCheck && (
-        <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          <div className="card-header flex items-center justify-between">
-            <h3 className="flex items-center gap-sm">
-              <CheckCircle size={18} style={{ color: 'var(--accent-primary)' }} />
-              Financial Fact Check
-              {(analysis.factCheck.primaryCompany || analysis.factCheck.primaryTopic) && (
-                <span
-                  className="badge badge-secondary"
-                  style={{ marginLeft: '8px', fontSize: '10px' }}
-                >
-                  {analysis.factCheck.primaryCompany
-                    ? `${analysis.factCheck.primaryCompany.name} (${analysis.factCheck.primaryCompany.ticker})`
-                    : analysis.factCheck.primaryTopic}
+        <ErrorBoundary sectionName="Financial Fact Check">
+          <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            <div className="card-header flex items-center justify-between">
+              <h3 className="flex items-center gap-sm">
+                <CheckCircle size={18} style={{ color: 'var(--accent-primary)' }} />
+                Financial Fact Check
+                {(analysis.factCheck.primaryCompany || analysis.factCheck.primaryTopic) && (
+                  <span
+                    className="badge badge-secondary"
+                    style={{ marginLeft: '8px', fontSize: '10px' }}
+                  >
+                    {analysis.factCheck.primaryCompany
+                      ? `${analysis.factCheck.primaryCompany.name} (${analysis.factCheck.primaryCompany.ticker})`
+                      : analysis.factCheck.primaryTopic}
+                  </span>
+                )}
+              </h3>
+              {analysis.factCheck.dataFetchedAt && (
+                <span className="text-xs text-muted">
+                  Data fetched: {formatDate(analysis.factCheck.dataFetchedAt, true)}
                 </span>
               )}
-            </h3>
-            {analysis.factCheck.dataFetchedAt && (
-              <span className="text-xs text-muted">
-                Data fetched: {formatDate(analysis.factCheck.dataFetchedAt, true)}
-              </span>
-            )}
-          </div>
-          {analysis.factCheck.searchSources && analysis.factCheck.searchSources.length > 0 && (
-            <div
-              style={{
-                padding: '12px 16px',
-                background: 'rgba(99, 102, 241, 0.05)',
-                borderBottom: '1px solid var(--border-color)',
-              }}
-            >
+            </div>
+            {analysis.factCheck.searchSources && analysis.factCheck.searchSources.length > 0 && (
               <div
-                className="flex items-center gap-sm"
                 style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  marginBottom: '8px',
-                  color: 'var(--accent-primary)',
+                  padding: '12px 16px',
+                  background: 'rgba(99, 102, 241, 0.05)',
+                  borderBottom: '1px solid var(--border-color)',
                 }}
               >
-                <FileText size={12} />
-                Verified with Google Search Grounding
-              </div>
-              <div className="flex flex-wrap gap-sm">
-                {analysis.factCheck.searchSources.map((source, i) => {
-                  try {
-                    return (
-                      <a
-                        key={i}
-                        href={source}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="badge hover:opacity-80 transition-opacity"
-                        style={{
-                          textDecoration: 'none',
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid var(--border-color)',
-                          color: 'var(--text-primary)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          maxWidth: '100%',
-                        }}
-                      >
-                        <span style={{ opacity: 0.7 }}>Source {i + 1}:</span>
-                        <span style={{ fontWeight: 500 }}>{new URL(source).hostname}</span>
-                      </a>
-                    );
-                  } catch {
-                    return null;
-                  }
-                })}
-              </div>
-            </div>
-          )}
-          <div className="card-body" style={{ padding: 0 }}>
-            {analysis.factCheck.verifications && analysis.factCheck.verifications.length > 0 ? (
-              analysis.factCheck.verifications.map((v, idx) => (
                 <div
-                  key={idx}
+                  className="flex items-center gap-sm"
                   style={{
-                    padding: '16px',
-                    borderBottom:
-                      idx < (analysis.factCheck?.verifications?.length || 0) - 1
-                        ? '1px solid var(--border-color)'
-                        : 'none',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    marginBottom: '8px',
+                    color: 'var(--accent-primary)',
                   }}
                 >
-                  <div className="flex items-start gap-md">
-                    <div style={{ marginTop: '2px' }}>
-                      {v.verdict?.toUpperCase() === 'VERIFIED' ? (
-                        <CheckCircle
-                          size={16}
-                          style={{ color: 'var(--success)' }}
-                          aria-label="Verified"
-                        />
-                      ) : v.verdict?.toUpperCase() === 'CONTRADICTED' ? (
-                        <AlertTriangle
-                          size={16}
-                          style={{ color: 'var(--error)' }}
-                          aria-label="Contradicted"
-                        />
-                      ) : (
-                        <Info
-                          size={16}
-                          style={{ color: 'var(--warning)' }}
-                          aria-label="Unverifiable"
-                        />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p
-                        style={{
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          marginBottom: '4px',
-                          color: 'var(--text-primary)',
-                        }}
-                      >
-                        &quot;{v.claim}&quot;
-                      </p>
-                      <div
-                        style={{
-                          fontSize: '10px',
-                          fontWeight: 700,
-                          marginBottom: '6px',
-                          color:
-                            v.verdict?.toUpperCase() === 'VERIFIED'
-                              ? 'var(--success)'
-                              : v.verdict?.toUpperCase() === 'CONTRADICTED'
-                                ? 'var(--error)'
-                                : 'var(--warning)',
-                        }}
-                      >
-                        {v.verdict?.toUpperCase()}
-                      </div>
-                      <p
-                        style={{
-                          fontSize: '12px',
-                          color: 'var(--text-secondary)',
-                          lineHeight: 1.5,
-                          marginBottom: '8px',
-                        }}
-                      >
-                        {v.explanation}
-                      </p>
-                      {v.sourceUrl && (
+                  <FileText size={12} />
+                  Verified with Google Search Grounding
+                </div>
+                <div className="flex flex-wrap gap-sm">
+                  {analysis.factCheck.searchSources.map((source, i) => {
+                    try {
+                      return (
                         <a
-                          href={v.sourceUrl}
+                          key={i}
+                          href={source}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-xs text-[10px]"
-                          style={{ color: 'var(--accent-primary)' }}
+                          className="badge hover:opacity-80 transition-opacity"
+                          style={{
+                            textDecoration: 'none',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            maxWidth: '100%',
+                          }}
                         >
-                          <FileText size={10} />
-                          Evidence Source:{' '}
-                          {(() => {
-                            try {
-                              return new URL(v.sourceUrl).hostname;
-                            } catch {
-                              return 'External Source';
-                            }
-                          })()}
+                          <span style={{ opacity: 0.7 }}>Source {i + 1}:</span>
+                          <span style={{ fontWeight: 500 }}>{new URL(source).hostname}</span>
                         </a>
-                      )}
-                    </div>
-                  </div>
+                      );
+                    } catch {
+                      return null;
+                    }
+                  })}
                 </div>
-              ))
-            ) : (
-              <div className="p-xl text-center text-muted">
-                <p>No specific financial claims were isolated for verification.</p>
               </div>
             )}
+            <div className="card-body" style={{ padding: 0 }}>
+              {analysis.factCheck.verifications && analysis.factCheck.verifications.length > 0 ? (
+                analysis.factCheck.verifications.map((v, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      padding: '16px',
+                      borderBottom:
+                        idx < (analysis.factCheck?.verifications?.length || 0) - 1
+                          ? '1px solid var(--border-color)'
+                          : 'none',
+                    }}
+                  >
+                    <div className="flex items-start gap-md">
+                      <div style={{ marginTop: '2px' }}>
+                        {v.verdict?.toUpperCase() === 'VERIFIED' ? (
+                          <CheckCircle
+                            size={16}
+                            style={{ color: 'var(--success)' }}
+                            aria-label="Verified"
+                          />
+                        ) : v.verdict?.toUpperCase() === 'CONTRADICTED' ? (
+                          <AlertTriangle
+                            size={16}
+                            style={{ color: 'var(--error)' }}
+                            aria-label="Contradicted"
+                          />
+                        ) : (
+                          <Info
+                            size={16}
+                            style={{ color: 'var(--warning)' }}
+                            aria-label="Unverifiable"
+                          />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            marginBottom: '4px',
+                            color: 'var(--text-primary)',
+                          }}
+                        >
+                          &quot;{v.claim}&quot;
+                        </p>
+                        <div
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            marginBottom: '6px',
+                            color:
+                              v.verdict?.toUpperCase() === 'VERIFIED'
+                                ? 'var(--success)'
+                                : v.verdict?.toUpperCase() === 'CONTRADICTED'
+                                  ? 'var(--error)'
+                                  : 'var(--warning)',
+                          }}
+                        >
+                          {v.verdict?.toUpperCase()}
+                        </div>
+                        <p
+                          style={{
+                            fontSize: '12px',
+                            color: 'var(--text-secondary)',
+                            lineHeight: 1.5,
+                            marginBottom: '8px',
+                          }}
+                        >
+                          {v.explanation}
+                        </p>
+                        {v.sourceUrl && (
+                          <a
+                            href={v.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-xs text-[10px]"
+                            style={{ color: 'var(--accent-primary)' }}
+                          >
+                            <FileText size={10} />
+                            Evidence Source:{' '}
+                            {(() => {
+                              try {
+                                return new URL(v.sourceUrl).hostname;
+                              } catch {
+                                return 'External Source';
+                              }
+                            })()}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="p-xl text-center text-muted">
+                  <p>No specific financial claims were isolated for verification.</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </ErrorBoundary>
       )}
 
       {/* Tabs + Content */}
@@ -960,82 +962,84 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </div>
 
         {/* Right Column: Bias Sidebar */}
-        <div className="flex flex-col gap-lg">
-          <div className="card">
-            <div className="card-body p-md flex justify-around">
-              <div className="text-center">
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
-                  Decision Quality
-                </div>
-                <div style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>
-                  {analysis ? Math.round(analysis.overallScore) : '--'}
-                </div>
-              </div>
-              <div className="text-center">
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
-                  Noise Score
-                </div>
-                <div style={{ color: 'var(--accent-secondary)', fontWeight: 700 }}>
-                  {analysis ? Math.round(analysis.noiseScore) : '--'}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card" style={{ alignSelf: 'start', width: '100%' }}>
-            <div className="card-header">
-              <h3>Detected Biases</h3>
-            </div>
-            <div
-              style={{ maxHeight: '60vh', overflowY: 'auto' }}
-              role="list"
-              aria-label="Detected biases"
-            >
-              {biases.length > 0 ? (
-                biases.map((bias, idx) => (
-                  <div
-                    key={bias.id}
-                    role="listitem"
-                    tabIndex={0}
-                    onClick={() => setSelectedBias(bias)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setSelectedBias(bias);
-                      }
-                    }}
-                    style={{
-                      padding: 'var(--spacing-md)',
-                      borderBottom:
-                        idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
-                      cursor: 'pointer',
-                      background:
-                        selectedBias?.id === bias.id ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
-                      borderLeft:
-                        selectedBias?.id === bias.id
-                          ? '3px solid var(--accent-primary)'
-                          : '3px solid transparent',
-                    }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span style={{ fontWeight: 500, fontSize: '13px' }}>{bias.biasType}</span>
-                      <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
-                    </div>
-                    <span
-                      className={`badge badge-${bias.severity}`}
-                      style={{ marginTop: 'var(--spacing-xs)', fontSize: '9px' }}
-                    >
-                      {bias.severity}
-                      <span className="sr-only"> severity</span>
-                    </span>
+        <ErrorBoundary sectionName="Bias Sidebar">
+          <div className="flex flex-col gap-lg">
+            <div className="card">
+              <div className="card-body p-md flex justify-around">
+                <div className="text-center">
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                    Decision Quality
                   </div>
-                ))
-              ) : (
-                <div className="p-xl text-center text-muted text-xs">No data available</div>
-              )}
+                  <div style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>
+                    {analysis ? Math.round(analysis.overallScore) : '--'}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                    Noise Score
+                  </div>
+                  <div style={{ color: 'var(--accent-secondary)', fontWeight: 700 }}>
+                    {analysis ? Math.round(analysis.noiseScore) : '--'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card" style={{ alignSelf: 'start', width: '100%' }}>
+              <div className="card-header">
+                <h3>Detected Biases</h3>
+              </div>
+              <div
+                style={{ maxHeight: '60vh', overflowY: 'auto' }}
+                role="list"
+                aria-label="Detected biases"
+              >
+                {biases.length > 0 ? (
+                  biases.map((bias, idx) => (
+                    <div
+                      key={bias.id}
+                      role="listitem"
+                      tabIndex={0}
+                      onClick={() => setSelectedBias(bias)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedBias(bias);
+                        }
+                      }}
+                      style={{
+                        padding: 'var(--spacing-md)',
+                        borderBottom:
+                          idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
+                        cursor: 'pointer',
+                        background:
+                          selectedBias?.id === bias.id ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
+                        borderLeft:
+                          selectedBias?.id === bias.id
+                            ? '3px solid var(--accent-primary)'
+                            : '3px solid transparent',
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span style={{ fontWeight: 500, fontSize: '13px' }}>{bias.biasType}</span>
+                        <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
+                      </div>
+                      <span
+                        className={`badge badge-${bias.severity}`}
+                        style={{ marginTop: 'var(--spacing-xs)', fontSize: '9px' }}
+                      >
+                        {bias.severity}
+                        <span className="sr-only"> severity</span>
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-xl text-center text-muted text-xs">No data available</div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </ErrorBoundary>
       </div>
 
       {/* Bias Detail Modal (accessible) */}
@@ -1068,14 +1072,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
       {/* Regulatory & Institutional Memory Widgets */}
       {analysis?.compliance && (
-        <div className="mb-xl">
-          <RegulatoryHorizonWidget compliance={analysis.compliance} />
-        </div>
+        <ErrorBoundary sectionName="Regulatory Horizon">
+          <div className="mb-xl">
+            <RegulatoryHorizonWidget compliance={analysis.compliance} />
+          </div>
+        </ErrorBoundary>
       )}
       {analysis?.institutionalMemory && (
-        <div className="mb-xl">
-          <InstitutionalMemoryWidget memory={analysis.institutionalMemory} />
-        </div>
+        <ErrorBoundary sectionName="Institutional Memory">
+          <div className="mb-xl">
+            <InstitutionalMemoryWidget memory={analysis.institutionalMemory} />
+          </div>
+        </ErrorBoundary>
       )}
     </div>
   );

@@ -96,6 +96,8 @@ describe('factCheckerNode Performance', () => {
       documentId: 'doc-1',
       userId: 'test-user',
       originalContent: 'Apple and Microsoft are tech companies.',
+      anonymizationStatus: 'success',
+      structuredContent: 'Apple and Microsoft are tech companies.',
       biasAnalysis: [],
       noiseStats: { mean: 0, stdDev: 0, variance: 0 },
       speakers: [],

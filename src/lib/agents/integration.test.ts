@@ -101,6 +101,8 @@ describe('Integration Tests', () => {
         documentId: 'doc-1',
         userId: 'test-user',
         originalContent: 'Apple is doing well.',
+        anonymizationStatus: 'success',
+        structuredContent: 'Apple is doing well.',
       };
 
       const result = await verificationNode(state);
@@ -134,6 +136,8 @@ describe('Integration Tests', () => {
         documentId: 'doc-1',
         userId: 'test-user',
         originalContent: 'No stocks here.',
+        anonymizationStatus: 'success',
+        structuredContent: 'No stocks here.',
       };
 
       const result = await verificationNode(state);
@@ -153,6 +157,7 @@ describe('Integration Tests', () => {
         documentId: 'doc-1',
         userId: 'test-user',
         originalContent: 'Raw content',
+        anonymizationStatus: 'success',
         structuredContent: 'Raw content', // set by anonymizer node before structurer runs
       };
 

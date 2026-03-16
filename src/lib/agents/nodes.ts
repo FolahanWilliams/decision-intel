@@ -297,6 +297,13 @@ Keep it concise — max 5 items per array.`,
 }
 
 export async function biasDetectiveNode(state: AuditState): Promise<Partial<AuditState>> {
+  // SECURITY: Defense-in-depth — abort if anonymization didn't succeed.
+  // Graph routing should prevent reaching this node, but guard anyway.
+  if (state.anonymizationStatus !== 'success') {
+    log.warn('biasDetective: anonymization not confirmed — skipping to protect PII');
+    return { biasAnalysis: [] };
+  }
+
   try {
     // SECURITY: Never fall back to originalContent — only use anonymized content
     const content = truncateText(state.structuredContent || '');
@@ -409,6 +416,12 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
 }
 
 export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditState>> {
+  // SECURITY: Defense-in-depth — abort if anonymization didn't succeed.
+  if (state.anonymizationStatus !== 'success') {
+    log.warn('noiseJudge: anonymization not confirmed — skipping to protect PII');
+    return { noiseScores: [], noiseStats: { mean: 0, stdDev: 0, variance: 0 } };
+  }
+
   // SECURITY: Never fall back to originalContent — only use anonymized content
   const content = truncateText(state.structuredContent || '');
 
@@ -620,6 +633,25 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
 // ============================================================
 
 export async function verificationNode(state: AuditState): Promise<Partial<AuditState>> {
+  // SECURITY: Defense-in-depth — abort if anonymization didn't succeed.
+  if (state.anonymizationStatus !== 'success') {
+    log.warn('verificationNode: anonymization not confirmed — skipping to protect PII');
+    return {
+      factCheckResult: {
+        status: 'error',
+        score: 0,
+        flags: ['Skipped: anonymization not confirmed'],
+      },
+      compliance: {
+        status: 'FAIL',
+        riskScore: 100,
+        summary: 'Skipped: anonymization not confirmed.',
+        regulations: [],
+        searchQueries: [],
+      },
+    };
+  }
+
   // SECURITY: Never fall back to originalContent — only use anonymized content
   const content = truncateText(state.structuredContent || '');
 
@@ -636,9 +668,13 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
         log.info('Executing RAG query for internal knowledge...');
         const similarDocs = await searchSimilarDocuments(content, state.userId, 3);
         if (similarDocs && similarDocs.length > 0) {
+          // SECURITY: Sanitize RAG results to prevent prompt injection from stored documents
           internalKnowledgeContext =
             `\n\nINTERNAL COMPANY KNOWLEDGE (cross-reference claims against these precedents):\n` +
-            similarDocs.map((doc, i) => `[Document ${i + 1} Excerpt]: ${doc.content}`).join('\n\n');
+            sanitizeForPrompt(
+              similarDocs.map((doc, i) => ({ document: i + 1, excerpt: doc.content })),
+              'internal_knowledge'
+            );
         }
       } catch (ragError) {
         log.warn(
@@ -810,6 +846,12 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
 // ============================================================
 
 export async function deepAnalysisNode(state: AuditState): Promise<Partial<AuditState>> {
+  // SECURITY: Defense-in-depth — abort if anonymization didn't succeed.
+  if (state.anonymizationStatus !== 'success') {
+    log.warn('deepAnalysisNode: anonymization not confirmed — skipping to protect PII');
+    return {};
+  }
+
   // SECURITY: Never fall back to originalContent — only use anonymized content
   const content = truncateText(state.structuredContent || '');
 
@@ -896,6 +938,12 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
 // ============================================================
 
 export async function simulationNode(state: AuditState): Promise<Partial<AuditState>> {
+  // SECURITY: Defense-in-depth — abort if anonymization didn't succeed.
+  if (state.anonymizationStatus !== 'success') {
+    log.warn('simulationNode: anonymization not confirmed — skipping to protect PII');
+    return { simulation: undefined, institutionalMemory: undefined };
+  }
+
   // SECURITY: Never fall back to originalContent — only use anonymized content
   const content = truncateText(state.structuredContent || '');
 
