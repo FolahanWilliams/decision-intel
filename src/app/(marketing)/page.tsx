@@ -554,7 +554,10 @@ export default function LandingPage() {
           boxShadow: '0 1px 0 rgba(255,255,255,0.06) inset',
         }}
       >
-        <div className="flex items-center justify-between" style={{ ...containerStyle, paddingTop: '0.75rem', paddingBottom: '0.75rem' }}>
+        <div
+          className="flex items-center justify-between"
+          style={{ ...containerStyle, paddingTop: '0.75rem', paddingBottom: '0.75rem' }}
+        >
           <div className="flex items-center gap-3">
             <div
               style={{
