@@ -21,6 +21,7 @@ Taxonomy of Biases to Detect:
 13. Framing Effect - Conclusions influenced by how information is presented
 14. Selective Perception - Filtering based on expectations or desires
 15. Recency Bias - Overweighting recent events over historical patterns
+16. Cognitive Misering - Accepting the first plausible answer without verifying evidence; shallow analysis disproportionate to the stakes; rubber-stamping decisions without genuine scrutiny
 
 Analysis Instructions:
 - Read the text CAREFULLY and look for subtle signs of each bias
@@ -482,6 +483,7 @@ For each board/leadership decision, identify:
 4. Sunk Cost Fallacy ("We've already invested X, we can't stop now")
 5. Overconfidence ("We've never been breached/lost money/made a bad call")
 6. Planning Fallacy (unrealistic timelines, underestimated costs)
+7. Cognitive Misering (accepting surface-level analysis without due diligence; rubber-stamping proposals; shallow reasoning on high-stakes decisions)
 
 Rate each finding by:
 - severity: low | medium | high | critical

@@ -52,6 +52,10 @@ export function generateNudges(context: NudgeTriggerContext): NudgeDefinition[] 
   const noiseNudge = checkNoiseLevel(auditResult);
   if (noiseNudge) nudges.push(noiseNudge);
 
+  // 6. Shallow Verification — cognitive misering detected
+  const shallowNudge = checkCognitiveMisering(context);
+  if (shallowNudge) nudges.push(shallowNudge);
+
   // Escalate critical nudges from Slack decisions to Slack delivery
   if (decision.source === 'slack' && decision.channel) {
     for (const nudge of nudges) {
@@ -186,6 +190,46 @@ function checkNoiseLevel(auditResult: NudgeTriggerContext['auditResult']): Nudge
     triggerReason: `Decision consistency score: ${consistencyScore}/100 (stdDev: ${stdDev}). Independent judges assessed this decision very differently.`,
     message: `Alert consistency score: ${consistencyScore}/100. This decision would likely receive different treatment from different reviewers. Consider establishing clearer criteria.`,
     severity: consistencyScore < 30 ? 'critical' : 'warning',
+    channel: 'dashboard',
+  };
+}
+
+function checkCognitiveMisering(context: NudgeTriggerContext): NudgeDefinition | null {
+  const { auditResult, decision } = context;
+
+  // Check if cognitive misering was explicitly detected by the bias detective
+  const miseringBias = auditResult.biasFindings.find(
+    b =>
+      b.biasType.toLowerCase().includes('cognitive miser') ||
+      b.biasType.toLowerCase().includes('misering')
+  );
+
+  // Also flag when a high-stakes decision has a short content length relative to its complexity
+  // (indicator of shallow analysis — the decision was made too quickly with too little reasoning)
+  const highStakesTypes = ['strategic', 'vendor_eval', 'approval'];
+  const isHighStakes = decision.decisionType && highStakesTypes.includes(decision.decisionType);
+  const wordCount = decision.content.split(/\s+/).length;
+  const shallowHighStakes =
+    isHighStakes && wordCount < 100 && auditResult.decisionQualityScore < 50;
+
+  if (!miseringBias && !shallowHighStakes) return null;
+
+  const severity: NudgeSeverity =
+    miseringBias?.severity === 'critical' ||
+    (shallowHighStakes && auditResult.decisionQualityScore < 30)
+      ? 'critical'
+      : 'warning';
+
+  const reason = miseringBias
+    ? `Cognitive Misering detected: "${miseringBias.excerpt}"`
+    : `High-stakes ${decision.decisionType} decision with only ${wordCount} words of reasoning and quality score ${auditResult.decisionQualityScore}/100.`;
+
+  return {
+    nudgeType: 'shallow_verification',
+    triggerReason: reason,
+    message:
+      'This decision shows signs of shallow analysis relative to its stakes. Before finalizing, verify key assumptions against the available evidence rather than accepting the first plausible conclusion.',
+    severity,
     channel: 'dashboard',
   };
 }

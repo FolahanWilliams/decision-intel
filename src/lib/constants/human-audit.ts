@@ -65,6 +65,7 @@ export const NUDGE_TYPE_LABELS: Record<string, string> = {
   base_rate_reminder: 'Base Rate Reminder',
   pre_mortem_trigger: 'Pre-Mortem Trigger',
   noise_check: 'Noise Check',
+  shallow_verification: 'Shallow Verification',
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

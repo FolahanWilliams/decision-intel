@@ -230,7 +230,8 @@ export type BiasCategory =
   | 'status_quo_bias'
   | 'framing_effect'
   | 'selective_perception'
-  | 'recency_bias';
+  | 'recency_bias'
+  | 'cognitive_misering';
 
 export const BIAS_CATEGORIES: Record<
   BiasCategory,
@@ -310,5 +311,11 @@ export const BIAS_CATEGORIES: Record<
     name: 'Recency Bias',
     description: 'Overweighting recent events over historical data',
     category: 'Information',
+  },
+  cognitive_misering: {
+    name: 'Cognitive Misering',
+    description:
+      'Defaulting to low-effort, superficial thinking instead of thoroughly analyzing available evidence',
+    category: 'Judgment',
   },
 };
