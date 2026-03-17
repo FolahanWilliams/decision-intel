@@ -20,7 +20,7 @@ import { createLogger } from '@/lib/utils/logger';
 const log = createLogger('NewsService');
 
 const parser = new Parser({
-  timeout: 10_000,
+  timeout: 20_000,
   headers: { 'User-Agent': 'DecisionIntel/1.0 (+https://decision-intel.app)' },
 });
 
@@ -49,7 +49,7 @@ async function fetchFeed(feed: FeedConfig): Promise<ParsedArticle[]> {
   try {
     const result = await withTimeout(
       () => parser.parseURL(feed.url),
-      15_000,
+      25_000,
       `Feed timeout: ${feed.name}`
     );
 

@@ -66,7 +66,7 @@ async function fetchFredSeries(seriesId: string): Promise<FredObservation | null
 
     const response = await withTimeout(
       () => fetch(`${FRED_API}/series/observations?${params}`),
-      8_000,
+      15_000,
       `FRED timeout: ${seriesId}`
     );
 
@@ -180,7 +180,7 @@ Return a JSON array of benchmark objects. Only include data you can verify via s
 
     const result = await withTimeout(
       () => model.generateContent(prompt),
-      15_000,
+      25_000,
       'Industry benchmark search timeout'
     );
 

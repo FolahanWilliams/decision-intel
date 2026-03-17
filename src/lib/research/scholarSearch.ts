@@ -42,7 +42,7 @@ async function searchSemanticScholar(query: string, limit: number = 5): Promise<
         fetch(`${SEMANTIC_SCHOLAR_API}/paper/search?${params}`, {
           headers: { 'User-Agent': 'DecisionIntel/1.0' },
         }),
-      10_000,
+      15_000,
       'Semantic Scholar timeout'
     );
 
@@ -107,7 +107,7 @@ Return a JSON array.`;
 
     const result = await withTimeout(
       () => model.generateContent(prompt),
-      20_000,
+      30_000,
       'Gemini scholar search timeout'
     );
 
