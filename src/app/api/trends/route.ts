@@ -55,7 +55,12 @@ export async function GET(request: Request) {
       take: MAX_ANALYSES,
     };
 
-    let analyses;
+    let analyses: Array<{
+      overallScore: number;
+      noiseScore: number;
+      createdAt: Date;
+      biases: Array<{ biasType: string }>;
+    }>;
     try {
       analyses = await prisma.analysis.findMany({
         ...queryArgs,
@@ -68,7 +73,7 @@ export async function GET(request: Request) {
       const code = (err as { code?: string }).code;
       if (code === 'P2021' || code === 'P2022') {
         log.warn('Schema drift in trends query, retrying with core fields only');
-        analyses = await prisma.analysis.findMany({
+        const fallback = await prisma.analysis.findMany({
           ...queryArgs,
           select: {
             id: true,
@@ -78,8 +83,7 @@ export async function GET(request: Request) {
             document: { select: { filename: true, uploadedAt: true } },
           },
         });
-        // Attach empty biases array for downstream compatibility
-        analyses = analyses.map((a: Record<string, unknown>) => ({ ...a, biases: [] }));
+        analyses = fallback.map(a => ({ ...a, biases: [] as Array<{ biasType: string }> }));
       } else {
         throw err;
       }
