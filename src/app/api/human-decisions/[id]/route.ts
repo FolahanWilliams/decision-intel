@@ -12,6 +12,11 @@ import { logAudit } from '@/lib/audit';
 
 const log = createLogger('HumanDecisionDetail');
 
+function isSchemaDrift(err: unknown): boolean {
+  const e = err as { code?: string; message?: string };
+  return e.code === 'P2021' || e.code === 'P2022' || !!e.message?.includes('does not exist');
+}
+
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
@@ -24,15 +29,24 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
     const { id } = await params;
 
-    const decision = await prisma.humanDecision.findFirst({
-      where: { id, userId: user.id },
-      include: {
-        cognitiveAudit: true,
-        nudges: {
-          orderBy: { createdAt: 'desc' },
+    let decision;
+    try {
+      decision = await prisma.humanDecision.findFirst({
+        where: { id, userId: user.id },
+        include: {
+          cognitiveAudit: true,
+          nudges: {
+            orderBy: { createdAt: 'desc' },
+          },
         },
-      },
-    });
+      });
+    } catch (dbError: unknown) {
+      if (isSchemaDrift(dbError)) {
+        log.warn('Schema drift in human decision detail: table not migrated yet');
+        return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      }
+      throw dbError;
+    }
 
     if (!decision) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -64,17 +78,25 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params;
 
-    // Verify ownership
-    const decision = await prisma.humanDecision.findFirst({
-      where: { id, userId: user.id },
-      select: { id: true },
-    });
+    try {
+      // Verify ownership
+      const decision = await prisma.humanDecision.findFirst({
+        where: { id, userId: user.id },
+        select: { id: true },
+      });
 
-    if (!decision) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      if (!decision) {
+        return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      }
+
+      await prisma.humanDecision.delete({ where: { id } });
+    } catch (dbError: unknown) {
+      if (isSchemaDrift(dbError)) {
+        log.warn('Schema drift in human decision delete: table not migrated yet');
+        return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      }
+      throw dbError;
     }
-
-    await prisma.humanDecision.delete({ where: { id } });
 
     logAudit({
       action: 'DELETE_ACCOUNT_DATA',

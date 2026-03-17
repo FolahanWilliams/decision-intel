@@ -12,6 +12,11 @@ import { logAudit } from '@/lib/audit';
 
 const log = createLogger('NudgesAPI');
 
+function isSchemaDrift(err: unknown): boolean {
+  const e = err as { code?: string; message?: string };
+  return e.code === 'P2021' || e.code === 'P2022' || !!e.message?.includes('does not exist');
+}
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -33,22 +38,31 @@ export async function GET(req: NextRequest) {
       where.acknowledgedAt = null;
     }
 
-    const nudges = await prisma.nudge.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-      include: {
-        humanDecision: {
-          select: {
-            id: true,
-            source: true,
-            channel: true,
-            decisionType: true,
-            createdAt: true,
+    let nudges: unknown[] = [];
+    try {
+      nudges = await prisma.nudge.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        include: {
+          humanDecision: {
+            select: {
+              id: true,
+              source: true,
+              channel: true,
+              decisionType: true,
+              createdAt: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (dbError: unknown) {
+      if (isSchemaDrift(dbError)) {
+        log.warn('Schema drift in nudges list: table not migrated yet');
+        return NextResponse.json({ nudges: [] });
+      }
+      throw dbError;
+    }
 
     return NextResponse.json({ nudges });
   } catch (error) {
@@ -78,27 +92,38 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Missing nudgeId' }, { status: 400 });
     }
 
-    // Verify ownership through the related human decision
-    const nudge = await prisma.nudge.findFirst({
-      where: {
-        id: body.nudgeId,
-        humanDecision: { userId: user.id },
-      },
-      select: { id: true },
-    });
+    try {
+      // Verify ownership through the related human decision
+      const nudge = await prisma.nudge.findFirst({
+        where: {
+          id: body.nudgeId,
+          humanDecision: { userId: user.id },
+        },
+        select: { id: true },
+      });
 
-    if (!nudge) {
-      return NextResponse.json({ error: 'Nudge not found' }, { status: 404 });
+      if (!nudge) {
+        return NextResponse.json({ error: 'Nudge not found' }, { status: 404 });
+      }
+
+      await prisma.nudge.update({
+        where: { id: body.nudgeId },
+        data: {
+          acknowledgedAt: new Date(),
+          wasHelpful: body.wasHelpful,
+          outcomeNotes: body.outcomeNotes,
+        },
+      });
+    } catch (dbError: unknown) {
+      if (isSchemaDrift(dbError)) {
+        log.warn('Schema drift in nudge acknowledge: table not migrated yet');
+        return NextResponse.json(
+          { error: 'Database schema not yet migrated', code: 'SCHEMA_DRIFT' },
+          { status: 503 }
+        );
+      }
+      throw dbError;
     }
-
-    await prisma.nudge.update({
-      where: { id: body.nudgeId },
-      data: {
-        acknowledgedAt: new Date(),
-        wasHelpful: body.wasHelpful,
-        outcomeNotes: body.outcomeNotes,
-      },
-    });
 
     // Audit log (fire-and-forget)
     logAudit({

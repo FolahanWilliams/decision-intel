@@ -94,16 +94,35 @@ export async function POST(req: NextRequest) {
     // Deduplicate by content hash
     const contentHash = crypto.createHash('sha256').update(body.content).digest('hex');
 
-    const existing = await prisma.humanDecision.findUnique({
-      where: { contentHash },
-      select: { id: true },
-    });
+    try {
+      const existing = await prisma.humanDecision.findUnique({
+        where: { contentHash },
+        select: { id: true },
+      });
 
-    if (existing) {
-      return NextResponse.json(
-        { id: existing.id, deduplicated: true, message: 'Decision already submitted' },
-        { status: 200 }
-      );
+      if (existing) {
+        return NextResponse.json(
+          { id: existing.id, deduplicated: true, message: 'Decision already submitted' },
+          { status: 200 }
+        );
+      }
+    } catch (dbError: unknown) {
+      const prismaError = dbError as { code?: string; message?: string };
+      if (
+        prismaError.code === 'P2021' ||
+        prismaError.code === 'P2022' ||
+        prismaError.message?.includes('does not exist')
+      ) {
+        log.warn('Schema drift in dedup check (' + prismaError.code + '), table not migrated');
+        return NextResponse.json(
+          {
+            error: 'Database schema not yet migrated. Run: npm run prisma:migrate',
+            code: 'SCHEMA_DRIFT',
+          },
+          { status: 503 }
+        );
+      }
+      throw dbError;
     }
 
     // Create the human decision record
@@ -195,45 +214,68 @@ export async function GET(req: NextRequest) {
     const where: Record<string, unknown> = { userId: user.id };
     if (source) where.source = source;
 
-    const [decisions, total] = await Promise.all([
-      prisma.humanDecision.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-        skip: offset,
-        include: {
-          cognitiveAudit: {
-            select: {
-              id: true,
-              decisionQualityScore: true,
-              noiseScore: true,
-              sentimentScore: true,
-              biasFindings: true,
-              summary: true,
-              teamConsensusFlag: true,
-              dissenterCount: true,
-              createdAt: true,
+    let decisions: unknown[] = [];
+    let total = 0;
+
+    try {
+      [decisions, total] = await Promise.all([
+        prisma.humanDecision.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+          skip: offset,
+          include: {
+            cognitiveAudit: {
+              select: {
+                id: true,
+                decisionQualityScore: true,
+                noiseScore: true,
+                sentimentScore: true,
+                biasFindings: true,
+                summary: true,
+                teamConsensusFlag: true,
+                dissenterCount: true,
+                createdAt: true,
+              },
+            },
+            nudges: {
+              select: {
+                id: true,
+                nudgeType: true,
+                message: true,
+                severity: true,
+                channel: true,
+                triggerReason: true,
+                acknowledgedAt: true,
+                wasHelpful: true,
+                createdAt: true,
+              },
+              orderBy: { createdAt: 'desc' },
+              take: 5,
             },
           },
-          nudges: {
-            select: {
-              id: true,
-              nudgeType: true,
-              message: true,
-              severity: true,
-              channel: true,
-              triggerReason: true,
-              acknowledgedAt: true,
-              wasHelpful: true,
-              createdAt: true,
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 5,
-          },
-        },
-      }),
-      prisma.humanDecision.count({ where }),
-    ]);
+        }),
+        prisma.humanDecision.count({ where }),
+      ]);
+    } catch (dbError: unknown) {
+      const prismaError = dbError as { code?: string; message?: string };
+      if (
+        prismaError.code === 'P2021' ||
+        prismaError.code === 'P2022' ||
+        prismaError.message?.includes('does not exist')
+      ) {
+        log.warn(
+          'Schema drift in HumanDecision list: table not migrated yet (' + prismaError.code + ')'
+        );
+        return NextResponse.json({
+          decisions: [],
+          total: 0,
+          page,
+          totalPages: 0,
+        });
+      }
+      throw dbError;
+    }
 
     return NextResponse.json({
       decisions,
