@@ -61,7 +61,10 @@ const prismaClientSingleton = () => {
     ...(needsSsl && { ssl: { rejectUnauthorized: false } }),
   });
 
-  const adapter = new PrismaPg(pool);
+  // Cast needed: @prisma/adapter-pg bundles its own @types/pg which can
+  // diverge from the top-level @types/pg, causing a TS mismatch on Vercel.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const adapter = new PrismaPg(pool as any);
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
