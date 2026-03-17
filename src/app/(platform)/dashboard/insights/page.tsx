@@ -886,7 +886,7 @@ export default function InsightsPage() {
                     tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(v: string) => (v.length > 18 ? v.slice(0, 16) + '…' : v)}
+                    tickFormatter={(v) => (String(v).length > 18 ? String(v).slice(0, 16) + '…' : String(v))}
                   />
                   <Tooltip
                     contentStyle={{

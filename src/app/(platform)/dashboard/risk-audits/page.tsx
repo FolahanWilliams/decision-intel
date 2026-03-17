@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useDocuments } from '@/hooks/useDocuments';
 import Link from 'next/link';
+import { formatDate } from '@/lib/utils/format-date';
 import {
   ShieldAlert,
   FileText,
@@ -403,7 +404,7 @@ export default function RiskAuditsPage() {
                         <div style={{ fontWeight: 600, marginBottom: '4px' }}>{doc.filename}</div>
                         <div className="flex items-center gap-md">
                           <span className="text-xs text-muted">
-                            {new Date(doc.uploadedAt).toLocaleDateString()}
+                            {formatDate(doc.uploadedAt)}
                           </span>
                           <span
                             style={{

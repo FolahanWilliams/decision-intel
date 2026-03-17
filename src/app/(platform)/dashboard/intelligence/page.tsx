@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import useSWR from 'swr';
+import { formatDate } from '@/lib/utils/format-date';
 import {
   Newspaper,
   BookOpen,
@@ -230,7 +231,7 @@ function ArticleCard({ article, delay }: { article: NewsArticle; delay: number }
         </span>
         <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{article.source}</span>
         <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-          {new Date(article.publishedAt).toLocaleDateString()}
+          {formatDate(article.publishedAt)}
         </span>
         {article.biasTypes.slice(0, 3).map(b => (
           <span
