@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
+import { normalizeBiasType, getBiasDisplayName } from '@/lib/utils/bias-normalize';
 
 const log = createLogger('StatsRoute');
 
@@ -97,10 +98,17 @@ export async function GET() {
           avgOverallScore: Math.round(scoreAggregation._avg.overallScore ?? 0),
           avgNoiseScore: Math.round(scoreAggregation._avg.noiseScore ?? 0),
         },
-        topBiases: topBiasesRaw.map((b: { biasType: string; count: bigint }) => ({
-          name: b.biasType,
-          count: Number(b.count),
-        })),
+        topBiases: (() => {
+          const merged = new Map<string, number>();
+          for (const b of topBiasesRaw) {
+            const key = normalizeBiasType(b.biasType);
+            merged.set(key, (merged.get(key) || 0) + Number(b.count));
+          }
+          return [...merged.entries()]
+            .map(([key, count]) => ({ name: getBiasDisplayName(key), count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+        })(),
         severityDistribution: severityCounts,
         recentDocuments: recentDocuments.map(
           (doc: {

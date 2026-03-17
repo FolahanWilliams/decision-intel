@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
+import { normalizeBiasType, getBiasDisplayName } from '@/lib/utils/bias-normalize';
 
 const log = createLogger('InsightsRoute');
 
@@ -373,11 +374,17 @@ export async function GET() {
         objectivity: sentimentCount > 0 ? Math.round(Math.abs(totalSentiment / sentimentCount)) : 0,
       },
 
-      // 2. Bias treemap
-      biasTreemap: biasDistribution.map((b: { biasType: string; count: bigint }) => ({
-        name: b.biasType,
-        count: Number(b.count),
-      })),
+      // 2. Bias treemap (normalize + merge duplicates from pre-normalization data)
+      biasTreemap: (() => {
+        const merged = new Map<string, number>();
+        for (const b of biasDistribution) {
+          const key = normalizeBiasType(b.biasType);
+          merged.set(key, (merged.get(key) || 0) + Number(b.count));
+        }
+        return [...merged.entries()]
+          .map(([key, count]) => ({ name: getBiasDisplayName(key), count }))
+          .sort((a, b) => b.count - a.count);
+      })(),
       biasSeverity: Object.fromEntries(
         severityCounts.map((s: { severity: string; count: bigint }) => [
           s.severity,

@@ -30,6 +30,7 @@ import { searchSimilarDocuments } from '@/lib/rag/embeddings';
 import { generateBiasWeb, generatePreMortemTopography } from '@/lib/agents/visualization';
 import type { HumanDecisionInput, CognitiveAuditResult } from '@/types/human-audit';
 import type { BiasDetectionResult, ComplianceResult, LogicalAnalysisResult } from '@/types';
+import { normalizeBiasType } from '@/lib/utils/bias-normalize';
 
 const log = createLogger('HumanAudit');
 
@@ -395,7 +396,7 @@ Return JSON with this schema:
   }
 
   const biases: BiasDetectionResult[] = parsed.biases.map(b => ({
-    biasType: b.biasType,
+    biasType: normalizeBiasType(b.biasType),
     found: true,
     severity: (['low', 'medium', 'high', 'critical'].includes(b.severity)
       ? b.severity

@@ -16,6 +16,7 @@ import { withRetry, smartTruncate, batchProcess } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
 import { createLogger } from '../utils/logger';
 import { assembleContext, formatContextForPrompt } from '../intelligence/contextBuilder';
+import { normalizeBiasType } from '../utils/bias-normalize';
 
 // ============================================================
 // CONSTANTS
@@ -1169,7 +1170,11 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       noiseScore: Math.min(100, (state.noiseStats?.stdDev || 0) * 10),
       summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Trust Score: ${trustScore}%.`,
       structuredContent: state.structuredContent,
-      biases: (state.biasAnalysis || []).map(b => ({ ...b, found: true })),
+      biases: (state.biasAnalysis || []).map(b => ({
+        ...b,
+        biasType: normalizeBiasType(b.biasType),
+        found: true,
+      })),
       noiseStats: state.noiseStats,
       noiseBenchmarks: state.noiseBenchmarks,
       factCheck: state.factCheckResult ?? undefined,

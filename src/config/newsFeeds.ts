@@ -16,11 +16,6 @@ export type FeedCategory = 'psychology' | 'business' | 'regulatory' | 'industry'
 export const NEWS_FEEDS: FeedConfig[] = [
   // ── Psychology & Decision Science ────────────────────────────────
   {
-    url: 'https://hbr.org/topic/decision-making/feed',
-    name: 'HBR Decision Making',
-    category: 'psychology',
-  },
-  {
     url: 'https://behavioralscientist.org/feed/',
     name: 'Behavioral Scientist',
     category: 'psychology',
@@ -28,11 +23,6 @@ export const NEWS_FEEDS: FeedConfig[] = [
   {
     url: 'https://fs.blog/feed/',
     name: 'Farnam Street',
-    category: 'psychology',
-  },
-  {
-    url: 'https://thedecisionlab.com/feed',
-    name: 'The Decision Lab',
     category: 'psychology',
   },
 
@@ -67,21 +57,9 @@ export const NEWS_FEEDS: FeedConfig[] = [
 
   // ── Industry News ────────────────────────────────────────────────
   {
-    url: 'https://feeds.reuters.com/reuters/businessNews',
-    name: 'Reuters Business',
-    category: 'industry',
-  },
-  {
     url: 'https://feeds.bbci.co.uk/news/business/rss.xml',
     name: 'BBC Business',
     category: 'industry',
-  },
-
-  // ── Academic Research ─────────────────────────────────────────────
-  {
-    url: 'https://papers.ssrn.com/sol3/Jnl_SSRN_Newrss.cfm?npage=1&ntype=2',
-    name: 'SSRN New Papers',
-    category: 'academic',
   },
 ];
 
