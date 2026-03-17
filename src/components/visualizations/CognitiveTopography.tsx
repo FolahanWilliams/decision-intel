@@ -1,7 +1,6 @@
 'use client';
 
 import { Brain, Zap, Maximize2, Info } from 'lucide-react';
-import Image from 'next/image';
 import { useState } from 'react';
 
 interface CognitiveTopographyProps {
@@ -57,12 +56,11 @@ export function CognitiveTopography({
       <div className="relative aspect-video bg-black/40 flex items-center justify-center group">
         {activeView === 'bias' && biasWebImageUrl && (
           <div className="w-full h-full relative animate-fade-in">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element -- data URIs don't benefit from next/image */}
+            <img
               src={biasWebImageUrl}
               alt="Decision Bias Web"
-              fill
-              className="object-contain"
-              priority
+              className="absolute inset-0 w-full h-full object-contain"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
               <p className="text-xs text-white/90 leading-relaxed max-w-lg">
@@ -76,18 +74,17 @@ export function CognitiveTopography({
 
         {activeView === 'premortem' && preMortemImageUrl && (
           <div className="w-full h-full relative animate-fade-in">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element -- data URIs don't benefit from next/image */}
+            <img
               src={preMortemImageUrl}
               alt="Pre-Mortem Failure Topography"
-              fill
-              className="object-contain"
-              priority
+              className="absolute inset-0 w-full h-full object-contain"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
               <p className="text-xs text-white/90 leading-relaxed max-w-lg">
                 <span className="font-bold text-accent-secondary">Pre-Mortem Topography:</span> A
-                simulated landscape of failure modes. Peaks represent high-probability failure points
-                identified through red-team simulation.
+                simulated landscape of failure modes. Peaks represent high-probability failure
+                points identified through red-team simulation.
               </p>
             </div>
           </div>
