@@ -68,9 +68,7 @@ export function OverviewTab({
                   },
                   {
                     id: '2',
-                    date: analysisCreatedAt
-                      ? formatDate(analysisCreatedAt)
-                      : 'Pending',
+                    date: analysisCreatedAt ? formatDate(analysisCreatedAt) : 'Pending',
                     title: 'AI Audit Completed',
                     description: 'Deep scan for biases and noise.',
                     type: 'decision',

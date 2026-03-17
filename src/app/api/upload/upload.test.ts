@@ -14,7 +14,8 @@ vi.mock('next/server', () => ({
     };
     formData: () => Promise<FormData>;
     constructor(input?: string | URL) {
-      this.url = typeof input === 'string' ? input : input?.toString() || 'http://localhost/api/upload';
+      this.url =
+        typeof input === 'string' ? input : input?.toString() || 'http://localhost/api/upload';
       this.formData = async () => new FormData();
     }
   },

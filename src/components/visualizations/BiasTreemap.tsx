@@ -158,7 +158,7 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
                 border: '1px solid var(--glass-border)',
                 fontSize: '12px',
               }}
-              formatter={(value) => [`${value ?? 0} occurrences`, 'Count']}
+              formatter={value => [`${value ?? 0} occurrences`, 'Count']}
             />
           </Treemap>
         </ResponsiveContainer>

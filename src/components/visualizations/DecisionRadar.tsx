@@ -67,7 +67,7 @@ export function DecisionRadar({ data }: DecisionRadarProps) {
                 border: '1px solid var(--glass-border)',
                 fontSize: '12px',
               }}
-              formatter={(value) => [`${value ?? 0}/100`, 'Score']}
+              formatter={value => [`${value ?? 0}/100`, 'Score']}
             />
           </RadarChart>
         </ResponsiveContainer>

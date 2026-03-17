@@ -403,9 +403,7 @@ export default function RiskAuditsPage() {
                       <div>
                         <div style={{ fontWeight: 600, marginBottom: '4px' }}>{doc.filename}</div>
                         <div className="flex items-center gap-md">
-                          <span className="text-xs text-muted">
-                            {formatDate(doc.uploadedAt)}
-                          </span>
+                          <span className="text-xs text-muted">{formatDate(doc.uploadedAt)}</span>
                           <span
                             style={{
                               fontSize: '10px',

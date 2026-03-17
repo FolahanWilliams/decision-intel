@@ -702,7 +702,7 @@ export default function InsightsPage() {
                       fontSize: '11px',
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
-                    formatter={(value) => [`${value ?? 0} analyses`, 'Count']}
+                    formatter={value => [`${value ?? 0} analyses`, 'Count']}
                   />
                   <Bar dataKey="count" radius={[2, 2, 0, 0]}>
                     {insights.scoreDistribution.map((entry, i) => (
@@ -886,7 +886,9 @@ export default function InsightsPage() {
                     tick={{ fill: 'var(--text-muted)', fontSize: 9, fontFamily: 'JetBrains Mono' }}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(v) => (String(v).length > 18 ? String(v).slice(0, 16) + '…' : String(v))}
+                    tickFormatter={v =>
+                      String(v).length > 18 ? String(v).slice(0, 16) + '…' : String(v)
+                    }
                   />
                   <Tooltip
                     contentStyle={{
@@ -895,10 +897,7 @@ export default function InsightsPage() {
                       fontSize: '11px',
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
-                    formatter={(value) => [
-                      `${value ?? 0} occurrences`,
-                      'Count',
-                    ]}
+                    formatter={value => [`${value ?? 0} occurrences`, 'Count']}
                   />
                   <Bar dataKey="count" radius={[0, 2, 2, 0]}>
                     {insights.fallacyFrequency.map((entry, i) => (
@@ -1105,7 +1104,7 @@ export default function InsightsPage() {
                         fontSize: '11px',
                         fontFamily: "'JetBrains Mono', monospace",
                       }}
-                      formatter={(value) => [`${value ?? 0} votes`, 'Count']}
+                      formatter={value => [`${value ?? 0} votes`, 'Count']}
                     />
                     <Bar dataKey="count" radius={[2, 2, 0, 0]}>
                       {['#30d158', '#ffd60a', '#ff453a'].map((fill, i) => (
