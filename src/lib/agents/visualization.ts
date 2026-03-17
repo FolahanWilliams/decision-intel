@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { createLogger } from '@/lib/utils/logger';
+import { uploadVisualization } from '@/lib/utils/visualization-storage';
 
 const log = createLogger('Visualization');
 
@@ -15,8 +16,8 @@ function getAI(): GoogleGenAI {
 // The Imagen 3 model (referred to as "Nano Banana 2" internally)
 const NANO_BANANA_MODEL = 'imagen-3.0-generate-002';
 
-// Guard: reject data URIs larger than 500 KB to avoid bloating the DB
-const MAX_DATA_URI_BYTES = 500_000;
+// Guard: reject images larger than 2 MB (raw bytes, not base64)
+const MAX_IMAGE_BYTES = 2_000_000;
 
 /** Sanitize user-derived text before embedding in an image prompt. */
 function sanitizeForPrompt(text: string, maxLength = 200): string {
@@ -27,10 +28,17 @@ function sanitizeForPrompt(text: string, maxLength = 200): string {
 }
 
 /**
- * Call Google's image generation API and return a data URI.
+ * Call Google's image generation API, upload to Supabase Storage,
+ * and return the public URL. Falls back to a data URI if storage
+ * upload fails (e.g. bucket not created yet).
  * Returns null (never throws) when generation is unavailable or fails.
  */
-async function generateImage(prompt: string): Promise<string | null> {
+async function generateImage(
+  prompt: string,
+  entityType: 'analysis' | 'audit',
+  entityId: string,
+  imageName: string
+): Promise<string | null> {
   if (!process.env.GOOGLE_API_KEY) {
     log.warn('No GOOGLE_API_KEY found — skipping image generation');
     return null;
@@ -51,16 +59,23 @@ async function generateImage(prompt: string): Promise<string | null> {
     const base64Image = response.generatedImages?.[0]?.image?.imageBytes;
     if (!base64Image) return null;
 
-    const dataUri = `data:image/jpeg;base64,${base64Image}`;
-
-    // Reject oversized images to protect DB storage
-    if (Buffer.byteLength(dataUri, 'utf8') > MAX_DATA_URI_BYTES) {
-      log.warn(
-        `Generated image exceeds ${MAX_DATA_URI_BYTES} bytes — discarding to protect DB storage`
-      );
+    // Reject oversized images
+    const rawBytes = Buffer.byteLength(base64Image, 'base64');
+    if (rawBytes > MAX_IMAGE_BYTES) {
+      log.warn(`Generated image exceeds ${MAX_IMAGE_BYTES} bytes — discarding`);
       return null;
     }
 
+    const dataUri = `data:image/jpeg;base64,${base64Image}`;
+
+    // Upload to Supabase Storage; fall back to data URI if upload fails
+    const publicUrl = await uploadVisualization(dataUri, entityType, entityId, imageName);
+    if (publicUrl) {
+      return publicUrl;
+    }
+
+    // Fallback: return data URI (legacy behavior) if storage unavailable
+    log.warn('Storage upload failed — falling back to data URI');
     return dataUri;
   } catch (error) {
     log.error('Image generation failed:', error instanceof Error ? error.message : String(error));
@@ -75,8 +90,14 @@ interface BiasInput {
 
 /**
  * Generates an abstract "Bias Web" visualization based on the detected biases.
+ * @param entityType - 'analysis' for document analyses, 'audit' for human-decision audits
+ * @param entityId - The ID of the analysis or audit record (used as storage path)
  */
-export async function generateBiasWeb(biases: BiasInput[]): Promise<string | null> {
+export async function generateBiasWeb(
+  biases: BiasInput[],
+  entityType: 'analysis' | 'audit' = 'analysis',
+  entityId: string = 'unknown'
+): Promise<string | null> {
   if (!biases || biases.length === 0) {
     return null;
   }
@@ -91,7 +112,7 @@ The color scheme features ${colorScheme} hues. The lines connecting the nodes ar
 This represents the complex intersection of cognitive biases: ${biasNames}. \
 Cyberpunk aesthetic, glassmorphism, 8k resolution, highly detailed, functional data art.`;
 
-  return generateImage(prompt);
+  return generateImage(prompt, entityType, entityId, 'bias-web');
 }
 
 interface PreMortemInput {
@@ -100,9 +121,13 @@ interface PreMortemInput {
 
 /**
  * Generates a "Pre-Mortem Topography" visualization based on failure scenarios.
+ * @param entityType - 'analysis' for document analyses, 'audit' for human-decision audits
+ * @param entityId - The ID of the analysis or audit record (used as storage path)
  */
 export async function generatePreMortemTopography(
-  preMortem: PreMortemInput | null | undefined
+  preMortem: PreMortemInput | null | undefined,
+  entityType: 'analysis' | 'audit' = 'analysis',
+  entityId: string = 'unknown'
 ): Promise<string | null> {
   if (!preMortem?.failureScenarios || preMortem.failureScenarios.length === 0) {
     return null;
@@ -124,5 +149,5 @@ Show structural stress points, subtle cracks in a foundation, or a bridge spanni
 The metaphorical landscape represents these risks: ${scenarios}. \
 Corporate strategy aesthetic, moody lighting, highly detailed, cinematic composition.`;
 
-  return generateImage(prompt);
+  return generateImage(prompt, entityType, entityId, 'pre-mortem');
 }

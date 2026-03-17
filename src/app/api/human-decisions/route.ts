@@ -253,7 +253,7 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
   try {
     log.info(`Starting cognitive audit for decision ${decisionId}`);
 
-    const auditResult = await analyzeHumanDecision(input, { userId });
+    const auditResult = await analyzeHumanDecision(input, { userId, decisionId });
 
     // Validate LLM outputs with Zod before persisting (matches existing pattern)
     const validatedBiases = BiasFindings.safeParse(auditResult.biasFindings).success

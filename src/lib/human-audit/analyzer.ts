@@ -170,7 +170,7 @@ Also detect:
  */
 export async function analyzeHumanDecision(
   input: HumanDecisionInput,
-  options?: { userId?: string }
+  options?: { userId?: string; decisionId?: string }
 ): Promise<CognitiveAuditResult> {
   log.info(
     `Analyzing human decision from ${input.source}${input.channel ? ` (${input.channel})` : ''}`
@@ -293,9 +293,10 @@ export async function analyzeHumanDecision(
   let preMortemImageUrl: string | undefined;
 
   try {
+    const auditEntityId = options?.decisionId ?? 'unknown';
     const [biasWebUrl, preMortemUrl] = await Promise.all([
-      generateBiasWeb(biasData?.biases ?? []),
-      generatePreMortemTopography(complianceData?.preMortem),
+      generateBiasWeb(biasData?.biases ?? [], 'audit', auditEntityId),
+      generatePreMortemTopography(complianceData?.preMortem, 'audit', auditEntityId),
     ]);
     biasWebImageUrl = biasWebUrl || undefined;
     preMortemImageUrl = preMortemUrl || undefined;

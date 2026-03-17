@@ -13,6 +13,10 @@ import { getSafeErrorMessage } from '@/lib/utils/error';
 
 const log = createLogger('EffectivenessAPI');
 
+// Cap to prevent unbounded memory usage on aggregation queries
+const MAX_DECISIONS = 1000;
+const MAX_NUDGES = 5000;
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -36,6 +40,7 @@ export async function GET(req: NextRequest) {
           status: 'analyzed',
           createdAt: { gte: since },
         },
+        take: MAX_DECISIONS,
         select: {
           id: true,
           source: true,
@@ -75,6 +80,7 @@ export async function GET(req: NextRequest) {
           humanDecision: { userId: user.id },
           createdAt: { gte: since },
         },
+        take: MAX_NUDGES,
         select: {
           acknowledgedAt: true,
           wasHelpful: true,

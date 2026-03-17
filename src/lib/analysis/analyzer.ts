@@ -96,8 +96,8 @@ export async function analyzeDocument(
     let preMortemImageUrl: string | null = null;
     try {
       const [biasWebUrl, preMortemUrl] = await Promise.all([
-        generateBiasWeb(foundBiases), // Assuming 'foundBiases' is the correct data source
-        generatePreMortemTopography(result.preMortem), // Assuming 'result.preMortem' is the correct data source
+        generateBiasWeb(foundBiases, 'analysis', documentId),
+        generatePreMortemTopography(result.preMortem, 'analysis', documentId),
       ]);
       biasWebImageUrl = biasWebUrl;
       preMortemImageUrl = preMortemUrl;

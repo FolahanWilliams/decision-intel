@@ -8,11 +8,13 @@ const mockHeaders = new Map<string, string>();
 
 vi.mock('next/server', () => ({
   NextRequest: class {
+    url: string;
     headers = {
       get: (key: string) => mockHeaders.get(key) || null,
     };
     formData: () => Promise<FormData>;
-    constructor() {
+    constructor(input?: string | URL) {
+      this.url = typeof input === 'string' ? input : input?.toString() || 'http://localhost/api/upload';
       this.formData = async () => new FormData();
     }
   },
@@ -47,6 +49,7 @@ const mockDocCreate = vi.fn();
 const mockDocFindFirst = vi.fn();
 const mockDocFindMany = vi.fn();
 const mockDocDelete = vi.fn();
+const mockDocCount = vi.fn();
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
@@ -55,6 +58,7 @@ vi.mock('@/lib/prisma', () => ({
       findFirst: (...args: unknown[]) => mockDocFindFirst(...args),
       findMany: (...args: unknown[]) => mockDocFindMany(...args),
       delete: (...args: unknown[]) => mockDocDelete(...args),
+      count: (...args: unknown[]) => mockDocCount(...args),
     },
   },
 }));
@@ -236,21 +240,31 @@ describe('POST /api/upload', () => {
 // ---------------------------------------------------------------------------
 
 describe('GET /api/upload', () => {
+  function createGetRequest(params?: Record<string, string>) {
+    const url = new URL('http://localhost/api/upload');
+    if (params) {
+      for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+    }
+    return new NextRequest(url);
+  }
+
   it('returns 401 when unauthenticated', async () => {
     mockGetUser.mockResolvedValue({ data: { user: null } });
 
-    const res = await GET();
+    const res = await GET(createGetRequest());
     expect(res.status).toBe(401);
   });
 
-  it('returns user documents', async () => {
+  it('returns user documents with pagination', async () => {
     mockDocFindMany.mockResolvedValue([{ id: 'doc1', filename: 'test.pdf', status: 'complete' }]);
+    mockDocCount.mockResolvedValue(1);
 
-    const res = await GET();
+    const res = await GET(createGetRequest());
     expect(res.status).toBe(200);
 
     const body = await res.json();
-    expect(body).toHaveLength(1);
-    expect(body[0].filename).toBe('test.pdf');
+    expect(body.data).toHaveLength(1);
+    expect(body.data[0].filename).toBe('test.pdf');
+    expect(body.pagination).toEqual({ page: 1, limit: 50, total: 1, totalPages: 1 });
   });
 });

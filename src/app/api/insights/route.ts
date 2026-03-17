@@ -5,6 +5,9 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('InsightsRoute');
 
+// Cap to prevent unbounded memory usage on aggregation
+const MAX_ANALYSES = 1000;
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -17,12 +20,12 @@ export async function GET() {
     }
 
     // All queries scoped to user's documents
-    const userDocIds = prisma.document.findMany({
-      where: { userId },
-      select: { id: true },
-    });
-
-    const docIds = (await userDocIds).map((d: { id: string }) => d.id);
+    const docIds = (
+      await prisma.document.findMany({
+        where: { userId },
+        select: { id: true },
+      })
+    ).map((d: { id: string }) => d.id);
 
     if (docIds.length === 0) {
       return NextResponse.json({ empty: true });
@@ -35,6 +38,8 @@ export async function GET() {
     try {
       analysesQuery = await prisma.analysis.findMany({
         where: { documentId: { in: docIds } },
+        orderBy: { createdAt: 'desc' },
+        take: MAX_ANALYSES,
         select: {
           id: true,
           documentId: true,
@@ -57,6 +62,8 @@ export async function GET() {
         log.warn('Schema drift in insights: falling back to core fields (' + code + ')');
         analysesQuery = await prisma.analysis.findMany({
           where: { documentId: { in: docIds } },
+          orderBy: { createdAt: 'desc' },
+          take: MAX_ANALYSES,
           select: {
             id: true,
             documentId: true,

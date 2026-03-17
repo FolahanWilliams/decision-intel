@@ -56,7 +56,7 @@ export function CognitiveTopography({
       <div className="relative aspect-video bg-black/40 flex items-center justify-center group">
         {activeView === 'bias' && biasWebImageUrl && (
           <div className="w-full h-full relative animate-fade-in">
-            {/* eslint-disable-next-line @next/next/no-img-element -- data URIs don't benefit from next/image */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- external storage URLs; next/image requires allowlisted domains */}
             <img
               src={biasWebImageUrl}
               alt="Decision Bias Web"
@@ -74,7 +74,7 @@ export function CognitiveTopography({
 
         {activeView === 'premortem' && preMortemImageUrl && (
           <div className="w-full h-full relative animate-fade-in">
-            {/* eslint-disable-next-line @next/next/no-img-element -- data URIs don't benefit from next/image */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- external storage URLs; next/image requires allowlisted domains */}
             <img
               src={preMortemImageUrl}
               alt="Pre-Mortem Failure Topography"

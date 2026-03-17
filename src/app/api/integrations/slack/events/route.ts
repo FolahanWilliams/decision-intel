@@ -116,7 +116,7 @@ async function processSlackDecision(
   input: Parameters<typeof analyzeHumanDecision>[0]
 ) {
   try {
-    const auditResult = await analyzeHumanDecision(input);
+    const auditResult = await analyzeHumanDecision(input, { decisionId });
 
     // Validate LLM outputs with Zod before persisting
     const validatedBiases = BiasFindings.safeParse(auditResult.biasFindings).success
