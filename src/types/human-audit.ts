@@ -24,7 +24,8 @@ export type NudgeType =
   | 'dissent_prompt'
   | 'base_rate_reminder'
   | 'pre_mortem_trigger'
-  | 'noise_check';
+  | 'noise_check'
+  | 'shallow_verification';
 
 export type NudgeSeverity = 'info' | 'warning' | 'critical';
 
@@ -145,6 +146,11 @@ export const NUDGE_TEMPLATES: Record<NudgeType, { icon: string; template: string
     icon: '\u{1F4C8}',
     template:
       'Alert consistency score: {consistencyScore}/100. Similar incidents received severity scores ranging from {low} to {high}.',
+  },
+  shallow_verification: {
+    icon: '\u{1F9E0}',
+    template:
+      'This decision shows signs of shallow analysis relative to its stakes. Verify key assumptions against the available evidence before finalizing.',
   },
 };
 
