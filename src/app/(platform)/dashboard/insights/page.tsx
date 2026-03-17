@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useInsights } from '@/hooks/useInsights';
+import { useTrends } from '@/hooks/useTrends';
 import { DecisionRadar } from '@/components/visualizations/DecisionRadar';
 import { BiasTreemap } from '@/components/visualizations/BiasTreemap';
 import { SwotQuadrant } from '@/components/visualizations/SwotQuadrant';
@@ -25,6 +26,8 @@ import {
   ReferenceArea,
   AreaChart,
   Area,
+  LineChart,
+  Line,
 } from 'recharts';
 import {
   Brain,
@@ -36,6 +39,8 @@ import {
   Cpu,
   Zap,
   TrendingUp,
+  TrendingDown,
+  Download,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -261,6 +266,8 @@ export default function InsightsPage() {
   const { insights, isLoading, error, mutate } = useInsights();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshTime, setRefreshTime] = useState('');
+  const [trendRange, setTrendRange] = useState('1M');
+  const { trends: trendData, isLoading: trendsLoading } = useTrends(trendRange);
 
   useEffect(() => {
     setRefreshTime(new Date().toISOString().replace('T', ' ').slice(0, 19));
@@ -1284,6 +1291,205 @@ export default function InsightsPage() {
         <ErrorBoundary sectionName="Compliance Grid">
           <ComplianceGrid data={insights.complianceGrid} />
         </ErrorBoundary>
+      </div>
+
+      {/* ── [09] HISTORICAL TRENDS ────────────────────────── */}
+      <SectionLabel index={9}>HISTORICAL TRENDS</SectionLabel>
+      <div className="animate-slide-up" style={{ animationDelay: '0.8s' }}>
+        {/* Time range selector */}
+        <div className="flex items-center justify-between mb-md">
+          <div className="flex items-center gap-sm">
+            {['1W', '1M', '3M', 'YTD', 'ALL'].map(range => (
+              <button
+                key={range}
+                onClick={() => setTrendRange(range)}
+                className={`btn btn-sm ${trendRange === range ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ minWidth: '36px', fontSize: '11px' }}
+              >
+                {range}
+              </button>
+            ))}
+          </div>
+          {trendData && trendData.trendData.length > 0 && (
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                const csvContent = [
+                  ['Date', 'Score', 'Noise', 'Volume'].join(','),
+                  ...trendData.trendData.map(d => [d.date, d.score, d.noise, d.volume].join(',')),
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `trends-${trendRange}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              <Download size={12} /> Export
+            </button>
+          )}
+        </div>
+
+        {trendsLoading ? (
+          <div className="card animate-pulse">
+            <div className="card-body" style={{ height: 300 }}>
+              <div className="skeleton" style={{ width: '100%', height: '100%' }} />
+            </div>
+          </div>
+        ) : !trendData || trendData.trendData.length === 0 ? (
+          <div className="card">
+            <div className="card-body text-center" style={{ padding: 'var(--spacing-xl)' }}>
+              <Activity size={32} style={{ color: 'var(--text-muted)', margin: '0 auto 8px' }} />
+              <p className="text-sm text-muted">No trend data yet. Analyze documents to see historical patterns.</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Decision Quality Index */}
+            <ErrorBoundary sectionName="Decision Quality Index">
+              <div className="card mb-md">
+                <div className="card-header flex justify-between">
+                  <div className="flex items-center gap-md">
+                    <h3 style={{ fontSize: '13px', color: 'var(--accent-primary)' }}>
+                      DQ-IDX (Decision Quality Index)
+                    </h3>
+                    <span className={`badge ${trendData.stats.trend >= 0 ? 'badge-complete' : 'badge-error'}`}>
+                      {trendData.stats.trend >= 0 ? (
+                        <><TrendingUp size={10} /> +{trendData.stats.trend}%</>
+                      ) : (
+                        <><TrendingDown size={10} /> {trendData.stats.trend}%</>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-md text-xs text-muted">
+                    <span>Avg: {trendData.stats.avgScore}</span>
+                    <span>H: {trendData.stats.highScore}</span>
+                    <span>L: {trendData.stats.lowScore}</span>
+                  </div>
+                </div>
+                <div className="card-body" style={{ height: 280, padding: 0 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={trendData.trendData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorTrendScore" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
+                      <XAxis dataKey="date" tickFormatter={str => str.slice(5)} stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} />
+                      <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} />
+                      <Tooltip
+                        contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                        itemStyle={{ color: 'var(--text-primary)' }}
+                        labelFormatter={label => `Date: ${label}`}
+                        formatter={(value, name) => {
+                          if (name === 'score') return [`${value}`, 'DQ Score'];
+                          return [value, name];
+                        }}
+                      />
+                      <Area type="monotone" dataKey="score" stroke="var(--accent-primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorTrendScore)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </ErrorBoundary>
+
+            {/* Stats row */}
+            <div className="grid grid-4 mb-md gap-md">
+              <div className="card"><div className="card-body text-center p-md">
+                <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>{trendData.stats.avgScore}</div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Score</div>
+              </div></div>
+              <div className="card"><div className="card-body text-center p-md">
+                <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--accent-secondary)' }}>{trendData.stats.avgNoise}%</div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Noise</div>
+              </div></div>
+              <div className="card"><div className="card-body text-center p-md">
+                <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--error)' }}>{trendData.stats.totalBiases}</div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total Biases</div>
+              </div></div>
+              <div className="card"><div className="card-body text-center p-md">
+                <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--success)' }}>{trendData.stats.totalAnalyses}</div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Analyses</div>
+              </div></div>
+            </div>
+
+            <div className="grid grid-2 gap-md mb-md">
+              {/* Noise Volatility */}
+              <ErrorBoundary sectionName="Noise Volatility">
+                <div className="card">
+                  <div className="card-header"><h3 style={{ fontSize: '13px' }}>Noise Volatility</h3></div>
+                  <div className="card-body" style={{ height: 200 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={trendData.trendData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
+                        <XAxis dataKey="date" hide />
+                        <YAxis hide domain={[0, 100]} />
+                        <Tooltip
+                          contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
+                          labelFormatter={label => `Date: ${label}`}
+                          formatter={value => [`${value}%`, 'Noise Level']}
+                        />
+                        <Line type="step" dataKey="noise" stroke="var(--accent-secondary)" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </ErrorBoundary>
+
+              {/* Bias Distribution */}
+              <ErrorBoundary sectionName="Bias Distribution">
+                <div className="card">
+                  <div className="card-header"><h3 style={{ fontSize: '13px' }}>Bias Frequency</h3></div>
+                  <div className="card-body" style={{ height: 200 }}>
+                    {trendData.biasDistribution.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={trendData.biasDistribution} layout="vertical">
+                          <XAxis type="number" hide />
+                          <YAxis dataKey="name" type="category" width={100} tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                          <Tooltip
+                            contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
+                            formatter={value => [`${value} occurrences`, 'Count']}
+                          />
+                          <Bar dataKey="value" barSize={14}>
+                            {trendData.biasDistribution.map((entry, index) => (
+                              <Cell key={`cell-${entry.name}`} fill={index % 2 === 0 ? 'var(--accent-primary)' : 'var(--accent-secondary)'} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-sm text-muted">No biases detected in this period</div>
+                    )}
+                  </div>
+                </div>
+              </ErrorBoundary>
+            </div>
+
+            {/* Volume Chart */}
+            <ErrorBoundary sectionName="Analysis Volume">
+              <div className="card">
+                <div className="card-header"><h3 style={{ fontSize: '13px' }}>Analysis Volume</h3></div>
+                <div className="card-body" style={{ height: 120 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={trendData.trendData}>
+                      <XAxis dataKey="date" tickFormatter={str => str.slice(5)} stroke="var(--text-muted)" fontSize={10} />
+                      <Tooltip
+                        contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
+                        labelFormatter={label => `Date: ${label}`}
+                        formatter={value => [`${value} documents`, 'Analyzed']}
+                      />
+                      <Bar dataKey="volume" fill="var(--accent-tertiary)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </ErrorBoundary>
+          </>
+        )}
       </div>
 
       {/* ── Footer timestamp ────────────────────────────── */}

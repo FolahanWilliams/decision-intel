@@ -6,8 +6,6 @@ import {
   LayoutDashboard,
   FileText,
   Settings,
-  Activity,
-  ShieldAlert,
   BarChart3,
   Menu,
   X,
@@ -283,29 +281,11 @@ export default function Sidebar() {
           )}
           {collapsed && <div style={{ height: '20px' }} />}
           <NavItem
-            href="/dashboard/trends"
-            icon={<Activity size={18} />}
-            label="Historical Trends"
-            description="Score trends over time"
-            active={pathname === '/dashboard/trends'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
             href="/dashboard/insights"
             icon={<BarChart3 size={18} />}
-            label="Visual Insights"
-            description="Charts and bias breakdowns"
+            label="Insights & Trends"
+            description="Charts, trends, and bias breakdowns"
             active={pathname === '/dashboard/insights'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/risk-audits"
-            icon={<ShieldAlert size={18} />}
-            label="Risk Audits"
-            description="Compliance and risk reports"
-            active={pathname === '/dashboard/risk-audits'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />

@@ -208,6 +208,27 @@ export default function Dashboard() {
     });
   }, [uploadedDocs, searchQuery, statusFilter]);
 
+  // Risk summary computed from analyzed documents
+  const riskSummary = useMemo(() => {
+    let high = 0, medium = 0, low = 0, totalScore = 0, scored = 0;
+    uploadedDocs.forEach(doc => {
+      if (doc.score !== undefined) {
+        scored++;
+        totalScore += doc.score;
+        if (doc.score < 40) high++;
+        else if (doc.score < 70) medium++;
+        else low++;
+      }
+    });
+    return {
+      total: scored,
+      high,
+      medium,
+      low,
+      avg: scored > 0 ? Math.round(totalScore / scored) : 0,
+    };
+  }, [uploadedDocs]);
+
   // Delete document handler — uses SWR mutate for cache invalidation
   const handleDelete = async () => {
     if (!deleteModal.docId) return;
@@ -1080,6 +1101,36 @@ export default function Dashboard() {
             </div>
           )}
 
+          {/* Risk Overview */}
+          {riskSummary.total > 0 && (
+            <div className="grid grid-4 mb-xl gap-md">
+              <div className="card">
+                <div className="card-body text-center p-md">
+                  <div className="text-xs text-muted mb-1 font-medium">Analyzed</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--accent-primary)' }}>{riskSummary.total}</div>
+                </div>
+              </div>
+              <div className="card">
+                <div className="card-body text-center p-md">
+                  <div className="text-xs text-muted mb-1 font-medium">Avg Score</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: riskSummary.avg >= 70 ? 'var(--success)' : riskSummary.avg >= 40 ? 'var(--warning)' : 'var(--error)' }}>{riskSummary.avg}</div>
+                </div>
+              </div>
+              <div className="card">
+                <div className="card-body text-center p-md">
+                  <div className="text-xs text-muted mb-1 font-medium">High Risk</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--error)' }}>{riskSummary.high}</div>
+                </div>
+              </div>
+              <div className="card">
+                <div className="card-body text-center p-md">
+                  <div className="text-xs text-muted mb-1 font-medium">Low Risk</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--success)' }}>{riskSummary.low}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Documents List */}
           <div id="documents" className="card">
             <div className="card-header flex items-center justify-between">
@@ -1239,6 +1290,25 @@ export default function Dashboard() {
                           <>
                             {doc.score !== undefined && (
                               <div className="flex items-center gap-2">
+                                <span
+                                  className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
+                                  style={{
+                                    color:
+                                      doc.score < 40
+                                        ? 'var(--error)'
+                                        : doc.score < 70
+                                          ? 'var(--warning)'
+                                          : 'var(--success)',
+                                    background:
+                                      doc.score < 40
+                                        ? 'rgba(239, 68, 68, 0.1)'
+                                        : doc.score < 70
+                                          ? 'rgba(245, 158, 11, 0.1)'
+                                          : 'rgba(34, 197, 94, 0.1)',
+                                  }}
+                                >
+                                  {doc.score < 40 ? 'HIGH RISK' : doc.score < 70 ? 'MEDIUM' : 'LOW RISK'}
+                                </span>
                                 <div className="progress-bar" style={{ width: 64 }}>
                                   <div
                                     className="progress-bar-fill"

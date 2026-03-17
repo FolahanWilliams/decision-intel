@@ -78,9 +78,8 @@ export async function POST(request: NextRequest) {
     // Check if document already exists (Semantic Caching)
     // Wrapped in schema-drift protection: if contentHash column doesn't
     // exist yet (migration pending) we skip the cache check gracefully.
-    let existingDoc:
-      | (Awaited<ReturnType<typeof prisma.document.findFirst>> & { analyses?: unknown[] })
-      | null = null;
+    let existingDoc: { id: string; filename: string; status: string; analyses?: unknown[] } | null =
+      null;
     try {
       existingDoc = await prisma.document.findFirst({
         where: { contentHash, userId },
@@ -126,8 +125,8 @@ export async function POST(request: NextRequest) {
       // Return cached result with the existing document ID and analysis
       return NextResponse.json({
         id: existingDoc.id,
-        filename: (existingDoc as { filename: string }).filename,
-        status: (existingDoc as { status: string }).status,
+        filename: existingDoc.filename,
+        status: existingDoc.status,
         cached: true,
         message: 'Document already analyzed (Cached)',
         analysis: (existingDoc.analyses as unknown[])?.[0] || null,
