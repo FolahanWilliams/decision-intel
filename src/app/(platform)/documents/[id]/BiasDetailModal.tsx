@@ -46,6 +46,8 @@ function getBiasDefinition(biasType: string): string {
       'Filtering information based on expectations or desires. The AI identified patterns of interpreting data in ways that align with predetermined expectations.',
     'Recency Bias':
       'Overweighting recent events over historical patterns. The AI detected disproportionate emphasis on recent data while ignoring longer-term trends.',
+    'Cognitive Misering':
+      'The tendency to default to low-effort, superficial thinking rather than thoroughly analyzing available evidence. The AI detected shallow reasoning disproportionate to the decision stakes — accepting the first plausible conclusion without verification or due diligence.',
   };
   return (
     definitions[biasType] ||
@@ -85,6 +87,8 @@ function getDetectionMethodology(biasType: string, excerpt: string): string {
       'Analyzed interpretation patterns for consistency with stated expectations or desired outcomes.',
     'Recency Bias':
       'Compared temporal weighting of evidence—identifying overemphasis on recent vs. historical data.',
+    'Cognitive Misering':
+      'Measured depth of reasoning relative to decision stakes—identifying superficial analysis, absence of verification steps, and acceptance of first plausible conclusions without scrutiny.',
   };
   const wordCount = excerpt.split(' ').length;
   return `${methods[biasType] || 'Applied psycholinguistic pattern matching to identify cognitive distortion markers.'} The flagged excerpt (${wordCount} words) triggered this detection with high confidence.`;
@@ -106,6 +110,8 @@ function getImpactAssessment(biasType: string, severity: string): string {
     Groupthink: 'Suppresses innovation and can lead to catastrophic blind spots.',
     'Hindsight Bias': 'Prevents learning from experience and distorts future planning.',
     'Planning Fallacy': 'Leads to budget overruns, missed deadlines, and resource misallocation.',
+    'Cognitive Misering':
+      'Leads to rubber-stamped decisions, missed red flags, and unverified assumptions propagating through critical processes.',
   };
   return `${severityImpacts[severity] || severityImpacts['medium']} ${biasRisks[biasType] || 'This bias type can distort judgment and lead to flawed decision-making.'}`;
 }
