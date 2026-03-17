@@ -702,7 +702,7 @@ export default function InsightsPage() {
                       fontSize: '11px',
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
-                    formatter={(value: number | undefined) => [`${value ?? 0} analyses`, 'Count']}
+                    formatter={(value) => [`${value ?? 0} analyses`, 'Count']}
                   />
                   <Bar dataKey="count" radius={[2, 2, 0, 0]}>
                     {insights.scoreDistribution.map((entry, i) => (
@@ -784,7 +784,7 @@ export default function InsightsPage() {
                       fontSize: '11px',
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
-                    formatter={(value: number | undefined, name: string | undefined) => [
+                    formatter={(value, name) => [
                       `${value ?? 0}`,
                       name === 'overallScore' ? 'Quality' : 'Noise',
                     ]}
@@ -895,7 +895,7 @@ export default function InsightsPage() {
                       fontSize: '11px',
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
-                    formatter={(value: number | undefined) => [
+                    formatter={(value) => [
                       `${value ?? 0} occurrences`,
                       'Count',
                     ]}
@@ -1105,7 +1105,7 @@ export default function InsightsPage() {
                         fontSize: '11px',
                         fontFamily: "'JetBrains Mono', monospace",
                       }}
-                      formatter={(value: number | undefined) => [`${value ?? 0} votes`, 'Count']}
+                      formatter={(value) => [`${value ?? 0} votes`, 'Count']}
                     />
                     <Bar dataKey="count" radius={[2, 2, 0, 0]}>
                       {['#30d158', '#ffd60a', '#ff453a'].map((fill, i) => (
