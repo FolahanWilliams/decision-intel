@@ -219,11 +219,11 @@ pre {
   font-family: 'JetBrains Mono', 'Menlo', 'Courier New', monospace;
 }
 
-/* Layout */
-.container {
+/* Layout — use @utility so it wins over Tailwind v4's built-in container */
+@utility container {
   max-width: 1600px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-lg);
+  margin-inline: auto;
+  padding-inline: var(--spacing-lg);
 }
 
 /* ═══════════════════════════════════════════
