@@ -518,6 +518,17 @@ export default function LandingPage() {
     damping: 20,
   });
 
+  // Inline container styles to bypass all CSS class conflicts
+  const containerStyle: React.CSSProperties = {
+    width: '100%',
+    maxWidth: '1280px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    paddingLeft: '2rem',
+    paddingRight: '2rem',
+    boxSizing: 'border-box' as const,
+  };
+
   return (
     <div
       className="min-h-screen overflow-x-hidden selection:bg-amber-500/30 selection:text-white"
@@ -543,7 +554,7 @@ export default function LandingPage() {
           boxShadow: '0 1px 0 rgba(255,255,255,0.06) inset',
         }}
       >
-        <div className="container mx-auto py-3 flex items-center justify-between">
+        <div className="flex items-center justify-between" style={{ ...containerStyle, paddingTop: '0.75rem', paddingBottom: '0.75rem' }}>
           <div className="flex items-center gap-3">
             <div
               style={{
@@ -630,7 +641,7 @@ export default function LandingPage() {
           style={{ background: 'rgba(168, 85, 247, 0.04)', y: glowY3 }}
         />
 
-        <div className="container relative z-10">
+        <div className="relative z-10" style={containerStyle}>
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
@@ -831,7 +842,7 @@ export default function LandingPage() {
         className="py-16 relative"
         style={{ background: 'var(--bg-primary)' }}
       >
-        <div className="container relative z-10">
+        <div className="relative z-10" style={containerStyle}>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={socialInView ? { opacity: 1, y: 0 } : {}}
@@ -880,7 +891,7 @@ export default function LandingPage() {
         className="py-32 relative"
         style={{ background: 'var(--bg-primary)' }}
       >
-        <div className="container relative z-10">
+        <div className="relative z-10" style={containerStyle}>
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={problemInView ? { opacity: 1, y: 0 } : {}}
@@ -1179,7 +1190,7 @@ export default function LandingPage() {
               'radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.04) 0%, transparent 60%)',
           }}
         />
-        <div className="container relative z-10">
+        <div className="relative z-10" style={containerStyle}>
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={solutionInView ? { opacity: 1, y: 0 } : {}}
@@ -1355,7 +1366,7 @@ export default function LandingPage() {
               'radial-gradient(circle at center, rgba(245, 158, 11, 0.03) 0%, transparent 70%)',
           }}
         />
-        <div className="container relative z-10">
+        <div className="relative z-10" style={containerStyle}>
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={featuresInView ? { opacity: 1, y: 0 } : {}}
@@ -1599,7 +1610,7 @@ export default function LandingPage() {
 
       {/* ROI Calculator */}
       <section id="roi" ref={roiRef} className="py-32" style={{ background: 'var(--bg-primary)' }}>
-        <div className="container mx-auto">
+        <div style={containerStyle}>
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={roiInView ? { opacity: 1, y: 0 } : {}}
@@ -1902,7 +1913,7 @@ export default function LandingPage() {
         className="py-32 relative"
         style={{ background: 'var(--bg-primary)' }}
       >
-        <div className="container relative z-10">
+        <div className="relative z-10" style={containerStyle}>
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={faqInView ? { opacity: 1, y: 0 } : {}}
@@ -1984,7 +1995,7 @@ export default function LandingPage() {
               'radial-gradient(ellipse at center, rgba(245, 158, 11, 0.06) 0%, transparent 60%)',
           }}
         />
-        <div className="container relative z-10">
+        <div className="relative z-10" style={containerStyle}>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={ctaInView ? { opacity: 1, y: 0 } : {}}
@@ -2093,7 +2104,7 @@ export default function LandingPage() {
           borderTop: '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
-        <div className="container mx-auto">
+        <div style={containerStyle}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
