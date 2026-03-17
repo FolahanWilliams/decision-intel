@@ -464,6 +464,7 @@ ENHANCED DETECTION FOR HUMAN DECISIONS:
 - Anchoring: First person's severity assessment anchoring everyone else's
 - Bandwagon Effect: "Everyone else is doing X" without independent evaluation
 - Status Quo Bias: "We've always done it this way" blocking better approaches
+- Cognitive Misering: Accepting the first plausible conclusion without verification; rubber-stamping decisions; shallow triage of alerts or proposals without genuine scrutiny relative to stakes
 
 ADDITIONAL OUTPUTS:
 - teamConsensusFlag: true if all participants reached agreement without visible debate

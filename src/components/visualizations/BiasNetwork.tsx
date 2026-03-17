@@ -42,6 +42,7 @@ const biasRelationships: Record<string, string[]> = {
   'Framing Effect': ['Anchoring Bias', 'Loss Aversion'],
   'Selective Perception': ['Confirmation Bias', 'Availability Heuristic'],
   'Recency Bias': ['Availability Heuristic'],
+  'Cognitive Misering': ['Confirmation Bias', 'Overconfidence Bias', 'Groupthink'],
 };
 
 const severityColors: Record<string, string> = {

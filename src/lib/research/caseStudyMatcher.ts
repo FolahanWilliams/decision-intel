@@ -69,7 +69,7 @@ const CURATED_CASES: Omit<CaseStudyMatch, never>[] = [
     year: 2018,
     summary:
       'Elizabeth Holmes built a $9B company on false claims about blood-testing technology. Authority bias (prestigious board), bandwagon effect (media hype), and overconfidence allowed the fraud to persist for years.',
-    biasTypes: ['authority', 'bandwagon', 'overconfidence', 'confirmation'],
+    biasTypes: ['authority', 'bandwagon', 'overconfidence', 'confirmation', 'cognitive_misering'],
     outcome: 'fraud_conviction',
     lessons:
       'Authority bias from prestigious names on a board does not validate technology. Independent technical due diligence is non-negotiable.',
@@ -81,7 +81,7 @@ const CURATED_CASES: Omit<CaseStudyMatch, never>[] = [
     year: 2019,
     summary:
       'WeWork was valued at $47B but collapsed during IPO scrutiny. Overconfidence bias from founder Adam Neumann, framing bias (calling real estate a tech company), and groupthink among investors led to a $39B value destruction.',
-    biasTypes: ['overconfidence', 'framing', 'groupthink', 'bandwagon'],
+    biasTypes: ['overconfidence', 'framing', 'groupthink', 'bandwagon', 'cognitive_misering'],
     outcome: 'market_loss',
     lessons:
       'Framing a traditional business as tech does not change fundamentals. Investor groupthink and FOMO create bubbles that harm all stakeholders.',
@@ -105,7 +105,13 @@ const CURATED_CASES: Omit<CaseStudyMatch, never>[] = [
     year: 2019,
     summary:
       'Boeing prioritized schedule and cost over safety in the 737 MAX program. Planning fallacy underestimated MCAS system risks, authority bias suppressed engineer concerns, and confirmation bias led to dismissing crash data.',
-    biasTypes: ['planning_fallacy', 'authority', 'confirmation', 'overconfidence'],
+    biasTypes: [
+      'planning_fallacy',
+      'authority',
+      'confirmation',
+      'overconfidence',
+      'cognitive_misering',
+    ],
     outcome: 'safety_crisis',
     lessons:
       'Planning fallacy in safety-critical systems has catastrophic consequences. When engineers raise concerns, authority bias in management must not override technical judgment.',
