@@ -97,8 +97,8 @@ async function ensureFreshNews(): Promise<void> {
     log.info('News data is stale or empty — triggering on-demand sync...');
     lastLazySyncAttempt = Date.now();
 
-    // Run sync with a tight timeout so it doesn't block analysis too long
-    await utilTimeout(() => syncAllFeeds(), 30_000, 'On-demand news sync timeout');
+    // Run sync with timeout — generous enough for slow RSS feeds
+    await utilTimeout(() => syncAllFeeds(), 60_000, 'On-demand news sync timeout');
     log.info('On-demand news sync completed');
   } catch (err) {
     // Non-fatal: if lazy sync fails, we proceed with whatever cached data exists
@@ -133,24 +133,24 @@ export async function assembleContext(request: IntelligenceRequest): Promise<Int
 
       // 2. Research: find papers for each detected bias type
       biasTypes.length > 0
-        ? utilTimeout(() => findResearchForBiases(biasTypes, 2), 12_000, 'Research lookup timeout')
+        ? utilTimeout(() => findResearchForBiases(biasTypes, 2), 25_000, 'Research lookup timeout')
         : Promise.resolve({} as Record<string, ResearchPaper[]>),
 
       // 3. Case studies: match by bias pattern + industry
       biasTypes.length > 0
         ? utilTimeout(
             () => matchCaseStudies(biasTypes, industry, 5),
-            8_000,
+            15_000,
             'Case study lookup timeout'
           )
         : Promise.resolve([] as CaseStudyMatch[]),
 
       // 4. Macro snapshot (FRED data)
-      utilTimeout(() => getMacroSnapshot(), 10_000, 'Macro snapshot timeout'),
+      utilTimeout(() => getMacroSnapshot(), 20_000, 'Macro snapshot timeout'),
 
       // 5. Industry benchmarks (Gemini grounded search)
       industry
-        ? utilTimeout(() => getIndustryBenchmarks(industry), 15_000, 'Industry benchmark timeout')
+        ? utilTimeout(() => getIndustryBenchmarks(industry), 30_000, 'Industry benchmark timeout')
         : Promise.resolve([] as IndustryBenchmark[]),
     ]);
 

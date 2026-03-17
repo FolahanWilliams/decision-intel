@@ -97,7 +97,24 @@ export async function POST(request: NextRequest) {
     } catch (cacheErr: unknown) {
       const code = (cacheErr as { code?: string }).code;
       if (code === 'P2021' || code === 'P2022') {
-        log.warn('Schema drift: contentHash column missing, skipping cache check (' + code + ')');
+        log.warn('Schema drift in cache check (' + code + '), retrying with core fields');
+        try {
+          existingDoc = await prisma.document.findFirst({
+            where: { userId, filename: file.name },
+            select: {
+              id: true,
+              filename: true,
+              status: true,
+              analyses: {
+                orderBy: { createdAt: 'desc' },
+                take: 1,
+                select: { id: true, overallScore: true, noiseScore: true, summary: true },
+              },
+            },
+          });
+        } catch {
+          log.warn('Schema drift: cache fallback also failed, skipping cache check');
+        }
       } else {
         throw cacheErr;
       }

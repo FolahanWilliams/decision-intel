@@ -46,18 +46,44 @@ export async function GET(request: Request) {
 
     // Fetch analyses for user within date range (capped to prevent unbounded memory usage)
     const MAX_ANALYSES = 500;
-    const analyses = await prisma.analysis.findMany({
+    const queryArgs = {
       where: {
         document: { userId },
         createdAt: { gte: startDate },
       },
-      include: {
-        biases: true,
-        document: { select: { filename: true, uploadedAt: true } },
-      },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'asc' as const },
       take: MAX_ANALYSES,
-    });
+    };
+
+    let analyses;
+    try {
+      analyses = await prisma.analysis.findMany({
+        ...queryArgs,
+        include: {
+          biases: true,
+          document: { select: { filename: true, uploadedAt: true } },
+        },
+      });
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code;
+      if (code === 'P2021' || code === 'P2022') {
+        log.warn('Schema drift in trends query, retrying with core fields only');
+        analyses = await prisma.analysis.findMany({
+          ...queryArgs,
+          select: {
+            id: true,
+            overallScore: true,
+            noiseScore: true,
+            createdAt: true,
+            document: { select: { filename: true, uploadedAt: true } },
+          },
+        });
+        // Attach empty biases array for downstream compatibility
+        analyses = analyses.map((a: Record<string, unknown>) => ({ ...a, biases: [] }));
+      } else {
+        throw err;
+      }
+    }
 
     // Group analyses by date for the chart
     const dailyData: Record<string, { scores: number[]; noise: number[]; volume: number }> = {};
