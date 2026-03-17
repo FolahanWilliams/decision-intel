@@ -40,27 +40,22 @@ export async function uploadVisualization(
     const { getServiceSupabase } = await import('@/lib/supabase');
     const supabase = getServiceSupabase();
 
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET)
-      .upload(storagePath, buffer, {
-        contentType,
-        upsert: true, // overwrite if re-analyzed
-      });
+    const { error: uploadError } = await supabase.storage.from(BUCKET).upload(storagePath, buffer, {
+      contentType,
+      upsert: true, // overwrite if re-analyzed
+    });
 
     if (uploadError) {
       log.warn(`Visualization upload failed (${storagePath}): ${uploadError.message}`);
       return null;
     }
 
-    const { data: urlData } = supabase.storage
-      .from(BUCKET)
-      .getPublicUrl(storagePath);
+    const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(storagePath);
 
     return urlData.publicUrl;
   } catch (error) {
     log.warn(
-      'Visualization upload error: ' +
-        (error instanceof Error ? error.message : String(error))
+      'Visualization upload error: ' + (error instanceof Error ? error.message : String(error))
     );
     return null;
   }
@@ -88,8 +83,7 @@ export async function deleteVisualizations(
     }
   } catch (error) {
     log.warn(
-      'Visualization cleanup error: ' +
-        (error instanceof Error ? error.message : String(error))
+      'Visualization cleanup error: ' + (error instanceof Error ? error.message : String(error))
     );
   }
 }

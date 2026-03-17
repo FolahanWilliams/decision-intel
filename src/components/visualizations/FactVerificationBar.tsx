@@ -63,7 +63,7 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
                   border: '1px solid var(--glass-border)',
                   fontSize: '12px',
                 }}
-                formatter={(value) => [
+                formatter={value => [
                   `${value ?? 0} (${Math.round(((Number(value) || 0) / total) * 100)}%)`,
                   'Claims',
                 ]}
