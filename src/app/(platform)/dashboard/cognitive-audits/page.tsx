@@ -539,21 +539,21 @@ export default function CognitiveAuditsPage() {
             </div>
           </div>
         </Link>
-        <Link href="/dashboard/risk-audits" className="card" style={{ textDecoration: 'none' }}>
+        <Link href="/dashboard" className="card" style={{ textDecoration: 'none' }}>
           <div className="card-body flex items-center gap-md">
             <BarChart3 size={24} style={{ color: 'var(--accent-secondary)' }} />
             <div>
-              <div style={{ fontWeight: 600 }}>AI Risk Audits</div>
+              <div style={{ fontWeight: 600 }}>Document Risk</div>
               <div className="text-xs text-muted">Document-based AI analysis</div>
             </div>
           </div>
         </Link>
-        <Link href="/dashboard/trends" className="card" style={{ textDecoration: 'none' }}>
+        <Link href="/dashboard/insights" className="card" style={{ textDecoration: 'none' }}>
           <div className="card-body flex items-center gap-md">
             <TrendingUp size={24} style={{ color: 'var(--success)' }} />
             <div>
-              <div style={{ fontWeight: 600 }}>View Trends</div>
-              <div className="text-xs text-muted">Historical analysis patterns</div>
+              <div style={{ fontWeight: 600 }}>Insights & Trends</div>
+              <div className="text-xs text-muted">Charts and historical patterns</div>
             </div>
           </div>
         </Link>
