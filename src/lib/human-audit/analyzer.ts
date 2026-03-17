@@ -194,11 +194,15 @@ export async function analyzeHumanDecision(
   try {
     anonymizedContent = await anonymizeContent(input.content);
   } catch (anonError) {
-    log.error('GDPR anonymization blocked pipeline:', anonError instanceof Error ? anonError.message : String(anonError));
+    log.error(
+      'GDPR anonymization blocked pipeline:',
+      anonError instanceof Error ? anonError.message : String(anonError)
+    );
     return {
       decisionQualityScore: 0,
       noiseScore: 50,
-      summary: 'Analysis blocked: content could not be anonymized. PII protection prevented analysis.',
+      summary:
+        'Analysis blocked: content could not be anonymized. PII protection prevented analysis.',
       biasFindings: [],
       teamConsensusFlag: false,
       dissenterCount: 0,

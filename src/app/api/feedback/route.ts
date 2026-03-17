@@ -44,10 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (![-1, 0, 1].includes(rating)) {
-      return NextResponse.json(
-        { error: 'Rating must be -1, 0, or 1' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Rating must be -1, 0, or 1' }, { status: 400 });
     }
 
     if (type === 'bias') {

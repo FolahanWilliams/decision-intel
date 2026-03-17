@@ -48,9 +48,6 @@ export async function POST(_request: NextRequest) {
     });
   } catch (error) {
     log.error('News sync failed:', error);
-    return NextResponse.json(
-      { error: 'News sync failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'News sync failed' }, { status: 500 });
   }
 }

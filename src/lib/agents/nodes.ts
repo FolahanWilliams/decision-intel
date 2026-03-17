@@ -454,7 +454,10 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
     let extractedBenchmarks: NoiseBenchmark[] = [];
     const scores = settled.map(r => {
       if (r.status === 'rejected') {
-        log.warn('Noise judge failed:', r.reason instanceof Error ? r.reason.message : String(r.reason));
+        log.warn(
+          'Noise judge failed:',
+          r.reason instanceof Error ? r.reason.message : String(r.reason)
+        );
         return 0;
       }
       const text = r.value.response?.text ? r.value.response.text() : '';
