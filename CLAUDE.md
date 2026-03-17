@@ -61,6 +61,12 @@ prisma/
   migrations/      → SQL migrations
 ```
 
+## Verification Rules
+
+- **Never confirm a fix works without actually verifying it.** When the user shares a screenshot, deployment URL, or any visual evidence, analyze it thoroughly before responding. If something still looks broken, say so — do not assume a prior code change resolved the issue.
+- **Never fabricate confirmations.** If you cannot confidently verify something (e.g. you're unsure what you're seeing in a screenshot), say that explicitly rather than defaulting to "looks good."
+- **Evidence over assumptions.** A code change being committed does not mean the problem is fixed. Always check the actual result — screenshot, build output, live page — against the original issue before declaring it resolved.
+
 ## Known Patterns
 
 - **Schema drift protection:** Production DB may lag behind Prisma schema. All write and read paths that use newer columns must catch `P2021`/`P2022` errors and fall back to core-only fields. The fallback MUST run in a separate `$transaction` because PostgreSQL poisons the entire transaction block after a column-not-found error.
