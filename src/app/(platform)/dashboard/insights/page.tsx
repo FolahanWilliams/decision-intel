@@ -1342,7 +1342,9 @@ export default function InsightsPage() {
           <div className="card">
             <div className="card-body text-center" style={{ padding: 'var(--spacing-xl)' }}>
               <Activity size={32} style={{ color: 'var(--text-muted)', margin: '0 auto 8px' }} />
-              <p className="text-sm text-muted">No trend data yet. Analyze documents to see historical patterns.</p>
+              <p className="text-sm text-muted">
+                No trend data yet. Analyze documents to see historical patterns.
+              </p>
             </div>
           </div>
         ) : (
@@ -1355,11 +1357,17 @@ export default function InsightsPage() {
                     <h3 style={{ fontSize: '13px', color: 'var(--accent-primary)' }}>
                       DQ-IDX (Decision Quality Index)
                     </h3>
-                    <span className={`badge ${trendData.stats.trend >= 0 ? 'badge-complete' : 'badge-error'}`}>
+                    <span
+                      className={`badge ${trendData.stats.trend >= 0 ? 'badge-complete' : 'badge-error'}`}
+                    >
                       {trendData.stats.trend >= 0 ? (
-                        <><TrendingUp size={10} /> +{trendData.stats.trend}%</>
+                        <>
+                          <TrendingUp size={10} /> +{trendData.stats.trend}%
+                        </>
                       ) : (
-                        <><TrendingDown size={10} /> {trendData.stats.trend}%</>
+                        <>
+                          <TrendingDown size={10} /> {trendData.stats.trend}%
+                        </>
                       )}
                     </span>
                   </div>
@@ -1371,7 +1379,10 @@ export default function InsightsPage() {
                 </div>
                 <div className="card-body" style={{ height: 280, padding: 0 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={trendData.trendData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                    <AreaChart
+                      data={trendData.trendData}
+                      margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+                    >
                       <defs>
                         <linearGradient id="colorTrendScore" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.3} />
@@ -1379,10 +1390,26 @@ export default function InsightsPage() {
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
-                      <XAxis dataKey="date" tickFormatter={str => str.slice(5)} stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} />
-                      <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} domain={[0, 100]} />
+                      <XAxis
+                        dataKey="date"
+                        tickFormatter={str => str.slice(5)}
+                        stroke="var(--text-muted)"
+                        fontSize={10}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="var(--text-muted)"
+                        fontSize={10}
+                        tickLine={false}
+                        axisLine={false}
+                        domain={[0, 100]}
+                      />
                       <Tooltip
-                        contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
+                        contentStyle={{
+                          background: 'var(--bg-card)',
+                          border: '1px solid var(--border-color)',
+                        }}
                         itemStyle={{ color: 'var(--text-primary)' }}
                         labelFormatter={label => `Date: ${label}`}
                         formatter={(value, name) => {
@@ -1390,7 +1417,14 @@ export default function InsightsPage() {
                           return [value, name];
                         }}
                       />
-                      <Area type="monotone" dataKey="score" stroke="var(--accent-primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorTrendScore)" />
+                      <Area
+                        type="monotone"
+                        dataKey="score"
+                        stroke="var(--accent-primary)"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorTrendScore)"
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -1399,29 +1433,55 @@ export default function InsightsPage() {
 
             {/* Stats row */}
             <div className="grid grid-4 mb-md gap-md">
-              <div className="card"><div className="card-body text-center p-md">
-                <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>{trendData.stats.avgScore}</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Score</div>
-              </div></div>
-              <div className="card"><div className="card-body text-center p-md">
-                <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--accent-secondary)' }}>{trendData.stats.avgNoise}%</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Noise</div>
-              </div></div>
-              <div className="card"><div className="card-body text-center p-md">
-                <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--error)' }}>{trendData.stats.totalBiases}</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total Biases</div>
-              </div></div>
-              <div className="card"><div className="card-body text-center p-md">
-                <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--success)' }}>{trendData.stats.totalAnalyses}</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Analyses</div>
-              </div></div>
+              <div className="card">
+                <div className="card-body text-center p-md">
+                  <div
+                    style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--accent-primary)' }}
+                  >
+                    {trendData.stats.avgScore}
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Score</div>
+                </div>
+              </div>
+              <div className="card">
+                <div className="card-body text-center p-md">
+                  <div
+                    style={{
+                      fontSize: '22px',
+                      fontWeight: 'bold',
+                      color: 'var(--accent-secondary)',
+                    }}
+                  >
+                    {trendData.stats.avgNoise}%
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Avg Noise</div>
+                </div>
+              </div>
+              <div className="card">
+                <div className="card-body text-center p-md">
+                  <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--error)' }}>
+                    {trendData.stats.totalBiases}
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Total Biases</div>
+                </div>
+              </div>
+              <div className="card">
+                <div className="card-body text-center p-md">
+                  <div style={{ fontSize: '22px', fontWeight: 'bold', color: 'var(--success)' }}>
+                    {trendData.stats.totalAnalyses}
+                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Analyses</div>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-2 gap-md mb-md">
               {/* Noise Volatility */}
               <ErrorBoundary sectionName="Noise Volatility">
                 <div className="card">
-                  <div className="card-header"><h3 style={{ fontSize: '13px' }}>Noise Volatility</h3></div>
+                  <div className="card-header">
+                    <h3 style={{ fontSize: '13px' }}>Noise Volatility</h3>
+                  </div>
                   <div className="card-body" style={{ height: 200 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={trendData.trendData}>
@@ -1429,11 +1489,20 @@ export default function InsightsPage() {
                         <XAxis dataKey="date" hide />
                         <YAxis hide domain={[0, 100]} />
                         <Tooltip
-                          contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
+                          contentStyle={{
+                            background: 'var(--bg-secondary)',
+                            border: '1px solid var(--glass-border)',
+                          }}
                           labelFormatter={label => `Date: ${label}`}
                           formatter={value => [`${value}%`, 'Noise Level']}
                         />
-                        <Line type="step" dataKey="noise" stroke="var(--accent-secondary)" strokeWidth={2} dot={false} />
+                        <Line
+                          type="step"
+                          dataKey="noise"
+                          stroke="var(--accent-secondary)"
+                          strokeWidth={2}
+                          dot={false}
+                        />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -1443,26 +1512,47 @@ export default function InsightsPage() {
               {/* Bias Distribution */}
               <ErrorBoundary sectionName="Bias Distribution">
                 <div className="card">
-                  <div className="card-header"><h3 style={{ fontSize: '13px' }}>Bias Frequency</h3></div>
+                  <div className="card-header">
+                    <h3 style={{ fontSize: '13px' }}>Bias Frequency</h3>
+                  </div>
                   <div className="card-body" style={{ height: 200 }}>
                     {trendData.biasDistribution.length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={trendData.biasDistribution} layout="vertical">
                           <XAxis type="number" hide />
-                          <YAxis dataKey="name" type="category" width={100} tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                          <YAxis
+                            dataKey="name"
+                            type="category"
+                            width={100}
+                            tick={{ fill: 'var(--text-secondary)', fontSize: 10 }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
                           <Tooltip
-                            contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
+                            contentStyle={{
+                              background: 'var(--bg-secondary)',
+                              border: '1px solid var(--glass-border)',
+                            }}
                             formatter={value => [`${value} occurrences`, 'Count']}
                           />
                           <Bar dataKey="value" barSize={14}>
                             {trendData.biasDistribution.map((entry, index) => (
-                              <Cell key={`cell-${entry.name}`} fill={index % 2 === 0 ? 'var(--accent-primary)' : 'var(--accent-secondary)'} />
+                              <Cell
+                                key={`cell-${entry.name}`}
+                                fill={
+                                  index % 2 === 0
+                                    ? 'var(--accent-primary)'
+                                    : 'var(--accent-secondary)'
+                                }
+                              />
                             ))}
                           </Bar>
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className="flex items-center justify-center h-full text-sm text-muted">No biases detected in this period</div>
+                      <div className="flex items-center justify-center h-full text-sm text-muted">
+                        No biases detected in this period
+                      </div>
                     )}
                   </div>
                 </div>
@@ -1472,13 +1562,23 @@ export default function InsightsPage() {
             {/* Volume Chart */}
             <ErrorBoundary sectionName="Analysis Volume">
               <div className="card">
-                <div className="card-header"><h3 style={{ fontSize: '13px' }}>Analysis Volume</h3></div>
+                <div className="card-header">
+                  <h3 style={{ fontSize: '13px' }}>Analysis Volume</h3>
+                </div>
                 <div className="card-body" style={{ height: 120 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={trendData.trendData}>
-                      <XAxis dataKey="date" tickFormatter={str => str.slice(5)} stroke="var(--text-muted)" fontSize={10} />
+                      <XAxis
+                        dataKey="date"
+                        tickFormatter={str => str.slice(5)}
+                        stroke="var(--text-muted)"
+                        fontSize={10}
+                      />
                       <Tooltip
-                        contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)' }}
+                        contentStyle={{
+                          background: 'var(--bg-secondary)',
+                          border: '1px solid var(--glass-border)',
+                        }}
                         labelFormatter={label => `Date: ${label}`}
                         formatter={value => [`${value} documents`, 'Analyzed']}
                       />

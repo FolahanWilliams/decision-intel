@@ -210,7 +210,11 @@ export default function Dashboard() {
 
   // Risk summary computed from analyzed documents
   const riskSummary = useMemo(() => {
-    let high = 0, medium = 0, low = 0, totalScore = 0, scored = 0;
+    let high = 0,
+      medium = 0,
+      low = 0,
+      totalScore = 0,
+      scored = 0;
     uploadedDocs.forEach(doc => {
       if (doc.score !== undefined) {
         scored++;
@@ -1107,25 +1111,46 @@ export default function Dashboard() {
               <div className="card">
                 <div className="card-body text-center p-md">
                   <div className="text-xs text-muted mb-1 font-medium">Analyzed</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--accent-primary)' }}>{riskSummary.total}</div>
+                  <div
+                    style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--accent-primary)' }}
+                  >
+                    {riskSummary.total}
+                  </div>
                 </div>
               </div>
               <div className="card">
                 <div className="card-body text-center p-md">
                   <div className="text-xs text-muted mb-1 font-medium">Avg Score</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: riskSummary.avg >= 70 ? 'var(--success)' : riskSummary.avg >= 40 ? 'var(--warning)' : 'var(--error)' }}>{riskSummary.avg}</div>
+                  <div
+                    style={{
+                      fontSize: '1.75rem',
+                      fontWeight: 800,
+                      color:
+                        riskSummary.avg >= 70
+                          ? 'var(--success)'
+                          : riskSummary.avg >= 40
+                            ? 'var(--warning)'
+                            : 'var(--error)',
+                    }}
+                  >
+                    {riskSummary.avg}
+                  </div>
                 </div>
               </div>
               <div className="card">
                 <div className="card-body text-center p-md">
                   <div className="text-xs text-muted mb-1 font-medium">High Risk</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--error)' }}>{riskSummary.high}</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--error)' }}>
+                    {riskSummary.high}
+                  </div>
                 </div>
               </div>
               <div className="card">
                 <div className="card-body text-center p-md">
                   <div className="text-xs text-muted mb-1 font-medium">Low Risk</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--success)' }}>{riskSummary.low}</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--success)' }}>
+                    {riskSummary.low}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1307,7 +1332,11 @@ export default function Dashboard() {
                                           : 'rgba(34, 197, 94, 0.1)',
                                   }}
                                 >
-                                  {doc.score < 40 ? 'HIGH RISK' : doc.score < 70 ? 'MEDIUM' : 'LOW RISK'}
+                                  {doc.score < 40
+                                    ? 'HIGH RISK'
+                                    : doc.score < 70
+                                      ? 'MEDIUM'
+                                      : 'LOW RISK'}
                                 </span>
                                 <div className="progress-bar" style={{ width: 64 }}>
                                   <div
