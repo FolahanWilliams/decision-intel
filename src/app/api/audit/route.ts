@@ -26,10 +26,19 @@ export async function POST(req: NextRequest) {
 
     // Validate action against known AuditAction values to prevent log injection
     const VALID_ACTIONS: Set<string> = new Set([
-      'VIEW_DOCUMENT', 'SCAN_DOCUMENT', 'EXPORT_PDF', 'EXPORT_CSV',
-      'SIMULATE_SCENARIO', 'SEARCH_MARKET_TRENDS', 'CHAT_MESSAGE',
-      'DELETE_ACCOUNT_DATA', 'SUBMIT_HUMAN_DECISION', 'VIEW_COGNITIVE_AUDIT',
-      'ACKNOWLEDGE_NUDGE', 'SLACK_DECISION_INGESTED', 'MEETING_TRANSCRIPT_ANALYZED',
+      'VIEW_DOCUMENT',
+      'SCAN_DOCUMENT',
+      'EXPORT_PDF',
+      'EXPORT_CSV',
+      'SIMULATE_SCENARIO',
+      'SEARCH_MARKET_TRENDS',
+      'CHAT_MESSAGE',
+      'DELETE_ACCOUNT_DATA',
+      'SUBMIT_HUMAN_DECISION',
+      'VIEW_COGNITIVE_AUDIT',
+      'ACKNOWLEDGE_NUDGE',
+      'SLACK_DECISION_INGESTED',
+      'MEETING_TRANSCRIPT_ANALYZED',
     ]);
     if (!body.action || !VALID_ACTIONS.has(body.action)) {
       return NextResponse.json({ error: 'Invalid audit action' }, { status: 400 });

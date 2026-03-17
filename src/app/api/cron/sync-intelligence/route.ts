@@ -123,9 +123,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     log.error('Intelligence cron failed:', error);
-    return NextResponse.json(
-      { error: 'Intelligence sync failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Intelligence sync failed' }, { status: 500 });
   }
 }

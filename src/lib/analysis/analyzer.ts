@@ -267,7 +267,10 @@ export async function analyzeDocument(
         data: { status: 'error' },
       });
     } catch (statusError) {
-      log.error('Failed to set document error status:', statusError instanceof Error ? statusError.message : String(statusError));
+      log.error(
+        'Failed to set document error status:',
+        statusError instanceof Error ? statusError.message : String(statusError)
+      );
     }
     throw error;
   }
