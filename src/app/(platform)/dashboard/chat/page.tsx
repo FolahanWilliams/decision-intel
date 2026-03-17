@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { formatDate } from '@/lib/utils/format-date';
 import {
   MessageSquare,
   Send,
@@ -311,7 +312,7 @@ export default function ChatPage() {
                         {s.title}
                       </div>
                       <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: 2 }}>
-                        {s.messages.length} messages · {new Date(s.updatedAt).toLocaleDateString()}
+                        {s.messages.length} messages · {formatDate(s.updatedAt)}
                       </div>
                     </button>
                     <button

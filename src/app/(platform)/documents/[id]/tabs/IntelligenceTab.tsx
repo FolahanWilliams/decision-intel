@@ -2,6 +2,7 @@
 
 import { ExternalLink, Newspaper, BookOpen, Database, Landmark, AlertTriangle } from 'lucide-react';
 import type { IntelligenceContextSummary } from '@/types';
+import { formatDateTime } from '@/lib/utils/format-date';
 
 interface IntelligenceTabProps {
   intelligenceContext?: IntelligenceContextSummary;
@@ -211,7 +212,7 @@ export function IntelligenceTab({ intelligenceContext }: IntelligenceTabProps) {
 
       {/* Metadata */}
       <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'right' }}>
-        Context assembled {new Date(ctx.assembledAt).toLocaleString()}
+        Context assembled {formatDateTime(ctx.assembledAt)}
       </div>
     </div>
   );

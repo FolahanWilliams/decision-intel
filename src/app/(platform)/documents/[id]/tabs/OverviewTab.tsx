@@ -1,6 +1,7 @@
 'use client';
 
 import { BiasInstance } from '@/types';
+import { formatDate } from '@/lib/utils/format-date';
 import { Brain, Lightbulb, ExternalLink } from 'lucide-react';
 import { BiasHeatmap } from '@/components/BiasHeatmap';
 import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
@@ -59,7 +60,7 @@ export function OverviewTab({
                 events={[
                   {
                     id: '1',
-                    date: new Date(uploadedAt).toLocaleDateString(),
+                    date: formatDate(uploadedAt),
                     title: 'Document Uploaded',
                     description: 'Initial file ingestion.',
                     type: 'info',
@@ -68,7 +69,7 @@ export function OverviewTab({
                   {
                     id: '2',
                     date: analysisCreatedAt
-                      ? new Date(analysisCreatedAt).toLocaleDateString()
+                      ? formatDate(analysisCreatedAt)
                       : 'Pending',
                     title: 'AI Audit Completed',
                     description: 'Deep scan for biases and noise.',
