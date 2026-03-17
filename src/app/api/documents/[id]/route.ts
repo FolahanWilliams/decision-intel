@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
+import { deleteVisualizations } from '@/lib/utils/visualization-storage';
 
 const log = createLogger('DocumentRoute');
 
@@ -56,6 +57,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               institutionalMemory: true,
               intelligenceContext: true,
               speakers: true,
+              biasWebImageUrl: true,
+              preMortemImageUrl: true,
             },
           },
         },
@@ -139,7 +142,7 @@ export async function DELETE(
     // storage path) and can verify it exists before deleting.
     const doc = await prisma.document.findFirst({
       where: { id, userId },
-      select: { id: true, filename: true },
+      select: { id: true, filename: true, analyses: { select: { id: true } } },
     });
 
     if (!doc) {
@@ -148,6 +151,11 @@ export async function DELETE(
 
     // Delete from DB (cascades to analyses, biases, embeddings)
     await prisma.document.delete({ where: { id } });
+
+    // Clean up visualization storage (fire-and-forget)
+    for (const analysis of doc.analyses) {
+      deleteVisualizations('analysis', analysis.id).catch(() => {});
+    }
 
     // Clean up Supabase storage (fire-and-forget).
     // Storage path matches the upload convention: ${userId}/${documentId}${ext}

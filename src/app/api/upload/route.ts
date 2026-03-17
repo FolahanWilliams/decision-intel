@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const authClient = await createClient();
     const {
@@ -239,26 +239,46 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const documents = await prisma.document.findMany({
-      where: { userId },
-      orderBy: { uploadedAt: 'desc' },
-      select: {
-        id: true,
-        userId: true,
-        filename: true,
-        fileType: true,
-        fileSize: true,
-        status: true,
-        uploadedAt: true,
-        updatedAt: true,
-        analyses: {
-          take: 1,
-          orderBy: { createdAt: 'desc' },
+    const { searchParams } = new URL(request.url);
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10) || 50, 100);
+    const page = Math.max(parseInt(searchParams.get('page') || '1', 10) || 1, 1);
+    const skip = (page - 1) * limit;
+
+    const where = { userId };
+
+    const [documents, total] = await Promise.all([
+      prisma.document.findMany({
+        where,
+        orderBy: { uploadedAt: 'desc' },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          userId: true,
+          filename: true,
+          fileType: true,
+          fileSize: true,
+          status: true,
+          uploadedAt: true,
+          updatedAt: true,
+          analyses: {
+            take: 1,
+            orderBy: { createdAt: 'desc' },
+          },
         },
+      }),
+      prisma.document.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      data: documents,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     });
-
-    return NextResponse.json(documents);
   } catch (error) {
     log.error('Error fetching documents:', error);
     return NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 });
