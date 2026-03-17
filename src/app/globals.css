@@ -221,12 +221,14 @@ pre {
 
 /* Layout — override Tailwind v4's container with explicit centering + padding */
 .container {
+  width: 100% !important;
   max-width: 1280px !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-  box-sizing: border-box;
+  margin-inline: auto !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  box-sizing: border-box !important;
 }
 
 /* ═══════════════════════════════════════════
@@ -575,20 +577,25 @@ tr:hover td {
 
 /* ═══════════════════════════════════════════
    Utility Grids & Flex
+   Placed inside @layer base so Tailwind v4
+   utility classes (gap-*, grid-cols-*, etc.)
+   can override them properly.
    ═══════════════════════════════════════════ */
-.grid { display: grid; gap: var(--spacing-md); }
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-4 { grid-template-columns: repeat(4, 1fr); }
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.gap-sm { gap: var(--spacing-sm); }
-.gap-md { gap: var(--spacing-md); }
-.mb-xl { margin-bottom: var(--spacing-xl); }
-.ml-md { margin-left: var(--spacing-md); }
-.mt-md { margin-top: var(--spacing-md); }
+@layer base {
+  .grid { display: grid; gap: var(--spacing-md); }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .flex { display: flex; }
+  .flex-col { flex-direction: column; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .gap-sm { gap: var(--spacing-sm); }
+  .gap-md { gap: var(--spacing-md); }
+  .mb-xl { margin-bottom: var(--spacing-xl); }
+  .ml-md { margin-left: var(--spacing-md); }
+  .mt-md { margin-top: var(--spacing-md); }
+}
 
 /* ═══════════════════════════════════════════
    Animations — Crisp & minimal
@@ -809,15 +816,17 @@ tr:hover td {
 /* ═══════════════════════════════════════════
    Responsive Grids
    ═══════════════════════════════════════════ */
-@media (max-width: 1024px) {
-  .grid-4 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: repeat(2, 1fr); }
-}
+@layer base {
+  @media (max-width: 1024px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  }
 
-@media (max-width: 640px) {
-  .grid-4 { grid-template-columns: 1fr; }
-  .grid-3 { grid-template-columns: 1fr; }
-  .grid-2 { grid-template-columns: 1fr; }
+  @media (max-width: 640px) {
+    .grid-4 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
 }
 
 /* Accessibility: Reduce motion */
