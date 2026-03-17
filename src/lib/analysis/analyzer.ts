@@ -85,7 +85,12 @@ export async function analyzeDocument(
 
     // Generate Cognitive Topographies
     if (onProgress) {
-      onProgress({ type: 'step', step: 'Generating Visualizations', status: 'running', progress: 85 });
+      onProgress({
+        type: 'step',
+        step: 'Generating Visualizations',
+        status: 'running',
+        progress: 85,
+      });
     }
     let biasWebImageUrl: string | null = null;
     let preMortemImageUrl: string | null = null;
@@ -96,11 +101,15 @@ export async function analyzeDocument(
       ]);
       biasWebImageUrl = biasWebUrl;
       preMortemImageUrl = preMortemUrl;
-      
+
       // Attach to result so it's returned to the client and cached
-      result.preMortemImageUrl = pMortem;
+      result.biasWebImageUrl = biasWebImageUrl;
+      result.preMortemImageUrl = preMortemImageUrl;
     } catch (visErr) {
-      log.warn('Visualization generation failed (non-critical): ' + (visErr instanceof Error ? visErr.message : String(visErr)));
+      log.warn(
+        'Visualization generation failed (non-critical): ' +
+          (visErr instanceof Error ? visErr.message : String(visErr))
+      );
     }
 
     // Try saving with ALL fields first. If the DB is missing newer
@@ -234,8 +243,8 @@ export async function analyzeDocument(
                 confidence: bias.confidence || 0.0,
               })),
             },
-            biasWebImageUrl,
-            preMortemImageUrl,
+            // Note: biasWebImageUrl/preMortemImageUrl omitted from fallback
+            // because they are also new columns that may trigger P2022.
           },
           select: { id: true },
         });

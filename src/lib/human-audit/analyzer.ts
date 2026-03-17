@@ -295,14 +295,15 @@ export async function analyzeHumanDecision(
   try {
     const [biasWebUrl, preMortemUrl] = await Promise.all([
       generateBiasWeb(biasData?.biases ?? []),
-      generatePreMortemTopography(
-        complianceData?.preMortem
-      ),
+      generatePreMortemTopography(complianceData?.preMortem),
     ]);
     biasWebImageUrl = biasWebUrl || undefined;
     preMortemImageUrl = preMortemUrl || undefined;
   } catch (error) {
-    log.error('Failed to generate visualizations for human audit:', error instanceof Error ? error.message : String(error));
+    log.error(
+      'Failed to generate visualizations for human audit:',
+      error instanceof Error ? error.message : String(error)
+    );
   }
 
   return {
