@@ -221,7 +221,7 @@ pre {
 
 /* Layout — override Tailwind v4's container with explicit centering + padding */
 .container {
-  max-width: 1600px !important;
+  max-width: 1280px !important;
   margin-left: auto !important;
   margin-right: auto !important;
   padding-left: 1.25rem;

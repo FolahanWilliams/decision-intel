@@ -884,7 +884,7 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={problemInView ? { opacity: 1, y: 0 } : {}}
-            className="mb-16"
+            className="mb-16 max-w-6xl mx-auto"
             style={{ borderLeft: '3px solid #ef4444', paddingLeft: '24px' }}
           >
             <h2
@@ -1183,7 +1183,7 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={solutionInView ? { opacity: 1, y: 0 } : {}}
-            className="mb-16"
+            className="mb-16 max-w-5xl mx-auto"
             style={{ borderLeft: '3px solid #6366f1', paddingLeft: '24px' }}
           >
             <h2
@@ -1359,7 +1359,7 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={featuresInView ? { opacity: 1, y: 0 } : {}}
-            className="mb-16"
+            className="mb-16 max-w-6xl mx-auto"
             style={{ borderLeft: '3px solid #f59e0b', paddingLeft: '24px' }}
           >
             <h2
@@ -1603,7 +1603,7 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={roiInView ? { opacity: 1, y: 0 } : {}}
-            className="mb-16"
+            className="mb-16 max-w-6xl mx-auto"
             style={{ borderLeft: '3px solid #3b82f6', paddingLeft: '24px' }}
           >
             <h2
@@ -1906,7 +1906,7 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={faqInView ? { opacity: 1, y: 0 } : {}}
-            className="mb-16"
+            className="mb-16 max-w-3xl mx-auto"
             style={{ borderLeft: '3px solid #a855f7', paddingLeft: '24px' }}
           >
             <h2
