@@ -86,7 +86,7 @@ describe('POST /api/audit', () => {
 
     const req = new NextRequest('http://localhost/api/audit', {
       method: 'POST',
-      body: JSON.stringify({ action: 'VIEW', resource: 'Document', resourceId: 'doc1' }),
+      body: JSON.stringify({ action: 'VIEW_DOCUMENT', resource: 'Document', resourceId: 'doc1' }),
     });
 
     const res = await POST(req);
@@ -96,7 +96,7 @@ describe('POST /api/audit', () => {
   it('logs audit event and returns success', async () => {
     mockLogAudit.mockResolvedValue(undefined);
 
-    const payload = { action: 'VIEW', resource: 'Document', resourceId: 'doc1' };
+    const payload = { action: 'VIEW_DOCUMENT', resource: 'Document', resourceId: 'doc1' };
     const req = new NextRequest('http://localhost/api/audit', {
       method: 'POST',
       body: JSON.stringify(payload),
@@ -130,7 +130,7 @@ describe('POST /api/audit', () => {
 
     const req = new NextRequest('http://localhost/api/audit', {
       method: 'POST',
-      body: JSON.stringify({ action: 'VIEW', resource: 'Document', resourceId: 'doc1' }),
+      body: JSON.stringify({ action: 'VIEW_DOCUMENT', resource: 'Document', resourceId: 'doc1' }),
     });
 
     const res = await POST(req);
@@ -161,7 +161,7 @@ describe('GET /api/audit', () => {
     mockFindMany.mockResolvedValue([
       {
         id: 'log1',
-        action: 'VIEW',
+        action: 'VIEW_DOCUMENT',
         resource: 'Document',
         resourceId: 'doc1',
         ipAddress: '127.0.0.1',
@@ -178,7 +178,7 @@ describe('GET /api/audit', () => {
     mockFindMany.mockResolvedValue([
       {
         id: 'log1',
-        action: 'VIEW',
+        action: 'VIEW_DOCUMENT',
         resource: 'Document,Special',
         resourceId: 'doc1',
         ipAddress: '127.0.0.1',
