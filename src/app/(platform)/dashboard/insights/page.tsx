@@ -556,7 +556,7 @@ export default function InsightsPage() {
                       fontSize: '11px',
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
-                    formatter={(value: number | undefined, name: string | undefined) => [
+                    formatter={(value: string | number | undefined, name: string | undefined) => [
                       `${value ?? 0}`,
                       name === 'avgScore' ? 'Quality' : 'Noise',
                     ]}
