@@ -2002,7 +2002,12 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={ctaInView ? { opacity: 1, y: 0 } : {}}
-            className="max-w-3xl mx-auto text-center"
+            style={{
+              maxWidth: '768px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              textAlign: 'center',
+            }}
           >
             <div
               style={{
@@ -2058,7 +2063,15 @@ export default function LandingPage() {
               Join teams using Decision Intel to quantify cognitive biases, reduce noise, and make
               consistently better decisions.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '16px',
+              }}
+            >
               <Link
                 href="/login"
                 className="btn btn-primary glow"
@@ -2079,8 +2092,15 @@ export default function LandingPage() {
               </a>
             </div>
             <div
-              className="flex items-center justify-center gap-6 mt-8"
-              style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '24px',
+                marginTop: '32px',
+                fontSize: '0.8rem',
+                color: 'var(--text-muted)',
+              }}
             >
               <span className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
