@@ -37,17 +37,32 @@ async function searchSemanticScholar(query: string, limit: number = 5): Promise<
       fields: 'title,authors,year,abstract,externalIds,citationCount,url',
     });
 
-    const response = await withTimeout(
-      () =>
-        fetch(`${SEMANTIC_SCHOLAR_API}/paper/search?${params}`, {
-          headers: { 'User-Agent': 'DecisionIntel/1.0' },
-        }),
-      15_000,
-      'Semantic Scholar timeout'
-    );
+    // Retry with backoff on 429 (rate limit) responses
+    let response: Response | null = null;
+    const MAX_RETRIES = 3;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      response = await withTimeout(
+        () =>
+          fetch(`${SEMANTIC_SCHOLAR_API}/paper/search?${params}`, {
+            headers: { 'User-Agent': 'DecisionIntel/1.0' },
+          }),
+        15_000,
+        'Semantic Scholar timeout'
+      );
 
-    if (!response.ok) {
-      log.warn(`Semantic Scholar returned ${response.status}: ${response.statusText}`);
+      if (response.status !== 429 || attempt === MAX_RETRIES) break;
+
+      const backoffMs = Math.min(1000 * Math.pow(2, attempt), 8000);
+      log.warn(
+        `Semantic Scholar 429 — retrying in ${backoffMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})`
+      );
+      await new Promise(resolve => setTimeout(resolve, backoffMs));
+    }
+
+    if (!response || !response.ok) {
+      log.warn(
+        `Semantic Scholar returned ${response?.status ?? 'no response'}: ${response?.statusText ?? ''}`
+      );
       return [];
     }
 
