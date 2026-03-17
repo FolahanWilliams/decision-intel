@@ -34,6 +34,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
       const extUserId = request.headers.get('x-extension-user-id');
+      // Validate extension user ID format — alphanumeric, hyphens, underscores only, max 128 chars
+      if (extUserId && !/^[a-zA-Z0-9_-]{1,128}$/.test(extUserId)) {
+        return NextResponse.json({ error: 'Invalid extension user ID format' }, { status: 400 });
+      }
       effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';
     }
 
@@ -72,6 +76,14 @@ export async function POST(request: NextRequest) {
 
     // Handle direct text analysis (from extension)
     if (!documentId && body.text) {
+      // Validate text length to prevent unbounded storage
+      const MAX_TEXT_LENGTH = 100_000;
+      if (typeof body.text !== 'string' || body.text.length > MAX_TEXT_LENGTH) {
+        return NextResponse.json(
+          { error: `Text must be a string of at most ${MAX_TEXT_LENGTH} characters` },
+          { status: 400 }
+        );
+      }
       const newDoc = await prisma.document.create({
         data: {
           userId: effectiveUserId,

@@ -43,6 +43,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (![-1, 0, 1].includes(rating)) {
+      return NextResponse.json(
+        { error: 'Rating must be -1, 0, or 1' },
+        { status: 400 }
+      );
+    }
+
     if (type === 'bias') {
       // Verify ownership through the Analysis -> Document relation
       const biasInstance = await prisma.biasInstance.findUnique({

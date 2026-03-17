@@ -65,10 +65,15 @@ export async function DELETE() {
     }
 
     // Delete all user data atomically.
-    // Order matters: audit logs and rate limits are independent, then
-    // documents (which cascade to analyses, bias instances, and embeddings),
-    // then user settings.
+    // Order matters: Product B tables (nudges → cognitive audits → human decisions)
+    // must be deleted before Product A (documents cascade to analyses, biases, embeddings).
+    // Audit logs, rate limits, and user settings are independent.
     await prisma.$transaction(async tx => {
+      // Product B: Nudges → CognitiveAudits → HumanDecisions (FK order)
+      await tx.nudge.deleteMany({ where: { humanDecision: { userId } } });
+      await tx.cognitiveAudit.deleteMany({ where: { humanDecision: { userId } } });
+      await tx.humanDecision.deleteMany({ where: { userId } });
+      // Product A + shared
       await tx.auditLog.deleteMany({ where: { userId } });
       await tx.rateLimit.deleteMany({ where: { identifier: userId } });
       await tx.document.deleteMany({ where: { userId } });

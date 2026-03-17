@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { SSEReader } from '@/lib/sse';
 import { createClientLogger } from '@/lib/utils/logger';
 
@@ -277,6 +277,17 @@ export function useAnalysisStream(options: StreamOptions) {
       timeoutRef.current = null;
     }
     setIsAnalyzing(false);
+  }, []);
+
+  // Cleanup on unmount: abort any in-flight stream and clear timeout
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
   }, []);
 
   return {

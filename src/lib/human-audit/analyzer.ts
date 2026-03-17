@@ -126,9 +126,9 @@ OUTPUT FORMAT: Return ONLY valid JSON.
       );
       if (!hasPlaceholders && content.length > 200) {
         log.warn(
-          'GDPR anonymizer returned no placeholders for substantial content — using original (may contain PII)'
+          'GDPR anonymizer returned no placeholders for substantial content — blocking to prevent PII leakage'
         );
-        return content;
+        throw new Error('GDPR anonymization produced no redactions for substantial content');
       }
       log.info(`GDPR anonymization complete: ${parsed.redactionCount ?? 0} redactions`);
       return parsed.redactedContent;
@@ -137,9 +137,10 @@ OUTPUT FORMAT: Return ONLY valid JSON.
     log.error('GDPR anonymization failed:', e instanceof Error ? e.message : String(e));
   }
 
-  // On failure, still proceed but log the risk
-  log.warn('GDPR anonymization unavailable — proceeding with original content');
-  return content;
+  // On failure, block the pipeline to prevent PII leakage to external LLMs
+  // (matches Product A behavior in nodes.ts which sets anonymizationStatus: 'failed')
+  log.error('GDPR anonymization unavailable — blocking content to prevent PII leakage');
+  throw new Error('GDPR anonymization failed — cannot proceed with un-anonymized content');
 }
 
 /** Adapted bias detection prompt for human conversational inputs */
@@ -189,7 +190,20 @@ export async function analyzeHumanDecision(
   }
 
   // GDPR anonymization — strip PII before any LLM calls
-  const anonymizedContent = await anonymizeContent(input.content);
+  let anonymizedContent: string;
+  try {
+    anonymizedContent = await anonymizeContent(input.content);
+  } catch (anonError) {
+    log.error('GDPR anonymization blocked pipeline:', anonError instanceof Error ? anonError.message : String(anonError));
+    return {
+      decisionQualityScore: 0,
+      noiseScore: 50,
+      summary: 'Analysis blocked: content could not be anonymized. PII protection prevented analysis.',
+      biasFindings: [],
+      teamConsensusFlag: false,
+      dissenterCount: 0,
+    };
+  }
 
   // Truncate if very long (same as existing pipeline)
   const content = smartTruncate(anonymizedContent, 50000);

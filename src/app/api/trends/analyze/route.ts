@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { GoogleGenerativeAI, type Tool } from '@google/generative-ai';
 import { getRequiredEnvVar } from '@/lib/env';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
 
@@ -31,6 +32,23 @@ export async function POST() {
     const userId = user?.id;
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limit: 5 market analyses per hour (LLM-backed, expensive)
+    const rateLimitResult = await checkRateLimit(userId, '/api/trends/analyze');
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded. You can run up to 5 market analyses per hour.',
+          limit: rateLimitResult.limit,
+          reset: rateLimitResult.reset,
+          remaining: 0,
+        },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) },
+        }
+      );
     }
 
     // 1. Gather Context (What is the user interested in?)

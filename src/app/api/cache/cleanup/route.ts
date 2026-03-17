@@ -5,10 +5,17 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('CacheCleanup');
 
-/** Constant-time string comparison to prevent timing attacks. */
+/** Constant-time string comparison to prevent timing attacks.
+ *  Pads the shorter buffer to avoid leaking length information. */
 function safeCompare(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  const maxLen = Math.max(bufA.length, bufB.length);
+  const paddedA = Buffer.alloc(maxLen);
+  const paddedB = Buffer.alloc(maxLen);
+  bufA.copy(paddedA);
+  bufB.copy(paddedB);
+  return bufA.length === bufB.length && timingSafeEqual(paddedA, paddedB);
 }
 
 /**

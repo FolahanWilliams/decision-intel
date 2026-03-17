@@ -74,6 +74,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate content length to prevent unbounded storage
+    const MAX_CONTENT_LENGTH = 100_000;
+    if (typeof body.content !== 'string' || body.content.length > MAX_CONTENT_LENGTH) {
+      return NextResponse.json(
+        { error: `Content must be a string of at most ${MAX_CONTENT_LENGTH} characters` },
+        { status: 400 }
+      );
+    }
+
     const validSources = ['slack', 'meeting_transcript', 'email', 'jira', 'manual'];
     if (!validSources.includes(body.source)) {
       return NextResponse.json(

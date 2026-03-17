@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
 
 export interface UserSettingsData {
   emailNotifications: boolean;
@@ -11,6 +12,14 @@ export interface UserSettingsData {
   darkMode: boolean;
   compactView: boolean;
 }
+
+const UserSettingsSchema = z.object({
+  emailNotifications: z.boolean(),
+  analysisAlerts: z.boolean(),
+  weeklyDigest: z.boolean(),
+  darkMode: z.boolean(),
+  compactView: z.boolean(),
+});
 
 export async function getUserSettings() {
   const supabase = await createClient();
@@ -44,12 +53,15 @@ export async function updateUserSettings(data: UserSettingsData) {
   const userId = user?.id;
   if (!userId) throw new Error('Unauthorized');
 
+  // Runtime validation — server actions receive unsanitized client input
+  const parsed = UserSettingsSchema.parse(data);
+
   await prisma.userSettings.upsert({
     where: { userId },
-    update: data,
+    update: parsed,
     create: {
       userId,
-      ...data,
+      ...parsed,
     },
   });
 
