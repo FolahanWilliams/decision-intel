@@ -61,6 +61,8 @@ export interface AnalysisResult {
   simulation?: SimulationResult;
   institutionalMemory?: InstitutionalMemoryResult;
   intelligenceContext?: IntelligenceContextSummary;
+  biasWebImageUrl?: string | null;
+  preMortemImageUrl?: string | null;
 }
 
 /** Lightweight summary of intelligence context stored with analysis results */

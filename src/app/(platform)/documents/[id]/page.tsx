@@ -45,6 +45,7 @@ import {
 } from '@/types';
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
+import { CognitiveTopography } from '@/components/visualizations/CognitiveTopography';
 
 // Lazy-loaded tab components
 const OverviewTab = lazy(() =>
@@ -109,7 +110,10 @@ interface Analysis {
   preMortem?: {
     failureScenarios: string[];
     preventiveMeasures: string[];
+    imageUrl?: string | null;
   };
+  biasWebImageUrl?: string | null;
+  preMortemImageUrl?: string | null;
   simulation?: {
     overallVerdict: 'APPROVED' | 'REJECTED' | 'MIXED';
     twins: Array<{
@@ -563,6 +567,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             />
           </div>
         </ErrorBoundary>
+      )}
+
+      {/* Cognitive Topographies */}
+      {analysis && (analysis.biasWebImageUrl || analysis.preMortemImageUrl) && (
+        <div className="mb-xl">
+          <ErrorBoundary sectionName="Cognitive Topographies">
+            <CognitiveTopography
+              biasWebImageUrl={analysis.biasWebImageUrl}
+              preMortemImageUrl={analysis.preMortemImageUrl}
+            />
+          </ErrorBoundary>
+        </div>
       )}
 
       {/* Re-scan Button */}

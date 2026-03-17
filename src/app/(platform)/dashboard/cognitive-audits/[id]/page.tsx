@@ -27,6 +27,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { QualityGauge } from '@/components/visualizations/QualityMetrics';
 import { SentimentGauge } from '@/components/visualizations/SentimentGauge';
+import { CognitiveTopography } from '@/components/visualizations/CognitiveTopography';
 import { createClientLogger } from '@/lib/utils/logger';
 import {
   SOURCE_LABELS_LONG as SOURCE_LABELS,
@@ -433,6 +434,18 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
             </div>
           </div>
         </ErrorBoundary>
+      )}
+
+      {/* Cognitive Topographies */}
+      {audit && (audit.biasWebImageUrl || audit.preMortemImageUrl) && (
+        <div className="mb-xl animate-fade-in" style={{ animationDelay: '0.15s' }}>
+          <ErrorBoundary sectionName="Cognitive Topographies">
+            <CognitiveTopography
+              biasWebImageUrl={audit.biasWebImageUrl}
+              preMortemImageUrl={audit.preMortemImageUrl}
+            />
+          </ErrorBoundary>
+        </div>
       )}
 
       {/* Tabbed Content */}

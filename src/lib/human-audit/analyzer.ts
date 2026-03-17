@@ -27,6 +27,7 @@ import {
   SIMULATION_SUPER_PROMPT,
 } from '@/lib/agents/prompts';
 import { searchSimilarDocuments } from '@/lib/rag/embeddings';
+import { generateBiasWeb, generatePreMortemTopography } from '@/lib/agents/visualization';
 import type { HumanDecisionInput, CognitiveAuditResult } from '@/types/human-audit';
 import type { BiasDetectionResult, ComplianceResult, LogicalAnalysisResult } from '@/types';
 
@@ -287,6 +288,23 @@ export async function analyzeHumanDecision(
     input
   );
 
+  // Generate Visualizations
+  let biasWebImageUrl: string | undefined;
+  let preMortemImageUrl: string | undefined;
+
+  try {
+    const [biasWebUrl, preMortemUrl] = await Promise.all([
+      generateBiasWeb(biasData?.biases ?? []),
+      generatePreMortemTopography(
+        complianceData?.preMortem
+      ),
+    ]);
+    biasWebImageUrl = biasWebUrl || undefined;
+    preMortemImageUrl = preMortemUrl || undefined;
+  } catch (error) {
+    log.error('Failed to generate visualizations for human audit:', error instanceof Error ? error.message : String(error));
+  }
+
   return {
     decisionQualityScore,
     noiseScore: Math.max(0, Math.min(100, noiseScore)),
@@ -302,6 +320,8 @@ export async function analyzeHumanDecision(
       : undefined,
     teamConsensusFlag: biasData?.teamConsensusFlag ?? false,
     dissenterCount: biasData?.dissenterCount ?? 0,
+    biasWebImageUrl,
+    preMortemImageUrl,
   };
 }
 

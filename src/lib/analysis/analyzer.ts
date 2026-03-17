@@ -7,6 +7,7 @@ type Document = NonNullable<Awaited<ReturnType<typeof prisma.document.findUnique
 import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/lib/utils/cache';
 import { validateContent } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
+import { generateBiasWeb, generatePreMortemTopography } from '@/lib/agents/visualization';
 
 import {
   NoiseStatsSchema,
@@ -82,6 +83,26 @@ export async function analyzeDocument(
     // Store analysis in database with Schema Drift Protection
     const foundBiases = result.biases.filter(b => b.found);
 
+    // Generate Cognitive Topographies
+    if (onProgress) {
+      onProgress({ type: 'step', step: 'Generating Visualizations', status: 'running', progress: 85 });
+    }
+    let biasWebImageUrl: string | null = null;
+    let preMortemImageUrl: string | null = null;
+    try {
+      const [biasWebUrl, preMortemUrl] = await Promise.all([
+        generateBiasWeb(foundBiases), // Assuming 'foundBiases' is the correct data source
+        generatePreMortemTopography(result.preMortem), // Assuming 'result.preMortem' is the correct data source
+      ]);
+      biasWebImageUrl = biasWebUrl;
+      preMortemImageUrl = preMortemUrl;
+      
+      // Attach to result so it's returned to the client and cached
+      result.preMortemImageUrl = pMortem;
+    } catch (visErr) {
+      log.warn('Visualization generation failed (non-critical): ' + (visErr instanceof Error ? visErr.message : String(visErr)));
+    }
+
     // Try saving with ALL fields first. If the DB is missing newer
     // columns (schema drift / P2022), the transaction is poisoned —
     // PostgreSQL rejects every subsequent command in the same transaction
@@ -136,6 +157,8 @@ export async function analyzeDocument(
                 : SentimentSchema.parse({})
             ),
             speakers: result.speakers || [],
+            biasWebImageUrl,
+            preMortemImageUrl,
             // Phase 4 Extensions
             logicalAnalysis: toPrismaJson(
               LogicalSchema.safeParse(result.logicalAnalysis).success
@@ -211,6 +234,8 @@ export async function analyzeDocument(
                 confidence: bias.confidence || 0.0,
               })),
             },
+            biasWebImageUrl,
+            preMortemImageUrl,
           },
           select: { id: true },
         });

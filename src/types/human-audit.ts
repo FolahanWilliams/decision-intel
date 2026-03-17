@@ -89,6 +89,10 @@ export interface CognitiveAuditResult {
   // Human-specific analysis
   teamConsensusFlag: boolean;
   dissenterCount: number;
+
+  // Visualizations
+  biasWebImageUrl?: string | null;
+  preMortemImageUrl?: string | null;
 }
 
 // ─── Nudge Types ─────────────────────────────────────────────────────────────

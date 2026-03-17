@@ -41,6 +41,8 @@ export interface HumanDecisionSummary {
     sentimentDetail?: unknown;
     teamConsensusFlag: boolean;
     dissenterCount: number;
+    biasWebImageUrl?: string | null;
+    preMortemImageUrl?: string | null;
   } | null;
   nudges: HumanDecisionNudge[];
 }
