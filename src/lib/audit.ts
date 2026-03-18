@@ -20,7 +20,10 @@ export type AuditAction =
   | 'ACKNOWLEDGE_NUDGE'
   | 'SLACK_DECISION_INGESTED'
   | 'MEETING_TRANSCRIPT_ANALYZED'
-  | 'SIMULATE_COGNITIVE_AUDIT';
+  | 'SIMULATE_COGNITIVE_AUDIT'
+  // Meeting Intelligence
+  | 'UPLOAD_MEETING'
+  | 'MEETING_TRANSCRIBED';
 
 export interface AuditLogParams {
   action: AuditAction;

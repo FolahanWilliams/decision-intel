@@ -258,6 +258,70 @@ model SlackInstallation {
   @@index([status])
 }
 
+// ─── Meeting Intelligence ─────────────────────────────────────────────────
+
+model Meeting {
+  id              String   @id @default(cuid())
+  userId          String   // Supabase Auth User ID
+  orgId           String?  // Organization ID
+
+  title           String
+  meetingType     String   @default("general") // "board" | "incident_response" | "vendor_review" | "strategic_planning" | "general"
+  source          String   @default("upload")  // "upload" | "zoom" | "google_meet" | "teams" | "slack_huddle"
+  sourceRef       String?  // External meeting ID (e.g. Zoom meeting ID)
+
+  // Media
+  fileName        String?
+  fileType        String?  // MIME type of the original recording
+  fileSize        Int?     // bytes
+  storagePath     String?  // Supabase Storage path
+  durationSeconds Int?
+
+  // Participants (may be auto-detected from transcript or provided by user)
+  participants    String[]
+
+  // Processing state
+  status          String   @default("uploading") // "uploading" | "transcribing" | "analyzing" | "complete" | "error"
+  errorMessage    String?  @db.Text
+  transcriptionProgress Float @default(0) // 0-100 progress percentage
+
+  // Link to the HumanDecision created from this meeting's transcript
+  humanDecisionId String?  @unique
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  transcript      MeetingTranscript?
+  humanDecision   HumanDecision? @relation(fields: [humanDecisionId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model MeetingTranscript {
+  id              String   @id @default(cuid())
+  meetingId       String   @unique
+  meeting         Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  // Speaker metadata: [{ id, name, speakTimeMs, wordCount }]
+  speakers        Json     @default("[]")
+
+  // Timestamped segments: [{ speaker, text, startMs, endMs }]
+  segments        Json     @default("[]")
+
+  // Full concatenated transcript text (used as input to analysis pipeline)
+  fullText        String   @db.Text
+
+  language        String   @default("en")
+  confidence      Float    @default(0) // Average transcription confidence 0-1
+
+  createdAt       DateTime @default(now())
+
+  @@index([meetingId])
+}
+
 // ─── Human Cognitive Auditing (Product B) ─────────────────────────────────
 
 model HumanDecision {
@@ -282,6 +346,7 @@ model HumanDecision {
   // Relations
   cognitiveAudit CognitiveAudit?
   nudges         Nudge[]
+  meeting        Meeting?
 
   @@index([userId])
   @@index([orgId])
