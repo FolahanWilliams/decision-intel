@@ -307,6 +307,7 @@ model CognitiveAudit {
   complianceResult Json?  // ComplianceResult
   preMortem        Json?  // { failureScenarios, preventiveMeasures }
   logicalAnalysis  Json?  // LogicalAnalysisResult
+  swotAnalysis     Json?  // SwotAnalysisResult
   sentimentDetail  Json?  // { score, label }
 
   // Team-level aggregation metadata

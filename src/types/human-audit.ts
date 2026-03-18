@@ -5,7 +5,7 @@
  * using the same engine that audits AI decisions (Product A).
  */
 
-import type { BiasDetectionResult, ComplianceResult, LogicalAnalysisResult } from '@/types';
+import type { BiasDetectionResult, ComplianceResult, LogicalAnalysisResult, SwotAnalysisResult } from '@/types';
 
 // ─── Decision Source Types ───────────────────────────────────────────────────
 
@@ -82,6 +82,7 @@ export interface CognitiveAuditResult {
     preventiveMeasures: string[];
   };
   logicalAnalysis?: LogicalAnalysisResult;
+  swotAnalysis?: SwotAnalysisResult;
   sentimentDetail?: {
     score: number;
     label: 'Positive' | 'Negative' | 'Neutral';

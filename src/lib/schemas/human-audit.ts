@@ -69,6 +69,14 @@ export const CognitiveAuditPreMortem = z.object({
   preventiveMeasures: z.array(z.string()).default([]),
 });
 
+export const CognitiveAuditSwot = z.object({
+  strengths: z.array(z.string()).default([]),
+  weaknesses: z.array(z.string()).default([]),
+  opportunities: z.array(z.string()).default([]),
+  threats: z.array(z.string()).default([]),
+  strategicAdvice: z.string().default('No strategic advice available.'),
+});
+
 export const CognitiveAuditLogicalAnalysis = z.object({
   score: z.number().min(0).max(100),
   fallacies: z

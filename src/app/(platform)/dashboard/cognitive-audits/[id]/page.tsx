@@ -22,6 +22,11 @@ import {
   Zap,
   UserCheck,
   BookOpen,
+  Target,
+  TrendingUp,
+  TrendingDown,
+  AlertCircle,
+  Download,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -111,7 +116,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
   const { decision, isLoading: loading, error, mutate: mutateDecision } = useHumanDecision(id);
   const [acknowledging, setAcknowledging] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
-    'biases' | 'noise' | 'nudges' | 'compliance' | 'premortem' | 'twins'
+    'biases' | 'noise' | 'nudges' | 'compliance' | 'premortem' | 'twins' | 'swot'
   >('biases');
 
   // Use nudges from the decision response directly
@@ -213,6 +218,16 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
         };
         assumptions?: string[];
         conclusion?: string;
+      }
+    | undefined;
+
+  const swotAnalysis = audit?.swotAnalysis as
+    | {
+        strengths: string[];
+        weaknesses: string[];
+        opportunities: string[];
+        threats: string[];
+        strategicAdvice: string;
       }
     | undefined;
 
@@ -484,6 +499,17 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                     label: 'Compliance',
                     icon: FileWarning,
                     count: compliance?.regulations?.length,
+                  },
+                  {
+                    key: 'swot' as const,
+                    label: 'SWOT',
+                    icon: Target,
+                    count: swotAnalysis
+                      ? (swotAnalysis.strengths?.length ?? 0) +
+                        (swotAnalysis.weaknesses?.length ?? 0) +
+                        (swotAnalysis.opportunities?.length ?? 0) +
+                        (swotAnalysis.threats?.length ?? 0)
+                      : undefined,
                   },
                   {
                     key: 'premortem' as const,
@@ -843,6 +869,130 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                               ))}
                             </tbody>
                           </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SWOT Tab */}
+              {activeTab === 'swot' && (
+                <div>
+                  {!swotAnalysis ? (
+                    <div
+                      className="flex flex-col items-center gap-md"
+                      style={{ padding: 'var(--spacing-xl)' }}
+                    >
+                      <Target size={48} style={{ color: 'var(--text-muted)' }} />
+                      <p className="text-muted">No SWOT analysis available for this decision.</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: 'var(--spacing-lg)',
+                        }}
+                      >
+                        {[
+                          {
+                            title: 'Strengths',
+                            items: swotAnalysis.strengths,
+                            icon: TrendingUp,
+                            color: 'var(--success)',
+                            bg: 'rgba(34, 197, 94, 0.08)',
+                          },
+                          {
+                            title: 'Weaknesses',
+                            items: swotAnalysis.weaknesses,
+                            icon: TrendingDown,
+                            color: 'var(--error)',
+                            bg: 'rgba(239, 68, 68, 0.08)',
+                          },
+                          {
+                            title: 'Opportunities',
+                            items: swotAnalysis.opportunities,
+                            icon: Target,
+                            color: 'var(--accent-primary)',
+                            bg: 'rgba(99, 102, 241, 0.08)',
+                          },
+                          {
+                            title: 'Threats',
+                            items: swotAnalysis.threats,
+                            icon: AlertCircle,
+                            color: 'var(--warning)',
+                            bg: 'rgba(245, 158, 11, 0.08)',
+                          },
+                        ].map(section => (
+                          <div
+                            key={section.title}
+                            style={{
+                              padding: 'var(--spacing-lg)',
+                              border: `1px solid ${section.color}30`,
+                              background: section.bg,
+                            }}
+                          >
+                            <h4
+                              className="flex items-center gap-sm mb-md"
+                              style={{ color: section.color }}
+                            >
+                              <section.icon size={18} /> {section.title}
+                            </h4>
+                            <div
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 'var(--spacing-sm)',
+                              }}
+                            >
+                              {section.items.map((item, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-start gap-sm"
+                                  style={{ fontSize: '14px', lineHeight: 1.5 }}
+                                >
+                                  <span
+                                    style={{
+                                      width: 6,
+                                      height: 6,
+                                      borderRadius: '50%',
+                                      background: section.color,
+                                      marginTop: 7,
+                                      flexShrink: 0,
+                                    }}
+                                  />
+                                  {item}
+                                </div>
+                              ))}
+                              {section.items.length === 0 && (
+                                <span className="text-muted text-sm">None identified</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Strategic Advice */}
+                      {swotAnalysis.strategicAdvice && (
+                        <div
+                          className="mt-lg"
+                          style={{
+                            padding: 'var(--spacing-lg)',
+                            background: 'rgba(99, 102, 241, 0.08)',
+                            borderLeft: '3px solid var(--accent-primary)',
+                            fontSize: '14px',
+                            lineHeight: 1.6,
+                          }}
+                        >
+                          <h4
+                            className="flex items-center gap-sm mb-sm"
+                            style={{ color: 'var(--accent-primary)', fontSize: '14px' }}
+                          >
+                            <Target size={16} /> Strategic Advice
+                          </h4>
+                          {swotAnalysis.strategicAdvice}
                         </div>
                       )}
                     </div>
@@ -1339,11 +1489,91 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
         </div>
       )}
 
-      {/* Back link */}
-      <div className="mt-xl">
+      {/* Actions */}
+      <div className="mt-xl flex items-center justify-between">
         <Link href="/dashboard/cognitive-audits" className="btn btn-secondary">
           <ArrowLeft size={16} /> Back to Cognitive Audits
         </Link>
+        {audit && (
+          <button
+            className="btn btn-secondary flex items-center gap-sm"
+            onClick={() => {
+              const reportData = {
+                source: SOURCE_LABELS[decision.source] || decision.source,
+                channel: decision.channel,
+                decisionType: decision.decisionType,
+                date: formatDate(decision.createdAt, true),
+                decisionQualityScore: audit.decisionQualityScore,
+                noiseScore: audit.noiseScore,
+                sentimentScore: audit.sentimentScore,
+                summary: audit.summary,
+                biases: biases.map(b => ({
+                  type: b.biasType,
+                  severity: b.severity,
+                  explanation: b.explanation,
+                  suggestion: b.suggestion,
+                })),
+                compliance: compliance
+                  ? {
+                      status: compliance.status,
+                      riskScore: compliance.riskScore,
+                      regulations: compliance.regulations,
+                    }
+                  : null,
+                swot: swotAnalysis || null,
+                preMortem: preMortem || null,
+                teamConsensusFlag: audit.teamConsensusFlag,
+                dissenterCount: audit.dissenterCount,
+              };
+              const csv = [
+                ['Decision Cognitive Audit Report'],
+                ['Source', reportData.source],
+                ['Channel', reportData.channel || 'N/A'],
+                ['Date', reportData.date],
+                ['Decision Quality Score', String(reportData.decisionQualityScore)],
+                ['Noise Score', String(reportData.noiseScore)],
+                ['Summary', reportData.summary],
+                [''],
+                ['BIASES DETECTED'],
+                ['Type', 'Severity', 'Explanation', 'Suggestion'],
+                ...reportData.biases.map(b => [b.type, b.severity, b.explanation, b.suggestion]),
+                [''],
+                ...(reportData.swot
+                  ? [
+                      ['SWOT ANALYSIS'],
+                      ['Strengths', ...reportData.swot.strengths],
+                      ['Weaknesses', ...reportData.swot.weaknesses],
+                      ['Opportunities', ...reportData.swot.opportunities],
+                      ['Threats', ...reportData.swot.threats],
+                      ['Strategic Advice', reportData.swot.strategicAdvice],
+                    ]
+                  : []),
+                [''],
+                ...(reportData.preMortem
+                  ? [
+                      ['PRE-MORTEM'],
+                      ['Failure Scenarios', ...reportData.preMortem.failureScenarios],
+                      ['Preventive Measures', ...reportData.preMortem.preventiveMeasures],
+                    ]
+                  : []),
+              ];
+              const csvContent = csv
+                .map(row =>
+                  row.map(cell => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(',')
+                )
+                .join('\n');
+              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `cognitive-audit-${id}.csv`;
+              link.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
+            <Download size={16} /> Export CSV
+          </button>
+        )}
       </div>
     </div>
   );
