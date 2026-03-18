@@ -116,7 +116,9 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                     gap: '6px',
                   }}
                 >
-                  <span role="img" aria-label={q.iconLabel}>{q.icon}</span>
+                  <span role="img" aria-label={q.iconLabel}>
+                    {q.icon}
+                  </span>
                   {q.label}
                   <span style={{ opacity: 0.6, fontWeight: 400 }}>({items.length})</span>
                 </div>

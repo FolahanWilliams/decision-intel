@@ -79,7 +79,9 @@ export function DecisionRadar({ data }: DecisionRadarProps) {
           if (!config) return null;
           return (
             <div key={key} className="flex items-baseline gap-1.5" title={config.description}>
-              <span className="text-[10px] font-mono font-bold text-accent-primary">{Math.round(value)}</span>
+              <span className="text-[10px] font-mono font-bold text-accent-primary">
+                {Math.round(value)}
+              </span>
               <span className="text-[10px] text-muted truncate">{config.label}</span>
             </div>
           );
