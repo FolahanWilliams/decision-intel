@@ -501,36 +501,102 @@ Output JSON:
 }
 `;
 
-export const SIMULATION_SUPER_PROMPT = `
-You are a "Boardroom Simulator" and "Institutional Memory" engine.
-Perform TWO combined analyses on the provided document.
+/**
+ * Build the simulation prompt dynamically.
+ *
+ * Two key improvements over the static prompt:
+ * 1. DYNAMIC PERSONAS — AI generates document-specific personas, or uses
+ *    custom org-defined personas if available. No more one-size-fits-all.
+ * 2. OUTCOME-AWARE MEMORY — Past cases include their actual real-world
+ *    outcomes (success/failure), confirmed biases, and lessons learned.
+ *    This closes the feedback loop and makes predictions improve over time.
+ */
+export function buildSimulationPrompt(options?: {
+  customPersonas?: Array<{
+    name: string;
+    role: string;
+    focus: string;
+    values: string;
+    bias: string;
+    riskTolerance: string;
+  }>;
+  hasOutcomeData?: boolean;
+}): string {
+  const { customPersonas, hasOutcomeData } = options || {};
 
-## PART 1: DECISION TWIN SIMULATION
-Simulate how 3 distinct corporate personas would vote on this proposal:
+  // Build persona section — custom org personas, or AI-generated
+  let personaSection: string;
 
-1. The Fiscal Conservative (CFO Proxy):
-   Focus: ROI, cost control, financial risk, cash flow.
-   Bias: Skeptical of unproven spend.
+  if (customPersonas && customPersonas.length > 0) {
+    personaSection = customPersonas
+      .map(
+        (p, i) =>
+          `${i + 1}. ${p.name} (${p.role}):\n` +
+          `   Focus: ${p.focus}\n` +
+          `   Values: ${p.values}\n` +
+          `   Bias: ${p.bias}\n` +
+          `   Risk Tolerance: ${p.riskTolerance}`
+      )
+      .join('\n\n');
+  } else {
+    personaSection = `IMPORTANT: You must FIRST analyze the document to determine the industry, company type,
+and decision context. Then GENERATE 3 personas that are MOST RELEVANT to this specific
+document and company. Do NOT use generic personas — tailor them to the domain.
 
-2. The Aggressive Growth (VP Sales/Marketing Proxy):
-   Focus: Market capture, speed to execution, competitive advantage.
-   Bias: Impatient with bureaucracy.
+Examples of domain-specific personas:
+- Healthcare: Chief Medical Officer, Patient Safety Director, Hospital CFO
+- Fintech: Chief Risk Officer, Head of Product, Regulatory Affairs Director
+- Defense: Program Manager, Systems Engineer, Contracting Officer
+- Retail: VP Merchandising, Supply Chain Director, Customer Experience Lead
 
-3. The Compliance Guard (Legal/Risk Proxy):
-   Focus: Regulatory compliance, liability, reputation risk.
-   Bias: Risk-averse.
+Each generated persona must include:
+- name: A descriptive title (not a generic one)
+- role: Their functional proxy role
+- focus: What they care about most (specific to the document's domain)
+- values: Their decision-making principles
+- bias: Their natural inclination or blind spot
+- riskTolerance: "conservative" | "moderate" | "aggressive"`;
+  }
 
-CRITICAL: Use Google Search BEFORE voting to check:
-- Current market volatility (VIX, Bond Yields)
-- Recent competitor announcements
-- Macroeconomic risks relevant to this proposal
-Cite these data points in each persona's rationale.
+  // Build outcome-aware memory section
+  const outcomeSection = hasOutcomeData
+    ? `## PART 2: OUTCOME-AWARE INSTITUTIONAL MEMORY
+Analyze the "Similar Past Cases" below. CRITICAL: Some cases include REAL OUTCOME DATA
+showing whether the decision actually succeeded or failed. This is ground truth.
 
-## PART 2: INSTITUTIONAL MEMORY
+When outcome data is present:
+- Weight these cases MORE HEAVILY than cases without outcomes
+- If a similar past decision FAILED, explain specifically what went wrong and how this proposal
+  avoids (or repeats) the same mistakes
+- If a similar past decision SUCCEEDED, identify what made it work and whether this proposal
+  replicates those success factors
+- Note which biases were CONFIRMED as real problems vs FALSE POSITIVES in past cases
+- If a Decision Twin persona was identified as "most accurate" in a past outcome, weight that
+  persona's vote higher for this analysis
+- Use the lessons learned from past outcomes to improve the quality of your current assessment
+
+This is a self-improving system: every outcome report makes future predictions more accurate.`
+    : `## PART 2: INSTITUTIONAL MEMORY
 Analyze the "Similar Past Cases" provided below (retrieved via Vector Search).
 - Identify patterns: "We tried this before and it failed because..."
 - Flag specific risks being repeated.
-- If no relevant past cases exist, state this is a novel initiative.
+- If no relevant past cases exist, state this is a novel initiative.`;
+
+  return `You are a "Boardroom Simulator" and "Institutional Memory" engine.
+Perform TWO combined analyses on the provided document.
+
+## PART 1: DECISION TWIN SIMULATION
+${customPersonas && customPersonas.length > 0 ? 'Simulate how the following organizational decision-makers would vote on this proposal:' : 'Analyze the document, then generate and simulate the most relevant decision-makers for this specific domain:'}
+
+${personaSection}
+
+CRITICAL: Use Google Search BEFORE voting to check:
+- Current market volatility (VIX, Bond Yields)
+- Recent competitor announcements in this specific industry
+- Macroeconomic risks relevant to this proposal
+Cite these data points in each persona's rationale.
+
+${outcomeSection}
 
 Output Format: Return ONLY valid JSON matching this exact schema:
 {
@@ -538,12 +604,13 @@ Output Format: Return ONLY valid JSON matching this exact schema:
     "overallVerdict": "APPROVED" | "REJECTED" | "MIXED",
     "twins": [
       {
-        "name": "Fiscal Conservative",
-        "role": "CFO Proxy",
+        "name": "Persona Name",
+        "role": "Role Proxy",
         "vote": "APPROVE" | "REJECT" | "REVISE",
         "confidence": 85,
         "rationale": "first-person reasoning with market data...",
-        "keyRiskIdentified": "specific risk from their perspective"
+        "keyRiskIdentified": "specific risk from their perspective",
+        "feedback": "optional constructive feedback for the decision-maker"
       }
     ]
   },
@@ -556,10 +623,16 @@ Output Format: Return ONLY valid JSON matching this exact schema:
         "summary": "What happened...",
         "outcome": "SUCCESS" | "FAILURE" | "MIXED",
         "similarity": 0.89,
-        "lessonLearned": "Key takeaway..."
+        "lessonLearned": "Key takeaway...",
+        "outcomeVerified": true
       }
     ],
-    "strategicAdvice": "Based on history, you should..."
+    "strategicAdvice": "Based on history and verified outcomes, you should...",
+    "confidenceBoost": "How past outcomes informed this analysis..."
   }
 }
 `;
+}
+
+// Legacy export for backward compatibility
+export const SIMULATION_SUPER_PROMPT = buildSimulationPrompt();

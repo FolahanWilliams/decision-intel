@@ -459,3 +459,111 @@ export async function getContextualInsights(
     patternInsights,
   };
 }
+
+/**
+ * Search similar documents WITH their reported decision outcomes.
+ *
+ * This powers the self-improving feedback loop: when the simulation node
+ * finds similar past cases, it also gets the actual outcome (success/failure),
+ * confirmed biases, and lessons learned — making future predictions more
+ * accurate based on real-world results.
+ */
+export async function searchSimilarWithOutcomes(
+  queryText: string,
+  userId: string,
+  limit: number = 5
+): Promise<
+  Array<{
+    documentId: string;
+    filename: string;
+    score: number;
+    similarity: number;
+    biases: string[];
+    content: string;
+    outcome?: {
+      result: string;
+      impactScore: number | null;
+      lessonsLearned: string | null;
+      confirmedBiases: string[];
+      falsPositiveBiases: string[];
+      mostAccurateTwin: string | null;
+      timeframe: string | null;
+    };
+  }>
+> {
+  // Get base similar documents
+  const similar = await searchSimilarDocuments(queryText, userId, limit);
+
+  if (similar.length === 0) return [];
+
+  // Enrich with outcome data where available
+  try {
+    const documentIds = similar.map(s => s.documentId);
+
+    // Find analyses for these documents, then their outcomes
+    const analyses = await prisma.analysis.findMany({
+      where: { documentId: { in: documentIds } },
+      select: { id: true, documentId: true },
+    });
+
+    const analysisIds = analyses.map(a => a.id);
+    const analysisDocMap = Object.fromEntries(analyses.map(a => [a.documentId, a.id]));
+
+    let outcomes: Array<{
+      analysisId: string;
+      outcome: string;
+      impactScore: number | null;
+      lessonsLearned: string | null;
+      confirmedBiases: string[];
+      falsPositiveBiases: string[];
+      mostAccurateTwin: string | null;
+      timeframe: string | null;
+    }> = [];
+
+    if (analysisIds.length > 0) {
+      try {
+        outcomes = await prisma.decisionOutcome.findMany({
+          where: { analysisId: { in: analysisIds } },
+          select: {
+            analysisId: true,
+            outcome: true,
+            impactScore: true,
+            lessonsLearned: true,
+            confirmedBiases: true,
+            falsPositiveBiases: true,
+            mostAccurateTwin: true,
+            timeframe: true,
+          },
+        });
+      } catch {
+        // Schema drift — DecisionOutcome table may not exist yet
+        log.warn('DecisionOutcome query failed (schema drift) — proceeding without outcomes');
+      }
+    }
+
+    const outcomeByAnalysisId = Object.fromEntries(outcomes.map(o => [o.analysisId, o]));
+
+    return similar.map(doc => {
+      const analysisId = analysisDocMap[doc.documentId];
+      const outcome = analysisId ? outcomeByAnalysisId[analysisId] : undefined;
+
+      return {
+        ...doc,
+        outcome: outcome
+          ? {
+              result: outcome.outcome,
+              impactScore: outcome.impactScore,
+              lessonsLearned: outcome.lessonsLearned,
+              confirmedBiases: outcome.confirmedBiases,
+              falsPositiveBiases: outcome.falsPositiveBiases,
+              mostAccurateTwin: outcome.mostAccurateTwin,
+              timeframe: outcome.timeframe,
+            }
+          : undefined,
+      };
+    });
+  } catch (error) {
+    log.warn('Outcome enrichment failed, returning base results:', error);
+    return similar;
+  }
+}
