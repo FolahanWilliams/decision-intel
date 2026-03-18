@@ -242,7 +242,10 @@ export function CognitiveTopography({
           role="dialog"
           aria-label={activeView === 'bias' ? 'Bias Web fullscreen' : 'Pre-Mortem fullscreen'}
         >
-          <div className="relative w-full h-full flex items-center justify-center p-8" onClick={e => e.stopPropagation()}>
+          <div
+            className="relative w-full h-full flex items-center justify-center p-8"
+            onClick={e => e.stopPropagation()}
+          >
             <button
               onClick={toggleFullscreen}
               className="absolute top-6 right-6 p-2 bg-white/10 border border-white/20 rounded-sm hover:bg-white/20 text-white transition-colors z-10"

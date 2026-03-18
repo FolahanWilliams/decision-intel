@@ -112,7 +112,11 @@ export function TreemapSkeleton() {
         }}
       >
         {[...Array(4)].map((_, i) => (
-          <SkeletonBlock key={i} className="skeleton-slow" style={{ width: '100%', height: '100%' }} />
+          <SkeletonBlock
+            key={i}
+            className="skeleton-slow"
+            style={{ width: '100%', height: '100%' }}
+          />
         ))}
       </div>
     </div>
