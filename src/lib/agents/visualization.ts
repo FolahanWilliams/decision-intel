@@ -13,8 +13,8 @@ function getAI(): GoogleGenAI {
   return aiInstance;
 }
 
-// Nano Banana 2 — Gemini 3.1 Flash Image (multi-modal generative model)
-const NANO_BANANA_2_MODEL = 'gemini-3.1-flash-preview-image';
+// Nano Banana 2 — Gemini 3.1 Flash Image Preview (multi-modal generative model)
+const NANO_BANANA_2_MODEL = 'gemini-3.1-flash-image-preview';
 
 // Guard: reject images larger than 2 MB (raw bytes, not base64)
 const MAX_IMAGE_BYTES = 2_000_000;
@@ -50,17 +50,31 @@ async function generateImage(
       model: NANO_BANANA_2_MODEL,
       contents: prompt,
       config: {
-        responseModalities: ['IMAGE'],
+        responseModalities: ['TEXT', 'IMAGE'],
+        imageConfig: {
+          aspectRatio: '16:9',
+          imageSize: '2K',
+        },
       },
     });
 
     // Extract inline image data from the Gemini response
-    const part = response.candidates?.[0]?.content?.parts?.find(p =>
-      p.inlineData?.mimeType?.startsWith('image/')
-    );
+    const parts = response.candidates?.[0]?.content?.parts;
+    if (!parts || parts.length === 0) {
+      log.warn('Nano Banana 2 returned no parts in response');
+      return null;
+    }
+
+    const part = parts.find(p => p.inlineData?.mimeType?.startsWith('image/'));
     const base64Image = part?.inlineData?.data;
     const mimeType = part?.inlineData?.mimeType ?? 'image/png';
-    if (!base64Image) return null;
+    if (!base64Image) {
+      log.warn(
+        `Nano Banana 2 returned ${parts.length} part(s) but none contained image data. ` +
+          `Part types: ${parts.map(p => (p.inlineData ? `inlineData(${p.inlineData.mimeType})` : p.text ? 'text' : 'unknown')).join(', ')}`
+      );
+      return null;
+    }
 
     // Reject oversized images
     const rawBytes = Buffer.byteLength(base64Image, 'base64');
