@@ -30,13 +30,13 @@ export function OverviewTab({
   return (
     <div className="flex flex-col gap-lg">
       <ErrorBoundary sectionName="Bias Visualizations">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg h-[500px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg" style={{ minHeight: '500px' }}>
           <BiasHeatmap content={documentContent} biases={biases} />
-          <div className="card">
+          <div className="card overflow-hidden">
             <div className="card-header">
               <h4>Bias Network Map</h4>
             </div>
-            <div className="card-body h-full">
+            <div className="card-body overflow-hidden" style={{ maxHeight: '460px' }}>
               <BiasNetwork
                 biases={biases.map((b, i) => ({
                   ...b,
