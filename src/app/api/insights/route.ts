@@ -55,6 +55,8 @@ export async function GET() {
           preMortem: true,
           simulation: true,
           cognitiveAnalysis: true,
+          biasWebImageUrl: true,
+          preMortemImageUrl: true,
         },
       });
     } catch (fetchErr: unknown) {
@@ -156,6 +158,10 @@ export async function GET() {
 
     // --- 12. Pre-mortem failure scenarios ---
     const failureFreq = new Map<string, number>();
+
+    // --- 14. Cognitive topography images (latest non-null) ---
+    let latestBiasWebImageUrl: string | null = null;
+    let latestPreMortemImageUrl: string | null = null;
 
     // --- 13. Weekly quality trend (last 8 weeks) ---
     const eightWeeksAgo = new Date(Date.now() - 56 * 24 * 60 * 60 * 1000);
@@ -301,6 +307,14 @@ export async function GET() {
         }
       }
 
+      // Cognitive topography images (take first non-null = most recent)
+      if (!latestBiasWebImageUrl && a.biasWebImageUrl) {
+        latestBiasWebImageUrl = a.biasWebImageUrl as string;
+      }
+      if (!latestPreMortemImageUrl && a.preMortemImageUrl) {
+        latestPreMortemImageUrl = a.preMortemImageUrl as string;
+      }
+
       // Weekly trend
       if (new Date(a.createdAt) >= eightWeeksAgo) {
         const d = new Date(a.createdAt);
@@ -436,6 +450,10 @@ export async function GET() {
       decisionTwinVotes,
       avgBlindSpotGap,
       topBlindSpots,
+
+      // 12. Cognitive topography images
+      biasWebImageUrl: latestBiasWebImageUrl,
+      preMortemImageUrl: latestPreMortemImageUrl,
 
       // Summary stats
       totalAnalyses: n,

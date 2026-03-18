@@ -45,6 +45,7 @@ import {
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BackToTop } from '@/components/ui/BackToTop';
+import { CognitiveTopography } from '@/components/visualizations/CognitiveTopography';
 
 /* ── Reusable sub-components ─────────────────────────────────── */
 
@@ -650,14 +651,20 @@ export default function InsightsPage() {
             <SwotQuadrant data={insights.swot} />
           </ErrorBoundary>
         </div>
-        <div className="animate-slide-up card-glow" style={{ animationDelay: '0.48s' }}>
+        <div className="animate-slide-up card-glow flex flex-col gap-md" style={{ animationDelay: '0.48s' }}>
           <ErrorBoundary sectionName="Fact Verification">
-            <FactVerificationBar data={insights.factVerification} />
+            <FactVerificationBar data={insights.factVerification} compact />
+          </ErrorBoundary>
+          <ErrorBoundary sectionName="Sentiment Gauge">
+            <SentimentGauge score={insights.sentiment.score} label={insights.sentiment.label} compact />
           </ErrorBoundary>
         </div>
         <div className="animate-slide-up card-glow" style={{ animationDelay: '0.54s' }}>
-          <ErrorBoundary sectionName="Sentiment Gauge">
-            <SentimentGauge score={insights.sentiment.score} label={insights.sentiment.label} />
+          <ErrorBoundary sectionName="Cognitive Topographies">
+            <CognitiveTopography
+              biasWebImageUrl={insights.biasWebImageUrl}
+              preMortemImageUrl={insights.preMortemImageUrl}
+            />
           </ErrorBoundary>
         </div>
       </div>

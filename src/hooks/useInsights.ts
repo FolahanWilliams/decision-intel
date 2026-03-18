@@ -35,6 +35,9 @@ export interface InsightsPayload {
   decisionTwinVotes: { approve: number; reject: number; revise: number; total: number };
   avgBlindSpotGap: number;
   topBlindSpots: string[];
+  // Cognitive topography images
+  biasWebImageUrl?: string | null;
+  preMortemImageUrl?: string | null;
 }
 
 const fetcher = (url: string) =>

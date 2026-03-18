@@ -6,9 +6,10 @@ import { InfoTooltip } from '@/components/ui/InfoTooltip';
 interface SentimentGaugeProps {
   score: number; // -100 to 100, or 0 to 100
   label: string; // e.g. "Positive", "Neutral", "Negative"
+  compact?: boolean;
 }
 
-export function SentimentGauge({ score, label }: SentimentGaugeProps) {
+export function SentimentGauge({ score, label, compact }: SentimentGaugeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasSize, setCanvasSize] = useState(200);
@@ -20,9 +21,9 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
   const updateSize = useCallback(() => {
     if (containerRef.current) {
       const width = containerRef.current.clientWidth;
-      setCanvasSize(Math.min(240, Math.max(140, width - 40)));
+      setCanvasSize(compact ? Math.min(160, Math.max(100, width - 40)) : Math.min(240, Math.max(140, width - 40)));
     }
-  }, []);
+  }, [compact]);
 
   useEffect(() => {
     updateSize();
@@ -128,7 +129,7 @@ export function SentimentGauge({ score, label }: SentimentGaugeProps) {
       <div
         ref={containerRef}
         className="card-body flex flex-col items-center justify-center"
-        style={{ minHeight: 200 }}
+        style={{ minHeight: compact ? 100 : 200 }}
       >
         <canvas ref={canvasRef} />
         <div
