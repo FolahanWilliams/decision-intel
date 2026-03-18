@@ -16,108 +16,124 @@ export function CognitiveTopography({
     biasWebImageUrl ? 'bias' : 'premortem'
   );
 
-  if (!biasWebImageUrl && !preMortemImageUrl) return null;
+  const hasImages = biasWebImageUrl || preMortemImageUrl;
 
   return (
-    <div className="card overflow-hidden">
+    <div className="card overflow-hidden h-full">
       <div className="card-header flex items-center justify-between border-b border-border/50 bg-secondary/5">
         <div className="flex items-center gap-sm">
           <Brain size={18} className="text-accent-primary" />
           <h3 className="text-sm font-semibold tracking-tight">Cognitive Topographies</h3>
         </div>
-        <div className="flex bg-secondary/20 p-1 rounded-sm">
-          {biasWebImageUrl && (
-            <button
-              onClick={() => setActiveView('bias')}
-              className={`px-3 py-1 text-[10px] uppercase font-bold tracking-wider transition-all ${
-                activeView === 'bias'
-                  ? 'bg-accent-primary text-white shadow-sm'
-                  : 'text-muted hover:text-foreground'
-              }`}
-            >
-              Bias Web
-            </button>
-          )}
-          {preMortemImageUrl && (
-            <button
-              onClick={() => setActiveView('premortem')}
-              className={`px-3 py-1 text-[10px] uppercase font-bold tracking-wider transition-all ${
-                activeView === 'premortem'
-                  ? 'bg-accent-secondary text-white shadow-sm'
-                  : 'text-muted hover:text-foreground'
-              }`}
-            >
-              Pre-Mortem
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="relative aspect-video bg-black/40 flex items-center justify-center group">
-        {activeView === 'bias' && biasWebImageUrl && (
-          <div className="w-full h-full relative animate-fade-in">
-            {/* eslint-disable-next-line @next/next/no-img-element -- external storage URLs; next/image requires allowlisted domains */}
-            <img
-              src={biasWebImageUrl}
-              alt="Decision Bias Web"
-              className="absolute inset-0 w-full h-full object-contain"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-              <p className="text-xs text-white/90 leading-relaxed max-w-lg">
-                <span className="font-bold text-accent-primary">Bias Web:</span> A multi-dimensional
-                mapping of cognitive distortions detected in the decision path. Dimensions represent
-                the 15 core neurocognitive biases.
-              </p>
-            </div>
+        {hasImages && (
+          <div className="flex bg-secondary/20 p-1 rounded-sm">
+            {biasWebImageUrl && (
+              <button
+                onClick={() => setActiveView('bias')}
+                className={`px-3 py-1 text-[10px] uppercase font-bold tracking-wider transition-all ${
+                  activeView === 'bias'
+                    ? 'bg-accent-primary text-white shadow-sm'
+                    : 'text-muted hover:text-foreground'
+                }`}
+              >
+                Bias Web
+              </button>
+            )}
+            {preMortemImageUrl && (
+              <button
+                onClick={() => setActiveView('premortem')}
+                className={`px-3 py-1 text-[10px] uppercase font-bold tracking-wider transition-all ${
+                  activeView === 'premortem'
+                    ? 'bg-accent-secondary text-white shadow-sm'
+                    : 'text-muted hover:text-foreground'
+                }`}
+              >
+                Pre-Mortem
+              </button>
+            )}
           </div>
         )}
+      </div>
 
-        {activeView === 'premortem' && preMortemImageUrl && (
-          <div className="w-full h-full relative animate-fade-in">
-            {/* eslint-disable-next-line @next/next/no-img-element -- external storage URLs; next/image requires allowlisted domains */}
-            <img
-              src={preMortemImageUrl}
-              alt="Pre-Mortem Failure Topography"
-              className="absolute inset-0 w-full h-full object-contain"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-              <p className="text-xs text-white/90 leading-relaxed max-w-lg">
-                <span className="font-bold text-accent-secondary">Pre-Mortem Topography:</span> A
-                simulated landscape of failure modes. Peaks represent high-probability failure
-                points identified through red-team simulation.
-              </p>
+      {hasImages ? (
+        <>
+          <div className="relative aspect-video bg-black/40 flex items-center justify-center group">
+            {activeView === 'bias' && biasWebImageUrl && (
+              <div className="w-full h-full relative animate-fade-in">
+                {/* eslint-disable-next-line @next/next/no-img-element -- external storage URLs; next/image requires allowlisted domains */}
+                <img
+                  src={biasWebImageUrl}
+                  alt="Decision Bias Web"
+                  className="absolute inset-0 w-full h-full object-contain"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                  <p className="text-xs text-white/90 leading-relaxed max-w-lg">
+                    <span className="font-bold text-accent-primary">Bias Web:</span> A
+                    multi-dimensional mapping of cognitive distortions detected in the decision
+                    path. Dimensions represent the 15 core neurocognitive biases.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeView === 'premortem' && preMortemImageUrl && (
+              <div className="w-full h-full relative animate-fade-in">
+                {/* eslint-disable-next-line @next/next/no-img-element -- external storage URLs; next/image requires allowlisted domains */}
+                <img
+                  src={preMortemImageUrl}
+                  alt="Pre-Mortem Failure Topography"
+                  className="absolute inset-0 w-full h-full object-contain"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                  <p className="text-xs text-white/90 leading-relaxed max-w-lg">
+                    <span className="font-bold text-accent-secondary">Pre-Mortem Topography:</span>{' '}
+                    A simulated landscape of failure modes. Peaks represent high-probability failure
+                    points identified through red-team simulation.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button className="p-1.5 bg-black/60 border border-white/10 rounded-sm hover:bg-black/80 text-white transition-colors">
+                <Maximize2 size={14} />
+              </button>
+              <button className="p-1.5 bg-black/60 border border-white/10 rounded-sm hover:bg-black/80 text-white transition-colors">
+                <Info size={14} />
+              </button>
             </div>
           </div>
-        )}
 
-        <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button className="p-1.5 bg-black/60 border border-white/10 rounded-sm hover:bg-black/80 text-white transition-colors">
-            <Maximize2 size={14} />
-          </button>
-          <button className="p-1.5 bg-black/60 border border-white/10 rounded-sm hover:bg-black/80 text-white transition-colors">
-            <Info size={14} />
-          </button>
-        </div>
-      </div>
-
-      <div className="px-4 py-3 bg-secondary/5 border-t border-border/50 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Zap size={12} className="text-warning" />
-          <span className="text-[10px] text-muted font-medium italic">
-            Visualizations generated by Nano Banana 2 Decision Engine
-          </span>
-        </div>
-        <div className="flex gap-4">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-accent-primary" />
-            <span className="text-[10px] text-muted">Density = Severity</span>
+          <div className="px-4 py-3 bg-secondary/5 border-t border-border/50 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap size={12} className="text-warning" />
+              <span className="text-[10px] text-muted font-medium italic">
+                Visualizations generated by Nano Banana 2 Decision Engine
+              </span>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-accent-primary" />
+                <span className="text-[10px] text-muted">Density = Severity</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-accent-secondary" />
+                <span className="text-[10px] text-muted">Distance = Correlation</span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-accent-secondary" />
-            <span className="text-[10px] text-muted">Distance = Correlation</span>
+        </>
+      ) : (
+        <div className="card-body flex flex-col items-center justify-center flex-1 py-12 text-center">
+          <div className="w-16 h-16 rounded-full bg-accent-primary/10 flex items-center justify-center mb-4">
+            <Brain size={28} className="text-accent-primary/60" />
           </div>
+          <p className="text-sm font-medium text-muted mb-1">No topographies generated yet</p>
+          <p className="text-xs text-muted/70 max-w-[200px]">
+            Bias Web and Pre-Mortem visualizations will appear here after document analysis.
+          </p>
         </div>
-      </div>
+      )}
     </div>
   );
 }
