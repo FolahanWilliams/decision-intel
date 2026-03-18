@@ -261,7 +261,7 @@ pre {
 }
 
 .card-header h3 {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
@@ -643,6 +643,14 @@ tr:hover td {
   border-radius: var(--radius-sm);
 }
 
+.skeleton-slow {
+  animation-duration: 2.8s;
+}
+
+.skeleton-fast {
+  animation-duration: 1.4s;
+}
+
 /* Removed — no longer needed */
 .scanner-line { display: none; }
 .pixel-grid { background: none; }
@@ -785,7 +793,7 @@ tr:hover td {
 .stat-card:hover {
   border-color: var(--liquid-border-hover);
   box-shadow: var(--liquid-shadow-hover);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 .stat-card-icon {
@@ -941,6 +949,10 @@ tr:hover td {
 [data-compact="true"] .mb-xl { margin-bottom: var(--spacing-lg); }
 [data-compact="true"] .score-value { font-size: 2.5rem; }
 [data-compact="true"] .upload-zone { padding: var(--spacing-lg); }
+
+@media (max-width: 640px) {
+  .upload-zone { padding: var(--spacing-lg); }
+}
 
 /* ═══════════════════════════════════════════
    Scrollbar (refined)

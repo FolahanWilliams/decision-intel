@@ -86,7 +86,7 @@ export function ChartSkeleton({ height = 240 }: { height?: number }) {
         <SkeletonBlock style={{ width: '120px', height: '13px' }} />
       </div>
       <div className="card-body flex items-center justify-center" style={{ minHeight: height }}>
-        <SkeletonBlock style={{ width: '80%', height: '70%' }} />
+        <SkeletonBlock className="skeleton-slow" style={{ width: '80%', height: '70%' }} />
       </div>
     </div>
   );
@@ -112,7 +112,7 @@ export function TreemapSkeleton() {
         }}
       >
         {[...Array(4)].map((_, i) => (
-          <SkeletonBlock key={i} style={{ width: '100%', height: '100%' }} />
+          <SkeletonBlock key={i} className="skeleton-slow" style={{ width: '100%', height: '100%' }} />
         ))}
       </div>
     </div>

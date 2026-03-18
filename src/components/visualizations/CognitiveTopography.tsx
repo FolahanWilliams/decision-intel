@@ -1,7 +1,7 @@
 'use client';
 
-import { Brain, Zap, Maximize2, Info, Sparkles, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { Brain, Zap, Maximize2, Minimize2, Info, Sparkles, Loader2 } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
 interface CognitiveTopographyProps {
   biasWebImageUrl?: string | null;
@@ -21,6 +21,11 @@ export function CognitiveTopography({
   const [error, setError] = useState<string | null>(null);
   const [localBiasUrl, setLocalBiasUrl] = useState<string | null>(null);
   const [localPreMortemUrl, setLocalPreMortemUrl] = useState<string | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+
+  const toggleFullscreen = useCallback(() => setIsFullscreen(v => !v), []);
+  const toggleInfo = useCallback(() => setShowInfo(v => !v), []);
 
   const effectiveBiasUrl = biasWebImageUrl || localBiasUrl;
   const effectivePreMortemUrl = preMortemImageUrl || localPreMortemUrl;
@@ -142,13 +147,40 @@ export function CognitiveTopography({
             )}
 
             <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button className="p-1.5 bg-black/60 border border-white/10 rounded-sm hover:bg-black/80 text-white transition-colors">
+              <button
+                onClick={toggleFullscreen}
+                title="View fullscreen"
+                className="p-1.5 bg-black/60 border border-white/10 rounded-sm hover:bg-black/80 text-white transition-colors"
+              >
                 <Maximize2 size={14} />
               </button>
-              <button className="p-1.5 bg-black/60 border border-white/10 rounded-sm hover:bg-black/80 text-white transition-colors">
+              <button
+                onClick={toggleInfo}
+                title="Toggle info overlay"
+                className="p-1.5 bg-black/60 border border-white/10 rounded-sm hover:bg-black/80 text-white transition-colors"
+              >
                 <Info size={14} />
               </button>
             </div>
+
+            {showInfo && (
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col justify-center items-center p-6 text-center animate-fade-in z-10">
+                <h4 className="text-sm font-bold text-white mb-2">
+                  {activeView === 'bias' ? 'Bias Web' : 'Pre-Mortem Topography'}
+                </h4>
+                <p className="text-xs text-white/80 max-w-xs leading-relaxed">
+                  {activeView === 'bias'
+                    ? 'A multi-dimensional mapping of cognitive distortions detected in the decision path. Node density represents severity; distance between nodes indicates correlation between bias types.'
+                    : 'A simulated landscape of failure modes. Peaks represent high-probability failure points identified through red-team simulation. Color intensity maps to risk severity.'}
+                </p>
+                <button
+                  onClick={toggleInfo}
+                  className="mt-4 px-3 py-1.5 text-xs bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="px-4 py-3 bg-secondary/5 border-t border-border/50 flex items-center justify-between">
@@ -199,6 +231,42 @@ export function CognitiveTopography({
               </button>
             </>
           )}
+        </div>
+      )}
+
+      {/* Fullscreen modal */}
+      {isFullscreen && hasImages && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center modal-overlay"
+          onClick={toggleFullscreen}
+          role="dialog"
+          aria-label={activeView === 'bias' ? 'Bias Web fullscreen' : 'Pre-Mortem fullscreen'}
+        >
+          <div className="relative w-full h-full flex items-center justify-center p-8" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={toggleFullscreen}
+              className="absolute top-6 right-6 p-2 bg-white/10 border border-white/20 rounded-sm hover:bg-white/20 text-white transition-colors z-10"
+              title="Exit fullscreen"
+            >
+              <Minimize2 size={18} />
+            </button>
+            {activeView === 'bias' && effectiveBiasUrl && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={effectiveBiasUrl}
+                alt="Decision Bias Web — fullscreen"
+                className="max-w-full max-h-full object-contain"
+              />
+            )}
+            {activeView === 'premortem' && effectivePreMortemUrl && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={effectivePreMortemUrl}
+                alt="Pre-Mortem Failure Topography — fullscreen"
+                className="max-w-full max-h-full object-contain"
+              />
+            )}
+          </div>
         </div>
       )}
     </div>

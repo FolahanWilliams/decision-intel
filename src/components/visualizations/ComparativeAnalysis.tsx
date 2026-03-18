@@ -26,57 +26,91 @@ export function ComparativeAnalysis({ documents }: DocumentComparisonProps) {
   ];
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr>
-            <th className="text-left p-4 min-w-[200px] text-muted">Metric</th>
-            {documents.map(doc => (
-              <th key={doc.id} className="text-left p-4 min-w-[150px]">
-                <div className="flex flex-col gap-1">
-                  <span className="font-medium text-foreground">{doc.title}</span>
-                  <span className="text-xs text-muted">{doc.date}</span>
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {metrics.map(metric => (
-            <tr key={metric.key} className="group hover:bg-secondary/20 transition-colors">
-              <td className="p-4 font-medium text-muted-foreground group-hover:text-foreground">
-                {metric.label}
-              </td>
-              {documents.map(doc => {
-                const value = doc.scores[metric.key as keyof typeof doc.scores];
-                const maxVal = Math.max(
-                  ...documents.map(d => d.scores[metric.key as keyof typeof d.scores])
-                );
-                const isHighest = value === maxVal;
+    <>
+      {/* Desktop: table layout */}
+      <div className="overflow-x-auto hidden sm:block">
+        <table className="w-full text-sm">
+          <thead>
+            <tr>
+              <th className="text-left p-4 min-w-[200px] text-muted">Metric</th>
+              {documents.map(doc => (
+                <th key={doc.id} className="text-left p-4 min-w-[150px]">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-medium text-foreground">{doc.title}</span>
+                    <span className="text-xs text-muted">{doc.date}</span>
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {metrics.map(metric => (
+              <tr key={metric.key} className="group hover:bg-secondary/20 transition-colors">
+                <td className="p-4 font-medium text-muted-foreground group-hover:text-foreground">
+                  {metric.label}
+                </td>
+                {documents.map(doc => {
+                  const value = doc.scores[metric.key as keyof typeof doc.scores];
+                  const maxVal = Math.max(
+                    ...documents.map(d => d.scores[metric.key as keyof typeof d.scores])
+                  );
+                  const isHighest = value === maxVal;
 
+                  return (
+                    <td key={doc.id} className="p-4 align-middle">
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={`font-bold ${isHighest ? 'text-accent-primary' : 'text-muted-foreground'}`}
+                        >
+                          {value}
+                        </span>
+                        <div className="flex-1 h-1.5 bg-secondary overflow-hidden w-24">
+                          <div
+                            className={`h-full ${metric.color} opacity-80`}
+                            style={{ width: `${(value / 100) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile: stacked card layout */}
+      <div className="space-y-4 sm:hidden">
+        {documents.map(doc => (
+          <div key={doc.id} className="p-4 bg-secondary/30 border border-border rounded-lg">
+            <div className="mb-3">
+              <p className="font-medium text-sm">{doc.title}</p>
+              <p className="text-xs text-muted">{doc.date}</p>
+            </div>
+            <div className="space-y-2">
+              {metrics.map(metric => {
+                const value = doc.scores[metric.key as keyof typeof doc.scores];
                 return (
-                  <td key={doc.id} className="p-4 align-middle">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`font-bold ${isHighest ? 'text-accent-primary' : 'text-muted-foreground'}`}
-                      >
-                        {value}
-                      </span>
-                      <div className="flex-1 h-1.5 bg-secondary  overflow-hidden w-24">
+                  <div key={metric.key} className="flex items-center justify-between gap-3">
+                    <span className="text-xs text-muted flex-shrink-0">{metric.label}</span>
+                    <div className="flex items-center gap-2 flex-1 justify-end">
+                      <div className="h-1.5 bg-secondary overflow-hidden w-20">
                         <div
-                          className={`h-full  ${metric.color} opacity-80`}
+                          className={`h-full ${metric.color} opacity-80`}
                           style={{ width: `${(value / 100) * 100}%` }}
                         />
                       </div>
+                      <span className="text-xs font-bold w-8 text-right">{value}</span>
                     </div>
-                  </td>
+                  </div>
                 );
               })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 

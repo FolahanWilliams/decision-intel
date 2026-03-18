@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 interface GaugeProps {
   value: number;
@@ -35,7 +35,7 @@ export function QualityGauge({
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="rgba(255,255,255,0.1)"
+            stroke="var(--liquid-border)"
             strokeWidth={strokeWidth}
           />
           {/* Progress circle */}
@@ -159,8 +159,16 @@ interface QualityRadarProps {
 
 export function QualityRadar({ data, size = 200 }: QualityRadarProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const prevDrawRef = useRef<string>('');
+
+  // Stable serialization of data to avoid unnecessary redraws
+  const dataKey = useMemo(() => data.map(d => `${d.label}:${d.value}`).join(','), [data]);
 
   useEffect(() => {
+    const drawKey = `${dataKey}-${size}`;
+    if (prevDrawRef.current === drawKey) return;
+    prevDrawRef.current = drawKey;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -212,10 +220,18 @@ export function QualityRadar({ data, size = 200 }: QualityRadarProps) {
       ctx.fillText(data[i].label, labelX, labelY);
     }
 
-    // Draw data
+    // Draw data — resolve accent color from CSS custom property
+    const computedStyle = getComputedStyle(canvas);
+    const accent = computedStyle.getPropertyValue('--accent-primary').trim() || '99, 102, 241';
+    // accent is a hex like #6366F1; convert to rgba
+    const accentHex = accent.startsWith('#') ? accent : '#6366F1';
+    const r = parseInt(accentHex.slice(1, 3), 16);
+    const g = parseInt(accentHex.slice(3, 5), 16);
+    const b = parseInt(accentHex.slice(5, 7), 16);
+
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(99, 102, 241, 0.3)';
-    ctx.strokeStyle = 'rgba(99, 102, 241, 0.8)';
+    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.3)`;
+    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.8)`;
     ctx.lineWidth = 2;
 
     data.forEach((point, i) => {
@@ -246,5 +262,14 @@ export function QualityRadar({ data, size = 200 }: QualityRadarProps) {
     });
   }, [data, size]);
 
-  return <canvas ref={canvasRef} width={size} height={size} className="mx-auto" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      width={size}
+      height={size}
+      className="mx-auto"
+      role="img"
+      aria-label={`Quality radar chart with ${data.length} metrics: ${data.map(d => `${d.label} ${d.value}`).join(', ')}`}
+    />
+  );
 }

@@ -39,11 +39,11 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
 
   const getCellColor = (impact: number, probability: number) => {
     const riskScore = (impact * probability) / 100;
-    if (riskScore >= 70) return 'bg-error';
-    if (riskScore >= 50) return 'bg-accent-primary';
-    if (riskScore >= 30) return 'bg-warning';
-    if (riskScore >= 15) return 'bg-success';
-    return 'bg-success/70';
+    if (riskScore >= 70) return { bg: 'bg-error', label: 'Critical' };
+    if (riskScore >= 50) return { bg: 'bg-accent-primary', label: 'High' };
+    if (riskScore >= 30) return { bg: 'bg-warning', label: 'Medium' };
+    if (riskScore >= 15) return { bg: 'bg-success', label: 'Low' };
+    return { bg: 'bg-success/70', label: 'Low' };
   };
 
   const getOpacity = (count: number) => {
@@ -85,7 +85,7 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
               gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
               gridTemplateRows: `repeat(${gridSize}, 1fr)`,
               aspectRatio: '1',
-              maxWidth: '320px',
+              maxWidth: '480px',
               width: '100%',
             }}
           >
@@ -100,6 +100,7 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
               const probability = ((col + 1) / gridSize) * 100;
 
               const isSelected = selectedCell?.impact === row && selectedCell?.probability === col;
+              const cellStyle = getCellColor(impact, probability);
 
               return (
                 <div
@@ -108,8 +109,8 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
                   tabIndex={0}
                   aria-label={
                     cell
-                      ? `${cell.count} risks, Impact ${Math.round(impact)}%, Probability ${Math.round(probability)}%`
-                      : 'No risks'
+                      ? `${cellStyle.label} risk zone: ${cell.count} risks, Impact ${Math.round(impact)}%, Probability ${Math.round(probability)}%`
+                      : 'Empty zone'
                   }
                   aria-pressed={isSelected}
                   onClick={() => handleCellClick(row, col)}
@@ -122,8 +123,8 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
                   className={`
                     relative  flex items-center justify-center cursor-pointer
                     transition-all duration-200 border border-transparent
-                    ${cell ? getCellColor(impact, probability) : 'hover:bg-white/5'}
-                    ${isSelected ? 'ring-2 ring-white scale-105 z-10 ' : 'hover:scale-105 hover:z-10'}
+                    ${cell ? cellStyle.bg : 'hover:bg-white/5'}
+                    ${isSelected ? 'ring-2 ring-accent-primary scale-105 z-10 ' : 'hover:scale-105 hover:z-10'}
                   `}
                   style={{
                     opacity: cell ? getOpacity(cell.count) : 0.1,

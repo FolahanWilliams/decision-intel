@@ -12,9 +12,9 @@ interface FactVerificationBarProps {
 }
 
 const COLORS = {
-  verified: '#22c55e',
-  contradicted: '#ef4444',
-  unverifiable: '#6b7280',
+  verified: 'var(--success)',
+  contradicted: 'var(--error)',
+  unverifiable: 'var(--text-muted)',
 };
 
 export function FactVerificationBar({ data, compact }: FactVerificationBarProps) {
@@ -24,7 +24,7 @@ export function FactVerificationBar({ data, compact }: FactVerificationBarProps)
     return (
       <div className="card card-glow h-full">
         <div className="card-header">
-          <h3 style={{ fontSize: '13px' }}>Fact Verification</h3>
+          <h3>Fact Verification</h3>
         </div>
         <div
           className="card-body flex items-center justify-center"
@@ -45,7 +45,7 @@ export function FactVerificationBar({ data, compact }: FactVerificationBarProps)
   return (
     <div className="card h-full">
       <div className="card-header flex items-center justify-between">
-        <h3 style={{ fontSize: '13px' }}>Fact Verification</h3>
+        <h3>Fact Verification</h3>
         <span className="text-xs text-muted">{total} claims</span>
       </div>
       <div className="card-body">
@@ -81,20 +81,16 @@ export function FactVerificationBar({ data, compact }: FactVerificationBarProps)
           </ResponsiveContainer>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+        <div className="flex justify-around">
           {chartData.map(d => (
-            <div key={d.name} style={{ textAlign: 'center' }}>
+            <div key={d.name} className="text-center">
               <div
-                style={{
-                  fontSize: compact ? '14px' : '20px',
-                  fontWeight: 700,
-                  color: d.color,
-                  fontFamily: "'JetBrains Mono', monospace",
-                }}
+                className={`font-bold font-mono ${compact ? 'text-sm' : 'text-xl'}`}
+                style={{ color: d.color }}
               >
                 {Math.round((d.value / total) * 100)}%
               </div>
-              <div style={{ fontSize: compact ? '10px' : '11px', color: 'var(--text-muted)' }}>
+              <div className={`text-muted ${compact ? 'text-[10px]' : 'text-[11px]'}`}>
                 {d.name}
               </div>
             </div>

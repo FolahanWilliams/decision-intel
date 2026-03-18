@@ -34,7 +34,13 @@ export function SentimentGauge({ score, label, compact }: SentimentGaugeProps) {
     return () => observer.disconnect();
   }, [compact]);
 
+  const prevDrawRef = useRef<string>('');
+
   useEffect(() => {
+    const drawKey = `${score}-${canvasSize}`;
+    if (prevDrawRef.current === drawKey) return;
+    prevDrawRef.current = drawKey;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -58,12 +64,18 @@ export function SentimentGauge({ score, label, compact }: SentimentGaugeProps) {
     ctx.clearRect(0, 0, size, size);
 
     // Background arc
+    const computedStyle = getComputedStyle(canvas);
+    const errorColor = computedStyle.getPropertyValue('--error').trim() || '#ef4444';
+    const warningColor = computedStyle.getPropertyValue('--warning').trim() || '#f59e0b';
+    const mutedColor = computedStyle.getPropertyValue('--text-muted').trim() || '#6b7280';
+    const successColor = computedStyle.getPropertyValue('--success').trim() || '#22c55e';
+
     const gradient = ctx.createLinearGradient(cx - radius, cy, cx + radius, cy);
-    gradient.addColorStop(0, '#ef4444');
-    gradient.addColorStop(0.35, '#eab308');
-    gradient.addColorStop(0.5, '#6b7280');
-    gradient.addColorStop(0.65, '#22c55e');
-    gradient.addColorStop(1, '#10b981');
+    gradient.addColorStop(0, errorColor);
+    gradient.addColorStop(0.35, warningColor);
+    gradient.addColorStop(0.5, mutedColor);
+    gradient.addColorStop(0.65, successColor);
+    gradient.addColorStop(1, successColor);
 
     ctx.beginPath();
     ctx.arc(cx, cy, radius, startAngle, endAngle);
@@ -124,7 +136,7 @@ export function SentimentGauge({ score, label, compact }: SentimentGaugeProps) {
   return (
     <div className="card card-glow h-full">
       <div className="card-header">
-        <h3 style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <h3 className="flex items-center gap-1.5">
           Sentiment Pulse
           <InfoTooltip text="Measures the overall emotional tone of the document on a scale from negative (red) to positive (green). A neutral score suggests balanced language." />
         </h3>
@@ -134,7 +146,11 @@ export function SentimentGauge({ score, label, compact }: SentimentGaugeProps) {
         className="card-body flex flex-col items-center justify-center"
         style={{ minHeight: compact ? 100 : 200 }}
       >
-        <canvas ref={canvasRef} />
+        <canvas
+          ref={canvasRef}
+          role="img"
+          aria-label={`Sentiment gauge showing score of ${Math.round(score)} out of 100, labeled ${label}`}
+        />
         <div
           style={{
             marginTop: '-4px',
