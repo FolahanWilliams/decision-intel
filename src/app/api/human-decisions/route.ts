@@ -26,6 +26,7 @@ import {
   CognitiveAuditCompliance,
   CognitiveAuditPreMortem,
   CognitiveAuditLogicalAnalysis,
+  CognitiveAuditSwot,
 } from '@/lib/schemas/human-audit';
 import crypto from 'crypto';
 import type { HumanDecisionInput } from '@/types/human-audit';
@@ -323,6 +324,11 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
         ? auditResult.logicalAnalysis
         : undefined
       : undefined;
+    const validatedSwot = auditResult.swotAnalysis
+      ? CognitiveAuditSwot.safeParse(auditResult.swotAnalysis).success
+        ? auditResult.swotAnalysis
+        : undefined
+      : undefined;
 
     // Persist cognitive audit with schema drift protection
     let schemaDrift = false;
@@ -342,6 +348,7 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
             logicalAnalysis: validatedLogicalAnalysis
               ? toPrismaJson(validatedLogicalAnalysis)
               : undefined,
+            swotAnalysis: validatedSwot ? toPrismaJson(validatedSwot) : undefined,
             teamConsensusFlag: auditResult.teamConsensusFlag,
             dissenterCount: auditResult.dissenterCount,
             summary: auditResult.summary,

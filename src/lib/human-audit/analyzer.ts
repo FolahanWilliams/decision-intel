@@ -25,6 +25,7 @@ import {
   NOISE_JUDGE_PROMPT,
   VERIFICATION_SUPER_PROMPT,
   SIMULATION_SUPER_PROMPT,
+  STRATEGIC_SWOT_PROMPT,
 } from '@/lib/agents/prompts';
 import { searchSimilarDocuments } from '@/lib/rag/embeddings';
 import type { HumanDecisionInput, CognitiveAuditResult } from '@/types/human-audit';
@@ -219,18 +220,21 @@ export async function analyzeHumanDecision(
   const runDecisionTwin = isHighStakes;
 
   // Phase 1: Core analyses (always run in parallel)
-  const [biasResult, noiseResult, sentimentResult, complianceResult] = await Promise.allSettled([
-    detectHumanBiases(content, input),
-    measureDecisionNoise(content),
-    analyzeSentiment(content),
-    runCompliance ? analyzeComplianceAndPreMortem(content, input) : Promise.resolve(null),
-  ]);
+  const [biasResult, noiseResult, sentimentResult, complianceResult, swotResult] =
+    await Promise.allSettled([
+      detectHumanBiases(content, input),
+      measureDecisionNoise(content),
+      analyzeSentiment(content),
+      runCompliance ? analyzeComplianceAndPreMortem(content, input) : Promise.resolve(null),
+      analyzeSwot(content, input),
+    ]);
 
   // Extract results with safe fallbacks
   const biasData = biasResult.status === 'fulfilled' ? biasResult.value : null;
   const noiseData = noiseResult.status === 'fulfilled' ? noiseResult.value : null;
   const sentimentData = sentimentResult.status === 'fulfilled' ? sentimentResult.value : null;
   const complianceData = complianceResult.status === 'fulfilled' ? complianceResult.value : null;
+  const swotData = swotResult.status === 'fulfilled' ? swotResult.value : null;
 
   if (biasResult.status === 'rejected') {
     log.error('Bias detection failed:', biasResult.reason);
@@ -243,6 +247,9 @@ export async function analyzeHumanDecision(
   }
   if (complianceResult.status === 'rejected') {
     log.error('Compliance/pre-mortem analysis failed:', complianceResult.reason);
+  }
+  if (swotResult.status === 'rejected') {
+    log.error('SWOT analysis failed:', swotResult.reason);
   }
 
   // Phase 2: Decision twin simulation (only for high-stakes decisions, runs after phase 1)
@@ -302,6 +309,7 @@ export async function analyzeHumanDecision(
     complianceResult: complianceData?.complianceResult ?? undefined,
     preMortem: complianceData?.preMortem ?? undefined,
     logicalAnalysis: simulationData?.logicalAnalysis ?? undefined,
+    swotAnalysis: swotData ?? undefined,
     sentimentDetail: sentimentData
       ? { score: sentimentData.score, label: sentimentData.label }
       : undefined,
@@ -781,4 +789,60 @@ function buildAuditSummary(
   }
 
   return parts.join(' ');
+}
+
+// ─── SWOT Analysis ──────────────────────────────────────────────────────────
+
+import type { SwotAnalysisResult } from '@/types';
+
+async function analyzeSwot(
+  content: string,
+  input: HumanDecisionInput
+): Promise<SwotAnalysisResult | null> {
+  const model = getModel();
+
+  const prompt = `${STRATEGIC_SWOT_PROMPT}
+
+CONTEXT: This is a HUMAN DECISION from ${input.source}${input.channel ? ` (${input.channel})` : ''}.
+Decision type: ${input.decisionType || 'general'}.
+
+Focus the SWOT on the decision itself:
+- Strengths: What about this decision process is sound?
+- Weaknesses: What about the decision-making process is flawed?
+- Opportunities: What external factors could this decision capitalize on?
+- Threats: What external factors could undermine this decision?
+
+<decision_text>
+${content}
+</decision_text>`;
+
+  const result = await withRetry(
+    async () => {
+      const response = await model.generateContent(prompt);
+      return response.response.text();
+    },
+    2,
+    1000
+  );
+
+  const parsed = parseJSON(result) as {
+    strengths?: string[];
+    weaknesses?: string[];
+    opportunities?: string[];
+    threats?: string[];
+    strategicAdvice?: string;
+  } | null;
+
+  if (!parsed) {
+    log.warn('Failed to parse SWOT analysis result');
+    return null;
+  }
+
+  return {
+    strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
+    weaknesses: Array.isArray(parsed.weaknesses) ? parsed.weaknesses : [],
+    opportunities: Array.isArray(parsed.opportunities) ? parsed.opportunities : [],
+    threats: Array.isArray(parsed.threats) ? parsed.threats : [],
+    strategicAdvice: parsed.strategicAdvice || 'No strategic advice available.',
+  };
 }

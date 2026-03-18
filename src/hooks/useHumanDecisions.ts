@@ -38,6 +38,7 @@ export interface HumanDecisionSummary {
     complianceResult?: unknown;
     preMortem?: unknown;
     logicalAnalysis?: unknown;
+    swotAnalysis?: unknown;
     sentimentDetail?: unknown;
     teamConsensusFlag: boolean;
     dissenterCount: number;
