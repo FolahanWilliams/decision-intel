@@ -26,6 +26,7 @@ export interface HumanDecisionSummary {
   decisionType: string | null;
   status: string;
   participants: string[];
+  content?: string;
   createdAt: string;
   cognitiveAudit: {
     id: string;

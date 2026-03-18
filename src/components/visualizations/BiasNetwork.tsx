@@ -107,12 +107,12 @@ function runForceSimulation(
   connections: BiasConnection[],
   width: number,
   height: number,
-  iterations: number = 80
+  iterations: number = 120
 ): BiasNode[] {
   const simNodes = nodes.map(n => ({
     ...n,
-    x: width / 2 + (Math.random() - 0.5) * width * 0.6,
-    y: height / 2 + (Math.random() - 0.5) * height * 0.6,
+    x: width / 2 + (Math.random() - 0.5) * width * 0.7,
+    y: height / 2 + (Math.random() - 0.5) * height * 0.7,
     vx: 0,
     vy: 0,
   }));
@@ -122,9 +122,9 @@ function runForceSimulation(
 
   for (let iter = 0; iter < iterations; iter++) {
     const alpha = 1 - iter / iterations;
-    const repulsion = 3000 * alpha;
-    const attraction = 0.02 * alpha;
-    const centerGravity = 0.01;
+    const repulsion = 5000 * alpha;
+    const attraction = 0.015 * alpha;
+    const centerGravity = 0.008;
 
     // Repulsion between all nodes
     for (let i = 0; i < simNodes.length; i++) {
@@ -283,8 +283,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
     return biases.filter(b => b.severity === severityFilter);
   }, [biases, severityFilter]);
 
-  const svgWidth = compact ? 360 : 500;
-  const svgHeight = compact ? 360 : 500;
+  const svgWidth = compact ? 440 : 600;
+  const svgHeight = compact ? 440 : 600;
 
   const { nodes, connections } = useMemo(() => {
     if (!filteredBiases || filteredBiases.length === 0) {
@@ -307,6 +307,9 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
     });
 
     const connectionList: BiasConnection[] = [];
+    const connectedNodes = new Set<string>();
+
+    // Phase 1: Known relationships from the hardcoded map
     nodeList.forEach(node => {
       const related = biasRelationships[node.id] || [];
       related.forEach((relatedBias, idx) => {
@@ -323,6 +326,35 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             from: node.id,
             to: targetNode.id,
             strength: 0.9 - idx * 0.15,
+          });
+          connectedNodes.add(node.id);
+          connectedNodes.add(targetNode.id);
+        }
+      });
+    });
+
+    // Phase 2: Connect orphan nodes (not in biasRelationships map) to
+    // their nearest neighbours so every node has at least one edge.
+    const orphans = nodeList.filter(n => !connectedNodes.has(n.id));
+    orphans.forEach(orphan => {
+      // Connect to closest severity peer first, then any node
+      const peers = nodeList.filter(n => n.id !== orphan.id);
+      const sameSeverity = peers.filter(n => n.severity === orphan.severity);
+      const targets = sameSeverity.length > 0 ? sameSeverity : peers;
+
+      // Connect to up to 2 other nodes
+      targets.slice(0, 2).forEach((target, idx) => {
+        if (
+          !connectionList.find(
+            c =>
+              (c.from === orphan.id && c.to === target.id) ||
+              (c.from === target.id && c.to === orphan.id)
+          )
+        ) {
+          connectionList.push({
+            from: orphan.id,
+            to: target.id,
+            strength: 0.5 - idx * 0.1,
           });
         }
       });
@@ -477,9 +509,11 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
           <svg
             ref={svgRef}
             viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+            preserveAspectRatio="xMidYMid meet"
             style={{
               width: '100%',
-              maxHeight: compact ? '380px' : '460px',
+              aspectRatio: `${svgWidth} / ${svgHeight}`,
+              maxHeight: compact ? '420px' : '520px',
               background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.03) 0%, transparent 70%)',
               borderRadius: '8px',
             }}
@@ -530,9 +564,9 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   y1={fromNode.y}
                   x2={toNode.x}
                   y2={toNode.y}
-                  stroke={isHighlighted ? SEVERITY_COLORS[fromNode.severity] : 'rgba(255,255,255,0.12)'}
-                  strokeOpacity={isDimmed ? 0.05 : isHighlighted ? 0.7 : 0.2}
-                  strokeWidth={isHighlighted ? Math.max(conn.strength * 5, 2) : 1}
+                  stroke={isHighlighted ? SEVERITY_COLORS[fromNode.severity] : 'rgba(148,163,184,0.6)'}
+                  strokeOpacity={isDimmed ? 0.08 : isHighlighted ? 0.85 : 0.45}
+                  strokeWidth={isHighlighted ? Math.max(conn.strength * 5, 2.5) : 1.5}
                   strokeLinecap="round"
                   style={{ transition: 'all 0.3s ease' }}
                 />
