@@ -107,73 +107,83 @@ function runForceSimulation(
   connections: BiasConnection[],
   width: number,
   height: number,
-  iterations: number = 120
+  iterations: number = 150
 ): BiasNode[] {
-  const simNodes = nodes.map(n => ({
-    ...n,
-    x: width / 2 + (Math.random() - 0.5) * width * 0.7,
-    y: height / 2 + (Math.random() - 0.5) * height * 0.7,
-    vx: 0,
-    vy: 0,
-  }));
-
   const centerX = width / 2;
   const centerY = height / 2;
 
-  for (let iter = 0; iter < iterations; iter++) {
-    const alpha = 1 - iter / iterations;
-    const repulsion = 5000 * alpha;
-    const attraction = 0.015 * alpha;
-    const centerGravity = 0.008;
+  // Spread nodes in a circle initially so they start well-separated
+  const initRadius = Math.min(width, height) * 0.35;
+  const simNodes = nodes.map((n, i) => {
+    const angle = (2 * Math.PI * i) / nodes.length - Math.PI / 2;
+    return {
+      ...n,
+      x: centerX + Math.cos(angle) * initRadius,
+      y: centerY + Math.sin(angle) * initRadius,
+      vx: 0,
+      vy: 0,
+    };
+  });
 
-    // Repulsion between all nodes
+  // Ideal link distance — nodes should settle roughly this far apart
+  const idealDist = Math.min(width, height) / (Math.sqrt(nodes.length) + 1);
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const alpha = Math.max(0.01, 1 - iter / iterations);
+
+    // Repulsion between all node pairs (Coulomb-like, with minimum distance floor)
     for (let i = 0; i < simNodes.length; i++) {
       for (let j = i + 1; j < simNodes.length; j++) {
         const dx = simNodes[j].x - simNodes[i].x;
         const dy = simNodes[j].y - simNodes[i].y;
-        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const force = repulsion / (dist * dist);
-        const fx = (dx / dist) * force;
-        const fy = (dy / dist) * force;
-        simNodes[i].vx -= fx;
-        simNodes[i].vy -= fy;
-        simNodes[j].vx += fx;
-        simNodes[j].vy += fy;
+        const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 1);
+        // Strong repulsion that keeps nodes at least idealDist apart
+        const repulsionStrength = 8000 * alpha;
+        const force = repulsionStrength / (dist * dist);
+        const nx = dx / dist;
+        const ny = dy / dist;
+        simNodes[i].vx -= nx * force;
+        simNodes[i].vy -= ny * force;
+        simNodes[j].vx += nx * force;
+        simNodes[j].vy += ny * force;
       }
     }
 
-    // Attraction along connections
+    // Spring attraction along connections — pulls toward idealDist, not toward zero
     for (const conn of connections) {
       const source = simNodes.find(n => n.id === conn.from);
       const target = simNodes.find(n => n.id === conn.to);
       if (!source || !target) continue;
       const dx = target.x - source.x;
       const dy = target.y - source.y;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const force = attraction * dist * conn.strength;
-      const fx = (dx / dist) * force;
-      const fy = (dy / dist) * force;
-      source.vx += fx;
-      source.vy += fy;
-      target.vx -= fx;
-      target.vy -= fy;
+      const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 1);
+      // Spring force: positive = attract, negative = repel
+      const displacement = dist - idealDist * 0.8;
+      const springK = 0.04 * alpha * conn.strength;
+      const force = springK * displacement;
+      const nx = dx / dist;
+      const ny = dy / dist;
+      source.vx += nx * force;
+      source.vy += ny * force;
+      target.vx -= nx * force;
+      target.vy -= ny * force;
     }
 
-    // Center gravity
+    // Gentle center gravity to keep the graph centered
     for (const node of simNodes) {
-      node.vx += (centerX - node.x) * centerGravity;
-      node.vy += (centerY - node.y) * centerGravity;
+      node.vx += (centerX - node.x) * 0.005 * alpha;
+      node.vy += (centerY - node.y) * 0.005 * alpha;
     }
 
     // Apply velocities with damping
-    const damping = 0.85;
+    const damping = 0.8;
     for (const node of simNodes) {
       node.vx *= damping;
       node.vy *= damping;
       node.x += node.vx;
       node.y += node.vy;
-      // Keep within bounds
-      const pad = node.radius + 30;
+      // Keep within bounds with generous padding
+      const pad = node.radius + 40;
       node.x = Math.max(pad, Math.min(width - pad, node.x));
       node.y = Math.max(pad, Math.min(height - pad, node.y));
     }
