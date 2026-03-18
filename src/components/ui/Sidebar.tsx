@@ -11,7 +11,6 @@ import {
   X,
   ClipboardList,
   Search,
-  Globe,
   ChevronLeft,
   LogOut as LogOutIcon,
   MessageSquare,
@@ -20,12 +19,10 @@ import {
   Bell,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
-import { useIntelligenceStatus } from '@/hooks/useIntelligence';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const { status: intelStatus } = useIntelligenceStatus();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
@@ -288,27 +285,6 @@ export default function Sidebar() {
             active={pathname === '/dashboard/insights'}
             collapsed={collapsed}
             onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/intelligence"
-            icon={<Globe size={18} />}
-            label="Intelligence"
-            description="External news and market signals"
-            active={pathname === '/dashboard/intelligence'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-            badge={
-              intelStatus
-                ? {
-                    color:
-                      intelStatus.freshness === 'fresh'
-                        ? 'var(--success)'
-                        : intelStatus.freshness === 'stale'
-                          ? 'var(--warning)'
-                          : 'var(--error)',
-                  }
-                : undefined
-            }
           />
           <NavItem
             href="/dashboard/search"

@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   BarChart3,
   ShieldAlert,
-  Globe,
   MessageSquare,
   GitCompareArrows,
   Settings,
@@ -96,14 +95,6 @@ export function CommandPalette() {
         icon: <ShieldAlert size={16} />,
         action: () => navigate('/dashboard/risk-audits'),
         keywords: ['compliance', 'audit'],
-      },
-      {
-        id: 'intelligence',
-        label: 'Intelligence',
-        description: 'External news and market signals',
-        icon: <Globe size={16} />,
-        action: () => navigate('/dashboard/intelligence'),
-        keywords: ['news', 'market', 'external'],
       },
       {
         id: 'search',
