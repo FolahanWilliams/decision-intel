@@ -104,7 +104,7 @@ export async function POST() {
       return NextResponse.json(
         {
           error:
-            'Failed to generate visualizations. Ensure GOOGLE_API_KEY is configured and has Imagen 3 access.',
+            'Failed to generate visualizations. Ensure GOOGLE_API_KEY is configured.',
         },
         { status: 502 }
       );
