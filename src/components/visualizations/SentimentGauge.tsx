@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { InfoTooltip } from '@/components/ui/InfoTooltip';
 
 interface SentimentGaugeProps {
@@ -18,18 +18,17 @@ export function SentimentGauge({ score, label, compact }: SentimentGaugeProps) {
   // Treat 0-100 where 50 = neutral
   const normalizedAngle = Math.max(0, Math.min(100, score));
 
-  const updateSize = useCallback(() => {
-    if (containerRef.current) {
-      const width = containerRef.current.clientWidth;
-      setCanvasSize(compact ? Math.min(160, Math.max(100, width - 40)) : Math.min(240, Math.max(140, width - 40)));
-    }
-  }, [compact]);
-
   useEffect(() => {
-    updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
-  }, [updateSize]);
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0;
+      setCanvasSize(compact ? Math.min(160, Math.max(100, width - 40)) : Math.min(240, Math.max(140, width - 40)));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [compact]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
