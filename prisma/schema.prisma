@@ -227,6 +227,37 @@ model IntelligenceSync {
   @@index([createdAt])
 }
 
+// ─── Multi-Tenant Slack Integration ──────────────────────────────────────
+
+model SlackInstallation {
+  id             String   @id @default(cuid())
+  teamId         String   @unique // Slack workspace ID (T-prefixed)
+  teamName       String            // Human-readable workspace name
+  orgId          String?           // Your internal organization ID (links to HumanDecision.orgId)
+  installedByUserId String         // Supabase Auth User ID who authorized the app
+
+  // OAuth credentials (encrypted at rest via application-layer AES-256-GCM)
+  botTokenEncrypted  String  @db.Text  // Encrypted bot access token
+  botTokenIv         String            // IV for AES-GCM decryption
+  botTokenTag        String            // Auth tag for AES-GCM verification
+  botUserId          String?           // Bot user ID in the workspace
+
+  // Scopes granted during OAuth
+  scopes             String[]          // e.g. ["channels:history", "chat:write", "channels:read"]
+
+  // Status
+  status             String  @default("active") // "active" | "revoked" | "expired"
+  revokedAt          DateTime?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([teamId])
+  @@index([orgId])
+  @@index([installedByUserId])
+  @@index([status])
+}
+
 // ─── Human Cognitive Auditing (Product B) ─────────────────────────────────
 
 model HumanDecision {

@@ -15,6 +15,8 @@
 
 import crypto from 'crypto';
 import { createLogger } from '@/lib/utils/logger';
+import { decryptToken } from '@/lib/utils/encryption';
+import { prisma } from '@/lib/prisma';
 import type {
   SlackWebhookPayload,
   SlackNudgePayload,
@@ -171,13 +173,45 @@ export function formatNudgeForSlack(nudge: NudgeDefinition, threadTs?: string): 
 }
 
 /**
- * Send a nudge to Slack via the Web API.
- * Uses the bot token stored in environment variables.
+ * Resolve a bot token for a given Slack workspace.
+ *
+ * Multi-tenant: looks up the encrypted token from SlackInstallation.
+ * Legacy fallback: uses SLACK_BOT_TOKEN env var (single-tenant mode).
  */
-export async function deliverSlackNudge(payload: SlackNudgePayload): Promise<boolean> {
-  const token = process.env.SLACK_BOT_TOKEN;
+async function resolveToken(teamId?: string): Promise<string | null> {
+  // Multi-tenant: look up per-workspace token
+  if (teamId) {
+    try {
+      const installation = await prisma.slackInstallation.findUnique({
+        where: { teamId, status: 'active' },
+        select: { botTokenEncrypted: true, botTokenIv: true, botTokenTag: true },
+      });
+
+      if (installation && installation.botTokenEncrypted) {
+        return decryptToken(installation);
+      }
+    } catch (error) {
+      log.error(`Failed to resolve token for team ${teamId}:`, error);
+    }
+  }
+
+  // Legacy fallback: single env var
+  return process.env.SLACK_BOT_TOKEN || null;
+}
+
+/**
+ * Send a nudge to Slack via the Web API.
+ *
+ * Multi-tenant: resolves the bot token per workspace from the DB.
+ * Falls back to SLACK_BOT_TOKEN env var for legacy single-tenant setups.
+ */
+export async function deliverSlackNudge(
+  payload: SlackNudgePayload,
+  teamId?: string
+): Promise<boolean> {
+  const token = await resolveToken(teamId);
   if (!token) {
-    log.warn('SLACK_BOT_TOKEN not configured, skipping Slack nudge delivery');
+    log.warn('No Slack bot token available, skipping nudge delivery');
     return false;
   }
 

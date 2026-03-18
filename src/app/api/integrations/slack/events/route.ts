@@ -20,6 +20,7 @@ import { prisma } from '@/lib/prisma';
 import { toPrismaStringArray, toPrismaJson } from '@/lib/utils/prisma-json';
 import { analyzeHumanDecision } from '@/lib/human-audit/analyzer';
 import { generateNudges } from '@/lib/nudges/engine';
+import { deliverSlackNudge, formatNudgeForSlack } from '@/lib/integrations/slack/handler';
 import {
   BiasFindings,
   CognitiveAuditNoiseStats,
@@ -65,6 +66,23 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true });
       }
 
+      // Look up workspace installation for multi-tenant support
+      const teamId = payload.team_id;
+      let installation: { installedByUserId: string; orgId: string | null } | null = null;
+
+      if (teamId) {
+        installation = await prisma.slackInstallation.findUnique({
+          where: { teamId, status: 'active' },
+          select: { installedByUserId: true, orgId: true },
+        });
+      }
+
+      if (!installation && !process.env.SLACK_BOT_TOKEN) {
+        // No installation record and no legacy env var — reject
+        log.warn(`No active Slack installation for team ${teamId}`);
+        return NextResponse.json({ ok: true });
+      }
+
       // Deduplicate
       const contentHash = crypto.createHash('sha256').update(decisionInput.content).digest('hex');
 
@@ -77,13 +95,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true, deduplicated: true });
       }
 
-      // Create decision record (use a system user ID for Slack-ingested decisions)
-      const systemUserId = process.env.SLACK_SYSTEM_USER_ID || 'system-slack';
+      // Use installation context or fall back to legacy env vars
+      const userId = installation?.installedByUserId
+        || process.env.SLACK_SYSTEM_USER_ID
+        || 'system-slack';
+      const orgId = installation?.orgId || teamId;
 
       const humanDecision = await prisma.humanDecision.create({
         data: {
-          userId: systemUserId,
-          orgId: payload.team_id,
+          userId,
+          orgId,
           source: 'slack',
           sourceRef: decisionInput.sourceRef,
           channel: decisionInput.channel,
@@ -96,7 +117,7 @@ export async function POST(req: NextRequest) {
       });
 
       // Run audit in background (don't block Slack's 3-second timeout)
-      processSlackDecision(humanDecision.id, decisionInput).catch(err => {
+      processSlackDecision(humanDecision.id, decisionInput, teamId).catch(err => {
         log.error(`Background Slack audit failed for ${humanDecision.id}:`, err);
       });
 
@@ -113,7 +134,8 @@ export async function POST(req: NextRequest) {
 
 async function processSlackDecision(
   decisionId: string,
-  input: Parameters<typeof analyzeHumanDecision>[0]
+  input: Parameters<typeof analyzeHumanDecision>[0],
+  teamId?: string
 ) {
   try {
     const auditResult = await analyzeHumanDecision(input, { decisionId });
@@ -175,10 +197,12 @@ async function processSlackDecision(
       return;
     }
 
-    // Generate and persist nudges
+    // Generate and persist nudges, deliver critical ones back to Slack
     const nudges = generateNudges({ decision: input, auditResult });
+    const sourceRef = input.sourceRef; // e.g. "C12345:1234567890.123456"
+
     for (const nudge of nudges) {
-      await prisma.nudge
+      const nudgeRecord = await prisma.nudge
         .create({
           data: {
             humanDecisionId: decisionId,
@@ -189,7 +213,26 @@ async function processSlackDecision(
             channel: 'slack',
           },
         })
-        .catch(err => log.error('Nudge persist failed:', err));
+        .catch(err => {
+          log.error('Nudge persist failed:', err);
+          return null;
+        });
+
+      // Deliver critical/warning nudges back to the Slack thread
+      if (nudgeRecord && (nudge.severity === 'critical' || nudge.severity === 'warning') && sourceRef) {
+        const [channel, threadTs] = sourceRef.split(':');
+        if (channel) {
+          const slackPayload = formatNudgeForSlack(nudge, threadTs);
+          slackPayload.channel = channel;
+          const delivered = await deliverSlackNudge(slackPayload, teamId);
+          if (delivered) {
+            await prisma.nudge.update({
+              where: { id: nudgeRecord.id },
+              data: { deliveredAt: new Date() },
+            }).catch(() => {});
+          }
+        }
+      }
     }
 
     log.info(`Slack decision ${decisionId} audited: score=${auditResult.decisionQualityScore}`);
