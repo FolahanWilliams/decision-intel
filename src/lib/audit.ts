@@ -19,7 +19,8 @@ export type AuditAction =
   | 'VIEW_COGNITIVE_AUDIT'
   | 'ACKNOWLEDGE_NUDGE'
   | 'SLACK_DECISION_INGESTED'
-  | 'MEETING_TRANSCRIPT_ANALYZED';
+  | 'MEETING_TRANSCRIPT_ANALYZED'
+  | 'SIMULATE_COGNITIVE_AUDIT';
 
 export interface AuditLogParams {
   action: AuditAction;
