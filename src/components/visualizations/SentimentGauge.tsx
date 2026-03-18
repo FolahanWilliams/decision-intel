@@ -22,9 +22,13 @@ export function SentimentGauge({ score, label, compact }: SentimentGaugeProps) {
     const el = containerRef.current;
     if (!el) return;
 
-    const observer = new ResizeObserver((entries) => {
+    const observer = new ResizeObserver(entries => {
       const width = entries[0]?.contentRect.width ?? 0;
-      setCanvasSize(compact ? Math.min(160, Math.max(100, width - 40)) : Math.min(240, Math.max(140, width - 40)));
+      setCanvasSize(
+        compact
+          ? Math.min(160, Math.max(100, width - 40))
+          : Math.min(240, Math.max(140, width - 40))
+      );
     });
     observer.observe(el);
     return () => observer.disconnect();

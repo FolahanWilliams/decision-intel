@@ -26,7 +26,10 @@ export function FactVerificationBar({ data, compact }: FactVerificationBarProps)
         <div className="card-header">
           <h3 style={{ fontSize: '13px' }}>Fact Verification</h3>
         </div>
-        <div className="card-body flex items-center justify-center" style={{ height: compact ? 80 : 200 }}>
+        <div
+          className="card-body flex items-center justify-center"
+          style={{ height: compact ? 80 : 200 }}
+        >
           <p className="text-muted text-sm">No fact-check data available</p>
         </div>
       </div>
@@ -91,7 +94,9 @@ export function FactVerificationBar({ data, compact }: FactVerificationBarProps)
               >
                 {Math.round((d.value / total) * 100)}%
               </div>
-              <div style={{ fontSize: compact ? '10px' : '11px', color: 'var(--text-muted)' }}>{d.name}</div>
+              <div style={{ fontSize: compact ? '10px' : '11px', color: 'var(--text-muted)' }}>
+                {d.name}
+              </div>
             </div>
           ))}
         </div>

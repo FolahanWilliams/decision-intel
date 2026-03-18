@@ -651,12 +651,19 @@ export default function InsightsPage() {
             <SwotQuadrant data={insights.swot} />
           </ErrorBoundary>
         </div>
-        <div className="animate-slide-up card-glow flex flex-col gap-md" style={{ animationDelay: '0.48s' }}>
+        <div
+          className="animate-slide-up card-glow flex flex-col gap-md"
+          style={{ animationDelay: '0.48s' }}
+        >
           <ErrorBoundary sectionName="Fact Verification">
             <FactVerificationBar data={insights.factVerification} compact />
           </ErrorBoundary>
           <ErrorBoundary sectionName="Sentiment Gauge">
-            <SentimentGauge score={insights.sentiment.score} label={insights.sentiment.label} compact />
+            <SentimentGauge
+              score={insights.sentiment.score}
+              label={insights.sentiment.label}
+              compact
+            />
           </ErrorBoundary>
         </div>
         <div className="animate-slide-up card-glow" style={{ animationDelay: '0.54s' }}>
