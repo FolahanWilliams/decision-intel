@@ -22,6 +22,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/ui/ToastContext';
 import { createClientLogger } from '@/lib/utils/logger';
 import type { SlackInstallationStatus } from '@/types/human-audit';
+import { PersonaManager } from './PersonaManager';
 
 const log = createClientLogger('Settings');
 
@@ -469,6 +470,9 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           </p>
         </div>
       </div>
+
+      {/* Boardroom Personas */}
+      <PersonaManager />
 
       {/* Save Button */}
       <div className="flex items-center justify-end gap-md">

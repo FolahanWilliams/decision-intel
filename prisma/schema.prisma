@@ -379,6 +379,63 @@ model TeamCognitiveProfile {
   @@index([periodStart])
 }
 
+// ─── Decision Outcomes Tracker (Feedback Loop) ──────────────────────────────
+
+model DecisionOutcome {
+  id           String   @id @default(cuid())
+  analysisId   String   @unique  // Links to Analysis record
+  userId       String             // Who reported the outcome
+  orgId        String?
+
+  // Outcome data
+  outcome      String   // "success" | "partial_success" | "failure" | "too_early"
+  timeframe    String?  // "30_days" | "60_days" | "90_days" | "6_months" | "1_year"
+  impactScore  Int?     // 0-100 actual impact rating
+  notes        String?  @db.Text  // Free-text explanation of what happened
+  lessonsLearned String? @db.Text // Key takeaways
+
+  // Which biases were actually problematic vs false positives
+  confirmedBiases   String[] // Bias types that proved real
+  falsPositiveBiases String[] // Bias types that were incorrect
+
+  // Which Decision Twin was most accurate
+  mostAccurateTwin  String?  // Name of the persona whose prediction was closest
+
+  reportedAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([analysisId])
+  @@index([userId])
+  @@index([orgId])
+  @@index([outcome])
+  @@index([reportedAt])
+}
+
+// ─── Custom Boardroom Personas ──────────────────────────────────────────────
+
+model BoardroomPersona {
+  id          String   @id @default(cuid())
+  orgId       String?  // Null = system default; set = org-specific custom persona
+  userId      String   // Creator
+
+  name        String            // e.g. "Chief Medical Officer"
+  role        String            // e.g. "CMO Proxy"
+  focus       String   @db.Text // e.g. "Patient safety, clinical evidence, treatment outcomes"
+  values      String   @db.Text // e.g. "Evidence-based medicine, do no harm, cost-effectiveness"
+  bias        String   @db.Text // e.g. "Skeptical of treatments without randomized controlled trials"
+  riskTolerance String @default("moderate") // "conservative" | "moderate" | "aggressive"
+
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0) // Display order
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([userId])
+  @@index([isActive])
+}
+
 // Rate limiting table - replaces Redis for cost savings
 model RateLimit {
   id        String   @id @default(cuid())

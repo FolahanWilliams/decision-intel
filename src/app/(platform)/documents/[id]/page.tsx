@@ -30,6 +30,7 @@ import { formatDate } from '@/lib/constants/human-audit';
 
 const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
+import { OutcomeReporter } from './OutcomeReporter';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -597,6 +598,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               </div>
             </div>
           </ErrorBoundary>
+        </div>
+      )}
+
+      {/* Decision Outcome Tracker */}
+      {analysis && (
+        <div className="mb-lg">
+          <OutcomeReporter
+            analysisId={analysis.id}
+            analysisDate={analysis.createdAt}
+            biases={biases}
+            twins={analysis.simulation?.twins}
+          />
         </div>
       )}
 

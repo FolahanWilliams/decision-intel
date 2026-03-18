@@ -9,7 +9,8 @@ import {
   type Tool,
 } from '@google/generative-ai';
 import { BIAS_DETECTIVE_PROMPT, NOISE_JUDGE_PROMPT, STRUCTURER_PROMPT } from './prompts';
-import { searchSimilarDocuments } from '../rag/embeddings';
+import { searchSimilarDocuments, searchSimilarWithOutcomes } from '../rag/embeddings';
+import { prisma } from '../prisma';
 import { executeDataRequests, DataRequest } from '../tools/financial';
 import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
 import { withRetry, smartTruncate, batchProcess } from '../utils/resilience';
@@ -966,12 +967,57 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
   try {
     log.info('Running boardroom simulation with institutional memory...');
 
-    // Step 1: RAG vector search for similar past documents
     const userId = state.userId || 'system';
-    let similarDocs: unknown[] = [];
+
+    // Step 1: Fetch custom org personas (if user has configured them)
+    let customPersonas: Array<{
+      name: string;
+      role: string;
+      focus: string;
+      values: string;
+      bias: string;
+      riskTolerance: string;
+    }> = [];
+
     try {
-      similarDocs = await searchSimilarDocuments(content, userId, 3);
-      log.info(`Found ${similarDocs.length} similar past cases for context.`);
+      const dbPersonas = await prisma.boardroomPersona.findMany({
+        where: {
+          OR: [{ userId }, { orgId: userId }],
+          isActive: true,
+        },
+        orderBy: { sortOrder: 'asc' },
+        take: 5,
+        select: { name: true, role: true, focus: true, values: true, bias: true, riskTolerance: true },
+      });
+
+      if (dbPersonas.length > 0) {
+        customPersonas = dbPersonas;
+        log.info(`Using ${customPersonas.length} custom boardroom personas for simulation`);
+      } else {
+        log.info('No custom personas found — AI will generate document-specific personas');
+      }
+    } catch (personaError) {
+      // Schema drift — BoardroomPersona table may not exist yet
+      log.warn('Custom persona lookup failed (schema drift) — AI will generate personas');
+    }
+
+    // Step 2: RAG vector search WITH outcome data (self-improving loop)
+    let similarDocs: unknown[] = [];
+    let hasOutcomeData = false;
+
+    try {
+      const docsWithOutcomes = await searchSimilarWithOutcomes(content, userId, 3);
+      similarDocs = docsWithOutcomes;
+      hasOutcomeData = docsWithOutcomes.some(d => d.outcome != null);
+
+      if (hasOutcomeData) {
+        const outcomeCount = docsWithOutcomes.filter(d => d.outcome).length;
+        log.info(
+          `Found ${docsWithOutcomes.length} similar cases, ${outcomeCount} with verified outcomes (feedback loop active)`
+        );
+      } else {
+        log.info(`Found ${docsWithOutcomes.length} similar past cases (no outcome data yet)`);
+      }
     } catch (ragError) {
       log.warn(
         'RAG search failed, proceeding without institutional memory:',
@@ -979,8 +1025,13 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
       );
     }
 
-    // Step 2: Combined simulation + memory prompt
-    const { SIMULATION_SUPER_PROMPT } = await import('./prompts');
+    // Step 3: Build dynamic prompt with custom personas + outcome awareness
+    const { buildSimulationPrompt } = await import('./prompts');
+
+    const dynamicPrompt = buildSimulationPrompt({
+      customPersonas: customPersonas.length > 0 ? customPersonas : undefined,
+      hasOutcomeData,
+    });
 
     // Build intelligence brief for decision twins
     const intelBrief = state.intelligenceContext
@@ -993,7 +1044,7 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
 
     const result = await withTimeout(
       getStandardSafetyGroundedModel().generateContent([
-        SIMULATION_SUPER_PROMPT,
+        dynamicPrompt,
         `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
         `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}`,
       ]),
@@ -1004,7 +1055,7 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
     const data = parseJSON(text);
 
     log.info(
-      `Simulation complete. Verdict: ${data?.simulation?.overallVerdict || 'N/A'}, Memory recall: ${data?.institutionalMemory?.recallScore ?? 'N/A'}`
+      `Simulation complete. Verdict: ${data?.simulation?.overallVerdict || 'N/A'}, Memory recall: ${data?.institutionalMemory?.recallScore ?? 'N/A'}, Outcome-informed: ${hasOutcomeData}`
     );
 
     return {
