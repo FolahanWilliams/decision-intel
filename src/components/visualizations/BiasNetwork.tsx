@@ -1037,8 +1037,3 @@ function ClusterView({
   );
 }
 
-// ─── Legacy export for backward compatibility ───────────────────────────────
-
-export function BiasClusterChart({ biases }: BiasNetworkProps) {
-  return <ClusterView biases={biases} severityCounts={{}} />;
-}

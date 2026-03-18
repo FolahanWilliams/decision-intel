@@ -27,7 +27,6 @@ import {
   SIMULATION_SUPER_PROMPT,
 } from '@/lib/agents/prompts';
 import { searchSimilarDocuments } from '@/lib/rag/embeddings';
-import { generateBiasWeb, generatePreMortemTopography } from '@/lib/agents/visualization';
 import type { HumanDecisionInput, CognitiveAuditResult } from '@/types/human-audit';
 import type { BiasDetectionResult, ComplianceResult, LogicalAnalysisResult } from '@/types';
 import { normalizeBiasType } from '@/lib/utils/bias-normalize';
@@ -289,24 +288,9 @@ export async function analyzeHumanDecision(
     input
   );
 
-  // Generate Visualizations
-  let biasWebImageUrl: string | undefined;
-  let preMortemImageUrl: string | undefined;
-
-  try {
-    const auditEntityId = options?.decisionId ?? 'unknown';
-    const [biasWebUrl, preMortemUrl] = await Promise.all([
-      generateBiasWeb(biasData?.biases ?? [], 'audit', auditEntityId),
-      generatePreMortemTopography(complianceData?.preMortem, 'audit', auditEntityId),
-    ]);
-    biasWebImageUrl = biasWebUrl || undefined;
-    preMortemImageUrl = preMortemUrl || undefined;
-  } catch (error) {
-    log.error(
-      'Failed to generate visualizations for human audit:',
-      error instanceof Error ? error.message : String(error)
-    );
-  }
+  // Static visualization images no longer generated (replaced with interactive BiasNetwork)
+  const biasWebImageUrl: string | undefined = undefined;
+  const preMortemImageUrl: string | undefined = undefined;
 
   return {
     decisionQualityScore,
