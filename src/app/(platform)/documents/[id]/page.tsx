@@ -45,7 +45,7 @@ import {
 } from '@/types';
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
-import { CognitiveTopography } from '@/components/visualizations/CognitiveTopography';
+import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
 
 // Lazy-loaded tab components
 const OverviewTab = lazy(() =>
@@ -569,14 +569,33 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </ErrorBoundary>
       )}
 
-      {/* Cognitive Topographies */}
-      {analysis && (analysis.biasWebImageUrl || analysis.preMortemImageUrl) && (
+      {/* Bias Network Map */}
+      {analysis && biases.length > 0 && (
         <div className="mb-xl">
-          <ErrorBoundary sectionName="Cognitive Topographies">
-            <CognitiveTopography
-              biasWebImageUrl={analysis.biasWebImageUrl}
-              preMortemImageUrl={analysis.preMortemImageUrl}
-            />
+          <ErrorBoundary sectionName="Bias Network">
+            <div className="card">
+              <div className="card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
+                  Bias Network Map
+                </h3>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                  Interactive &middot; Click nodes to explore
+                </span>
+              </div>
+              <div className="card-body">
+                <BiasNetwork
+                  biases={biases.map(b => ({
+                    ...b,
+                    category: 'cognitive',
+                  }))}
+                  onBiasClick={(biasType) => {
+                    const bias = biases.find(b => b.biasType === biasType);
+                    if (bias) setSelectedBias(bias);
+                  }}
+                />
+              </div>
+            </div>
           </ErrorBoundary>
         </div>
       )}
