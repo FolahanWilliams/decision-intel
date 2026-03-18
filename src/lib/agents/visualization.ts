@@ -16,8 +16,8 @@ function getAI(): GoogleGenAI {
 // Nano Banana 2 — Gemini 3.1 Flash Image Preview (multi-modal generative model)
 const NANO_BANANA_2_MODEL = 'gemini-3.1-flash-image-preview';
 
-// Guard: reject images larger than 2 MB (raw bytes, not base64)
-const MAX_IMAGE_BYTES = 2_000_000;
+// Guard: reject images larger than 5 MB (raw bytes, not base64)
+const MAX_IMAGE_BYTES = 5_000_000;
 
 /** Sanitize user-derived text before embedding in an image prompt. */
 function sanitizeForPrompt(text: string, maxLength = 200): string {
@@ -53,7 +53,7 @@ async function generateImage(
         responseModalities: ['TEXT', 'IMAGE'],
         imageConfig: {
           aspectRatio: '16:9',
-          imageSize: '2K',
+          imageSize: '1K',
         },
       },
     });
