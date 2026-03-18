@@ -7,7 +7,6 @@ type Document = NonNullable<Awaited<ReturnType<typeof prisma.document.findUnique
 import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/lib/utils/cache';
 import { validateContent } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
-import { generateBiasWeb, generatePreMortemTopography } from '@/lib/agents/visualization';
 
 import {
   NoiseStatsSchema,
@@ -83,34 +82,10 @@ export async function analyzeDocument(
     // Store analysis in database with Schema Drift Protection
     const foundBiases = result.biases.filter(b => b.found);
 
-    // Generate Cognitive Topographies
-    if (onProgress) {
-      onProgress({
-        type: 'step',
-        step: 'Generating Visualizations',
-        status: 'running',
-        progress: 85,
-      });
-    }
-    let biasWebImageUrl: string | null = null;
-    let preMortemImageUrl: string | null = null;
-    try {
-      const [biasWebUrl, preMortemUrl] = await Promise.all([
-        generateBiasWeb(foundBiases, 'analysis', documentId),
-        generatePreMortemTopography(result.preMortem, 'analysis', documentId),
-      ]);
-      biasWebImageUrl = biasWebUrl;
-      preMortemImageUrl = preMortemUrl;
-
-      // Attach to result so it's returned to the client and cached
-      result.biasWebImageUrl = biasWebImageUrl;
-      result.preMortemImageUrl = preMortemImageUrl;
-    } catch (visErr) {
-      log.warn(
-        'Visualization generation failed (non-critical): ' +
-          (visErr instanceof Error ? visErr.message : String(visErr))
-      );
-    }
+    // Visualization URLs no longer generated (static images replaced
+    // with interactive BiasNetwork component in the frontend)
+    const biasWebImageUrl: string | null = null;
+    const preMortemImageUrl: string | null = null;
 
     // Try saving with ALL fields first. If the DB is missing newer
     // columns (schema drift / P2022), the transaction is poisoned —
