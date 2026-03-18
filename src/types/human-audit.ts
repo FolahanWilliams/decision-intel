@@ -199,6 +199,36 @@ export interface SlackNudgePayload {
   thread_ts?: string;
 }
 
+// ─── Slack OAuth Types ──────────────────────────────────────────────────────
+
+export interface SlackOAuthResponse {
+  ok: boolean;
+  error?: string;
+  access_token?: string;
+  token_type?: string;
+  scope?: string;
+  bot_user_id?: string;
+  app_id?: string;
+  team?: {
+    id: string;
+    name: string;
+  };
+  authed_user?: {
+    id: string;
+    scope?: string;
+    access_token?: string;
+  };
+}
+
+export interface SlackInstallationStatus {
+  connected: boolean;
+  teamName?: string;
+  teamId?: string;
+  installedAt?: string;
+  scopes?: string[];
+  status?: string;
+}
+
 export interface SlackBlock {
   type: 'section' | 'divider' | 'context' | 'actions';
   text?: {

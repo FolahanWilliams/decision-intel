@@ -25,6 +25,11 @@ const OPTIONAL_ENV_VARS = [
   'GEMINI_MODEL_NAME',
   'JULES_API_KEY', // CI build-failure debugging via Jules
   'ALLOWED_ORIGIN', // CORS; falls back to production Vercel URL
+  'SLACK_CLIENT_ID', // Multi-tenant Slack OAuth app ID
+  'SLACK_CLIENT_SECRET', // Multi-tenant Slack OAuth app secret
+  'SLACK_SIGNING_SECRET', // Slack event webhook verification
+  'SLACK_BOT_TOKEN', // Legacy single-tenant bot token (fallback)
+  'SLACK_TOKEN_ENCRYPTION_KEY', // AES-256 key for encrypting per-workspace tokens
 ];
 
 /**
