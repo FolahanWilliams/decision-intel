@@ -16,34 +16,38 @@ const QUADRANTS = [
   {
     key: 'strengths',
     label: 'Strengths',
-    color: '#22c55e',
+    color: 'var(--success)',
     bg: 'rgba(34, 197, 94, 0.06)',
     borderColor: 'rgba(34, 197, 94, 0.2)',
     icon: '💪',
+    iconLabel: 'Strength indicator',
   },
   {
     key: 'weaknesses',
     label: 'Weaknesses',
-    color: '#ef4444',
+    color: 'var(--error)',
     bg: 'rgba(239, 68, 68, 0.06)',
     borderColor: 'rgba(239, 68, 68, 0.2)',
     icon: '⚠️',
+    iconLabel: 'Warning indicator',
   },
   {
     key: 'opportunities',
     label: 'Opportunities',
-    color: '#3b82f6',
-    bg: 'rgba(59, 130, 246, 0.06)',
-    borderColor: 'rgba(59, 130, 246, 0.2)',
+    color: 'var(--info)',
+    bg: 'rgba(99, 102, 241, 0.06)',
+    borderColor: 'rgba(99, 102, 241, 0.2)',
     icon: '🚀',
+    iconLabel: 'Opportunity indicator',
   },
   {
     key: 'threats',
     label: 'Threats',
-    color: '#f97316',
+    color: 'var(--severity-high)',
     bg: 'rgba(249, 115, 22, 0.06)',
     borderColor: 'rgba(249, 115, 22, 0.2)',
     icon: '🔥',
+    iconLabel: 'Threat indicator',
   },
 ] as const;
 
@@ -59,7 +63,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
     return (
       <div className="card card-glow h-full">
         <div className="card-header">
-          <h3 style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <h3 className="flex items-center gap-1.5">
             SWOT Analysis
             <InfoTooltip text="Strengths, Weaknesses, Opportunities, and Threats identified in the document. Helps evaluate the strategic position of the decision." />
           </h3>
@@ -74,7 +78,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
   return (
     <div className="card h-full">
       <div className="card-header">
-        <h3 style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <h3 className="flex items-center gap-1.5">
           SWOT Analysis
           <InfoTooltip text="Strengths, Weaknesses, Opportunities, and Threats identified in the document. Helps evaluate the strategic position of the decision." />
         </h3>
@@ -112,7 +116,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
                     gap: '6px',
                   }}
                 >
-                  <span>{q.icon}</span>
+                  <span role="img" aria-label={q.iconLabel}>{q.icon}</span>
                   {q.label}
                   <span style={{ opacity: 0.6, fontWeight: 400 }}>({items.length})</span>
                 </div>

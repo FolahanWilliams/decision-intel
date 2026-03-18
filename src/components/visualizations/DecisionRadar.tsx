@@ -21,18 +21,18 @@ interface DecisionRadarProps {
   };
 }
 
-const AXIS_LABELS: Record<string, string> = {
-  quality: 'Quality',
-  consistency: 'Consistency',
-  factAccuracy: 'Fact Accuracy',
-  logic: 'Logic',
-  compliance: 'Compliance',
-  objectivity: 'Objectivity',
+const AXIS_CONFIG: Record<string, { label: string; description: string }> = {
+  quality: { label: 'Quality', description: 'Overall decision quality and reasoning depth' },
+  consistency: { label: 'Consistency', description: 'Internal consistency across arguments' },
+  factAccuracy: { label: 'Fact Accuracy', description: 'Accuracy of stated facts and claims' },
+  logic: { label: 'Logic', description: 'Logical structure and absence of fallacies' },
+  compliance: { label: 'Compliance', description: 'Regulatory and policy alignment' },
+  objectivity: { label: 'Objectivity', description: 'Absence of subjective bias' },
 };
 
 export function DecisionRadar({ data }: DecisionRadarProps) {
   const chartData = Object.entries(data).map(([key, value]) => ({
-    axis: AXIS_LABELS[key] || key,
+    axis: AXIS_CONFIG[key]?.label || key,
     value,
     fullMark: 100,
   }));
@@ -40,9 +40,9 @@ export function DecisionRadar({ data }: DecisionRadarProps) {
   return (
     <div className="card card-glow h-full">
       <div className="card-header">
-        <h3 style={{ fontSize: '13px' }}>Decision Health Radar</h3>
+        <h3>Decision Health Radar</h3>
       </div>
-      <div className="card-body" style={{ height: 320 }}>
+      <div className="card-body" style={{ height: 'clamp(220px, 40vw, 320px)' }}>
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={chartData} cx="50%" cy="50%" outerRadius="70%">
             <PolarGrid stroke="rgba(255,255,255,0.06)" />
@@ -71,6 +71,19 @@ export function DecisionRadar({ data }: DecisionRadarProps) {
             />
           </RadarChart>
         </ResponsiveContainer>
+      </div>
+      {/* Axis legend */}
+      <div className="px-4 pb-3 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1.5">
+        {Object.entries(data).map(([key, value]) => {
+          const config = AXIS_CONFIG[key];
+          if (!config) return null;
+          return (
+            <div key={key} className="flex items-baseline gap-1.5" title={config.description}>
+              <span className="text-[10px] font-mono font-bold text-accent-primary">{Math.round(value)}</span>
+              <span className="text-[10px] text-muted truncate">{config.label}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

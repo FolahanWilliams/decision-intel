@@ -84,6 +84,9 @@ export default function Ticker() {
           animation: slide 25s linear infinite;
           padding-left: 20px;
         }
+        .ticker-track:hover {
+          animation-play-state: paused;
+        }
         @keyframes slide {
           0% {
             transform: translateX(0);

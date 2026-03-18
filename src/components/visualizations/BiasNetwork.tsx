@@ -119,7 +119,7 @@ export function BiasNetwork({ biases = [] }: BiasNetworkProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="relative flex-1 min-h-0 flex items-center justify-center bg-gradient-to-b from-transparent to-black/20">
-        <svg viewBox="0 0 400 400" className="w-full h-full max-w-[400px] max-h-[350px]">
+        <svg viewBox="0 0 400 400" className="w-full h-full max-h-[450px]">
           <defs>
             <marker
               id="arrowhead"
