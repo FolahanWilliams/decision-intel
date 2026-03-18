@@ -8,6 +8,7 @@ interface FactVerificationBarProps {
     contradicted: number;
     unverifiable: number;
   };
+  compact?: boolean;
 }
 
 const COLORS = {
@@ -16,7 +17,7 @@ const COLORS = {
   unverifiable: '#6b7280',
 };
 
-export function FactVerificationBar({ data }: FactVerificationBarProps) {
+export function FactVerificationBar({ data, compact }: FactVerificationBarProps) {
   const total = data.verified + data.contradicted + data.unverifiable;
 
   if (total === 0) {
@@ -25,7 +26,7 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
         <div className="card-header">
           <h3 style={{ fontSize: '13px' }}>Fact Verification</h3>
         </div>
-        <div className="card-body flex items-center justify-center" style={{ height: 200 }}>
+        <div className="card-body flex items-center justify-center" style={{ height: compact ? 80 : 200 }}>
           <p className="text-muted text-sm">No fact-check data available</p>
         </div>
       </div>
@@ -45,9 +46,9 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
         <span className="text-xs text-muted">{total} claims</span>
       </div>
       <div className="card-body">
-        <div style={{ height: 120, marginBottom: '16px' }}>
+        <div style={{ height: compact ? 60 : 120, marginBottom: compact ? '8px' : '16px' }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} layout="vertical" barSize={28}>
+            <BarChart data={chartData} layout="vertical" barSize={compact ? 14 : 28}>
               <XAxis type="number" hide />
               <YAxis
                 dataKey="name"
@@ -82,7 +83,7 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
             <div key={d.name} style={{ textAlign: 'center' }}>
               <div
                 style={{
-                  fontSize: '20px',
+                  fontSize: compact ? '14px' : '20px',
                   fontWeight: 700,
                   color: d.color,
                   fontFamily: "'JetBrains Mono', monospace",
@@ -90,7 +91,7 @@ export function FactVerificationBar({ data }: FactVerificationBarProps) {
               >
                 {Math.round((d.value / total) * 100)}%
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{d.name}</div>
+              <div style={{ fontSize: compact ? '10px' : '11px', color: 'var(--text-muted)' }}>{d.name}</div>
             </div>
           ))}
         </div>
