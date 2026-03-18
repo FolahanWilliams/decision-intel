@@ -82,7 +82,7 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
           </div>
         </div>
       </div>
-      <div className="card-body flex-1 overflow-y-auto" style={{ maxHeight: '600px' }}>
+      <div className="card-body flex-1 overflow-y-auto" style={{ maxHeight: '420px' }}>
         <div
           className="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-wrap font-serif p-4 bg-muted/30  relative"
           onClick={() => setSelectedBiasIndex(null)} // Click background to deselect
