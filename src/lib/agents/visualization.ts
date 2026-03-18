@@ -55,8 +55,8 @@ async function generateImage(
     });
 
     // Extract inline image data from the Gemini response
-    const part = response.candidates?.[0]?.content?.parts?.find(
-      (p) => p.inlineData?.mimeType?.startsWith('image/')
+    const part = response.candidates?.[0]?.content?.parts?.find(p =>
+      p.inlineData?.mimeType?.startsWith('image/')
     );
     const base64Image = part?.inlineData?.data;
     const mimeType = part?.inlineData?.mimeType ?? 'image/png';

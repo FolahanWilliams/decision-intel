@@ -103,8 +103,7 @@ export async function POST() {
     if (!biasWebImageUrl && !preMortemImageUrl) {
       return NextResponse.json(
         {
-          error:
-            'Failed to generate visualizations. Ensure GOOGLE_API_KEY is configured.',
+          error: 'Failed to generate visualizations. Ensure GOOGLE_API_KEY is configured.',
         },
         { status: 502 }
       );
