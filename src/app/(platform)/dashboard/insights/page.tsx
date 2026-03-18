@@ -45,7 +45,7 @@ import {
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BackToTop } from '@/components/ui/BackToTop';
-import { CognitiveTopography } from '@/components/visualizations/CognitiveTopography';
+import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
 
 /* ── Reusable sub-components ─────────────────────────────────── */
 
@@ -667,11 +667,29 @@ export default function InsightsPage() {
           </ErrorBoundary>
         </div>
         <div className="animate-slide-up card-glow" style={{ animationDelay: '0.54s' }}>
-          <ErrorBoundary sectionName="Cognitive Topographies">
-            <CognitiveTopography
-              biasWebImageUrl={insights.biasWebImageUrl}
-              preMortemImageUrl={insights.preMortemImageUrl}
-            />
+          <ErrorBoundary sectionName="Bias Network">
+            <div className="card">
+              <div className="card-header">
+                <h3 style={{ fontSize: '12px', fontWeight: 600 }}>Bias Network</h3>
+              </div>
+              <div className="card-body">
+                <BiasNetwork
+                  biases={insights.biasTreemap.map(b => ({
+                    biasType: b.name,
+                    severity:
+                      (insights.biasSeverity[b.name] ?? 50) >= 80
+                        ? 'critical'
+                        : (insights.biasSeverity[b.name] ?? 50) >= 60
+                          ? 'high'
+                          : (insights.biasSeverity[b.name] ?? 50) >= 40
+                            ? 'medium'
+                            : 'low',
+                    category: 'cognitive',
+                  }))}
+                  compact
+                />
+              </div>
+            </div>
           </ErrorBoundary>
         </div>
       </div>

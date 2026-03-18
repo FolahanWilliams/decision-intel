@@ -36,13 +36,14 @@ export function OverviewTab({
             <div className="card-header">
               <h4>Bias Network Map</h4>
             </div>
-            <div className="card-body overflow-hidden" style={{ maxHeight: '460px' }}>
+            <div className="card-body overflow-hidden">
               <BiasNetwork
                 biases={biases.map((b, i) => ({
                   ...b,
                   id: b.id || `bias-${i}`,
                   category: 'cognitive',
                 }))}
+                compact
               />
             </div>
           </div>

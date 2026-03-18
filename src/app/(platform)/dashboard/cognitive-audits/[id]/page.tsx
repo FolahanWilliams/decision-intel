@@ -27,7 +27,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { QualityGauge } from '@/components/visualizations/QualityMetrics';
 import { SentimentGauge } from '@/components/visualizations/SentimentGauge';
-import { CognitiveTopography } from '@/components/visualizations/CognitiveTopography';
+import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
 import { createClientLogger } from '@/lib/utils/logger';
 import {
   SOURCE_LABELS_LONG as SOURCE_LABELS,
@@ -436,14 +436,30 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
         </ErrorBoundary>
       )}
 
-      {/* Cognitive Topographies */}
-      {audit && (audit.biasWebImageUrl || audit.preMortemImageUrl) && (
+      {/* Bias Network Map */}
+      {audit && biases.length > 0 && (
         <div className="mb-xl animate-fade-in" style={{ animationDelay: '0.15s' }}>
-          <ErrorBoundary sectionName="Cognitive Topographies">
-            <CognitiveTopography
-              biasWebImageUrl={audit.biasWebImageUrl}
-              preMortemImageUrl={audit.preMortemImageUrl}
-            />
+          <ErrorBoundary sectionName="Bias Network">
+            <div className="card">
+              <div className="card-header">
+                <h3 style={{ fontSize: '13px', fontWeight: 600 }}>
+                  Bias Network Map
+                </h3>
+              </div>
+              <div className="card-body">
+                <BiasNetwork
+                  biases={biases.map(b => ({
+                    biasType: b.biasType,
+                    severity: b.severity,
+                    category: 'cognitive',
+                    excerpt: b.excerpt,
+                    explanation: b.explanation,
+                    suggestion: b.suggestion,
+                  }))}
+                  compact
+                />
+              </div>
+            </div>
           </ErrorBoundary>
         </div>
       )}
