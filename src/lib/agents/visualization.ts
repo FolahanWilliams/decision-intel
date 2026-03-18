@@ -13,8 +13,8 @@ function getAI(): GoogleGenAI {
   return aiInstance;
 }
 
-// The Imagen 3 model (referred to as "Nano Banana 2" internally)
-const NANO_BANANA_MODEL = 'imagen-3.0-generate-002';
+// Nano Banana 2 — Gemini 3.1 Flash Image (multi-modal generative model)
+const NANO_BANANA_2_MODEL = 'gemini-3.1-flash-preview-image';
 
 // Guard: reject images larger than 2 MB (raw bytes, not base64)
 const MAX_IMAGE_BYTES = 2_000_000;
@@ -28,9 +28,9 @@ function sanitizeForPrompt(text: string, maxLength = 200): string {
 }
 
 /**
- * Call Google's image generation API, upload to Supabase Storage,
- * and return the public URL. Falls back to a data URI if storage
- * upload fails (e.g. bucket not created yet).
+ * Call Nano Banana 2 (Gemini 3.1 Flash Image) to generate an image,
+ * upload to Supabase Storage, and return the public URL.
+ * Falls back to a data URI if storage upload fails.
  * Returns null (never throws) when generation is unavailable or fails.
  */
 async function generateImage(
@@ -46,17 +46,20 @@ async function generateImage(
 
   try {
     const ai = getAI();
-    const response = await ai.models.generateImages({
-      model: NANO_BANANA_MODEL,
-      prompt,
+    const response = await ai.models.generateContent({
+      model: NANO_BANANA_2_MODEL,
+      contents: prompt,
       config: {
-        numberOfImages: 1,
-        outputMimeType: 'image/jpeg',
-        aspectRatio: '16:9',
+        responseModalities: ['IMAGE'],
       },
     });
 
-    const base64Image = response.generatedImages?.[0]?.image?.imageBytes;
+    // Extract inline image data from the Gemini response
+    const part = response.candidates?.[0]?.content?.parts?.find(
+      (p) => p.inlineData?.mimeType?.startsWith('image/')
+    );
+    const base64Image = part?.inlineData?.data;
+    const mimeType = part?.inlineData?.mimeType ?? 'image/png';
     if (!base64Image) return null;
 
     // Reject oversized images
@@ -66,7 +69,7 @@ async function generateImage(
       return null;
     }
 
-    const dataUri = `data:image/jpeg;base64,${base64Image}`;
+    const dataUri = `data:${mimeType};base64,${base64Image}`;
 
     // Upload to Supabase Storage; fall back to data URI if upload fails
     const publicUrl = await uploadVisualization(dataUri, entityType, entityId, imageName);
