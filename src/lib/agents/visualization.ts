@@ -121,13 +121,16 @@ export async function generateBiasWeb(
 
   const biasNames = sanitizeForPrompt(biases.map(b => b.biasType).join(', '));
   const hasCritical = biases.some(b => b.severity?.toLowerCase() === 'critical');
-  const colorScheme = hasCritical ? 'crimson and deep purple' : 'electric blue and cyan';
+  const accentColor = hasCritical ? 'red' : 'cyan';
 
-  const prompt = `A highly abstract, futuristic glowing 3D network diagram representing a "Bias Web". \
-The web consists of interconnected nodes of varying sizes shining brightly against a very dark, premium stylized background. \
-The color scheme features ${colorScheme} hues. The lines connecting the nodes are laser-like. \
-This represents the complex intersection of cognitive biases: ${biasNames}. \
-Cyberpunk aesthetic, glassmorphism, 8k resolution, highly detailed, functional data art.`;
+  const prompt = `Clean, minimal flat 2D network diagram on a solid dark (#111827) background. \
+${biases.length} labeled circular nodes arranged in a radial layout, each node labeled with a bias name. \
+Nodes connected by thin straight lines showing relationships. \
+Node sizes vary by importance — larger nodes for more severe biases. \
+Use ${accentColor} as the accent color for nodes and lines, with white text labels. \
+Biases: ${biasNames}. \
+Style: simple infographic, clean sans-serif typography, no 3D effects, no gradients, no decorative elements. \
+The diagram should be immediately readable and look like a professional data visualization.`;
 
   return generateImage(prompt, entityType, entityId, 'bias-web');
 }
@@ -160,11 +163,15 @@ export async function generatePreMortemTopography(
 
   if (!scenarios) return null;
 
-  const prompt = `A conceptual, metaphorical 3D landscape representing a "Pre-Mortem Topography" of a project's potential failure points. \
-The landscape should look like an architectural scale model made of premium materials like dark glass, brushed steel, and glowing neon accents. \
-Show structural stress points, subtle cracks in a foundation, or a bridge spanning a chasm with warning holograms. \
-The metaphorical landscape represents these risks: ${scenarios}. \
-Corporate strategy aesthetic, moody lighting, highly detailed, cinematic composition.`;
+  const scenarioCount = preMortem.failureScenarios.length;
+
+  const prompt = `Clean, minimal flat 2D risk map on a solid dark (#111827) background. \
+A simple horizontal timeline or flow diagram showing ${scenarioCount} potential failure points as labeled markers. \
+Each failure point is a colored circle or diamond on the timeline, with a short text label below it. \
+Use a red-to-amber color gradient to indicate risk severity (red = highest risk). \
+Risks shown: ${scenarios}. \
+Style: simple infographic, clean sans-serif typography, no 3D effects, no photorealism, no decorative elements. \
+The diagram should be immediately readable and look like a professional risk assessment chart.`;
 
   return generateImage(prompt, entityType, entityId, 'pre-mortem');
 }
