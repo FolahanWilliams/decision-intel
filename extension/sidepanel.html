@@ -1,8 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Decision Intel</title>
+  <title>Decision Intel — Side Panel</title>
   <link rel="stylesheet" href="popup.css">
+  <style>
+    body {
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 480px;
+    }
+
+    .hero-card {
+      padding: 32px 20px;
+    }
+
+    /* Extended results for side panel */
+    .bias-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .bias-item-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .bias-excerpt {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-style: italic;
+      padding-left: 18px;
+      border-left: 2px solid var(--liquid-border);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .bias-explanation {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding-left: 18px;
+      line-height: 1.5;
+    }
+
+    .bias-suggestion {
+      font-size: 12px;
+      padding: 6px 10px;
+      background: rgba(34, 197, 94, 0.08);
+      border-left: 3px solid var(--success);
+      border-radius: 4px;
+      color: var(--text-secondary);
+      margin-left: 18px;
+      line-height: 1.5;
+    }
+
+    /* Summary section */
+    .summary-section {
+      padding: 14px 16px;
+      background: var(--liquid-bg);
+      border: 1px solid var(--liquid-border);
+      border-radius: var(--liquid-radius-sm);
+      margin-bottom: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .summary-section strong {
+      color: var(--text-primary);
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -12,20 +85,13 @@
         <div class="logo">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary)">
             <path d="M12 2a8 8 0 0 0-8 8c0 3.4 2.1 6.3 5 7.5V20h6v-2.5c2.9-1.2 5-4.1 5-7.5a8 8 0 0 0-8-8z"/>
-            <path d="M12 18v4"/>
-            <path d="M9 22h6"/>
+            <path d="M12 18v4"/><path d="M9 22h6"/>
           </svg>
           <div>
             <h1>Decision Intel</h1>
-            <p class="subtitle">Cognitive Bias Auditor</p>
+            <p class="subtitle">Side Panel Audit</p>
           </div>
         </div>
-        <button id="sidepanel-btn" class="btn-icon" title="Open Side Panel">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <line x1="15" y1="3" x2="15" y2="21"/>
-          </svg>
-        </button>
       </div>
     </header>
 
@@ -38,7 +104,7 @@
           <path d="M11 8v6"/>
           <path d="M8 11h6"/>
         </svg>
-        <p class="instruction">Analyze the current page for cognitive biases and decision noise.</p>
+        <p class="instruction">Analyze the current page for cognitive biases and decision noise with detailed results.</p>
         <button id="analyze-btn" class="btn-primary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
           Analyze Page
@@ -52,9 +118,7 @@
         <div class="progress-spinner"></div>
         <span>Auditing...</span>
       </div>
-      <div class="pipeline-steps" id="pipeline-steps">
-        <!-- Steps populated by JS -->
-      </div>
+      <div class="pipeline-steps" id="pipeline-steps"></div>
       <div class="progress-bar-track">
         <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
       </div>
@@ -85,6 +149,9 @@
         </div>
       </div>
 
+      <!-- Summary -->
+      <div class="summary-section" id="summary-section"></div>
+
       <div class="section-title">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Biases Detected
@@ -113,7 +180,7 @@
           Annotate Page
         </button>
         <a href="#" id="view-report-btn" class="btn-primary btn-sm" target="_blank">
-          View Full Report
+          Full Report
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </a>
       </div>
@@ -134,6 +201,6 @@
   </div>
 
   <script src="pdf.min.js"></script>
-  <script src="popup.js"></script>
+  <script src="sidepanel.js"></script>
 </body>
 </html>

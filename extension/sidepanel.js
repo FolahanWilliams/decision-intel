@@ -1,6 +1,7 @@
 /**
- * Decision Intel Extension — Popup Controller
- * Liquid glass UI with SSE streaming progress + inline annotation trigger.
+ * Decision Intel — Side Panel Controller
+ * Extended version of popup.js with detailed bias cards (excerpt, explanation, suggestion).
+ * Reuses the same streaming + annotation logic.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,13 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const errorView = document.getElementById('error-view');
   const errorMsg = document.getElementById('error-msg');
   const retryBtn = document.getElementById('retry-btn');
-  const sidepanelBtn = document.getElementById('sidepanel-btn');
   const annotateBtn = document.getElementById('annotate-btn');
   const pipelineSteps = document.getElementById('pipeline-steps');
   const progressBar = document.getElementById('progress-bar');
+  const summarySection = document.getElementById('summary-section');
 
   let lastResult = null;
-  let lastApiBaseUrl = '';
 
   analyzeBtn.addEventListener('click', startAnalysis);
   retryBtn.addEventListener('click', () => {
@@ -25,12 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initialView.classList.remove('hidden');
   });
 
-  // Side panel button
-  sidepanelBtn.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ action: 'openSidePanel' });
-  });
-
-  // Annotate page button — sends biases to content script
   annotateBtn?.addEventListener('click', async () => {
     if (!lastResult) return;
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -49,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     progressBar.style.width = '0%';
 
     try {
-      // 1. Get current tab
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab?.id) throw new Error('No active tab found');
 
@@ -57,14 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let contentData;
 
-      // 2. Check if it's a PDF
       if (tab.url && tab.url.toLowerCase().endsWith('.pdf')) {
         contentData = await extractPdfText(tab.url);
       } else {
         const response = await chrome.tabs
           .sendMessage(tab.id, { action: 'getContent' })
           .catch(() => null);
-
         contentData = response;
         if (!contentData) {
           await chrome.scripting.executeScript({
@@ -76,34 +67,26 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (!contentData || !contentData.text) {
-        throw new Error(
-          "Could not extract text. For local PDFs (file://), ensure 'Allow access to file URLs' is enabled."
-        );
+        throw new Error("Could not extract text.");
       }
 
       completeStep(0);
       progressBar.style.width = '10%';
 
-      // 3. Get API config
       const storage = await chrome.storage.local.get(['EXTENSION_API_KEY', 'API_BASE_URL']);
       const apiKey = storage.EXTENSION_API_KEY;
       let apiBaseUrl = storage.API_BASE_URL || 'http://localhost:3000';
       apiBaseUrl = apiBaseUrl.trim().replace(/\/$/, '');
-      if (apiBaseUrl && !apiBaseUrl.startsWith('http')) {
-        apiBaseUrl = 'https://' + apiBaseUrl;
-      }
-      lastApiBaseUrl = apiBaseUrl;
+      if (apiBaseUrl && !apiBaseUrl.startsWith('http')) apiBaseUrl = 'https://' + apiBaseUrl;
 
       if (!apiKey) throw new Error('Extension API Key not configured. Go to Options.');
 
-      // 4. Try streaming endpoint first, fall back to standard
       addStep('Connecting', 'Initiating audit pipeline...', 'running');
 
       let result;
       try {
         result = await analyzeWithStreaming(apiBaseUrl, apiKey, contentData);
       } catch {
-        // Fall back to non-streaming endpoint
         completeStep(1);
         addStep('Analyzing', 'Using standard analysis...', 'running');
         result = await analyzeStandard(apiBaseUrl, apiKey, contentData);
@@ -111,12 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       lastResult = result;
-
-      // 5. Show Results
       renderResults(result, apiBaseUrl);
       setView('results');
 
-      // 6. Auto-annotate the page
       chrome.tabs.sendMessage(tab.id, {
         action: 'annotate',
         biases: result.biases || [],
@@ -130,17 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ─── Streaming Analysis (SSE) ────────────────────────────────────────────
+  // ─── Streaming ───────────────────────────────────────────────────────────
 
   async function analyzeWithStreaming(apiBaseUrl, apiKey, contentData) {
-    const STREAM_URL = apiBaseUrl + '/api/analyze/stream';
-
-    const response = await fetch(STREAM_URL, {
+    const response = await fetch(apiBaseUrl + '/api/analyze/stream', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-extension-key': apiKey,
-      },
+      headers: { 'Content-Type': 'application/json', 'x-extension-key': apiKey },
       body: JSON.stringify({
         text: contentData.text,
         filename: contentData.title || 'Web Page',
@@ -148,10 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error('Stream endpoint unavailable');
-    }
-
+    if (!response.ok) throw new Error('Stream unavailable');
     completeStep(1);
 
     const reader = response.body.getReader();
@@ -162,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-
       buffer += decoder.decode(value, { stream: true });
       const parts = buffer.split('\n\n');
       buffer = parts.pop() || '';
@@ -170,107 +141,69 @@ document.addEventListener('DOMContentLoaded', () => {
       for (const part of parts) {
         const line = part.trim();
         if (!line) continue;
-
         let data;
         if (line.startsWith('data: ')) {
           try { data = JSON.parse(line.slice(6)); } catch { continue; }
         } else if (line.startsWith('{')) {
           try { data = JSON.parse(line); } catch { continue; }
         }
-
         if (!data) continue;
-
-        if (data.type === 'step') {
-          handleStreamStep(data);
-        } else if (data.type === 'result' || data.overallScore !== undefined) {
+        if (data.type === 'step') handleStreamStep(data);
+        else if (data.type === 'result' || data.overallScore !== undefined) {
           finalResult = data.result || data;
         }
       }
     }
 
-    if (!finalResult) {
-      throw new Error('No result received from stream');
-    }
-
+    if (!finalResult) throw new Error('No result from stream');
     return finalResult;
   }
 
   function handleStreamStep(data) {
-    const existingSteps = pipelineSteps.querySelectorAll('.pipeline-step');
-
-    // Mark all previous running steps as complete
-    existingSteps.forEach((el) => {
-      if (el.classList.contains('running')) {
-        el.classList.remove('running');
-        el.classList.add('complete');
-        const icon = el.querySelector('.step-icon');
-        if (icon) {
-          icon.classList.remove('running');
-          icon.classList.add('complete');
-          icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
-        }
+    pipelineSteps.querySelectorAll('.pipeline-step.running').forEach((el) => {
+      el.classList.remove('running');
+      el.classList.add('complete');
+      const icon = el.querySelector('.step-icon');
+      if (icon) {
+        icon.classList.remove('running');
+        icon.classList.add('complete');
+        icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
       }
     });
-
-    if (data.status === 'running') {
-      addStep(data.step, data.description || '', 'running');
-    }
-
-    if (data.progress) {
-      progressBar.style.width = Math.min(95, data.progress) + '%';
-    }
+    if (data.status === 'running') addStep(data.step, data.description || '', 'running');
+    if (data.progress) progressBar.style.width = Math.min(95, data.progress) + '%';
   }
 
-  // ─── Standard (non-streaming) Analysis ───────────────────────────────────
-
   async function analyzeStandard(apiBaseUrl, apiKey, contentData) {
-    const API_URL = apiBaseUrl + '/api/analyze';
-
-    const response = await fetch(API_URL, {
+    const response = await fetch(apiBaseUrl + '/api/analyze', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-extension-key': apiKey,
-      },
+      headers: { 'Content-Type': 'application/json', 'x-extension-key': apiKey },
       body: JSON.stringify({
         text: contentData.text,
         filename: contentData.title || 'Web Page',
         fileType: contentData.fileType || 'web',
       }),
     });
-
-    if (!response.ok) {
-      throw new Error('Analysis failed: ' + response.statusText);
-    }
-
+    if (!response.ok) throw new Error('Analysis failed: ' + response.statusText);
     return response.json();
   }
 
-  // ─── Pipeline Step UI ────────────────────────────────────────────────────
+  // ─── Pipeline Steps ──────────────────────────────────────────────────────
 
   function addStep(label, description, status) {
     const step = document.createElement('div');
     step.className = 'pipeline-step ' + status;
-
-    const iconClass = status === 'running' ? 'running' : 'complete';
-    const iconSvg =
-      status === 'running'
-        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'
-        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
-
+    const iconSvg = status === 'running'
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
     step.innerHTML =
-      '<div class="step-icon ' + iconClass + '">' + iconSvg + '</div>' +
+      '<div class="step-icon ' + status + '">' + iconSvg + '</div>' +
       '<div class="step-label">' + label +
         (description ? '<span class="step-desc">' + description + '</span>' : '') +
       '</div>';
-
     pipelineSteps.appendChild(step);
-
-    // Keep only last 5 visible to avoid overflow
     const allSteps = pipelineSteps.querySelectorAll('.pipeline-step');
-    if (allSteps.length > 5) {
-      allSteps[0].remove();
-    }
+    if (allSteps.length > 8) allSteps[0].remove();
   }
 
   function completeStep(index) {
@@ -287,124 +220,114 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ─── Render Results ──────────────────────────────────────────────────────
+  // ─── Render Results (Extended for Side Panel) ────────────────────────────
 
   function renderResults(data, apiBaseUrl) {
     const score = Math.round(data.overallScore || 0);
     const scoreColor = score >= 70 ? '#22c55e' : score >= 40 ? '#F59E0B' : '#ef4444';
 
-    // Score ring animation
     const scoreCircle = document.getElementById('score-circle');
-    const circumference = 2 * Math.PI * 34; // r=34
-    const offset = circumference - (score / 100) * circumference;
+    const circumference = 2 * Math.PI * 34;
     scoreCircle.style.stroke = scoreColor;
-    scoreCircle.style.strokeDashoffset = String(offset);
+    scoreCircle.style.strokeDashoffset = String(circumference - (score / 100) * circumference);
 
     document.getElementById('score-value').textContent = score;
 
-    // Verdict
     const verdict = score >= 70 ? 'Good Decision' : score >= 40 ? 'Needs Review' : 'High Risk';
     const verdictEl = document.getElementById('score-verdict');
     verdictEl.textContent = verdict;
     verdictEl.style.color = scoreColor;
 
-    // Noise
-    const noiseEl = document.getElementById('noise-value');
-    noiseEl.textContent = data.noiseScore != null ? Math.round(data.noiseScore) : '--';
+    document.getElementById('noise-value').textContent =
+      data.noiseScore != null ? Math.round(data.noiseScore) : '--';
 
-    // Biases
+    // Summary
+    if (data.summary) {
+      summarySection.innerHTML = '<strong>Summary:</strong> ' + escapeHtml(data.summary);
+      summarySection.classList.remove('hidden');
+    } else {
+      summarySection.classList.add('hidden');
+    }
+
+    // Biases — extended detail cards
     const list = document.getElementById('bias-list-items');
     list.innerHTML = '';
 
     if (!data.biases || data.biases.length === 0) {
       list.innerHTML = '<li class="bias-empty">No significant biases detected.</li>';
     } else {
-      data.biases.slice(0, 5).forEach((bias) => {
+      data.biases.forEach((bias) => {
         const sev = (bias.severity || 'medium').toLowerCase();
         const li = document.createElement('li');
         li.className = 'bias-item';
-        li.innerHTML =
-          '<div class="bias-severity-dot ' + sev + '"></div>' +
-          '<div class="bias-info"><span class="bias-name">' + escapeHtml(bias.biasType) + '</span></div>' +
-          '<span class="bias-severity-label ' + sev + '">' + sev + '</span>';
+
+        let html =
+          '<div class="bias-item-header">' +
+            '<div class="bias-severity-dot ' + sev + '"></div>' +
+            '<div class="bias-info"><span class="bias-name">' + escapeHtml(bias.biasType) + '</span></div>' +
+            '<span class="bias-severity-label ' + sev + '">' + sev + '</span>' +
+          '</div>';
+
+        if (bias.excerpt) {
+          html += '<div class="bias-excerpt">"' + escapeHtml(bias.excerpt) + '"</div>';
+        }
+        if (bias.explanation) {
+          html += '<div class="bias-explanation">' + escapeHtml(bias.explanation) + '</div>';
+        }
+        if (bias.suggestion) {
+          html += '<div class="bias-suggestion">' + escapeHtml(bias.suggestion) + '</div>';
+        }
+
+        li.innerHTML = html;
         list.appendChild(li);
       });
     }
 
-    // Fact Check
+    // Fact check
     const fcSection = document.getElementById('fact-check-section');
     if (data.factCheckResult) {
       fcSection.classList.remove('hidden');
       document.getElementById('fc-verified').textContent = data.factCheckResult.verifiedCount || 0;
       document.getElementById('fc-contradicted').textContent = data.factCheckResult.contradictedCount || 0;
-
-      const noteEl = document.getElementById('fc-note');
-      if (data.factCheckResult.score >= 80) {
-        noteEl.textContent = 'Data verified against real-time market stats.';
-        noteEl.style.color = 'var(--success)';
-      } else if (data.factCheckResult.score < 50) {
-        noteEl.textContent = 'Warning: Significant contradictions found.';
-        noteEl.style.color = 'var(--error)';
-      } else {
-        noteEl.textContent = 'Analyzed against real-time market data.';
-        noteEl.style.color = 'var(--text-muted)';
-      }
     } else {
       fcSection.classList.add('hidden');
     }
 
-    // Report link
     const reportBtn = document.getElementById('view-report-btn');
-    if (data.documentId) {
-      reportBtn.href = apiBaseUrl + '/documents/' + data.documentId;
-    }
+    if (data.documentId) reportBtn.href = apiBaseUrl + '/documents/' + data.documentId;
 
-    // Progress bar to 100%
     progressBar.style.width = '100%';
   }
 
-  // ─── View Management ─────────────────────────────────────────────────────
+  // ─── Utils ───────────────────────────────────────────────────────────────
 
   function setView(viewName) {
-    [initialView, loadingView, resultsView, errorView].forEach((el) =>
-      el.classList.add('hidden')
-    );
+    [initialView, loadingView, resultsView, errorView].forEach((el) => el.classList.add('hidden'));
     if (viewName === 'initial') initialView.classList.remove('hidden');
     if (viewName === 'loading') loadingView.classList.remove('hidden');
     if (viewName === 'results') resultsView.classList.remove('hidden');
     if (viewName === 'error') errorView.classList.remove('hidden');
   }
 
-  // ─── PDF Extraction ──────────────────────────────────────────────────────
-
   async function extractPdfText(url) {
     try {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
       const response = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
-      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-      const pdfDocument = await loadingTask.promise;
-
+      const pdfDocument = await (pdfjsLib.getDocument({ data: arrayBuffer })).promise;
       let fullText = '';
       for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
         const page = await pdfDocument.getPage(pageNum);
         const textContent = await page.getTextContent();
         fullText += textContent.items.map((item) => item.str).join(' ') + '\n\n';
       }
-
       let filename = url.split('/').pop() || 'Document.pdf';
       try { filename = decodeURIComponent(filename); } catch (e) { void e; }
-
       return { title: filename, text: fullText.trim(), fileType: 'pdf' };
     } catch (e) {
-      console.error('PDF Extract error:', e);
-      throw new Error(
-        "PDF Parsing failed: Check if the extension has 'Allow access to file URLs' enabled."
-      );
+      throw new Error("PDF Parsing failed.");
     }
   }
-
-  // ─── Utils ───────────────────────────────────────────────────────────────
 
   function escapeHtml(str) {
     const div = document.createElement('div');
