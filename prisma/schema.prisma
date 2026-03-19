@@ -130,7 +130,6 @@ model UserSettings {
   
   // Display Preferences
   darkMode          Boolean @default(true)
-  compactView       Boolean @default(false)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -225,6 +224,58 @@ model IntelligenceSync {
 
   @@index([syncType])
   @@index([createdAt])
+}
+
+// ─── Team Collaboration ──────────────────────────────────────────────────
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique  // URL-safe identifier
+  avatarUrl   String?           // Team avatar/logo
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     TeamMember[]
+  invites     TeamInvite[]
+
+  @@index([slug])
+}
+
+model TeamMember {
+  id             String   @id @default(cuid())
+  orgId          String
+  organization   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  userId         String   // Supabase Auth User ID
+  email          String   // Denormalized for display
+  displayName    String?  // Optional display name
+  role           String   @default("member") // "owner" | "admin" | "member" | "viewer"
+
+  joinedAt       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([orgId, userId])
+  @@index([orgId])
+  @@index([userId])
+}
+
+model TeamInvite {
+  id             String   @id @default(cuid())
+  orgId          String
+  organization   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  email          String   // Invited email address
+  role           String   @default("member") // Role to assign on acceptance
+  invitedByUserId String  // Who sent the invite
+  token          String   @unique @default(cuid()) // Accept-invite token
+  status         String   @default("pending") // "pending" | "accepted" | "expired" | "revoked"
+
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime // Invite expiration
+
+  @@index([orgId])
+  @@index([email])
+  @@index([token])
 }
 
 // ─── Multi-Tenant Slack Integration ──────────────────────────────────────

@@ -39,7 +39,6 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
 
   // Display preferences
   const [darkMode, setDarkMode] = useState(initialSettings.darkMode);
-  const [compactView, setCompactView] = useState(initialSettings.compactView);
 
   // Save state
   const [isPending, startTransition] = useTransition();
@@ -144,7 +143,6 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           analysisAlerts,
           weeklyDigest,
           darkMode,
-          compactView,
         });
         setSaved(true);
         showToast('Settings saved successfully', 'success');
@@ -275,13 +273,6 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
               description="Use dark theme (default)"
               checked={darkMode}
               onChange={setDarkMode}
-              disabled={isPending}
-            />
-            <ToggleOption
-              label="Compact View"
-              description="Show more documents per page"
-              checked={compactView}
-              onChange={setCompactView}
               disabled={isPending}
             />
           </div>
