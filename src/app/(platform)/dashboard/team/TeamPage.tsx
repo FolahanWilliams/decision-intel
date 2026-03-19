@@ -135,7 +135,7 @@ export default function TeamPage() {
               width: 64,
               height: 64,
               margin: '0 auto var(--spacing-lg)',
-              background: 'rgba(99, 102, 241, 0.12)',
+              background: 'rgba(249, 115, 22, 0.12)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -290,7 +290,7 @@ export default function TeamPage() {
                     style={{
                       fontSize: '11px',
                       padding: '2px 8px',
-                      background: 'rgba(99, 102, 241, 0.15)',
+                      background: 'rgba(249, 115, 22, 0.15)',
                       borderRadius: '12px',
                       color: 'var(--accent-primary)',
                       fontWeight: 600,
@@ -469,7 +469,7 @@ function MemberRow({
             padding: '3px 10px',
             borderRadius: '12px',
             background:
-              member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'rgba(99, 102, 241, 0.1)',
+              member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'rgba(249, 115, 22, 0.1)',
             color: ROLE_COLORS[member.role],
             fontWeight: 600,
           }}
@@ -1010,7 +1010,7 @@ function TeamActivityTab() {
               style={{
                 fontSize: '11px',
                 padding: '2px 8px',
-                background: 'rgba(99, 102, 241, 0.15)',
+                background: 'rgba(249, 115, 22, 0.15)',
                 borderRadius: '12px',
                 color: 'var(--accent-primary)',
                 fontWeight: 600,

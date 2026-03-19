@@ -40,8 +40,8 @@ export function SuggestedQuestions({ questions, onSelect, isVisible }: Suggested
           style={{
             padding: '4px 12px',
             fontSize: '12px',
-            background: 'rgba(99, 102, 241, 0.08)',
-            border: '1px solid rgba(99, 102, 241, 0.2)',
+            background: 'rgba(249, 115, 22, 0.08)',
+            border: '1px solid rgba(249, 115, 22, 0.2)',
             borderRadius: '16px',
             color: 'var(--accent-primary)',
             cursor: 'pointer',
