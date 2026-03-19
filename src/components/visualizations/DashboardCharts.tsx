@@ -39,14 +39,14 @@ interface DashboardChartsProps {
   avgScore: number;
 }
 
-const DONUT_COLORS = ['#ef4444', '#FBBF24', '#22c55e'];
+const DONUT_COLORS = ['#f87171', '#fbbf24', '#34d399'];
 
 const tooltipStyle = {
-  background: 'rgba(14, 14, 14, 0.95)',
-  border: '1px solid rgba(255,255,255,0.10)',
+  background: 'rgba(0, 0, 0, 0.75)',
+  border: '1px solid rgba(255,255,255,0.18)',
   borderRadius: '12px',
-  backdropFilter: 'blur(20px)',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+  backdropFilter: 'blur(24px) saturate(180%)',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.08) inset',
   padding: '8px 12px',
   fontSize: '12px',
 };
@@ -138,7 +138,7 @@ export function DashboardCharts({
                     style={{
                       fontSize: '9px',
                       fontWeight: 500,
-                      fill: '#52525b',
+                      fill: '#71717a',
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                     }}
@@ -200,11 +200,11 @@ export function DashboardCharts({
                 <AreaChart data={scoreTrend} margin={{ top: 5, right: 5, left: -30, bottom: 0 }}>
                   <defs>
                     <linearGradient id="dashTrendGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#FFFFFF" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#FFFFFF" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#34d399" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#34d399" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.04)" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
                   <XAxis
                     dataKey="date"
                     axisLine={false}
@@ -225,7 +225,7 @@ export function DashboardCharts({
                   <Area
                     type="monotone"
                     dataKey="score"
-                    stroke="#FFFFFF"
+                    stroke="#34d399"
                     strokeWidth={2}
                     fillOpacity={1}
                     fill="url(#dashTrendGrad)"
@@ -256,11 +256,11 @@ export function DashboardCharts({
                 >
                   <defs>
                     <linearGradient id="biasBarGrad" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="#FFFFFF" stopOpacity={0.8} />
-                      <stop offset="100%" stopColor="#d4d4d8" stopOpacity={0.8} />
+                      <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.5} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.04)" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.08)" />
                   <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#52525b' }} />
                   <YAxis
                     type="category"

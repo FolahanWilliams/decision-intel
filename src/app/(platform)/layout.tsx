@@ -21,9 +21,9 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           style={{
             flex: 1,
             overflowY: 'auto',
-            background: 'var(--bg-primary)',
+            background: 'transparent',
             color: 'var(--text-primary)',
-            transition: 'background 0.3s, color 0.3s',
+            transition: 'color 0.3s',
           }}
         >
           {children}
