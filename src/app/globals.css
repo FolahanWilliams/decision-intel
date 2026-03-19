@@ -41,7 +41,7 @@
   /* Text */
   --text-primary: #FAFAFA;
   --text-secondary: #a1a1aa;
-  --text-muted: #52525b;
+  --text-muted: #8a8a93;
   --text-highlight: #FFFFFF;
 
   /* Brand — Orange + Lime */
@@ -118,38 +118,40 @@
   --liquid-blur-strong: 48px;
   --liquid-radius: 16px;
   --liquid-radius-xl: 24px;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+
+  /* shadcn/ui semantic tokens — dark-only, matched to glassmorphism */
+  --background: #080808;
+  --foreground: #FAFAFA;
+  --card: #0e0e0e;
+  --card-foreground: #FAFAFA;
+  --popover: #161616;
+  --popover-foreground: #FAFAFA;
+  --primary: #F97316;
+  --primary-foreground: #fff;
+  --secondary: #1e1e1e;
+  --secondary-foreground: #FAFAFA;
+  --muted: #1e1e1e;
+  --muted-foreground: #a1a1aa;
+  --accent: #1e1e1e;
+  --accent-foreground: #FAFAFA;
+  --destructive: #ef4444;
+  --border: rgba(255, 255, 255, 0.06);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #F97316;
+  --chart-1: #F97316;
+  --chart-2: #A3E635;
+  --chart-3: #FBBF24;
+  --chart-4: #22c55e;
+  --chart-5: #38bdf8;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #080808;
+  --sidebar-foreground: #FAFAFA;
+  --sidebar-primary: #F97316;
+  --sidebar-primary-foreground: #fff;
+  --sidebar-accent: #161616;
+  --sidebar-accent-foreground: #FAFAFA;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: #F97316;
 }
 
 * {
@@ -664,13 +666,7 @@ tr:hover td {
   .ml-md { margin-left: var(--spacing-md); }
   .mt-md { margin-top: var(--spacing-md); }
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
+    @apply outline-ring/50;
   }
 }
 
@@ -1076,6 +1072,29 @@ tr:hover td {
 
 @media (max-width: 640px) {
   .upload-zone { padding: var(--spacing-lg); }
+
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Stack KPI cards nicely on mobile */
+  .stat-card {
+    padding: var(--spacing-md);
+  }
+
+  .stat-card-value {
+    font-size: 1.5rem;
+  }
+
+  /* Full-width cards on mobile */
+  .card-body {
+    padding: var(--spacing-md);
+  }
+
+  .card-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -1146,7 +1165,6 @@ tr:hover td {
   --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
-  --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -1162,45 +1180,8 @@ tr:hover td {
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
+  /* Keep our custom radii from @theme above — shadcn components use these */
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
+/* Dark-only app — no .dark override needed, :root already has dark values */

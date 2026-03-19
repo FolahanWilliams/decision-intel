@@ -1,15 +1,6 @@
 'use client';
 
-interface SkeletonProps {
-  className?: string;
-  style?: React.CSSProperties;
-}
-
-function SkeletonBlock({ className = '', style }: SkeletonProps) {
-  return (
-    <div className={`skeleton ${className}`} role="status" aria-label="Loading" style={style} />
-  );
-}
+import { Skeleton } from '@/components/ui/skeleton';
 
 /** Standardized page-level loading skeleton */
 export function PageSkeleton({ rows = 5 }: { rows?: number }) {
@@ -17,10 +8,10 @@ export function PageSkeleton({ rows = 5 }: { rows?: number }) {
     <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
       {/* Header skeleton */}
       <div className="flex items-center gap-md mb-xl">
-        <SkeletonBlock style={{ width: '24px', height: '24px' }} />
+        <Skeleton className="h-6 w-6" />
         <div>
-          <SkeletonBlock style={{ width: '200px', height: '20px', marginBottom: '6px' }} />
-          <SkeletonBlock style={{ width: '120px', height: '14px' }} />
+          <Skeleton className="h-5 w-[200px] mb-1.5" />
+          <Skeleton className="h-3.5 w-[120px]" />
         </div>
       </div>
 
@@ -28,8 +19,8 @@ export function PageSkeleton({ rows = 5 }: { rows?: number }) {
       <div className="grid grid-4 mb-xl">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="card" style={{ padding: 'var(--spacing-lg)' }}>
-            <SkeletonBlock style={{ width: '60%', height: '12px', marginBottom: '8px' }} />
-            <SkeletonBlock style={{ width: '40%', height: '24px' }} />
+            <Skeleton className="h-3 w-[60%] mb-2" />
+            <Skeleton className="h-6 w-[40%]" />
           </div>
         ))}
       </div>
@@ -37,7 +28,7 @@ export function PageSkeleton({ rows = 5 }: { rows?: number }) {
       {/* Content rows skeleton */}
       <div className="card">
         <div className="card-header">
-          <SkeletonBlock style={{ width: '140px', height: '14px' }} />
+          <Skeleton className="h-3.5 w-[140px]" />
         </div>
         <div className="card-body">
           {[...Array(rows)].map((_, i) => (
@@ -46,14 +37,18 @@ export function PageSkeleton({ rows = 5 }: { rows?: number }) {
               className="flex items-center gap-md"
               style={{ padding: '12px 0', borderBottom: '1px solid var(--border-color)' }}
             >
-              <SkeletonBlock style={{ width: '32px', height: '32px' }} />
-              <div style={{ flex: 1 }}>
-                <SkeletonBlock
-                  style={{ width: `${60 + ((i * 7) % 30)}%`, height: '14px', marginBottom: '4px' }}
+              <Skeleton className="h-8 w-8" />
+              <div className="flex-1">
+                <Skeleton
+                  className="h-3.5 mb-1"
+                  style={{ width: `${60 + ((i * 7) % 30)}%` }}
                 />
-                <SkeletonBlock style={{ width: `${30 + ((i * 13) % 20)}%`, height: '12px' }} />
+                <Skeleton
+                  className="h-3"
+                  style={{ width: `${30 + ((i * 13) % 20)}%` }}
+                />
               </div>
-              <SkeletonBlock style={{ width: '60px', height: '20px' }} />
+              <Skeleton className="h-5 w-[60px]" />
             </div>
           ))}
         </div>
@@ -68,9 +63,10 @@ export function CardSkeleton({ lines = 3 }: { lines?: number }) {
     <div className="card">
       <div className="card-body">
         {[...Array(lines)].map((_, i) => (
-          <SkeletonBlock
+          <Skeleton
             key={i}
-            style={{ width: `${60 + ((i * 11) % 35)}%`, height: '14px', marginBottom: '8px' }}
+            className="h-3.5 mb-2"
+            style={{ width: `${60 + ((i * 11) % 35)}%` }}
           />
         ))}
       </div>
@@ -83,10 +79,10 @@ export function ChartSkeleton({ height = 240 }: { height?: number }) {
   return (
     <div className="card card-glow h-full">
       <div className="card-header">
-        <SkeletonBlock style={{ width: '120px', height: '13px' }} />
+        <Skeleton className="h-3.5 w-[120px]" />
       </div>
       <div className="card-body flex items-center justify-center" style={{ minHeight: height }}>
-        <SkeletonBlock className="skeleton-slow" style={{ width: '80%', height: '70%' }} />
+        <Skeleton className="w-[80%] h-[70%]" />
       </div>
     </div>
   );
@@ -97,8 +93,8 @@ export function TreemapSkeleton() {
   return (
     <div className="card card-glow h-full">
       <div className="card-header flex items-center justify-between">
-        <SkeletonBlock style={{ width: '100px', height: '13px' }} />
-        <SkeletonBlock style={{ width: '60px', height: '13px' }} />
+        <Skeleton className="h-3.5 w-[100px]" />
+        <Skeleton className="h-3.5 w-[60px]" />
       </div>
       <div
         className="card-body"
@@ -112,11 +108,7 @@ export function TreemapSkeleton() {
         }}
       >
         {[...Array(4)].map((_, i) => (
-          <SkeletonBlock
-            key={i}
-            className="skeleton-slow"
-            style={{ width: '100%', height: '100%' }}
-          />
+          <Skeleton key={i} className="w-full h-full" />
         ))}
       </div>
     </div>
@@ -127,10 +119,40 @@ export function TreemapSkeleton() {
 export function GaugeSkeleton({ size = 120 }: { size?: number }) {
   return (
     <div className="flex flex-col items-center">
-      <SkeletonBlock style={{ width: size, height: size }} />
-      <SkeletonBlock style={{ width: '80px', height: '14px', marginTop: '8px' }} />
+      <Skeleton style={{ width: size, height: size }} />
+      <Skeleton className="h-3.5 w-[80px] mt-2" />
     </div>
   );
 }
 
-export { SkeletonBlock };
+/** Skeleton for a full dashboard layout: 4 KPI cards + 3 chart cards */
+export function DashboardSkeleton() {
+  return (
+    <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
+      {/* 4 KPI card skeletons */}
+      <div className="grid grid-4 mb-xl">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="card" style={{ padding: 'var(--spacing-lg)' }}>
+            <Skeleton className="h-3 w-[80px] mb-2" />
+            <Skeleton className="h-8 w-[100px] mb-1" />
+            <Skeleton className="h-3 w-[60px]" />
+          </div>
+        ))}
+      </div>
+
+      {/* 3 chart card skeletons */}
+      <div className="grid grid-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="card card-glow h-full">
+            <div className="card-header">
+              <Skeleton className="h-3.5 w-[120px]" />
+            </div>
+            <div className="card-body flex items-center justify-center" style={{ minHeight: 240 }}>
+              <Skeleton className="w-[80%] h-[160px]" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

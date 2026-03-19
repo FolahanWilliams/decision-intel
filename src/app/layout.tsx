@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 import { ToastProvider } from '@/components/ui/ToastContext';
 import { ThemeProvider } from '@/components/theme-provider';
 import { NotificationProvider } from '@/components/ui/NotificationCenter';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,9 @@ export default function RootLayout({
       <body className="antialiased min-h-screen">
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
           <NotificationProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <TooltipProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </TooltipProvider>
           </NotificationProvider>
         </ThemeProvider>
       </body>
