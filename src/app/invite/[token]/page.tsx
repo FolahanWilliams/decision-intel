@@ -7,7 +7,7 @@ import { Users, Loader2, CheckCircle, AlertTriangle, LogIn } from 'lucide-react'
 export default function InviteAcceptPage() {
   const { token } = useParams<{ token: string }>();
   const router = useRouter();
-  const [status, setStatus] = useState<'loading' | 'accepting' | 'success' | 'error' | 'auth_required'>('loading');
+  const [status, setStatus] = useState<'accepting' | 'success' | 'error' | 'auth_required'>('accepting');
   const [orgName, setOrgName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -46,8 +46,6 @@ export default function InviteAcceptPage() {
       }
     };
 
-    // Small delay to show loading state
-    setStatus('accepting');
     acceptInvite();
   }, [token, router]);
 
@@ -63,8 +61,8 @@ export default function InviteAcceptPage() {
       }}
     >
       <div style={{ maxWidth: 420, width: '90%', textAlign: 'center' }}>
-        {/* Loading / Accepting */}
-        {(status === 'loading' || status === 'accepting') && (
+        {/* Accepting */}
+        {status === 'accepting' && (
           <>
             <Loader2
               size={40}
