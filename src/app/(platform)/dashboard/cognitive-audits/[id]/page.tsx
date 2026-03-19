@@ -66,7 +66,7 @@ function NoiseStatsCards({
   if (!noiseStats) return null;
   return (
     <>
-      <div className="card">
+      <div className="card liquid-glass-premium">
         <div className="card-body text-center p-md">
           <div className="text-xs text-muted mb-sm">Judge Mean Score</div>
           <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-highlight)' }}>
@@ -75,7 +75,7 @@ function NoiseStatsCards({
           <div className="text-xs text-muted">Average across 3 judges</div>
         </div>
       </div>
-      <div className="card">
+      <div className="card liquid-glass-premium">
         <div className="card-body text-center p-md">
           <div className="text-xs text-muted mb-sm">Standard Deviation</div>
           <div
@@ -101,7 +101,7 @@ function NoiseStatsCards({
           </div>
         </div>
       </div>
-      <div className="card">
+      <div className="card liquid-glass-premium">
         <div className="card-body text-center p-md">
           <div className="text-xs text-muted mb-sm">Variance</div>
           <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-muted)' }}>
@@ -261,27 +261,27 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
         className="container"
         style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
       >
-        <div className="card animate-pulse mb-xl">
-          <div className="card-body">
-            <div className="h-6 w-48 bg-white/10 mb-md" />
-            <div className="h-4 w-96 bg-white/10 mb-lg" />
+        <div className="card liquid-glass-premium glass-enter mb-xl">
+            <div className="card-body">
+            <div className="glass-skeleton h-6 w-48 mb-md" />
+            <div className="glass-skeleton h-4 w-96 mb-lg" />
             <div className="grid grid-3 gap-md">
               {[0, 1, 2].map(i => (
                 <div key={i} className="flex flex-col items-center gap-sm">
-                  <div className="w-24 h-24 bg-white/10" style={{ borderRadius: '50%' }} />
-                  <div className="h-3 w-16 bg-white/10" />
+                  <div className="glass-skeleton w-24 h-24" style={{ borderRadius: '50%' }} />
+                  <div className="glass-skeleton h-3 w-16" />
                 </div>
               ))}
             </div>
           </div>
         </div>
-        <div className="card animate-pulse">
+        <div className="card liquid-glass-premium glass-enter" style={{ animationDelay: '0.1s' }}>
           <div className="card-header">
-            <div className="h-4 w-40 bg-white/10" />
+            <div className="glass-skeleton h-4 w-40" />
           </div>
           <div className="card-body">
             {[0, 1, 2].map(i => (
-              <div key={i} className="h-20 w-full bg-white/10 mb-md" />
+              <div key={i} className="glass-skeleton h-20 w-full mb-md" />
             ))}
           </div>
         </div>
@@ -379,7 +379,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
       {/* Score Gauges */}
       {audit && (
         <ErrorBoundary sectionName="Score Gauges">
-          <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="card liquid-glass-premium mb-xl glass-enter" style={{ animationDelay: '0.1s' }}>
             <div className="card-header">
               <h3 className="flex items-center gap-sm">
                 <BrainCircuit size={18} /> Cognitive Audit Summary
@@ -479,7 +479,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
       {audit && biases.length > 0 && (
         <div className="mb-xl animate-fade-in" style={{ animationDelay: '0.15s' }}>
           <ErrorBoundary sectionName="Bias Network">
-            <div className="card">
+            <div className="card liquid-glass-premium">
               <div className="card-header">
                 <h3 style={{ fontSize: '13px', fontWeight: 600 }}>Bias Network Map</h3>
               </div>
@@ -504,7 +504,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
       {/* Tabbed Content */}
       {audit && (
         <ErrorBoundary sectionName="Audit Details">
-          <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <div className="card liquid-glass-premium animate-fade-in" style={{ animationDelay: '0.2s' }}>
             {/* Tab bar */}
             <div className="card-header" style={{ padding: 0 }}>
               <div className="flex" style={{ borderBottom: '1px solid var(--border-color)' }}>
@@ -702,7 +702,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                       gap: 'var(--spacing-lg)',
                     }}
                   >
-                    <div className="card">
+                    <div className="card liquid-glass-premium">
                       <div className="card-body text-center p-md">
                         <div className="text-xs text-muted mb-sm">Noise Score</div>
                         <div style={{ fontSize: '2.5rem', fontWeight: 800, color: noiseColor }}>

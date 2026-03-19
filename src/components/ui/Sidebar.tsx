@@ -93,26 +93,26 @@ export default function Sidebar() {
         style={{
           width: sidebarWidth,
           minWidth: sidebarWidth,
-          borderRight: '1px solid rgba(255, 255, 255, 0.18)',
+          borderRight: '1px solid var(--liquid-border)',
           display: 'flex',
           flexDirection: 'column',
-          background: 'rgba(0, 0, 0, 0.45)',
-          backdropFilter: 'blur(40px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+          background: 'var(--liquid-tint)',
+          backdropFilter: 'blur(var(--liquid-blur-strong)) saturate(160%)',
+          WebkitBackdropFilter: 'blur(var(--liquid-blur-strong)) saturate(160%)',
           height: 'calc(100vh - 44px)',
           position: 'sticky',
           top: '44px',
           transition:
             'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
           overflow: 'hidden',
-          boxShadow: '1px 0 0 rgba(255, 255, 255, 0.08) inset, 4px 0 24px rgba(0, 0, 0, 0.4)',
+          boxShadow: '1px 0 0 rgba(255, 255, 255, 0.06) inset, 4px 0 24px rgba(0, 0, 0, 0.4)',
         }}
       >
         {/* Brand */}
         <div
           style={{
             padding: collapsed ? '16px 12px' : '24px 20px',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.18)',
+            borderBottom: '1px solid var(--liquid-border)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',

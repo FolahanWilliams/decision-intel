@@ -157,10 +157,22 @@ export function ActivityFeed({
         </div>
       )}
 
-      {/* Activity items */}
+      {/* Activity items with timeline */}
       {!isLoading && filtered.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          {filtered.map(activity => {
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          {/* Vertical timeline line */}
+          <div
+            style={{
+              position: 'absolute',
+              left: '25px',
+              top: '14px',
+              bottom: '14px',
+              width: '1px',
+              background: 'linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
+              pointerEvents: 'none',
+            }}
+          />
+          {filtered.map((activity, index) => {
             const config = TYPE_CONFIG[activity.type] || TYPE_CONFIG.upload;
             const href = activity.metadata.documentId
               ? `/documents/${activity.metadata.documentId}`
@@ -170,22 +182,26 @@ export function ActivityFeed({
 
             const content = (
               <div
-                className="flex items-start gap-md"
+                className="flex items-start gap-md glass-enter-stagger"
                 style={{
                   padding: '10px 12px',
                   borderRadius: '8px',
-                  transition: 'background 0.15s',
+                  transition: 'background 0.2s, box-shadow 0.2s',
                   cursor: href ? 'pointer' : 'default',
-                }}
+                  '--stagger-index': index,
+                } as React.CSSProperties}
                 onMouseEnter={e => {
-                  if (href)
+                  if (href) {
                     (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.2)';
+                  }
                 }}
                 onMouseLeave={e => {
                   (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
                 }}
               >
-                {/* Icon */}
+                {/* Glass-pill icon */}
                 <div
                   style={{
                     width: '28px',
@@ -194,9 +210,14 @@ export function ActivityFeed({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    background: config.bgColor,
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
                     color: config.color,
                     flexShrink: 0,
+                    position: 'relative',
+                    zIndex: 1,
                   }}
                 >
                   {config.icon}

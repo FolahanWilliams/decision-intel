@@ -160,10 +160,13 @@ export default function ComparePage() {
               key={id}
               className="flex items-center gap-sm"
               style={{
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
+                background: 'var(--liquid-bg)',
+                border: '1px solid var(--liquid-border)',
+                backdropFilter: 'blur(var(--liquid-blur)) saturate(140%)',
+                WebkitBackdropFilter: 'blur(var(--liquid-blur)) saturate(140%)',
                 padding: '6px 12px',
                 fontSize: '13px',
+                borderRadius: 'var(--liquid-radius-sm)',
               }}
             >
               <FileText size={14} style={{ color: 'var(--accent-primary)' }} />
@@ -208,12 +211,16 @@ export default function ComparePage() {
                   top: '100%',
                   left: 0,
                   marginTop: '4px',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-color)',
+                  background: 'var(--liquid-tint)',
+                  backdropFilter: 'blur(var(--liquid-blur-strong)) saturate(150%)',
+                  WebkitBackdropFilter: 'blur(var(--liquid-blur-strong)) saturate(150%)',
+                  border: '1px solid var(--liquid-border)',
+                  borderRadius: 'var(--liquid-radius-sm)',
                   width: '320px',
                   maxHeight: '240px',
                   overflowY: 'auto',
                   zIndex: 20,
+                  boxShadow: '0 16px 48px rgba(0, 0, 0, 0.4)',
                 }}
               >
                 {isLoading && (
@@ -280,12 +287,11 @@ export default function ComparePage() {
       {/* Empty state */}
       {selectedIds.length < 2 && (
         <div
-          className="flex flex-col items-center justify-center"
+          className="flex flex-col items-center justify-center liquid-glass-premium"
           style={{
             padding: 'var(--spacing-2xl)',
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)',
             textAlign: 'center',
+            borderRadius: 'var(--liquid-radius)',
           }}
         >
           <GitCompareArrows
@@ -303,7 +309,7 @@ export default function ComparePage() {
 
       {/* Comparison table */}
       {comparisonDocs.length >= 2 && !loadingDetails && (
-        <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+        <div className="card liquid-glass-premium" style={{ marginBottom: 'var(--spacing-xl)' }}>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
               <thead>

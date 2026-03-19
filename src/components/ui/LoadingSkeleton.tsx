@@ -18,7 +18,7 @@ export function PageSkeleton({ rows = 5 }: { rows?: number }) {
       {/* Stats cards skeleton */}
       <div className="grid grid-4 mb-xl">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="card" style={{ padding: 'var(--spacing-lg)' }}>
+          <div key={i} className="card glass-enter-stagger" style={{ padding: 'var(--spacing-lg)', '--stagger-index': i } as React.CSSProperties}>
             <Skeleton className="h-3 w-[60%] mb-2" />
             <Skeleton className="h-6 w-[40%]" />
           </div>
@@ -77,7 +77,7 @@ export function CardSkeleton({ lines = 3 }: { lines?: number }) {
 /** Skeleton for chart/gauge visualizations */
 export function ChartSkeleton({ height = 240 }: { height?: number }) {
   return (
-    <div className="card card-glow h-full">
+    <div className="card liquid-glass-premium glass-enter h-full">
       <div className="card-header">
         <Skeleton className="h-3.5 w-[120px]" />
       </div>
@@ -91,7 +91,7 @@ export function ChartSkeleton({ height = 240 }: { height?: number }) {
 /** Skeleton for treemap visualizations */
 export function TreemapSkeleton() {
   return (
-    <div className="card card-glow h-full">
+    <div className="card liquid-glass-premium glass-enter h-full">
       <div className="card-header flex items-center justify-between">
         <Skeleton className="h-3.5 w-[100px]" />
         <Skeleton className="h-3.5 w-[60px]" />
@@ -132,7 +132,7 @@ export function DashboardSkeleton() {
       {/* 4 KPI card skeletons */}
       <div className="grid grid-4 mb-xl">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="card" style={{ padding: 'var(--spacing-lg)' }}>
+          <div key={i} className="card glass-enter-stagger" style={{ padding: 'var(--spacing-lg)', '--stagger-index': i } as React.CSSProperties}>
             <Skeleton className="h-3 w-[80px] mb-2" />
             <Skeleton className="h-8 w-[100px] mb-1" />
             <Skeleton className="h-3 w-[60px]" />
@@ -143,7 +143,7 @@ export function DashboardSkeleton() {
       {/* 3 chart card skeletons */}
       <div className="grid grid-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="card card-glow h-full">
+          <div key={i} className="card liquid-glass-premium glass-enter-stagger h-full" style={{ '--stagger-index': i + 4 } as React.CSSProperties}>
             <div className="card-header">
               <Skeleton className="h-3.5 w-[120px]" />
             </div>

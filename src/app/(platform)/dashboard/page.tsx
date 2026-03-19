@@ -21,6 +21,9 @@ import {
   TrendingUp,
   Clock,
   CloudUpload,
+  Settings,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -108,6 +111,33 @@ export default function Dashboard() {
   const [showTrend, setShowTrend] = useState(false);
   const [showComparative, setShowComparative] = useState(false);
   const [docsPage, setDocsPage] = useState(1);
+
+  // KPI visibility state
+  const [showKpiSettings, setShowKpiSettings] = useState(false);
+  const [kpiVisibility, setKpiVisibility] = useState<Record<string, boolean>>(() => {
+    // Load from localStorage if available
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dashboard_kpi_visibility');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          // Fallback to defaults
+        }
+      }
+    }
+    return {
+      'Total Documents': true,
+      'Analyzed': true,
+      'Avg Quality': true,
+      'In Progress': true,
+    };
+  });
+
+  // Save KPI visibility to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('dashboard_kpi_visibility', JSON.stringify(kpiVisibility));
+  }, [kpiVisibility]);
 
   // Debounce search input → searchQuery (300ms)
   useEffect(() => {
@@ -613,57 +643,120 @@ export default function Dashboard() {
 
       {/* Hero KPI Cards */}
       {uploadedDocs.length > 0 && (
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-md mb-xl"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.08 } },
-          }}
-        >
-          {[
-            {
-              label: 'Total Documents',
-              value: totalDocs,
-              numericValue: totalDocs,
-              icon: <FileText size={18} />,
-              iconBg: 'rgba(255, 255, 255, 0.06)',
-              iconColor: 'rgba(255, 255, 255, 0.5)',
-              sparkColor: 'rgba(255, 255, 255, 0.4)',
-            },
-            {
-              label: 'Analyzed',
-              value: uploadedDocs.filter(d => d.status === 'complete').length,
-              numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
-              icon: <CheckCircle size={18} />,
-              iconBg: 'rgba(255, 255, 255, 0.06)',
-              iconColor: 'rgba(255, 255, 255, 0.5)',
-              sparkColor: 'rgba(255, 255, 255, 0.4)',
-            },
-            {
-              label: 'Avg Quality',
-              value: riskSummary.avg,
-              numericValue: riskSummary.avg,
-              suffix: '%',
-              icon: <TrendingUp size={18} />,
-              iconBg: 'rgba(255, 255, 255, 0.06)',
-              iconColor: 'rgba(255, 255, 255, 0.5)',
-              sparkColor: 'rgba(255, 255, 255, 0.4)',
-              showSparkline: true,
-            },
-            {
-              label: 'In Progress',
-              value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
-                .length,
-              numericValue: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
-                .length,
-              icon: <Clock size={18} />,
-              iconBg: 'rgba(255, 255, 255, 0.06)',
-              iconColor: 'rgba(255, 255, 255, 0.5)',
-              sparkColor: 'rgba(255, 255, 255, 0.4)',
-            },
-          ].map(stat => (
+        <>
+          {/* KPI Settings Button */}
+          <div className="flex justify-end mb-md">
+            <button
+              onClick={() => setShowKpiSettings(!showKpiSettings)}
+              className="btn btn-ghost p-sm flex items-center gap-xs text-xs"
+              style={{
+                background: showKpiSettings ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+            >
+              <Settings size={14} />
+              <span>Customize KPIs</span>
+              {showKpiSettings ? <EyeOff size={12} /> : <Eye size={12} />}
+            </button>
+          </div>
+
+          {/* KPI Settings Panel */}
+          <AnimatePresence>
+            {showKpiSettings && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
+                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className="card liquid-glass-premium p-md"
+              >
+                <div className="flex items-center gap-sm mb-sm">
+                  <Settings size={16} />
+                  <span className="text-sm font-semibold">Show/Hide KPI Cards</span>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-sm">
+                  {['Total Documents', 'Analyzed', 'Avg Quality', 'In Progress'].map(kpiName => (
+                    <label
+                      key={kpiName}
+                      className="flex items-center gap-xs cursor-pointer p-xs rounded hover:bg-white/5 transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={kpiVisibility[kpiName] ?? true}
+                        onChange={e => {
+                          setKpiVisibility(prev => ({
+                            ...prev,
+                            [kpiName]: e.target.checked,
+                          }));
+                        }}
+                        className="checkbox"
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          accentColor: 'var(--accent-primary)',
+                        }}
+                      />
+                      <span className="text-xs text-muted">{kpiName}</span>
+                    </label>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-md mb-xl"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.08 } },
+            }}
+          >
+            {[
+              {
+                label: 'Total Documents',
+                value: totalDocs,
+                numericValue: totalDocs,
+                icon: <FileText size={18} />,
+                iconBg: 'rgba(255, 255, 255, 0.06)',
+                iconColor: 'rgba(255, 255, 255, 0.5)',
+                sparkColor: 'rgba(255, 255, 255, 0.4)',
+              },
+              {
+                label: 'Analyzed',
+                value: uploadedDocs.filter(d => d.status === 'complete').length,
+                numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
+                icon: <CheckCircle size={18} />,
+                iconBg: 'rgba(255, 255, 255, 0.06)',
+                iconColor: 'rgba(255, 255, 255, 0.5)',
+                sparkColor: 'rgba(255, 255, 255, 0.4)',
+              },
+              {
+                label: 'Avg Quality',
+                value: riskSummary.avg,
+                numericValue: riskSummary.avg,
+                suffix: '%',
+                icon: <TrendingUp size={18} />,
+                iconBg: 'rgba(255, 255, 255, 0.06)',
+                iconColor: 'rgba(255, 255, 255, 0.5)',
+                sparkColor: 'rgba(255, 255, 255, 0.4)',
+                showSparkline: true,
+              },
+              {
+                label: 'In Progress',
+                value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
+                  .length,
+                numericValue: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
+                  .length,
+                icon: <Clock size={18} />,
+                iconBg: 'rgba(255, 255, 255, 0.06)',
+                iconColor: 'rgba(255, 255, 255, 0.5)',
+                sparkColor: 'rgba(255, 255, 255, 0.4)',
+              },
+            ]
+              .filter(stat => kpiVisibility[stat.label] !== false)
+              .map(stat => (
             <motion.div
               key={stat.label}
               className="stat-card liquid-glass-premium"
@@ -698,8 +791,9 @@ export default function Dashboard() {
               </div>
               <div className="stat-card-label">{stat.label}</div>
             </motion.div>
-          ))}
-        </motion.div>
+            ))}
+          </motion.div>
+        </>
       )}
 
       {/* Multi-Chart Dashboard Overview */}
