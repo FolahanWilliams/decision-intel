@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider   = "postgresql"
-  extensions = [vector(schema: "extensions")]
+  extensions = [vector(schema: "extensions"), pg_graphql(schema: "graphql_public"), pg_stat_statements(schema: "extensions"), pgcrypto(schema: "extensions"), pgjwt(schema: "extensions"), uuid_ossp(map: "uuid-ossp", schema: "extensions")]
 }
 
 model Document {
