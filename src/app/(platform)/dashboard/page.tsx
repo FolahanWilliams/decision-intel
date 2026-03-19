@@ -1249,6 +1249,7 @@ export default function Dashboard() {
               <button
                 onClick={() => setShowTrend(prev => !prev)}
                 className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+                aria-expanded={showTrend}
               >
                 <h3 className="flex items-center gap-2 text-base">
                   <BarChart3 size={18} style={{ color: '#F97316' }} />
@@ -1289,6 +1290,7 @@ export default function Dashboard() {
               <button
                 onClick={() => setShowComparative(prev => !prev)}
                 className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+                aria-expanded={showComparative}
               >
                 <h3 className="flex items-center gap-2 text-base">
                   <Scale size={18} style={{ color: '#F97316' }} />

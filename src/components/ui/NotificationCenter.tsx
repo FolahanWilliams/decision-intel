@@ -170,6 +170,8 @@ export function NotificationBell() {
             aria-hidden
           />
           <div
+            role="dialog"
+            aria-label="Notifications"
             style={{
               position: 'absolute',
               top: '100%',
