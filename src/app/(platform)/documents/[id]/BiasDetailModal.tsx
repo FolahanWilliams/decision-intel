@@ -279,7 +279,7 @@ export function BiasDetailModal({
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: 'rgba(99, 102, 241, 0.05)',
+              background: 'rgba(249, 115, 22, 0.05)',
               borderBottom: '1px solid var(--border-color)',
             }}
           >
@@ -385,7 +385,7 @@ export function BiasDetailModal({
                 <div
                   style={{
                     padding: 'var(--spacing-md) var(--spacing-lg)',
-                    background: 'rgba(99, 102, 241, 0.03)',
+                    background: 'rgba(249, 115, 22, 0.03)',
                   }}
                 >
                   <div
@@ -417,8 +417,8 @@ export function BiasDetailModal({
                   <div
                     style={{
                       padding: 'var(--spacing-md)',
-                      background: 'rgba(99, 102, 241, 0.04)',
-                      border: '1px solid rgba(99, 102, 241, 0.12)',
+                      background: 'rgba(249, 115, 22, 0.04)',
+                      border: '1px solid rgba(249, 115, 22, 0.12)',
                       borderRadius: '8px',
                       marginBottom: 'var(--spacing-md)',
                     }}
@@ -489,7 +489,7 @@ export function BiasDetailModal({
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              background: 'rgba(99, 102, 241, 0.02)',
+              background: 'rgba(249, 115, 22, 0.02)',
             }}
           >
             <span className="text-sm font-medium">Was this AI detection helpful?</span>
