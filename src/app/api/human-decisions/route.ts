@@ -431,6 +431,25 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
             })
             .catch(err => log.error('Slack nudge delivery failed:', err));
         }
+
+        // Deliver nudges via email for critical/warning severity
+        if (nudge.severity === 'critical' || nudge.severity === 'warning') {
+          import('@/lib/notifications/email')
+            .then(async ({ deliverEmailNudge }) => {
+              // Resolve user email from team membership
+              const member = await prisma.teamMember.findFirst({
+                where: { userId },
+                select: { email: true },
+              });
+              if (member?.email) {
+                await deliverEmailNudge(userId, member.email, nudge.message, nudge.nudgeType, nudge.severity);
+                await prisma.nudge
+                  .update({ where: { id: persisted.id }, data: { deliveredAt: new Date() } })
+                  .catch(() => {});
+              }
+            })
+            .catch(err => log.error('Email nudge delivery failed:', err));
+        }
       } catch (err) {
         log.error('Failed to persist nudge:', err);
       }

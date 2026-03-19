@@ -133,6 +133,18 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Resolve org membership for this user (if any)
+    let userOrgId: string | null = null;
+    try {
+      const membership = await prisma.teamMember.findFirst({
+        where: { userId },
+        select: { orgId: true },
+      });
+      userOrgId = membership?.orgId ?? null;
+    } catch {
+      // Schema drift — TeamMember table may not exist yet
+    }
+
     // Extract text content
     let content = '';
 
@@ -162,6 +174,7 @@ export async function POST(request: NextRequest) {
       document = await prisma.document.create({
         data: {
           userId,
+          orgId: userOrgId,
           filename: file.name,
           fileType: file.type || 'text/plain',
           fileSize: file.size,
@@ -177,6 +190,7 @@ export async function POST(request: NextRequest) {
         document = await prisma.document.create({
           data: {
             userId,
+            orgId: userOrgId,
             filename: file.name,
             fileType: file.type || 'text/plain',
             fileSize: file.size,
@@ -190,6 +204,7 @@ export async function POST(request: NextRequest) {
         document = await prisma.document.create({
           data: {
             userId,
+            orgId: userOrgId,
             filename: file.name,
             fileType: file.type || 'text/plain',
             fileSize: file.size,
@@ -260,7 +275,24 @@ export async function GET(request: NextRequest) {
     const page = Math.max(parseInt(searchParams.get('page') || '1', 10) || 1, 1);
     const skip = (page - 1) * limit;
 
-    const where = { userId };
+    // Include org-scoped documents if user belongs to a team
+    let where: { userId?: string; OR?: Array<Record<string, unknown>> } = { userId };
+    try {
+      const membership = await prisma.teamMember.findFirst({
+        where: { userId },
+        select: { orgId: true },
+      });
+      if (membership?.orgId) {
+        where = {
+          OR: [
+            { userId },
+            { orgId: membership.orgId },
+          ],
+        };
+      }
+    } catch {
+      // Schema drift — fall back to userId-only
+    }
 
     const [documents, total] = await Promise.all([
       prisma.document.findMany({

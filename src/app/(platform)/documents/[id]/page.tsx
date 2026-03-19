@@ -1194,6 +1194,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           isOpen={showShareModal}
           onClose={() => setShowShareModal(false)}
           documentName={document.filename}
+          analysisId={analysis.id}
           analysisData={{
             overallScore: analysis.overallScore,
             noiseScore: analysis.noiseScore,

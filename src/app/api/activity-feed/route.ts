@@ -52,13 +52,27 @@ export async function GET(request: NextRequest) {
     const cursorDate = cursor ? new Date(cursor) : undefined;
     const activities: ActivityItem[] = [];
 
+    // Resolve org membership for org-scoped queries
+    let docWhere: Record<string, unknown> = { userId: user.id };
+    try {
+      const membership = await prisma.teamMember.findFirst({
+        where: { userId: user.id },
+        select: { orgId: true },
+      });
+      if (membership?.orgId) {
+        docWhere = { OR: [{ userId: user.id }, { orgId: membership.orgId }] };
+      }
+    } catch {
+      // Schema drift
+    }
+
     // Fetch from multiple sources in parallel
     const [documents, nudges, outcomes] = await Promise.allSettled([
       // Documents (uploads + analysis completions/errors)
       (allowedTypes.has('upload') || allowedTypes.has('analysis_complete') || allowedTypes.has('analysis_error'))
         ? prisma.document.findMany({
             where: {
-              userId: user.id,
+              ...docWhere,
               ...(cursorDate ? { uploadedAt: { lt: cursorDate } } : {}),
             },
             orderBy: { uploadedAt: 'desc' },

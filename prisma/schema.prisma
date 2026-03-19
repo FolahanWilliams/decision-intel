@@ -560,6 +560,52 @@ model BoardroomPersona {
   @@index([isActive])
 }
 
+// ─── Shareable Links ─────────────────────────────────────────────────────
+
+model ShareLink {
+  id           String   @id @default(cuid())
+  token        String   @unique @default(cuid()) // Public URL token
+  analysisId   String   // Links to Analysis
+  userId       String   // Who created the link
+  orgId        String?  // Organization scope
+
+  // Access control
+  expiresAt    DateTime           // When the link stops working
+  revokedAt    DateTime?          // Manual revocation timestamp
+  password     String?            // Optional password hash (bcrypt)
+
+  // Tracking
+  viewCount    Int      @default(0)
+  lastViewedAt DateTime?
+
+  createdAt    DateTime @default(now())
+
+  @@index([token])
+  @@index([analysisId])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ─── Notification Log ────────────────────────────────────────────────────
+
+model NotificationLog {
+  id           String   @id @default(cuid())
+  userId       String
+  channel      String   // "email" | "slack" | "dashboard"
+  type         String   // "analysis_complete" | "weekly_digest" | "nudge" | "invite"
+  subject      String?
+  status       String   @default("sent") // "sent" | "failed" | "bounced"
+  metadata     Json?    // Channel-specific details
+  error        String?  @db.Text
+
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([channel])
+  @@index([type])
+  @@index([createdAt])
+}
+
 // Rate limiting table - replaces Redis for cost savings
 model RateLimit {
   id        String   @id @default(cuid())
