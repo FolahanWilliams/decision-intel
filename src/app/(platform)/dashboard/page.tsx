@@ -628,20 +628,18 @@ export default function Dashboard() {
               value: totalDocs,
               numericValue: totalDocs,
               icon: <FileText size={18} />,
-              iconBg: 'rgba(56, 189, 248, 0.15)',
-              iconColor: '#38bdf8',
-              accentColor: '#38bdf8',
-              sparkColor: '#38bdf8',
+              iconBg: 'rgba(255, 255, 255, 0.06)',
+              iconColor: 'rgba(255, 255, 255, 0.5)',
+              sparkColor: 'rgba(255, 255, 255, 0.4)',
             },
             {
               label: 'Analyzed',
               value: uploadedDocs.filter(d => d.status === 'complete').length,
               numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
               icon: <CheckCircle size={18} />,
-              iconBg: 'rgba(52, 211, 153, 0.15)',
-              iconColor: '#34d399',
-              accentColor: '#34d399',
-              sparkColor: '#34d399',
+              iconBg: 'rgba(255, 255, 255, 0.06)',
+              iconColor: 'rgba(255, 255, 255, 0.5)',
+              sparkColor: 'rgba(255, 255, 255, 0.4)',
             },
             {
               label: 'Avg Quality',
@@ -649,10 +647,9 @@ export default function Dashboard() {
               numericValue: riskSummary.avg,
               suffix: '%',
               icon: <TrendingUp size={18} />,
-              iconBg: 'rgba(251, 191, 36, 0.15)',
-              iconColor: '#fbbf24',
-              accentColor: '#fbbf24',
-              sparkColor: '#fbbf24',
+              iconBg: 'rgba(255, 255, 255, 0.06)',
+              iconColor: 'rgba(255, 255, 255, 0.5)',
+              sparkColor: 'rgba(255, 255, 255, 0.4)',
               showSparkline: true,
             },
             {
@@ -662,22 +659,20 @@ export default function Dashboard() {
               numericValue: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
                 .length,
               icon: <Clock size={18} />,
-              iconBg: 'rgba(248, 113, 113, 0.15)',
-              iconColor: '#f87171',
-              accentColor: '#f87171',
-              sparkColor: '#f87171',
+              iconBg: 'rgba(255, 255, 255, 0.06)',
+              iconColor: 'rgba(255, 255, 255, 0.5)',
+              sparkColor: 'rgba(255, 255, 255, 0.4)',
             },
           ].map(stat => (
             <motion.div
               key={stat.label}
-              className="stat-card liquid-glass-premium liquid-glass-fresnel"
-              style={{ borderTop: `2px solid ${stat.accentColor}` }}
+              className="stat-card liquid-glass-premium"
               variants={{
                 hidden: { opacity: 0, y: 20, scale: 0.97 },
                 visible: { opacity: 1, y: 0, scale: 1 },
               }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -4, boxShadow: '0 8px 30px rgba(255, 255, 255, 0.08), 0 0 40px rgba(255, 255, 255, 0.03)' }}
+              whileHover={{ y: -4, boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)' }}
             >
               <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
                 <div

@@ -200,8 +200,8 @@ export function DashboardCharts({
                 <AreaChart data={scoreTrend} margin={{ top: 5, right: 5, left: -30, bottom: 0 }}>
                   <defs>
                     <linearGradient id="dashTrendGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#34d399" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#34d399" stopOpacity={0} />
+                      <stop offset="5%" stopColor="rgba(255,255,255,0.2)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="rgba(255,255,255,0.05)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
@@ -225,8 +225,8 @@ export function DashboardCharts({
                   <Area
                     type="monotone"
                     dataKey="score"
-                    stroke="#34d399"
-                    strokeWidth={2}
+                    stroke="rgba(255,255,255,0.5)"
+                    strokeWidth={1.5}
                     fillOpacity={1}
                     fill="url(#dashTrendGrad)"
                   />
@@ -256,8 +256,8 @@ export function DashboardCharts({
                 >
                   <defs>
                     <linearGradient id="biasBarGrad" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.9} />
-                      <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.5} />
+                      <stop offset="0%" stopColor="rgba(255,255,255,0.45)" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="rgba(255,255,255,0.15)" stopOpacity={0.5} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.08)" />
