@@ -47,10 +47,10 @@ export default function Ticker() {
       role="marquee"
       aria-label="System metrics"
       style={{
-        background: 'rgba(0, 0, 0, 0.6)',
+        background: 'rgba(0, 0, 0, 0.5)',
         backdropFilter: 'blur(40px) saturate(180%)',
         WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.18)',
         height: '44px',
         display: 'flex',
         alignItems: 'center',
@@ -58,7 +58,7 @@ export default function Ticker() {
         whiteSpace: 'nowrap',
         fontSize: '13px',
         fontFamily: 'Inter, sans-serif',
-        boxShadow: '0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 4px 16px rgba(0, 0, 0, 0.3)',
+        boxShadow: '0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 4px 16px rgba(0, 0, 0, 0.4)',
       }}
     >
       <div className="ticker-track" style={{ flex: 1 }}>

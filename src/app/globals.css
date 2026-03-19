@@ -54,10 +54,10 @@
   --gradient-mid: #d4d4d8;
   --gradient-end: #a1a1aa;
 
-  /* Borders — clearly visible glass edges */
-  --border-color: rgba(255, 255, 255, 0.12);
-  --border-active: rgba(255, 255, 255, 0.5);
-  --border-hover: rgba(255, 255, 255, 0.22);
+  /* Borders — crisp visible glass edges */
+  --border-color: rgba(255, 255, 255, 0.18);
+  --border-active: rgba(255, 255, 255, 0.6);
+  --border-hover: rgba(255, 255, 255, 0.30);
 
   /* Severity — vivid, saturated */
   --success: #34d399;
@@ -100,8 +100,8 @@
   --shadow-glow-white: 0 0 40px rgba(255, 255, 255, 0.06);
 
   /* Glass — transparent frosted surfaces */
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.18);
   --glass-blur: 20px;
 
   /* Transitions */
@@ -110,16 +110,16 @@
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Liquid Glass — real frosted glass with depth */
-  --liquid-bg: rgba(255, 255, 255, 0.06);
-  --liquid-bg-strong: rgba(255, 255, 255, 0.10);
-  --liquid-bg-hover: rgba(255, 255, 255, 0.12);
-  --liquid-border: rgba(255, 255, 255, 0.15);
-  --liquid-border-hover: rgba(255, 255, 255, 0.25);
-  --liquid-border-active: rgba(255, 255, 255, 0.45);
-  --liquid-specular: rgba(255, 255, 255, 0.12);
-  --liquid-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
-  --liquid-shadow-hover: 0 16px 64px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.12) inset;
-  --liquid-shadow-glow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(255, 255, 255, 0.06), 0 0 60px rgba(255, 255, 255, 0.03);
+  --liquid-bg: rgba(255, 255, 255, 0.08);
+  --liquid-bg-strong: rgba(255, 255, 255, 0.12);
+  --liquid-bg-hover: rgba(255, 255, 255, 0.16);
+  --liquid-border: rgba(255, 255, 255, 0.20);
+  --liquid-border-hover: rgba(255, 255, 255, 0.35);
+  --liquid-border-active: rgba(255, 255, 255, 0.55);
+  --liquid-specular: rgba(255, 255, 255, 0.18);
+  --liquid-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  --liquid-shadow-hover: 0 16px 64px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.18) inset;
+  --liquid-shadow-glow: 0 0 0 1px rgba(255, 255, 255, 0.25), 0 8px 32px rgba(255, 255, 255, 0.08), 0 0 60px rgba(255, 255, 255, 0.04);
   --liquid-blur: 24px;
   --liquid-blur-strong: 48px;
   --liquid-radius: 16px;
@@ -128,21 +128,21 @@
   /* shadcn/ui semantic tokens — dark glassmorphism */
   --background: #000000;
   --foreground: #FFFFFF;
-  --card: rgba(255, 255, 255, 0.04);
+  --card: rgba(255, 255, 255, 0.06);
   --card-foreground: #FFFFFF;
-  --popover: rgba(10, 10, 10, 0.9);
+  --popover: rgba(10, 10, 10, 0.85);
   --popover-foreground: #FFFFFF;
   --primary: #FFFFFF;
   --primary-foreground: #000000;
-  --secondary: rgba(255, 255, 255, 0.08);
+  --secondary: rgba(255, 255, 255, 0.10);
   --secondary-foreground: #FFFFFF;
-  --muted: rgba(255, 255, 255, 0.06);
+  --muted: rgba(255, 255, 255, 0.08);
   --muted-foreground: #a1a1aa;
-  --accent: rgba(255, 255, 255, 0.08);
+  --accent: rgba(255, 255, 255, 0.10);
   --accent-foreground: #FFFFFF;
   --destructive: #f87171;
-  --border: rgba(255, 255, 255, 0.12);
-  --input: rgba(255, 255, 255, 0.10);
+  --border: rgba(255, 255, 255, 0.18);
+  --input: rgba(255, 255, 255, 0.12);
   --ring: #FFFFFF;
   --chart-1: #FFFFFF;
   --chart-2: #34d399;
@@ -150,13 +150,13 @@
   --chart-4: #fb923c;
   --chart-5: #38bdf8;
   --radius: 0.625rem;
-  --sidebar: rgba(0, 0, 0, 0.6);
+  --sidebar: rgba(0, 0, 0, 0.5);
   --sidebar-foreground: #FFFFFF;
   --sidebar-primary: #FFFFFF;
   --sidebar-primary-foreground: #000000;
-  --sidebar-accent: rgba(255, 255, 255, 0.08);
+  --sidebar-accent: rgba(255, 255, 255, 0.12);
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: rgba(255, 255, 255, 0.12);
+  --sidebar-border: rgba(255, 255, 255, 0.18);
   --sidebar-ring: #FFFFFF;
 }
 
@@ -183,11 +183,11 @@ body::before {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(ellipse 80% 60% at 10% 20%, rgba(52, 211, 153, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 80% at 85% 15%, rgba(56, 189, 248, 0.06) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 50% at 50% 90%, rgba(251, 191, 36, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(248, 113, 113, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse 90% 90% at 40% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 70%);
+    radial-gradient(ellipse 80% 60% at 10% 20%, rgba(52, 211, 153, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 85% 15%, rgba(56, 189, 248, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 90%, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(248, 113, 113, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 90% 90% at 40% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -205,9 +205,9 @@ body::after {
   inset: -20%;
   z-index: -1;
   background:
-    radial-gradient(ellipse 50% 50% at 70% 30%, rgba(52, 211, 153, 0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(248, 113, 113, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 50% 10%, rgba(56, 189, 248, 0.04) 0%, transparent 55%);
+    radial-gradient(ellipse 50% 50% at 70% 30%, rgba(52, 211, 153, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(248, 113, 113, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 10%, rgba(56, 189, 248, 0.07) 0%, transparent 55%);
   animation: ambientDrift 30s ease-in-out infinite;
   pointer-events: none;
 }
@@ -397,16 +397,16 @@ pre {
 
 .btn-primary {
   background: #FFFFFF;
-  color: #080808;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 2px 12px rgba(255, 255, 255, 0.1);
+  color: #000000;
+  border: 1px solid #FFFFFF;
+  box-shadow: 0 2px 16px rgba(255, 255, 255, 0.2), 0 0 40px rgba(255, 255, 255, 0.06);
   font-weight: 700;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #e4e4e7;
-  border-color: rgba(255, 255, 255, 1);
-  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.15);
+  background: #f0f0f0;
+  border-color: #FFFFFF;
+  box-shadow: 0 6px 30px rgba(255, 255, 255, 0.25), 0 0 60px rgba(255, 255, 255, 0.08);
   transform: translateY(-1px);
 }
 
@@ -814,21 +814,21 @@ tr:hover td {
    Surface Utilities (glass & depth)
    ═══════════════════════════════════════════ */
 .glass {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.20);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   border-radius: var(--liquid-radius);
-  box-shadow: var(--liquid-shadow), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  box-shadow: var(--liquid-shadow), 0 1px 0 rgba(255, 255, 255, 0.12) inset;
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.10);
-  border: 1px solid rgba(255, 255, 255, 0.20);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   border-radius: var(--liquid-radius);
-  box-shadow: var(--liquid-shadow), 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  box-shadow: var(--liquid-shadow), 0 1px 0 rgba(255, 255, 255, 0.16) inset;
 }
 
 .glow {
@@ -920,6 +920,47 @@ tr:hover td {
 
 .liquid-float {
   animation: floatUp 4s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════
+   Interactive Light Refraction — mouse-tracked
+   CSS vars set by LiquidGlassEffect.tsx
+   ═══════════════════════════════════════════ */
+.card,
+.glass,
+.glass-strong,
+.liquid-glass,
+.liquid-glass-float,
+.stat-card,
+.upload-zone {
+  --glass-light-x: -1000px;
+  --glass-light-y: -1000px;
+  --glass-light-intensity: 0;
+}
+
+/* Specular highlight overlay — follows cursor across glass surfaces */
+.card::after,
+.stat-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    350px circle at var(--glass-light-x) var(--glass-light-y),
+    rgba(255, 255, 255, calc(0.12 * var(--glass-light-intensity))) 0%,
+    rgba(255, 255, 255, calc(0.04 * var(--glass-light-intensity))) 35%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: screen;
+  transition: opacity 0.15s ease;
+}
+
+/* Border glow intensifies near cursor */
+.card:hover,
+.stat-card:hover {
+  border-color: rgba(255, 255, 255, calc(0.15 + 0.20 * var(--glass-light-intensity)));
 }
 
 /* ═══════════════════════════════════════════

@@ -93,10 +93,10 @@ export default function Sidebar() {
         style={{
           width: sidebarWidth,
           minWidth: sidebarWidth,
-          borderRight: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.18)',
           display: 'flex',
           flexDirection: 'column',
-          background: 'rgba(0, 0, 0, 0.5)',
+          background: 'rgba(0, 0, 0, 0.45)',
           backdropFilter: 'blur(40px) saturate(180%)',
           WebkitBackdropFilter: 'blur(40px) saturate(180%)',
           height: 'calc(100vh - 44px)',
@@ -105,14 +105,14 @@ export default function Sidebar() {
           transition:
             'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
           overflow: 'hidden',
-          boxShadow: '1px 0 0 rgba(255, 255, 255, 0.05) inset, 4px 0 24px rgba(0, 0, 0, 0.3)',
+          boxShadow: '1px 0 0 rgba(255, 255, 255, 0.08) inset, 4px 0 24px rgba(0, 0, 0, 0.4)',
         }}
       >
         {/* Brand */}
         <div
           style={{
             padding: collapsed ? '16px 12px' : '24px 20px',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.18)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -406,7 +406,7 @@ export default function Sidebar() {
         <div
           style={{
             padding: collapsed ? '12px' : '12px 20px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.18)',
           }}
         >
           <button
@@ -441,7 +441,7 @@ export default function Sidebar() {
         <div
           style={{
             padding: collapsed ? '12px' : '16px 20px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.18)',
           }}
         >
           <div
@@ -558,14 +558,14 @@ function NavItem({
               ? 'var(--text-primary)'
               : 'var(--text-secondary)',
           background: active
-            ? 'rgba(255, 255, 255, 0.12)'
+            ? 'rgba(255, 255, 255, 0.15)'
             : hovered
-              ? 'rgba(255, 255, 255, 0.06)'
+              ? 'rgba(255, 255, 255, 0.08)'
               : 'transparent',
           border: active
-            ? '1px solid rgba(255, 255, 255, 0.20)'
+            ? '1px solid rgba(255, 255, 255, 0.28)'
             : hovered
-              ? '1px solid rgba(255, 255, 255, 0.10)'
+              ? '1px solid rgba(255, 255, 255, 0.14)'
               : '1px solid transparent',
           borderRadius: 'var(--radius-lg)',
           marginBottom: '2px',
@@ -574,7 +574,7 @@ function NavItem({
           textDecoration: 'none',
           backdropFilter: active || hovered ? 'blur(12px)' : 'none',
           WebkitBackdropFilter: active || hovered ? 'blur(12px)' : 'none',
-          boxShadow: active ? '0 1px 0 rgba(255,255,255,0.10) inset, 0 4px 12px rgba(0,0,0,0.3)' : 'none',
+          boxShadow: active ? '0 1px 0 rgba(255,255,255,0.15) inset, 0 4px 12px rgba(0,0,0,0.4)' : 'none',
           transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
