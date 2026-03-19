@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
 import { useNotifications } from '@/components/ui/NotificationCenter';
@@ -759,7 +761,7 @@ export default function Dashboard() {
         >
           <AlertTriangle size={18} className="text-error shrink-0" />
           <span className="text-error text-sm">{error}</span>
-          <button onClick={() => setError(null)} className="ml-auto text-error/60 hover:text-error">
+          <button onClick={() => setError(null)} className="ml-auto text-error/60 hover:text-error" aria-label="Dismiss error">
             <X size={16} />
           </button>
         </motion.div>
@@ -1211,6 +1213,7 @@ export default function Dashboard() {
             <button
               onClick={() => setShowActivityFeed(prev => !prev)}
               className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+              aria-expanded={showActivityFeed}
             >
               <h3 className="flex items-center gap-2 text-base">
                 <Clock size={18} style={{ color: '#F97316' }} />
@@ -1246,6 +1249,7 @@ export default function Dashboard() {
               <button
                 onClick={() => setShowTrend(prev => !prev)}
                 className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+                aria-expanded={showTrend}
               >
                 <h3 className="flex items-center gap-2 text-base">
                   <BarChart3 size={18} style={{ color: '#F97316' }} />
@@ -1286,6 +1290,7 @@ export default function Dashboard() {
               <button
                 onClick={() => setShowComparative(prev => !prev)}
                 className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+                aria-expanded={showComparative}
               >
                 <h3 className="flex items-center gap-2 text-base">
                   <Scale size={18} style={{ color: '#F97316' }} />
@@ -1415,6 +1420,7 @@ export default function Dashboard() {
                         setSearchQuery('');
                       }}
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
+                      aria-label="Clear search"
                     >
                       <X size={14} />
                     </button>
@@ -1605,6 +1611,7 @@ export default function Dashboard() {
                           }
                           className="p-1.5 text-muted hover:text-error transition-colors rounded"
                           title="Delete"
+                          aria-label={`Delete ${doc.filename}`}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -1678,64 +1685,40 @@ export default function Dashboard() {
         </div>
       )}
 
-      <AnimatePresence>
-      {deleteModal.open && (
-        <motion.div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Delete document confirmation"
-          className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 modal-overlay"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          onClick={() => {
-            if (!deleting) setDeleteModal({ open: false, docId: '', filename: '' });
-          }}
-          onKeyDown={e => {
-            if (e.key === 'Escape' && !deleting)
-              setDeleteModal({ open: false, docId: '', filename: '' });
-          }}
-        >
-          <motion.div
-            className="card w-full max-w-sm mx-4 modal-content"
-            onClick={e => e.stopPropagation()}
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="card-body">
-              <div className="flex items-start gap-sm mb-lg">
-                <AlertTriangle size={20} className="text-error shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-medium mb-xs">Delete Document?</h3>
-                  <p className="text-sm text-muted">
-                    {deleteModal.filename} will be permanently removed.
-                  </p>
-                </div>
-              </div>
-              <div className="flex justify-end gap-sm">
-                <button
-                  onClick={() => setDeleteModal({ open: false, docId: '', filename: '' })}
-                  className="btn btn-ghost text-sm"
-                  disabled={deleting}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="btn bg-error text-white text-sm"
-                  disabled={deleting}
-                >
-                  {deleting ? <Loader2 size={14} className="animate-spin" /> : 'Delete'}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-      </AnimatePresence>
+      <Dialog
+        open={deleteModal.open}
+        onOpenChange={(open) => {
+          if (!open && !deleting) setDeleteModal({ open: false, docId: '', filename: '' });
+        }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-sm">
+              <AlertTriangle size={20} className="text-error shrink-0" />
+              Delete Document?
+            </DialogTitle>
+            <DialogDescription>
+              {deleteModal.filename} will be permanently removed.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteModal({ open: false, docId: '', filename: '' })}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              {deleting ? <Loader2 size={14} className="animate-spin" /> : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

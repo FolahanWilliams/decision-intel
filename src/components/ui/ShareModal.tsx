@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
-  X,
   Download,
   FileText,
   FileJson,
@@ -14,6 +13,13 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -47,16 +53,6 @@ export function ShareModal({
   const [creatingLink, setCreatingLink] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const { showToast } = useToast();
-
-  // Escape to close
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [isOpen, onClose]);
 
   const handlePdfExport = useCallback(async () => {
     setExportingPdf(true);
@@ -121,57 +117,27 @@ export function ShareModal({
     window.open(`mailto:?subject=${subject}&body=${body}`, '_self');
   }, [analysisData, documentName]);
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.7)' }}
-      onClick={onClose}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Share and Export"
-        className="card w-full max-w-md"
-        style={{
-          maxHeight: '85vh',
-          overflowY: 'auto',
-        }}
-        onClick={e => e.stopPropagation()}
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent
+        className="card w-full sm:max-w-md"
+        style={{ maxHeight: '85vh', overflowY: 'auto' }}
+        showCloseButton
       >
-        {/* Header */}
-        <div
-          className="card-header flex items-center justify-between"
-          style={{ position: 'sticky', top: 0, background: 'var(--bg-secondary)', zIndex: 5 }}
-        >
-          <div>
-            <h3 style={{ fontSize: '15px', fontWeight: 600 }}>Share & Export</h3>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
-              {documentName}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--text-muted)',
-              display: 'flex',
-            }}
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
-        </div>
+        <DialogHeader>
+          <DialogTitle style={{ fontSize: '15px', fontWeight: 600 }}>
+            Share & Export
+          </DialogTitle>
+          <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
+            {documentName}
+          </p>
+        </DialogHeader>
 
         {/* Tabs */}
         <div
           className="flex"
           style={{
             borderBottom: '1px solid var(--border-color)',
-            padding: '0 var(--spacing-lg)',
           }}
         >
           {(['export', 'share'] as const).map(tab => (
@@ -197,26 +163,15 @@ export function ShareModal({
           ))}
         </div>
 
-        <div style={{ padding: 'var(--spacing-lg)' }}>
+        <div>
           {/* Export Tab */}
           {activeTab === 'export' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              <button
+              <Button
+                variant="outline"
                 onClick={handlePdfExport}
                 disabled={exportingPdf}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: 'var(--spacing-lg)',
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  color: 'var(--text-primary)',
-                  transition: 'border-color 0.15s',
-                }}
+                className="h-auto flex-col gap-2 p-4"
               >
                 {exportingPdf ? (
                   <Loader2 size={24} className="animate-spin" style={{ color: 'var(--error)' }} />
@@ -227,85 +182,52 @@ export function ShareModal({
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                   Full formatted report
                 </span>
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="outline"
                 onClick={() => {
                   onExportCsv();
                   showToast('CSV exported', 'success');
                 }}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: 'var(--spacing-lg)',
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  color: 'var(--text-primary)',
-                  transition: 'border-color 0.15s',
-                }}
+                className="h-auto flex-col gap-2 p-4"
               >
                 <FileSpreadsheet size={24} style={{ color: 'var(--success)' }} />
                 <span style={{ fontSize: '13px', fontWeight: 500 }}>CSV Data</span>
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                   Spreadsheet format
                 </span>
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="outline"
                 onClick={() => {
                   onExportMarkdown();
                   showToast('Markdown exported', 'success');
                 }}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: 'var(--spacing-lg)',
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  color: 'var(--text-primary)',
-                  transition: 'border-color 0.15s',
-                }}
+                className="h-auto flex-col gap-2 p-4"
               >
                 <Download size={24} style={{ color: 'var(--accent-primary)' }} />
                 <span style={{ fontSize: '13px', fontWeight: 500 }}>Markdown</span>
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                   Documentation format
                 </span>
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="outline"
                 onClick={() => {
                   onExportJson();
                   showToast('JSON exported', 'success');
                 }}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: 'var(--spacing-lg)',
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  color: 'var(--text-primary)',
-                  transition: 'border-color 0.15s',
-                }}
+                className="h-auto flex-col gap-2 p-4"
               >
                 <FileJson size={24} style={{ color: 'var(--warning)' }} />
                 <span style={{ fontSize: '13px', fontWeight: 500 }}>JSON</span>
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                   Structured data
                 </span>
-              </button>
+              </Button>
             </div>
           )}
 
@@ -315,7 +237,8 @@ export function ShareModal({
               {/* Shareable Link */}
               {analysisId && (
                 <div>
-                  <button
+                  <Button
+                    variant="outline"
                     onClick={
                       shareUrl
                         ? async () => {
@@ -327,36 +250,25 @@ export function ShareModal({
                         : handleCreateShareLink
                     }
                     disabled={creatingLink}
+                    className="h-auto w-full justify-start gap-3 p-3 text-left"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px 16px',
-                      background: shareUrl ? 'rgba(249, 115, 22, 0.08)' : 'var(--bg-primary)',
-                      border: shareUrl
-                        ? '1px solid rgba(249, 115, 22, 0.3)'
-                        : '1px solid var(--border-color)',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      color: 'var(--text-primary)',
-                      fontSize: '13px',
-                      textAlign: 'left',
-                      width: '100%',
+                      background: shareUrl ? 'rgba(249, 115, 22, 0.08)' : undefined,
+                      borderColor: shareUrl ? 'rgba(249, 115, 22, 0.3)' : undefined,
                     }}
                   >
                     {creatingLink ? (
                       <Loader2
                         size={18}
-                        className="animate-spin"
-                        style={{ color: 'var(--accent-primary)', flexShrink: 0 }}
+                        className="animate-spin shrink-0"
+                        style={{ color: 'var(--accent-primary)' }}
                       />
                     ) : linkCopied ? (
-                      <Check size={18} style={{ color: 'var(--success)', flexShrink: 0 }} />
+                      <Check size={18} className="shrink-0" style={{ color: 'var(--success)' }} />
                     ) : (
-                      <Link2 size={18} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                      <Link2 size={18} className="shrink-0" style={{ color: 'var(--accent-primary)' }} />
                     )}
                     <div>
-                      <div style={{ fontWeight: 500 }}>
+                      <div style={{ fontWeight: 500, fontSize: '13px' }}>
                         {shareUrl
                           ? linkCopied
                             ? 'Link copied!'
@@ -369,7 +281,7 @@ export function ShareModal({
                           : 'Generates a public read-only link (7 day expiry)'}
                       </div>
                     </div>
-                  </button>
+                  </Button>
                   {shareUrl && (
                     <div
                       style={{
@@ -386,91 +298,58 @@ export function ShareModal({
                 </div>
               )}
 
-              <button
+              <Button
+                variant="outline"
                 onClick={handleCopySummary}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  textAlign: 'left',
-                }}
+                className="h-auto w-full justify-start gap-3 p-3 text-left"
               >
                 {copied ? (
-                  <Check size={18} style={{ color: 'var(--success)', flexShrink: 0 }} />
+                  <Check size={18} className="shrink-0" style={{ color: 'var(--success)' }} />
                 ) : (
-                  <Copy size={18} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                  <Copy size={18} className="shrink-0" style={{ color: 'var(--accent-primary)' }} />
                 )}
                 <div>
-                  <div style={{ fontWeight: 500 }}>Copy summary to clipboard</div>
+                  <div style={{ fontWeight: 500, fontSize: '13px' }}>Copy summary to clipboard</div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                     Score + executive summary as plain text
                   </div>
                 </div>
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="outline"
                 onClick={() => {
                   onExportMarkdown();
                   showToast('Copied Markdown to clipboard', 'success');
                 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  textAlign: 'left',
-                }}
+                className="h-auto w-full justify-start gap-3 p-3 text-left"
               >
-                <Link2 size={18} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                <Link2 size={18} className="shrink-0" style={{ color: 'var(--accent-primary)' }} />
                 <div>
-                  <div style={{ fontWeight: 500 }}>Export as Markdown</div>
+                  <div style={{ fontWeight: 500, fontSize: '13px' }}>Export as Markdown</div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                     Full report in Markdown format
                   </div>
                 </div>
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="outline"
                 onClick={handleEmailShare}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 16px',
-                  background: 'var(--bg-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  textAlign: 'left',
-                }}
+                className="h-auto w-full justify-start gap-3 p-3 text-left"
               >
-                <Mail size={18} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                <Mail size={18} className="shrink-0" style={{ color: 'var(--accent-primary)' }} />
                 <div>
-                  <div style={{ fontWeight: 500 }}>Send via email</div>
+                  <div style={{ fontWeight: 500, fontSize: '13px' }}>Send via email</div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                     Opens your email client with summary
                   </div>
                 </div>
-              </button>
+              </Button>
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

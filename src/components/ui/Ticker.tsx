@@ -95,6 +95,12 @@ export default function Ticker() {
             transform: translateX(-50%);
           }
         }
+        @media (max-width: 640px) {
+          .ticker-track {
+            gap: 24px;
+            animation-duration: 18s;
+          }
+        }
       `}</style>
     </div>
   );
