@@ -320,7 +320,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                           timeframe === tf.value ? 'rgba(249,115,22,0.15)' : 'transparent',
                         border: `1px solid ${timeframe === tf.value ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.08)'}`,
                         borderRadius: '14px',
-                        color: timeframe === tf.value ? '#a5b4fc' : 'var(--text-muted)',
+                        color: timeframe === tf.value ? '#FBBF24' : 'var(--text-muted)',
                         cursor: 'pointer',
                         fontWeight: timeframe === tf.value ? 600 : 400,
                       }}
@@ -453,7 +453,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                               : 'transparent',
                           border: `1px solid ${mostAccurateTwin === twin.name ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.08)'}`,
                           borderRadius: '14px',
-                          color: mostAccurateTwin === twin.name ? '#a5b4fc' : 'var(--text-muted)',
+                          color: mostAccurateTwin === twin.name ? '#FBBF24' : 'var(--text-muted)',
                           cursor: 'pointer',
                           fontWeight: mostAccurateTwin === twin.name ? 600 : 400,
                         }}
