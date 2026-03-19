@@ -3,31 +3,103 @@
 import { useEffect, useRef, useCallback } from 'react';
 
 /**
- * LiquidGlassEffect — Apple-style liquid glass with SVG filter-based refraction.
+ * LiquidGlassEffect — Apple-style liquid glass with real lens refraction.
  *
- * Uses SVG filters for physically accurate effects:
- * - feTurbulence: Generates organic noise for irregular refraction distortion
- * - feDisplacementMap: Warps pixels through the noise map (actual light bending)
- * - feSpecularLighting + fePointLight: Smooth specular highlight following cursor
- * - feGaussianBlur: Softens specular for natural glass caustics
+ * Key difference from basic glassmorphism: uses a canvas-generated convex lens
+ * displacement map applied via SVG feDisplacementMap + backdrop-filter.
+ * This actually warps what's BEHIND the glass element (real refraction),
+ * not the element itself.
  *
- * The specular light's fePointLight position tracks the mouse cursor via
- * requestAnimationFrame for 60fps interactive refraction.
+ * The displacement map encodes a convex lens shape:
+ * - Red channel = X displacement (128 = neutral, <128 = shift left, >128 = shift right)
+ * - Green channel = Y displacement (same encoding)
+ * - Creates outward radial distortion like looking through curved glass
+ *
+ * Layers:
+ * 1. backdrop-filter refraction (SVG displacement map)
+ * 2. Per-element specular highlight (CSS radial gradient tracking cursor)
+ * 3. Edge rim light (inset box-shadow)
+ * 4. Global ambient light bloom (radial gradient following cursor)
  */
+
+// Generate a convex lens displacement map as a data URL
+function generateLensMap(size: number): string {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const imageData = ctx.createImageData(size, size);
+  const data = imageData.data;
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const maxRadius = size / 2;
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const idx = (y * size + x) * 4;
+
+      const dx = (x - cx) / maxRadius;
+      const dy = (y - cy) / maxRadius;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 1.0) {
+        // Convex lens profile: displacement increases then falls at edges
+        // Using a smooth bell curve for natural glass refraction
+        const strength = Math.pow(1 - dist * dist, 1.5);
+        const angle = Math.atan2(dy, dx);
+
+        // Outward radial displacement (light bends outward through convex glass)
+        const displacementX = Math.cos(angle) * strength;
+        const displacementY = Math.sin(angle) * strength;
+
+        // Encode as RGB: 128 = no displacement, 0-127 = negative, 129-255 = positive
+        data[idx] = Math.round(128 + displacementX * 80);     // R = X offset
+        data[idx + 1] = Math.round(128 + displacementY * 80); // G = Y offset
+        data[idx + 2] = 128;                                   // B = unused
+        data[idx + 3] = 255;                                   // A = fully opaque
+      } else {
+        // Outside lens: neutral (no displacement)
+        data[idx] = 128;
+        data[idx + 1] = 128;
+        data[idx + 2] = 128;
+        data[idx + 3] = 255;
+      }
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  return canvas.toDataURL('image/png');
+}
+
 export function LiquidGlassEffect() {
   const lightRef = useRef<HTMLDivElement>(null);
-  const pointLightRef = useRef<SVGFEPointLightElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const rafRef = useRef<number>(0);
   const mouseRef = useRef({ x: -1000, y: -1000 });
+  const lensMapRef = useRef<string>('');
+
+  // Generate lens displacement map on mount
+  useEffect(() => {
+    const mapUrl = generateLensMap(256);
+    lensMapRef.current = mapUrl;
+
+    // Inject the displacement map into the SVG filter
+    const feImage = document.getElementById('liquid-glass-lens-image');
+    if (feImage) {
+      feImage.setAttribute('href', mapUrl);
+    }
+
+    // Also generate a rectangular version for cards
+    const rectMap = generateRectLensMap(512, 256);
+    const feImageRect = document.getElementById('liquid-glass-card-lens-image');
+    if (feImageRect) {
+      feImageRect.setAttribute('href', rectMap);
+    }
+  }, []);
 
   const updateGlassElements = useCallback(() => {
     const { x, y } = mouseRef.current;
-
-    // Update the SVG fePointLight position for specular tracking
-    if (pointLightRef.current) {
-      pointLightRef.current.setAttribute('x', String(x));
-      pointLightRef.current.setAttribute('y', String(y));
-    }
 
     // Update the CSS light bloom position
     if (lightRef.current) {
@@ -90,112 +162,56 @@ export function LiquidGlassEffect() {
   return (
     <>
       {/* ═══ SVG Filter Definitions ═══
-          These are referenced by CSS filter: url(#...) on glass elements.
-          They never render visually themselves — they're processing pipelines. */}
+          backdrop-filter: url(#...) applies these to what's BEHIND the element.
+          This is the key difference — it refracts the background, not the element. */}
       <svg
+        ref={svgRef}
         aria-hidden="true"
         style={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
       >
         <defs>
-          {/* ── Liquid Glass Refraction Filter ──
-              Creates organic distortion like light bending through thick glass */}
-          <filter id="liquid-glass-refraction" x="-10%" y="-10%" width="120%" height="120%">
-            {/* Step 1: Generate organic noise pattern */}
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.015"
-              numOctaves="3"
-              seed="1"
-              result="noise"
-            />
-            {/* Step 2: Use noise to displace pixels — actual refraction */}
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              scale="6"
-              xChannelSelector="R"
-              yChannelSelector="G"
-              result="displaced"
-            />
-            {/* Step 3: Slight blur to smooth the displacement edges */}
-            <feGaussianBlur in="displaced" stdDeviation="0.5" result="smoothed" />
-            {/* Step 4: Composite back with original for subtlety */}
-            <feBlend in="smoothed" in2="SourceGraphic" mode="normal" />
-          </filter>
-
-          {/* ── Specular Light Filter ──
-              Creates a smooth, physically-based specular highlight.
-              fePointLight position is updated dynamically by JS. */}
-          <filter id="liquid-glass-specular" x="-50%" y="-50%" width="200%" height="200%">
-            <feSpecularLighting
-              in="SourceAlpha"
-              specularExponent="80"
-              specularConstant="0.6"
-              surfaceScale="3"
-              lightingColor="rgba(255,255,255,1)"
-              result="specular"
-            >
-              <fePointLight ref={pointLightRef} x={-1000} y={-1000} z={200} />
-            </feSpecularLighting>
-            {/* Soften the specular highlight for glass caustic feel */}
-            <feGaussianBlur in="specular" stdDeviation="8" result="blurredSpec" />
-            {/* Only keep the bright parts */}
-            <feComposite
-              in="blurredSpec"
-              in2="SourceAlpha"
-              operator="in"
-              result="maskedSpec"
-            />
-            {/* Merge specular on top of original */}
-            <feMerge>
-              <feMergeNode in="SourceGraphic" />
-              <feMergeNode in="maskedSpec" />
-            </feMerge>
-          </filter>
-
-          {/* ── Combined Glass Filter ──
-              Applies both refraction + specular in one pass for elements
-              that want the full liquid glass treatment */}
-          <filter id="liquid-glass-full" x="-10%" y="-10%" width="120%" height="120%">
-            {/* Refraction distortion */}
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.012"
-              numOctaves="3"
-              seed="2"
-              result="noise"
+          {/* ── Convex Lens Refraction ──
+              Uses a canvas-generated displacement map encoding a convex lens shape.
+              feDisplacementMap warps backdrop pixels through the lens pattern.
+              This creates real optical distortion like looking through curved glass. */}
+          <filter id="liquid-glass-refraction" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+            <feImage
+              id="liquid-glass-lens-image"
+              href=""
+              x="0" y="0"
+              width="100%" height="100%"
+              preserveAspectRatio="none"
+              result="lens_map"
             />
             <feDisplacementMap
               in="SourceGraphic"
-              in2="noise"
-              scale="4"
+              in2="lens_map"
+              scale="18"
               xChannelSelector="R"
               yChannelSelector="G"
-              result="displaced"
             />
-            <feGaussianBlur in="displaced" stdDeviation="0.3" result="smoothDisp" />
-            {/* Specular highlight */}
-            <feSpecularLighting
-              in="SourceAlpha"
-              specularExponent="60"
-              specularConstant="0.4"
-              surfaceScale="2"
-              lightingColor="rgba(255,255,255,1)"
-              result="spec"
-            >
-              <fePointLight x={500} y={200} z={300} />
-            </feSpecularLighting>
-            <feGaussianBlur in="spec" stdDeviation="6" result="softSpec" />
-            <feComposite in="softSpec" in2="SourceAlpha" operator="in" result="clippedSpec" />
-            {/* Combine */}
-            <feMerge>
-              <feMergeNode in="smoothDisp" />
-              <feMergeNode in="clippedSpec" />
-            </feMerge>
           </filter>
 
-          {/* ── Subtle Glass Noise Texture ──
-              For elements that just need grain without refraction */}
+          {/* ── Card-optimized lens (wider aspect ratio) ── */}
+          <filter id="liquid-glass-card" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+            <feImage
+              id="liquid-glass-card-lens-image"
+              href=""
+              x="0" y="0"
+              width="100%" height="100%"
+              preserveAspectRatio="none"
+              result="card_lens_map"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="card_lens_map"
+              scale="12"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+
+          {/* ── Subtle Glass Noise Texture ── */}
           <filter id="glass-grain" x="0%" y="0%" width="100%" height="100%">
             <feTurbulence
               type="fractalNoise"
@@ -215,7 +231,7 @@ export function LiquidGlassEffect() {
         </defs>
       </svg>
 
-      {/* Smooth radial light bloom following cursor — uses CSS for buttery performance */}
+      {/* Smooth radial light bloom following cursor */}
       <div
         ref={lightRef}
         aria-hidden="true"
@@ -240,4 +256,55 @@ export function LiquidGlassEffect() {
       <div className="noise-grain" aria-hidden="true" />
     </>
   );
+}
+
+/**
+ * Generate a rectangular lens displacement map for card-shaped elements.
+ * Uses a squircle profile (rounded rectangle) instead of a circle.
+ */
+function generateRectLensMap(width: number, height: number): string {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d')!;
+  const imageData = ctx.createImageData(width, height);
+  const data = imageData.data;
+
+  const cx = width / 2;
+  const cy = height / 2;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+
+      // Normalize to -1..1 range
+      const nx = (x - cx) / cx;
+      const ny = (y - cy) / cy;
+
+      // Squircle distance (p=4 for smooth rounded rect)
+      const dist = Math.pow(Math.pow(Math.abs(nx), 4) + Math.pow(Math.abs(ny), 4), 0.25);
+
+      if (dist < 1.0) {
+        // Smooth convex lens profile
+        const strength = Math.pow(1 - dist * dist, 1.8);
+        const angle = Math.atan2(ny, nx);
+
+        const displacementX = Math.cos(angle) * strength;
+        const displacementY = Math.sin(angle) * strength;
+
+        data[idx] = Math.round(128 + displacementX * 60);
+        data[idx + 1] = Math.round(128 + displacementY * 60);
+        data[idx + 2] = 128;
+        data[idx + 3] = 255;
+      } else {
+        data[idx] = 128;
+        data[idx + 1] = 128;
+        data[idx + 2] = 128;
+        data[idx + 3] = 255;
+      }
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  return canvas.toDataURL('image/png');
 }
