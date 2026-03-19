@@ -229,6 +229,28 @@ export async function POST(request: NextRequest) {
           // Signal completion
           controller.enqueue(encoder.encode(formatSSE({ type: 'done' })));
 
+          // Generate follow-up suggestions (fire-and-forget, non-blocking)
+          try {
+            const suggestModel = getModel();
+            const suggestResult = await suggestModel.generateContent(
+              `Based on this conversation, suggest 2-3 short follow-up questions the user might want to ask next. The user's latest question was: "${message}". Return ONLY a JSON array of strings, no other text. Example: ["Question 1?", "Question 2?"]`
+            );
+            const suggestText = suggestResult.response.text().trim();
+            // Extract JSON array from response
+            const match = suggestText.match(/\[[\s\S]*\]/);
+            if (match) {
+              const parsed = JSON.parse(match[0]);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                controller.enqueue(
+                  encoder.encode(formatSSE({ type: 'suggestions', suggestions: parsed.slice(0, 3) }))
+                );
+              }
+            }
+          } catch (suggestErr) {
+            log.warn('Failed to generate suggestions:', suggestErr);
+            // Non-critical — don't fail the whole response
+          }
+
           // Audit log (fire-and-forget)
           void logAudit({
             action: 'CHAT_MESSAGE',

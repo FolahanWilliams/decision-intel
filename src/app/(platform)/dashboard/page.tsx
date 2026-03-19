@@ -36,6 +36,8 @@ import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnal
 import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { formatDate, formatDateShort } from '@/lib/constants/human-audit';
+import { ActivityFeed } from '@/components/ui/ActivityFeed';
+import { useActivityFeed } from '@/hooks/useActivityFeed';
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -121,6 +123,8 @@ export default function Dashboard() {
 
   const { addNotification } = useNotifications();
   const { startTracking, updateProgress, completeTracking, errorTracking } = useAnalysisProgress();
+  const [showActivityFeed, setShowActivityFeed] = useState(false);
+  const { activities, isLoading: feedLoading, hasMore: feedHasMore, loadMore: feedLoadMore } = useActivityFeed({ limit: 12 });
 
   // SWR: cached document list with auto-revalidation
   const {
@@ -1018,6 +1022,40 @@ export default function Dashboard() {
       {/* ═══════ BROWSE & ANALYZE VIEW ═══════ */}
       {activeView === 'browse' && (
         <>
+          {/* Activity Feed - Collapsible */}
+          <div className="card mb-xl">
+            <button
+              onClick={() => setShowActivityFeed(prev => !prev)}
+              className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+            >
+              <h3 className="flex items-center gap-2 text-base">
+                <Clock size={18} className="text-indigo-500" />
+                Recent Activity
+                {activities.length > 0 && (
+                  <span className="text-xs text-muted font-normal">
+                    ({activities.length} events)
+                  </span>
+                )}
+              </h3>
+              <ChevronRight
+                size={18}
+                className={`text-muted transition-transform ${showActivityFeed ? 'rotate-90' : ''}`}
+              />
+            </button>
+            {showActivityFeed && (
+              <div className="card-body">
+                <ErrorBoundary sectionName="Activity Feed">
+                  <ActivityFeed
+                    activities={activities}
+                    isLoading={feedLoading}
+                    hasMore={feedHasMore}
+                    onLoadMore={feedLoadMore}
+                  />
+                </ErrorBoundary>
+              </div>
+            )}
+          </div>
+
           {/* Risk Trend - Collapsible (collapsed by default) */}
           {uploadedDocs.some(d => d.score !== undefined) && (
             <div className="card mb-xl">

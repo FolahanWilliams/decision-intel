@@ -11,8 +11,6 @@ import {
   Loader2,
   ChevronRight,
   Lightbulb,
-  Download,
-  Table,
   Terminal,
   PlayCircle,
   Info,
@@ -47,6 +45,8 @@ import {
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
 import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
+import { ShareModal } from '@/components/ui/ShareModal';
+import { Share2 } from 'lucide-react';
 
 // Lazy-loaded tab components
 const OverviewTab = lazy(() =>
@@ -64,6 +64,9 @@ const SimulatorTab = lazy(() =>
 );
 const IntelligenceTab = lazy(() =>
   import('./tabs/IntelligenceTab').then(m => ({ default: m.IntelligenceTab }))
+);
+const ReplayTab = lazy(() =>
+  import('./tabs/ReplayTab').then(m => ({ default: m.ReplayTab }))
 );
 
 interface VerificationSource {
@@ -154,7 +157,8 @@ type TabId =
   | 'simulator'
   | 'red-team'
   | 'boardroom'
-  | 'intelligence';
+  | 'intelligence'
+  | 'replay';
 
 const VALID_TABS: TabId[] = [
   'overview',
@@ -165,6 +169,7 @@ const VALID_TABS: TabId[] = [
   'boardroom',
   'simulator',
   'intelligence',
+  'replay',
 ];
 
 export default function DocumentAnalysisPage({ params }: { params: Promise<{ id: string }> }) {
@@ -181,8 +186,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   >([]);
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
-  const [isExportingPdf, setIsExportingPdf] = useState(false);
-  const [isExportingCsv, setIsExportingCsv] = useState(false);
+  const [, setIsExportingPdf] = useState(false);
+  const [, setIsExportingCsv] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const scanAbortRef = useRef<AbortController | null>(null);
 
   // URL-based tab state (#7)
@@ -437,6 +443,46 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const biases = analysis?.biases || [];
   const selectedBiasIndex = selectedBias ? biases.findIndex(b => b.id === selectedBias.id) : -1;
 
+  const handleMarkdownExport = useCallback(async () => {
+    if (!analysis || !document) return;
+    const { generateMarkdownReport, downloadMarkdown } = await import('@/lib/reports/markdown-generator');
+    const md = generateMarkdownReport({
+      filename: document.filename,
+      uploadedAt: document.uploadedAt,
+      overallScore: analysis.overallScore,
+      noiseScore: analysis.noiseScore,
+      summary: analysis.summary,
+      biases: biases.map(b => ({ biasType: b.biasType, severity: b.severity, excerpt: b.excerpt, explanation: b.explanation, suggestion: b.suggestion })),
+      factCheck: analysis.factCheck as { score: number; verifications?: Array<{ claim: string; verdict: string; explanation: string }> } | undefined,
+      swotAnalysis: analysis.swotAnalysis as { strengths: string[]; weaknesses: string[]; opportunities: string[]; threats: string[]; strategicAdvice: string } | undefined,
+      simulation: analysis.simulation as { overallVerdict: string; twins?: Array<{ name: string; role: string; vote: string; confidence: number; rationale: string }> } | undefined,
+      noiseStats: analysis.noiseStats as { mean: number; stdDev: number; variance: number } | undefined,
+      logicalAnalysis: analysis.logicalAnalysis as { score: number; fallacies?: Array<{ name: string; severity: string; explanation: string }> } | undefined,
+      compliance: analysis.compliance as { status: string; riskScore: number; summary: string } | undefined,
+    });
+    downloadMarkdown(md, document.filename);
+  }, [analysis, document, biases]);
+
+  const handleJsonExport = useCallback(async () => {
+    if (!analysis || !document) return;
+    const { generateJsonReport, downloadJson } = await import('@/lib/reports/json-generator');
+    const json = generateJsonReport({
+      filename: document.filename,
+      uploadedAt: document.uploadedAt,
+      overallScore: analysis.overallScore,
+      noiseScore: analysis.noiseScore,
+      summary: analysis.summary,
+      biases: biases.map(b => ({ biasType: b.biasType, severity: b.severity, excerpt: b.excerpt, explanation: b.explanation, suggestion: b.suggestion })),
+      factCheck: analysis.factCheck as { score: number; verifications?: Array<{ claim: string; verdict: string; explanation: string }> } | undefined,
+      swotAnalysis: analysis.swotAnalysis as { strengths: string[]; weaknesses: string[]; opportunities: string[]; threats: string[]; strategicAdvice: string } | undefined,
+      simulation: analysis.simulation as { overallVerdict: string; twins?: Array<{ name: string; role: string; vote: string; confidence: number; rationale: string }> } | undefined,
+      noiseStats: analysis.noiseStats as { mean: number; stdDev: number; variance: number } | undefined,
+      logicalAnalysis: analysis.logicalAnalysis as { score: number; fallacies?: Array<{ name: string; severity: string; explanation: string }> } | undefined,
+      compliance: analysis.compliance as { status: string; riskScore: number; summary: string } | undefined,
+    });
+    downloadJson(json, document.filename);
+  }, [analysis, document, biases]);
+
   const TAB_GROUPS: { label: string; tabs: { id: TabId; label: string; icon: typeof Brain }[] }[] =
     [
       {
@@ -446,6 +492,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {
         label: 'Analysis',
         tabs: [
+          { id: 'replay', label: 'Replay', icon: PlayCircle },
           { id: 'logic', label: 'Logic', icon: CheckCircle },
           { id: 'swot', label: 'SWOT', icon: Lightbulb },
           { id: 'noise', label: 'Noise', icon: Info },
@@ -508,34 +555,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             </span>
           )}
           {analysis && (
-            <div className="flex gap-sm">
-              <button
-                onClick={handleExport}
-                disabled={isExportingPdf}
-                className="btn btn-secondary btn-sm flex items-center gap-sm"
-                aria-label="Export as PDF"
-              >
-                {isExportingPdf ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <Download size={14} />
-                )}
-                PDF
-              </button>
-              <button
-                onClick={handleCsvExport}
-                disabled={isExportingCsv}
-                className="btn btn-secondary btn-sm flex items-center gap-sm"
-                aria-label="Export as CSV"
-              >
-                {isExportingCsv ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <Table size={14} />
-                )}
-                CSV
-              </button>
-            </div>
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="btn btn-secondary btn-sm flex items-center gap-sm"
+              aria-label="Share and export"
+            >
+              <Share2 size={14} />
+              Share & Export
+            </button>
           )}
         </div>
       </header>
@@ -955,6 +982,32 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   />
                 </ErrorBoundary>
               )}
+              {activeTab === 'replay' && analysis && (
+                <ErrorBoundary sectionName="Decision Replay">
+                  <ReplayTab
+                    analysisData={{
+                      overallScore: analysis.overallScore,
+                      noiseScore: analysis.noiseScore,
+                      summary: analysis.summary,
+                      biases: biases.map(b => ({
+                        biasType: b.biasType,
+                        found: true,
+                        severity: b.severity as 'low' | 'medium' | 'high' | 'critical',
+                        excerpt: b.excerpt,
+                        explanation: b.explanation,
+                        suggestion: b.suggestion,
+                      })),
+                      ...(analysis.noiseStats ? { noiseStats: analysis.noiseStats as { mean: number; stdDev: number; variance: number } } : {}),
+                      ...(analysis.factCheck ? { factCheck: analysis.factCheck as { score: number; flags: string[]; verifications?: Array<{ claim: string; verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE'; explanation: string }> } } : {}),
+                      ...(analysis.compliance ? { compliance: analysis.compliance as import('@/types').ComplianceResult } : {}),
+                      ...(analysis.logicalAnalysis ? { logicalAnalysis: analysis.logicalAnalysis as import('@/types').LogicalAnalysisResult } : {}),
+                      ...(analysis.swotAnalysis ? { swotAnalysis: analysis.swotAnalysis as import('@/types').SwotAnalysisResult } : {}),
+                      ...(analysis.simulation ? { simulation: analysis.simulation as import('@/types').SimulationResult } : {}),
+                      ...(analysis.cognitiveAnalysis ? { cognitiveAnalysis: analysis.cognitiveAnalysis as import('@/types').CognitiveAnalysisResult } : {}),
+                    }}
+                  />
+                </ErrorBoundary>
+              )}
               {activeTab === 'logic' && (
                 <ErrorBoundary sectionName="Logic Analysis">
                   <LogicTab logicalAnalysis={analysis?.logicalAnalysis} />
@@ -1132,6 +1185,24 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             <InstitutionalMemoryWidget memory={analysis.institutionalMemory} />
           </div>
         </ErrorBoundary>
+      )}
+
+      {/* Share & Export Modal */}
+      {analysis && (
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          documentName={document.filename}
+          analysisData={{
+            overallScore: analysis.overallScore,
+            noiseScore: analysis.noiseScore,
+            summary: analysis.summary,
+          }}
+          onExportPdf={handleExport}
+          onExportCsv={handleCsvExport}
+          onExportMarkdown={handleMarkdownExport}
+          onExportJson={handleJsonExport}
+        />
       )}
     </div>
   );

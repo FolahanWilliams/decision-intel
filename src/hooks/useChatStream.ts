@@ -27,6 +27,7 @@ interface UseChatStreamReturn {
   messages: ChatMessage[];
   isStreaming: boolean;
   error: string | null;
+  suggestions: string[];
   sendMessage: (text: string) => Promise<void>;
   clearMessages: () => void;
   loadMessages: (msgs: ChatMessage[]) => void;
@@ -41,6 +42,7 @@ export function useChatStream(options?: UseChatStreamOptions): UseChatStreamRetu
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const abortRef = useRef<AbortController | null>(null);
   // Ref keeps the latest messages available inside the callback closure
   const messagesRef = useRef<ChatMessage[]>(messages);
@@ -66,6 +68,7 @@ export function useChatStream(options?: UseChatStreamOptions): UseChatStreamRetu
 
       setMessages(prev => [...prev, userMsg, assistantMsg]);
       setIsStreaming(true);
+      setSuggestions([]);
 
       // Build history from the ref (always up-to-date, avoids stale closure)
       const history = messagesRef.current
@@ -106,6 +109,7 @@ export function useChatStream(options?: UseChatStreamOptions): UseChatStreamRetu
             text?: string;
             sources?: ChatSource[];
             message?: string;
+            suggestions?: string[];
           };
           if (event.type === 'sources') {
             sources = event.sources || [];
@@ -126,6 +130,10 @@ export function useChatStream(options?: UseChatStreamOptions): UseChatStreamRetu
                   : m
               )
             );
+          } else if (event.type === 'suggestions') {
+            if (Array.isArray(event.suggestions)) {
+              setSuggestions(event.suggestions);
+            }
           } else if (event.type === 'error') {
             setError(event.message || 'An error occurred');
           }
@@ -179,5 +187,5 @@ export function useChatStream(options?: UseChatStreamOptions): UseChatStreamRetu
     };
   }, []);
 
-  return { messages, isStreaming, error, sendMessage, clearMessages, loadMessages };
+  return { messages, isStreaming, error, suggestions, sendMessage, clearMessages, loadMessages };
 }
