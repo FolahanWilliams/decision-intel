@@ -761,7 +761,7 @@ export default function Dashboard() {
         >
           <AlertTriangle size={18} className="text-error shrink-0" />
           <span className="text-error text-sm">{error}</span>
-          <button onClick={() => setError(null)} className="ml-auto text-error/60 hover:text-error">
+          <button onClick={() => setError(null)} className="ml-auto text-error/60 hover:text-error" aria-label="Dismiss error">
             <X size={16} />
           </button>
         </motion.div>
@@ -1213,6 +1213,7 @@ export default function Dashboard() {
             <button
               onClick={() => setShowActivityFeed(prev => !prev)}
               className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+              aria-expanded={showActivityFeed}
             >
               <h3 className="flex items-center gap-2 text-base">
                 <Clock size={18} style={{ color: '#F97316' }} />
@@ -1417,6 +1418,7 @@ export default function Dashboard() {
                         setSearchQuery('');
                       }}
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-primary"
+                      aria-label="Clear search"
                     >
                       <X size={14} />
                     </button>
@@ -1607,6 +1609,7 @@ export default function Dashboard() {
                           }
                           className="p-1.5 text-muted hover:text-error transition-colors rounded"
                           title="Delete"
+                          aria-label={`Delete ${doc.filename}`}
                         >
                           <Trash2 size={16} />
                         </button>
