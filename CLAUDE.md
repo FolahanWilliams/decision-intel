@@ -18,6 +18,13 @@ git push --force-with-lease -u origin <branch-name>
 - Before opening or updating a PR, verify the branch is not behind main: `git log --oneline origin/main..HEAD` should show only your commits, and `git log --oneline HEAD..origin/main` should be empty.
 - If your branch has fallen behind (e.g. main received new merges), rebase again before pushing.
 
+### Database Sync Strategy
+
+- **NEVER** run `npx prisma db push` for shared schema changes; always use `npx prisma migrate dev`.
+- **ALWAYS** commit the generated `prisma/migrations/` folder to Git with every schema change.
+- If you see "Schema drift detected," check if `schema.prisma` is missing Supabase-managed extensions (`pg_graphql`, `pg_stat_statements`, etc.) before agreeing to a reset.
+- To baseline an existing database without resetting: delete `prisma/migrations/`, run `npx prisma migrate dev --name initial_base --create-only`, then run `npx prisma migrate resolve --applied initial_base` on each existing database.
+
 ## Project Overview
 
 Next.js 14 app (App Router) with Prisma ORM, Supabase Auth, LangGraph AI pipeline, and Supabase Postgres.
