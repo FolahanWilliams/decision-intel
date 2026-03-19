@@ -46,13 +46,19 @@ function LoginContent() {
   const authError = searchParams.get('error');
   const errorMessage = getErrorMessage(authError);
 
+  const redirectTo = searchParams.get('redirect');
+
   const handleGoogleLogin = async () => {
     setLoading(true);
     const supabase = createClient();
+    const callbackUrl = new URL('/api/auth/callback', location.origin);
+    if (redirectTo) {
+      callbackUrl.searchParams.set('redirect', redirectTo);
+    }
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${location.origin}/api/auth/callback`,
+        redirectTo: callbackUrl.toString(),
       },
     });
   };

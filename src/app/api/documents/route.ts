@@ -39,7 +39,24 @@ export async function GET(request: Request) {
     const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 10));
     const skip = (page - 1) * limit;
 
-    const where = { userId };
+    // Build org-aware where clause: user's own docs + org-shared docs
+    let where: { userId?: string; OR?: Array<Record<string, unknown>> } = { userId };
+    try {
+      const membership = await prisma.teamMember.findFirst({
+        where: { userId },
+        select: { orgId: true },
+      });
+      if (membership?.orgId) {
+        where = {
+          OR: [
+            { userId },
+            { orgId: membership.orgId },
+          ],
+        };
+      }
+    } catch {
+      // Schema drift — TeamMember may not exist, fall back to userId-only
+    }
     let schemaDrift = false;
 
     // Build the select — detailed mode requests extended analysis fields.

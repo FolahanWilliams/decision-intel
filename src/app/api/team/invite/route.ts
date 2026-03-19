@@ -79,6 +79,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Send invite email (fire and forget)
+    const org = await prisma.organization.findUnique({ where: { id: membership.orgId } });
+    import('@/lib/notifications/email')
+      .then(({ notifyTeamInvite }) =>
+        notifyTeamInvite(
+          email,
+          (user.user_metadata as Record<string, string> | undefined)?.full_name || user.email || 'A teammate',
+          org?.name || 'a team',
+          invite.token
+        )
+      )
+      .catch(err => log.error('Invite email failed:', err));
+
     log.info(`Invite sent to ${email} for org ${membership.orgId}`);
     return NextResponse.json(invite, { status: 201 });
   } catch (error) {

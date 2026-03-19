@@ -809,7 +809,7 @@ function InviteModal({
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/join`);
+    navigator.clipboard.writeText(`${window.location.origin}/dashboard/team`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

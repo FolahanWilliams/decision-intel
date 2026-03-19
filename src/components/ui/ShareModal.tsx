@@ -20,6 +20,7 @@ interface ShareModalProps {
   onClose: () => void;
   documentName: string;
   analysisData: Record<string, unknown>;
+  analysisId?: string;
   onExportPdf: () => Promise<void>;
   onExportCsv: () => void;
   onExportMarkdown: () => void;
@@ -33,6 +34,7 @@ export function ShareModal({
   onClose,
   documentName,
   analysisData,
+  analysisId,
   onExportPdf,
   onExportCsv,
   onExportMarkdown,
@@ -41,6 +43,9 @@ export function ShareModal({
   const [activeTab, setActiveTab] = useState<ActiveTab>('export');
   const [exportingPdf, setExportingPdf] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [creatingLink, setCreatingLink] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const { showToast } = useToast();
 
   // Escape to close
@@ -77,6 +82,34 @@ export function ShareModal({
       showToast('Failed to copy', 'error');
     }
   }, [analysisData, documentName, showToast]);
+
+  const handleCreateShareLink = useCallback(async () => {
+    if (!analysisId) return;
+    setCreatingLink(true);
+    try {
+      const res = await fetch('/api/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysisId, expiresInDays: 7 }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const url = data.url || `${window.location.origin}/shared/${data.token}`;
+        setShareUrl(url);
+        await navigator.clipboard.writeText(url);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 3000);
+        showToast('Share link created and copied!', 'success');
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Failed to create share link', 'error');
+      }
+    } catch {
+      showToast('Failed to create share link', 'error');
+    } finally {
+      setCreatingLink(false);
+    }
+  }, [analysisId, showToast]);
 
   const handleEmailShare = useCallback(() => {
     const subject = encodeURIComponent(`Decision Audit: ${documentName}`);
@@ -268,6 +301,62 @@ export function ShareModal({
           {/* Share Tab */}
           {activeTab === 'share' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {/* Shareable Link */}
+              {analysisId && (
+                <div>
+                  <button
+                    onClick={shareUrl ? async () => {
+                      await navigator.clipboard.writeText(shareUrl);
+                      setLinkCopied(true);
+                      setTimeout(() => setLinkCopied(false), 2000);
+                      showToast('Link copied!', 'success');
+                    } : handleCreateShareLink}
+                    disabled={creatingLink}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 16px',
+                      background: shareUrl ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-primary)',
+                      border: shareUrl ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid var(--border-color)',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      color: 'var(--text-primary)',
+                      fontSize: '13px',
+                      textAlign: 'left',
+                      width: '100%',
+                    }}
+                  >
+                    {creatingLink ? (
+                      <Loader2 size={18} className="animate-spin" style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                    ) : linkCopied ? (
+                      <Check size={18} style={{ color: 'var(--success)', flexShrink: 0 }} />
+                    ) : (
+                      <Link2 size={18} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                    )}
+                    <div>
+                      <div style={{ fontWeight: 500 }}>
+                        {shareUrl ? (linkCopied ? 'Link copied!' : 'Copy share link') : 'Create shareable link'}
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        {shareUrl ? 'Anyone with this link can view the analysis' : 'Generates a public read-only link (7 day expiry)'}
+                      </div>
+                    </div>
+                  </button>
+                  {shareUrl && (
+                    <div style={{
+                      fontSize: '11px',
+                      color: 'var(--text-muted)',
+                      padding: '6px 16px',
+                      wordBreak: 'break-all',
+                      fontFamily: 'monospace',
+                    }}>
+                      {shareUrl}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <button
                 onClick={handleCopySummary}
                 style={{
