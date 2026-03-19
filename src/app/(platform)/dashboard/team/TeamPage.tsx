@@ -76,6 +76,7 @@ export default function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'members' | 'activity'>('members');
 
   const fetchTeam = useCallback(async () => {
     try {
@@ -159,7 +160,6 @@ export default function TeamPage() {
     );
   }
 
-  const [activeTab, setActiveTab] = useState<'members' | 'activity'>('members');
   const isAdmin = myRole === 'owner' || myRole === 'admin';
 
   return (
