@@ -925,6 +925,7 @@ tr:hover td {
 /* ═══════════════════════════════════════════
    Interactive Light Refraction — mouse-tracked
    CSS vars set by LiquidGlassEffect.tsx
+   SVG filters defined in LiquidGlassEffect component
    ═══════════════════════════════════════════ */
 .card,
 .glass,
@@ -938,7 +939,14 @@ tr:hover td {
   --glass-light-intensity: 0;
 }
 
-/* Specular highlight overlay — follows cursor across glass surfaces */
+/* Apply SVG refraction filter to glass surfaces for organic distortion */
+.liquid-glass,
+.liquid-glass-float {
+  filter: url(#liquid-glass-refraction);
+}
+
+/* Specular highlight overlay — smooth multi-stop radial gradient
+   Uses many stops to prevent visible banding in the light falloff */
 .card::after,
 .stat-card::after {
   content: '';
@@ -946,21 +954,26 @@ tr:hover td {
   inset: 0;
   border-radius: inherit;
   background: radial-gradient(
-    350px circle at var(--glass-light-x) var(--glass-light-y),
-    rgba(255, 255, 255, calc(0.12 * var(--glass-light-intensity))) 0%,
-    rgba(255, 255, 255, calc(0.04 * var(--glass-light-intensity))) 35%,
-    transparent 65%
+    400px circle at var(--glass-light-x) var(--glass-light-y),
+    rgba(255, 255, 255, calc(0.14 * var(--glass-light-intensity))) 0%,
+    rgba(255, 255, 255, calc(0.11 * var(--glass-light-intensity))) 10%,
+    rgba(255, 255, 255, calc(0.08 * var(--glass-light-intensity))) 20%,
+    rgba(255, 255, 255, calc(0.05 * var(--glass-light-intensity))) 30%,
+    rgba(255, 255, 255, calc(0.03 * var(--glass-light-intensity))) 40%,
+    rgba(255, 255, 255, calc(0.015 * var(--glass-light-intensity))) 50%,
+    rgba(255, 255, 255, calc(0.005 * var(--glass-light-intensity))) 60%,
+    transparent 70%
   );
   pointer-events: none;
   z-index: 2;
   mix-blend-mode: screen;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.1s ease;
 }
 
 /* Border glow intensifies near cursor */
 .card:hover,
 .stat-card:hover {
-  border-color: rgba(255, 255, 255, calc(0.15 + 0.20 * var(--glass-light-intensity)));
+  border-color: rgba(255, 255, 255, calc(0.18 + 0.22 * var(--glass-light-intensity)));
 }
 
 /* ═══════════════════════════════════════════
