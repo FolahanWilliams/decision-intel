@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Search, Filter, BookOpen, Brain } from 'lucide-react';
 import { BIAS_CATEGORIES, type BiasCategory } from '@/types';
 import { BiasEducationCard } from '@/components/ui/BiasEducationCard';
@@ -14,11 +14,10 @@ export default function BiasLibraryPage() {
   const [activeCategory, setActiveCategory] = useState<string>('All');
   // Use detailed mode to get analyses with biases
   const { documents } = useDocuments(true, 1, 100);
-  const [biasDetectionCounts, setBiasDetectionCounts] = useState<Record<string, number>>({});
 
   // Aggregate bias counts from all analysed documents
-  useEffect(() => {
-    if (!documents?.length) return;
+  const biasDetectionCounts = useMemo(() => {
+    if (!documents?.length) return {};
     const counts: Record<string, number> = {};
     for (const doc of documents) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,7 +34,7 @@ export default function BiasLibraryPage() {
         }
       }
     }
-    setBiasDetectionCounts(counts);
+    return counts;
   }, [documents]);
 
   const filtered = useMemo(() => {

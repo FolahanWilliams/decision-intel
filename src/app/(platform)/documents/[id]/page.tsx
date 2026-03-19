@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef, use, lazy, Suspense } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef, use, lazy, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -421,26 +421,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     }
   };
 
-  if (loading) return <PageSkeleton rows={6} />;
-
-  if (error || !document) {
-    return (
-      <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
-        <div className="card">
-          <div className="card-body flex flex-col items-center gap-md">
-            <AlertTriangle size={48} style={{ color: 'var(--error)' }} />
-            <p style={{ color: 'var(--error)' }}>{error || 'Document not found'}</p>
-            <Link href="/dashboard" className="btn btn-primary">
-              Back to Dashboard
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const analysis = document.analyses?.[0];
-  const biases = analysis?.biases || [];
+  // Derive analysis data before any early returns so hooks stay unconditional
+  const analysis = document?.analyses?.[0];
+  const biases = useMemo(() => analysis?.biases || [], [analysis]);
   const selectedBiasIndex = selectedBias ? biases.findIndex(b => b.id === selectedBias.id) : -1;
 
   const handleMarkdownExport = useCallback(async () => {
@@ -482,6 +465,24 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     });
     downloadJson(json, document.filename);
   }, [analysis, document, biases]);
+
+  if (loading) return <PageSkeleton rows={6} />;
+
+  if (error || !document) {
+    return (
+      <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
+        <div className="card">
+          <div className="card-body flex flex-col items-center gap-md">
+            <AlertTriangle size={48} style={{ color: 'var(--error)' }} />
+            <p style={{ color: 'var(--error)' }}>{error || 'Document not found'}</p>
+            <Link href="/dashboard" className="btn btn-primary">
+              Back to Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const TAB_GROUPS: { label: string; tabs: { id: TabId; label: string; icon: typeof Brain }[] }[] =
     [
