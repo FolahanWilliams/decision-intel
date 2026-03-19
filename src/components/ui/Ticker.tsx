@@ -107,15 +107,18 @@ export default function Ticker() {
 }
 
 function TickerItem({ label, value, color }: { label: string; value: string; color?: string }) {
+  const isStatus = value === 'Operational';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
       <span
+        className={isStatus ? 'status-glow-green' : undefined}
         style={{
-          width: '4px',
-          height: '4px',
+          width: isStatus ? '6px' : '4px',
+          height: isStatus ? '6px' : '4px',
           borderRadius: '50%',
           background: color || 'var(--text-muted)',
           flexShrink: 0,
+          boxShadow: !isStatus && color ? `0 0 6px ${color}40` : undefined,
         }}
       />
       <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{label}</span>
@@ -125,6 +128,7 @@ function TickerItem({ label, value, color }: { label: string; value: string; col
           fontWeight: 600,
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: '12px',
+          textShadow: color ? `0 0 10px ${color}30` : undefined,
         }}
       >
         {value}

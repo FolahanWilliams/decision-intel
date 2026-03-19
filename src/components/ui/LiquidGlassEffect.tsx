@@ -77,24 +77,28 @@ export function LiquidGlassEffect() {
   }, [updateGlassElements]);
 
   return (
-    <div
-      ref={lightRef}
-      aria-hidden="true"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 9999,
-        pointerEvents: 'none',
-        /* Radial light bloom following cursor */
-        background: `radial-gradient(
-          600px circle at var(--mouse-x, -1000px) var(--mouse-y, -1000px),
-          rgba(255, 255, 255, 0.035) 0%,
-          rgba(255, 255, 255, 0.015) 25%,
-          transparent 60%
-        )`,
-        mixBlendMode: 'screen',
-        transition: 'none',
-      }}
-    />
+    <>
+      {/* Radial light bloom following cursor */}
+      <div
+        ref={lightRef}
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9999,
+          pointerEvents: 'none',
+          background: `radial-gradient(
+            600px circle at var(--mouse-x, -1000px) var(--mouse-y, -1000px),
+            rgba(255, 255, 255, 0.04) 0%,
+            rgba(255, 255, 255, 0.015) 25%,
+            transparent 60%
+          )`,
+          mixBlendMode: 'screen',
+          transition: 'none',
+        }}
+      />
+      {/* Noise grain texture overlay — adds physical glass realism */}
+      <div className="noise-grain" aria-hidden="true" />
+    </>
   );
 }
