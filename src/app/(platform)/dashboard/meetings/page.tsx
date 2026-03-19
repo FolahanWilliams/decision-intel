@@ -24,7 +24,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   transcribing: {
     label: 'Transcribing',
     color: 'var(--accent-primary)',
-    bg: 'rgba(99,102,241,0.1)',
+    bg: 'rgba(249,115,22,0.1)',
   },
   analyzing: { label: 'Analyzing', color: 'var(--warning)', bg: 'rgba(245,158,11,0.1)' },
   complete: { label: 'Complete', color: 'var(--success)', bg: 'rgba(34,197,94,0.1)' },
