@@ -172,8 +172,8 @@ export function PersonaManager() {
                   padding: '14px 16px',
                   marginBottom: '8px',
                   background:
-                    editingId === persona.id ? 'rgba(99,102,241,0.05)' : 'var(--bg-secondary)',
-                  border: `1px solid ${editingId === persona.id ? 'rgba(99,102,241,0.3)' : 'var(--liquid-border)'}`,
+                    editingId === persona.id ? 'rgba(249,115,22,0.05)' : 'var(--bg-secondary)',
+                  border: `1px solid ${editingId === persona.id ? 'rgba(249,115,22,0.3)' : 'var(--liquid-border)'}`,
                   borderRadius: '8px',
                 }}
               >
@@ -209,8 +209,8 @@ export function PersonaManager() {
                             fontSize: '10px',
                             padding: '1px 8px',
                             borderRadius: '10px',
-                            background: 'rgba(99,102,241,0.1)',
-                            color: '#a5b4fc',
+                            background: 'rgba(249,115,22,0.1)',
+                            color: '#FBBF24',
                           }}
                         >
                           {persona.role}
@@ -297,8 +297,8 @@ export function PersonaManager() {
                 style={{
                   padding: '20px',
                   textAlign: 'center',
-                  background: 'rgba(99,102,241,0.03)',
-                  border: '1px dashed rgba(99,102,241,0.2)',
+                  background: 'rgba(249,115,22,0.03)',
+                  border: '1px dashed rgba(249,115,22,0.2)',
                   borderRadius: '8px',
                 }}
               >
@@ -325,8 +325,8 @@ export function PersonaManager() {
               <div
                 style={{
                   padding: '14px 16px',
-                  background: 'rgba(99,102,241,0.05)',
-                  border: '1px solid rgba(99,102,241,0.3)',
+                  background: 'rgba(249,115,22,0.05)',
+                  border: '1px solid rgba(249,115,22,0.3)',
                   borderRadius: '8px',
                   marginTop: '8px',
                 }}
@@ -441,10 +441,10 @@ function PersonaForm({
               style={{
                 padding: '4px 14px',
                 fontSize: '11px',
-                background: draft.riskTolerance === opt ? 'rgba(99,102,241,0.15)' : 'transparent',
-                border: `1px solid ${draft.riskTolerance === opt ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                background: draft.riskTolerance === opt ? 'rgba(249,115,22,0.15)' : 'transparent',
+                border: `1px solid ${draft.riskTolerance === opt ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.08)'}`,
                 borderRadius: '14px',
-                color: draft.riskTolerance === opt ? '#a5b4fc' : 'var(--text-muted)',
+                color: draft.riskTolerance === opt ? '#FBBF24' : 'var(--text-muted)',
                 cursor: 'pointer',
                 textTransform: 'capitalize',
                 fontWeight: draft.riskTolerance === opt ? 600 : 400,
