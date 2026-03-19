@@ -18,6 +18,7 @@ import {
   BrainCircuit,
   Bell,
   Video,
+  BookOpen,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -311,6 +312,15 @@ export default function Sidebar() {
             label="Chat"
             description="Ask questions about your documents"
             active={pathname === '/dashboard/chat'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/bias-library"
+            icon={<BookOpen size={18} />}
+            label="Bias Library"
+            description="Learn about cognitive biases"
+            active={pathname === '/dashboard/bias-library'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />

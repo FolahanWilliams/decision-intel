@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, FileText, Info, Terminal, Lightbulb } from 'lucide-react';
+import { AlertTriangle, FileText, Info, Terminal, Lightbulb, BookOpen, Shield, GraduationCap } from 'lucide-react';
 import { BiasInstance } from '@/types';
 import { createClientLogger } from '@/lib/utils/logger';
+import { getBiasEducation, DIFFICULTY_COLORS } from '@/lib/constants/bias-education';
 
 const log = createClientLogger('BiasDetailModal');
 
@@ -364,6 +365,90 @@ export function BiasDetailModal({
               </div>
             </div>
           </div>
+
+          {/* Education Section */}
+          {(() => {
+            const edu = getBiasEducation(bias.biasType);
+            if (!edu) return null;
+            const diffColor = DIFFICULTY_COLORS[edu.difficulty] || 'var(--text-muted)';
+            return (
+              <div style={{ borderTop: '1px solid var(--border-color)' }}>
+                <div
+                  style={{
+                    padding: 'var(--spacing-md) var(--spacing-lg)',
+                    background: 'rgba(99, 102, 241, 0.03)',
+                  }}
+                >
+                  <div className="flex items-center gap-sm" style={{ marginBottom: 'var(--spacing-md)' }}>
+                    <GraduationCap size={14} style={{ color: 'var(--accent-primary)' }} />
+                    <h4 className="text-xs text-muted uppercase" style={{ letterSpacing: '0.05em' }}>
+                      Learn &amp; Debias
+                    </h4>
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        color: diffColor,
+                        padding: '1px 8px',
+                        background: `${diffColor}15`,
+                        borderRadius: '10px',
+                        marginLeft: 'auto',
+                      }}
+                    >
+                      {edu.difficulty.toUpperCase()} TO COUNTER
+                    </span>
+                  </div>
+                  {/* Real-world example */}
+                  <div
+                    style={{
+                      padding: 'var(--spacing-md)',
+                      background: 'rgba(99, 102, 241, 0.04)',
+                      border: '1px solid rgba(99, 102, 241, 0.12)',
+                      borderRadius: '8px',
+                      marginBottom: 'var(--spacing-md)',
+                    }}
+                  >
+                    <div className="flex items-center gap-sm" style={{ marginBottom: '6px' }}>
+                      <BookOpen size={12} style={{ color: 'var(--accent-primary)' }} />
+                      <span style={{ fontSize: '12px', fontWeight: 600 }}>
+                        {edu.realWorldExample.title}
+                      </span>
+                      {edu.realWorldExample.year && (
+                        <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                          {edu.realWorldExample.company} · {edu.realWorldExample.year}
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                      {edu.realWorldExample.description}
+                    </p>
+                  </div>
+                  {/* Debiasing techniques */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {edu.debiasingTechniques.map((t, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start gap-sm"
+                        style={{
+                          padding: '6px 10px',
+                          background: 'var(--bg-primary)',
+                          borderRadius: '6px',
+                        }}
+                      >
+                        <Shield size={12} style={{ color: 'var(--success)', flexShrink: 0, marginTop: '2px' }} />
+                        <span style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                          {t}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: '8px', fontSize: '10px', color: 'var(--text-muted)' }}>
+                    📚 {edu.academicReference}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Feedback */}
           <div

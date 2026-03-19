@@ -8,7 +8,6 @@ import {
   Loader2,
   Trash2,
   FileText,
-  ArrowRight,
   Pin,
   PinOff,
   X,
@@ -16,9 +15,13 @@ import {
   Plus,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useChatStream, type ChatMessage, type ChatSource } from '@/hooks/useChatStream';
+import { useChatStream, type ChatMessage } from '@/hooks/useChatStream';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useToast } from '@/components/ui/ToastContext';
+import { SuggestedQuestions } from '@/components/chat/SuggestedQuestions';
+import { SourceAttribution } from '@/components/chat/SourceAttribution';
+import { ChatEmptyState } from '@/components/chat/ChatEmptyState';
+import { MessageActions } from '@/components/chat/MessageActions';
 
 const CHAT_HISTORY_KEY = 'decision-intel-chat-history';
 const MAX_SAVED_SESSIONS = 10;
@@ -57,16 +60,21 @@ export default function ChatPage() {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const { showToast } = useToast();
 
-  const { messages, isStreaming, error, sendMessage, clearMessages, loadMessages } = useChatStream({
+  const { messages, isStreaming, error, suggestions, sendMessage, clearMessages, loadMessages } = useChatStream({
     pinnedDocumentId: pinnedDocId || undefined,
   });
+  const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load sessions from localStorage on mount
+  // Load sessions and bookmarks from localStorage on mount
   useEffect(() => {
     setSessions(loadSessions());
+    try {
+      const saved = localStorage.getItem('decision-intel-chat-bookmarks');
+      if (saved) setBookmarks(new Set(JSON.parse(saved)));
+    } catch { /* ignore */ }
   }, []);
 
   // Auto-save current conversation whenever messages change
@@ -163,6 +171,22 @@ export default function ChatPage() {
     prevPinnedRef.current = pinnedDocId;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pinnedDocId, documents]);
+
+  const toggleBookmark = useCallback((messageId: string) => {
+    setBookmarks(prev => {
+      const next = new Set(prev);
+      if (next.has(messageId)) next.delete(messageId);
+      else next.add(messageId);
+      try { localStorage.setItem('decision-intel-chat-bookmarks', JSON.stringify([...next])); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
+
+  const handleSuggestionSelect = useCallback(async (question: string) => {
+    setInput('');
+    await sendMessage(question);
+    inputRef.current?.focus();
+  }, [sendMessage]);
 
   const handleSubmit = useCallback(async () => {
     const text = input.trim();
@@ -506,16 +530,35 @@ export default function ChatPage() {
         }}
       >
         {messages.length === 0 ? (
-          <EmptyState
-            onSuggestionClick={setInput}
-            isPinned={!!pinnedDocId}
-            pinnedFilename={pinnedDoc?.filename}
+          <ChatEmptyState
+            documents={documents}
+            onSuggestQuestion={handleSuggestionSelect}
           />
         ) : (
           <div className="flex flex-col gap-md">
-            {messages.map(msg => (
-              <MessageBubble key={msg.id} message={msg} />
+            {messages.map((msg, idx) => (
+              <div key={msg.id}>
+                <MessageBubble
+                  message={msg}
+                  isBookmarked={bookmarks.has(msg.id)}
+                  onToggleBookmark={toggleBookmark}
+                  onRetry={msg.role === 'assistant' && idx > 0 ? () => {
+                    const prevUser = messages.slice(0, idx).reverse().find(m => m.role === 'user');
+                    if (prevUser) sendMessage(prevUser.content);
+                  } : undefined}
+                />
+                {/* Source attribution for assistant messages */}
+                {msg.role === 'assistant' && !msg.isStreaming && msg.sources && msg.sources.length > 0 && (
+                  <SourceAttribution sources={msg.sources} />
+                )}
+              </div>
             ))}
+            {/* Follow-up suggestions */}
+            <SuggestedQuestions
+              questions={suggestions}
+              onSelect={handleSuggestionSelect}
+              isVisible={!isStreaming && suggestions.length > 0}
+            />
           </div>
         )}
         <div ref={bottomRef} />
@@ -600,89 +643,27 @@ export default function ChatPage() {
   );
 }
 
-function EmptyState({
-  onSuggestionClick,
-  isPinned,
-  pinnedFilename,
+function MessageBubble({
+  message,
+  isBookmarked,
+  onToggleBookmark,
+  onRetry,
 }: {
-  onSuggestionClick: (text: string) => void;
-  isPinned: boolean;
-  pinnedFilename?: string;
+  message: ChatMessage;
+  isBookmarked: boolean;
+  onToggleBookmark: (id: string) => void;
+  onRetry?: () => void;
 }) {
-  const globalSuggestions = [
-    'What cognitive biases appear most often in my documents?',
-    "Summarise the riskiest decisions I've analysed",
-    'Which documents had the lowest decision quality scores?',
-    'What patterns do you see across my analyses?',
-  ];
-
-  const pinnedSuggestions = [
-    `What are the main risks identified in this document?`,
-    `What cognitive biases were found?`,
-    `Summarise the key findings and recommendations`,
-    `What is the decision quality score and why?`,
-  ];
-
-  const suggestions = isPinned ? pinnedSuggestions : globalSuggestions;
-
-  return (
-    <div
-      className="flex flex-col items-center justify-center"
-      style={{ height: '100%', gap: 'var(--spacing-lg)' }}
-    >
-      <MessageSquare size={48} style={{ color: 'var(--text-muted)', opacity: 0.5 }} />
-      <div style={{ textAlign: 'center', maxWidth: 480 }}>
-        <h2
-          style={{
-            fontSize: '16px',
-            fontWeight: 600,
-            marginBottom: 'var(--spacing-sm)',
-          }}
-        >
-          {isPinned
-            ? `Ask about ${pinnedFilename || 'this document'}`
-            : 'Ask anything about your documents'}
-        </h2>
-        <p className="text-muted" style={{ fontSize: '13px', lineHeight: 1.6 }}>
-          {isPinned
-            ? "All responses will be grounded in this specific document's analysis."
-            : 'This chat uses semantic search to find relevant document analyses and provides grounded answers with source citations.'}
-        </p>
-      </div>
-      <div className="flex flex-col gap-sm" style={{ width: '100%', maxWidth: 440 }}>
-        {suggestions.map(s => (
-          <button
-            key={s}
-            className="card"
-            style={{
-              background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              padding: 'var(--spacing-sm) var(--spacing-md)',
-              fontSize: '13px',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: 'border-color 0.15s',
-            }}
-            onClick={() => onSuggestionClick(s)}
-          >
-            {s}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'user';
 
   return (
     <div
+      className="message-container"
       style={{
         display: 'flex',
         justifyContent: isUser ? 'flex-end' : 'flex-start',
         gap: 'var(--spacing-sm)',
+        position: 'relative',
       }}
     >
       <div
@@ -696,65 +677,32 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           lineHeight: 1.6,
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
+          position: 'relative',
         }}
       >
         {message.content}
         {message.isStreaming && !message.content && (
           <Loader2 size={14} className="animate-spin" style={{ opacity: 0.6 }} />
         )}
-        {/* Sources */}
-        {!isUser && !message.isStreaming && message.sources && message.sources.length > 0 && (
-          <SourcesList sources={message.sources} />
+        {/* Message Actions — shown on hover via CSS */}
+        {!message.isStreaming && message.content && (
+          <MessageActions
+            content={message.content}
+            messageId={message.id}
+            role={message.role}
+            isBookmarked={isBookmarked}
+            onToggleBookmark={onToggleBookmark}
+            onRetry={onRetry}
+          />
         )}
       </div>
+      <style jsx>{`
+        .message-container:hover :global(.message-actions) {
+          opacity: 1 !important;
+        }
+      `}</style>
     </div>
   );
 }
 
-function SourcesList({ sources }: { sources: ChatSource[] }) {
-  return (
-    <div
-      style={{
-        marginTop: 'var(--spacing-sm)',
-        paddingTop: 'var(--spacing-sm)',
-        borderTop: '1px solid var(--border-color)',
-      }}
-    >
-      <p
-        style={{
-          fontSize: '11px',
-          color: 'var(--text-muted)',
-          fontWeight: 600,
-          marginBottom: '4px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-        }}
-      >
-        Sources
-      </p>
-      <div className="flex flex-col gap-xs">
-        {sources.map(src => (
-          <Link
-            key={src.documentId}
-            href={`/documents/${src.documentId}?tab=overview`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '12px',
-              color: 'var(--accent-primary)',
-              textDecoration: 'none',
-            }}
-          >
-            <FileText size={12} />
-            <span>{src.filename}</span>
-            <span className="text-muted" style={{ fontSize: '11px' }}>
-              {Math.round(src.similarity * 100)}% match · Score {src.score}/100
-            </span>
-            <ArrowRight size={10} style={{ marginLeft: 'auto', opacity: 0.5 }} />
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
+// SourcesList replaced by SourceAttribution component
