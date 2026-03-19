@@ -103,8 +103,8 @@ export default function BiasLibraryPage() {
           className="card"
           style={{
             marginBottom: 'var(--spacing-lg)',
-            border: '1px solid rgba(99, 102, 241, 0.2)',
-            background: 'rgba(99, 102, 241, 0.04)',
+            border: '1px solid rgba(249, 115, 22, 0.2)',
+            background: 'rgba(249, 115, 22, 0.04)',
           }}
         >
           <div style={{ padding: 'var(--spacing-md) var(--spacing-lg)' }}>
@@ -216,7 +216,7 @@ export default function BiasLibraryPage() {
                     ? '1px solid var(--accent-primary)'
                     : '1px solid var(--border-color)',
                 background:
-                  activeCategory === cat ? 'rgba(99, 102, 241, 0.12)' : 'var(--bg-secondary)',
+                  activeCategory === cat ? 'rgba(249, 115, 22, 0.12)' : 'var(--bg-secondary)',
                 color: activeCategory === cat ? 'var(--accent-primary)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 fontWeight: activeCategory === cat ? 600 : 400,
