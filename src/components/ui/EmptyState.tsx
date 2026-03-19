@@ -49,8 +49,8 @@ export function EmptyState({
               position: 'absolute',
               inset: 0,
               borderRadius: 'var(--radius-xl)',
-              background: 'rgba(99, 102, 241, 0.04)',
-              border: '1px dashed rgba(99, 102, 241, 0.15)',
+              background: 'rgba(249, 115, 22, 0.04)',
+              border: '1px dashed rgba(249, 115, 22, 0.15)',
             }}
           />
           {/* Inner filled circle */}
@@ -61,8 +61,8 @@ export function EmptyState({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'rgba(99, 102, 241, 0.08)',
-              border: '1px solid rgba(99, 102, 241, 0.2)',
+              background: 'rgba(249, 115, 22, 0.08)',
+              border: '1px solid rgba(249, 115, 22, 0.2)',
               borderRadius: 'var(--radius-lg)',
             }}
           >

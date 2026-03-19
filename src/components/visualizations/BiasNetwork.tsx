@@ -103,9 +103,9 @@ const SEVERITY_BG: Record<string, string> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  cognitive: '#6366f1',
+  cognitive: '#F97316',
   emotional: '#ec4899',
-  social: '#8b5cf6',
+  social: '#FBBF24',
 };
 
 type ViewMode = 'network' | 'cluster';
@@ -473,20 +473,20 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   fontWeight: isActive ? 700 : 500,
                   background: isActive
                     ? sev === 'all'
-                      ? 'rgba(99,102,241,0.2)'
+                      ? 'rgba(249,115,22,0.2)'
                       : SEVERITY_BG[sev]
                     : 'transparent',
                   border: `1px solid ${
                     isActive
                       ? sev === 'all'
-                        ? 'rgba(99,102,241,0.4)'
+                        ? 'rgba(249,115,22,0.4)'
                         : SEVERITY_COLORS[sev] + '60'
                       : 'rgba(255,255,255,0.08)'
                   }`,
                   borderRadius: '20px',
                   color: isActive
                     ? sev === 'all'
-                      ? '#a5b4fc'
+                      ? '#FBBF24'
                       : SEVERITY_COLORS[sev]
                     : 'rgba(255,255,255,0.5)',
                   cursor: 'pointer',
@@ -518,8 +518,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                 padding: '3px 12px',
                 fontSize: '11px',
                 fontWeight: viewMode === mode ? 700 : 400,
-                background: viewMode === mode ? 'rgba(99,102,241,0.2)' : 'transparent',
-                color: viewMode === mode ? '#a5b4fc' : 'rgba(255,255,255,0.5)',
+                background: viewMode === mode ? 'rgba(249,115,22,0.2)' : 'transparent',
+                color: viewMode === mode ? '#FBBF24' : 'rgba(255,255,255,0.5)',
                 border: 'none',
                 cursor: 'pointer',
                 textTransform: 'capitalize',
@@ -544,7 +544,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
               aspectRatio: `${svgWidth} / ${svgHeight}`,
               maxHeight: compact ? '420px' : '520px',
               background:
-                'radial-gradient(ellipse at center, rgba(99,102,241,0.03) 0%, transparent 70%)',
+                'radial-gradient(ellipse at center, rgba(249,115,22,0.03) 0%, transparent 70%)',
               borderRadius: '8px',
             }}
           >
@@ -556,8 +556,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
               </filter>
               {/* Connection gradient */}
               <linearGradient id="connGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(99,102,241,0.6)" />
-                <stop offset="100%" stopColor="rgba(99,102,241,0.2)" />
+                <stop offset="0%" stopColor="rgba(249,115,22,0.6)" />
+                <stop offset="100%" stopColor="rgba(249,115,22,0.2)" />
               </linearGradient>
             </defs>
 
@@ -995,7 +995,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             >
               Total Connections
             </span>
-            <span style={{ fontSize: '20px', fontWeight: 800, color: '#a5b4fc' }}>
+            <span style={{ fontSize: '20px', fontWeight: 800, color: '#FBBF24' }}>
               {connections.length}
             </span>
           </div>

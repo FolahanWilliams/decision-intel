@@ -20,6 +20,7 @@ import {
   Video,
   BookOpen,
   Users,
+  Zap,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -52,16 +53,16 @@ export default function Sidebar() {
           top: '52px',
           left: '12px',
           zIndex: 60,
-          background: 'var(--liquid-bg)',
-          border: '1px solid var(--liquid-border)',
+          background: 'rgba(255, 255, 255, 0.04)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: 'var(--radius-full)',
           color: 'var(--text-primary)',
           padding: '8px',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          backdropFilter: 'blur(20px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+          backdropFilter: 'blur(20px) saturate(140%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(140%)',
           boxShadow: 'var(--liquid-shadow)',
         }}
       >
@@ -75,8 +76,9 @@ export default function Sidebar() {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0,0,0,0.6)',
+            background: 'rgba(0,0,0,0.7)',
             zIndex: 69,
+            backdropFilter: 'blur(4px)',
           }}
           onClick={() => setMobileOpen(false)}
           aria-hidden="true"
@@ -91,12 +93,12 @@ export default function Sidebar() {
         style={{
           width: sidebarWidth,
           minWidth: sidebarWidth,
-          borderRight: '1px solid var(--liquid-border)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.06)',
           display: 'flex',
           flexDirection: 'column',
-          background: 'var(--liquid-bg-strong)',
-          backdropFilter: 'blur(40px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+          background: 'rgba(8, 8, 8, 0.95)',
+          backdropFilter: 'blur(48px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(48px) saturate(160%)',
           height: 'calc(100vh - 44px)',
           position: 'sticky',
           top: '44px',
@@ -109,7 +111,7 @@ export default function Sidebar() {
         <div
           style={{
             padding: collapsed ? '16px 12px' : '24px 20px',
-            borderBottom: '1px solid var(--liquid-border)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -117,22 +119,65 @@ export default function Sidebar() {
           }}
         >
           {!collapsed && (
-            <div>
-              <div style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '-0.5px' }}>
-                <span style={{ color: 'var(--text-highlight)' }}>Decision</span>
-                <span style={{ color: 'var(--accent-primary)', marginLeft: '4px' }}>Intel</span>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
                 style={{
-                  fontSize: '11px',
-                  color: 'var(--text-muted)',
-                  marginTop: '2px',
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase',
+                  width: 32,
+                  height: 32,
+                  borderRadius: 'var(--radius-lg)',
+                  background: 'linear-gradient(135deg, #F97316, #A3E635)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 12px rgba(249, 115, 22, 0.3)',
                 }}
               >
-                Intelligence Platform
+                <Zap size={16} color="#0a0a0a" strokeWidth={2.5} />
               </div>
+              <div>
+                <div style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '-0.5px' }}>
+                  <span style={{ color: 'var(--text-highlight)' }}>Decision</span>
+                  <span
+                    style={{
+                      marginLeft: '4px',
+                      background: 'linear-gradient(135deg, #F97316, #FBBF24)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    Intel
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    marginTop: '1px',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    fontWeight: 500,
+                  }}
+                >
+                  Intelligence Platform
+                </div>
+              </div>
+            </div>
+          )}
+          {collapsed && (
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 'var(--radius-lg)',
+                background: 'linear-gradient(135deg, #F97316, #A3E635)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto',
+                boxShadow: '0 2px 12px rgba(249, 115, 22, 0.3)',
+              }}
+            >
+              <Zap size={16} color="#0a0a0a" strokeWidth={2.5} />
             </div>
           )}
           <button
@@ -145,8 +190,8 @@ export default function Sidebar() {
             }
             className="hidden md:flex"
             style={{
-              background: 'var(--liquid-bg)',
-              border: '1px solid var(--liquid-border)',
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: 'var(--radius-full)',
               color: 'var(--text-muted)',
               cursor: 'pointer',
@@ -200,14 +245,14 @@ export default function Sidebar() {
               gap: '8px',
               width: '100%',
               padding: collapsed ? '8px' : '8px 12px',
-              marginBottom: '12px',
-              background: 'var(--liquid-bg)',
-              border: '1px solid var(--liquid-border)',
+              marginBottom: '16px',
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
               borderRadius: 'var(--radius-full)',
               color: 'var(--text-muted)',
               fontSize: '12px',
               cursor: 'pointer',
-              transition: 'border-color 0.15s',
+              transition: 'border-color 0.15s, background 0.15s',
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
             }}
@@ -221,9 +266,10 @@ export default function Sidebar() {
                 style={{
                   fontSize: '10px',
                   padding: '1px 5px',
-                  background: 'var(--liquid-bg)',
-                  border: '1px solid var(--liquid-border)',
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
                   borderRadius: '6px',
+                  color: 'var(--text-muted)',
                 }}
               >
                 ⌘K
@@ -231,20 +277,7 @@ export default function Sidebar() {
             )}
           </button>
 
-          {!collapsed && (
-            <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                padding: '0 10px 8px',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Platform
-            </div>
-          )}
+          <SectionLabel collapsed={collapsed}>Platform</SectionLabel>
           <NavItem
             href="/dashboard"
             icon={<LayoutDashboard size={18} />}
@@ -265,21 +298,7 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
 
-          {!collapsed && (
-            <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                padding: '20px 10px 8px',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Analysis
-            </div>
-          )}
-          {collapsed && <div style={{ height: '20px' }} />}
+          <SectionLabel collapsed={collapsed}>Analysis</SectionLabel>
           <NavItem
             href="/dashboard/insights"
             icon={<BarChart3 size={18} />}
@@ -326,21 +345,7 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
 
-          {!collapsed && (
-            <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                padding: '20px 10px 8px',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Human Intelligence
-            </div>
-          )}
-          {collapsed && <div style={{ height: '20px' }} />}
+          <SectionLabel collapsed={collapsed}>Human Intelligence</SectionLabel>
           <NavItem
             href="/dashboard/cognitive-audits"
             icon={<BrainCircuit size={18} />}
@@ -369,21 +374,7 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
 
-          {!collapsed && (
-            <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                padding: '20px 10px 8px',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Collaboration
-            </div>
-          )}
-          {collapsed && <div style={{ height: '20px' }} />}
+          <SectionLabel collapsed={collapsed}>Collaboration</SectionLabel>
           <NavItem
             href="/dashboard/team"
             icon={<Users size={18} />}
@@ -394,21 +385,7 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
 
-          {!collapsed && (
-            <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                padding: '20px 10px 8px',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              System
-            </div>
-          )}
-          {collapsed && <div style={{ height: '20px' }} />}
+          <SectionLabel collapsed={collapsed}>System</SectionLabel>
           <NavItem
             href="/dashboard/audit-log"
             icon={<ClipboardList size={18} />}
@@ -430,7 +407,7 @@ export default function Sidebar() {
         <div
           style={{
             padding: collapsed ? '12px' : '12px 20px',
-            borderTop: '1px solid var(--liquid-border)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
           }}
         >
           <button
@@ -455,6 +432,7 @@ export default function Sidebar() {
               cursor: 'pointer',
               fontSize: '13.5px',
               transition: 'color 0.15s',
+              borderRadius: 'var(--radius-md)',
             }}
           >
             <LogOutIcon size={18} style={{ flexShrink: 0 }} />
@@ -464,7 +442,7 @@ export default function Sidebar() {
         <div
           style={{
             padding: collapsed ? '12px' : '16px 20px',
-            borderTop: '1px solid var(--liquid-border)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
           }}
         >
           <div
@@ -484,6 +462,7 @@ export default function Sidebar() {
                 background: 'var(--success)',
                 borderRadius: '50%',
                 flexShrink: 0,
+                boxShadow: '0 0 8px rgba(34, 197, 94, 0.4)',
               }}
             />
             {!collapsed && <span>Online</span>}
@@ -510,6 +489,24 @@ export default function Sidebar() {
         }
       `}</style>
     </>
+  );
+}
+
+function SectionLabel({ collapsed, children }: { collapsed: boolean; children: React.ReactNode }) {
+  if (collapsed) return <div style={{ height: '20px' }} />;
+  return (
+    <div
+      style={{
+        fontSize: '10px',
+        fontWeight: 600,
+        color: 'var(--text-muted)',
+        padding: '20px 10px 8px',
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -562,29 +559,29 @@ function NavItem({
               ? 'var(--text-primary)'
               : 'var(--text-secondary)',
           background: active
-            ? 'rgba(99, 102, 241, 0.14)'
+            ? 'rgba(249, 115, 22, 0.10)'
             : hovered
-              ? 'rgba(255, 255, 255, 0.06)'
+              ? 'rgba(255, 255, 255, 0.04)'
               : 'transparent',
           border: active
-            ? '1px solid rgba(99, 102, 241, 0.3)'
+            ? '1px solid rgba(249, 115, 22, 0.20)'
             : hovered
-              ? '1px solid var(--liquid-border)'
+              ? '1px solid rgba(255, 255, 255, 0.06)'
               : '1px solid transparent',
-          borderRadius: 'var(--radius-full)',
+          borderRadius: 'var(--radius-lg)',
           marginBottom: '2px',
           fontSize: '13.5px',
           fontWeight: active ? 600 : 400,
           textDecoration: 'none',
           backdropFilter: active || hovered ? 'blur(12px)' : 'none',
           WebkitBackdropFilter: active || hovered ? 'blur(12px)' : 'none',
-          boxShadow: active ? '0 1px 0 rgba(255,255,255,0.08) inset' : 'none',
+          boxShadow: active ? '0 1px 0 rgba(255,255,255,0.04) inset' : 'none',
           transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         <span
           style={{
-            color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
+            color: active ? '#F97316' : 'var(--text-muted)',
             flexShrink: 0,
             position: 'relative',
             display: 'flex',
@@ -618,12 +615,12 @@ function NavItem({
             top: '50%',
             transform: 'translateY(-50%)',
             marginLeft: 8,
-            padding: '6px 10px',
-            background: 'var(--liquid-bg-strong)',
-            border: '1px solid var(--liquid-border)',
-            backdropFilter: 'blur(20px) saturate(160%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-            borderRadius: 'var(--radius-full)',
+            padding: '6px 12px',
+            background: 'rgba(14, 14, 14, 0.95)',
+            border: '1px solid rgba(255, 255, 255, 0.10)',
+            backdropFilter: 'blur(24px) saturate(160%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+            borderRadius: 'var(--radius-lg)',
             color: 'var(--text-primary)',
             fontSize: '12px',
             fontWeight: 500,

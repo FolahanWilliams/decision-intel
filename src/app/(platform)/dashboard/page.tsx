@@ -507,30 +507,61 @@ export default function Dashboard() {
     >
       {/* Header with view tabs */}
       <div className="flex items-center justify-between mb-xl">
-        <h1 className="text-2xl font-bold">
-          <span className="bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">
-            Dashboard
-          </span>
-        </h1>
-        <div className="flex items-center gap-xs border border-border p-1">
+        <div>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <span className="text-gradient">Dashboard</span>
+          </h1>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+            Decision intelligence overview
+          </p>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px',
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: 'var(--radius-full)',
+            padding: '3px',
+          }}
+        >
           <button
             onClick={() => setActiveView('upload')}
-            className={`px-4 py-1.5 text-sm font-medium transition-colors flex items-center gap-sm ${
-              activeView === 'upload'
-                ? 'bg-accent-primary/10 text-accent-primary'
-                : 'text-muted hover:text-primary'
-            }`}
+            style={{
+              padding: '6px 16px',
+              fontSize: '13px',
+              fontWeight: activeView === 'upload' ? 600 : 400,
+              borderRadius: 'var(--radius-full)',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s',
+              background: activeView === 'upload' ? 'rgba(249, 115, 22, 0.12)' : 'transparent',
+              color: activeView === 'upload' ? '#F97316' : 'var(--text-muted)',
+            }}
           >
             <Upload size={14} />
             Upload &amp; Monitor
           </button>
           <button
             onClick={() => setActiveView('browse')}
-            className={`px-4 py-1.5 text-sm font-medium transition-colors flex items-center gap-sm ${
-              activeView === 'browse'
-                ? 'bg-accent-primary/10 text-accent-primary'
-                : 'text-muted hover:text-primary'
-            }`}
+            style={{
+              padding: '6px 16px',
+              fontSize: '13px',
+              fontWeight: activeView === 'browse' ? 600 : 400,
+              borderRadius: 'var(--radius-full)',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s',
+              background: activeView === 'browse' ? 'rgba(249, 115, 22, 0.12)' : 'transparent',
+              color: activeView === 'browse' ? '#F97316' : 'var(--text-muted)',
+            }}
           >
             <Search size={14} />
             Browse &amp; Analyze
@@ -538,23 +569,25 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats overview row */}
+      {/* Hero KPI Cards */}
       {uploadedDocs.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-md mb-xl">
           {[
             {
               label: 'Total Documents',
               value: totalDocs,
-              icon: <FileText size={16} />,
-              iconBg: 'rgba(99, 102, 241, 0.1)',
-              iconColor: 'var(--accent-primary)',
+              icon: <FileText size={18} />,
+              iconBg: 'rgba(249, 115, 22, 0.12)',
+              iconColor: '#F97316',
+              accentColor: '#F97316',
             },
             {
               label: 'Analyzed',
               value: uploadedDocs.filter(d => d.status === 'complete').length,
-              icon: <CheckCircle size={16} />,
-              iconBg: 'rgba(34, 197, 94, 0.1)',
-              iconColor: 'var(--success)',
+              icon: <CheckCircle size={18} />,
+              iconBg: 'rgba(34, 197, 94, 0.12)',
+              iconColor: '#22c55e',
+              accentColor: '#22c55e',
             },
             {
               label: 'Avg Quality',
@@ -564,27 +597,37 @@ export default function Dashboard() {
                   ? `${Math.round(scored.reduce((a, d) => a + (d.score || 0), 0) / scored.length)}%`
                   : '—';
               })(),
-              icon: <TrendingUp size={16} />,
-              iconBg: 'rgba(245, 158, 11, 0.1)',
-              iconColor: 'var(--warning)',
+              icon: <TrendingUp size={18} />,
+              iconBg: 'rgba(251, 191, 36, 0.12)',
+              iconColor: '#FBBF24',
+              accentColor: '#FBBF24',
             },
             {
               label: 'In Progress',
               value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
                 .length,
-              icon: <Clock size={16} />,
-              iconBg: 'rgba(129, 140, 248, 0.1)',
-              iconColor: 'var(--accent-secondary)',
+              icon: <Clock size={18} />,
+              iconBg: 'rgba(163, 230, 53, 0.12)',
+              iconColor: '#A3E635',
+              accentColor: '#A3E635',
             },
           ].map(stat => (
-            <div key={stat.label} className="stat-card">
-              <div
-                className="stat-card-icon"
-                style={{ background: stat.iconBg, color: stat.iconColor }}
-              >
-                {stat.icon}
+            <div
+              key={stat.label}
+              className="stat-card"
+              style={{ borderTop: `2px solid ${stat.accentColor}` }}
+            >
+              <div className="flex items-center justify-between" style={{ marginBottom: '12px' }}>
+                <div
+                  className="stat-card-icon"
+                  style={{ background: stat.iconBg, color: stat.iconColor, marginBottom: 0 }}
+                >
+                  {stat.icon}
+                </div>
               </div>
-              <div className="stat-card-value">{stat.value}</div>
+              <div className="stat-card-value" style={{ color: stat.accentColor }}>
+                {stat.value}
+              </div>
               <div className="stat-card-label">{stat.label}</div>
             </div>
           ))}
@@ -621,10 +664,10 @@ export default function Dashboard() {
 
           {/* Upload Confirmation Modal */}
           {pendingFile && !uploading && (
-            <div className="card mb-xl border-accent-primary/40 animate-fade-in">
-              <div className="card-header" style={{ background: 'rgba(99, 102, 241, 0.06)' }}>
+            <div className="card mb-xl animate-fade-in" style={{ borderColor: 'rgba(249, 115, 22, 0.3)' }}>
+              <div className="card-header" style={{ background: 'rgba(249, 115, 22, 0.04)' }}>
                 <h3 className="flex items-center gap-sm text-sm">
-                  <FileText size={16} className="text-accent-primary" />
+                  <FileText size={16} style={{ color: '#F97316' }} />
                   Ready to Analyze
                 </h3>
               </div>
@@ -703,9 +746,9 @@ export default function Dashboard() {
                     justifyContent: 'center',
                     borderRadius: 'var(--radius-lg)',
                     background: isDragOver
-                      ? 'rgba(99, 102, 241, 0.15)'
-                      : 'rgba(99, 102, 241, 0.08)',
-                    border: `1px solid ${isDragOver ? 'rgba(99, 102, 241, 0.4)' : 'rgba(99, 102, 241, 0.15)'}`,
+                      ? 'rgba(249, 115, 22, 0.15)'
+                      : 'rgba(249, 115, 22, 0.08)',
+                    border: `1px solid ${isDragOver ? 'rgba(249, 115, 22, 0.4)' : 'rgba(249, 115, 22, 0.15)'}`,
                     transition: 'all 0.2s ease',
                     transform: isDragOver ? 'scale(1.1)' : 'scale(1)',
                   }}
@@ -799,13 +842,13 @@ export default function Dashboard() {
                             step.status === 'complete'
                               ? 'rgba(34, 197, 94, 0.15)'
                               : step.status === 'running'
-                                ? 'rgba(99, 102, 241, 0.15)'
+                                ? 'rgba(249, 115, 22, 0.15)'
                                 : 'var(--bg-tertiary)',
                           border: `1px solid ${
                             step.status === 'complete'
                               ? 'rgba(34, 197, 94, 0.3)'
                               : step.status === 'running'
-                                ? 'rgba(99, 102, 241, 0.4)'
+                                ? 'rgba(249, 115, 22, 0.4)'
                                 : 'var(--border-color)'
                           }`,
                           transition: 'all var(--transition-normal)',
@@ -870,7 +913,7 @@ export default function Dashboard() {
                     <div
                       key={doc.id}
                       className="card border-accent-primary/30"
-                      style={{ background: 'rgba(99, 102, 241, 0.04)' }}
+                      style={{ background: 'rgba(249, 115, 22, 0.04)' }}
                     >
                       <div className="card-body flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -882,7 +925,7 @@ export default function Dashboard() {
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              background: 'rgba(99, 102, 241, 0.1)',
+                              background: 'rgba(249, 115, 22, 0.10)',
                             }}
                           >
                             <FileText size={18} className="text-accent-primary" />
@@ -951,7 +994,7 @@ export default function Dashboard() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                background: 'rgba(99, 102, 241, 0.1)',
+                                background: 'rgba(249, 115, 22, 0.10)',
                               }}
                             >
                               <FileText size={16} className="text-accent-primary" />
@@ -1034,7 +1077,7 @@ export default function Dashboard() {
               className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
             >
               <h3 className="flex items-center gap-2 text-base">
-                <Clock size={18} className="text-indigo-500" />
+                <Clock size={18} style={{ color: '#F97316' }} />
                 Recent Activity
                 {activities.length > 0 && (
                   <span className="text-xs text-muted font-normal">
@@ -1069,7 +1112,7 @@ export default function Dashboard() {
                 className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
               >
                 <h3 className="flex items-center gap-2 text-base">
-                  <BarChart3 size={18} className="text-indigo-500" />
+                  <BarChart3 size={18} style={{ color: '#F97316' }} />
                   Decision Quality Trend
                   <span className="text-xs text-muted font-normal">
                     ({uploadedDocs.filter(d => d.score !== undefined).length} analyzed)
@@ -1109,7 +1152,7 @@ export default function Dashboard() {
                 className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
               >
                 <h3 className="flex items-center gap-2 text-base">
-                  <Scale size={18} className="text-indigo-500" />
+                  <Scale size={18} style={{ color: '#F97316' }} />
                   Comparative Intelligence
                   <span className="text-xs text-muted font-normal">Document Benchmark</span>
                 </h3>
@@ -1319,7 +1362,7 @@ export default function Dashboard() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: 'rgba(99, 102, 241, 0.08)',
+                            background: 'rgba(249, 115, 22, 0.08)',
                           }}
                         >
                           <FileText size={16} className="text-accent-primary" />
@@ -1473,7 +1516,7 @@ export default function Dashboard() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'rgba(8, 11, 18, 0.85)',
+            background: 'rgba(8, 8, 8, 0.90)',
             backdropFilter: 'blur(4px)',
           }}
         >
@@ -1487,7 +1530,7 @@ export default function Dashboard() {
               padding: 'var(--spacing-2xl)',
               border: '2px dashed var(--accent-primary)',
               borderRadius: 'var(--radius-xl)',
-              background: 'rgba(99, 102, 241, 0.06)',
+              background: 'rgba(249, 115, 22, 0.06)',
             }}
           >
             <CloudUpload size={48} style={{ color: 'var(--accent-primary)' }} />

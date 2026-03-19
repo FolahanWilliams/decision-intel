@@ -248,7 +248,7 @@ export function NotificationBell() {
                     style={{
                       padding: '12px 16px',
                       borderBottom: '1px solid var(--border-color)',
-                      background: n.read ? 'transparent' : 'rgba(99, 102, 241, 0.04)',
+                      background: n.read ? 'transparent' : 'rgba(249, 115, 22, 0.04)',
                       cursor: 'pointer',
                     }}
                     onClick={() => {

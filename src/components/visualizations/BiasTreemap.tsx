@@ -26,18 +26,18 @@ interface TreemapContentProps {
 }
 
 const PALETTE = [
-  '#6366f1',
-  '#8b5cf6',
-  '#a855f7',
-  '#ec4899',
-  '#f43f5e',
-  '#f97316',
-  '#eab308',
+  '#F97316',
+  '#FBBF24',
+  '#A3E635',
   '#22c55e',
   '#14b8a6',
   '#06b6d4',
   '#3b82f6',
-  '#6366f1',
+  '#F97316',
+  '#FBBF24',
+  '#A3E635',
+  '#22c55e',
+  '#F97316',
 ];
 
 function CustomContent({ x, y, width, height, name, count, index }: TreemapContentProps) {

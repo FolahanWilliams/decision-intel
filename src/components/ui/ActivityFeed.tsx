@@ -39,7 +39,7 @@ const TYPE_CONFIG: Record<string, { icon: React.ReactNode; color: string; bgColo
   outcome: {
     icon: <Target size={14} />,
     color: 'var(--accent-primary)',
-    bgColor: 'rgba(99, 102, 241, 0.1)',
+    bgColor: 'rgba(249, 115, 22, 0.1)',
   },
 };
 
@@ -123,7 +123,7 @@ export function ActivityFeed({
                 activeFilter === opt.value
                   ? '1px solid var(--accent-primary)'
                   : '1px solid var(--border-color)',
-              background: activeFilter === opt.value ? 'rgba(99, 102, 241, 0.12)' : 'transparent',
+              background: activeFilter === opt.value ? 'rgba(249, 115, 22, 0.12)' : 'transparent',
               color: activeFilter === opt.value ? 'var(--accent-primary)' : 'var(--text-muted)',
               cursor: 'pointer',
               fontWeight: activeFilter === opt.value ? 600 : 400,

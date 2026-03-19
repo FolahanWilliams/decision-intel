@@ -47,10 +47,10 @@ export default function Ticker() {
       role="marquee"
       aria-label="System metrics"
       style={{
-        background: 'var(--liquid-bg-strong)',
-        backdropFilter: 'blur(40px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        borderBottom: '1px solid var(--liquid-border)',
+        background: 'rgba(8, 8, 8, 0.95)',
+        backdropFilter: 'blur(48px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(48px) saturate(160%)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
         height: '44px',
         display: 'flex',
         alignItems: 'center',
@@ -58,21 +58,21 @@ export default function Ticker() {
         whiteSpace: 'nowrap',
         fontSize: '13px',
         fontFamily: 'Inter, sans-serif',
-        boxShadow: '0 1px 0 var(--liquid-specular) inset',
+        boxShadow: '0 1px 0 rgba(255, 255, 255, 0.03) inset',
       }}
     >
       <div className="ticker-track" style={{ flex: 1 }}>
-        <TickerItem label="Avg Quality" value={stats.avgScore} />
-        <TickerItem label="Avg Noise" value={stats.avgNoise} />
-        <TickerItem label="Documents" value={stats.totalDocs} />
-        <TickerItem label="Analyzed" value={stats.analyzedDocs} />
-        <TickerItem label="Status" value="Operational" />
+        <TickerItem label="Avg Quality" value={stats.avgScore} color="#F97316" />
+        <TickerItem label="Avg Noise" value={stats.avgNoise} color="#FBBF24" />
+        <TickerItem label="Documents" value={stats.totalDocs} color="#A3E635" />
+        <TickerItem label="Analyzed" value={stats.analyzedDocs} color="#22c55e" />
+        <TickerItem label="Status" value="Operational" color="#22c55e" />
         {/* Duplicate for seamless marquee loop */}
-        <TickerItem label="Avg Quality" value={stats.avgScore} />
-        <TickerItem label="Avg Noise" value={stats.avgNoise} />
-        <TickerItem label="Documents" value={stats.totalDocs} />
-        <TickerItem label="Analyzed" value={stats.analyzedDocs} />
-        <TickerItem label="Status" value="Operational" />
+        <TickerItem label="Avg Quality" value={stats.avgScore} color="#F97316" />
+        <TickerItem label="Avg Noise" value={stats.avgNoise} color="#FBBF24" />
+        <TickerItem label="Documents" value={stats.totalDocs} color="#A3E635" />
+        <TickerItem label="Analyzed" value={stats.analyzedDocs} color="#22c55e" />
+        <TickerItem label="Status" value="Operational" color="#22c55e" />
       </div>
       <div style={{ flexShrink: 0, padding: '0 12px', zIndex: 10 }}>
         <NotificationBell />
@@ -100,13 +100,22 @@ export default function Ticker() {
   );
 }
 
-function TickerItem({ label, value }: { label: string; value: string }) {
+function TickerItem({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <span
+        style={{
+          width: '4px',
+          height: '4px',
+          borderRadius: '50%',
+          background: color || 'var(--text-muted)',
+          flexShrink: 0,
+        }}
+      />
       <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{label}</span>
       <span
         style={{
-          color: 'var(--text-highlight)',
+          color: color || 'var(--text-highlight)',
           fontWeight: 600,
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: '12px',
