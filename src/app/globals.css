@@ -816,19 +816,25 @@ tr:hover td {
 .glass {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.20);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: url(#liquid-glass-refraction) blur(20px) saturate(160%);
+  -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(20px) saturate(160%);
   border-radius: var(--liquid-radius);
-  box-shadow: var(--liquid-shadow), 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  box-shadow:
+    var(--liquid-shadow),
+    0 1px 0 rgba(255, 255, 255, 0.20) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.20) inset;
 }
 
 .glass-strong {
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: url(#liquid-glass-refraction) blur(40px) saturate(180%);
+  -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(40px) saturate(180%);
   border-radius: var(--liquid-radius);
-  box-shadow: var(--liquid-shadow), 0 1px 0 rgba(255, 255, 255, 0.16) inset;
+  box-shadow:
+    var(--liquid-shadow),
+    0 1px 0 rgba(255, 255, 255, 0.25) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.25) inset;
 }
 
 .glow {
@@ -843,10 +849,12 @@ tr:hover td {
   position: relative;
   background: var(--liquid-bg);
   border: 1px solid var(--liquid-border);
-  backdrop-filter: blur(var(--liquid-blur-strong)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--liquid-blur-strong)) saturate(160%);
+  /* backdrop-filter set in interactive refraction section with SVG lens */
   border-radius: var(--liquid-radius-xl);
-  box-shadow: var(--liquid-shadow);
+  box-shadow:
+    var(--liquid-shadow),
+    0 1px 0 rgba(255, 255, 255, 0.20) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.15) inset;
   transition: all var(--transition-normal);
   overflow: hidden;
 }
@@ -856,20 +864,20 @@ tr:hover td {
   box-shadow: var(--liquid-shadow-hover);
 }
 
-/* Specular light sweep — bright top edge like real glass */
+/* Specular caustic — bright top edge + soft highlight glow like curved glass catching light */
 .liquid-glass::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 1px;
+  height: 40%;
   background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.15) 20%,
-    rgba(255, 255, 255, 0.30) 50%,
-    rgba(255, 255, 255, 0.15) 80%,
+    180deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 30%,
     transparent 100%
   );
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: inherit;
   pointer-events: none;
   z-index: 1;
 }
@@ -896,10 +904,12 @@ tr:hover td {
   position: relative;
   background: var(--liquid-bg-strong);
   border: 1px solid var(--liquid-border);
-  backdrop-filter: blur(var(--liquid-blur-strong)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--liquid-blur-strong)) saturate(180%);
+  /* backdrop-filter set in interactive refraction section with SVG lens */
   border-radius: var(--liquid-radius-xl);
-  box-shadow: var(--liquid-shadow-hover);
+  box-shadow:
+    var(--liquid-shadow-hover),
+    0 1px 0 rgba(255, 255, 255, 0.20) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.20) inset;
   overflow: hidden;
 }
 
@@ -939,31 +949,52 @@ tr:hover td {
   --glass-light-intensity: 0;
 }
 
-/* Apply SVG refraction filter to glass surfaces for organic distortion */
+/* Apply SVG lens refraction via backdrop-filter — distorts what's BEHIND the glass.
+   This is the key to real Apple-style liquid glass: the background warps through
+   a convex lens displacement map, not the element itself.
+   Note: backdrop-filter: url() only works reliably in Chromium. Safari/Firefox
+   fall back to the blur-only backdrop-filter on .glass/.liquid-glass classes. */
 .liquid-glass,
 .liquid-glass-float {
-  filter: url(#liquid-glass-refraction);
+  backdrop-filter: url(#liquid-glass-refraction) blur(var(--liquid-blur-strong)) saturate(160%);
+  -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(var(--liquid-blur-strong)) saturate(160%);
 }
 
-/* Specular highlight overlay — smooth multi-stop radial gradient
-   Uses many stops to prevent visible banding in the light falloff */
+/* Card-optimized lens refraction (wider aspect ratio displacement map) */
+.card,
+.stat-card {
+  backdrop-filter: url(#liquid-glass-card) blur(var(--liquid-blur)) saturate(140%);
+  -webkit-backdrop-filter: url(#liquid-glass-card) blur(var(--liquid-blur)) saturate(140%);
+}
+
+/* Specular highlight overlay — cursor-tracked radial gradient + edge rim light.
+   The rim light (inset shadow-like gradient at edges) makes the glass feel 3D,
+   while the cursor highlight creates the interactive light response. */
 .card::after,
 .stat-card::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(
-    400px circle at var(--glass-light-x) var(--glass-light-y),
-    rgba(255, 255, 255, calc(0.14 * var(--glass-light-intensity))) 0%,
-    rgba(255, 255, 255, calc(0.11 * var(--glass-light-intensity))) 10%,
-    rgba(255, 255, 255, calc(0.08 * var(--glass-light-intensity))) 20%,
-    rgba(255, 255, 255, calc(0.05 * var(--glass-light-intensity))) 30%,
-    rgba(255, 255, 255, calc(0.03 * var(--glass-light-intensity))) 40%,
-    rgba(255, 255, 255, calc(0.015 * var(--glass-light-intensity))) 50%,
-    rgba(255, 255, 255, calc(0.005 * var(--glass-light-intensity))) 60%,
-    transparent 70%
-  );
+  background:
+    /* Cursor-tracked specular highlight */
+    radial-gradient(
+      350px circle at var(--glass-light-x) var(--glass-light-y),
+      rgba(255, 255, 255, calc(0.18 * var(--glass-light-intensity))) 0%,
+      rgba(255, 255, 255, calc(0.12 * var(--glass-light-intensity))) 12%,
+      rgba(255, 255, 255, calc(0.07 * var(--glass-light-intensity))) 25%,
+      rgba(255, 255, 255, calc(0.03 * var(--glass-light-intensity))) 40%,
+      rgba(255, 255, 255, calc(0.01 * var(--glass-light-intensity))) 55%,
+      transparent 70%
+    ),
+    /* Static rim light — bright at top edge, dark at bottom (glass depth) */
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 20%,
+      transparent 80%,
+      rgba(0, 0, 0, 0.05) 100%
+    );
   pointer-events: none;
   z-index: 2;
   mix-blend-mode: screen;
@@ -985,9 +1016,11 @@ tr:hover td {
   border-radius: var(--liquid-radius);
   padding: var(--spacing-lg) var(--spacing-lg);
   transition: all var(--transition-normal);
-  backdrop-filter: blur(var(--liquid-blur)) saturate(140%);
-  -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(140%);
-  box-shadow: var(--liquid-shadow);
+  /* backdrop-filter set in interactive refraction section with SVG lens */
+  box-shadow:
+    var(--liquid-shadow),
+    0 1px 0 rgba(255, 255, 255, 0.15) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.15) inset;
   position: relative;
   overflow: hidden;
 }
