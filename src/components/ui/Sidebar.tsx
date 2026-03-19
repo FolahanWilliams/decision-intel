@@ -19,6 +19,7 @@ import {
   Bell,
   Video,
   BookOpen,
+  Users,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -364,6 +365,31 @@ export default function Sidebar() {
             label="Nudges"
             description="Decision coaching alerts"
             active={pathname === '/dashboard/nudges'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+
+          {!collapsed && (
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                padding: '20px 10px 8px',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Collaboration
+            </div>
+          )}
+          {collapsed && <div style={{ height: '20px' }} />}
+          <NavItem
+            href="/dashboard/team"
+            icon={<Users size={18} />}
+            label="Team"
+            description="Manage your team and invites"
+            active={pathname === '/dashboard/team'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />

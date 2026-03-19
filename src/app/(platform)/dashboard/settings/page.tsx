@@ -14,7 +14,6 @@ export default async function SettingsPage() {
     analysisAlerts: true,
     weeklyDigest: false,
     darkMode: true,
-    compactView: false,
   };
 
   return <SettingsForm initialSettings={settings || defaultSettings} userEmail={user?.email} />;

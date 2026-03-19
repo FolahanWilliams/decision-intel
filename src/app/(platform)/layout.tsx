@@ -1,6 +1,5 @@
 import Sidebar from '@/components/ui/Sidebar';
 import Ticker from '@/components/ui/Ticker';
-import { getUserSettings } from '@/app/actions/settings';
 import {
   AnalysisProgressProvider,
   AnalysisProgressFloat,
@@ -8,9 +7,6 @@ import {
 import { CommandPalette } from '@/components/ui/CommandPalette';
 
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
-  const settings = await getUserSettings().catch(() => null);
-  const isCompact = settings?.compactView ?? false;
-
   return (
     <AnalysisProgressProvider>
       <a href="#main-content" className="skip-nav">
@@ -19,7 +15,6 @@ export default async function PlatformLayout({ children }: { children: React.Rea
       <Ticker />
       <div
         style={{ display: 'flex', flex: 1, overflow: 'hidden' }}
-        data-compact={isCompact || undefined}
       >
         <Sidebar />
         <main

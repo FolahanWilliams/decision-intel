@@ -10,7 +10,6 @@ export interface UserSettingsData {
   analysisAlerts: boolean;
   weeklyDigest: boolean;
   darkMode: boolean;
-  compactView: boolean;
 }
 
 const UserSettingsSchema = z.object({
@@ -18,7 +17,6 @@ const UserSettingsSchema = z.object({
   analysisAlerts: z.boolean(),
   weeklyDigest: z.boolean(),
   darkMode: z.boolean(),
-  compactView: z.boolean(),
 });
 
 export async function getUserSettings() {
