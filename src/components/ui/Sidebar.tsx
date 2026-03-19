@@ -455,13 +455,13 @@ export default function Sidebar() {
             }}
           >
             <span
+              className="status-glow-green"
               style={{
-                width: '7px',
-                height: '7px',
-                background: 'var(--success)',
+                width: '8px',
+                height: '8px',
+                background: '#34d399',
                 borderRadius: '50%',
                 flexShrink: 0,
-                boxShadow: '0 0 8px rgba(34, 197, 94, 0.4)',
               }}
             />
             {!collapsed && <span>Online</span>}
