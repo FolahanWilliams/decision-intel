@@ -23,6 +23,7 @@ import {
   CloudUpload,
 } from 'lucide-react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
 import { useNotifications } from '@/components/ui/NotificationCenter';
@@ -38,6 +39,9 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { formatDate, formatDateShort } from '@/lib/constants/human-audit';
 import { ActivityFeed } from '@/components/ui/ActivityFeed';
 import { useActivityFeed } from '@/hooks/useActivityFeed';
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
+import { SparklineChart } from '@/components/ui/SparklineChart';
+import { DashboardCharts } from '@/components/visualizations/DashboardCharts';
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -240,6 +244,42 @@ export default function Dashboard() {
       low,
       avg: scored > 0 ? Math.round(totalScore / scored) : 0,
     };
+  }, [uploadedDocs]);
+
+  // Sparkline data — last 10 scores for mini-chart in KPI cards
+  const sparklineData = useMemo(() => {
+    return [...uploadedDocs]
+      .filter(d => d.score !== undefined)
+      .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
+      .slice(-10)
+      .map(d => d.score || 0);
+  }, [uploadedDocs]);
+
+  // Score trend data for DashboardCharts
+  const scoreTrendData = useMemo(() => {
+    return [...uploadedDocs]
+      .filter(d => d.score !== undefined)
+      .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
+      .map(d => ({ date: formatDateShort(d.uploadedAt), score: d.score || 0 }));
+  }, [uploadedDocs]);
+
+  // Aggregate biases across all documents for DashboardCharts
+  const topBiases = useMemo(() => {
+    const counts: Record<string, number> = {};
+    uploadedDocs.forEach(doc => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const analyses = (doc as any).analyses;
+      if (analyses?.[0]?.biases) {
+        for (const bias of analyses[0].biases) {
+          const name = bias.name || bias.type || 'Unknown';
+          counts[name] = (counts[name] || 0) + 1;
+        }
+      }
+    });
+    return Object.entries(counts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
   }, [uploadedDocs]);
 
   // Delete document handler — uses SWR mutate for cache invalidation
@@ -571,51 +611,71 @@ export default function Dashboard() {
 
       {/* Hero KPI Cards */}
       {uploadedDocs.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-md mb-xl">
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-md mb-xl"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.08 } },
+          }}
+        >
           {[
             {
               label: 'Total Documents',
               value: totalDocs,
+              numericValue: totalDocs,
               icon: <FileText size={18} />,
               iconBg: 'rgba(249, 115, 22, 0.12)',
               iconColor: '#F97316',
               accentColor: '#F97316',
+              sparkColor: '#F97316',
             },
             {
               label: 'Analyzed',
               value: uploadedDocs.filter(d => d.status === 'complete').length,
+              numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
               icon: <CheckCircle size={18} />,
               iconBg: 'rgba(34, 197, 94, 0.12)',
               iconColor: '#22c55e',
               accentColor: '#22c55e',
+              sparkColor: '#22c55e',
             },
             {
               label: 'Avg Quality',
-              value: (() => {
-                const scored = uploadedDocs.filter(d => d.score !== undefined);
-                return scored.length
-                  ? `${Math.round(scored.reduce((a, d) => a + (d.score || 0), 0) / scored.length)}%`
-                  : '—';
-              })(),
+              value: riskSummary.avg,
+              numericValue: riskSummary.avg,
+              suffix: '%',
               icon: <TrendingUp size={18} />,
               iconBg: 'rgba(251, 191, 36, 0.12)',
               iconColor: '#FBBF24',
               accentColor: '#FBBF24',
+              sparkColor: '#FBBF24',
+              showSparkline: true,
             },
             {
               label: 'In Progress',
               value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
                 .length,
+              numericValue: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
+                .length,
               icon: <Clock size={18} />,
               iconBg: 'rgba(163, 230, 53, 0.12)',
               iconColor: '#A3E635',
               accentColor: '#A3E635',
+              sparkColor: '#A3E635',
             },
           ].map(stat => (
-            <div
+            <motion.div
               key={stat.label}
               className="stat-card"
               style={{ borderTop: `2px solid ${stat.accentColor}` }}
+              variants={{
+                hidden: { opacity: 0, y: 20, scale: 0.97 },
+                visible: { opacity: 1, y: 0, scale: 1 },
+              }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -4, boxShadow: `0 8px 30px ${stat.accentColor}22` }}
             >
               <div className="flex items-center justify-between" style={{ marginBottom: '12px' }}>
                 <div
@@ -624,37 +684,87 @@ export default function Dashboard() {
                 >
                   {stat.icon}
                 </div>
+                {stat.showSparkline && sparklineData.length >= 2 && (
+                  <SparklineChart data={sparklineData} color={stat.sparkColor} width={72} height={28} />
+                )}
               </div>
               <div className="stat-card-value" style={{ color: stat.accentColor }}>
-                {stat.value}
+                {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
+                  <AnimatedNumber
+                    value={stat.numericValue}
+                    suffix={stat.suffix || ''}
+                    duration={900}
+                  />
+                ) : (
+                  '—'
+                )}
               </div>
               <div className="stat-card-label">{stat.label}</div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
+      )}
+
+      {/* Multi-Chart Dashboard Overview */}
+      {riskSummary.total > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        >
+        <ErrorBoundary sectionName="Dashboard Charts">
+          <DashboardCharts
+            riskDistribution={{
+              highRisk: riskSummary.high,
+              mediumRisk: riskSummary.medium,
+              lowRisk: riskSummary.low,
+            }}
+            scoreTrend={scoreTrendData}
+            topBiases={topBiases}
+            totalAnalyzed={riskSummary.total}
+            avgScore={riskSummary.avg}
+          />
+        </ErrorBoundary>
+        </motion.div>
       )}
 
       {/* Stream timed out banner */}
+      <AnimatePresence>
       {streamTimedOut && !uploading && (
-        <div className="mb-lg p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm">
+        <motion.div
+          className="mb-lg p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.25 }}
+        >
           <AlertTriangle size={18} className="text-warning shrink-0" />
           <span className="text-warning text-sm">
             Analysis is taking longer than expected. The server may still be processing — refresh
             the page or try again.
           </span>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {/* Error Message - Compact */}
+      <AnimatePresence>
       {error && (
-        <div className="mb-lg p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm">
+        <motion.div
+          className="mb-lg p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.25 }}
+        >
           <AlertTriangle size={18} className="text-error shrink-0" />
           <span className="text-error text-sm">{error}</span>
           <button onClick={() => setError(null)} className="ml-auto text-error/60 hover:text-error">
             <X size={16} />
           </button>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
       {activeView === 'upload' && (
@@ -663,8 +773,16 @@ export default function Dashboard() {
           <OnboardingGuide />
 
           {/* Upload Confirmation Modal */}
+          <AnimatePresence>
           {pendingFile && !uploading && (
-            <div className="card mb-xl animate-fade-in" style={{ borderColor: 'rgba(249, 115, 22, 0.3)' }}>
+            <motion.div
+              className="card mb-xl"
+              style={{ borderColor: 'rgba(249, 115, 22, 0.3)' }}
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            >
               <div className="card-header" style={{ background: 'rgba(249, 115, 22, 0.04)' }}>
                 <h3 className="flex items-center gap-sm text-sm">
                   <FileText size={16} style={{ color: '#F97316' }} />
@@ -709,8 +827,9 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
 
           {/* Upload Zone - Enhanced with drag feedback */}
           {!uploading && !pendingFile ? (
@@ -971,16 +1090,32 @@ export default function Dashboard() {
                   View All <ChevronRight size={14} />
                 </button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <motion.div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: {},
+                  visible: { transition: { staggerChildren: 0.06 } },
+                }}
+              >
                 {uploadedDocs
                   .filter(d => d.status === 'complete')
                   .slice(0, 6)
                   .map(doc => (
-                    <Link
+                    <motion.div
                       key={doc.id}
+                      variants={{
+                        hidden: { opacity: 0, y: 16 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                    >
+                    <Link
                       href={`/documents/${doc.id}`}
                       className="card group hover:border-accent-primary/50 transition-all"
-                      style={{ textDecoration: 'none' }}
+                      style={{ textDecoration: 'none', display: 'block' }}
                     >
                       <div className="card-body">
                         <div className="flex items-start justify-between mb-3">
@@ -1043,8 +1178,9 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </Link>
+                    </motion.div>
                   ))}
-              </div>
+              </motion.div>
             </div>
           )}
 
@@ -1542,12 +1678,17 @@ export default function Dashboard() {
         </div>
       )}
 
+      <AnimatePresence>
       {deleteModal.open && (
-        <div
+        <motion.div
           role="dialog"
           aria-modal="true"
           aria-label="Delete document confirmation"
           className="fixed inset-0 bg-black/75 flex items-center justify-center z-50 modal-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           onClick={() => {
             if (!deleting) setDeleteModal({ open: false, docId: '', filename: '' });
           }}
@@ -1556,9 +1697,13 @@ export default function Dashboard() {
               setDeleteModal({ open: false, docId: '', filename: '' });
           }}
         >
-          <div
+          <motion.div
             className="card w-full max-w-sm mx-4 modal-content"
             onClick={e => e.stopPropagation()}
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="card-body">
               <div className="flex items-start gap-sm mb-lg">
@@ -1587,9 +1732,10 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

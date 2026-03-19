@@ -29,55 +29,63 @@ interface PersonaConfig {
   bgGradient: string;
   borderColor: string;
   description: string;
+  avatarInitials: string;
+  avatarGradient: string;
 }
 
 const PERSONA_CONFIG: Record<string, PersonaConfig> = {
   'Fiscal Conservative': {
-    icon: <Briefcase size={28} />,
-    color: '#3b82f6',
+    icon: <Briefcase size={20} />,
+    color: '#38bdf8',
     bgGradient:
-      'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)',
-    borderColor: 'rgba(59, 130, 246, 0.3)',
+      'linear-gradient(135deg, rgba(56, 189, 248, 0.06) 0%, rgba(56, 189, 248, 0.02) 100%)',
+    borderColor: 'rgba(56, 189, 248, 0.25)',
     description: 'Focuses on ROI, cost control, and financial risk',
+    avatarInitials: 'FC',
+    avatarGradient: 'linear-gradient(135deg, #38bdf8, #0ea5e9)',
   },
   'Aggressive Growth': {
-    icon: <TrendingUp size={28} />,
-    color: '#f59e0b',
+    icon: <TrendingUp size={20} />,
+    color: '#F97316',
     bgGradient:
-      'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
-    borderColor: 'rgba(245, 158, 11, 0.3)',
+      'linear-gradient(135deg, rgba(249, 115, 22, 0.06) 0%, rgba(249, 115, 22, 0.02) 100%)',
+    borderColor: 'rgba(249, 115, 22, 0.25)',
     description: 'Prioritizes market capture and competitive advantage',
+    avatarInitials: 'AG',
+    avatarGradient: 'linear-gradient(135deg, #F97316, #ea580c)',
   },
   'Compliance Guard': {
-    icon: <Shield size={28} />,
-    color: '#10b981',
+    icon: <Shield size={20} />,
+    color: '#A3E635',
     bgGradient:
-      'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+      'linear-gradient(135deg, rgba(163, 230, 53, 0.06) 0%, rgba(163, 230, 53, 0.02) 100%)',
+    borderColor: 'rgba(163, 230, 53, 0.25)',
     description: 'Ensures regulatory compliance and risk mitigation',
+    avatarInitials: 'CG',
+    avatarGradient: 'linear-gradient(135deg, #A3E635, #84cc16)',
   },
 };
 
 const VOTE_CONFIG = {
   APPROVE: {
     color: '#22c55e',
-    bgColor: 'rgba(34, 197, 94, 0.15)',
-    borderColor: 'rgba(34, 197, 94, 0.4)',
-    icon: <CheckCircle size={20} />,
+    bgColor: 'rgba(34, 197, 94, 0.12)',
+    borderColor: 'rgba(34, 197, 94, 0.3)',
+    icon: <CheckCircle size={16} />,
     label: 'APPROVES',
   },
   REJECT: {
     color: '#ef4444',
-    bgColor: 'rgba(239, 68, 68, 0.15)',
-    borderColor: 'rgba(239, 68, 68, 0.4)',
-    icon: <XCircle size={20} />,
+    bgColor: 'rgba(239, 68, 68, 0.12)',
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+    icon: <XCircle size={16} />,
     label: 'REJECTS',
   },
   REVISE: {
-    color: '#f59e0b',
-    bgColor: 'rgba(245, 158, 11, 0.15)',
-    borderColor: 'rgba(245, 158, 11, 0.4)',
-    icon: <AlertTriangle size={20} />,
+    color: '#FBBF24',
+    bgColor: 'rgba(251, 191, 36, 0.12)',
+    borderColor: 'rgba(251, 191, 36, 0.3)',
+    icon: <AlertTriangle size={16} />,
     label: 'REQUESTS REVISION',
   },
 };
@@ -85,11 +93,19 @@ const VOTE_CONFIG = {
 const OVERALL_CONFIG = {
   APPROVED: {
     color: '#22c55e',
-    bgColor: 'rgba(34, 197, 94, 0.2)',
-    icon: <CheckCircle size={32} />,
+    bgColor: 'rgba(34, 197, 94, 0.12)',
+    icon: <CheckCircle size={28} />,
   },
-  REJECTED: { color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.2)', icon: <XCircle size={32} /> },
-  MIXED: { color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.2)', icon: <Minus size={32} /> },
+  REJECTED: {
+    color: '#ef4444',
+    bgColor: 'rgba(239, 68, 68, 0.12)',
+    icon: <XCircle size={28} />,
+  },
+  MIXED: {
+    color: '#FBBF24',
+    bgColor: 'rgba(251, 191, 36, 0.12)',
+    icon: <Minus size={28} />,
+  },
 };
 
 export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
@@ -101,7 +117,6 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
   useEffect(() => {
     if (!simulation?.twins) return;
 
-    // Use setTimeout to avoid synchronous setState in effect
     const initTimer = setTimeout(() => {
       setRevealedVotes(0);
       setShowConsensus(false);
@@ -123,7 +138,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
 
   if (!simulation) {
     return (
-      <div className="flex items-center justify-center p-12 text-gray-500">
+      <div className="flex items-center justify-center p-12" style={{ color: 'var(--text-muted)' }}>
         <div className="text-center">
           <Building2 size={48} className="mx-auto mb-4 opacity-30" />
           <p>Simulation data not available</p>
@@ -149,32 +164,57 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden border border-white/10 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)]"
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: 'var(--liquid-radius)',
+          borderTop: '2px solid #F97316',
+        }}
       >
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-              backgroundSize: '24px 24px',
-            }}
-          />
-        </div>
-
-        <div className="relative p-6">
-          <div className="flex items-center justify-between">
+        <div style={{ position: 'relative', padding: '24px' }}>
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-white/5 border border-white/10">
-                <Building2 size={28} className="text-orange-500" />
+              {/* Avatar cluster */}
+              <div style={{ display: 'flex', alignItems: 'center', marginRight: '4px' }}>
+                {(simulation.twins || []).slice(0, 3).map((twin, i) => {
+                  const config = PERSONA_CONFIG[twin.name] || PERSONA_CONFIG['Fiscal Conservative'];
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0, x: -10 }}
+                      animate={{ scale: 1, x: 0 }}
+                      transition={{ delay: i * 0.15 }}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        background: config.avatarGradient,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        color: '#0a0a0a',
+                        border: '2px solid #080808',
+                        marginLeft: i > 0 ? '-10px' : '0',
+                        zIndex: 3 - i,
+                        position: 'relative',
+                      }}
+                    >
+                      {config.avatarInitials}
+                    </motion.div>
+                  );
+                })}
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FAFAFA', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   Virtual Boardroom
-                  <Sparkles size={16} className="text-orange-400" />
+                  <Sparkles size={16} style={{ color: '#F97316' }} />
                 </h3>
-                <p className="text-sm text-gray-400 mt-1">
-                  AI personas vote based on their expertise and real-time market data
+                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  AI personas deliberate based on their expertise
                 </p>
               </div>
             </div>
@@ -185,15 +225,21 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="text-right"
+                  style={{ textAlign: 'right' }}
                 >
-                  <div className="text-xs text-gray-500 tracking-wide mb-1">Board Consensus</div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '6px' }}>
+                    Board Consensus
+                  </div>
                   <motion.div
-                    className="flex items-center gap-3 px-4 py-2 font-bold text-lg"
+                    className="flex items-center gap-3"
                     style={{
+                      padding: '8px 16px',
+                      fontWeight: 800,
+                      fontSize: '1rem',
                       color: overallConfig.color,
                       backgroundColor: overallConfig.bgColor,
-                      border: `1px solid ${overallConfig.color}40`,
+                      border: `1px solid ${overallConfig.color}30`,
+                      borderRadius: 'var(--radius-lg)',
                     }}
                   >
                     {overallConfig.icon}
@@ -206,8 +252,13 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
 
           {/* Vote Tally Bar */}
           <div className="mt-6 flex items-center gap-4">
-            <span className="text-xs text-gray-500 tracking-wide">Vote Distribution</span>
-            <div className="flex-1 flex gap-1 h-3 overflow-hidden bg-white/5">
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', flexShrink: 0 }}>
+              Votes
+            </span>
+            <div
+              className="flex-1 flex gap-1 overflow-hidden"
+              style={{ height: '8px', background: 'rgba(255,255,255,0.04)', borderRadius: 'var(--radius-full)' }}
+            >
               {(() => {
                 const totalTwins = simulation.twins?.length || 1;
                 return (
@@ -216,47 +267,47 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(voteCounts['APPROVE'] / totalTwins) * 100}%` }}
-                        transition={{ delay: 2.5, duration: 0.5 }}
-                        className="h-full bg-green-500"
+                        transition={{ delay: 2.5, duration: 0.6, ease: 'easeOut' }}
+                        style={{ height: '100%', background: '#22c55e', borderRadius: 'var(--radius-full)' }}
                       />
                     )}
                     {voteCounts['REVISE'] > 0 && (
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(voteCounts['REVISE'] / totalTwins) * 100}%` }}
-                        transition={{ delay: 2.6, duration: 0.5 }}
-                        className="h-full bg-yellow-500"
+                        transition={{ delay: 2.6, duration: 0.6, ease: 'easeOut' }}
+                        style={{ height: '100%', background: '#FBBF24', borderRadius: 'var(--radius-full)' }}
                       />
                     )}
                     {voteCounts['REJECT'] > 0 && (
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(voteCounts['REJECT'] / totalTwins) * 100}%` }}
-                        transition={{ delay: 2.7, duration: 0.5 }}
-                        className="h-full bg-red-500"
+                        transition={{ delay: 2.7, duration: 0.6, ease: 'easeOut' }}
+                        style={{ height: '100%', background: '#ef4444', borderRadius: 'var(--radius-full)' }}
                       />
                     )}
                   </>
                 );
               })()}
             </div>
-            <div className="flex gap-3 text-xs">
+            <div className="flex gap-3" style={{ fontSize: '11px', flexShrink: 0 }}>
               {voteCounts['APPROVE'] > 0 && (
-                <span className="flex items-center gap-1 text-green-400">
-                  <div className="w-2 h-2 bg-green-500" />
-                  {voteCounts['APPROVE']} Approve
+                <span className="flex items-center gap-1" style={{ color: '#22c55e' }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+                  {voteCounts['APPROVE']}
                 </span>
               )}
               {voteCounts['REVISE'] > 0 && (
-                <span className="flex items-center gap-1 text-yellow-400">
-                  <div className="w-2 h-2 bg-yellow-500" />
-                  {voteCounts['REVISE']} Revise
+                <span className="flex items-center gap-1" style={{ color: '#FBBF24' }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FBBF24', display: 'inline-block' }} />
+                  {voteCounts['REVISE']}
                 </span>
               )}
               {voteCounts['REJECT'] > 0 && (
-                <span className="flex items-center gap-1 text-red-400">
-                  <div className="w-2 h-2 bg-red-500" />
-                  {voteCounts['REJECT']} Reject
+                <span className="flex items-center gap-1" style={{ color: '#ef4444' }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+                  {voteCounts['REJECT']}
                 </span>
               )}
             </div>
@@ -279,30 +330,45 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.15 }}
               onClick={() => setSelectedTwin(isSelected ? null : idx)}
-              className={`relative border transition-all duration-300 cursor-pointer overflow-hidden ${
-                isSelected ? 'ring-2 ring-orange-500/50' : ''
-              }`}
+              className="cursor-pointer"
               style={{
+                position: 'relative',
+                overflow: 'hidden',
                 background: config.bgGradient,
-                borderColor: isSelected ? config.borderColor : 'rgba(255,255,255,0.1)',
+                border: `1px solid ${isSelected ? config.borderColor : 'rgba(255,255,255,0.06)'}`,
+                borderRadius: 'var(--liquid-radius)',
+                transition: 'all 0.3s',
+                boxShadow: isSelected ? `0 0 24px ${config.color}15` : 'none',
               }}
             >
               {/* Top Color Bar */}
-              <div className="h-1 w-full" style={{ backgroundColor: config.color }} />
+              <div style={{ height: '2px', width: '100%', backgroundColor: config.color }} />
 
-              <div className="p-5">
-                {/* Persona Header */}
+              <div style={{ padding: '20px' }}>
+                {/* Persona Header with Avatar */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div
-                      className="p-2.5 bg-white/5 border border-white/10"
-                      style={{ color: config.color }}
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: '50%',
+                        background: config.avatarGradient,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '13px',
+                        fontWeight: 800,
+                        color: '#0a0a0a',
+                        boxShadow: `0 4px 16px ${config.color}30`,
+                        flexShrink: 0,
+                      }}
                     >
-                      {config.icon}
+                      {config.avatarInitials}
                     </div>
                     <div>
-                      <h4 className="font-bold text-white text-sm">{twin.name}</h4>
-                      <p className="text-xs text-gray-500">{twin.role}</p>
+                      <h4 style={{ fontWeight: 700, color: '#FAFAFA', fontSize: '14px' }}>{twin.name}</h4>
+                      <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{twin.role}</p>
                     </div>
                   </div>
 
@@ -313,11 +379,15 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                         initial={{ scale: 0, rotate: -180 }}
                         animate={{ scale: 1, rotate: 0 }}
                         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold border"
+                        className="flex items-center gap-1.5"
                         style={{
+                          padding: '4px 10px',
+                          fontSize: '11px',
+                          fontWeight: 700,
                           color: voteConfig.color,
                           backgroundColor: voteConfig.bgColor,
-                          borderColor: voteConfig.borderColor,
+                          border: `1px solid ${voteConfig.borderColor}`,
+                          borderRadius: 'var(--radius-full)',
                         }}
                       >
                         {voteConfig.icon}
@@ -327,9 +397,27 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center"
+                        style={{
+                          width: 36,
+                          height: 36,
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
                       >
-                        <div className="w-5 h-5 border-2 border-white/20 border-t-white/60 animate-spin" />
+                        <div
+                          style={{
+                            width: 18,
+                            height: 18,
+                            border: '2px solid rgba(255,255,255,0.15)',
+                            borderTopColor: config.color,
+                            borderRadius: '50%',
+                          }}
+                          className="animate-spin"
+                        />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -341,23 +429,24 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
-                      className="mb-4"
+                      style={{ marginBottom: '16px' }}
                     >
-                      <div className="flex justify-between text-xs mb-1.5">
-                        <span className="text-gray-500">Confidence</span>
-                        <span className="font-mono" style={{ color: config.color }}>
+                      <div className="flex justify-between" style={{ fontSize: '11px', marginBottom: '6px' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Confidence</span>
+                        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: config.color }}>
                           {Math.round(twin.confidence)}%
                         </span>
                       </div>
-                      <div className="h-2 bg-white/10 overflow-hidden">
+                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${twin.confidence}%` }}
                           transition={{ delay: 0.3, duration: 0.8, ease: 'easeOut' }}
-                          className="h-full"
                           style={{
+                            height: '100%',
                             backgroundColor: config.color,
-                            boxShadow: `0 0 10px ${config.color}50`,
+                            borderRadius: 'var(--radius-full)',
+                            boxShadow: `0 0 12px ${config.color}40`,
                           }}
                         />
                       </div>
@@ -372,12 +461,17 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.2 }}
-                      className="relative"
                     >
-                      <div className="absolute -top-2 -left-1 text-4xl text-white/10 font-serif">
-                        &quot;
-                      </div>
-                      <p className="text-sm text-gray-300 italic leading-relaxed pl-3 border-l-2 border-white/10">
+                      <p
+                        style={{
+                          fontSize: '13px',
+                          color: 'var(--text-secondary)',
+                          fontStyle: 'italic',
+                          lineHeight: 1.6,
+                          paddingLeft: '12px',
+                          borderLeft: `2px solid ${config.color}40`,
+                        }}
+                      >
                         {twin.rationale}
                       </p>
                     </motion.div>
@@ -391,15 +485,15 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="mt-4 pt-4 border-t border-white/10"
+                      style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}
                     >
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2" style={{ marginBottom: '6px' }}>
                         <Target size={12} style={{ color: config.color }} />
-                        <span className="text-xs tracking-wide text-gray-500">
+                        <span style={{ fontSize: '10px', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
                           Key {twin.vote === 'APPROVE' ? 'Opportunity' : 'Concern'}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-400">{twin.keyRiskIdentified}</p>
+                      <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{twin.keyRiskIdentified}</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -411,10 +505,11 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}
-                      className="mt-4 flex items-center justify-center text-xs text-gray-600"
+                      className="flex items-center justify-center"
+                      style={{ marginTop: '16px', fontSize: '11px', color: 'var(--text-muted)' }}
                     >
                       <span className="flex items-center gap-1">
-                        {isSelected ? 'Show Less' : 'Click to Expand'}
+                        {isSelected ? 'Show Less' : 'Expand'}
                         <ChevronRight
                           size={14}
                           className={`transition-transform ${isSelected ? 'rotate-90' : ''}`}
@@ -436,49 +531,54 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="border border-white/10 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--bg-primary)] p-6"
+            style={{
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: 'var(--liquid-radius)',
+              padding: '24px',
+            }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <Brain size={20} className="text-orange-500" />
-              <h4 className="font-bold text-white">Boardroom Analysis</h4>
+              <Brain size={20} style={{ color: '#F97316' }} />
+              <h4 style={{ fontWeight: 800, color: '#FAFAFA' }}>Boardroom Analysis</h4>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               {/* Consensus Analysis */}
               <div>
-                <h5 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+                <h5 className="flex items-center gap-2" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px' }}>
                   <Users size={14} />
                   Consensus Breakdown
                 </h5>
                 <div className="space-y-2">
                   {voteCounts['APPROVE'] === 3 && (
-                    <div className="flex items-center gap-2 text-sm text-green-400">
+                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#22c55e' }}>
                       <CheckCircle size={16} />
-                      <span>Unanimous approval - strong strategic alignment</span>
+                      <span>Unanimous approval — strong strategic alignment</span>
                     </div>
                   )}
                   {voteCounts['REJECT'] === 3 && (
-                    <div className="flex items-center gap-2 text-sm text-red-400">
+                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#ef4444' }}>
                       <XCircle size={16} />
-                      <span>Unanimous rejection - significant concerns identified</span>
+                      <span>Unanimous rejection — significant concerns identified</span>
                     </div>
                   )}
                   {voteCounts['APPROVE'] >= 2 && voteCounts['APPROVE'] < 3 && (
-                    <div className="flex items-center gap-2 text-sm text-yellow-400">
+                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#FBBF24' }}>
                       <AlertTriangle size={16} />
-                      <span>Mixed consensus - majority approval with reservations</span>
+                      <span>Mixed consensus — majority approval with reservations</span>
                     </div>
                   )}
                   {voteCounts['REJECT'] >= 2 && voteCounts['REJECT'] < 3 && (
-                    <div className="flex items-center gap-2 text-sm text-red-400">
+                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#ef4444' }}>
                       <AlertTriangle size={16} />
-                      <span>Mixed consensus - majority rejection with some support</span>
+                      <span>Mixed consensus — majority rejection with some support</span>
                     </div>
                   )}
                   {voteCounts['REVISE'] > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-orange-400">
+                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#F97316' }}>
                       <TrendingUp size={16} />
-                      <span>Revision requested - proposal needs refinement</span>
+                      <span>Revision requested — proposal needs refinement</span>
                     </div>
                   )}
                 </div>
@@ -486,7 +586,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
 
               {/* Confidence Analysis */}
               <div>
-                <h5 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+                <h5 className="flex items-center gap-2" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px' }}>
                   <Target size={14} />
                   Confidence Metrics
                 </h5>
@@ -499,36 +599,32 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
 
                     return (
                       <>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-500">Average Confidence</span>
+                        <div className="flex justify-between" style={{ fontSize: '13px' }}>
+                          <span style={{ color: 'var(--text-muted)' }}>Average Confidence</span>
                           <span
-                            className={`font-mono font-bold ${
-                              avgConfidence > 75
-                                ? 'text-green-400'
-                                : avgConfidence > 50
-                                  ? 'text-yellow-400'
-                                  : 'text-red-400'
-                            }`}
+                            style={{
+                              fontFamily: "'JetBrains Mono', monospace",
+                              fontWeight: 700,
+                              color: avgConfidence > 75 ? '#22c55e' : avgConfidence > 50 ? '#FBBF24' : '#ef4444',
+                            }}
                           >
                             {Math.round(avgConfidence)}%
                           </span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-500">Lowest Confidence</span>
+                        <div className="flex justify-between" style={{ fontSize: '13px' }}>
+                          <span style={{ color: 'var(--text-muted)' }}>Lowest Confidence</span>
                           <span
-                            className={`font-mono font-bold ${
-                              minConfidence > 75
-                                ? 'text-green-400'
-                                : minConfidence > 50
-                                  ? 'text-yellow-400'
-                                  : 'text-red-400'
-                            }`}
+                            style={{
+                              fontFamily: "'JetBrains Mono', monospace",
+                              fontWeight: 700,
+                              color: minConfidence > 75 ? '#22c55e' : minConfidence > 50 ? '#FBBF24' : '#ef4444',
+                            }}
                           >
                             {Math.round(minConfidence)}%
                           </span>
                         </div>
-                        <div className="pt-2 border-t border-white/10">
-                          <p className="text-xs text-gray-500">
+                        <div style={{ paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                             {avgConfidence > 80
                               ? 'High confidence levels indicate strong conviction across all perspectives.'
                               : avgConfidence > 60
