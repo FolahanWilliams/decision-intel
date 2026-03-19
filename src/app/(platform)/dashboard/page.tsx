@@ -112,31 +112,39 @@ export default function Dashboard() {
   const [showComparative, setShowComparative] = useState(false);
   const [docsPage, setDocsPage] = useState(1);
 
-  // KPI visibility state
+  // KPI visibility state — initialized with defaults, hydrated from localStorage via useEffect
+  // to avoid React hydration mismatch (error #418)
   const [showKpiSettings, setShowKpiSettings] = useState(false);
-  const [kpiVisibility, setKpiVisibility] = useState<Record<string, boolean>>(() => {
-    // Load from localStorage if available
-    if (typeof window !== 'undefined') {
+  const kpiDefaults: Record<string, boolean> = {
+    'Total Documents': true,
+    'Analyzed': true,
+    'Avg Quality': true,
+    'In Progress': true,
+  };
+  const [kpiVisibility, setKpiVisibility] = useState<Record<string, boolean>>(kpiDefaults);
+  const kpiHydrated = useRef(false);
+
+  // Hydrate KPI visibility from localStorage after mount (avoids hydration mismatch)
+  useEffect(() => {
+    try {
       const saved = localStorage.getItem('dashboard_kpi_visibility');
       if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // Fallback to defaults
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          setKpiVisibility(parsed);
         }
       }
+    } catch {
+      // Ignore — use defaults
     }
-    return {
-      'Total Documents': true,
-      'Analyzed': true,
-      'Avg Quality': true,
-      'In Progress': true,
-    };
-  });
+    kpiHydrated.current = true;
+  }, []);
 
-  // Save KPI visibility to localStorage when it changes
+  // Save KPI visibility to localStorage when it changes (skip the initial hydration write)
   useEffect(() => {
-    localStorage.setItem('dashboard_kpi_visibility', JSON.stringify(kpiVisibility));
+    if (kpiHydrated.current) {
+      localStorage.setItem('dashboard_kpi_visibility', JSON.stringify(kpiVisibility));
+    }
   }, [kpiVisibility]);
 
   // Debounce search input → searchQuery (300ms)

@@ -39,7 +39,9 @@ export async function GET(req: NextRequest) {
   // Validate required params
   if (!code || !state) {
     settingsUrl.searchParams.set('slack', 'error');
-    return NextResponse.redirect(settingsUrl.toString());
+    const response = NextResponse.redirect(settingsUrl.toString());
+    response.cookies.delete('slack_oauth_state');
+    return response;
   }
 
   // CSRF check
@@ -47,7 +49,9 @@ export async function GET(req: NextRequest) {
   if (!storedState || storedState !== state) {
     log.warn('Slack OAuth state mismatch — possible CSRF');
     settingsUrl.searchParams.set('slack', 'error');
-    return NextResponse.redirect(settingsUrl.toString());
+    const response = NextResponse.redirect(settingsUrl.toString());
+    response.cookies.delete('slack_oauth_state');
+    return response;
   }
 
   // Require authenticated user
@@ -134,6 +138,8 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     log.error('Slack OAuth callback error:', err);
     settingsUrl.searchParams.set('slack', 'error');
-    return NextResponse.redirect(settingsUrl.toString());
+    const response = NextResponse.redirect(settingsUrl.toString());
+    response.cookies.delete('slack_oauth_state');
+    return response;
   }
 }

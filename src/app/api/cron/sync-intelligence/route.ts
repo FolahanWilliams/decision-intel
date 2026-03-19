@@ -38,11 +38,13 @@ export async function GET(request: NextRequest) {
   const start = Date.now();
 
   // Verify cron secret (Vercel sends this in the Authorization header)
-  if (CRON_SECRET) {
-    const authHeader = request.headers.get('authorization') ?? '';
-    if (!safeCompare(authHeader, `Bearer ${CRON_SECRET}`)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  if (!CRON_SECRET) {
+    log.error('CRON_SECRET not configured — rejecting request');
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
+  }
+  const authHeader = request.headers.get('authorization') ?? '';
+  if (!safeCompare(authHeader, `Bearer ${CRON_SECRET}`)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const errors: string[] = [];

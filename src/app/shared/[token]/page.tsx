@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import {
   Shield,
@@ -80,6 +80,16 @@ export default function SharedAnalysisPage() {
     if (token) fetchAnalysis();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // Format dates — must be called before any early returns (Rules of Hooks)
+  const formattedExpiry = useMemo(
+    () => (expiresAt ? new Date(expiresAt).toLocaleDateString() : null),
+    [expiresAt]
+  );
+  const formattedCreatedAt = useMemo(
+    () => (analysis ? new Date(analysis.createdAt).toLocaleDateString() : ''),
+    [analysis]
+  );
 
   // Password gate
   if (requiresPassword && !analysis) {
@@ -226,7 +236,7 @@ export default function SharedAnalysisPage() {
             </span>
             {expiresAt && (
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Clock size={12} /> Expires {new Date(expiresAt).toLocaleDateString()}
+                <Clock size={12} /> Expires {formattedExpiry}
               </span>
             )}
           </div>
@@ -250,7 +260,7 @@ export default function SharedAnalysisPage() {
               <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>{analysis.documentName}</h1>
             </div>
             <p style={{ color: '#64748b', fontSize: 13, margin: 0 }}>
-              Analyzed {new Date(analysis.createdAt).toLocaleDateString()}
+              Analyzed {formattedCreatedAt}
             </p>
           </div>
           <div style={{ textAlign: 'center' }}>

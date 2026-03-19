@@ -160,7 +160,7 @@ function checkPreMortemNeed(context: NudgeTriggerContext): NudgeDefinition | nul
   if (auditResult.decisionQualityScore > 60) return null;
 
   // Check if risk/failure language is absent from the content
-  const riskTerms = /\b(risk|fail|concern|worry|downside|worst.?case|what.?if)\b/i;
+  const riskTerms = /\b(risk|fail|concern|worry|downside|worst[- ]?case|what[- ]?if)\b/i;
   const hasRiskDiscussion = riskTerms.test(decision.content);
 
   if (hasRiskDiscussion) return null;
