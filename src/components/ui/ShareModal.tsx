@@ -332,9 +332,9 @@ export function ShareModal({
                       alignItems: 'center',
                       gap: '12px',
                       padding: '12px 16px',
-                      background: shareUrl ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-primary)',
+                      background: shareUrl ? 'rgba(249, 115, 22, 0.08)' : 'var(--bg-primary)',
                       border: shareUrl
-                        ? '1px solid rgba(99, 102, 241, 0.3)'
+                        ? '1px solid rgba(249, 115, 22, 0.3)'
                         : '1px solid var(--border-color)',
                       borderRadius: '8px',
                       cursor: 'pointer',
