@@ -378,7 +378,12 @@ export function CommandPalette() {
         style={{ paddingTop: '20vh' }}
       >
         <div
-          className="fixed inset-0 bg-black/60"
+          className="fixed inset-0"
+          style={{
+            background: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(12px) saturate(150%)',
+            WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+          }}
           onClick={() => setShowShortcuts(false)}
           aria-hidden="true"
         />
@@ -388,11 +393,13 @@ export function CommandPalette() {
           aria-label="Keyboard shortcuts"
           className="relative w-full max-w-sm mx-4 animate-slide-up"
           style={{
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)',
+            background: 'rgba(30, 30, 30, 0.75)',
+            backdropFilter: 'blur(40px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.20)',
             borderRadius: 'var(--radius-xl)',
             overflow: 'hidden',
-            boxShadow: 'var(--shadow-lg)',
+            boxShadow: '0 24px 80px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.10) inset',
           }}
         >
           <div
@@ -463,7 +470,12 @@ export function CommandPalette() {
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60"
+        className="fixed inset-0"
+        style={{
+          background: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(12px) saturate(150%)',
+          WebkitBackdropFilter: 'blur(12px) saturate(150%)',
+        }}
         onClick={() => setOpen(false)}
         aria-hidden="true"
       />
@@ -475,11 +487,13 @@ export function CommandPalette() {
         aria-label="Command palette"
         className="relative w-full max-w-lg mx-4 animate-slide-up"
         style={{
-          background: 'var(--bg-secondary)',
-          border: '1px solid var(--border-color)',
+          background: 'rgba(30, 30, 30, 0.75)',
+          backdropFilter: 'blur(40px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.20)',
           borderRadius: 'var(--radius-xl)',
           overflow: 'hidden',
-          boxShadow: 'var(--shadow-lg)',
+          boxShadow: '0 24px 80px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.10) inset',
         }}
       >
         {/* Search input */}
@@ -557,7 +571,7 @@ export function CommandPalette() {
                       width: 'calc(100% - 8px)',
                       padding: '8px var(--spacing-md)',
                       margin: '1px 4px',
-                      background: idx === clampedIndex ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
+                      background: idx === clampedIndex ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
                       border: 'none',
                       borderRadius: 'var(--radius-md)',
                       cursor: 'pointer',

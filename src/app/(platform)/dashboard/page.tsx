@@ -548,7 +548,7 @@ export default function Dashboard() {
       style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
     >
       {/* Header with view tabs */}
-      <div className="flex items-center justify-between mb-xl">
+      <div className="page-header">
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
             <span className="text-gradient">Dashboard</span>
@@ -1022,8 +1022,8 @@ export default function Dashboard() {
 
           {/* Currently Analyzing Section */}
           {uploadedDocs.filter(d => d.status === 'analyzing').length > 0 && (
-            <div className="mb-xl">
-              <h2 className="text-lg font-semibold flex items-center gap-2 mb-md">
+            <div className="section">
+              <h2 className="section-header flex items-center gap-2">
                 <Loader2 size={18} className="animate-spin text-accent-primary" />
                 Currently Analyzing
               </h2>
@@ -1079,9 +1079,9 @@ export default function Dashboard() {
 
           {/* Recent Analyses Section */}
           {uploadedDocs.filter(d => d.status === 'complete').length > 0 && (
-            <div className="mb-xl">
-              <div className="flex items-center justify-between mb-md">
-                <h2 className="text-lg font-semibold flex items-center gap-2">
+            <div className="section">
+              <div className="flex items-center justify-between" style={{ marginBottom: 'var(--spacing-md)' }}>
+                <h2 className="section-header flex items-center gap-2" style={{ marginBottom: 0 }}>
                   <CheckCircle size={18} className="text-green-500" />
                   Recent Analyses
                 </h2>
