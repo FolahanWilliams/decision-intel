@@ -17,6 +17,7 @@ import {
   GitCompareArrows,
   BrainCircuit,
   Bell,
+  Video,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -335,6 +336,15 @@ export default function Sidebar() {
             label="Cognitive Audits"
             description="Audit human decisions"
             active={pathname === '/dashboard/cognitive-audits'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/meetings"
+            icon={<Video size={18} />}
+            label="Meetings"
+            description="Meeting recordings & transcripts"
+            active={pathname.startsWith('/dashboard/meetings')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
