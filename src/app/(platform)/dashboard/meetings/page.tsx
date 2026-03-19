@@ -12,6 +12,8 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  ListChecks,
+  Landmark,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useMeetings } from '@/hooks/useMeetings';
@@ -124,6 +126,7 @@ export default function MeetingsPage() {
                   <th style={{ textAlign: 'center', padding: '12px 8px', fontSize: '11px', color: 'var(--text-muted)' }}>SPEAKERS</th>
                   <th style={{ textAlign: 'center', padding: '12px 8px', fontSize: '11px', color: 'var(--text-muted)' }}>QUALITY</th>
                   <th style={{ textAlign: 'center', padding: '12px 8px', fontSize: '11px', color: 'var(--text-muted)' }}>BIASES</th>
+                  <th style={{ textAlign: 'center', padding: '12px 8px', fontSize: '11px', color: 'var(--text-muted)' }}>ACTIONS</th>
                   <th style={{ textAlign: 'center', padding: '12px 8px', fontSize: '11px', color: 'var(--text-muted)' }}>STATUS</th>
                   <th style={{ textAlign: 'right', padding: '12px 16px', fontSize: '11px', color: 'var(--text-muted)' }}>DATE</th>
                 </tr>
@@ -202,6 +205,22 @@ export default function MeetingsPage() {
                         ) : (
                           <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>--</span>
                         )}
+                      </td>
+                      <td style={{ textAlign: 'center', padding: '14px 8px' }}>
+                        {(() => {
+                          const actions = Array.isArray(meeting.actionItems) ? meeting.actionItems : [];
+                          const decisions = Array.isArray(meeting.keyDecisions) ? meeting.keyDecisions : [];
+                          const total = actions.length + decisions.length;
+                          if (total > 0) {
+                            return (
+                              <div className="flex items-center justify-center gap-xs" style={{ fontSize: '12px' }}>
+                                {actions.length > 0 && <span className="flex items-center gap-xs" title="Action items"><ListChecks size={11} style={{ color: 'var(--accent-primary)' }} />{actions.length}</span>}
+                                {decisions.length > 0 && <span className="flex items-center gap-xs" title="Key decisions"><Landmark size={11} style={{ color: 'var(--warning)' }} />{decisions.length}</span>}
+                              </div>
+                            );
+                          }
+                          return <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>--</span>;
+                        })()}
                       </td>
                       <td style={{ textAlign: 'center', padding: '14px 8px' }}>
                         <span style={{
