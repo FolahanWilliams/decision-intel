@@ -32,41 +32,26 @@ export function EmptyState({
   return (
     <div className="animate-fade-in" style={{ padding: 'var(--spacing-2xl)' }}>
       <div className="flex flex-col items-center gap-lg text-center">
-        {/* Icon with decorative ring */}
+        {/* Icon with animated decorative rings + glow */}
         <div
           style={{
             position: 'relative',
-            width: 80,
-            height: 80,
+            width: 96,
+            height: 96,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          {/* Outer decorative ring */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              borderRadius: 'var(--radius-xl)',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px dashed rgba(255, 255, 255, 0.1)',
-            }}
-          />
-          {/* Inner filled circle */}
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: 'var(--radius-lg)',
-            }}
-          >
-            <Icon size={28} style={{ color: 'var(--text-secondary)' }} />
+          {/* Ambient glow pulse */}
+          <div className="empty-state-glow" />
+          {/* Outer spinning ring */}
+          <div className="empty-state-ring" />
+          {/* Inner counter-spinning ring */}
+          <div className="empty-state-ring-inner" />
+          {/* Icon container with glass treatment */}
+          <div className="empty-state-icon">
+            <Icon size={26} style={{ color: 'var(--text-primary)' }} />
           </div>
         </div>
 
@@ -74,18 +59,29 @@ export function EmptyState({
         <div>
           <h2 className="text-lg font-semibold mb-sm">{title}</h2>
           <p
-            className="text-sm text-muted"
-            style={{ maxWidth: 420, margin: '0 auto', lineHeight: 1.6 }}
+            className="text-sm"
+            style={{ maxWidth: 420, margin: '0 auto', lineHeight: 1.7, color: 'var(--text-secondary)' }}
           >
             {description}
           </p>
         </div>
 
-        {/* Optional badges */}
+        {/* Optional badges with glass pill style */}
         {badges && badges.length > 0 && (
           <div className="flex flex-wrap justify-center gap-sm">
             {badges.map(badge => (
-              <span key={badge} className="badge" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              <span
+                key={badge}
+                className="glass-pill"
+                style={{
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                  color: 'var(--text-secondary)',
+                  padding: '4px 12px',
+                }}
+              >
                 {badge}
               </span>
             ))}
@@ -94,7 +90,7 @@ export function EmptyState({
 
         {/* Action buttons */}
         {(action || secondaryAction) && (
-          <div className="flex items-center gap-sm">
+          <div className="flex items-center gap-sm" style={{ marginTop: 'var(--spacing-sm)' }}>
             {secondaryAction && (
               <button onClick={secondaryAction.onClick} className="btn btn-ghost text-sm">
                 {secondaryAction.label}

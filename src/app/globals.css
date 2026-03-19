@@ -1219,6 +1219,137 @@ tr:hover td {
 }
 
 /* ═══════════════════════════════════════════
+   Page Header — glass bar with bottom glow
+   ═══════════════════════════════════════════ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg) 0;
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  position: relative;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.20) 20%,
+    rgba(255, 255, 255, 0.30) 50%,
+    rgba(255, 255, 255, 0.20) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.page-header .page-subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ═══════════════════════════════════════════
+   Section Divider — consistent vertical rhythm
+   ═══════════════════════════════════════════ */
+.section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+}
+
+.section-header h2,
+.section-header h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  margin: var(--spacing-xl) 0;
+  border: none;
+}
+
+/* ═══════════════════════════════════════════
+   Enhanced Empty State
+   ═══════════════════════════════════════════ */
+.empty-state-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  animation: emptyStateRingSpin 20s linear infinite;
+}
+
+.empty-state-ring-inner {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: emptyStateRingSpin 15s linear infinite reverse;
+}
+
+@keyframes emptyStateRingSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.empty-state-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.06), 0 1px 0 rgba(255, 255, 255, 0.10) inset;
+  position: relative;
+  z-index: 1;
+}
+
+.empty-state-glow {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  animation: emptyStateGlowPulse 4s ease-in-out infinite;
+}
+
+@keyframes emptyStateGlowPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* ═══════════════════════════════════════════
    Responsive Grids
    ═══════════════════════════════════════════ */
 @layer base {
