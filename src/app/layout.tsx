@@ -17,6 +17,11 @@ export const metadata: Metadata = {
 import { ToastProvider } from '@/components/ui/ToastContext';
 import { ThemeProvider } from '@/components/theme-provider';
 import { NotificationProvider } from '@/components/ui/NotificationCenter';
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
 
 export default function RootLayout({
   children,
@@ -24,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className="antialiased min-h-screen">
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
           <NotificationProvider>
