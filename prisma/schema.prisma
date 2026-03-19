@@ -285,6 +285,13 @@ model Meeting {
   errorMessage    String?  @db.Text
   transcriptionProgress Float @default(0) // 0-100 progress percentage
 
+  // Phase 2: Structured meeting intelligence
+  summary         String?  @db.Text   // AI-generated meeting summary
+  actionItems     Json?               // [{ id, text, assignee, dueDate, status, priority }]
+  keyDecisions    Json?               // [{ id, text, madeBy, context, decisionType, confidence }]
+  speakerBiases   Json?               // [{ speaker, biases: [{ biasType, count, avgSeverity }] }]
+  similarMeetings Json?               // [{ meetingId, title, similarity, outcome }]
+
   // Link to the HumanDecision created from this meeting's transcript
   humanDecisionId String?  @unique
 

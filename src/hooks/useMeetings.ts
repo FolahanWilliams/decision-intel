@@ -32,6 +32,51 @@ export interface MeetingTranscript {
   confidence: number;
 }
 
+// ─── Phase 2 Intelligence Types ─────────────────────────────────────────────
+
+export interface ActionItem {
+  id: string;
+  text: string;
+  assignee: string | null;
+  dueDate: string | null;
+  status: 'open' | 'in_progress' | 'done';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  context: string;
+}
+
+export interface KeyDecision {
+  id: string;
+  text: string;
+  madeBy: string | null;
+  context: string;
+  decisionType: string;
+  confidence: number;
+  rationale: string;
+  dissent: string | null;
+}
+
+export interface SpeakerBiasProfile {
+  speaker: string;
+  biases: Array<{
+    biasType: string;
+    count: number;
+    avgSeverity: number;
+    examples: string[];
+  }>;
+  dominanceScore: number;
+  dissenterScore: number;
+}
+
+export interface SimilarMeeting {
+  meetingId: string;
+  title: string;
+  similarity: number;
+  outcome: string;
+  lessonsLearned: string;
+}
+
+// ─── Meeting Summary Types ──────────────────────────────────────────────────
+
 export interface MeetingSummary {
   id: string;
   title: string;
@@ -46,6 +91,10 @@ export interface MeetingSummary {
   errorMessage: string | null;
   humanDecisionId: string | null;
   createdAt: string;
+  // Phase 2 intelligence
+  summary: string | null;
+  actionItems: ActionItem[] | null;
+  keyDecisions: KeyDecision[] | null;
   transcript?: {
     id: string;
     speakers: MeetingSpeaker[];
@@ -67,6 +116,9 @@ export interface MeetingSummary {
 export interface MeetingDetail extends MeetingSummary {
   storagePath: string | null;
   transcript: MeetingTranscript | null;
+  // Phase 2 intelligence
+  speakerBiases: SpeakerBiasProfile[] | null;
+  similarMeetings: SimilarMeeting[] | null;
   humanDecision: {
     id: string;
     status: string;

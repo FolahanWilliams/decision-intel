@@ -15,6 +15,7 @@ import { prisma } from '@/lib/prisma';
 // Dynamic import to avoid top-level env var check during build
 // import { getServiceSupabase } from '@/lib/supabase';
 import { transcribeMeeting } from '@/lib/meetings/transcribe';
+import { extractMeetingIntelligence } from '@/lib/meetings/intelligence';
 import { analyzeHumanDecision } from '@/lib/human-audit/analyzer';
 import { toPrismaJson, toPrismaStringArray } from '@/lib/utils/prisma-json';
 import { storeHumanDecisionEmbedding } from '@/lib/rag/embeddings';
@@ -111,6 +112,22 @@ export async function processMeeting(meetingId: string, userId: string): Promise
         language: transcriptionResult.language,
       },
     }).catch(() => {});
+
+    // ── Step 3b: Extract meeting intelligence (Phase 2) ──────────────
+    // Runs in parallel with audit preparation — action items, key decisions,
+    // summary, speaker biases, and similar past meetings
+    const intelligencePromise = extractMeetingIntelligence(
+      transcriptionResult.fullText,
+      transcriptionResult.segments,
+      transcriptionResult.speakers,
+      meeting.title,
+      meeting.meetingType,
+      userId,
+      meetingId
+    ).catch(err => {
+      log.error('Meeting intelligence extraction failed:', err);
+      return null;
+    });
 
     // ── Step 4: Create HumanDecision from transcript ──────────────────
     await updateStatus(meetingId, 'analyzing', 0);
@@ -221,6 +238,23 @@ export async function processMeeting(meetingId: string, userId: string): Promise
           channel: nudge.channel,
         },
       }).catch(err => log.error('Failed to persist nudge:', err));
+    }
+
+    // ── Step 6: Store meeting intelligence results ──────────────────
+    const intelligence = await intelligencePromise;
+    if (intelligence) {
+      await prisma.meeting.update({
+        where: { id: meetingId },
+        data: {
+          summary: intelligence.summary.executive,
+          actionItems: JSON.parse(JSON.stringify(intelligence.actionItems)),
+          keyDecisions: JSON.parse(JSON.stringify(intelligence.keyDecisions)),
+          speakerBiases: JSON.parse(JSON.stringify(intelligence.speakerBiases)),
+          similarMeetings: JSON.parse(JSON.stringify(intelligence.similarMeetings)),
+        },
+      }).catch(err => log.error('Failed to store meeting intelligence:', err));
+
+      log.info(`Intelligence stored: ${intelligence.actionItems.length} actions, ${intelligence.keyDecisions.length} decisions`);
     }
 
     // ── Done ──────────────────────────────────────────────────────────
