@@ -44,7 +44,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 };
 
 const SPEAKER_COLORS = [
-  '#6366f1',
+  '#F97316',
   '#ec4899',
   '#22c55e',
   '#f59e0b',
@@ -857,7 +857,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                             style={{
                               fontSize: '10px',
                               padding: '2px 8px',
-                              background: 'rgba(99,102,241,0.1)',
+                              background: 'rgba(249,115,22,0.1)',
                               color: 'var(--accent-primary)',
                               borderRadius: '4px',
                             }}
@@ -1172,7 +1172,7 @@ function highlightMatch(text: string, query: string): string {
   const regex = new RegExp(`(${escaped})`, 'gi');
   return escapeHtml(text).replace(
     regex,
-    '<mark style="background:rgba(99,102,241,0.25);padding:1px 2px;border-radius:2px">$1</mark>'
+    '<mark style="background:rgba(249,115,22,0.25);padding:1px 2px;border-radius:2px">$1</mark>'
   );
 }
 

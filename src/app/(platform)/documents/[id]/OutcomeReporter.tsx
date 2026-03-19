@@ -58,7 +58,7 @@ const OUTCOME_OPTIONS = [
     value: 'too_early',
     label: 'Too Early',
     icon: Clock,
-    color: '#6366f1',
+    color: '#F97316',
     description: 'Not enough time to evaluate',
   },
 ] as const;
@@ -178,7 +178,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
         borderRadius: '12px',
         overflow: 'hidden',
         background: existing
-          ? `linear-gradient(135deg, ${outcomeOption?.color || '#6366f1'}08, transparent)`
+          ? `linear-gradient(135deg, ${outcomeOption?.color || '#F97316'}08, transparent)`
           : 'var(--bg-secondary)',
       }}
     >
@@ -317,10 +317,10 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                         padding: '4px 12px',
                         fontSize: '11px',
                         background:
-                          timeframe === tf.value ? 'rgba(99,102,241,0.15)' : 'transparent',
-                        border: `1px solid ${timeframe === tf.value ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                          timeframe === tf.value ? 'rgba(249,115,22,0.15)' : 'transparent',
+                        border: `1px solid ${timeframe === tf.value ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.08)'}`,
                         borderRadius: '14px',
-                        color: timeframe === tf.value ? '#a5b4fc' : 'var(--text-muted)',
+                        color: timeframe === tf.value ? '#FBBF24' : 'var(--text-muted)',
                         cursor: 'pointer',
                         fontWeight: timeframe === tf.value ? 600 : 400,
                       }}
@@ -449,11 +449,11 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                           fontSize: '11px',
                           background:
                             mostAccurateTwin === twin.name
-                              ? 'rgba(99,102,241,0.15)'
+                              ? 'rgba(249,115,22,0.15)'
                               : 'transparent',
-                          border: `1px solid ${mostAccurateTwin === twin.name ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                          border: `1px solid ${mostAccurateTwin === twin.name ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.08)'}`,
                           borderRadius: '14px',
-                          color: mostAccurateTwin === twin.name ? '#a5b4fc' : 'var(--text-muted)',
+                          color: mostAccurateTwin === twin.name ? '#FBBF24' : 'var(--text-muted)',
                           cursor: 'pointer',
                           fontWeight: mostAccurateTwin === twin.name ? 600 : 400,
                         }}

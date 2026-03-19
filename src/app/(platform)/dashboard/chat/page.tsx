@@ -287,7 +287,7 @@ export default function ChatPage() {
                   style={{
                     width: '100%',
                     padding: '10px 12px',
-                    background: 'rgba(99, 102, 241, 0.06)',
+                    background: 'rgba(249, 115, 22, 0.06)',
                     border: 'none',
                     borderBottom: '1px solid var(--border-color)',
                     color: 'var(--accent-primary)',
@@ -319,7 +319,7 @@ export default function ChatPage() {
                       padding: '8px 12px',
                       borderBottom: '1px solid var(--border-color)',
                       background:
-                        s.id === activeSessionId ? 'rgba(99, 102, 241, 0.06)' : 'transparent',
+                        s.id === activeSessionId ? 'rgba(249, 115, 22, 0.06)' : 'transparent',
                     }}
                   >
                     <button
@@ -377,7 +377,7 @@ export default function ChatPage() {
               onClick={() => setShowPicker(!showPicker)}
               className="btn flex items-center gap-xs"
               style={{
-                background: pinnedDocId ? 'rgba(99, 102, 241, 0.1)' : 'var(--bg-tertiary)',
+                background: pinnedDocId ? 'rgba(249, 115, 22, 0.1)' : 'var(--bg-tertiary)',
                 border: `1px solid ${pinnedDocId ? 'var(--accent-primary)' : 'var(--border-color)'}`,
                 color: pinnedDocId ? 'var(--accent-primary)' : 'var(--text-muted)',
                 fontSize: '12px',
@@ -442,7 +442,7 @@ export default function ChatPage() {
                     style={{
                       width: '100%',
                       padding: '10px 12px',
-                      background: d.id === pinnedDocId ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                      background: d.id === pinnedDocId ? 'rgba(249, 115, 22, 0.08)' : 'transparent',
                       border: 'none',
                       borderBottom: '1px solid var(--border-color)',
                       color: 'var(--text-primary)',
@@ -497,7 +497,7 @@ export default function ChatPage() {
           className="flex items-center gap-sm"
           style={{
             padding: '8px var(--spacing-md)',
-            background: 'rgba(99, 102, 241, 0.06)',
+            background: 'rgba(249, 115, 22, 0.06)',
             borderBottom: '1px solid var(--border-color)',
             fontSize: '12px',
             flexShrink: 0,

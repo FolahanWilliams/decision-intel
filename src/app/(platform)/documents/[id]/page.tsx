@@ -844,7 +844,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               <div
                 style={{
                   padding: '12px 16px',
-                  background: 'rgba(99, 102, 241, 0.05)',
+                  background: 'rgba(249, 115, 22, 0.05)',
                   borderBottom: '1px solid var(--border-color)',
                 }}
               >
@@ -1242,7 +1242,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                           idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
                         cursor: 'pointer',
                         background:
-                          selectedBias?.id === bias.id ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
+                          selectedBias?.id === bias.id ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
                         borderLeft:
                           selectedBias?.id === bias.id
                             ? '3px solid var(--accent-primary)'

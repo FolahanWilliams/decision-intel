@@ -943,7 +943,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                             items: swotAnalysis.opportunities,
                             icon: Target,
                             color: 'var(--accent-primary)',
-                            bg: 'rgba(99, 102, 241, 0.08)',
+                            bg: 'rgba(249, 115, 22, 0.08)',
                           },
                           {
                             title: 'Threats',
@@ -1007,7 +1007,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                           className="mt-lg"
                           style={{
                             padding: 'var(--spacing-lg)',
-                            background: 'rgba(99, 102, 241, 0.08)',
+                            background: 'rgba(249, 115, 22, 0.08)',
                             borderLeft: '3px solid var(--accent-primary)',
                             fontSize: '14px',
                             lineHeight: 1.6,
@@ -1337,7 +1337,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                           <div
                             style={{
                               padding: 'var(--spacing-md)',
-                              background: 'rgba(99, 102, 241, 0.08)',
+                              background: 'rgba(249, 115, 22, 0.08)',
                               borderLeft: '3px solid var(--accent-primary)',
                               fontSize: '14px',
                               lineHeight: 1.6,
@@ -1484,7 +1484,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                     style={{
                       padding: 'var(--spacing-md)',
                       marginBottom: 'var(--spacing-md)',
-                      background: 'rgba(99, 102, 241, 0.06)',
+                      background: 'rgba(249, 115, 22, 0.06)',
                       borderLeft: '3px solid var(--accent-primary)',
                       fontSize: '13px',
                       color: 'var(--text-secondary)',
@@ -1912,7 +1912,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                                     style={{
                                       fontSize: '10px',
                                       padding: '2px 8px',
-                                      background: 'rgba(99,102,241,0.2)',
+                                      background: 'rgba(249,115,22,0.2)',
                                       color: 'var(--accent-primary)',
                                     }}
                                   >

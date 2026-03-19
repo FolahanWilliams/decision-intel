@@ -63,8 +63,9 @@ export function FactVerificationBar({ data, compact }: FactVerificationBarProps)
               />
               <Tooltip
                 contentStyle={{
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--glass-border)',
+                  background: 'rgba(14, 14, 14, 0.95)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  borderRadius: '12px',
                   fontSize: '12px',
                 }}
                 formatter={value => [

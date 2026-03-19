@@ -40,8 +40,8 @@ export function BiasEducationCard({
     <div
       className="card"
       style={{
-        border: detected ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid var(--border-color)',
-        background: detected ? 'rgba(99, 102, 241, 0.03)' : 'var(--bg-secondary)',
+        border: detected ? '1px solid rgba(249, 115, 22, 0.3)' : '1px solid var(--border-color)',
+        background: detected ? 'rgba(249, 115, 22, 0.03)' : 'var(--bg-secondary)',
         transition: 'all 0.2s ease',
       }}
     >
@@ -70,7 +70,7 @@ export function BiasEducationCard({
               style={{
                 fontSize: '10px',
                 padding: '1px 8px',
-                background: 'rgba(99, 102, 241, 0.1)',
+                background: 'rgba(249, 115, 22, 0.1)',
                 color: 'var(--accent-primary)',
                 borderRadius: '12px',
                 fontWeight: 500,
@@ -145,8 +145,8 @@ export function BiasEducationCard({
             <div
               style={{
                 padding: 'var(--spacing-md)',
-                background: 'rgba(99, 102, 241, 0.04)',
-                border: '1px solid rgba(99, 102, 241, 0.12)',
+                background: 'rgba(249, 115, 22, 0.04)',
+                border: '1px solid rgba(249, 115, 22, 0.12)',
                 borderRadius: '8px',
               }}
             >

@@ -22,7 +22,7 @@ export function DecisionTimeline({ events }: DecisionTimelineProps) {
 
     switch (type) {
       case 'decision':
-        return <Circle size={16} className="text-blue-400 fill-blue-400/20" />;
+        return <Circle size={16} className="text-orange-400 fill-orange-400/20" />;
       case 'risk':
         return <AlertCircle size={16} className="text-red-400" />;
       default:

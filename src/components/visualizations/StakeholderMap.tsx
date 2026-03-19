@@ -19,7 +19,7 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
     { label: 'Keep Satisfied', x: 0, y: 50, w: 50, h: 50, color: 'bg-yellow-500/10' },
     { label: 'Manage Closely', x: 50, y: 50, w: 50, h: 50, color: 'bg-red-500/10' },
     { label: 'Monitor', x: 0, y: 0, w: 50, h: 50, color: 'bg-gray-500/10' },
-    { label: 'Keep Informed', x: 50, y: 0, w: 50, h: 50, color: 'bg-blue-500/10' },
+    { label: 'Keep Informed', x: 50, y: 0, w: 50, h: 50, color: 'bg-orange-500/10' },
   ];
 
   const getStanceColor = (stance: string) => {

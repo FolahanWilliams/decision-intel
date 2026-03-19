@@ -312,7 +312,7 @@ export default function SubmitDecisionPage() {
                         padding: '40px 20px',
                         textAlign: 'center',
                         cursor: 'pointer',
-                        background: dragActive ? 'rgba(99, 102, 241, 0.05)' : 'var(--bg-secondary)',
+                        background: dragActive ? 'rgba(249, 115, 22, 0.05)' : 'var(--bg-secondary)',
                         transition: 'all 0.2s ease',
                       }}
                     >

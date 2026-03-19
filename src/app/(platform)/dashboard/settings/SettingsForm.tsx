@@ -348,7 +348,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                     height: 40,
                     background: slackStatus?.connected
                       ? 'rgba(34, 197, 94, 0.15)'
-                      : 'rgba(99, 102, 241, 0.15)',
+                      : 'rgba(249, 115, 22, 0.15)',
                     borderRadius: '10px',
                     display: 'flex',
                     alignItems: 'center',
@@ -437,8 +437,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                       style={{
                         fontSize: '11px',
                         padding: '2px 8px',
-                        background: 'rgba(99, 102, 241, 0.1)',
-                        border: '1px solid rgba(99, 102, 241, 0.2)',
+                        background: 'rgba(249, 115, 22, 0.1)',
+                        border: '1px solid rgba(249, 115, 22, 0.2)',
                         borderRadius: '12px',
                         color: 'var(--text-secondary)',
                       }}

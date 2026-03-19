@@ -21,7 +21,7 @@ function highlightMatch(text: string, query: string): ReactNode {
       <mark
         key={i}
         style={{
-          background: 'rgba(99, 102, 241, 0.25)',
+          background: 'rgba(249, 115, 22, 0.25)',
           color: 'inherit',
           padding: '0 1px',
           borderRadius: '2px',
