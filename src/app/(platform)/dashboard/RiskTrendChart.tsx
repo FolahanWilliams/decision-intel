@@ -29,41 +29,41 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#FFFFFF" stopOpacity={0.15} />
-              <stop offset="50%" stopColor="#A1A1AA" stopOpacity={0.08} />
-              <stop offset="95%" stopColor="#71717A" stopOpacity={0} />
+              <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.25} />
+              <stop offset="50%" stopColor="#fbbf24" stopOpacity={0.08} />
+              <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
           <XAxis
             dataKey="date"
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 11, fill: '#52525b' }}
+            tick={{ fontSize: 11, fill: '#71717a' }}
             dy={10}
           />
           <YAxis
             domain={[0, 100]}
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 11, fill: '#52525b' }}
+            tick={{ fontSize: 11, fill: '#71717a' }}
           />
           <Tooltip
             contentStyle={{
-              background: 'rgba(14, 14, 14, 0.95)',
-              border: '1px solid rgba(255,255,255,0.10)',
+              background: 'rgba(0, 0, 0, 0.75)',
+              border: '1px solid rgba(255,255,255,0.18)',
               borderRadius: '12px',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+              backdropFilter: 'blur(24px) saturate(180%)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.08) inset',
               padding: '8px 12px',
             }}
-            itemStyle={{ color: '#FAFAFA', fontWeight: 600, fontSize: '13px' }}
+            itemStyle={{ color: '#FFFFFF', fontWeight: 600, fontSize: '13px' }}
             labelStyle={{ color: '#a1a1aa', fontSize: '11px', marginBottom: '4px' }}
           />
           <Area
             type="monotone"
             dataKey="score"
-            stroke="#A1A1AA"
+            stroke="#fbbf24"
             strokeWidth={2.5}
             fillOpacity={1}
             fill="url(#scoreGradient)"

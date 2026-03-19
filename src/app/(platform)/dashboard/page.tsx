@@ -562,8 +562,8 @@ export default function Dashboard() {
             display: 'flex',
             alignItems: 'center',
             gap: '2px',
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
             borderRadius: 'var(--radius-full)',
             padding: '3px',
           }}
@@ -628,20 +628,20 @@ export default function Dashboard() {
               value: totalDocs,
               numericValue: totalDocs,
               icon: <FileText size={18} />,
-              iconBg: 'rgba(255, 255, 255, 0.08)',
-              iconColor: '#FFFFFF',
-              accentColor: 'rgba(255, 255, 255, 0.2)',
-              sparkColor: '#a1a1aa',
+              iconBg: 'rgba(56, 189, 248, 0.15)',
+              iconColor: '#38bdf8',
+              accentColor: '#38bdf8',
+              sparkColor: '#38bdf8',
             },
             {
               label: 'Analyzed',
               value: uploadedDocs.filter(d => d.status === 'complete').length,
               numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
               icon: <CheckCircle size={18} />,
-              iconBg: 'rgba(255, 255, 255, 0.08)',
-              iconColor: '#FFFFFF',
-              accentColor: 'rgba(255, 255, 255, 0.2)',
-              sparkColor: '#a1a1aa',
+              iconBg: 'rgba(52, 211, 153, 0.15)',
+              iconColor: '#34d399',
+              accentColor: '#34d399',
+              sparkColor: '#34d399',
             },
             {
               label: 'Avg Quality',
@@ -649,10 +649,10 @@ export default function Dashboard() {
               numericValue: riskSummary.avg,
               suffix: '%',
               icon: <TrendingUp size={18} />,
-              iconBg: 'rgba(255, 255, 255, 0.08)',
-              iconColor: '#FFFFFF',
-              accentColor: 'rgba(255, 255, 255, 0.2)',
-              sparkColor: '#a1a1aa',
+              iconBg: 'rgba(251, 191, 36, 0.15)',
+              iconColor: '#fbbf24',
+              accentColor: '#fbbf24',
+              sparkColor: '#fbbf24',
               showSparkline: true,
             },
             {
@@ -662,10 +662,10 @@ export default function Dashboard() {
               numericValue: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
                 .length,
               icon: <Clock size={18} />,
-              iconBg: 'rgba(255, 255, 255, 0.08)',
-              iconColor: '#FFFFFF',
-              accentColor: 'rgba(255, 255, 255, 0.2)',
-              sparkColor: '#a1a1aa',
+              iconBg: 'rgba(248, 113, 113, 0.15)',
+              iconColor: '#f87171',
+              accentColor: '#f87171',
+              sparkColor: '#f87171',
             },
           ].map(stat => (
             <motion.div
@@ -677,7 +677,7 @@ export default function Dashboard() {
                 visible: { opacity: 1, y: 0, scale: 1 },
               }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -4, boxShadow: '0 8px 30px rgba(255, 255, 255, 0.04)' }}
+              whileHover={{ y: -4, boxShadow: '0 8px 30px rgba(255, 255, 255, 0.08), 0 0 40px rgba(255, 255, 255, 0.03)' }}
             >
               <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
                 <div
@@ -785,7 +785,7 @@ export default function Dashboard() {
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="card-header" style={{ background: 'rgba(255, 255, 255, 0.03)' }}>
+              <div className="card-header" style={{ background: 'rgba(255, 255, 255, 0.06)' }}>
                 <h3 className="flex items-center gap-sm text-sm">
                   <FileText size={16} style={{ color: 'var(--text-highlight)' }} />
                   Ready to Analyze
@@ -1034,7 +1034,7 @@ export default function Dashboard() {
                     <div
                       key={doc.id}
                       className="card"
-                      style={{ background: 'rgba(255, 255, 255, 0.03)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+                      style={{ background: 'rgba(255, 255, 255, 0.06)', borderColor: 'rgba(255, 255, 255, 0.15)' }}
                     >
                       <div className="card-body flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -1659,8 +1659,8 @@ export default function Dashboard() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'rgba(8, 8, 8, 0.90)',
-            backdropFilter: 'blur(4px)',
+            background: 'rgba(0, 0, 0, 0.70)',
+            backdropFilter: 'blur(20px) saturate(150%)',
           }}
         >
           <div
@@ -1671,9 +1671,11 @@ export default function Dashboard() {
               alignItems: 'center',
               gap: 'var(--spacing-lg)',
               padding: 'var(--spacing-2xl)',
-              border: '2px dashed rgba(255, 255, 255, 0.3)',
+              border: '2px dashed rgba(255, 255, 255, 0.35)',
               borderRadius: 'var(--radius-xl)',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: 'rgba(255, 255, 255, 0.08)',
+              backdropFilter: 'blur(24px) saturate(160%)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.08) inset',
             }}
           >
             <CloudUpload size={48} style={{ color: 'var(--accent-primary)' }} />
