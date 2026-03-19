@@ -44,15 +44,15 @@ export function OnboardingGuide() {
 
   return (
     <div
-      className="card mb-xl card-glow animate-fade-in"
-      style={{ borderColor: 'var(--accent-primary)', borderWidth: '1px' }}
+      className="card mb-xl animate-fade-in"
+      style={{ borderColor: 'rgba(255, 255, 255, 0.12)', borderWidth: '1px' }}
       role="region"
       aria-label="Getting started guide"
     >
-      <div className="card-header" style={{ background: 'rgba(249, 115, 22, 0.06)' }}>
+      <div className="card-header" style={{ background: 'rgba(255, 255, 255, 0.03)' }}>
         <h3
           style={{
-            color: 'var(--accent-primary)',
+            color: 'var(--text-secondary)',
             fontSize: '12px',
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
@@ -90,10 +90,10 @@ export function OnboardingGuide() {
                 alignItems: 'center',
                 gap: '8px',
                 padding: 'var(--spacing-md)',
-                background: index === currentStep ? 'rgba(249, 115, 22, 0.08)' : 'transparent',
+                background: index === currentStep ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
                 border:
                   index === currentStep
-                    ? '1px solid var(--accent-primary)'
+                    ? '1px solid rgba(255, 255, 255, 0.2)'
                     : '1px solid var(--border-color)',
                 cursor: 'pointer',
                 color: 'inherit',
@@ -108,8 +108,8 @@ export function OnboardingGuide() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: index <= currentStep ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-                  color: index <= currentStep ? '#fff' : 'var(--text-muted)',
+                  background: index <= currentStep ? '#FFFFFF' : 'var(--bg-tertiary)',
+                  color: index <= currentStep ? '#080808' : 'var(--text-muted)',
                   fontSize: '12px',
                   fontWeight: 700,
                 }}
@@ -133,13 +133,13 @@ export function OnboardingGuide() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-lg)' }}>
           {(() => {
             const Icon = STEPS[currentStep].icon;
-            return <Icon size={40} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />;
+            return <Icon size={40} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />;
           })()}
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: '14px', marginBottom: '4px', color: 'var(--text-primary)' }}>
               {STEPS[currentStep].description}
             </p>
-            <p style={{ fontSize: '11px', color: 'var(--accent-primary)', fontWeight: 600 }}>
+            <p style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600 }}>
               {STEPS[currentStep].action}
             </p>
           </div>

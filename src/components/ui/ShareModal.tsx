@@ -148,9 +148,9 @@ export function ShareModal({
                 padding: '10px 16px',
                 fontSize: '13px',
                 fontWeight: activeTab === tab ? 600 : 400,
-                color: activeTab === tab ? 'var(--accent-primary)' : 'var(--text-muted)',
+                color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-muted)',
                 borderBottom:
-                  activeTab === tab ? '2px solid var(--accent-primary)' : '2px solid transparent',
+                  activeTab === tab ? '2px solid var(--text-highlight)' : '2px solid transparent',
                 background: 'transparent',
                 border: 'none',
                 borderBottomWidth: '2px',
@@ -207,7 +207,7 @@ export function ShareModal({
                 }}
                 className="h-auto flex-col gap-2 p-4"
               >
-                <Download size={24} style={{ color: 'var(--accent-primary)' }} />
+                <Download size={24} style={{ color: 'var(--text-secondary)' }} />
                 <span style={{ fontSize: '13px', fontWeight: 500 }}>Markdown</span>
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                   Documentation format
@@ -252,20 +252,20 @@ export function ShareModal({
                     disabled={creatingLink}
                     className="h-auto w-full justify-start gap-3 p-3 text-left"
                     style={{
-                      background: shareUrl ? 'rgba(249, 115, 22, 0.08)' : undefined,
-                      borderColor: shareUrl ? 'rgba(249, 115, 22, 0.3)' : undefined,
+                      background: shareUrl ? 'rgba(255, 255, 255, 0.06)' : undefined,
+                      borderColor: shareUrl ? 'rgba(255, 255, 255, 0.15)' : undefined,
                     }}
                   >
                     {creatingLink ? (
                       <Loader2
                         size={18}
                         className="animate-spin shrink-0"
-                        style={{ color: 'var(--accent-primary)' }}
+                        style={{ color: 'var(--text-secondary)' }}
                       />
                     ) : linkCopied ? (
                       <Check size={18} className="shrink-0" style={{ color: 'var(--success)' }} />
                     ) : (
-                      <Link2 size={18} className="shrink-0" style={{ color: 'var(--accent-primary)' }} />
+                      <Link2 size={18} className="shrink-0" style={{ color: 'var(--text-secondary)' }} />
                     )}
                     <div>
                       <div style={{ fontWeight: 500, fontSize: '13px' }}>
@@ -306,7 +306,7 @@ export function ShareModal({
                 {copied ? (
                   <Check size={18} className="shrink-0" style={{ color: 'var(--success)' }} />
                 ) : (
-                  <Copy size={18} className="shrink-0" style={{ color: 'var(--accent-primary)' }} />
+                  <Copy size={18} className="shrink-0" style={{ color: 'var(--text-secondary)' }} />
                 )}
                 <div>
                   <div style={{ fontWeight: 500, fontSize: '13px' }}>Copy summary to clipboard</div>
@@ -324,7 +324,7 @@ export function ShareModal({
                 }}
                 className="h-auto w-full justify-start gap-3 p-3 text-left"
               >
-                <Link2 size={18} className="shrink-0" style={{ color: 'var(--accent-primary)' }} />
+                <Link2 size={18} className="shrink-0" style={{ color: 'var(--text-secondary)' }} />
                 <div>
                   <div style={{ fontWeight: 500, fontSize: '13px' }}>Export as Markdown</div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -338,7 +338,7 @@ export function ShareModal({
                 onClick={handleEmailShare}
                 className="h-auto w-full justify-start gap-3 p-3 text-left"
               >
-                <Mail size={18} className="shrink-0" style={{ color: 'var(--accent-primary)' }} />
+                <Mail size={18} className="shrink-0" style={{ color: 'var(--text-secondary)' }} />
                 <div>
                   <div style={{ fontWeight: 500, fontSize: '13px' }}>Send via email</div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>

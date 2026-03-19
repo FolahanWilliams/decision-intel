@@ -677,7 +677,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           style={{
             height: '2px',
             marginTop: 'var(--spacing-md)',
-            background: 'linear-gradient(90deg, #F97316, #FBBF24, #A3E635)',
+            background: 'linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
             borderRadius: '1px',
           }}
         />
@@ -882,7 +882,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               <div
                 style={{
                   padding: '12px 16px',
-                  background: 'rgba(249, 115, 22, 0.05)',
+                  background: 'rgba(255, 255, 255, 0.06)',
                   borderBottom: '1px solid var(--border-color)',
                 }}
               >
@@ -1085,9 +1085,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         style={
                           activeTab === tab.id
                             ? {
-                                background: 'rgba(249, 115, 22, 0.10)',
-                                color: '#F97316',
-                                borderBottom: '2px solid #F97316',
+                                background: 'rgba(255, 255, 255, 0.06)',
+                                color: '#FFFFFF',
+                                borderBottom: '2px solid #FFFFFF',
                               }
                             : {
                                 color: 'var(--text-muted)',
@@ -1290,7 +1290,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                           idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
                         cursor: 'pointer',
                         background:
-                          selectedBias?.id === bias.id ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
+                          selectedBias?.id === bias.id ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
                         borderLeft:
                           selectedBias?.id === bias.id
                             ? '3px solid var(--accent-primary)'

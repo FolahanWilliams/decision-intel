@@ -58,7 +58,7 @@ const ROLE_ICONS: Record<string, React.ReactNode> = {
 
 const ROLE_COLORS: Record<string, string> = {
   owner: 'var(--warning)',
-  admin: 'var(--accent-primary)',
+  admin: 'var(--text-highlight)',
   member: 'var(--text-secondary)',
   viewer: 'var(--text-muted)',
 };
@@ -108,7 +108,7 @@ export default function TeamPage() {
         }}
       >
         <div className="flex items-center justify-center" style={{ minHeight: 300 }}>
-          <Loader2 size={24} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+          <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
         </div>
       </div>
     );
@@ -135,14 +135,14 @@ export default function TeamPage() {
               width: 64,
               height: 64,
               margin: '0 auto var(--spacing-lg)',
-              background: 'rgba(249, 115, 22, 0.12)',
+              background: 'rgba(255, 255, 255, 0.06)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Users size={28} style={{ color: 'var(--accent-primary)' }} />
+            <Users size={28} style={{ color: 'var(--text-secondary)' }} />
           </div>
           <h2 style={{ marginBottom: 'var(--spacing-sm)' }}>Create Your Team</h2>
           <p className="text-muted" style={{ maxWidth: 440, margin: '0 auto var(--spacing-xl)' }}>
@@ -190,7 +190,7 @@ export default function TeamPage() {
                 width: 48,
                 height: 48,
                 background:
-                  'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                  'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.06))',
                 borderRadius: '14px',
                 display: 'flex',
                 alignItems: 'center',
@@ -236,7 +236,7 @@ export default function TeamPage() {
               background: 'transparent',
               border: 'none',
               borderBottom:
-                activeTab === tab ? '2px solid var(--accent-primary)' : '2px solid transparent',
+                activeTab === tab ? '2px solid var(--text-highlight)' : '2px solid transparent',
               color: activeTab === tab ? 'var(--text-highlight)' : 'var(--text-muted)',
               fontWeight: activeTab === tab ? 600 : 400,
               fontSize: '14px',
@@ -290,9 +290,9 @@ export default function TeamPage() {
                     style={{
                       fontSize: '11px',
                       padding: '2px 8px',
-                      background: 'rgba(249, 115, 22, 0.15)',
+                      background: 'rgba(255, 255, 255, 0.1)',
                       borderRadius: '12px',
-                      color: 'var(--accent-primary)',
+                      color: 'var(--text-highlight)',
                       fontWeight: 600,
                     }}
                   >
@@ -469,7 +469,7 @@ function MemberRow({
             padding: '3px 10px',
             borderRadius: '12px',
             background:
-              member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'rgba(249, 115, 22, 0.1)',
+              member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'rgba(255, 255, 255, 0.06)',
             color: ROLE_COLORS[member.role],
             fontWeight: 600,
           }}
@@ -993,7 +993,7 @@ function TeamActivityTab() {
   if (loading) {
     return (
       <div className="flex items-center justify-center" style={{ minHeight: 200 }}>
-        <Loader2 size={20} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+        <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
       </div>
     );
   }
@@ -1010,9 +1010,9 @@ function TeamActivityTab() {
               style={{
                 fontSize: '11px',
                 padding: '2px 8px',
-                background: 'rgba(249, 115, 22, 0.15)',
+                background: 'rgba(255, 255, 255, 0.1)',
                 borderRadius: '12px',
-                color: 'var(--accent-primary)',
+                color: 'var(--text-highlight)',
                 fontWeight: 600,
               }}
             >

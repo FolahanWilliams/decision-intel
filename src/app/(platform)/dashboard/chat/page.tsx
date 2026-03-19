@@ -239,7 +239,7 @@ export default function ChatPage() {
         }}
       >
         <div className="flex items-center gap-md">
-          <MessageSquare size={24} style={{ color: 'var(--accent-primary)' }} />
+          <MessageSquare size={24} style={{ color: 'var(--text-secondary)' }} />
           <div>
             <h1 style={{ fontSize: '18px', margin: 0 }}>Chat</h1>
             <p className="text-muted" style={{ fontSize: '12px', margin: 0 }}>
@@ -287,10 +287,10 @@ export default function ChatPage() {
                   style={{
                     width: '100%',
                     padding: '10px 12px',
-                    background: 'rgba(249, 115, 22, 0.06)',
+                    background: 'rgba(255, 255, 255, 0.06)',
                     border: 'none',
                     borderBottom: '1px solid var(--border-color)',
-                    color: 'var(--accent-primary)',
+                    color: 'var(--text-highlight)',
                     fontSize: '13px',
                     cursor: 'pointer',
                     textAlign: 'left',
@@ -319,7 +319,7 @@ export default function ChatPage() {
                       padding: '8px 12px',
                       borderBottom: '1px solid var(--border-color)',
                       background:
-                        s.id === activeSessionId ? 'rgba(249, 115, 22, 0.06)' : 'transparent',
+                        s.id === activeSessionId ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
                     }}
                   >
                     <button
@@ -377,9 +377,9 @@ export default function ChatPage() {
               onClick={() => setShowPicker(!showPicker)}
               className="btn flex items-center gap-xs"
               style={{
-                background: pinnedDocId ? 'rgba(249, 115, 22, 0.1)' : 'var(--bg-tertiary)',
-                border: `1px solid ${pinnedDocId ? 'var(--accent-primary)' : 'var(--border-color)'}`,
-                color: pinnedDocId ? 'var(--accent-primary)' : 'var(--text-muted)',
+                background: pinnedDocId ? 'rgba(255, 255, 255, 0.06)' : 'var(--bg-tertiary)',
+                border: `1px solid ${pinnedDocId ? 'rgba(255, 255, 255, 0.15)' : 'var(--border-color)'}`,
+                color: pinnedDocId ? 'var(--text-highlight)' : 'var(--text-muted)',
                 fontSize: '12px',
                 padding: '6px 12px',
                 cursor: 'pointer',
@@ -442,7 +442,7 @@ export default function ChatPage() {
                     style={{
                       width: '100%',
                       padding: '10px 12px',
-                      background: d.id === pinnedDocId ? 'rgba(249, 115, 22, 0.08)' : 'transparent',
+                      background: d.id === pinnedDocId ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
                       border: 'none',
                       borderBottom: '1px solid var(--border-color)',
                       color: 'var(--text-primary)',
@@ -463,7 +463,7 @@ export default function ChatPage() {
                       {d.filename}
                     </span>
                     {d.id === pinnedDocId && (
-                      <Pin size={12} style={{ color: 'var(--accent-primary)' }} />
+                      <Pin size={12} style={{ color: 'var(--text-highlight)' }} />
                     )}
                   </button>
                 ))}
@@ -497,18 +497,18 @@ export default function ChatPage() {
           className="flex items-center gap-sm"
           style={{
             padding: '8px var(--spacing-md)',
-            background: 'rgba(249, 115, 22, 0.06)',
+            background: 'rgba(255, 255, 255, 0.06)',
             borderBottom: '1px solid var(--border-color)',
             fontSize: '12px',
             flexShrink: 0,
           }}
         >
-          <Pin size={12} style={{ color: 'var(--accent-primary)' }} />
+          <Pin size={12} style={{ color: 'var(--text-secondary)' }} />
           <span style={{ color: 'var(--text-secondary)' }}>
             Chatting about{' '}
             <Link
               href={`/documents/${pinnedDoc.id}`}
-              style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}
+              style={{ color: 'var(--text-highlight)', textDecoration: 'none' }}
             >
               {pinnedDoc.filename}
             </Link>
@@ -685,7 +685,7 @@ function MessageBubble({
         style={{
           maxWidth: '85%',
           padding: 'var(--spacing-sm) var(--spacing-md)',
-          background: isUser ? 'var(--accent-primary)' : 'var(--bg-secondary)',
+          background: isUser ? 'rgba(255, 255, 255, 0.1)' : 'var(--bg-secondary)',
           color: isUser ? '#fff' : 'var(--text-primary)',
           borderRadius: '2px',
           fontSize: '14px',

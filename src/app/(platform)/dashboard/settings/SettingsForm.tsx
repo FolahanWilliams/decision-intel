@@ -166,7 +166,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
       {/* Header */}
       <header className="mb-xl">
         <div className="flex items-center gap-md mb-sm">
-          <Settings size={28} style={{ color: 'var(--accent-primary)' }} />
+          <Settings size={28} style={{ color: 'var(--text-secondary)' }} />
           <h1>Settings</h1>
         </div>
         <p className="text-muted">Manage your account preferences and notifications</p>
@@ -208,7 +208,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                 <span
                   style={{
                     background:
-                      'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                      'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.06))',
                     padding: '2px 8px',
                     fontSize: '11px',
                     fontWeight: 600,
@@ -348,7 +348,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                     height: 40,
                     background: slackStatus?.connected
                       ? 'rgba(34, 197, 94, 0.15)'
-                      : 'rgba(249, 115, 22, 0.15)',
+                      : 'rgba(255, 255, 255, 0.06)',
                     borderRadius: '10px',
                     display: 'flex',
                     alignItems: 'center',
@@ -358,7 +358,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   <MessageSquare
                     size={20}
                     style={{
-                      color: slackStatus?.connected ? 'var(--success)' : 'var(--accent-primary)',
+                      color: slackStatus?.connected ? 'var(--success)' : 'var(--text-secondary)',
                     }}
                   />
                 </div>
@@ -437,8 +437,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                       style={{
                         fontSize: '11px',
                         padding: '2px 8px',
-                        background: 'rgba(249, 115, 22, 0.1)',
-                        border: '1px solid rgba(249, 115, 22, 0.2)',
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
                         borderRadius: '12px',
                         color: 'var(--text-secondary)',
                       }}
@@ -638,7 +638,7 @@ function ToggleOption({
         style={{
           width: 48,
           height: 26,
-          background: checked ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
+          background: checked ? '#FFFFFF' : 'var(--bg-tertiary)',
           border: 'none',
           cursor: disabled ? 'not-allowed' : 'pointer',
           opacity: disabled ? 0.5 : 1,
@@ -650,7 +650,7 @@ function ToggleOption({
           style={{
             width: 20,
             height: 20,
-            background: '#fff',
+            background: checked ? '#000' : '#fff',
             position: 'absolute',
             top: 3,
             left: checked ? 25 : 3,

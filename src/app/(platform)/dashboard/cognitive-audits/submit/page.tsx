@@ -214,7 +214,7 @@ export default function SubmitDecisionPage() {
 
       <header className="mb-xl animate-fade-in">
         <div className="flex items-center gap-md mb-sm">
-          <BrainCircuit size={28} style={{ color: 'var(--accent-primary)' }} />
+          <BrainCircuit size={28} style={{ color: 'var(--text-secondary)' }} />
           <h1>Submit Decision for Audit</h1>
         </div>
         <p className="text-muted">
@@ -307,18 +307,18 @@ export default function SubmitDecisionPage() {
                       onDragLeave={() => setDragActive(false)}
                       onDrop={handleDrop}
                       style={{
-                        border: `2px dashed ${dragActive ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                        border: `2px dashed ${dragActive ? 'var(--text-highlight)' : 'var(--border-color)'}`,
                         borderRadius: '12px',
                         padding: '40px 20px',
                         textAlign: 'center',
                         cursor: 'pointer',
-                        background: dragActive ? 'rgba(249, 115, 22, 0.05)' : 'var(--bg-secondary)',
+                        background: dragActive ? 'rgba(255, 255, 255, 0.06)' : 'var(--bg-secondary)',
                         transition: 'all 0.2s ease',
                       }}
                     >
                       <Upload
                         size={36}
-                        style={{ color: 'var(--accent-primary)', marginBottom: '12px' }}
+                        style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}
                       />
                       <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '6px' }}>
                         Drop recording here or click to browse
@@ -351,7 +351,7 @@ export default function SubmitDecisionPage() {
                     >
                       <FileAudio
                         size={28}
-                        style={{ color: 'var(--accent-primary)', flexShrink: 0 }}
+                        style={{ color: 'var(--text-secondary)', flexShrink: 0 }}
                       />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
@@ -398,7 +398,7 @@ export default function SubmitDecisionPage() {
                           style={{
                             height: '100%',
                             width: `${uploadProgress}%`,
-                            background: 'var(--accent-primary)',
+                            background: 'var(--text-highlight)',
                             transition: 'width 0.3s ease',
                           }}
                         />

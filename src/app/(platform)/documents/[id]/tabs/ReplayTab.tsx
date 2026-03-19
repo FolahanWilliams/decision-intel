@@ -165,13 +165,13 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
                         step.status === 'skipped'
                           ? 'var(--bg-tertiary)'
                           : isExpanded
-                            ? 'rgba(249, 115, 22, 0.15)'
+                            ? 'rgba(255, 255, 255, 0.1)'
                             : 'rgba(48, 209, 88, 0.1)',
                       color:
                         step.status === 'skipped'
                           ? 'var(--text-muted)'
                           : isExpanded
-                            ? 'var(--accent-primary)'
+                            ? '#FFFFFF'
                             : 'var(--success)',
                       fontSize: '12px',
                       fontWeight: 700,
@@ -314,11 +314,11 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
                           padding: '6px 12px',
                           fontSize: '12px',
                           background: showCounterfactual
-                            ? 'rgba(249, 115, 22, 0.1)'
+                            ? 'rgba(255, 255, 255, 0.06)'
                             : 'transparent',
-                          border: '1px solid rgba(249, 115, 22, 0.3)',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
                           borderRadius: 'var(--radius-full)',
-                          color: 'var(--accent-primary)',
+                          color: 'var(--text-highlight)',
                           cursor: 'pointer',
                         }}
                       >

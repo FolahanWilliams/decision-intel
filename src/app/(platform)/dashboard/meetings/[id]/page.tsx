@@ -37,14 +37,14 @@ type TabKey = 'transcript' | 'speakers' | 'actions' | 'decisions' | 'biases' | '
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   uploading: { label: 'Uploading recording...', color: 'var(--text-muted)' },
-  transcribing: { label: 'Transcribing audio...', color: 'var(--accent-primary)' },
+  transcribing: { label: 'Transcribing audio...', color: 'var(--text-secondary)' },
   analyzing: { label: 'Running cognitive audit...', color: 'var(--warning)' },
   complete: { label: 'Analysis complete', color: 'var(--success)' },
   error: { label: 'Processing failed', color: 'var(--error)' },
 };
 
 const SPEAKER_COLORS = [
-  '#F97316',
+  '#94a3b8',
   '#ec4899',
   '#22c55e',
   '#f59e0b',
@@ -52,7 +52,7 @@ const SPEAKER_COLORS = [
   '#8b5cf6',
   '#ef4444',
   '#14b8a6',
-  '#f97316',
+  '#64748b',
   '#a855f7',
 ];
 
@@ -167,7 +167,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
   if (isLoading) {
     return (
       <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', textAlign: 'center' }}>
-        <Loader2 size={32} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+        <Loader2 size={32} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
       </div>
     );
   }
@@ -216,7 +216,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
       {/* Header */}
       <header className="mb-xl animate-fade-in">
         <div className="flex items-center gap-md mb-sm">
-          <Video size={28} style={{ color: 'var(--accent-primary)' }} />
+          <Video size={28} style={{ color: 'var(--text-secondary)' }} />
           <h1>{meeting.title}</h1>
         </div>
         <div
@@ -313,7 +313,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
       {meeting.summary && (
         <div
           className="card animate-fade-in mb-lg"
-          style={{ padding: 'var(--spacing-lg)', borderLeft: '3px solid var(--accent-primary)' }}
+          style={{ padding: 'var(--spacing-lg)', borderLeft: '3px solid var(--text-highlight)' }}
         >
           <div
             style={{
@@ -392,8 +392,8 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                 gap: '4px',
               }}
             >
-              <ExternalLink size={20} style={{ color: 'var(--accent-primary)' }} />
-              <div style={{ fontSize: '12px', color: 'var(--accent-primary)', fontWeight: 600 }}>
+              <ExternalLink size={20} style={{ color: 'var(--text-highlight)' }} />
+              <div style={{ fontSize: '12px', color: 'var(--text-highlight)', fontWeight: 600 }}>
                 Full Audit
               </div>
             </Link>
@@ -414,7 +414,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                   padding: '6px 12px',
                   fontSize: '12px',
                   fontWeight: activeTab === tab.key ? 700 : 500,
-                  background: activeTab === tab.key ? 'var(--accent-primary)' : 'transparent',
+                  background: activeTab === tab.key ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
                   color: activeTab === tab.key ? '#fff' : 'var(--text-muted)',
                   border: 'none',
                   borderRadius: '6px',
@@ -461,7 +461,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                             fontSize: '11px',
                             fontWeight: !activeSpeakerFilter ? 700 : 500,
                             background: !activeSpeakerFilter
-                              ? 'var(--accent-primary)'
+                              ? 'rgba(255, 255, 255, 0.15)'
                               : 'var(--bg-tertiary)',
                             color: !activeSpeakerFilter ? '#fff' : 'var(--text-secondary)',
                             border: 'none',
@@ -848,7 +848,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                           padding: '16px',
                           background: 'var(--bg-secondary)',
                           borderRadius: '6px',
-                          borderLeft: `3px solid var(--accent-primary)`,
+                          borderLeft: `3px solid var(--text-highlight)`,
                         }}
                       >
                         <div className="flex items-center justify-between mb-xs">
@@ -857,8 +857,8 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
                             style={{
                               fontSize: '10px',
                               padding: '2px 8px',
-                              background: 'rgba(249,115,22,0.1)',
-                              color: 'var(--accent-primary)',
+                              background: 'rgba(255, 255, 255, 0.06)',
+                              color: 'var(--text-secondary)',
                               borderRadius: '4px',
                             }}
                           >
@@ -1172,7 +1172,7 @@ function highlightMatch(text: string, query: string): string {
   const regex = new RegExp(`(${escaped})`, 'gi');
   return escapeHtml(text).replace(
     regex,
-    '<mark style="background:rgba(249,115,22,0.25);padding:1px 2px;border-radius:2px">$1</mark>'
+    '<mark style="background:rgba(255,255,255,0.15);padding:1px 2px;border-radius:2px">$1</mark>'
   );
 }
 

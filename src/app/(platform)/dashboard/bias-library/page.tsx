@@ -70,7 +70,7 @@ export default function BiasLibraryPage() {
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       // Flash highlight
-      el.style.boxShadow = '0 0 0 2px var(--accent-primary)';
+      el.style.boxShadow = '0 0 0 2px var(--text-highlight)';
       setTimeout(() => {
         el.style.boxShadow = '';
       }, 1500);
@@ -88,7 +88,7 @@ export default function BiasLibraryPage() {
       {/* Header */}
       <div style={{ marginBottom: 'var(--spacing-xl)' }}>
         <div className="flex items-center gap-md" style={{ marginBottom: '8px' }}>
-          <BookOpen size={24} style={{ color: 'var(--accent-primary)' }} />
+          <BookOpen size={24} style={{ color: 'var(--text-secondary)' }} />
           <h1 style={{ fontSize: '22px', fontWeight: 700 }}>Bias Library</h1>
         </div>
         <p style={{ fontSize: '14px', color: 'var(--text-muted)', maxWidth: '600px' }}>
@@ -103,20 +103,20 @@ export default function BiasLibraryPage() {
           className="card"
           style={{
             marginBottom: 'var(--spacing-lg)',
-            border: '1px solid rgba(249, 115, 22, 0.2)',
-            background: 'rgba(249, 115, 22, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'rgba(255, 255, 255, 0.06)',
           }}
         >
           <div style={{ padding: 'var(--spacing-md) var(--spacing-lg)' }}>
             <div className="flex items-center gap-sm" style={{ marginBottom: '8px' }}>
-              <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
+              <Brain size={16} style={{ color: 'var(--text-highlight)' }} />
               <span
                 style={{
                   fontSize: '12px',
                   fontWeight: 600,
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
-                  color: 'var(--accent-primary)',
+                  color: 'var(--text-highlight)',
                 }}
               >
                 Your Detected Biases
@@ -213,11 +213,11 @@ export default function BiasLibraryPage() {
                 borderRadius: '16px',
                 border:
                   activeCategory === cat
-                    ? '1px solid var(--accent-primary)'
+                    ? '1px solid rgba(255, 255, 255, 0.15)'
                     : '1px solid var(--border-color)',
                 background:
-                  activeCategory === cat ? 'rgba(249, 115, 22, 0.12)' : 'var(--bg-secondary)',
-                color: activeCategory === cat ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                  activeCategory === cat ? 'rgba(255, 255, 255, 0.06)' : 'var(--bg-secondary)',
+                color: activeCategory === cat ? 'var(--text-highlight)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 fontWeight: activeCategory === cat ? 600 : 400,
               }}

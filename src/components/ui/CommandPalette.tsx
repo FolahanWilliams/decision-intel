@@ -54,7 +54,7 @@ const SHORTCUTS = [
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
   complete: <CheckCircle size={12} style={{ color: 'var(--success)' }} />,
-  analyzing: <Loader2 size={12} style={{ color: 'var(--accent-primary)' }} />,
+  analyzing: <Loader2 size={12} style={{ color: 'var(--text-secondary)' }} />,
   error: <AlertTriangle size={12} style={{ color: 'var(--error)' }} />,
 };
 
@@ -400,7 +400,7 @@ export function CommandPalette() {
             style={{ padding: 'var(--spacing-md)', borderBottom: '1px solid var(--border-color)' }}
           >
             <div className="flex items-center gap-sm">
-              <Keyboard size={16} style={{ color: 'var(--accent-primary)' }} />
+              <Keyboard size={16} style={{ color: 'var(--text-secondary)' }} />
               <span style={{ fontWeight: 600, fontSize: '14px' }}>Keyboard Shortcuts</span>
             </div>
             <button
@@ -557,7 +557,7 @@ export function CommandPalette() {
                       width: 'calc(100% - 8px)',
                       padding: '8px var(--spacing-md)',
                       margin: '1px 4px',
-                      background: idx === clampedIndex ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
+                      background: idx === clampedIndex ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
                       border: 'none',
                       borderRadius: 'var(--radius-md)',
                       cursor: 'pointer',
@@ -568,7 +568,7 @@ export function CommandPalette() {
                   >
                     <span
                       style={{
-                        color: idx === clampedIndex ? 'var(--accent-primary)' : 'var(--text-muted)',
+                        color: idx === clampedIndex ? 'var(--text-highlight)' : 'var(--text-muted)',
                         flexShrink: 0,
                         display: 'flex',
                         alignItems: 'center',
