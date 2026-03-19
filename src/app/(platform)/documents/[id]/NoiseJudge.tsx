@@ -38,7 +38,7 @@ export function NoiseJudge({
         <div className="card">
           <div className="card-header">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-indigo-500" />
+              <TrendingUp className="h-5 w-5" style={{ color: '#F97316' }} />
               <h3 className="card-title">Market Reality Check</h3>
             </div>
             <p className="text-sm text-muted">Internal Assumptions vs. External Market Consensus</p>
@@ -83,7 +83,8 @@ export function NoiseJudge({
                             href={b.sourceUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                            className="flex items-center gap-1"
+                            style={{ color: '#FBBF24' }}
                           >
                             Source <ExternalLink size={12} />
                           </a>

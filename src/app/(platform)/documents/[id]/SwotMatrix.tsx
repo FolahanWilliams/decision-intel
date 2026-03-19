@@ -57,8 +57,8 @@ export function SwotMatrix({ data }: { data: SwotAnalysisResult }) {
           </ul>
         </div>
       ))}
-      <div className="md:col-span-2 mt-4 p-4 bg-gradient-to-r from-slate-900 to-slate-800 border border-indigo-500/30">
-        <h4 className="text-indigo-400 font-semibold mb-2 flex items-center gap-2">
+      <div className="md:col-span-2 mt-4 p-4" style={{ background: 'linear-gradient(to right, #0f172a, #1e293b)', border: '1px solid rgba(249, 115, 22, 0.3)' }}>
+        <h4 className="font-semibold mb-2 flex items-center gap-2" style={{ color: '#FBBF24' }}>
           <Target className="w-4 h-4" /> Strategic Advice
         </h4>
         <p className="text-slate-300 text-sm leading-relaxed">{data.strategicAdvice}</p>
