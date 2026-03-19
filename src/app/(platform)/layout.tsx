@@ -5,6 +5,7 @@ import {
   AnalysisProgressFloat,
 } from '@/components/ui/AnalysisProgressBar';
 import { CommandPalette } from '@/components/ui/CommandPalette';
+import { LiquidGlassEffect } from '@/components/ui/LiquidGlassEffect';
 
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
       <a href="#main-content" className="skip-nav">
         Skip to main content
       </a>
+      <LiquidGlassEffect />
       <Ticker />
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         <Sidebar />
