@@ -134,7 +134,7 @@ export function SentimentGauge({ score, label, compact }: SentimentGaugeProps) {
   };
 
   return (
-    <div className="card card-glow h-full">
+    <div className="card card-glow liquid-glass-iridescent h-full">
       <div className="card-header">
         <h3 className="flex items-center gap-1.5">
           Sentiment Pulse

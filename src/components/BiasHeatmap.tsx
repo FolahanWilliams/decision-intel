@@ -63,7 +63,7 @@ export function BiasHeatmap({ content, biases }: BiasHeatmapProps) {
   });
 
   return (
-    <div className="card h-full border-l-4 border-l-accent-primary  flex flex-col">
+    <div className="card liquid-glass-textured liquid-glass-shimmer h-full border-l-4 border-l-accent-primary  flex flex-col">
       <div className="card-header pb-2">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-bold flex items-center gap-2">

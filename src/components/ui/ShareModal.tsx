@@ -120,7 +120,7 @@ export function ShareModal({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent
-        className="card w-full sm:max-w-md"
+        className="card liquid-glass-premium w-full sm:max-w-md"
         style={{ maxHeight: '85vh', overflowY: 'auto' }}
         showCloseButton
       >

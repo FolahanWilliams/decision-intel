@@ -81,7 +81,7 @@ export function DashboardCharts({
     >
       {/* Risk Distribution Donut */}
       {hasDonutData && (
-        <div className="card" style={{ padding: 0 }}>
+        <div className="card liquid-glass-premium" style={{ padding: 0 }}>
           <div className="card-header">
             <h3 style={{ fontSize: '0.8125rem', fontWeight: 600 }}>Risk Distribution</h3>
             <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -187,7 +187,7 @@ export function DashboardCharts({
 
       {/* Score Trend Area Chart */}
       {hasTrendData && (
-        <div className="card" style={{ padding: 0 }}>
+        <div className="card liquid-glass-premium" style={{ padding: 0 }}>
           <div className="card-header">
             <h3 style={{ fontSize: '0.8125rem', fontWeight: 600 }}>Quality Trend</h3>
             <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -239,7 +239,7 @@ export function DashboardCharts({
 
       {/* Top Biases Bar Chart */}
       {hasBiasData && (
-        <div className="card" style={{ padding: 0 }}>
+        <div className="card liquid-glass-premium" style={{ padding: 0 }}>
           <div className="card-header">
             <h3 style={{ fontSize: '0.8125rem', fontWeight: 600 }}>Top Biases Detected</h3>
             <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>

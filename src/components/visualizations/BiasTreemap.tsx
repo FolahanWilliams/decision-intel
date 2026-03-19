@@ -92,7 +92,7 @@ function CustomContent({ x, y, width, height, name, count, index }: TreemapConte
 export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
   if (!data || data.length === 0) {
     return (
-      <div className="card card-glow h-full">
+      <div className="card card-glow liquid-glass-depth liquid-glass-shimmer h-full">
         <div className="card-header">
           <h3 style={{ fontSize: '13px' }}>Bias Landscape</h3>
         </div>
@@ -113,7 +113,7 @@ export function BiasTreemap({ data, severityMap }: BiasTreemapProps) {
   }));
 
   return (
-    <div className="card card-glow h-full">
+    <div className="card card-glow liquid-glass-depth liquid-glass-shimmer h-full">
       <div className="card-header flex items-center justify-between">
         <h3 style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: 6 }}>
           Bias Landscape

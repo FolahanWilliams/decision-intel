@@ -38,7 +38,7 @@ export function DecisionRadar({ data }: DecisionRadarProps) {
   }));
 
   return (
-    <div className="card card-glow h-full">
+    <div className="card card-glow liquid-glass-fresnel h-full">
       <div className="card-header">
         <h3>Decision Health Radar</h3>
       </div>

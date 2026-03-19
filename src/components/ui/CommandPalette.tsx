@@ -391,7 +391,7 @@ export function CommandPalette() {
           role="dialog"
           aria-modal="true"
           aria-label="Keyboard shortcuts"
-          className="relative w-full max-w-sm mx-4 animate-slide-up"
+          className="relative w-full max-w-sm mx-4 animate-slide-up liquid-glass-premium"
           style={{
             background: 'rgba(30, 30, 30, 0.75)',
             backdropFilter: 'blur(40px) saturate(180%)',
@@ -485,7 +485,7 @@ export function CommandPalette() {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="relative w-full max-w-lg mx-4 animate-slide-up"
+        className="relative w-full max-w-lg mx-4 animate-slide-up liquid-glass-premium liquid-glass-fresnel"
         style={{
           background: 'rgba(30, 30, 30, 0.75)',
           backdropFilter: 'blur(40px) saturate(180%)',

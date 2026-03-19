@@ -61,7 +61,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
 
   if (isEmpty) {
     return (
-      <div className="card card-glow h-full">
+      <div className="card card-glow liquid-glass-premium h-full">
         <div className="card-header">
           <h3 className="flex items-center gap-1.5">
             SWOT Analysis
@@ -76,7 +76,7 @@ export function SwotQuadrant({ data }: SwotQuadrantProps) {
   }
 
   return (
-    <div className="card h-full">
+    <div className="card liquid-glass-premium h-full">
       <div className="card-header">
         <h3 className="flex items-center gap-1.5">
           SWOT Analysis

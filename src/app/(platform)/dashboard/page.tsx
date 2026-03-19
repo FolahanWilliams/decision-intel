@@ -670,7 +670,7 @@ export default function Dashboard() {
           ].map(stat => (
             <motion.div
               key={stat.label}
-              className="stat-card"
+              className="stat-card liquid-glass-premium liquid-glass-fresnel"
               style={{ borderTop: `2px solid ${stat.accentColor}` }}
               variants={{
                 hidden: { opacity: 0, y: 20, scale: 0.97 },
@@ -836,7 +836,7 @@ export default function Dashboard() {
           {/* Upload Zone - Enhanced with drag feedback */}
           {!uploading && !pendingFile ? (
             <div
-              className={`upload-zone mb-xl ${isDragOver ? 'dragover' : ''}`}
+              className={`upload-zone mb-xl liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
