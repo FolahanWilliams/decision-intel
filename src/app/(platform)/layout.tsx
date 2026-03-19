@@ -13,9 +13,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
         Skip to main content
       </a>
       <Ticker />
-      <div
-        style={{ display: 'flex', flex: 1, overflow: 'hidden' }}
-      >
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         <Sidebar />
         <main
           id="main-content"

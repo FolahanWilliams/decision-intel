@@ -29,18 +29,26 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       'Seek out disconfirming evidence before finalizing — specifically look for data that contradicts your position.',
     ],
     relatedBiases: [
-      { key: 'selective_perception', reason: 'Both involve filtering information to match existing beliefs' },
-      { key: 'anchoring_bias', reason: 'Initial beliefs act as anchors that confirmation bias reinforces' },
+      {
+        key: 'selective_perception',
+        reason: 'Both involve filtering information to match existing beliefs',
+      },
+      {
+        key: 'anchoring_bias',
+        reason: 'Initial beliefs act as anchors that confirmation bias reinforces',
+      },
     ],
-    academicReference: 'Wason, P.C. (1960). "On the failure to eliminate hypotheses in a conceptual task." Quarterly Journal of Experimental Psychology.',
-    quickTip: 'Before deciding, write down what evidence would change your mind — then go look for it.',
+    academicReference:
+      'Wason, P.C. (1960). "On the failure to eliminate hypotheses in a conceptual task." Quarterly Journal of Experimental Psychology.',
+    quickTip:
+      'Before deciding, write down what evidence would change your mind — then go look for it.',
     difficulty: 'hard',
   },
   anchoring_bias: {
     realWorldExample: {
       title: 'Real Estate Pricing Experiments',
       description:
-        'In Northcraft & Neale\'s landmark study, real estate agents were given different listing prices for identical properties. Even experienced agents\' valuations were heavily influenced by the arbitrary initial price, despite claiming they ignored it.',
+        "In Northcraft & Neale's landmark study, real estate agents were given different listing prices for identical properties. Even experienced agents' valuations were heavily influenced by the arbitrary initial price, despite claiming they ignored it.",
       company: 'University of Arizona Study',
       year: '1987',
     },
@@ -50,11 +58,19 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       'Explicitly challenge the first number you encounter: ask "Why is this the right starting point?"',
     ],
     relatedBiases: [
-      { key: 'framing_effect', reason: 'Anchors are a specific form of framing that sets a reference point' },
-      { key: 'confirmation_bias', reason: 'Once anchored, people seek data confirming the anchor value' },
+      {
+        key: 'framing_effect',
+        reason: 'Anchors are a specific form of framing that sets a reference point',
+      },
+      {
+        key: 'confirmation_bias',
+        reason: 'Once anchored, people seek data confirming the anchor value',
+      },
     ],
-    academicReference: 'Tversky, A. & Kahneman, D. (1974). "Judgment under Uncertainty: Heuristics and Biases." Science, 185(4157).',
-    quickTip: 'Always ask: "Would I reach the same conclusion if the first number I saw was different?"',
+    academicReference:
+      'Tversky, A. & Kahneman, D. (1974). "Judgment under Uncertainty: Heuristics and Biases." Science, 185(4157).',
+    quickTip:
+      'Always ask: "Would I reach the same conclusion if the first number I saw was different?"',
     difficulty: 'moderate',
   },
   availability_heuristic: {
@@ -71,10 +87,14 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       'Create a "recency check": is this top of mind because it\'s truly important or because it happened recently?',
     ],
     relatedBiases: [
-      { key: 'recency_bias', reason: 'Recent events are more available in memory, amplifying this heuristic' },
+      {
+        key: 'recency_bias',
+        reason: 'Recent events are more available in memory, amplifying this heuristic',
+      },
       { key: 'framing_effect', reason: 'Vivid examples frame perception of probability' },
     ],
-    academicReference: 'Tversky, A. & Kahneman, D. (1973). "Availability: A heuristic for judging frequency and probability." Cognitive Psychology, 5(2).',
+    academicReference:
+      'Tversky, A. & Kahneman, D. (1973). "Availability: A heuristic for judging frequency and probability." Cognitive Psychology, 5(2).',
     quickTip: 'When a risk feels scary, look up the actual statistics before adjusting your plans.',
     difficulty: 'moderate',
   },
@@ -82,7 +102,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     realWorldExample: {
       title: 'Bay of Pigs Invasion',
       description:
-        'President Kennedy\'s advisory team unanimously supported the 1961 invasion of Cuba despite serious flaws in the plan. Advisors suppressed doubts to maintain group harmony. After the disaster, Kennedy restructured his decision-making process to explicitly encourage dissent.',
+        "President Kennedy's advisory team unanimously supported the 1961 invasion of Cuba despite serious flaws in the plan. Advisors suppressed doubts to maintain group harmony. After the disaster, Kennedy restructured his decision-making process to explicitly encourage dissent.",
       company: 'U.S. Government',
       year: '1961',
     },
@@ -92,31 +112,41 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       'Split into independent sub-groups that analyze the problem separately before reconvening.',
     ],
     relatedBiases: [
-      { key: 'authority_bias', reason: 'Senior voices can suppress dissent, accelerating groupthink' },
+      {
+        key: 'authority_bias',
+        reason: 'Senior voices can suppress dissent, accelerating groupthink',
+      },
       { key: 'bandwagon_effect', reason: 'People join the majority to avoid social friction' },
     ],
     academicReference: 'Janis, I.L. (1972). "Victims of Groupthink." Houghton Mifflin.',
-    quickTip: 'If everyone agrees too quickly, that\'s a red flag — not a green light.',
+    quickTip: "If everyone agrees too quickly, that's a red flag — not a green light.",
     difficulty: 'hard',
   },
   authority_bias: {
     realWorldExample: {
       title: 'Milgram Obedience Experiments',
       description:
-        'Stanley Milgram\'s experiments showed that 65% of participants administered what they believed were lethal electric shocks when instructed by an authority figure in a lab coat. Authority cues override independent moral judgment.',
+        "Stanley Milgram's experiments showed that 65% of participants administered what they believed were lethal electric shocks when instructed by an authority figure in a lab coat. Authority cues override independent moral judgment.",
       company: 'Yale University',
       year: '1963',
     },
     debiasingTechniques: [
-      'Evaluate arguments on evidence quality, not the seniority of who\'s making them.',
+      "Evaluate arguments on evidence quality, not the seniority of who's making them.",
       'Use blind review processes where the source identity is hidden during evaluation.',
       'Ask: "Would I accept this argument if an intern presented it?"',
     ],
     relatedBiases: [
-      { key: 'groupthink', reason: 'Authority figures can trigger conformity that leads to groupthink' },
-      { key: 'bandwagon_effect', reason: 'Authority endorsement creates a bandwagon others follow' },
+      {
+        key: 'groupthink',
+        reason: 'Authority figures can trigger conformity that leads to groupthink',
+      },
+      {
+        key: 'bandwagon_effect',
+        reason: 'Authority endorsement creates a bandwagon others follow',
+      },
     ],
-    academicReference: 'Milgram, S. (1963). "Behavioral Study of Obedience." Journal of Abnormal and Social Psychology, 67(4).',
+    academicReference:
+      'Milgram, S. (1963). "Behavioral Study of Obedience." Journal of Abnormal and Social Psychology, 67(4).',
     quickTip: 'Separate the argument from the arguer — evaluate evidence, not credentials.',
     difficulty: 'moderate',
   },
@@ -135,10 +165,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     ],
     relatedBiases: [
       { key: 'groupthink', reason: 'Bandwagon adoption in groups becomes groupthink' },
-      { key: 'authority_bias', reason: 'Following authorities can trigger broader bandwagon effects' },
+      {
+        key: 'authority_bias',
+        reason: 'Following authorities can trigger broader bandwagon effects',
+      },
     ],
-    academicReference: 'Leibenstein, H. (1950). "Bandwagon, Snob, and Veblen Effects in the Theory of Consumers\' Demand." Quarterly Journal of Economics, 64(2).',
-    quickTip: 'Popularity is not proof. Ask: "What\'s the evidence this works, separate from who else is doing it?"',
+    academicReference:
+      'Leibenstein, H. (1950). "Bandwagon, Snob, and Veblen Effects in the Theory of Consumers\' Demand." Quarterly Journal of Economics, 64(2).',
+    quickTip:
+      'Popularity is not proof. Ask: "What\'s the evidence this works, separate from who else is doing it?"',
     difficulty: 'easy',
   },
   overconfidence_bias: {
@@ -152,14 +187,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     debiasingTechniques: [
       'Use calibration training: practice estimating ranges and track your accuracy over time.',
       'Replace point estimates with ranges (e.g., "between 2-4 months" instead of "3 months exactly").',
-      'Ask: "What\'s the probability I\'m wrong?" and if you can\'t say at least 10%, you\'re likely overconfident.',
+      "Ask: \"What's the probability I'm wrong?\" and if you can't say at least 10%, you're likely overconfident.",
     ],
     relatedBiases: [
       { key: 'planning_fallacy', reason: 'Overconfidence in timelines is the planning fallacy' },
       { key: 'hindsight_bias', reason: 'Past "correct" predictions inflate future confidence' },
     ],
-    academicReference: 'Moore, D.A. & Healy, P.J. (2008). "The trouble with overconfidence." Psychological Review, 115(2).',
-    quickTip: 'Add 30% to your worst-case estimate — that\'s probably closer to realistic.',
+    academicReference:
+      'Moore, D.A. & Healy, P.J. (2008). "The trouble with overconfidence." Psychological Review, 115(2).',
+    quickTip: "Add 30% to your worst-case estimate — that's probably closer to realistic.",
     difficulty: 'hard',
   },
   hindsight_bias: {
@@ -176,11 +212,19 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       'Use pre-registration: document your analysis and predictions before events unfold.',
     ],
     relatedBiases: [
-      { key: 'overconfidence_bias', reason: 'Hindsight bias inflates confidence in future predictions' },
-      { key: 'confirmation_bias', reason: 'After the fact, people selectively remember confirming signals' },
+      {
+        key: 'overconfidence_bias',
+        reason: 'Hindsight bias inflates confidence in future predictions',
+      },
+      {
+        key: 'confirmation_bias',
+        reason: 'After the fact, people selectively remember confirming signals',
+      },
     ],
-    academicReference: 'Fischhoff, B. (1975). "Hindsight is not equal to foresight: The effect of outcome knowledge on judgment under uncertainty." Journal of Experimental Psychology.',
-    quickTip: 'Before reviewing what happened, write down what you expected — then compare honestly.',
+    academicReference:
+      'Fischhoff, B. (1975). "Hindsight is not equal to foresight: The effect of outcome knowledge on judgment under uncertainty." Journal of Experimental Psychology.',
+    quickTip:
+      'Before reviewing what happened, write down what you expected — then compare honestly.',
     difficulty: 'moderate',
   },
   planning_fallacy: {
@@ -197,11 +241,19 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       'Break projects into small milestones and estimate each independently, then add buffer time.',
     ],
     relatedBiases: [
-      { key: 'overconfidence_bias', reason: 'Overconfidence in ability to execute leads to optimistic plans' },
-      { key: 'anchoring_bias', reason: 'Initial optimistic estimates anchor subsequent adjustments' },
+      {
+        key: 'overconfidence_bias',
+        reason: 'Overconfidence in ability to execute leads to optimistic plans',
+      },
+      {
+        key: 'anchoring_bias',
+        reason: 'Initial optimistic estimates anchor subsequent adjustments',
+      },
     ],
-    academicReference: 'Kahneman, D. & Tversky, A. (1979). "Intuitive prediction: biases and corrective procedures." TIMS Studies in Management Science, 12.',
-    quickTip: 'How long did similar projects actually take? Use that as your baseline, not your optimism.',
+    academicReference:
+      'Kahneman, D. & Tversky, A. (1979). "Intuitive prediction: biases and corrective procedures." TIMS Studies in Management Science, 12.',
+    quickTip:
+      'How long did similar projects actually take? Use that as your baseline, not your optimism.',
     difficulty: 'moderate',
   },
   loss_aversion: {
@@ -219,10 +271,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     ],
     relatedBiases: [
       { key: 'status_quo_bias', reason: 'Fear of loss makes people prefer the status quo' },
-      { key: 'sunk_cost_fallacy', reason: 'Loss aversion on invested resources drives sunk cost thinking' },
+      {
+        key: 'sunk_cost_fallacy',
+        reason: 'Loss aversion on invested resources drives sunk cost thinking',
+      },
     ],
-    academicReference: 'Kahneman, D. & Tversky, A. (1979). "Prospect Theory: An Analysis of Decision under Risk." Econometrica, 47(2).',
-    quickTip: 'Ask: "If I didn\'t already have this, would I pay to get it?" That reveals whether you\'re protecting a loss or making a smart choice.',
+    academicReference:
+      'Kahneman, D. & Tversky, A. (1979). "Prospect Theory: An Analysis of Decision under Risk." Econometrica, 47(2).',
+    quickTip:
+      'Ask: "If I didn\'t already have this, would I pay to get it?" That reveals whether you\'re protecting a loss or making a smart choice.',
     difficulty: 'moderate',
   },
   sunk_cost_fallacy: {
@@ -235,15 +292,23 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     },
     debiasingTechniques: [
       'Apply the "clean slate test": If you were starting fresh today with no prior investment, would you still choose this path?',
-      'Separate past costs from future decisions — what\'s spent is gone regardless of what you decide next.',
+      "Separate past costs from future decisions — what's spent is gone regardless of what you decide next.",
       'Set pre-defined "kill criteria" at the start of projects and honor them when triggered.',
     ],
     relatedBiases: [
-      { key: 'loss_aversion', reason: 'Abandoning a project feels like "losing" the sunk investment' },
-      { key: 'overconfidence_bias', reason: 'Confidence that more investment will turn things around' },
+      {
+        key: 'loss_aversion',
+        reason: 'Abandoning a project feels like "losing" the sunk investment',
+      },
+      {
+        key: 'overconfidence_bias',
+        reason: 'Confidence that more investment will turn things around',
+      },
     ],
-    academicReference: 'Arkes, H.R. & Blumer, C. (1985). "The psychology of sunk cost." Organizational Behavior and Human Decision Processes, 35(1).',
-    quickTip: 'Money already spent is gone. The only question is: "What\'s the best use of the NEXT dollar?"',
+    academicReference:
+      'Arkes, H.R. & Blumer, C. (1985). "The psychology of sunk cost." Organizational Behavior and Human Decision Processes, 35(1).',
+    quickTip:
+      'Money already spent is gone. The only question is: "What\'s the best use of the NEXT dollar?"',
     difficulty: 'moderate',
   },
   status_quo_bias: {
@@ -260,10 +325,17 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       'Reframe the question: instead of "Should we change?" ask "If we were starting new, would we choose this current setup?"',
     ],
     relatedBiases: [
-      { key: 'loss_aversion', reason: 'Change involves potential losses that trigger loss aversion' },
-      { key: 'sunk_cost_fallacy', reason: 'Investment in the current state makes change feel wasteful' },
+      {
+        key: 'loss_aversion',
+        reason: 'Change involves potential losses that trigger loss aversion',
+      },
+      {
+        key: 'sunk_cost_fallacy',
+        reason: 'Investment in the current state makes change feel wasteful',
+      },
     ],
-    academicReference: 'Samuelson, W. & Zeckhauser, R. (1988). "Status quo bias in decision making." Journal of Risk and Uncertainty, 1(1).',
+    academicReference:
+      'Samuelson, W. & Zeckhauser, R. (1988). "Status quo bias in decision making." Journal of Risk and Uncertainty, 1(1).',
     quickTip: 'Inaction is also a decision. Ask: "What is the cost of NOT changing?"',
     difficulty: 'easy',
   },
@@ -282,10 +354,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     ],
     relatedBiases: [
       { key: 'anchoring_bias', reason: 'Frames set anchors that influence subsequent judgment' },
-      { key: 'selective_perception', reason: 'Framing activates selective attention to certain aspects' },
+      {
+        key: 'selective_perception',
+        reason: 'Framing activates selective attention to certain aspects',
+      },
     ],
-    academicReference: 'Tversky, A. & Kahneman, D. (1981). "The framing of decisions and the psychology of choice." Science, 211(4481).',
-    quickTip: 'Flip the frame: if the data was presented oppositely, would you still reach the same conclusion?',
+    academicReference:
+      'Tversky, A. & Kahneman, D. (1981). "The framing of decisions and the psychology of choice." Science, 211(4481).',
+    quickTip:
+      'Flip the frame: if the data was presented oppositely, would you still reach the same conclusion?',
     difficulty: 'easy',
   },
   selective_perception: {
@@ -302,18 +379,26 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       'Practice "steel-manning": articulate the strongest version of the opposing view before critiquing it.',
     ],
     relatedBiases: [
-      { key: 'confirmation_bias', reason: 'Selective perception is how confirmation bias operates at the perceptual level' },
-      { key: 'framing_effect', reason: 'Expectations create internal frames that filter perception' },
+      {
+        key: 'confirmation_bias',
+        reason: 'Selective perception is how confirmation bias operates at the perceptual level',
+      },
+      {
+        key: 'framing_effect',
+        reason: 'Expectations create internal frames that filter perception',
+      },
     ],
-    academicReference: 'Hastorf, A.H. & Cantril, H. (1954). "They saw a game: A case study." Journal of Abnormal and Social Psychology, 49(1).',
-    quickTip: 'Ask someone who disagrees with you to read the same document — compare what each of you noticed.',
+    academicReference:
+      'Hastorf, A.H. & Cantril, H. (1954). "They saw a game: A case study." Journal of Abnormal and Social Psychology, 49(1).',
+    quickTip:
+      'Ask someone who disagrees with you to read the same document — compare what each of you noticed.',
     difficulty: 'hard',
   },
   recency_bias: {
     realWorldExample: {
       title: 'Performance Review Season',
       description:
-        'Research by Deloitte found that 62% of a performance rating is driven by events in the last 3 months, despite reviews covering a full year. A strong Q4 erases a weak Q1 in most managers\' evaluations.',
+        "Research by Deloitte found that 62% of a performance rating is driven by events in the last 3 months, despite reviews covering a full year. A strong Q4 erases a weak Q1 in most managers' evaluations.",
       company: 'Deloitte Research',
       year: '2015',
     },
@@ -326,15 +411,17 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       { key: 'availability_heuristic', reason: 'Recent events are more mentally available' },
       { key: 'anchoring_bias', reason: 'Recent data points anchor subsequent judgments' },
     ],
-    academicReference: 'Murdock, B.B. (1962). "The serial position effect of free recall." Journal of Experimental Psychology, 64(5).',
-    quickTip: 'Before making a judgment based on recent data, check whether the longer-term trend tells a different story.',
+    academicReference:
+      'Murdock, B.B. (1962). "The serial position effect of free recall." Journal of Experimental Psychology, 64(5).',
+    quickTip:
+      'Before making a judgment based on recent data, check whether the longer-term trend tells a different story.',
     difficulty: 'easy',
   },
   cognitive_misering: {
     realWorldExample: {
       title: 'Theranos Due Diligence Failures',
       description:
-        'Investors poured $700M into Theranos based on Elizabeth Holmes\' compelling narrative, without conducting basic technical due diligence. Board members — including former secretaries of state — relied on surface impressions rather than verifying the technology actually worked.',
+        "Investors poured $700M into Theranos based on Elizabeth Holmes' compelling narrative, without conducting basic technical due diligence. Board members — including former secretaries of state — relied on surface impressions rather than verifying the technology actually worked.",
       company: 'Theranos',
       year: '2003–2018',
     },
@@ -345,10 +432,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     ],
     relatedBiases: [
       { key: 'authority_bias', reason: 'Deferring to authority is a form of cognitive misering' },
-      { key: 'availability_heuristic', reason: 'Grabbing the most available answer instead of investigating' },
+      {
+        key: 'availability_heuristic',
+        reason: 'Grabbing the most available answer instead of investigating',
+      },
     ],
-    academicReference: 'Stanovich, K.E. & West, R.F. (2000). "Individual differences in reasoning: Implications for the rationality debate." Behavioral and Brain Sciences, 23(5).',
-    quickTip: 'If a high-stakes decision took less than an hour, you probably didn\'t think hard enough.',
+    academicReference:
+      'Stanovich, K.E. & West, R.F. (2000). "Individual differences in reasoning: Implications for the rationality debate." Behavioral and Brain Sciences, 23(5).',
+    quickTip:
+      "If a high-stakes decision took less than an hour, you probably didn't think hard enough.",
     difficulty: 'moderate',
   },
 };

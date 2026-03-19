@@ -46,7 +46,9 @@ export async function GET(request: NextRequest) {
     const cursor = searchParams.get('cursor') || undefined;
     const typesParam = searchParams.get('types');
     const allowedTypes = new Set(
-      typesParam ? typesParam.split(',').map((t) => t.trim()) : ['upload', 'analysis_complete', 'analysis_error', 'nudge', 'outcome']
+      typesParam
+        ? typesParam.split(',').map(t => t.trim())
+        : ['upload', 'analysis_complete', 'analysis_error', 'nudge', 'outcome']
     );
 
     const cursorDate = cursor ? new Date(cursor) : undefined;
@@ -69,7 +71,9 @@ export async function GET(request: NextRequest) {
     // Fetch from multiple sources in parallel
     const [documents, nudges, outcomes] = await Promise.allSettled([
       // Documents (uploads + analysis completions/errors)
-      (allowedTypes.has('upload') || allowedTypes.has('analysis_complete') || allowedTypes.has('analysis_error'))
+      allowedTypes.has('upload') ||
+      allowedTypes.has('analysis_complete') ||
+      allowedTypes.has('analysis_error')
         ? prisma.document.findMany({
             where: {
               ...docWhere,
@@ -99,40 +103,44 @@ export async function GET(request: NextRequest) {
 
       // Nudges
       allowedTypes.has('nudge')
-        ? prisma.nudge.findMany({
-            where: {
-              targetUserId: user.id,
-              ...(cursorDate ? { createdAt: { lt: cursorDate } } : {}),
-            },
-            orderBy: { createdAt: 'desc' },
-            take: limit,
-            select: {
-              id: true,
-              nudgeType: true,
-              message: true,
-              severity: true,
-              createdAt: true,
-            },
-          }).catch(() => [])
+        ? prisma.nudge
+            .findMany({
+              where: {
+                targetUserId: user.id,
+                ...(cursorDate ? { createdAt: { lt: cursorDate } } : {}),
+              },
+              orderBy: { createdAt: 'desc' },
+              take: limit,
+              select: {
+                id: true,
+                nudgeType: true,
+                message: true,
+                severity: true,
+                createdAt: true,
+              },
+            })
+            .catch(() => [])
         : Promise.resolve([]),
 
       // Outcomes
       allowedTypes.has('outcome')
-        ? prisma.decisionOutcome.findMany({
-            where: {
-              userId: user.id,
-              ...(cursorDate ? { reportedAt: { lt: cursorDate } } : {}),
-            },
-            orderBy: { reportedAt: 'desc' },
-            take: limit,
-            select: {
-              id: true,
-              outcome: true,
-              notes: true,
-              reportedAt: true,
-              analysisId: true,
-            },
-          }).catch(() => [])
+        ? prisma.decisionOutcome
+            .findMany({
+              where: {
+                userId: user.id,
+                ...(cursorDate ? { reportedAt: { lt: cursorDate } } : {}),
+              },
+              orderBy: { reportedAt: 'desc' },
+              take: limit,
+              select: {
+                id: true,
+                outcome: true,
+                notes: true,
+                reportedAt: true,
+                analysisId: true,
+              },
+            })
+            .catch(() => [])
         : Promise.resolve([]),
     ]);
 

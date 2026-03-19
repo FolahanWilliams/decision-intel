@@ -6,7 +6,14 @@ import { BIAS_CATEGORIES, type BiasCategory } from '@/types';
 import { BiasEducationCard } from '@/components/ui/BiasEducationCard';
 import { useDocuments } from '@/hooks/useDocuments';
 
-const ALL_CATEGORIES = ['All', 'Judgment', 'Group Dynamics', 'Overconfidence', 'Risk Assessment', 'Information'] as const;
+const ALL_CATEGORIES = [
+  'All',
+  'Judgment',
+  'Group Dynamics',
+  'Overconfidence',
+  'Risk Assessment',
+  'Information',
+] as const;
 const BIAS_KEYS = Object.keys(BIAS_CATEGORIES) as BiasCategory[];
 
 export default function BiasLibraryPage() {
@@ -38,7 +45,7 @@ export default function BiasLibraryPage() {
   }, [documents]);
 
   const filtered = useMemo(() => {
-    return BIAS_KEYS.filter((key) => {
+    return BIAS_KEYS.filter(key => {
       const meta = BIAS_CATEGORIES[key];
       if (activeCategory !== 'All' && meta.category !== activeCategory) return false;
       if (search) {
@@ -54,7 +61,7 @@ export default function BiasLibraryPage() {
   }, [search, activeCategory]);
 
   const detectedBiasKeys = useMemo(() => {
-    return BIAS_KEYS.filter((key) => (biasDetectionCounts[key] || 0) > 0);
+    return BIAS_KEYS.filter(key => (biasDetectionCounts[key] || 0) > 0);
   }, [biasDetectionCounts]);
 
   const handleBiasClick = (key: BiasCategory) => {
@@ -64,12 +71,20 @@ export default function BiasLibraryPage() {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       // Flash highlight
       el.style.boxShadow = '0 0 0 2px var(--accent-primary)';
-      setTimeout(() => { el.style.boxShadow = ''; }, 1500);
+      setTimeout(() => {
+        el.style.boxShadow = '';
+      }, 1500);
     }
   };
 
   return (
-    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: 'var(--spacing-xl) var(--spacing-lg)' }}>
+    <div
+      style={{
+        maxWidth: '1100px',
+        margin: '0 auto',
+        padding: 'var(--spacing-xl) var(--spacing-lg)',
+      }}
+    >
       {/* Header */}
       <div style={{ marginBottom: 'var(--spacing-xl)' }}>
         <div className="flex items-center gap-md" style={{ marginBottom: '8px' }}>
@@ -77,7 +92,8 @@ export default function BiasLibraryPage() {
           <h1 style={{ fontSize: '22px', fontWeight: 700 }}>Bias Library</h1>
         </div>
         <p style={{ fontSize: '14px', color: 'var(--text-muted)', maxWidth: '600px' }}>
-          Learn about the 16 cognitive biases our AI detects, with real-world examples and proven debiasing techniques.
+          Learn about the 16 cognitive biases our AI detects, with real-world examples and proven
+          debiasing techniques.
         </p>
       </div>
 
@@ -94,7 +110,15 @@ export default function BiasLibraryPage() {
           <div style={{ padding: 'var(--spacing-md) var(--spacing-lg)' }}>
             <div className="flex items-center gap-sm" style={{ marginBottom: '8px' }}>
               <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
-              <span style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--accent-primary)' }}>
+              <span
+                style={{
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  color: 'var(--accent-primary)',
+                }}
+              >
                 Your Detected Biases
               </span>
               <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -102,7 +126,7 @@ export default function BiasLibraryPage() {
               </span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-              {detectedBiasKeys.map((key) => {
+              {detectedBiasKeys.map(key => {
                 const meta = BIAS_CATEGORIES[key];
                 return (
                   <button
@@ -143,7 +167,10 @@ export default function BiasLibraryPage() {
       )}
 
       {/* Search and filter bar */}
-      <div className="flex items-center gap-md" style={{ marginBottom: 'var(--spacing-lg)', flexWrap: 'wrap' }}>
+      <div
+        className="flex items-center gap-md"
+        style={{ marginBottom: 'var(--spacing-lg)', flexWrap: 'wrap' }}
+      >
         <div
           style={{
             display: 'flex',
@@ -161,7 +188,7 @@ export default function BiasLibraryPage() {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder="Search biases..."
             aria-label="Search biases"
             style={{
@@ -176,7 +203,7 @@ export default function BiasLibraryPage() {
         </div>
         <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
           <Filter size={14} style={{ color: 'var(--text-muted)' }} />
-          {ALL_CATEGORIES.map((cat) => (
+          {ALL_CATEGORIES.map(cat => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
@@ -184,15 +211,13 @@ export default function BiasLibraryPage() {
                 padding: '4px 12px',
                 fontSize: '12px',
                 borderRadius: '16px',
-                border: activeCategory === cat
-                  ? '1px solid var(--accent-primary)'
-                  : '1px solid var(--border-color)',
-                background: activeCategory === cat
-                  ? 'rgba(99, 102, 241, 0.12)'
-                  : 'var(--bg-secondary)',
-                color: activeCategory === cat
-                  ? 'var(--accent-primary)'
-                  : 'var(--text-secondary)',
+                border:
+                  activeCategory === cat
+                    ? '1px solid var(--accent-primary)'
+                    : '1px solid var(--border-color)',
+                background:
+                  activeCategory === cat ? 'rgba(99, 102, 241, 0.12)' : 'var(--bg-secondary)',
+                color: activeCategory === cat ? 'var(--accent-primary)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 fontWeight: activeCategory === cat ? 600 : 400,
               }}
@@ -206,11 +231,17 @@ export default function BiasLibraryPage() {
       {/* Bias grid */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
         {filtered.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 'var(--spacing-xl)', color: 'var(--text-muted)' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              padding: 'var(--spacing-xl)',
+              color: 'var(--text-muted)',
+            }}
+          >
             No biases match your search. Try a different query.
           </div>
         )}
-        {filtered.map((key) => (
+        {filtered.map(key => (
           <div key={key} id={`bias-card-${key}`} style={{ transition: 'box-shadow 0.3s ease' }}>
             <BiasEducationCard
               biasType={key}

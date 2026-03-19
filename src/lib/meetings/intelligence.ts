@@ -100,10 +100,22 @@ function getModel(): GenerativeModel {
         maxOutputTokens: 16384,
       },
       safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
       ],
     });
   }
@@ -170,7 +182,8 @@ Rules:
     id: item.id || `ai_${i + 1}`,
     status: item.status || 'open',
     priority: (['low', 'medium', 'high', 'critical'].includes(item.priority)
-      ? item.priority : 'medium') as ActionItem['priority'],
+      ? item.priority
+      : 'medium') as ActionItem['priority'],
   }));
 }
 
@@ -248,7 +261,10 @@ export async function generateMeetingSummary(
   const model = getModel();
   const totalWords = speakers.reduce((s, sp) => s + sp.wordCount, 0);
   const speakerBreakdown = speakers
-    .map(s => `${s.name}: ${s.wordCount} words (${Math.round((s.wordCount / (totalWords || 1)) * 100)}%)`)
+    .map(
+      s =>
+        `${s.name}: ${s.wordCount} words (${Math.round((s.wordCount / (totalWords || 1)) * 100)}%)`
+    )
     .join(', ');
 
   const prompt = `You are an expert meeting analyst. Generate a comprehensive meeting summary.
@@ -310,7 +326,8 @@ Rules:
     nextSteps: Array.isArray(parsed.nextSteps) ? parsed.nextSteps : [],
     openQuestions: Array.isArray(parsed.openQuestions) ? parsed.openQuestions : [],
     sentiment: (['positive', 'neutral', 'negative', 'mixed'].includes(parsed.sentiment)
-      ? parsed.sentiment : 'neutral') as MeetingSummary['sentiment'],
+      ? parsed.sentiment
+      : 'neutral') as MeetingSummary['sentiment'],
     engagementScore: Math.max(0, Math.min(100, parsed.engagementScore ?? 50)),
   };
 }
@@ -393,12 +410,14 @@ Rules:
 
   return parsed.speakerBiases.map(sb => ({
     speaker: sb.speaker,
-    biases: Array.isArray(sb.biases) ? sb.biases.map(b => ({
-      biasType: b.biasType || 'unknown',
-      count: Math.max(1, b.count || 1),
-      avgSeverity: Math.max(0, Math.min(1, b.avgSeverity ?? 0.5)),
-      examples: Array.isArray(b.examples) ? b.examples : [],
-    })) : [],
+    biases: Array.isArray(sb.biases)
+      ? sb.biases.map(b => ({
+          biasType: b.biasType || 'unknown',
+          count: Math.max(1, b.count || 1),
+          avgSeverity: Math.max(0, Math.min(1, b.avgSeverity ?? 0.5)),
+          examples: Array.isArray(b.examples) ? b.examples : [],
+        }))
+      : [],
     dominanceScore: Math.max(0, Math.min(100, sb.dominanceScore ?? 50)),
     dissenterScore: Math.max(0, Math.min(100, sb.dissenterScore ?? 0)),
   }));
@@ -451,23 +470,37 @@ export async function extractMeetingIntelligence(
   userId: string,
   meetingId: string
 ): Promise<MeetingIntelligenceResult> {
-  log.info(`Extracting meeting intelligence for ${meetingId}: ${speakers.length} speakers, ${segments.length} segments`);
+  log.info(
+    `Extracting meeting intelligence for ${meetingId}: ${speakers.length} speakers, ${segments.length} segments`
+  );
 
   // Run all extractions in parallel
-  const [summaryResult, actionItemsResult, keyDecisionsResult, speakerBiasesResult, similarMeetingsResult] =
-    await Promise.allSettled([
-      generateMeetingSummary(transcript, meetingTitle, meetingType, speakers),
-      extractActionItems(transcript, speakers),
-      extractKeyDecisions(transcript, speakers),
-      analyzeSpeakerBiases(segments, speakers),
-      findSimilarMeetings(transcript, userId, meetingId),
-    ]);
+  const [
+    summaryResult,
+    actionItemsResult,
+    keyDecisionsResult,
+    speakerBiasesResult,
+    similarMeetingsResult,
+  ] = await Promise.allSettled([
+    generateMeetingSummary(transcript, meetingTitle, meetingType, speakers),
+    extractActionItems(transcript, speakers),
+    extractKeyDecisions(transcript, speakers),
+    analyzeSpeakerBiases(segments, speakers),
+    findSimilarMeetings(transcript, userId, meetingId),
+  ]);
 
-  const summary = summaryResult.status === 'fulfilled' ? summaryResult.value : {
-    executive: 'Summary generation failed.',
-    agenda: [], outcomes: [], nextSteps: [], openQuestions: [],
-    sentiment: 'neutral' as const, engagementScore: 50,
-  };
+  const summary =
+    summaryResult.status === 'fulfilled'
+      ? summaryResult.value
+      : {
+          executive: 'Summary generation failed.',
+          agenda: [],
+          outcomes: [],
+          nextSteps: [],
+          openQuestions: [],
+          sentiment: 'neutral' as const,
+          engagementScore: 50,
+        };
 
   if (summaryResult.status === 'rejected') {
     log.error('Meeting summary failed:', summaryResult.reason);
@@ -490,10 +523,13 @@ export async function extractMeetingIntelligence(
     actionItems: actionItemsResult.status === 'fulfilled' ? actionItemsResult.value : [],
     keyDecisions: keyDecisionsResult.status === 'fulfilled' ? keyDecisionsResult.value : [],
     speakerBiases: speakerBiasesResult.status === 'fulfilled' ? speakerBiasesResult.value : [],
-    similarMeetings: similarMeetingsResult.status === 'fulfilled' ? similarMeetingsResult.value : [],
+    similarMeetings:
+      similarMeetingsResult.status === 'fulfilled' ? similarMeetingsResult.value : [],
   };
 
-  log.info(`Meeting intelligence extracted: ${result.actionItems.length} action items, ${result.keyDecisions.length} decisions, ${result.speakerBiases.length} speaker profiles`);
+  log.info(
+    `Meeting intelligence extracted: ${result.actionItems.length} action items, ${result.keyDecisions.length} decisions, ${result.speakerBiases.length} speaker profiles`
+  );
 
   return result;
 }

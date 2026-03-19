@@ -43,7 +43,7 @@ async function sendEmail(payload: EmailPayload): Promise<boolean> {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        Authorization: `Bearer ${RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -163,9 +163,10 @@ export async function sendWeeklyDigest(
   if (settings && !settings.weeklyDigest) return;
 
   const subject = `Your Weekly Decision Intel Digest`;
-  const biasHtml = stats.topBiases.length > 0
-    ? stats.topBiases.map(b => `<li style="color: #e2e8f0;">${escapeHtml(b)}</li>`).join('')
-    : '<li style="color: #94a3b8;">No biases detected this week</li>';
+  const biasHtml =
+    stats.topBiases.length > 0
+      ? stats.topBiases.map(b => `<li style="color: #e2e8f0;">${escapeHtml(b)}</li>`).join('')
+      : '<li style="color: #94a3b8;">No biases detected this week</li>';
 
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto;">
@@ -275,7 +276,8 @@ export async function deliverEmailNudge(
   const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch(() => null);
   if (settings && !settings.emailNotifications) return;
 
-  const severityColor = severity === 'critical' ? '#ef4444' : severity === 'warning' ? '#eab308' : '#6366f1';
+  const severityColor =
+    severity === 'critical' ? '#ef4444' : severity === 'warning' ? '#eab308' : '#6366f1';
 
   const subject = `Decision Nudge: ${nudgeType.replace(/_/g, ' ')}`;
   const html = `

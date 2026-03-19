@@ -101,7 +101,11 @@ export default function TeamPage() {
     return (
       <div
         className="container"
-        style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)', maxWidth: 900 }}
+        style={{
+          paddingTop: 'var(--spacing-2xl)',
+          paddingBottom: 'var(--spacing-2xl)',
+          maxWidth: 900,
+        }}
       >
         <div className="flex items-center justify-center" style={{ minHeight: 300 }}>
           <Loader2 size={24} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
@@ -115,7 +119,11 @@ export default function TeamPage() {
     return (
       <div
         className="container"
-        style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)', maxWidth: 900 }}
+        style={{
+          paddingTop: 'var(--spacing-2xl)',
+          paddingBottom: 'var(--spacing-2xl)',
+          maxWidth: 900,
+        }}
       >
         <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Team' }]} />
         <div
@@ -165,7 +173,11 @@ export default function TeamPage() {
   return (
     <div
       className="container"
-      style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)', maxWidth: 900 }}
+      style={{
+        paddingTop: 'var(--spacing-2xl)',
+        paddingBottom: 'var(--spacing-2xl)',
+        maxWidth: 900,
+      }}
     >
       <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Team' }]} />
 
@@ -177,7 +189,8 @@ export default function TeamPage() {
               style={{
                 width: 48,
                 height: 48,
-                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                background:
+                  'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
                 borderRadius: '14px',
                 display: 'flex',
                 alignItems: 'center',
@@ -192,7 +205,8 @@ export default function TeamPage() {
             <div>
               <h1 style={{ marginBottom: '2px' }}>{org.name}</h1>
               <p className="text-muted text-xs">
-                {org.members.length} member{org.members.length !== 1 ? 's' : ''} &middot; /{org.slug}
+                {org.members.length} member{org.members.length !== 1 ? 's' : ''} &middot; /
+                {org.slug}
               </p>
             </div>
           </div>
@@ -213,7 +227,7 @@ export default function TeamPage() {
         className="flex items-center gap-sm mb-lg"
         style={{ borderBottom: '1px solid var(--liquid-border)', paddingBottom: '0' }}
       >
-        {(['members', 'activity'] as const).map((tab) => (
+        {(['members', 'activity'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -221,7 +235,8 @@ export default function TeamPage() {
               padding: '10px 16px',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === tab ? '2px solid var(--accent-primary)' : '2px solid transparent',
+              borderBottom:
+                activeTab === tab ? '2px solid var(--accent-primary)' : '2px solid transparent',
               color: activeTab === tab ? 'var(--text-highlight)' : 'var(--text-muted)',
               fontWeight: activeTab === tab ? 600 : 400,
               fontSize: '14px',
@@ -242,86 +257,85 @@ export default function TeamPage() {
 
       {activeTab === 'members' && (
         <>
-      {/* Members List */}
-      <div className="card mb-lg animate-fade-in">
-        <div className="card-header">
-          <h3 className="flex items-center gap-sm">
-            <Users size={18} />
-            Team Members
-          </h3>
-        </div>
-        <div className="card-body" style={{ padding: 0 }}>
-          {org.members.map((member, idx) => (
-            <MemberRow
-              key={member.id}
-              member={member}
-              isAdmin={isAdmin}
-              myRole={myRole!}
-              isLast={idx === org.members.length - 1}
-              onUpdate={fetchTeam}
-            />
-          ))}
-        </div>
-      </div>
+          {/* Members List */}
+          <div className="card mb-lg animate-fade-in">
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <Users size={18} />
+                Team Members
+              </h3>
+            </div>
+            <div className="card-body" style={{ padding: 0 }}>
+              {org.members.map((member, idx) => (
+                <MemberRow
+                  key={member.id}
+                  member={member}
+                  isAdmin={isAdmin}
+                  myRole={myRole!}
+                  isLast={idx === org.members.length - 1}
+                  onUpdate={fetchTeam}
+                />
+              ))}
+            </div>
+          </div>
 
-      {/* Pending Invites */}
-      {isAdmin && org.invites.length > 0 && (
-        <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <div className="card-header">
-            <h3 className="flex items-center gap-sm">
-              <Mail size={18} />
-              Pending Invitations
-              <span
-                style={{
-                  fontSize: '11px',
-                  padding: '2px 8px',
-                  background: 'rgba(99, 102, 241, 0.15)',
-                  borderRadius: '12px',
-                  color: 'var(--accent-primary)',
-                  fontWeight: 600,
-                }}
-              >
-                {org.invites.length}
-              </span>
-            </h3>
-          </div>
-          <div className="card-body" style={{ padding: 0 }}>
-            {org.invites.map((invite, idx) => (
-              <InviteRow
-                key={invite.id}
-                invite={invite}
-                isLast={idx === org.invites.length - 1}
-                onRevoke={fetchTeam}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+          {/* Pending Invites */}
+          {isAdmin && org.invites.length > 0 && (
+            <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <div className="card-header">
+                <h3 className="flex items-center gap-sm">
+                  <Mail size={18} />
+                  Pending Invitations
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      padding: '2px 8px',
+                      background: 'rgba(99, 102, 241, 0.15)',
+                      borderRadius: '12px',
+                      color: 'var(--accent-primary)',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {org.invites.length}
+                  </span>
+                </h3>
+              </div>
+              <div className="card-body" style={{ padding: 0 }}>
+                {org.invites.map((invite, idx) => (
+                  <InviteRow
+                    key={invite.id}
+                    invite={invite}
+                    isLast={idx === org.invites.length - 1}
+                    onRevoke={fetchTeam}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
 
-      {/* Team Stats */}
-      <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
-        <div className="card-header">
-          <h3 className="flex items-center gap-sm">
-            <Shield size={18} />
-            Team Overview
-          </h3>
-        </div>
-        <div className="card-body">
-          <div className="grid grid-2 gap-lg">
-            <StatCard label="Total Members" value={org.members.length.toString()} />
-            <StatCard label="Pending Invites" value={org.invites.length.toString()} />
-            <StatCard
-              label="Admins"
-              value={org.members.filter(m => m.role === 'owner' || m.role === 'admin').length.toString()}
-            />
-            <StatCard
-              label="Team URL"
-              value={`/${org.slug}`}
-            />
+          {/* Team Stats */}
+          <div className="card animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <Shield size={18} />
+                Team Overview
+              </h3>
+            </div>
+            <div className="card-body">
+              <div className="grid grid-2 gap-lg">
+                <StatCard label="Total Members" value={org.members.length.toString()} />
+                <StatCard label="Pending Invites" value={org.invites.length.toString()} />
+                <StatCard
+                  label="Admins"
+                  value={org.members
+                    .filter(m => m.role === 'owner' || m.role === 'admin')
+                    .length.toString()}
+                />
+                <StatCard label="Team URL" value={`/${org.slug}`} />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      </>
+        </>
       )}
 
       {showInviteModal && (
@@ -455,9 +469,7 @@ function MemberRow({
             padding: '3px 10px',
             borderRadius: '12px',
             background:
-              member.role === 'owner'
-                ? 'rgba(234, 179, 8, 0.12)'
-                : 'rgba(99, 102, 241, 0.1)',
+              member.role === 'owner' ? 'rgba(234, 179, 8, 0.12)' : 'rgba(99, 102, 241, 0.1)',
             color: ROLE_COLORS[member.role],
             fontWeight: 600,
           }}
@@ -470,7 +482,7 @@ function MemberRow({
           <>
             <select
               value={member.role}
-              onChange={(e) => handleRoleChange(e.target.value)}
+              onChange={e => handleRoleChange(e.target.value)}
               disabled={changingRole}
               style={{
                 fontSize: '12px',
@@ -569,7 +581,10 @@ function InviteRow({
             {isExpired ? (
               <span style={{ color: 'var(--error)' }}>Expired</span>
             ) : (
-              <>Invited as {ROLE_LABELS[invite.role]} &middot; expires {new Date(invite.expiresAt).toLocaleDateString()}</>
+              <>
+                Invited as {ROLE_LABELS[invite.role]} &middot; expires{' '}
+                {new Date(invite.expiresAt).toLocaleDateString()}
+              </>
             )}
           </div>
         </div>
@@ -593,13 +608,7 @@ function InviteRow({
   );
 }
 
-function CreateOrgModal({
-  onClose,
-  onCreated,
-}: {
-  onClose: () => void;
-  onCreated: () => void;
-}) {
+function CreateOrgModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [creating, setCreating] = useState(false);
@@ -657,12 +666,12 @@ function CreateOrgModal({
         zIndex: 1000,
       }}
       onClick={onClose}
-      onKeyDown={(e) => e.key === 'Escape' && onClose()}
+      onKeyDown={e => e.key === 'Escape' && onClose()}
     >
       <div
         className="card"
         style={{ maxWidth: 460, width: '90%' }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         <div className="card-header">
           <h3 className="flex items-center gap-sm">
@@ -684,7 +693,7 @@ function CreateOrgModal({
                 id="org-name"
                 type="text"
                 value={name}
-                onChange={(e) => handleNameChange(e.target.value)}
+                onChange={e => handleNameChange(e.target.value)}
                 placeholder="Acme Corp"
                 maxLength={100}
                 style={{
@@ -712,7 +721,7 @@ function CreateOrgModal({
                   id="org-slug"
                   type="text"
                   value={slug}
-                  onChange={(e) =>
+                  onChange={e =>
                     setSlug(
                       e.target.value
                         .toLowerCase()
@@ -735,10 +744,7 @@ function CreateOrgModal({
               </div>
             </div>
             {error && (
-              <div
-                className="flex items-center gap-sm text-sm"
-                style={{ color: 'var(--error)' }}
-              >
+              <div className="flex items-center gap-sm text-sm" style={{ color: 'var(--error)' }}>
                 <AlertTriangle size={14} />
                 {error}
               </div>
@@ -770,13 +776,7 @@ function CreateOrgModal({
   );
 }
 
-function InviteModal({
-  onClose,
-  onInvited,
-}: {
-  onClose: () => void;
-  onInvited: () => void;
-}) {
+function InviteModal({ onClose, onInvited }: { onClose: () => void; onInvited: () => void }) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('member');
   const [sending, setSending] = useState(false);
@@ -828,12 +828,12 @@ function InviteModal({
         zIndex: 1000,
       }}
       onClick={onClose}
-      onKeyDown={(e) => e.key === 'Escape' && onClose()}
+      onKeyDown={e => e.key === 'Escape' && onClose()}
     >
       <div
         className="card"
         style={{ maxWidth: 460, width: '90%' }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         <div className="card-header">
           <h3 className="flex items-center gap-sm">
@@ -855,7 +855,7 @@ function InviteModal({
                 id="invite-email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 placeholder="colleague@company.com"
                 style={{
                   width: '100%',
@@ -866,7 +866,7 @@ function InviteModal({
                   color: 'var(--text-primary)',
                   fontSize: '14px',
                 }}
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === 'Enter' && email.trim()) handleInvite();
                 }}
               />
@@ -882,7 +882,7 @@ function InviteModal({
               <select
                 id="invite-role"
                 value={role}
-                onChange={(e) => setRole(e.target.value)}
+                onChange={e => setRole(e.target.value)}
                 style={{
                   width: '100%',
                   padding: 'var(--spacing-md)',
@@ -926,11 +926,7 @@ function InviteModal({
                 onClick={handleInvite}
                 disabled={sending || !email.trim()}
               >
-                {sending ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <Mail size={14} />
-                )}
+                {sending ? <Loader2 size={14} className="animate-spin" /> : <Mail size={14} />}
                 {sending ? 'Sending...' : 'Send Invite'}
               </button>
             </div>
@@ -1042,7 +1038,8 @@ function TeamActivityTab() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: 'var(--spacing-md) var(--spacing-lg)',
-                  borderBottom: idx === documents.length - 1 ? 'none' : '1px solid var(--liquid-border)',
+                  borderBottom:
+                    idx === documents.length - 1 ? 'none' : '1px solid var(--liquid-border)',
                   textDecoration: 'none',
                   color: 'inherit',
                   transition: 'background 0.15s',
@@ -1069,14 +1066,14 @@ function TeamActivityTab() {
                           doc.latestScore >= 70
                             ? 'rgba(34, 197, 94, 0.12)'
                             : doc.latestScore >= 40
-                            ? 'rgba(234, 179, 8, 0.12)'
-                            : 'rgba(239, 68, 68, 0.12)',
+                              ? 'rgba(234, 179, 8, 0.12)'
+                              : 'rgba(239, 68, 68, 0.12)',
                         color:
                           doc.latestScore >= 70
                             ? 'var(--success)'
                             : doc.latestScore >= 40
-                            ? 'var(--warning)'
-                            : 'var(--error)',
+                              ? 'var(--warning)'
+                              : 'var(--error)',
                       }}
                     >
                       {Math.round(doc.latestScore)}
@@ -1087,7 +1084,8 @@ function TeamActivityTab() {
                       fontSize: '11px',
                       padding: '2px 8px',
                       borderRadius: '8px',
-                      background: doc.status === 'analyzed' ? 'rgba(34, 197, 94, 0.1)' : 'var(--bg-tertiary)',
+                      background:
+                        doc.status === 'analyzed' ? 'rgba(34, 197, 94, 0.1)' : 'var(--bg-tertiary)',
                       color: doc.status === 'analyzed' ? 'var(--success)' : 'var(--text-muted)',
                       fontWeight: 500,
                     }}
@@ -1124,7 +1122,10 @@ function TeamActivityTab() {
                 className="flex items-center gap-md"
                 style={{
                   padding: 'var(--spacing-sm) var(--spacing-lg)',
-                  borderBottom: idx === Math.min(activity.length, 20) - 1 ? 'none' : '1px solid var(--liquid-border)',
+                  borderBottom:
+                    idx === Math.min(activity.length, 20) - 1
+                      ? 'none'
+                      : '1px solid var(--liquid-border)',
                 }}
               >
                 <div

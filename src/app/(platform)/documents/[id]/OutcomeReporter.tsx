@@ -33,10 +33,34 @@ interface OutcomeReporterProps {
 }
 
 const OUTCOME_OPTIONS = [
-  { value: 'success', label: 'Success', icon: CheckCircle, color: '#22c55e', description: 'Decision achieved intended results' },
-  { value: 'partial_success', label: 'Partial', icon: TrendingUp, color: '#f59e0b', description: 'Some goals met, some missed' },
-  { value: 'failure', label: 'Failed', icon: XCircle, color: '#ef4444', description: 'Decision did not achieve goals' },
-  { value: 'too_early', label: 'Too Early', icon: Clock, color: '#6366f1', description: 'Not enough time to evaluate' },
+  {
+    value: 'success',
+    label: 'Success',
+    icon: CheckCircle,
+    color: '#22c55e',
+    description: 'Decision achieved intended results',
+  },
+  {
+    value: 'partial_success',
+    label: 'Partial',
+    icon: TrendingUp,
+    color: '#f59e0b',
+    description: 'Some goals met, some missed',
+  },
+  {
+    value: 'failure',
+    label: 'Failed',
+    icon: XCircle,
+    color: '#ef4444',
+    description: 'Decision did not achieve goals',
+  },
+  {
+    value: 'too_early',
+    label: 'Too Early',
+    icon: Clock,
+    color: '#6366f1',
+    description: 'Not enough time to evaluate',
+  },
 ] as const;
 
 const TIMEFRAME_OPTIONS = [
@@ -203,15 +227,28 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
 
       {/* Expanded Form */}
       {expanded && (
-        <div style={{ padding: '0 18px 18px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div
+          style={{ padding: '0 18px 18px', display: 'flex', flexDirection: 'column', gap: '16px' }}
+        >
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
             Reporting outcomes improves future analysis accuracy. Your feedback teaches the AI which
-            biases were real, which personas were most accurate, and what patterns lead to success or failure.
+            biases were real, which personas were most accurate, and what patterns lead to success
+            or failure.
           </p>
 
           {/* Outcome selection */}
           <div>
-            <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>
+            <label
+              style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                display: 'block',
+                marginBottom: '8px',
+              }}
+            >
               What happened?
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
@@ -235,8 +272,17 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                       transition: 'all 0.15s',
                     }}
                   >
-                    <Icon size={18} style={{ color: isSelected ? opt.color : 'var(--text-muted)' }} />
-                    <span style={{ fontSize: '11px', fontWeight: isSelected ? 700 : 500, color: isSelected ? opt.color : 'var(--text-secondary)' }}>
+                    <Icon
+                      size={18}
+                      style={{ color: isSelected ? opt.color : 'var(--text-muted)' }}
+                    />
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: isSelected ? 700 : 500,
+                        color: isSelected ? opt.color : 'var(--text-secondary)',
+                      }}
+                    >
                       {opt.label}
                     </span>
                   </button>
@@ -249,7 +295,17 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
             <>
               {/* Timeframe */}
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '6px' }}>
+                <label
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: 'var(--text-secondary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    display: 'block',
+                    marginBottom: '6px',
+                  }}
+                >
                   Evaluation timeframe
                 </label>
                 <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
@@ -260,7 +316,8 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                       style={{
                         padding: '4px 12px',
                         fontSize: '11px',
-                        background: timeframe === tf.value ? 'rgba(99,102,241,0.15)' : 'transparent',
+                        background:
+                          timeframe === tf.value ? 'rgba(99,102,241,0.15)' : 'transparent',
                         border: `1px solid ${timeframe === tf.value ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}`,
                         borderRadius: '14px',
                         color: timeframe === tf.value ? '#a5b4fc' : 'var(--text-muted)',
@@ -276,7 +333,17 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
 
               {/* Impact Score */}
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '6px' }}>
+                <label
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: 'var(--text-secondary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    display: 'block',
+                    marginBottom: '6px',
+                  }}
+                >
                   Actual impact score: {impactScore}/100
                 </label>
                 <input
@@ -292,7 +359,17 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
               {/* Bias verification */}
               {biases.length > 0 && (
                 <div>
-                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>
+                  <label
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: 'var(--text-secondary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'block',
+                      marginBottom: '8px',
+                    }}
+                  >
                     Which biases proved real?
                   </label>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -300,8 +377,13 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                       const isConfirmed = confirmedBiases.includes(bias.biasType);
                       const isFalse = falsPositiveBiases.includes(bias.biasType);
                       return (
-                        <div key={bias.biasType} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontSize: '12px', flex: 1, color: 'var(--text-secondary)' }}>
+                        <div
+                          key={bias.biasType}
+                          style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                        >
+                          <span
+                            style={{ fontSize: '12px', flex: 1, color: 'var(--text-secondary)' }}
+                          >
                             {bias.biasType}
                           </span>
                           <button
@@ -342,18 +424,33 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
               {/* Most accurate twin */}
               {twins && twins.length > 0 && (
                 <div>
-                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '6px' }}>
+                  <label
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: 'var(--text-secondary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'block',
+                      marginBottom: '6px',
+                    }}
+                  >
                     Which persona was most accurate?
                   </label>
                   <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                     {twins.map(twin => (
                       <button
                         key={twin.name}
-                        onClick={() => setMostAccurateTwin(twin.name === mostAccurateTwin ? '' : twin.name)}
+                        onClick={() =>
+                          setMostAccurateTwin(twin.name === mostAccurateTwin ? '' : twin.name)
+                        }
                         style={{
                           padding: '4px 12px',
                           fontSize: '11px',
-                          background: mostAccurateTwin === twin.name ? 'rgba(99,102,241,0.15)' : 'transparent',
+                          background:
+                            mostAccurateTwin === twin.name
+                              ? 'rgba(99,102,241,0.15)'
+                              : 'transparent',
                           border: `1px solid ${mostAccurateTwin === twin.name ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}`,
                           borderRadius: '14px',
                           color: mostAccurateTwin === twin.name ? '#a5b4fc' : 'var(--text-muted)',
@@ -371,7 +468,17 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
               {/* Notes & Lessons */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 <div>
-                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                  <label
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: 'var(--text-secondary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'block',
+                      marginBottom: '4px',
+                    }}
+                  >
                     What happened?
                   </label>
                   <textarea
@@ -392,7 +499,17 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                  <label
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: 'var(--text-secondary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'block',
+                      marginBottom: '4px',
+                    }}
+                  >
                     Lessons learned
                   </label>
                   <textarea

@@ -74,7 +74,10 @@ export async function POST(req: NextRequest) {
     const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/shared/${link.token}`;
 
     log.info(`Share link created for analysis ${analysisId} by ${user.id}`);
-    return NextResponse.json({ token: link.token, url: shareUrl, expiresAt: link.expiresAt }, { status: 201 });
+    return NextResponse.json(
+      { token: link.token, url: shareUrl, expiresAt: link.expiresAt },
+      { status: 201 }
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues[0].message }, { status: 400 });
@@ -111,12 +114,18 @@ export async function GET(req: NextRequest) {
     // Check password if set
     if (link.password) {
       if (!password) {
-        return NextResponse.json({ error: 'Password required', requiresPassword: true }, { status: 401 });
+        return NextResponse.json(
+          { error: 'Password required', requiresPassword: true },
+          { status: 401 }
+        );
       }
       const { createHash } = await import('crypto');
       const hash = createHash('sha256').update(password).digest('hex');
       if (hash !== link.password) {
-        return NextResponse.json({ error: 'Invalid password', requiresPassword: true }, { status: 401 });
+        return NextResponse.json(
+          { error: 'Invalid password', requiresPassword: true },
+          { status: 401 }
+        );
       }
     }
 
@@ -134,10 +143,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Increment view count (fire and forget)
-    prisma.shareLink.update({
-      where: { id: link.id },
-      data: { viewCount: { increment: 1 }, lastViewedAt: new Date() },
-    }).catch((err) => log.warn('View count update failed:', err));
+    prisma.shareLink
+      .update({
+        where: { id: link.id },
+        data: { viewCount: { increment: 1 }, lastViewedAt: new Date() },
+      })
+      .catch(err => log.warn('View count update failed:', err));
 
     return NextResponse.json({
       analysis: {

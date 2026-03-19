@@ -124,7 +124,12 @@ export default function Dashboard() {
   const { addNotification } = useNotifications();
   const { startTracking, updateProgress, completeTracking, errorTracking } = useAnalysisProgress();
   const [showActivityFeed, setShowActivityFeed] = useState(false);
-  const { activities, isLoading: feedLoading, hasMore: feedHasMore, loadMore: feedLoadMore } = useActivityFeed({ limit: 12 });
+  const {
+    activities,
+    isLoading: feedLoading,
+    hasMore: feedHasMore,
+    loadMore: feedLoadMore,
+  } = useActivityFeed({ limit: 12 });
 
   // SWR: cached document list with auto-revalidation
   const {

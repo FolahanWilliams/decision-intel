@@ -85,23 +85,17 @@ export async function POST(req: NextRequest) {
       where: { userId: user.id, role: 'owner' },
     });
     if (existing) {
-      return NextResponse.json(
-        { error: 'You already own an organization' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'You already own an organization' }, { status: 409 });
     }
 
     // Check slug uniqueness
     const slugExists = await prisma.organization.findUnique({ where: { slug } });
     if (slugExists) {
-      return NextResponse.json(
-        { error: 'This team URL is already taken' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: 'This team URL is already taken' }, { status: 409 });
     }
 
     // Create org + owner membership in a transaction
-    const org = await prisma.$transaction(async (tx) => {
+    const org = await prisma.$transaction(async tx => {
       const newOrg = await tx.organization.create({
         data: { name, slug },
       });
@@ -111,7 +105,10 @@ export async function POST(req: NextRequest) {
           orgId: newOrg.id,
           userId: user.id,
           email: user.email || '',
-          displayName: (user.user_metadata as Record<string, string> | undefined)?.full_name || user.email?.split('@')[0] || 'Owner',
+          displayName:
+            (user.user_metadata as Record<string, string> | undefined)?.full_name ||
+            user.email?.split('@')[0] ||
+            'Owner',
           role: 'owner',
         },
       });

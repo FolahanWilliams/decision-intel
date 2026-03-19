@@ -442,7 +442,13 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
                 select: { email: true },
               });
               if (member?.email) {
-                await deliverEmailNudge(userId, member.email, nudge.message, nudge.nudgeType, nudge.severity);
+                await deliverEmailNudge(
+                  userId,
+                  member.email,
+                  nudge.message,
+                  nudge.nudgeType,
+                  nudge.severity
+                );
                 await prisma.nudge
                   .update({ where: { id: persisted.id }, data: { deliveredAt: new Date() } })
                   .catch(() => {});

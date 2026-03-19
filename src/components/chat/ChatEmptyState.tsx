@@ -29,7 +29,7 @@ const STARTER_QUESTIONS_NO_DOCS = [
 ];
 
 export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateProps) {
-  const analyzedDocs = documents.filter((d) => d.status === 'complete');
+  const analyzedDocs = documents.filter(d => d.status === 'complete');
   const hasDocs = analyzedDocs.length > 0;
   const starterQuestions = hasDocs ? STARTER_QUESTIONS_WITH_DOCS : STARTER_QUESTIONS_NO_DOCS;
 
@@ -88,7 +88,7 @@ export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateP
             marginBottom: 'var(--spacing-lg)',
           }}
         >
-          {analyzedDocs.slice(0, 3).map((doc) => (
+          {analyzedDocs.slice(0, 3).map(doc => (
             <span
               key={doc.id}
               style={{
@@ -117,7 +117,14 @@ export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateP
 
       {/* Starter questions */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
-        <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <span
+          style={{
+            fontSize: '10px',
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
           Try asking:
         </span>
         {starterQuestions.map((q, i) => (

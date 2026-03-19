@@ -987,7 +987,14 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
         },
         orderBy: { sortOrder: 'asc' },
         take: 5,
-        select: { name: true, role: true, focus: true, values: true, bias: true, riskTolerance: true },
+        select: {
+          name: true,
+          role: true,
+          focus: true,
+          values: true,
+          bias: true,
+          riskTolerance: true,
+        },
       });
 
       if (dbPersonas.length > 0) {

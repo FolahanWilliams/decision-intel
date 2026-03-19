@@ -109,7 +109,7 @@ export default function SubmitDecisionPage() {
 
         const xhr = new XMLHttpRequest();
         const uploadPromise = new Promise<{ id: string }>((resolve, reject) => {
-          xhr.upload.addEventListener('progress', (e) => {
+          xhr.upload.addEventListener('progress', e => {
             if (e.lengthComputable) {
               setUploadProgress(Math.round((e.loaded / e.total) * 100));
             }
@@ -151,7 +151,10 @@ export default function SubmitDecisionPage() {
         if (channel.trim()) body.channel = channel.trim();
         if (decisionType) body.decisionType = decisionType;
         if (participants.trim()) {
-          body.participants = participants.split(',').map(p => p.trim()).filter(Boolean);
+          body.participants = participants
+            .split(',')
+            .map(p => p.trim())
+            .filter(Boolean);
         }
 
         const res = await fetch('/api/human-decisions', {
@@ -195,7 +198,11 @@ export default function SubmitDecisionPage() {
   return (
     <div
       className="container"
-      style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)', maxWidth: 720 }}
+      style={{
+        paddingTop: 'var(--spacing-2xl)',
+        paddingBottom: 'var(--spacing-2xl)',
+        maxWidth: 720,
+      }}
     >
       <Breadcrumbs
         items={[
@@ -211,7 +218,8 @@ export default function SubmitDecisionPage() {
           <h1>Submit Decision for Audit</h1>
         </div>
         <p className="text-muted">
-          Paste a decision, upload a meeting recording, or submit a transcript for cognitive bias analysis.
+          Paste a decision, upload a meeting recording, or submit a transcript for cognitive bias
+          analysis.
         </p>
       </header>
 
@@ -242,7 +250,9 @@ export default function SubmitDecisionPage() {
               <label style={labelStyle}>Source</label>
               <select value={source} onChange={e => setSource(e.target.value)} style={inputStyle}>
                 {SOURCES.map(s => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -268,9 +278,15 @@ export default function SubmitDecisionPage() {
                 {/* Meeting Type */}
                 <div>
                   <label style={labelStyle}>Meeting Type</label>
-                  <select value={meetingType} onChange={e => setMeetingType(e.target.value)} style={inputStyle}>
+                  <select
+                    value={meetingType}
+                    onChange={e => setMeetingType(e.target.value)}
+                    style={inputStyle}
+                  >
                     {MEETING_TYPES.map(t => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -284,7 +300,10 @@ export default function SubmitDecisionPage() {
                   {!meetingFile ? (
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      onDragOver={e => { e.preventDefault(); setDragActive(true); }}
+                      onDragOver={e => {
+                        e.preventDefault();
+                        setDragActive(true);
+                      }}
                       onDragLeave={() => setDragActive(false)}
                       onDrop={handleDrop}
                       style={{
@@ -330,9 +349,20 @@ export default function SubmitDecisionPage() {
                         borderRadius: '8px',
                       }}
                     >
-                      <FileAudio size={28} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                      <FileAudio
+                        size={28}
+                        style={{ color: 'var(--accent-primary)', flexShrink: 0 }}
+                      />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '14px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div
+                          style={{
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
                           {meetingFile.name}
                         </div>
                         <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
@@ -341,7 +371,10 @@ export default function SubmitDecisionPage() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => { setMeetingFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                        onClick={() => {
+                          setMeetingFile(null);
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
                         className="btn btn-ghost"
                         style={{ padding: '4px' }}
                       >
@@ -353,20 +386,31 @@ export default function SubmitDecisionPage() {
                   {/* Upload progress */}
                   {submitting && uploadProgress > 0 && (
                     <div style={{ marginTop: '12px' }}>
-                      <div style={{
-                        height: '6px',
-                        background: 'var(--bg-tertiary)',
-                        borderRadius: '3px',
-                        overflow: 'hidden',
-                      }}>
-                        <div style={{
-                          height: '100%',
-                          width: `${uploadProgress}%`,
-                          background: 'var(--accent-primary)',
-                          transition: 'width 0.3s ease',
-                        }} />
+                      <div
+                        style={{
+                          height: '6px',
+                          background: 'var(--bg-tertiary)',
+                          borderRadius: '3px',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: '100%',
+                            width: `${uploadProgress}%`,
+                            background: 'var(--accent-primary)',
+                            transition: 'width 0.3s ease',
+                          }}
+                        />
                       </div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'right' }}>
+                      <div
+                        style={{
+                          fontSize: '11px',
+                          color: 'var(--text-muted)',
+                          marginTop: '4px',
+                          textAlign: 'right',
+                        }}
+                      >
                         Uploading... {uploadProgress}%
                       </div>
                     </div>
@@ -381,7 +425,10 @@ export default function SubmitDecisionPage() {
                 {/* Channel */}
                 <div>
                   <label style={labelStyle}>
-                    Channel / Context <span className="text-muted" style={{ fontWeight: 400 }}>(optional)</span>
+                    Channel / Context{' '}
+                    <span className="text-muted" style={{ fontWeight: 400 }}>
+                      (optional)
+                    </span>
                   </label>
                   <input
                     type="text"
@@ -395,11 +442,20 @@ export default function SubmitDecisionPage() {
                 {/* Decision Type */}
                 <div>
                   <label style={labelStyle}>
-                    Decision Type <span className="text-muted" style={{ fontWeight: 400 }}>(optional)</span>
+                    Decision Type{' '}
+                    <span className="text-muted" style={{ fontWeight: 400 }}>
+                      (optional)
+                    </span>
                   </label>
-                  <select value={decisionType} onChange={e => setDecisionType(e.target.value)} style={inputStyle}>
+                  <select
+                    value={decisionType}
+                    onChange={e => setDecisionType(e.target.value)}
+                    style={inputStyle}
+                  >
                     {DECISION_TYPES.map(t => (
-                      <option key={t.value} value={t.value}>{t.label}</option>
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -409,7 +465,10 @@ export default function SubmitDecisionPage() {
             {/* Participants (shared) */}
             <div>
               <label style={labelStyle}>
-                Participants <span className="text-muted" style={{ fontWeight: 400 }}>(comma-separated, optional)</span>
+                Participants{' '}
+                <span className="text-muted" style={{ fontWeight: 400 }}>
+                  (comma-separated, optional)
+                </span>
               </label>
               <input
                 type="text"
@@ -420,8 +479,8 @@ export default function SubmitDecisionPage() {
               />
               {isRecordingMode && (
                 <div className="text-xs text-muted mt-xs">
-                  <Mic size={10} style={{ display: 'inline', verticalAlign: 'middle' }} />{' '}
-                  Speakers will also be auto-detected from the audio
+                  <Mic size={10} style={{ display: 'inline', verticalAlign: 'middle' }} /> Speakers
+                  will also be auto-detected from the audio
                 </div>
               )}
             </div>

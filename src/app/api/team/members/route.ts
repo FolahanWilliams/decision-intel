@@ -48,7 +48,7 @@ export async function PUT(req: NextRequest) {
 
     // Can't change the owner's role
     if (target.role === 'owner') {
-      return NextResponse.json({ error: 'Cannot change the owner\'s role' }, { status: 403 });
+      return NextResponse.json({ error: "Cannot change the owner's role" }, { status: 403 });
     }
 
     // Admins can't promote to admin (only owners can)

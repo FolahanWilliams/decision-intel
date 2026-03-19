@@ -481,9 +481,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
           <ErrorBoundary sectionName="Bias Network">
             <div className="card">
               <div className="card-header">
-                <h3 style={{ fontSize: '13px', fontWeight: 600 }}>
-                  Bias Network Map
-                </h3>
+                <h3 style={{ fontSize: '13px', fontWeight: 600 }}>Bias Network Map</h3>
               </div>
               <div className="card-body">
                 <BiasNetwork
@@ -1493,10 +1491,18 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                       lineHeight: 1.5,
                     }}
                   >
-                    Edit the decision text below and run a simulation to see how changes affect the quality score, noise level, and detected biases.
+                    Edit the decision text below and run a simulation to see how changes affect the
+                    quality score, noise level, and detected biases.
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '8px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                      gap: '8px',
+                      marginBottom: '8px',
+                    }}
+                  >
                     <button
                       onClick={() => {
                         setEditableContent(decision?.content || '');
@@ -1588,93 +1594,225 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                         }}
                       >
                         <div style={{ textAlign: 'center' }}>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                          <div
+                            style={{
+                              fontSize: '10px',
+                              color: 'var(--text-muted)',
+                              marginBottom: '4px',
+                            }}
+                          >
                             ORIGINAL
                           </div>
-                          <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                          <div
+                            style={{
+                              fontSize: '2.5rem',
+                              fontWeight: 800,
+                              color: 'var(--text-secondary)',
+                            }}
+                          >
                             {audit ? Math.round(audit.decisionQualityScore) : '--'}
                           </div>
                         </div>
                         <div style={{ textAlign: 'center' }}>
-                          <div style={{
-                            fontSize: '24px',
-                            color: simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
-                              ? 'var(--success)' : 'var(--error)',
-                          }}>
+                          <div
+                            style={{
+                              fontSize: '24px',
+                              color:
+                                simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
+                                  ? 'var(--success)'
+                                  : 'var(--error)',
+                            }}
+                          >
                             &rarr;
                           </div>
-                          <div style={{
-                            fontSize: '14px', fontWeight: 700, padding: '4px 12px',
-                            background: simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
-                              ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                            color: simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
-                              ? 'var(--success)' : 'var(--error)',
-                          }}>
-                            {simResult.decisionQualityScore > (audit?.decisionQualityScore || 0) ? '+' : ''}
-                            {Math.round(simResult.decisionQualityScore - (audit?.decisionQualityScore || 0))} pts
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              fontWeight: 700,
+                              padding: '4px 12px',
+                              background:
+                                simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
+                                  ? 'rgba(34, 197, 94, 0.2)'
+                                  : 'rgba(239, 68, 68, 0.2)',
+                              color:
+                                simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
+                                  ? 'var(--success)'
+                                  : 'var(--error)',
+                            }}
+                          >
+                            {simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
+                              ? '+'
+                              : ''}
+                            {Math.round(
+                              simResult.decisionQualityScore - (audit?.decisionQualityScore || 0)
+                            )}{' '}
+                            pts
                           </div>
                         </div>
                         <div style={{ textAlign: 'center' }}>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                          <div
+                            style={{
+                              fontSize: '10px',
+                              color: 'var(--text-muted)',
+                              marginBottom: '4px',
+                            }}
+                          >
                             PROJECTED
                           </div>
-                          <div style={{
-                            fontSize: '2.5rem', fontWeight: 800,
-                            color: simResult.decisionQualityScore >= 70 ? 'var(--success)'
-                              : simResult.decisionQualityScore >= 40 ? 'var(--warning)' : 'var(--error)',
-                          }}>
+                          <div
+                            style={{
+                              fontSize: '2.5rem',
+                              fontWeight: 800,
+                              color:
+                                simResult.decisionQualityScore >= 70
+                                  ? 'var(--success)'
+                                  : simResult.decisionQualityScore >= 40
+                                    ? 'var(--warning)'
+                                    : 'var(--error)',
+                            }}
+                          >
                             {Math.round(simResult.decisionQualityScore)}
                           </div>
                         </div>
                       </div>
 
                       {/* Metrics Table */}
-                      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 'var(--spacing-lg)' }}>
+                      <table
+                        style={{
+                          width: '100%',
+                          borderCollapse: 'collapse',
+                          marginBottom: 'var(--spacing-lg)',
+                        }}
+                      >
                         <thead>
                           <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                            <th style={{ textAlign: 'left', padding: '8px 0', fontSize: '11px', color: 'var(--text-muted)' }}>METRIC</th>
-                            <th style={{ textAlign: 'center', padding: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>ORIGINAL</th>
-                            <th style={{ textAlign: 'center', padding: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>PROJECTED</th>
-                            <th style={{ textAlign: 'center', padding: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>CHANGE</th>
+                            <th
+                              style={{
+                                textAlign: 'left',
+                                padding: '8px 0',
+                                fontSize: '11px',
+                                color: 'var(--text-muted)',
+                              }}
+                            >
+                              METRIC
+                            </th>
+                            <th
+                              style={{
+                                textAlign: 'center',
+                                padding: '8px',
+                                fontSize: '11px',
+                                color: 'var(--text-muted)',
+                              }}
+                            >
+                              ORIGINAL
+                            </th>
+                            <th
+                              style={{
+                                textAlign: 'center',
+                                padding: '8px',
+                                fontSize: '11px',
+                                color: 'var(--text-muted)',
+                              }}
+                            >
+                              PROJECTED
+                            </th>
+                            <th
+                              style={{
+                                textAlign: 'center',
+                                padding: '8px',
+                                fontSize: '11px',
+                                color: 'var(--text-muted)',
+                              }}
+                            >
+                              CHANGE
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                            <td style={{ padding: '12px 0', fontSize: '13px' }}>Decision Quality</td>
-                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{audit ? Math.round(audit.decisionQualityScore) : '--'}</td>
-                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{Math.round(simResult.decisionQualityScore)}</td>
-                            <td style={{
-                              textAlign: 'center', fontWeight: 600,
-                              color: simResult.decisionQualityScore > (audit?.decisionQualityScore || 0) ? 'var(--success)' : 'var(--error)',
-                            }}>
-                              {simResult.decisionQualityScore > (audit?.decisionQualityScore || 0) ? '\u2191' : '\u2193'}{' '}
-                              {Math.abs(Math.round(simResult.decisionQualityScore - (audit?.decisionQualityScore || 0)))}
+                            <td style={{ padding: '12px 0', fontSize: '13px' }}>
+                              Decision Quality
+                            </td>
+                            <td style={{ textAlign: 'center', fontWeight: 600 }}>
+                              {audit ? Math.round(audit.decisionQualityScore) : '--'}
+                            </td>
+                            <td style={{ textAlign: 'center', fontWeight: 600 }}>
+                              {Math.round(simResult.decisionQualityScore)}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontWeight: 600,
+                                color:
+                                  simResult.decisionQualityScore >
+                                  (audit?.decisionQualityScore || 0)
+                                    ? 'var(--success)'
+                                    : 'var(--error)',
+                              }}
+                            >
+                              {simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
+                                ? '\u2191'
+                                : '\u2193'}{' '}
+                              {Math.abs(
+                                Math.round(
+                                  simResult.decisionQualityScore -
+                                    (audit?.decisionQualityScore || 0)
+                                )
+                              )}
                             </td>
                           </tr>
                           <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                             <td style={{ padding: '12px 0', fontSize: '13px' }}>Biases</td>
-                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{biases.length}</td>
-                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{simResult.biasFindings.length}</td>
-                            <td style={{
-                              textAlign: 'center', fontWeight: 600,
-                              color: simResult.biasFindings.length < biases.length ? 'var(--success)'
-                                : simResult.biasFindings.length > biases.length ? 'var(--error)' : 'var(--text-muted)',
-                            }}>
-                              {simResult.biasFindings.length < biases.length ? '\u2193'
-                                : simResult.biasFindings.length > biases.length ? '\u2191' : '='}{' '}
+                            <td style={{ textAlign: 'center', fontWeight: 600 }}>
+                              {biases.length}
+                            </td>
+                            <td style={{ textAlign: 'center', fontWeight: 600 }}>
+                              {simResult.biasFindings.length}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontWeight: 600,
+                                color:
+                                  simResult.biasFindings.length < biases.length
+                                    ? 'var(--success)'
+                                    : simResult.biasFindings.length > biases.length
+                                      ? 'var(--error)'
+                                      : 'var(--text-muted)',
+                              }}
+                            >
+                              {simResult.biasFindings.length < biases.length
+                                ? '\u2193'
+                                : simResult.biasFindings.length > biases.length
+                                  ? '\u2191'
+                                  : '='}{' '}
                               {Math.abs(simResult.biasFindings.length - biases.length)}
                             </td>
                           </tr>
                           <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                             <td style={{ padding: '12px 0', fontSize: '13px' }}>Noise Score</td>
-                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{audit ? Math.round(audit.noiseScore) : '--'}</td>
-                            <td style={{ textAlign: 'center', fontWeight: 600 }}>{Math.round(simResult.noiseScore)}</td>
-                            <td style={{
-                              textAlign: 'center', fontWeight: 600,
-                              color: simResult.noiseScore > (audit?.noiseScore || 0) ? 'var(--success)' : 'var(--error)',
-                            }}>
-                              {simResult.noiseScore > (audit?.noiseScore || 0) ? '\u2191' : '\u2193'}{' '}
-                              {Math.abs(Math.round(simResult.noiseScore - (audit?.noiseScore || 0)))}
+                            <td style={{ textAlign: 'center', fontWeight: 600 }}>
+                              {audit ? Math.round(audit.noiseScore) : '--'}
+                            </td>
+                            <td style={{ textAlign: 'center', fontWeight: 600 }}>
+                              {Math.round(simResult.noiseScore)}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontWeight: 600,
+                                color:
+                                  simResult.noiseScore > (audit?.noiseScore || 0)
+                                    ? 'var(--success)'
+                                    : 'var(--error)',
+                              }}
+                            >
+                              {simResult.noiseScore > (audit?.noiseScore || 0)
+                                ? '\u2191'
+                                : '\u2193'}{' '}
+                              {Math.abs(
+                                Math.round(simResult.noiseScore - (audit?.noiseScore || 0))
+                              )}
                             </td>
                           </tr>
                         </tbody>
@@ -1685,45 +1823,101 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                         const origTypes = new Set(biases.map(b => b.biasType));
                         const simTypes = new Set(simResult.biasFindings.map(b => b.biasType));
                         const resolved = biases.filter(b => !simTypes.has(b.biasType));
-                        const newBiases = simResult.biasFindings.filter(b => !origTypes.has(b.biasType));
+                        const newBiases = simResult.biasFindings.filter(
+                          b => !origTypes.has(b.biasType)
+                        );
                         const still = biases.filter(b => simTypes.has(b.biasType));
 
-                        if (resolved.length === 0 && newBiases.length === 0 && still.length === 0) return null;
+                        if (resolved.length === 0 && newBiases.length === 0 && still.length === 0)
+                          return null;
 
                         return (
                           <div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px', fontWeight: 500 }}>
-                              Bias Analysis — {resolved.length} resolved, {still.length} remaining{newBiases.length > 0 ? `, ${newBiases.length} new` : ''}
+                            <div
+                              style={{
+                                fontSize: '11px',
+                                color: 'var(--text-muted)',
+                                marginBottom: '8px',
+                                fontWeight: 500,
+                              }}
+                            >
+                              Bias Analysis — {resolved.length} resolved, {still.length} remaining
+                              {newBiases.length > 0 ? `, ${newBiases.length} new` : ''}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                               {resolved.map((b, i) => (
-                                <div key={'r' + i} style={{
-                                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                  padding: '8px 12px', background: 'var(--bg-tertiary)',
-                                  borderLeft: '3px solid var(--success)',
-                                }}>
+                                <div
+                                  key={'r' + i}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '8px 12px',
+                                    background: 'var(--bg-tertiary)',
+                                    borderLeft: '3px solid var(--success)',
+                                  }}
+                                >
                                   <span style={{ fontSize: '13px' }}>{b.biasType}</span>
-                                  <span style={{ fontSize: '10px', padding: '2px 8px', background: 'rgba(34,197,94,0.2)', color: 'var(--success)' }}>RESOLVED</span>
+                                  <span
+                                    style={{
+                                      fontSize: '10px',
+                                      padding: '2px 8px',
+                                      background: 'rgba(34,197,94,0.2)',
+                                      color: 'var(--success)',
+                                    }}
+                                  >
+                                    RESOLVED
+                                  </span>
                                 </div>
                               ))}
                               {still.map((b, i) => (
-                                <div key={'s' + i} style={{
-                                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                  padding: '8px 12px', background: 'var(--bg-tertiary)',
-                                  borderLeft: `3px solid ${SEVERITY_COLORS[b.severity] || 'var(--warning)'}`,
-                                }}>
+                                <div
+                                  key={'s' + i}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '8px 12px',
+                                    background: 'var(--bg-tertiary)',
+                                    borderLeft: `3px solid ${SEVERITY_COLORS[b.severity] || 'var(--warning)'}`,
+                                  }}
+                                >
                                   <span style={{ fontSize: '13px' }}>{b.biasType}</span>
-                                  <span style={{ fontSize: '10px', padding: '2px 8px', background: 'rgba(239,68,68,0.2)', color: 'var(--error)' }}>STILL PRESENT</span>
+                                  <span
+                                    style={{
+                                      fontSize: '10px',
+                                      padding: '2px 8px',
+                                      background: 'rgba(239,68,68,0.2)',
+                                      color: 'var(--error)',
+                                    }}
+                                  >
+                                    STILL PRESENT
+                                  </span>
                                 </div>
                               ))}
                               {newBiases.map((b, i) => (
-                                <div key={'n' + i} style={{
-                                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                  padding: '8px 12px', background: 'var(--bg-tertiary)',
-                                  borderLeft: '3px solid var(--accent-primary)',
-                                }}>
+                                <div
+                                  key={'n' + i}
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '8px 12px',
+                                    background: 'var(--bg-tertiary)',
+                                    borderLeft: '3px solid var(--accent-primary)',
+                                  }}
+                                >
                                   <span style={{ fontSize: '13px' }}>{b.biasType}</span>
-                                  <span style={{ fontSize: '10px', padding: '2px 8px', background: 'rgba(99,102,241,0.2)', color: 'var(--accent-primary)' }}>NEW</span>
+                                  <span
+                                    style={{
+                                      fontSize: '10px',
+                                      padding: '2px 8px',
+                                      background: 'rgba(99,102,241,0.2)',
+                                      color: 'var(--accent-primary)',
+                                    }}
+                                  >
+                                    NEW
+                                  </span>
                                 </div>
                               ))}
                             </div>
@@ -1732,19 +1926,39 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                       })()}
 
                       {/* Summary Insight */}
-                      <div style={{
-                        marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-md)',
-                        background: simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
-                          ? 'rgba(34, 197, 94, 0.08)' : 'rgba(245, 158, 11, 0.08)',
-                        borderLeft: `3px solid ${simResult.decisionQualityScore > (audit?.decisionQualityScore || 0) ? 'var(--success)' : 'var(--warning)'}`,
-                      }}>
-                        <div style={{
-                          fontSize: '11px', fontWeight: 600, marginBottom: '4px',
-                          color: simResult.decisionQualityScore > (audit?.decisionQualityScore || 0) ? 'var(--success)' : 'var(--warning)',
-                        }}>
-                          {simResult.decisionQualityScore > (audit?.decisionQualityScore || 0) ? 'IMPROVEMENTS DETECTED' : 'NEEDS MORE WORK'}
+                      <div
+                        style={{
+                          marginTop: 'var(--spacing-lg)',
+                          padding: 'var(--spacing-md)',
+                          background:
+                            simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
+                              ? 'rgba(34, 197, 94, 0.08)'
+                              : 'rgba(245, 158, 11, 0.08)',
+                          borderLeft: `3px solid ${simResult.decisionQualityScore > (audit?.decisionQualityScore || 0) ? 'var(--success)' : 'var(--warning)'}`,
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            marginBottom: '4px',
+                            color:
+                              simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
+                                ? 'var(--success)'
+                                : 'var(--warning)',
+                          }}
+                        >
+                          {simResult.decisionQualityScore > (audit?.decisionQualityScore || 0)
+                            ? 'IMPROVEMENTS DETECTED'
+                            : 'NEEDS MORE WORK'}
                         </div>
-                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                        <div
+                          style={{
+                            fontSize: '13px',
+                            color: 'var(--text-secondary)',
+                            lineHeight: 1.5,
+                          }}
+                        >
                           {simResult.summary}
                         </div>
                       </div>

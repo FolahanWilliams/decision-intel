@@ -10,7 +10,7 @@ interface ActivityFeedResponse {
   total: number;
 }
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 interface UseActivityFeedOptions {
   types?: string[];
@@ -43,7 +43,7 @@ export function useActivityFeed(options?: UseActivityFeedOptions) {
     try {
       const res = await fetch(`${url}&cursor=${encodeURIComponent(nextCursor)}`);
       const result: ActivityFeedResponse = await res.json();
-      setExtraActivities((prev) => [...prev, ...result.activities]);
+      setExtraActivities(prev => [...prev, ...result.activities]);
       setCursor(result.nextCursor);
       if (!result.nextCursor || result.activities.length < limit) {
         setHasMore(false);

@@ -126,7 +126,10 @@ export function PersonaManager() {
 
   return (
     <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
-      <div className="card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div
+        className="card-header"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+      >
         <h3 className="flex items-center gap-sm">
           <Users size={18} />
           Boardroom Personas
@@ -146,10 +149,13 @@ export function PersonaManager() {
         )}
       </div>
       <div className="card-body">
-        <p className="text-xs text-muted" style={{ marginBottom: 'var(--spacing-md)', lineHeight: 1.5 }}>
-          Custom personas replace the default AI-generated boardroom for your organization.
-          Each analysis will simulate these specific decision-makers voting on your proposals.
-          If none are defined, the AI generates domain-specific personas per document.
+        <p
+          className="text-xs text-muted"
+          style={{ marginBottom: 'var(--spacing-md)', lineHeight: 1.5 }}
+        >
+          Custom personas replace the default AI-generated boardroom for your organization. Each
+          analysis will simulate these specific decision-makers voting on your proposals. If none
+          are defined, the AI generates domain-specific personas per document.
         </p>
 
         {loading ? (
@@ -165,7 +171,8 @@ export function PersonaManager() {
                 style={{
                   padding: '14px 16px',
                   marginBottom: '8px',
-                  background: editingId === persona.id ? 'rgba(99,102,241,0.05)' : 'var(--bg-secondary)',
+                  background:
+                    editingId === persona.id ? 'rgba(99,102,241,0.05)' : 'var(--bg-secondary)',
                   border: `1px solid ${editingId === persona.id ? 'rgba(99,102,241,0.3)' : 'var(--liquid-border)'}`,
                   borderRadius: '8px',
                 }}
@@ -180,9 +187,22 @@ export function PersonaManager() {
                     isEdit
                   />
                 ) : (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                    }}
+                  >
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          marginBottom: '4px',
+                        }}
+                      >
                         <span style={{ fontWeight: 600, fontSize: '13px' }}>{persona.name}</span>
                         <span
                           style={{
@@ -218,10 +238,24 @@ export function PersonaManager() {
                           {persona.riskTolerance}
                         </span>
                       </div>
-                      <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '2px 0', lineHeight: 1.4 }}>
+                      <p
+                        style={{
+                          fontSize: '11px',
+                          color: 'var(--text-muted)',
+                          margin: '2px 0',
+                          lineHeight: 1.4,
+                        }}
+                      >
                         <strong>Focus:</strong> {persona.focus}
                       </p>
-                      <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '2px 0', lineHeight: 1.4 }}>
+                      <p
+                        style={{
+                          fontSize: '11px',
+                          color: 'var(--text-muted)',
+                          margin: '2px 0',
+                          lineHeight: 1.4,
+                        }}
+                      >
                         <strong>Values:</strong> {persona.values}
                       </p>
                     </div>
@@ -269,7 +303,8 @@ export function PersonaManager() {
                 }}
               >
                 <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 8px' }}>
-                  No custom personas defined. The AI will generate domain-specific personas for each document.
+                  No custom personas defined. The AI will generate domain-specific personas for each
+                  document.
                 </p>
                 <button
                   onClick={() => {
@@ -431,7 +466,9 @@ function PersonaForm({
         </button>
         <button
           onClick={onSave}
-          disabled={saving || !draft.name || !draft.role || !draft.focus || !draft.values || !draft.bias}
+          disabled={
+            saving || !draft.name || !draft.role || !draft.focus || !draft.values || !draft.bias
+          }
           className="btn btn-primary flex items-center gap-sm"
           style={{ fontSize: '12px', padding: '5px 12px' }}
         >

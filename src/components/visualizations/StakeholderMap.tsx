@@ -116,4 +116,3 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
     </div>
   );
 }
-

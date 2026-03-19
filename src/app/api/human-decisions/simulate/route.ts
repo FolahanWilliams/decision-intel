@@ -57,7 +57,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (content.length > 100000) {
-      return NextResponse.json({ error: 'Content too long (max 100,000 characters)' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Content too long (max 100,000 characters)' },
+        { status: 400 }
+      );
     }
 
     // Build input matching the original decision's metadata
@@ -80,7 +83,9 @@ export async function POST(request: NextRequest) {
       },
     }).catch(() => {});
 
-    log.info(`Simulation complete: score=${result.decisionQualityScore}, biases=${result.biasFindings.length}`);
+    log.info(
+      `Simulation complete: score=${result.decisionQualityScore}, biases=${result.biasFindings.length}`
+    );
 
     return NextResponse.json({
       decisionQualityScore: result.decisionQualityScore,

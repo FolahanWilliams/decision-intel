@@ -232,4 +232,3 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
     </div>
   );
 }
-

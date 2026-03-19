@@ -63,7 +63,9 @@ export async function GET(req: NextRequest) {
         const [documents, nudges, biasInstances] = await Promise.all([
           prisma.document.findMany({
             where: { userId: settings.userId, status: 'complete', updatedAt: { gte: oneWeekAgo } },
-            include: { analyses: { take: 1, orderBy: { createdAt: 'desc' }, select: { overallScore: true } } },
+            include: {
+              analyses: { take: 1, orderBy: { createdAt: 'desc' }, select: { overallScore: true } },
+            },
           }),
           prisma.nudge.count({
             where: { targetUserId: settings.userId, createdAt: { gte: oneWeekAgo } },
