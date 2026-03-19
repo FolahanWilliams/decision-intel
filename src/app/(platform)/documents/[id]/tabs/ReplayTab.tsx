@@ -93,7 +93,12 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
                         transform: 'translateX(-50%)',
                         fontSize: '11px',
                         fontWeight: 700,
-                        color: score >= 70 ? 'var(--success)' : score >= 40 ? 'var(--warning)' : 'var(--error)',
+                        color:
+                          score >= 70
+                            ? 'var(--success)'
+                            : score >= 40
+                              ? 'var(--warning)'
+                              : 'var(--error)',
                       }}
                     >
                       {score}
@@ -124,7 +129,9 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
               <div
                 className="card"
                 style={{
-                  border: isExpanded ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
+                  border: isExpanded
+                    ? '1px solid var(--accent-primary)'
+                    : '1px solid var(--border-color)',
                   transition: 'border-color 0.15s',
                 }}
               >
@@ -174,7 +181,7 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
                     {step.status === 'skipped' ? (
                       <SkipForward size={12} />
                     ) : (
-                      STEP_ICONS[step.id] || (i + 1)
+                      STEP_ICONS[step.id] || i + 1
                     )}
                   </div>
 
@@ -183,7 +190,13 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
                     <div style={{ fontSize: '13px', fontWeight: 600 }}>
                       {step.label}
                       {step.status === 'skipped' && (
-                        <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginLeft: '8px' }}>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            color: 'var(--text-muted)',
+                            marginLeft: '8px',
+                          }}
+                        >
                           SKIPPED
                         </span>
                       )}
@@ -202,14 +215,13 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
                         padding: '2px 8px',
                         borderRadius: '10px',
                         background:
-                          step.scoreDelta > 0
-                            ? 'rgba(48, 209, 88, 0.1)'
-                            : 'rgba(239, 68, 68, 0.1)',
+                          step.scoreDelta > 0 ? 'rgba(48, 209, 88, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                         color: step.scoreDelta > 0 ? 'var(--success)' : 'var(--error)',
                         flexShrink: 0,
                       }}
                     >
-                      {step.scoreDelta > 0 ? '+' : ''}{step.scoreDelta} pts
+                      {step.scoreDelta > 0 ? '+' : ''}
+                      {step.scoreDelta} pts
                     </span>
                   )}
 
@@ -228,7 +240,15 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
                   >
                     {/* Findings */}
                     <div style={{ marginTop: 'var(--spacing-md)' }}>
-                      <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                      <div
+                        style={{
+                          fontSize: '10px',
+                          color: 'var(--text-muted)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          marginBottom: '6px',
+                        }}
+                      >
                         Findings
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -285,9 +305,7 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
                     {/* What-If button */}
                     {step.counterfactualSupported && (
                       <button
-                        onClick={() =>
-                          setCounterfactualStep(showCounterfactual ? null : step.id)
-                        }
+                        onClick={() => setCounterfactualStep(showCounterfactual ? null : step.id)}
                         style={{
                           marginTop: 'var(--spacing-sm)',
                           display: 'flex',

@@ -40,22 +40,33 @@ export interface BiasNetworkProps {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const BIAS_DEFINITIONS: Record<string, string> = {
-  'Confirmation Bias': 'Tendency to search for, interpret, and recall information that confirms existing beliefs.',
-  'Anchoring Bias': 'Over-reliance on the first piece of information encountered when making decisions.',
-  'Sunk Cost Fallacy': 'Continuing an endeavor due to previously invested resources rather than future value.',
-  'Overconfidence Bias': 'Excessive confidence in own answers or judgments, often underestimating uncertainty.',
+  'Confirmation Bias':
+    'Tendency to search for, interpret, and recall information that confirms existing beliefs.',
+  'Anchoring Bias':
+    'Over-reliance on the first piece of information encountered when making decisions.',
+  'Sunk Cost Fallacy':
+    'Continuing an endeavor due to previously invested resources rather than future value.',
+  'Overconfidence Bias':
+    'Excessive confidence in own answers or judgments, often underestimating uncertainty.',
   Groupthink: 'Desire for conformity in a group overrides realistic appraisal of alternatives.',
   'Authority Bias': 'Tendency to attribute greater accuracy to the opinion of an authority figure.',
-  'Bandwagon Effect': 'Tendency to do or believe things because many other people do or believe the same.',
-  'Loss Aversion': 'The pain of losing is psychologically about twice as powerful as the pleasure of gaining.',
-  'Availability Heuristic': 'Overestimating the importance of information that is most readily available.',
+  'Bandwagon Effect':
+    'Tendency to do or believe things because many other people do or believe the same.',
+  'Loss Aversion':
+    'The pain of losing is psychologically about twice as powerful as the pleasure of gaining.',
+  'Availability Heuristic':
+    'Overestimating the importance of information that is most readily available.',
   'Hindsight Bias': 'Tendency to see past events as having been predictable when they were not.',
   'Planning Fallacy': 'Tendency to underestimate the time, costs, and risks of future actions.',
-  'Status Quo Bias': 'Preference for the current state of affairs, resisting change even when beneficial.',
-  'Framing Effect': 'Drawing different conclusions from the same information depending on how it is presented.',
-  'Selective Perception': 'Tendency to perceive what we expect to perceive rather than what actually exists.',
+  'Status Quo Bias':
+    'Preference for the current state of affairs, resisting change even when beneficial.',
+  'Framing Effect':
+    'Drawing different conclusions from the same information depending on how it is presented.',
+  'Selective Perception':
+    'Tendency to perceive what we expect to perceive rather than what actually exists.',
   'Recency Bias': 'Giving disproportionate weight to recent events over historical ones.',
-  'Cognitive Misering': 'Taking mental shortcuts to avoid effortful thinking, defaulting to simple heuristics.',
+  'Cognitive Misering':
+    'Taking mental shortcuts to avoid effortful thinking, defaulting to simple heuristics.',
 };
 
 const biasRelationships: Record<string, string[]> = {
@@ -194,11 +205,7 @@ function runForceSimulation(
 
 // ─── Severity Donut Chart ───────────────────────────────────────────────────
 
-function SeverityDonut({
-  counts,
-}: {
-  counts: Record<string, number>;
-}) {
+function SeverityDonut({ counts }: { counts: Record<string, number> }) {
   const total = Object.values(counts).reduce((s, v) => s + v, 0);
   if (total === 0) return null;
 
@@ -264,7 +271,13 @@ function SeverityDonut({
                   flexShrink: 0,
                 }}
               />
-              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', textTransform: 'capitalize' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  color: 'rgba(255,255,255,0.7)',
+                  textTransform: 'capitalize',
+                }}
+              >
                 {sev}
               </span>
               <span style={{ fontSize: '11px', fontWeight: 700, color: SEVERITY_COLORS[sev] }}>
@@ -409,7 +422,6 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
     [onBiasClick]
   );
 
-
   if (biases.length === 0) {
     return (
       <div
@@ -531,7 +543,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
               width: '100%',
               aspectRatio: `${svgWidth} / ${svgHeight}`,
               maxHeight: compact ? '420px' : '520px',
-              background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.03) 0%, transparent 70%)',
+              background:
+                'radial-gradient(ellipse at center, rgba(99,102,241,0.03) 0%, transparent 70%)',
               borderRadius: '8px',
             }}
           >
@@ -581,7 +594,9 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   y1={fromNode.y}
                   x2={toNode.x}
                   y2={toNode.y}
-                  stroke={isHighlighted ? SEVERITY_COLORS[fromNode.severity] : 'rgba(148,163,184,0.6)'}
+                  stroke={
+                    isHighlighted ? SEVERITY_COLORS[fromNode.severity] : 'rgba(148,163,184,0.6)'
+                  }
                   strokeOpacity={isDimmed ? 0.08 : isHighlighted ? 0.85 : 0.45}
                   strokeWidth={isHighlighted ? Math.max(conn.strength * 5, 2.5) : 1.5}
                   strokeLinecap="round"
@@ -600,8 +615,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                 !isActive &&
                 !connections.some(
                   c =>
-                    ((c.from === (selectedNodeId || hoveredNodeId)) && c.to === node.id) ||
-                    (c.from === node.id && (c.to === (selectedNodeId || hoveredNodeId)))
+                    (c.from === (selectedNodeId || hoveredNodeId) && c.to === node.id) ||
+                    (c.from === node.id && c.to === (selectedNodeId || hoveredNodeId))
                 );
 
               const nodeRadius = isActive ? node.radius + 4 : node.radius;
@@ -736,7 +751,9 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                 pointerEvents: 'none',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}
+              >
                 <span
                   style={{
                     width: 8,
@@ -763,10 +780,15 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                 </span>
               </div>
               <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
-                {BIAS_DEFINITIONS[activeHover.name] || 'A cognitive bias detected in the decision path.'}
+                {BIAS_DEFINITIONS[activeHover.name] ||
+                  'A cognitive bias detected in the decision path.'}
               </div>
               <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', marginTop: '6px' }}>
-                {connections.filter(c => c.from === activeHover.id || c.to === activeHover.id).length} connections
+                {
+                  connections.filter(c => c.from === activeHover.id || c.to === activeHover.id)
+                    .length
+                }{' '}
+                connections
               </div>
             </div>
           )}
@@ -813,7 +835,14 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             transition: 'all 0.3s ease',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '8px',
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span
                 style={{
@@ -856,8 +885,16 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             </button>
           </div>
 
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5, margin: '0 0 8px 0' }}>
-            {BIAS_DEFINITIONS[selectedNode.name] || 'A cognitive bias detected in the decision path.'}
+          <p
+            style={{
+              fontSize: '12px',
+              color: 'rgba(255,255,255,0.6)',
+              lineHeight: 1.5,
+              margin: '0 0 8px 0',
+            }}
+          >
+            {BIAS_DEFINITIONS[selectedNode.name] ||
+              'A cognitive bias detected in the decision path.'}
           </p>
 
           {/* Excerpt if available */}
@@ -884,7 +921,15 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             if (relatedConns.length === 0) return null;
             return (
               <div>
-                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <span
+                  style={{
+                    fontSize: '10px',
+                    color: 'rgba(255,255,255,0.4)',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
                   Connected biases
                 </span>
                 <div style={{ display: 'flex', gap: '4px', marginTop: '6px', flexWrap: 'wrap' }}>
@@ -937,8 +982,17 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
           }}
         >
           <SeverityDonut counts={severityCounts} />
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}>
-            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px' }}
+          >
+            <span
+              style={{
+                fontSize: '10px',
+                color: 'rgba(255,255,255,0.35)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
               Total Connections
             </span>
             <span style={{ fontSize: '20px', fontWeight: 800, color: '#a5b4fc' }}>
@@ -972,7 +1026,13 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   border: `1px solid ${SEVERITY_COLORS[sev]}`,
                 }}
               />
-              <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', textTransform: 'capitalize' }}>
+              <span
+                style={{
+                  fontSize: '10px',
+                  color: 'rgba(255,255,255,0.5)',
+                  textTransform: 'capitalize',
+                }}
+              >
                 {sev}
               </span>
             </div>
@@ -1012,8 +1072,14 @@ function ClusterView({
   }, [biases]);
 
   const clusterMeta: Record<string, { label: string; description: string }> = {
-    critical: { label: 'Critical', description: 'Immediate attention required — major decision risk' },
-    high: { label: 'High', description: 'Significant bias with material impact on decision quality' },
+    critical: {
+      label: 'Critical',
+      description: 'Immediate attention required — major decision risk',
+    },
+    high: {
+      label: 'High',
+      description: 'Significant bias with material impact on decision quality',
+    },
     medium: { label: 'Medium', description: 'Notable bias that warrants monitoring' },
     low: { label: 'Low', description: 'Minor bias with limited decision impact' },
   };
@@ -1037,12 +1103,17 @@ function ClusterView({
               borderRadius: '10px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '8px',
+              }}
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ width: 10, height: 10, borderRadius: '50%', background: color }} />
-                <span style={{ fontSize: '13px', fontWeight: 700, color }}>
-                  {meta.label}
-                </span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color }}>{meta.label}</span>
                 <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
                   {meta.description}
                 </span>
@@ -1087,4 +1158,3 @@ function ClusterView({
     </div>
   );
 }
-

@@ -36,18 +36,13 @@ export async function GET() {
       where: { orgId: membership.orgId },
       select: { userId: true, displayName: true, email: true },
     });
-    const memberUserIds = members.map((m) => m.userId);
-    const memberMap = new Map(
-      members.map((m) => [m.userId, m.displayName || m.email.split('@')[0]])
-    );
+    const memberUserIds = members.map(m => m.userId);
+    const memberMap = new Map(members.map(m => [m.userId, m.displayName || m.email.split('@')[0]]));
 
     // Fetch recent team documents (shared across org)
     const documents = await prisma.document.findMany({
       where: {
-        OR: [
-          { orgId: membership.orgId },
-          { userId: { in: memberUserIds } },
-        ],
+        OR: [{ orgId: membership.orgId }, { userId: { in: memberUserIds } }],
       },
       orderBy: { updatedAt: 'desc' },
       take: 20,
@@ -63,22 +58,19 @@ export async function GET() {
     // Fetch recent audit log activity for team
     const activity = await prisma.auditLog.findMany({
       where: {
-        OR: [
-          { orgId: membership.orgId },
-          { userId: { in: memberUserIds } },
-        ],
+        OR: [{ orgId: membership.orgId }, { userId: { in: memberUserIds } }],
       },
       orderBy: { createdAt: 'desc' },
       take: 30,
     });
 
     // Enrich activity with display names
-    const enrichedActivity = activity.map((a) => ({
+    const enrichedActivity = activity.map(a => ({
       ...a,
       displayName: memberMap.get(a.userId) || 'Unknown',
     }));
 
-    const enrichedDocuments = documents.map((d) => ({
+    const enrichedDocuments = documents.map(d => ({
       id: d.id,
       filename: d.filename,
       status: d.status,

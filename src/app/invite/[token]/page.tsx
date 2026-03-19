@@ -7,7 +7,9 @@ import { Users, Loader2, CheckCircle, AlertTriangle, LogIn } from 'lucide-react'
 export default function InviteAcceptPage() {
   const { token } = useParams<{ token: string }>();
   const router = useRouter();
-  const [status, setStatus] = useState<'accepting' | 'success' | 'error' | 'auth_required'>('accepting');
+  const [status, setStatus] = useState<'accepting' | 'success' | 'error' | 'auth_required'>(
+    'accepting'
+  );
   const [orgName, setOrgName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 

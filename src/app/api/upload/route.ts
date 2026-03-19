@@ -284,10 +284,7 @@ export async function GET(request: NextRequest) {
       });
       if (membership?.orgId) {
         where = {
-          OR: [
-            { userId },
-            { orgId: membership.orgId },
-          ],
+          OR: [{ userId }, { orgId: membership.orgId }],
         };
       }
     } catch {

@@ -5,7 +5,12 @@
  * using the same engine that audits AI decisions (Product A).
  */
 
-import type { BiasDetectionResult, ComplianceResult, LogicalAnalysisResult, SwotAnalysisResult } from '@/types';
+import type {
+  BiasDetectionResult,
+  ComplianceResult,
+  LogicalAnalysisResult,
+  SwotAnalysisResult,
+} from '@/types';
 
 // ─── Decision Source Types ───────────────────────────────────────────────────
 

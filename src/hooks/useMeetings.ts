@@ -2,10 +2,11 @@
 
 import useSWR from 'swr';
 
-const fetcher = (url: string) => fetch(url).then(res => {
-  if (!res.ok) throw new Error('Failed to fetch');
-  return res.json();
-});
+const fetcher = (url: string) =>
+  fetch(url).then(res => {
+    if (!res.ok) throw new Error('Failed to fetch');
+    return res.json();
+  });
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -159,7 +160,7 @@ export function useMeetings(page = 1, limit = 20) {
     revalidateOnFocus: true,
     dedupingInterval: 5000,
     // Poll while any meeting is still processing
-    refreshInterval: (latestData) => {
+    refreshInterval: latestData => {
       if (!latestData?.meetings) return 0;
       const processing = latestData.meetings.some(
         m => m.status === 'uploading' || m.status === 'transcribing' || m.status === 'analyzing'
@@ -187,7 +188,7 @@ export function useMeeting(id: string | null) {
       revalidateOnFocus: true,
       dedupingInterval: 3000,
       // Auto-poll while still processing
-      refreshInterval: (latestData) => {
+      refreshInterval: latestData => {
         if (!latestData) return 0;
         const processing = ['uploading', 'transcribing', 'analyzing'].includes(latestData.status);
         return processing ? 2000 : 0;

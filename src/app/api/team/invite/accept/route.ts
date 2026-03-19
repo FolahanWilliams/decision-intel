@@ -18,7 +18,10 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: 'Please sign in to accept this invitation' }, { status: 401 });
+    return NextResponse.json(
+      { error: 'Please sign in to accept this invitation' },
+      { status: 401 }
+    );
   }
 
   try {
@@ -38,7 +41,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (invite.status !== 'pending') {
-      return NextResponse.json({ error: `This invitation has been ${invite.status}` }, { status: 410 });
+      return NextResponse.json(
+        { error: `This invitation has been ${invite.status}` },
+        { status: 410 }
+      );
     }
 
     if (invite.expiresAt < new Date()) {
@@ -73,7 +79,10 @@ export async function POST(req: NextRequest) {
           orgId: invite.orgId,
           userId: user.id,
           email: user.email || invite.email,
-          displayName: (user.user_metadata as Record<string, string> | undefined)?.full_name || user.email?.split('@')[0] || 'Member',
+          displayName:
+            (user.user_metadata as Record<string, string> | undefined)?.full_name ||
+            user.email?.split('@')[0] ||
+            'Member',
           role: invite.role,
         },
       }),

@@ -15,10 +15,7 @@ import Link from 'next/link';
 import type { ActivityItem } from '@/app/api/activity-feed/route';
 import { CardSkeleton } from '@/components/ui/LoadingSkeleton';
 
-const TYPE_CONFIG: Record<
-  string,
-  { icon: React.ReactNode; color: string; bgColor: string }
-> = {
+const TYPE_CONFIG: Record<string, { icon: React.ReactNode; color: string; bgColor: string }> = {
   upload: {
     icon: <Upload size={14} />,
     color: 'var(--accent-secondary)',
@@ -100,14 +97,21 @@ export function ActivityFeed({
   const filtered =
     activeFilter === 'all'
       ? activities
-      : activities.filter((a) => a.type === activeFilter || (activeFilter === 'analysis_complete' && a.type === 'analysis_error'));
+      : activities.filter(
+          a =>
+            a.type === activeFilter ||
+            (activeFilter === 'analysis_complete' && a.type === 'analysis_error')
+        );
 
   return (
     <div>
       {/* Filter chips */}
-      <div className="flex items-center gap-sm" style={{ marginBottom: 'var(--spacing-md)', flexWrap: 'wrap' }}>
+      <div
+        className="flex items-center gap-sm"
+        style={{ marginBottom: 'var(--spacing-md)', flexWrap: 'wrap' }}
+      >
         <Filter size={14} style={{ color: 'var(--text-muted)' }} />
-        {FILTER_OPTIONS.map((opt) => (
+        {FILTER_OPTIONS.map(opt => (
           <button
             key={opt.value}
             onClick={() => handleFilter(opt.value)}
@@ -119,14 +123,8 @@ export function ActivityFeed({
                 activeFilter === opt.value
                   ? '1px solid var(--accent-primary)'
                   : '1px solid var(--border-color)',
-              background:
-                activeFilter === opt.value
-                  ? 'rgba(99, 102, 241, 0.12)'
-                  : 'transparent',
-              color:
-                activeFilter === opt.value
-                  ? 'var(--accent-primary)'
-                  : 'var(--text-muted)',
+              background: activeFilter === opt.value ? 'rgba(99, 102, 241, 0.12)' : 'transparent',
+              color: activeFilter === opt.value ? 'var(--accent-primary)' : 'var(--text-muted)',
               cursor: 'pointer',
               fontWeight: activeFilter === opt.value ? 600 : 400,
             }}
@@ -162,7 +160,7 @@ export function ActivityFeed({
       {/* Activity items */}
       {!isLoading && filtered.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          {filtered.map((activity) => {
+          {filtered.map(activity => {
             const config = TYPE_CONFIG[activity.type] || TYPE_CONFIG.upload;
             const href = activity.metadata.documentId
               ? `/documents/${activity.metadata.documentId}`
@@ -179,10 +177,11 @@ export function ActivityFeed({
                   transition: 'background 0.15s',
                   cursor: href ? 'pointer' : 'default',
                 }}
-                onMouseEnter={(e) => {
-                  if (href) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
+                onMouseEnter={e => {
+                  if (href)
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   (e.currentTarget as HTMLElement).style.background = 'transparent';
                 }}
               >
@@ -205,7 +204,9 @@ export function ActivityFeed({
                 {/* Content */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="flex items-center gap-sm">
-                    <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>
+                    <span
+                      style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}
+                    >
                       {activity.title}
                     </span>
                     {activity.metadata.score != null && (
@@ -262,7 +263,11 @@ export function ActivityFeed({
             );
 
             return href ? (
-              <Link key={activity.id} href={href} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link
+                key={activity.id}
+                href={href}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
                 {content}
               </Link>
             ) : (
@@ -291,7 +296,11 @@ export function ActivityFeed({
               gap: '6px',
             }}
           >
-            {loadingMore ? <Loader2 size={12} className="animate-spin" /> : <ChevronDown size={12} />}
+            {loadingMore ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : (
+              <ChevronDown size={12} />
+            )}
             Load more
           </button>
         </div>

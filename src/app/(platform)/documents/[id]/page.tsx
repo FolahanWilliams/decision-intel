@@ -65,9 +65,7 @@ const SimulatorTab = lazy(() =>
 const IntelligenceTab = lazy(() =>
   import('./tabs/IntelligenceTab').then(m => ({ default: m.IntelligenceTab }))
 );
-const ReplayTab = lazy(() =>
-  import('./tabs/ReplayTab').then(m => ({ default: m.ReplayTab }))
-);
+const ReplayTab = lazy(() => import('./tabs/ReplayTab').then(m => ({ default: m.ReplayTab })));
 
 interface VerificationSource {
   ticker?: string;
@@ -428,20 +426,60 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
   const handleMarkdownExport = useCallback(async () => {
     if (!analysis || !document) return;
-    const { generateMarkdownReport, downloadMarkdown } = await import('@/lib/reports/markdown-generator');
+    const { generateMarkdownReport, downloadMarkdown } =
+      await import('@/lib/reports/markdown-generator');
     const md = generateMarkdownReport({
       filename: document.filename,
       uploadedAt: document.uploadedAt,
       overallScore: analysis.overallScore,
       noiseScore: analysis.noiseScore,
       summary: analysis.summary,
-      biases: biases.map(b => ({ biasType: b.biasType, severity: b.severity, excerpt: b.excerpt, explanation: b.explanation, suggestion: b.suggestion })),
-      factCheck: analysis.factCheck as { score: number; verifications?: Array<{ claim: string; verdict: string; explanation: string }> } | undefined,
-      swotAnalysis: analysis.swotAnalysis as { strengths: string[]; weaknesses: string[]; opportunities: string[]; threats: string[]; strategicAdvice: string } | undefined,
-      simulation: analysis.simulation as { overallVerdict: string; twins?: Array<{ name: string; role: string; vote: string; confidence: number; rationale: string }> } | undefined,
-      noiseStats: analysis.noiseStats as { mean: number; stdDev: number; variance: number } | undefined,
-      logicalAnalysis: analysis.logicalAnalysis as { score: number; fallacies?: Array<{ name: string; severity: string; explanation: string }> } | undefined,
-      compliance: analysis.compliance as { status: string; riskScore: number; summary: string } | undefined,
+      biases: biases.map(b => ({
+        biasType: b.biasType,
+        severity: b.severity,
+        excerpt: b.excerpt,
+        explanation: b.explanation,
+        suggestion: b.suggestion,
+      })),
+      factCheck: analysis.factCheck as
+        | {
+            score: number;
+            verifications?: Array<{ claim: string; verdict: string; explanation: string }>;
+          }
+        | undefined,
+      swotAnalysis: analysis.swotAnalysis as
+        | {
+            strengths: string[];
+            weaknesses: string[];
+            opportunities: string[];
+            threats: string[];
+            strategicAdvice: string;
+          }
+        | undefined,
+      simulation: analysis.simulation as
+        | {
+            overallVerdict: string;
+            twins?: Array<{
+              name: string;
+              role: string;
+              vote: string;
+              confidence: number;
+              rationale: string;
+            }>;
+          }
+        | undefined,
+      noiseStats: analysis.noiseStats as
+        | { mean: number; stdDev: number; variance: number }
+        | undefined,
+      logicalAnalysis: analysis.logicalAnalysis as
+        | {
+            score: number;
+            fallacies?: Array<{ name: string; severity: string; explanation: string }>;
+          }
+        | undefined,
+      compliance: analysis.compliance as
+        | { status: string; riskScore: number; summary: string }
+        | undefined,
     });
     downloadMarkdown(md, document.filename);
   }, [analysis, document, biases]);
@@ -455,13 +493,52 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       overallScore: analysis.overallScore,
       noiseScore: analysis.noiseScore,
       summary: analysis.summary,
-      biases: biases.map(b => ({ biasType: b.biasType, severity: b.severity, excerpt: b.excerpt, explanation: b.explanation, suggestion: b.suggestion })),
-      factCheck: analysis.factCheck as { score: number; verifications?: Array<{ claim: string; verdict: string; explanation: string }> } | undefined,
-      swotAnalysis: analysis.swotAnalysis as { strengths: string[]; weaknesses: string[]; opportunities: string[]; threats: string[]; strategicAdvice: string } | undefined,
-      simulation: analysis.simulation as { overallVerdict: string; twins?: Array<{ name: string; role: string; vote: string; confidence: number; rationale: string }> } | undefined,
-      noiseStats: analysis.noiseStats as { mean: number; stdDev: number; variance: number } | undefined,
-      logicalAnalysis: analysis.logicalAnalysis as { score: number; fallacies?: Array<{ name: string; severity: string; explanation: string }> } | undefined,
-      compliance: analysis.compliance as { status: string; riskScore: number; summary: string } | undefined,
+      biases: biases.map(b => ({
+        biasType: b.biasType,
+        severity: b.severity,
+        excerpt: b.excerpt,
+        explanation: b.explanation,
+        suggestion: b.suggestion,
+      })),
+      factCheck: analysis.factCheck as
+        | {
+            score: number;
+            verifications?: Array<{ claim: string; verdict: string; explanation: string }>;
+          }
+        | undefined,
+      swotAnalysis: analysis.swotAnalysis as
+        | {
+            strengths: string[];
+            weaknesses: string[];
+            opportunities: string[];
+            threats: string[];
+            strategicAdvice: string;
+          }
+        | undefined,
+      simulation: analysis.simulation as
+        | {
+            overallVerdict: string;
+            twins?: Array<{
+              name: string;
+              role: string;
+              vote: string;
+              confidence: number;
+              rationale: string;
+            }>;
+          }
+        | undefined,
+      noiseStats: analysis.noiseStats as
+        | { mean: number; stdDev: number; variance: number }
+        | undefined,
+      logicalAnalysis: analysis.logicalAnalysis as
+        | {
+            score: number;
+            fallacies?: Array<{ name: string; severity: string; explanation: string }>;
+          }
+        | undefined,
+      compliance: analysis.compliance as
+        | { status: string; riskScore: number; summary: string }
+        | undefined,
     });
     downloadJson(json, document.filename);
   }, [analysis, document, biases]);
@@ -603,8 +680,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         <div className="mb-xl">
           <ErrorBoundary sectionName="Bias Network">
             <div className="card">
-              <div className="card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                className="card-header"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              >
+                <h3
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
                   <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
                   Bias Network Map
                 </h3>
@@ -618,7 +706,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     ...b,
                     category: 'cognitive',
                   }))}
-                  onBiasClick={(biasType) => {
+                  onBiasClick={biasType => {
                     const bias = biases.find(b => b.biasType === biasType);
                     if (bias) setSelectedBias(bias);
                   }}
@@ -998,13 +1086,52 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         explanation: b.explanation,
                         suggestion: b.suggestion,
                       })),
-                      ...(analysis.noiseStats ? { noiseStats: analysis.noiseStats as { mean: number; stdDev: number; variance: number } } : {}),
-                      ...(analysis.factCheck ? { factCheck: analysis.factCheck as { score: number; flags: string[]; verifications?: Array<{ claim: string; verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE'; explanation: string }> } } : {}),
-                      ...(analysis.compliance ? { compliance: analysis.compliance as import('@/types').ComplianceResult } : {}),
-                      ...(analysis.logicalAnalysis ? { logicalAnalysis: analysis.logicalAnalysis as import('@/types').LogicalAnalysisResult } : {}),
-                      ...(analysis.swotAnalysis ? { swotAnalysis: analysis.swotAnalysis as import('@/types').SwotAnalysisResult } : {}),
-                      ...(analysis.simulation ? { simulation: analysis.simulation as import('@/types').SimulationResult } : {}),
-                      ...(analysis.cognitiveAnalysis ? { cognitiveAnalysis: analysis.cognitiveAnalysis as import('@/types').CognitiveAnalysisResult } : {}),
+                      ...(analysis.noiseStats
+                        ? {
+                            noiseStats: analysis.noiseStats as {
+                              mean: number;
+                              stdDev: number;
+                              variance: number;
+                            },
+                          }
+                        : {}),
+                      ...(analysis.factCheck
+                        ? {
+                            factCheck: analysis.factCheck as {
+                              score: number;
+                              flags: string[];
+                              verifications?: Array<{
+                                claim: string;
+                                verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE';
+                                explanation: string;
+                              }>;
+                            },
+                          }
+                        : {}),
+                      ...(analysis.compliance
+                        ? { compliance: analysis.compliance as import('@/types').ComplianceResult }
+                        : {}),
+                      ...(analysis.logicalAnalysis
+                        ? {
+                            logicalAnalysis:
+                              analysis.logicalAnalysis as import('@/types').LogicalAnalysisResult,
+                          }
+                        : {}),
+                      ...(analysis.swotAnalysis
+                        ? {
+                            swotAnalysis:
+                              analysis.swotAnalysis as import('@/types').SwotAnalysisResult,
+                          }
+                        : {}),
+                      ...(analysis.simulation
+                        ? { simulation: analysis.simulation as import('@/types').SimulationResult }
+                        : {}),
+                      ...(analysis.cognitiveAnalysis
+                        ? {
+                            cognitiveAnalysis:
+                              analysis.cognitiveAnalysis as import('@/types').CognitiveAnalysisResult,
+                          }
+                        : {}),
                     }}
                   />
                 </ErrorBoundary>

@@ -1,6 +1,5 @@
 'use client';
 
-
 interface GaugeProps {
   value: number;
   maxValue?: number;
@@ -113,4 +112,3 @@ export function ScoreCard({
     </div>
   );
 }
-

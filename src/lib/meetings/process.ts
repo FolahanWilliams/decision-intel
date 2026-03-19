@@ -70,7 +70,7 @@ export async function processMeeting(meetingId: string, userId: string): Promise
       meeting.fileName || 'recording.webm',
       meeting.fileType || 'audio/webm',
       meeting.participants,
-      async (progress) => {
+      async progress => {
         await updateStatus(meetingId, 'transcribing', progress);
       }
     );
@@ -92,13 +92,16 @@ export async function processMeeting(meetingId: string, userId: string): Promise
       where: { id: meetingId },
       data: {
         durationSeconds: Math.round(transcriptionResult.durationMs / 1000),
-        participants: transcriptionResult.speakers.length > 0
-          ? toPrismaStringArray(transcriptionResult.speakers.map(s => s.name))
-          : meeting.participants,
+        participants:
+          transcriptionResult.speakers.length > 0
+            ? toPrismaStringArray(transcriptionResult.speakers.map(s => s.name))
+            : meeting.participants,
       },
     });
 
-    log.info(`Transcript stored: ${transcriptionResult.segments.length} segments, ${transcriptionResult.speakers.length} speakers`);
+    log.info(
+      `Transcript stored: ${transcriptionResult.segments.length} segments, ${transcriptionResult.speakers.length} speakers`
+    );
 
     // Audit log
     logAudit({
@@ -181,21 +184,35 @@ export async function processMeeting(meetingId: string, userId: string): Promise
 
     // Validate and persist (same pattern as /api/human-decisions runCognitiveAudit)
     const validatedBiases = BiasFindings.safeParse(auditResult.biasFindings).success
-      ? auditResult.biasFindings : BiasFindings.parse([]);
+      ? auditResult.biasFindings
+      : BiasFindings.parse([]);
     const validatedNoiseStats = CognitiveAuditNoiseStats.safeParse(auditResult.noiseStats).success
-      ? auditResult.noiseStats : CognitiveAuditNoiseStats.parse({});
-    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail).success
-      ? auditResult.sentimentDetail : CognitiveAuditSentiment.parse({});
-    const validatedCompliance = auditResult.complianceResult && CognitiveAuditCompliance.safeParse(auditResult.complianceResult).success
-      ? auditResult.complianceResult : undefined;
-    const validatedPreMortem = auditResult.preMortem && CognitiveAuditPreMortem.safeParse(auditResult.preMortem).success
-      ? auditResult.preMortem : undefined;
-    const validatedLogicalAnalysis = auditResult.logicalAnalysis && CognitiveAuditLogicalAnalysis.safeParse(auditResult.logicalAnalysis).success
-      ? auditResult.logicalAnalysis : undefined;
-    const validatedSwot = auditResult.swotAnalysis && CognitiveAuditSwot.safeParse(auditResult.swotAnalysis).success
-      ? auditResult.swotAnalysis : undefined;
+      ? auditResult.noiseStats
+      : CognitiveAuditNoiseStats.parse({});
+    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail)
+      .success
+      ? auditResult.sentimentDetail
+      : CognitiveAuditSentiment.parse({});
+    const validatedCompliance =
+      auditResult.complianceResult &&
+      CognitiveAuditCompliance.safeParse(auditResult.complianceResult).success
+        ? auditResult.complianceResult
+        : undefined;
+    const validatedPreMortem =
+      auditResult.preMortem && CognitiveAuditPreMortem.safeParse(auditResult.preMortem).success
+        ? auditResult.preMortem
+        : undefined;
+    const validatedLogicalAnalysis =
+      auditResult.logicalAnalysis &&
+      CognitiveAuditLogicalAnalysis.safeParse(auditResult.logicalAnalysis).success
+        ? auditResult.logicalAnalysis
+        : undefined;
+    const validatedSwot =
+      auditResult.swotAnalysis && CognitiveAuditSwot.safeParse(auditResult.swotAnalysis).success
+        ? auditResult.swotAnalysis
+        : undefined;
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async tx => {
       await tx.cognitiveAudit.create({
         data: {
           humanDecisionId: humanDecision.id,
@@ -207,7 +224,9 @@ export async function processMeeting(meetingId: string, userId: string): Promise
           sentimentDetail: toPrismaJson(validatedSentiment),
           complianceResult: validatedCompliance ? toPrismaJson(validatedCompliance) : undefined,
           preMortem: validatedPreMortem ? toPrismaJson(validatedPreMortem) : undefined,
-          logicalAnalysis: validatedLogicalAnalysis ? toPrismaJson(validatedLogicalAnalysis) : undefined,
+          logicalAnalysis: validatedLogicalAnalysis
+            ? toPrismaJson(validatedLogicalAnalysis)
+            : undefined,
           swotAnalysis: validatedSwot ? toPrismaJson(validatedSwot) : undefined,
           teamConsensusFlag: auditResult.teamConsensusFlag,
           dissenterCount: auditResult.dissenterCount,
@@ -222,64 +241,79 @@ export async function processMeeting(meetingId: string, userId: string): Promise
     });
 
     // Embed for RAG
-    storeHumanDecisionEmbedding(humanDecision.id, decisionContent, userId, auditResult.summary)
-      .catch(err => log.error('Meeting embedding failed:', err));
+    storeHumanDecisionEmbedding(
+      humanDecision.id,
+      decisionContent,
+      userId,
+      auditResult.summary
+    ).catch(err => log.error('Meeting embedding failed:', err));
 
     // Generate nudges
     const nudges = generateNudges({ decision: input, auditResult });
     for (const nudge of nudges) {
-      await prisma.nudge.create({
-        data: {
-          humanDecisionId: humanDecision.id,
-          nudgeType: nudge.nudgeType,
-          triggerReason: nudge.triggerReason,
-          message: nudge.message,
-          severity: nudge.severity,
-          channel: nudge.channel,
-        },
-      }).catch(err => log.error('Failed to persist nudge:', err));
+      await prisma.nudge
+        .create({
+          data: {
+            humanDecisionId: humanDecision.id,
+            nudgeType: nudge.nudgeType,
+            triggerReason: nudge.triggerReason,
+            message: nudge.message,
+            severity: nudge.severity,
+            channel: nudge.channel,
+          },
+        })
+        .catch(err => log.error('Failed to persist nudge:', err));
     }
 
     // ── Step 6: Store meeting intelligence results ──────────────────
     const intelligence = await intelligencePromise;
     if (intelligence) {
-      await prisma.meeting.update({
-        where: { id: meetingId },
-        data: {
-          summary: intelligence.summary.executive,
-          actionItems: JSON.parse(JSON.stringify(intelligence.actionItems)),
-          keyDecisions: JSON.parse(JSON.stringify(intelligence.keyDecisions)),
-          speakerBiases: JSON.parse(JSON.stringify(intelligence.speakerBiases)),
-          similarMeetings: JSON.parse(JSON.stringify(intelligence.similarMeetings)),
-        },
-      }).catch(err => log.error('Failed to store meeting intelligence:', err));
+      await prisma.meeting
+        .update({
+          where: { id: meetingId },
+          data: {
+            summary: intelligence.summary.executive,
+            actionItems: JSON.parse(JSON.stringify(intelligence.actionItems)),
+            keyDecisions: JSON.parse(JSON.stringify(intelligence.keyDecisions)),
+            speakerBiases: JSON.parse(JSON.stringify(intelligence.speakerBiases)),
+            similarMeetings: JSON.parse(JSON.stringify(intelligence.similarMeetings)),
+          },
+        })
+        .catch(err => log.error('Failed to store meeting intelligence:', err));
 
-      log.info(`Intelligence stored: ${intelligence.actionItems.length} actions, ${intelligence.keyDecisions.length} decisions`);
+      log.info(
+        `Intelligence stored: ${intelligence.actionItems.length} actions, ${intelligence.keyDecisions.length} decisions`
+      );
     }
 
     // ── Done ──────────────────────────────────────────────────────────
     await updateStatus(meetingId, 'complete', 100);
-    log.info(`Meeting ${meetingId} fully processed: score=${auditResult.decisionQualityScore}, biases=${auditResult.biasFindings.length}`);
-
+    log.info(
+      `Meeting ${meetingId} fully processed: score=${auditResult.decisionQualityScore}, biases=${auditResult.biasFindings.length}`
+    );
   } catch (error) {
     log.error(`Meeting processing failed for ${meetingId}:`, error);
-    await prisma.meeting.update({
-      where: { id: meetingId },
-      data: {
-        status: 'error',
-        errorMessage: error instanceof Error ? error.message : String(error),
-      },
-    }).catch(() => {});
+    await prisma.meeting
+      .update({
+        where: { id: meetingId },
+        data: {
+          status: 'error',
+          errorMessage: error instanceof Error ? error.message : String(error),
+        },
+      })
+      .catch(() => {});
   }
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 async function updateStatus(meetingId: string, status: string, progress: number) {
-  await prisma.meeting.update({
-    where: { id: meetingId },
-    data: { status, transcriptionProgress: progress },
-  }).catch(() => {});
+  await prisma.meeting
+    .update({
+      where: { id: meetingId },
+      data: { status, transcriptionProgress: progress },
+    })
+    .catch(() => {});
 }
 
 function formatDuration(ms: number): string {

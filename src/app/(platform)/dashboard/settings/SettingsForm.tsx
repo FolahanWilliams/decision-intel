@@ -358,9 +358,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   <MessageSquare
                     size={20}
                     style={{
-                      color: slackStatus?.connected
-                        ? 'var(--success)'
-                        : 'var(--accent-primary)',
+                      color: slackStatus?.connected ? 'var(--success)' : 'var(--accent-primary)',
                     }}
                   />
                 </div>
@@ -374,8 +372,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                       {slackStatus.installedAt && (
                         <span className="text-muted">
                           {' '}
-                          &middot; since{' '}
-                          {new Date(slackStatus.installedAt).toLocaleDateString()}
+                          &middot; since {new Date(slackStatus.installedAt).toLocaleDateString()}
                         </span>
                       )}
                     </div>
@@ -455,9 +452,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           </div>
 
           <p className="text-xs text-muted" style={{ marginTop: 'var(--spacing-md)' }}>
-            When connected, Decision Intel monitors decision-related messages in your
-            channels and provides real-time cognitive bias nudges. All content is anonymized
-            before analysis.
+            When connected, Decision Intel monitors decision-related messages in your channels and
+            provides real-time cognitive bias nudges. All content is anonymized before analysis.
           </p>
         </div>
       </div>

@@ -81,7 +81,7 @@ export function CommandPalette() {
   // Build recent documents group
   const recentDocItems: CommandItem[] = useMemo(() => {
     if (!documents?.length) return [];
-    return documents.slice(0, 5).map((doc) => {
+    return documents.slice(0, 5).map(doc => {
       return {
         id: `doc-${doc.id}`,
         label: doc.filename,
@@ -89,7 +89,10 @@ export function CommandPalette() {
         icon: STATUS_ICONS[doc.status] || <FileText size={14} />,
         action: () => navigate(`/documents/${doc.id}`),
         keywords: [doc.filename.toLowerCase(), doc.status],
-        rightHint: doc.status === 'complete' && doc.score != null ? `${Math.round(doc.score)}/100` : undefined,
+        rightHint:
+          doc.status === 'complete' && doc.score != null
+            ? `${Math.round(doc.score)}/100`
+            : undefined,
       };
     });
   }, [documents, navigate]);
@@ -259,7 +262,7 @@ export function CommandPalette() {
       return (
         item.label.toLowerCase().includes(q) ||
         item.description?.toLowerCase().includes(q) ||
-        item.keywords?.some((k) => k.includes(q))
+        item.keywords?.some(k => k.includes(q))
       );
     };
 
@@ -289,7 +292,7 @@ export function CommandPalette() {
       }
     }
 
-    const flat = result.flatMap((g) => g.items);
+    const flat = result.flatMap(g => g.items);
     return { groups: result, flatItems: flat };
   }, [query, recentDocItems, navCommands, actionCommands]);
 
@@ -301,7 +304,7 @@ export function CommandPalette() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setOpen((prev) => {
+        setOpen(prev => {
           if (!prev) {
             setQuery('');
             setSelectedIndex(0);
@@ -312,7 +315,7 @@ export function CommandPalette() {
       // Ctrl+Shift+P as alternative
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'p') {
         e.preventDefault();
-        setOpen((prev) => {
+        setOpen(prev => {
           if (!prev) {
             setQuery('>');
             setSelectedIndex(0);
@@ -353,10 +356,10 @@ export function CommandPalette() {
     (e: React.KeyboardEvent) => {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setSelectedIndex((i) => Math.min(i + 1, flatItems.length - 1));
+        setSelectedIndex(i => Math.min(i + 1, flatItems.length - 1));
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setSelectedIndex((i) => Math.max(i - 1, 0));
+        setSelectedIndex(i => Math.max(i - 1, 0));
       } else if (e.key === 'Enter' && flatItems[clampedIndex]) {
         e.preventDefault();
         flatItems[clampedIndex].action();
@@ -415,7 +418,7 @@ export function CommandPalette() {
             </button>
           </div>
           <div style={{ padding: '8px 0' }}>
-            {SHORTCUTS.map((shortcut) => (
+            {SHORTCUTS.map(shortcut => (
               <div
                 key={shortcut.description}
                 className="flex items-center justify-between"
@@ -423,7 +426,7 @@ export function CommandPalette() {
               >
                 <span style={{ color: 'var(--text-secondary)' }}>{shortcut.description}</span>
                 <div className="flex items-center gap-1">
-                  {shortcut.keys.map((key) => (
+                  {shortcut.keys.map(key => (
                     <kbd
                       key={key}
                       style={{
@@ -490,7 +493,7 @@ export function CommandPalette() {
             type="text"
             placeholder="Search pages, actions, documents...  (> actions, / pages, @ docs)"
             value={query}
-            onChange={(e) => {
+            onChange={e => {
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
@@ -536,8 +539,8 @@ export function CommandPalette() {
               No results for &ldquo;{query}&rdquo;
             </div>
           ) : (
-            groups.map((group) => {
-              const groupItems = group.items.map((cmd) => {
+            groups.map(group => {
+              const groupItems = group.items.map(cmd => {
                 const idx = itemIndex++;
                 return (
                   <button

@@ -1,7 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, FileText, Info, Terminal, Lightbulb, BookOpen, Shield, GraduationCap } from 'lucide-react';
+import {
+  AlertTriangle,
+  FileText,
+  Info,
+  Terminal,
+  Lightbulb,
+  BookOpen,
+  Shield,
+  GraduationCap,
+} from 'lucide-react';
 import { BiasInstance } from '@/types';
 import { createClientLogger } from '@/lib/utils/logger';
 import { getBiasEducation, DIFFICULTY_COLORS } from '@/lib/constants/bias-education';
@@ -379,9 +388,15 @@ export function BiasDetailModal({
                     background: 'rgba(99, 102, 241, 0.03)',
                   }}
                 >
-                  <div className="flex items-center gap-sm" style={{ marginBottom: 'var(--spacing-md)' }}>
+                  <div
+                    className="flex items-center gap-sm"
+                    style={{ marginBottom: 'var(--spacing-md)' }}
+                  >
                     <GraduationCap size={14} style={{ color: 'var(--accent-primary)' }} />
-                    <h4 className="text-xs text-muted uppercase" style={{ letterSpacing: '0.05em' }}>
+                    <h4
+                      className="text-xs text-muted uppercase"
+                      style={{ letterSpacing: '0.05em' }}
+                    >
                       Learn &amp; Debias
                     </h4>
                     <span
@@ -419,7 +434,14 @@ export function BiasDetailModal({
                         </span>
                       )}
                     </div>
-                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                    <p
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.5,
+                        margin: 0,
+                      }}
+                    >
                       {edu.realWorldExample.description}
                     </p>
                   </div>
@@ -435,8 +457,17 @@ export function BiasDetailModal({
                           borderRadius: '6px',
                         }}
                       >
-                        <Shield size={12} style={{ color: 'var(--success)', flexShrink: 0, marginTop: '2px' }} />
-                        <span style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                        <Shield
+                          size={12}
+                          style={{ color: 'var(--success)', flexShrink: 0, marginTop: '2px' }}
+                        />
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            color: 'var(--text-secondary)',
+                            lineHeight: 1.4,
+                          }}
+                        >
                           {t}
                         </span>
                       </div>

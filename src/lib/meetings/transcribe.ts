@@ -19,11 +19,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { withRetry } from '@/lib/utils/resilience';
 import { parseJSON } from '@/lib/utils/json';
-import {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
 const log = createLogger('Transcription');
 
@@ -105,13 +101,16 @@ async function assemblyAITranscribe(
     body: JSON.stringify({
       audio_url: upload_url,
       speaker_labels: true,
-      speakers_expected: participantHints.length > 0 ? Math.min(participantHints.length, 10) : undefined,
+      speakers_expected:
+        participantHints.length > 0 ? Math.min(participantHints.length, 10) : undefined,
       language_detection: true,
     }),
   });
 
   if (!transcriptRes.ok) {
-    throw new Error(`AssemblyAI transcript creation failed (${transcriptRes.status}): ${await transcriptRes.text()}`);
+    throw new Error(
+      `AssemblyAI transcript creation failed (${transcriptRes.status}): ${await transcriptRes.text()}`
+    );
   }
 
   const { id: transcriptId } = await transcriptRes.json();
@@ -132,7 +131,7 @@ async function assemblyAITranscribe(
 
     if (!pollRes.ok) continue;
 
-    const data = await pollRes.json() as AssemblyAITranscript;
+    const data = (await pollRes.json()) as AssemblyAITranscript;
 
     if (data.status === 'completed') {
       transcriptData = data;
@@ -168,16 +167,15 @@ async function assemblyAITranscribe(
   // If we have more participant hints than speakers, try to match with Gemini
   if (participantHints.length > 0 && participantHints.length >= uniqueSpeakers.length) {
     try {
-      const enrichedMap = await matchSpeakersToNames(
-        utterances,
-        uniqueSpeakers,
-        participantHints
-      );
+      const enrichedMap = await matchSpeakersToNames(utterances, uniqueSpeakers, participantHints);
       for (const [label, name] of enrichedMap) {
         speakerMap.set(label, name);
       }
     } catch (e) {
-      log.warn('Speaker name matching failed, using defaults:', e instanceof Error ? e.message : String(e));
+      log.warn(
+        'Speaker name matching failed, using defaults:',
+        e instanceof Error ? e.message : String(e)
+      );
     }
   }
 
@@ -197,22 +195,20 @@ async function assemblyAITranscribe(
     speakerStats.set(seg.speaker, existing);
   }
 
-  const speakers: SpeakerInfo[] = Array.from(speakerStats.entries()).map(
-    ([name, stats], i) => ({
-      id: `speaker_${i + 1}`,
-      name,
-      speakTimeMs: stats.speakTimeMs,
-      wordCount: stats.wordCount,
-    })
-  );
+  const speakers: SpeakerInfo[] = Array.from(speakerStats.entries()).map(([name, stats], i) => ({
+    id: `speaker_${i + 1}`,
+    name,
+    speakTimeMs: stats.speakTimeMs,
+    wordCount: stats.wordCount,
+  }));
 
-  const fullText = segments
-    .map(seg => `[${seg.speaker}]: ${seg.text}`)
-    .join('\n');
+  const fullText = segments.map(seg => `[${seg.speaker}]: ${seg.text}`).join('\n');
 
   await onProgress?.(100);
 
-  log.info(`AssemblyAI transcription complete: ${speakers.length} speakers, ${segments.length} utterances, confidence=${(transcriptData.confidence ?? 0).toFixed(2)}`);
+  log.info(
+    `AssemblyAI transcription complete: ${speakers.length} speakers, ${segments.length} utterances, confidence=${(transcriptData.confidence ?? 0).toFixed(2)}`
+  );
 
   return {
     fullText,
@@ -220,7 +216,9 @@ async function assemblyAITranscribe(
     speakers,
     language: transcriptData.language_code || 'en',
     confidence: transcriptData.confidence ?? 0.9,
-    durationMs: transcriptData.audio_duration ? Math.round(transcriptData.audio_duration * 1000) : 0,
+    durationMs: transcriptData.audio_duration
+      ? Math.round(transcriptData.audio_duration * 1000)
+      : 0,
     provider: 'assemblyai',
   };
 }
@@ -268,9 +266,18 @@ async function matchSpeakersToNames(
     },
     safetySettings: [
       { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
     ],
   });
 
@@ -360,13 +367,11 @@ async function whisperTranscribe(
     text: data.text || '',
     language: data.language || 'en',
     duration: data.duration || 0,
-    segments: (data.segments || []).map(
-      (s: { start: number; end: number; text: string }) => ({
-        start: s.start,
-        end: s.end,
-        text: s.text?.trim() || '',
-      })
-    ),
+    segments: (data.segments || []).map((s: { start: number; end: number; text: string }) => ({
+      start: s.start,
+      end: s.end,
+      text: s.text?.trim() || '',
+    })),
   };
 }
 
@@ -386,10 +391,22 @@ async function diarizeSpeakersLLM(
         maxOutputTokens: 16384,
       },
       safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
       ],
     });
 
@@ -451,7 +468,10 @@ Return JSON:
       }));
     }
   } catch (e) {
-    log.warn('LLM diarization failed, falling back to single speaker:', e instanceof Error ? e.message : String(e));
+    log.warn(
+      'LLM diarization failed, falling back to single speaker:',
+      e instanceof Error ? e.message : String(e)
+    );
   }
 
   return segments.map(seg => ({
@@ -477,14 +497,25 @@ export async function transcribeMeeting(
   onProgress?: (progress: number) => Promise<void>
 ): Promise<TranscriptionResult> {
   const provider = getProvider();
-  log.info(`Starting transcription: ${fileName} (${(audioBuffer.length / 1024 / 1024).toFixed(1)}MB) via ${provider}`);
+  log.info(
+    `Starting transcription: ${fileName} (${(audioBuffer.length / 1024 / 1024).toFixed(1)}MB) via ${provider}`
+  );
 
   // ── AssemblyAI Path (preferred) ──────────────────────────────────
   if (provider === 'assemblyai') {
     try {
-      return await assemblyAITranscribe(audioBuffer, fileName, mimeType, participantHints, onProgress);
+      return await assemblyAITranscribe(
+        audioBuffer,
+        fileName,
+        mimeType,
+        participantHints,
+        onProgress
+      );
     } catch (e) {
-      log.error('AssemblyAI failed, falling back to Whisper:', e instanceof Error ? e.message : String(e));
+      log.error(
+        'AssemblyAI failed, falling back to Whisper:',
+        e instanceof Error ? e.message : String(e)
+      );
       // Fall through to Whisper
     }
   }
@@ -498,7 +529,9 @@ export async function transcribeMeeting(
     throw new Error('Transcription produced empty text — the audio may be silent or corrupt');
   }
 
-  log.info(`Whisper complete: ${whisperResult.segments.length} segments, ${whisperResult.duration.toFixed(0)}s, lang=${whisperResult.language}`);
+  log.info(
+    `Whisper complete: ${whisperResult.segments.length} segments, ${whisperResult.duration.toFixed(0)}s, lang=${whisperResult.language}`
+  );
 
   await onProgress?.(65);
   const diarizedSegments = await diarizeSpeakersLLM(whisperResult.segments, participantHints);
@@ -513,22 +546,20 @@ export async function transcribeMeeting(
     speakerStats.set(seg.speaker, existing);
   }
 
-  const speakers: SpeakerInfo[] = Array.from(speakerStats.entries()).map(
-    ([name, stats], i) => ({
-      id: `speaker_${i + 1}`,
-      name,
-      speakTimeMs: stats.speakTimeMs,
-      wordCount: stats.wordCount,
-    })
-  );
+  const speakers: SpeakerInfo[] = Array.from(speakerStats.entries()).map(([name, stats], i) => ({
+    id: `speaker_${i + 1}`,
+    name,
+    speakTimeMs: stats.speakTimeMs,
+    wordCount: stats.wordCount,
+  }));
 
-  const fullText = diarizedSegments
-    .map(seg => `[${seg.speaker}]: ${seg.text}`)
-    .join('\n');
+  const fullText = diarizedSegments.map(seg => `[${seg.speaker}]: ${seg.text}`).join('\n');
 
   await onProgress?.(100);
 
-  log.info(`Transcription complete (Whisper): ${speakers.length} speakers, ${diarizedSegments.length} segments`);
+  log.info(
+    `Transcription complete (Whisper): ${speakers.length} speakers, ${diarizedSegments.length} segments`
+  );
 
   return {
     fullText,

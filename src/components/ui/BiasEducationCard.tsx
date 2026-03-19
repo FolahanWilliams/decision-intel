@@ -1,7 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { BookOpen, ChevronDown, ChevronUp, GraduationCap, Lightbulb, Link2, Shield } from 'lucide-react';
+import {
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  GraduationCap,
+  Lightbulb,
+  Link2,
+  Shield,
+} from 'lucide-react';
 import { BIAS_CATEGORIES, type BiasCategory } from '@/types';
 import { BIAS_EDUCATION, DIFFICULTY_COLORS } from '@/lib/constants/bias-education';
 
@@ -32,9 +40,7 @@ export function BiasEducationCard({
     <div
       className="card"
       style={{
-        border: detected
-          ? '1px solid rgba(99, 102, 241, 0.3)'
-          : '1px solid var(--border-color)',
+        border: detected ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid var(--border-color)',
         background: detected ? 'rgba(99, 102, 241, 0.03)' : 'var(--bg-secondary)',
         transition: 'all 0.2s ease',
       }}
@@ -124,7 +130,15 @@ export function BiasEducationCard({
           <div style={{ marginTop: 'var(--spacing-md)' }}>
             <div className="flex items-center gap-sm" style={{ marginBottom: '8px' }}>
               <BookOpen size={14} style={{ color: 'var(--accent-primary)' }} />
-              <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  color: 'var(--text-muted)',
+                  letterSpacing: '0.05em',
+                }}
+              >
                 Real-World Example
               </span>
             </div>
@@ -139,12 +153,26 @@ export function BiasEducationCard({
               <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '4px' }}>
                 {education.realWorldExample.title}
                 {education.realWorldExample.year && (
-                  <span style={{ color: 'var(--text-muted)', fontWeight: 400, marginLeft: '8px', fontSize: '11px' }}>
+                  <span
+                    style={{
+                      color: 'var(--text-muted)',
+                      fontWeight: 400,
+                      marginLeft: '8px',
+                      fontSize: '11px',
+                    }}
+                  >
                     {education.realWorldExample.company} · {education.realWorldExample.year}
                   </span>
                 )}
               </div>
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+              <p
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                  margin: 0,
+                }}
+              >
                 {education.realWorldExample.description}
               </p>
             </div>
@@ -154,7 +182,15 @@ export function BiasEducationCard({
           <div style={{ marginTop: 'var(--spacing-md)' }}>
             <div className="flex items-center gap-sm" style={{ marginBottom: '8px' }}>
               <Shield size={14} style={{ color: 'var(--success)' }} />
-              <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  color: 'var(--text-muted)',
+                  letterSpacing: '0.05em',
+                }}
+              >
                 Debiasing Techniques
               </span>
             </div>
@@ -200,7 +236,15 @@ export function BiasEducationCard({
           <div style={{ marginTop: 'var(--spacing-md)' }}>
             <div className="flex items-center gap-sm" style={{ marginBottom: '8px' }}>
               <Link2 size={14} style={{ color: 'var(--warning)' }} />
-              <span style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  color: 'var(--text-muted)',
+                  letterSpacing: '0.05em',
+                }}
+              >
                 Related Biases
               </span>
             </div>
@@ -211,7 +255,7 @@ export function BiasEducationCard({
                 return (
                   <button
                     key={key}
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       onBiasClick?.(key);
                     }}
@@ -246,7 +290,9 @@ export function BiasEducationCard({
             }}
           >
             <div className="flex items-center gap-sm">
-              <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Difficulty to counteract:</span>
+              <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                Difficulty to counteract:
+              </span>
               <span
                 style={{
                   fontSize: '10px',

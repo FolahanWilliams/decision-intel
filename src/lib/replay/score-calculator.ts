@@ -52,7 +52,9 @@ export function calculateCounterfactualScore(
 
     adjustedScore += recoveredPoints;
     if (recoveredPoints > 0) {
-      reasons.push(`Removing ${overrides.removeBiases.length} bias${overrides.removeBiases.length > 1 ? 'es' : ''} recovers ~${recoveredPoints} points`);
+      reasons.push(
+        `Removing ${overrides.removeBiases.length} bias${overrides.removeBiases.length > 1 ? 'es' : ''} recovers ~${recoveredPoints} points`
+      );
     }
   }
 
@@ -97,18 +99,20 @@ export function calculateCounterfactualScore(
     }
     adjustedScore += fallacyRecovery;
     if (fallacyRecovery > 0) {
-      reasons.push(`Removing ${overrides.removeFallacies.length} fallacy recovers ~${fallacyRecovery} points`);
+      reasons.push(
+        `Removing ${overrides.removeFallacies.length} fallacy recovers ~${fallacyRecovery} points`
+      );
     }
   }
 
   // 5. Flip boardroom votes
   if (overrides.flipVotes && analysis.simulation?.twins) {
-    const originalApprovals = analysis.simulation.twins.filter((t) => t.vote === 'APPROVE').length;
-    const modifiedTwins = analysis.simulation.twins.map((t) => ({
+    const originalApprovals = analysis.simulation.twins.filter(t => t.vote === 'APPROVE').length;
+    const modifiedTwins = analysis.simulation.twins.map(t => ({
       ...t,
       vote: overrides.flipVotes![t.name] || t.vote,
     }));
-    const newApprovals = modifiedTwins.filter((t) => t.vote === 'APPROVE').length;
+    const newApprovals = modifiedTwins.filter(t => t.vote === 'APPROVE').length;
     const approvalDelta = newApprovals - originalApprovals;
     const voteImpact = Math.round(approvalDelta * 4);
     adjustedScore += voteImpact;
@@ -126,9 +130,7 @@ export function calculateCounterfactualScore(
   const delta = adjustedScore - original;
 
   const explanation =
-    reasons.length > 0
-      ? reasons.join('. ') + '.'
-      : 'No changes applied — score remains the same.';
+    reasons.length > 0 ? reasons.join('. ') + '.' : 'No changes applied — score remains the same.';
 
   return { projectedScore: adjustedScore, delta, explanation };
 }
@@ -157,7 +159,9 @@ export function decomposeAnalysis(analysis: AnalysisResult): ReplayStep[] {
     status: 'complete',
     findings: [
       analysis.structuredContent ? 'Structured content extracted' : 'Raw content processed',
-      analysis.speakers?.length ? `${analysis.speakers.length} speakers identified` : 'Single-author document',
+      analysis.speakers?.length
+        ? `${analysis.speakers.length} speakers identified`
+        : 'Single-author document',
     ],
     scoreDelta: 0,
     counterfactualSupported: false,
@@ -176,7 +180,7 @@ export function decomposeAnalysis(analysis: AnalysisResult): ReplayStep[] {
     status: 'complete',
     findings: [
       `${biasCount} bias${biasCount !== 1 ? 'es' : ''} detected`,
-      ...analysis.biases.slice(0, 3).map((b) => `${b.biasType} (${b.severity})`),
+      ...analysis.biases.slice(0, 3).map(b => `${b.biasType} (${b.severity})`),
       biasCount > 3 ? `...and ${biasCount - 3} more` : '',
     ].filter(Boolean),
     scoreDelta: -biasPenalty,
@@ -201,9 +205,7 @@ export function decomposeAnalysis(analysis: AnalysisResult): ReplayStep[] {
   });
 
   // Step 4: Fact Check
-  const factPenalty = analysis.factCheck
-    ? Math.round((100 - analysis.factCheck.score) * 0.2)
-    : 0;
+  const factPenalty = analysis.factCheck ? Math.round((100 - analysis.factCheck.score) * 0.2) : 0;
   steps.push({
     id: 'fact-check',
     label: 'Fact & Compliance Check',
@@ -232,7 +234,9 @@ export function decomposeAnalysis(analysis: AnalysisResult): ReplayStep[] {
     description: 'Sentiment, logical analysis, SWOT, and cognitive blind spot detection',
     status: 'complete',
     findings: [
-      analysis.sentiment ? `Sentiment: ${analysis.sentiment.label} (${analysis.sentiment.score})` : 'Sentiment: N/A',
+      analysis.sentiment
+        ? `Sentiment: ${analysis.sentiment.label} (${analysis.sentiment.score})`
+        : 'Sentiment: N/A',
       analysis.logicalAnalysis
         ? `Logic score: ${analysis.logicalAnalysis.score}/100 · ${analysis.logicalAnalysis.fallacies.length} fallacies`
         : 'Logic: N/A',
@@ -253,9 +257,9 @@ export function decomposeAnalysis(analysis: AnalysisResult): ReplayStep[] {
     findings: analysis.simulation
       ? [
           `Verdict: ${analysis.simulation.overallVerdict}`,
-          ...analysis.simulation.twins.slice(0, 3).map(
-            (t) => `${t.name}: ${t.vote} (${t.confidence}% confident)`
-          ),
+          ...analysis.simulation.twins
+            .slice(0, 3)
+            .map(t => `${t.name}: ${t.vote} (${t.confidence}% confident)`),
         ]
       : ['Boardroom simulation not available'],
     scoreDelta: 0,

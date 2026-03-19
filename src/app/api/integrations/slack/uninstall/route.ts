@@ -96,7 +96,10 @@ async function handleUserInitiated(rawBody: string): Promise<NextResponse> {
     }
 
     if (installation.installedByUserId !== user.id && installation.orgId !== user.id) {
-      return NextResponse.json({ error: 'Not authorized to disconnect this workspace' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Not authorized to disconnect this workspace' },
+        { status: 403 }
+      );
     }
 
     await revokeInstallation(teamId, 'user');

@@ -60,9 +60,10 @@ export default function ChatPage() {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const { showToast } = useToast();
 
-  const { messages, isStreaming, error, suggestions, sendMessage, clearMessages, loadMessages } = useChatStream({
-    pinnedDocumentId: pinnedDocId || undefined,
-  });
+  const { messages, isStreaming, error, suggestions, sendMessage, clearMessages, loadMessages } =
+    useChatStream({
+      pinnedDocumentId: pinnedDocId || undefined,
+    });
   const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -74,7 +75,9 @@ export default function ChatPage() {
     try {
       const saved = localStorage.getItem('decision-intel-chat-bookmarks');
       if (saved) setBookmarks(new Set(JSON.parse(saved)));
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   // Auto-save current conversation whenever messages change
@@ -177,16 +180,23 @@ export default function ChatPage() {
       const next = new Set(prev);
       if (next.has(messageId)) next.delete(messageId);
       else next.add(messageId);
-      try { localStorage.setItem('decision-intel-chat-bookmarks', JSON.stringify([...next])); } catch { /* ignore */ }
+      try {
+        localStorage.setItem('decision-intel-chat-bookmarks', JSON.stringify([...next]));
+      } catch {
+        /* ignore */
+      }
       return next;
     });
   }, []);
 
-  const handleSuggestionSelect = useCallback(async (question: string) => {
-    setInput('');
-    await sendMessage(question);
-    inputRef.current?.focus();
-  }, [sendMessage]);
+  const handleSuggestionSelect = useCallback(
+    async (question: string) => {
+      setInput('');
+      await sendMessage(question);
+      inputRef.current?.focus();
+    },
+    [sendMessage]
+  );
 
   const handleSubmit = useCallback(async () => {
     const text = input.trim();
@@ -530,10 +540,7 @@ export default function ChatPage() {
         }}
       >
         {messages.length === 0 ? (
-          <ChatEmptyState
-            documents={documents}
-            onSuggestQuestion={handleSuggestionSelect}
-          />
+          <ChatEmptyState documents={documents} onSuggestQuestion={handleSuggestionSelect} />
         ) : (
           <div className="flex flex-col gap-md">
             {messages.map((msg, idx) => (
@@ -542,15 +549,23 @@ export default function ChatPage() {
                   message={msg}
                   isBookmarked={bookmarks.has(msg.id)}
                   onToggleBookmark={toggleBookmark}
-                  onRetry={msg.role === 'assistant' && idx > 0 ? () => {
-                    const prevUser = messages.slice(0, idx).reverse().find(m => m.role === 'user');
-                    if (prevUser) sendMessage(prevUser.content);
-                  } : undefined}
+                  onRetry={
+                    msg.role === 'assistant' && idx > 0
+                      ? () => {
+                          const prevUser = messages
+                            .slice(0, idx)
+                            .reverse()
+                            .find(m => m.role === 'user');
+                          if (prevUser) sendMessage(prevUser.content);
+                        }
+                      : undefined
+                  }
                 />
                 {/* Source attribution for assistant messages */}
-                {msg.role === 'assistant' && !msg.isStreaming && msg.sources && msg.sources.length > 0 && (
-                  <SourceAttribution sources={msg.sources} />
-                )}
+                {msg.role === 'assistant' &&
+                  !msg.isStreaming &&
+                  msg.sources &&
+                  msg.sources.length > 0 && <SourceAttribution sources={msg.sources} />}
               </div>
             ))}
             {/* Follow-up suggestions */}

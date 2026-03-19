@@ -22,30 +22,43 @@ import { processMeeting } from '@/lib/meetings/process';
 const log = createLogger('MeetingUpload');
 
 const ALLOWED_AUDIO_TYPES = [
-  'audio/mpeg',       // .mp3
-  'audio/mp4',        // .m4a
-  'audio/wav',        // .wav
+  'audio/mpeg', // .mp3
+  'audio/mp4', // .m4a
+  'audio/wav', // .wav
   'audio/x-wav',
-  'audio/webm',       // .webm audio
-  'audio/ogg',        // .ogg
-  'audio/flac',       // .flac
+  'audio/webm', // .webm audio
+  'audio/ogg', // .ogg
+  'audio/flac', // .flac
 ];
 
 const ALLOWED_VIDEO_TYPES = [
-  'video/mp4',        // .mp4
-  'video/webm',       // .webm video
-  'video/quicktime',  // .mov
-  'video/x-msvideo',  // .avi
+  'video/mp4', // .mp4
+  'video/webm', // .webm video
+  'video/quicktime', // .mov
+  'video/x-msvideo', // .avi
 ];
 
 const ALLOWED_TYPES = [...ALLOWED_AUDIO_TYPES, ...ALLOWED_VIDEO_TYPES];
 
 const ALLOWED_EXTENSIONS = [
-  '.mp3', '.m4a', '.wav', '.webm', '.ogg', '.flac',
-  '.mp4', '.mov', '.avi',
+  '.mp3',
+  '.m4a',
+  '.wav',
+  '.webm',
+  '.ogg',
+  '.flac',
+  '.mp4',
+  '.mov',
+  '.avi',
 ];
 
-const MEETING_TYPES = ['board', 'incident_response', 'vendor_review', 'strategic_planning', 'general'];
+const MEETING_TYPES = [
+  'board',
+  'incident_response',
+  'vendor_review',
+  'strategic_planning',
+  'general',
+];
 
 // 500MB max file size for recordings
 const MAX_FILE_SIZE = 500 * 1024 * 1024;
@@ -53,7 +66,9 @@ const MAX_FILE_SIZE = 500 * 1024 * 1024;
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -116,7 +131,10 @@ export async function POST(request: NextRequest) {
     }
 
     const participants = participantsRaw
-      ? participantsRaw.split(',').map(p => p.trim()).filter(Boolean)
+      ? participantsRaw
+          .split(',')
+          .map(p => p.trim())
+          .filter(Boolean)
       : [];
 
     // Create meeting record

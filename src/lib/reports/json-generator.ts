@@ -67,7 +67,7 @@ export function generateJsonReport(data: JsonReportData): string {
       complianceRiskScore: data.compliance?.riskScore,
     },
     summary: data.summary,
-    biases: data.biases?.map((b) => ({
+    biases: data.biases?.map(b => ({
       type: b.biasType,
       severity: b.severity,
       excerpt: b.excerpt,
@@ -77,7 +77,7 @@ export function generateJsonReport(data: JsonReportData): string {
     factCheck: data.factCheck
       ? {
           score: data.factCheck.score,
-          verifications: data.factCheck.verifications?.map((v) => ({
+          verifications: data.factCheck.verifications?.map(v => ({
             claim: v.claim,
             verdict: v.verdict,
             explanation: v.explanation,
@@ -88,7 +88,7 @@ export function generateJsonReport(data: JsonReportData): string {
     boardroomSimulation: data.simulation
       ? {
           verdict: data.simulation.overallVerdict,
-          personas: data.simulation.twins?.map((t) => ({
+          personas: data.simulation.twins?.map(t => ({
             name: t.name,
             role: t.role,
             vote: t.vote,

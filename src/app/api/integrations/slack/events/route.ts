@@ -96,9 +96,8 @@ export async function POST(req: NextRequest) {
       }
 
       // Use installation context or fall back to legacy env vars
-      const userId = installation?.installedByUserId
-        || process.env.SLACK_SYSTEM_USER_ID
-        || 'system-slack';
+      const userId =
+        installation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || 'system-slack';
       const orgId = installation?.orgId || teamId;
 
       const humanDecision = await prisma.humanDecision.create({
@@ -219,17 +218,23 @@ async function processSlackDecision(
         });
 
       // Deliver critical/warning nudges back to the Slack thread
-      if (nudgeRecord && (nudge.severity === 'critical' || nudge.severity === 'warning') && sourceRef) {
+      if (
+        nudgeRecord &&
+        (nudge.severity === 'critical' || nudge.severity === 'warning') &&
+        sourceRef
+      ) {
         const [channel, threadTs] = sourceRef.split(':');
         if (channel) {
           const slackPayload = formatNudgeForSlack(nudge, threadTs);
           slackPayload.channel = channel;
           const delivered = await deliverSlackNudge(slackPayload, teamId);
           if (delivered) {
-            await prisma.nudge.update({
-              where: { id: nudgeRecord.id },
-              data: { deliveredAt: new Date() },
-            }).catch(() => {});
+            await prisma.nudge
+              .update({
+                where: { id: nudgeRecord.id },
+                data: { deliveredAt: new Date() },
+              })
+              .catch(() => {});
           }
         }
       }

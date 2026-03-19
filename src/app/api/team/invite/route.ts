@@ -58,7 +58,10 @@ export async function POST(req: NextRequest) {
       where: { orgId: membership.orgId, email, status: 'pending' },
     });
     if (existingInvite) {
-      return NextResponse.json({ error: 'An invite is already pending for this email' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'An invite is already pending for this email' },
+        { status: 409 }
+      );
     }
 
     // Limit team size
@@ -85,7 +88,9 @@ export async function POST(req: NextRequest) {
       .then(({ notifyTeamInvite }) =>
         notifyTeamInvite(
           email,
-          (user.user_metadata as Record<string, string> | undefined)?.full_name || user.email || 'A teammate',
+          (user.user_metadata as Record<string, string> | undefined)?.full_name ||
+            user.email ||
+            'A teammate',
           org?.name || 'a team',
           invite.token
         )

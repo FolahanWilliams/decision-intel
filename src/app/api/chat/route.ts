@@ -242,7 +242,9 @@ export async function POST(request: NextRequest) {
               const parsed = JSON.parse(match[0]);
               if (Array.isArray(parsed) && parsed.length > 0) {
                 controller.enqueue(
-                  encoder.encode(formatSSE({ type: 'suggestions', suggestions: parsed.slice(0, 3) }))
+                  encoder.encode(
+                    formatSSE({ type: 'suggestions', suggestions: parsed.slice(0, 3) })
+                  )
                 );
               }
             }

@@ -138,7 +138,7 @@ export function ShareModal({
           maxHeight: '85vh',
           overflowY: 'auto',
         }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div
@@ -147,7 +147,9 @@ export function ShareModal({
         >
           <div>
             <h3 style={{ fontSize: '15px', fontWeight: 600 }}>Share & Export</h3>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>{documentName}</p>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
+              {documentName}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -172,7 +174,7 @@ export function ShareModal({
             padding: '0 var(--spacing-lg)',
           }}
         >
-          {(['export', 'share'] as const).map((tab) => (
+          {(['export', 'share'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -181,7 +183,8 @@ export function ShareModal({
                 fontSize: '13px',
                 fontWeight: activeTab === tab ? 600 : 400,
                 color: activeTab === tab ? 'var(--accent-primary)' : 'var(--text-muted)',
-                borderBottom: activeTab === tab ? '2px solid var(--accent-primary)' : '2px solid transparent',
+                borderBottom:
+                  activeTab === tab ? '2px solid var(--accent-primary)' : '2px solid transparent',
                 background: 'transparent',
                 border: 'none',
                 borderBottomWidth: '2px',
@@ -221,7 +224,9 @@ export function ShareModal({
                   <FileText size={24} style={{ color: 'var(--error)' }} />
                 )}
                 <span style={{ fontSize: '13px', fontWeight: 500 }}>PDF Report</span>
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Full formatted report</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                  Full formatted report
+                </span>
               </button>
 
               <button
@@ -245,7 +250,9 @@ export function ShareModal({
               >
                 <FileSpreadsheet size={24} style={{ color: 'var(--success)' }} />
                 <span style={{ fontSize: '13px', fontWeight: 500 }}>CSV Data</span>
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Spreadsheet format</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                  Spreadsheet format
+                </span>
               </button>
 
               <button
@@ -269,7 +276,9 @@ export function ShareModal({
               >
                 <Download size={24} style={{ color: 'var(--accent-primary)' }} />
                 <span style={{ fontSize: '13px', fontWeight: 500 }}>Markdown</span>
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Documentation format</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                  Documentation format
+                </span>
               </button>
 
               <button
@@ -293,7 +302,9 @@ export function ShareModal({
               >
                 <FileJson size={24} style={{ color: 'var(--warning)' }} />
                 <span style={{ fontSize: '13px', fontWeight: 500 }}>JSON</span>
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Structured data</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                  Structured data
+                </span>
               </button>
             </div>
           )}
@@ -305,12 +316,16 @@ export function ShareModal({
               {analysisId && (
                 <div>
                   <button
-                    onClick={shareUrl ? async () => {
-                      await navigator.clipboard.writeText(shareUrl);
-                      setLinkCopied(true);
-                      setTimeout(() => setLinkCopied(false), 2000);
-                      showToast('Link copied!', 'success');
-                    } : handleCreateShareLink}
+                    onClick={
+                      shareUrl
+                        ? async () => {
+                            await navigator.clipboard.writeText(shareUrl);
+                            setLinkCopied(true);
+                            setTimeout(() => setLinkCopied(false), 2000);
+                            showToast('Link copied!', 'success');
+                          }
+                        : handleCreateShareLink
+                    }
                     disabled={creatingLink}
                     style={{
                       display: 'flex',
@@ -318,7 +333,9 @@ export function ShareModal({
                       gap: '12px',
                       padding: '12px 16px',
                       background: shareUrl ? 'rgba(99, 102, 241, 0.08)' : 'var(--bg-primary)',
-                      border: shareUrl ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid var(--border-color)',
+                      border: shareUrl
+                        ? '1px solid rgba(99, 102, 241, 0.3)'
+                        : '1px solid var(--border-color)',
                       borderRadius: '8px',
                       cursor: 'pointer',
                       color: 'var(--text-primary)',
@@ -328,7 +345,11 @@ export function ShareModal({
                     }}
                   >
                     {creatingLink ? (
-                      <Loader2 size={18} className="animate-spin" style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                      <Loader2
+                        size={18}
+                        className="animate-spin"
+                        style={{ color: 'var(--accent-primary)', flexShrink: 0 }}
+                      />
                     ) : linkCopied ? (
                       <Check size={18} style={{ color: 'var(--success)', flexShrink: 0 }} />
                     ) : (
@@ -336,21 +357,29 @@ export function ShareModal({
                     )}
                     <div>
                       <div style={{ fontWeight: 500 }}>
-                        {shareUrl ? (linkCopied ? 'Link copied!' : 'Copy share link') : 'Create shareable link'}
+                        {shareUrl
+                          ? linkCopied
+                            ? 'Link copied!'
+                            : 'Copy share link'
+                          : 'Create shareable link'}
                       </div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                        {shareUrl ? 'Anyone with this link can view the analysis' : 'Generates a public read-only link (7 day expiry)'}
+                        {shareUrl
+                          ? 'Anyone with this link can view the analysis'
+                          : 'Generates a public read-only link (7 day expiry)'}
                       </div>
                     </div>
                   </button>
                   {shareUrl && (
-                    <div style={{
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
-                      padding: '6px 16px',
-                      wordBreak: 'break-all',
-                      fontFamily: 'monospace',
-                    }}>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                        padding: '6px 16px',
+                        wordBreak: 'break-all',
+                        fontFamily: 'monospace',
+                      }}
+                    >
                       {shareUrl}
                     </div>
                   )}
