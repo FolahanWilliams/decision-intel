@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
         // Gather stats for this user
         const [documents, nudges, biasInstances] = await Promise.all([
           prisma.document.findMany({
-            where: { userId: settings.userId, status: 'analyzed', updatedAt: { gte: oneWeekAgo } },
+            where: { userId: settings.userId, status: 'complete', updatedAt: { gte: oneWeekAgo } },
             include: { analyses: { take: 1, orderBy: { createdAt: 'desc' }, select: { overallScore: true } } },
           }),
           prisma.nudge.count({

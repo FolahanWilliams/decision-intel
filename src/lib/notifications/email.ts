@@ -23,6 +23,16 @@ interface EmailPayload {
   text?: string;
 }
 
+/** Escape HTML entities to prevent XSS in email templates */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 async function sendEmail(payload: EmailPayload): Promise<boolean> {
   if (!RESEND_API_KEY) {
     log.info(`[DRY RUN] Email to ${payload.to}: ${payload.subject}`);
@@ -100,6 +110,7 @@ export async function notifyAnalysisComplete(
   const scoreColor = score >= 70 ? '#22c55e' : score >= 40 ? '#eab308' : '#ef4444';
   const scoreLabel = score >= 70 ? 'Good' : score >= 40 ? 'Moderate Risk' : 'High Risk';
 
+  const safeName = escapeHtml(documentName);
   const subject = `Analysis Complete: ${documentName} (${Math.round(score)}/100)`;
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto;">
@@ -109,7 +120,7 @@ export async function notifyAnalysisComplete(
 
         <div style="background: #1a1a2e; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
           <div style="font-size: 14px; color: #94a3b8; margin-bottom: 4px;">Document</div>
-          <div style="font-weight: 600; color: #fff;">${documentName}</div>
+          <div style="font-weight: 600; color: #fff;">${safeName}</div>
         </div>
 
         <div style="background: #1a1a2e; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
@@ -153,7 +164,7 @@ export async function sendWeeklyDigest(
 
   const subject = `Your Weekly Decision Intel Digest`;
   const biasHtml = stats.topBiases.length > 0
-    ? stats.topBiases.map(b => `<li style="color: #e2e8f0;">${b}</li>`).join('')
+    ? stats.topBiases.map(b => `<li style="color: #e2e8f0;">${escapeHtml(b)}</li>`).join('')
     : '<li style="color: #94a3b8;">No biases detected this week</li>';
 
   const html = `
@@ -209,6 +220,8 @@ export async function notifyTeamInvite(
   orgName: string,
   inviteToken: string
 ) {
+  const safeInviter = escapeHtml(inviterName);
+  const safeOrg = escapeHtml(orgName);
   const subject = `You've been invited to join ${orgName} on Decision Intel`;
   const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/invite/${inviteToken}`;
 
@@ -217,7 +230,7 @@ export async function notifyTeamInvite(
       <div style="background: #0f0f23; padding: 24px; border-radius: 12px; color: #e2e8f0;">
         <h2 style="margin: 0 0 16px; color: #fff;">Team Invitation</h2>
         <p style="color: #94a3b8; margin: 0 0 20px;">
-          <strong>${inviterName}</strong> has invited you to join <strong>${orgName}</strong> on Decision Intel.
+          <strong>${safeInviter}</strong> has invited you to join <strong>${safeOrg}</strong> on Decision Intel.
         </p>
 
         <a href="${acceptUrl}"
@@ -272,7 +285,7 @@ export async function deliverEmailNudge(
           ${severity.toUpperCase()}
         </div>
         <h2 style="margin: 0 0 12px; color: #fff;">Cognitive Bias Alert</h2>
-        <p style="color: #e2e8f0; line-height: 1.6; margin: 0 0 20px;">${nudgeMessage}</p>
+        <p style="color: #e2e8f0; line-height: 1.6; margin: 0 0 20px;">${escapeHtml(nudgeMessage)}</p>
 
         <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard/nudges"
            style="display: inline-block; padding: 10px 20px; background: #6366f1; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">

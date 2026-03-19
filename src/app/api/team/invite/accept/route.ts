@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
           orgId: invite.orgId,
           userId: user.id,
           email: user.email || invite.email,
-          displayName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Member',
+          displayName: (user.user_metadata as Record<string, string> | undefined)?.full_name || user.email?.split('@')[0] || 'Member',
           role: invite.role,
         },
       }),

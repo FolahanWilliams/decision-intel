@@ -137,7 +137,7 @@ export async function GET(req: NextRequest) {
     prisma.shareLink.update({
       where: { id: link.id },
       data: { viewCount: { increment: 1 }, lastViewedAt: new Date() },
-    }).catch(() => {});
+    }).catch((err) => log.warn('View count update failed:', err));
 
     return NextResponse.json({
       analysis: {

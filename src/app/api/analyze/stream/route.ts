@@ -404,22 +404,24 @@ export async function POST(request: NextRequest) {
           });
 
           // Send email notification (fire and forget)
-          import('@/lib/notifications/email')
-            .then(({ notifyAnalysisComplete }) =>
-              notifyAnalysisComplete(
-                userId,
-                user?.email || '',
-                doc.filename,
-                (report.overallScore as number) || 0,
-                documentId
+          if (user?.email) {
+            import('@/lib/notifications/email')
+              .then(({ notifyAnalysisComplete }) =>
+                notifyAnalysisComplete(
+                  userId,
+                  user.email!,
+                  doc.filename,
+                  (report.overallScore as number) || 0,
+                  documentId
+                )
               )
-            )
-            .catch((err: unknown) => {
-              log.warn(
-                'Email notification failed (non-critical): ' +
-                  (err instanceof Error ? err.message : String(err))
-              );
-            });
+              .catch((err: unknown) => {
+                log.warn(
+                  'Email notification failed (non-critical): ' +
+                    (err instanceof Error ? err.message : String(err))
+                );
+              });
+          }
 
           // Send final complete
           sendUpdate({ type: 'complete', progress: 100, result: result.finalReport });

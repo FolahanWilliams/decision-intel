@@ -34,6 +34,15 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Public routes that don't require authentication
+  const isPublicRoute =
+    request.nextUrl.pathname.startsWith('/shared/') ||
+    request.nextUrl.pathname.startsWith('/invite/');
+
+  if (isPublicRoute) {
+    return supabaseResponse;
+  }
+
   const isProtectedRoute =
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/documents') ||

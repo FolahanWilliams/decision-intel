@@ -26,6 +26,7 @@ model Document {
   embeddings  DecisionEmbedding[]
 
   @@index([userId])
+  @@index([orgId])     // For org-scoped document queries
   @@index([updatedAt]) // For sorting by recent
   @@index([contentHash]) // For cache lookups
 }

@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
           orgId: newOrg.id,
           userId: user.id,
           email: user.email || '',
-          displayName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Owner',
+          displayName: (user.user_metadata as Record<string, string> | undefined)?.full_name || user.email?.split('@')[0] || 'Owner',
           role: 'owner',
         },
       });
