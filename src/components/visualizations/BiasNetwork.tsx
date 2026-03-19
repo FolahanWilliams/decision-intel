@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -283,8 +283,20 @@ function SeverityDonut({
 export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasNetworkProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('network');
-  const [severityFilter, setSeverityFilter] = useState<SeverityFilter>('all');
+  const [viewMode, setViewModeRaw] = useState<ViewMode>('network');
+  const [severityFilter, setSeverityFilterRaw] = useState<SeverityFilter>('all');
+
+  // Wrap setters to reset selection when filter/view changes
+  const setViewMode = useCallback((mode: ViewMode) => {
+    setViewModeRaw(mode);
+    setSelectedNodeId(null);
+    setHoveredNodeId(null);
+  }, []);
+  const setSeverityFilter = useCallback((filter: SeverityFilter) => {
+    setSeverityFilterRaw(filter);
+    setSelectedNodeId(null);
+    setHoveredNodeId(null);
+  }, []);
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Filter biases by severity
@@ -397,11 +409,6 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
     [onBiasClick]
   );
 
-  // Reset selection when filter changes
-  useEffect(() => {
-    setSelectedNodeId(null);
-    setHoveredNodeId(null);
-  }, [severityFilter, viewMode]);
 
   if (biases.length === 0) {
     return (
@@ -980,7 +987,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
 
 function ClusterView({
   biases,
-  severityCounts,
+  severityCounts: _severityCounts,
   onBiasClick,
 }: {
   biases: BiasNetworkProps['biases'];

@@ -996,7 +996,7 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
       } else {
         log.info('No custom personas found — AI will generate document-specific personas');
       }
-    } catch (personaError) {
+    } catch (_personaError) {
       // Schema drift — BoardroomPersona table may not exist yet
       log.warn('Custom persona lookup failed (schema drift) — AI will generate personas');
     }
