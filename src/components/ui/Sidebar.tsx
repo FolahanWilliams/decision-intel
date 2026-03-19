@@ -125,14 +125,14 @@ export default function Sidebar() {
                   width: 32,
                   height: 32,
                   borderRadius: 'var(--radius-lg)',
-                  background: 'linear-gradient(135deg, #F97316, #A3E635)',
+                  background: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 2px 12px rgba(249, 115, 22, 0.3)',
+                  boxShadow: '0 2px 12px rgba(255, 255, 255, 0.1)',
                 }}
               >
-                <Zap size={16} color="#0a0a0a" strokeWidth={2.5} />
+                <Zap size={16} color="#080808" strokeWidth={2.5} />
               </div>
               <div>
                 <div style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '-0.5px' }}>
@@ -140,9 +140,7 @@ export default function Sidebar() {
                   <span
                     style={{
                       marginLeft: '4px',
-                      background: 'linear-gradient(135deg, #F97316, #FBBF24)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
+                      color: 'var(--text-highlight)',
                     }}
                   >
                     Intel
@@ -169,15 +167,15 @@ export default function Sidebar() {
                 width: 32,
                 height: 32,
                 borderRadius: 'var(--radius-lg)',
-                background: 'linear-gradient(135deg, #F97316, #A3E635)',
+                background: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 auto',
-                boxShadow: '0 2px 12px rgba(249, 115, 22, 0.3)',
+                boxShadow: '0 2px 12px rgba(255, 255, 255, 0.1)',
               }}
             >
-              <Zap size={16} color="#0a0a0a" strokeWidth={2.5} />
+              <Zap size={16} color="#080808" strokeWidth={2.5} />
             </div>
           )}
           <button
@@ -559,12 +557,12 @@ function NavItem({
               ? 'var(--text-primary)'
               : 'var(--text-secondary)',
           background: active
-            ? 'rgba(249, 115, 22, 0.10)'
+            ? 'rgba(255, 255, 255, 0.08)'
             : hovered
               ? 'rgba(255, 255, 255, 0.04)'
               : 'transparent',
           border: active
-            ? '1px solid rgba(249, 115, 22, 0.20)'
+            ? '1px solid rgba(255, 255, 255, 0.12)'
             : hovered
               ? '1px solid rgba(255, 255, 255, 0.06)'
               : '1px solid transparent',
@@ -581,7 +579,7 @@ function NavItem({
       >
         <span
           style={{
-            color: active ? '#F97316' : 'var(--text-muted)',
+            color: active ? 'var(--text-highlight)' : 'var(--text-muted)',
             flexShrink: 0,
             position: 'relative',
             display: 'flex',

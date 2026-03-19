@@ -207,7 +207,7 @@ export function NotificationBell() {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: 'var(--accent-primary)',
+                      color: 'var(--text-secondary)',
                       fontSize: '11px',
                       cursor: 'pointer',
                     }}
@@ -250,7 +250,7 @@ export function NotificationBell() {
                     style={{
                       padding: '12px 16px',
                       borderBottom: '1px solid var(--border-color)',
-                      background: n.read ? 'transparent' : 'rgba(249, 115, 22, 0.04)',
+                      background: n.read ? 'transparent' : 'rgba(255, 255, 255, 0.04)',
                       cursor: 'pointer',
                     }}
                     onClick={() => {
@@ -291,7 +291,7 @@ export function NotificationBell() {
                         style={{
                           width: '6px',
                           height: '6px',
-                          background: 'var(--accent-primary)',
+                          background: 'var(--text-highlight)',
                           borderRadius: '50%',
                           flexShrink: 0,
                           marginTop: '6px',

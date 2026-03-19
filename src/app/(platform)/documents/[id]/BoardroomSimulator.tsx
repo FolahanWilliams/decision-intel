@@ -46,13 +46,13 @@ const PERSONA_CONFIG: Record<string, PersonaConfig> = {
   },
   'Aggressive Growth': {
     icon: <TrendingUp size={20} />,
-    color: '#F97316',
+    color: '#a78bfa',
     bgGradient:
-      'linear-gradient(135deg, rgba(249, 115, 22, 0.06) 0%, rgba(249, 115, 22, 0.02) 100%)',
-    borderColor: 'rgba(249, 115, 22, 0.25)',
+      'linear-gradient(135deg, rgba(167, 139, 250, 0.06) 0%, rgba(167, 139, 250, 0.02) 100%)',
+    borderColor: 'rgba(167, 139, 250, 0.25)',
     description: 'Prioritizes market capture and competitive advantage',
     avatarInitials: 'AG',
-    avatarGradient: 'linear-gradient(135deg, #F97316, #ea580c)',
+    avatarGradient: 'linear-gradient(135deg, #a78bfa, #7c3aed)',
   },
   'Compliance Guard': {
     icon: <Shield size={20} />,
@@ -170,7 +170,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
           background: 'rgba(255, 255, 255, 0.03)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: 'var(--liquid-radius)',
-          borderTop: '2px solid #F97316',
+          borderTop: '2px solid rgba(255, 255, 255, 0.15)',
         }}
       >
         <div style={{ position: 'relative', padding: '24px' }}>
@@ -211,7 +211,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
               <div>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FAFAFA', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   Virtual Boardroom
-                  <Sparkles size={16} style={{ color: '#F97316' }} />
+                  <Sparkles size={16} style={{ color: 'var(--text-highlight)' }} />
                 </h3>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
                   AI personas deliberate based on their expertise
@@ -539,7 +539,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
             }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <Brain size={20} style={{ color: '#F97316' }} />
+              <Brain size={20} style={{ color: 'var(--text-highlight)' }} />
               <h4 style={{ fontWeight: 800, color: '#FAFAFA' }}>Boardroom Analysis</h4>
             </div>
 
@@ -576,7 +576,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                     </div>
                   )}
                   {voteCounts['REVISE'] > 0 && (
-                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#F97316' }}>
+                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#FBBF24' }}>
                       <TrendingUp size={16} />
                       <span>Revision requested — proposal needs refinement</span>
                     </div>

@@ -69,7 +69,7 @@ function NoiseStatsCards({
       <div className="card">
         <div className="card-body text-center p-md">
           <div className="text-xs text-muted mb-sm">Judge Mean Score</div>
-          <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
+          <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-highlight)' }}>
             {noiseStats.mean.toFixed(1)}
           </div>
           <div className="text-xs text-muted">Average across 3 judges</div>
@@ -339,7 +339,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
       {/* Header */}
       <header className="mb-xl animate-fade-in">
         <div className="flex items-center gap-md mb-sm">
-          <SourceIcon size={28} style={{ color: 'var(--accent-primary)' }} />
+          <SourceIcon size={28} style={{ color: 'var(--text-secondary)' }} />
           <h1>
             {SOURCE_LABELS[decision.source] || decision.source}
             {decision.channel && ` — ${decision.channel}`}
@@ -566,9 +566,9 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                       border: 'none',
                       borderBottom:
                         activeTab === tab.key
-                          ? '2px solid var(--accent-primary)'
+                          ? '2px solid var(--text-highlight)'
                           : '2px solid transparent',
-                      color: activeTab === tab.key ? 'var(--accent-primary)' : 'var(--text-muted)',
+                      color: activeTab === tab.key ? 'var(--text-highlight)' : 'var(--text-muted)',
                       fontWeight: activeTab === tab.key ? 600 : 400,
                       cursor: 'pointer',
                       fontSize: '14px',
@@ -583,7 +583,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                       <span
                         style={{
                           background:
-                            activeTab === tab.key ? 'var(--accent-primary)' : 'var(--bg-secondary)',
+                            activeTab === tab.key ? 'rgba(255, 255, 255, 0.15)' : 'var(--bg-secondary)',
                           color: activeTab === tab.key ? '#fff' : 'var(--text-muted)',
                           padding: '1px 8px',
                           fontSize: '11px',
@@ -942,8 +942,8 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                             title: 'Opportunities',
                             items: swotAnalysis.opportunities,
                             icon: Target,
-                            color: 'var(--accent-primary)',
-                            bg: 'rgba(249, 115, 22, 0.08)',
+                            color: 'var(--accent-secondary)',
+                            bg: 'rgba(59, 130, 246, 0.08)',
                           },
                           {
                             title: 'Threats',
@@ -1007,15 +1007,15 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                           className="mt-lg"
                           style={{
                             padding: 'var(--spacing-lg)',
-                            background: 'rgba(249, 115, 22, 0.08)',
-                            borderLeft: '3px solid var(--accent-primary)',
+                            background: 'rgba(255, 255, 255, 0.06)',
+                            borderLeft: '3px solid var(--text-highlight)',
                             fontSize: '14px',
                             lineHeight: 1.6,
                           }}
                         >
                           <h4
                             className="flex items-center gap-sm mb-sm"
-                            style={{ color: 'var(--accent-primary)', fontSize: '14px' }}
+                            style={{ color: 'var(--text-highlight)', fontSize: '14px' }}
                           >
                             <Target size={16} /> Strategic Advice
                           </h4>
@@ -1337,8 +1337,8 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                           <div
                             style={{
                               padding: 'var(--spacing-md)',
-                              background: 'rgba(249, 115, 22, 0.08)',
-                              borderLeft: '3px solid var(--accent-primary)',
+                              background: 'rgba(255, 255, 255, 0.06)',
+                              borderLeft: '3px solid var(--text-highlight)',
                               fontSize: '14px',
                               lineHeight: 1.6,
                             }}
@@ -1484,8 +1484,8 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                     style={{
                       padding: 'var(--spacing-md)',
                       marginBottom: 'var(--spacing-md)',
-                      background: 'rgba(249, 115, 22, 0.06)',
-                      borderLeft: '3px solid var(--accent-primary)',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      borderLeft: '3px solid var(--text-highlight)',
                       fontSize: '13px',
                       color: 'var(--text-secondary)',
                       lineHeight: 1.5,
@@ -1904,7 +1904,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                                     justifyContent: 'space-between',
                                     padding: '8px 12px',
                                     background: 'var(--bg-tertiary)',
-                                    borderLeft: '3px solid var(--accent-primary)',
+                                    borderLeft: '3px solid var(--warning)',
                                   }}
                                 >
                                   <span style={{ fontSize: '13px' }}>{b.biasType}</span>
@@ -1912,8 +1912,8 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
                                     style={{
                                       fontSize: '10px',
                                       padding: '2px 8px',
-                                      background: 'rgba(249,115,22,0.2)',
-                                      color: 'var(--accent-primary)',
+                                      background: 'rgba(245,158,11,0.2)',
+                                      color: 'var(--warning)',
                                     }}
                                   >
                                     NEW
@@ -1980,7 +1980,7 @@ export default function CognitiveAuditDetailPage({ params }: { params: Promise<{
           >
             <Loader2
               size={48}
-              style={{ color: 'var(--accent-primary)' }}
+              style={{ color: 'var(--text-secondary)' }}
               className="animate-spin"
             />
             <h3>Cognitive Audit In Progress</h3>

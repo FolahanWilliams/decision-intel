@@ -51,14 +51,14 @@ export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateP
           width: '56px',
           height: '56px',
           borderRadius: '50%',
-          background: 'rgba(249, 115, 22, 0.1)',
+          background: 'rgba(255, 255, 255, 0.08)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: 'var(--spacing-lg)',
         }}
       >
-        <Brain size={28} style={{ color: 'var(--accent-primary)' }} />
+        <Brain size={28} style={{ color: 'var(--text-highlight)' }} />
       </div>
 
       <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>
@@ -146,7 +146,7 @@ export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateP
               transition: 'all 0.15s',
             }}
           >
-            <span style={{ color: 'var(--accent-primary)' }}>→</span>
+            <span style={{ color: 'var(--text-highlight)' }}>→</span>
             {q}
           </button>
         ))}
@@ -162,10 +162,10 @@ export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateP
             gap: '8px',
             marginTop: 'var(--spacing-lg)',
             padding: '10px 20px',
-            background: 'rgba(249, 115, 22, 0.1)',
-            border: '1px solid rgba(249, 115, 22, 0.3)',
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
             borderRadius: 'var(--radius-full)',
-            color: 'var(--accent-primary)',
+            color: 'var(--text-highlight)',
             fontSize: '13px',
             fontWeight: 500,
             textDecoration: 'none',

@@ -49,8 +49,8 @@ export function EmptyState({
               position: 'absolute',
               inset: 0,
               borderRadius: 'var(--radius-xl)',
-              background: 'rgba(249, 115, 22, 0.04)',
-              border: '1px dashed rgba(249, 115, 22, 0.15)',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px dashed rgba(255, 255, 255, 0.1)',
             }}
           />
           {/* Inner filled circle */}
@@ -61,12 +61,12 @@ export function EmptyState({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'rgba(249, 115, 22, 0.08)',
-              border: '1px solid rgba(249, 115, 22, 0.2)',
+              background: 'rgba(255, 255, 255, 0.06)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: 'var(--radius-lg)',
             }}
           >
-            <Icon size={28} style={{ color: 'var(--accent-primary)' }} />
+            <Icon size={28} style={{ color: 'var(--text-secondary)' }} />
           </div>
         </div>
 
@@ -85,7 +85,7 @@ export function EmptyState({
         {badges && badges.length > 0 && (
           <div className="flex flex-wrap justify-center gap-sm">
             {badges.map(badge => (
-              <span key={badge} className="badge badge-complete" style={{ fontSize: '0.7rem' }}>
+              <span key={badge} className="badge" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
                 {badge}
               </span>
             ))}

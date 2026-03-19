@@ -13,7 +13,7 @@ export function SparklineChart({
   data,
   width = 80,
   height = 32,
-  color = '#F97316',
+  color = '#A1A1AA',
   fillColor,
   strokeWidth = 1.5,
 }: SparklineChartProps) {

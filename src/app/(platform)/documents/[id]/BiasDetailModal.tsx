@@ -279,12 +279,12 @@ export function BiasDetailModal({
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: 'rgba(249, 115, 22, 0.05)',
+              background: 'rgba(255, 255, 255, 0.06)',
               borderBottom: '1px solid var(--border-color)',
             }}
           >
             <div className="flex items-center gap-sm mb-sm">
-              <Info size={14} style={{ color: 'var(--accent-primary)' }} />
+              <Info size={14} style={{ color: 'var(--text-secondary)' }} />
               <h4 className="text-xs text-muted uppercase">What is {bias.biasType}?</h4>
             </div>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -315,8 +315,8 @@ export function BiasDetailModal({
               <div
                 style={{
                   padding: 'var(--spacing-md)',
-                  background: 'rgba(255, 159, 10, 0.05)',
-                  border: '1px solid rgba(255, 159, 10, 0.2)',
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
                 }}
               >
                 <div className="flex items-center gap-sm mb-sm">
@@ -385,14 +385,14 @@ export function BiasDetailModal({
                 <div
                   style={{
                     padding: 'var(--spacing-md) var(--spacing-lg)',
-                    background: 'rgba(249, 115, 22, 0.03)',
+                    background: 'rgba(255, 255, 255, 0.06)',
                   }}
                 >
                   <div
                     className="flex items-center gap-sm"
                     style={{ marginBottom: 'var(--spacing-md)' }}
                   >
-                    <GraduationCap size={14} style={{ color: 'var(--accent-primary)' }} />
+                    <GraduationCap size={14} style={{ color: 'var(--text-secondary)' }} />
                     <h4
                       className="text-xs text-muted uppercase"
                       style={{ letterSpacing: '0.05em' }}
@@ -417,14 +417,14 @@ export function BiasDetailModal({
                   <div
                     style={{
                       padding: 'var(--spacing-md)',
-                      background: 'rgba(249, 115, 22, 0.04)',
-                      border: '1px solid rgba(249, 115, 22, 0.12)',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
                       borderRadius: '8px',
                       marginBottom: 'var(--spacing-md)',
                     }}
                   >
                     <div className="flex items-center gap-sm" style={{ marginBottom: '6px' }}>
-                      <BookOpen size={12} style={{ color: 'var(--accent-primary)' }} />
+                      <BookOpen size={12} style={{ color: 'var(--text-secondary)' }} />
                       <span style={{ fontSize: '12px', fontWeight: 600 }}>
                         {edu.realWorldExample.title}
                       </span>
@@ -489,7 +489,7 @@ export function BiasDetailModal({
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              background: 'rgba(249, 115, 22, 0.02)',
+              background: 'rgba(255, 255, 255, 0.03)',
             }}
           >
             <span className="text-sm font-medium">Was this AI detection helpful?</span>
@@ -539,7 +539,7 @@ export function BiasDetailModal({
             <div className="flex items-center gap-lg">
               <div>
                 <span className="text-xs text-muted">Detection Model: </span>
-                <span className="text-xs" style={{ color: 'var(--accent-primary)' }}>
+                <span className="text-xs" style={{ color: 'var(--text-highlight)' }}>
                   Gemini 3 Pro
                 </span>
               </div>

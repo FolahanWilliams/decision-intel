@@ -56,15 +56,15 @@ export function SourceAttribution({ sources }: SourceAttributionProps) {
                 alignItems: 'center',
                 gap: '10px',
                 padding: '8px 12px',
-                background: 'rgba(249, 115, 22, 0.04)',
-                border: '1px solid rgba(249, 115, 22, 0.1)',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '8px',
                 textDecoration: 'none',
                 color: 'inherit',
                 transition: 'border-color 0.15s',
               }}
             >
-              <FileText size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+              <FileText size={14} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)' }}>
                   {source.filename}

@@ -58,7 +58,7 @@ const OUTCOME_OPTIONS = [
     value: 'too_early',
     label: 'Too Early',
     icon: Clock,
-    color: '#F97316',
+    color: '#a1a1aa',
     description: 'Not enough time to evaluate',
   },
 ] as const;
@@ -178,7 +178,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
         borderRadius: '12px',
         overflow: 'hidden',
         background: existing
-          ? `linear-gradient(135deg, ${outcomeOption?.color || '#F97316'}08, transparent)`
+          ? `linear-gradient(135deg, ${outcomeOption?.color || 'rgba(255,255,255,0.06)'}08, transparent)`
           : 'var(--bg-secondary)',
       }}
     >
@@ -198,7 +198,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <TrendingUp size={16} style={{ color: 'var(--accent-primary)' }} />
+          <TrendingUp size={16} style={{ color: 'var(--text-secondary)' }} />
           <span style={{ fontSize: '13px', fontWeight: 600 }}>Decision Outcome</span>
           {existing ? (
             <span
@@ -317,10 +317,10 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                         padding: '4px 12px',
                         fontSize: '11px',
                         background:
-                          timeframe === tf.value ? 'rgba(249,115,22,0.15)' : 'transparent',
-                        border: `1px solid ${timeframe === tf.value ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                          timeframe === tf.value ? 'rgba(255,255,255,0.06)' : 'transparent',
+                        border: `1px solid ${timeframe === tf.value ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)'}`,
                         borderRadius: '14px',
-                        color: timeframe === tf.value ? '#FBBF24' : 'var(--text-muted)',
+                        color: timeframe === tf.value ? '#FFFFFF' : 'var(--text-muted)',
                         cursor: 'pointer',
                         fontWeight: timeframe === tf.value ? 600 : 400,
                       }}
@@ -449,11 +449,11 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                           fontSize: '11px',
                           background:
                             mostAccurateTwin === twin.name
-                              ? 'rgba(249,115,22,0.15)'
+                              ? 'rgba(255,255,255,0.06)'
                               : 'transparent',
-                          border: `1px solid ${mostAccurateTwin === twin.name ? 'rgba(249,115,22,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                          border: `1px solid ${mostAccurateTwin === twin.name ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)'}`,
                           borderRadius: '14px',
-                          color: mostAccurateTwin === twin.name ? '#FBBF24' : 'var(--text-muted)',
+                          color: mostAccurateTwin === twin.name ? '#FFFFFF' : 'var(--text-muted)',
                           cursor: 'pointer',
                           fontWeight: mostAccurateTwin === twin.name ? 600 : 400,
                         }}

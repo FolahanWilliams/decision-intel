@@ -40,8 +40,8 @@ export function BiasEducationCard({
     <div
       className="card"
       style={{
-        border: detected ? '1px solid rgba(249, 115, 22, 0.3)' : '1px solid var(--border-color)',
-        background: detected ? 'rgba(249, 115, 22, 0.03)' : 'var(--bg-secondary)',
+        border: detected ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid var(--border-color)',
+        background: detected ? 'rgba(255, 255, 255, 0.04)' : 'var(--bg-secondary)',
         transition: 'all 0.2s ease',
       }}
     >
@@ -70,8 +70,8 @@ export function BiasEducationCard({
               style={{
                 fontSize: '10px',
                 padding: '1px 8px',
-                background: 'rgba(249, 115, 22, 0.1)',
-                color: 'var(--accent-primary)',
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: 'var(--text-secondary)',
                 borderRadius: '12px',
                 fontWeight: 500,
               }}
@@ -129,7 +129,7 @@ export function BiasEducationCard({
           {/* Real-world example */}
           <div style={{ marginTop: 'var(--spacing-md)' }}>
             <div className="flex items-center gap-sm" style={{ marginBottom: '8px' }}>
-              <BookOpen size={14} style={{ color: 'var(--accent-primary)' }} />
+              <BookOpen size={14} style={{ color: 'var(--text-secondary)' }} />
               <span
                 style={{
                   fontSize: '11px',
@@ -145,8 +145,8 @@ export function BiasEducationCard({
             <div
               style={{
                 padding: 'var(--spacing-md)',
-                background: 'rgba(249, 115, 22, 0.04)',
-                border: '1px solid rgba(249, 115, 22, 0.12)',
+                background: 'rgba(255, 255, 255, 0.04)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '8px',
               }}
             >
@@ -235,7 +235,7 @@ export function BiasEducationCard({
           {/* Related biases */}
           <div style={{ marginTop: 'var(--spacing-md)' }}>
             <div className="flex items-center gap-sm" style={{ marginBottom: '8px' }}>
-              <Link2 size={14} style={{ color: 'var(--warning)' }} />
+              <Link2 size={14} style={{ color: 'var(--text-secondary)' }} />
               <span
                 style={{
                   fontSize: '11px',
@@ -265,8 +265,8 @@ export function BiasEducationCard({
                       alignItems: 'center',
                       gap: '6px',
                       padding: '4px 12px',
-                      background: 'rgba(255, 159, 10, 0.08)',
-                      border: '1px solid rgba(255, 159, 10, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
                       borderRadius: '16px',
                       fontSize: '11px',
                       color: 'var(--text-secondary)',

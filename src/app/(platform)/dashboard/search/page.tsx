@@ -21,7 +21,7 @@ function highlightMatch(text: string, query: string): ReactNode {
       <mark
         key={i}
         style={{
-          background: 'rgba(249, 115, 22, 0.25)',
+          background: 'rgba(255, 255, 255, 0.15)',
           color: 'inherit',
           padding: '0 1px',
           borderRadius: '2px',
@@ -101,7 +101,7 @@ export default function SearchPage() {
     >
       <header className="mb-xl">
         <div className="flex items-center gap-md mb-sm">
-          <Search size={28} style={{ color: 'var(--accent-primary)' }} />
+          <Search size={28} style={{ color: 'var(--text-secondary)' }} />
           <h1>Semantic Search</h1>
         </div>
         <p className="text-muted">
@@ -146,7 +146,7 @@ export default function SearchPage() {
       {/* Results */}
       {loading && (
         <div className="flex items-center justify-center py-8">
-          <Loader2 size={24} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+          <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
           <span className="ml-2 text-muted">Searching documents...</span>
         </div>
       )}
@@ -181,7 +181,7 @@ export default function SearchPage() {
                 <div className="flex items-start justify-between gap-md">
                   <div className="flex-1">
                     <div className="flex items-center gap-sm mb-sm">
-                      <FileText size={16} style={{ color: 'var(--accent-primary)' }} />
+                      <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
                       <span style={{ fontWeight: 600, fontSize: '14px' }}>
                         {highlightMatch(result.filename || result.documentId, query)}
                       </span>

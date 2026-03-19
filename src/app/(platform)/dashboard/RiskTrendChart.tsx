@@ -29,9 +29,9 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#F97316" stopOpacity={0.25} />
-              <stop offset="50%" stopColor="#FBBF24" stopOpacity={0.10} />
-              <stop offset="95%" stopColor="#A3E635" stopOpacity={0} />
+              <stop offset="5%" stopColor="#FFFFFF" stopOpacity={0.15} />
+              <stop offset="50%" stopColor="#A1A1AA" stopOpacity={0.08} />
+              <stop offset="95%" stopColor="#71717A" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
@@ -63,7 +63,7 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
           <Area
             type="monotone"
             dataKey="score"
-            stroke="#F97316"
+            stroke="#A1A1AA"
             strokeWidth={2.5}
             fillOpacity={1}
             fill="url(#scoreGradient)"
