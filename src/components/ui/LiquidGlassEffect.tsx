@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
+import { generatePremiumLensMap } from './LiquidGlassPremium';
 
 /**
  * LiquidGlassEffect — Apple-style liquid glass with real lens refraction.
@@ -95,6 +96,13 @@ export function LiquidGlassEffect() {
     const feImageRect = document.getElementById('liquid-glass-card-lens-image');
     if (feImageRect) {
       feImageRect.setAttribute('href', rectMap);
+    }
+
+    // Generate premium lens with variable thickness for enhanced refraction
+    const premiumMap = generatePremiumLensMap(512);
+    const feImagePremium = document.getElementById('liquid-glass-premium-lens-image');
+    if (feImagePremium) {
+      feImagePremium.setAttribute('href', premiumMap);
     }
   }, []);
 
@@ -227,6 +235,50 @@ export function LiquidGlassEffect() {
               result="grayGrain"
             />
             <feBlend in="SourceGraphic" in2="grayGrain" mode="overlay" />
+          </filter>
+
+          {/* ── Chromatic Aberration (Color Fringing) ── */}
+          <filter id="chromatic-aberration" x="-10%" y="-10%" width="120%" height="120%">
+            <feOffset in="SourceGraphic" dx="-0.5" dy="0" result="redShift"/>
+            <feComponentTransfer in="redShift" result="red">
+              <feFuncR type="identity"/>
+              <feFuncG type="discrete" tableValues="0"/>
+              <feFuncB type="discrete" tableValues="0"/>
+              <feFuncA type="identity"/>
+            </feComponentTransfer>
+
+            <feOffset in="SourceGraphic" dx="0.5" dy="0" result="blueShift"/>
+            <feComponentTransfer in="blueShift" result="blue">
+              <feFuncR type="discrete" tableValues="0"/>
+              <feFuncG type="discrete" tableValues="0"/>
+              <feFuncB type="identity"/>
+              <feFuncA type="identity"/>
+            </feComponentTransfer>
+
+            <feComposite in="red" in2="SourceGraphic" operator="arithmetic" k1="0" k2="0.5" k3="0.5" k4="0" result="redGreen"/>
+            <feComposite in="redGreen" in2="blue" operator="arithmetic" k1="0" k2="1" k3="0.5" k4="0"/>
+          </filter>
+
+          {/* ── Enhanced Refraction with Chromatic Shift ── */}
+          <filter id="liquid-glass-premium" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+            <feImage
+              id="liquid-glass-premium-lens-image"
+              href=""
+              x="0" y="0"
+              width="100%" height="100%"
+              preserveAspectRatio="none"
+              result="premium_lens_map"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="premium_lens_map"
+              scale="22"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="displaced"
+            />
+            <feGaussianBlur in="displaced" stdDeviation="0.3" result="blurred"/>
+            <feComposite in="blurred" in2="displaced" operator="over"/>
           </filter>
         </defs>
       </svg>

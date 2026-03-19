@@ -68,6 +68,79 @@ prisma/
   migrations/      → SQL migrations
 ```
 
+## NotebookLM CLI
+
+The `notebooklm` CLI (v0.3.4) is installed via Python 3.12. The binary is at `/Library/Frameworks/Python.framework/Versions/3.12/bin/notebooklm`. Auth state is stored at `~/.notebooklm/storage_state.json`.
+
+**Before running any `notebooklm` command, prepend the PATH:**
+```bash
+export PATH="/Library/Frameworks/Python.framework/Versions/3.12/bin:$PATH"
+```
+
+**Quick verify:** `notebooklm list` should return notebooks. If auth fails, run `notebooklm login`.
+
+The skill file is at `~/.claude/skills/notebooklm/SKILL.md` — refer to it for full command reference.
+
+## Superpowers Workflows
+
+The Superpowers skill library is installed at `~/.claude/skills/superpowers/`. **Proactively use these workflows when appropriate:**
+
+### When to Use Specific Workflows
+
+**Test-Driven Development (TDD)**
+- Building new API endpoints, services, or complex business logic
+- Refactoring critical code paths
+- Any backend feature where correctness is crucial
+- User asks for "tests" or mentions TDD/testing first
+
+**Systematic Debugging**
+- Complex bugs spanning multiple files
+- Performance issues requiring methodical investigation
+- "Weird" bugs where the cause isn't obvious
+- Race conditions or async issues
+
+**Git Worktrees**
+- Working on experimental features that might break the build
+- Parallel development of multiple features
+- When user wants to preserve main branch stability
+- Complex refactors that need isolation
+
+**Subagent-Driven Development**
+- Large features touching 5+ files
+- When parallelization would speed up development
+- Multiple independent components to build
+- User asks to "work on multiple things at once"
+
+**Writing/Executing Plans**
+- Features requiring 4+ implementation steps
+- Complex migrations or refactors
+- When user asks "how would you approach this?"
+- Before starting any task estimated at >30 minutes
+
+**Code Review Workflows**
+- Before committing major features
+- When user asks for review or quality check
+- After complex refactors
+- Before merging to main
+
+**Brainstorming**
+- Architecture decisions
+- Naming things (the hardest problem!)
+- When user says "I'm not sure how to..."
+- Design pattern selection
+
+### Available Commands
+- `/brainstorm` — Structured ideation session
+- `/write-plan` — Create detailed implementation plan
+- `/execute-plan` — Execute a written plan systematically
+
+**Note:** These workflows are NOT needed for:
+- Simple UI/CSS changes
+- Single-file edits
+- Trivial bug fixes
+- Documentation updates
+- Configuration tweaks
+
 ## Known Patterns
 
 - **Schema drift protection:** Production DB may lag behind Prisma schema. All write and read paths that use newer columns must catch `P2021`/`P2022` errors and fall back to core-only fields. The fallback MUST run in a separate `$transaction` because PostgreSQL poisons the entire transaction block after a column-not-found error.

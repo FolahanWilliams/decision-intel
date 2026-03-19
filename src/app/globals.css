@@ -1178,6 +1178,212 @@ tr:hover td {
 }
 
 /* ═══════════════════════════════════════════
+   Premium Glass Variants — Advanced Effects
+   ═══════════════════════════════════════════ */
+
+/* Iridescent Glass — Prismatic light diffraction */
+.liquid-glass-iridescent {
+  position: relative;
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  border-radius: var(--liquid-radius-xl);
+  backdrop-filter: url(#liquid-glass-premium) blur(var(--liquid-blur-strong)) saturate(180%);
+  -webkit-backdrop-filter: url(#liquid-glass-premium) blur(var(--liquid-blur-strong)) saturate(180%);
+  box-shadow: var(--liquid-shadow);
+  overflow: hidden;
+}
+
+.liquid-glass-iridescent::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 45deg at 30% 30%,
+    transparent,
+    rgba(255, 71, 71, 0.04),
+    rgba(255, 184, 71, 0.04),
+    rgba(71, 255, 122, 0.04),
+    rgba(71, 184, 255, 0.04),
+    rgba(184, 71, 255, 0.04),
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: calc(var(--glass-light-intensity, 0) * 2);
+  filter: blur(60px);
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+/* Fresnel Glass — Edge reflectance at shallow angles */
+.liquid-glass-fresnel {
+  position: relative;
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  border-radius: var(--liquid-radius-xl);
+  backdrop-filter: blur(var(--liquid-blur-strong)) saturate(170%);
+  -webkit-backdrop-filter: blur(var(--liquid-blur-strong)) saturate(170%);
+  box-shadow: var(--liquid-shadow);
+  overflow: hidden;
+}
+
+.liquid-glass-fresnel::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(
+    ellipse 50% 50% at center,
+    transparent 30%,
+    rgba(255, 255, 255, 0.03) 45%,
+    rgba(255, 255, 255, 0.10) 48%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 52%
+  );
+  animation: fresnel-rotate 20s linear infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+
+@keyframes fresnel-rotate {
+  to { transform: rotate(360deg); }
+}
+
+/* Shimmer Animation — Light sweep across glass surface */
+@keyframes glass-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.liquid-glass-shimmer {
+  position: relative;
+  background: var(--liquid-bg);
+  border: 1px solid var(--liquid-border);
+  border-radius: var(--liquid-radius-xl);
+  backdrop-filter: blur(var(--liquid-blur-strong)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--liquid-blur-strong)) saturate(160%);
+  box-shadow: var(--liquid-shadow);
+  overflow: hidden;
+}
+
+.liquid-glass-shimmer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: glass-shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Depth layers — Parallax glass panels */
+.liquid-glass-depth {
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.liquid-glass-depth::before,
+.liquid-glass-depth::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.liquid-glass-depth::before {
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 70%
+  );
+  transform: translateZ(-10px) scale(1.02);
+  opacity: 0.6;
+}
+
+.liquid-glass-depth::after {
+  background: linear-gradient(
+    45deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.03) 40%,
+    transparent 60%
+  );
+  transform: translateZ(-20px) scale(1.04);
+  opacity: 0.4;
+}
+
+/* Textured Glass — Surface micro-imperfections */
+.liquid-glass-textured::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.02) 2px,
+      rgba(255, 255, 255, 0.02) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.02) 2px,
+      rgba(255, 255, 255, 0.02) 4px
+    );
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Premium Glass — All effects combined */
+.liquid-glass-premium {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.10) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--liquid-radius-xl);
+  backdrop-filter: url(#liquid-glass-premium) blur(var(--liquid-blur-strong)) saturate(180%) brightness(1.02);
+  -webkit-backdrop-filter: url(#liquid-glass-premium) blur(var(--liquid-blur-strong)) saturate(180%) brightness(1.02);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    0 10px 20px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.25) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.1) inset,
+    0 0 100px rgba(255, 255, 255, 0.03) inset;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  transform-style: preserve-3d;
+}
+
+.liquid-glass-premium:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.6),
+    0 12px 24px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.30) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.1) inset,
+    0 0 120px rgba(255, 255, 255, 0.04) inset,
+    0 0 60px rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════
    Glowing Status Indicators — pulsing color auras
    ═══════════════════════════════════════════ */
 
