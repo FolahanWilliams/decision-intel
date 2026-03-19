@@ -18,6 +18,7 @@ import { ToastProvider } from '@/components/ui/ToastContext';
 import { ThemeProvider } from '@/components/theme-provider';
 import { NotificationProvider } from '@/components/ui/NotificationCenter';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { ReducedMotionProvider } from '@/components/ReducedMotionProvider';
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -33,11 +34,13 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className="antialiased min-h-screen">
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
-          <NotificationProvider>
-            <TooltipProvider>
-              <ToastProvider>{children}</ToastProvider>
-            </TooltipProvider>
-          </NotificationProvider>
+          <ReducedMotionProvider>
+            <NotificationProvider>
+              <TooltipProvider>
+                <ToastProvider>{children}</ToastProvider>
+              </TooltipProvider>
+            </NotificationProvider>
+          </ReducedMotionProvider>
         </ThemeProvider>
       </body>
     </html>
