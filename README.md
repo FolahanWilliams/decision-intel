@@ -115,10 +115,62 @@ Real-time intelligence enrichment from external sources:
 - **Macro Context** — FRED economic indicators for market backdrop
 - **Intelligence Hub** — Dedicated dashboard page with filterable news grid, research counts, and freshness monitoring
 
+### Decision Replay & Counterfactual Analysis
+
+Step through your analysis like a debugger steps through code. The **Replay** tab decomposes the 15-agent pipeline into a visual timeline, showing exactly how each stage influenced the final score:
+
+- **Score Waterfall** — Horizontal bar chart showing score progression from 100 → final through each analysis stage
+- **Step-by-Step Replay** — Expandable cards for each pipeline stage: Document Intelligence → Bias Detection → Noise Analysis → Fact Check → Deep Analysis → Boardroom → Final Score
+- **"What-If" Counterfactual Panel** — Click "What if…?" on any step to test scenarios:
+  - Remove individual biases and see projected score recovery
+  - Override noise score (perfect consistency vs. doubled noise)
+  - Toggle fact-check results (all verified vs. all contradicted)
+  - Client-side scoring engine calculates projections instantly — no API calls
+
+### Bias Education Library
+
+A comprehensive learning resource for all 16 cognitive biases, accessible at `/dashboard/bias-library`:
+
+- **16 Rich Education Cards** — Each bias includes a real-world business case study (Kodak, Bay of Pigs, Theranos, Concorde, etc.), 3 actionable debiasing techniques, academic references, difficulty rating, and related biases
+- **"Your Detected Biases" Banner** — Aggregates bias detections across all your documents, showing which biases appear most in your decision-making
+- **Search & Filter** — Filter by category (Judgment, Group Dynamics, Overconfidence, Risk Assessment, Information) or search by name
+- **Integrated Learning** — The BiasDetailModal on document pages now includes a "Learn & Debias" section with real-world examples and debiasing techniques inline
+
+### Second Brain Chat (RAG-Powered)
+
+An intelligent conversational interface at `/dashboard/chat` that uses semantic search to answer questions grounded in your analyzed documents:
+
+- **AI Follow-Up Suggestions** — After each response, the AI generates 2-3 contextual follow-up questions as clickable pills
+- **Message Actions** — Hover over any message to copy, bookmark, or retry responses
+- **Enhanced Source Attribution** — Expandable source cards showing document name, relevance bar (% match), and decision quality score badge
+- **Contextual Empty State** — Time-of-day greeting, document chips for your analyzed files, and contextual starter questions
+- **Session Management** — Auto-saved conversations with history browser, document pinning for scoped Q&A, and session import/export
+
+### Unified Activity Feed
+
+A chronological timeline on the dashboard that aggregates all platform activity:
+
+- **Multi-Source Aggregation** — Combines uploads, analysis completions/failures, nudges, and outcome reports into a single feed
+- **Filter Chips** — Filter by activity type (All, Uploads, Analyses, Nudges, Outcomes)
+- **Cursor Pagination** — Load more events without page reloads
+- **Color-Coded Icons** — Each activity type has a distinct icon and color for quick scanning
+- **Auto-Refresh** — Feed refreshes every 30 seconds via SWR
+
+### Command Palette
+
+A VS Code-style command palette (`Cmd+K` / `Ctrl+K`) with intelligent search:
+
+- **Grouped Commands** — Recent Documents (last 5, with score badges), Navigation (12 pages), Actions (upload, new chat, shortcuts)
+- **Prefix Search** — Type `>` for actions only, `/` for pages only, `@` to search documents by filename
+- **Score Indicators** — Recent documents show analysis status icons and score badges
+- **Alternative Shortcut** — `Ctrl+Shift+P` opens in action mode (like VS Code)
+
 ### Reporting & Export
 
-- **PDF Reports** — Full analysis exported as formatted PDF documents
-- **CSV Export** — Raw data export for further analysis
+- **4-Format Export** — PDF, CSV, Markdown, and JSON export from a unified "Share & Export" modal
+- **Markdown Reports** — Full analysis with tables, blockquotes, and sections for documentation workflows
+- **JSON Export** — Clean, structured data for API integrations and programmatic analysis
+- **Quick Share** — Copy executive summary to clipboard, export as Markdown, or open in email client with pre-filled subject and body
 - **Audit Trail** — Complete logging of all user actions for compliance
 - **Comparative Analysis** — Cross-document trend analysis and benchmarking
 
@@ -138,9 +190,9 @@ Real-time intelligence enrichment from external sources:
 │                           FRONTEND (Next.js 16 App Router)              │
 │                                                                         │
 │  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌─────────┐ │
-│  │Dashboard │  │Documents │  │Intelligence│  │  Trends  │  │Settings │ │
-│  │  Upload  │  │ Detail   │  │    Hub     │  │ & Audits │  │  Auth   │ │
-│  │  Search  │  │ 8 Tabs   │  │News/Macro  │  │ Insights │  │  GDPR   │ │
+│  │Dashboard │  │Documents │  │Intelligence│  │Second    │  │Settings │ │
+│  │  Upload  │  │ Detail   │  │    Hub     │  │ Brain    │  │  Auth   │ │
+│  │  Feed    │  │ 9 Tabs   │  │Bias Library│  │  Chat    │  │  GDPR   │ │
 │  └────┬─────┘  └────┬─────┘  └─────┬──────┘  └────┬─────┘  └────┬────┘ │
 │       │              │              │               │              │     │
 │  ─────┴──────────────┴──────────────┴───────────────┴──────────────┴──── │
@@ -151,7 +203,7 @@ Real-time intelligence enrichment from external sources:
 │                         API LAYER (Route Handlers)                       │
 │                                                                         │
 │  /upload  /analyze/stream  /documents  /intelligence  /search  /audit   │
-│  /trends  /stats  /cron/sync-intelligence  /health  /news/sync          │
+│  /activity-feed  /chat  /trends  /stats  /cron/sync  /health           │
 └──────────────────────────────────┬──────────────────────────────────────┘
                                    │
 ┌──────────────────────────────────┴──────────────────────────────────────┐
@@ -186,8 +238,9 @@ Real-time intelligence enrichment from external sources:
 │                    PERSISTENCE (Supabase PostgreSQL)                     │
 │                                                                         │
 │  Documents │ Analyses │ BiasInstances │ Embeddings (pgvector 1536-dim)  │
-│  NewsArticles │ ResearchCache │ CaseStudies │ AuditLogs │ UserSettings  │
-│  CacheEntries │ RateLimits │ IntelligenceSync                          │
+│  HumanDecisions │ CognitiveAudits │ Nudges │ DecisionOutcomes           │
+│  NewsArticles │ ResearchCache │ CaseStudies │ BoardroomPersonas         │
+│  AuditLogs │ UserSettings │ CacheEntries │ RateLimits │ IntelSync      │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -241,21 +294,37 @@ src/
 │   ├── (marketing)/           # Public landing page
 │   ├── (platform)/            # Authenticated routes
 │   │   └── dashboard/
-│   │       ├── page.tsx           # Main dashboard (upload, search, filter)
+│   │       ├── page.tsx           # Main dashboard (upload, activity feed, search)
+│   │       ├── bias-library/      # Bias Education Library (16 biases with examples)
+│   │       ├── chat/              # Second Brain Chat (RAG-powered Q&A)
+│   │       ├── compare/           # Side-by-side document comparison
+│   │       ├── cognitive-audits/  # Human decision auditing
 │   │       ├── intelligence/      # Intelligence Hub (news, macro, research)
-│   │       ├── trends/            # Risk trend analysis
 │   │       ├── insights/          # Aggregated cross-document insights
+│   │       ├── meetings/          # Meeting recordings & transcripts
+│   │       ├── nudges/            # Decision coaching alerts
 │   │       ├── audit-log/         # Compliance audit trail
-│   │       ├── risk-audits/       # Risk assessment reports
 │   │       ├── search/            # Semantic search
 │   │       └── settings/          # User preferences
 │   │   └── documents/
-│   │       └── [id]/              # Document detail (8 analysis tabs)
+│   │       └── [id]/              # Document detail (9 analysis tabs)
+│   │           └── tabs/
+│   │               ├── OverviewTab     # Document content & biases
+│   │               ├── ReplayTab       # Decision Replay & counterfactual analysis
+│   │               ├── LogicTab        # Logical fallacy detection
+│   │               ├── SwotTab         # Interactive SWOT analysis
+│   │               ├── NoiseTab        # Decision noise benchmarks
+│   │               ├── RedTeamTab      # Counter-arguments & blind spots
+│   │               ├── BoardroomTab    # Decision Twin simulation
+│   │               ├── SimulatorTab    # What-If scenario testing
+│   │               └── IntelligenceTab # Relevant news & research
 │   ├── api/
 │   │   ├── upload/                # File ingestion (PDF/DOCX/TXT, 5MB limit)
 │   │   ├── analyze/
 │   │   │   ├── stream/            # SSE streaming analysis
 │   │   │   └── simulate/          # Boardroom simulation
+│   │   ├── activity-feed/         # Unified activity feed (multi-source)
+│   │   ├── chat/                  # RAG-powered chat with follow-up suggestions
 │   │   ├── documents/             # CRUD operations
 │   │   ├── intelligence/          # News, macro, status endpoints
 │   │   ├── search/                # Vector similarity search
@@ -269,12 +338,20 @@ src/
 │   ├── analysis/                  # LangGraph pipeline orchestration
 │   │   └── analyzer.ts            # Main graph builder & execution
 │   ├── agents/                    # 15 AI agent node implementations
+│   ├── constants/
+│   │   └── bias-education.ts      # Educational content for 16 biases
 │   ├── intelligence/              # Context assembly (news + research + cases)
 │   ├── news/                      # RSS feed fetching & classification
+│   ├── replay/
+│   │   └── score-calculator.ts    # Counterfactual score projection engine
 │   ├── research/                  # Semantic Scholar paper matching
 │   ├── rag/                       # Embeddings & vector search (pgvector)
 │   ├── tools/                     # External data (Finnhub, FRED macro)
-│   ├── reports/                   # PDF & CSV generation
+│   ├── reports/
+│   │   ├── pdf-generator.ts       # Full PDF report with jsPDF
+│   │   ├── csv-generator.ts       # CSV data export
+│   │   ├── markdown-generator.ts  # Markdown report generation
+│   │   └── json-generator.ts      # Structured JSON export
 │   ├── utils/
 │   │   ├── cache.ts               # Postgres-based caching (TTL)
 │   │   ├── rate-limit.ts          # API rate limiting
@@ -285,7 +362,24 @@ src/
 │   ├── audit.ts                   # Audit logging utility
 │   └── sse.ts                     # Server-Sent Events helpers
 ├── components/
-│   ├── ui/                        # Sidebar, Table, Toast, Breadcrumbs, Onboarding
+│   ├── chat/                      # Chat components
+│   │   ├── SuggestedQuestions      # AI-generated follow-up question pills
+│   │   ├── MessageActions          # Copy, bookmark, retry on hover
+│   │   ├── SourceAttribution       # Enhanced source display with relevance bars
+│   │   └── ChatEmptyState          # Contextual empty state with starters
+│   ├── replay/
+│   │   └── CounterfactualPanel     # "What-If" scenario testing UI
+│   ├── ui/
+│   │   ├── ActivityFeed            # Unified activity timeline
+│   │   ├── BiasEducationCard       # Expandable bias education cards
+│   │   ├── CommandPalette          # Grouped command palette (⌘K)
+│   │   ├── ShareModal              # Multi-format export & sharing
+│   │   ├── Sidebar                 # Navigation with Bias Library link
+│   │   ├── NotificationCenter      # Bell icon with notification dropdown
+│   │   ├── Toast                   # Toast notification system
+│   │   ├── OnboardingGuide         # 3-step onboarding
+│   │   ├── LoadingSkeleton          # 5 skeleton variants
+│   │   └── ...                     # Table, Breadcrumbs, EmptyState, etc.
 │   └── visualizations/            # 14 Recharts-based chart components
 │       ├── ExecutiveSummary        # Overall score & key findings
 │       ├── BiasTreemap             # Bias distribution visualization
@@ -302,7 +396,9 @@ src/
 │       ├── BiasHeatmap             # Bias severity heatmap
 │       └── ComparativeAnalysis     # Cross-document comparison
 ├── hooks/
+│   ├── useActivityFeed.ts         # SWR activity feed with pagination
 │   ├── useAnalysisStream.ts       # SSE streaming with progress & retry
+│   ├── useChatStream.ts           # Chat SSE with follow-up suggestions
 │   ├── useDocuments.ts            # SWR document list with pagination
 │   ├── useInsights.ts             # Aggregated cross-analysis insights
 │   ├── useIntelligence.ts         # Intelligence status & freshness
@@ -326,10 +422,10 @@ src/
 | **Vector Search** | pgvector (1536-dim) | Semantic similarity search for embeddings |
 | **Authentication** | Supabase Auth | Google OAuth, protected routes, user management |
 | **UI Framework** | React 19 + TailwindCSS 4 | Component-based UI with utility-first styling |
-| **Charts** | Recharts 3 | 14 custom visualization components |
+| **Charts** | Recharts 3 | 14+ custom visualization components |
 | **Animations** | Framer Motion | Page transitions and interactive elements |
 | **Document Parsing** | mammoth + unpdf | PDF, DOCX, and TXT ingestion |
-| **Report Generation** | jsPDF + AutoTable | PDF export of analysis results |
+| **Report Generation** | jsPDF + AutoTable | PDF, CSV, Markdown, and JSON export |
 | **News Syndication** | rss-parser | 14-source RSS feed aggregation |
 | **Validation** | Zod 4 | Schema validation for all AI pipeline output |
 | **Testing** | Vitest | Unit & integration tests |
@@ -409,8 +505,9 @@ Visit `http://localhost:3000/api/health` to confirm database connectivity and sy
 1. **Sign up** at `/sign-up` and log in
 2. **Upload** a document (PDF, DOCX, or TXT — up to 5MB) from the dashboard
 3. **Watch** real-time analysis progress via SSE streaming
-4. **Explore** results across 8 analysis tabs:
+4. **Explore** results across 9 analysis tabs:
    - **Overview** — Executive summary with overall score
+   - **Replay** — Step-by-step pipeline walkthrough with counterfactual "What-If" testing
    - **Logic** — Logical fallacies and reasoning quality
    - **SWOT** — Interactive strengths/weaknesses/opportunities/threats
    - **Noise** — Decision quality benchmarks and variance analysis
@@ -418,7 +515,31 @@ Visit `http://localhost:3000/api/health` to confirm database connectivity and sy
    - **Boardroom** — Simulated decision votes from virtual personas
    - **Simulator** — Scenario planning interface
    - **Intelligence** — Relevant news, research papers, and case studies
-5. **Export** results as PDF or CSV
+5. **Share & Export** — Click the Share & Export button to download as PDF, CSV, Markdown, or JSON, or quick-share via clipboard or email
+
+### Decision Replay
+
+On any analyzed document, open the **Replay** tab to:
+- See how the score progressed through each pipeline stage (score waterfall chart)
+- Expand any step to see its findings, running score, and detection details
+- Click **"What if…?"** to test counterfactual scenarios — remove biases, change noise levels, flip boardroom votes — and see projected score changes instantly
+
+### Bias Library
+
+Navigate to `/dashboard/bias-library` to:
+- Browse all 16 cognitive biases with real-world examples (Kodak, Bay of Pigs, Theranos, etc.)
+- Learn 3 actionable debiasing techniques for each bias
+- See which biases have appeared in your own documents
+- Filter by category and search by name
+
+### Second Brain Chat
+
+Navigate to `/dashboard/chat` to:
+- Ask questions about your analyzed documents using RAG-powered semantic search
+- Pin a specific document for focused Q&A
+- Get AI-generated follow-up question suggestions after each response
+- Bookmark important messages and manage conversation history
+- View enhanced source attribution with relevance scores
 
 ### Intelligence Hub
 
@@ -427,6 +548,13 @@ Navigate to `/dashboard/intelligence` to:
 - View research paper counts and case study matches
 - Monitor macro-economic indicators (FRED data)
 - Trigger manual intelligence sync
+
+### Command Palette
+
+Press `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux) to:
+- Search across pages, actions, and recent documents in one place
+- Use prefix shortcuts: `>` for actions, `/` for pages, `@` for documents
+- Jump to any analyzed document with score badges
 
 ### Semantic Search
 
@@ -537,15 +665,23 @@ Or connect your GitHub repository to Vercel for automatic deployments on push.
 - [x] Web Intelligence Layer (news, research, case studies, macro)
 - [x] Intelligence Hub dashboard
 - [x] Semantic search (pgvector embeddings)
-- [x] PDF/CSV report generation
-- [x] Full audit trail
 - [x] 14 interactive visualization components
 - [x] SSE real-time streaming analysis
+- [x] Full audit trail
+- [x] **Decision Replay & Counterfactual Analysis** — Step-by-step pipeline replay with "What-If" scenario testing
+- [x] **Bias Education Library** — 16 biases with real-world case studies, debiasing techniques, and academic references
+- [x] **Second Brain Chat (RAG)** — AI follow-up suggestions, message actions, enhanced source attribution
+- [x] **Unified Activity Feed** — Multi-source chronological timeline on the dashboard
+- [x] **Command Palette** — Grouped search with recent documents, prefix filters, and keyboard shortcuts
+- [x] **Multi-Format Export** — PDF, CSV, Markdown, and JSON export with unified Share & Export modal
+- [x] **Cognitive Audits** — Human decision auditing with bias detection and effectiveness tracking
+- [x] **Nudge Engine** — Behavioral coaching alerts based on Thaler's Nudge Theory
+- [x] **Meeting Intelligence** — Meeting recording upload with speaker diarization and bias tracking
+- [x] **Institutional Memory** — Surface similar past decisions and their outcomes
+- [x] **Outcome Tracking** — Report actual decision outcomes and compare against predictions
 
 ### Planned
 
-- [ ] **Multi-Speaker Diarization** — Analyze meeting transcripts with speaker-specific bias tracking
-- [ ] **Institutional Memory** — Surface similar past decisions and their outcomes
 - [ ] **Custom Bias Taxonomies** — Let organizations define domain-specific bias categories
 - [ ] **Team Analytics** — Aggregate decision quality metrics across teams and departments
 - [ ] **API Access** — RESTful API for programmatic document analysis
@@ -554,6 +690,8 @@ Or connect your GitHub repository to Vercel for automatic deployments on push.
 - [ ] **Multi-language Support** — Document analysis in non-English languages
 - [ ] **Batch Analysis** — Upload and analyze multiple documents simultaneously
 - [ ] **Decision Playbooks** — Templated analysis configurations for common decision types
+- [ ] **Shareable Links** — Generate expiring read-only links for external stakeholders
+- [ ] **Team Collaboration** — Sharing, commenting, and multi-user analysis workflows
 
 ---
 

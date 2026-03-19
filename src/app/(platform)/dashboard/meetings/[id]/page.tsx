@@ -83,12 +83,12 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
   const segments: TranscriptSegment[] = useMemo(() => {
     if (!meeting?.transcript?.segments) return [];
     return Array.isArray(meeting.transcript.segments) ? meeting.transcript.segments : [];
-  }, [meeting?.transcript?.segments]);
+  }, [meeting]);
 
   const speakers: MeetingSpeaker[] = useMemo(() => {
     if (!meeting?.transcript?.speakers) return [];
     return Array.isArray(meeting.transcript.speakers) ? meeting.transcript.speakers : [];
-  }, [meeting?.transcript?.speakers]);
+  }, [meeting]);
 
   const speakerColorMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -111,22 +111,22 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
   const actionItems: ActionItem[] = useMemo(() => {
     if (!meeting?.actionItems) return [];
     return Array.isArray(meeting.actionItems) ? meeting.actionItems : [];
-  }, [meeting?.actionItems]);
+  }, [meeting]);
 
   const keyDecisions: KeyDecision[] = useMemo(() => {
     if (!meeting?.keyDecisions) return [];
     return Array.isArray(meeting.keyDecisions) ? meeting.keyDecisions : [];
-  }, [meeting?.keyDecisions]);
+  }, [meeting]);
 
   const speakerBiases: SpeakerBiasProfile[] = useMemo(() => {
     if (!meeting?.speakerBiases) return [];
     return Array.isArray(meeting.speakerBiases) ? meeting.speakerBiases : [];
-  }, [meeting?.speakerBiases]);
+  }, [meeting]);
 
   const similarMeetings: SimilarMeeting[] = useMemo(() => {
     if (!meeting?.similarMeetings) return [];
     return Array.isArray(meeting.similarMeetings) ? meeting.similarMeetings : [];
-  }, [meeting?.similarMeetings]);
+  }, [meeting]);
 
   const audit = meeting?.humanDecision?.cognitiveAudit;
   const biases = audit ? getBiasArray<{ biasType: string; severity: string; explanation: string }>(audit.biasFindings) : [];
