@@ -613,36 +613,74 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       />
 
       {/* Header */}
-      <header className="flex items-center justify-between mb-xl">
-        <div className="flex items-center gap-md">
-          <Link href="/dashboard" className="btn btn-ghost p-2" aria-label="Back to dashboard">
-            <ArrowLeft size={20} />
-          </Link>
-          <div>
-            <h1 className="text-xl font-semibold">{document.filename}</h1>
-            <p className="text-sm text-muted">
-              {formatDate(document.uploadedAt)} • {(document.fileSize / 1024).toFixed(1)} KB
-            </p>
+      <header style={{ marginBottom: 'var(--spacing-xl)' }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-md">
+            <Link href="/dashboard" className="btn btn-ghost p-2" aria-label="Back to dashboard">
+              <ArrowLeft size={20} />
+            </Link>
+            <div>
+              <h1 className="text-xl font-semibold">{document.filename}</h1>
+              <p className="text-sm text-muted">
+                {formatDate(document.uploadedAt)} • {(document.fileSize / 1024).toFixed(1)} KB
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-md">
+            {/* Prominent score display */}
+            {analysis && (
+              <div style={{ textAlign: 'center', marginRight: '8px' }}>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Score
+                </div>
+                <div
+                  style={{
+                    fontSize: '36px',
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: analysis.overallScore >= 70
+                      ? '#22c55e'
+                      : analysis.overallScore >= 40
+                        ? '#f59e0b'
+                        : '#ef4444',
+                  }}
+                >
+                  {Math.round(analysis.overallScore)}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center gap-sm">
+              {document.status === 'complete' && (
+                <span className="flex items-center gap-sm text-sm" style={{ color: 'var(--success)' }}>
+                  <CheckCircle size={16} /> Complete
+                </span>
+              )}
+              {analysis && (
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="btn btn-secondary btn-sm flex items-center gap-sm"
+                  aria-label="Share and export"
+                >
+                  <Share2 size={14} />
+                  Share & Export
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-sm">
-          {document.status === 'complete' && (
-            <span className="flex items-center gap-sm text-sm" style={{ color: 'var(--success)' }}>
-              <CheckCircle size={16} /> Complete
-            </span>
-          )}
-          {analysis && (
-            <button
-              onClick={() => setShowShareModal(true)}
-              className="btn btn-secondary btn-sm flex items-center gap-sm"
-              aria-label="Share and export"
-            >
-              <Share2 size={14} />
-              Share & Export
-            </button>
-          )}
-        </div>
+        {/* Gradient accent line */}
+        <div
+          style={{
+            height: '2px',
+            marginTop: 'var(--spacing-md)',
+            background: 'linear-gradient(90deg, #F97316, #FBBF24, #A3E635)',
+            borderRadius: '1px',
+          }}
+        />
       </header>
 
       {/* Executive Summary */}
@@ -1001,9 +1039,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         <div className="flex flex-col gap-lg">
           {/* Tab Bar with group labels */}
           <div
-            className="flex flex-wrap items-end gap-0 border-b border-border mb-lg"
+            className="flex flex-wrap items-end gap-0 mb-lg"
             role="tablist"
             aria-label="Analysis tabs"
+            style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
           >
             {TAB_GROUPS.map((group, gi) => (
               <div key={group.label} className="flex items-end">
@@ -1042,11 +1081,20 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         aria-selected={activeTab === tab.id}
                         aria-controls={`tabpanel-${tab.id}`}
                         onClick={() => handleTabChange(tab.id)}
-                        className={`flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                        className="flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors -mb-px"
+                        style={
                           activeTab === tab.id
-                            ? 'text-accent-primary border-accent-primary bg-accent-primary/5'
-                            : 'text-muted border-transparent hover:text-primary hover:border-border'
-                        }`}
+                            ? {
+                                background: 'rgba(249, 115, 22, 0.10)',
+                                color: '#F97316',
+                                borderBottom: '2px solid #F97316',
+                              }
+                            : {
+                                color: 'var(--text-muted)',
+                                background: 'transparent',
+                                borderBottom: '2px solid transparent',
+                              }
+                        }
                       >
                         <tab.icon size={14} />
                         {tab.label}
