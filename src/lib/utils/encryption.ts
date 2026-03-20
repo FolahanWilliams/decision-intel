@@ -101,7 +101,7 @@ export function decryptToken(record: {
       iv: record.botTokenIv,
       tag: record.botTokenTag,
     });
-  } catch (_error) {
+  } catch {
     log.error('Failed to decrypt token — possible key rotation or data corruption');
     throw new Error('Token decryption failed');
   }

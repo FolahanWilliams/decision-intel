@@ -26,7 +26,7 @@ interface ActivityFeedProps {
   onLoadMore?: () => void;
 }
 
-const activityIcons: Record<string, any> = {
+const activityIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   analysis: FileText,
   analysis_complete: CheckCircle,
   analysis_error: AlertCircle,

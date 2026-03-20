@@ -86,7 +86,7 @@ class ErrorTracker {
       return {
         message: error.message,
         stack: error.stack,
-        code: (error as any).code,
+        code: (error as Record<string, unknown>).code as string | undefined,
       };
     }
 
@@ -95,11 +95,11 @@ class ErrorTracker {
     }
 
     if (typeof error === 'object' && error !== null) {
-      const obj = error as any;
+      const obj = error as Record<string, unknown>;
       return {
-        message: obj.message || obj.error || JSON.stringify(error),
-        stack: obj.stack,
-        code: obj.code || obj.statusCode,
+        message: (obj.message || obj.error || JSON.stringify(error)) as string,
+        stack: obj.stack as string | undefined,
+        code: (obj.code || obj.statusCode) as string | undefined,
       };
     }
 
@@ -161,7 +161,7 @@ class ErrorTracker {
   /**
    * Persist error to the database
    */
-  private async persistError(details: any, context: ErrorContext): Promise<void> {
+  private async persistError(details: Record<string, unknown>, context: ErrorContext): Promise<void> {
     try {
       await prisma.auditLog.create({
         data: {
@@ -183,7 +183,7 @@ class ErrorTracker {
   /**
    * Get recent system errors (admin only)
    */
-  async getRecentErrors(limit = 50): Promise<any[]> {
+  async getRecentErrors(limit = 50): Promise<Record<string, unknown>[]> {
     try {
       const errors = await prisma.auditLog.findMany({
         where: { action: 'system_error' },
@@ -192,10 +192,10 @@ class ErrorTracker {
       });
 
       // Group by fingerprint and count occurrences
-      const grouped = new Map<string, any>();
+      const grouped = new Map<string, Record<string, unknown>>();
 
       for (const error of errors) {
-        const fingerprint = (error.details as any)?.fingerprint;
+        const fingerprint = (error.details as Record<string, unknown>)?.fingerprint;
         if (fingerprint) {
           const existing = grouped.get(fingerprint);
           if (existing) {
@@ -232,7 +232,7 @@ export function trackError(error: Error | unknown, context: ErrorContext = {}): 
 /**
  * Express/Next.js error handler wrapper
  */
-export function withErrorTracking<T extends (...args: any[]) => Promise<any>>(
+export function withErrorTracking<T extends (...args: unknown[]) => Promise<unknown>>(
   handler: T,
   defaultContext?: ErrorContext
 ): T {
