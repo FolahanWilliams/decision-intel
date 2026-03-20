@@ -1167,17 +1167,30 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     };
   }
 
-  // 1. Bias Deductions (Weighted by Severity)
+  // Load calibrated bias severity weights (behavioral data flywheel)
+  // Falls back to static defaults if no calibration exists
+  let severityWeights: Record<string, number> = {
+    low: 5,
+    medium: 15,
+    high: 30,
+    critical: 50,
+  };
+
+  try {
+    const { loadBiasSeverityWeights } = await import('@/lib/learning/feedback-loop');
+    // Attempt to load org-specific weights; userId is used as a proxy for org lookup
+    severityWeights = await loadBiasSeverityWeights(null, state.userId);
+    log.debug('Using calibrated bias severity weights');
+  } catch {
+    // feedback-loop module or CalibrationProfile table may not exist yet
+    log.debug('Using default bias severity weights (calibration unavailable)');
+  }
+
+  // 1. Bias Deductions (Weighted by Severity — now calibration-aware)
   const biasDeductions = (state.biasAnalysis || []).reduce(
     (acc: number, b: { severity?: string }) => {
-      const severityScores: Record<string, number> = {
-        low: 5,
-        medium: 15,
-        high: 30,
-        critical: 50,
-      };
       const severity = (b.severity || 'low').toLowerCase();
-      return acc + (severityScores[severity] || 5);
+      return acc + (severityWeights[severity] || 5);
     },
     0
   );

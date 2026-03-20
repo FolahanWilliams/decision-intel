@@ -15,6 +15,7 @@
 import { createLogger } from '@/lib/utils/logger';
 import type { NudgeDefinition, NudgeTriggerContext, NudgeSeverity } from '@/types/human-audit';
 import type { BiasDetectionResult } from '@/types';
+import type { NudgeThresholdCalibration } from '@/lib/learning/feedback-loop';
 
 const log = createLogger('NudgeEngine');
 
@@ -27,8 +28,14 @@ const log = createLogger('NudgeEngine');
  * 3. Historical consistency (noise measurement)
  * 4. Decision stakes (high-stakes decisions get pre-mortem triggers)
  * 5. Base rate divergence (escalation rates vs. historical norms)
+ *
+ * When calibration data is provided, nudge types that users consistently
+ * mark as unhelpful are suppressed (behavioral data flywheel).
  */
-export function generateNudges(context: NudgeTriggerContext): NudgeDefinition[] {
+export function generateNudges(
+  context: NudgeTriggerContext,
+  calibration?: NudgeThresholdCalibration | null
+): NudgeDefinition[] {
   const nudges: NudgeDefinition[] = [];
   const { auditResult, decision, history } = context;
 
@@ -65,8 +72,22 @@ export function generateNudges(context: NudgeTriggerContext): NudgeDefinition[] 
     }
   }
 
-  log.info(`Generated ${nudges.length} nudge(s) for decision`);
-  return nudges;
+  // Apply calibration: suppress nudge types users consistently find unhelpful
+  const filteredNudges = calibration
+    ? nudges.filter(nudge => {
+        const threshold = calibration.thresholds[nudge.nudgeType];
+        if (threshold?.suppressed) {
+          log.info(
+            `Suppressing ${nudge.nudgeType} nudge (helpfulRate=${threshold.helpfulRate}, n=${threshold.sampleSize})`
+          );
+          return false;
+        }
+        return true;
+      })
+    : nudges;
+
+  log.info(`Generated ${filteredNudges.length} nudge(s) for decision (${nudges.length - filteredNudges.length} suppressed by calibration)`);
+  return filteredNudges;
 }
 
 // ─── Nudge Detectors ─────────────────────────────────────────────────────────

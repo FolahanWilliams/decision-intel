@@ -158,6 +158,24 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Auto-trigger recalibration if sufficient outcomes exist (behavioral data flywheel)
+    try {
+      const outcomeCount = await prisma.decisionOutcome.count({
+        where: orgId ? { orgId } : { userId: user.id },
+      });
+      // Recalibrate every 5 outcomes to keep weights fresh
+      if (outcomeCount > 0 && outcomeCount % 5 === 0) {
+        const { runFullRecalibration } = await import('@/lib/learning/feedback-loop');
+        runFullRecalibration(orgId).catch(err =>
+          log.warn('Auto-recalibration failed (non-critical):', err)
+        );
+        log.info(`Auto-recalibration triggered at ${outcomeCount} outcomes for ${orgId || user.id}`);
+      }
+    } catch (recalErr) {
+      // Non-critical — CalibrationProfile table may not exist yet
+      log.debug('Auto-recalibration skipped:', recalErr instanceof Error ? recalErr.message : String(recalErr));
+    }
+
     // Calculate outcome statistics for this user/org
     const outcomes = await prisma.decisionOutcome.findMany({
       where: orgId ? { orgId } : { userId: user.id },

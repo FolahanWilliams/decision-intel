@@ -1,4 +1,5 @@
 import type { AnalysisResult } from '@/types';
+import { DEFAULT_COUNTERFACTUAL_WEIGHTS } from '@/lib/learning/constants';
 
 export interface ScoreOverrides {
   removeBiases?: string[];
@@ -15,25 +16,21 @@ export interface CounterfactualResult {
 }
 
 /**
- * Approximate severity weights used for bias impact on overall score.
- * These are estimates based on how the pipeline calculates scores.
- */
-const SEVERITY_WEIGHTS: Record<string, number> = {
-  critical: 8,
-  high: 5,
-  medium: 3,
-  low: 1,
-};
-
-/**
  * Calculate a counterfactual score by applying overrides to the analysis.
  * This is a client-side approximation — it estimates how the score would change
  * if certain biases were removed, noise was different, etc.
+ *
+ * Accepts optional calibrated severity weights from the behavioral data flywheel.
+ * When calibration data is available, bias weights are adjusted based on
+ * historical confirmation rates (biases with high false-positive rates
+ * have lower counterfactual impact).
  */
 export function calculateCounterfactualScore(
   analysis: AnalysisResult,
-  overrides: ScoreOverrides
+  overrides: ScoreOverrides,
+  calibratedWeights?: Record<string, number>
 ): CounterfactualResult {
+  const severityWeights = calibratedWeights ?? DEFAULT_COUNTERFACTUAL_WEIGHTS;
   const original = analysis.overallScore;
   let adjustedScore = original;
   const reasons: string[] = [];
@@ -45,7 +42,7 @@ export function calculateCounterfactualScore(
 
     for (const bias of analysis.biases) {
       if (removedSet.has(bias.biasType)) {
-        const weight = SEVERITY_WEIGHTS[bias.severity] || 3;
+        const weight = severityWeights[bias.severity] || 3;
         recoveredPoints += weight;
       }
     }
@@ -93,7 +90,7 @@ export function calculateCounterfactualScore(
     let fallacyRecovery = 0;
     for (const fallacy of analysis.logicalAnalysis.fallacies) {
       if (removedSet.has(fallacy.name)) {
-        const weight = SEVERITY_WEIGHTS[fallacy.severity] || 3;
+        const weight = severityWeights[fallacy.severity] || 3;
         fallacyRecovery += weight;
       }
     }
@@ -137,6 +134,7 @@ export function calculateCounterfactualScore(
 
 /**
  * Decompose an analysis into replay steps with approximate score deltas.
+ * Accepts optional calibrated weights for accurate bias penalty display.
  */
 export interface ReplayStep {
   id: string;
@@ -148,7 +146,11 @@ export interface ReplayStep {
   counterfactualSupported: boolean;
 }
 
-export function decomposeAnalysis(analysis: AnalysisResult): ReplayStep[] {
+export function decomposeAnalysis(
+  analysis: AnalysisResult,
+  calibratedWeights?: Record<string, number>
+): ReplayStep[] {
+  const severityWeights = calibratedWeights ?? DEFAULT_COUNTERFACTUAL_WEIGHTS;
   const steps: ReplayStep[] = [];
 
   // Step 1: Document Intelligence
@@ -170,7 +172,7 @@ export function decomposeAnalysis(analysis: AnalysisResult): ReplayStep[] {
   // Step 2: Bias Detection
   const biasCount = analysis.biases.length;
   const biasPenalty = analysis.biases.reduce(
-    (sum, b) => sum + (SEVERITY_WEIGHTS[b.severity] || 3),
+    (sum, b) => sum + (severityWeights[b.severity] || 3),
     0
   );
   steps.push({
