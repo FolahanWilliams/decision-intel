@@ -594,3 +594,22 @@ model BatchUpload {
 
   @@index([userId, status])
 }
+
+// ─── Behavioral Data Flywheel ─────────────────────────────────────────────
+
+model CalibrationProfile {
+  id               String   @id @default(cuid())
+  orgId            String?
+  userId           String?
+  profileType      String   // "bias_severity" | "nudge_threshold" | "twin_weight"
+  calibrationData  Json     // org-specific learned weights
+  sampleSize       Int      @default(0)
+  lastCalibratedAt DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([orgId, userId, profileType])
+  @@index([orgId])
+  @@index([userId])
+  @@index([profileType])
+}
