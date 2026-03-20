@@ -169,12 +169,13 @@ function exportAsCSV(analysis: AnalysisWithRelations): NextResponse {
   });
 
   // Additional metrics
-  if (analysis.factCheck) {
-    rows.push(`Fact Check,,,Verification score,${analysis.factCheck.score || 0}`);
+  if (analysis.factCheck && typeof analysis.factCheck === 'object' && 'score' in analysis.factCheck) {
+    rows.push(`Fact Check,,,Verification score,${(analysis.factCheck as { score?: number }).score || 0}`);
   }
 
-  if (analysis.sentiment) {
-    rows.push(`Sentiment,${analysis.sentiment.label},,Overall sentiment,${analysis.sentiment.score || 0}`);
+  if (analysis.sentiment && typeof analysis.sentiment === 'object' && 'label' in analysis.sentiment && 'score' in analysis.sentiment) {
+    const sentiment = analysis.sentiment as { label?: string; score?: number };
+    rows.push(`Sentiment,${sentiment.label || 'Unknown'},,Overall sentiment,${sentiment.score || 0}`);
   }
 
   const csv = rows.join('\n');

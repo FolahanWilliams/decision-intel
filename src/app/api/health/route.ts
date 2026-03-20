@@ -16,7 +16,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 async function checkLLMHealth(): Promise<{ status: string; model?: string; error?: string }> {
   const cached = healthCache.get('llm');
   if (cached && cached.expires > Date.now()) {
-    return cached.data;
+    return cached.data as { status: string; model?: string; error?: string };
   }
 
   try {
