@@ -1,0 +1,403 @@
+/**
+ * Decision Outcome Tracking API
+ *
+ * POST /api/outcomes/track - Report the actual outcome of a decision
+ * GET /api/outcomes/track?analysisId=xxx - Get outcome for an analysis
+ * GET /api/outcomes/track?userId=xxx - Get all outcomes for a user
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { prisma } from '@/lib/prisma';
+import { createLogger } from '@/lib/utils/logger';
+
+const log = createLogger('OutcomeTracking');
+
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const {
+      analysisId,
+      outcome,
+      timeframe,
+      impactScore,
+      notes,
+      lessonsLearned,
+      confirmedBiases,
+      falsPositiveBiases,
+      mostAccurateTwin,
+    } = body;
+
+    if (!analysisId || !outcome) {
+      return NextResponse.json({ error: 'Analysis ID and outcome are required' }, { status: 400 });
+    }
+
+    // Validate outcome value
+    const validOutcomes = ['success', 'partial_success', 'failure', 'too_early'];
+    if (!validOutcomes.includes(outcome)) {
+      return NextResponse.json({ error: 'Invalid outcome value' }, { status: 400 });
+    }
+
+    // Verify the analysis exists and user has access
+    const analysis = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      include: {
+        document: true,
+        biases: true,
+      },
+    });
+
+    if (!analysis) {
+      return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
+    }
+
+    // Verify ownership
+    const orgId = analysis.document.orgId;
+    if (analysis.document.userId !== user.id) {
+      const membership = await prisma.teamMember.findFirst({
+        where: { userId: user.id },
+      });
+
+      if (!membership || membership.orgId !== orgId) {
+        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+      }
+    }
+
+    // Check if outcome already exists
+    const existingOutcome = await prisma.decisionOutcome.findUnique({
+      where: { analysisId },
+    });
+
+    let decisionOutcome;
+    if (existingOutcome) {
+      // Update existing outcome
+      decisionOutcome = await prisma.decisionOutcome.update({
+        where: { id: existingOutcome.id },
+        data: {
+          outcome,
+          timeframe,
+          impactScore,
+          notes,
+          lessonsLearned,
+          confirmedBiases: confirmedBiases || [],
+          falsPositiveBiases: falsPositiveBiases || [],
+          mostAccurateTwin,
+        },
+      });
+
+      log.info(`Updated outcome for analysis ${analysisId}: ${outcome}`);
+    } else {
+      // Create new outcome
+      decisionOutcome = await prisma.decisionOutcome.create({
+        data: {
+          analysisId,
+          userId: user.id,
+          orgId,
+          outcome,
+          timeframe,
+          impactScore,
+          notes,
+          lessonsLearned,
+          confirmedBiases: confirmedBiases || [],
+          falsPositiveBiases: falsPositiveBiases || [],
+          mostAccurateTwin,
+        },
+      });
+
+      log.info(`Created outcome for analysis ${analysisId}: ${outcome}`);
+    }
+
+    // Update bias accuracy based on confirmed/false positives
+    if (confirmedBiases?.length || falsPositiveBiases?.length) {
+      // Update confirmed biases with high rating
+      if (confirmedBiases?.length) {
+        await prisma.biasInstance.updateMany({
+          where: {
+            analysisId,
+            biasType: { in: confirmedBiases },
+          },
+          data: { userRating: 5 },
+        });
+      }
+
+      // Update false positives with low rating
+      if (falsPositiveBiases?.length) {
+        await prisma.biasInstance.updateMany({
+          where: {
+            analysisId,
+            biasType: { in: falsPositiveBiases },
+          },
+          data: { userRating: 1 },
+        });
+      }
+    }
+
+    // Log audit trail
+    await prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        orgId,
+        action: existingOutcome ? 'outcome.update' : 'outcome.create',
+        resource: 'outcome',
+        resourceId: decisionOutcome.id,
+        details: {
+          analysisId,
+          outcome,
+          impactScore,
+        },
+      },
+    });
+
+    // Calculate outcome statistics for this user/org
+    const outcomes = await prisma.decisionOutcome.findMany({
+      where: orgId ? { orgId } : { userId: user.id },
+      select: { outcome: true, impactScore: true },
+    });
+
+    const stats = {
+      total: outcomes.length,
+      success: outcomes.filter(o => o.outcome === 'success').length,
+      partialSuccess: outcomes.filter(o => o.outcome === 'partial_success').length,
+      failure: outcomes.filter(o => o.outcome === 'failure').length,
+      averageImpact: outcomes
+        .filter(o => o.impactScore !== null)
+        .reduce((sum, o) => sum + (o.impactScore || 0), 0) /
+        outcomes.filter(o => o.impactScore !== null).length || 0,
+    };
+
+    return NextResponse.json({
+      message: existingOutcome ? 'Outcome updated' : 'Outcome tracked',
+      outcome: decisionOutcome,
+      stats,
+    });
+  } catch (error) {
+    log.error('Failed to track outcome:', error);
+    return NextResponse.json({ error: 'Failed to track outcome' }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const analysisId = searchParams.get('analysisId');
+    const userId = searchParams.get('userId');
+    const timeRange = searchParams.get('timeRange') || '30d';
+
+    // Get date range
+    const endDate = new Date();
+    const startDate = new Date();
+    switch (timeRange) {
+      case '7d':
+        startDate.setDate(endDate.getDate() - 7);
+        break;
+      case '30d':
+        startDate.setDate(endDate.getDate() - 30);
+        break;
+      case '90d':
+        startDate.setDate(endDate.getDate() - 90);
+        break;
+      case 'all':
+        startDate.setFullYear(2020);
+        break;
+      default:
+        startDate.setDate(endDate.getDate() - 30);
+    }
+
+    if (analysisId) {
+      // Get outcome for specific analysis
+      const outcome = await prisma.decisionOutcome.findUnique({
+        where: { analysisId },
+        include: {
+          analysis: {
+            include: {
+              document: { select: { filename: true } },
+              biases: { select: { biasType: true, severity: true, userRating: true } },
+            },
+          },
+        },
+      });
+
+      if (!outcome) {
+        return NextResponse.json({ outcome: null });
+      }
+
+      // Verify access
+      const analysis = await prisma.analysis.findUnique({
+        where: { id: analysisId },
+        include: { document: true },
+      });
+
+      if (analysis?.document.userId !== user.id) {
+        const membership = await prisma.teamMember.findFirst({
+          where: { userId: user.id },
+        });
+
+        if (!membership || membership.orgId !== analysis?.document.orgId) {
+          return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+        }
+      }
+
+      return NextResponse.json({ outcome });
+    }
+
+    // Get all outcomes for user or organization
+    const membership = await prisma.teamMember.findFirst({
+      where: { userId: userId || user.id },
+    });
+
+    const outcomes = await prisma.decisionOutcome.findMany({
+      where: {
+        ...(membership?.orgId ? { orgId: membership.orgId } : { userId: userId || user.id }),
+        reportedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { reportedAt: 'desc' },
+      include: {
+        analysis: {
+          include: {
+            document: { select: { filename: true } },
+          },
+        },
+      },
+    });
+
+    // Calculate metrics
+    const metrics = {
+      total: outcomes.length,
+      byOutcome: {
+        success: outcomes.filter(o => o.outcome === 'success').length,
+        partialSuccess: outcomes.filter(o => o.outcome === 'partial_success').length,
+        failure: outcomes.filter(o => o.outcome === 'failure').length,
+        tooEarly: outcomes.filter(o => o.outcome === 'too_early').length,
+      },
+      averageImpact: outcomes
+        .filter(o => o.impactScore !== null)
+        .reduce((sum, o) => sum + (o.impactScore || 0), 0) /
+        outcomes.filter(o => o.impactScore !== null).length || 0,
+      biasAccuracy: calculateBiasAccuracy(outcomes),
+    };
+
+    return NextResponse.json({ outcomes, metrics });
+  } catch (error) {
+    log.error('Failed to fetch outcomes:', error);
+    return NextResponse.json({ error: 'Failed to fetch outcomes' }, { status: 500 });
+  }
+}
+
+/**
+ * Calculate bias detection accuracy from outcomes
+ */
+function calculateBiasAccuracy(outcomes: any[]): {
+  confirmed: string[];
+  falsePositives: string[];
+  accuracy: number;
+} {
+  const allBiases = new Set<string>();
+  const confirmedBiases = new Set<string>();
+  const falsePositiveBiases = new Set<string>();
+
+  outcomes.forEach(outcome => {
+    outcome.confirmedBiases?.forEach((bias: string) => {
+      allBiases.add(bias);
+      confirmedBiases.add(bias);
+    });
+
+    outcome.falsPositiveBiases?.forEach((bias: string) => {
+      allBiases.add(bias);
+      falsePositiveBiases.add(bias);
+    });
+  });
+
+  const accuracy = allBiases.size > 0
+    ? (confirmedBiases.size / allBiases.size) * 100
+    : 0;
+
+  return {
+    confirmed: Array.from(confirmedBiases),
+    falsePositives: Array.from(falsePositiveBiases),
+    accuracy,
+  };
+}
+
+/**
+ * Get outcome prediction accuracy by digital twin
+ */
+export async function PUT(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get outcomes with twin accuracy data
+    const outcomes = await prisma.decisionOutcome.findMany({
+      where: {
+        userId: user.id,
+        mostAccurateTwin: { not: null },
+      },
+      select: {
+        mostAccurateTwin: true,
+        outcome: true,
+        impactScore: true,
+      },
+    });
+
+    // Group by digital twin
+    const twinAccuracy = outcomes.reduce((acc, outcome) => {
+      const twin = outcome.mostAccurateTwin || 'Unknown';
+      if (!acc[twin]) {
+        acc[twin] = { count: 0, successRate: 0, averageImpact: 0 };
+      }
+      acc[twin].count++;
+      if (outcome.outcome === 'success') {
+        acc[twin].successRate++;
+      }
+      if (outcome.impactScore) {
+        acc[twin].averageImpact += outcome.impactScore;
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Calculate percentages
+    Object.keys(twinAccuracy).forEach(twin => {
+      const data = twinAccuracy[twin];
+      data.successRate = (data.successRate / data.count) * 100;
+      data.averageImpact = data.averageImpact / data.count;
+    });
+
+    return NextResponse.json({
+      twinAccuracy,
+      mostAccurate: Object.entries(twinAccuracy)
+        .sort((a, b) => b[1].successRate - a[1].successRate)
+        .slice(0, 3)
+        .map(([name, data]) => ({ name, ...data })),
+    });
+  } catch (error) {
+    log.error('Failed to analyze twin accuracy:', error);
+    return NextResponse.json({ error: 'Failed to analyze accuracy' }, { status: 500 });
+  }
+}

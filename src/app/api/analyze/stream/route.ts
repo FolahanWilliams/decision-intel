@@ -296,11 +296,24 @@ export async function POST(request: NextRequest) {
           // the same transaction block. So the fallback MUST run in a
           // separate transaction instead of inside the same one.
           let schemaDrift = false;
+
           try {
             await prisma.$transaction(async tx => {
-              await tx.analysis.create({
+              // Check for existing analyses to determine version
+              const existingAnalyses = await tx.analysis.findMany({
+                where: { documentId },
+                orderBy: { version: 'desc' },
+                take: 1,
+                select: { id: true, version: true, overallScore: true, noiseScore: true },
+              });
+
+              const previousAnalysis = existingAnalyses[0];
+              const nextVersion = previousAnalysis ? previousAnalysis.version + 1 : 1;
+
+              const newAnalysis = await tx.analysis.create({
                 data: {
                   documentId,
+                  version: nextVersion,
                   overallScore: (report.overallScore as number) || 0,
                   noiseScore: (report.noiseScore as number) || 0,
                   summary: (report.summary as string) || '',
@@ -376,6 +389,27 @@ export async function POST(request: NextRequest) {
                   ),
                 } satisfies Prisma.AnalysisUncheckedCreateInput,
               });
+
+              // Create version snapshot if this is a new version
+              if (nextVersion > 1 && previousAnalysis) {
+                await tx.analysisVersion.create({
+                  data: {
+                    analysisId: newAnalysis.id,
+                    version: nextVersion,
+                    overallScore: (report.overallScore as number) || 0,
+                    noiseScore: (report.noiseScore as number) || 0,
+                    summary: (report.summary as string) || '',
+                    biases: detectedBiases as any,
+                    fullSnapshot: report as any,
+                  },
+                });
+
+                // Log score difference for monitoring
+                const scoreDiff = ((report.overallScore as number) || 0) - previousAnalysis.overallScore;
+                if (Math.abs(scoreDiff) > 10) {
+                  log.info(`Significant score change for document ${documentId}: ${scoreDiff.toFixed(1)} (v${nextVersion})`);
+                }
+              }
 
               await tx.document.update({
                 where: { id: documentId },

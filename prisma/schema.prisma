@@ -66,6 +66,7 @@ model Analysis {
   biases              BiasInstance[]
   versions     AnalysisVersion[]
   shareLinks   ShareLink[]
+  outcome      DecisionOutcome?
 
   @@index([documentId])
 }
@@ -436,6 +437,8 @@ model DecisionOutcome {
   mostAccurateTwin   String?
   reportedAt         DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
 
   @@index([analysisId])
   @@index([userId])
