@@ -153,7 +153,7 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
 
                 {bias.excerpt && (
                   <blockquote className="pl-4 border-l-2 border-white/20 text-gray-500 text-sm italic">
-                    "{bias.excerpt}"
+                    &ldquo;{bias.excerpt}&rdquo;
                   </blockquote>
                 )}
 

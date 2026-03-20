@@ -305,7 +305,7 @@ async function processFilesAsync(
 /**
  * Trigger analysis for a document (simplified - would use proper queue in production)
  */
-async function triggerAnalysis(documentId: string, userId: string): Promise<void> {
+async function triggerAnalysis(documentId: string, _userId: string): Promise<void> {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/analyze/stream`, {
       method: 'POST',

@@ -63,7 +63,7 @@ export function validateOrigin(request: NextRequest): boolean {
     } else {
       return false;
     }
-  } catch (error) {
+  } catch {
     log.warn(`CSRF: Invalid Origin/Referer URL: ${origin || referer}`);
     return false;
   }
