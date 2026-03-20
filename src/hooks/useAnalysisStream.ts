@@ -67,6 +67,8 @@ export function useAnalysisStream(options: StreamOptions) {
   const abortRef = useRef<AbortController | null>(null);
   const retryCountRef = useRef(0);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastEventIdRef = useRef<string | null>(null);
+  const seenEventIdsRef = useRef<Set<string>>(new Set());
 
   // Initialize steps to "pending"
   const resetSteps = useCallback(() => {
@@ -75,16 +77,26 @@ export function useAnalysisStream(options: StreamOptions) {
     setError(null);
     setResult(null);
     setTimedOut(false);
+    lastEventIdRef.current = null;
+    seenEventIdsRef.current.clear();
   }, [stepNames]);
 
   /**
    * Core stream reader — extracted so retries can call it recursively.
    */
   const readStream = useCallback(
-    async (documentId: string, signal: AbortSignal) => {
+    async (documentId: string, signal: AbortSignal, isRetry = false) => {
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+
+      // Include Last-Event-ID for resumption on retry
+      if (isRetry && lastEventIdRef.current) {
+        headers['Last-Event-ID'] = lastEventIdRef.current;
+        log.info(`Resuming stream from event ID: ${lastEventIdRef.current}`);
+      }
+
       const res = await fetch('/api/analyze/stream', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ documentId }),
         signal,
       });
@@ -116,7 +128,19 @@ export function useAnalysisStream(options: StreamOptions) {
           if (done) break;
 
           const chunk = decoder.decode(value, { stream: true });
-          sseReader.processChunk(chunk, (data: unknown) => {
+          sseReader.processChunk(chunk, (data: unknown, eventId?: string) => {
+            // Store last event ID for resumption
+            if (eventId) {
+              lastEventIdRef.current = eventId;
+
+              // Skip duplicate events on resume
+              if (seenEventIdsRef.current.has(eventId)) {
+                log.debug(`Skipping duplicate event ID: ${eventId}`);
+                return;
+              }
+              seenEventIdsRef.current.add(eventId);
+            }
+
             const update = data as Record<string, unknown>;
 
             switch (update.type) {
@@ -220,9 +244,9 @@ export function useAnalysisStream(options: StreamOptions) {
         controller.abort();
       }, STREAM_TIMEOUT_MS);
 
-      const attemptStream = async (): Promise<StreamResult | null> => {
+      const attemptStream = async (isRetryAttempt = false): Promise<StreamResult | null> => {
         try {
-          const streamResult = await readStream(documentId, controller.signal);
+          const streamResult = await readStream(documentId, controller.signal, isRetryAttempt);
           setResult(streamResult);
           return streamResult;
         } catch (err) {
@@ -241,7 +265,7 @@ export function useAnalysisStream(options: StreamOptions) {
             const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 4000);
             log.warn(`SSE retry ${retryCountRef.current}/${maxRetries} in ${delay}ms`);
             await new Promise(r => setTimeout(r, delay));
-            return attemptStream();
+            return attemptStream(true); // Pass true for retry attempts
           }
 
           // All retries used — treat as timed out for the UI

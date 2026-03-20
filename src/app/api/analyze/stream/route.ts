@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getGraph, ProgressUpdate } from '@/lib/analysis/analyzer';
-import { formatSSE } from '@/lib/sse';
+import { formatSSE, formatSSEHeartbeat } from '@/lib/sse';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
@@ -130,16 +130,51 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check for resumption with Last-Event-ID header
+    const lastEventId = request.headers.get('Last-Event-ID');
+    const resumeFromId = lastEventId ? parseInt(lastEventId, 10) : 0;
+
+    // Check for cached checkpoint state if resuming
+    let checkpoint: Record<string, unknown> | null = null;
+    if (resumeFromId > 0) {
+      const cacheKey = `stream:${documentId}:${userId}`;
+      const cached = await prisma.cacheEntry.findUnique({
+        where: { key: cacheKey },
+        select: { value: true, expiresAt: true },
+      });
+      if (cached && new Date(cached.expiresAt) > new Date()) {
+        try {
+          checkpoint = JSON.parse(cached.value);
+          log.info(`Resuming stream from event ID ${resumeFromId} for document ${documentId}`);
+        } catch (e) {
+          log.warn('Failed to parse checkpoint cache', e);
+        }
+      }
+    }
+
     const encoder = new TextEncoder();
+    let eventCounter = resumeFromId;
+    let heartbeatInterval: NodeJS.Timeout | null = null;
+
     const stream = new ReadableStream({
       async start(controller) {
-        const sendUpdate = (update: ProgressUpdate) => {
-          const sseString = formatSSE(update);
+        const sendUpdate = (update: ProgressUpdate, skipIncrement = false) => {
+          if (!skipIncrement) {
+            eventCounter++;
+          }
+          const sseString = formatSSE(update, String(eventCounter));
           controller.enqueue(encoder.encode(sseString));
         };
 
+        // Start heartbeat to keep connection alive
+        heartbeatInterval = setInterval(() => {
+          controller.enqueue(encoder.encode(formatSSEHeartbeat()));
+        }, 15000); // Send heartbeat every 15 seconds
+
         // Track completed nodes for progress calculation
-        const completedNodes = new Set<string>();
+        const completedNodes = checkpoint?.completedNodes
+          ? new Set<string>(checkpoint.completedNodes as string[])
+          : new Set<string>();
         const totalNodes = Object.keys(NODE_LABELS).length;
 
         try {
@@ -192,6 +227,30 @@ export async function POST(request: NextRequest) {
                   status: 'complete',
                   progress,
                 });
+
+                // Save checkpoint state for resumption
+                const cacheKey = `stream:${documentId}:${userId}`;
+                const checkpointData = {
+                  completedNodes: Array.from(completedNodes),
+                  lastEventId: eventCounter,
+                  progress,
+                };
+                prisma.cacheEntry
+                  .upsert({
+                    where: { key: cacheKey },
+                    update: {
+                      value: JSON.stringify(checkpointData),
+                      expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 min TTL
+                    },
+                    create: {
+                      key: cacheKey,
+                      value: JSON.stringify(checkpointData),
+                      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+                    },
+                  })
+                  .catch((err: unknown) => {
+                    log.warn('Failed to save checkpoint:', err);
+                  });
 
                 // Send bias detection updates
                 if (event.name === 'biasDetective' && event.data?.output?.biasAnalysis) {
@@ -425,6 +484,16 @@ export async function POST(request: NextRequest) {
 
           // Send final complete
           sendUpdate({ type: 'complete', progress: 100, result: result.finalReport });
+
+          // Clean up checkpoint cache on completion
+          const cacheKey = `stream:${documentId}:${userId}`;
+          await prisma.cacheEntry
+            .delete({ where: { key: cacheKey } })
+            .catch(() => {}); // Ignore errors
+
+          if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+          }
           controller.close();
         } catch (error) {
           log.error('Stream processing error:', error);
@@ -438,7 +507,17 @@ export async function POST(request: NextRequest) {
           }
           const errorMessage = getSafeErrorMessage(error);
           sendUpdate({ type: 'error', message: errorMessage, progress: 0 });
+
+          if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+          }
           controller.close();
+        }
+      },
+      cancel() {
+        // Clean up on stream cancellation
+        if (heartbeatInterval) {
+          clearInterval(heartbeatInterval);
         }
       },
     });
