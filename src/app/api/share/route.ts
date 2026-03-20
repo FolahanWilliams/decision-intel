@@ -12,6 +12,7 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 
 const log = createLogger('ShareLink');
 
@@ -55,11 +56,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Hash password if provided
+    // Hash password if provided using bcrypt
     let passwordHash: string | null = null;
     if (password) {
-      const { createHash } = await import('crypto');
-      passwordHash = createHash('sha256').update(password).digest('hex');
+      passwordHash = await bcrypt.hash(password, 12); // 12 rounds for good security/performance balance
     }
 
     const link = await prisma.shareLink.create({
@@ -90,6 +90,12 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+
+  // Check if this is an access history request
+  if (searchParams.get('access') === 'true' && searchParams.get('linkId')) {
+    return getShareLinkAccessHistory(req);
+  }
+
   const token = searchParams.get('token');
   const password = searchParams.get('password');
 
@@ -131,9 +137,33 @@ export async function GET(req: NextRequest) {
           { status: 401 }
         );
       }
-      const { createHash } = await import('crypto');
-      const hash = createHash('sha256').update(password).digest('hex');
-      if (hash !== link.password) {
+
+      let passwordValid = false;
+
+      // Check if it's a bcrypt hash (starts with $2a$, $2b$, or $2y$)
+      if (link.password.startsWith('$2')) {
+        // bcrypt hash
+        passwordValid = await bcrypt.compare(password, link.password);
+      } else if (link.password.length === 64) {
+        // Legacy SHA-256 hash (64 hex characters)
+        const { createHash } = await import('crypto');
+        const hash = createHash('sha256').update(password).digest('hex');
+        passwordValid = hash === link.password;
+
+        // If valid, transparently upgrade to bcrypt
+        if (passwordValid) {
+          const newHash = await bcrypt.hash(password, 12);
+          prisma.shareLink
+            .update({
+              where: { id: link.id },
+              data: { password: newHash },
+            })
+            .catch(err => log.warn('Failed to upgrade password hash:', err));
+          log.info(`Upgraded share link ${link.token} from SHA-256 to bcrypt`);
+        }
+      }
+
+      if (!passwordValid) {
         return NextResponse.json(
           { error: 'Invalid password', requiresPassword: true },
           { status: 401 }
@@ -154,15 +184,41 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Analysis no longer exists' }, { status: 404 });
     }
 
-    // Increment view count (fire and forget)
-    prisma.shareLink
-      .update({
+    // Update view count and create access log (fire and forget)
+    const updatePromises = [
+      // Update view count
+      prisma.shareLink.update({
         where: { id: link.id },
         data: { viewCount: { increment: 1 }, lastViewedAt: new Date() },
-      })
-      .catch(err => log.warn('View count update failed:', err));
+      }),
+      // Create access log entry
+      prisma.shareLinkAccess.create({
+        data: {
+          shareLinkId: link.id,
+          ipAddress: clientIp.slice(0, 45), // Limit IP length for IPv6 compatibility
+          userAgent: req.headers.get('user-agent')?.slice(0, 256) || null,
+        },
+      }),
+    ];
 
-    return NextResponse.json({
+    Promise.all(updatePromises).catch(err => log.warn('Share link tracking failed:', err));
+
+    // Generate ETag based on analysis updated timestamp and view count
+    const etag = `"${analysis.id}-${analysis.updatedAt.getTime()}-${link.viewCount}"`;
+
+    // Check If-None-Match header for conditional request
+    const ifNoneMatch = req.headers.get('if-none-match');
+    if (ifNoneMatch === etag) {
+      return new NextResponse(null, {
+        status: 304, // Not Modified
+        headers: {
+          'ETag': etag,
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      });
+    }
+
+    const responseData = {
       analysis: {
         id: analysis.id,
         documentName: analysis.document.filename,
@@ -185,6 +241,14 @@ export async function GET(req: NextRequest) {
       },
       sharedBy: link.userId,
       expiresAt: link.expiresAt,
+    };
+
+    return NextResponse.json(responseData, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300', // Cache for 60s, serve stale for 5min
+        'ETag': etag,
+        'Vary': 'Accept-Encoding', // Ensure proper caching with compression
+      },
     });
   } catch (error) {
     log.error('Failed to fetch shared analysis:', error);
@@ -224,5 +288,56 @@ export async function DELETE(req: NextRequest) {
   } catch (error) {
     log.error('Failed to revoke share link:', error);
     return NextResponse.json({ error: 'Failed to revoke share link' }, { status: 500 });
+  }
+}
+
+/**
+ * GET /api/share?linkId=xxx&access=true — View access logs for a share link (owner only)
+ */
+export async function getShareLinkAccessHistory(req: NextRequest) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const linkId = searchParams.get('linkId');
+
+  if (!linkId) {
+    return NextResponse.json({ error: 'Missing linkId parameter' }, { status: 400 });
+  }
+
+  try {
+    // Verify ownership
+    const link = await prisma.shareLink.findUnique({
+      where: { id: linkId },
+      select: { userId: true },
+    });
+
+    if (!link || link.userId !== user.id) {
+      return NextResponse.json({ error: 'Share link not found' }, { status: 404 });
+    }
+
+    // Fetch access history
+    const accesses = await prisma.shareLinkAccess.findMany({
+      where: { shareLinkId: linkId },
+      orderBy: { createdAt: 'desc' },
+      take: 100, // Limit to last 100 accesses
+      select: {
+        id: true,
+        ipAddress: true,
+        userAgent: true,
+        createdAt: true,
+      },
+    });
+
+    return NextResponse.json({ accesses });
+  } catch (error) {
+    log.error('Failed to fetch share link access history:', error);
+    return NextResponse.json({ error: 'Failed to fetch access history' }, { status: 500 });
   }
 }

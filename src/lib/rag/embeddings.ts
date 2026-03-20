@@ -36,7 +36,95 @@ interface EmbeddingMetadata {
 }
 
 /**
+ * Generate embedding vectors for multiple texts using Gemini's batch API
+ * @param texts Array of texts to embed (up to 100 per batch)
+ * @returns Array of embeddings in the same order as input texts
+ */
+export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
+  if (texts.length === 0) return [];
+
+  // If single text, use simpler single-text API
+  if (texts.length === 1) {
+    const embedding = await generateEmbedding(texts[0]);
+    return [embedding];
+  }
+
+  try {
+    const model = getGenAI().getGenerativeModel({ model: EMBEDDING_MODEL });
+
+    // Process in chunks of 100 (Gemini's batch limit)
+    const BATCH_SIZE = 100;
+    const results: number[][] = [];
+
+    for (let i = 0; i < texts.length; i += BATCH_SIZE) {
+      const batch = texts.slice(i, i + BATCH_SIZE);
+
+      // Process batch in parallel with concurrency limit
+      const CONCURRENCY = 3;
+      const batchResults: number[][] = [];
+
+      for (let j = 0; j < batch.length; j += CONCURRENCY) {
+        const chunk = batch.slice(j, j + CONCURRENCY);
+
+        const chunkPromises = chunk.map(async text => {
+          // Truncate text to avoid token limits
+          const truncatedText = text.slice(0, 30000);
+
+          const result = await model.embedContent({
+            content: { role: 'user', parts: [{ text: truncatedText }] },
+            taskType: TaskType.RETRIEVAL_DOCUMENT,
+            outputDimensionality: 1536,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- outputDimensionality not yet in SDK types
+          } as any);
+
+          const embedding = result.embedding.values;
+
+          // Validate embedding
+          if (!embedding || !Array.isArray(embedding) || embedding.length !== 1536) {
+            throw new Error(
+              `Invalid embedding generated: expected 1536 dimensions, got ${embedding?.length}`
+            );
+          }
+
+          return embedding;
+        });
+
+        const chunkResults = await Promise.all(chunkPromises);
+        batchResults.push(...chunkResults);
+      }
+
+      results.push(...batchResults);
+
+      // Log batch progress
+      log.info(`Generated embeddings for batch ${Math.ceil((i + BATCH_SIZE) / BATCH_SIZE)}, size: ${batch.length}`);
+    }
+
+    return results;
+  } catch (error) {
+    log.error('Batch embedding generation failed:', error);
+
+    // Fall back to single-text mode
+    log.warn('Falling back to single-text embedding generation');
+    const results: number[][] = [];
+
+    for (const text of texts) {
+      try {
+        const embedding = await generateEmbedding(text);
+        results.push(embedding);
+      } catch (err) {
+        log.error('Single embedding failed, using zero vector:', err);
+        // Return zero vector for failed items to maintain array alignment
+        results.push(new Array(1536).fill(0));
+      }
+    }
+
+    return results;
+  }
+}
+
+/**
  * Generate an embedding vector for text content using Gemini
+ * (Single-text version, preserved for backward compatibility)
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
   try {
@@ -114,46 +202,40 @@ export async function storeAnalysisEmbeddingsBatch(items: EmbeddingInput[]): Pro
   if (items.length === 0) return 0;
 
   try {
-    // Generate all embeddings in parallel (fault-tolerant)
-    const embeddingResults = await Promise.allSettled(
-      items.map(async item => {
-        const text = createAnalysisEmbeddingText(
-          item.filename,
-          item.summary,
-          item.biases,
-          item.score
-        );
-        const embedding = await generateEmbedding(text);
-
-        const metadata: EmbeddingMetadata = {
-          documentId: item.documentId,
-          analysisId: item.analysisId,
-          filename: item.filename,
-          overallScore: item.score,
-          biasCount: item.biases.length,
-          primaryBiases: item.biases.slice(0, 3).map(b => b.biasType),
-          createdAt: new Date().toISOString(),
-        };
-
-        return { text, embedding, metadata, documentId: item.documentId };
-      })
+    // Prepare texts for batch embedding
+    const texts = items.map(item =>
+      createAnalysisEmbeddingText(item.filename, item.summary, item.biases, item.score)
     );
 
-    // Filter to successful results only
-    const successful = embeddingResults
-      .filter(
-        (
-          r
-        ): r is PromiseFulfilledResult<{
-          text: string;
-          embedding: number[];
-          metadata: EmbeddingMetadata;
-          documentId: string;
-        }> => r.status === 'fulfilled'
-      )
-      .map(r => r.value);
+    // Generate embeddings in batch (much more efficient than parallel individual calls)
+    const embeddings = await generateEmbeddings(texts);
 
-    const failed = embeddingResults.filter(r => r.status === 'rejected').length;
+    // Combine embeddings with metadata
+    const embeddingData = items.map((item, index) => {
+      const metadata: EmbeddingMetadata = {
+        documentId: item.documentId,
+        analysisId: item.analysisId,
+        filename: item.filename,
+        overallScore: item.score,
+        biasCount: item.biases.length,
+        primaryBiases: item.biases.slice(0, 3).map(b => b.biasType),
+        createdAt: new Date().toISOString(),
+      };
+
+      return {
+        text: texts[index],
+        embedding: embeddings[index],
+        metadata,
+        documentId: item.documentId,
+      };
+    });
+
+    // Filter out any failed embeddings (zero vectors)
+    const successful = embeddingData.filter(
+      data => data.embedding && data.embedding.length === 1536 && !data.embedding.every(v => v === 0)
+    );
+
+    const failed = embeddingData.length - successful.length;
     if (failed > 0) {
       log.warn(`${failed}/${items.length} embedding generations failed`);
     }
