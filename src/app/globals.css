@@ -1828,3 +1828,324 @@ tr:hover td {
 }
 
 /* Dark-only app — no .dark override needed, :root already has dark values */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ADVANCED LIQUID GLASS EFFECTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Holographic Glass Variant - Iridescent with color shifts */
+.liquid-glass-holographic {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    hsla(0, 0%, 100%, 0.05),
+    hsla(0, 0%, 100%, 0.02),
+    hsla(0, 0%, 100%, 0.05)
+  );
+  backdrop-filter: url(#liquid-glass-holographic) blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: url(#liquid-glass-holographic) blur(12px) saturate(1.2);
+  animation: holographic-shift 8s ease-in-out infinite;
+}
+
+.liquid-glass-holographic::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 77, 77, 0.03) 35%,   /* Red accent shimmer */
+    rgba(255, 163, 77, 0.03) 40%,  /* Orange accent shimmer */
+    rgba(77, 255, 136, 0.03) 45%,  /* Green accent shimmer */
+    transparent 50%
+  );
+  background-size: 200% 200%;
+  animation: holographic-sweep 15s linear infinite;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@keyframes holographic-shift {
+  0%, 100% { filter: hue-rotate(0deg); }
+  25% { filter: hue-rotate(5deg); }
+  50% { filter: hue-rotate(-5deg); }
+  75% { filter: hue-rotate(3deg); }
+}
+
+@keyframes holographic-sweep {
+  0% { background-position: 200% 200%; }
+  100% { background-position: -100% -100%; }
+}
+
+/* Glass Morphing States */
+.liquid-glass-curved {
+  border-radius: var(--radius-4xl);
+  transform: perspective(1000px) rotateX(2deg);
+  backdrop-filter: url(#liquid-glass-card) blur(16px);
+  -webkit-backdrop-filter: url(#liquid-glass-card) blur(16px);
+}
+
+.liquid-glass-bubble {
+  border-radius: 50%;
+  transform: scale(1.05);
+  backdrop-filter: url(#liquid-glass-refraction) blur(20px);
+  -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(20px);
+  box-shadow:
+    inset 0 -20px 40px rgba(255, 255, 255, 0.1),
+    inset 0 20px 40px rgba(0, 0, 0, 0.2),
+    0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Depth-Based Progressive Blur */
+.liquid-glass-depth-1 { backdrop-filter: blur(2px); z-index: 10; }
+.liquid-glass-depth-2 { backdrop-filter: blur(6px); z-index: 9; }
+.liquid-glass-depth-3 { backdrop-filter: blur(12px); z-index: 8; }
+.liquid-glass-depth-4 { backdrop-filter: blur(18px); z-index: 7; }
+.liquid-glass-depth-5 { backdrop-filter: blur(24px); z-index: 6; }
+
+/* Performance-Aware Glass Rendering */
+.liquid-glass-active {
+  transition: all 0.3s ease-out;
+}
+
+.liquid-glass-advanced {
+  backdrop-filter: blur(calc(10px * var(--glass-render, 1)));
+  -webkit-backdrop-filter: blur(calc(10px * var(--glass-render, 1)));
+  transition: backdrop-filter 0.3s ease-out;
+}
+
+/* Micro-Interaction Animations */
+@keyframes glass-ripple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.8;
+  }
+  100% {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+  }
+}
+
+@keyframes glass-fill {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes glass-pulse {
+  0%, 100% {
+    opacity: 0.05;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.15;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes glass-wave {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@keyframes glass-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Glass Feedback States */
+.glass-feedback-success {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 197, 94, 0.05),  /* Green success */
+    transparent
+  );
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.glass-feedback-error {
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.05),  /* Red error */
+    transparent
+  );
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.glass-feedback-warning {
+  background: linear-gradient(
+    135deg,
+    rgba(249, 115, 22, 0.05),  /* Orange warning */
+    transparent
+  );
+  border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.glass-feedback-info {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Glass Crack Pattern for Errors */
+.glass-crack-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10,30 L50,10 L40,50 M50,10 L90,30 M40,50 L30,90 L70,70 L90,90' stroke='rgba(239,68,68,0.3)' stroke-width='0.5' fill='none'/%3E%3C/svg%3E");
+  background-size: 100px 100px;
+}
+
+/* Glass Sparkle Effect for Success */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.glass-sparkle-effect::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  width: 4px;
+  height: 4px;
+  background: rgba(34, 197, 94, 0.8);
+  border-radius: 50%;
+  animation: sparkle 1s ease-in-out infinite;
+  box-shadow:
+    20px 10px 0 rgba(34, 197, 94, 0.6),
+    -15px 25px 0 rgba(34, 197, 94, 0.4),
+    30px -20px 0 rgba(34, 197, 94, 0.5);
+}
+
+/* Enhanced Hover Glow */
+.glass-hover-glow {
+  box-shadow:
+    0 0 20px rgba(255, 255, 255, 0.1),
+    0 0 40px rgba(255, 255, 255, 0.05),
+    inset 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+/* Pressure-Sensitive Variables */
+.liquid-glass-pressure {
+  --glass-opacity: 0.05;
+  --glass-pressure: 0;
+  background: rgba(255, 255, 255, var(--glass-opacity));
+  backdrop-filter: blur(calc(10px + var(--glass-pressure) * 5px));
+  -webkit-backdrop-filter: blur(calc(10px + var(--glass-pressure) * 5px));
+}
+
+/* Component-Specific Enhancements */
+
+/* KPI Cards with Dynamic Updates */
+.stat-card.liquid-glass-active {
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card.has-update::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--update-x, 50%) var(--update-y, 50%),
+    rgba(255, 255, 255, 0.2),
+    transparent 70%
+  );
+  animation: pulse-glow 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes pulse-glow {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Data Visualization Glass Points */
+.glass-data-point {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-data-point:hover {
+  backdrop-filter: blur(12px) saturate(1.5);
+  -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  transform: scale(1.2) translateZ(10px);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+/* Modal Glass Materialization */
+@keyframes glass-materialize {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0);
+    transform: scale(0.9);
+  }
+  50% {
+    backdrop-filter: blur(20px);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(12px);
+    transform: scale(1);
+  }
+}
+
+.modal-glass-enter {
+  animation: glass-materialize 0.4s ease-out;
+}
+
+/* Navigation Glass Flow */
+.nav-item-active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: liquid-flow 2s ease-in-out infinite;
+}
+
+@keyframes liquid-flow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Accessibility Mode - High Contrast Glass */
+@media (prefers-contrast: high) {
+  .liquid-glass,
+  .liquid-glass-advanced,
+  .liquid-glass-holographic {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid white !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Reduced Motion - Disable Animations */
+@media (prefers-reduced-motion: reduce) {
+  .liquid-glass-holographic::before,
+  .glass-sparkle-effect::after,
+  .nav-item-active::after {
+    animation: none !important;
+  }
+
+  .liquid-glass-advanced,
+  .glass-data-point {
+    transition: none !important;
+  }
+}
