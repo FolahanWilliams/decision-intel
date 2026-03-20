@@ -19,6 +19,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { NotificationProvider } from '@/components/ui/NotificationCenter';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ReducedMotionProvider } from '@/components/ReducedMotionProvider';
+import { DensityProvider } from '@/components/DensityProvider';
 import { cn } from "@/lib/utils";
 
 
@@ -30,14 +31,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans")}>
       <body className="antialiased min-h-screen">
-        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" disableTransitionOnChange>
-          <ReducedMotionProvider>
-            <NotificationProvider>
-              <TooltipProvider>
-                <ToastProvider>{children}</ToastProvider>
-              </TooltipProvider>
-            </NotificationProvider>
-          </ReducedMotionProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <DensityProvider>
+            <ReducedMotionProvider>
+              <NotificationProvider>
+                <TooltipProvider>
+                  <ToastProvider>{children}</ToastProvider>
+                </TooltipProvider>
+              </NotificationProvider>
+            </ReducedMotionProvider>
+          </DensityProvider>
         </ThemeProvider>
       </body>
     </html>

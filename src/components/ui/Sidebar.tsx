@@ -23,6 +23,8 @@ import {
   Zap,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
+import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
+import { DensityToggle } from '@/components/DensityProvider';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -409,34 +411,47 @@ export default function Sidebar() {
             borderTop: '1px solid rgba(255, 255, 255, 0.18)',
           }}
         >
-          <button
-            onClick={async () => {
-              const { createClient } = await import('@/utils/supabase/client');
-              const supabase = createClient();
-              await supabase.auth.signOut();
-              window.location.href = '/login';
-            }}
-            title={collapsed ? 'Sign out' : undefined}
-            aria-label="Sign out"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: collapsed ? 'center' : 'flex-start',
-              gap: collapsed ? '0' : '12px',
-              padding: collapsed ? '10px' : '9px 12px',
-              width: '100%',
-              color: 'var(--text-muted)',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '13.5px',
-              transition: 'color 0.15s',
-              borderRadius: 'var(--radius-md)',
-            }}
-          >
-            <LogOutIcon size={18} style={{ flexShrink: 0 }} />
-            {!collapsed && <span>Sign Out</span>}
-          </button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            {collapsed ? (
+              <>
+                <ThemeToggleCompact className="flex-1" />
+                <DensityToggle className="flex-1" />
+              </>
+            ) : (
+              <>
+                <ThemeToggle className="flex-1" />
+                <DensityToggle className="flex-1" />
+              </>
+            )}
+            <button
+              onClick={async () => {
+                const { createClient } = await import('@/utils/supabase/client');
+                const supabase = createClient();
+                await supabase.auth.signOut();
+                window.location.href = '/login';
+              }}
+              title={collapsed ? 'Sign out' : undefined}
+              aria-label="Sign out"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                gap: collapsed ? '0' : '12px',
+                padding: collapsed ? '10px' : '9px 12px',
+                flex: collapsed ? 1 : 'none',
+                color: 'var(--text-muted)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '13.5px',
+                transition: 'color 0.15s',
+                borderRadius: 'var(--radius-md)',
+              }}
+            >
+              <LogOutIcon size={18} style={{ flexShrink: 0 }} />
+              {!collapsed && <span>Sign Out</span>}
+            </button>
+          </div>
         </div>
         <div
           style={{

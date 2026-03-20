@@ -22,8 +22,18 @@ import {
   CheckCircle,
   AlertTriangle,
   Loader2,
+  Moon,
+  Sun,
+  Plus,
+  TrendingUp,
+  Users,
+  Filter,
+  Download,
+  Copy,
+  Eye,
 } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
+import { useTheme } from 'next-themes';
 
 interface CommandItem {
   id: string;
@@ -66,6 +76,7 @@ export function CommandPalette() {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   // Only fetch documents when palette is open
   const { documents } = useDocuments(false, 1, 8);
@@ -234,9 +245,91 @@ export function CommandPalette() {
           setShowShortcuts(true);
         },
         keywords: ['keys', 'help', 'hotkeys'],
+        rightHint: 'Shift+?',
+      },
+      {
+        id: 'theme-toggle',
+        label: theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+        description: 'Toggle between light and dark themes',
+        icon: theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />,
+        action: () => {
+          setTheme(theme === 'dark' ? 'light' : 'dark');
+          setOpen(false);
+        },
+        keywords: ['theme', 'mode', 'dark', 'light', 'appearance'],
+        rightHint: '⌘+Shift+L',
+      },
+      {
+        id: 'new-analysis',
+        label: 'Start New Analysis',
+        description: 'Analyze a document for cognitive biases',
+        icon: <BrainCircuit size={16} />,
+        action: () => {
+          navigate('/dashboard/cognitive-audits/submit');
+        },
+        keywords: ['analyze', 'audit', 'bias', 'cognitive'],
+        rightHint: '⌘+N',
+      },
+      {
+        id: 'export-data',
+        label: 'Export Current View',
+        description: 'Download data in CSV, JSON, or PDF',
+        icon: <Download size={16} />,
+        action: () => {
+          // Trigger export modal or function
+          console.log('Export triggered');
+          setOpen(false);
+        },
+        keywords: ['download', 'csv', 'json', 'pdf', 'export'],
+        rightHint: '⌘+E',
+      },
+      {
+        id: 'view-trends',
+        label: 'View Bias Trends',
+        description: 'See patterns over time',
+        icon: <TrendingUp size={16} />,
+        action: () => {
+          navigate('/dashboard/insights');
+        },
+        keywords: ['trends', 'patterns', 'analytics', 'statistics'],
+      },
+      {
+        id: 'team-view',
+        label: 'Team Dashboard',
+        description: 'View team activity and insights',
+        icon: <Users size={16} />,
+        action: () => {
+          navigate('/dashboard/team');
+        },
+        keywords: ['team', 'collaboration', 'members', 'activity'],
+      },
+      {
+        id: 'copy-link',
+        label: 'Copy Current Page Link',
+        description: 'Share this page with others',
+        icon: <Copy size={16} />,
+        action: () => {
+          navigator.clipboard.writeText(window.location.href);
+          setOpen(false);
+        },
+        keywords: ['share', 'link', 'url', 'copy'],
+        rightHint: '⌘+Shift+C',
+      },
+      {
+        id: 'filter-view',
+        label: 'Filter Current View',
+        description: 'Apply filters to current data',
+        icon: <Filter size={16} />,
+        action: () => {
+          // Trigger filter panel
+          console.log('Filter triggered');
+          setOpen(false);
+        },
+        keywords: ['filter', 'sort', 'search', 'refine'],
+        rightHint: '⌘+F',
       },
     ],
-    [navigate]
+    [navigate, theme, setTheme]
   );
 
   // Build groups with filtering
@@ -327,6 +420,26 @@ export function CommandPalette() {
         e.preventDefault();
         setShowShortcuts(true);
       }
+      // Theme toggle shortcut
+      if (e.metaKey && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        setTheme(theme === 'dark' ? 'light' : 'dark');
+      }
+      // New analysis shortcut
+      if (e.metaKey && e.key === 'n' && !open) {
+        e.preventDefault();
+        router.push('/dashboard/cognitive-audits/submit');
+      }
+      // Export shortcut
+      if (e.metaKey && e.key === 'e' && !open) {
+        e.preventDefault();
+        console.log('Export triggered via shortcut');
+      }
+      // Copy link shortcut
+      if (e.metaKey && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        navigator.clipboard.writeText(window.location.href);
+      }
       if (e.key === 'Escape') {
         if (showShortcuts) setShowShortcuts(false);
         else if (open) setOpen(false);
@@ -334,7 +447,7 @@ export function CommandPalette() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, showShortcuts]);
+  }, [open, showShortcuts, theme, setTheme, router]);
 
   // Focus input when opened
   useEffect(() => {

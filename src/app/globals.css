@@ -30,7 +30,7 @@
 }
 
 :root {
-  /* Backgrounds — deep black */
+  /* Default to dark theme */
   --bg-primary: #000000;
   --bg-secondary: #050505;
   --bg-tertiary: #0a0a0a;
@@ -38,13 +38,11 @@
   --bg-card-hover: rgba(255, 255, 255, 0.06);
   --bg-elevated: rgba(255, 255, 255, 0.05);
 
-  /* Text — high contrast */
   --text-primary: #FFFFFF;
   --text-secondary: #b4b4bc;
   --text-muted: #71717a;
   --text-highlight: #FFFFFF;
 
-  /* Brand — Pure white accent */
   --accent-primary: #FFFFFF;
   --accent-secondary: #d4d4d8;
   --accent-tertiary: #a1a1aa;
@@ -163,10 +161,144 @@
   --sidebar-ring: #FFFFFF;
 }
 
+/* Light mode overrides */
+.light {
+  /* Backgrounds — clean whites and grays */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-card: rgba(0, 0, 0, 0.02);
+  --bg-card-hover: rgba(0, 0, 0, 0.04);
+  --bg-elevated: rgba(255, 255, 255, 0.95);
+
+  /* Text — dark on light */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --text-highlight: #000000;
+
+  /* Brand — Dark accent for light mode */
+  --accent-primary: #111827;
+  --accent-secondary: #374151;
+  --accent-tertiary: #6b7280;
+
+  /* Gradient stops — dark to gray */
+  --gradient-start: #111827;
+  --gradient-mid: #374151;
+  --gradient-end: #6b7280;
+
+  /* Borders — subtle gray */
+  --border-color: rgba(0, 0, 0, 0.12);
+  --border-active: rgba(0, 0, 0, 0.24);
+  --border-hover: rgba(0, 0, 0, 0.16);
+
+  /* Shadows — softer for light mode */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12), 0 5px 10px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 20px rgba(0, 0, 0, 0.04), 0 0 40px rgba(0, 0, 0, 0.02);
+  --shadow-glow-white: 0 0 30px rgba(0, 0, 0, 0.03);
+
+  /* Glass — adapted for light mode */
+  --glass-bg: rgba(0, 0, 0, 0.03);
+  --glass-border: rgba(0, 0, 0, 0.12);
+
+  /* Liquid Glass — optimized for light backgrounds */
+  --liquid-bg: rgba(0, 0, 0, 0.02);
+  --liquid-bg-strong: rgba(0, 0, 0, 0.04);
+  --liquid-bg-hover: rgba(0, 0, 0, 0.06);
+  --liquid-border: rgba(0, 0, 0, 0.08);
+  --liquid-border-hover: rgba(0, 0, 0, 0.16);
+  --liquid-border-active: rgba(0, 0, 0, 0.24);
+  --liquid-specular: rgba(255, 255, 255, 0.8);
+  --liquid-tint: rgba(255, 255, 255, 0.42);
+  --liquid-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.12);
+  --liquid-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.16);
+  --liquid-shadow-glow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+
+  /* shadcn/ui semantic tokens — light glassmorphism */
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --primary: #111827;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111827;
+  --muted: #f9fafb;
+  --muted-foreground: #6b7280;
+  --accent: #f3f4f6;
+  --accent-foreground: #111827;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.12);
+  --input: rgba(0, 0, 0, 0.12);
+  --ring: #111827;
+  --sidebar-background: #ffffff;
+  --sidebar-foreground: #111827;
+  --sidebar-primary: #111827;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3f4f6;
+  --sidebar-accent-foreground: #111827;
+  --sidebar-border: rgba(0, 0, 0, 0.12);
+  --sidebar-ring: #111827;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Density modes for compact/dense views */
+.density-comfortable {
+  --density-spacing: 1;
+  --density-text: 1;
+  --density-padding: 1;
+}
+
+.density-compact {
+  --density-spacing: 0.75;
+  --density-text: 0.95;
+  --density-padding: 0.8;
+}
+
+.density-dense {
+  --density-spacing: 0.5;
+  --density-text: 0.9;
+  --density-padding: 0.6;
+}
+
+/* Apply density to common elements */
+.density-compact .card,
+.density-compact .liquid-glass {
+  padding: calc(var(--spacing-md) * var(--density-padding)) !important;
+}
+
+.density-dense .card,
+.density-dense .liquid-glass {
+  padding: calc(var(--spacing-sm) * var(--density-padding)) !important;
+}
+
+.density-compact h1 { font-size: calc(2rem * var(--density-text)); }
+.density-compact h2 { font-size: calc(1.5rem * var(--density-text)); }
+.density-compact h3 { font-size: calc(1.25rem * var(--density-text)); }
+.density-compact p { font-size: calc(0.875rem * var(--density-text)); }
+
+.density-dense h1 { font-size: calc(1.75rem * var(--density-text)); }
+.density-dense h2 { font-size: calc(1.25rem * var(--density-text)); }
+.density-dense h3 { font-size: calc(1.1rem * var(--density-text)); }
+.density-dense p { font-size: calc(0.8125rem * var(--density-text)); }
+
+/* Compact grid layouts */
+.density-compact .grid { gap: calc(var(--spacing-md) * var(--density-spacing)); }
+.density-dense .grid { gap: calc(var(--spacing-sm) * var(--density-spacing)); }
+
+/* Reduce chart heights in dense mode */
+.density-dense .chart-container {
+  max-height: 200px;
 }
 
 body {
