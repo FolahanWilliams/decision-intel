@@ -497,6 +497,8 @@ export async function POST(request: NextRequest) {
           controller.close();
         } catch (error) {
           log.error('Stream processing error:', error);
+
+          // Update document status
           try {
             await prisma.document.update({
               where: { id: documentId },
@@ -505,6 +507,59 @@ export async function POST(request: NextRequest) {
           } catch (updateErr) {
             log.error('Failed to update document status to error:', updateErr);
           }
+
+          // Save to dead letter queue for retry
+          try {
+            const errorMessage = getSafeErrorMessage(error);
+            const errorCode = (error as any)?.code || null;
+
+            // Check if a failed analysis record already exists
+            const existingFailed = await prisma.failedAnalysis.findFirst({
+              where: {
+                documentId,
+                resolvedAt: null, // Only check unresolved failures
+              },
+            });
+
+            if (existingFailed) {
+              // Update existing record with incremented retry count
+              const nextRetryDelay = Math.min(
+                5 * 60 * 1000 * Math.pow(2, existingFailed.retryCount), // Exponential backoff
+                2 * 60 * 60 * 1000 // Max 2 hours
+              );
+
+              await prisma.failedAnalysis.update({
+                where: { id: existingFailed.id },
+                data: {
+                  retryCount: { increment: 1 },
+                  error: errorMessage,
+                  errorCode,
+                  nextRetryAt: new Date(Date.now() + nextRetryDelay),
+                },
+              });
+            } else {
+              // Create new failed analysis record
+              await prisma.failedAnalysis.create({
+                data: {
+                  documentId,
+                  userId,
+                  error: errorMessage,
+                  errorCode,
+                  input: {
+                    content: doc.content.slice(0, 5000), // Truncate for storage
+                    filename: doc.filename,
+                    options: { documentId, userId },
+                  },
+                  nextRetryAt: new Date(Date.now() + 5 * 60 * 1000), // 5 min initial retry
+                },
+              });
+            }
+
+            log.info(`Failed analysis saved to dead letter queue for document ${documentId}`);
+          } catch (dlqError) {
+            log.error('Failed to save to dead letter queue:', dlqError);
+          }
+
           const errorMessage = getSafeErrorMessage(error);
           sendUpdate({ type: 'error', message: errorMessage, progress: 0 });
 

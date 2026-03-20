@@ -1,7 +1,14 @@
 import { updateSession } from '@/utils/supabase/middleware';
 import { NextRequest } from 'next/server';
+import { validateOrigin, createCSRFErrorResponse } from '@/lib/utils/csrf';
 
 export async function middleware(request: NextRequest) {
+  // CSRF protection - validate origin for mutation requests
+  if (!validateOrigin(request)) {
+    return createCSRFErrorResponse();
+  }
+
+  // Continue with session update
   return await updateSession(request);
 }
 

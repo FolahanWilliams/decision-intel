@@ -2,11 +2,27 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async headers() {
+    // Content Security Policy
+    const cspHeader = `
+      default-src 'self';
+      script-src 'self' 'unsafe-eval' 'unsafe-inline';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: blob: https:;
+      font-src 'self' data:;
+      connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+      upgrade-insecure-requests;
+    `.replace(/\s+/g, ' ').trim();
+
     const securityHeaders = [
+      { key: "Content-Security-Policy", value: cspHeader },
       { key: "X-Frame-Options", value: "DENY" },
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
       { key: "X-DNS-Prefetch-Control", value: "on" },
+      { key: "Permissions-Policy", value: "geolocation=(), microphone=(), camera=()" },
     ];
 
     // Only add HSTS in production (when ALLOWED_ORIGIN is set)
