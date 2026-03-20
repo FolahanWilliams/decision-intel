@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { z } from 'zod';
 
 const log = createLogger('ShareLink');
@@ -94,6 +95,17 @@ export async function GET(req: NextRequest) {
 
   if (!token) {
     return NextResponse.json({ error: 'Missing token' }, { status: 400 });
+  }
+
+  // Rate limit public share lookups to prevent brute-force token enumeration
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rateLimit = await checkRateLimit(clientIp, '/api/share:GET', {
+    windowMs: 60 * 1000, // 1 minute
+    maxRequests: 20,
+    failMode: 'closed',
+  });
+  if (!rateLimit.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
   try {

@@ -283,7 +283,7 @@ export async function analyzeHumanDecision(
   );
 
   const noiseScore = noiseData?.noiseStats
-    ? Math.round(100 - noiseData.noiseStats.stdDev * 10)
+    ? Math.max(0, Math.min(100, Math.round(100 - noiseData.noiseStats.stdDev * 10)))
     : 50;
 
   // Generate summary

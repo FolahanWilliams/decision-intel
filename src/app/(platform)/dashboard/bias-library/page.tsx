@@ -29,11 +29,12 @@ export default function BiasLibraryPage() {
     for (const doc of documents) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const analyses = (doc as any).analyses;
-      if (!analyses?.length) continue;
+      if (!Array.isArray(analyses) || !analyses.length) continue;
       for (const analysis of analyses) {
-        if (!analysis.biases?.length) continue;
+        if (!Array.isArray(analysis.biases) || !analysis.biases.length) continue;
         for (const bias of analysis.biases) {
-          const key = (bias.biasType as string)
+          if (!bias.biasType || typeof bias.biasType !== 'string') continue;
+          const key = bias.biasType
             .toLowerCase()
             .replace(/\s+/g, '_')
             .replace(/[^a-z_]/g, '');

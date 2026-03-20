@@ -145,10 +145,11 @@ function getStandardSafetyGroundedModel(): GenerativeModel {
 const LLM_TIMEOUT_MS = 90000; // 90 seconds - increased for complex analysis
 
 async function withTimeout<T>(promise: Promise<T>, ms: number = LLM_TIMEOUT_MS): Promise<T> {
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error(`LLM timeout after ${ms}ms`)), ms)
-  );
-  return Promise.race([promise, timeout]);
+  let timer: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`LLM timeout after ${ms}ms`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
 // Text truncation to prevent timeouts on large documents
@@ -294,7 +295,7 @@ Keep it concise — max 5 items per array.`,
     return { intelligenceContext };
   } catch (e) {
     log.warn('Intelligence node failed (non-fatal):', e instanceof Error ? e.message : String(e));
-    return { intelligenceContext: undefined };
+    return {};  // Omit the key entirely so downstream nodes don't receive undefined
   }
 }
 
@@ -1225,7 +1226,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
   return {
     finalReport: {
       overallScore,
-      noiseScore: Math.min(100, (state.noiseStats?.stdDev || 0) * 10),
+      noiseScore: Math.max(0, Math.min(100, (state.noiseStats?.stdDev || 0) * 10)),
       summary: `Audit complete. Detected ${(state.biasAnalysis || []).length} biases. Trust Score: ${trustScore}%.`,
       structuredContent: state.structuredContent,
       biases: (state.biasAnalysis || []).map(b => ({

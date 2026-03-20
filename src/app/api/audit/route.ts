@@ -91,7 +91,8 @@ export async function GET(req: NextRequest) {
       if (/^[=+\-@\t\r]/.test(s)) {
         s = `'${s}`;
       }
-      return s.includes(',') || s.includes('"') || s.includes('\n')
+      // Always quote fields that contain special characters (commas, quotes, newlines, tabs, semicolons)
+      return s.includes(',') || s.includes('"') || s.includes('\n') || s.includes('\t') || s.includes(';')
         ? `"${s.replace(/"/g, '""')}"`
         : s;
     };

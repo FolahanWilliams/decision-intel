@@ -46,6 +46,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'analysisId and outcome are required' }, { status: 400 });
     }
 
+    // Validate array fields
+    if (confirmedBiases !== undefined && !Array.isArray(confirmedBiases)) {
+      return NextResponse.json({ error: 'confirmedBiases must be an array' }, { status: 400 });
+    }
+    if (falsPositiveBiases !== undefined && !Array.isArray(falsPositiveBiases)) {
+      return NextResponse.json({ error: 'falsPositiveBiases must be an array' }, { status: 400 });
+    }
+
     if (!VALID_OUTCOMES.includes(outcome)) {
       return NextResponse.json(
         { error: `outcome must be one of: ${VALID_OUTCOMES.join(', ')}` },
