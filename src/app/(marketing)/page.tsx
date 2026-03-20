@@ -12,6 +12,10 @@ import {
   AnimatePresence,
   useSpring,
 } from 'framer-motion';
+import { LiquidGlassEffect } from '@/components/ui/LiquidGlassEffect';
+import { LiquidGlassAdvanced } from '@/components/ui/LiquidGlassAdvanced';
+import { GlassRipple, GlassHover } from '@/components/ui/GlassMicroInteractions';
+import { cn } from '@/lib/utils';
 import {
   Brain,
   AlertTriangle,
@@ -185,24 +189,22 @@ function TypewriterTerminal() {
   );
 }
 
-// Glass card style helper
+// Glass card style helper - now using liquid glass classes
 const glassCard = {
   background: 'rgba(8, 11, 20, 0.58)',
-  backdropFilter: 'blur(32px) saturate(170%)',
-  WebkitBackdropFilter: 'blur(32px) saturate(170%)',
-  border: '1px solid rgba(255, 255, 255, 0.12)',
   borderRadius: '20px',
   boxShadow: '0 12px 48px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.07) inset',
 } as const;
 
 const glassCardLight = {
   background: 'rgba(8, 11, 20, 0.55)',
-  backdropFilter: 'blur(24px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-  border: '1px solid rgba(255, 255, 255, 0.10)',
   borderRadius: '20px',
   boxShadow: '0 8px 32px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.06) inset',
 } as const;
+
+// Liquid glass class names to use with these styles
+const glassCardClasses = "liquid-glass-premium border border-white/12 rounded-[20px]";
+const glassCardLightClasses = "liquid-glass border border-white/10 rounded-[20px]";
 
 // Mobile nav overlay
 function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -238,8 +240,8 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50"
-            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+            className="fixed inset-0 z-50 liquid-glass"
+            style={{ background: 'rgba(0,0,0,0.6)' }}
             onClick={onClose}
           />
           <motion.div
@@ -248,14 +250,12 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed top-0 right-0 bottom-0 z-50 w-72"
+            className={cn("fixed top-0 right-0 bottom-0 z-50 w-72", "liquid-glass-premium", "border-l border-white/10")}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
             style={{
               background: 'rgba(8, 11, 20, 0.95)',
-              backdropFilter: 'blur(40px)',
-              borderLeft: '1px solid rgba(255,255,255,0.10)',
             }}
           >
             <div className="flex justify-end p-4">
@@ -288,14 +288,16 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
               <div
                 style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '12px 0' }}
               />
-              <Link
-                href="/login"
-                onClick={onClose}
-                className="btn btn-primary glow"
-                style={{ textAlign: 'center', padding: '14px', fontSize: '0.9rem' }}
-              >
-                Get Started
-              </Link>
+              <GlassRipple>
+                <Link
+                  href="/login"
+                  onClick={onClose}
+                  className="btn btn-primary glow"
+                  style={{ textAlign: 'center', padding: '14px', fontSize: '0.9rem' }}
+                >
+                  Get Started
+                </Link>
+              </GlassRipple>
               <Link
                 href="/login"
                 onClick={onClose}
@@ -539,18 +541,21 @@ export default function LandingPage() {
       }}
     >
       <ScrollProgress />
+      <LiquidGlassEffect />
+      <LiquidGlassAdvanced />
       <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
 
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="fixed top-0 left-0 right-0 z-40"
+        className={cn(
+          "fixed top-0 left-0 right-0 z-40",
+          "liquid-glass-premium",
+          "border-b border-white/10"
+        )}
         style={{
           background: 'rgba(8, 11, 20, 0.65)',
-          backdropFilter: 'blur(40px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.10)',
           boxShadow: '0 1px 0 rgba(255,255,255,0.06) inset',
         }}
       >
@@ -560,12 +565,13 @@ export default function LandingPage() {
         >
           <div className="flex items-center gap-3">
             <div
+              className={cn(
+                "p-2 rounded-[14px]",
+                "liquid-glass",
+                "border border-white/15"
+              )}
               style={{
-                padding: '8px',
                 background: 'rgba(255, 255, 255, 0.06)',
-                borderRadius: '14px',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                backdropFilter: 'blur(12px)',
               }}
             >
               <Brain className="w-5 h-5" style={{ color: '#FFFFFF' }} />
@@ -599,20 +605,24 @@ export default function LandingPage() {
             </a>
           </div>
           <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="btn btn-secondary hidden sm:inline-flex"
-              style={{ fontSize: '0.85rem' }}
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/login"
-              className="btn btn-primary hidden sm:inline-flex"
-              style={{ fontSize: '0.85rem' }}
-            >
-              Get Started
-            </Link>
+            <GlassHover>
+              <Link
+                href="/login"
+                className="btn btn-secondary hidden sm:inline-flex"
+                style={{ fontSize: '0.85rem' }}
+              >
+                Sign In
+              </Link>
+            </GlassHover>
+            <GlassRipple>
+              <Link
+                href="/login"
+                className="btn btn-primary hidden sm:inline-flex"
+                style={{ fontSize: '0.85rem' }}
+              >
+                Get Started
+              </Link>
+            </GlassRipple>
             <button
               className="md:hidden p-2"
               onClick={() => setMobileNavOpen(true)}
@@ -730,20 +740,24 @@ export default function LandingPage() {
                   transition={{ delay: 0.3 }}
                   className="flex flex-wrap items-center gap-4"
                 >
-                  <Link
-                    href="/login"
-                    className="btn btn-primary glow"
-                    style={{ padding: '14px 32px', fontSize: '0.9rem' }}
-                  >
-                    Start Free Trial <ArrowRight className="w-4 h-4 ml-2 inline" />
-                  </Link>
-                  <a
-                    href="#solution"
-                    className="btn btn-secondary"
-                    style={{ padding: '14px 32px', fontSize: '0.9rem' }}
-                  >
-                    See How It Works
-                  </a>
+                  <GlassRipple>
+                    <Link
+                      href="/login"
+                      className="btn btn-primary glow"
+                      style={{ padding: '14px 32px', fontSize: '0.9rem' }}
+                    >
+                      Start Free Trial <ArrowRight className="w-4 h-4 ml-2 inline" />
+                    </Link>
+                  </GlassRipple>
+                  <GlassHover>
+                    <a
+                      href="#solution"
+                      className="btn btn-secondary"
+                      style={{ padding: '14px 32px', fontSize: '0.9rem' }}
+                    >
+                      See How It Works
+                    </a>
+                  </GlassHover>
                 </motion.div>
 
                 <motion.div
@@ -1504,8 +1518,8 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.1 }}
-              className="col-span-1 md:col-span-2 lg:col-span-2"
-              style={{ ...glassCardLight, padding: '32px' }}
+              className={cn("col-span-1 md:col-span-2 lg:col-span-2", glassCardLightClasses, "p-8")}
+              style={glassCardLight}
             >
               <div
                 style={{
@@ -1559,8 +1573,8 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.2 }}
-              className="col-span-1 flex flex-col items-center text-center justify-center"
-              style={{ ...glassCardLight, padding: '32px' }}
+              className={cn("col-span-1 flex flex-col items-center text-center justify-center", glassCardLightClasses, "p-8")}
+              style={glassCardLight}
             >
               <Zap className="w-8 h-8 mb-4" style={{ color: '#fbbf24' }} />
               <h3
@@ -1585,8 +1599,8 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.3 }}
-              className="col-span-1 flex flex-col items-center text-center justify-center"
-              style={{ ...glassCardLight, padding: '32px' }}
+              className={cn("col-span-1 flex flex-col items-center text-center justify-center", glassCardLightClasses, "p-8")}
+              style={glassCardLight}
             >
               <Shield className="w-8 h-8 mb-4" style={{ color: '#22c55e' }} />
               <h3
@@ -1641,8 +1655,8 @@ export default function LandingPage() {
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={roiInView ? { opacity: 1, x: 0 } : {}}
-              className="md:col-span-2"
-              style={{ ...glassCard, padding: '32px' }}
+              className={cn("md:col-span-2", glassCardClasses, "p-8")}
+              style={glassCard}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 <div
