@@ -1909,8 +1909,8 @@ tr:hover td {
 }
 
 .liquid-glass-advanced {
-  backdrop-filter: blur(calc(10px * var(--glass-render, 1)));
-  -webkit-backdrop-filter: blur(calc(10px * var(--glass-render, 1)));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: backdrop-filter 0.3s ease-out;
 }
 

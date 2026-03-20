@@ -26,7 +26,7 @@ function detectPerformanceTier(): PerformanceTier {
   }
 
   // Simple GPU detection based on device memory and core count
-  const memory = (navigator as any).deviceMemory || 4;
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4;
   const cores = navigator.hardwareConcurrency || 4;
 
   if (memory >= 8 && cores >= 8) return 'ultra';
@@ -99,16 +99,21 @@ function generateDepthMap(layers: number = 3): string {
 }
 
 export function useGlassPerformance() {
-  const [tier, setTier] = useState<PerformanceTier>('medium');
   const reducedMotion = useReducedMotion();
 
+  // Initialize state with a function to avoid setState in effect
+  const [tier, setTier] = useState<PerformanceTier>(() => {
+    if (typeof window === 'undefined') return 'medium';
+    return reducedMotion ? 'accessibility' : detectPerformanceTier();
+  });
+
   useEffect(() => {
-    if (reducedMotion) {
-      setTier('accessibility');
-    } else {
-      setTier(detectPerformanceTier());
+    // Only update if value actually changes
+    const newTier = reducedMotion ? 'accessibility' : detectPerformanceTier();
+    if (newTier !== tier) {
+      setTier(newTier);
     }
-  }, [reducedMotion]);
+  }, [reducedMotion, tier]);
 
   return tier;
 }
@@ -152,11 +157,9 @@ export function LiquidGlassAdvanced() {
           if (entry.isIntersecting) {
             // Enable glass effects when visible
             target.classList.add('liquid-glass-active');
-            target.style.setProperty('--glass-render', '1');
           } else {
-            // Disable complex effects when not visible
+            // Keep glass visible but remove active state for performance
             target.classList.remove('liquid-glass-active');
-            target.style.setProperty('--glass-render', '0');
           }
         });
       },

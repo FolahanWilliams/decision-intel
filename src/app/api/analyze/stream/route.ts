@@ -399,8 +399,8 @@ export async function POST(request: NextRequest) {
                     overallScore: (report.overallScore as number) || 0,
                     noiseScore: (report.noiseScore as number) || 0,
                     summary: (report.summary as string) || '',
-                    biases: detectedBiases as any,
-                    fullSnapshot: report as any,
+                    biases: detectedBiases as Prisma.InputJsonValue,
+                    fullSnapshot: report as Prisma.InputJsonValue,
                   },
                 });
 
@@ -545,7 +545,7 @@ export async function POST(request: NextRequest) {
           // Save to dead letter queue for retry
           try {
             const errorMessage = getSafeErrorMessage(error);
-            const errorCode = (error as any)?.code || null;
+            const errorCode = (error as Error & { code?: string })?.code || null;
 
             // Check if a failed analysis record already exists
             const existingFailed = await prisma.failedAnalysis.findFirst({
