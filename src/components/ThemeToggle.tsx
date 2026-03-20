@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { Moon, Sun, Monitor } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 
 export function ThemeToggle({ className }: { className?: string }) {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -22,32 +21,36 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   if (!mounted) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className={cn("w-9 h-9", className)}
+      <button
+        className={cn(
+          "inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+          "hover:bg-accent hover:text-accent-foreground",
+          "h-9 w-9 rounded-md",
+          className
+        )}
         aria-label="Toggle theme"
       >
         <Sun className="h-4 w-4" />
-      </Button>
+      </button>
     );
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className={cn("w-9 h-9", className)}
-          aria-label="Toggle theme"
-        >
-          {resolvedTheme === 'dark' ? (
-            <Moon className="h-4 w-4" />
-          ) : (
-            <Sun className="h-4 w-4" />
-          )}
-        </Button>
+      <DropdownMenuTrigger
+        className={cn(
+          "inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+          "hover:bg-accent hover:text-accent-foreground",
+          "h-9 w-9 rounded-md",
+          className
+        )}
+        aria-label="Toggle theme"
+      >
+        {resolvedTheme === 'dark' ? (
+          <Moon className="h-4 w-4" />
+        ) : (
+          <Sun className="h-4 w-4" />
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme('light')}>

@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import {
   PieChart,
   Pie,
   Cell,
   ResponsiveContainer,
   Tooltip,
-  AreaChart,
   Area,
   XAxis,
   YAxis,
@@ -25,23 +24,14 @@ import {
   Radar,
   ComposedChart,
   Line,
-  Scatter,
 } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
   TrendingUp,
   TrendingDown,
-  AlertCircle,
-  Info,
-  Filter,
-  ZoomIn,
-  Maximize2,
-  Download,
-  RefreshCw,
   ChevronRight,
   Brain,
-  Shield,
   Activity,
 } from 'lucide-react';
 
@@ -96,17 +86,7 @@ const SEVERITY_COLORS = {
 
 // Custom active shape for pie chart
 const renderActiveShape = (props: any) => {
-  const RADIAN = Math.PI / 180;
-  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value, percent } = props;
-  const sin = Math.sin(-RADIAN * midAngle);
-  const cos = Math.cos(-RADIAN * midAngle);
-  const sx = cx + (outerRadius + 10) * cos;
-  const sy = cy + (outerRadius + 10) * sin;
-  const mx = cx + (outerRadius + 30) * cos;
-  const my = cy + (outerRadius + 30) * sin;
-  const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-  const ey = my;
-  const textAnchor = cos >= 0 ? 'start' : 'end';
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value, percent } = props;
 
   return (
     <g>
@@ -138,8 +118,6 @@ const renderActiveShape = (props: any) => {
         fill={fill}
         opacity={0.3}
       />
-      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
-      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
     </g>
   );
 };
@@ -157,9 +135,9 @@ export function EnhancedDashboardCharts({
   const [activeRiskIndex, setActiveRiskIndex] = useState<number | undefined>(undefined);
   const [selectedBias, setSelectedBias] = useState<string | null>(null);
   const [hoveredBias, setHoveredBias] = useState<string | null>(null);
-  const [selectedTimeRange, setSelectedTimeRange] = useState<[number, number] | null>(null);
+  const [_selectedTimeRange, setSelectedTimeRange] = useState<[number, number] | null>(null);
   const [viewMode, setViewMode] = useState<'overview' | 'detailed' | 'comparison'>('overview');
-  const [animationKey, setAnimationKey] = useState(0);
+  const [_animationKey, setAnimationKey] = useState(0);
   const [showBiasDetails, setShowBiasDetails] = useState(false);
   const [selectedRiskLevel, setSelectedRiskLevel] = useState<'all' | 'high' | 'medium' | 'low'>('all');
 
@@ -380,8 +358,10 @@ export function EnhancedDashboardCharts({
             <ResponsiveContainer width="100%" height={viewMode === 'detailed' ? 300 : 200}>
               <PieChart>
                 <Pie
-                  activeIndex={activeRiskIndex}
-                  activeShape={viewMode === 'detailed' ? renderActiveShape : undefined}
+                  {...({
+                    activeIndex: activeRiskIndex,
+                    activeShape: viewMode === 'detailed' ? renderActiveShape : undefined,
+                  } as any)}
                   data={donutData}
                   cx="50%"
                   cy="50%"
@@ -683,7 +663,7 @@ export function EnhancedDashboardCharts({
                 <Bar
                   dataKey="count"
                   animationDuration={800}
-                  onClick={(data) => handleBiasClick(data.name)}
+                  onClick={(data) => data.name && handleBiasClick(data.name)}
                   className="cursor-pointer"
                 >
                   {filteredBiases.map((entry, index) => (

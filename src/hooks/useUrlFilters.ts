@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 
 export interface FilterState {
   search?: string;
@@ -147,7 +147,22 @@ export function useUrlFilters(defaults?: Partial<FilterState>) {
 }
 
 // Helper hook for debounced search
-import { useDebounce } from './useDebounce';
+// Simple inline useDebounce implementation
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 export function useSearchFilter(delay = 500) {
   const { filters, setFilter } = useUrlFilters();
@@ -170,5 +185,3 @@ export function useSearchFilter(delay = 500) {
     urlSearch: filters.search,
   };
 }
-
-import { useState, useEffect } from 'react';

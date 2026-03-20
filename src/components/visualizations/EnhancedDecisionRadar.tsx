@@ -9,24 +9,17 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
   Tooltip,
-  Legend,
-  Cell,
 } from 'recharts';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
-  Info,
   Target,
-  TrendingUp,
-  TrendingDown,
   AlertTriangle,
   CheckCircle,
-  ChevronRight,
   Sliders,
   Eye,
   EyeOff,
   RotateCcw,
-  Download,
   Play,
   Pause,
   Zap,
@@ -131,14 +124,13 @@ export function EnhancedDecisionRadar({
   const [hoveredAxis, setHoveredAxis] = useState<string | null>(null);
   const [showBenchmark, setShowBenchmark] = useState(true);
   const [showTarget, setShowTarget] = useState(true);
-  const [animationStep, setAnimationStep] = useState(0);
+  const [_animationStep, setAnimationStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [whatIfData, setWhatIfData] = useState<DecisionRadarData>(data);
   const [whatIfMode, setWhatIfMode] = useState(false);
   const [selectedHistorical, setSelectedHistorical] = useState<number | null>(null);
 
-  const svgRef = useRef<SVGSVGElement>(null);
-  const animationRef = useRef<NodeJS.Timeout>();
+  const animationRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Calculate weighted score
   const calculateWeightedScore = useCallback((values: DecisionRadarData) => {
@@ -470,7 +462,7 @@ export function EnhancedDecisionRadar({
               fill="#22c55e"
               fillOpacity={0.25}
               strokeWidth={2}
-              onMouseEnter={(data) => setHoveredAxis(data.key)}
+              onMouseEnter={(data) => data.key && setHoveredAxis(String(data.key))}
               onMouseLeave={() => setHoveredAxis(null)}
             />
 

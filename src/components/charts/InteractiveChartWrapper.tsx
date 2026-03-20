@@ -9,15 +9,13 @@ import {
   Maximize2,
   Filter,
   Search,
-  MoreVertical,
-  Share2,
   RefreshCw,
   Camera,
   Layers,
-  Eye,
-  EyeOff,
   Info,
   X,
+  FileText,
+  Code,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -133,6 +131,7 @@ export function InteractiveChartWrapper({
       }, 300);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [searchQuery, onSearch]);
 
   // Handle fullscreen
@@ -436,5 +435,3 @@ export function InteractiveChartWrapper({
   );
 }
 
-// Add missing imports
-import { FileText, Code } from 'lucide-react';

@@ -24,13 +24,11 @@ import {
   Loader2,
   Moon,
   Sun,
-  Plus,
   TrendingUp,
   Users,
   Filter,
   Download,
   Copy,
-  Eye,
 } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useTheme } from 'next-themes';

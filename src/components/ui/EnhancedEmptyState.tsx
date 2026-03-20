@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { Button } from './button';
 import { useDensity } from '@/components/DensityProvider';
 
 export type EmptyStateType =
@@ -377,13 +376,31 @@ export function EnhancedEmptyState({
           className="flex flex-wrap gap-3 justify-center"
         >
           {finalActions.map((action, index) => {
-            const Component = action.href ? Link : 'button';
-            const props = action.href ? { href: action.href } : { onClick: action.onClick };
+            if (action.href) {
+              return (
+                <Link
+                  key={index}
+                  href={action.href}
+                  className={cn(
+                    "inline-flex items-center gap-2 px-4 py-2 rounded-lg",
+                    "transition-all duration-200",
+                    action.variant === 'primary'
+                      ? "bg-accent-primary text-black hover:bg-accent-secondary"
+                      : "bg-white/10 text-white hover:bg-white/20",
+                    isCompact && "px-3 py-1.5 text-sm"
+                  )}
+                >
+                  {action.icon}
+                  <span>{action.label}</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              );
+            }
 
             return (
-              <Component
+              <button
                 key={index}
-                {...props}
+                onClick={action.onClick}
                 className={cn(
                   "inline-flex items-center gap-2 px-4 py-2 rounded-lg",
                   "transition-all duration-200",
@@ -395,8 +412,7 @@ export function EnhancedEmptyState({
               >
                 {action.icon}
                 <span>{action.label}</span>
-                {action.href && <ArrowRight className="w-3 h-3" />}
-              </Component>
+              </button>
             );
           })}
         </motion.div>
