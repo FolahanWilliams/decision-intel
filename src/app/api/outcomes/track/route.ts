@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { DecisionOutcome } from '@prisma/client';
 
 const log = createLogger('OutcomeTracking');
 
@@ -307,7 +308,7 @@ export async function GET(req: NextRequest) {
 /**
  * Calculate bias detection accuracy from outcomes
  */
-function calculateBiasAccuracy(outcomes: any[]): {
+function calculateBiasAccuracy(outcomes: DecisionOutcome[]): {
   confirmed: string[];
   falsePositives: string[];
   accuracy: number;
@@ -342,7 +343,7 @@ function calculateBiasAccuracy(outcomes: any[]): {
 /**
  * Get outcome prediction accuracy by digital twin
  */
-export async function PUT(req: NextRequest) {
+export async function PUT(_req: NextRequest) {
   try {
     const supabase = await createClient();
     const {
@@ -380,7 +381,7 @@ export async function PUT(req: NextRequest) {
         acc[twin].averageImpact += outcome.impactScore;
       }
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, { count: number; successRate: number; averageImpact: number }>);
 
     // Calculate percentages
     Object.keys(twinAccuracy).forEach(twin => {

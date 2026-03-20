@@ -7,7 +7,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const log = createLogger('HealthRoute');
 
 // Cache for expensive health checks
-const healthCache = new Map<string, { data: any; expires: number }>();
+const healthCache = new Map<string, { data: unknown; expires: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**

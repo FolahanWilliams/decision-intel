@@ -15,7 +15,7 @@ const log = createLogger('RetryFailed');
 /**
  * GET /api/admin/retry-failed - List failed analyses pending retry
  */
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     // Authenticate user
     const supabase = await createClient();

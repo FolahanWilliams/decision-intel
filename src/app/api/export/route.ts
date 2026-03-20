@@ -8,6 +8,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { Analysis, BiasInstance, AnalysisVersion, Document } from '@prisma/client';
+
+type AnalysisWithRelations = Analysis & {
+  document: Document;
+  biases: BiasInstance[];
+  versions?: AnalysisVersion[];
+};
+
+interface PreMortem {
+  failureScenarios?: Array<{
+    scenario: string;
+    likelihood: string;
+  }>;
+  preventiveMeasures?: string[];
+}
+
+interface SwotAnalysis {
+  strengths?: string[];
+  weaknesses?: string[];
+  opportunities?: string[];
+  threats?: string[];
+}
 
 const log = createLogger('Export');
 
@@ -82,7 +104,7 @@ export async function GET(req: NextRequest) {
 /**
  * Export analysis as JSON
  */
-function exportAsJSON(analysis: any): NextResponse {
+function exportAsJSON(analysis: AnalysisWithRelations): NextResponse {
   const exportData = {
     metadata: {
       exportDate: new Date().toISOString(),
@@ -94,7 +116,7 @@ function exportAsJSON(analysis: any): NextResponse {
       noise: analysis.noiseScore,
     },
     summary: analysis.summary,
-    biases: analysis.biases.map((b: any) => ({
+    biases: analysis.biases.map((b: BiasInstance) => ({
       type: b.biasType,
       severity: b.severity,
       excerpt: b.excerpt,
@@ -111,7 +133,7 @@ function exportAsJSON(analysis: any): NextResponse {
       simulation: analysis.simulation,
       preMortem: analysis.preMortem,
     },
-    versionHistory: analysis.versions.map((v: any) => ({
+    versionHistory: analysis.versions?.map((v: AnalysisVersion) => ({
       version: v.version,
       date: v.createdAt,
       overallScore: v.overallScore,
@@ -130,7 +152,7 @@ function exportAsJSON(analysis: any): NextResponse {
 /**
  * Export analysis as CSV
  */
-function exportAsCSV(analysis: any): NextResponse {
+function exportAsCSV(analysis: AnalysisWithRelations): NextResponse {
   const rows: string[] = [];
 
   // Headers
@@ -141,7 +163,7 @@ function exportAsCSV(analysis: any): NextResponse {
   rows.push(`Noise Score,,,Consistency measure,${analysis.noiseScore}`);
 
   // Biases
-  analysis.biases.forEach((bias: any) => {
+  analysis.biases.forEach((bias: BiasInstance) => {
     const description = `"${bias.explanation.replace(/"/g, '""')}"`;
     rows.push(`Bias,${bias.biasType},${bias.severity},${description},${bias.confidence || 0}`);
   });
@@ -168,7 +190,7 @@ function exportAsCSV(analysis: any): NextResponse {
 /**
  * Export analysis as Markdown
  */
-function exportAsMarkdown(analysis: any): NextResponse {
+function exportAsMarkdown(analysis: AnalysisWithRelations): NextResponse {
   const lines: string[] = [];
 
   // Header
@@ -191,7 +213,7 @@ function exportAsMarkdown(analysis: any): NextResponse {
   // Cognitive Biases
   if (analysis.biases.length > 0) {
     lines.push('## Detected Cognitive Biases');
-    analysis.biases.forEach((bias: any) => {
+    analysis.biases.forEach((bias: BiasInstance) => {
       lines.push(`### ${bias.biasType} (${bias.severity})`);
       if (bias.excerpt) {
         lines.push(`> "${bias.excerpt}"`);
@@ -205,7 +227,7 @@ function exportAsMarkdown(analysis: any): NextResponse {
   // SWOT Analysis
   if (analysis.swotAnalysis) {
     lines.push('## SWOT Analysis');
-    const swot = analysis.swotAnalysis as any;
+    const swot = analysis.swotAnalysis as SwotAnalysis;
 
     if (swot.strengths?.length) {
       lines.push('### Strengths');
@@ -232,11 +254,11 @@ function exportAsMarkdown(analysis: any): NextResponse {
   // Pre-mortem
   if (analysis.preMortem) {
     lines.push('## Pre-mortem Analysis');
-    const preMortem = analysis.preMortem as any;
+    const preMortem = analysis.preMortem as PreMortem;
 
     if (preMortem.failureScenarios?.length) {
       lines.push('### Potential Failure Scenarios');
-      preMortem.failureScenarios.forEach((scenario: any) => {
+      preMortem.failureScenarios.forEach((scenario) => {
         lines.push(`- **${scenario.scenario}** (Likelihood: ${scenario.likelihood})`);
       });
     }
@@ -244,9 +266,9 @@ function exportAsMarkdown(analysis: any): NextResponse {
   }
 
   // Version History
-  if (analysis.versions.length > 0) {
+  if (analysis.versions && analysis.versions.length > 0) {
     lines.push('## Version History');
-    analysis.versions.forEach((v: any) => {
+    analysis.versions.forEach((v: AnalysisVersion) => {
       lines.push(`- **v${v.version}** (${new Date(v.createdAt).toLocaleDateString()}): Score ${v.overallScore}/100`);
     });
   }
@@ -264,7 +286,7 @@ function exportAsMarkdown(analysis: any): NextResponse {
 /**
  * Export analysis as PDF (stub - would need PDF library)
  */
-function exportAsPDF(analysis: any): NextResponse {
+function exportAsPDF(_analysis: AnalysisWithRelations): NextResponse {
   // In production, you'd use a library like puppeteer or pdfkit
   // For now, return a message indicating PDF export is not yet implemented
 

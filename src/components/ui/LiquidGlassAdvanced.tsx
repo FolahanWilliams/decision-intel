@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 /**
@@ -101,19 +101,8 @@ function generateDepthMap(layers: number = 3): string {
 export function useGlassPerformance() {
   const reducedMotion = useReducedMotion();
 
-  // Initialize state with a function to avoid setState in effect
-  const [tier, setTier] = useState<PerformanceTier>(() => {
-    if (typeof window === 'undefined') return 'medium';
-    return reducedMotion ? 'accessibility' : detectPerformanceTier();
-  });
-
-  useEffect(() => {
-    // Only update if value actually changes
-    const newTier = reducedMotion ? 'accessibility' : detectPerformanceTier();
-    if (newTier !== tier) {
-      setTier(newTier);
-    }
-  }, [reducedMotion, tier]);
+  // Calculate tier directly from reducedMotion state
+  const tier = reducedMotion ? 'accessibility' : detectPerformanceTier();
 
   return tier;
 }

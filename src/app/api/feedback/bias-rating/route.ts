@@ -161,7 +161,7 @@ export async function GET(req: NextRequest) {
 /**
  * Get aggregated feedback stats for improving bias detection
  */
-export async function PUT(req: NextRequest) {
+export async function PUT(_req: NextRequest) {
   try {
     const supabase = await createClient();
     const {
