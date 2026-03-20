@@ -5,6 +5,7 @@
  * for monitoring and debugging production issues.
  */
 
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from './logger';
 import { createHash } from 'crypto';
@@ -62,7 +63,7 @@ class ErrorTracker {
 
       // Persist to AuditLog for critical errors
       if (this.isCriticalError(context.statusCode)) {
-        await this.persistError(details, context);
+        await this.persistError(details as unknown as Prisma.InputJsonObject, context);
       }
 
       // Log to console for debugging
@@ -86,7 +87,7 @@ class ErrorTracker {
       return {
         message: error.message,
         stack: error.stack,
-        code: (error as Record<string, unknown>).code as string | undefined,
+        code: (error as unknown as Record<string, unknown>).code as string | undefined,
       };
     }
 
@@ -161,7 +162,7 @@ class ErrorTracker {
   /**
    * Persist error to the database
    */
-  private async persistError(details: Record<string, unknown>, context: ErrorContext): Promise<void> {
+  private async persistError(details: Prisma.InputJsonObject, context: ErrorContext): Promise<void> {
     try {
       await prisma.auditLog.create({
         data: {
@@ -169,7 +170,7 @@ class ErrorTracker {
           orgId: context.orgId,
           action: 'system_error',
           resource: context.route || 'unknown',
-          resourceId: details.fingerprint,
+          resourceId: details.fingerprint as string,
           details,
           ipAddress: context.ipAddress,
           userAgent: context.userAgent,
@@ -192,10 +193,10 @@ class ErrorTracker {
       });
 
       // Group by fingerprint and count occurrences
-      const grouped = new Map<string, Record<string, unknown>>();
+      const grouped = new Map<string, (typeof errors)[number] & { count: number; lastOccurred: Date }>();
 
       for (const error of errors) {
-        const fingerprint = (error.details as Record<string, unknown>)?.fingerprint;
+        const fingerprint = (error.details as Record<string, unknown>)?.fingerprint as string | undefined;
         if (fingerprint) {
           const existing = grouped.get(fingerprint);
           if (existing) {
@@ -232,7 +233,8 @@ export function trackError(error: Error | unknown, context: ErrorContext = {}): 
 /**
  * Express/Next.js error handler wrapper
  */
-export function withErrorTracking<T extends (...args: unknown[]) => Promise<unknown>>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withErrorTracking<T extends (...args: any[]) => Promise<any>>(
   handler: T,
   defaultContext?: ErrorContext
 ): T {
@@ -241,12 +243,14 @@ export function withErrorTracking<T extends (...args: unknown[]) => Promise<unkn
       return await handler(...args);
     } catch (error) {
       // Extract context from request if available
-      const req = args[0];
+      const req = args[0] as Record<string, unknown> | undefined;
       const context: ErrorContext = {
         ...defaultContext,
-        route: req?.url || req?.nextUrl?.pathname,
-        method: req?.method,
-        userAgent: req?.headers?.get?.('user-agent'),
+        route: (req?.url as string) || (req?.nextUrl as Record<string, unknown>)?.pathname as string,
+        method: req?.method as string,
+        userAgent: typeof (req?.headers as Record<string, unknown>)?.get === 'function'
+          ? ((req?.headers as { get: (key: string) => string }).get('user-agent'))
+          : undefined,
       };
 
       await trackError(error, context);
