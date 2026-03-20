@@ -35,6 +35,10 @@ import {
   Menu,
   X,
   ChevronDown,
+  Lock,
+  RefreshCw,
+  Fingerprint,
+  Network,
 } from 'lucide-react';
 
 // Scroll Progress
@@ -212,6 +216,7 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
     { label: 'The Problem', href: '#problem' },
     { label: 'How It Works', href: '#solution' },
     { label: 'Features', href: '#features' },
+    { label: 'Why Us', href: '#why-us' },
     { label: 'ROI', href: '#roi' },
     { label: 'FAQ', href: '#faq' },
   ];
@@ -491,6 +496,7 @@ export default function LandingPage() {
   const problemRef = useRef(null);
   const solutionRef = useRef(null);
   const featuresRef = useRef(null);
+  const moatRef = useRef(null);
   const socialRef = useRef(null);
   const roiRef = useRef(null);
   const faqRef = useRef(null);
@@ -500,6 +506,7 @@ export default function LandingPage() {
   const problemInView = useInView(problemRef, { once: true, margin: '-100px' });
   const solutionInView = useInView(solutionRef, { once: true, margin: '-100px' });
   const featuresInView = useInView(featuresRef, { once: true, margin: '-100px' });
+  const moatInView = useInView(moatRef, { once: true, margin: '-100px' });
   const socialInView = useInView(socialRef, { once: true, margin: '-100px' });
   const roiInView = useInView(roiRef, { once: true, margin: '-100px' });
   const faqInView = useInView(faqRef, { once: true, margin: '-100px' });
@@ -599,6 +606,9 @@ export default function LandingPage() {
             </a>
             <a href="#features" className="hover:text-white transition-colors duration-300">
               Features
+            </a>
+            <a href="#why-us" className="hover:text-white transition-colors duration-300">
+              Why Us
             </a>
             <a href="#roi" className="hover:text-white transition-colors duration-300">
               ROI
@@ -1620,6 +1630,342 @@ export default function LandingPage() {
               </p>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.08)" />
+
+      {/* Why Decision Intel — Moat Section */}
+      <section
+        id="why-us"
+        ref={moatRef}
+        className="py-32 relative"
+        style={{ background: 'var(--bg-primary)' }}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.03) 0%, transparent 60%)',
+          }}
+        />
+        <div className="relative z-10" style={containerStyle}>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={moatInView ? { opacity: 1, y: 0 } : {}}
+            className="mb-16 max-w-6xl mx-auto"
+            style={{ borderLeft: '3px solid #FFFFFF', paddingLeft: '24px' }}
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '8px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Not Another AI Wrapper
+            </h2>
+            <p
+              style={{
+                color: 'var(--text-muted)',
+                maxWidth: '640px',
+                fontSize: '0.95rem',
+                lineHeight: 1.7,
+              }}
+            >
+              Anyone can wire an LLM to scan documents. What they cannot replicate is
+              the proprietary intelligence your organization builds inside Decision Intel
+              over time.
+            </p>
+          </motion.div>
+
+          {/* Flywheel Visualization */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={moatInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1 }}
+            className="max-w-6xl mx-auto mb-16"
+          >
+            <div
+              style={{
+                ...glassCard,
+                padding: '32px',
+                overflow: 'hidden',
+                position: 'relative',
+              }}
+            >
+              <div
+                className="absolute top-4 right-6"
+                style={{
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  background: 'rgba(34, 197, 94, 0.12)',
+                  color: '#22c55e',
+                }}
+              >
+                Self-Improving
+              </div>
+              <h3
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '24px',
+                }}
+              >
+                The Behavioral Data Flywheel
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {[
+                  {
+                    step: '1',
+                    label: 'Analyze',
+                    description: 'AI audits your decisions and detects cognitive biases',
+                    color: '#FFFFFF',
+                  },
+                  {
+                    step: '2',
+                    label: 'Track Outcomes',
+                    description: 'You report what actually happened — success, failure, lessons',
+                    color: '#A3E635',
+                  },
+                  {
+                    step: '3',
+                    label: 'Recalibrate',
+                    description: 'Platform learns which biases matter most for your org',
+                    color: '#22c55e',
+                  },
+                  {
+                    step: '4',
+                    label: 'Improve',
+                    description: 'Next analysis is more accurate — tuned to your patterns',
+                    color: '#FFFFFF',
+                  },
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={moatInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: 0.15 + i * 0.1 }}
+                    style={{
+                      padding: '20px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '14px',
+                      position: 'relative',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        background: `${item.color}18`,
+                        border: `1px solid ${item.color}40`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: '12px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        color: item.color,
+                        fontFamily: "'JetBrains Mono', monospace",
+                      }}
+                    >
+                      {item.step}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '0.95rem',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      {item.label}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                      {item.description}
+                    </div>
+                    {i < 3 && (
+                      <div
+                        className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2"
+                        style={{
+                          color: 'rgba(255, 255, 255, 0.15)',
+                          fontSize: '1.2rem',
+                          zIndex: 10,
+                        }}
+                      >
+                        &rarr;
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+              <div
+                className="mt-6 text-center"
+                style={{
+                  fontSize: '0.8rem',
+                  color: 'var(--text-muted)',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  opacity: 0.6,
+                }}
+              >
+                Every cycle compounds your competitive advantage
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Moat Pillars */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {[
+              {
+                icon: Fingerprint,
+                title: 'Org-Specific Calibration',
+                description:
+                  'Bias severity weights, nudge thresholds, and twin accuracy are continuously recalibrated from your outcome data. Your model is unique to you.',
+                stat: 'Unique per org',
+                color: '#FFFFFF',
+              },
+              {
+                icon: RefreshCw,
+                title: 'Self-Improving Accuracy',
+                description:
+                  'False-positive biases automatically get downweighted. Nudges users ignore get suppressed. The system gets smarter with every decision you track.',
+                stat: 'Gets better over time',
+                color: '#A3E635',
+              },
+              {
+                icon: Lock,
+                title: 'Proprietary Data Moat',
+                description:
+                  'Your confirmed biases, outcome correlations, and team cognitive patterns are data no competitor has access to — even with the same AI models.',
+                stat: 'Cannot be replicated',
+                color: '#22c55e',
+              },
+              {
+                icon: Network,
+                title: 'Institutional Memory',
+                description:
+                  'Vector-indexed past decisions with verified outcomes feed into every new analysis. Your AI boardroom remembers what worked and what failed.',
+                stat: 'Grows with usage',
+                color: '#FFFFFF',
+              },
+            ].map((pillar, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                animate={moatInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.2 + i * 0.1 }}
+                style={{
+                  ...glassCardLight,
+                  padding: '28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px',
+                }}
+              >
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
+                    background: `${pillar.color}12`,
+                    border: `1px solid ${pillar.color}30`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <pillar.icon className="w-5 h-5" style={{ color: pillar.color }} />
+                </div>
+                <div>
+                  <h3
+                    style={{
+                      fontSize: '1.05rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    {pillar.title}
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+                    {pillar.description}
+                  </p>
+                </div>
+                <div
+                  style={{
+                    marginTop: 'auto',
+                    paddingTop: '12px',
+                    borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: pillar.color,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  {pillar.stat}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Competitor comparison callout */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={moatInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.6 }}
+            className="max-w-4xl mx-auto mt-16"
+          >
+            <div
+              style={{
+                ...glassCardLight,
+                padding: '28px 32px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                borderLeft: '3px solid rgba(255, 255, 255, 0.2)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                The switching cost question every enterprise asks:
+              </div>
+              <div
+                style={{
+                  fontSize: '0.88rem',
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.8,
+                }}
+              >
+                &ldquo;A competitor offers a generic bias scanner at half the price. Why not switch?&rdquo;
+                Because after 6 months on Decision Intel, your platform has learned that{' '}
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                  anchoring bias is 3x more impactful in your org than the industry average
+                </span>
+                , that{' '}
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                  your VP of Engineering is the most accurate digital twin for technical decisions
+                </span>
+                , and that{' '}
+                <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                  groupthink nudges in your #product-decisions Slack channel are acknowledged 4x more than email
+                </span>
+                . A generic tool starts from zero. Decision Intel starts from everything you&apos;ve taught it.
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
