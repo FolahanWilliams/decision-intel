@@ -176,7 +176,10 @@ export function useSearchFilter(delay = 500) {
   }, [debouncedSearch, filters.search, setFilter]);
 
   useEffect(() => {
-    setLocalSearch(filters.search || '');
+    const id = requestAnimationFrame(() => {
+      setLocalSearch(filters.search || '');
+    });
+    return () => cancelAnimationFrame(id);
   }, [filters.search]);
 
   return {

@@ -19,17 +19,17 @@ const logger = createLogger('MCPServer');
 interface MCPRequest {
   id: string;
   method: string;
-  params?: any;
+  params?: Record<string, unknown>;
   timestamp: string;
 }
 
 interface MCPResponse {
   id: string;
-  result?: any;
+  result?: Record<string, unknown>;
   error?: {
     code: number;
     message: string;
-    data?: any;
+    data?: Record<string, unknown>;
   };
   timestamp: string;
 }
@@ -38,7 +38,7 @@ interface MCPContext {
   sessionId: string;
   clientId: string;
   permissions: string[];
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 // ─── Request/Response Schemas ────────────────────────────────────────────────
@@ -63,11 +63,11 @@ const BiasCheckRequestSchema = z.object({
 
 const CausalAnalysisRequestSchema = z.object({
   scenario: z.enum(['patch_decision', 'secret_rotation', 'incident_response']),
-  context: z.record(z.string(), z.any()),
+  context: z.record(z.string(), z.unknown()),
   objective: z.string().optional(),
   interventions: z.array(z.object({
     variable: z.string(),
-    value: z.any()
+    value: z.unknown()
   })).optional()
 });
 
@@ -226,7 +226,7 @@ export class MCPServer {
   /**
    * Handle bias detection requests
    */
-  private async handleBiasCheck(ws: WebSocket, request: MCPRequest, context: MCPContext) {
+  private async handleBiasCheck(ws: WebSocket, request: MCPRequest, _context: MCPContext) {
     try {
       const params = BiasCheckRequestSchema.parse(request.params);
 
@@ -255,12 +255,12 @@ export class MCPServer {
       // Perform counterfactual analysis if requested
       let counterfactual = null;
       if (params.includeCounterfactual && riskAssessment.primaryBias) {
-        const context = new Map<string, any>();
-        context.set('decision_urgency', params.decision.urgency === 'immediate' ? 1 : 0);
-        context.set('automation_involved', params.decision.context.automationInvolved ? 1 : 0);
+        const cfContext = new Map<string, unknown>();
+        cfContext.set('decision_urgency', params.decision.urgency === 'immediate' ? 1 : 0);
+        cfContext.set('automation_involved', params.decision.context.automationInvolved ? 1 : 0);
 
         const cfResult = this.causalModel.counterfactual(
-          context,
+          cfContext,
           { variable: 'automation_involved', value: 0 }
         );
 
@@ -300,7 +300,7 @@ export class MCPServer {
   /**
    * Handle causal analysis requests
    */
-  private async handleCausalAnalysis(ws: WebSocket, request: MCPRequest, context: MCPContext) {
+  private async handleCausalAnalysis(ws: WebSocket, request: MCPRequest, _context: MCPContext) {
     try {
       const params = CausalAnalysisRequestSchema.parse(request.params);
 
@@ -308,7 +308,7 @@ export class MCPServer {
       const contextMap = new Map(Object.entries(params.context));
 
       // Perform interventions if specified
-      const results: any[] = [];
+      const results: Array<{ intervention: { variable: string; value: unknown }; outcomes: Record<string, unknown> }> = [];
       if (params.interventions && params.interventions.length > 0) {
         for (const intervention of params.interventions) {
           const result = this.causalModel.doIntervention(
@@ -363,7 +363,7 @@ export class MCPServer {
   /**
    * Handle nudge generation requests
    */
-  private async handleGetNudge(ws: WebSocket, request: MCPRequest, context: MCPContext) {
+  private async handleGetNudge(ws: WebSocket, request: MCPRequest, _context: MCPContext) {
     const biasType = request.params?.biasType as SecurityBiasType;
     const severity = request.params?.severity || 'medium';
 
@@ -418,7 +418,7 @@ export class MCPServer {
     actions: string[];
     timing: 'immediate' | 'delayed' | 'scheduled';
   } {
-    const nudgeMap: Record<SecurityBiasType, any> = {
+    const nudgeMap: Record<SecurityBiasType, { message: string; type: 'alert' | 'suggestion' | 'warning' | 'blocker'; actions: string[]; timing: 'immediate' | 'delayed' | 'scheduled' }> = {
       [SecurityBiasType.ANCHORING]: {
         message: '⚠️ You may be anchoring on initial severity. Consider reviewing additional context.',
         type: 'warning',
@@ -561,7 +561,7 @@ export class MCPServer {
   /**
    * Send error response
    */
-  private sendError(ws: WebSocket, id: string, code: number, message: string, data?: any) {
+  private sendError(ws: WebSocket, id: string, code: number, message: string, data?: Record<string, unknown>) {
     this.sendResponse(ws, {
       id,
       error: { code, message, data },
@@ -602,7 +602,7 @@ export class MCPServer {
   /**
    * Broadcast message to all connected clients
    */
-  broadcast(message: any) {
+  broadcast(message: unknown) {
     const messageStr = JSON.stringify(message);
     for (const [, client] of this.clients) {
       if (client.ws.readyState === WebSocket.OPEN) {

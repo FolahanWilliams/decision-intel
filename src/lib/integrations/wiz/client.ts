@@ -313,7 +313,7 @@ export class WizClient {
    */
   private async graphqlRequest<T>(
     query: string,
-    variables?: Record<string, any>
+    variables?: Record<string, unknown>
   ): Promise<T> {
     const token = await this.authenticate();
 
@@ -353,13 +353,13 @@ export class WizClient {
     limit?: number;
     offset?: number;
   }): Promise<{ issues: WizIssue[]; hasMore: boolean }> {
-    const filters: any = {};
+    const filters: Record<string, unknown> = {};
 
     if (params?.severity) filters.severity = params.severity;
     if (params?.status) filters.status = params.status;
     if (params?.cloudProvider) filters.cloudProvider = params.cloudProvider;
 
-    const result = await this.graphqlRequest<any>(
+    const result = await this.graphqlRequest<{ issues: { nodes: unknown[]; pageInfo: { hasNextPage: boolean } } }>(
       QUERIES.GET_ISSUES,
       {
         filters,
@@ -369,7 +369,7 @@ export class WizClient {
     );
 
     return {
-      issues: result.issues.nodes.map((node: any) => WizIssueSchema.parse(node)),
+      issues: result.issues.nodes.map((node: unknown) => WizIssueSchema.parse(node)),
       hasMore: result.issues.pageInfo.hasNextPage,
     };
   }
@@ -386,7 +386,7 @@ export class WizClient {
       path: Array<{ nodeId: string; nodeType: string; action: string }>;
     }>;
   }> {
-    const result = await this.graphqlRequest<any>(
+    const result = await this.graphqlRequest<{ securityGraph: { node: unknown; attackPaths: Array<{ id: string; likelihood: number; impact: number; path: Array<{ nodeId: string; nodeType: string; action: string }> }> } }>(
       QUERIES.GET_SECURITY_GRAPH,
       { nodeId }
     );
@@ -407,11 +407,11 @@ export class WizClient {
     id: string;
     title: string;
     riskScore: number;
-    components: any;
+    components: Record<string, unknown>;
     mitigationSteps: string[];
     automatedRemediation: boolean;
   }>> {
-    const result = await this.graphqlRequest<any>(
+    const result = await this.graphqlRequest<{ toxicCombinations: Array<{ id: string; title: string; riskScore: number; components: Record<string, unknown>; mitigationSteps: string[]; automatedRemediation: boolean }> }>(
       QUERIES.GET_TOXIC_COMBINATIONS,
       {
         severity: params?.severity,
@@ -430,7 +430,7 @@ export class WizClient {
     status: WizIssue['status'],
     notes?: string
   ): Promise<{ success: boolean; issue: Partial<WizIssue> }> {
-    const result = await this.graphqlRequest<any>(
+    const result = await this.graphqlRequest<{ updateIssueStatus: { success: boolean; issue: Partial<WizIssue> } }>(
       MUTATIONS.UPDATE_ISSUE_STATUS,
       { issueId, status, notes }
     );
@@ -450,7 +450,7 @@ export class WizClient {
     estimatedTime: number;
     status: string;
   }> {
-    const result = await this.graphqlRequest<any>(
+    const result = await this.graphqlRequest<{ triggerRemediation: { success: boolean; jobId: string; estimatedTime: number; status: string } }>(
       MUTATIONS.TRIGGER_REMEDIATION,
       { issueId, automated }
     );
@@ -475,7 +475,7 @@ export class WizClient {
       expiresAt?: string;
     };
   }> {
-    const result = await this.graphqlRequest<any>(
+    const result = await this.graphqlRequest<{ createException: { success: boolean; exception: { id: string; issueId: string; reason: string; createdAt: string; expiresAt?: string } } }>(
       MUTATIONS.CREATE_EXCEPTION,
       {
         issueId,
@@ -553,14 +553,14 @@ export class WizWebhookHandler {
   /**
    * Verify webhook signature for security
    */
-  static verifySignature(
+  static async verifySignature(
     payload: string,
     signature: string,
     secret: string
-  ): boolean {
+  ): Promise<boolean> {
     // Implementation of webhook signature verification
     // This would use HMAC-SHA256 or similar
-    const crypto = require('crypto');
+    const crypto = await import('crypto');
     const expectedSignature = crypto
       .createHmac('sha256', secret)
       .update(payload)

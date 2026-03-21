@@ -234,7 +234,7 @@ export function EnhancedToastProvider({ children }: { children: React.ReactNode 
 
 // Convenience functions for common toast types
 export function useToastActions() {
-  const { addToast } = useToast();
+  const { addToast, removeToast } = useToast();
 
   return {
     success: (title: string, options?: Partial<Toast>) =>
@@ -257,7 +257,7 @@ export function useToastActions() {
       messages: {
         loading: string;
         success: string | ((data: T) => string);
-        error: string | ((error: any) => string);
+        error: string | ((error: unknown) => string);
       }
     ) => {
       const id = addToast({ type: 'loading', title: messages.loading, persistent: true });
@@ -276,7 +276,6 @@ export function useToastActions() {
         });
         throw error;
       } finally {
-        const { removeToast } = useToast();
         removeToast(id);
       }
     },

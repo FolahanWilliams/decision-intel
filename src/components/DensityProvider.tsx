@@ -31,10 +31,13 @@ export function DensityProvider({ children }: DensityProviderProps) {
 
   // Load saved preference
   useEffect(() => {
-    const saved = localStorage.getItem('ui-density');
-    if (saved === 'compact' || saved === 'dense' || saved === 'comfortable') {
-      setDensityState(saved);
-    }
+    const id = requestAnimationFrame(() => {
+      const saved = localStorage.getItem('ui-density');
+      if (saved === 'compact' || saved === 'dense' || saved === 'comfortable') {
+        setDensityState(saved);
+      }
+    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const setDensity = (newDensity: 'comfortable' | 'compact' | 'dense') => {
