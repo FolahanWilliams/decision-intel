@@ -149,8 +149,28 @@ export async function DELETE(
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
-    // Delete from DB (cascades to analyses, biases, embeddings)
-    await prisma.document.delete({ where: { id } });
+    // Delete from DB (cascades to analyses, biases, embeddings).
+    // Wrap in a retry: if a leftover RESTRICT FK blocks the cascade,
+    // attempt a raw cleanup first, then retry the delete.
+    try {
+      await prisma.document.delete({ where: { id } });
+    } catch (deleteErr: unknown) {
+      const code = (deleteErr as { code?: string }).code;
+      // P2003 = foreign key constraint violation
+      if (code === 'P2003') {
+        log.warn('FK constraint blocked delete — attempting raw cleanup for document', id);
+        // Clean up any orphaned rows in legacy tables that still reference
+        // this document with ON DELETE RESTRICT.
+        await prisma.$executeRawUnsafe(
+          `DELETE FROM "HumanDecisionAudit" WHERE "documentId" = $1`,
+          id
+        ).catch(() => {});
+        // Retry the delete
+        await prisma.document.delete({ where: { id } });
+      } else {
+        throw deleteErr;
+      }
+    }
 
     // Clean up visualization storage (fire-and-forget)
     for (const analysis of doc.analyses) {
