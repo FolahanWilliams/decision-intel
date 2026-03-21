@@ -114,7 +114,7 @@ export class TrueCausalEngine {
     if (!yVariable) throw new Error(`Variable ${Y} not found`);
 
     if (yVariable.type === 'binary') {
-      return xData.filter(row => row[Y] === true || row[Y] === 1).length / xData.length;
+      return xData.filter(row => row[Y] === 1).length / xData.length;
     } else if (yVariable.type === 'continuous') {
       // Return mean for continuous variables
       return xData.reduce((sum, row) => sum + (row[Y] || 0), 0) / xData.length;
@@ -439,7 +439,7 @@ export class TrueCausalEngine {
         }
 
         // Inverse function to find noise
-        const observed = evidence.get(varId);
+        const observed = evidence.get(varId) ?? 0;
         const predicted = equation.equation(parentValues, 0);
         const noise = observed - predicted; // Simplified for linear case
 
@@ -673,12 +673,12 @@ export class TrueCausalEngine {
 
   // ─── Helper Methods ──────────────────────────────────────────────────────────
 
-  private generateConfigurations(variables: string[]): Array<[string, number | string | boolean][]> {
+  private generateConfigurations(variables: string[]): Array<[string, number][]> {
     if (variables.length === 0) return [[]];
 
     const [first, ...rest] = variables;
     const restConfigs = this.generateConfigurations(rest);
-    const configs: Array<[string, number | string | boolean][]> = [];
+    const configs: Array<[string, number][]> = [];
 
     const values = this.getVariableValues(first);
     for (const value of values) {
@@ -690,18 +690,20 @@ export class TrueCausalEngine {
     return configs;
   }
 
-  private getVariableValues(varId: string): (number | string | boolean)[] {
+  private getVariableValues(varId: string): number[] {
     const variable = this.dag.variables.get(varId);
     if (!variable) return [];
 
-    if (variable.type === 'binary') return [false, true];
-    if (variable.domain) return [...variable.domain];
+    if (variable.type === 'binary') return [0, 1];
+    if (variable.domain) {
+      return variable.domain.map(v => typeof v === 'number' ? v : parseFloat(v) || 0);
+    }
 
     // For continuous, return discretized values
     return [0, 0.25, 0.5, 0.75, 1];
   }
 
-  private calculateJointProbability(conditions: Map<string, number | string | boolean>): number {
+  private calculateJointProbability(conditions: Map<string, number>): number {
     if (this.data.length === 0) return 1 / Math.pow(2, conditions.size);
 
     const matching = this.data.filter(row => {

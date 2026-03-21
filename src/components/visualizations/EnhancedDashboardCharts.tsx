@@ -276,9 +276,9 @@ export function EnhancedDashboardCharts({
     setAnimationKey(prev => prev + 1);
   }, [onBiasClick]);
 
-  const handleRiskSegmentClick = useCallback((entry: { name: string }, index: number) => {
+  const handleRiskSegmentClick = useCallback((entry: { name?: string }, index: number) => {
     setActiveRiskIndex(index);
-    const riskLevel = entry.name.toLowerCase().replace(' risk', '') as 'high' | 'medium' | 'low';
+    const riskLevel = (entry.name || '').toLowerCase().replace(' risk', '') as 'high' | 'medium' | 'low';
     setSelectedRiskLevel(riskLevel);
     onRiskSegmentClick?.(riskLevel);
   }, [onRiskSegmentClick]);
