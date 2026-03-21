@@ -198,7 +198,15 @@ export async function POST(req: NextRequest) {
       outcome: decisionOutcome,
       stats,
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    const code = (error as { code?: string }).code;
+    if (code === 'P2021' || code === 'P2022') {
+      log.warn('Schema drift in outcome tracking: DecisionOutcome table not yet migrated');
+      return NextResponse.json(
+        { error: 'Outcome tracking not yet available. Database migration pending.' },
+        { status: 503, headers: { 'Retry-After': '300' } }
+      );
+    }
     log.error('Failed to track outcome:', error);
     return NextResponse.json({ error: 'Failed to track outcome' }, { status: 500 });
   }
@@ -317,7 +325,12 @@ export async function GET(req: NextRequest) {
     };
 
     return NextResponse.json({ outcomes, metrics });
-  } catch (error) {
+  } catch (error: unknown) {
+    const code = (error as { code?: string }).code;
+    if (code === 'P2021' || code === 'P2022') {
+      log.warn('Schema drift in outcome fetch: DecisionOutcome table not yet migrated');
+      return NextResponse.json({ outcomes: [], metrics: null });
+    }
     log.error('Failed to fetch outcomes:', error);
     return NextResponse.json({ error: 'Failed to fetch outcomes' }, { status: 500 });
   }
@@ -415,7 +428,12 @@ export async function PUT(_req: NextRequest) {
         .slice(0, 3)
         .map(([name, data]) => ({ name, ...data })),
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    const code = (error as { code?: string }).code;
+    if (code === 'P2021' || code === 'P2022') {
+      log.warn('Schema drift in twin accuracy: DecisionOutcome table not yet migrated');
+      return NextResponse.json({ twinAccuracy: {}, mostAccurate: [] });
+    }
     log.error('Failed to analyze twin accuracy:', error);
     return NextResponse.json({ error: 'Failed to analyze accuracy' }, { status: 500 });
   }

@@ -59,7 +59,10 @@ export async function GET(req: NextRequest) {
     } catch (dbError: unknown) {
       if (isSchemaDrift(dbError)) {
         log.warn('Schema drift in nudges list: table not migrated yet');
-        return NextResponse.json({ nudges: [] });
+        return NextResponse.json(
+          { nudges: [], _schemaDrift: true },
+          { status: 503, headers: { 'Retry-After': '300' } }
+        );
       }
       throw dbError;
     }

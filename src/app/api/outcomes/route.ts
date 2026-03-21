@@ -115,7 +115,15 @@ export async function POST(req: NextRequest) {
 
     log.info(`Outcome reported for analysis ${analysisId}: ${outcome}`);
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (error: unknown) {
+    const code = (error as { code?: string }).code;
+    if (code === 'P2021' || code === 'P2022') {
+      log.warn('Schema drift in outcomes POST: DecisionOutcome table not yet migrated');
+      return NextResponse.json(
+        { error: 'Outcome tracking not yet available. Database migration pending.' },
+        { status: 503, headers: { 'Retry-After': '300' } }
+      );
+    }
     log.error('Failed to save outcome:', error);
     return NextResponse.json({ error: 'Failed to save outcome' }, { status: 500 });
   }
@@ -142,7 +150,12 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(outcome || null);
-  } catch (error) {
+  } catch (error: unknown) {
+    const code = (error as { code?: string }).code;
+    if (code === 'P2021' || code === 'P2022') {
+      log.warn('Schema drift in outcomes GET: DecisionOutcome table not yet migrated');
+      return NextResponse.json(null);
+    }
     log.error('Failed to fetch outcome:', error);
     return NextResponse.json(null);
   }

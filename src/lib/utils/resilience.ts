@@ -69,11 +69,12 @@ export async function withTimeout<T>(
   timeoutMs: number,
   errorMessage: string = 'Operation timed out'
 ): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
   const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
+    timer = setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
   });
 
-  return Promise.race([fn(), timeoutPromise]);
+  return Promise.race([fn(), timeoutPromise]).finally(() => clearTimeout(timer));
 }
 
 /**

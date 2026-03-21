@@ -7,6 +7,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { logAudit } from '@/lib/audit';
+import { prisma } from '@/lib/prisma';
 
 const log = createLogger('ChatRoute');
 
@@ -161,13 +162,40 @@ export async function POST(request: NextRequest) {
 
     try {
       if (documentId && typeof documentId === 'string') {
-        // Pinned mode: scope search to this specific document
-        const pinned = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT);
-        ragResults = pinned.filter(r => r.documentId === documentId);
-        // If no embedding match, still try to include the pinned doc's embeddings
+        // Pinned mode: search all docs then scope to the pinned document
+        try {
+          const pinned = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT * 3);
+          ragResults = pinned.filter(r => r.documentId === documentId).slice(0, RAG_RESULT_LIMIT);
+        } catch {
+          // Embedding search failed — ignore, will fall back below
+        }
+
+        // If vector search didn't find the pinned doc, load its embeddings directly
         if (ragResults.length === 0) {
-          const all = await searchSimilarDocuments('', userId, RAG_RESULT_LIMIT);
-          ragResults = all.filter(r => r.documentId === documentId);
+          try {
+            const embeddings = await prisma.decisionEmbedding.findMany({
+              where: { documentId },
+              select: { content: true, metadata: true },
+              take: RAG_RESULT_LIMIT,
+            });
+            const doc = await prisma.document.findUnique({
+              where: { id: documentId },
+              select: { filename: true },
+            });
+            ragResults = embeddings.map(e => {
+              const meta = e.metadata as Record<string, unknown> | null;
+              return {
+                documentId,
+                filename: doc?.filename || 'Unknown',
+                score: (meta?.overallScore as number) || 0,
+                similarity: 1.0,
+                biases: (meta?.primaryBiases as string[]) || [],
+                content: e.content,
+              };
+            });
+          } catch (dbErr) {
+            log.warn('Direct embedding fetch for pinned doc failed:', dbErr);
+          }
         }
       } else {
         ragResults = await searchSimilarDocuments(message, userId, RAG_RESULT_LIMIT);
