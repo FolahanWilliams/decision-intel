@@ -15,7 +15,7 @@ export interface CausalNode {
   type: 'action' | 'outcome' | 'confounder' | 'mediator' | 'collider';
   name: string;
   description: string;
-  value?: any;
+  value?: string | number | boolean;
   probability?: number;
 }
 
@@ -30,7 +30,7 @@ export interface CausalEdge {
 export interface StructuralCausalModel {
   nodes: Map<string, CausalNode>;
   edges: CausalEdge[];
-  equations: Map<string, (inputs: Map<string, any>) => any>;
+  equations: Map<string, (inputs: Map<string, number>) => number>;
 }
 
 // ─── Security-Specific Causal Models ─────────────────────────────────────────
@@ -48,7 +48,7 @@ export class SecurityCausalModel {
   private buildSecurityModel(): StructuralCausalModel {
     const nodes = new Map<string, CausalNode>();
     const edges: CausalEdge[] = [];
-    const equations = new Map<string, (inputs: Map<string, any>) => any>();
+    const equations = new Map<string, (inputs: Map<string, number>) => number>();
 
     // Define nodes
     nodes.set('patch_deployment', {
@@ -184,7 +184,7 @@ export class SecurityCausalModel {
     );
 
     // Define structural equations
-    equations.set('breach_risk', (inputs: Map<string, any>) => {
+    equations.set('breach_risk', (inputs: Map<string, number>) => {
       const vulnExposure = inputs.get('vulnerability_exposure') || 0;
       const networkExposure = inputs.get('network_exposure') || 0;
       const attackerCap = inputs.get('attacker_capability') || 0;
@@ -198,7 +198,7 @@ export class SecurityCausalModel {
       return Math.min(1, baseRate * (1 + vulnFactor + networkFactor + attackerFactor));
     });
 
-    equations.set('business_impact', (inputs: Map<string, any>) => {
+    equations.set('business_impact', (inputs: Map<string, number>) => {
       const breachRisk = inputs.get('breach_risk') || 0;
       const downtime = inputs.get('system_downtime') || 0;
       const dataSensitivity = inputs.get('data_sensitivity') || 0;
@@ -210,7 +210,7 @@ export class SecurityCausalModel {
       return breachRisk * breachCost + downtime * downtimeCost;
     });
 
-    equations.set('system_downtime', (inputs: Map<string, any>) => {
+    equations.set('system_downtime', (inputs: Map<string, number>) => {
       const patchDeployment = inputs.get('patch_deployment') || 0;
       // Expected downtime in hours
       return patchDeployment ? Math.random() < 0.3 ? 2 : 0 : 0; // 30% chance of 2hr downtime
@@ -225,10 +225,10 @@ export class SecurityCausalModel {
    */
   doIntervention(
     action: string,
-    value: any,
-    context: Map<string, any> = new Map()
-  ): Map<string, any> {
-    const results = new Map<string, any>(context);
+    value: number,
+    context: Map<string, number> = new Map()
+  ): Map<string, number> {
+    const results = new Map<string, number>(context);
     results.set(action, value);
 
     // Propagate causal effects through the graph
@@ -268,12 +268,12 @@ export class SecurityCausalModel {
    * Counterfactual reasoning: "What would have happened if..."
    */
   counterfactual(
-    factual: Map<string, any>,
-    intervention: { variable: string; value: any }
+    factual: Map<string, number>,
+    intervention: { variable: string; value: number }
   ): {
-    factual: Map<string, any>;
-    counterfactual: Map<string, any>;
-    differences: Map<string, { factual: any; counterfactual: any; delta: any }>;
+    factual: Map<string, number>;
+    counterfactual: Map<string, number>;
+    differences: Map<string, { factual: number; counterfactual: number; delta: number | string }>;
   } {
     // Apply intervention to get counterfactual world
     const counterfactual = this.doIntervention(
@@ -283,7 +283,7 @@ export class SecurityCausalModel {
     );
 
     // Calculate differences
-    const differences = new Map<string, { factual: any; counterfactual: any; delta: any }>();
+    const differences = new Map<string, { factual: number; counterfactual: number; delta: number | string }>();
 
     for (const [key, factualValue] of factual) {
       const counterfactualValue = counterfactual.get(key);
@@ -349,8 +349,8 @@ export class SecurityCausalModel {
   /**
    * Generate random context for simulations
    */
-  private generateRandomContext(): Map<string, any> {
-    const context = new Map<string, any>();
+  private generateRandomContext(): Map<string, number> {
+    const context = new Map<string, number>();
 
     context.set('network_exposure', Math.random()); // 0-1 scale
     context.set('data_sensitivity', Math.random()); // 0-1 scale
@@ -370,12 +370,12 @@ export class SecurityCausalModel {
     possibleActions: string[] = []
   ): {
     bestAction: string;
-    bestValue: any;
+    bestValue: number | null;
     expectedOutcome: number;
     tradeoffs: Map<string, number>;
   } {
     let bestAction = '';
-    let bestValue: any = null;
+    let bestValue: number | null = null;
     let bestOutcome = minimize ? Infinity : -Infinity;
     const tradeoffs = new Map<string, number>();
 
@@ -445,7 +445,7 @@ export class CausalDiscovery {
    * using constraint-based methods (simplified PC algorithm)
    */
   static discoverStructure(
-    data: Array<Record<string, any>>,
+    data: Array<Record<string, number>>,
     variables: string[],
     significanceLevel: number = 0.05
   ): {
@@ -496,7 +496,7 @@ export class CausalDiscovery {
    * Calculate correlation between two variables
    */
   private static calculateCorrelation(
-    data: Array<Record<string, any>>,
+    data: Array<Record<string, number>>,
     varA: string,
     varB: string
   ): number {
@@ -556,7 +556,7 @@ export class SecurityScenarios {
     const severityMap = { low: 0.2, medium: 0.5, high: 0.8, critical: 1.0 };
     const dataMap = { public: 0.1, internal: 0.3, confidential: 0.6, restricted: 1.0 };
 
-    const inputs = new Map<string, any>();
+    const inputs = new Map<string, number>();
     inputs.set('vulnerability_exposure', severityMap[context.vulnerabilitySeverity]);
     inputs.set('data_sensitivity', dataMap[context.dataClassification]);
     inputs.set('network_exposure', context.productionSystem ? 0.9 : 0.3);
@@ -588,9 +588,6 @@ export class SecurityScenarios {
     };
 
     // Make recommendation
-    let recommendation: 'patch_now' | 'patch_maintenance_window' | 'accept_risk';
-    let reasoning: string;
-
     const impacts = [
       { action: 'patch_now' as const, impact: patchNowImpact.totalImpact },
       { action: 'patch_maintenance_window' as const, impact: patchLaterImpact.totalImpact },
@@ -601,9 +598,10 @@ export class SecurityScenarios {
       curr.impact < min.impact ? curr : min
     );
 
-    recommendation = bestAction.action;
+    const recommendation = bestAction.action;
 
     // Generate reasoning
+    let reasoning: string;
     if (recommendation === 'patch_now') {
       reasoning = `Immediate patching recommended despite potential downtime. The ${context.vulnerabilitySeverity} severity vulnerability on a ${context.dataClassification} data system poses significant risk that outweighs ${patchNowImpact.downtime}h downtime.`;
     } else if (recommendation === 'patch_maintenance_window') {

@@ -20,13 +20,13 @@ export interface CausalVariable {
   observed: boolean;
   domain?: number[] | string[];
   distribution?: 'normal' | 'bernoulli' | 'poisson' | 'uniform';
-  parameters?: Record<string, any>;
+  parameters?: Record<string, number>;
 }
 
 export interface StructuralEquation {
   target: string;
   parents: string[];
-  equation: (parentValues: Map<string, any>, noise: number) => any;
+  equation: (parentValues: Map<string, number>, noise: number) => number;
   noiseDistribution: {
     type: 'normal' | 'uniform' | 'bernoulli';
     parameters: Record<string, number>;
@@ -44,7 +44,7 @@ export interface CausalDAG {
 
 export class TrueCausalEngine {
   private dag: CausalDAG;
-  private data: Array<Record<string, any>> = [];
+  private data: Array<Record<string, number>> = [];
 
   constructor(dag: CausalDAG) {
     this.dag = dag;
@@ -92,8 +92,8 @@ export class TrueCausalEngine {
   association(
     Y: string,
     X: string,
-    value: any,
-    conditions: Map<string, any> = new Map()
+    value: number,
+    conditions: Map<string, number> = new Map()
   ): number {
     if (this.data.length === 0) {
       throw new Error('No observational data available');
@@ -130,7 +130,7 @@ export class TrueCausalEngine {
   intervention(
     Y: string,
     X: string,
-    value: any,
+    value: number,
     method: 'backdoor' | 'frontdoor' | 'instrumental' = 'backdoor'
   ): number {
     if (method === 'backdoor') {
@@ -145,7 +145,7 @@ export class TrueCausalEngine {
   /**
    * Backdoor Criterion and Adjustment Formula
    */
-  private backdoorAdjustment(Y: string, X: string, value: any): number {
+  private backdoorAdjustment(Y: string, X: string, value: number): number {
     // Find backdoor paths from X to Y
     const backdoorPaths = this.findBackdoorPaths(X, Y);
 
@@ -303,7 +303,7 @@ export class TrueCausalEngine {
   /**
    * Front-door Criterion and Adjustment
    */
-  private frontdoorAdjustment(Y: string, X: string, value: any): number {
+  private frontdoorAdjustment(Y: string, X: string, value: number): number {
     // Find mediator M between X and Y
     const mediators = this.findMediators(X, Y);
 
@@ -345,7 +345,7 @@ export class TrueCausalEngine {
   /**
    * Instrumental Variable Method
    */
-  private instrumentalVariable(Y: string, X: string, value: any): number {
+  private instrumentalVariable(Y: string, X: string, value: number): number {
     // Find instrumental variable Z
     const instruments = this.findInstruments(X, Y);
 
@@ -388,8 +388,8 @@ export class TrueCausalEngine {
    * What would Y be if X had been x, given observations
    */
   counterfactual(
-    query: { variable: string; intervention: any },
-    evidence: Map<string, any>
+    query: { variable: string; intervention: number },
+    evidence: Map<string, number>
   ): {
     probability: number;
     explanation: string;
@@ -427,13 +427,13 @@ export class TrueCausalEngine {
   /**
    * Abduction: Infer noise terms from observations
    */
-  private abduction(evidence: Map<string, any>): Map<string, number> {
+  private abduction(evidence: Map<string, number>): Map<string, number> {
     const noiseTerms = new Map<string, number>();
 
     for (const [varId, equation] of this.dag.equations) {
       if (evidence.has(varId)) {
         // Solve for noise: observed = f(parents, noise)
-        const parentValues = new Map<string, any>();
+        const parentValues = new Map<string, number>();
         for (const parent of equation.parents) {
           parentValues.set(parent, evidence.get(parent) || 0);
         }
@@ -455,7 +455,7 @@ export class TrueCausalEngine {
    */
   private applyIntervention(
     variable: string,
-    value: any
+    value: number
   ): Map<string, StructuralEquation> {
     const modified = new Map(this.dag.equations);
 
@@ -481,7 +481,7 @@ export class TrueCausalEngine {
     equations: Map<string, StructuralEquation>,
     noiseTerms: Map<string, number>
   ): number {
-    const values = new Map<string, any>();
+    const values = new Map<string, number>();
     const computed = new Set<string>();
 
     // Topological sort for computation order
@@ -492,7 +492,7 @@ export class TrueCausalEngine {
         const equation = equations.get(varId);
         if (!equation) continue;
 
-        const parentValues = new Map<string, any>();
+        const parentValues = new Map<string, number>();
         for (const parent of equation.parents) {
           parentValues.set(parent, values.get(parent) || 0);
         }
@@ -673,12 +673,12 @@ export class TrueCausalEngine {
 
   // ─── Helper Methods ──────────────────────────────────────────────────────────
 
-  private generateConfigurations(variables: string[]): Array<[string, any][]> {
+  private generateConfigurations(variables: string[]): Array<[string, number | string | boolean][]> {
     if (variables.length === 0) return [[]];
 
     const [first, ...rest] = variables;
     const restConfigs = this.generateConfigurations(rest);
-    const configs: Array<[string, any][]> = [];
+    const configs: Array<[string, number | string | boolean][]> = [];
 
     const values = this.getVariableValues(first);
     for (const value of values) {
@@ -690,7 +690,7 @@ export class TrueCausalEngine {
     return configs;
   }
 
-  private getVariableValues(varId: string): any[] {
+  private getVariableValues(varId: string): (number | string | boolean)[] {
     const variable = this.dag.variables.get(varId);
     if (!variable) return [];
 
@@ -701,7 +701,7 @@ export class TrueCausalEngine {
     return [0, 0.25, 0.5, 0.75, 1];
   }
 
-  private calculateJointProbability(conditions: Map<string, any>): number {
+  private calculateJointProbability(conditions: Map<string, number | string | boolean>): number {
     if (this.data.length === 0) return 1 / Math.pow(2, conditions.size);
 
     const matching = this.data.filter(row => {
@@ -722,25 +722,25 @@ export class TrueCausalEngine {
   /**
    * Load observational data for analysis
    */
-  loadData(data: Array<Record<string, any>>): void {
+  loadData(data: Array<Record<string, number>>): void {
     this.data = data;
   }
 
   /**
    * Generate synthetic data from the causal model
    */
-  generateData(samples: number = 1000): Array<Record<string, any>> {
-    const data: Array<Record<string, any>> = [];
+  generateData(samples: number = 1000): Array<Record<string, number>> {
+    const data: Array<Record<string, number>> = [];
 
     for (let i = 0; i < samples; i++) {
-      const sample: Record<string, any> = {};
+      const sample: Record<string, number> = {};
       const order = this.topologicalSort();
 
       for (const varId of order) {
         const equation = this.dag.equations.get(varId);
         if (!equation) continue;
 
-        const parentValues = new Map<string, any>();
+        const parentValues = new Map<string, number>();
         for (const parent of equation.parents) {
           parentValues.set(parent, sample[parent] || 0);
         }

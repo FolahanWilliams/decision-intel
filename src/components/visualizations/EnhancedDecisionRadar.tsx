@@ -110,6 +110,64 @@ const AXIS_CONFIG: Record<string, {
   },
 };
 
+// Custom tooltip extracted outside the component to avoid re-creation during render
+interface RadarTooltipPayloadItem {
+  payload: {
+    axis: string;
+    key: string;
+    value: number;
+    benchmark: number | null;
+    target: number | null;
+    color: string;
+  };
+}
+
+function CustomRadarTooltip({ active, payload }: {
+  active?: boolean;
+  payload?: RadarTooltipPayloadItem[];
+}) {
+  if (!active || !payload || !payload.length) return null;
+
+  const data = payload[0].payload;
+  const config = AXIS_CONFIG[data.key];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="p-3 bg-black/90 backdrop-blur-xl border border-white/20 rounded-lg"
+    >
+      <div className="flex items-center gap-2 mb-2">
+        {config?.icon}
+        <span className="font-semibold text-sm">{data.axis}</span>
+      </div>
+      <div className="text-xs space-y-1">
+        <div className="flex justify-between gap-4">
+          <span className="text-white/60">Current:</span>
+          <span className="font-mono font-semibold" style={{ color: config?.color }}>
+            {data.value}
+          </span>
+        </div>
+        {data.benchmark && (
+          <div className="flex justify-between gap-4">
+            <span className="text-white/60">Benchmark:</span>
+            <span className="font-mono">{data.benchmark}</span>
+          </div>
+        )}
+        {data.target && (
+          <div className="flex justify-between gap-4">
+            <span className="text-white/60">Target:</span>
+            <span className="font-mono">{data.target}</span>
+          </div>
+        )}
+        <div className="pt-1 mt-1 border-t border-white/10">
+          <div className="text-white/60">{config?.description}</div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function EnhancedDecisionRadar({
   data,
   historicalData = [],
@@ -199,50 +257,6 @@ export function EnhancedDecisionRadar({
     setSelectedAxis(prev => prev === axisKey ? null : axisKey);
     onAxisClick?.(axisKey);
   }, [interactive, onAxisClick]);
-
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (!active || !payload || !payload.length) return null;
-
-    const data = payload[0].payload;
-    const config = AXIS_CONFIG[data.key];
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="p-3 bg-black/90 backdrop-blur-xl border border-white/20 rounded-lg"
-      >
-        <div className="flex items-center gap-2 mb-2">
-          {config?.icon}
-          <span className="font-semibold text-sm">{data.axis}</span>
-        </div>
-        <div className="text-xs space-y-1">
-          <div className="flex justify-between gap-4">
-            <span className="text-white/60">Current:</span>
-            <span className="font-mono font-semibold" style={{ color: config?.color }}>
-              {data.value}
-            </span>
-          </div>
-          {data.benchmark && (
-            <div className="flex justify-between gap-4">
-              <span className="text-white/60">Benchmark:</span>
-              <span className="font-mono">{data.benchmark}</span>
-            </div>
-          )}
-          {data.target && (
-            <div className="flex justify-between gap-4">
-              <span className="text-white/60">Target:</span>
-              <span className="font-mono">{data.target}</span>
-            </div>
-          )}
-          <div className="pt-1 mt-1 border-t border-white/10">
-            <div className="text-white/60">{config?.description}</div>
-          </div>
-        </div>
-      </motion.div>
-    );
-  };
 
   // Calculate delta from benchmark
   const deltaFromBenchmark = useMemo(() => {
@@ -466,7 +480,7 @@ export function EnhancedDecisionRadar({
               onMouseLeave={() => setHoveredAxis(null)}
             />
 
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomRadarTooltip />} />
           </RadarChart>
         </ResponsiveContainer>
 

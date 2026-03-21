@@ -77,6 +77,51 @@ const RISK_COLORS = {
   low: '#22c55e',
 };
 
+const stableHash = (str: string, seed: number): number => {
+  let hash = seed;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash % 100);
+};
+
+// Custom tooltip with rich content — extracted outside component to avoid re-creation during render
+interface ChartTooltipProps {
+  active?: boolean;
+  payload?: Array<{ color: string; name: string; value: number }>;
+  label?: string;
+}
+
+function CustomTooltip({ active, payload, label }: ChartTooltipProps) {
+  if (!active || !payload || !payload.length) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={cn(
+        "p-3 rounded-lg",
+        "bg-black/90 backdrop-blur-xl",
+        "border border-white/20",
+        "shadow-xl"
+      )}
+    >
+      <p className="text-xs font-semibold text-white">{label}</p>
+      {payload.map((entry, index: number) => (
+        <div key={index} className="flex items-center gap-2 mt-1">
+          <div
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: entry.color }}
+          />
+          <span className="text-xs text-white/80">
+            {entry.name}: {entry.value}
+          </span>
+        </div>
+      ))}
+    </motion.div>
+  );
+}
+
 const SEVERITY_COLORS = {
   low: '#22c55e',
   medium: '#fbbf24',
@@ -85,7 +130,20 @@ const SEVERITY_COLORS = {
 };
 
 // Custom active shape for pie chart
-const renderActiveShape = (props: any) => {
+interface ActiveShapeProps {
+  cx: number;
+  cy: number;
+  innerRadius: number;
+  outerRadius: number;
+  startAngle: number;
+  endAngle: number;
+  fill: string;
+  payload: { name: string };
+  value: number;
+  percent: number;
+}
+
+const renderActiveShape = (props: ActiveShapeProps) => {
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value, percent } = props;
 
   return (
@@ -190,11 +248,11 @@ export function EnhancedDashboardCharts({
 
   // Enhanced bias data with relationships
   const enhancedBiasData = useMemo(() => {
-    return topBiases.map(bias => ({
+    return topBiases.map((bias, biasIndex) => ({
       ...bias,
       severity: bias.severity || 'medium',
       connections: topBiases
-        .filter(b => b.name !== bias.name && Math.random() > 0.6)
+        .filter((b, bIndex) => b.name !== bias.name && stableHash(bias.name + b.name, biasIndex + bIndex) > 60)
         .map(b => b.name),
       impact: Math.round(bias.count * (bias.severity === 'critical' ? 4 : bias.severity === 'high' ? 3 : 2)),
     }));
@@ -218,14 +276,14 @@ export function EnhancedDashboardCharts({
     setAnimationKey(prev => prev + 1);
   }, [onBiasClick]);
 
-  const handleRiskSegmentClick = useCallback((entry: any, index: number) => {
+  const handleRiskSegmentClick = useCallback((entry: { name: string }, index: number) => {
     setActiveRiskIndex(index);
     const riskLevel = entry.name.toLowerCase().replace(' risk', '') as 'high' | 'medium' | 'low';
     setSelectedRiskLevel(riskLevel);
     onRiskSegmentClick?.(riskLevel);
   }, [onRiskSegmentClick]);
 
-  const handleTimeRangeSelect = useCallback((domain: any) => {
+  const handleTimeRangeSelect = useCallback((domain: { startIndex?: number; endIndex?: number } | null) => {
     if (domain && domain.startIndex !== undefined && domain.endIndex !== undefined) {
       setSelectedTimeRange([domain.startIndex, domain.endIndex]);
       const startDate = scoreTrend[domain.startIndex].date;
@@ -234,43 +292,12 @@ export function EnhancedDashboardCharts({
     }
   }, [scoreTrend, onPeriodSelect]);
 
-  // Custom tooltip with rich content
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (!active || !payload || !payload.length) return null;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className={cn(
-          "p-3 rounded-lg",
-          "bg-black/90 backdrop-blur-xl",
-          "border border-white/20",
-          "shadow-xl"
-        )}
-      >
-        <p className="text-xs font-semibold text-white">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <div key={index} className="flex items-center gap-2 mt-1">
-            <div
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-xs text-white/80">
-              {entry.name}: {entry.value}
-            </span>
-          </div>
-        ))}
-      </motion.div>
-    );
-  };
-
   // Radar chart data for bias relationships
   const radarData = useMemo(() => {
     const categories = ['Cognitive', 'Emotional', 'Social', 'Logical', 'Memory'];
-    return categories.map(category => ({
+    return categories.map((category, index) => ({
       category,
-      current: Math.random() * 100,
+      current: stableHash(category, index),
       benchmark: 50,
       target: 30,
     }));
@@ -361,7 +388,7 @@ export function EnhancedDashboardCharts({
                   {...({
                     activeIndex: activeRiskIndex,
                     activeShape: viewMode === 'detailed' ? renderActiveShape : undefined,
-                  } as any)}
+                  } as Record<string, unknown>)}
                   data={donutData}
                   cx="50%"
                   cy="50%"
