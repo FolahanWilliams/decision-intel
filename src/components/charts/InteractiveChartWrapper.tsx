@@ -117,7 +117,29 @@ export function InteractiveChartWrapper({
       } catch (error) {
         console.error('Failed to export chart:', error);
       }
+    } else if (format === 'svg' && chartRef.current) {
+      try {
+        const svgElement = chartRef.current.querySelector('svg');
+        if (svgElement) {
+          const serializer = new XMLSerializer();
+          const svgString = serializer.serializeToString(svgElement);
+          const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${title || 'chart'}-${Date.now()}.svg`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } else {
+          onExport?.(format);
+        }
+      } catch (error) {
+        console.error('Failed to export SVG:', error);
+      }
     } else {
+      if (!onExport) {
+        console.warn(`No export handler provided for format: ${format}. Pass an onExport callback to handle ${format} exports.`);
+      }
       onExport?.(format);
     }
     setShowExportMenu(false);

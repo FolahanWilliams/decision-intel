@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, useCallback, useRef } from 'react';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -139,6 +140,9 @@ function runForceSimulation(
   // Ideal link distance — nodes should settle roughly this far apart
   const idealDist = Math.min(width, height) / (Math.sqrt(nodes.length) + 1);
 
+  // Build index map once for O(1) lookups (avoids O(n) .find() per connection per iteration)
+  const nodeIndex = new Map(simNodes.map((n, i) => [n.id, i]));
+
   for (let iter = 0; iter < iterations; iter++) {
     const alpha = Math.max(0.01, 1 - iter / iterations);
 
@@ -162,9 +166,11 @@ function runForceSimulation(
 
     // Spring attraction along connections — pulls toward idealDist, not toward zero
     for (const conn of connections) {
-      const source = simNodes.find(n => n.id === conn.from);
-      const target = simNodes.find(n => n.id === conn.to);
-      if (!source || !target) continue;
+      const sourceIdx = nodeIndex.get(conn.from);
+      const targetIdx = nodeIndex.get(conn.to);
+      if (sourceIdx === undefined || targetIdx === undefined) continue;
+      const source = simNodes[sourceIdx];
+      const target = simNodes[targetIdx];
       const dx = target.x - source.x;
       const dy = target.y - source.y;
       const dist = Math.max(Math.sqrt(dx * dx + dy * dy), 1);
@@ -404,6 +410,11 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
     return runForceSimulation(nodes, connections, svgWidth, svgHeight);
   }, [nodes, connections, svgWidth, svgHeight]);
 
+  // O(1) lookup map for positioned nodes (used in connection rendering & details panel)
+  const positionedNodeMap = useMemo(() => new Map(positionedNodes.map(n => [n.id, n])), [positionedNodes]);
+
+  const prefersReducedMotion = useReducedMotion();
+
   // Severity counts for donut
   const severityCounts = useMemo(() => {
     const counts: Record<string, number> = { low: 0, medium: 0, high: 0, critical: 0 };
@@ -439,8 +450,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
     );
   }
 
-  const selectedNode = selectedNodeId ? positionedNodes.find(n => n.id === selectedNodeId) : null;
-  const activeHover = hoveredNodeId ? positionedNodes.find(n => n.id === hoveredNodeId) : null;
+  const selectedNode = selectedNodeId ? positionedNodeMap.get(selectedNodeId) ?? null : null;
+  const activeHover = hoveredNodeId ? positionedNodeMap.get(hoveredNodeId) ?? null : null;
   const biasDataMap = Object.fromEntries(biases.map(b => [b.biasType, b]));
 
   return (
@@ -491,7 +502,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                     : 'rgba(255,255,255,0.5)',
                   cursor: 'pointer',
                   textTransform: 'capitalize',
-                  transition: 'all 0.15s',
+                  transition: prefersReducedMotion ? 'none' : 'all 0.15s',
                 }}
               >
                 {sev === 'all' ? `All (${count})` : `${sev} (${count})`}
@@ -523,7 +534,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                 border: 'none',
                 cursor: 'pointer',
                 textTransform: 'capitalize',
-                transition: 'all 0.15s',
+                transition: prefersReducedMotion ? 'none' : 'all 0.15s',
               }}
             >
               {mode}
@@ -576,8 +587,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
 
             {/* Connections */}
             {connections.map((conn, idx) => {
-              const fromNode = positionedNodes.find(n => n.id === conn.from);
-              const toNode = positionedNodes.find(n => n.id === conn.to);
+              const fromNode = positionedNodeMap.get(conn.from);
+              const toNode = positionedNodeMap.get(conn.to);
               if (!fromNode || !toNode) return null;
 
               const isHighlighted = selectedNodeId
@@ -600,7 +611,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   strokeOpacity={isDimmed ? 0.08 : isHighlighted ? 0.85 : 0.45}
                   strokeWidth={isHighlighted ? Math.max(conn.strength * 5, 2.5) : 1.5}
                   strokeLinecap="round"
-                  style={{ transition: 'all 0.3s ease' }}
+                  style={{ transition: prefersReducedMotion ? 'none' : 'all 0.3s ease' }}
                 />
               );
             })}
@@ -641,7 +652,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   style={{
                     cursor: 'pointer',
                     opacity: isDimmed ? 0.15 : 1,
-                    transition: 'opacity 0.3s ease',
+                    transition: prefersReducedMotion ? 'none' : 'opacity 0.3s ease',
                     outline: 'none',
                   }}
                 >
@@ -657,14 +668,16 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                       strokeOpacity={0.3}
                       strokeDasharray="4,4"
                     >
-                      <animateTransform
-                        attributeName="transform"
-                        type="rotate"
-                        from={`0 ${node.x} ${node.y}`}
-                        to={`360 ${node.x} ${node.y}`}
-                        dur="8s"
-                        repeatCount="indefinite"
-                      />
+                      {!prefersReducedMotion && (
+                        <animateTransform
+                          attributeName="transform"
+                          type="rotate"
+                          from={`0 ${node.x} ${node.y}`}
+                          to={`360 ${node.x} ${node.y}`}
+                          dur="8s"
+                          repeatCount="indefinite"
+                        />
+                      )}
                     </circle>
                   )}
 
@@ -819,6 +832,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
           biases={filteredBiases}
           severityCounts={severityCounts}
           onBiasClick={onBiasClick}
+          prefersReducedMotion={prefersReducedMotion}
         />
       )}
 
@@ -832,7 +846,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             backdropFilter: 'blur(12px)',
             border: `1px solid ${SEVERITY_COLORS[selectedNode.severity]}30`,
             borderRadius: '10px',
-            transition: 'all 0.3s ease',
+            transition: prefersReducedMotion ? 'none' : 'all 0.3s ease',
           }}
         >
           <div
@@ -935,7 +949,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                 <div style={{ display: 'flex', gap: '4px', marginTop: '6px', flexWrap: 'wrap' }}>
                   {relatedConns.map(c => {
                     const otherId = c.from === selectedNode.id ? c.to : c.from;
-                    const otherNode = positionedNodes.find(n => n.id === otherId);
+                    const otherNode = positionedNodeMap.get(otherId);
                     if (!otherNode) return null;
                     return (
                       <button
@@ -950,7 +964,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                           color: SEVERITY_COLORS[otherNode.severity],
                           cursor: 'pointer',
                           fontWeight: 500,
-                          transition: 'all 0.15s',
+                          transition: prefersReducedMotion ? 'none' : 'all 0.15s',
                         }}
                       >
                         {otherNode.name}
@@ -1049,10 +1063,12 @@ function ClusterView({
   biases,
   severityCounts: _severityCounts,
   onBiasClick,
+  prefersReducedMotion = false,
 }: {
   biases: BiasNetworkProps['biases'];
   severityCounts: Record<string, number>;
   onBiasClick?: (biasType: string) => void;
+  prefersReducedMotion?: boolean;
 }) {
   const clusters = useMemo(() => {
     const groups: Record<string, typeof biases> = {
@@ -1145,7 +1161,7 @@ function ClusterView({
                     borderRadius: '16px',
                     color: 'rgba(255,255,255,0.8)',
                     cursor: onBiasClick ? 'pointer' : 'default',
-                    transition: 'all 0.15s',
+                    transition: prefersReducedMotion ? 'none' : 'all 0.15s',
                   }}
                 >
                   {bias.biasType}

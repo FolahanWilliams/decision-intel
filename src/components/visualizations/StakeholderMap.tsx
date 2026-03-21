@@ -14,6 +14,39 @@ interface StakeholderMapProps {
   stakeholders: Stakeholder[];
 }
 
+const getStanceColor = (stance: string) => {
+  switch (stance) {
+    case 'supportive':
+      return 'bg-emerald-500 border-emerald-300';
+    case 'opposed':
+      return 'bg-red-500 border-red-300';
+    default:
+      return 'bg-gray-500 border-gray-300';
+  }
+};
+
+const getStanceShape = (stance: string) => {
+  switch (stance) {
+    case 'supportive':
+      return 'rounded-full'; // circle
+    case 'opposed':
+      return 'rounded-none'; // square
+    default:
+      return 'rounded-none rotate-45'; // diamond
+  }
+};
+
+const getStanceLabel = (stance: string) => {
+  switch (stance) {
+    case 'supportive':
+      return 'Supportive';
+    case 'opposed':
+      return 'Opposed';
+    default:
+      return 'Neutral';
+  }
+};
+
 export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
   const quadrants = [
     { label: 'Keep Satisfied', x: 0, y: 50, w: 50, h: 50, color: 'bg-yellow-500/10' },
@@ -22,19 +55,8 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
     { label: 'Keep Informed', x: 50, y: 0, w: 50, h: 50, color: 'bg-orange-500/10' },
   ];
 
-  const getStanceColor = (stance: string) => {
-    switch (stance) {
-      case 'supportive':
-        return 'bg-emerald-500 border-emerald-300';
-      case 'opposed':
-        return 'bg-red-500 border-red-300';
-      default:
-        return 'bg-gray-500 border-gray-300';
-    }
-  };
-
   return (
-    <div className="relative aspect-square w-full max-w-lg mx-auto bg-secondary/20  border border-border p-8">
+    <div className="relative aspect-square w-full max-w-lg mx-auto bg-secondary/20 border border-border p-8 overflow-hidden">
       {/* Y-Axis Label */}
       <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-sm font-medium text-muted">
         Influence / Power
@@ -46,7 +68,7 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
       </div>
 
       {/* Quadrants */}
-      <div className="relative w-full h-full border-l-2 border-b-2 border-muted/30">
+      <div className="relative w-full h-full border-l-2 border-b-2 border-muted/30 overflow-hidden">
         {quadrants.map((q, idx) => (
           <div
             key={idx}
@@ -58,58 +80,87 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
               height: `${q.h}%`,
             }}
           >
-            <span className="text-sm font-bold text-muted/50 tracking-wide">{q.label}</span>
+            <span className="text-xs sm:text-sm font-bold text-muted/50 tracking-wide text-center px-1">{q.label}</span>
           </div>
         ))}
 
         {/* Stakeholder Nodes */}
-        {stakeholders.map(stakeholder => (
-          <div
-            key={stakeholder.id}
-            className="absolute group transform -translate-x-1/2 translate-y-1/2 hover:z-50"
-            style={{
-              left: `${stakeholder.interest}%`,
-              bottom: `${stakeholder.influence}%`,
-            }}
-          >
-            <div
-              className={`
-              w-4 h-4  border-2 cursor-pointer               transition-transform duration-300 group-hover:scale-150
-              ${getStanceColor(stakeholder.stance)}
-            `}
-            />
+        {stakeholders.map(stakeholder => {
+          const initials = stakeholder.name.slice(0, 2).toUpperCase();
+          const isDiamond = stakeholder.stance === 'neutral';
 
-            {/* Tooltip */}
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 hidden group-hover:block z-50">
-              <div className="bg-popover text-popover-foreground text-xs   p-3 border border-border">
-                <p className="font-bold text-sm">{stakeholder.name}</p>
-                <p className="text-muted-foreground mb-2">{stakeholder.role}</p>
-                <div className="space-y-1">
-                  {stakeholder.keyConcerns.slice(0, 2).map((concern, i) => (
-                    <p key={i} className="flex items-start gap-1">
-                      <span className="text-accent-primary">•</span>
-                      {concern}
-                    </p>
-                  ))}
+          return (
+            <div
+              key={stakeholder.id}
+              className="absolute group transform -translate-x-1/2 translate-y-1/2 hover:z-50 focus-within:z-50"
+              style={{
+                left: `${Math.min(Math.max(stakeholder.interest, 5), 95)}%`,
+                bottom: `${Math.min(Math.max(stakeholder.influence, 5), 95)}%`,
+              }}
+            >
+              {/* Touch target wrapper for mobile accessibility (min 44px) */}
+              <button
+                type="button"
+                className="relative flex items-center justify-center p-3 sm:p-2 -m-3 sm:-m-2 bg-transparent border-none cursor-pointer"
+                role="img"
+                aria-label={`${stakeholder.name}, ${stakeholder.role}. Stance: ${getStanceLabel(stakeholder.stance)}. Influence: ${stakeholder.influence}%, Interest: ${stakeholder.interest}%`}
+              >
+                <div
+                  className={`
+                    w-5 h-5 sm:w-4 sm:h-4 border-2
+                    transition-transform duration-300 group-hover:scale-150 focus-within:scale-150
+                    flex items-center justify-center
+                    ${getStanceColor(stakeholder.stance)}
+                    ${getStanceShape(stakeholder.stance)}
+                  `}
+                >
+                  {/* Initials inside the shape - counter-rotate for diamond */}
+                  <span
+                    className={`text-[6px] sm:text-[5px] font-bold text-white leading-none select-none ${
+                      isDiamond ? '-rotate-45' : ''
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {initials}
+                  </span>
+                </div>
+              </button>
+
+              {/* Tooltip - shown on hover and focus */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 hidden group-hover:block group-focus-within:block z-50">
+                <div className="bg-popover text-popover-foreground text-xs p-3 border border-border">
+                  <p className="font-bold text-sm">{stakeholder.name}</p>
+                  <p className="text-muted-foreground">{stakeholder.role}</p>
+                  <p className="text-muted-foreground mb-2">
+                    Stance: {getStanceLabel(stakeholder.stance)}
+                  </p>
+                  <div className="space-y-1">
+                    {stakeholder.keyConcerns.slice(0, 2).map((concern, i) => (
+                      <p key={i} className="flex items-start gap-1">
+                        <span className="text-accent-primary">•</span>
+                        {concern}
+                      </p>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Legend */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2 bg-background/80 p-2  border border-border text-xs backdrop-blur-sm">
+      {/* Legend - updated with shapes */}
+      <div className="absolute top-4 right-4 flex flex-col gap-2 bg-background/80 p-2 border border-border text-xs backdrop-blur-sm">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2  bg-emerald-500" />
+          <span className="w-3 h-3 rounded-full bg-emerald-500" aria-hidden="true" />
           <span>Supportive</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2  bg-gray-500" />
+          <span className="w-3 h-3 rounded-none rotate-45 bg-gray-500" aria-hidden="true" />
           <span>Neutral</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2  bg-red-500" />
+          <span className="w-3 h-3 rounded-none bg-red-500" aria-hidden="true" />
           <span>Opposed</span>
         </div>
       </div>
