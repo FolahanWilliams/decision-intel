@@ -255,7 +255,7 @@ export class MCPServer {
       // Perform counterfactual analysis if requested
       let counterfactual = null;
       if (params.includeCounterfactual && riskAssessment.primaryBias) {
-        const cfContext = new Map<string, unknown>();
+        const cfContext = new Map<string, number>();
         cfContext.set('decision_urgency', params.decision.urgency === 'immediate' ? 1 : 0);
         cfContext.set('automation_involved', params.decision.context.automationInvolved ? 1 : 0);
 
@@ -304,21 +304,24 @@ export class MCPServer {
     try {
       const params = CausalAnalysisRequestSchema.parse(request.params);
 
-      // Build context map
-      const contextMap = new Map(Object.entries(params.context));
+      // Build context map — coerce values to numbers for causal model
+      const contextMap = new Map(
+        Object.entries(params.context).map(([k, v]) => [k, typeof v === 'number' ? v : Number(v) || 0] as [string, number])
+      );
 
       // Perform interventions if specified
-      const results: Array<{ intervention: { variable: string; value: unknown }; outcomes: Record<string, unknown> }> = [];
+      const results: Array<{ intervention: { variable: string; value: number }; outcomes: Record<string, unknown> }> = [];
       if (params.interventions && params.interventions.length > 0) {
         for (const intervention of params.interventions) {
+          const interventionValue = typeof intervention.value === 'number' ? intervention.value : Number(intervention.value) || 0;
           const result = this.causalModel.doIntervention(
             intervention.variable,
-            intervention.value,
+            interventionValue,
             new Map(contextMap)
           );
 
           results.push({
-            intervention: intervention,
+            intervention: { variable: intervention.variable, value: interventionValue },
             outcomes: Object.fromEntries(result)
           });
         }
@@ -365,7 +368,7 @@ export class MCPServer {
    */
   private async handleGetNudge(ws: WebSocket, request: MCPRequest, _context: MCPContext) {
     const biasType = request.params?.biasType as SecurityBiasType;
-    const severity = request.params?.severity || 'medium';
+    const severity = (typeof request.params?.severity === 'string' ? request.params.severity : 'medium');
 
     // Generate context-aware nudge
     const nudge = this.generateNudge(biasType, severity);
