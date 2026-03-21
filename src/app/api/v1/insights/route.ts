@@ -23,10 +23,7 @@ export async function GET(request: NextRequest) {
     const authResult = await validateApiKey(request);
     if (!authResult.success) {
       const err = authResult as ValidateError;
-      return NextResponse.json(
-        { error: err.error },
-        { status: err.status, headers: err.headers }
-      );
+      return NextResponse.json({ error: err.error }, { status: err.status, headers: err.headers });
     }
     const { context } = authResult;
 
@@ -42,11 +39,20 @@ export async function GET(request: NextRequest) {
     const endDate = new Date();
     const startDate = new Date();
     switch (timeRange) {
-      case '7d': startDate.setDate(endDate.getDate() - 7); break;
-      case '30d': startDate.setDate(endDate.getDate() - 30); break;
-      case '90d': startDate.setDate(endDate.getDate() - 90); break;
-      case '1y': startDate.setFullYear(endDate.getFullYear() - 1); break;
-      default: startDate.setDate(endDate.getDate() - 90);
+      case '7d':
+        startDate.setDate(endDate.getDate() - 7);
+        break;
+      case '30d':
+        startDate.setDate(endDate.getDate() - 30);
+        break;
+      case '90d':
+        startDate.setDate(endDate.getDate() - 90);
+        break;
+      case '1y':
+        startDate.setFullYear(endDate.getFullYear() - 1);
+        break;
+      default:
+        startDate.setDate(endDate.getDate() - 90);
     }
 
     const userFilter = context.orgId ? { orgId: context.orgId } : { userId: context.userId };
@@ -83,9 +89,23 @@ export async function GET(request: NextRequest) {
           .sort((a, b) => b[1].count - a[1].count)
           .slice(0, 10)
           .map(([biasType, data]) => {
-            const severityValues: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 };
-            const avgVal = data.severities.reduce((s, sev) => s + (severityValues[sev] || 2), 0) / data.severities.length;
-            const avgLabel = avgVal >= 3.5 ? 'critical' : avgVal >= 2.5 ? 'high' : avgVal >= 1.5 ? 'medium' : 'low';
+            const severityValues: Record<string, number> = {
+              low: 1,
+              medium: 2,
+              high: 3,
+              critical: 4,
+            };
+            const avgVal =
+              data.severities.reduce((s, sev) => s + (severityValues[sev] || 2), 0) /
+              data.severities.length;
+            const avgLabel =
+              avgVal >= 3.5
+                ? 'critical'
+                : avgVal >= 2.5
+                  ? 'high'
+                  : avgVal >= 1.5
+                    ? 'medium'
+                    : 'low';
             return { biasType, count: data.count, avgSeverity: avgLabel };
           });
 
@@ -129,7 +149,8 @@ export async function GET(request: NextRequest) {
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([month, data]) => ({
           month,
-          avgNoise: Math.round(data.noises.reduce((a, b) => a + b, 0) / data.noises.length * 10) / 10,
+          avgNoise:
+            Math.round((data.noises.reduce((a, b) => a + b, 0) / data.noises.length) * 10) / 10,
           count: data.noises.length,
         }));
     } catch {
@@ -149,7 +170,9 @@ export async function GET(request: NextRequest) {
       });
 
       if (outcomes.length > 0) {
-        const successes = outcomes.filter(o => o.outcome === 'success' || o.outcome === 'partial_success').length;
+        const successes = outcomes.filter(
+          o => o.outcome === 'success' || o.outcome === 'partial_success'
+        ).length;
         const failures = outcomes.filter(o => o.outcome === 'failure').length;
         const totalConfirmed = outcomes.reduce((s, o) => s + o.confirmedBiases.length, 0);
         const totalFP = outcomes.reduce((s, o) => s + o.falsPositiveBiases.length, 0);

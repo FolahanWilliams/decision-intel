@@ -40,7 +40,8 @@ export async function GET() {
       return NextResponse.json({
         profile: null,
         globalBaseline: null,
-        _message: 'Organization membership required for causal insights. Join or create an org first.',
+        _message:
+          'Organization membership required for causal insights. Join or create an org first.',
       });
     }
 
@@ -55,7 +56,8 @@ export async function GET() {
         const globalOutcomes = await prisma.decisionOutcome.findMany({
           select: { outcome: true },
         });
-        const globalFailureRate = globalOutcomes.filter(o => o.outcome === 'failure').length / globalOutcomes.length;
+        const globalFailureRate =
+          globalOutcomes.filter(o => o.outcome === 'failure').length / globalOutcomes.length;
 
         globalBaseline = {
           totalOutcomes: globalOutcomeCount,

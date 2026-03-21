@@ -112,7 +112,11 @@ export async function validateApiKey(
     const code = (dbError as { code?: string }).code;
     if (code === 'P2021' || code === 'P2022') {
       log.error('ApiKey table missing (schema drift). Run prisma migrate.');
-      return { success: false, error: 'API keys not available — schema migration required.', status: 503 };
+      return {
+        success: false,
+        error: 'API keys not available — schema migration required.',
+        status: 503,
+      };
     }
     throw dbError;
   }
@@ -132,15 +136,11 @@ export async function validateApiKey(
   }
 
   // Rate limiting — use per-key identifier
-  const rateLimitResult = await checkRateLimit(
-    `apikey:${apiKey.id}`,
-    '/api/v1',
-    {
-      windowMs: 60 * 60 * 1000, // 1 hour
-      maxRequests: apiKey.rateLimit,
-      failMode: 'closed',
-    }
-  );
+  const rateLimitResult = await checkRateLimit(`apikey:${apiKey.id}`, '/api/v1', {
+    windowMs: 60 * 60 * 1000, // 1 hour
+    maxRequests: apiKey.rateLimit,
+    failMode: 'closed',
+  });
 
   if (!rateLimitResult.success) {
     return {
@@ -164,8 +164,7 @@ export async function validateApiKey(
     })
     .catch((err: unknown) => {
       log.warn(
-        'Failed to update lastUsedAt: ' +
-          (err instanceof Error ? err.message : String(err))
+        'Failed to update lastUsedAt: ' + (err instanceof Error ? err.message : String(err))
       );
     });
 
@@ -185,10 +184,7 @@ export async function validateApiKey(
 // Scope check helper
 // ---------------------------------------------------------------------------
 
-export function requireScope(
-  context: ApiKeyContext,
-  scope: string
-): ValidateError | null {
+export function requireScope(context: ApiKeyContext, scope: string): ValidateError | null {
   if (!context.scopes.includes(scope)) {
     return {
       success: false,

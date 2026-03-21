@@ -108,7 +108,8 @@ export async function getOrgBiasHistory(orgId: string): Promise<OrgBiasHistory> 
       const isFailure = o.outcome === 'failure';
 
       for (const bias of o.confirmedBiases) {
-        if (!statsMap[bias]) statsMap[bias] = { confirmed: 0, falsePositive: 0, failureImpacts: [] };
+        if (!statsMap[bias])
+          statsMap[bias] = { confirmed: 0, falsePositive: 0, failureImpacts: [] };
         statsMap[bias].confirmed++;
         if (isFailure && o.impactScore != null) {
           statsMap[bias].failureImpacts.push(o.impactScore);
@@ -116,7 +117,8 @@ export async function getOrgBiasHistory(orgId: string): Promise<OrgBiasHistory> 
       }
 
       for (const bias of o.falsPositiveBiases) {
-        if (!statsMap[bias]) statsMap[bias] = { confirmed: 0, falsePositive: 0, failureImpacts: [] };
+        if (!statsMap[bias])
+          statsMap[bias] = { confirmed: 0, falsePositive: 0, failureImpacts: [] };
         statsMap[bias].falsePositive++;
       }
     }
@@ -142,7 +144,9 @@ export async function getOrgBiasHistory(orgId: string): Promise<OrgBiasHistory> 
     // Sort to find most dangerous biases (high confirmation + high failure impact)
     const dangerousBiases = [...biasStats]
       .filter(s => s.totalRated >= 3 && s.confirmationRate >= 0.5)
-      .sort((a, b) => b.avgFailureImpact - a.avgFailureImpact || b.confirmationRate - a.confirmationRate)
+      .sort(
+        (a, b) => b.avgFailureImpact - a.avgFailureImpact || b.confirmationRate - a.confirmationRate
+      )
       .map(s => s.biasType);
 
     // Sort to find most over-detected biases (high false positive rate)
@@ -203,7 +207,8 @@ export async function getOutcomeWeightedBiasPenalty(
   confirmationRate: number | null;
   sampleSize: number;
 }> {
-  const defaultPenalty = DEFAULT_BIAS_SEVERITY_WEIGHTS[severity] ?? DEFAULT_BIAS_SEVERITY_WEIGHTS.medium;
+  const defaultPenalty =
+    DEFAULT_BIAS_SEVERITY_WEIGHTS[severity] ?? DEFAULT_BIAS_SEVERITY_WEIGHTS.medium;
 
   try {
     const history = await getOrgBiasHistory(orgId);
@@ -339,9 +344,7 @@ export async function getCrossDocumentPatterns(
     }
 
     if (docsWithOutcomes.length > 0 && poorOutcomes.length === 0) {
-      insights.push(
-        `${docsWithOutcomes.length} similar past decisions all had positive outcomes.`
-      );
+      insights.push(`${docsWithOutcomes.length} similar past decisions all had positive outcomes.`);
     }
 
     if (avgOutcomeScore > 0) {
@@ -353,9 +356,7 @@ export async function getCrossDocumentPatterns(
       .filter(d => d.outcome?.lessonsLearned)
       .map(d => d.outcome!.lessonsLearned!);
     if (lessons.length > 0) {
-      insights.push(
-        `${lessons.length} similar decision(s) have recorded lessons learned.`
-      );
+      insights.push(`${lessons.length} similar decision(s) have recorded lessons learned.`);
     }
 
     return {
@@ -379,9 +380,7 @@ export async function getCrossDocumentPatterns(
  * A positive improvementPct means the platform is getting better at detecting
  * real biases (fewer false positives over time).
  */
-export async function getAccuracyImprovement(
-  orgId: string
-): Promise<AccuracyImprovement> {
+export async function getAccuracyImprovement(orgId: string): Promise<AccuracyImprovement> {
   const BUCKET_SIZE = 10; // Compare first 10 vs last 10
 
   try {
@@ -389,10 +388,7 @@ export async function getAccuracyImprovement(
     const outcomes = await prisma.decisionOutcome.findMany({
       where: {
         orgId,
-        OR: [
-          { confirmedBiases: { isEmpty: false } },
-          { falsPositiveBiases: { isEmpty: false } },
-        ],
+        OR: [{ confirmedBiases: { isEmpty: false } }, { falsPositiveBiases: { isEmpty: false } }],
       },
       orderBy: { reportedAt: 'asc' },
       select: {

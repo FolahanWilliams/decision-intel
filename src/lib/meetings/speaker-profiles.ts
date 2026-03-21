@@ -93,8 +93,7 @@ function computeTrend(values: number[]): 'increasing' | 'decreasing' | 'stable' 
   // Compare first-third average to last-third average
   const third = Math.max(1, Math.floor(values.length / 3));
   const firstAvg = values.slice(0, third).reduce((a, b) => a + b, 0) / third;
-  const lastAvg =
-    values.slice(-third).reduce((a, b) => a + b, 0) / third;
+  const lastAvg = values.slice(-third).reduce((a, b) => a + b, 0) / third;
   const diff = lastAvg - firstAvg;
   if (diff > 5) return 'increasing';
   if (diff < -5) return 'decreasing';
@@ -106,7 +105,7 @@ function computeTrend(values: number[]): 'increasing' | 'decreasing' | 'stable' 
  */
 async function fetchOrgMeetings(orgId: string): Promise<MeetingRow[]> {
   try {
-    return await prisma.meeting.findMany({
+    return (await prisma.meeting.findMany({
       where: {
         orgId,
         status: 'analyzed',
@@ -119,20 +118,22 @@ async function fetchOrgMeetings(orgId: string): Promise<MeetingRow[]> {
         title: true,
       },
       orderBy: { createdAt: 'asc' },
-    }) as MeetingRow[];
+    })) as MeetingRow[];
   } catch (err: unknown) {
     const code = (err as { code?: string }).code;
     if (code === 'P2021' || code === 'P2022') {
       log.warn('Schema drift: speakerBiases column not yet migrated');
       // Retry with core fields only in a separate transaction
       try {
-        return (await prisma.$transaction(async (tx) => {
-          return tx.meeting.findMany({
-            where: { orgId, status: 'analyzed' },
-            select: { id: true, createdAt: true, title: true },
-            orderBy: { createdAt: 'asc' },
-          });
-        })).map((m) => ({ ...m, speakerBiases: null })) as MeetingRow[];
+        return (
+          await prisma.$transaction(async tx => {
+            return tx.meeting.findMany({
+              where: { orgId, status: 'analyzed' },
+              select: { id: true, createdAt: true, title: true },
+              orderBy: { createdAt: 'asc' },
+            });
+          })
+        ).map(m => ({ ...m, speakerBiases: null })) as MeetingRow[];
       } catch {
         return [];
       }
@@ -168,9 +169,7 @@ export async function aggregateSpeakerProfile(
 
   for (const meeting of meetings) {
     const biases = parseSpeakerBiases(meeting.speakerBiases);
-    const profile = biases.find(
-      (b) => b.speaker.toLowerCase() === speakerName.toLowerCase()
-    );
+    const profile = biases.find(b => b.speaker.toLowerCase() === speakerName.toLowerCase());
 
     if (!profile) continue;
 
@@ -231,8 +230,7 @@ export async function aggregateSpeakerProfile(
     .map(([biasType, data]) => ({
       biasType,
       totalCount: data.totalCount,
-      avgSeverity:
-        data.severities.reduce((a, b) => a + b, 0) / data.severities.length,
+      avgSeverity: data.severities.reduce((a, b) => a + b, 0) / data.severities.length,
       meetingsWithBias: data.meetingIds.size,
       trend: computeTrend(data.severities),
     }))
@@ -242,19 +240,17 @@ export async function aggregateSpeakerProfile(
   const riskFactors: string[] = [];
   const strengths: string[] = [];
 
-  const dominanceScores = dominanceTrend.map((t) => t.score);
-  const dissentScores = dissenterTrend.map((t) => t.score);
+  const dominanceScores = dominanceTrend.map(t => t.score);
+  const dissentScores = dissenterTrend.map(t => t.score);
   const avgDominance =
     dominanceScores.length > 0
       ? dominanceScores.reduce((a, b) => a + b, 0) / dominanceScores.length
       : 0;
   const avgDissent =
-    dissentScores.length > 0
-      ? dissentScores.reduce((a, b) => a + b, 0) / dissentScores.length
-      : 0;
+    dissentScores.length > 0 ? dissentScores.reduce((a, b) => a + b, 0) / dissentScores.length : 0;
 
   // High dominance risk
-  const highDominanceMeetings = dominanceScores.filter((s) => s >= 85).length;
+  const highDominanceMeetings = dominanceScores.filter(s => s >= 85).length;
   if (highDominanceMeetings >= 3 && meetingsWithSpeaker >= 5) {
     riskFactors.push(
       `Consistently anchors discussions (dominance 85+/100 in ${highDominanceMeetings}/${meetingsWithSpeaker} meetings)`
@@ -300,9 +296,7 @@ export async function aggregateSpeakerProfile(
   }
 
   if (biasProfile.length === 0 && meetingsWithSpeaker >= 3) {
-    strengths.push(
-      `No recurring cognitive biases detected across ${meetingsWithSpeaker} meetings`
-    );
+    strengths.push(`No recurring cognitive biases detected across ${meetingsWithSpeaker} meetings`);
   }
 
   const dominanceTrendDir = computeTrend(dominanceScores);
@@ -333,9 +327,7 @@ export async function aggregateSpeakerProfile(
  * who dominates, who dissents, how balanced are discussions, and what
  * red flags should leadership be aware of.
  */
-export async function getTeamDynamicsSnapshot(
-  orgId: string
-): Promise<TeamDynamicsSnapshot> {
+export async function getTeamDynamicsSnapshot(orgId: string): Promise<TeamDynamicsSnapshot> {
   log.info(`Building team dynamics snapshot for org ${orgId}`);
 
   const meetings = await fetchOrgMeetings(orgId);
@@ -366,8 +358,8 @@ export async function getTeamDynamicsSnapshot(
     if (biases.length === 0) continue;
 
     // Per-meeting stats
-    const dominanceScores = biases.map((b) => b.dominanceScore);
-    const dissentScores = biases.map((b) => b.dissenterScore);
+    const dominanceScores = biases.map(b => b.dominanceScore);
+    const dissentScores = biases.map(b => b.dissenterScore);
     const maxDissent = Math.max(...dissentScores, 0);
 
     if (maxDissent < 15) {
@@ -375,13 +367,10 @@ export async function getTeamDynamicsSnapshot(
     }
 
     // Balance score: low standard deviation of dominance = more balanced
-    const avgDominance =
-      dominanceScores.reduce((a, b) => a + b, 0) / dominanceScores.length;
+    const avgDominance = dominanceScores.reduce((a, b) => a + b, 0) / dominanceScores.length;
     const variance =
-      dominanceScores.reduce(
-        (sum, d) => sum + Math.pow(d - avgDominance, 2),
-        0
-      ) / dominanceScores.length;
+      dominanceScores.reduce((sum, d) => sum + Math.pow(d - avgDominance, 2), 0) /
+      dominanceScores.length;
     const stdDev = Math.sqrt(variance);
     // Balance: 100 = perfectly equal, 0 = one person dominates completely
     const balanceScore = Math.max(0, Math.min(100, 100 - stdDev * 2));
@@ -412,25 +401,23 @@ export async function getTeamDynamicsSnapshot(
       name,
       meetingsAnalyzed: data.meetingIds.size,
       avgDominance: Math.round(
-        data.dominanceScores.reduce((a, b) => a + b, 0) /
-          data.dominanceScores.length
+        data.dominanceScores.reduce((a, b) => a + b, 0) / data.dominanceScores.length
       ),
       avgDissent: Math.round(
-        data.dissentScores.reduce((a, b) => a + b, 0) /
-          data.dissentScores.length
+        data.dissentScores.reduce((a, b) => a + b, 0) / data.dissentScores.length
       ),
     }))
     .sort((a, b) => b.meetingsAnalyzed - a.meetingsAnalyzed);
 
   // Identify dominant speakers (avg dominance > 70)
   const dominantSpeakers = speakers
-    .filter((s) => s.avgDominance > 70 && s.meetingsAnalyzed >= 2)
-    .map((s) => s.name);
+    .filter(s => s.avgDominance > 70 && s.meetingsAnalyzed >= 2)
+    .map(s => s.name);
 
   // Identify dissenters (avg dissent > 35)
   const dissenters = speakers
-    .filter((s) => s.avgDissent > 35 && s.meetingsAnalyzed >= 2)
-    .map((s) => s.name);
+    .filter(s => s.avgDissent > 35 && s.meetingsAnalyzed >= 2)
+    .map(s => s.name);
 
   // Most balanced meetings (top 5)
   const mostBalancedMeetings = meetingBalanceScores
@@ -441,14 +428,13 @@ export async function getTeamDynamicsSnapshot(
   let cognitiveDiversityScore = 50; // baseline
   if (speakers.length > 0) {
     // Factor 1: Dissent variety
-    const hasDissenters = speakers.some((s) => s.avgDissent >= 30);
+    const hasDissenters = speakers.some(s => s.avgDissent >= 30);
     if (hasDissenters) cognitiveDiversityScore += 15;
     if (dissenters.length >= 2) cognitiveDiversityScore += 10;
 
     // Factor 2: Dominance distribution
-    const dominanceValues = speakers.map((s) => s.avgDominance);
-    const dominanceRange =
-      Math.max(...dominanceValues) - Math.min(...dominanceValues);
+    const dominanceValues = speakers.map(s => s.avgDominance);
+    const dominanceRange = Math.max(...dominanceValues) - Math.min(...dominanceValues);
     if (dominanceRange < 30) {
       cognitiveDiversityScore += 15; // Well-distributed
     } else if (dominanceRange > 60) {
@@ -456,7 +442,7 @@ export async function getTeamDynamicsSnapshot(
     }
 
     // Factor 3: Meeting-level diversity
-    const balanceScores = meetingBalanceScores.map((m) => m.balanceScore);
+    const balanceScores = meetingBalanceScores.map(m => m.balanceScore);
     const avgBalance =
       balanceScores.length > 0
         ? balanceScores.reduce((a, b) => a + b, 0) / balanceScores.length
@@ -473,9 +459,7 @@ export async function getTeamDynamicsSnapshot(
   let recentZeroDissent = 0;
   for (const meeting of recentMeetings) {
     const biases = parseSpeakerBiases(meeting.speakerBiases);
-    const maxDissent = biases.length > 0
-      ? Math.max(...biases.map((b) => b.dissenterScore))
-      : 0;
+    const maxDissent = biases.length > 0 ? Math.max(...biases.map(b => b.dissenterScore)) : 0;
     if (maxDissent < 15) recentZeroDissent++;
   }
   if (recentZeroDissent >= 3 && recentMeetingCount >= 5) {

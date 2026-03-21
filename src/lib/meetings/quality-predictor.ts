@@ -64,11 +64,10 @@ function computeDissentSignal(speakerBiases: SpeakerBiasProfile[]): QualitySigna
     };
   }
 
-  const dissentScores = speakerBiases.map((s) => s.dissenterScore);
+  const dissentScores = speakerBiases.map(s => s.dissenterScore);
   const maxDissent = Math.max(...dissentScores);
-  const avgDissent =
-    dissentScores.reduce((a, b) => a + b, 0) / dissentScores.length;
-  const hasSubstantialDissent = dissentScores.some((d) => d >= 30);
+  const avgDissent = dissentScores.reduce((a, b) => a + b, 0) / dissentScores.length;
+  const hasSubstantialDissent = dissentScores.some(d => d >= 30);
 
   // Optimal: at least one dissenter with score 30-70
   let normalizedScore: number;
@@ -118,17 +117,14 @@ function computeSpeakerBalanceSignal(speakerBiases: SpeakerBiasProfile[]): Quali
     };
   }
 
-  const dominanceScores = speakerBiases.map((s) => s.dominanceScore);
+  const dominanceScores = speakerBiases.map(s => s.dominanceScore);
   const maxDominance = Math.max(...dominanceScores);
-  const avgDominance =
-    dominanceScores.reduce((a, b) => a + b, 0) / dominanceScores.length;
+  const avgDominance = dominanceScores.reduce((a, b) => a + b, 0) / dominanceScores.length;
 
   // Standard deviation of dominance
   const variance =
-    dominanceScores.reduce(
-      (sum, d) => sum + Math.pow(d - avgDominance, 2),
-      0
-    ) / dominanceScores.length;
+    dominanceScores.reduce((sum, d) => sum + Math.pow(d - avgDominance, 2), 0) /
+    dominanceScores.length;
   const stdDev = Math.sqrt(variance);
 
   const spread = maxDominance - Math.min(...dominanceScores);
@@ -148,7 +144,7 @@ function computeSpeakerBalanceSignal(speakerBiases: SpeakerBiasProfile[]): Quali
 
   let description: string;
   if (maxDominance >= 80) {
-    const dominant = speakerBiases.find((s) => s.dominanceScore === maxDominance);
+    const dominant = speakerBiases.find(s => s.dominanceScore === maxDominance);
     description = `Discussion dominated by ${dominant?.speaker ?? 'one speaker'} (${Math.round(maxDominance)}/100) — other voices may be suppressed`;
   } else if (spread < 25) {
     description = `Well-balanced discussion (spread ${Math.round(spread)}, std dev ${Math.round(stdDev)}) — all voices heard`;
@@ -259,10 +255,7 @@ function computeDecisionExplicitnessSignal(keyDecisions: KeyDecision[]): Quality
   const dissentDocRatio = withDissent / keyDecisions.length;
 
   // Weighted score: confidence (40%), rationale (40%), dissent documentation (20%)
-  const normalizedScore =
-    avgConfidence * 40 +
-    rationaleRatio * 40 +
-    dissentDocRatio * 20;
+  const normalizedScore = avgConfidence * 40 + rationaleRatio * 40 + dissentDocRatio * 20;
 
   const impact = ((normalizedScore - 50) / 100) * WEIGHTS.decisionExplicitness;
 
@@ -313,7 +306,7 @@ function computeRiskDiscussionSignal(
     .toLowerCase();
 
   const decisionText = keyDecisions
-    .map((d) => `${d.text} ${d.rationale} ${d.dissent ?? ''}`)
+    .map(d => `${d.text} ${d.rationale} ${d.dissent ?? ''}`)
     .join(' ')
     .toLowerCase();
 
@@ -326,8 +319,8 @@ function computeRiskDiscussionSignal(
     if (matches) riskMentions += matches.length;
   }
 
-  const riskQuestions = meetingSummary.openQuestions.filter((q) =>
-    riskKeywords.some((k) => q.toLowerCase().includes(k))
+  const riskQuestions = meetingSummary.openQuestions.filter(q =>
+    riskKeywords.some(k => q.toLowerCase().includes(k))
   ).length;
 
   let normalizedScore: number;
@@ -384,10 +377,7 @@ function computeEngagementSignal(meetingSummary: MeetingSummary): QualitySignal 
       break;
   }
 
-  const normalizedScore = Math.max(
-    0,
-    Math.min(100, engagementScore + sentimentBonus)
-  );
+  const normalizedScore = Math.max(0, Math.min(100, engagementScore + sentimentBonus));
   const impact = ((normalizedScore - 50) / 100) * WEIGHTS.engagementQuality;
 
   return {

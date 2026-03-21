@@ -20,10 +20,7 @@ export async function GET(request: NextRequest) {
     const authResult = await validateApiKey(request);
     if (!authResult.success) {
       const err = authResult as ValidateError;
-      return NextResponse.json(
-        { error: err.error },
-        { status: err.status, headers: err.headers }
-      );
+      return NextResponse.json({ error: err.error }, { status: err.status, headers: err.headers });
     }
     const { context } = authResult;
 
@@ -118,7 +115,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const code = (error as { code?: string }).code;
     if (code === 'P2021' || code === 'P2022') {
-      return NextResponse.json({ documents: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+      return NextResponse.json({
+        documents: [],
+        pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+      });
     }
     log.error('Public documents API error:', error);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
