@@ -68,10 +68,8 @@ export function WeightedSwot({ data }: WeightedSwotProps) {
     }
 
     // Balance: positive factors vs negative factors (normalized to -100..+100)
-    const positiveScore =
-      (quadrantScores.strengths + quadrantScores.opportunities) / 2;
-    const negativeScore =
-      (quadrantScores.weaknesses + quadrantScores.threats) / 2;
+    const positiveScore = (quadrantScores.strengths + quadrantScores.opportunities) / 2;
+    const negativeScore = (quadrantScores.weaknesses + quadrantScores.threats) / 2;
     // Map from [-4, +4] range to [-100, +100]
     const rawBalance = positiveScore - negativeScore; // -4 to +4
     const balanceScore = Math.round((rawBalance / 4) * 100);
@@ -135,8 +133,16 @@ export function WeightedSwot({ data }: WeightedSwotProps) {
             style={{
               width: `${barWidth / 2}%`,
               ...(barDirection === 'right'
-                ? { left: '50%', background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--success) 60%, transparent))' }
-                : { right: '50%', background: 'linear-gradient(to left, transparent, color-mix(in srgb, var(--error) 60%, transparent))' }),
+                ? {
+                    left: '50%',
+                    background:
+                      'linear-gradient(to right, transparent, color-mix(in srgb, var(--success) 60%, transparent))',
+                  }
+                : {
+                    right: '50%',
+                    background:
+                      'linear-gradient(to left, transparent, color-mix(in srgb, var(--error) 60%, transparent))',
+                  }),
             }}
           />
           {/* Labels */}
@@ -201,7 +207,9 @@ export function WeightedSwot({ data }: WeightedSwotProps) {
                           value={weights[key][i]}
                           onChange={e => setWeight(key, i, Number(e.target.value))}
                           className="w-16 h-1 accent-current"
-                          style={{ accentColor: `var(--${key === 'strengths' ? 'success' : key === 'weaknesses' ? 'error' : key === 'opportunities' ? 'info' : 'warning'})` }}
+                          style={{
+                            accentColor: `var(--${key === 'strengths' ? 'success' : key === 'weaknesses' ? 'error' : key === 'opportunities' ? 'info' : 'warning'})`,
+                          }}
                           aria-label={`Weight for: ${item.slice(0, 40)}`}
                         />
                         <span className="text-[9px] text-muted tabular-nums">

@@ -442,7 +442,8 @@ export default function ChatPage() {
                     style={{
                       width: '100%',
                       padding: '10px 12px',
-                      background: d.id === pinnedDocId ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
+                      background:
+                        d.id === pinnedDocId ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
                       border: 'none',
                       borderBottom: '1px solid var(--border-color)',
                       color: 'var(--text-primary)',

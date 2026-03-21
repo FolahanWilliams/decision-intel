@@ -17,9 +17,24 @@ type SwotView = 'matrix' | 'weighted' | 'cross-impact' | 'actions';
 
 const VIEWS: { id: SwotView; label: string; icon: typeof LayoutGrid; description: string }[] = [
   { id: 'matrix', label: 'Matrix', icon: LayoutGrid, description: 'Classic 2×2 SWOT grid' },
-  { id: 'weighted', label: 'Weighted', icon: Scale, description: 'Assign importance weights & balance score' },
-  { id: 'cross-impact', label: 'Cross-Impact', icon: Grid3X3, description: 'How strengths/weaknesses interact with threats' },
-  { id: 'actions', label: 'Actions', icon: Sparkles, description: 'Strategic action cards from S×O pairs' },
+  {
+    id: 'weighted',
+    label: 'Weighted',
+    icon: Scale,
+    description: 'Assign importance weights & balance score',
+  },
+  {
+    id: 'cross-impact',
+    label: 'Cross-Impact',
+    icon: Grid3X3,
+    description: 'How strengths/weaknesses interact with threats',
+  },
+  {
+    id: 'actions',
+    label: 'Actions',
+    icon: Sparkles,
+    description: 'Strategic action cards from S×O pairs',
+  },
 ];
 
 export function SwotTab({ swotAnalysis }: SwotTabProps) {
@@ -97,7 +112,6 @@ export function SwotTab({ swotAnalysis }: SwotTabProps) {
         {swotAnalysis.strategicAdvice && activeView !== 'matrix' && (
           <div className="card p-4 border border-border bg-secondary/50">
             <h4 className="font-semibold mb-2 flex items-center gap-2 text-warning">
-
               <Sparkles className="w-4 h-4" /> Strategic Advice
             </h4>
             <p className="text-foreground/70 text-sm leading-relaxed">

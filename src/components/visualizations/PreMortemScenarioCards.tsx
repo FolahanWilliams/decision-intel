@@ -1,7 +1,14 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { AlertTriangle, Lightbulb, ChevronDown, ChevronUp, CheckSquare, Square } from 'lucide-react';
+import {
+  AlertTriangle,
+  Lightbulb,
+  ChevronDown,
+  ChevronUp,
+  CheckSquare,
+  Square,
+} from 'lucide-react';
 
 interface PreMortemScenarioCardsProps {
   failureScenarios: string[];
@@ -97,11 +104,19 @@ export function PreMortemScenarioCards({
             Pre-Mortem Scenarios ({cards.length})
           </span>
           <span className="text-[10px] text-muted">
-            Preparedness: {' '}
-            <span className={preparednessPercent > 60 ? 'text-emerald-400' : preparednessPercent > 30 ? 'text-amber-400' : 'text-muted'}>
+            Preparedness:{' '}
+            <span
+              className={
+                preparednessPercent > 60
+                  ? 'text-emerald-400'
+                  : preparednessPercent > 30
+                    ? 'text-amber-400'
+                    : 'text-muted'
+              }
+            >
               {preparednessPercent}%
-            </span>
-            {' '}({completedCount}/{totalMeasures} measures addressed)
+            </span>{' '}
+            ({completedCount}/{totalMeasures} measures addressed)
           </span>
         </div>
         <div className="h-1.5 bg-muted/20 overflow-hidden">
@@ -134,7 +149,9 @@ export function PreMortemScenarioCards({
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
                     <AlertTriangle size={12} className={colors.text} />
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 ${colors.bg} ${colors.text}`}>
+                    <span
+                      className={`text-[10px] font-bold px-1.5 py-0.5 ${colors.bg} ${colors.text}`}
+                    >
                       {card.impact} Impact
                     </span>
                   </div>
@@ -155,7 +172,11 @@ export function PreMortemScenarioCards({
                 <div className="h-1 bg-muted/20 overflow-hidden mb-2">
                   <div
                     className={`h-full transition-all duration-500 ${
-                      card.probability > 60 ? 'bg-red-500' : card.probability > 35 ? 'bg-amber-500' : 'bg-blue-500'
+                      card.probability > 60
+                        ? 'bg-red-500'
+                        : card.probability > 35
+                          ? 'bg-amber-500'
+                          : 'bg-blue-500'
                     }`}
                     style={{ width: `${card.probability}%` }}
                   />
@@ -196,16 +217,23 @@ export function PreMortemScenarioCards({
                     >
                       <div className="flex items-start gap-2">
                         {isMeasureChecked ? (
-                          <CheckSquare size={14} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                          <CheckSquare
+                            size={14}
+                            className="text-emerald-400 flex-shrink-0 mt-0.5"
+                          />
                         ) : (
                           <Square size={14} className="text-muted flex-shrink-0 mt-0.5" />
                         )}
                         <div>
                           <div className="flex items-center gap-1 mb-1">
                             <Lightbulb size={10} className="text-emerald-400" />
-                            <span className="font-semibold text-emerald-400">Preventive Measure</span>
+                            <span className="font-semibold text-emerald-400">
+                              Preventive Measure
+                            </span>
                           </div>
-                          <p className={`text-foreground/70 leading-relaxed ${isMeasureChecked ? 'line-through opacity-60' : ''}`}>
+                          <p
+                            className={`text-foreground/70 leading-relaxed ${isMeasureChecked ? 'line-through opacity-60' : ''}`}
+                          >
                             {card.measure}
                           </p>
                         </div>

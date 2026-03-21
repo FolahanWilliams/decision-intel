@@ -33,7 +33,12 @@ interface RedTeamTabProps {
 
 type RedTeamView = 'overview' | 'network' | 'counter' | 'mitigate' | 'premortem';
 
-const VIEWS: { id: RedTeamView; label: string; icon: typeof ShieldAlert; needs: 'cognitive' | 'premortem' | 'either' }[] = [
+const VIEWS: {
+  id: RedTeamView;
+  label: string;
+  icon: typeof ShieldAlert;
+  needs: 'cognitive' | 'premortem' | 'either';
+}[] = [
   { id: 'overview', label: 'Overview', icon: ShieldAlert, needs: 'either' },
   { id: 'network', label: 'Blind Spots', icon: EyeOff, needs: 'cognitive' },
   { id: 'counter', label: 'Challenges', icon: AlertTriangle, needs: 'cognitive' },
@@ -145,7 +150,11 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                     <div className="mt-2 h-2 bg-muted/20 overflow-hidden">
                       <div
                         className={`h-full transition-all duration-700 ${
-                          blindSpotGap < 50 ? 'bg-red-500' : blindSpotGap < 80 ? 'bg-amber-500' : 'bg-emerald-500'
+                          blindSpotGap < 50
+                            ? 'bg-red-500'
+                            : blindSpotGap < 80
+                              ? 'bg-amber-500'
+                              : 'bg-emerald-500'
                         }`}
                         style={{ width: `${blindSpotGap}%` }}
                       />
@@ -221,16 +230,25 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                     .sort((a, b) => b.confidence - a.confidence)
                     .slice(0, 3)
                     .map((arg, i) => (
-                      <div key={i} className="flex items-center gap-3 p-2 border border-border bg-card/50">
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-2 border border-border bg-card/50"
+                      >
                         <div className="flex-1 min-w-0">
-                          <span className="text-xs font-semibold text-foreground">{arg.perspective}</span>
+                          <span className="text-xs font-semibold text-foreground">
+                            {arg.perspective}
+                          </span>
                           <p className="text-[11px] text-muted line-clamp-1">{arg.argument}</p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <div className="w-16 h-1.5 bg-muted/20 overflow-hidden">
                             <div
                               className={`h-full ${
-                                arg.confidence >= 0.7 ? 'bg-red-500' : arg.confidence >= 0.4 ? 'bg-amber-500' : 'bg-blue-500'
+                                arg.confidence >= 0.7
+                                  ? 'bg-red-500'
+                                  : arg.confidence >= 0.4
+                                    ? 'bg-amber-500'
+                                    : 'bg-blue-500'
                               }`}
                               style={{ width: `${arg.confidence * 100}%` }}
                             />
@@ -282,10 +300,7 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
           <div className="card">
             <div className="card-body">
               <ErrorBoundary sectionName="Mitigation Strategies">
-                <MitigationStrategyBuilder
-                  blindSpots={blindSpots}
-                  blindSpotGap={blindSpotGap}
-                />
+                <MitigationStrategyBuilder blindSpots={blindSpots} blindSpotGap={blindSpotGap} />
               </ErrorBoundary>
             </div>
           </div>
@@ -326,7 +341,10 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                     {isSubmittingFeedback && feedbackGiven === null ? (
                       <Loader2 size={14} className="animate-spin" />
                     ) : (
-                      <ThumbsUp size={14} className={feedbackGiven === 'helpful' ? 'fill-current' : ''} />
+                      <ThumbsUp
+                        size={14}
+                        className={feedbackGiven === 'helpful' ? 'fill-current' : ''}
+                      />
                     )}
                     Helpful
                   </button>
@@ -344,7 +362,10 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                     {isSubmittingFeedback && feedbackGiven === null ? (
                       <Loader2 size={14} className="animate-spin" />
                     ) : (
-                      <ThumbsDown size={14} className={feedbackGiven === 'unhelpful' ? 'fill-current' : ''} />
+                      <ThumbsDown
+                        size={14}
+                        className={feedbackGiven === 'unhelpful' ? 'fill-current' : ''}
+                      />
                     )}
                     Unhelpful
                   </button>

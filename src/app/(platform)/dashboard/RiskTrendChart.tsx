@@ -17,7 +17,10 @@ interface RiskTrendChartProps {
 export function RiskTrendChart({ data }: RiskTrendChartProps) {
   if (!data || data.length === 0) {
     return (
-      <div className="h-[200px] w-full flex items-center justify-center text-sm" style={{ color: 'var(--text-muted)' }}>
+      <div
+        className="h-[200px] w-full flex items-center justify-center text-sm"
+        style={{ color: 'var(--text-muted)' }}
+      >
         No trend data available
       </div>
     );

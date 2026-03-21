@@ -27,7 +27,14 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
@@ -117,7 +124,7 @@ export default function Dashboard() {
   const [showKpiSettings, setShowKpiSettings] = useState(false);
   const kpiDefaults: Record<string, boolean> = {
     'Total Documents': true,
-    'Analyzed': true,
+    Analyzed: true,
     'Avg Quality': true,
     'In Progress': true,
   };
@@ -755,8 +762,9 @@ export default function Dashboard() {
                 label: 'In Progress',
                 value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
                   .length,
-                numericValue: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
-                  .length,
+                numericValue: uploadedDocs.filter(
+                  d => d.status === 'analyzing' || d.status === 'pending'
+                ).length,
                 icon: <Clock size={18} />,
                 iconBg: 'rgba(255, 255, 255, 0.06)',
                 iconColor: 'rgba(255, 255, 255, 0.5)',
@@ -765,41 +773,52 @@ export default function Dashboard() {
             ]
               .filter(stat => kpiVisibility[stat.label] !== false)
               .map(stat => (
-            <motion.div
-              key={stat.label}
-              className="stat-card liquid-glass-premium"
-              variants={{
-                hidden: { opacity: 0, y: 20, scale: 0.97 },
-                visible: { opacity: 1, y: 0, scale: 1 },
-              }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -4, boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)' }}
-            >
-              <div className="flex items-center justify-between" style={{ marginBottom: '16px' }}>
-                <div
-                  className="stat-card-icon"
-                  style={{ background: stat.iconBg, color: stat.iconColor, marginBottom: 0 }}
+                <motion.div
+                  key={stat.label}
+                  className="stat-card liquid-glass-premium"
+                  variants={{
+                    hidden: { opacity: 0, y: 20, scale: 0.97 },
+                    visible: { opacity: 1, y: 0, scale: 1 },
+                  }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{
+                    y: -4,
+                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
+                  }}
                 >
-                  {stat.icon}
-                </div>
-                {stat.showSparkline && sparklineData.length >= 2 && (
-                  <SparklineChart data={sparklineData} color={stat.sparkColor} width={72} height={28} />
-                )}
-              </div>
-              <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
-                {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
-                  <AnimatedNumber
-                    value={stat.numericValue}
-                    suffix={stat.suffix || ''}
-                    duration={900}
-                  />
-                ) : (
-                  '—'
-                )}
-              </div>
-              <div className="stat-card-label">{stat.label}</div>
-            </motion.div>
-            ))}
+                  <div
+                    className="flex items-center justify-between"
+                    style={{ marginBottom: '16px' }}
+                  >
+                    <div
+                      className="stat-card-icon"
+                      style={{ background: stat.iconBg, color: stat.iconColor, marginBottom: 0 }}
+                    >
+                      {stat.icon}
+                    </div>
+                    {stat.showSparkline && sparklineData.length >= 2 && (
+                      <SparklineChart
+                        data={sparklineData}
+                        color={stat.sparkColor}
+                        width={72}
+                        height={28}
+                      />
+                    )}
+                  </div>
+                  <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
+                    {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
+                      <AnimatedNumber
+                        value={stat.numericValue}
+                        suffix={stat.suffix || ''}
+                        duration={900}
+                      />
+                    ) : (
+                      '—'
+                    )}
+                  </div>
+                  <div className="stat-card-label">{stat.label}</div>
+                </motion.div>
+              ))}
           </motion.div>
         </>
       )}
@@ -811,58 +830,62 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
-        <ErrorBoundary sectionName="Dashboard Charts">
-          <DashboardCharts
-            riskDistribution={{
-              highRisk: riskSummary.high,
-              mediumRisk: riskSummary.medium,
-              lowRisk: riskSummary.low,
-            }}
-            scoreTrend={scoreTrendData}
-            topBiases={topBiases}
-            totalAnalyzed={riskSummary.total}
-            avgScore={riskSummary.avg}
-          />
-        </ErrorBoundary>
+          <ErrorBoundary sectionName="Dashboard Charts">
+            <DashboardCharts
+              riskDistribution={{
+                highRisk: riskSummary.high,
+                mediumRisk: riskSummary.medium,
+                lowRisk: riskSummary.low,
+              }}
+              scoreTrend={scoreTrendData}
+              topBiases={topBiases}
+              totalAnalyzed={riskSummary.total}
+              avgScore={riskSummary.avg}
+            />
+          </ErrorBoundary>
         </motion.div>
       )}
 
       {/* Stream timed out banner */}
       <AnimatePresence>
-      {streamTimedOut && !uploading && (
-        <motion.div
-          className="mb-lg p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.25 }}
-        >
-          <AlertTriangle size={18} className="text-warning shrink-0" />
-          <span className="text-warning text-sm">
-            Analysis is taking longer than expected. The server may still be processing — refresh
-            the page or try again.
-          </span>
-        </motion.div>
-      )}
+        {streamTimedOut && !uploading && (
+          <motion.div
+            className="mb-lg p-md bg-warning/10 border border-warning/30 rounded-lg flex items-center gap-sm"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <AlertTriangle size={18} className="text-warning shrink-0" />
+            <span className="text-warning text-sm">
+              Analysis is taking longer than expected. The server may still be processing — refresh
+              the page or try again.
+            </span>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Error Message - Compact */}
       <AnimatePresence>
-      {error && (
-        <motion.div
-          className="mb-lg p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.25 }}
-        >
-          <AlertTriangle size={18} className="text-error shrink-0" />
-          <span className="text-error text-sm">{error}</span>
-          <button onClick={() => setError(null)} className="ml-auto text-error/60 hover:text-error" aria-label="Dismiss error">
-            <X size={16} />
-          </button>
-        </motion.div>
-      )}
+        {error && (
+          <motion.div
+            className="mb-lg p-md bg-error/10 border border-error/30 rounded-lg flex items-center gap-sm"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <AlertTriangle size={18} className="text-error shrink-0" />
+            <span className="text-error text-sm">{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-error/60 hover:text-error"
+              aria-label="Dismiss error"
+            >
+              <X size={16} />
+            </button>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
@@ -873,61 +896,64 @@ export default function Dashboard() {
 
           {/* Upload Confirmation Modal */}
           <AnimatePresence>
-          {pendingFile && !uploading && (
-            <motion.div
-              className="card mb-xl"
-              style={{ borderColor: 'rgba(255, 255, 255, 0.15)' }}
-              initial={{ opacity: 0, y: -10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div className="card-header" style={{ background: 'rgba(255, 255, 255, 0.06)' }}>
-                <h3 className="flex items-center gap-sm text-sm">
-                  <FileText size={16} style={{ color: 'var(--text-highlight)' }} />
-                  Ready to Analyze
-                </h3>
-              </div>
-              <div className="card-body">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-md">
-                    <div
-                      style={{
-                        width: 48,
-                        height: 48,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'var(--bg-tertiary)',
-                        border: '1px solid var(--border-color)',
-                      }}
-                    >
-                      <FileText size={24} className="text-accent-primary" />
+            {pendingFile && !uploading && (
+              <motion.div
+                className="card mb-xl"
+                style={{ borderColor: 'rgba(255, 255, 255, 0.15)' }}
+                initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.98 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="card-header" style={{ background: 'rgba(255, 255, 255, 0.06)' }}>
+                  <h3 className="flex items-center gap-sm text-sm">
+                    <FileText size={16} style={{ color: 'var(--text-highlight)' }} />
+                    Ready to Analyze
+                  </h3>
+                </div>
+                <div className="card-body">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-md">
+                      <div
+                        style={{
+                          width: 48,
+                          height: 48,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'var(--bg-tertiary)',
+                          border: '1px solid var(--border-color)',
+                        }}
+                      >
+                        <FileText size={24} className="text-accent-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{pendingFile.name}</p>
+                        <p className="text-xs text-muted">
+                          {(pendingFile.size / 1024).toFixed(1)} KB ·{' '}
+                          {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{pendingFile.name}</p>
-                      <p className="text-xs text-muted">
-                        {(pendingFile.size / 1024).toFixed(1)} KB ·{' '}
-                        {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
-                      </p>
+                    <div className="flex items-center gap-sm">
+                      <button
+                        onClick={() => setPendingFile(null)}
+                        className="btn btn-ghost text-sm"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={confirmUpload}
+                        className="btn btn-primary flex items-center gap-sm"
+                      >
+                        <Brain size={16} />
+                        Start Analysis
+                      </button>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-sm">
-                    <button onClick={() => setPendingFile(null)} className="btn btn-ghost text-sm">
-                      Cancel
-                    </button>
-                    <button
-                      onClick={confirmUpload}
-                      className="btn btn-primary flex items-center gap-sm"
-                    >
-                      <Brain size={16} />
-                      Start Analysis
-                    </button>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
           </AnimatePresence>
 
           {/* Upload Zone - Enhanced with drag feedback */}
@@ -1131,7 +1157,10 @@ export default function Dashboard() {
                     <div
                       key={doc.id}
                       className="card"
-                      style={{ background: 'rgba(255, 255, 255, 0.06)', borderColor: 'rgba(255, 255, 255, 0.15)' }}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                      }}
                     >
                       <div className="card-body flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -1177,7 +1206,10 @@ export default function Dashboard() {
           {/* Recent Analyses Section */}
           {uploadedDocs.filter(d => d.status === 'complete').length > 0 && (
             <div className="section">
-              <div className="flex items-center justify-between" style={{ marginBottom: 'var(--spacing-md)' }}>
+              <div
+                className="flex items-center justify-between"
+                style={{ marginBottom: 'var(--spacing-md)' }}
+              >
                 <h2 className="section-header flex items-center gap-2" style={{ marginBottom: 0 }}>
                   <CheckCircle size={18} className="text-green-500" />
                   Recent Analyses
@@ -1211,72 +1243,72 @@ export default function Dashboard() {
                       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                       whileHover={{ y: -3, transition: { duration: 0.2 } }}
                     >
-                    <Link
-                      href={`/documents/${doc.id}`}
-                      className="card group hover:border-white/20 transition-all"
-                      style={{ textDecoration: 'none', display: 'block' }}
-                    >
-                      <div className="card-body">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <div
-                              style={{
-                                width: 32,
-                                height: 32,
-                                flexShrink: 0,
-                                borderRadius: 'var(--radius-md)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                background: 'rgba(255, 255, 255, 0.06)',
-                              }}
-                            >
-                              <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
+                      <Link
+                        href={`/documents/${doc.id}`}
+                        className="card group hover:border-white/20 transition-all"
+                        style={{ textDecoration: 'none', display: 'block' }}
+                      >
+                        <div className="card-body">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div
+                                style={{
+                                  width: 32,
+                                  height: 32,
+                                  flexShrink: 0,
+                                  borderRadius: 'var(--radius-md)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  background: 'rgba(255, 255, 255, 0.06)',
+                                }}
+                              >
+                                <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
+                              </div>
+                              <span className="font-medium text-sm truncate max-w-[130px]">
+                                {doc.filename}
+                              </span>
                             </div>
-                            <span className="font-medium text-sm truncate max-w-[130px]">
-                              {doc.filename}
-                            </span>
+                            {doc.score !== undefined && (
+                              <span
+                                className="text-sm font-bold shrink-0 ml-2"
+                                style={{
+                                  color:
+                                    doc.score >= 70
+                                      ? 'var(--success)'
+                                      : doc.score >= 40
+                                        ? 'var(--warning)'
+                                        : 'var(--error)',
+                                }}
+                              >
+                                {Math.round(doc.score)}%
+                              </span>
+                            )}
                           </div>
                           {doc.score !== undefined && (
-                            <span
-                              className="text-sm font-bold shrink-0 ml-2"
-                              style={{
-                                color:
-                                  doc.score >= 70
-                                    ? 'var(--success)'
-                                    : doc.score >= 40
-                                      ? 'var(--warning)'
-                                      : 'var(--error)',
-                              }}
-                            >
-                              {Math.round(doc.score)}%
-                            </span>
+                            <div className="progress-bar mb-2">
+                              <div
+                                className="progress-bar-fill"
+                                style={{
+                                  width: `${doc.score}%`,
+                                  background:
+                                    doc.score >= 70
+                                      ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                      : doc.score >= 40
+                                        ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                        : 'linear-gradient(90deg, #ef4444, #dc2626)',
+                                }}
+                              />
+                            </div>
                           )}
-                        </div>
-                        {doc.score !== undefined && (
-                          <div className="progress-bar mb-2">
-                            <div
-                              className="progress-bar-fill"
-                              style={{
-                                width: `${doc.score}%`,
-                                background:
-                                  doc.score >= 70
-                                    ? 'linear-gradient(90deg, #22c55e, #16a34a)'
-                                    : doc.score >= 40
-                                      ? 'linear-gradient(90deg, #f59e0b, #d97706)'
-                                      : 'linear-gradient(90deg, #ef4444, #dc2626)',
-                              }}
-                            />
+                          <div className="flex items-center justify-between text-xs text-muted">
+                            <span>{formatDate(doc.uploadedAt)}</span>
+                            <span className="flex items-center gap-1 group-hover:text-primary transition-colors">
+                              View Analysis <ArrowRight size={12} />
+                            </span>
                           </div>
-                        )}
-                        <div className="flex items-center justify-between text-xs text-muted">
-                          <span>{formatDate(doc.uploadedAt)}</span>
-                          <span className="flex items-center gap-1 group-hover:text-primary transition-colors">
-                            View Analysis <ArrowRight size={12} />
-                          </span>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
                     </motion.div>
                   ))}
               </motion.div>
@@ -1786,7 +1818,7 @@ export default function Dashboard() {
 
       <Dialog
         open={deleteModal.open}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           if (!open && !deleting) setDeleteModal({ open: false, docId: '', filename: '' });
         }}
       >
@@ -1808,11 +1840,7 @@ export default function Dashboard() {
             >
               Cancel
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleting}
-            >
+            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
               {deleting ? <Loader2 size={14} className="animate-spin" /> : 'Delete'}
             </Button>
           </DialogFooter>

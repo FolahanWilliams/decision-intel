@@ -30,9 +30,17 @@ export function CrossImpactMatrix({ data }: CrossImpactMatrixProps) {
         const key: CellKey = `${ri}-${ci}`;
         // Simple keyword overlap heuristic for impact scoring
         const rowWords = new Set(
-          row.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 3)
+          row
+            .toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .split(/\s+/)
+            .filter(w => w.length > 3)
         );
-        const colWords = col.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 3);
+        const colWords = col
+          .toLowerCase()
+          .replace(/[^\w\s]/g, '')
+          .split(/\s+/)
+          .filter(w => w.length > 3);
         const overlap = colWords.filter(w => rowWords.has(w)).length;
         const maxOverlap = Math.max(colWords.length, 1);
         const rawScore = Math.min((overlap / maxOverlap) * 5, 5);
@@ -77,9 +85,7 @@ export function CrossImpactMatrix({ data }: CrossImpactMatrixProps) {
   }
 
   const selectedData = selectedCell ? impactMatrix[selectedCell] : null;
-  const [selRow, selCol] = selectedCell
-    ? selectedCell.split('-').map(Number)
-    : [null, null];
+  const [selRow, selCol] = selectedCell ? selectedCell.split('-').map(Number) : [null, null];
 
   return (
     <div className="space-y-3">
@@ -91,15 +97,23 @@ export function CrossImpactMatrix({ data }: CrossImpactMatrixProps) {
         </div>
         <div className="flex border border-border overflow-hidden text-xs">
           <button
-            onClick={() => { setMode('st'); setSelectedCell(null); }}
+            onClick={() => {
+              setMode('st');
+              setSelectedCell(null);
+            }}
             className={`px-3 py-1.5 flex items-center gap-1.5 transition-colors ${
-              mode === 'st' ? 'bg-emerald-500/20 text-emerald-400' : 'text-muted hover:text-foreground'
+              mode === 'st'
+                ? 'bg-emerald-500/20 text-emerald-400'
+                : 'text-muted hover:text-foreground'
             }`}
           >
             <Shield size={12} /> Strengths vs Threats
           </button>
           <button
-            onClick={() => { setMode('wt'); setSelectedCell(null); }}
+            onClick={() => {
+              setMode('wt');
+              setSelectedCell(null);
+            }}
             className={`px-3 py-1.5 flex items-center gap-1.5 border-l border-border transition-colors ${
               mode === 'wt' ? 'bg-rose-500/20 text-rose-400' : 'text-muted hover:text-foreground'
             }`}
@@ -150,7 +164,9 @@ export function CrossImpactMatrix({ data }: CrossImpactMatrixProps) {
                     <td
                       key={ci}
                       className={`p-2 border border-border text-center cursor-pointer transition-all duration-150 ${getCellColor(cell.score)} ${
-                        isSelected ? 'ring-2 ring-accent-primary ring-offset-1 ring-offset-transparent' : ''
+                        isSelected
+                          ? 'ring-2 ring-accent-primary ring-offset-1 ring-offset-transparent'
+                          : ''
                       }`}
                       onClick={() => setSelectedCell(isSelected ? null : key)}
                       role="button"
@@ -190,7 +206,9 @@ export function CrossImpactMatrix({ data }: CrossImpactMatrixProps) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
             <div className="p-2 bg-muted/20 text-xs">
-              <span className={`font-semibold ${mode === 'st' ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <span
+                className={`font-semibold ${mode === 'st' ? 'text-emerald-400' : 'text-rose-400'}`}
+              >
                 {mode === 'st' ? 'Strength' : 'Weakness'}:
               </span>
               <p className="text-foreground/80 mt-1">{rows[selRow]}</p>
@@ -225,13 +243,16 @@ export function CrossImpactMatrix({ data }: CrossImpactMatrixProps) {
       <div className="flex items-center gap-4 text-[10px] text-muted">
         <span>Impact: </span>
         <span className="flex items-center gap-1">
-          <span className={`w-3 h-2 ${mode === 'st' ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`} /> Low
+          <span className={`w-3 h-2 ${mode === 'st' ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`} />{' '}
+          Low
         </span>
         <span className="flex items-center gap-1">
-          <span className={`w-3 h-2 ${mode === 'st' ? 'bg-emerald-500/20' : 'bg-rose-500/20'}`} /> Medium
+          <span className={`w-3 h-2 ${mode === 'st' ? 'bg-emerald-500/20' : 'bg-rose-500/20'}`} />{' '}
+          Medium
         </span>
         <span className="flex items-center gap-1">
-          <span className={`w-3 h-2 ${mode === 'st' ? 'bg-emerald-500/40' : 'bg-rose-500/40'}`} /> High
+          <span className={`w-3 h-2 ${mode === 'st' ? 'bg-emerald-500/40' : 'bg-rose-500/40'}`} />{' '}
+          High
         </span>
         <span className="ml-auto">Click any cell for details</span>
       </div>

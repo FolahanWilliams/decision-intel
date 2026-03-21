@@ -209,7 +209,16 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                 })}
               </div>
               <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#FAFAFA', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 800,
+                    color: '#FAFAFA',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
                   Virtual Boardroom
                   <Sparkles size={16} style={{ color: 'var(--text-highlight)' }} />
                 </h3>
@@ -227,7 +236,15 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                   animate={{ scale: 1, opacity: 1 }}
                   style={{ textAlign: 'right' }}
                 >
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '6px' }}>
+                  <div
+                    style={{
+                      fontSize: '10px',
+                      color: 'var(--text-muted)',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      marginBottom: '6px',
+                    }}
+                  >
                     Board Consensus
                   </div>
                   <motion.div
@@ -252,12 +269,24 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
 
           {/* Vote Tally Bar */}
           <div className="mt-6 flex items-center gap-4">
-            <span style={{ fontSize: '10px', color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', flexShrink: 0 }}>
+            <span
+              style={{
+                fontSize: '10px',
+                color: 'var(--text-muted)',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                flexShrink: 0,
+              }}
+            >
               Votes
             </span>
             <div
               className="flex-1 flex gap-1 overflow-hidden"
-              style={{ height: '8px', background: 'rgba(255,255,255,0.04)', borderRadius: 'var(--radius-full)' }}
+              style={{
+                height: '8px',
+                background: 'rgba(255,255,255,0.04)',
+                borderRadius: 'var(--radius-full)',
+              }}
             >
               {(() => {
                 const totalTwins = simulation.twins?.length || 1;
@@ -268,7 +297,11 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                         initial={{ width: 0 }}
                         animate={{ width: `${(voteCounts['APPROVE'] / totalTwins) * 100}%` }}
                         transition={{ delay: 2.5, duration: 0.6, ease: 'easeOut' }}
-                        style={{ height: '100%', background: '#22c55e', borderRadius: 'var(--radius-full)' }}
+                        style={{
+                          height: '100%',
+                          background: '#22c55e',
+                          borderRadius: 'var(--radius-full)',
+                        }}
                       />
                     )}
                     {voteCounts['REVISE'] > 0 && (
@@ -276,7 +309,11 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                         initial={{ width: 0 }}
                         animate={{ width: `${(voteCounts['REVISE'] / totalTwins) * 100}%` }}
                         transition={{ delay: 2.6, duration: 0.6, ease: 'easeOut' }}
-                        style={{ height: '100%', background: '#FBBF24', borderRadius: 'var(--radius-full)' }}
+                        style={{
+                          height: '100%',
+                          background: '#FBBF24',
+                          borderRadius: 'var(--radius-full)',
+                        }}
                       />
                     )}
                     {voteCounts['REJECT'] > 0 && (
@@ -284,7 +321,11 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                         initial={{ width: 0 }}
                         animate={{ width: `${(voteCounts['REJECT'] / totalTwins) * 100}%` }}
                         transition={{ delay: 2.7, duration: 0.6, ease: 'easeOut' }}
-                        style={{ height: '100%', background: '#ef4444', borderRadius: 'var(--radius-full)' }}
+                        style={{
+                          height: '100%',
+                          background: '#ef4444',
+                          borderRadius: 'var(--radius-full)',
+                        }}
                       />
                     )}
                   </>
@@ -294,19 +335,43 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
             <div className="flex gap-3" style={{ fontSize: '11px', flexShrink: 0 }}>
               {voteCounts['APPROVE'] > 0 && (
                 <span className="flex items-center gap-1" style={{ color: '#22c55e' }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: '#22c55e',
+                      display: 'inline-block',
+                    }}
+                  />
                   {voteCounts['APPROVE']}
                 </span>
               )}
               {voteCounts['REVISE'] > 0 && (
                 <span className="flex items-center gap-1" style={{ color: '#FBBF24' }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FBBF24', display: 'inline-block' }} />
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: '#FBBF24',
+                      display: 'inline-block',
+                    }}
+                  />
                   {voteCounts['REVISE']}
                 </span>
               )}
               {voteCounts['REJECT'] > 0 && (
                 <span className="flex items-center gap-1" style={{ color: '#ef4444' }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: '#ef4444',
+                      display: 'inline-block',
+                    }}
+                  />
                   {voteCounts['REJECT']}
                 </span>
               )}
@@ -367,7 +432,9 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       {config.avatarInitials}
                     </div>
                     <div>
-                      <h4 style={{ fontWeight: 700, color: '#FAFAFA', fontSize: '14px' }}>{twin.name}</h4>
+                      <h4 style={{ fontWeight: 700, color: '#FAFAFA', fontSize: '14px' }}>
+                        {twin.name}
+                      </h4>
                       <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{twin.role}</p>
                     </div>
                   </div>
@@ -431,13 +498,29 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       animate={{ opacity: 1, height: 'auto' }}
                       style={{ marginBottom: '16px' }}
                     >
-                      <div className="flex justify-between" style={{ fontSize: '11px', marginBottom: '6px' }}>
+                      <div
+                        className="flex justify-between"
+                        style={{ fontSize: '11px', marginBottom: '6px' }}
+                      >
                         <span style={{ color: 'var(--text-muted)' }}>Confidence</span>
-                        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: config.color }}>
+                        <span
+                          style={{
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontWeight: 700,
+                            color: config.color,
+                          }}
+                        >
                           {Math.round(twin.confidence)}%
                         </span>
                       </div>
-                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          height: '4px',
+                          background: 'rgba(255,255,255,0.06)',
+                          borderRadius: 'var(--radius-full)',
+                          overflow: 'hidden',
+                        }}
+                      >
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${twin.confidence}%` }}
@@ -485,15 +568,28 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                      style={{
+                        marginTop: '16px',
+                        paddingTop: '16px',
+                        borderTop: '1px solid rgba(255,255,255,0.06)',
+                      }}
                     >
                       <div className="flex items-center gap-2" style={{ marginBottom: '6px' }}>
                         <Target size={12} style={{ color: config.color }} />
-                        <span style={{ fontSize: '10px', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            letterSpacing: '0.06em',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-muted)',
+                          }}
+                        >
                           Key {twin.vote === 'APPROVE' ? 'Opportunity' : 'Concern'}
                         </span>
                       </div>
-                      <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{twin.keyRiskIdentified}</p>
+                      <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        {twin.keyRiskIdentified}
+                      </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -546,37 +642,60 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Consensus Analysis */}
               <div>
-                <h5 className="flex items-center gap-2" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px' }}>
+                <h5
+                  className="flex items-center gap-2"
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    marginBottom: '12px',
+                  }}
+                >
                   <Users size={14} />
                   Consensus Breakdown
                 </h5>
                 <div className="space-y-2">
                   {voteCounts['APPROVE'] === 3 && (
-                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#22c55e' }}>
+                    <div
+                      className="flex items-center gap-2"
+                      style={{ fontSize: '13px', color: '#22c55e' }}
+                    >
                       <CheckCircle size={16} />
                       <span>Unanimous approval — strong strategic alignment</span>
                     </div>
                   )}
                   {voteCounts['REJECT'] === 3 && (
-                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#ef4444' }}>
+                    <div
+                      className="flex items-center gap-2"
+                      style={{ fontSize: '13px', color: '#ef4444' }}
+                    >
                       <XCircle size={16} />
                       <span>Unanimous rejection — significant concerns identified</span>
                     </div>
                   )}
                   {voteCounts['APPROVE'] >= 2 && voteCounts['APPROVE'] < 3 && (
-                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#FBBF24' }}>
+                    <div
+                      className="flex items-center gap-2"
+                      style={{ fontSize: '13px', color: '#FBBF24' }}
+                    >
                       <AlertTriangle size={16} />
                       <span>Mixed consensus — majority approval with reservations</span>
                     </div>
                   )}
                   {voteCounts['REJECT'] >= 2 && voteCounts['REJECT'] < 3 && (
-                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#ef4444' }}>
+                    <div
+                      className="flex items-center gap-2"
+                      style={{ fontSize: '13px', color: '#ef4444' }}
+                    >
                       <AlertTriangle size={16} />
                       <span>Mixed consensus — majority rejection with some support</span>
                     </div>
                   )}
                   {voteCounts['REVISE'] > 0 && (
-                    <div className="flex items-center gap-2" style={{ fontSize: '13px', color: '#FBBF24' }}>
+                    <div
+                      className="flex items-center gap-2"
+                      style={{ fontSize: '13px', color: '#FBBF24' }}
+                    >
                       <TrendingUp size={16} />
                       <span>Revision requested — proposal needs refinement</span>
                     </div>
@@ -586,7 +705,15 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
 
               {/* Confidence Analysis */}
               <div>
-                <h5 className="flex items-center gap-2" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '12px' }}>
+                <h5
+                  className="flex items-center gap-2"
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    marginBottom: '12px',
+                  }}
+                >
                   <Target size={14} />
                   Confidence Metrics
                 </h5>
@@ -605,7 +732,12 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                             style={{
                               fontFamily: "'JetBrains Mono', monospace",
                               fontWeight: 700,
-                              color: avgConfidence > 75 ? '#22c55e' : avgConfidence > 50 ? '#FBBF24' : '#ef4444',
+                              color:
+                                avgConfidence > 75
+                                  ? '#22c55e'
+                                  : avgConfidence > 50
+                                    ? '#FBBF24'
+                                    : '#ef4444',
                             }}
                           >
                             {Math.round(avgConfidence)}%
@@ -617,13 +749,23 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                             style={{
                               fontFamily: "'JetBrains Mono', monospace",
                               fontWeight: 700,
-                              color: minConfidence > 75 ? '#22c55e' : minConfidence > 50 ? '#FBBF24' : '#ef4444',
+                              color:
+                                minConfidence > 75
+                                  ? '#22c55e'
+                                  : minConfidence > 50
+                                    ? '#FBBF24'
+                                    : '#ef4444',
                             }}
                           >
                             {Math.round(minConfidence)}%
                           </span>
                         </div>
-                        <div style={{ paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div
+                          style={{
+                            paddingTop: '8px',
+                            borderTop: '1px solid rgba(255,255,255,0.06)',
+                          }}
+                        >
                           <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                             {avgConfidence > 80
                               ? 'High confidence levels indicate strong conviction across all perspectives.'

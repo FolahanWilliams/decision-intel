@@ -35,7 +35,7 @@ async function checkLLMHealth(): Promise<{ status: string; model?: string; error
 
     const health = {
       status: 'healthy',
-      model: 'gemini-1.5-flash'
+      model: 'gemini-1.5-flash',
     };
 
     healthCache.set('llm', { data: health, expires: Date.now() + CACHE_TTL });
@@ -43,7 +43,7 @@ async function checkLLMHealth(): Promise<{ status: string; model?: string; error
   } catch (error) {
     const health = {
       status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
     healthCache.set('llm', { data: health, expires: Date.now() + 60000 }); // Cache errors for 1 minute
     return health;
@@ -64,7 +64,7 @@ async function checkStorageHealth(): Promise<{ status: string; error?: string }>
     // Simple connectivity check
     const response = await fetch(`${storageUrl}/storage/v1/health`, {
       method: 'GET',
-      headers: { 'Accept': 'application/json' },
+      headers: { Accept: 'application/json' },
     }).catch(() => null);
 
     if (response && response.ok) {
@@ -75,7 +75,7 @@ async function checkStorageHealth(): Promise<{ status: string; error?: string }>
   } catch (error) {
     return {
       status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -109,7 +109,15 @@ async function checkSchemaDrift(): Promise<{
 
       // Define expected columns for each table (simplified check)
       const expectedColumns: Record<string, string[]> = {
-        Analysis: ['id', 'documentId', 'overallScore', 'noiseScore', 'summary', 'version', 'promptVersionId'],
+        Analysis: [
+          'id',
+          'documentId',
+          'overallScore',
+          'noiseScore',
+          'summary',
+          'version',
+          'promptVersionId',
+        ],
         Document: ['id', 'userId', 'filename', 'content', 'status'],
         BiasInstance: ['id', 'analysisId', 'biasType', 'severity'],
         FailedAnalysis: ['id', 'documentId', 'userId', 'error', 'retryCount'],
@@ -141,7 +149,7 @@ async function checkSchemaDrift(): Promise<{
     log.error('Schema drift check failed:', error);
     return {
       status: 'check_failed',
-      drift: undefined
+      drift: undefined,
     };
   }
 }
@@ -164,12 +172,9 @@ export async function GET() {
     // Determine overall health status
     const criticalServicesHealthy = dbHealthy;
     const hasWarnings =
-      llmHealth.status !== 'healthy' ||
-      storageHealth.status !== 'healthy' ||
-      schemaDrift.drift;
+      llmHealth.status !== 'healthy' || storageHealth.status !== 'healthy' || schemaDrift.drift;
 
-    const overallStatus = !criticalServicesHealthy ? 'error' :
-                          hasWarnings ? 'degraded' : 'healthy';
+    const overallStatus = !criticalServicesHealthy ? 'error' : hasWarnings ? 'degraded' : 'healthy';
 
     // Return 503 only if critical services are down
     const statusCode = !criticalServicesHealthy ? 503 : 200;
@@ -177,7 +182,9 @@ export async function GET() {
     const response = {
       status: overallStatus,
       message: criticalServicesHealthy
-        ? (hasWarnings ? 'Some services degraded' : 'All systems operational')
+        ? hasWarnings
+          ? 'Some services degraded'
+          : 'All systems operational'
         : 'Critical service failure',
       timestamp: new Date().toISOString(),
       responseTime: Date.now() - startTime,

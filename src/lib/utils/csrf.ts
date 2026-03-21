@@ -132,11 +132,8 @@ function getAllowedHosts(): string[] {
  * Create a CSRF error response
  */
 export function createCSRFErrorResponse(): Response {
-  return new Response(
-    JSON.stringify({ error: 'CSRF validation failed' }),
-    {
-      status: 403,
-      headers: { 'Content-Type': 'application/json' },
-    }
-  );
+  return new Response(JSON.stringify({ error: 'CSRF validation failed' }), {
+    status: 403,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }

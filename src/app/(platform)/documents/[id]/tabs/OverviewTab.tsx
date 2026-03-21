@@ -50,10 +50,9 @@ export function OverviewTab({
   analysisCreatedAt,
 }: OverviewTabProps) {
   // Fetch historical bias frequencies for sparklines
-  const [biasFrequencies, setBiasFrequencies] = useState<Record<
-    string,
-    BiasFrequencyData
-  > | null>(null);
+  const [biasFrequencies, setBiasFrequencies] = useState<Record<string, BiasFrequencyData> | null>(
+    null
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -178,15 +177,10 @@ export function OverviewTab({
                 const borderStyle = SEVERITY_BORDER_STYLES[severityKey] ?? 'border-border';
 
                 return (
-                  <div
-                    key={i}
-                    className={`p-4 border bg-card/50 ${borderStyle}`}
-                  >
+                  <div key={i} className={`p-4 border bg-card/50 ${borderStyle}`}>
                     <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
                       <div className="flex items-center gap-3">
-                        <span
-                          className={`text-xs font-bold uppercase px-2 py-0.5 ${badgeStyle}`}
-                        >
+                        <span className={`text-xs font-bold uppercase px-2 py-0.5 ${badgeStyle}`}>
                           {bias.biasType}
                         </span>
                         <span className={`text-xs capitalize ${badgeStyle} px-1.5 py-0.5`}>

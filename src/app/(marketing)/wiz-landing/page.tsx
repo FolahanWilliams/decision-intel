@@ -2,13 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  motion,
-  useInView,
-  useMotionValue,
-  useTransform,
-  animate,
-} from 'framer-motion';
+import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import ROICalculator from '@/components/ROICalculator';
 import {
@@ -24,11 +18,19 @@ import {
   Calculator,
   Clock,
   AlertTriangle,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 
 // Animated counter for metrics
-function AnimatedCounter({ target, suffix = '', prefix = '' }: { target: number; suffix?: string; prefix?: string }) {
+function AnimatedCounter({
+  target,
+  suffix = '',
+  prefix = '',
+}: {
+  target: number;
+  suffix?: string;
+  prefix?: string;
+}) {
   const count = useMotionValue(0);
   const rounded = useTransform(count, v => Math.round(v));
   const ref = useRef(null);
@@ -44,7 +46,9 @@ function AnimatedCounter({ target, suffix = '', prefix = '' }: { target: number;
 
   return (
     <span ref={ref}>
-      {prefix}<motion.span>{rounded}</motion.span>{suffix}
+      {prefix}
+      <motion.span>{rounded}</motion.span>
+      {suffix}
     </span>
   );
 }
@@ -68,9 +72,7 @@ function KPICard({ icon: Icon, metric, value, improvement, description }: KPICar
         <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20">
           <Icon className="w-6 h-6 text-blue-400" />
         </div>
-        <Badge className="bg-green-500/20 text-green-400 text-xs">
-          {improvement}
-        </Badge>
+        <Badge className="bg-green-500/20 text-green-400 text-xs">{improvement}</Badge>
       </div>
       <div className="space-y-2">
         <h3 className="text-2xl font-bold text-white">{value}</h3>
@@ -84,10 +86,12 @@ function KPICard({ icon: Icon, metric, value, improvement, description }: KPICar
 // Badge component
 function Badge({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn(
-      "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-      className
-    )}>
+    <span
+      className={cn(
+        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+        className
+      )}
+    >
       {children}
     </span>
   );
@@ -100,7 +104,7 @@ function BiasVisualization() {
     { name: 'Automation', detected: 189, severity: 'critical', reduction: 78 },
     { name: 'Groupthink', detected: 156, severity: 'medium', reduction: 52 },
     { name: 'Loss Aversion', detected: 298, severity: 'high', reduction: 71 },
-    { name: 'Confirmation', detected: 112, severity: 'medium', reduction: 45 }
+    { name: 'Confirmation', detected: 112, severity: 'medium', reduction: 45 },
   ];
 
   return (
@@ -121,16 +125,16 @@ function BiasVisualization() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Badge className={`
+            <Badge
+              className={`
               ${bias.severity === 'critical' ? 'bg-red-500/20 text-red-400' : ''}
               ${bias.severity === 'high' ? 'bg-orange-500/20 text-orange-400' : ''}
               ${bias.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : ''}
-            `}>
+            `}
+            >
               {bias.severity}
             </Badge>
-            <span className="text-sm font-medium text-green-400">
-              -{bias.reduction}%
-            </span>
+            <span className="text-sm font-medium text-green-400">-{bias.reduction}%</span>
           </div>
         </motion.div>
       ))}
@@ -197,9 +201,10 @@ export default function WizLandingPage() {
               transition={{ delay: 0.2 }}
               className="text-xl text-gray-400 mb-8 max-w-3xl"
             >
-              Decision Intel audits both <span className="text-white font-semibold">human and AI decisions</span> in
-              real-time, reducing MTTR by 40% and eliminating 72% of false positives through
-              behavioral science and causal AI.
+              Decision Intel audits both{' '}
+              <span className="text-white font-semibold">human and AI decisions</span> in real-time,
+              reducing MTTR by 40% and eliminating 72% of false positives through behavioral science
+              and causal AI.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -307,15 +312,13 @@ export default function WizLandingPage() {
               animate={integrationInView ? { opacity: 1, y: 0 } : {}}
               className="text-center mb-16"
             >
-              <Badge className="bg-purple-500/20 text-purple-400 mb-4">
-                Wiz Integration
-              </Badge>
+              <Badge className="bg-purple-500/20 text-purple-400 mb-4">Wiz Integration</Badge>
               <h2 className="text-4xl font-bold mb-4">
                 Seamlessly Integrates with Your Wiz Deployment
               </h2>
               <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                Decision Intel enhances Wiz with cognitive governance, providing real-time bias detection
-                and causal analysis for every security decision.
+                Decision Intel enhances Wiz with cognitive governance, providing real-time bias
+                detection and causal analysis for every security decision.
               </p>
             </motion.div>
 
@@ -463,12 +466,8 @@ export default function WizLandingPage() {
             animate={featuresInView ? { opacity: 1, y: 0 } : {}}
             className="text-center mb-16"
           >
-            <Badge className="bg-yellow-500/20 text-yellow-400 mb-4">
-              Behavioral Science
-            </Badge>
-            <h2 className="text-4xl font-bold mb-4">
-              15-Bias Security Taxonomy
-            </h2>
+            <Badge className="bg-yellow-500/20 text-yellow-400 mb-4">Behavioral Science</Badge>
+            <h2 className="text-4xl font-bold mb-4">15-Bias Security Taxonomy</h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               The only platform that detects and mitigates all 15 security-specific cognitive biases
               based on Kahneman&apos;s research.
@@ -486,23 +485,33 @@ export default function WizLandingPage() {
                 </h3>
                 <ol className="space-y-3 text-sm">
                   <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      1
+                    </span>
                     <span>Real-time analysis of decision patterns in your SOC</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      2
+                    </span>
                     <span>Detection of cognitive biases using behavioral markers</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      3
+                    </span>
                     <span>Intelligent nudges delivered at the point of decision</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
+                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      4
+                    </span>
                     <span>Causal analysis to understand impact and alternatives</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">5</span>
+                    <span className="w-6 h-6 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      5
+                    </span>
                     <span>Continuous learning and calibration to your team</span>
                   </li>
                 </ol>
@@ -536,14 +545,11 @@ export default function WizLandingPage() {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <Badge className="bg-blue-500/20 text-blue-400 mb-4">
-                True Causal AI
-              </Badge>
-              <h2 className="text-4xl font-bold mb-4">
-                Beyond Correlation to Causation
-              </h2>
+              <Badge className="bg-blue-500/20 text-blue-400 mb-4">True Causal AI</Badge>
+              <h2 className="text-4xl font-bold mb-4">Beyond Correlation to Causation</h2>
               <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                Pearl&apos;s causal hierarchy implementation for counterfactual reasoning in security operations
+                Pearl&apos;s causal hierarchy implementation for counterfactual reasoning in
+                security operations
               </p>
             </div>
 
@@ -553,9 +559,7 @@ export default function WizLandingPage() {
                   <Eye className="w-6 h-6 text-blue-400" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Level 1: Association</h3>
-                <p className="text-sm text-gray-400 mb-4">
-                  Observational analysis: P(Y|X)
-                </p>
+                <p className="text-sm text-gray-400 mb-4">Observational analysis: P(Y|X)</p>
                 <p className="text-xs text-gray-500">
                   &ldquo;Critical vulnerabilities are associated with breaches&rdquo;
                 </p>
@@ -566,9 +570,7 @@ export default function WizLandingPage() {
                   <GitBranch className="w-6 h-6 text-purple-400" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Level 2: Intervention</h3>
-                <p className="text-sm text-gray-400 mb-4">
-                  Do-calculus: P(Y|do(X))
-                </p>
+                <p className="text-sm text-gray-400 mb-4">Do-calculus: P(Y|do(X))</p>
                 <p className="text-xs text-gray-500">
                   &ldquo;If we patch now, breach risk drops 65%&rdquo;
                 </p>
@@ -641,8 +643,13 @@ export default function WizLandingPage() {
                     </div>
                   </div>
                   <div className="mt-4 p-3 rounded bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/30">
-                    <div className="text-xs font-semibold text-green-400 mb-1">AI RECOMMENDATION</div>
-                    <p className="text-xs">Patch during next maintenance window with staged rollout to minimize both breach risk and operational impact.</p>
+                    <div className="text-xs font-semibold text-green-400 mb-1">
+                      AI RECOMMENDATION
+                    </div>
+                    <p className="text-xs">
+                      Patch during next maintenance window with staged rollout to minimize both
+                      breach risk and operational impact.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -669,9 +676,7 @@ export default function WizLandingPage() {
       {/* CTA Section */}
       <section className="py-24 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 border-t border-gray-800">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-4">
-            Ready to Transform Your Security Operations?
-          </h2>
+          <h2 className="text-4xl font-bold mb-4">Ready to Transform Your Security Operations?</h2>
           <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
             Join Fortune 100 companies already using Decision Intel to achieve 40% MTTR reduction
             and 280% ROI within 6 months.

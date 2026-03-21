@@ -19,17 +19,11 @@ export default function NotFound() {
           404
         </p>
 
-        <h1
-          className="text-2xl font-semibold -mt-4"
-          style={{ color: 'var(--text-primary)' }}
-        >
+        <h1 className="text-2xl font-semibold -mt-4" style={{ color: 'var(--text-primary)' }}>
           Page not found
         </h1>
 
-        <p
-          className="text-sm max-w-md"
-          style={{ color: 'var(--text-muted)' }}
-        >
+        <p className="text-sm max-w-md" style={{ color: 'var(--text-muted)' }}>
           The page you are looking for does not exist or has been moved.
         </p>
 

@@ -23,9 +23,9 @@ export function ThemeToggle({ className }: { className?: string }) {
     return (
       <button
         className={cn(
-          "inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
-          "hover:bg-accent hover:text-accent-foreground",
-          "h-9 w-9 rounded-md",
+          'inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+          'hover:bg-accent hover:text-accent-foreground',
+          'h-9 w-9 rounded-md',
           className
         )}
         aria-label="Toggle theme"
@@ -39,18 +39,14 @@ export function ThemeToggle({ className }: { className?: string }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          "inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
-          "hover:bg-accent hover:text-accent-foreground",
-          "h-9 w-9 rounded-md",
+          'inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+          'hover:bg-accent hover:text-accent-foreground',
+          'h-9 w-9 rounded-md',
           className
         )}
         aria-label="Toggle theme"
       >
-        {resolvedTheme === 'dark' ? (
-          <Moon className="h-4 w-4" />
-        ) : (
-          <Sun className="h-4 w-4" />
-        )}
+        {resolvedTheme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme('light')}>
@@ -82,10 +78,7 @@ export function ThemeToggleCompact({ className }: { className?: string }) {
   if (!mounted) {
     return (
       <button
-        className={cn(
-          "p-1.5 rounded-md hover:bg-white/10 transition-colors",
-          className
-        )}
+        className={cn('p-1.5 rounded-md hover:bg-white/10 transition-colors', className)}
         aria-label="Toggle theme"
       >
         <Sun className="h-3.5 w-3.5" />
@@ -100,10 +93,7 @@ export function ThemeToggleCompact({ className }: { className?: string }) {
   return (
     <button
       onClick={toggleTheme}
-      className={cn(
-        "p-1.5 rounded-md hover:bg-white/10 transition-colors",
-        className
-      )}
+      className={cn('p-1.5 rounded-md hover:bg-white/10 transition-colors', className)}
       aria-label="Toggle theme"
     >
       {resolvedTheme === 'dark' ? (

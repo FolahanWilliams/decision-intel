@@ -36,7 +36,9 @@ export async function GET() {
     // Raw SQL for efficiency: group bias instances by type and analysis date
     let rows: Array<{ biasType: string; analysisDate: string; count: bigint }>;
     try {
-      rows = await prisma.$queryRaw<Array<{ biasType: string; analysisDate: string; count: bigint }>>`
+      rows = await prisma.$queryRaw<
+        Array<{ biasType: string; analysisDate: string; count: bigint }>
+      >`
         SELECT
           bi."biasType",
           DATE(a."createdAt") as "analysisDate",
@@ -76,9 +78,10 @@ export async function GET() {
       const count = Number(row.count);
       frequencies[key].total += count;
       // Merge into existing date entry or create new
-      const dateStr = typeof row.analysisDate === 'string'
-        ? row.analysisDate
-        : new Date(row.analysisDate).toISOString().split('T')[0];
+      const dateStr =
+        typeof row.analysisDate === 'string'
+          ? row.analysisDate
+          : new Date(row.analysisDate).toISOString().split('T')[0];
       const existing = frequencies[key].timeline.find(t => t.date === dateStr);
       if (existing) {
         existing.count += count;

@@ -11,7 +11,10 @@ interface DocumentTextHighlighterProps {
   onBiasSelect?: (bias: BiasInstance) => void;
 }
 
-const SEVERITY_COLORS: Record<string, { bg: string; border: string; text: string; underline: string }> = {
+const SEVERITY_COLORS: Record<
+  string,
+  { bg: string; border: string; text: string; underline: string }
+> = {
   critical: {
     bg: 'bg-red-500/20',
     border: 'border-red-500',
@@ -204,7 +207,10 @@ export function DocumentTextHighlighter({
         </div>
       </div>
 
-      <div className="card-body flex-1 flex flex-col md:flex-row gap-0 overflow-hidden" style={{ minHeight: '300px' }}>
+      <div
+        className="card-body flex-1 flex flex-col md:flex-row gap-0 overflow-hidden"
+        style={{ minHeight: '300px' }}
+      >
         {/* Document text panel */}
         <div
           ref={textRef}
@@ -220,8 +226,7 @@ export function DocumentTextHighlighter({
             const bias = biases[seg.biasIndex];
             const colors = getSeverityColor(bias.severity);
             const isSelected = selectedBiasIdx === seg.biasIndex;
-            const isFiltered =
-              severityFilter && bias.severity.toLowerCase() !== severityFilter;
+            const isFiltered = severityFilter && bias.severity.toLowerCase() !== severityFilter;
             const isVisible = showHighlights && !isFiltered;
 
             return (

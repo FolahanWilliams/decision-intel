@@ -18,7 +18,11 @@ export function PageSkeleton({ rows = 5 }: { rows?: number }) {
       {/* Stats cards skeleton */}
       <div className="grid grid-4 mb-xl">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="card glass-enter-stagger" style={{ padding: 'var(--spacing-lg)', '--stagger-index': i } as React.CSSProperties}>
+          <div
+            key={i}
+            className="card glass-enter-stagger"
+            style={{ padding: 'var(--spacing-lg)', '--stagger-index': i } as React.CSSProperties}
+          >
             <Skeleton className="h-3 w-[60%] mb-2" />
             <Skeleton className="h-6 w-[40%]" />
           </div>
@@ -39,14 +43,8 @@ export function PageSkeleton({ rows = 5 }: { rows?: number }) {
             >
               <Skeleton className="h-8 w-8" />
               <div className="flex-1">
-                <Skeleton
-                  className="h-3.5 mb-1"
-                  style={{ width: `${60 + ((i * 7) % 30)}%` }}
-                />
-                <Skeleton
-                  className="h-3"
-                  style={{ width: `${30 + ((i * 13) % 20)}%` }}
-                />
+                <Skeleton className="h-3.5 mb-1" style={{ width: `${60 + ((i * 7) % 30)}%` }} />
+                <Skeleton className="h-3" style={{ width: `${30 + ((i * 13) % 20)}%` }} />
               </div>
               <Skeleton className="h-5 w-[60px]" />
             </div>
@@ -63,11 +61,7 @@ export function CardSkeleton({ lines = 3 }: { lines?: number }) {
     <div className="card">
       <div className="card-body">
         {[...Array(lines)].map((_, i) => (
-          <Skeleton
-            key={i}
-            className="h-3.5 mb-2"
-            style={{ width: `${60 + ((i * 11) % 35)}%` }}
-          />
+          <Skeleton key={i} className="h-3.5 mb-2" style={{ width: `${60 + ((i * 11) % 35)}%` }} />
         ))}
       </div>
     </div>
@@ -132,7 +126,11 @@ export function DashboardSkeleton() {
       {/* 4 KPI card skeletons */}
       <div className="grid grid-4 mb-xl">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="card glass-enter-stagger" style={{ padding: 'var(--spacing-lg)', '--stagger-index': i } as React.CSSProperties}>
+          <div
+            key={i}
+            className="card glass-enter-stagger"
+            style={{ padding: 'var(--spacing-lg)', '--stagger-index': i } as React.CSSProperties}
+          >
             <Skeleton className="h-3 w-[80px] mb-2" />
             <Skeleton className="h-8 w-[100px] mb-1" />
             <Skeleton className="h-3 w-[60px]" />
@@ -143,7 +141,11 @@ export function DashboardSkeleton() {
       {/* 3 chart card skeletons */}
       <div className="grid grid-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="card liquid-glass-premium glass-enter-stagger h-full" style={{ '--stagger-index': i + 4 } as React.CSSProperties}>
+          <div
+            key={i}
+            className="card liquid-glass-premium glass-enter-stagger h-full"
+            style={{ '--stagger-index': i + 4 } as React.CSSProperties}
+          >
             <div className="card-header">
               <Skeleton className="h-3.5 w-[120px]" />
             </div>

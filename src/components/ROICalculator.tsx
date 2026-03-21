@@ -16,7 +16,7 @@ import {
   ChevronRight,
   Calculator,
   Download,
-  Share2
+  Share2,
 } from 'lucide-react';
 import {
   Line,
@@ -32,7 +32,7 @@ import {
   AreaChart,
   PieChart,
   Pie,
-  Cell
+  Cell,
 } from 'recharts';
 
 interface ROIInputs {
@@ -98,7 +98,8 @@ const calculateROI = (inputs: ROIInputs): ROIResults => {
 
   // Calculate operational efficiency
   const alertsReduced = inputs.alertsPerDay * (improvedFalsePositiveRate / 100);
-  const minutesSavedPerAlert = (inputs.currentMTTR - improvedMTTR) + (inputs.currentMTTD - improvedMTTD);
+  const minutesSavedPerAlert =
+    inputs.currentMTTR - improvedMTTR + (inputs.currentMTTD - improvedMTTD);
   const hoursReclaimed = (alertsReduced * minutesSavedPerAlert * 365) / 60;
   const operationalEfficiency = hoursReclaimed * (inputs.averageSecuritySalary / 2080); // Annual hours
 
@@ -106,10 +107,12 @@ const calculateROI = (inputs: ROIInputs): ROIResults => {
   const complianceSavings = inputs.compliancePenalty * 0.85; // 85% penalty avoidance
 
   // Wiz-specific enhancements
-  const wizBonus = inputs.hasWiz ? {
-    toxicCombinationSavings: inputs.toxicCombinationsPerMonth * 12 * 50000, // $50k per toxic combo prevented
-    integrationEfficiency: inputs.wizAnnualCost * 0.15 // 15% more value from Wiz
-  } : { toxicCombinationSavings: 0, integrationEfficiency: 0 };
+  const wizBonus = inputs.hasWiz
+    ? {
+        toxicCombinationSavings: inputs.toxicCombinationsPerMonth * 12 * 50000, // $50k per toxic combo prevented
+        integrationEfficiency: inputs.wizAnnualCost * 0.15, // 15% more value from Wiz
+      }
+    : { toxicCombinationSavings: 0, integrationEfficiency: 0 };
 
   // Total savings
   const annualSavings =
@@ -121,12 +124,16 @@ const calculateROI = (inputs: ROIInputs): ROIResults => {
 
   // Decision Intel pricing (tiered)
   const decisionIntelCost =
-    inputs.securityTeamSize <= 10 ? 120000 :
-    inputs.securityTeamSize <= 50 ? 250000 :
-    inputs.securityTeamSize <= 100 ? 400000 : 600000;
+    inputs.securityTeamSize <= 10
+      ? 120000
+      : inputs.securityTeamSize <= 50
+        ? 250000
+        : inputs.securityTeamSize <= 100
+          ? 400000
+          : 600000;
 
   const totalROI = ((annualSavings - decisionIntelCost) / decisionIntelCost) * 100;
-  const paybackPeriod = decisionIntelCost / annualSavings * 12; // months
+  const paybackPeriod = (decisionIntelCost / annualSavings) * 12; // months
 
   return {
     improvedMTTR,
@@ -141,7 +148,7 @@ const calculateROI = (inputs: ROIInputs): ROIResults => {
     paybackPeriod,
     hoursReclaimed,
     alertsReduced: alertsReduced * 365,
-    decisionsImproved: inputs.alertsPerDay * 365 * biasReductionRate
+    decisionsImproved: inputs.alertsPerDay * 365 * biasReductionRate,
   };
 };
 
@@ -160,7 +167,7 @@ export default function ROICalculator() {
     compliancePenalty: 500000,
     hasWiz: true,
     wizAnnualCost: 500000,
-    toxicCombinationsPerMonth: 5
+    toxicCombinationsPerMonth: 5,
   });
 
   const [results, setResults] = useState<ROIResults>(calculateROI(inputs));
@@ -179,14 +186,14 @@ export default function ROICalculator() {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(value);
   };
 
   const formatNumber = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(value);
   };
 
@@ -195,20 +202,29 @@ export default function ROICalculator() {
     { name: 'Breach Risk', value: results.breachRiskReduction, color: '#ef4444' },
     { name: 'Operational', value: results.operationalEfficiency, color: '#22c55e' },
     { name: 'Compliance', value: results.complianceSavings, color: '#3b82f6' },
-    { name: 'Wiz Enhanced', value: inputs.hasWiz ? inputs.toxicCombinationsPerMonth * 12 * 50000 : 0, color: '#a855f7' }
+    {
+      name: 'Wiz Enhanced',
+      value: inputs.hasWiz ? inputs.toxicCombinationsPerMonth * 12 * 50000 : 0,
+      color: '#a855f7',
+    },
   ];
 
   const performanceComparison = [
     { metric: 'MTTR', current: inputs.currentMTTR, improved: results.improvedMTTR, unit: 'min' },
     { metric: 'MTTD', current: inputs.currentMTTD, improved: results.improvedMTTD, unit: 'min' },
-    { metric: 'False Positives', current: inputs.falsePositiveRate, improved: results.reducedFalsePositives, unit: '%' }
+    {
+      metric: 'False Positives',
+      current: inputs.falsePositiveRate,
+      improved: results.reducedFalsePositives,
+      unit: '%',
+    },
   ];
 
   const monthlyProjection = Array.from({ length: 12 }, (_, i) => ({
     month: `Month ${i + 1}`,
     savings: (results.annualSavings / 12) * (i + 1),
     cost: 250000 * ((i + 1) / 12),
-    net: ((results.annualSavings / 12) * (i + 1)) - (250000 * ((i + 1) / 12))
+    net: (results.annualSavings / 12) * (i + 1) - 250000 * ((i + 1) / 12),
   }));
 
   return (
@@ -219,9 +235,7 @@ export default function ROICalculator() {
             <div className="flex items-center gap-3">
               <Calculator className="w-6 h-6 text-blue-400" />
               <CardTitle className="text-2xl">ROI Calculator</CardTitle>
-              <Badge className="bg-green-500/20 text-green-400">
-                Enterprise Security
-              </Badge>
+              <Badge className="bg-green-500/20 text-green-400">Enterprise Security</Badge>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" className="border-gray-700">
@@ -239,17 +253,21 @@ export default function ROICalculator() {
           {/* Tab Navigation */}
           <div className="flex gap-4 mb-6 border-b border-gray-800">
             <button
-              className={`pb-2 px-1 ${activeTab === 'inputs'
-                ? 'border-b-2 border-blue-400 text-blue-400'
-                : 'text-gray-400'}`}
+              className={`pb-2 px-1 ${
+                activeTab === 'inputs'
+                  ? 'border-b-2 border-blue-400 text-blue-400'
+                  : 'text-gray-400'
+              }`}
               onClick={() => setActiveTab('inputs')}
             >
               Input Parameters
             </button>
             <button
-              className={`pb-2 px-1 ${activeTab === 'results'
-                ? 'border-b-2 border-blue-400 text-blue-400'
-                : 'text-gray-400'}`}
+              className={`pb-2 px-1 ${
+                activeTab === 'results'
+                  ? 'border-b-2 border-blue-400 text-blue-400'
+                  : 'text-gray-400'
+              }`}
               onClick={() => setActiveTab('results')}
             >
               ROI Analysis
@@ -267,31 +285,39 @@ export default function ROICalculator() {
                     <Input
                       type="number"
                       value={inputs.annualRevenue}
-                      onChange={(e) => updateInput('annualRevenue', parseFloat(e.target.value))}
+                      onChange={e => updateInput('annualRevenue', parseFloat(e.target.value))}
                       className="bg-gray-900 border-gray-700"
                     />
-                    <span className="text-xs text-gray-400">{formatCurrency(inputs.annualRevenue)}</span>
+                    <span className="text-xs text-gray-400">
+                      {formatCurrency(inputs.annualRevenue)}
+                    </span>
                   </div>
                   <div className="space-y-2">
                     <Label>Security Team Size</Label>
                     <Slider
                       value={[inputs.securityTeamSize]}
-                      onValueChange={(v) => updateInput('securityTeamSize', v[0])}
+                      onValueChange={v => updateInput('securityTeamSize', v[0])}
                       max={100}
                       min={5}
                       className="mt-2"
                     />
-                    <span className="text-sm text-gray-400">{inputs.securityTeamSize} analysts</span>
+                    <span className="text-sm text-gray-400">
+                      {inputs.securityTeamSize} analysts
+                    </span>
                   </div>
                   <div className="space-y-2">
                     <Label>Average Salary</Label>
                     <Input
                       type="number"
                       value={inputs.averageSecuritySalary}
-                      onChange={(e) => updateInput('averageSecuritySalary', parseFloat(e.target.value))}
+                      onChange={e =>
+                        updateInput('averageSecuritySalary', parseFloat(e.target.value))
+                      }
                       className="bg-gray-900 border-gray-700"
                     />
-                    <span className="text-xs text-gray-400">{formatCurrency(inputs.averageSecuritySalary)}</span>
+                    <span className="text-xs text-gray-400">
+                      {formatCurrency(inputs.averageSecuritySalary)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -304,7 +330,7 @@ export default function ROICalculator() {
                     <Label>MTTR (minutes)</Label>
                     <Slider
                       value={[inputs.currentMTTR]}
-                      onValueChange={(v) => updateInput('currentMTTR', v[0])}
+                      onValueChange={v => updateInput('currentMTTR', v[0])}
                       max={180}
                       min={15}
                       className="mt-2"
@@ -315,7 +341,7 @@ export default function ROICalculator() {
                     <Label>MTTD (minutes)</Label>
                     <Slider
                       value={[inputs.currentMTTD]}
-                      onValueChange={(v) => updateInput('currentMTTD', v[0])}
+                      onValueChange={v => updateInput('currentMTTD', v[0])}
                       max={60}
                       min={5}
                       className="mt-2"
@@ -326,7 +352,7 @@ export default function ROICalculator() {
                     <Label>Alerts per Day</Label>
                     <Slider
                       value={[inputs.alertsPerDay]}
-                      onValueChange={(v) => updateInput('alertsPerDay', v[0])}
+                      onValueChange={v => updateInput('alertsPerDay', v[0])}
                       max={1000}
                       min={50}
                       className="mt-2"
@@ -337,7 +363,7 @@ export default function ROICalculator() {
                     <Label>False Positive Rate (%)</Label>
                     <Slider
                       value={[inputs.falsePositiveRate]}
-                      onValueChange={(v) => updateInput('falsePositiveRate', v[0])}
+                      onValueChange={v => updateInput('falsePositiveRate', v[0])}
                       max={50}
                       min={5}
                       className="mt-2"
@@ -356,16 +382,18 @@ export default function ROICalculator() {
                     <Input
                       type="number"
                       value={inputs.averageBreachCost}
-                      onChange={(e) => updateInput('averageBreachCost', parseFloat(e.target.value))}
+                      onChange={e => updateInput('averageBreachCost', parseFloat(e.target.value))}
                       className="bg-gray-900 border-gray-700"
                     />
-                    <span className="text-xs text-gray-400">{formatCurrency(inputs.averageBreachCost)}</span>
+                    <span className="text-xs text-gray-400">
+                      {formatCurrency(inputs.averageBreachCost)}
+                    </span>
                   </div>
                   <div className="space-y-2">
                     <Label>Annual Breach Probability (%)</Label>
                     <Slider
                       value={[inputs.breachProbability]}
-                      onValueChange={(v) => updateInput('breachProbability', v[0])}
+                      onValueChange={v => updateInput('breachProbability', v[0])}
                       max={100}
                       min={5}
                       className="mt-2"
@@ -383,7 +411,7 @@ export default function ROICalculator() {
                   <input
                     type="checkbox"
                     checked={inputs.hasWiz}
-                    onChange={(e) => updateInput('hasWiz', e.target.checked)}
+                    onChange={e => updateInput('hasWiz', e.target.checked)}
                     className="ml-auto"
                   />
                 </div>
@@ -394,7 +422,7 @@ export default function ROICalculator() {
                       <Input
                         type="number"
                         value={inputs.wizAnnualCost}
-                        onChange={(e) => updateInput('wizAnnualCost', parseFloat(e.target.value))}
+                        onChange={e => updateInput('wizAnnualCost', parseFloat(e.target.value))}
                         className="bg-gray-900 border-gray-700"
                       />
                     </div>
@@ -402,12 +430,14 @@ export default function ROICalculator() {
                       <Label>Toxic Combinations/Month</Label>
                       <Slider
                         value={[inputs.toxicCombinationsPerMonth]}
-                        onValueChange={(v) => updateInput('toxicCombinationsPerMonth', v[0])}
+                        onValueChange={v => updateInput('toxicCombinationsPerMonth', v[0])}
                         max={20}
                         min={1}
                         className="mt-2"
                       />
-                      <span className="text-sm text-gray-400">{inputs.toxicCombinationsPerMonth}</span>
+                      <span className="text-sm text-gray-400">
+                        {inputs.toxicCombinationsPerMonth}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -490,18 +520,20 @@ export default function ROICalculator() {
                           cx="50%"
                           cy="50%"
                           outerRadius={80}
-                          label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                          label={({ name, percent }) =>
+                            `${name} ${((percent || 0) * 100).toFixed(0)}%`
+                          }
                         >
                           {savingsBreakdown.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
                         <Tooltip
-                          formatter={(value) => formatCurrency(value as number)}
+                          formatter={value => formatCurrency(value as number)}
                           contentStyle={{
                             backgroundColor: '#1F2937',
                             border: '1px solid #374151',
-                            borderRadius: '8px'
+                            borderRadius: '8px',
                           }}
                         />
                       </PieChart>
@@ -523,7 +555,7 @@ export default function ROICalculator() {
                           contentStyle={{
                             backgroundColor: '#1F2937',
                             border: '1px solid #374151',
-                            borderRadius: '8px'
+                            borderRadius: '8px',
                           }}
                         />
                         <Bar dataKey="current" fill="#ef4444" name="Current" />
@@ -544,23 +576,26 @@ export default function ROICalculator() {
                     <AreaChart data={monthlyProjection}>
                       <defs>
                         <linearGradient id="colorSavings" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0.1}/>
+                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8} />
+                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0.1} />
                         </linearGradient>
                         <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="month" tick={{ fill: '#9CA3AF' }} />
-                      <YAxis tick={{ fill: '#9CA3AF' }} tickFormatter={(value) => `$${value / 1000}k`} />
+                      <YAxis
+                        tick={{ fill: '#9CA3AF' }}
+                        tickFormatter={value => `$${value / 1000}k`}
+                      />
                       <Tooltip
-                        formatter={(value) => formatCurrency(value as number)}
+                        formatter={value => formatCurrency(value as number)}
                         contentStyle={{
                           backgroundColor: '#1F2937',
                           border: '1px solid #374151',
-                          borderRadius: '8px'
+                          borderRadius: '8px',
                         }}
                       />
                       <Area
@@ -598,29 +633,52 @@ export default function ROICalculator() {
                 <h3 className="text-lg font-semibold mb-4 text-white">Executive Summary</h3>
                 <div className="space-y-3 text-sm">
                   <p className="text-gray-300">
-                    By implementing Decision Intel with your Wiz deployment, your organization will achieve:
+                    By implementing Decision Intel with your Wiz deployment, your organization will
+                    achieve:
                   </p>
                   <ul className="space-y-2 ml-4">
                     <li className="flex items-start gap-2">
                       <ChevronRight className="w-4 h-4 text-green-400 mt-0.5" />
-                      <span><strong className="text-green-400">{formatCurrency(results.annualSavings)}</strong> in annual savings</span>
+                      <span>
+                        <strong className="text-green-400">
+                          {formatCurrency(results.annualSavings)}
+                        </strong>{' '}
+                        in annual savings
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <ChevronRight className="w-4 h-4 text-blue-400 mt-0.5" />
-                      <span><strong className="text-blue-400">{results.biasReduction.toFixed(0)}%</strong> reduction in cognitive biases</span>
+                      <span>
+                        <strong className="text-blue-400">
+                          {results.biasReduction.toFixed(0)}%
+                        </strong>{' '}
+                        reduction in cognitive biases
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <ChevronRight className="w-4 h-4 text-purple-400 mt-0.5" />
-                      <span><strong className="text-purple-400">{formatNumber(results.hoursReclaimed)}</strong> hours reclaimed annually</span>
+                      <span>
+                        <strong className="text-purple-400">
+                          {formatNumber(results.hoursReclaimed)}
+                        </strong>{' '}
+                        hours reclaimed annually
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <ChevronRight className="w-4 h-4 text-orange-400 mt-0.5" />
-                      <span><strong className="text-orange-400">{results.paybackPeriod.toFixed(1)}</strong> month payback period</span>
+                      <span>
+                        <strong className="text-orange-400">
+                          {results.paybackPeriod.toFixed(1)}
+                        </strong>{' '}
+                        month payback period
+                      </span>
                     </li>
                   </ul>
                   <p className="text-gray-300 mt-4">
-                    The platform pays for itself in under {Math.ceil(results.paybackPeriod)} months and delivers
-                    a <strong className="text-white">{results.totalROI.toFixed(0)}% ROI</strong> in the first year.
+                    The platform pays for itself in under {Math.ceil(results.paybackPeriod)} months
+                    and delivers a{' '}
+                    <strong className="text-white">{results.totalROI.toFixed(0)}% ROI</strong> in
+                    the first year.
                   </p>
                 </div>
               </div>

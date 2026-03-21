@@ -55,7 +55,9 @@ export function AnimatedNumber({
 
   return (
     <span className={className} style={style}>
-      {prefix}{displayed}{suffix}
+      {prefix}
+      {displayed}
+      {suffix}
     </span>
   );
 }

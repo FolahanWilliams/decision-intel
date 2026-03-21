@@ -62,9 +62,7 @@ export class TrueCausalEngine {
       visited.add(node);
       recursionStack.add(node);
 
-      const children = this.dag.edges
-        .filter(e => e.from === node)
-        .map(e => e.to);
+      const children = this.dag.edges.filter(e => e.from === node).map(e => e.to);
 
       for (const child of children) {
         if (!visited.has(child)) {
@@ -187,9 +185,7 @@ export class TrueCausalEngine {
     const paths: string[][] = [];
 
     // Find parents of X (backdoor starts with arrow into X)
-    const xParents = this.dag.edges
-      .filter(e => e.to === X)
-      .map(e => e.from);
+    const xParents = this.dag.edges.filter(e => e.to === X).map(e => e.from);
 
     for (const parent of xParents) {
       // Find all paths from parent to Y
@@ -205,11 +201,7 @@ export class TrueCausalEngine {
   /**
    * Find all paths between two nodes
    */
-  private findAllPaths(
-    start: string,
-    end: string,
-    visited: Set<string> = new Set()
-  ): string[][] {
+  private findAllPaths(start: string, end: string, visited: Set<string> = new Set()): string[][] {
     if (start === end) return [[]];
 
     visited.add(start);
@@ -218,7 +210,7 @@ export class TrueCausalEngine {
     // Consider all neighbors (both directions for undirected paths)
     const neighbors = [
       ...this.dag.edges.filter(e => e.from === start).map(e => e.to),
-      ...this.dag.edges.filter(e => e.to === start).map(e => e.from)
+      ...this.dag.edges.filter(e => e.to === start).map(e => e.from),
     ];
 
     for (const neighbor of neighbors) {
@@ -236,11 +228,7 @@ export class TrueCausalEngine {
   /**
    * Find minimal adjustment set using backdoor criterion
    */
-  private findMinimalAdjustmentSet(
-    X: string,
-    Y: string,
-    backdoorPaths: string[][]
-  ): Set<string> {
+  private findMinimalAdjustmentSet(X: string, Y: string, backdoorPaths: string[][]): Set<string> {
     const adjustmentSet = new Set<string>();
 
     // For each backdoor path, find variables that block it
@@ -327,7 +315,10 @@ export class TrueCausalEngine {
       let innerSum = 0;
       for (const xPrime of xValues) {
         // P(Y|M=m,X=x')
-        const conditions = new Map([[M, m], [X, xPrime]]);
+        const conditions = new Map([
+          [M, m],
+          [X, xPrime],
+        ]);
         const probYGivenMX = this.association(Y, X, xPrime, conditions);
 
         // P(X=x')
@@ -399,28 +390,26 @@ export class TrueCausalEngine {
     const noiseTerms = this.abduction(evidence);
 
     // Step 2: Action - Apply intervention
-    const modifiedEquations = this.applyIntervention(
-      query.variable,
-      query.intervention
-    );
+    const modifiedEquations = this.applyIntervention(query.variable, query.intervention);
 
     // Step 3: Prediction - Compute counterfactual outcome
-    const outcome = this.prediction(
-      query.variable,
-      modifiedEquations,
-      noiseTerms
-    );
+    const outcome = this.prediction(query.variable, modifiedEquations, noiseTerms);
 
     // Calculate confidence based on identifiability
     // Simple confidence calculation based on data availability
-    const confidence = this.data.length > 100 ? 0.9 :
-                      this.data.length > 50 ? 0.7 :
-                      this.data.length > 10 ? 0.5 : 0.3;
+    const confidence =
+      this.data.length > 100
+        ? 0.9
+        : this.data.length > 50
+          ? 0.7
+          : this.data.length > 10
+            ? 0.5
+            : 0.3;
 
     return {
       probability: outcome,
       explanation: `Counterfactual analysis: If ${query.variable} were set to ${query.intervention}, the outcome would change with probability ${outcome.toFixed(2)}`,
-      confidence
+      confidence,
     };
   }
 
@@ -453,10 +442,7 @@ export class TrueCausalEngine {
   /**
    * Apply intervention by modifying structural equations
    */
-  private applyIntervention(
-    variable: string,
-    value: number
-  ): Map<string, StructuralEquation> {
+  private applyIntervention(variable: string, value: number): Map<string, StructuralEquation> {
     const modified = new Map(this.dag.equations);
 
     // Replace equation for intervened variable
@@ -466,8 +452,8 @@ export class TrueCausalEngine {
       equation: () => value,
       noiseDistribution: {
         type: 'uniform',
-        parameters: { min: 0, max: 0 }
-      }
+        parameters: { min: 0, max: 0 },
+      },
     });
 
     return modified;
@@ -518,9 +504,7 @@ export class TrueCausalEngine {
       if (visited.has(node)) return;
       visited.add(node);
 
-      const children = this.dag.edges
-        .filter(e => e.from === node)
-        .map(e => e.to);
+      const children = this.dag.edges.filter(e => e.from === node).map(e => e.to);
 
       for (const child of children) {
         visit(child);
@@ -597,9 +581,7 @@ export class TrueCausalEngine {
       if (visited.has(current)) continue;
       visited.add(current);
 
-      const children = this.dag.edges
-        .filter(e => e.from === current)
-        .map(e => e.to);
+      const children = this.dag.edges.filter(e => e.from === current).map(e => e.to);
 
       queue.push(...children);
     }
@@ -631,9 +613,7 @@ export class TrueCausalEngine {
     while (queue.length > 0) {
       const current = queue.shift()!;
 
-      const parents = this.dag.edges
-        .filter(e => e.to === current)
-        .map(e => e.from);
+      const parents = this.dag.edges.filter(e => e.to === current).map(e => e.from);
 
       for (const parent of parents) {
         if (!ancestors.has(parent)) {
@@ -656,9 +636,7 @@ export class TrueCausalEngine {
     while (queue.length > 0) {
       const current = queue.shift()!;
 
-      const children = this.dag.edges
-        .filter(e => e.from === current)
-        .map(e => e.to);
+      const children = this.dag.edges.filter(e => e.from === current).map(e => e.to);
 
       for (const child of children) {
         if (!descendants.has(child)) {
@@ -696,7 +674,7 @@ export class TrueCausalEngine {
 
     if (variable.type === 'binary') return [0, 1];
     if (variable.domain) {
-      return variable.domain.map(v => typeof v === 'number' ? v : parseFloat(v) || 0);
+      return variable.domain.map(v => (typeof v === 'number' ? v : parseFloat(v) || 0));
     }
 
     // For continuous, return discretized values
@@ -715,11 +693,6 @@ export class TrueCausalEngine {
 
     return matching.length / this.data.length;
   }
-
-
-
-
-
 
   /**
    * Load observational data for analysis
@@ -795,70 +768,100 @@ export class TrueCausalEngine {
 export function createSecurityCausalModel(): TrueCausalEngine {
   const dag: CausalDAG = {
     variables: new Map([
-      ['vulnerability_severity', {
-        id: 'vulnerability_severity',
-        name: 'Vulnerability Severity',
-        type: 'ordinal',
-        observed: true,
-        domain: [0, 1, 2, 3, 4] // low to critical
-      }],
-      ['patch_deployed', {
-        id: 'patch_deployed',
-        name: 'Patch Deployed',
-        type: 'binary',
-        observed: true
-      }],
-      ['attacker_sophistication', {
-        id: 'attacker_sophistication',
-        name: 'Attacker Sophistication',
-        type: 'continuous',
-        observed: false,
-        distribution: 'normal',
-        parameters: { mean: 0.5, std: 0.2 }
-      }],
-      ['network_exposure', {
-        id: 'network_exposure',
-        name: 'Network Exposure',
-        type: 'continuous',
-        observed: true
-      }],
-      ['breach_occurred', {
-        id: 'breach_occurred',
-        name: 'Breach Occurred',
-        type: 'binary',
-        observed: true
-      }],
-      ['downtime_hours', {
-        id: 'downtime_hours',
-        name: 'Downtime Hours',
-        type: 'continuous',
-        observed: true
-      }],
-      ['financial_impact', {
-        id: 'financial_impact',
-        name: 'Financial Impact',
-        type: 'continuous',
-        observed: true
-      }],
-      ['data_sensitivity', {
-        id: 'data_sensitivity',
-        name: 'Data Sensitivity',
-        type: 'ordinal',
-        observed: true,
-        domain: [0, 1, 2, 3] // public, internal, confidential, restricted
-      }],
-      ['alert_fatigue', {
-        id: 'alert_fatigue',
-        name: 'Alert Fatigue Level',
-        type: 'continuous',
-        observed: true
-      }],
-      ['decision_quality', {
-        id: 'decision_quality',
-        name: 'Decision Quality',
-        type: 'continuous',
-        observed: true
-      }]
+      [
+        'vulnerability_severity',
+        {
+          id: 'vulnerability_severity',
+          name: 'Vulnerability Severity',
+          type: 'ordinal',
+          observed: true,
+          domain: [0, 1, 2, 3, 4], // low to critical
+        },
+      ],
+      [
+        'patch_deployed',
+        {
+          id: 'patch_deployed',
+          name: 'Patch Deployed',
+          type: 'binary',
+          observed: true,
+        },
+      ],
+      [
+        'attacker_sophistication',
+        {
+          id: 'attacker_sophistication',
+          name: 'Attacker Sophistication',
+          type: 'continuous',
+          observed: false,
+          distribution: 'normal',
+          parameters: { mean: 0.5, std: 0.2 },
+        },
+      ],
+      [
+        'network_exposure',
+        {
+          id: 'network_exposure',
+          name: 'Network Exposure',
+          type: 'continuous',
+          observed: true,
+        },
+      ],
+      [
+        'breach_occurred',
+        {
+          id: 'breach_occurred',
+          name: 'Breach Occurred',
+          type: 'binary',
+          observed: true,
+        },
+      ],
+      [
+        'downtime_hours',
+        {
+          id: 'downtime_hours',
+          name: 'Downtime Hours',
+          type: 'continuous',
+          observed: true,
+        },
+      ],
+      [
+        'financial_impact',
+        {
+          id: 'financial_impact',
+          name: 'Financial Impact',
+          type: 'continuous',
+          observed: true,
+        },
+      ],
+      [
+        'data_sensitivity',
+        {
+          id: 'data_sensitivity',
+          name: 'Data Sensitivity',
+          type: 'ordinal',
+          observed: true,
+          domain: [0, 1, 2, 3], // public, internal, confidential, restricted
+        },
+      ],
+      [
+        'alert_fatigue',
+        {
+          id: 'alert_fatigue',
+          name: 'Alert Fatigue Level',
+          type: 'continuous',
+          observed: true,
+        },
+      ],
+      [
+        'decision_quality',
+        {
+          id: 'decision_quality',
+          name: 'Decision Quality',
+          type: 'continuous',
+          observed: true,
+        },
+      ],
     ]),
 
     edges: [
@@ -871,81 +874,102 @@ export function createSecurityCausalModel(): TrueCausalEngine {
       { from: 'downtime_hours', to: 'financial_impact' },
       { from: 'data_sensitivity', to: 'financial_impact' },
       { from: 'alert_fatigue', to: 'decision_quality' },
-      { from: 'decision_quality', to: 'patch_deployed' }
+      { from: 'decision_quality', to: 'patch_deployed' },
     ],
 
     equations: new Map([
-      ['breach_occurred', {
-        target: 'breach_occurred',
-        parents: ['vulnerability_severity', 'patch_deployed', 'attacker_sophistication', 'network_exposure'],
-        equation: (parents, noise) => {
-          const vulnSeverity = parents.get('vulnerability_severity') || 0;
-          const patchDeployed = parents.get('patch_deployed') ? 1 : 0;
-          const attackerSoph = parents.get('attacker_sophistication') || 0.5;
-          const networkExp = parents.get('network_exposure') || 0.5;
+      [
+        'breach_occurred',
+        {
+          target: 'breach_occurred',
+          parents: [
+            'vulnerability_severity',
+            'patch_deployed',
+            'attacker_sophistication',
+            'network_exposure',
+          ],
+          equation: (parents, noise) => {
+            const vulnSeverity = parents.get('vulnerability_severity') || 0;
+            const patchDeployed = parents.get('patch_deployed') ? 1 : 0;
+            const attackerSoph = parents.get('attacker_sophistication') || 0.5;
+            const networkExp = parents.get('network_exposure') || 0.5;
 
-          // Logistic function for breach probability
-          const logit = -2 +
-            0.8 * vulnSeverity -
-            3 * patchDeployed +
-            2 * attackerSoph +
-            1.5 * networkExp +
-            noise;
+            // Logistic function for breach probability
+            const logit =
+              -2 +
+              0.8 * vulnSeverity -
+              3 * patchDeployed +
+              2 * attackerSoph +
+              1.5 * networkExp +
+              noise;
 
-          const probability = 1 / (1 + Math.exp(-logit));
-          return Math.random() < probability ? 1 : 0;
+            const probability = 1 / (1 + Math.exp(-logit));
+            return Math.random() < probability ? 1 : 0;
+          },
+          noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 0.5 } },
         },
-        noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 0.5 } }
-      }],
-      ['financial_impact', {
-        target: 'financial_impact',
-        parents: ['breach_occurred', 'downtime_hours', 'data_sensitivity'],
-        equation: (parents, noise) => {
-          const breach = parents.get('breach_occurred') || 0;
-          const downtime = parents.get('downtime_hours') || 0;
-          const dataSens = parents.get('data_sensitivity') || 0;
+      ],
+      [
+        'financial_impact',
+        {
+          target: 'financial_impact',
+          parents: ['breach_occurred', 'downtime_hours', 'data_sensitivity'],
+          equation: (parents, noise) => {
+            const breach = parents.get('breach_occurred') || 0;
+            const downtime = parents.get('downtime_hours') || 0;
+            const dataSens = parents.get('data_sensitivity') || 0;
 
-          // Financial impact in millions
-          const breachCost = breach * (1 + dataSens) * 2; // $2-8M for breach
-          const downtimeCost = downtime * 0.01; // $10k per hour
+            // Financial impact in millions
+            const breachCost = breach * (1 + dataSens) * 2; // $2-8M for breach
+            const downtimeCost = downtime * 0.01; // $10k per hour
 
-          return Math.max(0, breachCost + downtimeCost + noise);
+            return Math.max(0, breachCost + downtimeCost + noise);
+          },
+          noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 0.2 } },
         },
-        noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 0.2 } }
-      }],
-      ['patch_deployed', {
-        target: 'patch_deployed',
-        parents: ['decision_quality'],
-        equation: (parents, noise) => {
-          const quality = parents.get('decision_quality') || 0.5;
-          const probability = quality + noise;
-          return Math.random() < probability ? 1 : 0;
+      ],
+      [
+        'patch_deployed',
+        {
+          target: 'patch_deployed',
+          parents: ['decision_quality'],
+          equation: (parents, noise) => {
+            const quality = parents.get('decision_quality') || 0.5;
+            const probability = quality + noise;
+            return Math.random() < probability ? 1 : 0;
+          },
+          noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 0.1 } },
         },
-        noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 0.1 } }
-      }],
-      ['downtime_hours', {
-        target: 'downtime_hours',
-        parents: ['patch_deployed'],
-        equation: (parents, noise) => {
-          const patched = parents.get('patch_deployed') || 0;
-          return patched ? Math.max(0, 2 + noise) : 0; // 2 hours average if patched
+      ],
+      [
+        'downtime_hours',
+        {
+          target: 'downtime_hours',
+          parents: ['patch_deployed'],
+          equation: (parents, noise) => {
+            const patched = parents.get('patch_deployed') || 0;
+            return patched ? Math.max(0, 2 + noise) : 0; // 2 hours average if patched
+          },
+          noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 1 } },
         },
-        noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 1 } }
-      }],
-      ['decision_quality', {
-        target: 'decision_quality',
-        parents: ['alert_fatigue'],
-        equation: (parents, noise) => {
-          const fatigue = parents.get('alert_fatigue') || 0;
-          return Math.max(0, Math.min(1, 0.9 - 0.5 * fatigue + noise));
+      ],
+      [
+        'decision_quality',
+        {
+          target: 'decision_quality',
+          parents: ['alert_fatigue'],
+          equation: (parents, noise) => {
+            const fatigue = parents.get('alert_fatigue') || 0;
+            return Math.max(0, Math.min(1, 0.9 - 0.5 * fatigue + noise));
+          },
+          noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 0.1 } },
         },
-        noiseDistribution: { type: 'normal', parameters: { mean: 0, std: 0.1 } }
-      }]
+      ],
     ]),
 
     latentConfounders: [
-      { affects: ['attacker_sophistication', 'network_exposure'] } // Threat landscape
-    ]
+      { affects: ['attacker_sophistication', 'network_exposure'] }, // Threat landscape
+    ],
   };
 
   return new TrueCausalEngine(dag);
@@ -956,12 +980,14 @@ export function createSecurityCausalModel(): TrueCausalEngine {
 export const CausalQuerySchema = z.object({
   queryType: z.enum(['association', 'intervention', 'counterfactual']),
   target: z.string(),
-  intervention: z.object({
-    variable: z.string(),
-    value: z.any()
-  }).optional(),
+  intervention: z
+    .object({
+      variable: z.string(),
+      value: z.any(),
+    })
+    .optional(),
   conditions: z.record(z.string(), z.any()).optional(),
-  evidence: z.record(z.string(), z.any()).optional()
+  evidence: z.record(z.string(), z.any()).optional(),
 });
 
 export type CausalQuery = z.infer<typeof CausalQuerySchema>;

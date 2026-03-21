@@ -13,10 +13,7 @@
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
-import {
-  DEFAULT_BIAS_SEVERITY_WEIGHTS,
-  DEFAULT_COUNTERFACTUAL_WEIGHTS,
-} from './constants';
+import { DEFAULT_BIAS_SEVERITY_WEIGHTS, DEFAULT_COUNTERFACTUAL_WEIGHTS } from './constants';
 
 // Re-export constants so existing imports keep working
 export { DEFAULT_BIAS_SEVERITY_WEIGHTS, DEFAULT_COUNTERFACTUAL_WEIGHTS };
@@ -161,11 +158,7 @@ export async function loadNudgeCalibration(
   orgId?: string | null,
   userId?: string | null
 ): Promise<NudgeThresholdCalibration | null> {
-  return loadCalibrationProfile<NudgeThresholdCalibration>(
-    'nudge_threshold',
-    orgId,
-    userId
-  );
+  return loadCalibrationProfile<NudgeThresholdCalibration>('nudge_threshold', orgId, userId);
 }
 
 // ─── Recalibration Functions ────────────────────────────────────────────────
@@ -189,10 +182,7 @@ export async function recalibrateBiasSeverity(
     const outcomes = await prisma.decisionOutcome.findMany({
       where: {
         ...(orgId ? { orgId } : {}),
-        OR: [
-          { confirmedBiases: { isEmpty: false } },
-          { falsPositiveBiases: { isEmpty: false } },
-        ],
+        OR: [{ confirmedBiases: { isEmpty: false } }, { falsPositiveBiases: { isEmpty: false } }],
       },
       select: {
         confirmedBiases: true,
@@ -354,9 +344,7 @@ export async function recalibrateNudgeThresholds(
     });
 
     if (nudges.length < MIN_SAMPLE_SIZE) {
-      log.info(
-        `Insufficient nudge data for calibration: ${nudges.length}/${MIN_SAMPLE_SIZE}`
-      );
+      log.info(`Insufficient nudge data for calibration: ${nudges.length}/${MIN_SAMPLE_SIZE}`);
       return { updated: false, sampleSize: nudges.length };
     }
 
@@ -454,9 +442,7 @@ export async function recalibrateTwinWeights(
     });
 
     if (outcomes.length < MIN_SAMPLE_SIZE) {
-      log.info(
-        `Insufficient twin data for calibration: ${outcomes.length}/${MIN_SAMPLE_SIZE}`
-      );
+      log.info(`Insufficient twin data for calibration: ${outcomes.length}/${MIN_SAMPLE_SIZE}`);
       return { updated: false, sampleSize: outcomes.length };
     }
 

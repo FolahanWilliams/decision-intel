@@ -60,7 +60,12 @@ export function EmptyState({
           <h2 className="text-lg font-semibold mb-sm">{title}</h2>
           <p
             className="text-sm"
-            style={{ maxWidth: 420, margin: '0 auto', lineHeight: 1.7, color: 'var(--text-secondary)' }}
+            style={{
+              maxWidth: 420,
+              margin: '0 auto',
+              lineHeight: 1.7,
+              color: 'var(--text-secondary)',
+            }}
           >
             {description}
           </p>

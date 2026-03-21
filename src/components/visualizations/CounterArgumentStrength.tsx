@@ -192,7 +192,11 @@ export function CounterArgumentStrength({ counterArguments }: CounterArgumentStr
           {sorted.filter(a => a.confidence < 0.4).length} minor
         </span>
         <span>
-          Avg strength: {Math.round((counterArguments.reduce((s, a) => s + a.confidence, 0) / counterArguments.length) * 100)}%
+          Avg strength:{' '}
+          {Math.round(
+            (counterArguments.reduce((s, a) => s + a.confidence, 0) / counterArguments.length) * 100
+          )}
+          %
         </span>
       </div>
     </div>

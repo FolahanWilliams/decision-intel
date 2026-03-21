@@ -631,7 +631,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             {/* Prominent score display */}
             {analysis && (
               <div style={{ textAlign: 'center', marginRight: '8px' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
                   Score
                 </div>
                 <div
@@ -640,11 +648,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     fontWeight: 700,
                     lineHeight: 1,
                     fontFamily: "'JetBrains Mono', monospace",
-                    color: analysis.overallScore >= 70
-                      ? '#22c55e'
-                      : analysis.overallScore >= 40
-                        ? '#f59e0b'
-                        : '#ef4444',
+                    color:
+                      analysis.overallScore >= 70
+                        ? '#22c55e'
+                        : analysis.overallScore >= 40
+                          ? '#f59e0b'
+                          : '#ef4444',
                   }}
                 >
                   {Math.round(analysis.overallScore)}
@@ -654,7 +663,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
             <div className="flex items-center gap-sm">
               {document.status === 'complete' && (
-                <span className="flex items-center gap-sm text-sm" style={{ color: 'var(--success)' }}>
+                <span
+                  className="flex items-center gap-sm text-sm"
+                  style={{ color: 'var(--success)' }}
+                >
                   <CheckCircle size={16} /> Complete
                 </span>
               )}
@@ -677,7 +689,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           style={{
             height: '2px',
             marginTop: 'var(--spacing-md)',
-            background: 'linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+            background:
+              'linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
             borderRadius: '1px',
           }}
         />
@@ -1290,7 +1303,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                           idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
                         cursor: 'pointer',
                         background:
-                          selectedBias?.id === bias.id ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
+                          selectedBias?.id === bias.id
+                            ? 'rgba(255, 255, 255, 0.06)'
+                            : 'transparent',
                         borderLeft:
                           selectedBias?.id === bias.id
                             ? '3px solid var(--accent-primary)'

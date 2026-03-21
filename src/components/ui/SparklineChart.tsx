@@ -48,10 +48,7 @@ export function SparklineChart({
           <stop offset="100%" stopColor={fill} stopOpacity={0} />
         </linearGradient>
       </defs>
-      <path
-        d={fillPath}
-        fill={`url(#spark-fill-${color.replace('#', '')})`}
-      />
+      <path d={fillPath} fill={`url(#spark-fill-${color.replace('#', '')})`} />
       <path
         d={linePath}
         fill="none"

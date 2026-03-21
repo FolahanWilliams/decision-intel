@@ -8,7 +8,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
-import { registerPrompt, getPromptHistory, detectPromptDrift, initializePromptRegistry } from '@/lib/prompts/registry';
+import {
+  registerPrompt,
+  getPromptHistory,
+  detectPromptDrift,
+  initializePromptRegistry,
+} from '@/lib/prompts/registry';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('AdminPrompts');

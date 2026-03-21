@@ -169,13 +169,26 @@ function exportAsCSV(analysis: AnalysisWithRelations): NextResponse {
   });
 
   // Additional metrics
-  if (analysis.factCheck && typeof analysis.factCheck === 'object' && 'score' in analysis.factCheck) {
-    rows.push(`Fact Check,,,Verification score,${(analysis.factCheck as { score?: number }).score || 0}`);
+  if (
+    analysis.factCheck &&
+    typeof analysis.factCheck === 'object' &&
+    'score' in analysis.factCheck
+  ) {
+    rows.push(
+      `Fact Check,,,Verification score,${(analysis.factCheck as { score?: number }).score || 0}`
+    );
   }
 
-  if (analysis.sentiment && typeof analysis.sentiment === 'object' && 'label' in analysis.sentiment && 'score' in analysis.sentiment) {
+  if (
+    analysis.sentiment &&
+    typeof analysis.sentiment === 'object' &&
+    'label' in analysis.sentiment &&
+    'score' in analysis.sentiment
+  ) {
     const sentiment = analysis.sentiment as { label?: string; score?: number };
-    rows.push(`Sentiment,${sentiment.label || 'Unknown'},,Overall sentiment,${sentiment.score || 0}`);
+    rows.push(
+      `Sentiment,${sentiment.label || 'Unknown'},,Overall sentiment,${sentiment.score || 0}`
+    );
   }
 
   const csv = rows.join('\n');
@@ -259,7 +272,7 @@ function exportAsMarkdown(analysis: AnalysisWithRelations): NextResponse {
 
     if (preMortem.failureScenarios?.length) {
       lines.push('### Potential Failure Scenarios');
-      preMortem.failureScenarios.forEach((scenario) => {
+      preMortem.failureScenarios.forEach(scenario => {
         lines.push(`- **${scenario.scenario}** (Likelihood: ${scenario.likelihood})`);
       });
     }
@@ -270,7 +283,9 @@ function exportAsMarkdown(analysis: AnalysisWithRelations): NextResponse {
   if (analysis.versions && analysis.versions.length > 0) {
     lines.push('## Version History');
     analysis.versions.forEach((v: AnalysisVersion) => {
-      lines.push(`- **v${v.version}** (${new Date(v.createdAt).toLocaleDateString()}): Score ${v.overallScore}/100`);
+      lines.push(
+        `- **v${v.version}** (${new Date(v.createdAt).toLocaleDateString()}): Score ${v.overallScore}/100`
+      );
     });
   }
 
@@ -294,7 +309,8 @@ function exportAsPDF(_analysis: AnalysisWithRelations): NextResponse {
   return NextResponse.json(
     {
       error: 'PDF export coming soon',
-      message: 'PDF export functionality is under development. Please use JSON, CSV, or Markdown format for now.',
+      message:
+        'PDF export functionality is under development. Please use JSON, CSV, or Markdown format for now.',
       alternativeFormats: ['json', 'csv', 'markdown'],
     },
     { status: 501 } // Not Implemented

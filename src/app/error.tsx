@@ -27,10 +27,7 @@ export default function RootError({
           <AlertTriangle size={28} style={{ color: 'var(--error)' }} />
         </div>
 
-        <h1
-          className="text-2xl font-semibold"
-          style={{ color: 'var(--text-primary)' }}
-        >
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
           Something went wrong
         </h1>
 

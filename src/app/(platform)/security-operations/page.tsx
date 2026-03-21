@@ -14,7 +14,7 @@ import {
   Target,
   Brain,
   ChevronRight,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import {
   Line,
@@ -30,7 +30,7 @@ import {
   Legend,
   ResponsiveContainer,
   Area,
-  AreaChart
+  AreaChart,
 } from 'recharts';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ const mockKPIs: SecurityKPI[] = [
     trend: 'down',
     target: 15,
     status: 'good',
-    lastUpdated: '2 min ago'
+    lastUpdated: '2 min ago',
   },
   {
     metric: 'MTTR',
@@ -83,7 +83,7 @@ const mockKPIs: SecurityKPI[] = [
     trend: 'down',
     target: 60,
     status: 'good',
-    lastUpdated: '5 min ago'
+    lastUpdated: '5 min ago',
   },
   {
     metric: 'MTTA',
@@ -92,7 +92,7 @@ const mockKPIs: SecurityKPI[] = [
     trend: 'up',
     target: 5,
     status: 'warning',
-    lastUpdated: '1 min ago'
+    lastUpdated: '1 min ago',
   },
   {
     metric: 'Dwell Time',
@@ -101,7 +101,7 @@ const mockKPIs: SecurityKPI[] = [
     trend: 'down',
     target: 48,
     status: 'good',
-    lastUpdated: '10 min ago'
+    lastUpdated: '10 min ago',
   },
   {
     metric: 'False Positive Rate',
@@ -110,7 +110,7 @@ const mockKPIs: SecurityKPI[] = [
     trend: 'down',
     target: 5,
     status: 'good',
-    lastUpdated: '3 min ago'
+    lastUpdated: '3 min ago',
   },
   {
     metric: 'Alert Volume',
@@ -119,8 +119,8 @@ const mockKPIs: SecurityKPI[] = [
     trend: 'up',
     target: 200,
     status: 'warning',
-    lastUpdated: '1 min ago'
-  }
+    lastUpdated: '1 min ago',
+  },
 ];
 
 const mockIssues: WizIssue[] = [
@@ -133,7 +133,7 @@ const mockIssues: WizIssue[] = [
     biasDetected: ['anchoring_bias', 'automation_bias'],
     decisionTime: 15,
     assignee: 'Alice Chen',
-    createdAt: '2024-03-20T10:30:00Z'
+    createdAt: '2024-03-20T10:30:00Z',
   },
   {
     id: 'WIZ-002',
@@ -144,7 +144,7 @@ const mockIssues: WizIssue[] = [
     biasDetected: ['loss_aversion'],
     decisionTime: 120,
     assignee: 'Bob Smith',
-    createdAt: '2024-03-20T09:15:00Z'
+    createdAt: '2024-03-20T09:15:00Z',
   },
   {
     id: 'WIZ-003',
@@ -155,8 +155,8 @@ const mockIssues: WizIssue[] = [
     biasDetected: [],
     decisionTime: 35,
     assignee: 'Carol White',
-    createdAt: '2024-03-20T08:00:00Z'
-  }
+    createdAt: '2024-03-20T08:00:00Z',
+  },
 ];
 
 const mockBiasMetrics: BiasMetric[] = [
@@ -164,7 +164,7 @@ const mockBiasMetrics: BiasMetric[] = [
   { type: 'Automation', count: 18, severity: 'critical', trend: 25 },
   { type: 'Groupthink', count: 12, severity: 'medium', trend: -5 },
   { type: 'Loss Aversion', count: 31, severity: 'high', trend: 10 },
-  { type: 'Confirmation', count: 8, severity: 'low', trend: -20 }
+  { type: 'Confirmation', count: 8, severity: 'low', trend: -20 },
 ];
 
 // ─── Components ──────────────────────────────────────────────────────────────
@@ -172,10 +172,14 @@ const mockBiasMetrics: BiasMetric[] = [
 function KPICard({ kpi }: { kpi: SecurityKPI }) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'good': return 'text-green-500';
-      case 'warning': return 'text-yellow-500';
-      case 'critical': return 'text-red-500';
-      default: return 'text-gray-500';
+      case 'good':
+        return 'text-green-500';
+      case 'warning':
+        return 'text-yellow-500';
+      case 'critical':
+        return 'text-red-500';
+      default:
+        return 'text-gray-500';
     }
   };
 
@@ -200,18 +204,17 @@ function KPICard({ kpi }: { kpi: SecurityKPI }) {
           </div>
           <Badge
             variant="secondary"
-            className={`${isPositiveTrend(kpi.metric, kpi.trend)
-              ? 'bg-green-500/20 text-green-400'
-              : 'bg-red-500/20 text-red-400'
+            className={`${
+              isPositiveTrend(kpi.metric, kpi.trend)
+                ? 'bg-green-500/20 text-green-400'
+                : 'bg-red-500/20 text-red-400'
             }`}
           >
             {getTrendIcon(kpi.trend)}
           </Badge>
         </div>
         <div className="flex items-baseline gap-2 mb-2">
-          <span className={`text-3xl font-bold ${getStatusColor(kpi.status)}`}>
-            {kpi.value}
-          </span>
+          <span className={`text-3xl font-bold ${getStatusColor(kpi.status)}`}>{kpi.value}</span>
           <span className="text-sm text-gray-400">{kpi.unit}</span>
         </div>
         <div className="flex justify-between items-center">
@@ -234,11 +237,16 @@ function KPICard({ kpi }: { kpi: SecurityKPI }) {
 function IssuesList({ issues }: { issues: WizIssue[] }) {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'CRITICAL': return 'bg-red-500/20 text-red-400 border-red-500/50';
-      case 'HIGH': return 'bg-orange-500/20 text-orange-400 border-orange-500/50';
-      case 'MEDIUM': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
-      case 'LOW': return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
-      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
+      case 'CRITICAL':
+        return 'bg-red-500/20 text-red-400 border-red-500/50';
+      case 'HIGH':
+        return 'bg-orange-500/20 text-orange-400 border-orange-500/50';
+      case 'MEDIUM':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
+      case 'LOW':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
     }
   };
 
@@ -250,9 +258,7 @@ function IssuesList({ issues }: { issues: WizIssue[] }) {
             <div className="flex justify-between items-start mb-3">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <Badge className={getSeverityColor(issue.severity)}>
-                    {issue.severity}
-                  </Badge>
+                  <Badge className={getSeverityColor(issue.severity)}>{issue.severity}</Badge>
                   {issue.toxicCombination && (
                     <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/50">
                       <Zap className="w-3 h-3 mr-1" />
@@ -299,7 +305,7 @@ function BiasRadar() {
     { bias: 'Groupthink', current: 45, target: 25, industry: 55 },
     { bias: 'Loss Aversion', current: 70, target: 35, industry: 65 },
     { bias: 'Confirmation', current: 38, target: 20, industry: 50 },
-    { bias: 'Overconfidence', current: 55, target: 30, industry: 48 }
+    { bias: 'Overconfidence', current: 55, target: 30, industry: 48 },
   ];
 
   return (
@@ -307,25 +313,9 @@ function BiasRadar() {
       <RadarChart data={data}>
         <PolarGrid stroke="#374151" />
         <PolarAngleAxis dataKey="bias" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
-        <PolarRadiusAxis
-          angle={90}
-          domain={[0, 100]}
-          tick={{ fill: '#9CA3AF', fontSize: 10 }}
-        />
-        <Radar
-          name="Current"
-          dataKey="current"
-          stroke="#ef4444"
-          fill="#ef4444"
-          fillOpacity={0.3}
-        />
-        <Radar
-          name="Target"
-          dataKey="target"
-          stroke="#22c55e"
-          fill="#22c55e"
-          fillOpacity={0.2}
-        />
+        <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: '#9CA3AF', fontSize: 10 }} />
+        <Radar name="Current" dataKey="current" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
+        <Radar name="Target" dataKey="target" stroke="#22c55e" fill="#22c55e" fillOpacity={0.2} />
         <Radar
           name="Industry Avg"
           dataKey="industry"
@@ -347,7 +337,7 @@ function MTTRTrend() {
     { day: 'Thu', actual: 55, target: 60, withAI: 40 },
     { day: 'Fri', actual: 52, target: 60, withAI: 38 },
     { day: 'Sat', actual: 48, target: 60, withAI: 35 },
-    { day: 'Sun', actual: 45, target: 60, withAI: 32 }
+    { day: 'Sun', actual: 45, target: 60, withAI: 32 },
   ];
 
   return (
@@ -355,12 +345,12 @@ function MTTRTrend() {
       <AreaChart data={data}>
         <defs>
           <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1}/>
+            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1} />
           </linearGradient>
           <linearGradient id="colorAI" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#22c55e" stopOpacity={0.1}/>
+            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#22c55e" stopOpacity={0.1} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -370,7 +360,7 @@ function MTTRTrend() {
           contentStyle={{
             backgroundColor: '#1F2937',
             border: '1px solid #374151',
-            borderRadius: '8px'
+            borderRadius: '8px',
           }}
         />
         <Area
@@ -434,9 +424,7 @@ export default function SecurityOperationsPage() {
             <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          <Button className="bg-gradient-to-r from-blue-500 to-purple-500">
-            Connect to Wiz
-          </Button>
+          <Button className="bg-gradient-to-r from-blue-500 to-purple-500">Connect to Wiz</Button>
         </div>
       </div>
 
@@ -519,7 +507,10 @@ export default function SecurityOperationsPage() {
               <CardContent>
                 <div className="space-y-4">
                   {mockBiasMetrics.map(metric => (
-                    <div key={metric.type} className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50">
+                    <div
+                      key={metric.type}
+                      className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50"
+                    >
                       <div className="flex items-center gap-3">
                         <Brain className="w-5 h-5 text-yellow-400" />
                         <div>
@@ -528,18 +519,23 @@ export default function SecurityOperationsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className={`
+                        <Badge
+                          className={`
                           ${metric.severity === 'critical' ? 'bg-red-500/20 text-red-400' : ''}
                           ${metric.severity === 'high' ? 'bg-orange-500/20 text-orange-400' : ''}
                           ${metric.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : ''}
                           ${metric.severity === 'low' ? 'bg-blue-500/20 text-blue-400' : ''}
-                        `}>
+                        `}
+                        >
                           {metric.severity}
                         </Badge>
-                        <span className={`text-sm font-medium ${
-                          metric.trend > 0 ? 'text-red-400' : 'text-green-400'
-                        }`}>
-                          {metric.trend > 0 ? '+' : ''}{metric.trend}%
+                        <span
+                          className={`text-sm font-medium ${
+                            metric.trend > 0 ? 'text-red-400' : 'text-green-400'
+                          }`}
+                        >
+                          {metric.trend > 0 ? '+' : ''}
+                          {metric.trend}%
                         </span>
                       </div>
                     </div>

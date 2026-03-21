@@ -24,7 +24,7 @@ const WizIssuesRequestSchema = z.object({
   limit: z.number().min(1).max(100).default(50),
   offset: z.number().min(0).default(0),
   includeBiasAnalysis: z.boolean().default(true),
-  includeCausalAnalysis: z.boolean().default(false)
+  includeCausalAnalysis: z.boolean().default(false),
 });
 
 // ─── Helper Functions ────────────────────────────────────────────────────────
@@ -37,7 +37,7 @@ function getWizClient(): WizClient {
     apiUrl: process.env.WIZ_API_URL || 'https://api.wiz.io',
     clientId: process.env.WIZ_CLIENT_ID || '',
     clientSecret: process.env.WIZ_CLIENT_SECRET || '',
-    tenantId: process.env.WIZ_TENANT_ID || ''
+    tenantId: process.env.WIZ_TENANT_ID || '',
   };
 
   if (!config.clientId || !config.clientSecret) {
@@ -75,7 +75,7 @@ async function analyzeDecisionContext(
     teamSize: teamContext?.teamSize || 3,
     automationInvolved: issue.remediation?.automatedFix || false,
     productionSystem: issue.severity === 'CRITICAL',
-    alertVolume: 50 // Would come from real-time metrics
+    alertVolume: 50, // Would come from real-time metrics
   };
 
   const biasResults = detector.detectBias(context);
@@ -84,7 +84,7 @@ async function analyzeDecisionContext(
   return {
     biasesDetected: biasResults.map(b => b.biasType),
     cognitiveRisk: riskAssessment.overallRisk,
-    nudges: biasResults.slice(0, 2).map(b => b.nudgeRecommendation)
+    nudges: biasResults.slice(0, 2).map(b => b.nudgeRecommendation),
   };
 }
 
@@ -107,17 +107,17 @@ async function analyzeCausality(issue: IssueContext): Promise<{
 
   // Map Wiz issue to causal analysis context
   const severityMap: Record<string, 'low' | 'medium' | 'high' | 'critical'> = {
-    'LOW': 'low',
-    'MEDIUM': 'medium',
-    'HIGH': 'high',
-    'CRITICAL': 'critical'
+    LOW: 'low',
+    MEDIUM: 'medium',
+    HIGH: 'high',
+    CRITICAL: 'critical',
   };
 
   const context = {
     vulnerabilitySeverity: issue.severity ? severityMap[issue.severity] || 'medium' : 'medium',
     productionSystem: issue.cloudProvider !== undefined,
     peakTrafficHours: new Date().getHours() >= 9 && new Date().getHours() <= 17,
-    dataClassification: issue.severity === 'CRITICAL' ? 'restricted' : 'internal'
+    dataClassification: issue.severity === 'CRITICAL' ? 'restricted' : 'internal',
   } as const;
 
   const analysis = scenarios.analyzePatchDecision(context);
@@ -130,21 +130,21 @@ async function analyzeCausality(issue: IssueContext): Promise<{
         action: 'patch_now',
         breachRisk: analysis.riskComparison.patchNow.breachRisk,
         downtime: analysis.riskComparison.patchNow.downtime,
-        impact: analysis.riskComparison.patchNow.totalImpact
+        impact: analysis.riskComparison.patchNow.totalImpact,
       },
       {
         action: 'patch_later',
         breachRisk: analysis.riskComparison.patchLater.breachRisk,
         downtime: analysis.riskComparison.patchLater.downtime,
-        impact: analysis.riskComparison.patchLater.totalImpact
+        impact: analysis.riskComparison.patchLater.totalImpact,
       },
       {
         action: 'accept_risk',
         breachRisk: analysis.riskComparison.noAction.breachRisk,
         downtime: analysis.riskComparison.noAction.downtime,
-        impact: analysis.riskComparison.noAction.totalImpact
-      }
-    ]
+        impact: analysis.riskComparison.noAction.totalImpact,
+      },
+    ],
   };
 }
 
@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50,
       offset: searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : 0,
       includeBiasAnalysis: searchParams.get('includeBiasAnalysis') !== 'false',
-      includeCausalAnalysis: searchParams.get('includeCausalAnalysis') === 'true'
+      includeCausalAnalysis: searchParams.get('includeCausalAnalysis') === 'true',
     });
 
     // Initialize Wiz client
@@ -179,16 +179,16 @@ export async function GET(request: NextRequest) {
       status: statusValue ? [statusValue] : undefined,
       cloudProvider: params.cloudProvider,
       limit: params.limit,
-      offset: params.offset
+      offset: params.offset,
     });
 
     // Enhance issues with cognitive analysis
     const enhancedIssues = await Promise.all(
-      issues.map(async (issue) => {
+      issues.map(async issue => {
         const enhanced = {
           ...issue,
           biasAnalysis: undefined as Awaited<ReturnType<typeof analyzeDecisionContext>> | undefined,
-          causalAnalysis: undefined as Awaited<ReturnType<typeof analyzeCausality>> | undefined
+          causalAnalysis: undefined as Awaited<ReturnType<typeof analyzeCausality>> | undefined,
         };
 
         // Add bias analysis if requested
@@ -211,8 +211,8 @@ export async function GET(request: NextRequest) {
       resource: 'wiz_issues',
       details: {
         issueCount: issues.length,
-        filters: params
-      }
+        filters: params,
+      },
     });
 
     return NextResponse.json({
@@ -223,16 +223,15 @@ export async function GET(request: NextRequest) {
           limit: params.limit,
           offset: params.offset,
           hasMore,
-          total: enhancedIssues.length
+          total: enhancedIssues.length,
         },
         metadata: {
           biasAnalysisEnabled: params.includeBiasAnalysis,
           causalAnalysisEnabled: params.includeCausalAnalysis,
-          timestamp: new Date().toISOString()
-        }
-      }
+          timestamp: new Date().toISOString(),
+        },
+      },
     });
-
   } catch (error) {
     logger.error('Error fetching Wiz issues:', error);
 
@@ -259,10 +258,7 @@ export async function POST(request: NextRequest) {
     const { issueId, automated = false, bypassBiasCheck = false } = body;
 
     if (!issueId) {
-      return NextResponse.json(
-        { success: false, error: 'Issue ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'Issue ID is required' }, { status: 400 });
     }
 
     // Initialize clients
@@ -277,7 +273,7 @@ export async function POST(request: NextRequest) {
         dataPointsConsulted: 1,
         teamSize: 1,
         automationInvolved: automated,
-        productionSystem: true
+        productionSystem: true,
       };
 
       const biases = detector.detectBias(biasContext);
@@ -292,9 +288,9 @@ export async function POST(request: NextRequest) {
             biases: biases.map(b => ({
               type: b.biasType,
               severity: b.severity,
-              nudge: b.nudgeRecommendation
+              nudge: b.nudgeRecommendation,
             })),
-            recommendation: 'Please review the decision with your team before proceeding'
+            recommendation: 'Please review the decision with your team before proceeding',
           },
           { status: 400 }
         );
@@ -315,18 +311,17 @@ export async function POST(request: NextRequest) {
           automated,
           bypassBiasCheck,
           jobId: result.jobId,
-          estimatedTime: result.estimatedTime
+          estimatedTime: result.estimatedTime,
         },
         ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: request.headers.get('user-agent') || 'unknown'
-      }
+        userAgent: request.headers.get('user-agent') || 'unknown',
+      },
     });
 
     return NextResponse.json({
       success: true,
-      data: result
+      data: result,
     });
-
   } catch (error) {
     logger.error('Error triggering remediation:', error);
     return NextResponse.json(
@@ -359,14 +354,13 @@ export async function PATCH(request: NextRequest) {
       action: 'VIEW_DOCUMENT', // Using existing action type
       resource: 'wiz_issue',
       resourceId: issueId,
-      details: { newStatus: status, notes }
+      details: { newStatus: status, notes },
     });
 
     return NextResponse.json({
       success: true,
-      data: result
+      data: result,
     });
-
   } catch (error) {
     logger.error('Error updating issue status:', error);
     return NextResponse.json(

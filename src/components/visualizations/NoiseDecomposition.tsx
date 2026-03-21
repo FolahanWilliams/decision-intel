@@ -55,13 +55,7 @@ function CustomContent({ x, y, width, height, name, variance }: TreemapContentPr
       />
       {width > 50 && height > 30 && (
         <>
-          <text
-            x={x + 8}
-            y={y + 16}
-            fill="var(--text-primary)"
-            fontSize={10}
-            fontWeight={500}
-          >
+          <text x={x + 8} y={y + 16} fill="var(--text-primary)" fontSize={10} fontWeight={500}>
             {(name || '').length > Math.floor(width / 7)
               ? (name || '').slice(0, Math.floor(width / 7)) + '…'
               : name}
@@ -86,7 +80,10 @@ function CustomContent({ x, y, width, height, name, variance }: TreemapContentPr
  * Treemap showing which benchmark metrics contribute the most noise.
  * Tile size = variance weight. Color = variance level.
  */
-export function NoiseDecomposition({ benchmarks, noiseScore: _noiseScore }: NoiseDecompositionProps) {
+export function NoiseDecomposition({
+  benchmarks,
+  noiseScore: _noiseScore,
+}: NoiseDecompositionProps) {
   const [selectedMetric, setSelectedMetric] = useState<NoiseBenchmark | null>(null);
 
   const treemapData = useMemo(() => {
@@ -122,26 +119,15 @@ export function NoiseDecomposition({ benchmarks, noiseScore: _noiseScore }: Nois
           <span className="text-sm font-semibold">Noise Decomposition</span>
         </div>
         <div className="flex items-center gap-3 text-[10px]">
-          {highCount > 0 && (
-            <span className="text-red-400">
-              {highCount} high-noise
-            </span>
-          )}
-          {medCount > 0 && (
-            <span className="text-yellow-400">
-              {medCount} medium
-            </span>
-          )}
-          {lowCount > 0 && (
-            <span className="text-emerald-400">
-              {lowCount} low
-            </span>
-          )}
+          {highCount > 0 && <span className="text-red-400">{highCount} high-noise</span>}
+          {medCount > 0 && <span className="text-yellow-400">{medCount} medium</span>}
+          {lowCount > 0 && <span className="text-emerald-400">{lowCount} low</span>}
         </div>
       </div>
 
       <p className="text-[11px] text-muted">
-        Larger tiles = higher deviation from market consensus. Red tiles are the primary noise sources.
+        Larger tiles = higher deviation from market consensus. Red tiles are the primary noise
+        sources.
       </p>
 
       <div style={{ height: 240 }}>
@@ -153,7 +139,7 @@ export function NoiseDecomposition({ benchmarks, noiseScore: _noiseScore }: Nois
             content={<CustomContent x={0} y={0} width={0} height={0} index={0} />}
             onClick={(data: { name: string }) => {
               const found = benchmarks.find(b => b.metric === data.name);
-              setSelectedMetric(prev => prev?.metric === found?.metric ? null : found || null);
+              setSelectedMetric(prev => (prev?.metric === found?.metric ? null : found || null));
             }}
           >
             <Tooltip
@@ -169,7 +155,9 @@ export function NoiseDecomposition({ benchmarks, noiseScore: _noiseScore }: Nois
                 return (
                   <div className="bg-secondary border border-border p-2 text-[11px]">
                     <p className="font-semibold">{d.name}</p>
-                    <p className="text-muted">Doc: {d.documentValue} | Mkt: {d.marketValue}</p>
+                    <p className="text-muted">
+                      Doc: {d.documentValue} | Mkt: {d.marketValue}
+                    </p>
                     <p style={{ color: VARIANCE_COLORS[d.variance] }}>{d.variance} variance</p>
                   </div>
                 );

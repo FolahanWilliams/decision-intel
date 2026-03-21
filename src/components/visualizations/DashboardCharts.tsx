@@ -119,12 +119,7 @@ export function DashboardCharts({
                     style={{
                       fontSize: '22px',
                       fontWeight: 800,
-                      fill:
-                        avgScore >= 70
-                          ? '#22c55e'
-                          : avgScore >= 40
-                            ? '#FBBF24'
-                            : '#ef4444',
+                      fill: avgScore >= 70 ? '#22c55e' : avgScore >= 40 ? '#FBBF24' : '#ef4444',
                       fontFamily: "'JetBrains Mono', monospace",
                     }}
                   >
@@ -149,7 +144,7 @@ export function DashboardCharts({
               </ResponsiveContainer>
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {donutData.map((item) => (
+              {donutData.map(item => (
                 <div
                   key={item.name}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
@@ -204,7 +199,11 @@ export function DashboardCharts({
                       <stop offset="95%" stopColor="rgba(255,255,255,0.05)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="rgba(255,255,255,0.08)"
+                  />
                   <XAxis
                     dataKey="date"
                     axisLine={false}
@@ -260,8 +259,17 @@ export function DashboardCharts({
                       <stop offset="100%" stopColor="rgba(255,255,255,0.15)" stopOpacity={0.5} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.08)" />
-                  <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#52525b' }} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke="rgba(255,255,255,0.08)"
+                  />
+                  <XAxis
+                    type="number"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10, fill: '#52525b' }}
+                  />
                   <YAxis
                     type="category"
                     dataKey="name"

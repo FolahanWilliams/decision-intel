@@ -32,7 +32,7 @@ export default function ComparePage() {
     setLoading(true);
     try {
       const results = await Promise.all(
-        ids.map(async (id) => {
+        ids.map(async id => {
           const res = await fetch(`/api/documents/${id}`);
           if (!res.ok) return null;
           const data = await res.json();
@@ -66,25 +66,26 @@ export default function ComparePage() {
   }, [selectedIds, fetchAnalyses]);
 
   const completeDocs = documents.filter(
-    (d) => d.status === 'complete' && !selectedIds.includes(d.id)
+    d => d.status === 'complete' && !selectedIds.includes(d.id)
   );
 
   const toggleSelection = (docId: string) => {
-    setSelectedIds((prev) => {
-      if (prev.includes(docId)) return prev.filter((id) => id !== docId);
+    setSelectedIds(prev => {
+      if (prev.includes(docId)) return prev.filter(id => id !== docId);
       if (prev.length >= 3) return prev; // max 3
       return [...prev, docId];
     });
   };
 
   const removeSelection = (docId: string) => {
-    setSelectedIds((prev) => prev.filter((id) => id !== docId));
+    setSelectedIds(prev => prev.filter(id => id !== docId));
   };
 
   const scoreDelta = (a: number, b: number) => {
     const diff = a - b;
     if (Math.abs(diff) < 1) return { icon: Minus, label: 'Same', color: 'text-gray-400' };
-    if (diff > 0) return { icon: TrendingUp, label: `+${diff.toFixed(0)}`, color: 'text-green-400' };
+    if (diff > 0)
+      return { icon: TrendingUp, label: `+${diff.toFixed(0)}`, color: 'text-green-400' };
     return { icon: TrendingDown, label: `${diff.toFixed(0)}`, color: 'text-red-400' };
   };
 
@@ -108,8 +109,8 @@ export default function ComparePage() {
           {/* Selected chips */}
           {selectedIds.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {selectedIds.map((id) => {
-                const doc = documents.find((d) => d.id === id);
+              {selectedIds.map(id => {
+                const doc = documents.find(d => d.id === id);
                 return (
                   <span
                     key={id}
@@ -140,7 +141,7 @@ export default function ComparePage() {
             </div>
           ) : completeDocs.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
-              {completeDocs.slice(0, 12).map((doc) => (
+              {completeDocs.slice(0, 12).map(doc => (
                 <button
                   key={doc.id}
                   onClick={() => toggleSelection(doc.id)}
@@ -156,9 +157,7 @@ export default function ComparePage() {
                   <Plus size={16} className="text-gray-400 flex-shrink-0" />
                   <div className="min-w-0">
                     <p className="text-sm text-white truncate">{doc.filename}</p>
-                    <p className="text-xs text-gray-500">
-                      Score: {doc.score ?? 'N/A'}
-                    </p>
+                    <p className="text-xs text-gray-500">Score: {doc.score ?? 'N/A'}</p>
                   </div>
                 </button>
               ))}
@@ -184,7 +183,7 @@ export default function ComparePage() {
                 <thead>
                   <tr className="border-b border-white/10">
                     <th className="text-left text-gray-400 py-3 px-4 font-medium">Metric</th>
-                    {analyses.map((a) => (
+                    {analyses.map(a => (
                       <th key={a.id} className="text-center text-white py-3 px-4 font-medium">
                         <span className="block truncate max-w-[180px]">{a.filename}</span>
                       </th>
@@ -198,7 +197,7 @@ export default function ComparePage() {
                   {/* Overall Score */}
                   <tr className="border-b border-white/5">
                     <td className="py-3 px-4 text-gray-300">Overall Score</td>
-                    {analyses.map((a) => (
+                    {analyses.map(a => (
                       <td key={a.id} className="text-center py-3 px-4">
                         <span
                           className={cn(
@@ -214,44 +213,46 @@ export default function ComparePage() {
                         </span>
                       </td>
                     ))}
-                    {analyses.length === 2 && (() => {
-                      const d = scoreDelta(analyses[0].overallScore, analyses[1].overallScore);
-                      const Icon = d.icon;
-                      return (
-                        <td className={cn('text-center py-3 px-4', d.color)}>
-                          <span className="inline-flex items-center gap-1">
-                            <Icon size={14} /> {d.label}
-                          </span>
-                        </td>
-                      );
-                    })()}
+                    {analyses.length === 2 &&
+                      (() => {
+                        const d = scoreDelta(analyses[0].overallScore, analyses[1].overallScore);
+                        const Icon = d.icon;
+                        return (
+                          <td className={cn('text-center py-3 px-4', d.color)}>
+                            <span className="inline-flex items-center gap-1">
+                              <Icon size={14} /> {d.label}
+                            </span>
+                          </td>
+                        );
+                      })()}
                   </tr>
 
                   {/* Noise Score */}
                   <tr className="border-b border-white/5">
                     <td className="py-3 px-4 text-gray-300">Noise Score</td>
-                    {analyses.map((a) => (
+                    {analyses.map(a => (
                       <td key={a.id} className="text-center py-3 px-4 text-white">
                         {a.noiseScore}
                       </td>
                     ))}
-                    {analyses.length === 2 && (() => {
-                      const d = scoreDelta(analyses[1].noiseScore, analyses[0].noiseScore);
-                      const Icon = d.icon;
-                      return (
-                        <td className={cn('text-center py-3 px-4', d.color)}>
-                          <span className="inline-flex items-center gap-1">
-                            <Icon size={14} /> {d.label}
-                          </span>
-                        </td>
-                      );
-                    })()}
+                    {analyses.length === 2 &&
+                      (() => {
+                        const d = scoreDelta(analyses[1].noiseScore, analyses[0].noiseScore);
+                        const Icon = d.icon;
+                        return (
+                          <td className={cn('text-center py-3 px-4', d.color)}>
+                            <span className="inline-flex items-center gap-1">
+                              <Icon size={14} /> {d.label}
+                            </span>
+                          </td>
+                        );
+                      })()}
                   </tr>
 
                   {/* Bias Count */}
                   <tr className="border-b border-white/5">
                     <td className="py-3 px-4 text-gray-300">Biases Detected</td>
-                    {analyses.map((a) => (
+                    {analyses.map(a => (
                       <td key={a.id} className="text-center py-3 px-4 text-white">
                         {a.biasCount}
                       </td>
@@ -266,15 +267,19 @@ export default function ComparePage() {
                   {/* Fact Check Score */}
                   <tr className="border-b border-white/5">
                     <td className="py-3 px-4 text-gray-300">Fact Check Score</td>
-                    {analyses.map((a) => (
+                    {analyses.map(a => (
                       <td key={a.id} className="text-center py-3 px-4 text-white">
                         {a.factCheckScore !== null ? a.factCheckScore : 'N/A'}
                       </td>
                     ))}
                     {analyses.length === 2 &&
                       analyses[0].factCheckScore !== null &&
-                      analyses[1].factCheckScore !== null && (() => {
-                        const d = scoreDelta(analyses[0].factCheckScore!, analyses[1].factCheckScore!);
+                      analyses[1].factCheckScore !== null &&
+                      (() => {
+                        const d = scoreDelta(
+                          analyses[0].factCheckScore!,
+                          analyses[1].factCheckScore!
+                        );
                         const Icon = d.icon;
                         return (
                           <td className={cn('text-center py-3 px-4', d.color)}>
@@ -295,7 +300,7 @@ export default function ComparePage() {
                 Top Biases by Document
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {analyses.map((a) => (
+                {analyses.map(a => (
                   <div key={a.id} className="p-4 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-sm text-white font-medium mb-2 truncate">{a.filename}</p>
                     {a.topBiases.length > 0 ? (
@@ -315,29 +320,30 @@ export default function ComparePage() {
               </div>
 
               {/* Common biases */}
-              {analyses.length >= 2 && (() => {
-                const allBiasSets = analyses.map((a) => new Set(a.topBiases));
-                const common = [...allBiasSets[0]].filter((b) =>
-                  allBiasSets.every((s) => s.has(b))
-                );
-                if (common.length === 0) return null;
-                return (
-                  <div className="mt-4 p-3 rounded-lg bg-yellow-400/10 border border-yellow-400/20">
-                    <p className="text-xs font-medium text-yellow-400 mb-1">
-                      Common biases across all selected:
-                    </p>
-                    <p className="text-xs text-yellow-300/80">
-                      {common.map((b) => b.replace(/_/g, ' ')).join(', ')}
-                    </p>
-                  </div>
-                );
-              })()}
+              {analyses.length >= 2 &&
+                (() => {
+                  const allBiasSets = analyses.map(a => new Set(a.topBiases));
+                  const common = [...allBiasSets[0]].filter(b => allBiasSets.every(s => s.has(b)));
+                  if (common.length === 0) return null;
+                  return (
+                    <div className="mt-4 p-3 rounded-lg bg-yellow-400/10 border border-yellow-400/20">
+                      <p className="text-xs font-medium text-yellow-400 mb-1">
+                        Common biases across all selected:
+                      </p>
+                      <p className="text-xs text-yellow-300/80">
+                        {common.map(b => b.replace(/_/g, ' ')).join(', ')}
+                      </p>
+                    </div>
+                  );
+                })()}
             </div>
           </div>
         )}
 
         {!loading && analyses.length === 1 && (
-          <div className={cn('p-6 rounded-xl text-center', 'liquid-glass', 'border border-white/10')}>
+          <div
+            className={cn('p-6 rounded-xl text-center', 'liquid-glass', 'border border-white/10')}
+          >
             <p className="text-gray-400">Select at least one more analysis to compare.</p>
           </div>
         )}

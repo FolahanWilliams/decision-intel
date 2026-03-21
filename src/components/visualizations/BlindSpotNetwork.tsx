@@ -29,7 +29,10 @@ interface Edge {
  * Force-directed network showing blind spot relationships.
  * Connected blind spots form "vulnerability clusters."
  */
-export function BlindSpotNetwork({ blindSpots, blindSpotGap: _blindSpotGap }: BlindSpotNetworkProps) {
+export function BlindSpotNetwork({
+  blindSpots,
+  blindSpotGap: _blindSpotGap,
+}: BlindSpotNetworkProps) {
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
   const [hoveredNode, setHoveredNode] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -154,9 +157,7 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap: _blindSpotGap }: Bl
   }, [nodes, edges, width, height]);
 
   if (blindSpots.length === 0) {
-    return (
-      <div className="text-center p-6 text-muted text-sm">No blind spots identified.</div>
-    );
+    return <div className="text-center p-6 text-muted text-sm">No blind spots identified.</div>;
   }
 
   if (positions.length === 0) return null;
@@ -184,7 +185,10 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap: _blindSpotGap }: Bl
         )}
       </div>
 
-      <div ref={containerRef} className="relative border border-border bg-secondary/30 overflow-hidden">
+      <div
+        ref={containerRef}
+        className="relative border border-border bg-secondary/30 overflow-hidden"
+      >
         <svg
           width="100%"
           height={height}
@@ -199,9 +203,7 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap: _blindSpotGap }: Bl
             const cx = clusterPositions.reduce((s, p) => s + p.x, 0) / cluster.length;
             const cy = clusterPositions.reduce((s, p) => s + p.y, 0) / cluster.length;
             const maxDist = Math.max(
-              ...clusterPositions.map(p =>
-                Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2)
-              ),
+              ...clusterPositions.map(p => Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2)),
               30
             );
             return (
@@ -223,8 +225,7 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap: _blindSpotGap }: Bl
             const s = positions[e.source];
             const t = positions[e.target];
             const isHighlighted =
-              activeNode !== null &&
-              (e.source === activeNode || e.target === activeNode);
+              activeNode !== null && (e.source === activeNode || e.target === activeNode);
             return (
               <line
                 key={`edge-${i}`}
@@ -244,8 +245,7 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap: _blindSpotGap }: Bl
             const isActive = activeNode === i;
             const isConnected = connectedNodes.has(i);
             const nodeRadius = isActive ? 22 : 18;
-            const opacity =
-              activeNode !== null && !isActive && !isConnected ? 0.3 : 1;
+            const opacity = activeNode !== null && !isActive && !isConnected ? 0.3 : 1;
 
             return (
               <g
@@ -280,7 +280,9 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap: _blindSpotGap }: Bl
                   cy={pos.y}
                   r={nodeRadius}
                   fill={isActive ? 'rgba(251, 146, 60, 0.25)' : 'rgba(251, 146, 60, 0.12)'}
-                  stroke={isActive || isConnected ? 'rgba(251, 146, 60, 0.6)' : 'rgba(251, 146, 60, 0.3)'}
+                  stroke={
+                    isActive || isConnected ? 'rgba(251, 146, 60, 0.6)' : 'rgba(251, 146, 60, 0.3)'
+                  }
                   strokeWidth={isActive ? 2 : 1}
                 />
                 <text
@@ -306,9 +308,7 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap: _blindSpotGap }: Bl
       {selectedNode !== null && blindSpots[selectedNode] && (
         <div className="p-3 border border-orange-500/30 bg-orange-500/5 text-xs space-y-2">
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-orange-400">
-              {blindSpots[selectedNode].name}
-            </span>
+            <span className="font-semibold text-orange-400">{blindSpots[selectedNode].name}</span>
             <button
               onClick={() => setSelectedNode(null)}
               className="text-muted hover:text-foreground"

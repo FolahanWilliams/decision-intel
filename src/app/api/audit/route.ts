@@ -92,7 +92,11 @@ export async function GET(req: NextRequest) {
         s = `'${s}`;
       }
       // Always quote fields that contain special characters (commas, quotes, newlines, tabs, semicolons)
-      return s.includes(',') || s.includes('"') || s.includes('\n') || s.includes('\t') || s.includes(';')
+      return s.includes(',') ||
+        s.includes('"') ||
+        s.includes('\n') ||
+        s.includes('\t') ||
+        s.includes(';')
         ? `"${s.replace(/"/g, '""')}"`
         : s;
     };

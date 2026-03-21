@@ -33,28 +33,38 @@ export const WizIssueSchema = z.object({
   resourceType: z.string().optional(),
   cloudProvider: z.enum(['AWS', 'AZURE', 'GCP', 'KUBERNETES']).optional(),
   region: z.string().optional(),
-  toxicCombination: z.object({
-    attackPath: z.array(z.object({
-      nodeId: z.string(),
-      nodeType: z.string(),
-      risk: z.string()
-    })),
-    exploitability: z.number(),
-    impact: z.number(),
-    riskScore: z.number()
-  }).optional(),
-  affectedResources: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    type: z.string(),
-    tags: z.record(z.string(), z.string())
-  })).optional(),
-  remediation: z.object({
-    recommendation: z.string(),
-    automatedFix: z.boolean(),
-    script: z.string().optional(),
-    estimatedTime: z.number().optional()
-  }).optional()
+  toxicCombination: z
+    .object({
+      attackPath: z.array(
+        z.object({
+          nodeId: z.string(),
+          nodeType: z.string(),
+          risk: z.string(),
+        })
+      ),
+      exploitability: z.number(),
+      impact: z.number(),
+      riskScore: z.number(),
+    })
+    .optional(),
+  affectedResources: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        type: z.string(),
+        tags: z.record(z.string(), z.string()),
+      })
+    )
+    .optional(),
+  remediation: z
+    .object({
+      recommendation: z.string(),
+      automatedFix: z.boolean(),
+      script: z.string().optional(),
+      estimatedTime: z.number().optional(),
+    })
+    .optional(),
 });
 
 export const WizControlSchema = z.object({
@@ -64,11 +74,15 @@ export const WizControlSchema = z.object({
   category: z.string(),
   enabled: z.boolean(),
   severity: z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']),
-  compliance: z.array(z.object({
-    framework: z.string(),
-    requirement: z.string(),
-    status: z.enum(['PASS', 'FAIL', 'NOT_APPLICABLE'])
-  })).optional()
+  compliance: z
+    .array(
+      z.object({
+        framework: z.string(),
+        requirement: z.string(),
+        status: z.enum(['PASS', 'FAIL', 'NOT_APPLICABLE']),
+      })
+    )
+    .optional(),
 });
 
 export const WizSecurityGraphNodeSchema = z.object({
@@ -76,16 +90,22 @@ export const WizSecurityGraphNodeSchema = z.object({
   type: z.enum(['COMPUTE', 'STORAGE', 'NETWORK', 'IDENTITY', 'DATA']),
   name: z.string(),
   properties: z.record(z.string(), z.any()),
-  relationships: z.array(z.object({
-    targetId: z.string(),
-    type: z.string(),
-    properties: z.record(z.string(), z.any()).optional()
-  })),
-  riskFactors: z.array(z.object({
-    type: z.string(),
-    severity: z.string(),
-    description: z.string()
-  })).optional()
+  relationships: z.array(
+    z.object({
+      targetId: z.string(),
+      type: z.string(),
+      properties: z.record(z.string(), z.any()).optional(),
+    })
+  ),
+  riskFactors: z
+    .array(
+      z.object({
+        type: z.string(),
+        severity: z.string(),
+        description: z.string(),
+      })
+    )
+    .optional(),
 });
 
 export type WizIssue = z.infer<typeof WizIssueSchema>;
@@ -223,7 +243,7 @@ const QUERIES = {
         automatedRemediation
       }
     }
-  `
+  `,
 };
 
 const MUTATIONS = {
@@ -264,7 +284,7 @@ const MUTATIONS = {
         }
       }
     }
-  `
+  `,
 };
 
 // ─── Wiz API Client ──────────────────────────────────────────────────────────
@@ -311,17 +331,14 @@ export class WizClient {
   /**
    * Execute a GraphQL query against the Wiz API
    */
-  private async graphqlRequest<T>(
-    query: string,
-    variables?: Record<string, unknown>
-  ): Promise<T> {
+  private async graphqlRequest<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
     const token = await this.authenticate();
 
     const response = await fetch(`${this.config.apiUrl}/graphql`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         'X-API-Version': this.config.apiVersion || 'v1',
       },
       body: JSON.stringify({
@@ -359,14 +376,13 @@ export class WizClient {
     if (params?.status) filters.status = params.status;
     if (params?.cloudProvider) filters.cloudProvider = params.cloudProvider;
 
-    const result = await this.graphqlRequest<{ issues: { nodes: unknown[]; pageInfo: { hasNextPage: boolean } } }>(
-      QUERIES.GET_ISSUES,
-      {
-        filters,
-        limit: params?.limit || 100,
-        offset: params?.offset || 0,
-      }
-    );
+    const result = await this.graphqlRequest<{
+      issues: { nodes: unknown[]; pageInfo: { hasNextPage: boolean } };
+    }>(QUERIES.GET_ISSUES, {
+      filters,
+      limit: params?.limit || 100,
+      offset: params?.offset || 0,
+    });
 
     return {
       issues: result.issues.nodes.map((node: unknown) => WizIssueSchema.parse(node)),
@@ -386,10 +402,17 @@ export class WizClient {
       path: Array<{ nodeId: string; nodeType: string; action: string }>;
     }>;
   }> {
-    const result = await this.graphqlRequest<{ securityGraph: { node: unknown; attackPaths: Array<{ id: string; likelihood: number; impact: number; path: Array<{ nodeId: string; nodeType: string; action: string }> }> } }>(
-      QUERIES.GET_SECURITY_GRAPH,
-      { nodeId }
-    );
+    const result = await this.graphqlRequest<{
+      securityGraph: {
+        node: unknown;
+        attackPaths: Array<{
+          id: string;
+          likelihood: number;
+          impact: number;
+          path: Array<{ nodeId: string; nodeType: string; action: string }>;
+        }>;
+      };
+    }>(QUERIES.GET_SECURITY_GRAPH, { nodeId });
 
     return {
       node: WizSecurityGraphNodeSchema.parse(result.securityGraph.node),
@@ -400,24 +423,29 @@ export class WizClient {
   /**
    * Get toxic combinations (high-risk security patterns)
    */
-  async getToxicCombinations(params?: {
-    severity?: WizIssue['severity'];
-    limit?: number;
-  }): Promise<Array<{
-    id: string;
-    title: string;
-    riskScore: number;
-    components: Record<string, unknown>;
-    mitigationSteps: string[];
-    automatedRemediation: boolean;
-  }>> {
-    const result = await this.graphqlRequest<{ toxicCombinations: Array<{ id: string; title: string; riskScore: number; components: Record<string, unknown>; mitigationSteps: string[]; automatedRemediation: boolean }> }>(
-      QUERIES.GET_TOXIC_COMBINATIONS,
-      {
-        severity: params?.severity,
-        limit: params?.limit || 50,
-      }
-    );
+  async getToxicCombinations(params?: { severity?: WizIssue['severity']; limit?: number }): Promise<
+    Array<{
+      id: string;
+      title: string;
+      riskScore: number;
+      components: Record<string, unknown>;
+      mitigationSteps: string[];
+      automatedRemediation: boolean;
+    }>
+  > {
+    const result = await this.graphqlRequest<{
+      toxicCombinations: Array<{
+        id: string;
+        title: string;
+        riskScore: number;
+        components: Record<string, unknown>;
+        mitigationSteps: string[];
+        automatedRemediation: boolean;
+      }>;
+    }>(QUERIES.GET_TOXIC_COMBINATIONS, {
+      severity: params?.severity,
+      limit: params?.limit || 50,
+    });
 
     return result.toxicCombinations;
   }
@@ -430,10 +458,9 @@ export class WizClient {
     status: WizIssue['status'],
     notes?: string
   ): Promise<{ success: boolean; issue: Partial<WizIssue> }> {
-    const result = await this.graphqlRequest<{ updateIssueStatus: { success: boolean; issue: Partial<WizIssue> } }>(
-      MUTATIONS.UPDATE_ISSUE_STATUS,
-      { issueId, status, notes }
-    );
+    const result = await this.graphqlRequest<{
+      updateIssueStatus: { success: boolean; issue: Partial<WizIssue> };
+    }>(MUTATIONS.UPDATE_ISSUE_STATUS, { issueId, status, notes });
 
     return result.updateIssueStatus;
   }
@@ -450,10 +477,14 @@ export class WizClient {
     estimatedTime: number;
     status: string;
   }> {
-    const result = await this.graphqlRequest<{ triggerRemediation: { success: boolean; jobId: string; estimatedTime: number; status: string } }>(
-      MUTATIONS.TRIGGER_REMEDIATION,
-      { issueId, automated }
-    );
+    const result = await this.graphqlRequest<{
+      triggerRemediation: {
+        success: boolean;
+        jobId: string;
+        estimatedTime: number;
+        status: string;
+      };
+    }>(MUTATIONS.TRIGGER_REMEDIATION, { issueId, automated });
 
     return result.triggerRemediation;
   }
@@ -475,14 +506,22 @@ export class WizClient {
       expiresAt?: string;
     };
   }> {
-    const result = await this.graphqlRequest<{ createException: { success: boolean; exception: { id: string; issueId: string; reason: string; createdAt: string; expiresAt?: string } } }>(
-      MUTATIONS.CREATE_EXCEPTION,
-      {
-        issueId,
-        reason,
-        expiresAt: expiresAt?.toISOString(),
-      }
-    );
+    const result = await this.graphqlRequest<{
+      createException: {
+        success: boolean;
+        exception: {
+          id: string;
+          issueId: string;
+          reason: string;
+          createdAt: string;
+          expiresAt?: string;
+        };
+      };
+    }>(MUTATIONS.CREATE_EXCEPTION, {
+      issueId,
+      reason,
+      expiresAt: expiresAt?.toISOString(),
+    });
 
     return result.createException;
   }
@@ -500,15 +539,18 @@ export class WizClient {
 
     ws.onopen = async () => {
       const token = await this.authenticate();
-      ws.send(JSON.stringify({
-        type: 'connection_init',
-        payload: { authorization: `Bearer ${token}` }
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'connection_init',
+          payload: { authorization: `Bearer ${token}` },
+        })
+      );
 
-      ws.send(JSON.stringify({
-        type: 'start',
-        payload: {
-          query: `
+      ws.send(
+        JSON.stringify({
+          type: 'start',
+          payload: {
+            query: `
             subscription OnIssueUpdate($filters: IssueFilters) {
               issueUpdated(filters: $filters) {
                 id
@@ -519,12 +561,13 @@ export class WizClient {
               }
             }
           `,
-          variables: { filters }
-        }
-      }));
+            variables: { filters },
+          },
+        })
+      );
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = event => {
       const message = JSON.parse(event.data);
       if (message.type === 'data') {
         const issue = WizIssueSchema.parse(message.payload.data.issueUpdated);
@@ -561,10 +604,7 @@ export class WizWebhookHandler {
     // Implementation of webhook signature verification
     // This would use HMAC-SHA256 or similar
     const crypto = await import('crypto');
-    const expectedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(payload)
-      .digest('hex');
+    const expectedSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
 
     return signature === `sha256=${expectedSignature}`;
   }
