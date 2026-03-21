@@ -44,10 +44,11 @@ function extractNumeric(val: string): number | null {
   return num;
 }
 
+// Aligned with design system: --error, --warning, --success
 const VARIANCE_COLORS: Record<string, string> = {
-  High: '#ef4444',
-  Medium: '#eab308',
-  Low: '#10b981',
+  High: '#f87171',
+  Medium: '#fbbf24',
+  Low: '#34d399',
 };
 
 export function ClaimDeviationScatter({ benchmarks }: ClaimDeviationScatterProps) {
@@ -235,11 +236,11 @@ export function ClaimDeviationScatter({ benchmarks }: ClaimDeviationScatterProps
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <div className="p-2 bg-black/10">
+            <div className="p-2 bg-muted/20">
               <span className="text-muted block">Document Claims</span>
               <span className="font-semibold text-foreground">{selectedPoint.rawDocValue}</span>
             </div>
-            <div className="p-2 bg-black/10">
+            <div className="p-2 bg-muted/20">
               <span className="text-muted block">Market Consensus</span>
               <span className="font-semibold text-foreground">{selectedPoint.rawMarketValue}</span>
             </div>

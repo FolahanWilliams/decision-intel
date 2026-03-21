@@ -95,20 +95,12 @@ export function SwotTab({ swotAnalysis }: SwotTabProps) {
 
         {/* Strategic Advice (always visible) */}
         {swotAnalysis.strategicAdvice && activeView !== 'matrix' && (
-          <div
-            className="card p-4"
-            style={{
-              background: 'linear-gradient(to right, #0f172a, #1e293b)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-            }}
-          >
-            <h4
-              className="font-semibold mb-2 flex items-center gap-2"
-              style={{ color: '#FBBF24' }}
-            >
+          <div className="card p-4 border border-border bg-secondary/50">
+            <h4 className="font-semibold mb-2 flex items-center gap-2 text-warning">
+
               <Sparkles className="w-4 h-4" /> Strategic Advice
             </h4>
-            <p className="text-slate-300 text-sm leading-relaxed">
+            <p className="text-foreground/70 text-sm leading-relaxed">
               {swotAnalysis.strategicAdvice}
             </p>
           </div>

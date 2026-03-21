@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 
 interface AnimatedNoiseGaugeProps {
   /** Noise score 0-100 (higher = more noise) */
@@ -24,15 +24,26 @@ export function AnimatedNoiseGauge({
   const frameRef = useRef<number>(0);
   const startTimeRef = useRef<number>(0);
 
+  const easeOutBack = useCallback((t: number): number => {
+    const c1 = 1.70158;
+    const c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  }, []);
+
   useEffect(() => {
     const duration = 1400; // ms
 
-    // Ease-out-back: overshoots slightly then settles
-    const easeOutBack = (t: number): number => {
-      const c1 = 1.70158;
-      const c3 = c1 + 1;
-      return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-    };
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      // Use rAF to avoid synchronous setState within effect body
+      const id = requestAnimationFrame(() => {
+        setAnimatedNoise(noiseScore);
+        setAnimatedConsistency(consistencyScore);
+      });
+      return () => cancelAnimationFrame(id);
+    }
+
+    startTimeRef.current = 0;
 
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) startTimeRef.current = timestamp;
@@ -48,19 +59,9 @@ export function AnimatedNoiseGauge({
       }
     };
 
-    // Check reduced motion
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      setAnimatedNoise(noiseScore);
-      setAnimatedConsistency(consistencyScore);
-      return;
-    }
-
-    startTimeRef.current = 0;
     frameRef.current = requestAnimationFrame(animate);
-
     return () => cancelAnimationFrame(frameRef.current);
-  }, [noiseScore, consistencyScore]);
+  }, [noiseScore, consistencyScore, easeOutBack]);
 
   const halfSize = size / 2;
   const strokeWidth = 14;
@@ -72,9 +73,9 @@ export function AnimatedNoiseGauge({
   const consistencyOffset = circumference - (animatedConsistency / 100) * circumference;
 
   const noiseColor =
-    noiseScore > 70 ? '#ef4444' : noiseScore > 40 ? '#eab308' : '#10b981';
+    noiseScore > 70 ? 'var(--error)' : noiseScore > 40 ? 'var(--warning)' : 'var(--success)';
   const consistencyColor =
-    consistencyScore > 70 ? '#10b981' : consistencyScore > 40 ? '#eab308' : '#ef4444';
+    consistencyScore > 70 ? 'var(--success)' : consistencyScore > 40 ? 'var(--warning)' : 'var(--error)';
 
   // Needle angle for the noise gauge (0° = left, 180° = right)
   const needleAngle = (animatedNoise / 100) * 180;
@@ -88,7 +89,7 @@ export function AnimatedNoiseGauge({
       {/* Noise Gauge */}
       <div className="flex flex-col items-center">
         <div className="relative" style={{ width: size, height: halfSize + 20 }}>
-          <svg width={size} height={halfSize + 20} viewBox={`0 0 ${size} ${halfSize + 20}`}>
+          <svg width={size} height={halfSize + 20} viewBox={`0 0 ${size} ${halfSize + 20}`} role="img" aria-label={`Noise level gauge: ${Math.round(noiseScore)} out of 100`}>
             {/* Background arc */}
             <path
               d={`M ${strokeWidth + 4} ${halfSize} A ${radius} ${radius} 0 0 1 ${size - strokeWidth - 4} ${halfSize}`}
@@ -147,7 +148,7 @@ export function AnimatedNoiseGauge({
       {/* Consistency Gauge */}
       <div className="flex flex-col items-center">
         <div className="relative" style={{ width: size, height: halfSize + 20 }}>
-          <svg width={size} height={halfSize + 20} viewBox={`0 0 ${size} ${halfSize + 20}`}>
+          <svg width={size} height={halfSize + 20} viewBox={`0 0 ${size} ${halfSize + 20}`} role="img" aria-label={`Consistency gauge: ${Math.round(consistencyScore)} out of 100`}>
             <path
               d={`M ${strokeWidth + 4} ${halfSize} A ${radius} ${radius} 0 0 1 ${size - strokeWidth - 4} ${halfSize}`}
               fill="none"

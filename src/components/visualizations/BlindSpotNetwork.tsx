@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { CognitiveAnalysisResult } from '@/types';
 import { EyeOff } from 'lucide-react';
 
@@ -29,7 +29,7 @@ interface Edge {
  * Force-directed network showing blind spot relationships.
  * Connected blind spots form "vulnerability clusters."
  */
-export function BlindSpotNetwork({ blindSpots, blindSpotGap }: BlindSpotNetworkProps) {
+export function BlindSpotNetwork({ blindSpots, blindSpotGap: _blindSpotGap }: BlindSpotNetworkProps) {
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
   const [hoveredNode, setHoveredNode] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -94,11 +94,9 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap }: BlindSpotNetworkP
     };
   }, [blindSpots, width, height]);
 
-  // Run simple force simulation
-  const [positions, setPositions] = useState<{ x: number; y: number }[]>([]);
-
-  useEffect(() => {
-    if (nodes.length === 0) return;
+  // Run simple force simulation (pure computation, no side effects)
+  const positions = useMemo(() => {
+    if (nodes.length === 0) return [];
 
     const pos = nodes.map(n => ({ x: n.x, y: n.y }));
     const vel = nodes.map(() => ({ vx: 0, vy: 0 }));
@@ -152,7 +150,7 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap }: BlindSpotNetworkP
       }
     }
 
-    setPositions(pos.map(p => ({ x: p.x, y: p.y })));
+    return pos.map(p => ({ x: p.x, y: p.y }));
   }, [nodes, edges, width, height]);
 
   if (blindSpots.length === 0) {
@@ -186,7 +184,7 @@ export function BlindSpotNetwork({ blindSpots, blindSpotGap }: BlindSpotNetworkP
         )}
       </div>
 
-      <div ref={containerRef} className="relative border border-border bg-black/10 overflow-hidden">
+      <div ref={containerRef} className="relative border border-border bg-secondary/30 overflow-hidden">
         <svg
           width="100%"
           height={height}

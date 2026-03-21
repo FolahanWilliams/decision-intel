@@ -16,10 +16,11 @@ const VARIANCE_WEIGHTS: Record<string, number> = {
   Low: 1,
 };
 
+// Aligned with design system: --error, --warning, --success
 const VARIANCE_COLORS: Record<string, string> = {
-  High: '#ef4444',
-  Medium: '#eab308',
-  Low: '#10b981',
+  High: '#f87171',
+  Medium: '#fbbf24',
+  Low: '#34d399',
 };
 
 interface TreemapContentProps {
@@ -85,7 +86,7 @@ function CustomContent({ x, y, width, height, name, variance }: TreemapContentPr
  * Treemap showing which benchmark metrics contribute the most noise.
  * Tile size = variance weight. Color = variance level.
  */
-export function NoiseDecomposition({ benchmarks, noiseScore }: NoiseDecompositionProps) {
+export function NoiseDecomposition({ benchmarks, noiseScore: _noiseScore }: NoiseDecompositionProps) {
   const [selectedMetric, setSelectedMetric] = useState<NoiseBenchmark | null>(null);
 
   const treemapData = useMemo(() => {
@@ -191,15 +192,15 @@ export function NoiseDecomposition({ benchmarks, noiseScore }: NoiseDecompositio
             </button>
           </div>
           <div className="grid grid-cols-3 gap-2">
-            <div className="p-2 bg-black/10">
+            <div className="p-2 bg-muted/20">
               <span className="text-muted block text-[10px]">Document</span>
               <span className="font-semibold">{selectedMetric.documentValue}</span>
             </div>
-            <div className="p-2 bg-black/10">
+            <div className="p-2 bg-muted/20">
               <span className="text-muted block text-[10px]">Market</span>
               <span className="font-semibold">{selectedMetric.marketValue}</span>
             </div>
-            <div className="p-2 bg-black/10">
+            <div className="p-2 bg-muted/20">
               <span className="text-muted block text-[10px]">Variance</span>
               <span
                 className="font-semibold"

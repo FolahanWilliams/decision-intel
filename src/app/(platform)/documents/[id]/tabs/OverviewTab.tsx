@@ -174,7 +174,7 @@ export function OverviewTab({
             <div className="space-y-4">
               {biases.map((bias, i) => {
                 const severityKey = bias.severity.toLowerCase();
-                const badgeStyle = SEVERITY_BADGE_STYLES[severityKey] ?? 'bg-slate-700 text-slate-300';
+                const badgeStyle = SEVERITY_BADGE_STYLES[severityKey] ?? 'bg-muted/30 text-muted';
                 const borderStyle = SEVERITY_BORDER_STYLES[severityKey] ?? 'border-border';
 
                 return (
@@ -202,10 +202,10 @@ export function OverviewTab({
                         height={20}
                       />
                     </div>
-                    <p className="text-sm italic text-slate-300 border-l-2 border-slate-700 pl-3 my-2">
+                    <p className="text-sm italic text-foreground/70 border-l-2 border-border pl-3 my-2">
                       &quot;{bias.excerpt}&quot;
                     </p>
-                    <p className="text-sm text-slate-400 mb-3">{bias.explanation}</p>
+                    <p className="text-sm text-muted mb-3">{bias.explanation}</p>
 
                     {(bias as unknown as ExtendedBiasInstance).researchInsight && (
                       <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/20">
@@ -224,7 +224,7 @@ export function OverviewTab({
                           {(bias as unknown as ExtendedBiasInstance).researchInsight.title}{' '}
                           <ExternalLink size={10} className="inline ml-1" />
                         </a>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-muted">
                           {(bias as unknown as ExtendedBiasInstance).researchInsight.summary}
                         </p>
                       </div>
