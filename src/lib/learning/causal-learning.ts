@@ -108,7 +108,6 @@ export async function learnCausalEdges(orgId: string): Promise<CausalWeight[]> {
 
     // Compute causal weights
     const totalFailures = outcomes.filter(o => o.outcome === 'failure').length;
-    const _totalSuccesses = outcomes.filter(o => o.outcome === 'success').length;
     const baseFailureRate = totalFailures / outcomes.length;
 
     const weights: CausalWeight[] = [];
