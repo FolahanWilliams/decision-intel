@@ -21,6 +21,7 @@ import {
   BookOpen,
   Users,
   Zap,
+  Shield,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -342,6 +343,17 @@ export default function Sidebar() {
             label="Bias Library"
             description="Learn about cognitive biases"
             active={pathname === '/dashboard/bias-library'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+
+          <SectionLabel collapsed={collapsed}>Security Operations</SectionLabel>
+          <NavItem
+            href="/security-operations"
+            icon={<Shield size={18} />}
+            label="SOC Dashboard"
+            description="Wiz integration & KPI tracking"
+            active={pathname === '/security-operations'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
