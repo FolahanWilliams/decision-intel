@@ -198,3 +198,95 @@ export function useMeeting(id: string | null) {
 
   return { meeting: data ?? null, isLoading, error, mutate };
 }
+
+// ─── Speaker Profiles & Quality Prediction Hooks ──────────────────────────
+
+export interface QualitySignal {
+  signal: string;
+  value: number;
+  impact: number;
+  description: string;
+}
+
+export interface QualityPrediction {
+  predictedScore: number;
+  confidence: number;
+  signals: QualitySignal[];
+  recommendations: string[];
+}
+
+export interface QualityPredictionResponse {
+  meetingId: string;
+  prediction: QualityPrediction;
+  dataCompleteness: 'partial' | 'full';
+  note: string;
+}
+
+export interface SpeakerProfileResponse {
+  profile: {
+    name: string;
+    meetingsAnalyzed: number;
+    totalSpeakingTime: number;
+    biasProfile: Array<{
+      biasType: string;
+      totalCount: number;
+      avgSeverity: number;
+      meetingsWithBias: number;
+      trend: 'increasing' | 'decreasing' | 'stable';
+    }>;
+    dominanceTrend: Array<{ meetingDate: string; meetingId: string; score: number }>;
+    dissenterTrend: Array<{ meetingDate: string; meetingId: string; score: number }>;
+    riskFactors: string[];
+    strengths: string[];
+  };
+}
+
+export interface TeamDynamicsResponse {
+  snapshot: {
+    orgId: string;
+    totalMeetingsAnalyzed: number;
+    speakers: Array<{
+      name: string;
+      meetingsAnalyzed: number;
+      avgDominance: number;
+      avgDissent: number;
+    }>;
+    dominantSpeakers: string[];
+    dissenters: string[];
+    mostBalancedMeetings: Array<{ meetingId: string; title: string; balanceScore: number }>;
+    cognitiveDiversityScore: number;
+    redFlags: string[];
+  };
+}
+
+export function useMeetingQuality(meetingId: string | null) {
+  const { data, error, isLoading } = useSWR<QualityPredictionResponse>(
+    meetingId ? `/api/meetings/${meetingId}/quality` : null,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  );
+
+  return { prediction: data?.prediction ?? null, dataCompleteness: data?.dataCompleteness, isLoading, error };
+}
+
+export function useTeamDynamics(orgId: string | null) {
+  const { data, error, isLoading, mutate } = useSWR<TeamDynamicsResponse>(
+    orgId ? `/api/meetings/speakers?orgId=${orgId}` : null,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  );
+
+  return { snapshot: data?.snapshot ?? null, isLoading, error, mutate };
+}
+
+export function useSpeakerProfile(speakerName: string | null, orgId: string | null) {
+  const { data, error, isLoading } = useSWR<SpeakerProfileResponse>(
+    speakerName && orgId
+      ? `/api/meetings/speakers?speaker=${encodeURIComponent(speakerName)}&orgId=${orgId}`
+      : null,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 30000 }
+  );
+
+  return { profile: data?.profile ?? null, isLoading, error };
+}

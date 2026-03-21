@@ -613,3 +613,25 @@ model CalibrationProfile {
   @@index([userId])
   @@index([profileType])
 }
+
+// ─── Public API Keys ──────────────────────────────────────────────────────
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  userId      String
+  orgId       String?
+  name        String
+  keyHash     String    @unique
+  keyPrefix   String    // First 8 chars of the key for display (e.g., "di_live_a1b2...")
+  scopes      String[]  // ["analyze", "documents", "outcomes", "insights"]
+  rateLimit   Int       @default(100) // requests per hour
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([keyHash])
+  @@index([userId])
+  @@index([keyPrefix])
+}
