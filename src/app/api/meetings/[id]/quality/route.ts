@@ -36,10 +36,7 @@ function parseKeyDecisions(raw: unknown): KeyDecision[] {
   );
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const supabase = await createClient();
@@ -80,10 +77,7 @@ export async function GET(
     }
 
     if (meeting.status !== 'analyzed' && meeting.status !== 'complete') {
-      return NextResponse.json(
-        { error: 'Meeting has not been analyzed yet' },
-        { status: 422 }
-      );
+      return NextResponse.json({ error: 'Meeting has not been analyzed yet' }, { status: 422 });
     }
 
     const speakerBiases = parseSpeakerBiases(meeting.speakerBiases);
@@ -112,9 +106,6 @@ export async function GET(
     });
   } catch (error) {
     log.error('Quality prediction API failed:', error);
-    return NextResponse.json(
-      { error: 'Failed to compute quality prediction' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to compute quality prediction' }, { status: 500 });
   }
 }

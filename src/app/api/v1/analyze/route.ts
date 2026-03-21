@@ -27,10 +27,7 @@ export async function POST(request: NextRequest) {
     const authResult = await validateApiKey(request);
     if (!authResult.success) {
       const err = authResult as ValidateError;
-      return NextResponse.json(
-        { error: err.error },
-        { status: err.status, headers: err.headers }
-      );
+      return NextResponse.json({ error: err.error }, { status: err.status, headers: err.headers });
     }
     const { context } = authResult;
 
@@ -47,7 +44,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON in request body.' }, { status: 400 });
     }
 
-    const { content, filename, options: _options } = body as {
+    const {
+      content,
+      filename,
+      options: _options,
+    } = body as {
       content?: string;
       filename?: string;
       options?: { skipBoardroom?: boolean };
@@ -61,7 +62,9 @@ export async function POST(request: NextRequest) {
     }
     if (content.length > MAX_CONTENT_LENGTH) {
       return NextResponse.json(
-        { error: `Content exceeds maximum length of ${MAX_CONTENT_LENGTH.toLocaleString()} characters (got ${content.length.toLocaleString()}).` },
+        {
+          error: `Content exceeds maximum length of ${MAX_CONTENT_LENGTH.toLocaleString()} characters (got ${content.length.toLocaleString()}).`,
+        },
         { status: 400 }
       );
     }
@@ -139,17 +142,15 @@ export async function POST(request: NextRequest) {
 
     let analysisResult;
     try {
-      analysisResult = await runAnalysis(
-        content,
-        document.id,
-        context.userId
-      );
+      analysisResult = await runAnalysis(content, document.id, context.userId);
     } catch (pipelineErr) {
       // Mark document as errored
-      await prisma.document.update({
-        where: { id: document.id },
-        data: { status: 'error' },
-      }).catch(() => {});
+      await prisma.document
+        .update({
+          where: { id: document.id },
+          data: { status: 'error' },
+        })
+        .catch(() => {});
 
       log.error('Analysis pipeline failed:', pipelineErr);
       return NextResponse.json(

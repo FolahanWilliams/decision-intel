@@ -266,7 +266,12 @@ export function useMeetingQuality(meetingId: string | null) {
     { revalidateOnFocus: false, dedupingInterval: 30000 }
   );
 
-  return { prediction: data?.prediction ?? null, dataCompleteness: data?.dataCompleteness, isLoading, error };
+  return {
+    prediction: data?.prediction ?? null,
+    dataCompleteness: data?.dataCompleteness,
+    isLoading,
+    error,
+  };
 }
 
 export function useTeamDynamics(orgId: string | null) {

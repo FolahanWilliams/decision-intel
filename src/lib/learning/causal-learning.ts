@@ -78,7 +78,13 @@ export async function learnCausalEdges(orgId: string): Promise<CausalWeight[]> {
     // Build per-bias-type outcome statistics
     const biasOutcomes = new Map<
       string,
-      { failures: number; successes: number; partials: number; impactSum: number; impactCount: number }
+      {
+        failures: number;
+        successes: number;
+        partials: number;
+        impactSum: number;
+        impactCount: number;
+      }
     >();
 
     for (const outcome of outcomes) {
@@ -91,7 +97,11 @@ export async function learnCausalEdges(orgId: string): Promise<CausalWeight[]> {
 
       for (const biasType of biasTypes) {
         const stats = biasOutcomes.get(biasType) || {
-          failures: 0, successes: 0, partials: 0, impactSum: 0, impactCount: 0,
+          failures: 0,
+          successes: 0,
+          partials: 0,
+          impactSum: 0,
+          impactCount: 0,
         };
 
         if (isFailure) stats.failures++;
@@ -120,14 +130,15 @@ export async function learnCausalEdges(orgId: string): Promise<CausalWeight[]> {
 
       // Correlation: how much does this bias increase failure rate vs baseline
       // Positive = bias makes failures more likely; negative = bias is benign
-      const outcomeCorrelation = Number(
-        (biasFailureRate - baseFailureRate).toFixed(3)
-      );
+      const outcomeCorrelation = Number((biasFailureRate - baseFailureRate).toFixed(3));
 
       // Danger multiplier: ratio of bias failure rate to base failure rate
-      const dangerMultiplier = baseFailureRate > 0
-        ? Number((biasFailureRate / baseFailureRate).toFixed(2))
-        : biasFailureRate > 0 ? 2.0 : 1.0;
+      const dangerMultiplier =
+        baseFailureRate > 0
+          ? Number((biasFailureRate / baseFailureRate).toFixed(2))
+          : biasFailureRate > 0
+            ? 2.0
+            : 1.0;
 
       weights.push({
         biasType,
@@ -177,7 +188,8 @@ export async function generateCausalInsights(orgId: string): Promise<CausalInsig
     if (weights.length === 0) {
       insights.push({
         type: 'noise',
-        message: 'Not enough outcome data to generate causal insights. Track at least 5 decision outcomes.',
+        message:
+          'Not enough outcome data to generate causal insights. Track at least 5 decision outcomes.',
         confidence: 0,
         dataPoints: 0,
       });
@@ -266,12 +278,15 @@ export async function generateCausalInsights(orgId: string): Promise<CausalInsig
     return insights;
   } catch (error) {
     log.error('Failed to generate causal insights:', error);
-    return [{
-      type: 'noise',
-      message: 'Unable to generate causal insights. This may be due to insufficient outcome data.',
-      confidence: 0,
-      dataPoints: 0,
-    }];
+    return [
+      {
+        type: 'noise',
+        message:
+          'Unable to generate causal insights. This may be due to insufficient outcome data.',
+        confidence: 0,
+        dataPoints: 0,
+      },
+    ];
   }
 }
 
@@ -303,7 +318,5 @@ export async function getOrgCausalProfile(orgId: string): Promise<OrgCausalProfi
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function formatBiasName(biasType: string): string {
-  return biasType
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }

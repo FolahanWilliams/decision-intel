@@ -45,10 +45,16 @@ export async function POST(request: NextRequest) {
 
     // Validate name
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json({ error: '"name" is required and must be a non-empty string.' }, { status: 400 });
+      return NextResponse.json(
+        { error: '"name" is required and must be a non-empty string.' },
+        { status: 400 }
+      );
     }
     if (name.length > 100) {
-      return NextResponse.json({ error: '"name" must be 100 characters or fewer.' }, { status: 400 });
+      return NextResponse.json(
+        { error: '"name" must be 100 characters or fewer.' },
+        { status: 400 }
+      );
     }
 
     // Validate scopes
@@ -61,7 +67,9 @@ export async function POST(request: NextRequest) {
     const invalidScopes = scopes.filter((s): s is string => !VALID_SCOPES.includes(s as Scope));
     if (invalidScopes.length > 0) {
       return NextResponse.json(
-        { error: `Invalid scopes: [${invalidScopes.join(', ')}]. Valid scopes: [${VALID_SCOPES.join(', ')}]` },
+        {
+          error: `Invalid scopes: [${invalidScopes.join(', ')}]. Valid scopes: [${VALID_SCOPES.join(', ')}]`,
+        },
         { status: 400 }
       );
     }
@@ -85,7 +93,9 @@ export async function POST(request: NextRequest) {
 
     if (activeKeyCount >= MAX_KEYS_PER_USER) {
       return NextResponse.json(
-        { error: `Maximum of ${MAX_KEYS_PER_USER} active API keys allowed. Revoke an existing key first.` },
+        {
+          error: `Maximum of ${MAX_KEYS_PER_USER} active API keys allowed. Revoke an existing key first.`,
+        },
         { status: 409 }
       );
     }
