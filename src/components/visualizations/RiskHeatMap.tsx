@@ -140,6 +140,9 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
                       <span className="text-white font-bold text-lg drop-shadow-md">
                         {cell.count}
                       </span>
+                      <span className="text-white/80 text-[9px] leading-tight drop-shadow-md">
+                        {cellStyle.label}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -164,21 +167,29 @@ export function RiskHeatMap({ risks = [] }: RiskHeatMapProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex justify-center gap-4 mt-6">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3  bg-success/70" />
+      <div className="flex justify-center gap-4 mt-6" role="list" aria-label="Risk severity legend">
+        <div className="flex items-center gap-2" role="listitem" aria-label="Low severity - green">
+          <div className="w-4 h-4 bg-success/70 flex items-center justify-center">
+            <span className="text-[8px] font-bold text-white leading-none" aria-hidden="true">{'\u2713'}</span>
+          </div>
           <span className="text-xs text-muted">Low</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3  bg-warning" />
+        <div className="flex items-center gap-2" role="listitem" aria-label="Medium severity - amber">
+          <div className="w-4 h-4 bg-warning flex items-center justify-center">
+            <span className="text-[8px] font-bold text-white leading-none" aria-hidden="true">{'\u2014'}</span>
+          </div>
           <span className="text-xs text-muted">Medium</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3  bg-accent-primary" />
+        <div className="flex items-center gap-2" role="listitem" aria-label="High severity - blue">
+          <div className="w-4 h-4 bg-accent-primary flex items-center justify-center">
+            <span className="text-[8px] font-bold text-white leading-none" aria-hidden="true">!</span>
+          </div>
           <span className="text-xs text-muted">High</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3  bg-error" />
+        <div className="flex items-center gap-2" role="listitem" aria-label="Critical severity - red">
+          <div className="w-4 h-4 bg-error flex items-center justify-center">
+            <span className="text-[8px] font-bold text-white leading-none" aria-hidden="true">{'\u2716'}</span>
+          </div>
           <span className="text-xs text-muted">Critical</span>
         </div>
       </div>
