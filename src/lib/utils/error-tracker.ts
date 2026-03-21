@@ -116,8 +116,8 @@ class ErrorTracker {
     // Include stack trace but only the first meaningful line
     if (error.stack) {
       const stackLines = error.stack.split('\n');
-      const firstRelevantLine = stackLines.find(line =>
-        line.includes('at ') && !line.includes('node_modules')
+      const firstRelevantLine = stackLines.find(
+        line => line.includes('at ') && !line.includes('node_modules')
       );
       if (firstRelevantLine) {
         parts.push(firstRelevantLine.trim());
@@ -162,7 +162,10 @@ class ErrorTracker {
   /**
    * Persist error to the database
    */
-  private async persistError(details: Prisma.InputJsonObject, context: ErrorContext): Promise<void> {
+  private async persistError(
+    details: Prisma.InputJsonObject,
+    context: ErrorContext
+  ): Promise<void> {
     try {
       await prisma.auditLog.create({
         data: {
@@ -193,10 +196,15 @@ class ErrorTracker {
       });
 
       // Group by fingerprint and count occurrences
-      const grouped = new Map<string, (typeof errors)[number] & { count: number; lastOccurred: Date }>();
+      const grouped = new Map<
+        string,
+        (typeof errors)[number] & { count: number; lastOccurred: Date }
+      >();
 
       for (const error of errors) {
-        const fingerprint = (error.details as Record<string, unknown>)?.fingerprint as string | undefined;
+        const fingerprint = (error.details as Record<string, unknown>)?.fingerprint as
+          | string
+          | undefined;
         if (fingerprint) {
           const existing = grouped.get(fingerprint);
           if (existing) {
@@ -246,11 +254,13 @@ export function withErrorTracking<T extends (...args: any[]) => Promise<any>>(
       const req = args[0] as Record<string, unknown> | undefined;
       const context: ErrorContext = {
         ...defaultContext,
-        route: (req?.url as string) || (req?.nextUrl as Record<string, unknown>)?.pathname as string,
+        route:
+          (req?.url as string) || ((req?.nextUrl as Record<string, unknown>)?.pathname as string),
         method: req?.method as string,
-        userAgent: typeof (req?.headers as Record<string, unknown>)?.get === 'function'
-          ? ((req?.headers as { get: (key: string) => string }).get('user-agent'))
-          : undefined,
+        userAgent:
+          typeof (req?.headers as Record<string, unknown>)?.get === 'function'
+            ? (req?.headers as { get: (key: string) => string }).get('user-agent')
+            : undefined,
       };
 
       await trackError(error, context);

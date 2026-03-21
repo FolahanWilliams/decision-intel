@@ -2,15 +2,7 @@
 
 import { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Info,
-  X,
-  Undo,
-  Loader2,
-} from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, Info, X, Undo, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info' | 'loading';
@@ -77,7 +69,7 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
 
     const interval = setInterval(() => {
       setProgress(prev => {
-        const next = prev - (100 / (toast.duration! / 100));
+        const next = prev - 100 / (toast.duration! / 100);
         if (next <= 0) {
           onRemove();
           return 0;
@@ -98,11 +90,11 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       style={{ bottom: `${index * 80 + 20}px` }}
       className={cn(
-        "fixed right-4 z-50",
-        "min-w-[320px] max-w-[420px]",
-        "liquid-glass backdrop-blur-xl",
-        "border rounded-lg shadow-lg",
-        "p-4 pr-12",
+        'fixed right-4 z-50',
+        'min-w-[320px] max-w-[420px]',
+        'liquid-glass backdrop-blur-xl',
+        'border rounded-lg shadow-lg',
+        'p-4 pr-12',
         colors[toast.type]
       )}
     >
@@ -111,9 +103,7 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
         <div className="flex-shrink-0 mt-0.5">{icons[toast.type]}</div>
         <div className="flex-1 min-w-0">
           <h4 className="font-medium text-sm">{toast.title}</h4>
-          {toast.description && (
-            <p className="mt-1 text-xs opacity-90">{toast.description}</p>
-          )}
+          {toast.description && <p className="mt-1 text-xs opacity-90">{toast.description}</p>}
 
           {/* Actions */}
           {(toast.action || toast.onUndo) && (
@@ -125,9 +115,9 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
                     onRemove();
                   }}
                   className={cn(
-                    "text-xs font-medium px-2 py-1 rounded",
-                    "bg-white/20 hover:bg-white/30",
-                    "transition-colors"
+                    'text-xs font-medium px-2 py-1 rounded',
+                    'bg-white/20 hover:bg-white/30',
+                    'transition-colors'
                   )}
                 >
                   {toast.action.label}
@@ -140,10 +130,10 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
                     onRemove();
                   }}
                   className={cn(
-                    "inline-flex items-center gap-1",
-                    "text-xs font-medium px-2 py-1 rounded",
-                    "bg-white/20 hover:bg-white/30",
-                    "transition-colors"
+                    'inline-flex items-center gap-1',
+                    'text-xs font-medium px-2 py-1 rounded',
+                    'bg-white/20 hover:bg-white/30',
+                    'transition-colors'
                   )}
                 >
                   <Undo className="w-3 h-3" />
@@ -159,9 +149,9 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
       <button
         onClick={onRemove}
         className={cn(
-          "absolute top-3 right-3",
-          "p-1 rounded-md",
-          "hover:bg-white/20 transition-colors"
+          'absolute top-3 right-3',
+          'p-1 rounded-md',
+          'hover:bg-white/20 transition-colors'
         )}
         aria-label="Close notification"
       >

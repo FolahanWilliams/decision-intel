@@ -212,7 +212,7 @@ export async function GET(req: NextRequest) {
       return new NextResponse(null, {
         status: 304, // Not Modified
         headers: {
-          'ETag': etag,
+          ETag: etag,
           'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
         },
       });
@@ -246,8 +246,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(responseData, {
       headers: {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300', // Cache for 60s, serve stale for 5min
-        'ETag': etag,
-        'Vary': 'Accept-Encoding', // Ensure proper caching with compression
+        ETag: etag,
+        Vary: 'Accept-Encoding', // Ensure proper caching with compression
       },
     });
   } catch (error) {

@@ -52,14 +52,17 @@ interface EnhancedDecisionRadarProps {
   showWhatIf?: boolean;
 }
 
-const AXIS_CONFIG: Record<string, {
-  label: string;
-  description: string;
-  icon: React.ReactNode;
-  color: string;
-  threshold: number;
-  weight: number;
-}> = {
+const AXIS_CONFIG: Record<
+  string,
+  {
+    label: string;
+    description: string;
+    icon: React.ReactNode;
+    color: string;
+    threshold: number;
+    weight: number;
+  }
+> = {
   quality: {
     label: 'Quality',
     description: 'Overall decision quality and reasoning depth',
@@ -122,7 +125,10 @@ interface RadarTooltipPayloadItem {
   };
 }
 
-function CustomRadarTooltip({ active, payload }: {
+function CustomRadarTooltip({
+  active,
+  payload,
+}: {
   active?: boolean;
   payload?: RadarTooltipPayloadItem[];
 }) {
@@ -197,7 +203,7 @@ export function EnhancedDecisionRadar({
       (sum, [key, value]) => sum + value * (AXIS_CONFIG[key]?.weight || 1),
       0
     );
-    return Math.round((weightedSum / totalWeight));
+    return Math.round(weightedSum / totalWeight);
   }, []);
 
   // Prepare chart data
@@ -207,9 +213,10 @@ export function EnhancedDecisionRadar({
       const config = AXIS_CONFIG[key];
       const benchmark = benchmarkData?.[key as keyof DecisionRadarData];
       const target = targetData?.[key as keyof DecisionRadarData];
-      const historical = selectedHistorical !== null && historicalData[selectedHistorical]
-        ? historicalData[selectedHistorical].data[key as keyof DecisionRadarData]
-        : null;
+      const historical =
+        selectedHistorical !== null && historicalData[selectedHistorical]
+          ? historicalData[selectedHistorical].data[key as keyof DecisionRadarData]
+          : null;
 
       return {
         axis: config?.label || key,
@@ -225,7 +232,19 @@ export function EnhancedDecisionRadar({
         isHovered: hoveredAxis === key,
       };
     });
-  }, [data, whatIfData, whatIfMode, benchmarkData, targetData, showBenchmark, showTarget, selectedAxis, hoveredAxis, selectedHistorical, historicalData]);
+  }, [
+    data,
+    whatIfData,
+    whatIfMode,
+    benchmarkData,
+    targetData,
+    showBenchmark,
+    showTarget,
+    selectedAxis,
+    hoveredAxis,
+    selectedHistorical,
+    historicalData,
+  ]);
 
   // Animation for historical playback
   useEffect(() => {
@@ -252,20 +271,26 @@ export function EnhancedDecisionRadar({
   }, [data, onThresholdAlert]);
 
   // Handle axis interaction
-  const handleAxisClick = useCallback((axisKey: string) => {
-    if (!interactive) return;
-    setSelectedAxis(prev => prev === axisKey ? null : axisKey);
-    onAxisClick?.(axisKey);
-  }, [interactive, onAxisClick]);
+  const handleAxisClick = useCallback(
+    (axisKey: string) => {
+      if (!interactive) return;
+      setSelectedAxis(prev => (prev === axisKey ? null : axisKey));
+      onAxisClick?.(axisKey);
+    },
+    [interactive, onAxisClick]
+  );
 
   // Calculate delta from benchmark
   const deltaFromBenchmark = useMemo(() => {
     if (!benchmarkData) return null;
-    return Object.entries(data).reduce((acc, [key, value]) => {
-      const benchmark = benchmarkData[key as keyof DecisionRadarData];
-      acc[key] = value - benchmark;
-      return acc;
-    }, {} as Record<string, number>);
+    return Object.entries(data).reduce(
+      (acc, [key, value]) => {
+        const benchmark = benchmarkData[key as keyof DecisionRadarData];
+        acc[key] = value - benchmark;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }, [data, benchmarkData]);
 
   // What-if scenario handler
@@ -283,13 +308,17 @@ export function EnhancedDecisionRadar({
             <button
               onClick={() => setShowBenchmark(!showBenchmark)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                 showBenchmark
-                  ? "bg-white/20 text-white"
-                  : "bg-white/5 text-white/60 hover:bg-white/10"
+                  ? 'bg-white/20 text-white'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
               )}
             >
-              {showBenchmark ? <Eye className="w-3 h-3 inline mr-1" /> : <EyeOff className="w-3 h-3 inline mr-1" />}
+              {showBenchmark ? (
+                <Eye className="w-3 h-3 inline mr-1" />
+              ) : (
+                <EyeOff className="w-3 h-3 inline mr-1" />
+              )}
               Benchmark
             </button>
           )}
@@ -297,13 +326,15 @@ export function EnhancedDecisionRadar({
             <button
               onClick={() => setShowTarget(!showTarget)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-                showTarget
-                  ? "bg-white/20 text-white"
-                  : "bg-white/5 text-white/60 hover:bg-white/10"
+                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                showTarget ? 'bg-white/20 text-white' : 'bg-white/5 text-white/60 hover:bg-white/10'
               )}
             >
-              {showTarget ? <Eye className="w-3 h-3 inline mr-1" /> : <EyeOff className="w-3 h-3 inline mr-1" />}
+              {showTarget ? (
+                <Eye className="w-3 h-3 inline mr-1" />
+              ) : (
+                <EyeOff className="w-3 h-3 inline mr-1" />
+              )}
               Target
             </button>
           )}
@@ -314,10 +345,10 @@ export function EnhancedDecisionRadar({
                 if (!whatIfMode) setWhatIfData(data);
               }}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                 whatIfMode
-                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/50"
-                  : "bg-white/5 text-white/60 hover:bg-white/10"
+                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
               )}
             >
               <Sliders className="w-3 h-3 inline mr-1" />
@@ -337,7 +368,9 @@ export function EnhancedDecisionRadar({
             </button>
             <select
               value={selectedHistorical ?? ''}
-              onChange={(e) => setSelectedHistorical(e.target.value ? parseInt(e.target.value) : null)}
+              onChange={e =>
+                setSelectedHistorical(e.target.value ? parseInt(e.target.value) : null)
+              }
               className="px-2 py-1 rounded-lg bg-white/10 text-xs border border-white/20"
             >
               <option value="">Current</option>
@@ -359,22 +392,32 @@ export function EnhancedDecisionRadar({
             <div className="flex items-center gap-3 mt-1">
               <span className="text-xs text-white/60">
                 Weighted Score:
-                <span className={cn(
-                  "ml-1 font-bold",
-                  calculateWeightedScore(whatIfMode ? whatIfData : data) >= 70 ? "text-success" : "text-warning"
-                )}>
+                <span
+                  className={cn(
+                    'ml-1 font-bold',
+                    calculateWeightedScore(whatIfMode ? whatIfData : data) >= 70
+                      ? 'text-success'
+                      : 'text-warning'
+                  )}
+                >
                   {calculateWeightedScore(whatIfMode ? whatIfData : data)}
                 </span>
               </span>
               {deltaFromBenchmark && (
                 <span className="text-xs text-white/60">
                   vs Benchmark:
-                  <span className={cn(
-                    "ml-1 font-bold",
-                    Object.values(deltaFromBenchmark).reduce((a, b) => a + b, 0) >= 0 ? "text-success" : "text-error"
-                  )}>
+                  <span
+                    className={cn(
+                      'ml-1 font-bold',
+                      Object.values(deltaFromBenchmark).reduce((a, b) => a + b, 0) >= 0
+                        ? 'text-success'
+                        : 'text-error'
+                    )}
+                  >
                     {Object.values(deltaFromBenchmark).reduce((a, b) => a + b, 0) >= 0 ? '+' : ''}
-                    {Object.values(deltaFromBenchmark).reduce((a, b) => a + b, 0).toFixed(1)}
+                    {Object.values(deltaFromBenchmark)
+                      .reduce((a, b) => a + b, 0)
+                      .toFixed(1)}
                   </span>
                 </span>
               )}
@@ -384,10 +427,7 @@ export function EnhancedDecisionRadar({
 
         <ResponsiveContainer width="100%" height={300}>
           <RadarChart data={chartData}>
-            <PolarGrid
-              stroke="rgba(255,255,255,0.1)"
-              radialLines={true}
-            />
+            <PolarGrid stroke="rgba(255,255,255,0.1)" radialLines={true} />
             <PolarAngleAxis
               dataKey="axis"
               tick={({ x, y, payload }) => {
@@ -476,7 +516,7 @@ export function EnhancedDecisionRadar({
               fill="#22c55e"
               fillOpacity={0.25}
               strokeWidth={2}
-              onMouseEnter={(data) => data.key && setHoveredAxis(String(data.key))}
+              onMouseEnter={data => data.key && setHoveredAxis(String(data.key))}
               onMouseLeave={() => setHoveredAxis(null)}
             />
 
@@ -496,10 +536,10 @@ export function EnhancedDecisionRadar({
                 key={key}
                 whileHover={{ scale: 1.02 }}
                 className={cn(
-                  "p-2 rounded-lg cursor-pointer transition-all",
-                  "bg-white/5 hover:bg-white/10",
-                  selectedAxis === key && "ring-1 ring-white/30",
-                  isLow && "ring-1 ring-warning/50"
+                  'p-2 rounded-lg cursor-pointer transition-all',
+                  'bg-white/5 hover:bg-white/10',
+                  selectedAxis === key && 'ring-1 ring-white/30',
+                  isLow && 'ring-1 ring-warning/50'
                 )}
                 onClick={() => handleAxisClick(key)}
               >
@@ -517,11 +557,11 @@ export function EnhancedDecisionRadar({
                   </span>
                   <span className="text-xs text-white/40">/100</span>
                   {delta !== null && delta !== undefined && (
-                    <span className={cn(
-                      "text-xs ml-auto",
-                      delta >= 0 ? "text-success" : "text-error"
-                    )}>
-                      {delta >= 0 ? '+' : ''}{delta.toFixed(0)}
+                    <span
+                      className={cn('text-xs ml-auto', delta >= 0 ? 'text-success' : 'text-error')}
+                    >
+                      {delta >= 0 ? '+' : ''}
+                      {delta.toFixed(0)}
                     </span>
                   )}
                 </div>
@@ -540,7 +580,7 @@ export function EnhancedDecisionRadar({
                         min="0"
                         max="100"
                         value={whatIfData[key as keyof DecisionRadarData]}
-                        onChange={(e) => handleWhatIfChange(key, parseInt(e.target.value))}
+                        onChange={e => handleWhatIfChange(key, parseInt(e.target.value))}
                         className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
                         style={{
                           background: `linear-gradient(to right, ${config.color} ${value}%, rgba(255,255,255,0.2) ${value}%)`,
@@ -579,14 +619,19 @@ export function EnhancedDecisionRadar({
                   <span className="font-semibold text-blue-400">What-If Scenario</span>
                   <div className="text-xs text-white/60 mt-1">
                     New weighted score:
-                    <span className={cn(
-                      "ml-1 font-bold",
-                      calculateWeightedScore(whatIfData) >= 70 ? "text-success" : "text-warning"
-                    )}>
+                    <span
+                      className={cn(
+                        'ml-1 font-bold',
+                        calculateWeightedScore(whatIfData) >= 70 ? 'text-success' : 'text-warning'
+                      )}
+                    >
                       {calculateWeightedScore(whatIfData)}
                     </span>
                     <span className="ml-2">
-                      ({calculateWeightedScore(whatIfData) - calculateWeightedScore(data) >= 0 ? '+' : ''}
+                      (
+                      {calculateWeightedScore(whatIfData) - calculateWeightedScore(data) >= 0
+                        ? '+'
+                        : ''}
                       {calculateWeightedScore(whatIfData) - calculateWeightedScore(data)})
                     </span>
                   </div>

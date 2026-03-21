@@ -37,10 +37,7 @@ export function NoiseTab({ noiseScore, noiseStats, noiseBenchmarks }: NoiseTabPr
             <h4>Noise & Consistency Overview</h4>
           </div>
           <div className="card-body">
-            <AnimatedNoiseGauge
-              noiseScore={noiseScore}
-              consistencyScore={100 - noiseScore}
-            />
+            <AnimatedNoiseGauge noiseScore={noiseScore} consistencyScore={100 - noiseScore} />
           </div>
         </div>
 
@@ -61,10 +58,7 @@ export function NoiseTab({ noiseScore, noiseStats, noiseBenchmarks }: NoiseTabPr
                   <h4>Noise Sources</h4>
                 </div>
                 <div className="card-body">
-                  <NoiseDecomposition
-                    benchmarks={benchmarks}
-                    noiseScore={noiseScore}
-                  />
+                  <NoiseDecomposition benchmarks={benchmarks} noiseScore={noiseScore} />
                 </div>
               </div>
             </div>

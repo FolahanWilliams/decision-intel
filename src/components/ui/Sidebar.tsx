@@ -601,7 +601,9 @@ function NavItem({
           textDecoration: 'none',
           backdropFilter: active || hovered ? 'blur(12px)' : 'none',
           WebkitBackdropFilter: active || hovered ? 'blur(12px)' : 'none',
-          boxShadow: active ? '0 1px 0 rgba(255,255,255,0.15) inset, 0 4px 12px rgba(0,0,0,0.4)' : 'none',
+          boxShadow: active
+            ? '0 1px 0 rgba(255,255,255,0.15) inset, 0 4px 12px rgba(0,0,0,0.4)'
+            : 'none',
           transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >

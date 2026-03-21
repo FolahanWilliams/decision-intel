@@ -42,7 +42,12 @@ export function MitigationStrategyBuilder({
       const name = spot.name.toLowerCase();
 
       // Strategy templates based on common blind spot patterns
-      const templates: Array<{ label: string; description: string; effort: 'Low' | 'Medium' | 'High'; impact: number }> = [];
+      const templates: Array<{
+        label: string;
+        description: string;
+        effort: 'Low' | 'Medium' | 'High';
+        impact: number;
+      }> = [];
 
       // Always generate a "seek external perspective" strategy
       templates.push({
@@ -126,9 +131,7 @@ export function MitigationStrategyBuilder({
   const projectedScore = Math.min(blindSpotGap + projectedImprovement, 100);
 
   if (blindSpots.length === 0) {
-    return (
-      <div className="text-center p-6 text-muted text-sm">No blind spots to mitigate.</div>
-    );
+    return <div className="text-center p-6 text-muted text-sm">No blind spots to mitigate.</div>;
   }
 
   // Group strategies by blind spot
@@ -152,13 +155,17 @@ export function MitigationStrategyBuilder({
           </div>
           <div className="flex items-center gap-4 text-xs">
             <span className="text-muted">
-              Current: <span className={`font-bold ${scoreColor(blindSpotGap)}`}>{blindSpotGap}</span>
+              Current:{' '}
+              <span className={`font-bold ${scoreColor(blindSpotGap)}`}>{blindSpotGap}</span>
             </span>
             {projectedImprovement > 0 && (
               <>
                 <TrendingUp size={12} className="text-emerald-400" />
                 <span className="text-muted">
-                  Projected: <span className={`font-bold ${scoreColor(projectedScore)}`}>{projectedScore}</span>
+                  Projected:{' '}
+                  <span className={`font-bold ${scoreColor(projectedScore)}`}>
+                    {projectedScore}
+                  </span>
                   <span className="text-emerald-400 ml-1">(+{projectedImprovement})</span>
                 </span>
               </>
@@ -171,7 +178,11 @@ export function MitigationStrategyBuilder({
           {/* Current score */}
           <div
             className={`absolute top-0 bottom-0 left-0 transition-all duration-300 ${
-              blindSpotGap < 50 ? 'bg-red-500/40' : blindSpotGap < 80 ? 'bg-amber-500/40' : 'bg-emerald-500/40'
+              blindSpotGap < 50
+                ? 'bg-red-500/40'
+                : blindSpotGap < 80
+                  ? 'bg-amber-500/40'
+                  : 'bg-emerald-500/40'
             }`}
             style={{ width: `${blindSpotGap}%` }}
           />
@@ -186,8 +197,12 @@ export function MitigationStrategyBuilder({
             />
           )}
           {/* Labels */}
-          <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[7px] text-foreground/50">0</span>
-          <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[7px] text-foreground/50">100</span>
+          <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[7px] text-foreground/50">
+            0
+          </span>
+          <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[7px] text-foreground/50">
+            100
+          </span>
         </div>
 
         <p className="text-[10px] text-muted mt-2">
@@ -204,9 +219,7 @@ export function MitigationStrategyBuilder({
               <span className="text-xs font-semibold text-orange-400">
                 {blindSpots[bsIdx].name}
               </span>
-              <p className="text-[10px] text-muted mt-0.5">
-                {blindSpots[bsIdx].description}
-              </p>
+              <p className="text-[10px] text-muted mt-0.5">{blindSpots[bsIdx].description}</p>
             </div>
             <div className="p-2 space-y-1">
               {groupStrategies.map(strategy => {
@@ -234,14 +247,18 @@ export function MitigationStrategyBuilder({
                         <span className="text-xs font-semibold text-foreground">
                           {strategy.label}
                         </span>
-                        <span className={`text-[9px] font-bold px-1 py-0 ${effortStyle.bg} ${effortStyle.text}`}>
+                        <span
+                          className={`text-[9px] font-bold px-1 py-0 ${effortStyle.bg} ${effortStyle.text}`}
+                        >
                           {strategy.effort}
                         </span>
                         <span className="text-[9px] text-muted tabular-nums">
                           +{strategy.impact * 3} pts
                         </span>
                       </div>
-                      <p className="text-[10px] text-muted leading-relaxed">{strategy.description}</p>
+                      <p className="text-[10px] text-muted leading-relaxed">
+                        {strategy.description}
+                      </p>
                     </div>
                   </button>
                 );

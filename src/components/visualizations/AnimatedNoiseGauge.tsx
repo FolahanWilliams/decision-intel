@@ -75,7 +75,11 @@ export function AnimatedNoiseGauge({
   const noiseColor =
     noiseScore > 70 ? 'var(--error)' : noiseScore > 40 ? 'var(--warning)' : 'var(--success)';
   const consistencyColor =
-    consistencyScore > 70 ? 'var(--success)' : consistencyScore > 40 ? 'var(--warning)' : 'var(--error)';
+    consistencyScore > 70
+      ? 'var(--success)'
+      : consistencyScore > 40
+        ? 'var(--warning)'
+        : 'var(--error)';
 
   // Needle angle for the noise gauge (0° = left, 180° = right)
   const needleAngle = (animatedNoise / 100) * 180;
@@ -89,7 +93,13 @@ export function AnimatedNoiseGauge({
       {/* Noise Gauge */}
       <div className="flex flex-col items-center">
         <div className="relative" style={{ width: size, height: halfSize + 20 }}>
-          <svg width={size} height={halfSize + 20} viewBox={`0 0 ${size} ${halfSize + 20}`} role="img" aria-label={`Noise level gauge: ${Math.round(noiseScore)} out of 100`}>
+          <svg
+            width={size}
+            height={halfSize + 20}
+            viewBox={`0 0 ${size} ${halfSize + 20}`}
+            role="img"
+            aria-label={`Noise level gauge: ${Math.round(noiseScore)} out of 100`}
+          >
             {/* Background arc */}
             <path
               d={`M ${strokeWidth + 4} ${halfSize} A ${radius} ${radius} 0 0 1 ${size - strokeWidth - 4} ${halfSize}`}
@@ -125,9 +135,27 @@ export function AnimatedNoiseGauge({
             {/* Center dot */}
             <circle cx={halfSize} cy={halfSize} r={4} fill="var(--text-primary)" />
             {/* Scale labels */}
-            <text x={strokeWidth + 4} y={halfSize + 16} fontSize="9" fill="var(--text-muted)" textAnchor="start">0</text>
-            <text x={halfSize} y={10} fontSize="9" fill="var(--text-muted)" textAnchor="middle">50</text>
-            <text x={size - strokeWidth - 4} y={halfSize + 16} fontSize="9" fill="var(--text-muted)" textAnchor="end">100</text>
+            <text
+              x={strokeWidth + 4}
+              y={halfSize + 16}
+              fontSize="9"
+              fill="var(--text-muted)"
+              textAnchor="start"
+            >
+              0
+            </text>
+            <text x={halfSize} y={10} fontSize="9" fill="var(--text-muted)" textAnchor="middle">
+              50
+            </text>
+            <text
+              x={size - strokeWidth - 4}
+              y={halfSize + 16}
+              fontSize="9"
+              fill="var(--text-muted)"
+              textAnchor="end"
+            >
+              100
+            </text>
           </svg>
           {/* Center value overlay */}
           <div
@@ -141,14 +169,24 @@ export function AnimatedNoiseGauge({
         </div>
         <p className="text-sm font-medium mt-1">Noise Level</p>
         <p className="text-[10px] text-muted">
-          {noiseScore > 70 ? 'High deviation from consensus' : noiseScore > 40 ? 'Moderate noise detected' : 'Low noise — claims align well'}
+          {noiseScore > 70
+            ? 'High deviation from consensus'
+            : noiseScore > 40
+              ? 'Moderate noise detected'
+              : 'Low noise — claims align well'}
         </p>
       </div>
 
       {/* Consistency Gauge */}
       <div className="flex flex-col items-center">
         <div className="relative" style={{ width: size, height: halfSize + 20 }}>
-          <svg width={size} height={halfSize + 20} viewBox={`0 0 ${size} ${halfSize + 20}`} role="img" aria-label={`Consistency gauge: ${Math.round(consistencyScore)} out of 100`}>
+          <svg
+            width={size}
+            height={halfSize + 20}
+            viewBox={`0 0 ${size} ${halfSize + 20}`}
+            role="img"
+            aria-label={`Consistency gauge: ${Math.round(consistencyScore)} out of 100`}
+          >
             <path
               d={`M ${strokeWidth + 4} ${halfSize} A ${radius} ${radius} 0 0 1 ${size - strokeWidth - 4} ${halfSize}`}
               fill="none"
@@ -171,9 +209,27 @@ export function AnimatedNoiseGauge({
             />
             {/* Center dot */}
             <circle cx={halfSize} cy={halfSize} r={4} fill="var(--text-primary)" />
-            <text x={strokeWidth + 4} y={halfSize + 16} fontSize="9" fill="var(--text-muted)" textAnchor="start">0</text>
-            <text x={halfSize} y={10} fontSize="9" fill="var(--text-muted)" textAnchor="middle">50</text>
-            <text x={size - strokeWidth - 4} y={halfSize + 16} fontSize="9" fill="var(--text-muted)" textAnchor="end">100</text>
+            <text
+              x={strokeWidth + 4}
+              y={halfSize + 16}
+              fontSize="9"
+              fill="var(--text-muted)"
+              textAnchor="start"
+            >
+              0
+            </text>
+            <text x={halfSize} y={10} fontSize="9" fill="var(--text-muted)" textAnchor="middle">
+              50
+            </text>
+            <text
+              x={size - strokeWidth - 4}
+              y={halfSize + 16}
+              fontSize="9"
+              fill="var(--text-muted)"
+              textAnchor="end"
+            >
+              100
+            </text>
           </svg>
           <div
             className="absolute flex flex-col items-center"
@@ -186,7 +242,11 @@ export function AnimatedNoiseGauge({
         </div>
         <p className="text-sm font-medium mt-1">Consistency</p>
         <p className="text-[10px] text-muted">
-          {consistencyScore > 70 ? 'High internal agreement' : consistencyScore > 40 ? 'Some variability between audits' : 'Significant audit disagreement'}
+          {consistencyScore > 70
+            ? 'High internal agreement'
+            : consistencyScore > 40
+              ? 'Some variability between audits'
+              : 'Significant audit disagreement'}
         </p>
       </div>
     </div>

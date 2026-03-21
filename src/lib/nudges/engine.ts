@@ -86,7 +86,9 @@ export function generateNudges(
       })
     : nudges;
 
-  log.info(`Generated ${filteredNudges.length} nudge(s) for decision (${nudges.length - filteredNudges.length} suppressed by calibration)`);
+  log.info(
+    `Generated ${filteredNudges.length} nudge(s) for decision (${nudges.length - filteredNudges.length} suppressed by calibration)`
+  );
   return filteredNudges;
 }
 

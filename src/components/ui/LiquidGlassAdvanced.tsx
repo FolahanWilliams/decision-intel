@@ -56,10 +56,10 @@ function generateHolographicMap(width: number, height: number): string {
       const interference = (wave1 + wave2 + wave3) / 3;
 
       // Map to displacement with color-coded channels
-      data[idx] = Math.round(128 + interference * 30);     // R
+      data[idx] = Math.round(128 + interference * 30); // R
       data[idx + 1] = Math.round(128 - interference * 20); // G
       data[idx + 2] = Math.round(128 + interference * 25); // B
-      data[idx + 3] = 255;                                  // A
+      data[idx + 3] = 255; // A
     }
   }
 
@@ -77,16 +77,13 @@ function generateDepthMap(layers: number = 3): string {
 
   // Create gradient layers for depth
   for (let i = 0; i < layers; i++) {
-    const opacity = 1 - (i / layers);
+    const opacity = 1 - i / layers;
     const blur = i * 2;
 
     ctx.globalAlpha = opacity;
     ctx.filter = `blur(${blur}px)`;
 
-    const gradient = ctx.createRadialGradient(
-      size / 2, size / 2, 0,
-      size / 2, size / 2, size / 2
-    );
+    const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
 
     gradient.addColorStop(0, `rgba(255, 255, 255, ${opacity})`);
     gradient.addColorStop(1, 'transparent');
@@ -140,7 +137,7 @@ export function LiquidGlassAdvanced() {
     if (tier === 'accessibility') return;
 
     observerRef.current = new IntersectionObserver(
-      (entries) => {
+      entries => {
         entries.forEach(entry => {
           const target = entry.target as HTMLElement;
           if (entry.isIntersecting) {
@@ -154,7 +151,7 @@ export function LiquidGlassAdvanced() {
       },
       {
         rootMargin: '50px',
-        threshold: 0.1
+        threshold: 0.1,
       }
     );
 
@@ -185,29 +182,31 @@ export function LiquidGlassAdvanced() {
             <feImage
               id="liquid-glass-holographic-image"
               href=""
-              x="0" y="0"
-              width="100%" height="100%"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
               preserveAspectRatio="none"
               result="holo_map"
             />
 
             {/* Color channel separation for iridescent effect */}
             <feComponentTransfer in="holo_map" result="red_channel">
-              <feFuncR type="identity"/>
-              <feFuncG type="discrete" tableValues="0"/>
-              <feFuncB type="discrete" tableValues="0"/>
+              <feFuncR type="identity" />
+              <feFuncG type="discrete" tableValues="0" />
+              <feFuncB type="discrete" tableValues="0" />
             </feComponentTransfer>
 
             <feComponentTransfer in="holo_map" result="green_channel">
-              <feFuncR type="discrete" tableValues="0"/>
-              <feFuncG type="identity"/>
-              <feFuncB type="discrete" tableValues="0"/>
+              <feFuncR type="discrete" tableValues="0" />
+              <feFuncG type="identity" />
+              <feFuncB type="discrete" tableValues="0" />
             </feComponentTransfer>
 
             <feComponentTransfer in="holo_map" result="blue_channel">
-              <feFuncR type="discrete" tableValues="0"/>
-              <feFuncG type="discrete" tableValues="0"/>
-              <feFuncB type="identity"/>
+              <feFuncR type="discrete" tableValues="0" />
+              <feFuncG type="discrete" tableValues="0" />
+              <feFuncB type="identity" />
             </feComponentTransfer>
 
             {/* Combine with displacement */}
@@ -239,8 +238,8 @@ export function LiquidGlassAdvanced() {
             />
 
             {/* Blend displaced channels */}
-            <feBlend in="displaced_r" in2="displaced_g" mode="screen" result="rg"/>
-            <feBlend in="rg" in2="displaced_b" mode="screen"/>
+            <feBlend in="displaced_r" in2="displaced_g" mode="screen" result="rg" />
+            <feBlend in="rg" in2="displaced_b" mode="screen" />
           </filter>
 
           {/* Progressive Depth Blur */}
@@ -248,24 +247,53 @@ export function LiquidGlassAdvanced() {
             <feImage
               id="liquid-glass-depth-image"
               href=""
-              x="0" y="0"
-              width="100%" height="100%"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
               preserveAspectRatio="none"
               result="depth_map"
             />
 
             {/* Multi-layer blur based on depth */}
-            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur1"/>
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur2"/>
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur3"/>
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur1" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur2" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur3" />
 
             {/* Composite based on depth map */}
-            <feComposite in="blur1" in2="depth_map" operator="arithmetic" k1="0" k2="1" k3="0" k4="0" result="layer1"/>
-            <feComposite in="blur2" in2="depth_map" operator="arithmetic" k1="0" k2="0.5" k3="0.5" k4="0" result="layer2"/>
-            <feComposite in="blur3" in2="depth_map" operator="arithmetic" k1="0" k2="0.3" k3="0.7" k4="0" result="layer3"/>
+            <feComposite
+              in="blur1"
+              in2="depth_map"
+              operator="arithmetic"
+              k1="0"
+              k2="1"
+              k3="0"
+              k4="0"
+              result="layer1"
+            />
+            <feComposite
+              in="blur2"
+              in2="depth_map"
+              operator="arithmetic"
+              k1="0"
+              k2="0.5"
+              k3="0.5"
+              k4="0"
+              result="layer2"
+            />
+            <feComposite
+              in="blur3"
+              in2="depth_map"
+              operator="arithmetic"
+              k1="0"
+              k2="0.3"
+              k3="0.7"
+              k4="0"
+              result="layer3"
+            />
 
-            <feComposite in="layer1" in2="layer2" operator="over" result="comp1"/>
-            <feComposite in="comp1" in2="layer3" operator="over"/>
+            <feComposite in="layer1" in2="layer2" operator="over" result="comp1" />
+            <feComposite in="comp1" in2="layer3" operator="over" />
           </filter>
 
           {/* Glass Morphing Animation Filter */}

@@ -682,7 +682,8 @@ export function CommandPalette() {
                       width: 'calc(100% - 8px)',
                       padding: '8px var(--spacing-md)',
                       margin: '1px 4px',
-                      background: idx === clampedIndex ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+                      background:
+                        idx === clampedIndex ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
                       border: 'none',
                       borderRadius: 'var(--radius-md)',
                       cursor: 'pointer',

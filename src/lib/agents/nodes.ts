@@ -295,7 +295,7 @@ Keep it concise — max 5 items per array.`,
     return { intelligenceContext };
   } catch (e) {
     log.warn('Intelligence node failed (non-fatal):', e instanceof Error ? e.message : String(e));
-    return {};  // Omit the key entirely so downstream nodes don't receive undefined
+    return {}; // Omit the key entirely so downstream nodes don't receive undefined
   }
 }
 

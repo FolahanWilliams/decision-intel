@@ -2,7 +2,16 @@
 
 import { useState, useMemo } from 'react';
 import { NoiseBenchmark } from '@/types';
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+} from 'recharts';
 import { ExternalLink, Info } from 'lucide-react';
 
 interface ClaimDeviationScatterProps {
@@ -79,7 +88,9 @@ export function ClaimDeviationScatter({ benchmarks }: ClaimDeviationScatterProps
     return (
       <div className="text-center p-6 text-muted text-sm">
         No numeric benchmark data available for scatter plot.
-        <p className="text-[10px] mt-1">Benchmarks need numeric document and market values to plot.</p>
+        <p className="text-[10px] mt-1">
+          Benchmarks need numeric document and market values to plot.
+        </p>
       </div>
     );
   }
@@ -110,7 +121,8 @@ export function ClaimDeviationScatter({ benchmarks }: ClaimDeviationScatterProps
       </div>
 
       <p className="text-[11px] text-muted">
-        Points on the diagonal = document claims match market consensus. Points far from the diagonal = high-noise claims.
+        Points on the diagonal = document claims match market consensus. Points far from the
+        diagonal = high-noise claims.
       </p>
 
       <div style={{ height: 320 }}>
@@ -211,9 +223,7 @@ export function ClaimDeviationScatter({ benchmarks }: ClaimDeviationScatterProps
                     const varPoints = points.filter(p => p.variance === variance);
                     const clicked = varPoints[idx];
                     if (clicked) {
-                      setSelectedPoint(prev =>
-                        prev?.name === clicked.name ? null : clicked
-                      );
+                      setSelectedPoint(prev => (prev?.name === clicked.name ? null : clicked));
                     }
                   }}
                 />

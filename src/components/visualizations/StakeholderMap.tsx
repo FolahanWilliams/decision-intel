@@ -80,7 +80,9 @@ export function StakeholderMap({ stakeholders }: StakeholderMapProps) {
               height: `${q.h}%`,
             }}
           >
-            <span className="text-xs sm:text-sm font-bold text-muted/50 tracking-wide text-center px-1">{q.label}</span>
+            <span className="text-xs sm:text-sm font-bold text-muted/50 tracking-wide text-center px-1">
+              {q.label}
+            </span>
           </div>
         ))}
 

@@ -54,21 +54,25 @@ const BiasCheckRequestSchema = z.object({
       teamSize: z.number().optional(),
       automationInvolved: z.boolean().optional(),
       productionSystem: z.boolean().optional(),
-      alertVolume: z.number().optional()
-    })
+      alertVolume: z.number().optional(),
+    }),
   }),
   requestNudge: z.boolean().default(true),
-  includeCounterfactual: z.boolean().default(false)
+  includeCounterfactual: z.boolean().default(false),
 });
 
 const CausalAnalysisRequestSchema = z.object({
   scenario: z.enum(['patch_decision', 'secret_rotation', 'incident_response']),
   context: z.record(z.string(), z.unknown()),
   objective: z.string().optional(),
-  interventions: z.array(z.object({
-    variable: z.string(),
-    value: z.unknown()
-  })).optional()
+  interventions: z
+    .array(
+      z.object({
+        variable: z.string(),
+        value: z.unknown(),
+      })
+    )
+    .optional(),
 });
 
 // ─── MCP Server Implementation ───────────────────────────────────────────────
@@ -91,22 +95,29 @@ export class MCPServer {
     this.httpServer = createServer((req, res) => {
       if (req.url === '/health') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          status: 'healthy',
-          clients: this.clients.size,
-          uptime: process.uptime()
-        }));
+        res.end(
+          JSON.stringify({
+            status: 'healthy',
+            clients: this.clients.size,
+            uptime: process.uptime(),
+          })
+        );
       } else if (req.url === '/metrics') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          totalRequests: Array.from(this.requestMetrics.values()).reduce((sum, m) => sum + m.count, 0),
-          activeClients: this.clients.size,
-          requestsPerClient: Array.from(this.requestMetrics.entries()).map(([id, metrics]) => ({
-            clientId: id,
-            requests: metrics.count,
-            lastRequest: metrics.lastRequest
-          }))
-        }));
+        res.end(
+          JSON.stringify({
+            totalRequests: Array.from(this.requestMetrics.values()).reduce(
+              (sum, m) => sum + m.count,
+              0
+            ),
+            activeClients: this.clients.size,
+            requestsPerClient: Array.from(this.requestMetrics.entries()).map(([id, metrics]) => ({
+              clientId: id,
+              requests: metrics.count,
+              lastRequest: metrics.lastRequest,
+            })),
+          })
+        );
       } else {
         res.writeHead(404);
         res.end();
@@ -136,8 +147,8 @@ export class MCPServer {
         metadata: {
           connectedAt: new Date(),
           userAgent: req.headers['user-agent'],
-          ip: req.socket.remoteAddress
-        }
+          ip: req.socket.remoteAddress,
+        },
       };
 
       this.clients.set(clientId, { ws, context });
@@ -149,9 +160,9 @@ export class MCPServer {
         result: {
           sessionId: context.sessionId,
           capabilities: this.getServerCapabilities(),
-          version: '1.0.0'
+          version: '1.0.0',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Handle incoming messages
@@ -172,7 +183,7 @@ export class MCPServer {
       });
 
       // Handle errors
-      ws.on('error', (error) => {
+      ws.on('error', error => {
         logger.error(`MCP client error (${clientId}):`, error);
       });
     });
@@ -183,7 +194,10 @@ export class MCPServer {
    */
   private async handleRequest(ws: WebSocket, request: MCPRequest, context: MCPContext) {
     // Track metrics
-    const metrics = this.requestMetrics.get(context.clientId) || { count: 0, lastRequest: new Date() };
+    const metrics = this.requestMetrics.get(context.clientId) || {
+      count: 0,
+      lastRequest: new Date(),
+    };
     metrics.count++;
     metrics.lastRequest = new Date();
     this.requestMetrics.set(context.clientId, metrics);
@@ -210,7 +224,7 @@ export class MCPServer {
           this.sendResponse(ws, {
             id: request.id,
             result: this.getServerCapabilities(),
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
           break;
 
@@ -238,7 +252,7 @@ export class MCPServer {
         teamSize: params.decision.context.teamSize || 1,
         automationInvolved: params.decision.context.automationInvolved || false,
         productionSystem: params.decision.context.productionSystem || false,
-        alertVolume: params.decision.context.alertVolume
+        alertVolume: params.decision.context.alertVolume,
       });
 
       // Calculate cognitive risk
@@ -259,14 +273,14 @@ export class MCPServer {
         cfContext.set('decision_urgency', params.decision.urgency === 'immediate' ? 1 : 0);
         cfContext.set('automation_involved', params.decision.context.automationInvolved ? 1 : 0);
 
-        const cfResult = this.causalModel.counterfactual(
-          cfContext,
-          { variable: 'automation_involved', value: 0 }
-        );
+        const cfResult = this.causalModel.counterfactual(cfContext, {
+          variable: 'automation_involved',
+          value: 0,
+        });
 
         counterfactual = {
           recommendation: 'Consider manual review to reduce bias risk',
-          impactReduction: Array.from(cfResult.differences.values())
+          impactReduction: Array.from(cfResult.differences.values()),
         };
       }
 
@@ -278,20 +292,19 @@ export class MCPServer {
             type: b.biasType,
             confidence: b.confidence,
             severity: b.severity,
-            signals: b.signals
+            signals: b.signals,
           })),
           cognitiveRisk: {
             level: riskAssessment.overallRisk,
             score: riskAssessment.riskScore,
-            primaryBias: riskAssessment.primaryBias
+            primaryBias: riskAssessment.primaryBias,
           },
           nudges,
           counterfactual,
-          mitigationPriority: riskAssessment.mitigationPriority
+          mitigationPriority: riskAssessment.mitigationPriority,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-
     } catch (error) {
       this.sendError(ws, request.id, -32602, 'Invalid parameters', { error: String(error) });
     }
@@ -306,14 +319,22 @@ export class MCPServer {
 
       // Build context map — coerce values to numbers for causal model
       const contextMap = new Map(
-        Object.entries(params.context).map(([k, v]) => [k, typeof v === 'number' ? v : Number(v) || 0] as [string, number])
+        Object.entries(params.context).map(
+          ([k, v]) => [k, typeof v === 'number' ? v : Number(v) || 0] as [string, number]
+        )
       );
 
       // Perform interventions if specified
-      const results: Array<{ intervention: { variable: string; value: number }; outcomes: Record<string, unknown> }> = [];
+      const results: Array<{
+        intervention: { variable: string; value: number };
+        outcomes: Record<string, unknown>;
+      }> = [];
       if (params.interventions && params.interventions.length > 0) {
         for (const intervention of params.interventions) {
-          const interventionValue = typeof intervention.value === 'number' ? intervention.value : Number(intervention.value) || 0;
+          const interventionValue =
+            typeof intervention.value === 'number'
+              ? intervention.value
+              : Number(intervention.value) || 0;
           const result = this.causalModel.doIntervention(
             intervention.variable,
             interventionValue,
@@ -322,7 +343,7 @@ export class MCPServer {
 
           results.push({
             intervention: { variable: intervention.variable, value: interventionValue },
-            outcomes: Object.fromEntries(result)
+            outcomes: Object.fromEntries(result),
           });
         }
       }
@@ -352,12 +373,11 @@ export class MCPServer {
             action: optimal.bestAction,
             value: optimal.bestValue,
             expectedOutcome: optimal.expectedOutcome,
-            tradeoffs: Object.fromEntries(optimal.tradeoffs)
-          }
+            tradeoffs: Object.fromEntries(optimal.tradeoffs),
+          },
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-
     } catch (error) {
       this.sendError(ws, request.id, -32602, 'Invalid parameters', { error: String(error) });
     }
@@ -368,7 +388,8 @@ export class MCPServer {
    */
   private async handleGetNudge(ws: WebSocket, request: MCPRequest, _context: MCPContext) {
     const biasType = request.params?.biasType as SecurityBiasType;
-    const severity = (typeof request.params?.severity === 'string' ? request.params.severity : 'medium');
+    const severity =
+      typeof request.params?.severity === 'string' ? request.params.severity : 'medium';
 
     // Generate context-aware nudge
     const nudge = this.generateNudge(biasType, severity);
@@ -379,9 +400,9 @@ export class MCPServer {
         nudge: nudge.message,
         type: nudge.type,
         actions: nudge.actions,
-        timing: nudge.timing
+        timing: nudge.timing,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -398,7 +419,7 @@ export class MCPServer {
       clientId: context.clientId,
       decision,
       biases,
-      outcome
+      outcome,
     });
 
     this.sendResponse(ws, {
@@ -406,113 +427,146 @@ export class MCPServer {
       result: {
         recorded: true,
         decisionId: this.generateDecisionId(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
   /**
    * Generate context-aware nudge
    */
-  private generateNudge(biasType: SecurityBiasType, severity: string): {
+  private generateNudge(
+    biasType: SecurityBiasType,
+    severity: string
+  ): {
     message: string;
     type: 'alert' | 'suggestion' | 'warning' | 'blocker';
     actions: string[];
     timing: 'immediate' | 'delayed' | 'scheduled';
   } {
-    const nudgeMap: Record<SecurityBiasType, { message: string; type: 'alert' | 'suggestion' | 'warning' | 'blocker'; actions: string[]; timing: 'immediate' | 'delayed' | 'scheduled' }> = {
+    const nudgeMap: Record<
+      SecurityBiasType,
+      {
+        message: string;
+        type: 'alert' | 'suggestion' | 'warning' | 'blocker';
+        actions: string[];
+        timing: 'immediate' | 'delayed' | 'scheduled';
+      }
+    > = {
       [SecurityBiasType.ANCHORING]: {
-        message: '⚠️ You may be anchoring on initial severity. Consider reviewing additional context.',
+        message:
+          '⚠️ You may be anchoring on initial severity. Consider reviewing additional context.',
         type: 'warning',
-        actions: ['Review identity permissions', 'Check data sensitivity', 'Assess network exposure'],
-        timing: 'immediate'
+        actions: [
+          'Review identity permissions',
+          'Check data sensitivity',
+          'Assess network exposure',
+        ],
+        timing: 'immediate',
       },
       [SecurityBiasType.AUTOMATION_BIAS]: {
-        message: '🤖 Automated recommendation detected. Please verify the reasoning before proceeding.',
+        message:
+          '🤖 Automated recommendation detected. Please verify the reasoning before proceeding.',
         type: 'alert',
         actions: ['Review automation logic', 'Check for edge cases', 'Consider manual override'],
-        timing: 'immediate'
+        timing: 'immediate',
       },
       [SecurityBiasType.GROUPTHINK]: {
-        message: '👥 Quick consensus reached. Assign someone to play devil\'s advocate.',
+        message: "👥 Quick consensus reached. Assign someone to play devil's advocate.",
         type: 'suggestion',
-        actions: ['Assign devil\'s advocate', 'List alternative approaches', 'Document dissenting views'],
-        timing: 'immediate'
+        actions: [
+          "Assign devil's advocate",
+          'List alternative approaches',
+          'Document dissenting views',
+        ],
+        timing: 'immediate',
       },
       [SecurityBiasType.LOSS_AVERSION]: {
         message: '💰 Production change hesitation detected. Compare breach cost vs downtime cost.',
         type: 'warning',
         actions: ['Calculate breach impact', 'Estimate downtime cost', 'Review rollback plan'],
-        timing: 'delayed'
+        timing: 'delayed',
       },
       [SecurityBiasType.AVAILABILITY]: {
         message: '📰 Recent news may be influencing priority. Check actual exploitation rates.',
         type: 'suggestion',
-        actions: ['Review threat intelligence', 'Check environment-specific risk', 'Consult base rates'],
-        timing: 'delayed'
+        actions: [
+          'Review threat intelligence',
+          'Check environment-specific risk',
+          'Consult base rates',
+        ],
+        timing: 'delayed',
       },
       // Add more bias-specific nudges...
       [SecurityBiasType.CONFIRMATION]: {
         message: '🔍 Single hypothesis focus detected. Consider alternative explanations.',
         type: 'warning',
-        actions: ['List alternative causes', 'Seek contradictory evidence', 'Expand investigation scope'],
-        timing: 'immediate'
+        actions: [
+          'List alternative causes',
+          'Seek contradictory evidence',
+          'Expand investigation scope',
+        ],
+        timing: 'immediate',
       },
       [SecurityBiasType.RECENCY]: {
         message: '📅 Focusing on recent alerts. Review historical threat patterns.',
         type: 'suggestion',
         actions: ['Check historical data', 'Review persistent threats', 'Analyze trends'],
-        timing: 'delayed'
+        timing: 'delayed',
       },
       [SecurityBiasType.OVERCONFIDENCE]: {
         message: '💭 High confidence detected. Consider requesting peer review.',
         type: 'suggestion',
         actions: ['Request second opinion', 'Document confidence level', 'List assumptions'],
-        timing: 'delayed'
+        timing: 'delayed',
       },
       [SecurityBiasType.SUNK_COST]: {
         message: '💸 Past investment influencing decision. Focus on future ROI.',
         type: 'alert',
         actions: ['Calculate future costs', 'Ignore sunk costs', 'Compare alternatives'],
-        timing: 'scheduled'
+        timing: 'scheduled',
       },
       [SecurityBiasType.HALO_EFFECT]: {
         message: '✨ Vendor reputation may be influencing judgment. Evaluate independently.',
         type: 'suggestion',
         actions: ['Independent evaluation', 'Competitive analysis', 'Proof of concept'],
-        timing: 'scheduled'
+        timing: 'scheduled',
       },
       [SecurityBiasType.BANDWAGON]: {
         message: '🚂 Following industry trends. Ensure fit for your environment.',
         type: 'suggestion',
-        actions: ['Environment-specific assessment', 'Risk-benefit analysis', 'Custom requirements'],
-        timing: 'scheduled'
+        actions: [
+          'Environment-specific assessment',
+          'Risk-benefit analysis',
+          'Custom requirements',
+        ],
+        timing: 'scheduled',
       },
       [SecurityBiasType.STATUS_QUO]: {
         message: '🔒 Resistance to change detected. Review threat evolution.',
         type: 'warning',
         actions: ['Threat landscape review', 'Architecture assessment', 'Competitive analysis'],
-        timing: 'scheduled'
+        timing: 'scheduled',
       },
       [SecurityBiasType.FRAMING]: {
         message: '🖼️ Presentation affecting judgment. Review raw data.',
         type: 'suggestion',
         actions: ['Review source data', 'Multiple perspectives', 'Standardize format'],
-        timing: 'immediate'
+        timing: 'immediate',
       },
       [SecurityBiasType.DUNNING_KRUGER]: {
         message: '📚 Experience-confidence mismatch. Consider mentorship.',
         type: 'alert',
         actions: ['Seek mentor input', 'Document reasoning', 'Request assistance'],
-        timing: 'immediate'
+        timing: 'immediate',
       },
       [SecurityBiasType.CHOICE_OVERLOAD]: {
         message: '🎯 Too many options causing paralysis. Use progressive disclosure.',
         type: 'warning',
         actions: ['Filter top priorities', 'Batch similar items', 'Use decision tree'],
-        timing: 'immediate'
-      }
+        timing: 'immediate',
+      },
     };
 
     const nudge = nudgeMap[biasType];
@@ -531,13 +585,7 @@ export class MCPServer {
    */
   private getServerCapabilities() {
     return {
-      methods: [
-        'checkBias',
-        'analyzeCausality',
-        'getNudge',
-        'recordDecision',
-        'getCapabilities'
-      ],
+      methods: ['checkBias', 'analyzeCausality', 'getNudge', 'recordDecision', 'getCapabilities'],
       biasTypes: Object.values(SecurityBiasType),
       scenarios: ['patch_decision', 'secret_rotation', 'incident_response'],
       features: {
@@ -545,10 +593,10 @@ export class MCPServer {
         causalAnalysis: true,
         counterfactualReasoning: true,
         nudgeGeneration: true,
-        decisionAudit: true
+        decisionAudit: true,
       },
       version: '1.0.0',
-      maxRequestsPerMinute: 100
+      maxRequestsPerMinute: 100,
     };
   }
 
@@ -564,11 +612,17 @@ export class MCPServer {
   /**
    * Send error response
    */
-  private sendError(ws: WebSocket, id: string, code: number, message: string, data?: Record<string, unknown>) {
+  private sendError(
+    ws: WebSocket,
+    id: string,
+    code: number,
+    message: string,
+    data?: Record<string, unknown>
+  ) {
     this.sendResponse(ws, {
       id,
       error: { code, message, data },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -626,12 +680,12 @@ export class MCPServer {
     }
 
     // Close WebSocket server
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       this.wss.close(() => resolve());
     });
 
     // Close HTTP server
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       this.httpServer.close(() => resolve());
     });
 
@@ -645,9 +699,7 @@ let serverInstance: MCPServer | null = null;
 
 export function getMCPServer(): MCPServer {
   if (!serverInstance) {
-    serverInstance = new MCPServer(
-      parseInt(process.env.MCP_SERVER_PORT || '8080')
-    );
+    serverInstance = new MCPServer(parseInt(process.env.MCP_SERVER_PORT || '8080'));
   }
   return serverInstance;
 }

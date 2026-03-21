@@ -20,8 +20,7 @@ import { NotificationProvider } from '@/components/ui/NotificationCenter';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ReducedMotionProvider } from '@/components/ReducedMotionProvider';
 import { DensityProvider } from '@/components/DensityProvider';
-import { cn } from "@/lib/utils";
-
+import { cn } from '@/lib/utils';
 
 export default function RootLayout({
   children,
@@ -29,9 +28,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans")}>
+    <html lang="en" className={cn('font-sans')}>
       <body className="antialiased min-h-screen">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <DensityProvider>
             <ReducedMotionProvider>
               <NotificationProvider>

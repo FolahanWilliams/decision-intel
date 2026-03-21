@@ -307,14 +307,17 @@ async function processFilesAsync(
  */
 async function triggerAnalysis(documentId: string, _userId: string): Promise<void> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/analyze/stream`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // You'd need proper auth headers here in production
-      },
-      body: JSON.stringify({ documentId }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/analyze/stream`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // You'd need proper auth headers here in production
+        },
+        body: JSON.stringify({ documentId }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Analysis trigger failed: ${response.status}`);

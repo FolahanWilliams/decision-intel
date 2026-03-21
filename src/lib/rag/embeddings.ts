@@ -96,7 +96,9 @@ export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
       results.push(...batchResults);
 
       // Log batch progress
-      log.info(`Generated embeddings for batch ${Math.ceil((i + BATCH_SIZE) / BATCH_SIZE)}, size: ${batch.length}`);
+      log.info(
+        `Generated embeddings for batch ${Math.ceil((i + BATCH_SIZE) / BATCH_SIZE)}, size: ${batch.length}`
+      );
     }
 
     return results;
@@ -232,7 +234,8 @@ export async function storeAnalysisEmbeddingsBatch(items: EmbeddingInput[]): Pro
 
     // Filter out any failed embeddings (zero vectors)
     const successful = embeddingData.filter(
-      data => data.embedding && data.embedding.length === 1536 && !data.embedding.every(v => v === 0)
+      data =>
+        data.embedding && data.embedding.length === 1536 && !data.embedding.every(v => v === 0)
     );
 
     const failed = embeddingData.length - successful.length;

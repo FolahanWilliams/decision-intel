@@ -13,12 +13,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/ToastContext';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 
 interface ShareModalProps {
@@ -118,19 +113,20 @@ export function ShareModal({
   }, [analysisData, documentName]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={open => {
+        if (!open) onClose();
+      }}
+    >
       <DialogContent
         className="card liquid-glass-premium w-full sm:max-w-md"
         style={{ maxHeight: '85vh', overflowY: 'auto' }}
         showCloseButton
       >
         <DialogHeader>
-          <DialogTitle style={{ fontSize: '15px', fontWeight: 600 }}>
-            Share & Export
-          </DialogTitle>
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
-            {documentName}
-          </p>
+          <DialogTitle style={{ fontSize: '15px', fontWeight: 600 }}>Share & Export</DialogTitle>
+          <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>{documentName}</p>
         </DialogHeader>
 
         {/* Tabs */}
@@ -265,7 +261,11 @@ export function ShareModal({
                     ) : linkCopied ? (
                       <Check size={18} className="shrink-0" style={{ color: 'var(--success)' }} />
                     ) : (
-                      <Link2 size={18} className="shrink-0" style={{ color: 'var(--text-secondary)' }} />
+                      <Link2
+                        size={18}
+                        className="shrink-0"
+                        style={{ color: 'var(--text-secondary)' }}
+                      />
                     )}
                     <div>
                       <div style={{ fontWeight: 500, fontSize: '13px' }}>

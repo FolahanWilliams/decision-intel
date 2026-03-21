@@ -137,9 +137,10 @@ export async function GET(req: NextRequest) {
 
     // Calculate accuracy metrics
     const rated = biases.filter(b => b.userRating !== null);
-    const accuracyScore = rated.length > 0
-      ? rated.reduce((sum, b) => sum + (b.userRating || 0), 0) / (rated.length * 5) * 100
-      : null;
+    const accuracyScore =
+      rated.length > 0
+        ? (rated.reduce((sum, b) => sum + (b.userRating || 0), 0) / (rated.length * 5)) * 100
+        : null;
 
     return NextResponse.json({
       biases,
@@ -147,9 +148,10 @@ export async function GET(req: NextRequest) {
         totalBiases: biases.length,
         ratedBiases: rated.length,
         accuracyScore,
-        averageRating: rated.length > 0
-          ? rated.reduce((sum, b) => sum + (b.userRating || 0), 0) / rated.length
-          : null,
+        averageRating:
+          rated.length > 0
+            ? rated.reduce((sum, b) => sum + (b.userRating || 0), 0) / rated.length
+            : null,
       },
     });
   } catch (error) {
@@ -206,9 +208,11 @@ export async function PUT(_req: NextRequest) {
       summary: {
         totalBiasTypes: feedbackStats.length,
         totalRatings: feedbackStats.reduce((sum, stat) => sum + (stat._count.userRating || 0), 0),
-        overallAverage: feedbackStats.length > 0
-          ? feedbackStats.reduce((sum, stat) => sum + (stat._avg.userRating || 0), 0) / feedbackStats.length
-          : null,
+        overallAverage:
+          feedbackStats.length > 0
+            ? feedbackStats.reduce((sum, stat) => sum + (stat._avg.userRating || 0), 0) /
+              feedbackStats.length
+            : null,
       },
       poorPerformers,
       highPerformers,

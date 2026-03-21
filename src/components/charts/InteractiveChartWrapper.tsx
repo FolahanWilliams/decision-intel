@@ -102,48 +102,53 @@ export function InteractiveChartWrapper({
   }, [onReset]);
 
   // Handle export
-  const handleExport = useCallback(async (format: 'png' | 'svg' | 'csv' | 'json') => {
-    if (format === 'png' && chartRef.current) {
-      try {
-        const canvas = await html2canvas(chartRef.current, {
-          backgroundColor: null,
-          scale: 2,
-        });
-        const url = canvas.toDataURL('image/png');
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${title || 'chart'}-${Date.now()}.png`;
-        a.click();
-      } catch (error) {
-        console.error('Failed to export chart:', error);
-      }
-    } else if (format === 'svg' && chartRef.current) {
-      try {
-        const svgElement = chartRef.current.querySelector('svg');
-        if (svgElement) {
-          const serializer = new XMLSerializer();
-          const svgString = serializer.serializeToString(svgElement);
-          const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-          const url = URL.createObjectURL(blob);
+  const handleExport = useCallback(
+    async (format: 'png' | 'svg' | 'csv' | 'json') => {
+      if (format === 'png' && chartRef.current) {
+        try {
+          const canvas = await html2canvas(chartRef.current, {
+            backgroundColor: null,
+            scale: 2,
+          });
+          const url = canvas.toDataURL('image/png');
           const a = document.createElement('a');
           a.href = url;
-          a.download = `${title || 'chart'}-${Date.now()}.svg`;
+          a.download = `${title || 'chart'}-${Date.now()}.png`;
           a.click();
-          URL.revokeObjectURL(url);
-        } else {
-          onExport?.(format);
+        } catch (error) {
+          console.error('Failed to export chart:', error);
         }
-      } catch (error) {
-        console.error('Failed to export SVG:', error);
+      } else if (format === 'svg' && chartRef.current) {
+        try {
+          const svgElement = chartRef.current.querySelector('svg');
+          if (svgElement) {
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(svgElement);
+            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title || 'chart'}-${Date.now()}.svg`;
+            a.click();
+            URL.revokeObjectURL(url);
+          } else {
+            onExport?.(format);
+          }
+        } catch (error) {
+          console.error('Failed to export SVG:', error);
+        }
+      } else {
+        if (!onExport) {
+          console.warn(
+            `No export handler provided for format: ${format}. Pass an onExport callback to handle ${format} exports.`
+          );
+        }
+        onExport?.(format);
       }
-    } else {
-      if (!onExport) {
-        console.warn(`No export handler provided for format: ${format}. Pass an onExport callback to handle ${format} exports.`);
-      }
-      onExport?.(format);
-    }
-    setShowExportMenu(false);
-  }, [title, onExport]);
+      setShowExportMenu(false);
+    },
+    [title, onExport]
+  );
 
   // Handle search
   useEffect(() => {
@@ -180,43 +185,34 @@ export function InteractiveChartWrapper({
     <div
       ref={chartRef}
       className={cn(
-        "relative group",
-        "liquid-glass border border-white/10 rounded-xl",
-        isCompact ? "p-3" : "p-4",
-        isFullscreen && "fixed inset-0 z-50 m-0 rounded-none",
+        'relative group',
+        'liquid-glass border border-white/10 rounded-xl',
+        isCompact ? 'p-3' : 'p-4',
+        isFullscreen && 'fixed inset-0 z-50 m-0 rounded-none',
         className
       )}
     >
       {/* Header */}
-      <div className={cn(
-        "flex items-start justify-between mb-4",
-        isCompact && "mb-2"
-      )}>
+      <div className={cn('flex items-start justify-between mb-4', isCompact && 'mb-2')}>
         <div className="flex-1">
           {title && (
-            <h3 className={cn(
-              "font-semibold",
-              isCompact ? "text-sm" : "text-base"
-            )}>
-              {title}
-            </h3>
+            <h3 className={cn('font-semibold', isCompact ? 'text-sm' : 'text-base')}>{title}</h3>
           )}
           {description && (
-            <p className={cn(
-              "text-muted mt-1",
-              isCompact ? "text-xs" : "text-sm"
-            )}>
+            <p className={cn('text-muted mt-1', isCompact ? 'text-xs' : 'text-sm')}>
               {description}
             </p>
           )}
         </div>
 
         {/* Toolbar */}
-        <div className={cn(
-          "flex items-center gap-1",
-          "opacity-0 group-hover:opacity-100 transition-opacity",
-          isFullscreen && "opacity-100"
-        )}>
+        <div
+          className={cn(
+            'flex items-center gap-1',
+            'opacity-0 group-hover:opacity-100 transition-opacity',
+            isFullscreen && 'opacity-100'
+          )}
+        >
           {/* Search */}
           {enableSearch && (
             <>
@@ -225,13 +221,13 @@ export function InteractiveChartWrapper({
                   <input
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     placeholder="Search..."
                     className={cn(
-                      "px-3 py-1.5 pr-8",
-                      "bg-white/10 border border-white/20 rounded-md",
-                      "text-xs text-white placeholder-white/50",
-                      "focus:outline-none focus:border-white/40"
+                      'px-3 py-1.5 pr-8',
+                      'bg-white/10 border border-white/20 rounded-md',
+                      'text-xs text-white placeholder-white/50',
+                      'focus:outline-none focus:border-white/40'
                     )}
                     autoFocus
                   />
@@ -329,10 +325,10 @@ export function InteractiveChartWrapper({
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     className={cn(
-                      "absolute top-10 right-0 z-10",
-                      "bg-black/90 backdrop-blur-xl",
-                      "border border-white/20 rounded-lg",
-                      "p-2 min-w-[120px]"
+                      'absolute top-10 right-0 z-10',
+                      'bg-black/90 backdrop-blur-xl',
+                      'border border-white/20 rounded-lg',
+                      'p-2 min-w-[120px]'
                     )}
                   >
                     <button
@@ -376,7 +372,7 @@ export function InteractiveChartWrapper({
               size="icon"
               onClick={toggleFullscreen}
               className="h-8 w-8"
-              title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+              title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
             >
               <Maximize2 className="w-4 h-4" />
             </Button>
@@ -420,9 +416,9 @@ export function InteractiveChartWrapper({
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className={cn(
-              "mb-4 p-3 rounded-lg",
-              "bg-white/5 border border-white/10",
-              "text-xs text-muted"
+              'mb-4 p-3 rounded-lg',
+              'bg-white/5 border border-white/10',
+              'text-xs text-muted'
             )}
           >
             {description}
@@ -432,10 +428,7 @@ export function InteractiveChartWrapper({
 
       {/* Chart content with zoom */}
       <div
-        className={cn(
-          "relative transition-transform duration-300",
-          "origin-top-left"
-        )}
+        className={cn('relative transition-transform duration-300', 'origin-top-left')}
         style={{
           transform: `scale(${zoomLevel / 100})`,
           width: zoomLevel > 100 ? `${(100 / zoomLevel) * 100}%` : '100%',
@@ -446,14 +439,10 @@ export function InteractiveChartWrapper({
 
       {/* Legend */}
       {showLegend && legend && (
-        <div className={cn(
-          "mt-4 pt-4 border-t border-white/10",
-          isCompact && "mt-2 pt-2"
-        )}>
+        <div className={cn('mt-4 pt-4 border-t border-white/10', isCompact && 'mt-2 pt-2')}>
           {legend}
         </div>
       )}
     </div>
   );
 }
-

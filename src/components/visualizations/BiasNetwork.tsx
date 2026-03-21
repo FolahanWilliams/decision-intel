@@ -411,7 +411,10 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
   }, [nodes, connections, svgWidth, svgHeight]);
 
   // O(1) lookup map for positioned nodes (used in connection rendering & details panel)
-  const positionedNodeMap = useMemo(() => new Map(positionedNodes.map(n => [n.id, n])), [positionedNodes]);
+  const positionedNodeMap = useMemo(
+    () => new Map(positionedNodes.map(n => [n.id, n])),
+    [positionedNodes]
+  );
 
   const prefersReducedMotion = useReducedMotion();
 
@@ -450,8 +453,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
     );
   }
 
-  const selectedNode = selectedNodeId ? positionedNodeMap.get(selectedNodeId) ?? null : null;
-  const activeHover = hoveredNodeId ? positionedNodeMap.get(hoveredNodeId) ?? null : null;
+  const selectedNode = selectedNodeId ? (positionedNodeMap.get(selectedNodeId) ?? null) : null;
+  const activeHover = hoveredNodeId ? (positionedNodeMap.get(hoveredNodeId) ?? null) : null;
   const biasDataMap = Object.fromEntries(biases.map(b => [b.biasType, b]));
 
   return (

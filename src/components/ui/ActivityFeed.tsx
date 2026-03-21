@@ -6,7 +6,18 @@ import { cn } from '@/lib/utils';
 
 export interface Activity {
   id: string;
-  type: 'analysis' | 'alert' | 'success' | 'pending' | 'trend' | 'team' | 'upload' | 'analysis_complete' | 'analysis_error' | 'nudge' | 'outcome';
+  type:
+    | 'analysis'
+    | 'alert'
+    | 'success'
+    | 'pending'
+    | 'trend'
+    | 'team'
+    | 'upload'
+    | 'analysis_complete'
+    | 'analysis_error'
+    | 'nudge'
+    | 'outcome';
   title: string;
   description?: string;
   timestamp: Date | string;
@@ -66,7 +77,7 @@ export function ActivityFeed({ activities, className, compact = false }: Activit
 
   return (
     <div className={cn('space-y-3', className)}>
-      {activities.map((activity) => {
+      {activities.map(activity => {
         const Icon = activityIcons[activity.type];
         const iconColor = activityColors[activity.type];
 
@@ -87,10 +98,7 @@ export function ActivityFeed({ activities, className, compact = false }: Activit
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    'font-medium text-white truncate',
-                    compact && 'text-sm'
-                  )}>
+                  <p className={cn('font-medium text-white truncate', compact && 'text-sm')}>
                     {activity.title}
                   </p>
 
@@ -102,13 +110,13 @@ export function ActivityFeed({ activities, className, compact = false }: Activit
 
                   <div className="flex items-center gap-2 mt-1">
                     {activity.user && (
-                      <span className="text-xs text-gray-500">
-                        {activity.user}
-                      </span>
+                      <span className="text-xs text-gray-500">{activity.user}</span>
                     )}
                     <span className="text-xs text-gray-500">
                       {formatDistanceToNow(
-                        typeof activity.timestamp === 'string' ? new Date(activity.timestamp) : activity.timestamp,
+                        typeof activity.timestamp === 'string'
+                          ? new Date(activity.timestamp)
+                          : activity.timestamp,
                         { addSuffix: true }
                       )}
                     </span>

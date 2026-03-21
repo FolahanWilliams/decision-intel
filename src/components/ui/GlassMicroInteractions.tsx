@@ -103,16 +103,14 @@ export function GlassPressure({ className, children, onPressureChange }: GlassPr
 
   return (
     <div
-      className={cn(
-        'transition-all duration-300',
-        'liquid-glass-advanced',
-        className
-      )}
-      style={{
-        '--glass-pressure': pressure,
-        '--glass-opacity': isPressed ? 0.05 + pressure * 0.15 : 0.05,
-        transform: isPressed ? `scale(${1 - pressure * 0.02})` : 'scale(1)',
-      } as React.CSSProperties}
+      className={cn('transition-all duration-300', 'liquid-glass-advanced', className)}
+      style={
+        {
+          '--glass-pressure': pressure,
+          '--glass-opacity': isPressed ? 0.05 + pressure * 0.15 : 0.05,
+          transform: isPressed ? `scale(${1 - pressure * 0.02})` : 'scale(1)',
+        } as React.CSSProperties
+      }
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
@@ -141,11 +139,7 @@ export function GlassMorph({ className, morphState, children }: GlassMorphProps)
 
   return (
     <div
-      className={cn(
-        'transition-all duration-700 ease-out',
-        morphClasses[morphState],
-        className
-      )}
+      className={cn('transition-all duration-700 ease-out', morphClasses[morphState], className)}
     >
       {children}
     </div>
@@ -191,13 +185,7 @@ export function GlassLoading({ variant, color = 'white', size = 'md' }: GlassLoa
 
   if (variant === 'pulse') {
     return (
-      <div
-        className={cn(
-          'rounded-full liquid-glass',
-          'animate-glass-pulse',
-          sizeClasses[size]
-        )}
-      />
+      <div className={cn('rounded-full liquid-glass', 'animate-glass-pulse', sizeClasses[size])} />
     );
   }
 
@@ -285,12 +273,7 @@ export function GlassHover({ className, children, intensity = 'medium' }: GlassH
         transformStyle: 'preserve-3d',
       }}
     >
-      <div
-        className={cn(
-          'transition-all duration-300',
-          isHovered && 'glass-hover-glow'
-        )}
-      >
+      <div className={cn('transition-all duration-300', isHovered && 'glass-hover-glow')}>
         {children}
       </div>
     </div>

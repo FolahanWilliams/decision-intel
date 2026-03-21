@@ -58,8 +58,7 @@ export function BiasSparkline({
     if (n >= 3) {
       const third = Math.ceil(n / 3);
       const firstAvg = counts.slice(0, third).reduce((a, b) => a + b, 0) / third;
-      const lastAvg =
-        counts.slice(n - third).reduce((a, b) => a + b, 0) / third;
+      const lastAvg = counts.slice(n - third).reduce((a, b) => a + b, 0) / third;
       trendVal = lastAvg - firstAvg;
     }
 
@@ -72,15 +71,11 @@ export function BiasSparkline({
   }, [frequency, width, height]);
 
   if (!frequency || points === 0) {
-    return (
-      <span className="text-[10px] text-muted italic">No history</span>
-    );
+    return <span className="text-[10px] text-muted italic">No history</span>;
   }
 
-  const TrendIcon =
-    trend > 0.5 ? TrendingUp : trend < -0.5 ? TrendingDown : Minus;
-  const trendColor =
-    trend > 0.5 ? 'text-red-400' : trend < -0.5 ? 'text-green-400' : 'text-muted';
+  const TrendIcon = trend > 0.5 ? TrendingUp : trend < -0.5 ? TrendingDown : Minus;
+  const trendColor = trend > 0.5 ? 'text-red-400' : trend < -0.5 ? 'text-green-400' : 'text-muted';
 
   return (
     <span
@@ -137,19 +132,9 @@ export function BiasSparklineWithData({
   height,
 }: BiasSparklineWithDataProps) {
   // Normalize bias type to match API keys
-  const normalizedKey = biasType
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '_');
+  const normalizedKey = biasType.toLowerCase().trim().replace(/\s+/g, '_');
 
   const frequency = frequencies?.[normalizedKey] ?? null;
 
-  return (
-    <BiasSparkline
-      biasType={biasType}
-      frequency={frequency}
-      width={width}
-      height={height}
-    />
-  );
+  return <BiasSparkline biasType={biasType} frequency={frequency} width={width} height={height} />;
 }

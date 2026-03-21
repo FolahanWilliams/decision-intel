@@ -169,11 +169,16 @@ export async function POST(req: NextRequest) {
         runFullRecalibration(orgId).catch(err =>
           log.warn('Auto-recalibration failed (non-critical):', err)
         );
-        log.info(`Auto-recalibration triggered at ${outcomeCount} outcomes for ${orgId || user.id}`);
+        log.info(
+          `Auto-recalibration triggered at ${outcomeCount} outcomes for ${orgId || user.id}`
+        );
       }
     } catch (recalErr) {
       // Non-critical — CalibrationProfile table may not exist yet
-      log.debug('Auto-recalibration skipped:', recalErr instanceof Error ? recalErr.message : String(recalErr));
+      log.debug(
+        'Auto-recalibration skipped:',
+        recalErr instanceof Error ? recalErr.message : String(recalErr)
+      );
     }
 
     // Calculate outcome statistics for this user/org
@@ -187,10 +192,11 @@ export async function POST(req: NextRequest) {
       success: outcomes.filter(o => o.outcome === 'success').length,
       partialSuccess: outcomes.filter(o => o.outcome === 'partial_success').length,
       failure: outcomes.filter(o => o.outcome === 'failure').length,
-      averageImpact: outcomes
-        .filter(o => o.impactScore !== null)
-        .reduce((sum, o) => sum + (o.impactScore || 0), 0) /
-        outcomes.filter(o => o.impactScore !== null).length || 0,
+      averageImpact:
+        outcomes
+          .filter(o => o.impactScore !== null)
+          .reduce((sum, o) => sum + (o.impactScore || 0), 0) /
+          outcomes.filter(o => o.impactScore !== null).length || 0,
     };
 
     return NextResponse.json({
@@ -317,10 +323,11 @@ export async function GET(req: NextRequest) {
         failure: outcomes.filter(o => o.outcome === 'failure').length,
         tooEarly: outcomes.filter(o => o.outcome === 'too_early').length,
       },
-      averageImpact: outcomes
-        .filter(o => o.impactScore !== null)
-        .reduce((sum, o) => sum + (o.impactScore || 0), 0) /
-        outcomes.filter(o => o.impactScore !== null).length || 0,
+      averageImpact:
+        outcomes
+          .filter(o => o.impactScore !== null)
+          .reduce((sum, o) => sum + (o.impactScore || 0), 0) /
+          outcomes.filter(o => o.impactScore !== null).length || 0,
       biasAccuracy: calculateBiasAccuracy(outcomes),
     };
 
@@ -360,9 +367,7 @@ function calculateBiasAccuracy(outcomes: DecisionOutcome[]): {
     });
   });
 
-  const accuracy = allBiases.size > 0
-    ? (confirmedBiases.size / allBiases.size) * 100
-    : 0;
+  const accuracy = allBiases.size > 0 ? (confirmedBiases.size / allBiases.size) * 100 : 0;
 
   return {
     confirmed: Array.from(confirmedBiases),
@@ -399,20 +404,23 @@ export async function PUT(_req: NextRequest) {
     });
 
     // Group by digital twin
-    const twinAccuracy = outcomes.reduce((acc, outcome) => {
-      const twin = outcome.mostAccurateTwin || 'Unknown';
-      if (!acc[twin]) {
-        acc[twin] = { count: 0, successRate: 0, averageImpact: 0 };
-      }
-      acc[twin].count++;
-      if (outcome.outcome === 'success') {
-        acc[twin].successRate++;
-      }
-      if (outcome.impactScore) {
-        acc[twin].averageImpact += outcome.impactScore;
-      }
-      return acc;
-    }, {} as Record<string, { count: number; successRate: number; averageImpact: number }>);
+    const twinAccuracy = outcomes.reduce(
+      (acc, outcome) => {
+        const twin = outcome.mostAccurateTwin || 'Unknown';
+        if (!acc[twin]) {
+          acc[twin] = { count: 0, successRate: 0, averageImpact: 0 };
+        }
+        acc[twin].count++;
+        if (outcome.outcome === 'success') {
+          acc[twin].successRate++;
+        }
+        if (outcome.impactScore) {
+          acc[twin].averageImpact += outcome.impactScore;
+        }
+        return acc;
+      },
+      {} as Record<string, { count: number; successRate: number; averageImpact: number }>
+    );
 
     // Calculate percentages
     Object.keys(twinAccuracy).forEach(twin => {

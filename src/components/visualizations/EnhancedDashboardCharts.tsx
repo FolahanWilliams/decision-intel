@@ -27,13 +27,7 @@ import {
 } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import {
-  TrendingUp,
-  TrendingDown,
-  ChevronRight,
-  Brain,
-  Activity,
-} from 'lucide-react';
+import { TrendingUp, TrendingDown, ChevronRight, Brain, Activity } from 'lucide-react';
 
 interface RiskDistribution {
   highRisk: number;
@@ -100,19 +94,16 @@ function CustomTooltip({ active, payload, label }: ChartTooltipProps) {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
-        "p-3 rounded-lg",
-        "bg-black/90 backdrop-blur-xl",
-        "border border-white/20",
-        "shadow-xl"
+        'p-3 rounded-lg',
+        'bg-black/90 backdrop-blur-xl',
+        'border border-white/20',
+        'shadow-xl'
       )}
     >
       <p className="text-xs font-semibold text-white">{label}</p>
       {payload.map((entry, index: number) => (
         <div key={index} className="flex items-center gap-2 mt-1">
-          <div
-            className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: entry.color }}
-          />
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
           <span className="text-xs text-white/80">
             {entry.name}: {entry.value}
           </span>
@@ -144,7 +135,8 @@ interface ActiveShapeProps {
 }
 
 const renderActiveShape = (props: ActiveShapeProps) => {
-  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value, percent } = props;
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value, percent } =
+    props;
 
   return (
     <g>
@@ -197,34 +189,40 @@ export function EnhancedDashboardCharts({
   const [viewMode, setViewMode] = useState<'overview' | 'detailed' | 'comparison'>('overview');
   const [_animationKey, setAnimationKey] = useState(0);
   const [showBiasDetails, setShowBiasDetails] = useState(false);
-  const [selectedRiskLevel, setSelectedRiskLevel] = useState<'all' | 'high' | 'medium' | 'low'>('all');
+  const [selectedRiskLevel, setSelectedRiskLevel] = useState<'all' | 'high' | 'medium' | 'low'>(
+    'all'
+  );
 
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
   // Enhanced donut data with animations
-  const donutData = useMemo(() => [
-    {
-      name: 'High Risk',
-      value: riskDistribution.highRisk,
-      color: RISK_COLORS.high,
-      description: 'Critical attention needed',
-      percentage: (riskDistribution.highRisk / totalAnalyzed) * 100,
-    },
-    {
-      name: 'Medium Risk',
-      value: riskDistribution.mediumRisk,
-      color: RISK_COLORS.medium,
-      description: 'Monitor closely',
-      percentage: (riskDistribution.mediumRisk / totalAnalyzed) * 100,
-    },
-    {
-      name: 'Low Risk',
-      value: riskDistribution.lowRisk,
-      color: RISK_COLORS.low,
-      description: 'Acceptable levels',
-      percentage: (riskDistribution.lowRisk / totalAnalyzed) * 100,
-    },
-  ].filter(d => d.value > 0), [riskDistribution, totalAnalyzed]);
+  const donutData = useMemo(
+    () =>
+      [
+        {
+          name: 'High Risk',
+          value: riskDistribution.highRisk,
+          color: RISK_COLORS.high,
+          description: 'Critical attention needed',
+          percentage: (riskDistribution.highRisk / totalAnalyzed) * 100,
+        },
+        {
+          name: 'Medium Risk',
+          value: riskDistribution.mediumRisk,
+          color: RISK_COLORS.medium,
+          description: 'Monitor closely',
+          percentage: (riskDistribution.mediumRisk / totalAnalyzed) * 100,
+        },
+        {
+          name: 'Low Risk',
+          value: riskDistribution.lowRisk,
+          color: RISK_COLORS.low,
+          description: 'Acceptable levels',
+          percentage: (riskDistribution.lowRisk / totalAnalyzed) * 100,
+        },
+      ].filter(d => d.value > 0),
+    [riskDistribution, totalAnalyzed]
+  );
 
   // Enhanced trend data with predictions
   const enhancedTrendData = useMemo(() => {
@@ -252,9 +250,14 @@ export function EnhancedDashboardCharts({
       ...bias,
       severity: bias.severity || 'medium',
       connections: topBiases
-        .filter((b, bIndex) => b.name !== bias.name && stableHash(bias.name + b.name, biasIndex + bIndex) > 60)
+        .filter(
+          (b, bIndex) =>
+            b.name !== bias.name && stableHash(bias.name + b.name, biasIndex + bIndex) > 60
+        )
         .map(b => b.name),
-      impact: Math.round(bias.count * (bias.severity === 'critical' ? 4 : bias.severity === 'high' ? 3 : 2)),
+      impact: Math.round(
+        bias.count * (bias.severity === 'critical' ? 4 : bias.severity === 'high' ? 3 : 2)
+      ),
     }));
   }, [topBiases]);
 
@@ -268,29 +271,41 @@ export function EnhancedDashboardCharts({
   }, [enhancedBiasData, selectedRiskLevel]);
 
   // Handle interactions
-  const handleBiasClick = useCallback((biasName: string) => {
-    setSelectedBias(prev => prev === biasName ? null : biasName);
-    onBiasClick?.(biasName);
+  const handleBiasClick = useCallback(
+    (biasName: string) => {
+      setSelectedBias(prev => (prev === biasName ? null : biasName));
+      onBiasClick?.(biasName);
 
-    // Trigger animation
-    setAnimationKey(prev => prev + 1);
-  }, [onBiasClick]);
+      // Trigger animation
+      setAnimationKey(prev => prev + 1);
+    },
+    [onBiasClick]
+  );
 
-  const handleRiskSegmentClick = useCallback((entry: { name?: string }, index: number) => {
-    setActiveRiskIndex(index);
-    const riskLevel = (entry.name || '').toLowerCase().replace(' risk', '') as 'high' | 'medium' | 'low';
-    setSelectedRiskLevel(riskLevel);
-    onRiskSegmentClick?.(riskLevel);
-  }, [onRiskSegmentClick]);
+  const handleRiskSegmentClick = useCallback(
+    (entry: { name?: string }, index: number) => {
+      setActiveRiskIndex(index);
+      const riskLevel = (entry.name || '').toLowerCase().replace(' risk', '') as
+        | 'high'
+        | 'medium'
+        | 'low';
+      setSelectedRiskLevel(riskLevel);
+      onRiskSegmentClick?.(riskLevel);
+    },
+    [onRiskSegmentClick]
+  );
 
-  const handleTimeRangeSelect = useCallback((domain: { startIndex?: number; endIndex?: number } | null) => {
-    if (domain && domain.startIndex !== undefined && domain.endIndex !== undefined) {
-      setSelectedTimeRange([domain.startIndex, domain.endIndex]);
-      const startDate = scoreTrend[domain.startIndex].date;
-      const endDate = scoreTrend[domain.endIndex].date;
-      onPeriodSelect?.(startDate, endDate);
-    }
-  }, [scoreTrend, onPeriodSelect]);
+  const handleTimeRangeSelect = useCallback(
+    (domain: { startIndex?: number; endIndex?: number } | null) => {
+      if (domain && domain.startIndex !== undefined && domain.endIndex !== undefined) {
+        setSelectedTimeRange([domain.startIndex, domain.endIndex]);
+        const startDate = scoreTrend[domain.startIndex].date;
+        const endDate = scoreTrend[domain.endIndex].date;
+        onPeriodSelect?.(startDate, endDate);
+      }
+    },
+    [scoreTrend, onPeriodSelect]
+  );
 
   // Radar chart data for bias relationships
   const radarData = useMemo(() => {
@@ -313,10 +328,10 @@ export function EnhancedDashboardCharts({
               key={mode}
               onClick={() => setViewMode(mode)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                 viewMode === mode
-                  ? "bg-white/20 text-white"
-                  : "bg-white/5 text-white/60 hover:bg-white/10"
+                  ? 'bg-white/20 text-white'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10'
               )}
             >
               {mode.charAt(0).toUpperCase() + mode.slice(1)}
@@ -331,32 +346,35 @@ export function EnhancedDashboardCharts({
               key={level}
               onClick={() => setSelectedRiskLevel(level)}
               className={cn(
-                "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+                'px-3 py-1.5 rounded-full text-xs font-medium transition-all',
                 selectedRiskLevel === level
                   ? level === 'all'
-                    ? "bg-white/20 text-white border border-white/30"
+                    ? 'bg-white/20 text-white border border-white/30'
                     : `bg-opacity-20 border`
-                  : "bg-white/5 text-white/60 hover:bg-white/10",
-                selectedRiskLevel === level && level !== 'all' && "border-opacity-50"
+                  : 'bg-white/5 text-white/60 hover:bg-white/10',
+                selectedRiskLevel === level && level !== 'all' && 'border-opacity-50'
               )}
               style={{
-                backgroundColor: selectedRiskLevel === level && level !== 'all'
-                  ? `${RISK_COLORS[level]}20`
-                  : undefined,
-                borderColor: selectedRiskLevel === level && level !== 'all'
-                  ? RISK_COLORS[level]
-                  : undefined,
-                color: selectedRiskLevel === level && level !== 'all'
-                  ? RISK_COLORS[level]
-                  : undefined,
+                backgroundColor:
+                  selectedRiskLevel === level && level !== 'all'
+                    ? `${RISK_COLORS[level]}20`
+                    : undefined,
+                borderColor:
+                  selectedRiskLevel === level && level !== 'all' ? RISK_COLORS[level] : undefined,
+                color:
+                  selectedRiskLevel === level && level !== 'all' ? RISK_COLORS[level] : undefined,
               }}
             >
               <span className="capitalize">{level}</span>
               {level !== 'all' && (
                 <span className="ml-1 opacity-60">
-                  ({level === 'high' ? riskDistribution.highRisk :
-                    level === 'medium' ? riskDistribution.mediumRisk :
-                    riskDistribution.lowRisk})
+                  (
+                  {level === 'high'
+                    ? riskDistribution.highRisk
+                    : level === 'medium'
+                      ? riskDistribution.mediumRisk
+                      : riskDistribution.lowRisk}
+                  )
                 </span>
               )}
             </button>
@@ -369,8 +387,8 @@ export function EnhancedDashboardCharts({
         <motion.div
           layout
           className={cn(
-            "card liquid-glass-premium p-4",
-            viewMode === 'detailed' && "lg:col-span-2"
+            'card liquid-glass-premium p-4',
+            viewMode === 'detailed' && 'lg:col-span-2'
           )}
         >
           <div className="flex items-center justify-between mb-4">
@@ -440,9 +458,9 @@ export function EnhancedDashboardCharts({
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.1 }}
                     className={cn(
-                      "flex items-center justify-between p-2 rounded-lg",
-                      "bg-white/5 hover:bg-white/10 transition-colors cursor-pointer",
-                      activeRiskIndex === index && "bg-white/15"
+                      'flex items-center justify-between p-2 rounded-lg',
+                      'bg-white/5 hover:bg-white/10 transition-colors cursor-pointer',
+                      activeRiskIndex === index && 'bg-white/15'
                     )}
                     onClick={() => handleRiskSegmentClick(item, index)}
                   >
@@ -468,21 +486,22 @@ export function EnhancedDashboardCharts({
         <motion.div
           layout
           className={cn(
-            "card liquid-glass-premium p-4",
-            viewMode === 'comparison' ? "lg:col-span-2" : "lg:col-span-1"
+            'card liquid-glass-premium p-4',
+            viewMode === 'comparison' ? 'lg:col-span-2' : 'lg:col-span-1'
           )}
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold">Score Trend</h3>
             <div className="flex items-center gap-2">
-              {scoreTrend.length > 1 && scoreTrend[scoreTrend.length - 1].score > scoreTrend[0].score ? (
+              {scoreTrend.length > 1 &&
+              scoreTrend[scoreTrend.length - 1].score > scoreTrend[0].score ? (
                 <TrendingUp className="w-4 h-4 text-success" />
               ) : (
                 <TrendingDown className="w-4 h-4 text-error" />
               )}
               <span className="text-xs text-white/60">
                 {scoreTrend.length > 1
-                  ? `${((scoreTrend[scoreTrend.length - 1].score - scoreTrend[0].score) > 0 ? '+' : '')}${(scoreTrend[scoreTrend.length - 1].score - scoreTrend[0].score).toFixed(1)}`
+                  ? `${scoreTrend[scoreTrend.length - 1].score - scoreTrend[0].score > 0 ? '+' : ''}${(scoreTrend[scoreTrend.length - 1].score - scoreTrend[0].score).toFixed(1)}`
                   : 'N/A'}
               </span>
             </div>
@@ -535,12 +554,7 @@ export function EnhancedDashboardCharts({
 
               {/* Deviation bars */}
               {viewMode === 'detailed' && (
-                <Bar
-                  dataKey="deviation"
-                  fill="#ef4444"
-                  opacity={0.3}
-                  name="Deviation"
-                />
+                <Bar dataKey="deviation" fill="#ef4444" opacity={0.3} name="Deviation" />
               )}
 
               {/* Interactive brush for time selection */}
@@ -565,8 +579,8 @@ export function EnhancedDashboardCharts({
         <motion.div
           layout
           className={cn(
-            "card liquid-glass-premium p-4",
-            viewMode === 'detailed' && "lg:col-span-3"
+            'card liquid-glass-premium p-4',
+            viewMode === 'detailed' && 'lg:col-span-3'
           )}
         >
           <div className="flex items-center justify-between mb-4">
@@ -589,9 +603,9 @@ export function EnhancedDashboardCharts({
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: index * 0.05 }}
                   className={cn(
-                    "p-3 rounded-lg cursor-pointer transition-all",
-                    "bg-white/5 hover:bg-white/10",
-                    selectedBias === bias.name && "bg-white/15 ring-1 ring-white/30"
+                    'p-3 rounded-lg cursor-pointer transition-all',
+                    'bg-white/5 hover:bg-white/10',
+                    selectedBias === bias.name && 'bg-white/15 ring-1 ring-white/30'
                   )}
                   onClick={() => handleBiasClick(bias.name)}
                   onMouseEnter={() => setHoveredBias(bias.name)}
@@ -613,11 +627,14 @@ export function EnhancedDashboardCharts({
 
                     <div className="flex items-center gap-2">
                       {bias.trend && (
-                        <span className={cn(
-                          "text-xs font-medium",
-                          bias.trend > 0 ? "text-error" : "text-success"
-                        )}>
-                          {bias.trend > 0 ? '+' : ''}{bias.trend}%
+                        <span
+                          className={cn(
+                            'text-xs font-medium',
+                            bias.trend > 0 ? 'text-error' : 'text-success'
+                          )}
+                        >
+                          {bias.trend > 0 ? '+' : ''}
+                          {bias.trend}%
                         </span>
                       )}
                       <ChevronRight className="w-4 h-4 text-white/40" />
@@ -626,26 +643,27 @@ export function EnhancedDashboardCharts({
 
                   {/* Connections */}
                   <AnimatePresence>
-                    {(selectedBias === bias.name || hoveredBias === bias.name) && bias.connections && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="mt-2 pt-2 border-t border-white/10"
-                      >
-                        <div className="text-xs text-white/60 mb-1">Related biases:</div>
-                        <div className="flex flex-wrap gap-1">
-                          {bias.connections.map(conn => (
-                            <span
-                              key={conn}
-                              className="px-2 py-0.5 bg-white/10 rounded-full text-xs"
-                            >
-                              {conn}
-                            </span>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
+                    {(selectedBias === bias.name || hoveredBias === bias.name) &&
+                      bias.connections && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="mt-2 pt-2 border-t border-white/10"
+                        >
+                          <div className="text-xs text-white/60 mb-1">Related biases:</div>
+                          <div className="flex flex-wrap gap-1">
+                            {bias.connections.map(conn => (
+                              <span
+                                key={conn}
+                                className="px-2 py-0.5 bg-white/10 rounded-full text-xs"
+                              >
+                                {conn}
+                              </span>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
                   </AnimatePresence>
 
                   {/* Instances preview */}
@@ -690,7 +708,7 @@ export function EnhancedDashboardCharts({
                 <Bar
                   dataKey="count"
                   animationDuration={800}
-                  onClick={(data) => data.name && handleBiasClick(data.name)}
+                  onClick={data => data.name && handleBiasClick(data.name)}
                   className="cursor-pointer"
                 >
                   {filteredBiases.map((entry, index) => (

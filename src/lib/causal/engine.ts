@@ -55,70 +55,70 @@ export class SecurityCausalModel {
       id: 'patch_deployment',
       type: 'action',
       name: 'Deploy Security Patch',
-      description: 'Action to deploy a security patch to production'
+      description: 'Action to deploy a security patch to production',
     });
 
     nodes.set('system_downtime', {
       id: 'system_downtime',
       type: 'outcome',
       name: 'System Downtime',
-      description: 'Production system unavailability'
+      description: 'Production system unavailability',
     });
 
     nodes.set('breach_risk', {
       id: 'breach_risk',
       type: 'outcome',
       name: 'Breach Risk',
-      description: 'Probability of security breach'
+      description: 'Probability of security breach',
     });
 
     nodes.set('vulnerability_exposure', {
       id: 'vulnerability_exposure',
       type: 'mediator',
       name: 'Vulnerability Exposure Window',
-      description: 'Time window where vulnerability is exploitable'
+      description: 'Time window where vulnerability is exploitable',
     });
 
     nodes.set('business_impact', {
       id: 'business_impact',
       type: 'outcome',
       name: 'Business Impact',
-      description: 'Financial and operational impact'
+      description: 'Financial and operational impact',
     });
 
     nodes.set('network_exposure', {
       id: 'network_exposure',
       type: 'confounder',
       name: 'Network Exposure',
-      description: 'Public internet exposure of the system'
+      description: 'Public internet exposure of the system',
     });
 
     nodes.set('data_sensitivity', {
       id: 'data_sensitivity',
       type: 'confounder',
       name: 'Data Sensitivity',
-      description: 'Classification level of data in system'
+      description: 'Classification level of data in system',
     });
 
     nodes.set('attacker_capability', {
       id: 'attacker_capability',
       type: 'confounder',
       name: 'Attacker Capability',
-      description: 'Sophistication level of potential attackers'
+      description: 'Sophistication level of potential attackers',
     });
 
     nodes.set('secret_rotation', {
       id: 'secret_rotation',
       type: 'action',
       name: 'Rotate Secrets',
-      description: 'Action to rotate compromised credentials'
+      description: 'Action to rotate compromised credentials',
     });
 
     nodes.set('service_availability', {
       id: 'service_availability',
       type: 'outcome',
       name: 'Service Availability',
-      description: 'Percentage of service uptime'
+      description: 'Percentage of service uptime',
     });
 
     // Define edges (causal relationships)
@@ -128,58 +128,58 @@ export class SecurityCausalModel {
         to: 'system_downtime',
         strength: 0.3, // Patch deployment causes 30% chance of downtime
         mechanism: 'Service restart required for patch application',
-        timeDelay: 60
+        timeDelay: 60,
       },
       {
         from: 'patch_deployment',
         to: 'vulnerability_exposure',
         strength: -0.95, // Patching reduces vulnerability exposure by 95%
         mechanism: 'Patch closes security vulnerability',
-        timeDelay: 0
+        timeDelay: 0,
       },
       {
         from: 'vulnerability_exposure',
         to: 'breach_risk',
         strength: 0.7,
         mechanism: 'Exposed vulnerabilities increase breach probability',
-        timeDelay: 3600 // 1 hour
+        timeDelay: 3600, // 1 hour
       },
       {
         from: 'network_exposure',
         to: 'breach_risk',
         strength: 0.4,
-        mechanism: 'Public exposure increases attack surface'
+        mechanism: 'Public exposure increases attack surface',
       },
       {
         from: 'data_sensitivity',
         to: 'business_impact',
         strength: 0.8,
-        mechanism: 'Sensitive data breaches have higher impact'
+        mechanism: 'Sensitive data breaches have higher impact',
       },
       {
         from: 'breach_risk',
         to: 'business_impact',
         strength: 0.9,
-        mechanism: 'Security breaches directly impact business'
+        mechanism: 'Security breaches directly impact business',
       },
       {
         from: 'system_downtime',
         to: 'business_impact',
         strength: 0.5,
-        mechanism: 'Downtime causes revenue and productivity loss'
+        mechanism: 'Downtime causes revenue and productivity loss',
       },
       {
         from: 'secret_rotation',
         to: 'service_availability',
         strength: -0.2, // 20% chance of service disruption
         mechanism: 'Connection resets during credential rotation',
-        timeDelay: 30
+        timeDelay: 30,
       },
       {
         from: 'attacker_capability',
         to: 'breach_risk',
         strength: 0.6,
-        mechanism: 'Sophisticated attackers more likely to succeed'
+        mechanism: 'Sophisticated attackers more likely to succeed',
       }
     );
 
@@ -213,7 +213,7 @@ export class SecurityCausalModel {
     equations.set('system_downtime', (inputs: Map<string, number>) => {
       const patchDeployment = inputs.get('patch_deployment') || 0;
       // Expected downtime in hours
-      return patchDeployment ? Math.random() < 0.3 ? 2 : 0 : 0; // 30% chance of 2hr downtime
+      return patchDeployment ? (Math.random() < 0.3 ? 2 : 0) : 0; // 30% chance of 2hr downtime
     });
 
     return { nodes, edges, equations };
@@ -283,19 +283,23 @@ export class SecurityCausalModel {
     );
 
     // Calculate differences
-    const differences = new Map<string, { factual: number; counterfactual: number; delta: number | string }>();
+    const differences = new Map<
+      string,
+      { factual: number; counterfactual: number; delta: number | string }
+    >();
 
     for (const [key, factualValue] of factual) {
       const counterfactualValue = counterfactual.get(key);
       if (counterfactualValue !== undefined && counterfactualValue !== factualValue) {
-        const delta = typeof factualValue === 'number' && typeof counterfactualValue === 'number'
-          ? counterfactualValue - factualValue
-          : `${factualValue} → ${counterfactualValue}`;
+        const delta =
+          typeof factualValue === 'number' && typeof counterfactualValue === 'number'
+            ? counterfactualValue - factualValue
+            : `${factualValue} → ${counterfactualValue}`;
 
         differences.set(key, {
           factual: factualValue,
           counterfactual: counterfactualValue,
-          delta
+          delta,
         });
       }
     }
@@ -432,7 +436,7 @@ export class SecurityCausalModel {
       bestAction,
       bestValue,
       expectedOutcome: bestOutcome,
-      tradeoffs
+      tradeoffs,
     };
   }
 }
@@ -470,7 +474,7 @@ export class CausalDiscovery {
           edges.push({
             from: varA,
             to: varB,
-            strength: correlation
+            strength: correlation,
           });
         }
       }
@@ -567,7 +571,7 @@ export class SecurityScenarios {
     const patchNowImpact = {
       breachRisk: patchNow.get('breach_risk') || 0,
       downtime: context.peakTrafficHours ? 4 : 2, // Hours
-      totalImpact: patchNow.get('business_impact') || 0
+      totalImpact: patchNow.get('business_impact') || 0,
     };
 
     // Scenario 2: Patch in maintenance window (6 hours delay)
@@ -576,7 +580,7 @@ export class SecurityScenarios {
     const patchLaterImpact = {
       breachRisk: (patchLater.get('breach_risk') || 0) * 1.5, // Higher risk due to delay
       downtime: 1, // Less downtime in maintenance window
-      totalImpact: patchLater.get('business_impact') || 0
+      totalImpact: patchLater.get('business_impact') || 0,
     };
 
     // Scenario 3: No action
@@ -584,19 +588,17 @@ export class SecurityScenarios {
     const noActionImpact = {
       breachRisk: noAction.get('breach_risk') || 0,
       downtime: 0,
-      totalImpact: noAction.get('business_impact') || 0
+      totalImpact: noAction.get('business_impact') || 0,
     };
 
     // Make recommendation
     const impacts = [
       { action: 'patch_now' as const, impact: patchNowImpact.totalImpact },
       { action: 'patch_maintenance_window' as const, impact: patchLaterImpact.totalImpact },
-      { action: 'accept_risk' as const, impact: noActionImpact.totalImpact }
+      { action: 'accept_risk' as const, impact: noActionImpact.totalImpact },
     ];
 
-    const bestAction = impacts.reduce((min, curr) =>
-      curr.impact < min.impact ? curr : min
-    );
+    const bestAction = impacts.reduce((min, curr) => (curr.impact < min.impact ? curr : min));
 
     const recommendation = bestAction.action;
 
@@ -616,8 +618,8 @@ export class SecurityScenarios {
       riskComparison: {
         patchNow: patchNowImpact,
         patchLater: patchLaterImpact,
-        noAction: noActionImpact
-      }
+        noAction: noActionImpact,
+      },
     };
   }
 
@@ -642,14 +644,14 @@ export class SecurityScenarios {
       public_repo: 0.9,
       logs: 0.6,
       suspected: 0.4,
-      confirmed_breach: 1.0
+      confirmed_breach: 1.0,
     };
 
     const secretCriticality = {
       api_key: 0.5,
       database: 0.9,
       encryption_key: 1.0,
-      certificate: 0.7
+      certificate: 0.7,
     };
 
     const risk = exposureRisk[context.exposureType] * secretCriticality[context.secretType];
@@ -664,7 +666,7 @@ export class SecurityScenarios {
         'Initiate emergency rotation procedure',
         'Notify affected service owners',
         'Prepare rollback plan',
-        'Monitor for unauthorized access during rotation'
+        'Monitor for unauthorized access during rotation',
       ];
     } else if (risk > 0.5 || staleness > 0.5) {
       urgency = 'scheduled';
@@ -672,7 +674,7 @@ export class SecurityScenarios {
         'Schedule rotation for next maintenance window',
         'Coordinate with service teams',
         'Test rotation in staging environment',
-        'Prepare gradual rollout plan'
+        'Prepare gradual rollout plan',
       ];
     } else {
       urgency = 'monitor';
@@ -680,21 +682,23 @@ export class SecurityScenarios {
         'Add secret to monitoring watchlist',
         'Review access logs for anomalies',
         'Plan rotation for next quarter',
-        'Document secret dependencies'
+        'Document secret dependencies',
       ];
     }
 
-    const serviceDisruption = context.dependentServices > 10
-      ? 'High - Multiple service restarts required'
-      : context.dependentServices > 3
-      ? 'Medium - Coordinated restart needed'
-      : 'Low - Minimal service impact';
+    const serviceDisruption =
+      context.dependentServices > 10
+        ? 'High - Multiple service restarts required'
+        : context.dependentServices > 3
+          ? 'Medium - Coordinated restart needed'
+          : 'Low - Minimal service impact';
 
-    const securityRisk = risk > 0.8
-      ? 'Critical - Immediate exploitation possible'
-      : risk > 0.5
-      ? 'High - Exploitation likely within days'
-      : 'Medium - Preventive measure recommended';
+    const securityRisk =
+      risk > 0.8
+        ? 'Critical - Immediate exploitation possible'
+        : risk > 0.5
+          ? 'High - Exploitation likely within days'
+          : 'Medium - Preventive measure recommended';
 
     const operationalCost = context.dependentServices * 1000 * risk; // $ estimate
 
@@ -703,9 +707,9 @@ export class SecurityScenarios {
       estimatedImpact: {
         serviceDisruption,
         securityRisk,
-        operationalCost
+        operationalCost,
       },
-      strategy
+      strategy,
     };
   }
 }
@@ -716,22 +720,29 @@ export const CausalAnalysisRequestSchema = z.object({
   scenario: z.enum(['patch_decision', 'secret_rotation', 'incident_response']),
   context: z.record(z.string(), z.any()),
   objective: z.string().optional(),
-  constraints: z.record(z.string(), z.object({
-    min: z.number().optional(),
-    max: z.number().optional()
-  })).optional()
+  constraints: z
+    .record(
+      z.string(),
+      z.object({
+        min: z.number().optional(),
+        max: z.number().optional(),
+      })
+    )
+    .optional(),
 });
 
 export const CausalAnalysisResponseSchema = z.object({
   recommendation: z.string(),
   reasoning: z.string(),
-  counterfactuals: z.array(z.object({
-    scenario: z.string(),
-    probability: z.number(),
-    impact: z.number()
-  })),
+  counterfactuals: z.array(
+    z.object({
+      scenario: z.string(),
+      probability: z.number(),
+      impact: z.number(),
+    })
+  ),
   confidence: z.number(),
-  tradeoffs: z.record(z.string(), z.number())
+  tradeoffs: z.record(z.string(), z.number()),
 });
 
 export type CausalAnalysisRequest = z.infer<typeof CausalAnalysisRequestSchema>;

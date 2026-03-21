@@ -45,7 +45,11 @@ export function DensityProvider({ children }: DensityProviderProps) {
     localStorage.setItem('ui-density', newDensity);
 
     // Apply density class to root element
-    document.documentElement.classList.remove('density-comfortable', 'density-compact', 'density-dense');
+    document.documentElement.classList.remove(
+      'density-comfortable',
+      'density-compact',
+      'density-dense'
+    );
     document.documentElement.classList.add(`density-${newDensity}`);
   };
 
@@ -60,12 +64,18 @@ export function DensityProvider({ children }: DensityProviderProps) {
 
   // Apply density class on mount and changes
   useEffect(() => {
-    document.documentElement.classList.remove('density-comfortable', 'density-compact', 'density-dense');
+    document.documentElement.classList.remove(
+      'density-comfortable',
+      'density-compact',
+      'density-dense'
+    );
     document.documentElement.classList.add(`density-${density}`);
   }, [density]);
 
   return (
-    <DensityContext.Provider value={{ isDense: density !== 'comfortable', toggleDensity, density, setDensity }}>
+    <DensityContext.Provider
+      value={{ isDense: density !== 'comfortable', toggleDensity, density, setDensity }}
+    >
       {children}
     </DensityContext.Provider>
   );
@@ -92,7 +102,7 @@ export function DensityToggle({ className }: { className?: string }) {
       variant="ghost"
       size="icon"
       onClick={toggleDensity}
-      className={cn("w-9 h-9", className)}
+      className={cn('w-9 h-9', className)}
       title={`Switch to ${labels[density]}`}
       aria-label={`Current: ${labels[density]}. Click to toggle density.`}
     >

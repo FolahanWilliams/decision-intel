@@ -171,28 +171,16 @@ export function EnhancedBreadcrumbs() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className={cn(
-        "mb-4 px-1",
-        "density-compact:mb-2",
-        "density-dense:mb-1"
-      )}
+      className={cn('mb-4 px-1', 'density-compact:mb-2', 'density-dense:mb-1')}
     >
       <ol className="flex items-center gap-1 list-none p-0 m-0 text-xs">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
             <li key={index} className="flex items-center gap-1">
-              {index > 0 && (
-                <ChevronRight
-                  size={12}
-                  className="text-muted"
-                  aria-hidden="true"
-                />
-              )}
+              {index > 0 && <ChevronRight size={12} className="text-muted" aria-hidden="true" />}
               <div className="flex items-center gap-1.5">
-                {item.icon && !item.isLoading && (
-                  <span className="text-muted">{item.icon}</span>
-                )}
+                {item.icon && !item.isLoading && <span className="text-muted">{item.icon}</span>}
                 {item.isLoading ? (
                   <span className="text-muted animate-pulse">Loading...</span>
                 ) : isLast || !item.href ? (
@@ -200,7 +188,7 @@ export function EnhancedBreadcrumbs() {
                     aria-current={isLast ? 'page' : undefined}
                     className={cn(
                       isLast ? 'text-primary font-medium' : 'text-muted',
-                      "max-w-[200px] truncate"
+                      'max-w-[200px] truncate'
                     )}
                     title={item.label}
                   >
@@ -210,8 +198,8 @@ export function EnhancedBreadcrumbs() {
                   <Link
                     href={item.href}
                     className={cn(
-                      "text-muted hover:text-primary transition-colors",
-                      "max-w-[200px] truncate inline-block"
+                      'text-muted hover:text-primary transition-colors',
+                      'max-w-[200px] truncate inline-block'
                     )}
                     title={item.label}
                   >

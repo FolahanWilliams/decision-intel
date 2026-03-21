@@ -76,7 +76,9 @@ const prismaClientSingleton = () => {
 
   // Log pool configuration in development
   if (isDevelopment) {
-    log.info(`Database pool configured: max=${poolConfig.max}, idle=${poolConfig.idleTimeoutMillis}ms`);
+    log.info(
+      `Database pool configured: max=${poolConfig.max}, idle=${poolConfig.idleTimeoutMillis}ms`
+    );
   }
 
   // Cast needed: @prisma/adapter-pg bundles its own @types/pg which can

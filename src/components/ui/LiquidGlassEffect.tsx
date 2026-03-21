@@ -55,10 +55,10 @@ function generateLensMap(size: number): string {
         const displacementY = Math.sin(angle) * strength;
 
         // Encode as RGB: 128 = no displacement, 0-127 = negative, 129-255 = positive
-        data[idx] = Math.round(128 + displacementX * 80);     // R = X offset
+        data[idx] = Math.round(128 + displacementX * 80); // R = X offset
         data[idx + 1] = Math.round(128 + displacementY * 80); // G = Y offset
-        data[idx + 2] = 128;                                   // B = unused
-        data[idx + 3] = 255;                                   // A = fully opaque
+        data[idx + 2] = 128; // B = unused
+        data[idx + 3] = 255; // A = fully opaque
       } else {
         // Outside lens: neutral (no displacement)
         data[idx] = 128;
@@ -182,12 +182,21 @@ export function LiquidGlassEffect() {
               Uses a canvas-generated displacement map encoding a convex lens shape.
               feDisplacementMap warps backdrop pixels through the lens pattern.
               This creates real optical distortion like looking through curved glass. */}
-          <filter id="liquid-glass-refraction" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+          <filter
+            id="liquid-glass-refraction"
+            x="0%"
+            y="0%"
+            width="100%"
+            height="100%"
+            colorInterpolationFilters="sRGB"
+          >
             <feImage
               id="liquid-glass-lens-image"
               href=""
-              x="0" y="0"
-              width="100%" height="100%"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
               preserveAspectRatio="none"
               result="lens_map"
             />
@@ -201,12 +210,21 @@ export function LiquidGlassEffect() {
           </filter>
 
           {/* ── Card-optimized lens (wider aspect ratio) ── */}
-          <filter id="liquid-glass-card" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+          <filter
+            id="liquid-glass-card"
+            x="0%"
+            y="0%"
+            width="100%"
+            height="100%"
+            colorInterpolationFilters="sRGB"
+          >
             <feImage
               id="liquid-glass-card-lens-image"
               href=""
-              x="0" y="0"
-              width="100%" height="100%"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
               preserveAspectRatio="none"
               result="card_lens_map"
             />
@@ -228,44 +246,65 @@ export function LiquidGlassEffect() {
               stitchTiles="stitch"
               result="grain"
             />
-            <feColorMatrix
-              in="grain"
-              type="saturate"
-              values="0"
-              result="grayGrain"
-            />
+            <feColorMatrix in="grain" type="saturate" values="0" result="grayGrain" />
             <feBlend in="SourceGraphic" in2="grayGrain" mode="overlay" />
           </filter>
 
           {/* ── Chromatic Aberration (Color Fringing) ── */}
           <filter id="chromatic-aberration" x="-10%" y="-10%" width="120%" height="120%">
-            <feOffset in="SourceGraphic" dx="-0.5" dy="0" result="redShift"/>
+            <feOffset in="SourceGraphic" dx="-0.5" dy="0" result="redShift" />
             <feComponentTransfer in="redShift" result="red">
-              <feFuncR type="identity"/>
-              <feFuncG type="discrete" tableValues="0"/>
-              <feFuncB type="discrete" tableValues="0"/>
-              <feFuncA type="identity"/>
+              <feFuncR type="identity" />
+              <feFuncG type="discrete" tableValues="0" />
+              <feFuncB type="discrete" tableValues="0" />
+              <feFuncA type="identity" />
             </feComponentTransfer>
 
-            <feOffset in="SourceGraphic" dx="0.5" dy="0" result="blueShift"/>
+            <feOffset in="SourceGraphic" dx="0.5" dy="0" result="blueShift" />
             <feComponentTransfer in="blueShift" result="blue">
-              <feFuncR type="discrete" tableValues="0"/>
-              <feFuncG type="discrete" tableValues="0"/>
-              <feFuncB type="identity"/>
-              <feFuncA type="identity"/>
+              <feFuncR type="discrete" tableValues="0" />
+              <feFuncG type="discrete" tableValues="0" />
+              <feFuncB type="identity" />
+              <feFuncA type="identity" />
             </feComponentTransfer>
 
-            <feComposite in="red" in2="SourceGraphic" operator="arithmetic" k1="0" k2="0.5" k3="0.5" k4="0" result="redGreen"/>
-            <feComposite in="redGreen" in2="blue" operator="arithmetic" k1="0" k2="1" k3="0.5" k4="0"/>
+            <feComposite
+              in="red"
+              in2="SourceGraphic"
+              operator="arithmetic"
+              k1="0"
+              k2="0.5"
+              k3="0.5"
+              k4="0"
+              result="redGreen"
+            />
+            <feComposite
+              in="redGreen"
+              in2="blue"
+              operator="arithmetic"
+              k1="0"
+              k2="1"
+              k3="0.5"
+              k4="0"
+            />
           </filter>
 
           {/* ── Enhanced Refraction with Chromatic Shift ── */}
-          <filter id="liquid-glass-premium" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+          <filter
+            id="liquid-glass-premium"
+            x="0%"
+            y="0%"
+            width="100%"
+            height="100%"
+            colorInterpolationFilters="sRGB"
+          >
             <feImage
               id="liquid-glass-premium-lens-image"
               href=""
-              x="0" y="0"
-              width="100%" height="100%"
+              x="0"
+              y="0"
+              width="100%"
+              height="100%"
               preserveAspectRatio="none"
               result="premium_lens_map"
             />
@@ -277,8 +316,8 @@ export function LiquidGlassEffect() {
               yChannelSelector="G"
               result="displaced"
             />
-            <feGaussianBlur in="displaced" stdDeviation="0.3" result="blurred"/>
-            <feComposite in="blurred" in2="displaced" operator="over"/>
+            <feGaussianBlur in="displaced" stdDeviation="0.3" result="blurred" />
+            <feComposite in="blurred" in2="displaced" operator="over" />
           </filter>
         </defs>
       </svg>

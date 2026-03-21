@@ -47,9 +47,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     log.error('Failed to fetch system errors:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch system errors' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch system errors' }, { status: 500 });
   }
 }

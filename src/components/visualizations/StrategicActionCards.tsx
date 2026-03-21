@@ -34,7 +34,11 @@ export function StrategicActionCards({ data }: StrategicActionCardsProps) {
       data.opportunities.forEach((opportunity, oi) => {
         // Calculate relevance via keyword overlap
         const sWords = new Set(
-          strength.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 3)
+          strength
+            .toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .split(/\s+/)
+            .filter(w => w.length > 3)
         );
         const oWords = opportunity
           .toLowerCase()
@@ -47,9 +51,7 @@ export function StrategicActionCards({ data }: StrategicActionCardsProps) {
 
         // Confidence based on specificity of both items
         const specificityScore = Math.min((strength.length + opportunity.length) / 200, 1);
-        const confidence = Math.round(
-          Math.min((relevance * 60 + specificityScore * 30 + 20), 95)
-        );
+        const confidence = Math.round(Math.min(relevance * 60 + specificityScore * 30 + 20, 95));
 
         // Timeline heuristic
         const urgentKeywords = /immediate|urgent|now|quick|fast|rapid/i;
@@ -223,9 +225,7 @@ export function StrategicActionCards({ data }: StrategicActionCardsProps) {
           onClick={() => setShowAll(p => !p)}
           className="w-full text-center text-xs text-accent-primary hover:text-accent-primary/80 py-2 border border-border/50 hover:bg-muted/10 transition-colors"
         >
-          {showAll
-            ? `Show top 4 cards`
-            : `Show all ${actionCards.length} action cards`}
+          {showAll ? `Show top 4 cards` : `Show all ${actionCards.length} action cards`}
         </button>
       )}
     </div>

@@ -207,8 +207,8 @@ const glassCardLight = {
 } as const;
 
 // Liquid glass class names to use with these styles
-const glassCardClasses = "liquid-glass-premium border border-white/12 rounded-[20px]";
-const glassCardLightClasses = "liquid-glass border border-white/10 rounded-[20px]";
+const glassCardClasses = 'liquid-glass-premium border border-white/12 rounded-[20px]';
+const glassCardLightClasses = 'liquid-glass border border-white/10 rounded-[20px]';
 
 // Mobile nav overlay
 function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -255,7 +255,11 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className={cn("fixed top-0 right-0 bottom-0 z-50 w-72", "liquid-glass-premium", "border-l border-white/10")}
+            className={cn(
+              'fixed top-0 right-0 bottom-0 z-50 w-72',
+              'liquid-glass-premium',
+              'border-l border-white/10'
+            )}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
@@ -557,9 +561,9 @@ export default function LandingPage() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-40",
-          "liquid-glass-premium",
-          "border-b border-white/10"
+          'fixed top-0 left-0 right-0 z-40',
+          'liquid-glass-premium',
+          'border-b border-white/10'
         )}
         style={{
           background: 'rgba(8, 11, 20, 0.65)',
@@ -572,11 +576,7 @@ export default function LandingPage() {
         >
           <div className="flex items-center gap-3">
             <div
-              className={cn(
-                "p-2 rounded-[14px]",
-                "liquid-glass",
-                "border border-white/15"
-              )}
+              className={cn('p-2 rounded-[14px]', 'liquid-glass', 'border border-white/15')}
               style={{
                 background: 'rgba(255, 255, 255, 0.06)',
               }}
@@ -1528,7 +1528,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.1 }}
-              className={cn("col-span-1 md:col-span-2 lg:col-span-2", glassCardLightClasses, "p-8")}
+              className={cn('col-span-1 md:col-span-2 lg:col-span-2', glassCardLightClasses, 'p-8')}
               style={glassCardLight}
             >
               <div
@@ -1583,7 +1583,11 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.2 }}
-              className={cn("col-span-1 flex flex-col items-center text-center justify-center", glassCardLightClasses, "p-8")}
+              className={cn(
+                'col-span-1 flex flex-col items-center text-center justify-center',
+                glassCardLightClasses,
+                'p-8'
+              )}
               style={glassCardLight}
             >
               <Zap className="w-8 h-8 mb-4" style={{ color: '#fbbf24' }} />
@@ -1609,7 +1613,11 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.3 }}
-              className={cn("col-span-1 flex flex-col items-center text-center justify-center", glassCardLightClasses, "p-8")}
+              className={cn(
+                'col-span-1 flex flex-col items-center text-center justify-center',
+                glassCardLightClasses,
+                'p-8'
+              )}
               style={glassCardLight}
             >
               <Shield className="w-8 h-8 mb-4" style={{ color: '#22c55e' }} />
@@ -1675,9 +1683,8 @@ export default function LandingPage() {
                 lineHeight: 1.7,
               }}
             >
-              Anyone can wire an LLM to scan documents. What they cannot replicate is
-              the proprietary intelligence your organization builds inside Decision Intel
-              over time.
+              Anyone can wire an LLM to scan documents. What they cannot replicate is the
+              proprietary intelligence your organization builds inside Decision Intel over time.
             </p>
           </motion.div>
 
@@ -1788,7 +1795,9 @@ export default function LandingPage() {
                     >
                       {item.label}
                     </div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                    <div
+                      style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.6 }}
+                    >
                       {item.description}
                     </div>
                     {i < 3 && (
@@ -1949,8 +1958,9 @@ export default function LandingPage() {
                   lineHeight: 1.8,
                 }}
               >
-                &ldquo;A competitor offers a generic bias scanner at half the price. Why not switch?&rdquo;
-                Because after 6 months on Decision Intel, your platform has learned that{' '}
+                &ldquo;A competitor offers a generic bias scanner at half the price. Why not
+                switch?&rdquo; Because after 6 months on Decision Intel, your platform has learned
+                that{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                   anchoring bias is 3x more impactful in your org than the industry average
                 </span>
@@ -1960,9 +1970,11 @@ export default function LandingPage() {
                 </span>
                 , and that{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                  groupthink nudges in your #product-decisions Slack channel are acknowledged 4x more than email
+                  groupthink nudges in your #product-decisions Slack channel are acknowledged 4x
+                  more than email
                 </span>
-                . A generic tool starts from zero. Decision Intel starts from everything you&apos;ve taught it.
+                . A generic tool starts from zero. Decision Intel starts from everything you&apos;ve
+                taught it.
               </div>
             </div>
           </motion.div>
@@ -2001,7 +2013,7 @@ export default function LandingPage() {
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={roiInView ? { opacity: 1, x: 0 } : {}}
-              className={cn("md:col-span-2", glassCardClasses, "p-8")}
+              className={cn('md:col-span-2', glassCardClasses, 'p-8')}
               style={glassCard}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>

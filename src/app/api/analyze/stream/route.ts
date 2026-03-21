@@ -405,9 +405,12 @@ export async function POST(request: NextRequest) {
                 });
 
                 // Log score difference for monitoring
-                const scoreDiff = ((report.overallScore as number) || 0) - previousAnalysis.overallScore;
+                const scoreDiff =
+                  ((report.overallScore as number) || 0) - previousAnalysis.overallScore;
                 if (Math.abs(scoreDiff) > 10) {
-                  log.info(`Significant score change for document ${documentId}: ${scoreDiff.toFixed(1)} (v${nextVersion})`);
+                  log.info(
+                    `Significant score change for document ${documentId}: ${scoreDiff.toFixed(1)} (v${nextVersion})`
+                  );
                 }
               }
 
@@ -521,9 +524,7 @@ export async function POST(request: NextRequest) {
 
           // Clean up checkpoint cache on completion
           const cacheKey = `stream:${documentId}:${userId}`;
-          await prisma.cacheEntry
-            .delete({ where: { key: cacheKey } })
-            .catch(() => {}); // Ignore errors
+          await prisma.cacheEntry.delete({ where: { key: cacheKey } }).catch(() => {}); // Ignore errors
 
           if (heartbeatInterval) {
             clearInterval(heartbeatInterval);
