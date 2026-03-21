@@ -110,17 +110,20 @@ function getAllowedHosts(): string[] {
     try {
       const url = new URL(appUrl);
       hosts.push(url.host);
-
-      // Also allow Vercel preview deployments
-      if (url.host.includes('vercel.app')) {
-        hosts.push('*.vercel.app');
-      }
     } catch (error) {
       log.error('Invalid NEXT_PUBLIC_APP_URL:', error);
     }
   }
 
-  // Add Vercel URL if available (for preview deployments)
+  // When running on Vercel, always allow *.vercel.app so that preview
+  // deployments, branch URLs, and project aliases all pass CSRF checks.
+  // VERCEL_URL is deployment-specific and may differ from the Origin the
+  // browser sends, so a wildcard is the only reliable approach.
+  if (process.env.VERCEL === '1' || process.env.VERCEL_URL) {
+    hosts.push('*.vercel.app');
+  }
+
+  // Also add the exact VERCEL_URL as a fallback
   if (process.env.VERCEL_URL) {
     hosts.push(process.env.VERCEL_URL);
   }
