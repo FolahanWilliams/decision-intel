@@ -135,8 +135,8 @@ export function WeightedSwot({ data }: WeightedSwotProps) {
             style={{
               width: `${barWidth / 2}%`,
               ...(barDirection === 'right'
-                ? { left: '50%', background: 'linear-gradient(to right, transparent, rgba(52, 211, 153, 0.6))' }
-                : { right: '50%', background: 'linear-gradient(to left, transparent, rgba(239, 68, 68, 0.6))' }),
+                ? { left: '50%', background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--success) 60%, transparent))' }
+                : { right: '50%', background: 'linear-gradient(to left, transparent, color-mix(in srgb, var(--error) 60%, transparent))' }),
             }}
           />
           {/* Labels */}
@@ -188,7 +188,7 @@ export function WeightedSwot({ data }: WeightedSwotProps) {
               {isExpanded && (
                 <div className="border-t border-border/50 p-3 space-y-2">
                   {items.map((item, i) => (
-                    <div key={i} className="flex items-start gap-3 p-2 bg-black/10">
+                    <div key={i} className="flex items-start gap-3 p-2 bg-muted/20">
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-foreground/80 leading-relaxed">{item}</p>
                       </div>

@@ -28,15 +28,25 @@ export function PreMortemScenarioCards({
   const [checkedMeasures, setCheckedMeasures] = useState<Set<number>>(new Set());
 
   const cards = useMemo(() => {
+    // Simple deterministic hash to generate stable "random" values per scenario
+    const stableHash = (str: string, seed: number): number => {
+      let hash = seed;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+      }
+      return Math.abs(hash % 100);
+    };
+
     return failureScenarios.map((scenario, i) => {
       // Heuristic probability based on keyword signals
       const urgentWords = /catastroph|critical|fail|collapse|bankrupt|legal|regulat|lawsuit/i;
       const moderateWords = /delay|exceed|budget|turnover|competitor|market|risk/i;
+      const variation = stableHash(scenario, i) % 15;
 
       let probability = 40; // baseline
-      if (urgentWords.test(scenario)) probability = 70 + Math.round(Math.random() * 15);
-      else if (moderateWords.test(scenario)) probability = 45 + Math.round(Math.random() * 20);
-      else probability = 20 + Math.round(Math.random() * 25);
+      if (urgentWords.test(scenario)) probability = 70 + variation;
+      else if (moderateWords.test(scenario)) probability = 45 + variation;
+      else probability = 20 + variation;
 
       const impact: 'High' | 'Medium' | 'Low' =
         probability > 60 ? 'High' : probability > 35 ? 'Medium' : 'Low';

@@ -189,13 +189,13 @@ export function CrossImpactMatrix({ data }: CrossImpactMatrixProps) {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-            <div className="p-2 bg-black/10 text-xs">
+            <div className="p-2 bg-muted/20 text-xs">
               <span className={`font-semibold ${mode === 'st' ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {mode === 'st' ? 'Strength' : 'Weakness'}:
               </span>
               <p className="text-foreground/80 mt-1">{rows[selRow]}</p>
             </div>
-            <div className="p-2 bg-black/10 text-xs">
+            <div className="p-2 bg-muted/20 text-xs">
               <span className="font-semibold text-amber-400">Threat:</span>
               <p className="text-foreground/80 mt-1">{cols[selCol]}</p>
             </div>

@@ -204,11 +204,11 @@ export function DocumentTextHighlighter({
         </div>
       </div>
 
-      <div className="card-body flex-1 flex gap-0 overflow-hidden" style={{ minHeight: '400px' }}>
+      <div className="card-body flex-1 flex flex-col md:flex-row gap-0 overflow-hidden" style={{ minHeight: '300px' }}>
         {/* Document text panel */}
         <div
           ref={textRef}
-          className="flex-1 overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-wrap font-serif bg-muted/20 border-r border-border"
+          className="flex-1 overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-wrap font-serif bg-muted/20 md:border-r border-b md:border-b-0 border-border"
           style={{ maxHeight: '500px' }}
           onClick={() => setSelectedBiasIdx(null)}
         >
@@ -262,7 +262,7 @@ export function DocumentTextHighlighter({
 
         {/* Bias sidebar */}
         <div
-          className="w-64 lg:w-72 overflow-y-auto flex-shrink-0 bg-secondary/30"
+          className="w-full md:w-64 lg:w-72 overflow-y-auto flex-shrink-0 bg-secondary/30"
           style={{ maxHeight: '500px' }}
         >
           <div className="p-2 text-[10px] text-muted border-b border-border uppercase tracking-wider font-semibold">
@@ -285,7 +285,7 @@ export function DocumentTextHighlighter({
                     ? `${colors.bg} border-l-2 ${colors.border}`
                     : 'hover:bg-muted/30 border-l-2 border-l-transparent'
                 }`}
-                aria-selected={isSelected}
+                aria-pressed={isSelected}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span
@@ -306,7 +306,7 @@ export function DocumentTextHighlighter({
                 {/* Expanded details */}
                 {isSelected && (
                   <div className="mt-2 pt-2 border-t border-border/50 space-y-2">
-                    <p className="text-[11px] text-slate-400">{bias.explanation}</p>
+                    <p className="text-[11px] text-muted">{bias.explanation}</p>
                     <div className="p-2 bg-accent-primary/10 border border-accent-primary/20 text-[11px] text-accent-primary">
                       <span className="font-semibold block mb-0.5">Suggestion</span>
                       {bias.suggestion}
