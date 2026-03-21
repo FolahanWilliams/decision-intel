@@ -16,6 +16,7 @@ import { prisma } from '@/lib/prisma';
 // import { getServiceSupabase } from '@/lib/supabase';
 import { transcribeMeeting } from '@/lib/meetings/transcribe';
 import { extractMeetingIntelligence } from '@/lib/meetings/intelligence';
+import { predictDecisionQuality } from '@/lib/meetings/quality-predictor';
 import { analyzeHumanDecision } from '@/lib/human-audit/analyzer';
 import { toPrismaJson, toPrismaStringArray } from '@/lib/utils/prisma-json';
 import { storeHumanDecisionEmbedding } from '@/lib/rag/embeddings';
@@ -281,8 +282,15 @@ export async function processMeeting(meetingId: string, userId: string): Promise
         })
         .catch(err => log.error('Failed to store meeting intelligence:', err));
 
+      // Compute meeting decision quality prediction while full summary is available
+      const qualityPrediction = predictDecisionQuality(
+        intelligence.summary,
+        intelligence.speakerBiases,
+        intelligence.keyDecisions
+      );
+
       log.info(
-        `Intelligence stored: ${intelligence.actionItems.length} actions, ${intelligence.keyDecisions.length} decisions`
+        `Intelligence stored: ${intelligence.actionItems.length} actions, ${intelligence.keyDecisions.length} decisions, quality=${qualityPrediction.predictedScore} (confidence=${qualityPrediction.confidence})`
       );
     }
 

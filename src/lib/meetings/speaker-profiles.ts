@@ -7,6 +7,7 @@
  * more predictive the profiles become.
  */
 
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import type { SpeakerBiasProfile } from '@/lib/meetings/intelligence';
@@ -109,7 +110,7 @@ async function fetchOrgMeetings(orgId: string): Promise<MeetingRow[]> {
       where: {
         orgId,
         status: 'analyzed',
-        speakerBiases: { not: undefined },
+        speakerBiases: { not: Prisma.DbNull },
       },
       select: {
         id: true,
