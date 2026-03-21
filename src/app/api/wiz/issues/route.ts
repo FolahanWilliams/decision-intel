@@ -50,8 +50,15 @@ function getWizClient(): WizClient {
 /**
  * Analyze decision context for biases
  */
+interface IssueContext {
+  severity?: string;
+  affectedResources?: Array<{ id: string }>;
+  remediation?: { automatedFix?: boolean };
+  cloudProvider?: string;
+}
+
 async function analyzeDecisionContext(
-  issue: any,
+  issue: IssueContext,
   teamContext?: { teamSize: number; responseTime: number }
 ): Promise<{
   biasesDetected: string[];
@@ -84,10 +91,17 @@ async function analyzeDecisionContext(
 /**
  * Perform causal analysis for remediation decision
  */
-async function analyzeCausality(issue: any): Promise<{
+async function analyzeCausality(issue: IssueContext): Promise<{
   recommendation: string;
   reasoning: string;
-  alternativeScenarios: any[];
+  alternativeScenarios: Array<{
+    action: string;
+    outcome?: string;
+    risk?: string;
+    breachRisk?: number;
+    downtime?: number;
+    impact?: number;
+  }>;
 }> {
   const scenarios = new SecurityScenarios();
 
@@ -100,7 +114,7 @@ async function analyzeCausality(issue: any): Promise<{
   };
 
   const context = {
-    vulnerabilitySeverity: severityMap[issue.severity] || 'medium',
+    vulnerabilitySeverity: issue.severity ? severityMap[issue.severity] || 'medium' : 'medium',
     productionSystem: issue.cloudProvider !== undefined,
     peakTrafficHours: new Date().getHours() >= 9 && new Date().getHours() <= 17,
     dataClassification: issue.severity === 'CRITICAL' ? 'restricted' : 'internal'
@@ -157,9 +171,12 @@ export async function GET(request: NextRequest) {
     const wizClient = getWizClient();
 
     // Fetch issues from Wiz
+    const severityValue = params.severity as 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | undefined;
+    const statusValue = params.status as 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | undefined;
+
     const { issues, hasMore } = await wizClient.getIssues({
-      severity: params.severity as any,
-      status: params.status as any,
+      severity: severityValue ? [severityValue] : undefined,
+      status: statusValue ? [statusValue] : undefined,
       cloudProvider: params.cloudProvider,
       limit: params.limit,
       offset: params.offset
@@ -168,7 +185,11 @@ export async function GET(request: NextRequest) {
     // Enhance issues with cognitive analysis
     const enhancedIssues = await Promise.all(
       issues.map(async (issue) => {
-        const enhanced: any = { ...issue };
+        const enhanced = {
+          ...issue,
+          biasAnalysis: undefined as Awaited<ReturnType<typeof analyzeDecisionContext>> | undefined,
+          causalAnalysis: undefined as Awaited<ReturnType<typeof analyzeCausality>> | undefined
+        };
 
         // Add bias analysis if requested
         if (params.includeBiasAnalysis) {

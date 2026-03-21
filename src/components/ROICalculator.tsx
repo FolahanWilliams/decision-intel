@@ -170,7 +170,7 @@ export default function ROICalculator() {
     setResults(calculateROI(inputs));
   }, [inputs]);
 
-  const updateInput = (key: keyof ROIInputs, value: any) => {
+  const updateInput = (key: keyof ROIInputs, value: number | boolean) => {
     setInputs(prev => ({ ...prev, [key]: value }));
   };
 

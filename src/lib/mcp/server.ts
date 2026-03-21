@@ -308,7 +308,7 @@ export class MCPServer {
       const contextMap = new Map(Object.entries(params.context));
 
       // Perform interventions if specified
-      let results: any[] = [];
+      const results: any[] = [];
       if (params.interventions && params.interventions.length > 0) {
         for (const intervention of params.interventions) {
           const result = this.causalModel.doIntervention(

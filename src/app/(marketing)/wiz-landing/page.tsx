@@ -50,7 +50,15 @@ function AnimatedCounter({ target, suffix = '', prefix = '' }: { target: number;
 }
 
 // Security KPI Card
-function KPICard({ icon: Icon, metric, value, improvement, description }: any) {
+interface KPICardProps {
+  icon: React.ElementType;
+  metric: string;
+  value: string | React.ReactNode;
+  improvement: string;
+  description: string;
+}
+
+function KPICard({ icon: Icon, metric, value, improvement, description }: KPICardProps) {
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
@@ -463,7 +471,7 @@ export default function WizLandingPage() {
             </h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               The only platform that detects and mitigates all 15 security-specific cognitive biases
-              based on Kahneman's research.
+              based on Kahneman&apos;s research.
             </p>
           </motion.div>
 
@@ -535,7 +543,7 @@ export default function WizLandingPage() {
                 Beyond Correlation to Causation
               </h2>
               <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                Pearl's causal hierarchy implementation for counterfactual reasoning in security operations
+                Pearl&apos;s causal hierarchy implementation for counterfactual reasoning in security operations
               </p>
             </div>
 
@@ -549,7 +557,7 @@ export default function WizLandingPage() {
                   Observational analysis: P(Y|X)
                 </p>
                 <p className="text-xs text-gray-500">
-                  "Critical vulnerabilities are associated with breaches"
+                  &ldquo;Critical vulnerabilities are associated with breaches&rdquo;
                 </p>
               </div>
 
@@ -562,7 +570,7 @@ export default function WizLandingPage() {
                   Do-calculus: P(Y|do(X))
                 </p>
                 <p className="text-xs text-gray-500">
-                  "If we patch now, breach risk drops 65%"
+                  &ldquo;If we patch now, breach risk drops 65%&rdquo;
                 </p>
               </div>
 
@@ -572,10 +580,10 @@ export default function WizLandingPage() {
                 </div>
                 <h3 className="text-xl font-bold mb-2">Level 3: Counterfactuals</h3>
                 <p className="text-sm text-gray-400 mb-4">
-                  What-if scenarios: P(Y_x|X',Y')
+                  What-if scenarios: P(Y_x|X&apos;,Y&apos;)
                 </p>
                 <p className="text-xs text-gray-500">
-                  "Had we patched yesterday, the breach wouldn't have occurred"
+                  &ldquo;Had we patched yesterday, the breach wouldn&apos;t have occurred&rdquo;
                 </p>
               </div>
             </div>

@@ -138,7 +138,7 @@ export function EnhancedBreadcrumbs() {
 
     // Check for dynamic title
     let label = staticTitles[segment] || segment;
-    let icon = sectionIcons[segment];
+    const icon = sectionIcons[segment];
 
     // Check if this is an ID with a fetched title
     if (index > 0) {
