@@ -161,10 +161,9 @@ export async function DELETE(
         log.warn('FK constraint blocked delete — attempting raw cleanup for document', id);
         // Clean up any orphaned rows in legacy tables that still reference
         // this document with ON DELETE RESTRICT.
-        await prisma.$executeRawUnsafe(
-          `DELETE FROM "HumanDecisionAudit" WHERE "documentId" = $1`,
-          id
-        ).catch(() => {});
+        await prisma
+          .$executeRawUnsafe(`DELETE FROM "HumanDecisionAudit" WHERE "documentId" = $1`, id)
+          .catch(() => {});
         // Retry the delete
         await prisma.document.delete({ where: { id } });
       } else {
