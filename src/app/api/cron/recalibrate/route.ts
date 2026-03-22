@@ -75,6 +75,48 @@ export async function GET(request: NextRequest) {
     for (const orgId of orgIds) {
       const result = await runFullRecalibration(orgId);
       results.push({ orgId, ...result });
+
+      // Persist learned causal edges to CausalEdge table (Moat 1)
+      if (orgId) {
+        try {
+          const { learnCausalEdges } = await import('@/lib/learning/causal-learning');
+          const causalWeights = await learnCausalEdges(orgId);
+          for (const w of causalWeights) {
+            await prisma.causalEdge.upsert({
+              where: {
+                orgId_fromVar_toVar: {
+                  orgId: orgId,
+                  fromVar: w.biasType,
+                  toVar: 'decision_quality',
+                },
+              },
+              create: {
+                orgId,
+                fromVar: w.biasType,
+                toVar: 'decision_quality',
+                strength: w.outcomeCorrelation,
+                confidence: Math.min(1, w.sampleSize / 20),
+                sampleSize: w.sampleSize,
+              },
+              update: {
+                strength: w.outcomeCorrelation,
+                confidence: Math.min(1, w.sampleSize / 20),
+                sampleSize: w.sampleSize,
+              },
+            });
+          }
+          if (causalWeights.length > 0) {
+            log.info(`Persisted ${causalWeights.length} causal edges for org ${orgId}`);
+          }
+        } catch (causalError) {
+          const msg = causalError instanceof Error ? causalError.message : String(causalError);
+          if (msg.includes('P2021') || msg.includes('P2022')) {
+            log.debug('CausalEdge table not available (schema drift)');
+          } else {
+            log.warn(`Causal edge persistence failed for org ${orgId}:`, msg);
+          }
+        }
+      }
     }
 
     const durationMs = Date.now() - start;

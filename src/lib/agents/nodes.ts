@@ -1033,7 +1033,49 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
       );
     }
 
-    // Step 3: Build dynamic prompt with custom personas + outcome awareness
+    // Step 3: Load causal driver rankings (Moat 1: Causal AI Layer)
+    // Tells decision twins which biases ACTUALLY matter for this org
+    let causalDriverBrief = '';
+    try {
+      const { learnCausalEdges } = await import('@/lib/learning/causal-learning');
+      const causalWeights = await learnCausalEdges(userId);
+      if (causalWeights.length > 0) {
+        const topDangers = causalWeights
+          .filter(w => w.dangerMultiplier >= 1.3 && w.sampleSize >= 3)
+          .slice(0, 5);
+        const topSafe = causalWeights
+          .filter(w => w.dangerMultiplier <= 0.7 && w.sampleSize >= 3)
+          .slice(-3);
+
+        if (topDangers.length > 0 || topSafe.length > 0) {
+          const dangerLines = topDangers.map(
+            w =>
+              `- ${w.biasType.replace(/_/g, ' ')}: ${w.dangerMultiplier}x danger (${w.failureCount} failures in ${w.sampleSize} decisions)`
+          );
+          const safeLines = topSafe.map(
+            w =>
+              `- ${w.biasType.replace(/_/g, ' ')}: mostly benign (${w.failureCount} failures in ${w.sampleSize} decisions)`
+          );
+
+          causalDriverBrief =
+            '\n\nCAUSAL INTELLIGENCE (learned from this organization\'s actual decision outcomes):\n' +
+            (dangerLines.length > 0
+              ? 'HIGH-DANGER biases (focus your deliberation here):\n' + dangerLines.join('\n') + '\n'
+              : '') +
+            (safeLines.length > 0
+              ? 'LOWER-RISK biases (de-prioritize in deliberation):\n' + safeLines.join('\n')
+              : '');
+
+          log.info(
+            `Causal drivers injected into simulation: ${topDangers.length} dangerous, ${topSafe.length} benign`
+          );
+        }
+      }
+    } catch {
+      log.debug('Causal drivers unavailable for simulation — proceeding without');
+    }
+
+    // Step 4: Build dynamic prompt with custom personas + outcome awareness
     const { buildSimulationPrompt } = await import('./prompts');
 
     const dynamicPrompt = buildSimulationPrompt({
@@ -1054,7 +1096,7 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
       getStandardSafetyGroundedModel().generateContent([
         dynamicPrompt,
         `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
-        `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}`,
+        `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}${causalDriverBrief}`,
       ]),
       90000
     );
@@ -1186,11 +1228,35 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     log.debug('Using default bias severity weights (calibration unavailable)');
   }
 
-  // 1. Bias Deductions (Weighted by Severity — now calibration-aware)
+  // Load causal danger multipliers from org outcome data (Moat 1: Causal AI Layer)
+  // If a bias type is causally linked to poor outcomes, amplify its deduction.
+  // If a bias type is mostly benign, reduce its deduction.
+  let causalMultipliers: Map<string, number> = new Map();
+  try {
+    const { learnCausalEdges } = await import('@/lib/learning/causal-learning');
+    // userId serves as proxy for org lookup when orgId isn't available
+    const causalWeights = await learnCausalEdges(state.userId || '');
+    if (causalWeights.length > 0) {
+      causalMultipliers = new Map(
+        causalWeights.map(w => [w.biasType.toLowerCase().replace(/\s+/g, '_'), w.dangerMultiplier])
+      );
+      log.debug(`Causal AI active: ${causalWeights.length} bias-outcome edges loaded`);
+    }
+  } catch {
+    log.debug('Causal weights unavailable — using static severity only');
+  }
+
+  // 1. Bias Deductions (Weighted by Severity + Causal Danger Multiplier)
   const biasDeductions = (state.biasAnalysis || []).reduce(
-    (acc: number, b: { severity?: string }) => {
+    (acc: number, b: { severity?: string; biasType?: string }) => {
       const severity = (b.severity || 'low').toLowerCase();
-      return acc + (severityWeights[severity] || 5);
+      const basePenalty = severityWeights[severity] || 5;
+      // Apply causal multiplier: >1 amplifies (dangerous), <1 dampens (benign)
+      const biasKey = (b.biasType || '').toLowerCase().replace(/\s+/g, '_');
+      const multiplier = causalMultipliers.get(biasKey) ?? 1.0;
+      // Clamp multiplier to [0.3, 2.5] to prevent extreme swings
+      const clampedMultiplier = Math.max(0.3, Math.min(2.5, multiplier));
+      return acc + Math.round(basePenalty * clampedMultiplier);
     },
     0
   );

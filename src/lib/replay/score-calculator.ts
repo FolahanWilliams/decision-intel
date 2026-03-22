@@ -16,6 +16,16 @@ export interface CounterfactualResult {
 }
 
 /**
+ * Causal effect multipliers for counterfactual reasoning.
+ * When provided, adjusts bias removal impact based on actual causal
+ * relationships learned from outcome data (Moat 1: Causal AI Layer).
+ */
+export interface CausalEffectEstimates {
+  /** Per-bias-type danger multiplier learned from org outcome data */
+  dangerMultipliers: Record<string, number>;
+}
+
+/**
  * Calculate a counterfactual score by applying overrides to the analysis.
  * This is a client-side approximation — it estimates how the score would change
  * if certain biases were removed, noise was different, etc.
@@ -24,11 +34,17 @@ export interface CounterfactualResult {
  * When calibration data is available, bias weights are adjusted based on
  * historical confirmation rates (biases with high false-positive rates
  * have lower counterfactual impact).
+ *
+ * Accepts optional causal effect estimates from the Causal AI Layer.
+ * When available, uses learned danger multipliers to produce more accurate
+ * counterfactual projections (e.g., removing a bias that is causally benign
+ * in this org will recover fewer points than one that is causally dangerous).
  */
 export function calculateCounterfactualScore(
   analysis: AnalysisResult,
   overrides: ScoreOverrides,
-  calibratedWeights?: Record<string, number>
+  calibratedWeights?: Record<string, number>,
+  causalEffects?: CausalEffectEstimates
 ): CounterfactualResult {
   const severityWeights = calibratedWeights ?? DEFAULT_COUNTERFACTUAL_WEIGHTS;
   const original = analysis.overallScore;
@@ -36,21 +52,36 @@ export function calculateCounterfactualScore(
   const reasons: string[] = [];
 
   // 1. Remove biases — each removed bias adds back its penalty
+  // When causal effects are available, scale recovery by danger multiplier:
+  //   High danger bias → removing it recovers MORE points (it was truly harmful)
+  //   Low danger bias → removing it recovers FEWER points (it was mostly noise)
   if (overrides.removeBiases?.length) {
     const removedSet = new Set(overrides.removeBiases);
     let recoveredPoints = 0;
+    let causallyAdjusted = false;
 
     for (const bias of analysis.biases) {
       if (removedSet.has(bias.biasType)) {
-        const weight = severityWeights[bias.severity] || 3;
-        recoveredPoints += weight;
+        const baseWeight = severityWeights[bias.severity] || 3;
+        const biasKey = bias.biasType.toLowerCase().replace(/\s+/g, '_');
+        const causalMultiplier = causalEffects?.dangerMultipliers[biasKey];
+
+        if (causalMultiplier !== undefined) {
+          // Clamp to [0.3, 2.5] to prevent extreme swings
+          const clamped = Math.max(0.3, Math.min(2.5, causalMultiplier));
+          recoveredPoints += Math.round(baseWeight * clamped);
+          causallyAdjusted = true;
+        } else {
+          recoveredPoints += baseWeight;
+        }
       }
     }
 
     adjustedScore += recoveredPoints;
     if (recoveredPoints > 0) {
+      const causalNote = causallyAdjusted ? ' (causal-adjusted)' : '';
       reasons.push(
-        `Removing ${overrides.removeBiases.length} bias${overrides.removeBiases.length > 1 ? 'es' : ''} recovers ~${recoveredPoints} points`
+        `Removing ${overrides.removeBiases.length} bias${overrides.removeBiases.length > 1 ? 'es' : ''} recovers ~${recoveredPoints} points${causalNote}`
       );
     }
   }
