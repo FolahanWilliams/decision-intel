@@ -47,31 +47,75 @@ export function hashApiKey(key: string): string {
 // Key generation
 // ---------------------------------------------------------------------------
 
+export interface GenerateApiKeyOptions {
+  userId: string;
+  orgId?: string | null;
+  name: string;
+  scopes: string[];
+  rateLimit?: number;
+  expiresAt?: Date | null;
+}
+
+export interface GenerateApiKeyResult {
+  key: string;
+  keyId: string;
+  name: string;
+  scopes: string[];
+  expiresAt?: string;
+  /** @deprecated use key */
+  rawKey?: string;
+  /** @deprecated */
+  keyPrefix?: string;
+}
+
 export async function generateApiKey(
-  userId: string,
-  orgId: string | null,
-  name: string,
-  scopes: string[]
-): Promise<{ rawKey: string; keyId: string; keyPrefix: string }> {
-  const rawHex = randomBytes(32).toString('hex'); // 64 hex chars
+  userIdOrOptions: string | GenerateApiKeyOptions,
+  orgId?: string | null,
+  name?: string,
+  scopes?: string[]
+): Promise<GenerateApiKeyResult> {
+  let opts: GenerateApiKeyOptions;
+  if (typeof userIdOrOptions === 'object') {
+    opts = userIdOrOptions;
+  } else {
+    // Legacy positional-argument signature
+    opts = {
+      userId: userIdOrOptions,
+      orgId: orgId ?? null,
+      name: name ?? '',
+      scopes: scopes ?? [],
+    };
+  }
+
+  const rawHex = randomBytes(16).toString('hex'); // 32 hex chars
   const rawKey = `${API_KEY_PREFIX}${rawHex}`;
   const keyHash = hashApiKey(rawKey);
   const keyPrefix = rawKey.slice(0, 16); // "di_live_" + first 8 hex chars
 
   const record = await prisma.apiKey.create({
     data: {
-      userId,
-      orgId,
-      name,
+      userId: opts.userId,
+      orgId: opts.orgId ?? null,
+      name: opts.name,
       keyHash,
       keyPrefix,
-      scopes,
+      scopes: opts.scopes,
+      ...(opts.rateLimit !== undefined && { rateLimit: opts.rateLimit }),
+      ...(opts.expiresAt !== undefined && opts.expiresAt !== null && { expiresAt: opts.expiresAt }),
     },
   });
 
-  log.info(`API key created: ${record.id} for user ${userId} (prefix: ${keyPrefix})`);
+  log.info(`API key created: ${record.id} for user ${opts.userId} (prefix: ${keyPrefix})`);
 
-  return { rawKey, keyId: record.id, keyPrefix };
+  return {
+    key: rawKey,
+    rawKey,
+    keyId: record.id,
+    keyPrefix,
+    name: record.name,
+    scopes: record.scopes,
+    ...(record.expiresAt && { expiresAt: record.expiresAt.toISOString() }),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -86,7 +130,7 @@ export async function validateApiKey(
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return {
       success: false,
-      error: 'Missing or malformed Authorization header. Expected: Bearer di_live_xxx',
+      error: 'API key required',
       status: 401,
     };
   }
@@ -95,7 +139,7 @@ export async function validateApiKey(
   if (!rawKey.startsWith(API_KEY_PREFIX)) {
     return {
       success: false,
-      error: 'Invalid API key format. Keys must start with "di_live_".',
+      error: 'Invalid API key format',
       status: 401,
     };
   }
@@ -122,17 +166,17 @@ export async function validateApiKey(
   }
 
   if (!apiKey) {
-    return { success: false, error: 'Invalid API key.', status: 401 };
+    return { success: false, error: 'Invalid API key', status: 401 };
   }
 
   // Check revocation
   if (apiKey.revokedAt) {
-    return { success: false, error: 'API key has been revoked.', status: 401 };
+    return { success: false, error: 'API key has been revoked', status: 401 };
   }
 
   // Check expiration
   if (apiKey.expiresAt && apiKey.expiresAt < new Date()) {
-    return { success: false, error: 'API key has expired.', status: 401 };
+    return { success: false, error: 'API key has expired', status: 401 };
   }
 
   // Rate limiting — use per-key identifier
@@ -142,13 +186,18 @@ export async function validateApiKey(
     failMode: 'closed',
   });
 
-  if (!rateLimitResult.success) {
+  const allowed =
+    (rateLimitResult as { allowed?: boolean }).allowed ?? rateLimitResult.success;
+  if (!allowed) {
+    const retryAfter =
+      (rateLimitResult as { retryAfter?: number }).retryAfter ??
+      (rateLimitResult.reset - Math.floor(Date.now() / 1000));
     return {
       success: false,
-      error: 'Rate limit exceeded.',
+      error: 'Rate limit exceeded',
       status: 429,
       headers: {
-        'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)),
+        'Retry-After': String(retryAfter),
         'X-RateLimit-Limit': String(rateLimitResult.limit),
         'X-RateLimit-Remaining': '0',
         'X-RateLimit-Reset': String(rateLimitResult.reset),
@@ -157,16 +206,16 @@ export async function validateApiKey(
   }
 
   // Update lastUsedAt (fire-and-forget)
-  prisma.apiKey
-    .update({
+  void Promise.resolve(
+    prisma.apiKey.update({
       where: { id: apiKey.id },
       data: { lastUsedAt: new Date() },
     })
-    .catch((err: unknown) => {
-      log.warn(
-        'Failed to update lastUsedAt: ' + (err instanceof Error ? err.message : String(err))
-      );
-    });
+  ).catch((err: unknown) => {
+    log.warn(
+      'Failed to update lastUsedAt: ' + (err instanceof Error ? err.message : String(err))
+    );
+  });
 
   return {
     success: true,
@@ -193,4 +242,81 @@ export function requireScope(context: ApiKeyContext, scope: string): ValidateErr
     };
   }
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Key management
+// ---------------------------------------------------------------------------
+
+export async function revokeApiKey(keyId: string): Promise<boolean> {
+  await prisma.apiKey.update({
+    where: { id: keyId },
+    data: { revokedAt: new Date() },
+  });
+  return true;
+}
+
+export async function listApiKeys(
+  userId: string,
+  orgId?: string
+): Promise<
+  Array<{
+    id: string;
+    name: string;
+    scopes: string[];
+    rateLimit: number;
+    lastUsedAt: Date | null;
+    createdAt: Date;
+    expiresAt: Date | null;
+    revokedAt: Date | null;
+  }>
+> {
+  return prisma.apiKey.findMany({
+    where: {
+      userId,
+      ...(orgId !== undefined && { orgId }),
+    },
+    select: {
+      id: true,
+      name: true,
+      scopes: true,
+      rateLimit: true,
+      lastUsedAt: true,
+      createdAt: true,
+      expiresAt: true,
+      revokedAt: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
+export async function getApiKeyStats(
+  keyId: string,
+  from?: Date,
+  to?: Date
+): Promise<{ totalRequests: number; averageResponseTime: number | null }> {
+  const dateFilter =
+    from || to
+      ? {
+          createdAt: {
+            ...(from && { gte: from }),
+            ...(to && { lte: to }),
+          },
+        }
+      : {};
+
+  const [count, agg] = await Promise.all([
+    prisma.apiKeyUsage.count({
+      where: { keyId, ...dateFilter },
+    }),
+    prisma.apiKeyUsage.aggregate({
+      where: { keyId, ...dateFilter },
+      _avg: { responseTime: true },
+    }),
+  ]);
+
+  return {
+    totalRequests: count,
+    averageResponseTime: agg?._avg?.responseTime ?? null,
+  };
 }

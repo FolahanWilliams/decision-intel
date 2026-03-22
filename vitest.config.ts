@@ -6,6 +6,7 @@ const config = {
       '@': path.resolve(__dirname, './src'),
     },
     environment: 'node',
+    setupFiles: ['./vitest.setup.ts'],
   },
 };
 
