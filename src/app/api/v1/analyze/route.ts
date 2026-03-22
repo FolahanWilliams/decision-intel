@@ -44,11 +44,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON in request body.' }, { status: 400 });
     }
 
-    const { documentId, content, title, metadata } = body as {
+    const { documentId, content, title } = body as {
       documentId?: string;
       content?: string;
       title?: string;
-      metadata?: Record<string, unknown>;
     };
 
     if (!documentId && !content) {
@@ -97,26 +96,23 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Run new analysis
-      let analysisResult;
       try {
-        analysisResult = await analyzeDocument(
-          { content: document.content ?? '', title: document.filename },
-          { userId: context.userId, orgId: context.orgId }
-        );
+        await analyzeDocument(document);
       } catch (err) {
         log.error('Analysis failed:', err);
         return NextResponse.json({ error: 'Analysis failed' }, { status: 500 });
       }
 
-      const saved = await prisma.analysis.create({
-        data: {
-          ...(analysisResult as Record<string, unknown>),
-          documentId,
-          userId: context.userId,
-          orgId: context.orgId,
-        },
+      // get the DB record that was just created by analyzer.ts
+      const saved = await prisma.analysis.findFirst({
+        where: { documentId },
+        orderBy: { createdAt: 'desc' },
       });
+
+      if (!saved) {
+        log.error('Analysis record not found after successful analysis');
+        return NextResponse.json({ error: 'Analysis failed to save' }, { status: 500 });
+      }
 
       return NextResponse.json({
         success: true,
@@ -132,24 +128,36 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Case 2: raw content provided ──────────────────────────────────
-    let analysisResult;
+    let saved;
     try {
-      analysisResult = await analyzeDocument(
-        { content: content as string, title: title ?? 'Untitled', metadata },
-        { userId: context.userId, orgId: context.orgId }
-      );
+      // First create the document
+      const newDoc = await prisma.document.create({
+        data: {
+          userId: context.userId,
+          filename: title ?? 'Untitled',
+          fileType: 'text',
+          fileSize: (content as string).length,
+          content: content as string,
+          status: 'pending',
+          orgId: context.orgId,
+        },
+      });
+
+      await analyzeDocument(newDoc);
+
+      // get the DB record that was just created by analyzer.ts
+      saved = await prisma.analysis.findFirst({
+        where: { documentId: newDoc.id },
+        orderBy: { createdAt: 'desc' },
+      });
+      
+      if (!saved) {
+        throw new Error('Analysis record not found after successful analysis');
+      }
     } catch (err) {
       log.error('Analysis failed:', err);
       return NextResponse.json({ error: 'Analysis failed' }, { status: 500 });
     }
-
-    const saved = await prisma.analysis.create({
-      data: {
-        ...(analysisResult as Record<string, unknown>),
-        userId: context.userId,
-        orgId: context.orgId,
-      },
-    });
 
     return NextResponse.json({
       success: true,

@@ -74,7 +74,7 @@ export async function computeOrgCausalWeights(
   to?: Date
 ): Promise<CausalWeight[]> {
   try {
-    const outcomes: OutcomeRecord[] = await (prisma as Record<string, unknown> as {
+    const outcomes: OutcomeRecord[] = await (prisma as unknown as {
       outcomeRecord: { findMany: (args: unknown) => Promise<OutcomeRecord[]> };
     }).outcomeRecord.findMany({
       where: {
@@ -175,7 +175,7 @@ export async function applyOrgWeights(
   biases: Record<string, { score: number; instances: unknown[] }>
 ): Promise<Record<string, { score: number; instances: unknown[]; adjusted?: boolean; orgMultiplier?: number }>> {
   try {
-    const model = await (prisma as Record<string, unknown> as {
+    const model = await (prisma as unknown as {
       orgCausalModel: { findUnique: (args: unknown) => Promise<{
         weights: CausalWeight[];
         updatedAt?: Date;
@@ -298,7 +298,7 @@ export function getCausalInsights(
 export async function updateCausalModel(orgId: string): Promise<unknown | null> {
   try {
     const weights = await computeOrgCausalWeights(orgId);
-    const outcomes = await (prisma as Record<string, unknown> as {
+    const outcomes = await (prisma as unknown as {
       outcomeRecord: { findMany: (args: unknown) => Promise<OutcomeRecord[]> };
     }).outcomeRecord.findMany({
       where: { orgId },
@@ -307,7 +307,7 @@ export async function updateCausalModel(orgId: string): Promise<unknown | null> 
     const totalOutcomes = outcomes.length;
     const insights = getCausalInsights(weights, totalOutcomes);
 
-    const result = await (prisma as Record<string, unknown> as {
+    const result = await (prisma as unknown as {
       orgCausalModel: { upsert: (args: unknown) => Promise<unknown> };
     }).orgCausalModel.upsert({
       where: { orgId },
