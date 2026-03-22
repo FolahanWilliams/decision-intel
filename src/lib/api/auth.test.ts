@@ -2,7 +2,7 @@
  * Tests for API key authentication system
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import {
   hashApiKey,
@@ -11,7 +11,6 @@ import {
   revokeApiKey,
   listApiKeys,
   getApiKeyStats,
-  type ApiKeyContext,
 } from './auth';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
@@ -71,7 +70,7 @@ describe('API Authentication', () => {
 
   describe('generateApiKey', () => {
     it('should generate a new API key with correct format', async () => {
-      const mockKey = {
+      const mockKey: any = {
         id: 'key_123',
         name: 'Test API Key',
         keyHash: 'hashed_value',
@@ -84,7 +83,7 @@ describe('API Authentication', () => {
         createdAt: new Date(),
       };
 
-      vi.mocked(prisma.apiKey.create).mockResolvedValue(mockKey);
+      vi.mocked((prisma as any).apiKey.create).mockResolvedValue(mockKey);
 
       const result = await generateApiKey({
         userId: 'user_123',
@@ -102,7 +101,7 @@ describe('API Authentication', () => {
 
     it('should handle expiration dates', async () => {
       const expiresAt = new Date('2025-12-31');
-      const mockKey = {
+      const mockKey: any = {
         id: 'key_123',
         name: 'Expiring Key',
         keyHash: 'hashed_value',
@@ -115,7 +114,7 @@ describe('API Authentication', () => {
         createdAt: new Date(),
       };
 
-      vi.mocked(prisma.apiKey.create).mockResolvedValue(mockKey);
+      vi.mocked((prisma as any).apiKey.create).mockResolvedValue(mockKey);
 
       const result = await generateApiKey({
         userId: 'user_123',
@@ -133,7 +132,7 @@ describe('API Authentication', () => {
       const key = 'di_live_1234567890abcdef1234567890abcdef';
       const keyHash = hashApiKey(key);
 
-      const mockApiKey = {
+      const mockApiKey: any = {
         id: 'key_123',
         userId: 'user_123',
         orgId: 'org_123',
@@ -147,8 +146,8 @@ describe('API Authentication', () => {
         createdAt: new Date(),
       };
 
-      vi.mocked(prisma.apiKey.findUnique).mockResolvedValue(mockApiKey);
-      vi.mocked(checkRateLimit).mockResolvedValue({ allowed: true });
+      vi.mocked((prisma as any).apiKey.findUnique).mockResolvedValue(mockApiKey);
+      vi.mocked(checkRateLimit).mockResolvedValue({ allowed: true } as any);
       vi.mocked(prisma.$transaction).mockImplementation(async (fn) => {
         if (typeof fn === 'function') {
           return fn(prisma);
@@ -203,7 +202,7 @@ describe('API Authentication', () => {
     it('should reject non-existent API key', async () => {
       const key = 'di_live_1234567890abcdef1234567890abcdef';
 
-      vi.mocked(prisma.apiKey.findUnique).mockResolvedValue(null);
+      vi.mocked((prisma as any).apiKey.findUnique).mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/test', {
         headers: {
@@ -224,7 +223,7 @@ describe('API Authentication', () => {
       const key = 'di_live_1234567890abcdef1234567890abcdef';
       const keyHash = hashApiKey(key);
 
-      const mockApiKey = {
+      const mockApiKey: any = {
         id: 'key_123',
         userId: 'user_123',
         orgId: null,
@@ -238,7 +237,7 @@ describe('API Authentication', () => {
         createdAt: new Date(),
       };
 
-      vi.mocked(prisma.apiKey.findUnique).mockResolvedValue(mockApiKey);
+      vi.mocked((prisma as any).apiKey.findUnique).mockResolvedValue(mockApiKey);
 
       const request = new NextRequest('http://localhost:3000/api/test', {
         headers: {
@@ -259,7 +258,7 @@ describe('API Authentication', () => {
       const key = 'di_live_1234567890abcdef1234567890abcdef';
       const keyHash = hashApiKey(key);
 
-      const mockApiKey = {
+      const mockApiKey: any = {
         id: 'key_123',
         userId: 'user_123',
         orgId: null,
@@ -273,7 +272,7 @@ describe('API Authentication', () => {
         createdAt: new Date(),
       };
 
-      vi.mocked(prisma.apiKey.findUnique).mockResolvedValue(mockApiKey);
+      vi.mocked((prisma as any).apiKey.findUnique).mockResolvedValue(mockApiKey);
 
       const request = new NextRequest('http://localhost:3000/api/test', {
         headers: {
@@ -294,7 +293,7 @@ describe('API Authentication', () => {
       const key = 'di_live_1234567890abcdef1234567890abcdef';
       const keyHash = hashApiKey(key);
 
-      const mockApiKey = {
+      const mockApiKey: any = {
         id: 'key_123',
         userId: 'user_123',
         orgId: null,
@@ -308,11 +307,11 @@ describe('API Authentication', () => {
         createdAt: new Date(),
       };
 
-      vi.mocked(prisma.apiKey.findUnique).mockResolvedValue(mockApiKey);
+      vi.mocked((prisma as any).apiKey.findUnique).mockResolvedValue(mockApiKey);
       vi.mocked(checkRateLimit).mockResolvedValue({
         allowed: false,
         retryAfter: 60,
-      });
+      } as any);
 
       const request = new NextRequest('http://localhost:3000/api/test', {
         headers: {
@@ -338,12 +337,12 @@ describe('API Authentication', () => {
         revokedAt: new Date(),
       };
 
-      vi.mocked(prisma.apiKey.update).mockResolvedValue(mockKey as any);
+      vi.mocked((prisma as any).apiKey.update).mockResolvedValue(mockKey as any);
 
       const result = await revokeApiKey('key_123');
 
       expect(result).toBe(true);
-      expect(prisma.apiKey.update).toHaveBeenCalledWith({
+      expect((prisma as any).apiKey.update).toHaveBeenCalledWith({
         where: { id: 'key_123' },
         data: { revokedAt: expect.any(Date) },
       });
@@ -375,7 +374,7 @@ describe('API Authentication', () => {
         },
       ];
 
-      vi.mocked(prisma.apiKey.findMany).mockResolvedValue(mockKeys as any);
+      vi.mocked((prisma as any).apiKey.findMany).mockResolvedValue(mockKeys as any);
 
       const result = await listApiKeys('user_123');
 
@@ -387,7 +386,7 @@ describe('API Authentication', () => {
     it('should filter by organization', async () => {
       await listApiKeys('user_123', 'org_456');
 
-      expect(prisma.apiKey.findMany).toHaveBeenCalledWith({
+      expect((prisma as any).apiKey.findMany).toHaveBeenCalledWith({
         where: {
           userId: 'user_123',
           orgId: 'org_456',
@@ -400,13 +399,13 @@ describe('API Authentication', () => {
 
   describe('getApiKeyStats', () => {
     it('should return usage statistics for an API key', async () => {
-      vi.mocked(prisma.apiKeyUsage.count).mockResolvedValue(150);
-      vi.mocked(prisma.apiKeyUsage.aggregate).mockResolvedValue({
+      vi.mocked((prisma as any).apiKeyUsage.count).mockResolvedValue(150);
+      vi.mocked((prisma as any).apiKeyUsage.aggregate).mockResolvedValue({
         _avg: { responseTime: 250 },
         _count: { id: 150 },
-        _max: null,
-        _min: null,
-        _sum: null,
+        _max: null as any,
+        _min: null as any,
+        _sum: null as any,
       });
 
       const result = await getApiKeyStats('key_123');
@@ -421,7 +420,7 @@ describe('API Authentication', () => {
 
       await getApiKeyStats('key_123', from, to);
 
-      expect(prisma.apiKeyUsage.count).toHaveBeenCalledWith({
+      expect((prisma as any).apiKeyUsage.count).toHaveBeenCalledWith({
         where: {
           keyId: 'key_123',
           createdAt: {

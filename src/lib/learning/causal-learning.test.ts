@@ -9,7 +9,6 @@ import {
   getCausalInsights,
   updateCausalModel,
   type CausalWeight,
-  type CausalInsight,
   type OrgCausalProfile,
 } from './causal-learning';
 import { prisma } from '@/lib/prisma';
@@ -86,7 +85,7 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      vi.mocked(prisma.outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
+      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
 
       const result = await computeOrgCausalWeights('org_123');
 
@@ -105,7 +104,7 @@ describe('Causal Learning Service', () => {
     });
 
     it('should handle empty outcome data', async () => {
-      vi.mocked(prisma.outcomeRecord.findMany).mockResolvedValue([]);
+      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue([]);
 
       const result = await computeOrgCausalWeights('org_123');
 
@@ -149,7 +148,7 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      vi.mocked(prisma.outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
+      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
 
       const result = await computeOrgCausalWeights('org_123');
 
@@ -164,7 +163,7 @@ describe('Causal Learning Service', () => {
 
       await computeOrgCausalWeights('org_123', from, to);
 
-      expect(prisma.outcomeRecord.findMany).toHaveBeenCalledWith({
+      expect((prisma as any).outcomeRecord.findMany).toHaveBeenCalledWith({
         where: {
           orgId: 'org_123',
           createdAt: {
@@ -216,7 +215,7 @@ describe('Causal Learning Service', () => {
         ],
       };
 
-      vi.mocked(prisma.orgCausalModel.findUnique).mockResolvedValue(mockModel as any);
+      vi.mocked((prisma as any).orgCausalModel.findUnique).mockResolvedValue(mockModel as any);
 
       const result = await applyOrgWeights('org_123', biases);
 
@@ -239,7 +238,7 @@ describe('Causal Learning Service', () => {
         confirmatoryBias: { score: 7, instances: ['example'] },
       };
 
-      vi.mocked(prisma.orgCausalModel.findUnique).mockResolvedValue(null);
+      vi.mocked((prisma as any).orgCausalModel.findUnique).mockResolvedValue(null);
 
       const result = await applyOrgWeights('org_123', biases);
 
@@ -256,7 +255,7 @@ describe('Causal Learning Service', () => {
         updatedAt: new Date('2020-01-01'), // Very old
       };
 
-      vi.mocked(prisma.orgCausalModel.findUnique).mockResolvedValue(staleModel as any);
+      vi.mocked((prisma as any).orgCausalModel.findUnique).mockResolvedValue(staleModel as any);
 
       const result = await applyOrgWeights('org_123', biases);
 
@@ -361,8 +360,8 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      vi.mocked(prisma.outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
-      vi.mocked(prisma.orgCausalModel.upsert).mockResolvedValue({
+      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
+      vi.mocked((prisma as any).orgCausalModel.upsert).mockResolvedValue({
         id: 'model_1',
         orgId: 'org_123',
         weights: [],
@@ -374,7 +373,7 @@ describe('Causal Learning Service', () => {
       const result = await updateCausalModel('org_123');
 
       expect(result).toBeDefined();
-      expect(prisma.orgCausalModel.upsert).toHaveBeenCalledWith({
+      expect((prisma as any).orgCausalModel.upsert).toHaveBeenCalledWith({
         where: { orgId: 'org_123' },
         create: expect.objectContaining({
           orgId: 'org_123',
@@ -391,7 +390,7 @@ describe('Causal Learning Service', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      vi.mocked(prisma.outcomeRecord.findMany).mockRejectedValue(new Error('Database error'));
+      vi.mocked((prisma as any).outcomeRecord.findMany).mockRejectedValue(new Error('Database error'));
 
       const result = await updateCausalModel('org_123');
 
@@ -427,7 +426,7 @@ describe('Causal Learning Service', () => {
         },
       ];
 
-      vi.mocked(prisma.outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
+      vi.mocked((prisma as any).outcomeRecord.findMany).mockResolvedValue(mockOutcomes as any);
 
       const weights = await computeOrgCausalWeights('org_123');
       const insights = getCausalInsights(weights, 2);

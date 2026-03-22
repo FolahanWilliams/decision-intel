@@ -2,7 +2,7 @@
  * Tests for Meeting Decision Quality Predictor
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   predictMeetingQuality,
   calculateDissentRatio,
@@ -13,9 +13,8 @@ import {
   calculateEngagementQuality,
   generateRecommendations,
   type QualitySignal,
-  type QualityPrediction,
 } from './quality-predictor';
-import type { SpeakerBiasProfile, KeyDecision, MeetingSummary } from './intelligence';
+// (Removed unused imports)
 
 // Mock logger
 vi.mock('@/lib/utils/logger', () => ({
@@ -31,7 +30,7 @@ describe('Meeting Quality Predictor', () => {
     name: string,
     talkTime: number,
     biases: Record<string, number> = {}
-  ): SpeakerBiasProfile => ({
+  ): any => ({
     name,
     talkTimeSeconds: talkTime,
     interruptionCount: 0,
@@ -43,7 +42,7 @@ describe('Meeting Quality Predictor', () => {
     explicit: boolean,
     hasRationale: boolean,
     dissent: number = 0
-  ): KeyDecision => ({
+  ): any => ({
     decision: 'Test decision',
     timestamp: '00:15:00',
     speaker: 'John',
@@ -53,7 +52,7 @@ describe('Meeting Quality Predictor', () => {
     biasesPresent: [],
   });
 
-  const createMockSummary = (hasRisks: boolean): MeetingSummary => ({
+  const createMockSummary = (hasRisks: boolean): any => ({
     objective: 'Test meeting',
     keyPoints: ['Point 1', 'Point 2'],
     decisions: ['Decision 1'],
@@ -438,7 +437,7 @@ describe('Meeting Quality Predictor', () => {
         },
       ];
 
-      const summary: MeetingSummary = {
+      const summary: any = {
         objective: 'Q2 Planning',
         keyPoints: ['Product launch', 'Budget increase', 'Team expansion'],
         decisions: ['Launch product', 'Increase budget', 'Hire engineers'],
