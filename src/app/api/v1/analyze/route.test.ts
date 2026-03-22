@@ -16,6 +16,7 @@ vi.mock('@/lib/prisma', () => ({
   prisma: {
     document: {
       findFirst: vi.fn(),
+      create: vi.fn(),
     },
     analysis: {
       create: vi.fn(),
@@ -86,6 +87,9 @@ describe('API v1 Analyze Endpoint', () => {
 
       vi.mocked(prisma.document.findFirst).mockResolvedValue(mockDocument as any);
       vi.mocked(analyzeDocument).mockResolvedValue(mockAnalysis as any);
+      vi.mocked(prisma.analysis.findFirst)
+        .mockResolvedValueOnce(null as any) // Check for existing
+        .mockResolvedValueOnce(mockAnalysis as any); // Retrieve newly saved
       vi.mocked(prisma.analysis.create).mockResolvedValue(mockAnalysis as any);
 
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
@@ -117,6 +121,8 @@ describe('API v1 Analyze Endpoint', () => {
       });
 
       vi.mocked(analyzeDocument).mockResolvedValue(mockAnalysis as any);
+      vi.mocked(prisma.document.create).mockResolvedValue(mockDocument as any);
+      vi.mocked(prisma.analysis.findFirst).mockResolvedValue(mockAnalysis as any);
       vi.mocked(prisma.analysis.create).mockResolvedValue(mockAnalysis as any);
 
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
@@ -136,13 +142,7 @@ describe('API v1 Analyze Endpoint', () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      expect(analyzeDocument).toHaveBeenCalledWith(
-        expect.objectContaining({
-          content: 'This is raw content to analyze',
-          title: 'Raw Analysis',
-        }),
-        expect.any(Object)
-      );
+      expect(analyzeDocument).toHaveBeenCalledWith(mockDocument);
     });
 
     it('should require write:analyses scope', async () => {
@@ -279,6 +279,7 @@ describe('API v1 Analyze Endpoint', () => {
       });
 
       vi.mocked(prisma.document.findFirst).mockResolvedValue(mockDocument as any);
+      vi.mocked(prisma.analysis.findFirst).mockResolvedValueOnce(null as any);
       vi.mocked(analyzeDocument).mockRejectedValue(new Error('LLM API error'));
 
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
@@ -335,6 +336,8 @@ describe('API v1 Analyze Endpoint', () => {
       });
 
       vi.mocked(analyzeDocument).mockResolvedValue(mockAnalysis as any);
+      vi.mocked(prisma.document.create).mockResolvedValue(mockDocument as any);
+      vi.mocked(prisma.analysis.findFirst).mockResolvedValue(mockAnalysis as any);
       vi.mocked(prisma.analysis.create).mockResolvedValue(mockAnalysis as any);
 
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
