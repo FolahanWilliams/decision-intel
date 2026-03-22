@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -65,107 +65,7 @@ interface BiasMetric {
 }
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
-
-const mockKPIs: SecurityKPI[] = [
-  {
-    metric: 'MTTD',
-    value: 12.5,
-    unit: 'minutes',
-    trend: 'down',
-    target: 15,
-    status: 'good',
-    lastUpdated: '2 min ago',
-  },
-  {
-    metric: 'MTTR',
-    value: 45,
-    unit: 'minutes',
-    trend: 'down',
-    target: 60,
-    status: 'good',
-    lastUpdated: '5 min ago',
-  },
-  {
-    metric: 'MTTA',
-    value: 8,
-    unit: 'minutes',
-    trend: 'up',
-    target: 5,
-    status: 'warning',
-    lastUpdated: '1 min ago',
-  },
-  {
-    metric: 'Dwell Time',
-    value: 24,
-    unit: 'hours',
-    trend: 'down',
-    target: 48,
-    status: 'good',
-    lastUpdated: '10 min ago',
-  },
-  {
-    metric: 'False Positive Rate',
-    value: 4.2,
-    unit: '%',
-    trend: 'down',
-    target: 5,
-    status: 'good',
-    lastUpdated: '3 min ago',
-  },
-  {
-    metric: 'Alert Volume',
-    value: 247,
-    unit: 'alerts/day',
-    trend: 'up',
-    target: 200,
-    status: 'warning',
-    lastUpdated: '1 min ago',
-  },
-];
-
-const mockIssues: WizIssue[] = [
-  {
-    id: 'WIZ-001',
-    title: 'Critical RCE vulnerability in public-facing service',
-    severity: 'CRITICAL',
-    status: 'IN_PROGRESS',
-    toxicCombination: true,
-    biasDetected: ['anchoring_bias', 'automation_bias'],
-    decisionTime: 15,
-    assignee: 'Alice Chen',
-    createdAt: '2024-03-20T10:30:00Z',
-  },
-  {
-    id: 'WIZ-002',
-    title: 'Exposed AWS credentials in application logs',
-    severity: 'HIGH',
-    status: 'OPEN',
-    toxicCombination: false,
-    biasDetected: ['loss_aversion'],
-    decisionTime: 120,
-    assignee: 'Bob Smith',
-    createdAt: '2024-03-20T09:15:00Z',
-  },
-  {
-    id: 'WIZ-003',
-    title: 'Misconfigured S3 bucket with public read access',
-    severity: 'HIGH',
-    status: 'RESOLVED',
-    toxicCombination: true,
-    biasDetected: [],
-    decisionTime: 35,
-    assignee: 'Carol White',
-    createdAt: '2024-03-20T08:00:00Z',
-  },
-];
-
-const mockBiasMetrics: BiasMetric[] = [
-  { type: 'Anchoring', count: 23, severity: 'high', trend: -15 },
-  { type: 'Automation', count: 18, severity: 'critical', trend: 25 },
-  { type: 'Groupthink', count: 12, severity: 'medium', trend: -5 },
-  { type: 'Loss Aversion', count: 31, severity: 'high', trend: 10 },
-  { type: 'Confirmation', count: 8, severity: 'low', trend: -20 },
-];
+// Mock data has been removed; functionality now dynamically fetches via API endpoints.
 
 // ─── Components ──────────────────────────────────────────────────────────────
 
@@ -397,11 +297,40 @@ function MTTRTrend() {
 
 export default function SecurityOperationsPage() {
   const [selectedTab, setSelectedTab] = useState('overview');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [kpis, setKpis] = useState<SecurityKPI[]>([]);
+  const [issues, setIssues] = useState<WizIssue[]>([]);
+  const [biasMetrics, setBiasMetrics] = useState<BiasMetric[]>([]);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [metricsRes, wizRes] = await Promise.all([
+        fetch('/api/v1/security/metrics'),
+        fetch('/api/v1/security/wiz'),
+      ]);
+      if (metricsRes.ok) {
+        const metricsData = await metricsRes.json();
+        setKpis(metricsData.kpis || []);
+        setBiasMetrics(metricsData.biasMetrics || []);
+      }
+      if (wizRes.ok) {
+        const wizData = await wizRes.json();
+        setIssues(wizData.issues || []);
+      }
+    } catch (err) {
+      console.error('Failed to load security operations data:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleRefresh = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1000);
+    fetchData();
   };
 
   return (
@@ -430,7 +359,7 @@ export default function SecurityOperationsPage() {
 
       {/* KPI Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-        {mockKPIs.map(kpi => (
+        {kpis.map(kpi => (
           <KPICard key={kpi.metric} kpi={kpi} />
         ))}
       </div>
@@ -479,7 +408,7 @@ export default function SecurityOperationsPage() {
               </p>
             </CardHeader>
             <CardContent>
-              <IssuesList issues={mockIssues.slice(0, 3)} />
+              <IssuesList issues={issues.slice(0, 3)} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -493,7 +422,7 @@ export default function SecurityOperationsPage() {
               </p>
             </CardHeader>
             <CardContent>
-              <IssuesList issues={mockIssues} />
+              <IssuesList issues={issues} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -506,7 +435,7 @@ export default function SecurityOperationsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {mockBiasMetrics.map(metric => (
+                  {biasMetrics.map(metric => (
                     <div
                       key={metric.type}
                       className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50"

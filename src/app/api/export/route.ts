@@ -9,6 +9,15 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { Analysis, BiasInstance, AnalysisVersion, Document } from '@prisma/client';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import type { UserOptions } from 'jspdf-autotable';
+
+// Extend jsPDF interface to avoid TS errors
+interface jsPDFWithAutoTable extends jsPDF {
+  autoTable: (options: UserOptions) => void;
+  lastAutoTable: { finalY: number };
+}
 
 type AnalysisWithRelations = Analysis & {
   document: Document;
@@ -300,19 +309,154 @@ function exportAsMarkdown(analysis: AnalysisWithRelations): NextResponse {
 }
 
 /**
- * Export analysis as PDF (stub - would need PDF library)
+ * Export analysis as PDF
  */
-function exportAsPDF(_analysis: AnalysisWithRelations): NextResponse {
-  // In production, you'd use a library like puppeteer or pdfkit
-  // For now, return a message indicating PDF export is not yet implemented
+function exportAsPDF(analysis: AnalysisWithRelations): NextResponse {
+  try {
+    const doc = new jsPDF() as jsPDFWithAutoTable;
+    let yPos = 20;
+    const margin = 14;
 
-  return NextResponse.json(
-    {
-      error: 'PDF export coming soon',
-      message:
-        'PDF export functionality is under development. Please use JSON, CSV, or Markdown format for now.',
-      alternativeFormats: ['json', 'csv', 'markdown'],
-    },
-    { status: 501 } // Not Implemented
-  );
+    // Header
+    doc.setFontSize(22);
+    doc.text('Decision Analysis Report', margin, yPos);
+    yPos += 10;
+
+    doc.setFontSize(14);
+    doc.text(`Document: ${analysis.document.filename}`, margin, yPos);
+    yPos += 8;
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated on ${new Date().toLocaleDateString()}`, margin, yPos);
+    doc.setTextColor(0);
+    yPos += 15;
+
+    // Executive Summary
+    doc.setFontSize(16);
+    doc.text('Executive Summary', margin, yPos);
+    yPos += 8;
+
+    doc.setFontSize(11);
+    const summaryLines = doc.splitTextToSize(analysis.summary, 180);
+    doc.text(summaryLines, margin, yPos);
+    yPos += summaryLines.length * 6 + 10;
+
+    // Quality Scores Table
+    doc.setFontSize(16);
+    doc.text('Quality Scores', margin, yPos);
+    yPos += 5;
+
+    doc.autoTable({
+      startY: yPos,
+      head: [['Metric', 'Score']],
+      body: [
+        ['Overall Decision Quality', `${analysis.overallScore}/100`],
+        ['Decision Consistency (Noise)', `${analysis.noiseScore}/100`],
+      ],
+      theme: 'grid',
+    });
+    yPos = doc.lastAutoTable.finalY + 15;
+
+    // Cognitive Biases
+    if (analysis.biases.length > 0) {
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(16);
+      doc.text('Detected Cognitive Biases', margin, yPos);
+      yPos += 5;
+
+      const biasData = analysis.biases.map((bias: BiasInstance) => [
+        bias.biasType,
+        bias.severity,
+        bias.explanation,
+        bias.suggestion
+      ]);
+
+      doc.autoTable({
+        startY: yPos,
+        head: [['Type', 'Severity', 'Analysis', 'Recommendation']],
+        body: biasData,
+        theme: 'striped',
+        styles: { fontSize: 9 },
+        columnStyles: {
+          0: { cellWidth: 30 },
+          1: { cellWidth: 20 },
+          2: { cellWidth: 65 },
+          3: { cellWidth: 65 },
+        }
+      });
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // SWOT Analysis
+    if (analysis.swotAnalysis) {
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(16);
+      doc.text('SWOT Analysis', margin, yPos);
+      yPos += 5;
+
+      const swot = analysis.swotAnalysis as SwotAnalysis;
+      const swotData = [
+        ['Strengths', swot.strengths?.join('\n') || 'None identified'],
+        ['Weaknesses', swot.weaknesses?.join('\n') || 'None identified'],
+        ['Opportunities', swot.opportunities?.join('\n') || 'None identified'],
+        ['Threats', swot.threats?.join('\n') || 'None identified'],
+      ];
+
+      doc.autoTable({
+        startY: yPos,
+        head: [['Category', 'Details']],
+        body: swotData,
+        theme: 'grid',
+        styles: { fontSize: 10 },
+      });
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Pre-mortem
+    if (analysis.preMortem) {
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      const preMortem = analysis.preMortem as PreMortem;
+      if (preMortem.failureScenarios?.length) {
+        doc.setFontSize(16);
+        doc.text('Pre-mortem Analysis', margin, yPos);
+        yPos += 5;
+
+        const pmData = preMortem.failureScenarios.map(s => [s.scenario, s.likelihood]);
+        
+        doc.autoTable({
+          startY: yPos,
+          head: [['Failure Scenario', 'Likelihood']],
+          body: pmData,
+          theme: 'grid',
+        });
+      }
+    }
+
+    // Convert PDF to ArrayBuffer
+    const pdfOutput = doc.output('arraybuffer');
+
+    return new NextResponse(pdfOutput, {
+      headers: {
+        'Content-Disposition': `attachment; filename="analysis-${analysis.id}.pdf"`,
+        'Content-Type': 'application/pdf',
+        'Content-Length': pdfOutput.byteLength.toString(),
+      },
+    });
+  } catch (error) {
+    log.error('PDF generation failed:', error);
+    return NextResponse.json({ error: 'Failed to generate PDF document' }, { status: 500 });
+  }
 }

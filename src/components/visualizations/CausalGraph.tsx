@@ -177,9 +177,9 @@ export function CausalGraph({
       )
       .force('charge', d3.forceManyBody().strength(-300))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .force(
         'collision',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         d3.forceCollide().radius((d: any) => sizeScale(d.value) + 5)
       );
 
