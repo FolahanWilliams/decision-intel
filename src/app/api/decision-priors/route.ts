@@ -130,9 +130,7 @@ export async function PATCH(request: NextRequest) {
       },
     });
 
-    log.info(
-      `Decision prior updated for analysis ${analysisId}: beliefDelta=${beliefDelta}`
-    );
+    log.info(`Decision prior updated for analysis ${analysisId}: beliefDelta=${beliefDelta}`);
     return NextResponse.json({ id: updated.id, beliefDelta });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

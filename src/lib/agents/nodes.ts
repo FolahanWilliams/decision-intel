@@ -1058,9 +1058,11 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
           );
 
           causalDriverBrief =
-            '\n\nCAUSAL INTELLIGENCE (learned from this organization\'s actual decision outcomes):\n' +
+            "\n\nCAUSAL INTELLIGENCE (learned from this organization's actual decision outcomes):\n" +
             (dangerLines.length > 0
-              ? 'HIGH-DANGER biases (focus your deliberation here):\n' + dangerLines.join('\n') + '\n'
+              ? 'HIGH-DANGER biases (focus your deliberation here):\n' +
+                dangerLines.join('\n') +
+                '\n'
               : '') +
             (safeLines.length > 0
               ? 'LOWER-RISK biases (de-prioritize in deliberation):\n' + safeLines.join('\n')

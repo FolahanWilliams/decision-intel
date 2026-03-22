@@ -101,8 +101,8 @@ export function DecisionCheckpoint({
       {showDetails && (
         <div className="space-y-5">
           <p className="text-sm text-zinc-300">
-            This helps us measure how the analysis impacts your thinking. Your prior beliefs
-            create a personal calibration profile that improves future analyses.
+            This helps us measure how the analysis impacts your thinking. Your prior beliefs create
+            a personal calibration profile that improves future analyses.
           </p>
 
           {/* Default Action */}
@@ -157,9 +157,7 @@ export function DecisionCheckpoint({
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-400">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-400">{error}</p>}
 
           <div className="flex items-center gap-3">
             <button

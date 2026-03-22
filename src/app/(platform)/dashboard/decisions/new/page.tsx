@@ -43,10 +43,7 @@ export default function NewDecisionPage() {
     successCriteria.some(c => c.trim().length > 0) &&
     failureCriteria.some(c => c.trim().length > 0);
 
-  function addCriterion(
-    list: string[],
-    setter: (v: string[]) => void
-  ) {
+  function addCriterion(list: string[], setter: (v: string[]) => void) {
     setter([...list, '']);
   }
 
@@ -61,11 +58,7 @@ export default function NewDecisionPage() {
     setter(updated);
   }
 
-  function removeCriterion(
-    list: string[],
-    setter: (v: string[]) => void,
-    index: number
-  ) {
+  function removeCriterion(list: string[], setter: (v: string[]) => void, index: number) {
     if (list.length <= 1) return;
     setter(list.filter((_, i) => i !== index));
   }
@@ -133,8 +126,8 @@ export default function NewDecisionPage() {
       <div className="mb-6 rounded-lg border border-indigo-500/20 bg-indigo-950/20 p-4">
         <p className="text-sm text-indigo-200">
           By capturing your intent <strong>before</strong> analysis, we create a more accurate
-          audit. The AI will evaluate your document against your stated objectives, not just
-          generic criteria. This also builds your organization&apos;s decision archive.
+          audit. The AI will evaluate your document against your stated objectives, not just generic
+          criteria. This also builds your organization&apos;s decision archive.
         </p>
       </div>
 
@@ -159,9 +152,7 @@ export default function NewDecisionPage() {
           <label className="mb-1.5 block text-sm font-medium text-zinc-300">
             Default Action <span className="text-indigo-400">*</span>
           </label>
-          <p className="mb-2 text-xs text-zinc-500">
-            Without further analysis, what would you do?
-          </p>
+          <p className="mb-2 text-xs text-zinc-500">Without further analysis, what would you do?</p>
           <textarea
             value={defaultAction}
             onChange={e => setDefaultAction(e.target.value)}
@@ -182,7 +173,9 @@ export default function NewDecisionPage() {
             <div key={i} className="mb-2 flex gap-2">
               <input
                 value={criterion}
-                onChange={e => updateCriterion(successCriteria, setSuccessCriteria, i, e.target.value)}
+                onChange={e =>
+                  updateCriterion(successCriteria, setSuccessCriteria, i, e.target.value)
+                }
                 placeholder={`Success criterion ${i + 1}`}
                 className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
               />
@@ -217,7 +210,9 @@ export default function NewDecisionPage() {
             <div key={i} className="mb-2 flex gap-2">
               <input
                 value={criterion}
-                onChange={e => updateCriterion(failureCriteria, setFailureCriteria, i, e.target.value)}
+                onChange={e =>
+                  updateCriterion(failureCriteria, setFailureCriteria, i, e.target.value)
+                }
                 placeholder={`Failure criterion ${i + 1}`}
                 className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
               />
@@ -247,9 +242,7 @@ export default function NewDecisionPage() {
             <Users className="h-4 w-4 text-blue-400" />
             Stakeholders Affected (optional)
           </label>
-          <p className="mb-2 text-xs text-zinc-500">
-            Maps to boardroom simulation personas
-          </p>
+          <p className="mb-2 text-xs text-zinc-500">Maps to boardroom simulation personas</p>
           {stakeholders.map((stakeholder, i) => (
             <div key={i} className="mb-2 flex gap-2">
               <input
@@ -293,10 +286,7 @@ export default function NewDecisionPage() {
             {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
             Frame Decision &amp; Upload Document
           </button>
-          <Link
-            href="/dashboard/documents"
-            className="text-sm text-zinc-400 hover:text-zinc-300"
-          >
+          <Link href="/dashboard/documents" className="text-sm text-zinc-400 hover:text-zinc-300">
             Skip framing (upload directly)
           </Link>
         </div>
