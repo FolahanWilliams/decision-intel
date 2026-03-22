@@ -55,7 +55,7 @@ export default function MeetingCommandCenter() {
           0,
           Math.min(100, prev.participationBalance + (Math.random() - 0.5) * 10)
         ),
-        biasLevel: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as any,
+        biasLevel: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as 'low' | 'medium' | 'high',
         dissentHealth: Math.max(0, Math.min(100, prev.dissentHealth + (Math.random() - 0.5) * 8)),
         decisionClarity: Math.max(
           0,
@@ -665,7 +665,7 @@ function LiveInsightsFeed({ isLive }: { isLive: boolean }) {
       const newInsight = {
         time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
         message: messages[Math.floor(Math.random() * messages.length)],
-        type: ['positive', 'warning', 'danger'][Math.floor(Math.random() * 3)] as any,
+        type: ['positive', 'warning', 'danger'][Math.floor(Math.random() * 3)] as 'positive' | 'warning' | 'danger',
       };
 
       setInsights((prev) => [newInsight, ...prev.slice(0, 3)]);

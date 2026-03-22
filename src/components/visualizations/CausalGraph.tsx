@@ -51,7 +51,7 @@ export function CausalGraph({
   weights,
   insights,
   totalOutcomes,
-  orgId,
+  orgId: _orgId,
   timeRange,
   onBiasSelect,
 }: CausalGraphProps) {
@@ -172,11 +172,14 @@ export function CausalGraph({
         'link',
         d3
           .forceLink(links)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .id((d: any) => d.id)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .strength((d: any) => d.strength * 0.5)
       )
       .force('charge', d3.forceManyBody().strength(-300))
       .force('center', d3.forceCenter(width / 2, height / 2))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .force('collision', d3.forceCollide().radius((d: any) => sizeScale(d.value) + 5));
 
     // Create SVG groups
@@ -225,6 +228,7 @@ export function CausalGraph({
             if (!event.active) simulation.alphaTarget(0);
             d.fx = null;
             d.fy = null;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           }) as any
       );
 
@@ -268,11 +272,16 @@ export function CausalGraph({
     // Update positions on tick
     simulation.on('tick', () => {
       link
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .attr('x1', (d: any) => d.source.x)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .attr('y1', (d: any) => d.source.y)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .attr('x2', (d: any) => d.target.x)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .attr('y2', (d: any) => d.target.y);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       node.attr('transform', (d: any) => `translate(${d.x},${d.y})`);
     });
 
@@ -300,7 +309,7 @@ export function CausalGraph({
       {/* Controls */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-4">
-          <Tabs value={viewMode} onValueChange={(v: any) => setViewMode(v)}>
+          <Tabs value={viewMode} onValueChange={(v: string) => setViewMode(v as 'force' | 'radial' | 'timeline')}>
             <TabsList>
               <TabsTrigger value="force">Force Graph</TabsTrigger>
               <TabsTrigger value="radial">Radial View</TabsTrigger>
@@ -498,8 +507,8 @@ function RadialView({
 
 // Timeline View Component
 function TimelineView({
-  weights,
-  timeRange,
+  weights: _weights,
+  timeRange: _timeRange,
   dimensions,
 }: {
   weights: CausalWeight[];

@@ -7,6 +7,7 @@ import { POST } from './route';
 import { validateApiKey } from '@/lib/api/auth';
 import { analyzeDocument } from '@/lib/analysis/analyzer';
 import { prisma } from '@/lib/prisma';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from 'next/server';
 
 // Mock dependencies
