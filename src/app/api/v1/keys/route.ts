@@ -112,12 +112,16 @@ export async function POST(request: NextRequest) {
       // Schema drift — TeamMember may not exist
     }
 
-    const { rawKey, keyId, keyPrefix } = await generateApiKey(
-      user.id,
+    const {
+      key: rawKey,
+      keyId,
+      keyPrefix,
+    } = await generateApiKey({
+      userId: user.id,
       orgId,
-      name.trim(),
-      scopes as string[]
-    );
+      name: name.trim(),
+      scopes: scopes as string[],
+    });
 
     log.info(`API key ${keyId} created by user ${user.id}`);
 

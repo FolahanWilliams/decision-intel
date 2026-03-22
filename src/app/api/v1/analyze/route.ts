@@ -1,25 +1,22 @@
 /**
  * Public API — POST /api/v1/analyze
  *
- * Accepts document content, runs the full LangGraph analysis pipeline
- * synchronously, and returns the AnalysisResult JSON.
+ * Accepts a documentId (existing document) or raw content, runs the full
+ * analysis pipeline, and returns the AnalysisResult JSON.
  *
- * Auth: API key (Bearer di_live_xxx) — requires "analyze" scope.
+ * Auth: API key (Bearer di_live_xxx) — requires "write:analyses" scope.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { validateApiKey, requireScope, type ValidateError } from '@/lib/api/auth';
-import { runAnalysis } from '@/lib/analysis/analyzer';
+import { validateApiKey, type ValidateError } from '@/lib/api/auth';
+import { analyzeDocument } from '@/lib/analysis/analyzer';
 import { createLogger } from '@/lib/utils/logger';
-import { createHash } from 'crypto';
 
 const log = createLogger('PublicAnalyzeRoute');
 
 // Allow generous timeout for the synchronous pipeline
 export const maxDuration = 300;
-
-const MAX_CONTENT_LENGTH = 50_000;
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,158 +24,143 @@ export async function POST(request: NextRequest) {
     const authResult = await validateApiKey(request);
     if (!authResult.success) {
       const err = authResult as ValidateError;
-      return NextResponse.json({ error: err.error }, { status: err.status, headers: err.headers });
+      return NextResponse.json(
+        { error: err.error },
+        { status: err.status, headers: err.headers }
+      );
     }
     const { context } = authResult;
 
-    const scopeErr = requireScope(context, 'analyze');
-    if (scopeErr) {
-      return NextResponse.json({ error: scopeErr.error }, { status: scopeErr.status });
+    // ── Scope check ────────────────────────────────────────────────────
+    if (!context.scopes.includes('write:analyses')) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    // ── Parse body ───────────────────────────────────────────────────
-    let body;
+    // ── Parse body ────────────────────────────────────────────────────
+    let body: Record<string, unknown>;
     try {
       body = await request.json();
     } catch {
       return NextResponse.json({ error: 'Invalid JSON in request body.' }, { status: 400 });
     }
 
-    const {
-      content,
-      filename,
-      options: _options,
-    } = body as {
+    const { documentId, content, title, metadata } = body as {
+      documentId?: string;
       content?: string;
-      filename?: string;
-      options?: { skipBoardroom?: boolean };
+      title?: string;
+      metadata?: Record<string, unknown>;
     };
 
-    if (!content || typeof content !== 'string') {
+    if (!documentId && !content) {
       return NextResponse.json(
-        { error: '"content" is required and must be a non-empty string.' },
-        { status: 400 }
-      );
-    }
-    if (content.length > MAX_CONTENT_LENGTH) {
-      return NextResponse.json(
-        {
-          error: `Content exceeds maximum length of ${MAX_CONTENT_LENGTH.toLocaleString()} characters (got ${content.length.toLocaleString()}).`,
-        },
+        { error: 'Either documentId or content is required' },
         { status: 400 }
       );
     }
 
-    const resolvedFilename = filename || 'api-upload.txt';
+    // ── Metadata from headers ─────────────────────────────────────────
+    const requestId = request.headers.get('x-request-id') ?? undefined;
+    const responseMeta = {
+      requestId: requestId ?? `req_${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      apiVersion: 'v1',
+    };
 
-    // ── Deduplicate by content hash ──────────────────────────────────
-    const contentHash = createHash('sha256').update(content).digest('hex');
+    // ── Case 1: documentId provided ───────────────────────────────────
+    if (documentId) {
+      const document = await prisma.document.findFirst({
+        where: { id: documentId, userId: context.userId },
+      });
 
-    // ── Create Document record ───────────────────────────────────────
-    let document;
-    try {
-      document = await prisma.document.create({
+      if (!document) {
+        return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+      }
+
+      // Check for existing analysis
+      const existing = await prisma.analysis.findFirst({
+        where: { documentId },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (existing) {
+        log.info(`Returning cached analysis for document ${documentId}`);
+        return NextResponse.json({
+          success: true,
+          data: {
+            analysisId: existing.id,
+            overallScore: (existing as Record<string, unknown>).overallScore,
+            biases: (existing as Record<string, unknown>).biases,
+            recommendations: (existing as Record<string, unknown>).recommendations,
+            cached: true,
+          },
+          metadata: responseMeta,
+        });
+      }
+
+      // Run new analysis
+      let analysisResult;
+      try {
+        analysisResult = await analyzeDocument(
+          { content: document.content ?? '', title: document.filename },
+          { userId: context.userId, orgId: context.orgId }
+        );
+      } catch (err) {
+        log.error('Analysis failed:', err);
+        return NextResponse.json({ error: 'Analysis failed' }, { status: 500 });
+      }
+
+      const saved = await prisma.analysis.create({
         data: {
+          ...(analysisResult as Record<string, unknown>),
+          documentId,
           userId: context.userId,
           orgId: context.orgId,
-          filename: resolvedFilename,
-          fileType: 'text/plain',
-          fileSize: Buffer.byteLength(content, 'utf-8'),
-          content,
-          contentHash,
-          status: 'analyzing',
         },
       });
-    } catch (createErr: unknown) {
-      // If contentHash already exists, find the existing document
-      const prismaErr = createErr as { code?: string };
-      if (prismaErr.code === 'P2002') {
-        // Unique constraint on contentHash — find existing & return its latest analysis
-        const existing = await prisma.document.findFirst({
-          where: { contentHash, userId: context.userId },
-          include: {
-            analyses: {
-              orderBy: { createdAt: 'desc' },
-              take: 1,
-              include: { biases: true },
-            },
-          },
-        });
-        if (existing?.analyses?.[0]) {
-          return NextResponse.json({
-            documentId: existing.id,
-            cached: true,
-            analysis: existing.analyses[0],
-          });
-        }
-        // Existing doc but no analysis — fall through to re-analyze
-        if (existing) {
-          document = existing;
-        } else {
-          throw createErr;
-        }
-      } else {
-        const code = (createErr as { code?: string }).code;
-        if (code === 'P2021' || code === 'P2022') {
-          // Schema drift — retry without newer columns
-          document = await prisma.document.create({
-            data: {
-              userId: context.userId,
-              filename: resolvedFilename,
-              fileType: 'text/plain',
-              fileSize: Buffer.byteLength(content, 'utf-8'),
-              content,
-              status: 'analyzing',
-            },
-          });
-        } else {
-          throw createErr;
-        }
-      }
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          analysisId: saved.id,
+          overallScore: (saved as Record<string, unknown>).overallScore,
+          biases: (saved as Record<string, unknown>).biases,
+          recommendations: (saved as Record<string, unknown>).recommendations,
+          cached: false,
+        },
+        metadata: responseMeta,
+      });
     }
 
-    // ── Run analysis pipeline ────────────────────────────────────────
-    log.info(`Starting API analysis for document ${document.id} (user: ${context.userId})`);
-
+    // ── Case 2: raw content provided ──────────────────────────────────
     let analysisResult;
     try {
-      analysisResult = await runAnalysis(content, document.id, context.userId);
-    } catch (pipelineErr) {
-      // Mark document as errored
-      await prisma.document
-        .update({
-          where: { id: document.id },
-          data: { status: 'error' },
-        })
-        .catch(() => {});
-
-      log.error('Analysis pipeline failed:', pipelineErr);
-      return NextResponse.json(
-        { error: 'Analysis pipeline failed. Please try again later.' },
-        { status: 502 }
+      analysisResult = await analyzeDocument(
+        { content: content as string, title: title ?? 'Untitled', metadata },
+        { userId: context.userId, orgId: context.orgId }
       );
+    } catch (err) {
+      log.error('Analysis failed:', err);
+      return NextResponse.json({ error: 'Analysis failed' }, { status: 500 });
     }
 
-    // The runAnalysis function already persists the analysis to the DB,
-    // so we just need to fetch the saved record for the response.
-    let savedAnalysis;
-    try {
-      savedAnalysis = await prisma.analysis.findFirst({
-        where: { documentId: document.id },
-        orderBy: { createdAt: 'desc' },
-        include: { biases: true },
-      });
-    } catch {
-      // If fetching fails, return the in-memory result
-      savedAnalysis = null;
-    }
-
-    log.info(`API analysis complete for document ${document.id}`);
+    const saved = await prisma.analysis.create({
+      data: {
+        ...(analysisResult as Record<string, unknown>),
+        userId: context.userId,
+        orgId: context.orgId,
+      },
+    });
 
     return NextResponse.json({
-      documentId: document.id,
-      cached: false,
-      analysis: savedAnalysis || analysisResult,
+      success: true,
+      data: {
+        analysisId: saved.id,
+        overallScore: (saved as Record<string, unknown>).overallScore,
+        biases: (saved as Record<string, unknown>).biases,
+        recommendations: (saved as Record<string, unknown>).recommendations,
+        cached: false,
+      },
+      metadata: responseMeta,
     });
   } catch (error) {
     log.error('Public analyze API error:', error);
