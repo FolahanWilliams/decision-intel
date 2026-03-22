@@ -325,7 +325,7 @@ function exportAsPDF(analysis: AnalysisWithRelations): NextResponse {
     doc.setFontSize(14);
     doc.text(`Document: ${analysis.document.filename}`, margin, yPos);
     yPos += 8;
-    
+
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Generated on ${new Date().toLocaleDateString()}`, margin, yPos);
@@ -364,7 +364,7 @@ function exportAsPDF(analysis: AnalysisWithRelations): NextResponse {
         doc.addPage();
         yPos = 20;
       }
-      
+
       doc.setFontSize(16);
       doc.text('Detected Cognitive Biases', margin, yPos);
       yPos += 5;
@@ -373,7 +373,7 @@ function exportAsPDF(analysis: AnalysisWithRelations): NextResponse {
         bias.biasType,
         bias.severity,
         bias.explanation,
-        bias.suggestion
+        bias.suggestion,
       ]);
 
       doc.autoTable({
@@ -387,7 +387,7 @@ function exportAsPDF(analysis: AnalysisWithRelations): NextResponse {
           1: { cellWidth: 20 },
           2: { cellWidth: 65 },
           3: { cellWidth: 65 },
-        }
+        },
       });
       yPos = doc.lastAutoTable.finalY + 15;
     }
@@ -398,7 +398,7 @@ function exportAsPDF(analysis: AnalysisWithRelations): NextResponse {
         doc.addPage();
         yPos = 20;
       }
-      
+
       doc.setFontSize(16);
       doc.text('SWOT Analysis', margin, yPos);
       yPos += 5;
@@ -427,7 +427,7 @@ function exportAsPDF(analysis: AnalysisWithRelations): NextResponse {
         doc.addPage();
         yPos = 20;
       }
-      
+
       const preMortem = analysis.preMortem as PreMortem;
       if (preMortem.failureScenarios?.length) {
         doc.setFontSize(16);
@@ -435,7 +435,7 @@ function exportAsPDF(analysis: AnalysisWithRelations): NextResponse {
         yPos += 5;
 
         const pmData = preMortem.failureScenarios.map(s => [s.scenario, s.likelihood]);
-        
+
         doc.autoTable({
           startY: yPos,
           head: [['Failure Scenario', 'Likelihood']],
