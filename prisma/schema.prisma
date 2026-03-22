@@ -23,6 +23,7 @@ model Document {
   analyses    Analysis[]
   embeddings  DecisionEmbedding[]
   failedAnalyses FailedAnalysis[]
+  decisionFrame DecisionFrame?
 
   @@index([userId])
   @@index([orgId])
@@ -67,6 +68,8 @@ model Analysis {
   versions     AnalysisVersion[]
   shareLinks   ShareLink[]
   outcome      DecisionOutcome?
+  prior        DecisionPrior?
+  complianceAssessments ComplianceAssessment[]
 
   @@index([documentId])
 }
@@ -612,6 +615,81 @@ model CalibrationProfile {
   @@index([orgId])
   @@index([userId])
   @@index([profileType])
+}
+
+// ─── Causal AI Layer (Moat 1) ─────────────────────────────────────────────
+
+model CausalEdge {
+  id         String   @id @default(cuid())
+  orgId      String?
+  fromVar    String   // e.g., "confirmation_bias"
+  toVar      String   // e.g., "noise_score"
+  strength   Float    // learned from outcome data (-1 to 1)
+  confidence Float    // sample size confidence (0-1)
+  sampleSize Int
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+
+  @@unique([orgId, fromVar, toVar])
+  @@index([orgId])
+}
+
+// ─── Structured RLHF (Moat 3) ────────────────────────────────────────────
+
+model DecisionPrior {
+  id                 String   @id @default(cuid())
+  analysisId         String   @unique
+  userId             String
+  defaultAction      String   @db.Text // "What would you do with no info?"
+  confidence         Float              // 0-100
+  evidenceToChange   String?  @db.Text // "What would change your mind?"
+  postAnalysisAction String?  @db.Text // What they actually decided
+  beliefDelta        Float?             // Calculated shift
+  createdAt          DateTime @default(now())
+
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── Outcomes-First Workflow (Moat 4) ─────────────────────────────────────
+
+model DecisionFrame {
+  id                String   @id @default(cuid())
+  userId            String
+  orgId             String?
+  decisionStatement String   @db.Text
+  defaultAction     String   @db.Text
+  successCriteria   String[]
+  failureCriteria   String[]
+  stakeholders      String[]
+  documentId        String?  @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  document Document? @relation(fields: [documentId], references: [id])
+
+  @@index([userId])
+  @@index([orgId])
+}
+
+// ─── Deep Vertical Integration — Compliance (Moat 5) ─────────────────────
+
+model ComplianceAssessment {
+  id              String   @id @default(cuid())
+  analysisId      String
+  framework       String   // "FCA_CONSUMER_DUTY" | "SOX" | "BASEL_III"
+  outcomeScores   Json     // { "products_services": 85, "price_value": 72, ... }
+  findings        Json     // detailed regulatory findings
+  riskLevel       String   // "low" | "medium" | "high" | "critical"
+  remediationPlan Json?    // suggested remediation steps
+  createdAt       DateTime @default(now())
+
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId])
+  @@index([framework])
+  @@index([riskLevel])
 }
 
 // ─── Public API Keys ──────────────────────────────────────────────────────
