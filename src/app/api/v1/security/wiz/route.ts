@@ -55,14 +55,14 @@ export async function GET() {
       log.warn('Wiz API credentials not found, returning demo data');
       return NextResponse.json({
         issues: mockIssues,
-        isDemo: true
+        isDemo: true,
       });
     }
 
     const wiz = new WizClient(config);
     const { issues } = await wiz.getIssues({ limit: 10 });
 
-    const formattedIssues = issues.map((issue) => ({
+    const formattedIssues = issues.map(issue => ({
       id: issue.id,
       title: issue.title,
       severity: issue.severity,
@@ -77,7 +77,7 @@ export async function GET() {
 
     return NextResponse.json({
       issues: formattedIssues,
-      isDemo: false
+      isDemo: false,
     });
   } catch (error) {
     log.error('Failed to fetch Wiz issues', error);
@@ -85,7 +85,7 @@ export async function GET() {
     return NextResponse.json({
       issues: mockIssues,
       isDemo: true,
-      error: 'Failed to connect to Wiz API'
+      error: 'Failed to connect to Wiz API',
     });
   }
 }
