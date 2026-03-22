@@ -50,12 +50,15 @@ export default function MeetingCommandCenter() {
     if (!isLive) return;
 
     const interval = setInterval(() => {
-      setHealthMetrics((prev) => ({
+      setHealthMetrics(prev => ({
         participationBalance: Math.max(
           0,
           Math.min(100, prev.participationBalance + (Math.random() - 0.5) * 10)
         ),
-        biasLevel: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as 'low' | 'medium' | 'high',
+        biasLevel: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as
+          | 'low'
+          | 'medium'
+          | 'high',
         dissentHealth: Math.max(0, Math.min(100, prev.dissentHealth + (Math.random() - 0.5) * 8)),
         decisionClarity: Math.max(
           0,
@@ -313,7 +316,7 @@ function SpeakerDominanceView({ isLive }: { isLive: boolean }) {
     if (!isLive) return;
 
     const interval = setInterval(() => {
-      setSpeakers((prev) => {
+      setSpeakers(prev => {
         const newSpeakers = [...prev];
         const activeIndex = Math.floor(Math.random() * newSpeakers.length);
         newSpeakers.forEach((s, i) => {
@@ -332,7 +335,7 @@ function SpeakerDominanceView({ isLive }: { isLive: boolean }) {
   return (
     <Card className="p-6">
       <div className="space-y-4">
-        {speakers.map((speaker) => (
+        {speakers.map(speaker => (
           <div key={speaker.name} className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -393,7 +396,7 @@ function BiasHeatMap() {
           <thead>
             <tr>
               <th className="text-left p-2">Bias Type</th>
-              {speakers.map((s) => (
+              {speakers.map(s => (
                 <th key={s} className="text-center p-2 capitalize">
                   {s}
                 </th>
@@ -401,10 +404,10 @@ function BiasHeatMap() {
             </tr>
           </thead>
           <tbody>
-            {biasData.map((bias) => (
+            {biasData.map(bias => (
               <tr key={bias.type}>
                 <td className="p-2 font-medium">{bias.type}</td>
-                {speakers.map((speaker) => (
+                {speakers.map(speaker => (
                   <td key={speaker} className="p-2 text-center">
                     <div
                       className={`w-10 h-10 mx-auto rounded flex items-center justify-center ${getHeatColor(
@@ -481,7 +484,7 @@ function DecisionTracker() {
   return (
     <Card className="p-6">
       <div className="space-y-4">
-        {decisions.map((decision) => (
+        {decisions.map(decision => (
           <div key={decision.id} className="border rounded-lg p-4">
             <div className="flex items-start justify-between mb-2">
               <div>
@@ -644,7 +647,11 @@ function QualityPredictionChart({ prediction }: { prediction: number }) {
 // Live Insights Feed
 function LiveInsightsFeed({ isLive }: { isLive: boolean }) {
   const [insights, setInsights] = useState([
-    { time: '10:45', message: 'Charlie showed strong leadership in decision-making', type: 'positive' },
+    {
+      time: '10:45',
+      message: 'Charlie showed strong leadership in decision-making',
+      type: 'positive',
+    },
     { time: '10:42', message: 'Eve has not spoken in 15 minutes', type: 'warning' },
     { time: '10:38', message: 'Groupthink pattern emerging in budget discussion', type: 'danger' },
     { time: '10:35', message: 'Good dissent level on product timeline', type: 'positive' },
@@ -665,10 +672,13 @@ function LiveInsightsFeed({ isLive }: { isLive: boolean }) {
       const newInsight = {
         time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
         message: messages[Math.floor(Math.random() * messages.length)],
-        type: ['positive', 'warning', 'danger'][Math.floor(Math.random() * 3)] as 'positive' | 'warning' | 'danger',
+        type: ['positive', 'warning', 'danger'][Math.floor(Math.random() * 3)] as
+          | 'positive'
+          | 'warning'
+          | 'danger',
       };
 
-      setInsights((prev) => [newInsight, ...prev.slice(0, 3)]);
+      setInsights(prev => [newInsight, ...prev.slice(0, 3)]);
     }, 8000);
 
     return () => clearInterval(interval);
@@ -787,19 +797,17 @@ function ActionItemsTracker() {
   ]);
 
   const toggleItem = (id: number) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, completed: !item.completed } : item))
+    setItems(prev =>
+      prev.map(item => (item.id === id ? { ...item, completed: !item.completed } : item))
     );
   };
 
   return (
     <div className="space-y-2">
-      {items.map((item) => (
+      {items.map(item => (
         <div
           key={item.id}
-          className={`flex items-start gap-2 p-2 rounded ${
-            item.completed ? 'opacity-60' : ''
-          }`}
+          className={`flex items-start gap-2 p-2 rounded ${item.completed ? 'opacity-60' : ''}`}
         >
           <button
             onClick={() => toggleItem(item.id)}

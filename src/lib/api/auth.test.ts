@@ -149,7 +149,7 @@ describe('API Authentication', () => {
 
       vi.mocked((prisma as any).apiKey.findUnique).mockResolvedValue(mockApiKey);
       vi.mocked(checkRateLimit).mockResolvedValue({ allowed: true } as any);
-      vi.mocked(prisma.$transaction).mockImplementation(async (fn) => {
+      vi.mocked(prisma.$transaction).mockImplementation(async fn => {
         if (typeof fn === 'function') {
           return fn(prisma);
         }

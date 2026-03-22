@@ -107,7 +107,7 @@ export function CausalGraph({
     });
 
     // Add bias nodes and links
-    weights.forEach((weight) => {
+    weights.forEach(weight => {
       if (
         Math.abs(weight.outcomeCorrelation) >= filterThreshold &&
         (!showOnlyDangerous || weight.dangerMultiplier > 1.3)
@@ -158,12 +158,10 @@ export function CausalGraph({
     // Create scales
     const sizeScale = d3
       .scaleLinear()
-      .domain([0, d3.max(nodes, (d) => d.value) || 1])
+      .domain([0, d3.max(nodes, d => d.value) || 1])
       .range([10, 40]);
 
-    const colorScale = d3
-      .scaleSequential(d3.interpolateRdYlGn)
-      .domain([2, 0.5]); // Inverted for danger
+    const colorScale = d3.scaleSequential(d3.interpolateRdYlGn).domain([2, 0.5]); // Inverted for danger
 
     // Create simulation
     const simulation = d3
@@ -180,15 +178,19 @@ export function CausalGraph({
       .force('charge', d3.forceManyBody().strength(-300))
       .force('center', d3.forceCenter(width / 2, height / 2))
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .force('collision', d3.forceCollide().radius((d: any) => sizeScale(d.value) + 5));
+      .force(
+        'collision',
+        d3.forceCollide().radius((d: any) => sizeScale(d.value) + 5)
+      );
 
     // Create SVG groups
     const g = svg.append('g');
 
     // Add zoom behavior
-    const zoom = d3.zoom<SVGSVGElement, unknown>()
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.5, 3])
-      .on('zoom', (event) => {
+      .on('zoom', event => {
         g.attr('transform', event.transform);
       });
 
@@ -200,11 +202,11 @@ export function CausalGraph({
       .selectAll('line')
       .data(links)
       .join('line')
-      .attr('stroke', (d) =>
+      .attr('stroke', d =>
         d.type === 'positive' ? '#22c55e' : d.type === 'negative' ? '#ef4444' : '#94a3b8'
       )
-      .attr('stroke-opacity', (d) => 0.3 + d.strength * 0.4)
-      .attr('stroke-width', (d) => 1 + d.strength * 3);
+      .attr('stroke-opacity', d => 0.3 + d.strength * 0.4)
+      .attr('stroke-width', d => 1 + d.strength * 3);
 
     // Create nodes
     const node = g
@@ -228,15 +230,15 @@ export function CausalGraph({
             if (!event.active) simulation.alphaTarget(0);
             d.fx = null;
             d.fy = null;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           }) as any
       );
 
     // Add circles
     node
       .append('circle')
-      .attr('r', (d) => sizeScale(d.value))
-      .attr('fill', (d) => {
+      .attr('r', d => sizeScale(d.value))
+      .attr('fill', d => {
         if (d.group === 'center') return '#1e293b';
         if (d.group === 'outcome') return d.id === 'success' ? '#22c55e' : '#ef4444';
         return colorScale(d.danger || 1);
@@ -253,16 +255,16 @@ export function CausalGraph({
     // Add labels
     node
       .append('text')
-      .text((d) => d.label)
+      .text(d => d.label)
       .attr('text-anchor', 'middle')
-      .attr('dy', (d) => sizeScale(d.value) + 15)
+      .attr('dy', d => sizeScale(d.value) + 15)
       .style('font-size', '12px')
       .style('font-weight', '500')
       .style('fill', '#475569');
 
     // Add danger indicators
     node
-      .filter((d) => d.group === 'bias' && (d.danger || 0) > 1.5)
+      .filter(d => d.group === 'bias' && (d.danger || 0) > 1.5)
       .append('text')
       .text('⚠')
       .attr('text-anchor', 'middle')
@@ -309,7 +311,10 @@ export function CausalGraph({
       {/* Controls */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-4">
-          <Tabs value={viewMode} onValueChange={(v: string) => setViewMode(v as 'force' | 'radial' | 'timeline')}>
+          <Tabs
+            value={viewMode}
+            onValueChange={(v: string) => setViewMode(v as 'force' | 'radial' | 'timeline')}
+          >
             <TabsList>
               <TabsTrigger value="force">Force Graph</TabsTrigger>
               <TabsTrigger value="radial">Radial View</TabsTrigger>
@@ -325,7 +330,7 @@ export function CausalGraph({
               max={1}
               step={0.1}
               value={[filterThreshold]}
-              onValueChange={(v) => setFilterThreshold(v[0])}
+              onValueChange={v => setFilterThreshold(v[0])}
               className="w-32"
             />
             <span className="text-sm text-muted-foreground">{filterThreshold.toFixed(1)}</span>
@@ -390,9 +395,7 @@ export function CausalGraph({
       {/* Selected Node Details */}
       {selectedNode && (
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">
-            {formatBiasName(selectedNode)} Details
-          </h3>
+          <h3 className="text-lg font-semibold mb-4">{formatBiasName(selectedNode)} Details</h3>
           <BiasDetails biasType={selectedNode} weights={weights} />
         </Card>
       )}
@@ -419,12 +422,10 @@ function RadialView({
     const { width, height } = dimensions;
     const radius = Math.min(width, height) / 2 - 50;
 
-    const g = svg
-      .append('g')
-      .attr('transform', `translate(${width / 2},${height / 2})`);
+    const g = svg.append('g').attr('transform', `translate(${width / 2},${height / 2})`);
 
     // Create radial layout
-    const biasNodes = data.nodes.filter((n) => n.group === 'bias');
+    const biasNodes = data.nodes.filter(n => n.group === 'bias');
     const angleStep = (2 * Math.PI) / biasNodes.length;
 
     biasNodes.forEach((node, i) => {
@@ -441,7 +442,7 @@ function RadialView({
       { radius: radius * 1.1, label: 'Danger', color: '#ef444420' },
     ];
 
-    zones.forEach((zone) => {
+    zones.forEach(zone => {
       g.append('circle')
         .attr('r', zone.radius)
         .attr('fill', zone.color)
@@ -464,12 +465,12 @@ function RadialView({
       .data(biasNodes)
       .join('g')
       .attr('class', 'node')
-      .attr('transform', (d) => `translate(${d.x},${d.y})`);
+      .attr('transform', d => `translate(${d.x},${d.y})`);
 
     nodeGroups
       .append('circle')
-      .attr('r', (d) => 10 + d.value * 0.5)
-      .attr('fill', (d) => {
+      .attr('r', d => 10 + d.value * 0.5)
+      .attr('fill', d => {
         const danger = d.danger || 1;
         if (danger < 0.8) return '#22c55e';
         if (danger < 1.3) return '#f97316';
@@ -480,7 +481,7 @@ function RadialView({
 
     nodeGroups
       .append('text')
-      .text((d) => d.label)
+      .text(d => d.label)
       .attr('dy', 25)
       .attr('text-anchor', 'middle')
       .style('font-size', '11px')
@@ -566,30 +567,18 @@ function InsightCard({ insight }: { insight: CausalInsight }) {
 }
 
 // Bias Details Component
-function BiasDetails({
-  biasType,
-  weights,
-}: {
-  biasType: string;
-  weights: CausalWeight[];
-}) {
-  const weight = weights.find((w) => w.biasType === biasType);
+function BiasDetails({ biasType, weights }: { biasType: string; weights: CausalWeight[] }) {
+  const weight = weights.find(w => w.biasType === biasType);
   if (!weight) return null;
 
   const dangerLevel =
-    weight.dangerMultiplier > 1.5
-      ? 'High'
-      : weight.dangerMultiplier > 1.2
-      ? 'Medium'
-      : 'Low';
+    weight.dangerMultiplier > 1.5 ? 'High' : weight.dangerMultiplier > 1.2 ? 'Medium' : 'Low';
 
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
         <p className="text-sm text-muted-foreground">Outcome Correlation</p>
-        <p className="text-lg font-semibold">
-          {(weight.outcomeCorrelation * 100).toFixed(1)}%
-        </p>
+        <p className="text-lg font-semibold">{(weight.outcomeCorrelation * 100).toFixed(1)}%</p>
       </div>
       <div>
         <p className="text-sm text-muted-foreground">Danger Level</p>
@@ -615,6 +604,6 @@ function BiasDetails({
 function formatBiasName(biasType: string): string {
   return biasType
     .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, (str) => str.toUpperCase())
+    .replace(/^./, str => str.toUpperCase())
     .trim();
 }

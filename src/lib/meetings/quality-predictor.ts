@@ -183,8 +183,7 @@ export function calculateBiasDensity(speakers: SpeakerProfile[]): QualitySignal 
     const biasValues = Object.values(speaker.biasScores);
     const avgBias =
       biasValues.length > 0 ? biasValues.reduce((a, b) => a + b, 0) / biasValues.length : 0;
-    const weight =
-      totalTime > 0 ? speaker.talkTimeSeconds / totalTime : 1 / speakers.length;
+    const weight = totalTime > 0 ? speaker.talkTimeSeconds / totalTime : 1 / speakers.length;
     weightedBiasSum += avgBias * weight;
   }
 
@@ -293,10 +292,7 @@ export function calculateEngagementQuality(
     };
   }
 
-  const totalInterruptions = speakers.reduce(
-    (sum, s) => sum + (s.interruptionCount || 0),
-    0
-  );
+  const totalInterruptions = speakers.reduce((sum, s) => sum + (s.interruptionCount || 0), 0);
   const totalTalkTime = speakers.reduce((sum, s) => sum + s.talkTimeSeconds, 0);
 
   // Interruption penalty: based on total interruptions relative to acceptable threshold per speaker
@@ -433,27 +429,24 @@ export function predictDecisionQuality(
   speakerBiases: unknown[],
   keyDecisions: unknown[]
 ): QualityPrediction {
-  const speakers: SpeakerProfile[] = (
-    speakerBiases as Array<Record<string, unknown>>
-  ).map(s => ({
+  const speakers: SpeakerProfile[] = (speakerBiases as Array<Record<string, unknown>>).map(s => ({
     name: (s.speaker as string) ?? 'Unknown',
     talkTimeSeconds: 300,
     interruptionCount: 0,
     biasScores: Object.fromEntries(
-      (
-        (s.biases as Array<{ biasType: string; avgSeverity: number }>) ?? []
-      ).map(b => [b.biasType, b.avgSeverity * 10])
+      ((s.biases as Array<{ biasType: string; avgSeverity: number }>) ?? []).map(b => [
+        b.biasType,
+        b.avgSeverity * 10,
+      ])
     ),
   }));
 
-  const decisions: Decision[] = (keyDecisions as Array<Record<string, unknown>>).map(
-    d => ({
-      decision: (d.text as string) ?? '',
-      explicitDecision: (d.confidence as number) >= 0.7,
-      rationale: d.rationale as string | undefined,
-      dissentLevel: d.dissent ? 1 : 0,
-    })
-  );
+  const decisions: Decision[] = (keyDecisions as Array<Record<string, unknown>>).map(d => ({
+    decision: (d.text as string) ?? '',
+    explicitDecision: (d.confidence as number) >= 0.7,
+    rationale: d.rationale as string | undefined,
+    dissentLevel: d.dissent ? 1 : 0,
+  }));
 
   const summary = (meetingSummary as MeetingContext) ?? {};
   const partialSummary: MeetingContext = {

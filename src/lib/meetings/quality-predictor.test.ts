@@ -78,10 +78,7 @@ describe('Meeting Quality Predictor', () => {
     });
 
     it('should penalize no dissent', () => {
-      const decisions = [
-        createMockDecision(true, true, 0),
-        createMockDecision(true, true, 0),
-      ];
+      const decisions = [createMockDecision(true, true, 0), createMockDecision(true, true, 0)];
 
       const signal = calculateDissentRatio(decisions);
 
@@ -206,10 +203,7 @@ describe('Meeting Quality Predictor', () => {
   describe('calculateRiskDiscussion', () => {
     it('should reward risk acknowledgment', () => {
       const summary = createMockSummary(true);
-      const decisions = [
-        createMockDecision(true, true, 3),
-        createMockDecision(true, true, 2),
-      ];
+      const decisions = [createMockDecision(true, true, 3), createMockDecision(true, true, 2)];
 
       const signal = calculateRiskDiscussion(summary, decisions);
 
@@ -219,10 +213,7 @@ describe('Meeting Quality Predictor', () => {
 
     it('should penalize lack of risk discussion', () => {
       const summary = createMockSummary(false);
-      const decisions = [
-        createMockDecision(true, true, 0),
-        createMockDecision(true, true, 0),
-      ];
+      const decisions = [createMockDecision(true, true, 0), createMockDecision(true, true, 0)];
 
       const signal = calculateRiskDiscussion(summary, decisions);
 
@@ -268,10 +259,7 @@ describe('Meeting Quality Predictor', () => {
         createMockSpeaker('Charlie', 290, { availabilityHeuristic: 2 }),
       ];
 
-      const decisions = [
-        createMockDecision(true, true, 3),
-        createMockDecision(true, true, 2),
-      ];
+      const decisions = [createMockDecision(true, true, 3), createMockDecision(true, true, 2)];
 
       const summary = createMockSummary(true);
 
@@ -289,10 +277,7 @@ describe('Meeting Quality Predictor', () => {
         createMockSpeaker('Bob', 50, { availabilityHeuristic: 2 }),
       ];
 
-      const decisions = [
-        createMockDecision(false, false, 0),
-        createMockDecision(false, false, 0),
-      ];
+      const decisions = [createMockDecision(false, false, 0), createMockDecision(false, false, 0)];
 
       const summary = createMockSummary(false);
 
@@ -335,7 +320,9 @@ describe('Meeting Quality Predictor', () => {
 
       const recommendations = generateRecommendations(signals);
 
-      expect(recommendations).toContain('Encourage constructive dissent and devil\'s advocacy in decision-making');
+      expect(recommendations).toContain(
+        "Encourage constructive dissent and devil's advocacy in decision-making"
+      );
       expect(recommendations).toContain('Ensure balanced participation from all attendees');
       expect(recommendations).toContain('Implement bias checks and structured decision frameworks');
     });
@@ -458,9 +445,9 @@ describe('Meeting Quality Predictor', () => {
 
       // Should generate targeted recommendations
       expect(prediction.recommendations.length).toBeGreaterThan(0);
-      expect(prediction.recommendations.some(r =>
-        r.includes('balance') || r.includes('participation')
-      )).toBe(true);
+      expect(
+        prediction.recommendations.some(r => r.includes('balance') || r.includes('participation'))
+      ).toBe(true);
     });
   });
 });

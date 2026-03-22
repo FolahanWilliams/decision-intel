@@ -24,10 +24,7 @@ export async function POST(request: NextRequest) {
     const authResult = await validateApiKey(request);
     if (!authResult.success) {
       const err = authResult as ValidateError;
-      return NextResponse.json(
-        { error: err.error },
-        { status: err.status, headers: err.headers }
-      );
+      return NextResponse.json({ error: err.error }, { status: err.status, headers: err.headers });
     }
     const { context } = authResult;
 
@@ -150,7 +147,7 @@ export async function POST(request: NextRequest) {
         where: { documentId: newDoc.id },
         orderBy: { createdAt: 'desc' },
       });
-      
+
       if (!saved) {
         throw new Error('Analysis record not found after successful analysis');
       }

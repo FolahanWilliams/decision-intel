@@ -73,10 +73,7 @@ describe('API v1 Analyze Endpoint', () => {
           instances: ['Group pressure detected'],
         },
       },
-      recommendations: [
-        'Consider alternative viewpoints',
-        'Seek diverse opinions',
-      ],
+      recommendations: ['Consider alternative viewpoints', 'Seek diverse opinions'],
       createdAt: new Date(),
     };
 
@@ -96,7 +93,7 @@ describe('API v1 Analyze Endpoint', () => {
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer di_live_test123',
+          Authorization: 'Bearer di_live_test123',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -129,7 +126,7 @@ describe('API v1 Analyze Endpoint', () => {
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer di_live_test123',
+          Authorization: 'Bearer di_live_test123',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -158,7 +155,7 @@ describe('API v1 Analyze Endpoint', () => {
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer di_live_test123',
+          Authorization: 'Bearer di_live_test123',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -182,7 +179,7 @@ describe('API v1 Analyze Endpoint', () => {
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer di_live_test123',
+          Authorization: 'Bearer di_live_test123',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({}), // Missing required fields
@@ -230,7 +227,7 @@ describe('API v1 Analyze Endpoint', () => {
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer di_live_test123',
+          Authorization: 'Bearer di_live_test123',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -257,7 +254,7 @@ describe('API v1 Analyze Endpoint', () => {
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer di_live_test123',
+          Authorization: 'Bearer di_live_test123',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -286,7 +283,7 @@ describe('API v1 Analyze Endpoint', () => {
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer di_live_test123',
+          Authorization: 'Bearer di_live_test123',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -314,7 +311,7 @@ describe('API v1 Analyze Endpoint', () => {
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer di_live_test123',
+          Authorization: 'Bearer di_live_test123',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -344,7 +341,7 @@ describe('API v1 Analyze Endpoint', () => {
       const request = new NextRequest('http://localhost:3000/api/v1/analyze', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer di_live_test123',
+          Authorization: 'Bearer di_live_test123',
           'Content-Type': 'application/json',
           'X-Request-ID': 'req_123',
         },

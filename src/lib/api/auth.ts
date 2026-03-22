@@ -186,12 +186,11 @@ export async function validateApiKey(
     failMode: 'closed',
   });
 
-  const allowed =
-    (rateLimitResult as { allowed?: boolean }).allowed ?? rateLimitResult.success;
+  const allowed = (rateLimitResult as { allowed?: boolean }).allowed ?? rateLimitResult.success;
   if (!allowed) {
     const retryAfter =
       (rateLimitResult as { retryAfter?: number }).retryAfter ??
-      (rateLimitResult.reset - Math.floor(Date.now() / 1000));
+      rateLimitResult.reset - Math.floor(Date.now() / 1000);
     return {
       success: false,
       error: 'Rate limit exceeded',
@@ -212,9 +211,7 @@ export async function validateApiKey(
       data: { lastUsedAt: new Date() },
     })
   ).catch((err: unknown) => {
-    log.warn(
-      'Failed to update lastUsedAt: ' + (err instanceof Error ? err.message : String(err))
-    );
+    log.warn('Failed to update lastUsedAt: ' + (err instanceof Error ? err.message : String(err)));
   });
 
   return {

@@ -304,12 +304,16 @@ describe('Causal Learning Service', () => {
       const insights = getCausalInsights(weights, 100);
 
       // Should identify confirmatory bias as dangerous
-      const dangerInsight = insights.find(i => i.type === 'danger' && i.biasType === 'confirmatoryBias');
+      const dangerInsight = insights.find(
+        i => i.type === 'danger' && i.biasType === 'confirmatoryBias'
+      );
       expect(dangerInsight).toBeDefined();
       expect(dangerInsight?.confidence).toBeGreaterThan(0.8);
 
       // Should identify availability heuristic as safe
-      const safeInsight = insights.find(i => i.type === 'safe' && i.biasType === 'availabilityHeuristic');
+      const safeInsight = insights.find(
+        i => i.type === 'safe' && i.biasType === 'availabilityHeuristic'
+      );
       expect(safeInsight).toBeDefined();
 
       // Should identify anchoring bias as noise (low sample size)
@@ -391,7 +395,9 @@ describe('Causal Learning Service', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      vi.mocked((prisma as any).outcomeRecord.findMany).mockRejectedValue(new Error('Database error'));
+      vi.mocked((prisma as any).outcomeRecord.findMany).mockRejectedValue(
+        new Error('Database error')
+      );
 
       const result = await updateCausalModel('org_123');
 

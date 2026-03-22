@@ -74,9 +74,11 @@ export async function computeOrgCausalWeights(
   to?: Date
 ): Promise<CausalWeight[]> {
   try {
-    const outcomes: OutcomeRecord[] = await (prisma as unknown as {
-      outcomeRecord: { findMany: (args: unknown) => Promise<OutcomeRecord[]> };
-    }).outcomeRecord.findMany({
+    const outcomes: OutcomeRecord[] = await (
+      prisma as unknown as {
+        outcomeRecord: { findMany: (args: unknown) => Promise<OutcomeRecord[]> };
+      }
+    ).outcomeRecord.findMany({
       where: {
         orgId,
         ...(from || to
@@ -104,10 +106,7 @@ export async function computeOrgCausalWeights(
     const baseFailureRate = 1 - baseSuccessRate;
 
     // Accumulate per-bias statistics
-    const biasStats = new Map<
-      string,
-      { failures: number; successes: number; partials: number }
-    >();
+    const biasStats = new Map<string, { failures: number; successes: number; partials: number }>();
 
     for (const outcome of outcomesList) {
       const biases = outcome.analysis?.biases ?? {};
@@ -173,14 +172,23 @@ export async function computeOrgCausalWeights(
 export async function applyOrgWeights(
   orgId: string,
   biases: Record<string, { score: number; instances: unknown[] }>
-): Promise<Record<string, { score: number; instances: unknown[]; adjusted?: boolean; orgMultiplier?: number }>> {
+): Promise<
+  Record<
+    string,
+    { score: number; instances: unknown[]; adjusted?: boolean; orgMultiplier?: number }
+  >
+> {
   try {
-    const model = await (prisma as unknown as {
-      orgCausalModel: { findUnique: (args: unknown) => Promise<{
-        weights: CausalWeight[];
-        updatedAt?: Date;
-      } | null> };
-    }).orgCausalModel.findUnique({
+    const model = await (
+      prisma as unknown as {
+        orgCausalModel: {
+          findUnique: (args: unknown) => Promise<{
+            weights: CausalWeight[];
+            updatedAt?: Date;
+          } | null>;
+        };
+      }
+    ).orgCausalModel.findUnique({
       where: { orgId },
     });
 
@@ -201,7 +209,10 @@ export async function applyOrgWeights(
       (model.weights as CausalWeight[]).map(w => [w.biasType, w.dangerMultiplier])
     );
 
-    const result: Record<string, { score: number; instances: unknown[]; adjusted: boolean; orgMultiplier: number }> = {};
+    const result: Record<
+      string,
+      { score: number; instances: unknown[]; adjusted: boolean; orgMultiplier: number }
+    > = {};
     for (const [biasType, bias] of Object.entries(biases)) {
       const multiplier = weightMap.get(biasType);
       if (multiplier !== undefined) {
@@ -226,10 +237,7 @@ export async function applyOrgWeights(
  * Generate human-readable causal insights from pre-computed weights.
  * This is a synchronous function (no DB calls).
  */
-export function getCausalInsights(
-  weights: CausalWeight[],
-  totalOutcomes: number
-): CausalInsight[] {
+export function getCausalInsights(weights: CausalWeight[], totalOutcomes: number): CausalInsight[] {
   if (weights.length === 0 || totalOutcomes === 0) {
     return [
       {
@@ -298,18 +306,22 @@ export function getCausalInsights(
 export async function updateCausalModel(orgId: string): Promise<unknown | null> {
   try {
     const weights = await computeOrgCausalWeights(orgId);
-    const outcomes = await (prisma as unknown as {
-      outcomeRecord: { findMany: (args: unknown) => Promise<OutcomeRecord[]> };
-    }).outcomeRecord.findMany({
+    const outcomes = await (
+      prisma as unknown as {
+        outcomeRecord: { findMany: (args: unknown) => Promise<OutcomeRecord[]> };
+      }
+    ).outcomeRecord.findMany({
       where: { orgId },
       include: { analysis: true },
     });
     const totalOutcomes = outcomes.length;
     const insights = getCausalInsights(weights, totalOutcomes);
 
-    const result = await (prisma as unknown as {
-      orgCausalModel: { upsert: (args: unknown) => Promise<unknown> };
-    }).orgCausalModel.upsert({
+    const result = await (
+      prisma as unknown as {
+        orgCausalModel: { upsert: (args: unknown) => Promise<unknown> };
+      }
+    ).orgCausalModel.upsert({
       where: { orgId },
       create: {
         orgId,
@@ -371,7 +383,9 @@ export async function learnCausalEdges(orgId: string): Promise<CausalWeight[]> {
       const isSuccess = outcome.outcome === 'success';
       const isPartial = outcome.outcome === 'partial_success';
 
-      const biasTypes = Array.from(new Set(outcome.analysis.biases.map((b: { biasType: string }) => b.biasType)));
+      const biasTypes = Array.from(
+        new Set(outcome.analysis.biases.map((b: { biasType: string }) => b.biasType))
+      );
 
       for (const biasType of biasTypes) {
         const stats = biasOutcomes.get(biasType) || {
