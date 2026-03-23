@@ -17,7 +17,7 @@ import {
   buildBiasResearchPrompt,
   buildNoiseBenchmarkPrompt,
   buildFactCheckRefinementPrompt,
-  buildMetaJudgePrompt
+  buildMetaJudgePrompt,
 } from './prompts';
 import { searchSimilarDocuments, searchSimilarWithOutcomes } from '../rag/embeddings';
 import { prisma } from '../prisma';
@@ -523,10 +523,7 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
 
     // Use the model to identify and redact PII
     const result = await withTimeout(
-      getModel().generateContent([
-        GDPR_ANONYMIZER_PROMPT,
-        `Text to anonymize:\n${content}`,
-      ])
+      getModel().generateContent([GDPR_ANONYMIZER_PROMPT, `Text to anonymize:\n${content}`])
     );
 
     const responseText = result.response?.text ? result.response.text() : '';

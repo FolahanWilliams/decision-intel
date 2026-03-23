@@ -52,7 +52,9 @@ export function DecisionTimeline({ events }: DecisionTimelineProps) {
               <h4 className="font-semibold text-[15px] text-white/90 group-hover:text-white transition-colors tracking-tight">
                 {event.title}
               </h4>
-              <p className="text-sm text-muted leading-relaxed drop-shadow-sm">{event.description}</p>
+              <p className="text-sm text-muted leading-relaxed drop-shadow-sm">
+                {event.description}
+              </p>
             </div>
           </div>
         </div>

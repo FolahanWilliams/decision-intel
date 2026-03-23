@@ -716,7 +716,10 @@ OUTPUT JSON:
 ]`;
 }
 
-export function buildFactCheckRefinementPrompt(verificationsXml: string, financialDataXml: string): string {
+export function buildFactCheckRefinementPrompt(
+  verificationsXml: string,
+  financialDataXml: string
+): string {
   return `You are a Financial Fact Checker. Refine the verification verdicts below using the REAL-TIME FINANCIAL DATA provided.
 If a claim was marked UNVERIFIABLE but the data now supports or contradicts it, update the verdict.
 
@@ -729,7 +732,11 @@ ${financialDataXml}
 Return valid JSON: { "score": 0-100, "verifications": [...updated...] }`;
 }
 
-export function buildMetaJudgePrompt(content: string, failureScenariosXml: string, objectiveFindingsXml: string): string {
+export function buildMetaJudgePrompt(
+  content: string,
+  failureScenariosXml: string,
+  objectiveFindingsXml: string
+): string {
   return `You are the META-JUDGE in an adversarial review protocol.
 TASK: Synthesize the findings from the Pre-Mortem (Pessimistic) and Fact-Check/Bias (Objective) nodes into a final executive summary.
 
