@@ -192,7 +192,7 @@ describe('GET /api/outcomes/dashboard', () => {
   it('accepts explicit orgId query parameter', async () => {
     mockFindMany.mockResolvedValue([]);
     const res = await GET(makeRequest({ orgId: 'explicit-org' }));
-    const body = await res.json();
+    await res.json();
 
     expect(res.status).toBe(200);
     // findFirst should NOT have been called when explicit orgId is provided
