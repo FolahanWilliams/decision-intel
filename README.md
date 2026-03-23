@@ -1,9 +1,11 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js" alt="Next.js" />
-  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/LangGraph-1.1-FF6B35?style=for-the-badge" alt="LangGraph" />
-  <img src="https://img.shields.io/badge/Prisma-7.4-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" />
+  <img src="https://img.shields.io/badge/Prisma-7.5-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/D3.js-7-F9A03C?style=for-the-badge&logo=d3dotjs&logoColor=white" alt="D3.js" />
+  <img src="https://img.shields.io/badge/Slack-Integration-4A154B?style=for-the-badge&logo=slack&logoColor=white" alt="Slack" />
 </p>
 
 # Decision Intelligence Platform
@@ -81,9 +83,12 @@ Cross-references claims against real-time data sources:
 
 #### Compliance Mapping
 Automated regulatory alignment checking:
-- **FCA Consumer Duty** — Products, price, support, understanding outcomes
+- **FCA Consumer Duty** — Products, price, support, understanding outcomes with framework-specific scoring
+- **SOX Compliance** — Sarbanes-Oxley internal controls assessment
+- **Basel III** — Banking regulatory capital and risk requirements
 - **SEC disclosure** requirements
 - **GDPR readiness** — Automated PII anonymization before analysis
+- **Remediation Plans** — Auto-generated remediation steps for failing assessments
 - Status output: **PASS / WARN / FAIL** with specific recommendations
 
 #### Pre-Mortem Analysis
@@ -104,6 +109,77 @@ A unique **decision simulation engine** that creates virtual boardroom personas 
 - Individual persona votes (APPROVE / REJECT / ABSTAIN) with reasoning
 - Consensus analysis and coalition mapping
 - Dissent patterns and minority concerns
+- **Custom Personas** — Create organization-specific boardroom personas with configurable risk tolerance, focus areas, and values
+
+### Causal AI Layer
+
+Organization-specific **Structural Causal Models (SCM)** that learn which biases actually cause poor outcomes in *your* organization:
+- **Causal Edge Discovery** — Learns relationships between biases and decision quality from outcome data (e.g., "confirmation bias → high noise score")
+- **Danger Multipliers** — Organization-specific learned weights that amplify bias severity based on historical impact
+- **Counterfactual Reasoning** — "What would the outcome have been if this bias were absent?"
+
+### Outcomes-First Workflow (Decision Framing)
+
+Captures decision context *before* document upload to prevent biases from influencing interpretation:
+- **Decision Frames** — Define decision statement, default action, success/failure criteria, and stakeholders upfront
+- **Decision Priors (Structured RLHF)** — Records the decision-maker's pre-analysis belief and confidence level
+- **Belief Delta Tracking** — Measures how much the analysis shifted the decision-maker's position
+
+### Behavioral Data Flywheel
+
+A continuous improvement loop that makes the platform smarter over time:
+- **Outcome Tracking** — Report actual decision outcomes and compare against predictions
+- **Calibration Profiles** — Per-organization learned weights for bias severity, nudge thresholds, and twin accuracy
+- **Nudge Effectiveness** — Tracks which coaching interventions actually improved decisions
+- **Weekly Recalibration** — Automated cron job recalibrates models based on accumulated outcome data
+
+### Shareable Analysis Links
+
+Password-protected, expiring links for sharing analyses with external stakeholders:
+- **Token-based URLs** — `/shared/[token]` for secure external access
+- **Password Protection** — Optional password gate on shared links
+- **Access Audit Trail** — View count, last viewed, IP address and user-agent logging
+- **Revocable** — Revoke access at any time
+
+### Slack Integration
+
+Enterprise-grade Slack integration for real-time decision intelligence:
+- **OAuth Installation** — Full Slack OAuth flow with encrypted bot token storage (AES-256-GCM)
+- **Decision Detection** — Automatically identifies decisions being made in Slack channels
+- **Real-Time Nudges** — Delivers cognitive bias alerts directly in Slack when decisions are detected
+- **Decision Ingestion** — Routes Slack decisions into the cognitive audit pipeline for full analysis
+
+### Wiz Cloud Security Integration
+
+Bridges cognitive bias analysis with cloud security operations:
+- **Security Findings** — Fetches Wiz findings and maps cognitive biases to security decisions
+- **Toxic Combination Detection** — Identifies vulnerability attack paths amplified by cognitive biases
+- **KPI Metrics Dashboard** — Security operations metrics at `/dashboard/security-operations`
+- **ROI Calculator** — Quantifies the value of bias-aware security decision-making
+
+### Public API (v1)
+
+RESTful API for programmatic access to the platform:
+- **API Key Management** — Create, rotate, and revoke API keys with granular scopes (`analyze`, `documents`, `outcomes`, `insights`)
+- **Rate Limiting** — Per-key rate limits (default 100 req/hour)
+- **Endpoints** — `/api/v1/analyze`, `/api/v1/documents`, `/api/v1/insights`
+- **Usage Tracking** — API call logging with endpoint, method, status code, and response time
+
+### Team Collaboration
+
+Multi-tenant organization support with role-based access:
+- **Organizations** — Create teams with slug-based routing
+- **Member Management** — Invite members via email with role assignment (admin/member)
+- **Team Cognitive Profiles** — Aggregated decision quality metrics across the organization (average quality, noise, top biases)
+- **Team Activity Stream** — Organization-scoped activity feed
+- **Invitation System** — Token-based invites with expiration
+
+### Batch Upload
+
+Upload and analyze multiple documents simultaneously:
+- **Multi-File Upload** — Up to 10 files per batch (10MB each)
+- **Job Tracking** — Progress tracking with completed/failed counts per batch
+- **Spreadsheet Support** — Extended file format support
 
 ### Web Intelligence Layer
 
@@ -174,12 +250,38 @@ A VS Code-style command palette (`Cmd+K` / `Ctrl+K`) with intelligent search:
 - **Audit Trail** — Complete logging of all user actions for compliance
 - **Comparative Analysis** — Cross-document trend analysis and benchmarking
 
+### Meeting Command Center
+
+A live monitoring dashboard for ongoing meetings at `/meetings/command-center`:
+- **Speaker Bias Profiles** — Aggregated bias tendencies per speaker across meetings
+- **Meeting Health Metrics** — Participation balance, dissent health, decision clarity scoring
+- **Quality Prediction** — Predicts meeting outcome quality based on real-time patterns
+- **Similar Meeting Matching** — Surfaces past meetings with similar topics and their outcomes
+
+### Human Decision Cognitive Audit
+
+A parallel analysis product that audits spoken and written decisions from multiple channels:
+- **Multi-Channel Ingestion** — Manual submission, email, Slack messages, and meeting transcripts
+- **Cognitive Audit Pipeline** — Runs the same AI analysis (bias detection, noise, sentiment, SWOT, compliance) on human decisions
+- **Nudge Engine** — Behavioral coaching alerts triggered by detected biases with severity levels
+- **Effectiveness Tracking** — Measures whether nudges improved subsequent decisions
+
+### Analysis Versioning & Observability
+
+- **Analysis Versions** — Full snapshot history of every analysis version with score deltas
+- **Prompt Versioning** — Tracks LLM prompts with SHA-256 hashing for drift detection
+- **Failed Analysis Recovery** — Automatic retry queue with configurable max retries and exponential backoff
+- **Error Dashboard** — Admin error tracking and retry management
+
 ### Privacy & Security
 
 - **GDPR Anonymization** — PII is stripped *before* any AI analysis (names, emails, companies replaced with tokens)
 - **Supabase Authentication** — Enterprise-ready auth with protected routes
 - **Rate Limiting** — 5 documents/hour per user (Postgres-based, no Redis dependency)
 - **Audit Logging** — Every action recorded for compliance and forensics
+- **Encrypted Secrets** — AES-256-GCM encryption for integration tokens (Slack bot tokens)
+- **CSRF Protection** — Token-based CSRF prevention
+- **API Key Authentication** — Scoped API keys with bcrypt hashing for programmatic access
 
 ---
 
@@ -194,6 +296,11 @@ A VS Code-style command palette (`Cmd+K` / `Ctrl+K`) with intelligent search:
 │  │  Upload  │  │ Detail   │  │    Hub     │  │ Brain    │  │  Auth   │ │
 │  │  Feed    │  │ 9 Tabs   │  │Bias Library│  │  Chat    │  │  GDPR   │ │
 │  └────┬─────┘  └────┬─────┘  └─────┬──────┘  └────┬─────┘  └────┬────┘ │
+│  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌─────────┐ │
+│  │  Team    │  │ Meeting  │  │ Cognitive  │  │ Security │  │ Shared  │ │
+│  │ Collab   │  │ Command  │  │  Audits    │  │   Ops    │  │ Links   │ │
+│  │ & Orgs   │  │ Center   │  │ & Nudges   │  │  (Wiz)   │  │ (Ext.)  │ │
+│  └────┬─────┘  └────┬─────┘  └─────┬──────┘  └────┬─────┘  └────┬────┘ │
 │       │              │              │               │              │     │
 │  ─────┴──────────────┴──────────────┴───────────────┴──────────────┴──── │
 │                          SSE Streaming / REST API                        │
@@ -204,6 +311,9 @@ A VS Code-style command palette (`Cmd+K` / `Ctrl+K`) with intelligent search:
 │                                                                         │
 │  /upload  /analyze/stream  /documents  /intelligence  /search  /audit   │
 │  /activity-feed  /chat  /trends  /stats  /cron/sync  /health           │
+│  /v1/analyze  /v1/documents  /v1/insights  /v1/keys  /v1/security      │
+│  /human-decisions  /decision-frames  /decision-priors  /learning       │
+│  /team  /integrations/slack  /upload/bulk  /personas  /outcomes        │
 └──────────────────────────────────┬──────────────────────────────────────┘
                                    │
 ┌──────────────────────────────────┴──────────────────────────────────────┐
@@ -232,6 +342,11 @@ A VS Code-style command palette (`Cmd+K` / `Ctrl+K`) with intelligent search:
 │  │ Gemini   │  │Financial │  │ Scholar   │  │ (14 src) │  │  Macro  │ │
 │  │   API    │  │   API    │  │   API     │  │          │  │  Data   │ │
 │  └──────────┘  └──────────┘  └───────────┘  └──────────┘  └─────────┘ │
+│  ┌──────────┐  ┌──────────┐  ┌───────────┐                            │
+│  │  Slack   │  │   Wiz    │  │   MCP     │                            │
+│  │  OAuth   │  │ GraphQL  │  │ WebSocket │                            │
+│  │  Events  │  │   API    │  │  Server   │                            │
+│  └──────────┘  └──────────┘  └───────────┘                            │
 └─────────────────────────────────────────────────────────────────────────┘
                                    │
 ┌──────────────────────────────────┴──────────────────────────────────────┐
@@ -241,6 +356,11 @@ A VS Code-style command palette (`Cmd+K` / `Ctrl+K`) with intelligent search:
 │  HumanDecisions │ CognitiveAudits │ Nudges │ DecisionOutcomes           │
 │  NewsArticles │ ResearchCache │ CaseStudies │ BoardroomPersonas         │
 │  AuditLogs │ UserSettings │ CacheEntries │ RateLimits │ IntelSync      │
+│  Organizations │ TeamMembers │ TeamInvites │ TeamCognitiveProfiles      │
+│  CausalEdges │ CalibrationProfiles │ DecisionPriors │ DecisionFrames  │
+│  ComplianceAssessments │ ShareLinks │ ApiKeys │ BatchUploads             │
+│  AnalysisVersions │ PromptVersions │ FailedAnalyses │ NotificationLogs│
+│  SlackInstallations │ Meetings │ MeetingTranscripts                    │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -302,9 +422,14 @@ src/
 │   │       ├── intelligence/      # Intelligence Hub (news, macro, research)
 │   │       ├── insights/          # Aggregated cross-document insights
 │   │       ├── meetings/          # Meeting recordings & transcripts
+│   │       │   └── command-center/ # Live meeting health monitoring
 │   │       ├── nudges/            # Decision coaching alerts
+│   │       ├── decisions/
+│   │       │   └── new/           # Decision framing (outcomes-first workflow)
+│   │       ├── team/              # Team collaboration & member management
 │   │       ├── audit-log/         # Compliance audit trail
 │   │       ├── search/            # Semantic search
+│   │       ├── security-operations/ # Wiz security metrics dashboard
 │   │       └── settings/          # User preferences
 │   │   └── documents/
 │   │       └── [id]/              # Document detail (9 analysis tabs)
@@ -318,34 +443,85 @@ src/
 │   │               ├── BoardroomTab    # Decision Twin simulation
 │   │               ├── SimulatorTab    # What-If scenario testing
 │   │               └── IntelligenceTab # Relevant news & research
+│   │   └── shared/
+│   │       └── [token]/           # Password-protected shareable analysis links
+│   ├── invite/
+│   │   └── [token]/               # Team invitation acceptance
 │   ├── api/
 │   │   ├── upload/                # File ingestion (PDF/DOCX/TXT, 5MB limit)
+│   │   │   └── bulk/              # Batch upload (up to 10 files)
 │   │   ├── analyze/
 │   │   │   ├── stream/            # SSE streaming analysis
 │   │   │   └── simulate/          # Boardroom simulation
+│   │   ├── v1/                    # Public API (API key auth)
+│   │   │   ├── analyze/           # Programmatic document analysis
+│   │   │   ├── documents/         # Document listing
+│   │   │   ├── insights/          # Aggregated insights
+│   │   │   ├── keys/              # API key management
+│   │   │   └── security/          # Wiz security findings & metrics
 │   │   ├── activity-feed/         # Unified activity feed (multi-source)
 │   │   ├── chat/                  # RAG-powered chat with follow-up suggestions
 │   │   ├── documents/             # CRUD operations
+│   │   ├── human-decisions/       # Cognitive audit ingestion (manual/email/Slack)
+│   │   ├── decision-frames/       # Outcomes-first decision framing
+│   │   ├── decision-priors/       # Pre-analysis belief capture (RLHF)
+│   │   ├── learning/              # Causal weights, accuracy, recalibration
 │   │   ├── intelligence/          # News, macro, status endpoints
+│   │   ├── integrations/
+│   │   │   └── slack/             # OAuth, events, status, uninstall
+│   │   ├── team/                  # Members, invites, activity
+│   │   ├── personas/              # Custom boardroom persona management
+│   │   ├── outcomes/              # Decision outcome tracking
 │   │   ├── search/                # Vector similarity search
 │   │   ├── audit/                 # Audit log queries
+│   │   ├── admin/                 # Error tracking, retry, prompt management
+│   │   ├── feedback/              # Bias rating user feedback
 │   │   ├── trends/                # Trend analysis
 │   │   ├── stats/                 # Dashboard analytics
-│   │   ├── cron/                  # Scheduled intelligence sync
+│   │   ├── cron/                  # Scheduled sync, recalibration, weekly digest
 │   │   └── health/                # Health check
 │   └── login/                    # Google OAuth login page
 ├── lib/
 │   ├── analysis/                  # LangGraph pipeline orchestration
 │   │   └── analyzer.ts            # Main graph builder & execution
 │   ├── agents/                    # 15 AI agent node implementations
+│   ├── causal/                    # Causal AI Layer (Moat 1)
+│   │   ├── engine.ts              # Structural Causal Model (SCM) engine
+│   │   └── true-causal-engine.ts  # Causal inference & counterfactuals
+│   ├── learning/                  # Behavioral Data Flywheel
+│   │   ├── causal-learning.ts     # Org-specific causal weight discovery
+│   │   ├── outcome-scoring.ts     # Accuracy tracking from outcomes
+│   │   ├── feedback-loop.ts       # Behavioral calibration loop
+│   │   └── constants.ts           # Default weights and thresholds
+│   ├── human-audit/               # Human Decision Cognitive Audit
+│   │   └── analyzer.ts            # Audit pipeline for spoken/written decisions
+│   ├── meetings/                  # Meeting Intelligence
+│   │   ├── intelligence.ts        # Speaker bias profiles & decision tracking
+│   │   ├── speaker-profiles.ts    # Speaker tendency aggregation
+│   │   ├── quality-predictor.ts   # Meeting health & quality prediction
+│   │   ├── transcribe.ts          # Transcription processing
+│   │   └── process.ts             # Meeting data processing pipeline
+│   ├── integrations/              # External platform integrations
+│   │   ├── slack/
+│   │   │   └── handler.ts         # Slack event routing & signature verification
+│   │   └── wiz/
+│   │       └── client.ts          # Wiz GraphQL API client
+│   ├── compliance/                # Deep Compliance Integration (Moat 5)
+│   │   └── fca-consumer-duty.ts   # FCA Consumer Duty framework
 │   ├── constants/
 │   │   └── bias-education.ts      # Educational content for 16 biases
 │   ├── intelligence/              # Context assembly (news + research + cases)
 │   ├── news/                      # RSS feed fetching & classification
+│   ├── prompts/
+│   │   └── registry.ts            # Prompt versioning & drift detection
 │   ├── replay/
 │   │   └── score-calculator.ts    # Counterfactual score projection engine
 │   ├── research/                  # Semantic Scholar paper matching
 │   ├── rag/                       # Embeddings & vector search (pgvector)
+│   ├── security/
+│   │   └── bias-taxonomy.ts       # Security-specific bias definitions
+│   ├── mcp/
+│   │   └── server.ts              # Model Context Protocol WebSocket server
 │   ├── tools/                     # External data (Finnhub, FRED macro)
 │   ├── reports/
 │   │   ├── pdf-generator.ts       # Full PDF report with jsPDF
@@ -353,12 +529,18 @@ src/
 │   │   ├── markdown-generator.ts  # Markdown report generation
 │   │   └── json-generator.ts      # Structured JSON export
 │   ├── utils/
+│   │   ├── api-auth.ts            # API key validation & scope checking
 │   │   ├── cache.ts               # Postgres-based caching (TTL)
+│   │   ├── csrf.ts                # CSRF token generation
+│   │   ├── encryption.ts          # AES-256-GCM token encryption
+│   │   ├── error-tracker.ts       # Error aggregation & retry management
 │   │   ├── rate-limit.ts          # API rate limiting
 │   │   ├── logger.ts              # Structured logging
 │   │   ├── file-parser.ts         # PDF/DOCX/TXT parsing
 │   │   ├── prisma-json.ts         # Safe JSON serialization for Prisma
 │   │   └── resilience.ts          # Timeout & batch utilities
+│   ├── schemas/
+│   │   └── human-audit.ts         # Zod schemas for human decision validation
 │   ├── audit.ts                   # Audit logging utility
 │   └── sse.ts                     # Server-Sent Events helpers
 ├── components/
@@ -373,28 +555,45 @@ src/
 │   │   ├── ActivityFeed            # Unified activity timeline
 │   │   ├── BiasEducationCard       # Expandable bias education cards
 │   │   ├── CommandPalette          # Grouped command palette (⌘K)
+│   │   ├── DecisionCheckpoint      # Structured RLHF pre-analysis capture
 │   │   ├── ShareModal              # Multi-format export & sharing
 │   │   ├── Sidebar                 # Navigation with Bias Library link
 │   │   ├── NotificationCenter      # Bell icon with notification dropdown
-│   │   ├── Toast                   # Toast notification system
+│   │   ├── ROICalculator           # Security ROI calculation tool
+│   │   ├── ThemeToggle             # Dark/light mode toggle
+│   │   ├── DensityProvider         # UI density adjustment
+│   │   ├── ReducedMotionProvider   # Accessibility: motion-sensitive users
+│   │   ├── ErrorBoundary           # Error boundary wrapper
+│   │   ├── Toast                   # Enhanced toast notification system
 │   │   ├── OnboardingGuide         # 3-step onboarding
 │   │   ├── LoadingSkeleton          # 5 skeleton variants
+│   │   ├── LiquidGlassEffect      # Animated glass morphism effects
 │   │   └── ...                     # Table, Breadcrumbs, EmptyState, etc.
-│   └── visualizations/            # 14 Recharts-based chart components
+│   └── visualizations/            # 25+ Recharts/D3-based chart components
 │       ├── ExecutiveSummary        # Overall score & key findings
 │       ├── BiasTreemap             # Bias distribution visualization
+│       ├── CausalGraph             # Causal relationship visualization (D3)
 │       ├── RiskHeatMap             # Risk severity matrix
 │       ├── DecisionRadar           # Multi-dimension radar chart
+│       ├── EnhancedDecisionRadar   # Radar with confidence intervals
 │       ├── SentimentGauge          # Emotional tone gauge
 │       ├── FactVerificationBar     # Claim verification status
+│       ├── ClaimDeviationScatter   # Fact-check deviation scatter plot
 │       ├── SwotQuadrant            # SWOT matrix visualization
+│       ├── WeightedSwot            # SWOT with importance weighting
 │       ├── ComplianceGrid          # Regulatory status grid
 │       ├── StakeholderMap          # Stakeholder impact analysis
 │       ├── DecisionTimeline        # Decision evolution timeline
 │       ├── QualityMetrics          # Noise measurement charts
+│       ├── NoiseDecomposition      # Decision noise breakdown
 │       ├── BiasNetwork             # Bias relationship graph
+│       ├── BlindSpotNetwork        # Cognitive blind spots network
 │       ├── BiasHeatmap             # Bias severity heatmap
-│       └── ComparativeAnalysis     # Cross-document comparison
+│       ├── BiasSparkline           # Inline bias trend sparklines
+│       ├── CrossImpactMatrix       # Multi-dimensional impact analysis
+│       ├── PreMortemScenarioCards   # Failure scenario cards
+│       ├── ComparativeAnalysis     # Cross-document comparison
+│       └── DocumentTextHighlighter # Bias excerpt highlighting
 ├── hooks/
 │   ├── useActivityFeed.ts         # SWR activity feed with pagination
 │   ├── useAnalysisStream.ts       # SSE streaming with progress & retry
@@ -414,21 +613,29 @@ src/
 | Layer | Technology | Purpose |
 |:------|:-----------|:--------|
 | **Framework** | Next.js 16 (App Router) | Full-stack React with server components & route handlers |
-| **Language** | TypeScript 5 (strict mode) | Type safety across the entire codebase |
+| **Language** | TypeScript 5.9 (strict mode) | Type safety across the entire codebase |
 | **AI Engine** | Google Gemini (via LangChain) | LLM powering all 15 agent nodes |
 | **Orchestration** | LangGraph 1.1 | Multi-agent directed graph with parallel execution |
+| **Causal AI** | Custom SCM Engine | Structural Causal Models for counterfactual reasoning |
 | **Database** | Supabase PostgreSQL | Primary data store with PgBouncer connection pooling |
-| **ORM** | Prisma 7.4 | Type-safe database access with migrations |
+| **ORM** | Prisma 7.5 | Type-safe database access with migrations |
 | **Vector Search** | pgvector (1536-dim) | Semantic similarity search for embeddings |
-| **Authentication** | Supabase Auth | Google OAuth, protected routes, user management |
+| **Authentication** | Supabase Auth + API Keys | Google OAuth, protected routes, scoped API key auth |
+| **Encryption** | AES-256-GCM (Node crypto) | Integration token encryption (Slack bot tokens) |
 | **UI Framework** | React 19 + TailwindCSS 4 | Component-based UI with utility-first styling |
-| **Charts** | Recharts 3 | 14+ custom visualization components |
-| **Animations** | Framer Motion | Page transitions and interactive elements |
-| **Document Parsing** | mammoth + unpdf | PDF, DOCX, and TXT ingestion |
+| **Component Libraries** | shadcn + Radix UI + Base UI | Accessible, unstyled UI primitives with CVA variants |
+| **Charts** | Recharts 3 + D3.js 7 | 25+ custom visualization components including causal graphs |
+| **Animations** | Framer Motion | Page transitions, glass morphism effects, and micro-interactions |
+| **Theming** | next-themes | Dark/light mode with system preference detection |
+| **Document Parsing** | mammoth + unpdf | PDF, DOCX, TXT, and spreadsheet ingestion |
 | **Report Generation** | jsPDF + AutoTable | PDF, CSV, Markdown, and JSON export |
+| **Real-Time** | WebSocket (ws) + SSE | MCP server and streaming analysis progress |
+| **Integrations** | Slack OAuth + Wiz GraphQL | Enterprise messaging and cloud security platforms |
 | **News Syndication** | rss-parser | 14-source RSS feed aggregation |
 | **Validation** | Zod 4 | Schema validation for all AI pipeline output |
-| **Testing** | Vitest | Unit & integration tests |
+| **Date Utilities** | date-fns 4 | Human-readable date formatting |
+| **Testing** | Vitest 4 + Coverage V8 | Unit & integration tests with coverage reports |
+| **Git Hooks** | Husky 9 | Pre-commit hooks for code quality |
 | **Deployment** | Vercel (serverless) | Edge-optimized, zero-config deployment |
 
 ---
@@ -469,6 +676,17 @@ GOOGLE_API_KEY="your-gemini-api-key"
 
 # External APIs (optional — enables enhanced fact-checking)
 FINNHUB_API_KEY="your-finnhub-key"
+
+# Slack Integration (optional)
+SLACK_CLIENT_ID="your-slack-client-id"
+SLACK_CLIENT_SECRET="your-slack-client-secret"
+SLACK_SIGNING_SECRET="your-signing-secret"
+ENCRYPTION_KEY="your-256-bit-hex-key"
+
+# Wiz Integration (optional — enables security operations)
+WIZ_CLIENT_ID="your-wiz-client-id"
+WIZ_CLIENT_SECRET="your-wiz-client-secret"
+WIZ_API_URL="https://api.us1.app.wiz.io/graphql"
 ```
 
 ### 3. Database Setup
@@ -604,9 +822,10 @@ Tests cover: agent nodes, analysis pipeline, API routes, hooks, utilities, and c
 
 | Workflow | Trigger | Actions |
 |:---------|:--------|:--------|
-| **CI/CD Pipeline** | Push & PR | TypeScript check, ESLint, tests, Vercel deploy |
+| **CI/CD Pipeline** | Push & PR | TypeScript check, ESLint, Vitest, Vercel deploy |
 | **Database Migrations** | Schema changes on main | Applies Prisma migrations to production |
 | **Dependency Updates** | Weekly schedule | Creates issues for outdated packages |
+| **Jules AI Audit** | Manual / scheduled | AI-powered codebase audits via Gemini CLI |
 | **Release Management** | Version tags | Generates changelogs & GitHub releases |
 
 ### Required Repository Secrets
@@ -680,18 +899,31 @@ Or connect your GitHub repository to Vercel for automatic deployments on push.
 - [x] **Institutional Memory** — Surface similar past decisions and their outcomes
 - [x] **Outcome Tracking** — Report actual decision outcomes and compare against predictions
 
+- [x] **Causal AI Layer** — Structural Causal Models learning org-specific bias→outcome relationships
+- [x] **Outcomes-First Workflow** — Decision framing before document upload (success/failure criteria)
+- [x] **Structured RLHF** — Pre-analysis belief capture and belief delta tracking
+- [x] **Behavioral Data Flywheel** — Continuous calibration from outcome data with weekly recalibration
+- [x] **Slack Integration** — Full OAuth flow, decision detection, and real-time nudge delivery
+- [x] **Wiz Security Integration** — Cloud security findings with cognitive bias mapping and KPI dashboard
+- [x] **Public API (v1)** — RESTful API with scoped API key authentication and rate limiting
+- [x] **Team Collaboration** — Multi-tenant organizations with roles, invites, and team cognitive profiles
+- [x] **Batch Upload** — Multi-file upload with job tracking
+- [x] **Shareable Links** — Password-protected, expiring share links with access audit trail
+- [x] **Meeting Command Center** — Live meeting health monitoring and speaker bias profiles
+- [x] **Deep Compliance (SOX/Basel III)** — Multi-framework compliance with remediation plans
+- [x] **Analysis Versioning** — Full snapshot history and prompt drift detection
+- [x] **MCP Server** — Model Context Protocol WebSocket server for external AI agent queries
+- [x] **Custom Boardroom Personas** — Organization-specific persona configuration
+
 ### Planned
 
 - [ ] **Custom Bias Taxonomies** — Let organizations define domain-specific bias categories
-- [ ] **Team Analytics** — Aggregate decision quality metrics across teams and departments
-- [ ] **API Access** — RESTful API for programmatic document analysis
-- [ ] **Webhook Integrations** — Slack, Teams, and email notifications on analysis completion
 - [ ] **Enterprise SSO** — SAML/OIDC integration for large organizations
 - [ ] **Multi-language Support** — Document analysis in non-English languages
-- [ ] **Batch Analysis** — Upload and analyze multiple documents simultaneously
 - [ ] **Decision Playbooks** — Templated analysis configurations for common decision types
-- [ ] **Shareable Links** — Generate expiring read-only links for external stakeholders
-- [ ] **Team Collaboration** — Sharing, commenting, and multi-user analysis workflows
+- [ ] **Microsoft Teams Integration** — Decision detection and nudge delivery in Teams
+- [ ] **Email Integration** — Automated decision detection from email threads
+- [ ] **Webhook Notifications** — Configurable webhooks on analysis completion
 
 ---
 
