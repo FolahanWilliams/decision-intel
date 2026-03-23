@@ -64,8 +64,7 @@ interface DashboardData {
 const glassCard: React.CSSProperties = {
   background: 'rgba(8, 11, 20, 0.58)',
   borderRadius: '20px',
-  boxShadow:
-    '0 12px 48px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.07) inset',
+  boxShadow: '0 12px 48px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.07) inset',
   padding: 'var(--spacing-lg)',
 };
 
@@ -74,8 +73,7 @@ const tooltipStyle: React.CSSProperties = {
   border: '1px solid rgba(255,255,255,0.18)',
   borderRadius: '12px',
   backdropFilter: 'blur(24px) saturate(180%)',
-  boxShadow:
-    '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.08) inset',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.08) inset',
   padding: '8px 12px',
   fontSize: '12px',
 };
@@ -155,10 +153,7 @@ function KpiCard({
             background: `${accentColor ?? CHART_COLORS.zinc600}22`,
           }}
         >
-          <Icon
-            size={18}
-            style={{ color: accentColor ?? CHART_COLORS.zinc400 }}
-          />
+          <Icon size={18} style={{ color: accentColor ?? CHART_COLORS.zinc400 }} />
         </div>
         <span
           style={{
@@ -180,18 +175,20 @@ function KpiCard({
       >
         {value}
       </span>
-      {subtext && (
-        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>
-          {subtext}
-        </span>
-      )}
+      {subtext && <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{subtext}</span>}
     </motion.div>
   );
 }
 
 // ─── Custom Tooltips ────────────────────────────────────────────────────────
 
-function CalibrationTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: CalibrationBucket }> }) {
+function CalibrationTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload: CalibrationBucket }>;
+}) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload as CalibrationBucket;
   return (
@@ -202,21 +199,23 @@ function CalibrationTooltip({ active, payload }: { active?: boolean; payload?: A
       <div style={{ color: CHART_COLORS.zinc200 }}>
         Actual success: {formatPercent(d.successRate)}
       </div>
-      <div style={{ color: CHART_COLORS.zinc400 }}>
-        Decisions: {d.count}
-      </div>
+      <div style={{ color: CHART_COLORS.zinc400 }}>Decisions: {d.count}</div>
     </div>
   );
 }
 
-function BiasCostTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: BiasCostEntry }> }) {
+function BiasCostTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload: BiasCostEntry }>;
+}) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload as BiasCostEntry;
   return (
     <div style={tooltipStyle}>
-      <div style={{ color: CHART_COLORS.white, fontWeight: 600, marginBottom: 4 }}>
-        {d.bias}
-      </div>
+      <div style={{ color: CHART_COLORS.white, fontWeight: 600, marginBottom: 4 }}>{d.bias}</div>
       <div style={{ color: CHART_COLORS.failure }}>
         {formatPercent(Math.abs(d.successRateDelta))} lower success rate
       </div>
@@ -269,7 +268,7 @@ export default function DecisionPerformance() {
   // Calibration chart data augmented with perfect-calibration midpoint
   const calibrationData = useMemo(() => {
     if (!data?.calibration) return [];
-    return data.calibration.map((b) => ({
+    return data.calibration.map(b => ({
       ...b,
       perfectCalibration: b.midpoint,
     }));
@@ -278,17 +277,13 @@ export default function DecisionPerformance() {
   // Sort bias costs by impact (most negative first)
   const sortedBiasCosts = useMemo(() => {
     if (!data?.biasCosts) return [];
-    return [...data.biasCosts].sort(
-      (a, b) => a.successRateDelta - b.successRateDelta
-    );
+    return [...data.biasCosts].sort((a, b) => a.successRateDelta - b.successRateDelta);
   }, [data?.biasCosts]);
 
   // Sort persona leaderboard by accuracy desc
   const sortedPersonas = useMemo(() => {
     if (!data?.personaLeaderboard) return [];
-    return [...data.personaLeaderboard].sort(
-      (a, b) => b.accuracy - a.accuracy
-    );
+    return [...data.personaLeaderboard].sort((a, b) => b.accuracy - a.accuracy);
   }, [data?.personaLeaderboard]);
 
   // ── Loading state ──────────────────────────────────────────────────────
@@ -336,9 +331,7 @@ export default function DecisionPerformance() {
           <div style={{ fontWeight: 600, marginBottom: 4 }}>
             Failed to load Decision Performance
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-            {error}
-          </div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{error}</div>
         </div>
       </div>
     );
@@ -377,8 +370,8 @@ export default function DecisionPerformance() {
             maxWidth: 400,
           }}
         >
-          Start analyzing documents and reporting outcomes to see your decision
-          calibration, bias costs, and persona accuracy here.
+          Start analyzing documents and reporting outcomes to see your decision calibration, bias
+          costs, and persona accuracy here.
         </div>
       </div>
     );
@@ -516,15 +509,11 @@ export default function DecisionPerformance() {
             marginBottom: 'var(--spacing-md)',
           }}
         >
-          Points above the diagonal indicate overconfidence. Points below
-          indicate underconfidence.
+          Points above the diagonal indicate overconfidence. Points below indicate underconfidence.
         </div>
         <ResponsiveContainer width="100%" height={320}>
           <ComposedChart data={calibrationData}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.06)"
-            />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
             <XAxis
               dataKey="bucket"
               tick={{ fill: CHART_COLORS.zinc400, fontSize: 12 }}
@@ -564,12 +553,7 @@ export default function DecisionPerformance() {
               legendType="none"
             />
             {/* Actual success rate bars */}
-            <Bar
-              dataKey="successRate"
-              name="Success Rate"
-              radius={[6, 6, 0, 0]}
-              maxBarSize={48}
-            >
+            <Bar dataKey="successRate" name="Success Rate" radius={[6, 6, 0, 0]} maxBarSize={48}>
               {calibrationData.map((entry, idx) => {
                 const diff = entry.successRate - entry.midpoint;
                 let fill = CHART_COLORS.zinc200;
@@ -705,11 +689,7 @@ export default function DecisionPerformance() {
                     tickLine={false}
                   />
                   <Tooltip content={<BiasCostTooltip />} />
-                  <Bar
-                    dataKey="successRateDelta"
-                    radius={[4, 0, 0, 4]}
-                    maxBarSize={28}
-                  >
+                  <Bar dataKey="successRateDelta" radius={[4, 0, 0, 4]} maxBarSize={28}>
                     {sortedBiasCosts.map((_, idx) => (
                       <Cell
                         key={idx}
@@ -727,11 +707,10 @@ export default function DecisionPerformance() {
                   fontSize: 11,
                 }}
               >
-                {sortedBiasCosts.map((b) => (
+                {sortedBiasCosts.map(b => (
                   <div key={b.bias} style={{ marginBottom: 2 }}>
-                    {b.bias} &mdash; correlated with{' '}
-                    {formatPercent(Math.abs(b.successRateDelta))} lower success
-                    rate
+                    {b.bias} &mdash; correlated with {formatPercent(Math.abs(b.successRateDelta))}{' '}
+                    lower success rate
                   </div>
                 ))}
               </div>
@@ -815,9 +794,7 @@ export default function DecisionPerformance() {
                       padding: '10px 12px',
                       borderBottom: '1px solid rgba(255,255,255,0.04)',
                       alignItems: 'center',
-                      background: isTop
-                        ? 'rgba(255,255,255,0.03)'
-                        : 'transparent',
+                      background: isTop ? 'rgba(255,255,255,0.03)' : 'transparent',
                     }}
                   >
                     <span
@@ -828,10 +805,7 @@ export default function DecisionPerformance() {
                       }}
                     >
                       {isTop ? (
-                        <Award
-                          size={16}
-                          style={{ color: '#fbbf24' }}
-                        />
+                        <Award size={16} style={{ color: '#fbbf24' }} />
                       ) : (
                         <span
                           style={{
@@ -856,11 +830,12 @@ export default function DecisionPerformance() {
                     <span
                       style={{
                         textAlign: 'right',
-                        color: persona.accuracy >= 70
-                          ? CHART_COLORS.success
-                          : persona.accuracy >= 50
-                            ? CHART_COLORS.zinc200
-                            : CHART_COLORS.failure,
+                        color:
+                          persona.accuracy >= 70
+                            ? CHART_COLORS.success
+                            : persona.accuracy >= 50
+                              ? CHART_COLORS.zinc200
+                              : CHART_COLORS.failure,
                         fontSize: 14,
                         fontWeight: 600,
                       }}

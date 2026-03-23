@@ -185,8 +185,7 @@ export async function GET(req: NextRequest) {
           calibration.push({
             bucket: `${start}-${start + 10}%`,
             midpoint: start + 5,
-            successRate:
-              stats.count > 0 ? Math.round((stats.successes / stats.count) * 100) : 0,
+            successRate: stats.count > 0 ? Math.round((stats.successes / stats.count) * 100) : 0,
             count: stats.count,
           });
         }
@@ -195,13 +194,9 @@ export async function GET(req: NextRequest) {
       // ---------------------------------------------------------------
       // 3. Bias cost estimates
       // ---------------------------------------------------------------
-      const overallSuccessRate =
-        totalDecisions > 0 ? (successes / totalDecisions) * 100 : 0;
+      const overallSuccessRate = totalDecisions > 0 ? (successes / totalDecisions) * 100 : 0;
 
-      const biasStats: Record<
-        string,
-        { successes: number; failures: number; total: number }
-      > = {};
+      const biasStats: Record<string, { successes: number; failures: number; total: number }> = {};
 
       for (const o of outcomes) {
         for (const bias of o.confirmedBiases) {
@@ -217,8 +212,7 @@ export async function GET(req: NextRequest) {
 
       const biasCosts = Object.entries(biasStats)
         .map(([bias, stats]) => {
-          const biasSuccessRate =
-            stats.total > 0 ? (stats.successes / stats.total) * 100 : 0;
+          const biasSuccessRate = stats.total > 0 ? (stats.successes / stats.total) * 100 : 0;
           return {
             bias,
             successRateDelta: Math.round(biasSuccessRate - overallSuccessRate),
@@ -231,10 +225,7 @@ export async function GET(req: NextRequest) {
       // ---------------------------------------------------------------
       // 4. Decision Twin accuracy rankings → persona leaderboard
       // ---------------------------------------------------------------
-      const twinMap: Record<
-        string,
-        { predictions: number; correct: number }
-      > = {};
+      const twinMap: Record<string, { predictions: number; correct: number }> = {};
 
       for (const o of outcomes) {
         if (!o.mostAccurateTwin) continue;

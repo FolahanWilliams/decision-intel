@@ -133,10 +133,30 @@ describe('GET /api/outcomes/dashboard', () => {
 
   it('computes KPIs correctly', async () => {
     mockFindMany.mockResolvedValue([
-      makeOutcome({ outcome: 'success', impactScore: 80, confirmedBiases: ['anchoring'], falsPositiveBiases: ['sunk_cost'] }),
-      makeOutcome({ outcome: 'failure', impactScore: 30, confirmedBiases: ['anchoring'], falsPositiveBiases: [] }),
-      makeOutcome({ outcome: 'partial_success', impactScore: 60, confirmedBiases: [], falsPositiveBiases: [] }),
-      makeOutcome({ outcome: 'too_early', impactScore: null, confirmedBiases: [], falsPositiveBiases: [] }),
+      makeOutcome({
+        outcome: 'success',
+        impactScore: 80,
+        confirmedBiases: ['anchoring'],
+        falsPositiveBiases: ['sunk_cost'],
+      }),
+      makeOutcome({
+        outcome: 'failure',
+        impactScore: 30,
+        confirmedBiases: ['anchoring'],
+        falsPositiveBiases: [],
+      }),
+      makeOutcome({
+        outcome: 'partial_success',
+        impactScore: 60,
+        confirmedBiases: [],
+        falsPositiveBiases: [],
+      }),
+      makeOutcome({
+        outcome: 'too_early',
+        impactScore: null,
+        confirmedBiases: [],
+        falsPositiveBiases: [],
+      }),
     ]);
 
     const res = await GET(makeRequest());
