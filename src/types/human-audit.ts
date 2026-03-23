@@ -30,7 +30,8 @@ export type NudgeType =
   | 'base_rate_reminder'
   | 'pre_mortem_trigger'
   | 'noise_check'
-  | 'shallow_verification';
+  | 'shallow_verification'
+  | 'pre_decision_coaching';
 
 export type NudgeSeverity = 'info' | 'warning' | 'critical';
 
