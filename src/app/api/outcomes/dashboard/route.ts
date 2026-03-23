@@ -1,18 +1,17 @@
 /**
  * Decision Accuracy Dashboard API
  *
- * GET /api/outcomes/dashboard?timeRange=30d
+ * GET /api/outcomes/dashboard?timeRange=30d&orgId=...
  *
  * Returns aggregated decision performance metrics for the Decision Accuracy
  * Dashboard — the moat strategy's "mandatory outcome tracking" feature.
  *
- * Sections:
- * 1. Overall accuracy stats (success rate, total tracked, avg impact)
- * 2. Confidence vs Reality (DecisionPrior confidence vs actual outcomes)
- * 3. Bias cost estimates (which biases correlated with failures)
- * 4. Decision Twin accuracy rankings
- * 5. Calibration trend over time (monthly buckets)
- * 6. Pending outcome reminders (analyses >30 days without outcomes)
+ * Response shape matches the DashboardData interface in DecisionPerformance.tsx:
+ *   kpis: { accuracyRate, avgImpactScore, decisionsTracked, biasDetectionAccuracy }
+ *   calibration: CalibrationBucket[]
+ *   biasCosts: BiasCostEntry[]
+ *   personaLeaderboard: PersonaLeaderboardEntry[]
+ *   pendingOutcomes: number
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -55,16 +54,21 @@ export async function GET(req: NextRequest) {
         startDate.setDate(endDate.getDate() - 30);
     }
 
-    // Resolve org context
-    let orgId: string | null = null;
-    try {
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId: user.id },
-        select: { orgId: true },
-      });
-      orgId = membership?.orgId ?? null;
-    } catch {
-      // Schema drift — TeamMember may not exist yet
+    // Resolve org context — accept explicit orgId query param (consistent with
+    // other endpoints like /api/meetings/speakers?orgId=...), falling back to
+    // the user's first membership.
+    const requestedOrgId = req.nextUrl.searchParams.get('orgId');
+    let orgId: string | null = requestedOrgId;
+    if (!orgId) {
+      try {
+        const membership = await prisma.teamMember.findFirst({
+          where: { userId: user.id },
+          select: { orgId: true },
+        });
+        orgId = membership?.orgId ?? null;
+      } catch {
+        // Schema drift — TeamMember may not exist yet
+      }
     }
 
     const ownerFilter = orgId ? { orgId } : { userId: user.id };
@@ -103,29 +107,26 @@ export async function GET(req: NextRequest) {
             )
           : 0;
 
-      const overallStats = {
-        totalDecisions,
-        successRate,
-        avgImpactScore,
-        byOutcome: {
-          success: outcomes.filter(o => o.outcome === 'success').length,
-          partialSuccess: outcomes.filter(o => o.outcome === 'partial_success').length,
-          failure: outcomes.filter(o => o.outcome === 'failure').length,
-          tooEarly: outcomes.filter(o => o.outcome === 'too_early').length,
-        },
-      };
+      // Compute bias detection accuracy: confirmed / (confirmed + false positives)
+      let totalConfirmed = 0;
+      let totalFalsePositives = 0;
+      for (const o of outcomes) {
+        totalConfirmed += o.confirmedBiases.length;
+        totalFalsePositives += (o.falsPositiveBiases ?? []).length;
+      }
+      const biasDetectionAccuracy =
+        totalConfirmed + totalFalsePositives > 0
+          ? Math.round((totalConfirmed / (totalConfirmed + totalFalsePositives)) * 100)
+          : 0;
 
       // ---------------------------------------------------------------
-      // 2. Confidence vs Reality
+      // 2. Confidence vs Reality — calibration buckets
       // ---------------------------------------------------------------
       const analysisIds = outcomes.map(o => o.analysisId);
 
       let confidenceVsReality: Array<{
-        analysisId: string;
         confidence: number;
         outcome: string;
-        impactScore: number | null;
-        beliefDelta: number | null;
       }> = [];
 
       if (analysisIds.length > 0) {
@@ -135,7 +136,6 @@ export async function GET(req: NextRequest) {
             select: {
               analysisId: true,
               confidence: true,
-              beliefDelta: true,
             },
           });
 
@@ -146,11 +146,8 @@ export async function GET(req: NextRequest) {
             .map(o => {
               const prior = priorMap.get(o.analysisId)!;
               return {
-                analysisId: o.analysisId,
-                confidence: prior.confidence,
+                confidence: prior.confidence, // 0-100 scale
                 outcome: o.outcome,
-                impactScore: o.impactScore,
-                beliefDelta: prior.beliefDelta,
               };
             });
         } catch (priorErr) {
@@ -160,185 +157,148 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      // Compute calibration score: how well confidence predicts success
-      let calibrationScore: number | null = null;
+      // Build calibration buckets for the Confidence vs Reality chart.
+      // Confidence is 0-100, so we bucket into 0-10%, 10-20%, ..., 90-100%.
+      const calibration: Array<{
+        bucket: string;
+        midpoint: number;
+        successRate: number;
+        count: number;
+      }> = [];
+
       if (confidenceVsReality.length >= 3) {
-        // Bucket by confidence range and compare predicted vs actual success rate
-        const buckets: Record<string, { predicted: number; actual: number; count: number }> = {};
+        const bucketMap: Record<number, { successes: number; count: number }> = {};
         for (const entry of confidenceVsReality) {
-          const bucketKey = `${Math.floor(entry.confidence * 10) * 10}`;
-          if (!buckets[bucketKey]) buckets[bucketKey] = { predicted: 0, actual: 0, count: 0 };
-          buckets[bucketKey].predicted += entry.confidence;
-          buckets[bucketKey].actual +=
-            entry.outcome === 'success' || entry.outcome === 'partial_success' ? 1 : 0;
-          buckets[bucketKey].count++;
+          // confidence is 0-100 → divide by 10 to get bucket start (0, 10, 20, ...)
+          const bucketStart = Math.min(Math.floor(entry.confidence / 10) * 10, 90);
+          if (!bucketMap[bucketStart]) bucketMap[bucketStart] = { successes: 0, count: 0 };
+          bucketMap[bucketStart].count++;
+          if (entry.outcome === 'success' || entry.outcome === 'partial_success') {
+            bucketMap[bucketStart].successes++;
+          }
         }
 
-        let totalError = 0;
-        let bucketCount = 0;
-        for (const bucket of Object.values(buckets)) {
-          if (bucket.count < 1) continue;
-          const avgPredicted = bucket.predicted / bucket.count;
-          const avgActual = bucket.actual / bucket.count;
-          totalError += Math.abs(avgPredicted - avgActual);
-          bucketCount++;
+        for (const [startStr, stats] of Object.entries(bucketMap).sort(
+          ([a], [b]) => Number(a) - Number(b)
+        )) {
+          const start = Number(startStr);
+          calibration.push({
+            bucket: `${start}-${start + 10}%`,
+            midpoint: start + 5,
+            successRate:
+              stats.count > 0 ? Math.round((stats.successes / stats.count) * 100) : 0,
+            count: stats.count,
+          });
         }
-
-        calibrationScore =
-          bucketCount > 0 ? Math.round((1 - totalError / bucketCount) * 100) : null;
       }
 
       // ---------------------------------------------------------------
       // 3. Bias cost estimates
       // ---------------------------------------------------------------
-      const biasCosts: Record<
+      const overallSuccessRate =
+        totalDecisions > 0 ? (successes / totalDecisions) * 100 : 0;
+
+      const biasStats: Record<
         string,
-        { occurrences: number; failureCorrelation: number; avgImpactWhenPresent: number }
+        { successes: number; failures: number; total: number }
       > = {};
 
-      const failedOutcomes = outcomes.filter(o => o.outcome === 'failure');
-      const successOutcomes = outcomes.filter(
-        o => o.outcome === 'success' || o.outcome === 'partial_success'
-      );
-
-      // Count confirmed biases across all outcomes
       for (const o of outcomes) {
         for (const bias of o.confirmedBiases) {
-          if (!biasCosts[bias]) {
-            biasCosts[bias] = { occurrences: 0, failureCorrelation: 0, avgImpactWhenPresent: 0 };
-          }
-          biasCosts[bias].occurrences++;
-          if (o.impactScore !== null) {
-            biasCosts[bias].avgImpactWhenPresent += o.impactScore;
+          if (!biasStats[bias]) biasStats[bias] = { successes: 0, failures: 0, total: 0 };
+          biasStats[bias].total++;
+          if (o.outcome === 'success' || o.outcome === 'partial_success') {
+            biasStats[bias].successes++;
+          } else if (o.outcome === 'failure') {
+            biasStats[bias].failures++;
           }
         }
       }
 
-      // Calculate failure correlation for each bias
-      for (const bias of Object.keys(biasCosts)) {
-        const inFailures = failedOutcomes.filter(o => o.confirmedBiases.includes(bias)).length;
-        const inSuccesses = successOutcomes.filter(o => o.confirmedBiases.includes(bias)).length;
-        const total = inFailures + inSuccesses;
-        biasCosts[bias].failureCorrelation =
-          total > 0 ? Math.round((inFailures / total) * 100) : 0;
-        biasCosts[bias].avgImpactWhenPresent =
-          biasCosts[bias].occurrences > 0
-            ? Math.round(biasCosts[bias].avgImpactWhenPresent / biasCosts[bias].occurrences)
-            : 0;
-      }
-
-      const biasCostRanking = Object.entries(biasCosts)
-        .map(([biasType, stats]) => ({ biasType, ...stats }))
-        .sort((a, b) => b.failureCorrelation - a.failureCorrelation);
+      const biasCosts = Object.entries(biasStats)
+        .map(([bias, stats]) => {
+          const biasSuccessRate =
+            stats.total > 0 ? (stats.successes / stats.total) * 100 : 0;
+          return {
+            bias,
+            successRateDelta: Math.round(biasSuccessRate - overallSuccessRate),
+            failedCount: stats.failures,
+            totalCount: stats.total,
+          };
+        })
+        .sort((a, b) => a.successRateDelta - b.successRateDelta);
 
       // ---------------------------------------------------------------
-      // 4. Decision Twin accuracy rankings
+      // 4. Decision Twin accuracy rankings → persona leaderboard
       // ---------------------------------------------------------------
       const twinMap: Record<
         string,
-        { predictions: number; correct: number; totalImpact: number }
+        { predictions: number; correct: number }
       > = {};
 
       for (const o of outcomes) {
         if (!o.mostAccurateTwin) continue;
         const twin = o.mostAccurateTwin;
-        if (!twinMap[twin]) twinMap[twin] = { predictions: 0, correct: 0, totalImpact: 0 };
+        if (!twinMap[twin]) twinMap[twin] = { predictions: 0, correct: 0 };
         twinMap[twin].predictions++;
         if (o.outcome === 'success' || o.outcome === 'partial_success') {
           twinMap[twin].correct++;
         }
-        if (o.impactScore !== null) {
-          twinMap[twin].totalImpact += o.impactScore;
-        }
       }
 
-      const twinRankings = Object.entries(twinMap)
-        .map(([twinName, stats]) => ({
-          twinName,
-          predictions: stats.predictions,
-          accuracyRate: Math.round((stats.correct / stats.predictions) * 100),
-          avgImpact:
-            stats.predictions > 0 ? Math.round(stats.totalImpact / stats.predictions) : 0,
+      const personaLeaderboard = Object.entries(twinMap)
+        .map(([name, stats]) => ({
+          name,
+          accuracy: Math.round((stats.correct / stats.predictions) * 100),
+          timesSelected: stats.predictions,
         }))
-        .sort((a, b) => b.accuracyRate - a.accuracyRate);
+        .sort((a, b) => b.accuracy - a.accuracy);
 
       // ---------------------------------------------------------------
-      // 5. Calibration trend over time (monthly buckets)
-      // ---------------------------------------------------------------
-      const monthlyBuckets: Record<
-        string,
-        { success: number; total: number; totalImpact: number; impactCount: number }
-      > = {};
-
-      for (const o of outcomes) {
-        const month = o.reportedAt.toISOString().slice(0, 7);
-        if (!monthlyBuckets[month]) {
-          monthlyBuckets[month] = { success: 0, total: 0, totalImpact: 0, impactCount: 0 };
-        }
-        monthlyBuckets[month].total++;
-        if (o.outcome === 'success' || o.outcome === 'partial_success') {
-          monthlyBuckets[month].success++;
-        }
-        if (o.impactScore !== null) {
-          monthlyBuckets[month].totalImpact += o.impactScore;
-          monthlyBuckets[month].impactCount++;
-        }
-      }
-
-      const calibrationTrend = Object.entries(monthlyBuckets)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([month, stats]) => ({
-          month,
-          successRate: stats.total > 0 ? Math.round((stats.success / stats.total) * 100) : 0,
-          avgImpact:
-            stats.impactCount > 0 ? Math.round(stats.totalImpact / stats.impactCount) : 0,
-          totalDecisions: stats.total,
-        }));
-
-      // ---------------------------------------------------------------
-      // 6. Pending outcome reminders
+      // 5. Pending outcome reminders
       // ---------------------------------------------------------------
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       // Find analyses older than 30 days that belong to this user/org
       // but have no DecisionOutcome record yet.
-      const pendingReminders = await prisma.$queryRaw<
-        Array<{
-          analysisId: string;
-          documentId: string;
-          filename: string;
-          overallScore: number | null;
-          createdAt: Date;
-          daysSinceAnalysis: number;
-        }>
-      >`
-        SELECT
-          a.id AS "analysisId",
-          d.id AS "documentId",
-          d.filename,
-          a."overallScore",
-          a."createdAt",
-          EXTRACT(DAY FROM NOW() - a."createdAt")::int AS "daysSinceAnalysis"
-        FROM "Analysis" a
-        JOIN "Document" d ON d.id = a."documentId"
-        LEFT JOIN "DecisionOutcome" do2 ON do2."analysisId" = a.id
-        WHERE d."userId" = ${user.id}
-          AND a."createdAt" < ${thirtyDaysAgo}
-          AND do2.id IS NULL
-        ORDER BY a."createdAt" ASC
-        LIMIT 20
-      `;
+      // Use orgId-aware filtering when org context is available.
+      const pendingReminders = orgId
+        ? await prisma.$queryRaw<Array<{ analysisId: string }>>`
+            SELECT a.id AS "analysisId"
+            FROM "Analysis" a
+            JOIN "Document" d ON d.id = a."documentId"
+            LEFT JOIN "DecisionOutcome" do2 ON do2."analysisId" = a.id
+            WHERE d."orgId" = ${orgId}
+              AND a."createdAt" < ${thirtyDaysAgo}
+              AND do2.id IS NULL
+            ORDER BY a."createdAt" ASC
+            LIMIT 20
+          `
+        : await prisma.$queryRaw<Array<{ analysisId: string }>>`
+            SELECT a.id AS "analysisId"
+            FROM "Analysis" a
+            JOIN "Document" d ON d.id = a."documentId"
+            LEFT JOIN "DecisionOutcome" do2 ON do2."analysisId" = a.id
+            WHERE d."userId" = ${user.id}
+              AND a."createdAt" < ${thirtyDaysAgo}
+              AND do2.id IS NULL
+            ORDER BY a."createdAt" ASC
+            LIMIT 20
+          `;
 
       return NextResponse.json(
         {
-          overallStats,
-          confidenceVsReality,
-          calibrationScore,
-          biasCostRanking,
-          twinRankings,
-          calibrationTrend,
-          pendingReminders,
+          kpis: {
+            accuracyRate: successRate,
+            avgImpactScore,
+            decisionsTracked: totalDecisions,
+            biasDetectionAccuracy,
+          },
+          calibration,
+          biasCosts,
+          personaLeaderboard,
+          pendingOutcomes: pendingReminders.length,
           timeRange,
         },
         {
@@ -350,18 +310,16 @@ export async function GET(req: NextRequest) {
       if (code === 'P2021' || code === 'P2022') {
         log.warn('Schema drift in outcomes dashboard: required tables not yet migrated');
         return NextResponse.json({
-          overallStats: {
-            totalDecisions: 0,
-            successRate: 0,
+          kpis: {
+            accuracyRate: 0,
             avgImpactScore: 0,
-            byOutcome: { success: 0, partialSuccess: 0, failure: 0, tooEarly: 0 },
+            decisionsTracked: 0,
+            biasDetectionAccuracy: 0,
           },
-          confidenceVsReality: [],
-          calibrationScore: null,
-          biasCostRanking: [],
-          twinRankings: [],
-          calibrationTrend: [],
-          pendingReminders: [],
+          calibration: [],
+          biasCosts: [],
+          personaLeaderboard: [],
+          pendingOutcomes: 0,
           timeRange,
           _message: 'Outcome tracking not yet available. Database migration pending.',
         });

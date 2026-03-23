@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import {
-  ScatterChart,
-  Scatter,
   BarChart,
   Bar,
   XAxis,
@@ -13,7 +11,6 @@ import {
   ResponsiveContainer,
   Cell,
   Line,
-  ReferenceLine,
   ComposedChart,
 } from 'recharts';
 import { motion } from 'framer-motion';

@@ -15,7 +15,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
-import { verifySlackSignature, slackEventToDecisionInput } from '@/lib/integrations/slack/handler';
+import {
+  verifySlackSignature,
+  slackEventToDecisionInput,
+  slackEventToPreDecisionInput,
+} from '@/lib/integrations/slack/handler';
 import { prisma } from '@/lib/prisma';
 import { toPrismaStringArray, toPrismaJson } from '@/lib/utils/prisma-json';
 import { analyzeHumanDecision } from '@/lib/human-audit/analyzer';
@@ -62,6 +66,30 @@ export async function POST(req: NextRequest) {
       const decisionInput = slackEventToDecisionInput(payload);
 
       if (!decisionInput) {
+        // Check for pre-decision deliberation messages and deliver coaching nudges
+        const preDecision = slackEventToPreDecisionInput(payload);
+        if (preDecision?.nudge) {
+          const teamId = payload.team_id;
+          const [channel, threadTs] = (preDecision.input.sourceRef ?? '').split(':');
+          if (channel) {
+            const slackPayload = formatNudgeForSlack(
+              {
+                nudgeType: 'pre_decision_coaching',
+                triggerReason: preDecision.biases.map(b => b.bias).join(', '),
+                message: preDecision.nudge.message,
+                severity: preDecision.nudge.severity,
+                channel: 'slack',
+              },
+              threadTs
+            );
+            slackPayload.channel = channel;
+            deliverSlackNudge(slackPayload, teamId).catch(err => {
+              log.error('Pre-decision nudge delivery failed:', err);
+            });
+          }
+          return NextResponse.json({ ok: true, preDecision: true });
+        }
+
         // Not a decision-relevant message — acknowledge silently
         return NextResponse.json({ ok: true });
       }
