@@ -876,7 +876,12 @@ export default function LandingPage() {
             className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
           >
             {[
-              { value: 15000, suffix: '+', label: 'Investment Decisions Audited', color: '#FFFFFF' },
+              {
+                value: 15000,
+                suffix: '+',
+                label: 'Investment Decisions Audited',
+                color: '#FFFFFF',
+              },
               { value: 47, suffix: '%', label: 'Avg Noise Reduction', color: '#22c55e' },
               { value: 12, suffix: '%', label: 'EBITDA Recovered', color: '#FFFFFF' },
               { value: 94, suffix: '%', label: 'Outcome Tracking Rate', color: '#FFFFFF' },
@@ -945,8 +950,8 @@ export default function LandingPage() {
               }}
             >
               Investment committees evaluating identical deals produce wildly varying
-              recommendations. Cognitive bias and decision noise silently erode fund
-              performance — and nobody is measuring it.
+              recommendations. Cognitive bias and decision noise silently erode fund performance —
+              and nobody is measuring it.
             </p>
           </motion.div>
 
@@ -1250,7 +1255,11 @@ export default function LandingPage() {
                 description:
                   'Upload investment memos, board papers, or IC transcripts. Define success criteria and your prior beliefs before analysis begins.',
                 color: '#FFFFFF',
-                details: ['Investment memo parsing', 'Decision Frame capture', 'Prior confidence recording'],
+                details: [
+                  'Investment memo parsing',
+                  'Decision Frame capture',
+                  'Prior confidence recording',
+                ],
               },
               {
                 step: '02',
@@ -1259,7 +1268,11 @@ export default function LandingPage() {
                 description:
                   'Multi-agent pipeline detects 15+ biases, runs a statistical jury for noise scoring, and simulates a boardroom of Decision Twins to stress-test your thesis.',
                 color: '#A3E635',
-                details: ['Bias detection engine', 'Decision Twin simulation', 'Pre-mortem analysis'],
+                details: [
+                  'Bias detection engine',
+                  'Decision Twin simulation',
+                  'Pre-mortem analysis',
+                ],
               },
               {
                 step: '03',
@@ -1268,7 +1281,11 @@ export default function LandingPage() {
                 description:
                   'Log actual outcomes. See your Confidence vs Reality calibration curve. Watch "This bias cost you X" calculations compound your advantage over time.',
                 color: '#22c55e',
-                details: ['Mandatory outcome tracking', 'Calibration dashboards', 'Bias cost estimates'],
+                details: [
+                  'Mandatory outcome tracking',
+                  'Calibration dashboards',
+                  'Bias cost estimates',
+                ],
               },
             ].map((item, i) => (
               <motion.div
@@ -1466,9 +1483,9 @@ export default function LandingPage() {
                     lineHeight: 1.7,
                   }}
                 >
-                  Scans investment memos, IC transcripts, and board papers for 15+ cognitive
-                  biases including anchoring to entry multiples, confirmation bias in due
-                  diligence, and groupthink in committee votes.
+                  Scans investment memos, IC transcripts, and board papers for 15+ cognitive biases
+                  including anchoring to entry multiples, confirmation bias in due diligence, and
+                  groupthink in committee votes.
                 </p>
               </div>
               <div style={{ padding: '0 32px', paddingBottom: 0, zIndex: 1 }}>
@@ -1685,8 +1702,8 @@ export default function LandingPage() {
               }}
             >
               Anyone can wire an LLM to scan documents. What they cannot replicate is the
-              longitudinal dataset of audited investment decisions with verified outcomes that
-              your fund builds inside Decision Intel over time.
+              longitudinal dataset of audited investment decisions with verified outcomes that your
+              fund builds inside Decision Intel over time.
             </p>
           </motion.div>
 
@@ -1960,8 +1977,8 @@ export default function LandingPage() {
                   lineHeight: 1.8,
                 }}
               >
-                &ldquo;Why not use a generic bias scanner at half the price?&rdquo; Because
-                after 6 months on Decision Intel, your fund has learned that{' '}
+                &ldquo;Why not use a generic bias scanner at half the price?&rdquo; Because after 6
+                months on Decision Intel, your fund has learned that{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                   anchoring to entry multiples cost you 18% across 12 deals
                 </span>
@@ -2432,8 +2449,8 @@ export default function LandingPage() {
                 marginRight: 'auto',
               }}
             >
-              Join PE/VC funds and investment committees using Decision Intel to track, score,
-              and continuously improve decision performance — with measurable ROI.
+              Join PE/VC funds and investment committees using Decision Intel to track, score, and
+              continuously improve decision performance — with measurable ROI.
             </p>
             <div
               style={{
@@ -2528,7 +2545,8 @@ export default function LandingPage() {
                   maxWidth: '240px',
                 }}
               >
-                The Decision Performance OS for capital allocators. Track, score, and improve investment decisions with measurable ROI.
+                The Decision Performance OS for capital allocators. Track, score, and improve
+                investment decisions with measurable ROI.
               </p>
             </div>
 

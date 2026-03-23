@@ -377,8 +377,7 @@ const PRE_DECISION_NUDGE_TEMPLATES: Record<
   { message: string; severity: 'info' | 'warning' | 'critical' }
 > = {
   anchoring: {
-    message:
-      'This thread shows anchoring signals. Want a 2-minute counterfactual before deciding?',
+    message: 'This thread shows anchoring signals. Want a 2-minute counterfactual before deciding?',
     severity: 'info',
   },
   confirmation_bias: {
@@ -392,8 +391,7 @@ const PRE_DECISION_NUDGE_TEMPLATES: Record<
     severity: 'warning',
   },
   groupthink: {
-    message:
-      'Groupthink detected — consider assigning a formal dissenter before voting.',
+    message: 'Groupthink detected — consider assigning a formal dissenter before voting.',
     severity: 'critical',
   },
   availability_bias: {
@@ -486,9 +484,7 @@ export function extractDecisionFrame(
  * deliberation phase and returns coaching nudges, bias signals, and
  * an extracted Decision Frame for the /api/decision-frames endpoint.
  */
-export function slackEventToPreDecisionInput(
-  payload: SlackWebhookPayload
-): {
+export function slackEventToPreDecisionInput(payload: SlackWebhookPayload): {
   input: HumanDecisionInput;
   biases: { bias: string; signal: string }[];
   nudge: { message: string; severity: 'info' | 'warning' | 'critical' } | null;
