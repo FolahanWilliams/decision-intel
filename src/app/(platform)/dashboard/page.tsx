@@ -54,6 +54,7 @@ import { useActivityFeed } from '@/hooks/useActivityFeed';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { SparklineChart } from '@/components/ui/SparklineChart';
 import { DashboardCharts } from '@/components/visualizations/DashboardCharts';
+import DecisionPerformance from '@/components/visualizations/DecisionPerformance';
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -842,6 +843,19 @@ export default function Dashboard() {
               totalAnalyzed={riskSummary.total}
               avgScore={riskSummary.avg}
             />
+          </ErrorBoundary>
+        </motion.div>
+      )}
+
+      {/* Decision Performance Dashboard — Outcome tracking, calibration, bias costs */}
+      {uploadedDocs.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <ErrorBoundary sectionName="Decision Performance">
+            <DecisionPerformance />
           </ErrorBoundary>
         </motion.div>
       )}
