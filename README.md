@@ -149,14 +149,6 @@ Enterprise-grade Slack integration for real-time decision intelligence:
 - **Real-Time Nudges** — Delivers cognitive bias alerts directly in Slack when decisions are detected
 - **Decision Ingestion** — Routes Slack decisions into the cognitive audit pipeline for full analysis
 
-### Wiz Cloud Security Integration
-
-Bridges cognitive bias analysis with cloud security operations:
-- **Security Findings** — Fetches Wiz findings and maps cognitive biases to security decisions
-- **Toxic Combination Detection** — Identifies vulnerability attack paths amplified by cognitive biases
-- **KPI Metrics Dashboard** — Security operations metrics at `/dashboard/security-operations`
-- **ROI Calculator** — Quantifies the value of bias-aware security decision-making
-
 ### Public API (v1)
 
 RESTful API for programmatic access to the platform:
@@ -296,11 +288,11 @@ A parallel analysis product that audits spoken and written decisions from multip
 │  │  Upload  │  │ Detail   │  │    Hub     │  │ Brain    │  │  Auth   │ │
 │  │  Feed    │  │ 9 Tabs   │  │Bias Library│  │  Chat    │  │  GDPR   │ │
 │  └────┬─────┘  └────┬─────┘  └─────┬──────┘  └────┬─────┘  └────┬────┘ │
-│  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌─────────┐ │
-│  │  Team    │  │ Meeting  │  │ Cognitive  │  │ Security │  │ Shared  │ │
-│  │ Collab   │  │ Command  │  │  Audits    │  │   Ops    │  │ Links   │ │
-│  │ & Orgs   │  │ Center   │  │ & Nudges   │  │  (Wiz)   │  │ (Ext.)  │ │
-│  └────┬─────┘  └────┬─────┘  └─────┬──────┘  └────┬─────┘  └────┬────┘ │
+│  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────┐               │
+│  │  Team    │  │ Meeting  │  │ Cognitive  │  │ Shared   │               │
+│  │ Collab   │  │ Command  │  │  Audits    │  │  Links   │               │
+│  │ & Orgs   │  │ Center   │  │ & Nudges   │  │ (Ext.)   │               │
+│  └────┬─────┘  └────┬─────┘  └─────┬──────┘  └────┬─────┘               │
 │       │              │              │               │              │     │
 │  ─────┴──────────────┴──────────────┴───────────────┴──────────────┴──── │
 │                          SSE Streaming / REST API                        │
@@ -311,7 +303,7 @@ A parallel analysis product that audits spoken and written decisions from multip
 │                                                                         │
 │  /upload  /analyze/stream  /documents  /intelligence  /search  /audit   │
 │  /activity-feed  /chat  /trends  /stats  /cron/sync  /health           │
-│  /v1/analyze  /v1/documents  /v1/insights  /v1/keys  /v1/security      │
+│  /v1/analyze  /v1/documents  /v1/insights  /v1/keys                    │
 │  /human-decisions  /decision-frames  /decision-priors  /learning       │
 │  /team  /integrations/slack  /upload/bulk  /personas  /outcomes        │
 └──────────────────────────────────┬──────────────────────────────────────┘
@@ -342,11 +334,11 @@ A parallel analysis product that audits spoken and written decisions from multip
 │  │ Gemini   │  │Financial │  │ Scholar   │  │ (14 src) │  │  Macro  │ │
 │  │   API    │  │   API    │  │   API     │  │          │  │  Data   │ │
 │  └──────────┘  └──────────┘  └───────────┘  └──────────┘  └─────────┘ │
-│  ┌──────────┐  ┌──────────┐  ┌───────────┐                            │
-│  │  Slack   │  │   Wiz    │  │   MCP     │                            │
-│  │  OAuth   │  │ GraphQL  │  │ WebSocket │                            │
-│  │  Events  │  │   API    │  │  Server   │                            │
-│  └──────────┘  └──────────┘  └───────────┘                            │
+│  ┌──────────┐                                                         │
+│  │  Slack   │                                                         │
+│  │  OAuth   │                                                         │
+│  │  Events  │                                                         │
+│  └──────────┘                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
                                    │
 ┌──────────────────────────────────┴──────────────────────────────────────┐
@@ -429,7 +421,6 @@ src/
 │   │       ├── team/              # Team collaboration & member management
 │   │       ├── audit-log/         # Compliance audit trail
 │   │       ├── search/            # Semantic search
-│   │       ├── security-operations/ # Wiz security metrics dashboard
 │   │       └── settings/          # User preferences
 │   │   └── documents/
 │   │       └── [id]/              # Document detail (9 analysis tabs)
@@ -457,8 +448,7 @@ src/
 │   │   │   ├── analyze/           # Programmatic document analysis
 │   │   │   ├── documents/         # Document listing
 │   │   │   ├── insights/          # Aggregated insights
-│   │   │   ├── keys/              # API key management
-│   │   │   └── security/          # Wiz security findings & metrics
+│   │   │   └── keys/              # API key management
 │   │   ├── activity-feed/         # Unified activity feed (multi-source)
 │   │   ├── chat/                  # RAG-powered chat with follow-up suggestions
 │   │   ├── documents/             # CRUD operations
@@ -485,9 +475,6 @@ src/
 │   ├── analysis/                  # LangGraph pipeline orchestration
 │   │   └── analyzer.ts            # Main graph builder & execution
 │   ├── agents/                    # 15 AI agent node implementations
-│   ├── causal/                    # Causal AI Layer (Moat 1)
-│   │   ├── engine.ts              # Structural Causal Model (SCM) engine
-│   │   └── true-causal-engine.ts  # Causal inference & counterfactuals
 │   ├── learning/                  # Behavioral Data Flywheel
 │   │   ├── causal-learning.ts     # Org-specific causal weight discovery
 │   │   ├── outcome-scoring.ts     # Accuracy tracking from outcomes
@@ -502,10 +489,8 @@ src/
 │   │   ├── transcribe.ts          # Transcription processing
 │   │   └── process.ts             # Meeting data processing pipeline
 │   ├── integrations/              # External platform integrations
-│   │   ├── slack/
-│   │   │   └── handler.ts         # Slack event routing & signature verification
-│   │   └── wiz/
-│   │       └── client.ts          # Wiz GraphQL API client
+│   │   └── slack/
+│   │       └── handler.ts         # Slack event routing & signature verification
 │   ├── compliance/                # Deep Compliance Integration (Moat 5)
 │   │   └── fca-consumer-duty.ts   # FCA Consumer Duty framework
 │   ├── constants/
@@ -518,10 +503,6 @@ src/
 │   │   └── score-calculator.ts    # Counterfactual score projection engine
 │   ├── research/                  # Semantic Scholar paper matching
 │   ├── rag/                       # Embeddings & vector search (pgvector)
-│   ├── security/
-│   │   └── bias-taxonomy.ts       # Security-specific bias definitions
-│   ├── mcp/
-│   │   └── server.ts              # Model Context Protocol WebSocket server
 │   ├── tools/                     # External data (Finnhub, FRED macro)
 │   ├── reports/
 │   │   ├── pdf-generator.ts       # Full PDF report with jsPDF
@@ -559,7 +540,6 @@ src/
 │   │   ├── ShareModal              # Multi-format export & sharing
 │   │   ├── Sidebar                 # Navigation with Bias Library link
 │   │   ├── NotificationCenter      # Bell icon with notification dropdown
-│   │   ├── ROICalculator           # Security ROI calculation tool
 │   │   ├── ThemeToggle             # Dark/light mode toggle
 │   │   ├── DensityProvider         # UI density adjustment
 │   │   ├── ReducedMotionProvider   # Accessibility: motion-sensitive users
@@ -629,8 +609,8 @@ src/
 | **Theming** | next-themes | Dark/light mode with system preference detection |
 | **Document Parsing** | mammoth + unpdf | PDF, DOCX, TXT, and spreadsheet ingestion |
 | **Report Generation** | jsPDF + AutoTable | PDF, CSV, Markdown, and JSON export |
-| **Real-Time** | WebSocket (ws) + SSE | MCP server and streaming analysis progress |
-| **Integrations** | Slack OAuth + Wiz GraphQL | Enterprise messaging and cloud security platforms |
+| **Real-Time** | SSE (Server-Sent Events) | Streaming analysis progress |
+| **Integrations** | Slack OAuth | Enterprise messaging and decision detection |
 | **News Syndication** | rss-parser | 14-source RSS feed aggregation |
 | **Validation** | Zod 4 | Schema validation for all AI pipeline output |
 | **Date Utilities** | date-fns 4 | Human-readable date formatting |
@@ -682,11 +662,6 @@ SLACK_CLIENT_ID="your-slack-client-id"
 SLACK_CLIENT_SECRET="your-slack-client-secret"
 SLACK_SIGNING_SECRET="your-signing-secret"
 ENCRYPTION_KEY="your-256-bit-hex-key"
-
-# Wiz Integration (optional — enables security operations)
-WIZ_CLIENT_ID="your-wiz-client-id"
-WIZ_CLIENT_SECRET="your-wiz-client-secret"
-WIZ_API_URL="https://api.us1.app.wiz.io/graphql"
 ```
 
 ### 3. Database Setup
@@ -904,7 +879,6 @@ Or connect your GitHub repository to Vercel for automatic deployments on push.
 - [x] **Structured RLHF** — Pre-analysis belief capture and belief delta tracking
 - [x] **Behavioral Data Flywheel** — Continuous calibration from outcome data with weekly recalibration
 - [x] **Slack Integration** — Full OAuth flow, decision detection, and real-time nudge delivery
-- [x] **Wiz Security Integration** — Cloud security findings with cognitive bias mapping and KPI dashboard
 - [x] **Public API (v1)** — RESTful API with scoped API key authentication and rate limiting
 - [x] **Team Collaboration** — Multi-tenant organizations with roles, invites, and team cognitive profiles
 - [x] **Batch Upload** — Multi-file upload with job tracking
@@ -912,7 +886,6 @@ Or connect your GitHub repository to Vercel for automatic deployments on push.
 - [x] **Meeting Command Center** — Live meeting health monitoring and speaker bias profiles
 - [x] **Deep Compliance (SOX/Basel III)** — Multi-framework compliance with remediation plans
 - [x] **Analysis Versioning** — Full snapshot history and prompt drift detection
-- [x] **MCP Server** — Model Context Protocol WebSocket server for external AI agent queries
 - [x] **Custom Boardroom Personas** — Organization-specific persona configuration
 
 ### Planned
