@@ -695,7 +695,7 @@ export default function LandingPage() {
                       boxShadow: '0 0 8px rgba(34,197,94,0.5)',
                     }}
                   />
-                  <span>Now Available</span>
+                  <span>Built for Capital Allocators</span>
                 </motion.div>
 
                 <motion.h1
@@ -711,7 +711,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.03em',
                   }}
                 >
-                  Quantify
+                  Track, Score &
                   <span
                     className="block"
                     style={{
@@ -722,7 +722,7 @@ export default function LandingPage() {
                       paddingBottom: '4px',
                     }}
                   >
-                    Decision Noise.
+                    Improve Decisions.
                   </span>
                 </motion.h1>
 
@@ -738,10 +738,10 @@ export default function LandingPage() {
                     maxWidth: '540px',
                   }}
                 >
-                  Cognitive biases and inconsistencies silently drain{' '}
-                  <span style={{ color: '#ef4444', fontWeight: 700 }}>12-15%</span> of revenue.
-                  Deploy our AI audit engine to detect, measure, and eliminate human error in
-                  critical decisions.
+                  Investment memos, board papers and capital allocation decisions lose{' '}
+                  <span style={{ color: '#ef4444', fontWeight: 700 }}>12-15% of EBITDA</span> to
+                  cognitive bias and decision noise. The only platform that measures decision
+                  performance over time — with verified outcomes and measurable ROI.
                 </motion.p>
 
                 <motion.div
@@ -876,10 +876,10 @@ export default function LandingPage() {
             className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
           >
             {[
-              { value: 15000, suffix: '+', label: 'Decisions Audited', color: '#FFFFFF' },
+              { value: 15000, suffix: '+', label: 'Investment Decisions Audited', color: '#FFFFFF' },
               { value: 47, suffix: '%', label: 'Avg Noise Reduction', color: '#22c55e' },
-              { value: 15, suffix: '+', label: 'Bias Types Detected', color: '#FFFFFF' },
-              { value: 2.4, suffix: 's', label: 'Avg Analysis Time', color: '#FFFFFF' },
+              { value: 12, suffix: '%', label: 'EBITDA Recovered', color: '#FFFFFF' },
+              { value: 94, suffix: '%', label: 'Outcome Tracking Rate', color: '#FFFFFF' },
             ].map((stat, i) => (
               <motion.div
                 key={i}
@@ -934,7 +934,7 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              The Hidden Cost of Decision Noise
+              The Hidden Tax on Investment Returns
             </h2>
             <p
               style={{
@@ -944,8 +944,9 @@ export default function LandingPage() {
                 lineHeight: 1.7,
               }}
             >
-              Different experts evaluating identical data produce wildly varying outputs. Human
-              inconsistency is a silent tax destroying profit margins.
+              Investment committees evaluating identical deals produce wildly varying
+              recommendations. Cognitive bias and decision noise silently erode fund
+              performance — and nobody is measuring it.
             </p>
           </motion.div>
 
@@ -1057,10 +1058,10 @@ export default function LandingPage() {
                 style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}
               >
                 {[
-                  'High variance across similar critical decisions',
-                  'Undetected cognitive biases steering outcomes',
-                  'No visibility or measurability of decision quality',
-                  '12-15% of EBITDA lost to systematic errors',
+                  'IC members score identical deals 30-40% apart',
+                  'Anchoring to entry multiples distorts exit analysis',
+                  'No longitudinal tracking of decision accuracy',
+                  '12-15% of EBITDA lost to unaudited cognitive errors',
                 ].map((text, i) => (
                   <div
                     key={i}
@@ -1157,10 +1158,10 @@ export default function LandingPage() {
                 style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}
               >
                 {[
-                  'Consistent, objectively scored decision criteria',
-                  '15+ bias signatures detected automatically',
-                  'Quantifiable metrics generated for every review',
-                  'Up to 60% reduction in measured variance',
+                  'Every IC memo scored against calibrated baselines',
+                  '15+ investment-specific bias signatures detected',
+                  'Mandatory outcome tracking proves decision ROI',
+                  'Decision Twin boardroom simulates dissent before you vote',
                 ].map((text, i) => (
                   <div
                     key={i}
@@ -1236,7 +1237,7 @@ export default function LandingPage() {
               How It Works
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
-              Three steps from noisy decisions to quantified intelligence.
+              From investment memo to verified outcome in three steps.
             </p>
           </motion.div>
 
@@ -1245,29 +1246,29 @@ export default function LandingPage() {
               {
                 step: '01',
                 icon: FileSearch,
-                title: 'Upload & Ingest',
+                title: 'Capture & Frame',
                 description:
-                  'Submit decision documents, meeting notes, or Slack threads. Our pipeline extracts structured decision data automatically.',
+                  'Upload investment memos, board papers, or IC transcripts. Define success criteria and your prior beliefs before analysis begins.',
                 color: '#FFFFFF',
-                details: ['PDF, DOCX, TXT support', 'Slack & API integrations', 'Batch processing'],
+                details: ['Investment memo parsing', 'Decision Frame capture', 'Prior confidence recording'],
               },
               {
                 step: '02',
                 icon: Brain,
                 title: 'AI Cognitive Audit',
                 description:
-                  'Multi-agent AI pipeline scans for 15+ cognitive biases, runs a statistical jury for noise measurement, and scores decision quality.',
+                  'Multi-agent pipeline detects 15+ biases, runs a statistical jury for noise scoring, and simulates a boardroom of Decision Twins to stress-test your thesis.',
                 color: '#A3E635',
-                details: ['Bias detection engine', 'Noise quantification', 'Pre-mortem analysis'],
+                details: ['Bias detection engine', 'Decision Twin simulation', 'Pre-mortem analysis'],
               },
               {
                 step: '03',
                 icon: TrendingUp,
-                title: 'Actionable Insights',
+                title: 'Track & Improve',
                 description:
-                  'Receive behavioral nudges, compliance reports, and historical trend analysis. Track improvement over time.',
+                  'Log actual outcomes. See your Confidence vs Reality calibration curve. Watch "This bias cost you X" calculations compound your advantage over time.',
                 color: '#22c55e',
-                details: ['Real-time nudges', 'Effectiveness tracking', 'ROI dashboards'],
+                details: ['Mandatory outcome tracking', 'Calibration dashboards', 'Bias cost estimates'],
               },
             ].map((item, i) => (
               <motion.div
@@ -1409,10 +1410,10 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              Platform Features
+              The Decision Performance OS
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              Enterprise-grade tools for cognitive auditing.
+              Purpose-built for investment committees, PE/VC partners, and capital allocators.
             </p>
           </motion.div>
 
@@ -1465,9 +1466,9 @@ export default function LandingPage() {
                     lineHeight: 1.7,
                   }}
                 >
-                  Advanced argumentation mining algorithms parse unstructured text to identify 15+
-                  logical fallacies and cognitive distortions including confirmation bias,
-                  anchoring, and groupthink.
+                  Scans investment memos, IC transcripts, and board papers for 15+ cognitive
+                  biases including anchoring to entry multiples, confirmation bias in due
+                  diligence, and groupthink in committee votes.
                 </p>
               </div>
               <div style={{ padding: '0 32px', paddingBottom: 0, zIndex: 1 }}>
@@ -1573,8 +1574,8 @@ export default function LandingPage() {
                 Statistical Jury
               </h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.7 }}>
-                Simulates multiple independent assessments to measure variance and identify Decision
-                Noise. Outputs precise standard deviations.
+                Three independent AI judges score the same memo blind. Measures variance to quantify
+                how much &ldquo;noise&rdquo; is in your IC process — the hidden tax on returns.
               </p>
             </motion.div>
 
@@ -1673,7 +1674,7 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              Not Another AI Wrapper
+              Why Decision Intel Compounds
             </h2>
             <p
               style={{
@@ -1684,7 +1685,8 @@ export default function LandingPage() {
               }}
             >
               Anyone can wire an LLM to scan documents. What they cannot replicate is the
-              proprietary intelligence your organization builds inside Decision Intel over time.
+              longitudinal dataset of audited investment decisions with verified outcomes that
+              your fund builds inside Decision Intel over time.
             </p>
           </motion.div>
 
@@ -1834,34 +1836,34 @@ export default function LandingPage() {
             {[
               {
                 icon: Fingerprint,
-                title: 'Org-Specific Calibration',
+                title: 'Mandatory Outcome Flywheel',
                 description:
-                  'Bias severity weights, nudge thresholds, and twin accuracy are continuously recalibrated from your outcome data. Your model is unique to you.',
-                stat: 'Unique per org',
+                  'Every decision gets a verified outcome. Your Confidence vs Reality calibration curve improves with each data point. This is the dataset no competitor can copy.',
+                stat: 'Longitudinal data moat',
                 color: '#FFFFFF',
               },
               {
                 icon: RefreshCw,
                 title: 'Self-Improving Accuracy',
                 description:
-                  'False-positive biases automatically get downweighted. Nudges users ignore get suppressed. The system gets smarter with every decision you track.',
-                stat: 'Gets better over time',
+                  'Bias severity weights retrain on your real outcomes. "Anchoring cost your fund 18% across 12 deals" — not generic warnings, but your actual numbers.',
+                stat: 'Gets better every quarter',
                 color: '#A3E635',
               },
               {
                 icon: Lock,
-                title: 'Proprietary Data Moat',
+                title: 'Pre-Decision Capture',
                 description:
-                  'Your confirmed biases, outcome correlations, and team cognitive patterns are data no competitor has access to — even with the same AI models.',
-                stat: 'Cannot be replicated',
+                  'Slack integration detects deliberation in real time. Nudges arrive before the vote — "This thread shows anchoring. Want a 2-minute counterfactual?"',
+                stat: 'Always-on decision OS',
                 color: '#22c55e',
               },
               {
                 icon: Network,
-                title: 'Institutional Memory',
+                title: 'Governance-Ready',
                 description:
-                  'Vector-indexed past decisions with verified outcomes feed into every new analysis. Your AI boardroom remembers what worked and what failed.',
-                stat: 'Grows with usage',
+                  'SOX, SEC, FCA compliance mapping built in. Exportable "Human Decision Governance" packs for EU AI Act. Audit trail for every decision, bias, and outcome.',
+                stat: 'Enterprise compliance',
                 color: '#FFFFFF',
               },
             ].map((pillar, i) => (
@@ -1958,23 +1960,21 @@ export default function LandingPage() {
                   lineHeight: 1.8,
                 }}
               >
-                &ldquo;A competitor offers a generic bias scanner at half the price. Why not
-                switch?&rdquo; Because after 6 months on Decision Intel, your platform has learned
-                that{' '}
+                &ldquo;Why not use a generic bias scanner at half the price?&rdquo; Because
+                after 6 months on Decision Intel, your fund has learned that{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                  anchoring bias is 3x more impactful in your org than the industry average
+                  anchoring to entry multiples cost you 18% across 12 deals
                 </span>
                 , that{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                  your VP of Engineering is the most accurate digital twin for technical decisions
+                  your Fiscal Conservative twin was most accurate on Series B+ decisions
                 </span>
                 , and that{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                  groupthink nudges in your #product-decisions Slack channel are acknowledged 4x
-                  more than email
+                  pre-decision nudges in #investment-committee improved outcomes by 23%
                 </span>
-                . A generic tool starts from zero. Decision Intel starts from everything you&apos;ve
-                taught it.
+                . A generic tool starts from zero. Decision Intel starts from every outcome
+                you&apos;ve tracked.
               </div>
             </div>
           </motion.div>
@@ -2004,7 +2004,7 @@ export default function LandingPage() {
               ROI Calculator
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              Model the financial impact of unmitigated decision variance.
+              Model the financial impact of unaudited investment decisions.
             </p>
           </motion.div>
 
@@ -2319,28 +2319,28 @@ export default function LandingPage() {
           >
             {[
               {
-                q: 'How is my data protected?',
-                a: 'All documents are encrypted at rest (AES-256) and in transit (TLS 1.3). We run on SOC 2 Type II audited infrastructure, and PII is automatically detected and redacted before analysis. Your data is never used to train models and is deleted upon request.',
+                q: 'How is investment data protected?',
+                a: 'All documents are encrypted at rest (AES-256) and in transit (TLS 1.3). We run on SOC 2 Type II audited infrastructure, and PII is automatically detected and redacted before analysis. Your data is never used to train models and is deleted upon request. We support on-prem deployment for funds requiring full data sovereignty.',
               },
               {
                 q: 'How long does integration take?',
-                a: 'Most teams are up and running in under 30 minutes. Upload documents directly through the dashboard, connect Slack with a single OAuth flow, or use our REST API. No infrastructure changes or IT involvement required.',
+                a: 'Most investment teams are up and running in under 30 minutes. Upload investment memos directly, connect your IC Slack channel with a single OAuth flow, or use our REST API for programmatic ingestion. No infrastructure changes required.',
               },
               {
-                q: 'How accurate is the bias detection?',
-                a: 'Our cognitive bias engine achieves 89% precision and 92% recall across 15+ bias types, benchmarked against expert-annotated decision corpora. The statistical jury system cross-validates findings to minimize false positives.',
+                q: 'How does outcome tracking work?',
+                a: 'After each decision analysis, the platform tracks the actual outcome (success, partial, failure) at configurable intervals (30/60/90 days, 6 months, 1 year). This data feeds the calibration flywheel — your bias severity weights and Decision Twin accuracy improve with every tracked outcome.',
               },
               {
-                q: 'Does it work with our existing tools?',
-                a: 'Decision Intel integrates with Slack, Microsoft Teams, Google Workspace, and any system with a REST API. We support PDF, DOCX, TXT, and structured JSON ingestion. Custom connectors are available on Enterprise plans.',
+                q: 'What is a Decision Twin?',
+                a: 'Decision Twins are AI-simulated boardroom personas (e.g. Fiscal Conservative, Growth Advocate, Compliance Guard) that independently vote on your investment thesis. Research shows that simulated dissent improves outcomes by 15-25%. The platform tracks which twin was most accurate over time.',
               },
               {
                 q: 'What compliance standards do you support?',
-                a: 'We provide built-in mapping for FCA Consumer Duty, GDPR data protection requirements, and SOX compliance controls. Our audit trail generates regulator-ready reports with full decision lineage.',
+                a: 'Built-in mapping for SOX Section 302/404, SEC disclosure requirements, FCA Consumer Duty, and EU AI Act governance. Exportable audit trails with full decision lineage, bias detection logs, and outcome verification for regulator-ready governance packs.',
               },
               {
-                q: 'Is there a free tier?',
-                a: 'Yes. The free tier includes up to 50 decision audits per month, basic bias detection, and noise scoring. No credit card required. Upgrade to Pro for unlimited audits, advanced analytics, and team collaboration.',
+                q: 'How is this different from a generic AI bias scanner?',
+                a: 'Generic scanners analyze one document at a time with no memory. Decision Intel builds a longitudinal dataset of your audited decisions with verified outcomes. After 6 months, your platform knows which biases cost your fund the most, which Decision Twin is most accurate for your deal type, and how your calibration has improved. That dataset is your moat.',
               },
             ].map((item, i) => (
               <FAQItem
@@ -2397,7 +2397,7 @@ export default function LandingPage() {
               }}
             >
               <Target className="w-3.5 h-3.5" />
-              Ready to eliminate decision noise?
+              Built for capital allocators
             </div>
             <h2
               style={{
@@ -2409,7 +2409,7 @@ export default function LandingPage() {
                 lineHeight: 1.15,
               }}
             >
-              Stop leaving money on the table.
+              Your next investment decision
               <br />
               <span
                 style={{
@@ -2418,7 +2418,7 @@ export default function LandingPage() {
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                Start auditing decisions today.
+                should be your best one yet.
               </span>
             </h2>
             <p
@@ -2432,8 +2432,8 @@ export default function LandingPage() {
                 marginRight: 'auto',
               }}
             >
-              Join teams using Decision Intel to quantify cognitive biases, reduce noise, and make
-              consistently better decisions.
+              Join PE/VC funds and investment committees using Decision Intel to track, score,
+              and continuously improve decision performance — with measurable ROI.
             </p>
             <div
               style={{
@@ -2528,7 +2528,7 @@ export default function LandingPage() {
                   maxWidth: '240px',
                 }}
               >
-                AI-powered cognitive auditing for better organizational decisions.
+                The Decision Performance OS for capital allocators. Track, score, and improve investment decisions with measurable ROI.
               </p>
             </div>
 

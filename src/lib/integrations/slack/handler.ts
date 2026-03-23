@@ -238,3 +238,278 @@ export async function deliverSlackNudge(
     return false;
   }
 }
+
+// ─── Pre-Decision Detection ─────────────────────────────────────────────────
+
+/**
+ * Signals that indicate a decision is ABOUT to be made — the deliberation
+ * phase before commitment. These are distinct from DECISION_SIGNALS which
+ * detect decisions already made.
+ */
+const PRE_DECISION_SIGNALS = [
+  /\bshould\s+we\b/i,
+  /\bthinking\s+about\b/i,
+  /\bconsidering\b/i,
+  /\bwhat\s+if\s+we\b/i,
+  /\bdebating\s+whether\b/i,
+  /\bproposal\s+to\b/i,
+  /\boptions\s+are\b/i,
+  /\bweighing\s+up\b/i,
+  /\bdo\s+we\s+go\s+with\b/i,
+  /\bleaning\s+towards?\b/i,
+  /\brecommendation\s+is\b/i,
+  /\bmy\s+gut\s+says\b/i,
+];
+
+/**
+ * Detect whether a message is in the pre-decision deliberation phase —
+ * i.e., BEFORE a decision has been committed. This is the optimal moment
+ * for coaching nudges because interventions can still change outcomes.
+ */
+export function isPreDecisionMessage(text: string): boolean {
+  if (!text || text.length < 10) return false;
+  return PRE_DECISION_SIGNALS.some(pattern => pattern.test(text));
+}
+
+// ─── Bias Detection ─────────────────────────────────────────────────────────
+
+/**
+ * Cognitive bias signal patterns for real-time detection in Slack messages.
+ * Each entry maps a bias name to the regex patterns that indicate it.
+ */
+const BIAS_PATTERNS: { bias: string; patterns: RegExp[] }[] = [
+  {
+    bias: 'anchoring',
+    patterns: [
+      /\binitial\s+offer\b/i,
+      /\bstarting\s+point\b/i,
+      /\bfirst\s+(price|number|quote|estimate|figure)\b/i,
+      /\boriginal(ly)?\s+(price|cost|estimate|quote)\b/i,
+    ],
+  },
+  {
+    bias: 'confirmation_bias',
+    patterns: [
+      /\bconfirms?\s+what\s+I\s+thought\b/i,
+      /\bas\s+expected\b/i,
+      /\bjust\s+as\s+I\s+predicted\b/i,
+      /\bknew\s+it\b/i,
+      /\btold\s+you\s+so\b/i,
+    ],
+  },
+  {
+    bias: 'sunk_cost',
+    patterns: [
+      /\balready\s+invested\b/i,
+      /\btoo\s+far\s+in\b/i,
+      /\bcan'?t\s+stop\s+now\b/i,
+      /\balready\s+spent\b/i,
+      /\bcome\s+this\s+far\b/i,
+      /\btoo\s+much\s+(time|money|effort)\s+(into|on)\b/i,
+    ],
+  },
+  {
+    bias: 'groupthink',
+    patterns: [
+      /\beveryone\s+agrees?\b/i,
+      /\bno\s+objections?\b/i,
+      /\bunanimous(ly)?\b/i,
+      /\bwe\s+all\s+think\b/i,
+      /\bnobody\s+disagrees?\b/i,
+      /\bwe'?re\s+all\s+(on\s+the\s+same\s+page|aligned)\b/i,
+    ],
+  },
+  {
+    bias: 'availability_bias',
+    patterns: [
+      /\blast\s+time\s+this\s+happened\b/i,
+      /\bremember\s+when\b/i,
+      /\bjust\s+saw\b/i,
+      /\bjust\s+(read|heard)\s+about\b/i,
+      /\bhappened\s+(to\s+us|before)\b/i,
+    ],
+  },
+  {
+    bias: 'overconfidence',
+    patterns: [
+      /\bguaranteed\b/i,
+      /\b100\s*%\b/i,
+      /\bno\s+way\s+this\s+fails\b/i,
+      /\bslam\s+dunk\b/i,
+      /\bno[- ]brainer\b/i,
+      /\bsure\s+thing\b/i,
+      /\bcannot?\s+lose\b/i,
+      /\bcan'?t\s+go\s+wrong\b/i,
+    ],
+  },
+];
+
+/**
+ * Detect cognitive bias signals in a Slack message in real time.
+ * Returns all detected biases with the matched signal text.
+ */
+export function detectMessageBiases(text: string): { bias: string; signal: string }[] {
+  if (!text) return [];
+
+  const detected: { bias: string; signal: string }[] = [];
+
+  for (const { bias, patterns } of BIAS_PATTERNS) {
+    for (const pattern of patterns) {
+      const match = text.match(pattern);
+      if (match) {
+        detected.push({ bias, signal: match[0] });
+        break; // One match per bias type is sufficient
+      }
+    }
+  }
+
+  return detected;
+}
+
+// ─── Pre-Decision Nudge Generation ──────────────────────────────────────────
+
+/**
+ * Nudge templates keyed by bias type. These are coaching interventions
+ * designed to be delivered BEFORE a decision is committed.
+ */
+const PRE_DECISION_NUDGE_TEMPLATES: Record<
+  string,
+  { message: string; severity: 'info' | 'warning' | 'critical' }
+> = {
+  anchoring: {
+    message:
+      'This thread shows anchoring signals. Want a 2-minute counterfactual before deciding?',
+    severity: 'info',
+  },
+  confirmation_bias: {
+    message:
+      'Confirmation bias detected — consider actively seeking disconfirming evidence before committing.',
+    severity: 'warning',
+  },
+  sunk_cost: {
+    message:
+      "Sunk cost language detected. Try reframing: 'If we were starting fresh today, would we still choose this?'",
+    severity: 'warning',
+  },
+  groupthink: {
+    message:
+      'Groupthink detected — consider assigning a formal dissenter before voting.',
+    severity: 'critical',
+  },
+  availability_bias: {
+    message:
+      'Availability bias signal — recent events may be overweighted. Check base-rate data before deciding.',
+    severity: 'info',
+  },
+  overconfidence: {
+    message:
+      'Overconfidence language detected. Consider: what would need to be true for this to fail?',
+    severity: 'warning',
+  },
+};
+
+/**
+ * Generate a coaching nudge for a pre-decision message based on detected biases.
+ * Returns the highest-severity nudge, or null if no biases were detected.
+ */
+export function generatePreDecisionNudge(
+  text: string,
+  biases: { bias: string; signal: string }[]
+): { message: string; severity: 'info' | 'warning' | 'critical' } | null {
+  if (!text || biases.length === 0) return null;
+
+  const severityRank = { info: 0, warning: 1, critical: 2 };
+  let highestNudge: { message: string; severity: 'info' | 'warning' | 'critical' } | null = null;
+
+  for (const { bias } of biases) {
+    const template = PRE_DECISION_NUDGE_TEMPLATES[bias];
+    if (!template) continue;
+
+    if (!highestNudge || severityRank[template.severity] > severityRank[highestNudge.severity]) {
+      highestNudge = { message: template.message, severity: template.severity };
+    }
+  }
+
+  return highestNudge;
+}
+
+// ─── Decision Frame Extraction ──────────────────────────────────────────────
+
+/**
+ * Attempt to extract a Decision Frame from a Slack message.
+ * Looks for a decision statement and mentioned stakeholders (@-mentions).
+ *
+ * This feeds into the /api/decision-frames endpoint for structured
+ * pre-decision capture.
+ */
+export function extractDecisionFrame(
+  text: string
+): { decisionStatement: string; stakeholders: string[] } | null {
+  if (!text || text.length < 15) return null;
+
+  // Extract the decision statement: the first sentence that matches a
+  // pre-decision signal, or the full text up to the first period/newline.
+  let decisionStatement: string | null = null;
+
+  for (const pattern of PRE_DECISION_SIGNALS) {
+    const match = text.match(pattern);
+    if (match && match.index !== undefined) {
+      // Grab from the match start to the next sentence boundary
+      const fromMatch = text.slice(match.index);
+      const sentenceEnd = fromMatch.search(/[.!?\n]/);
+      decisionStatement =
+        sentenceEnd > 0 ? fromMatch.slice(0, sentenceEnd).trim() : fromMatch.trim();
+      break;
+    }
+  }
+
+  if (!decisionStatement) return null;
+
+  // Extract stakeholders from Slack @-mentions (format: <@U01ABC123>)
+  const mentionPattern = /<@([A-Z0-9]+)>/g;
+  const stakeholders: string[] = [];
+  let mentionMatch: RegExpExecArray | null;
+  while ((mentionMatch = mentionPattern.exec(text)) !== null) {
+    stakeholders.push(mentionMatch[1]);
+  }
+
+  return { decisionStatement, stakeholders };
+}
+
+// ─── Pre-Decision Event Processing ──────────────────────────────────────────
+
+/**
+ * Convert a Slack event into a pre-decision processing result.
+ *
+ * This is the pre-decision counterpart to slackEventToDecisionInput.
+ * Instead of capturing an already-made decision, it captures the
+ * deliberation phase and returns coaching nudges, bias signals, and
+ * an extracted Decision Frame for the /api/decision-frames endpoint.
+ */
+export function slackEventToPreDecisionInput(
+  payload: SlackWebhookPayload
+): {
+  input: HumanDecisionInput;
+  biases: { bias: string; signal: string }[];
+  nudge: { message: string; severity: 'info' | 'warning' | 'critical' } | null;
+  frame: { decisionStatement: string; stakeholders: string[] } | null;
+} | null {
+  const event = payload.event;
+  if (!event || event.type !== 'message') return null;
+  if (!isPreDecisionMessage(event.text)) return null;
+
+  const biases = detectMessageBiases(event.text);
+  const nudge = generatePreDecisionNudge(event.text, biases);
+  const frame = extractDecisionFrame(event.text);
+
+  const input: HumanDecisionInput = {
+    source: 'slack',
+    sourceRef: `${event.channel}:${event.ts}`,
+    channel: event.channel,
+    decisionType: classifyDecisionType(event.text),
+    participants: [event.user],
+    content: event.text,
+  };
+
+  return { input, biases, nudge, frame };
+}
