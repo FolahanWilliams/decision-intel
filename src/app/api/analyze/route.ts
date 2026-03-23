@@ -20,7 +20,10 @@ export async function POST(request: NextRequest) {
     const authResult = await authenticateApiRequest(request);
     if (authResult.error || !authResult.userId) {
       log.error('Unified Auth Failed: ' + (authResult.error || 'No User ID'));
-      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
+      return NextResponse.json(
+        { error: authResult.error || 'Unauthorized' },
+        { status: authResult.status || 401 }
+      );
     }
     const effectiveUserId = authResult.userId;
 

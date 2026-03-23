@@ -9,7 +9,10 @@ export async function GET(request: Request) {
   try {
     const authResult = await authenticateApiRequest(request);
     if (authResult.error || !authResult.userId) {
-      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
+      return NextResponse.json(
+        { error: authResult.error || 'Unauthorized' },
+        { status: authResult.status || 401 }
+      );
     }
     const userId = authResult.userId;
 
