@@ -1,21 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { createClient } from '@/utils/supabase/server';
+import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('TrendsRoute');
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const userId = user?.id;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authResult = await authenticateApiRequest(request);
+    if (authResult.error || !authResult.userId) {
+      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
     }
+    const userId = authResult.userId;
 
     // Parse time range from query params
     const { searchParams } = new URL(request.url);

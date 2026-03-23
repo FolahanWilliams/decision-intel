@@ -31,31 +31,38 @@ export function DecisionTimeline({ events }: DecisionTimelineProps) {
   };
 
   return (
-    <div className="relative pl-6 border-l border-border/50 space-y-8 my-4">
+    <div className="relative pl-[30px] border-l border-white/10 space-y-12 my-6">
       {events.map(event => (
-        <div key={event.id} className="relative group">
-          {/* Timeline Node */}
-          <div className="absolute -left-[29px] top-1 bg-background p-1 border border-border  group-hover:border-accent-primary group-hover:scale-110 transition-all">
+        <div key={event.id} className="relative group perspective">
+          {/* Timeline Node Icon */}
+          <div className="absolute -left-[38px] top-1 bg-black p-[3px] rounded-full border border-white/20 group-hover:border-white group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all duration-300 z-10 shadow-lg">
             {getIcon(event.type, event.status)}
           </div>
 
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-muted">{event.date}</span>
-              <span className="text-[10px] tracking-wide text-muted/50 border border-border px-2 ">
-                {event.type}
-              </span>
+          {/* Timeline Content Card */}
+          <div className="card p-5 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:shadow-glow transition-all duration-400 ease-out ml-2">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+            <div className="relative z-10 space-y-2">
+              <div className="flex items-center justify-between mb-3 border-b border-white/5 pb-2">
+                <span className="text-[11px] font-mono text-muted/80">{event.date}</span>
+                <span className="text-[10px] tracking-widest uppercase font-semibold text-muted/70 border border-white/10 px-2.5 py-0.5 rounded-full bg-black/40 shadow-inner">
+                  {event.type}
+                </span>
+              </div>
+              <h4 className="font-semibold text-[15px] text-white/90 group-hover:text-white transition-colors tracking-tight">
+                {event.title}
+              </h4>
+              <p className="text-sm text-muted leading-relaxed drop-shadow-sm">{event.description}</p>
             </div>
-            <h4 className="font-medium text-sm group-hover:text-accent-primary transition-colors">
-              {event.title}
-            </h4>
-            <p className="text-sm text-muted-foreground leading-snug">{event.description}</p>
           </div>
         </div>
       ))}
 
       {events.length === 0 && (
-        <div className="text-center p-4 text-muted text-sm">No timeline events detected.</div>
+        <div className="card p-8 text-center text-muted text-sm border-dashed border-white/20">
+          <Clock size={20} className="mx-auto mb-2 opacity-30" />
+          No timeline events detected yet.
+        </div>
       )}
     </div>
   );

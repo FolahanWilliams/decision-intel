@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeDocument } from '@/lib/analysis/analyzer';
 import { BiasDetectionResult } from '@/types';
-import { createClient } from '@/utils/supabase/server';
+import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('AnalyzeRoute');
-
-const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY?.trim();
 
 // Allow longer processing times for AI analysis
 export const maxDuration = 300;
@@ -19,32 +17,12 @@ export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const userId = user?.id;
-    const apiKey = request.headers.get('x-extension-key');
-    let effectiveUserId = userId;
-
-    // Secure check: ensure EXTENSION_API_KEY is defined and not empty before comparing
-    if (!effectiveUserId && EXTENSION_API_KEY && EXTENSION_API_KEY.length > 0) {
-      if (apiKey !== EXTENSION_API_KEY) {
-        log.error('Unauthorized: Invalid API key provided');
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-      const extUserId = request.headers.get('x-extension-user-id');
-      // Validate extension user ID format — alphanumeric, hyphens, underscores only, max 128 chars
-      if (extUserId && !/^[a-zA-Z0-9_-]{1,128}$/.test(extUserId)) {
-        return NextResponse.json({ error: 'Invalid extension user ID format' }, { status: 400 });
-      }
-      effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';
+    const authResult = await authenticateApiRequest(request);
+    if (authResult.error || !authResult.userId) {
+      log.error('Unified Auth Failed: ' + (authResult.error || 'No User ID'));
+      return NextResponse.json({ error: authResult.error || 'Unauthorized' }, { status: authResult.status || 401 });
     }
-
-    if (!effectiveUserId) {
-      log.error('Unified Auth Failed: No Session ID and Invalid API Key');
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const effectiveUserId = authResult.userId;
 
     // Rate limit by authenticated user (not IP)
     const rateLimitResult = await checkRateLimit(effectiveUserId, '/api/analyze');

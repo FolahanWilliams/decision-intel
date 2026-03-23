@@ -636,3 +636,113 @@ Output Format: Return ONLY valid JSON matching this exact schema:
 
 // Legacy export for backward compatibility
 export const SIMULATION_SUPER_PROMPT = buildSimulationPrompt();
+
+// ============================================================
+// EXTRACTED INLINE PROMPTS
+// ============================================================
+
+export const INTELLIGENCE_EXTRACTION_PROMPT = `Extract key metadata from this document for intelligence gathering.
+Return JSON:
+{
+    "topics": ["topic1", "topic2"],
+    "industry": "sector name or null",
+    "companies": ["company1", "company2"],
+    "biasKeywords": ["keyword relevant to cognitive biases"]
+}
+Keep it concise — max 5 items per array.`;
+
+export const GDPR_ANONYMIZER_PROMPT = `You are a GDPR Privacy Compliance Expert.
+
+TASK: Identify and redact ALL Personally Identifiable Information (PII) from the text below.
+
+PII to redact includes:
+- Full names of individuals (e.g., "John Smith" -> "[PERSON_1]")
+- Email addresses (e.g., "john@example.com" -> "[EMAIL_1]")
+- Phone numbers (e.g., "+1-555-0123" -> "[PHONE_1]")
+- Physical addresses (e.g., "123 Main St" -> "[ADDRESS_1]")
+- Company names (e.g., "Acme Corp" -> "[COMPANY_1]")
+- Job titles with names (e.g., "CEO John" -> "CEO [PERSON_1]")
+- IP addresses (e.g., "192.168.1.1" -> "[IP_1]")
+- SSN/National ID numbers
+- Financial account numbers
+
+INSTRUCTIONS:
+1. Replace each PII instance with a numbered placeholder in format [TYPE_NUMBER]
+2. Maintain the structure and meaning of the document
+3. DO NOT redact generic terms like "the company", "our team", etc.
+4. Return the complete redacted text
+
+OUTPUT FORMAT: Return ONLY valid JSON.
+{
+    "structuredContent": "redacted text with [PLACEHOLDERS]",
+    "redactions": [
+        {"type": "PERSON", "index": 1, "original": "John Smith"},
+        {"type": "EMAIL", "index": 1, "original": "john@example.com"}
+    ]
+}`;
+
+export function buildBiasResearchPrompt(biasType: string): string {
+  return `You are a Cognitive Psychology Tutor.
+TASK: Find a specific scientific study or "HBR" (Harvard Business Review) article that explains the following bias: "${biasType}".
+
+OUTPUT JSON:
+{
+    "title": "The Hidden Traps in Decision Making (HBR)",
+    "summary": "1-sentence explanation of why this bias occurs based on the study.",
+    "sourceUrl": "https://hbr.org/..."
+}`;
+}
+
+export function buildNoiseBenchmarkPrompt(metricsXml: string): string {
+  return `You are a Market Research validator.
+TASK:
+1. Take the provided internal metrics.
+2. Use Google Search to find EXTERNAL consensus data for 2024/2025.
+3. Compare internal vs external.
+
+METRICS TO VERIFY:
+${metricsXml}
+
+OUTPUT JSON:
+[
+    {
+        "metric": "Projected Market Growth",
+        "documentValue": "15%",
+        "marketValue": "12% (Gartner Report)",
+        "variance": "Medium",
+        "explanation": "Document is slightly optimistic compared to industry avg.",
+        "sourceUrl": "https://..."
+    }
+]`;
+}
+
+export function buildFactCheckRefinementPrompt(verificationsXml: string, financialDataXml: string): string {
+  return `You are a Financial Fact Checker. Refine the verification verdicts below using the REAL-TIME FINANCIAL DATA provided.
+If a claim was marked UNVERIFIABLE but the data now supports or contradicts it, update the verdict.
+
+CURRENT VERIFICATIONS:
+${verificationsXml}
+
+REAL-TIME FINANCIAL DATA (Finnhub):
+${financialDataXml}
+
+Return valid JSON: { "score": 0-100, "verifications": [...updated...] }`;
+}
+
+export function buildMetaJudgePrompt(content: string, failureScenariosXml: string, objectiveFindingsXml: string): string {
+  return `You are the META-JUDGE in an adversarial review protocol.
+TASK: Synthesize the findings from the Pre-Mortem (Pessimistic) and Fact-Check/Bias (Objective) nodes into a final executive summary.
+
+Document Proposal:
+<input_text>\n${content}\n</input_text>
+
+Red Team (Pre-Mortem) Failure Scenarios:
+${failureScenariosXml}
+
+Objective Verifications & Biases:
+${objectiveFindingsXml}
+
+INSTRUCTIONS:
+Write a 2-3 paragraph "Meta Verdict" that directly addresses whether the Red Team's concerns are valid given the objective facts, and what the ultimate recommendation is.
+Return ONLY the text of the verdict. No JSON.`;
+}
