@@ -159,6 +159,11 @@ export const NUDGE_TEMPLATES: Record<NudgeType, { icon: string; template: string
     template:
       'This decision shows signs of shallow analysis relative to its stakes. Verify key assumptions against the available evidence before finalizing.',
   },
+  pre_decision_coaching: {
+    icon: '\u{1F3AF}',
+    template:
+      'Deliberation detected — cognitive bias signals identified. Consider reviewing the coaching nudge before committing to a decision.',
+  },
 };
 
 // ─── Team Aggregation Types ──────────────────────────────────────────────────
