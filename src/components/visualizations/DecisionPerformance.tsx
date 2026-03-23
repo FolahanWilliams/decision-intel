@@ -191,7 +191,7 @@ function KpiCard({
 
 // ─── Custom Tooltips ────────────────────────────────────────────────────────
 
-function CalibrationTooltip({ active, payload }: any) {
+function CalibrationTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: CalibrationBucket }> }) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload as CalibrationBucket;
   return (
@@ -209,7 +209,7 @@ function CalibrationTooltip({ active, payload }: any) {
   );
 }
 
-function BiasCostTooltip({ active, payload }: any) {
+function BiasCostTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: BiasCostEntry }> }) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload as BiasCostEntry;
   return (
@@ -249,9 +249,9 @@ export default function DecisionPerformance() {
         if (!cancelled) {
           setData(json);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!cancelled) {
-          setError(err?.message ?? 'An unexpected error occurred');
+          setError(err instanceof Error ? err.message : 'An unexpected error occurred');
         }
       } finally {
         if (!cancelled) {
