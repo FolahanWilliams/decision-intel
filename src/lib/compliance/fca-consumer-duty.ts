@@ -303,7 +303,9 @@ function generateRemediationPlan(
   }
 
   // High-risk outcomes = short-term remediation
-  const highRiskOutcomes = outcomes.filter(o => o.riskLevel === 'high' || o.riskLevel === 'critical');
+  const highRiskOutcomes = outcomes.filter(
+    o => o.riskLevel === 'high' || o.riskLevel === 'critical'
+  );
   for (const o of highRiskOutcomes) {
     steps.push({
       priority: 'short_term',
