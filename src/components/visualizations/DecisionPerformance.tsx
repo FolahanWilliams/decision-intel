@@ -992,9 +992,9 @@ export default function DecisionPerformance() {
                   />
                   <Tooltip
                     contentStyle={tooltipStyle}
-                    formatter={(value: number, name: string) => {
-                      if (name === 'count') return [value, 'Priors'];
-                      return [value, name];
+                    formatter={(value, name) => {
+                      if (name === 'count') return [value as number, 'Priors'];
+                      return [value as number, name as string];
                     }}
                   />
                   <Bar dataKey="count" name="count" radius={[0, 6, 6, 0]} maxBarSize={28}>

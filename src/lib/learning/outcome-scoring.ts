@@ -703,12 +703,8 @@ export async function getQuarterlyImpact(
         // Not enough data to compute meaningful savings — skip monetary calc
         return {
           ...emptySummary,
-          totalDecisions: allOutcomes.length,
+          totalDecisions: outcomes.length,
           improvedDecisions: changedPositive.length,
-          topCostlyBiases: biasCosts
-            .filter(b => b.estimatedCost != null)
-            .slice(0, 5)
-            .map(b => ({ biasType: b.biasType, estimatedCost: b.estimatedCost! })),
         };
       }
 
