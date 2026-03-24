@@ -377,7 +377,7 @@ function wilsonConfidence(
   // Wilson interval half-width (z=1.96 for 95% CI)
   const z = 1.96;
   const denominator = 1 + (z * z) / total;
-  const center = (pHat + (z * z) / (2 * total)) / denominator;
+  // center not needed for confidence calc, only halfWidth matters
   const halfWidth =
     (z * Math.sqrt((pHat * (1 - pHat) + (z * z) / (4 * total)) / total)) /
     denominator;
