@@ -16,22 +16,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-interface BlindPrior {
-  id: string;
-  userId: string;
-  defaultAction: string;
-  confidence: number;
-  reasoning?: string;
-  isRevealed: boolean;
-  submittedAt: string;
-}
-
-interface Participant {
-  userId: string;
-  role: string;
-  joinedAt: string;
-}
-
 interface DecisionRoom {
   id: string;
   title: string;
@@ -40,12 +24,6 @@ interface DecisionRoom {
   participantCount: number;
   priorCount: number;
   createdAt: string;
-}
-
-interface DecisionRoomDetail extends DecisionRoom {
-  participants: Participant[];
-  blindPriors: BlindPrior[];
-  allSubmitted: boolean;
 }
 
 // ─── Room List Card ─────────────────────────────────────────────────────────
