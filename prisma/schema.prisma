@@ -63,6 +63,10 @@ model Analysis {
   version         Int             @default(1)
   promptVersionId String?         // FK to PromptVersion used for this analysis
 
+  // Outcome tracking — mandatory flywheel
+  outcomeStatus   String          @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
+  outcomeDueAt    DateTime?       // When outcome should be reported
+
   document            Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
   biases              BiasInstance[]
   versions     AnalysisVersion[]
@@ -217,10 +221,11 @@ model Organization {
   name      String
   slug      String       @unique
   avatarUrl String?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  invites   TeamInvite[]
-  members   TeamMember[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  isAnonymized Boolean      @default(false) // Consent to anonymous aggregation
+  invites      TeamInvite[]
+  members      TeamMember[]
 
   @@index([slug])
 }
@@ -397,6 +402,8 @@ model Nudge {
   severity        String         @default("info")
   triggerReason   String
   wasHelpful      Boolean?
+  experimentId    String?        // FK to NudgeExperiment
+  variantId       String?        // Which variant was served
   humanDecision   HumanDecision? @relation(fields: [humanDecisionId], references: [id])
 
   @@index([humanDecisionId])
@@ -404,6 +411,23 @@ model Nudge {
   @@index([nudgeType])
   @@index([targetUserId])
   @@index([createdAt])
+  @@index([experimentId])
+}
+
+model NudgeExperiment {
+  id            String   @id @default(cuid())
+  name          String
+  nudgeType     String   // which nudge type is being tested
+  status        String   @default("active") // active, paused, completed
+  variants      Json     // Array<{ id: string, label: string, template: string, severity: string }>
+  trafficSplit  Json     // { [variantId]: number } — percentage allocation (must sum to 100)
+  startedAt     DateTime @default(now())
+  endedAt       DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([nudgeType])
+  @@index([status])
 }
 
 model TeamCognitiveProfile {
@@ -663,6 +687,8 @@ model DecisionFrame {
   successCriteria   String[]
   failureCriteria   String[]
   stakeholders      String[]
+  monetaryValue     Decimal?  // Estimated decision value
+  currency          String?   @default("GBP") // ISO currency code
   documentId        String?  @unique
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -674,6 +700,81 @@ model DecisionFrame {
 }
 
 // ─── Deep Vertical Integration — Compliance (Moat 5) ─────────────────────
+
+// ─── Decision Rooms (Real-Time Collaboration) ────────────────────────────
+
+model DecisionRoom {
+  id            String          @id @default(cuid())
+  documentId    String?
+  analysisId    String?
+  title         String
+  createdBy     String          // userId
+  orgId         String?
+  status        String          @default("open") // open, closed, archived
+  closedAt      DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  participants  RoomParticipant[]
+  blindPriors   BlindPrior[]
+
+  @@index([createdBy])
+  @@index([orgId])
+  @@index([status])
+}
+
+model RoomParticipant {
+  id            String       @id @default(cuid())
+  roomId        String
+  userId        String
+  role          String       @default("member") // creator, member, observer
+  joinedAt      DateTime     @default(now())
+  room          DecisionRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@index([userId])
+}
+
+model BlindPrior {
+  id            String       @id @default(cuid())
+  roomId        String
+  userId        String
+  defaultAction String       @db.Text
+  confidence    Float        // 0-100
+  reasoning     String?      @db.Text
+  isRevealed    Boolean      @default(false) // blind until all submit
+  submittedAt   DateTime     @default(now())
+  room          DecisionRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@index([roomId])
+}
+
+// ─── Automated Decision Journal ──────────────────────────────────────────
+
+model JournalEntry {
+  id            String   @id @default(cuid())
+  userId        String
+  orgId         String?
+  source        String   // email_forward, calendar_webhook, manual, slack_digest
+  sourceRef     String?  // message-id for email, event-id for calendar
+  title         String
+  content       String   @db.Text
+  extractedDecisions String[] // AI-extracted decision statements
+  decisionType  String?
+  participants  String[]
+  scheduledAt   DateTime? // for calendar events
+  processedAt   DateTime?
+  status        String   @default("pending") // pending, processed, dismissed
+  linkedDecisionId String? // FK to HumanDecision if converted
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([source])
+  @@index([status])
+  @@index([createdAt])
+}
 
 model ComplianceAssessment {
   id              String   @id @default(cuid())

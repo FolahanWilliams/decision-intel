@@ -10,6 +10,7 @@ import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
+import { checkOutcomeGate, formatOutcomeReminder } from '@/lib/learning/outcome-gate';
 import {
   NoiseStatsSchema,
   FactCheckSchema,
@@ -110,6 +111,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
+    // ── Outcome enforcement gate ──────────────────────────────────────
+    // The behavioral data flywheel only works when users close the loop.
+    // Soft-gate: warn when 3+ analyses lack outcomes (>30 days old).
+    // Hard-gate: block new analyses when 5+ outcomes are overdue.
+    const outcomeGate = await checkOutcomeGate(userId);
+
+    if (!outcomeGate.allowed) {
+      log.info(`Outcome gate: blocking user ${userId} with ${outcomeGate.pendingCount} unreported outcomes`);
+      return NextResponse.json(
+        {
+          error: 'Outcome reporting required before new analyses',
+          code: 'OUTCOME_GATE',
+          pendingOutcomes: outcomeGate.pendingCount,
+          pendingAnalysisIds: outcomeGate.pendingAnalysisIds,
+          message: outcomeGate.message,
+        },
+        { status: 423 }
+      );
+    }
+
     // Guard against concurrent analysis — block if one is already in
     // flight, but allow re-analysis of completed documents (e.g. "Run
     // Live Audit" on the detail page).
@@ -170,6 +191,12 @@ export async function POST(request: NextRequest) {
         heartbeatInterval = setInterval(() => {
           controller.enqueue(encoder.encode(formatSSEHeartbeat()));
         }, 15000); // Send heartbeat every 15 seconds
+
+        // Emit outcome reminder as first event if user has pending outcomes
+        const outcomeReminder = formatOutcomeReminder(outcomeGate);
+        if (outcomeReminder) {
+          sendUpdate(outcomeReminder as unknown as ProgressUpdate);
+        }
 
         // Track completed nodes for progress calculation
         const completedNodes = checkpoint?.completedNodes
@@ -296,6 +323,7 @@ export async function POST(request: NextRequest) {
           // the same transaction block. So the fallback MUST run in a
           // separate transaction instead of inside the same one.
           let schemaDrift = false;
+          let createdAnalysisId: string | null = null;
 
           try {
             await prisma.$transaction(async tx => {
@@ -389,6 +417,8 @@ export async function POST(request: NextRequest) {
                   ),
                 } satisfies Prisma.AnalysisUncheckedCreateInput,
               });
+
+              createdAnalysisId = newAnalysis.id;
 
               // Create version snapshot if this is a new version
               if (nextVersion > 1 && previousAnalysis) {
@@ -498,6 +528,29 @@ export async function POST(request: NextRequest) {
                 (err instanceof Error ? err.message : String(err))
             );
           });
+
+          // Auto-create outcome tracking stub (fire and forget).
+          // Sets outcomeDueAt to 30 days from now as the default review date.
+          // Users can adjust via the OutcomeTimeframePicker on the detail page.
+          try {
+            if (createdAnalysisId) {
+              const outcomeDueAt = new Date();
+              outcomeDueAt.setDate(outcomeDueAt.getDate() + 30);
+
+              await prisma.analysis.update({
+                where: { id: createdAnalysisId },
+                data: {
+                  outcomeStatus: 'pending_outcome',
+                  outcomeDueAt,
+                },
+              }).catch(() => {}); // Schema drift — column may not exist yet
+            }
+          } catch (stubErr) {
+            log.warn(
+              'Outcome stub creation failed (non-critical): ' +
+                (stubErr instanceof Error ? stubErr.message : String(stubErr))
+            );
+          }
 
           // Send email notification (fire and forget)
           if (user?.email) {

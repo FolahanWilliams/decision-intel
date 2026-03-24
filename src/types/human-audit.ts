@@ -22,7 +22,11 @@ export type DecisionType =
   | 'approval'
   | 'override'
   | 'strategic'
-  | 'vendor_eval';
+  | 'vendor_eval'
+  | 'capital_allocation'
+  | 'investment_thesis'
+  | 'portfolio_exit'
+  | 'm_and_a';
 
 export type NudgeType =
   | 'anchor_alert'
@@ -111,6 +115,8 @@ export interface NudgeDefinition {
   message: string;
   severity: NudgeSeverity;
   channel: NudgeChannel;
+  experimentId?: string;
+  variantId?: string;
 }
 
 export interface NudgeTriggerContext {

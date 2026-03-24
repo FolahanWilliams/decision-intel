@@ -29,6 +29,10 @@ import { formatDate } from '@/lib/constants/human-audit';
 const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
 import { OutcomeReporter } from './OutcomeReporter';
+import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/DecisionPriorCapture';
+import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
+import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
+import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -188,6 +192,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const [, setIsExportingCsv] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const scanAbortRef = useRef<AbortController | null>(null);
+
+  // Decision prior state
+  const [prior, setPrior] = useState<{
+    id?: string;
+    analysisId: string;
+    defaultAction: string;
+    confidence: number;
+    evidenceToChange?: string;
+    postAnalysisAction?: string;
+    beliefDelta?: number;
+  } | null>(null);
+  const [priorLoading, setPriorLoading] = useState(false);
 
   // URL-based tab state (#7)
   const tabFromUrl = searchParams.get('tab') as TabId | null;
@@ -423,6 +439,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const analysis = document?.analyses?.[0];
   const biases = useMemo(() => analysis?.biases || [], [analysis]);
   const selectedBiasIndex = selectedBias ? biases.findIndex(b => b.id === selectedBias.id) : -1;
+
+  // Fetch decision prior for this analysis
+  useEffect(() => {
+    if (!analysis?.id) return;
+    setPriorLoading(true);
+    fetch(`/api/decision-priors?analysisId=${analysis.id}`)
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (data?.prior) setPrior(data.prior);
+      })
+      .catch(() => {})
+      .finally(() => setPriorLoading(false));
+  }, [analysis?.id]);
 
   const handleMarkdownExport = useCallback(async () => {
     if (!analysis || !document) return;
@@ -768,6 +797,42 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
+      {/* Decision Prior — capture or display */}
+      {analysis && !priorLoading && (
+        <div className="mb-lg">
+          {prior ? (
+            <PostAnalysisPrior
+              analysisId={analysis.id}
+              prior={prior}
+              onUpdated={beliefDelta => {
+                setPrior(prev => (prev ? { ...prev, beliefDelta, postAnalysisAction: 'updated' } : prev));
+              }}
+            />
+          ) : (
+            <DecisionPriorCapture
+              analysisId={analysis.id}
+              onPriorSaved={savedPrior => {
+                setPrior({
+                  analysisId: analysis.id,
+                  defaultAction: savedPrior.defaultAction,
+                  confidence: savedPrior.confidence,
+                });
+              }}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Outcome Timeframe Picker — set when to review */}
+      {analysis && (
+        <div className="mb-lg">
+          <OutcomeTimeframePicker
+            analysisId={analysis.id}
+            currentDueAt={(analysis as unknown as { outcomeDueAt?: string }).outcomeDueAt}
+          />
+        </div>
+      )}
+
       {/* Decision Outcome Tracker */}
       {analysis && (
         <div className="mb-lg">
@@ -777,6 +842,20 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             biases={biases}
             twins={analysis.simulation?.twins}
           />
+        </div>
+      )}
+
+      {/* Counterfactual Analysis */}
+      {analysis && (
+        <div className="mb-lg">
+          <CounterfactualPanel analysisId={analysis.id} />
+        </div>
+      )}
+
+      {/* Decision Room — collaborative blind priors */}
+      {document && (
+        <div className="mb-lg">
+          <DecisionRoomList documentId={document.id} analysisId={analysis?.id} />
         </div>
       )}
 

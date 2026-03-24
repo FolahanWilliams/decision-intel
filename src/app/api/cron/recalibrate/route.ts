@@ -12,6 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { runFullRecalibration } from '@/lib/learning/feedback-loop';
 import { timingSafeEqual } from 'crypto';
@@ -65,6 +66,8 @@ export async function GET(request: NextRequest) {
       log.warn('Could not query org-specific outcomes (schema drift)');
     }
 
+    let twinRecalibratedCount = 0;
+
     const results: Array<{
       orgId: string | null;
       biasSeverity: { updated: boolean; sampleSize: number };
@@ -117,6 +120,43 @@ export async function GET(request: NextRequest) {
           }
         }
       }
+
+      // Twin effectiveness recalibration
+      try {
+        const { computeTwinEffectiveness } = await import('@/lib/learning/twin-effectiveness');
+        const effectiveness = await computeTwinEffectiveness(orgId);
+        if (effectiveness.length > 0) {
+          await prisma.calibrationProfile.upsert({
+            where: {
+              orgId_userId_profileType: {
+                orgId: orgId ?? '',
+                userId: '',
+                profileType: 'twin_effectiveness',
+              },
+            },
+            create: {
+              orgId: orgId,
+              profileType: 'twin_effectiveness',
+              calibrationData: JSON.parse(JSON.stringify(effectiveness)) as Prisma.InputJsonValue,
+              sampleSize: effectiveness.reduce((s, t) => s + t.sampleSize, 0),
+              lastCalibratedAt: new Date(),
+            },
+            update: {
+              calibrationData: JSON.parse(JSON.stringify(effectiveness)) as Prisma.InputJsonValue,
+              sampleSize: effectiveness.reduce((s, t) => s + t.sampleSize, 0),
+              lastCalibratedAt: new Date(),
+            },
+          });
+          twinRecalibratedCount++;
+        }
+      } catch (twinErr) {
+        const msg = twinErr instanceof Error ? twinErr.message : String(twinErr);
+        if (msg.includes('P2021') || msg.includes('P2022')) {
+          log.debug('Twin effectiveness tables not available (schema drift)');
+        } else {
+          log.warn(`Twin effectiveness recalibration failed for org ${orgId}:`, msg);
+        }
+      }
     }
 
     const durationMs = Date.now() - start;
@@ -126,7 +166,8 @@ export async function GET(request: NextRequest) {
 
     log.info(
       `Recalibration cron complete in ${durationMs}ms: ` +
-        `${orgIds.length} orgs processed, ${updatedCount} updated`
+        `${orgIds.length} orgs processed, ${updatedCount} updated, ` +
+        `${twinRecalibratedCount} twin effectiveness profiles updated`
     );
 
     return NextResponse.json({

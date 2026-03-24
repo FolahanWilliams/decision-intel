@@ -32,10 +32,10 @@ const log = createLogger('NudgeEngine');
  * When calibration data is provided, nudge types that users consistently
  * mark as unhelpful are suppressed (behavioral data flywheel).
  */
-export function generateNudges(
+export async function generateNudges(
   context: NudgeTriggerContext,
   calibration?: NudgeThresholdCalibration | null
-): NudgeDefinition[] {
+): Promise<NudgeDefinition[]> {
   const nudges: NudgeDefinition[] = [];
   const { auditResult, decision, history } = context;
 
@@ -85,6 +85,27 @@ export function generateNudges(
         return true;
       })
     : nudges;
+
+  // A/B test variant selection — apply experiment variants to generated nudges
+  try {
+    const { selectVariant } = await import('./ab-testing');
+    for (let i = 0; i < filteredNudges.length; i++) {
+      const assignment = await selectVariant(filteredNudges[i].nudgeType, (context.decision as Record<string, unknown>)?.userId as string || '');
+      if (assignment) {
+        filteredNudges[i] = {
+          ...filteredNudges[i],
+          message: assignment.variant.template
+            .replace('{original}', filteredNudges[i].message)
+            .replace('{trigger}', filteredNudges[i].triggerReason),
+          severity: (assignment.variant.severity || filteredNudges[i].severity) as NudgeSeverity,
+          experimentId: assignment.experimentId,
+          variantId: assignment.variant.id,
+        };
+      }
+    }
+  } catch {
+    // A/B testing not available — use default nudges
+  }
 
   log.info(
     `Generated ${filteredNudges.length} nudge(s) for decision (${nudges.length - filteredNudges.length} suppressed by calibration)`

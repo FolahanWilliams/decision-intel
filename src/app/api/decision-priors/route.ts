@@ -45,6 +45,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify the analysis belongs to this user before writing a prior
+    const analysis = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      select: { document: { select: { userId: true } } },
+    });
+
+    if (!analysis || analysis.document.userId !== user.id) {
+      return NextResponse.json({ error: 'Analysis not found or not owned by you' }, { status: 403 });
+    }
+
     const prior = await prisma.decisionPrior.upsert({
       where: { analysisId },
       create: {
@@ -116,6 +126,11 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'No prior found for this analysis' }, { status: 404 });
     }
 
+    // Verify ownership
+    if (existing.userId !== user.id) {
+      return NextResponse.json({ error: 'Not authorized to update this prior' }, { status: 403 });
+    }
+
     // Calculate belief delta: how much did the analysis change their position?
     // Simple heuristic: compare prior default action vs post-analysis action
     // If they're identical -> delta = 0, if different -> delta based on confidence shift
@@ -138,6 +153,50 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ id: 'schema-drift-noop', beliefDelta: 0 });
     }
     log.error('Failed to update decision prior:', msg);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+/**
+ * GET /api/decision-priors?analysisId=xxx
+ * Fetches an existing prior for a given analysis.
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const analysisId = request.nextUrl.searchParams.get('analysisId');
+    if (!analysisId) {
+      return NextResponse.json({ error: 'analysisId query parameter required' }, { status: 400 });
+    }
+
+    const prior = await prisma.decisionPrior.findUnique({
+      where: { analysisId },
+    });
+
+    if (!prior) {
+      return NextResponse.json({ prior: null });
+    }
+
+    // Verify ownership
+    if (prior.userId !== user.id) {
+      return NextResponse.json({ prior: null });
+    }
+
+    return NextResponse.json({ prior });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg.includes('P2021') || msg.includes('P2022')) {
+      return NextResponse.json({ prior: null });
+    }
+    log.error('Failed to fetch decision prior:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

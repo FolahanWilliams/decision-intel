@@ -30,6 +30,12 @@ interface StreamResult {
   [key: string]: unknown;
 }
 
+export interface OutcomeGateInfo {
+  pendingCount: number;
+  pendingAnalysisIds: string[];
+  message: string;
+}
+
 interface StreamOptions {
   /** Pre-configured analysis step names (used for the progress UI). */
   stepNames: string[];
@@ -37,6 +43,8 @@ interface StreamOptions {
   onBiasDetected?: (biasType: string, severity: string) => void;
   /** Called when the noise score is emitted. */
   onNoiseUpdate?: (score: number) => void;
+  /** Called when the server sends an outcome reminder (soft gate). */
+  onOutcomeReminder?: (pendingCount: number, analysisIds: string[]) => void;
   /** Max number of automatic retries on network failure. */
   maxRetries?: number;
 }
@@ -55,7 +63,7 @@ interface StreamOptions {
  * Replaces ~80 lines of inline stream-reading code in the dashboard.
  */
 export function useAnalysisStream(options: StreamOptions) {
-  const { stepNames, onBiasDetected, onNoiseUpdate, maxRetries = 2 } = options;
+  const { stepNames, onBiasDetected, onNoiseUpdate, onOutcomeReminder, maxRetries = 2 } = options;
 
   const [steps, setSteps] = useState<AnalysisStep[]>([]);
   const [progress, setProgress] = useState(0);
@@ -63,6 +71,7 @@ export function useAnalysisStream(options: StreamOptions) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<StreamResult | null>(null);
   const [timedOut, setTimedOut] = useState(false);
+  const [outcomeGate, setOutcomeGate] = useState<OutcomeGateInfo | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
   const retryCountRef = useRef(0);
@@ -105,9 +114,20 @@ export function useAnalysisStream(options: StreamOptions) {
         let errorMessage = `Analysis failed (${res.status})`;
         try {
           const errorData = await res.json();
-          errorMessage = errorData.error || errorMessage;
+          // Handle outcome gate (423) — surface structured gate info
+          if (res.status === 423 && errorData.code === 'OUTCOME_GATE') {
+            setOutcomeGate({
+              pendingCount: errorData.pendingOutcomes,
+              pendingAnalysisIds: errorData.pendingAnalysisIds || [],
+              message: errorData.message || errorMessage,
+            });
+            // Don't throw inside the try — set message and fall through
+            errorMessage = errorData.message || 'Outcome reporting required';
+          } else {
+            errorMessage = errorData.error || errorMessage;
+          }
         } catch {
-          /* ignore parse errors */
+          /* ignore JSON parse errors — use status-based message */
         }
         throw new Error(errorMessage);
       }
@@ -193,6 +213,13 @@ export function useAnalysisStream(options: StreamOptions) {
                 break;
               }
 
+              case 'outcome_reminder': {
+                const reminderCount = update.pendingCount as number;
+                const reminderIds = (update.analysisIds as string[]) || [];
+                onOutcomeReminder?.(reminderCount, reminderIds);
+                break;
+              }
+
               case 'error':
                 streamError = (update.message as string) || 'Analysis failed';
                 break;
@@ -216,7 +243,7 @@ export function useAnalysisStream(options: StreamOptions) {
 
       return streamResult;
     },
-    [onBiasDetected, onNoiseUpdate]
+    [onBiasDetected, onNoiseUpdate, onOutcomeReminder]
   );
 
   /**
@@ -238,6 +265,7 @@ export function useAnalysisStream(options: StreamOptions) {
       setIsAnalyzing(true);
       setError(null);
       setTimedOut(false);
+      setOutcomeGate(null);
 
       // Arm the global timeout — aborts the controller after STREAM_TIMEOUT_MS
       timeoutRef.current = setTimeout(() => {
@@ -324,5 +352,7 @@ export function useAnalysisStream(options: StreamOptions) {
     result,
     /** True when the stream was aborted due to timeout or exhausted retries. */
     timedOut,
+    /** Non-null when the server returned a 423 outcome gate response. */
+    outcomeGate,
   };
 }

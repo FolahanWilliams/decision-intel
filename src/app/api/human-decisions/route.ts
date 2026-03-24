@@ -392,7 +392,7 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
     ).catch(err => log.error('Human decision embedding failed:', err));
 
     // Generate nudges
-    const nudges = generateNudges({
+    const nudges = await generateNudges({
       decision: input,
       auditResult,
     });
@@ -408,6 +408,8 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
             message: nudge.message,
             severity: nudge.severity,
             channel: nudge.channel,
+            ...(nudge.experimentId && { experimentId: nudge.experimentId }),
+            ...(nudge.variantId && { variantId: nudge.variantId }),
           },
         });
 

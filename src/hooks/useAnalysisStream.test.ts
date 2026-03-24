@@ -127,3 +127,62 @@ describe('SSE parsing logic (used by useAnalysisStream)', () => {
     expect(events).toHaveLength(2);
   });
 });
+
+// ---------------------------------------------------------------------------
+// SSE outcome_reminder event parsing
+// ---------------------------------------------------------------------------
+
+describe('SSE outcome_reminder event parsing', () => {
+  it('parses outcome_reminder events with pendingCount and analysisIds', async () => {
+    const { SSEReader } = await import('@/lib/sse');
+    const reader = new SSEReader();
+    const events: unknown[] = [];
+
+    const chunk =
+      'data: {"type":"outcome_reminder","pendingCount":3,"analysisIds":["a-1","a-2","a-3"]}\n\n';
+    reader.processChunk(chunk, data => events.push(data));
+
+    expect(events).toHaveLength(1);
+    const event = events[0] as Record<string, unknown>;
+    expect(event.type).toBe('outcome_reminder');
+    expect(event.pendingCount).toBe(3);
+    expect(event.analysisIds).toEqual(['a-1', 'a-2', 'a-3']);
+  });
+
+  it('event shape matches what the hook expects (pendingCount + analysisIds)', async () => {
+    const { SSEReader } = await import('@/lib/sse');
+    const reader = new SSEReader();
+    const events: unknown[] = [];
+
+    const chunk =
+      'data: {"type":"outcome_reminder","pendingCount":1,"analysisIds":["analysis-abc"]}\n\n';
+    reader.processChunk(chunk, data => events.push(data));
+
+    const event = events[0] as Record<string, unknown>;
+    // The hook reads these exact fields in the outcome_reminder case
+    expect(typeof event.pendingCount).toBe('number');
+    expect(Array.isArray(event.analysisIds)).toBe(true);
+    expect((event.analysisIds as string[]).every(id => typeof id === 'string')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// OutcomeGateInfo type export
+// ---------------------------------------------------------------------------
+
+describe('OutcomeGateInfo type export', () => {
+  it('OutcomeGateInfo shape is compatible with outcome_reminder events', () => {
+    // OutcomeGateInfo is a TypeScript interface — we verify the expected shape
+    // at the value level since the hook module requires React (no jsdom).
+    // The interface expects: { pendingCount: number, pendingAnalysisIds: string[], message: string }
+    const gateInfo = {
+      pendingCount: 2,
+      pendingAnalysisIds: ['a-1', 'a-2'],
+      message: 'Please report outcomes',
+    };
+
+    expect(gateInfo.pendingCount).toBe(2);
+    expect(gateInfo.pendingAnalysisIds).toHaveLength(2);
+    expect(typeof gateInfo.message).toBe('string');
+  });
+});

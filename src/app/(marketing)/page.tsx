@@ -711,7 +711,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.03em',
                   }}
                 >
-                  Track, Score &
+                  The only system that tracks, scores, and
                   <span
                     className="block"
                     style={{
@@ -722,7 +722,7 @@ export default function LandingPage() {
                       paddingBottom: '4px',
                     }}
                   >
-                    Improve Decisions.
+                    improves executive decision performance over time
                   </span>
                 </motion.h1>
 
@@ -738,10 +738,10 @@ export default function LandingPage() {
                     maxWidth: '540px',
                   }}
                 >
-                  Investment memos, board papers and capital allocation decisions lose{' '}
-                  <span style={{ color: '#ef4444', fontWeight: 700 }}>12-15% of EBITDA</span> to
-                  cognitive bias and decision noise. The only platform that measures decision
-                  performance over time — with verified outcomes and measurable ROI.
+                  Every decision your team makes generates proprietary data that makes your next
+                  analysis more accurate. After 90 days, your org-specific bias detection is{' '}
+                  <span style={{ color: '#22c55e', fontWeight: 700 }}>3x more precise</span> than
+                  any generic tool.
                 </motion.p>
 
                 <motion.div
@@ -884,7 +884,7 @@ export default function LandingPage() {
               },
               { value: 47, suffix: '%', label: 'Avg Noise Reduction', color: '#22c55e' },
               { value: 12, suffix: '%', label: 'EBITDA Recovered', color: '#FFFFFF' },
-              { value: 94, suffix: '%', label: 'Outcome Tracking Rate', color: '#FFFFFF' },
+              { value: 18, suffix: '-Mo', label: 'Data Advantage', color: '#FFFFFF' },
             ].map((stat, i) => (
               <motion.div
                 key={i}
@@ -1756,7 +1756,7 @@ export default function LandingPage() {
                   {
                     step: '2',
                     label: 'Track Outcomes',
-                    description: 'You report what actually happened — success, failure, lessons',
+                    description: 'Platform enforces outcome reporting — success, failure, and lessons learned close the loop',
                     color: '#A3E635',
                   },
                   {
@@ -1855,32 +1855,32 @@ export default function LandingPage() {
                 icon: Fingerprint,
                 title: 'Mandatory Outcome Flywheel',
                 description:
-                  'Every decision gets a verified outcome. Your Confidence vs Reality calibration curve improves with each data point. This is the dataset no competitor can copy.',
-                stat: 'Longitudinal data moat',
+                  'The platform enforces outcome reporting — you cannot run new analyses until prior decisions are closed out. Your Confidence vs Reality calibration curve sharpens with every data point. After 6 months, this dataset becomes your 18-month competitive moat.',
+                stat: '18-month data advantage',
                 color: '#FFFFFF',
               },
               {
                 icon: RefreshCw,
-                title: 'Self-Improving Accuracy',
+                title: 'Auto-Recalibrating',
                 description:
-                  'Bias severity weights retrain on your real outcomes. "Anchoring cost your fund 18% across 12 deals" — not generic warnings, but your actual numbers.',
-                stat: 'Gets better every quarter',
+                  'Every outcome you report retrains bias weights, nudge thresholds, and Decision Twin accuracy for YOUR organization. "Anchoring cost your fund 18% across 12 deals" — not generic warnings, but your fund\'s actual P&L impact by bias type.',
+                stat: 'Auto-recalibrates every 5 decisions',
                 color: '#A3E635',
               },
               {
                 icon: Lock,
                 title: 'Pre-Decision Capture',
                 description:
-                  'Slack integration detects deliberation in real time. Nudges arrive before the vote — "This thread shows anchoring. Want a 2-minute counterfactual?"',
+                  'Slack integration detects IC deliberation threads in real time. Cognitive coaching nudges arrive before the vote — "This thread shows anchoring to entry multiple. Want a 2-minute counterfactual?"',
                 stat: 'Always-on decision OS',
                 color: '#22c55e',
               },
               {
                 icon: Network,
-                title: 'Governance-Ready',
+                title: 'Regulator-Ready',
                 description:
-                  'SOX, SEC, FCA compliance mapping built in. Exportable "Human Decision Governance" packs for EU AI Act. Audit trail for every decision, bias, and outcome.',
-                stat: 'Enterprise compliance',
+                  'Audit-grade decision logs with timestamped priors, outcomes, and calibration curves for compliance packs. SOX Section 302/404, SEC disclosure, FCA Consumer Duty compliance mapping built in. Exportable "Human Decision Governance" packs for EU AI Act.',
+                stat: 'Regulator-ready audit packs',
                 color: '#FFFFFF',
               },
             ].map((pillar, i) => (
@@ -1990,8 +1990,9 @@ export default function LandingPage() {
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                   pre-decision nudges in #investment-committee improved outcomes by 23%
                 </span>
-                . A generic tool starts from zero. Decision Intel starts from every outcome
-                you&apos;ve tracked.
+                . A generic tool starts from zero every session. Decision Intel compounds from every
+                outcome your fund has ever tracked — and enforces outcome reporting so the data
+                keeps flowing. That&apos;s an 18-month head start no competitor can shortcut.
               </div>
             </div>
           </motion.div>
@@ -2345,7 +2346,7 @@ export default function LandingPage() {
               },
               {
                 q: 'How does outcome tracking work?',
-                a: 'After each decision analysis, the platform tracks the actual outcome (success, partial, failure) at configurable intervals (30/60/90 days, 6 months, 1 year). This data feeds the calibration flywheel — your bias severity weights and Decision Twin accuracy improve with every tracked outcome.',
+                a: 'After each decision analysis, the platform prompts you to report the actual outcome (success, partial, failure) at configurable intervals (30/60/90 days, 6 months, 1 year). Outcome reporting is enforced — if you have 5+ analyses awaiting outcomes, new analyses are gated until you close the loop. This deliberate friction ensures the calibration flywheel keeps spinning: your bias severity weights, Decision Twin accuracy, and org-specific causal models all improve with every tracked outcome.',
               },
               {
                 q: 'What is a Decision Twin?',
