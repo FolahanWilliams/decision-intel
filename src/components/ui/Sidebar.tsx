@@ -21,6 +21,7 @@ import {
   BookOpen,
   Users,
   Zap,
+  Network,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -324,6 +325,15 @@ export default function Sidebar() {
             label="Compare"
             description="Side-by-side document comparison"
             active={pathname === '/dashboard/compare'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/decision-graph"
+            icon={<Network size={18} />}
+            label="Decision Graph"
+            description="Map relationships between decisions"
+            active={pathname === '/dashboard/decision-graph'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
