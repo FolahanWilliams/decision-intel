@@ -34,6 +34,7 @@ import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinationCard';
+import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -907,6 +908,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {document && (
         <div className="mb-lg">
           <DecisionRoomList documentId={document.id} analysisId={analysis?.id} />
+        </div>
+      )}
+
+      {/* Related Decisions — knowledge graph connections */}
+      {analysis && (
+        <div className="mb-lg">
+          <RelatedDecisions analysisId={analysis.id} />
         </div>
       )}
 
