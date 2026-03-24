@@ -68,7 +68,7 @@ export async function checkOutcomeGate(userId: string): Promise<OutcomeGateResul
       LEFT JOIN "DecisionOutcome" do2 ON do2."analysisId" = a.id
       WHERE d."userId" = ${userId}
         AND a."createdAt" < ${cutoffDate}
-        AND a.status = 'complete'
+        AND d.status = 'complete'
         AND do2.id IS NULL
       ORDER BY a."createdAt" ASC
       LIMIT 20
