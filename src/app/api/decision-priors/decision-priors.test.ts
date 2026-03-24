@@ -52,12 +52,16 @@ vi.mock('@/utils/supabase/server', () => ({
 const mockFindUnique = vi.fn();
 const mockUpsert = vi.fn();
 const mockUpdate = vi.fn();
+const mockAnalysisFindUnique = vi.fn();
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     decisionPrior: {
       findUnique: (...args: unknown[]) => mockFindUnique(...args),
       upsert: (...args: unknown[]) => mockUpsert(...args),
       update: (...args: unknown[]) => mockUpdate(...args),
+    },
+    analysis: {
+      findUnique: (...args: unknown[]) => mockAnalysisFindUnique(...args),
     },
   },
 }));
@@ -194,6 +198,7 @@ describe('POST /api/decision-priors', () => {
   });
 
   it('creates prior with valid data, returns { id }', async () => {
+    mockAnalysisFindUnique.mockResolvedValue({ document: { userId: 'user-1' } });
     mockUpsert.mockResolvedValue({ id: 'prior-1' });
 
     const res = await POST(
