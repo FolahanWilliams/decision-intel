@@ -12,6 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { runFullRecalibration } from '@/lib/learning/feedback-loop';
 import { timingSafeEqual } from 'crypto';
@@ -136,12 +137,12 @@ export async function GET(request: NextRequest) {
             create: {
               orgId: orgId,
               profileType: 'twin_effectiveness',
-              calibrationData: effectiveness as unknown as Record<string, unknown>,
+              calibrationData: JSON.parse(JSON.stringify(effectiveness)) as Prisma.InputJsonValue,
               sampleSize: effectiveness.reduce((s, t) => s + t.sampleSize, 0),
               lastCalibratedAt: new Date(),
             },
             update: {
-              calibrationData: effectiveness as unknown as Record<string, unknown>,
+              calibrationData: JSON.parse(JSON.stringify(effectiveness)) as Prisma.InputJsonValue,
               sampleSize: effectiveness.reduce((s, t) => s + t.sampleSize, 0),
               lastCalibratedAt: new Date(),
             },
