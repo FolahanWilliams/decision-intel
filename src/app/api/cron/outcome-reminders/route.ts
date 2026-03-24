@@ -149,16 +149,65 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Send Slack reminders for Slack-sourced decisions
+    let slackRemindersSent = 0;
+    for (const analysis of overdueAnalyses) {
+      const doc = docMap.get(analysis.documentId);
+      if (!doc) continue;
+
+      // Check if this document originated from Slack (has a HumanDecision with source='slack')
+      try {
+        const slackDecision = await prisma.humanDecision.findFirst({
+          where: {
+            linkedAnalysisId: analysis.id,
+            source: 'slack',
+            sourceRef: { not: null },
+          },
+          select: { sourceRef: true, orgId: true },
+        });
+
+        if (slackDecision?.sourceRef) {
+          const [slackChannel] = slackDecision.sourceRef.split(':');
+          if (slackChannel) {
+            const { formatNudgeForSlack, deliverSlackNudge } = await import('@/lib/integrations/slack/handler');
+            // Find teamId from installation
+            const slackInstall = slackDecision.orgId
+              ? await prisma.slackInstallation.findFirst({
+                  where: { orgId: slackDecision.orgId, status: 'active' },
+                  select: { teamId: true },
+                })
+              : null;
+
+            const reminderPayload = formatNudgeForSlack(
+              {
+                nudgeType: 'pre_decision_coaching',
+                triggerReason: 'Outcome overdue',
+                message: `This decision is overdue for outcome reporting. How did it turn out? Report the outcome to improve future analysis accuracy.`,
+                severity: 'warning',
+                channel: 'slack',
+              }
+            );
+            reminderPayload.channel = slackChannel;
+            await deliverSlackNudge(reminderPayload, slackInstall?.teamId).catch(() => {});
+            slackRemindersSent++;
+          }
+        }
+      } catch {
+        // Schema drift or missing tables — skip Slack reminder
+      }
+    }
+
     const duration = Date.now() - start;
     log.info(
       `Outcome reminder cron complete: ${overdueAnalyses.length} marked overdue, ` +
-        `${remindersSent} reminders sent in ${duration}ms`
+        `${remindersSent} email + ${slackRemindersSent} Slack reminders sent in ${duration}ms`
     );
 
     return NextResponse.json({
       processed: overdueAnalyses.length,
       marked_overdue: overdueIds.length,
       reminders_sent: remindersSent,
+      slack_reminders_sent: slackRemindersSent,
       users_notified: userReminders.size,
       duration_ms: duration,
     });

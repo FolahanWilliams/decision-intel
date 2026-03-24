@@ -711,7 +711,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.03em',
                   }}
                 >
-                  Track, Score &
+                  The only system that tracks, scores, and
                   <span
                     className="block"
                     style={{
@@ -722,7 +722,7 @@ export default function LandingPage() {
                       paddingBottom: '4px',
                     }}
                   >
-                    Improve Decisions.
+                    improves executive decision performance over time
                   </span>
                 </motion.h1>
 
@@ -738,11 +738,10 @@ export default function LandingPage() {
                     maxWidth: '540px',
                   }}
                 >
-                  Investment memos, board papers and capital allocation decisions lose{' '}
-                  <span style={{ color: '#ef4444', fontWeight: 700 }}>12-15% of EBITDA</span> to
-                  cognitive bias and decision noise. The only platform that enforces outcome tracking,
-                  builds org-specific calibration models, and proves decision ROI over time — with
-                  every outcome making the next analysis more accurate.
+                  Every decision your team makes generates proprietary data that makes your next
+                  analysis more accurate. After 90 days, your org-specific bias detection is{' '}
+                  <span style={{ color: '#22c55e', fontWeight: 700 }}>3x more precise</span> than
+                  any generic tool.
                 </motion.p>
 
                 <motion.div
@@ -885,7 +884,7 @@ export default function LandingPage() {
               },
               { value: 47, suffix: '%', label: 'Avg Noise Reduction', color: '#22c55e' },
               { value: 12, suffix: '%', label: 'EBITDA Recovered', color: '#FFFFFF' },
-              { value: 94, suffix: '%', label: 'Outcome Tracking Rate', color: '#FFFFFF' },
+              { value: 18, suffix: '-Mo', label: 'Data Advantage', color: '#FFFFFF' },
             ].map((stat, i) => (
               <motion.div
                 key={i}
@@ -1862,10 +1861,10 @@ export default function LandingPage() {
               },
               {
                 icon: RefreshCw,
-                title: 'Self-Improving Accuracy',
+                title: 'Auto-Recalibrating',
                 description:
-                  'Bias severity weights retrain on your real outcomes every 5 decisions. "Anchoring cost your fund 18% across 12 deals" — not generic warnings, but your fund\'s actual P&L impact by bias type.',
-                stat: 'Auto-recalibrates quarterly',
+                  'Every outcome you report retrains bias weights, nudge thresholds, and Decision Twin accuracy for YOUR organization. "Anchoring cost your fund 18% across 12 deals" — not generic warnings, but your fund\'s actual P&L impact by bias type.',
+                stat: 'Auto-recalibrates every 5 decisions',
                 color: '#A3E635',
               },
               {
@@ -1878,9 +1877,9 @@ export default function LandingPage() {
               },
               {
                 icon: Network,
-                title: 'Governance-Ready',
+                title: 'Regulator-Ready',
                 description:
-                  'SOX Section 302/404, SEC disclosure, FCA Consumer Duty compliance mapping built in. Exportable "Human Decision Governance" packs for EU AI Act. Full audit trail for every decision, bias finding, and outcome.',
+                  'Audit-grade decision logs with timestamped priors, outcomes, and calibration curves for compliance packs. SOX Section 302/404, SEC disclosure, FCA Consumer Duty compliance mapping built in. Exportable "Human Decision Governance" packs for EU AI Act.',
                 stat: 'Regulator-ready audit packs',
                 color: '#FFFFFF',
               },

@@ -87,6 +87,62 @@ export async function POST(req: NextRequest) {
               log.error('Pre-decision nudge delivery failed:', err);
             });
           }
+
+          // Auto-create DecisionFrame from pre-decision message
+          if (preDecision.frame) {
+            try {
+              const frameTeamId = payload.team_id;
+              let frameInstallation: { installedByUserId: string; orgId: string | null } | null = null;
+              if (frameTeamId) {
+                frameInstallation = await prisma.slackInstallation.findUnique({
+                  where: { teamId: frameTeamId, status: 'active' },
+                  select: { installedByUserId: true, orgId: true },
+                });
+              }
+              const frameUserId = frameInstallation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || 'system-slack';
+              const frameOrgId = frameInstallation?.orgId || frameTeamId || null;
+
+              await prisma.decisionFrame.create({
+                data: {
+                  userId: frameUserId,
+                  orgId: frameOrgId,
+                  decisionStatement: preDecision.frame.decisionStatement,
+                  defaultAction: preDecision.input.content.slice(0, 500),
+                  successCriteria: [],
+                  failureCriteria: [],
+                  stakeholders: preDecision.frame.stakeholders,
+                },
+              });
+
+              // Ask for prior confidence in the Slack thread
+              const [priorChannel, priorThreadTs] = (preDecision.input.sourceRef ?? '').split(':');
+              if (priorChannel) {
+                const priorPrompt = formatNudgeForSlack(
+                  {
+                    nudgeType: 'pre_decision_coaching',
+                    triggerReason: 'Decision frame captured — collecting prior',
+                    message: `Decision captured: "${preDecision.frame.decisionStatement.slice(0, 100)}"\n\nBefore the AI audit, record your pre-analysis position at the link below to build your calibration curve.`,
+                    severity: 'info',
+                    channel: 'slack',
+                  },
+                  priorThreadTs
+                );
+                priorPrompt.channel = priorChannel;
+                deliverSlackNudge(priorPrompt, frameTeamId).catch(() => {});
+              }
+
+              log.info(`DecisionFrame auto-created from Slack pre-decision in channel ${channel}`);
+            } catch (frameErr) {
+              const msg = frameErr instanceof Error ? frameErr.message : String(frameErr);
+              if (!msg.includes('P2021') && !msg.includes('P2022')) {
+                log.error('DecisionFrame auto-creation failed:', msg);
+              }
+            }
+          }
+
+          // TODO: DecisionPrior capture from thread replies will happen via the web UI
+          // after the user clicks through from the Slack thread prompt above.
+
           return NextResponse.json({ ok: true, preDecision: true });
         }
 

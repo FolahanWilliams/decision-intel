@@ -92,6 +92,10 @@ export function classifyDecisionType(text: string): HumanDecisionInput['decision
   if (/\b(overrid|dismiss|ignore|false.?positive)\b/.test(lower)) return 'override';
   if (/\b(vendor|supplier|tool|platform|evaluate)\b/.test(lower)) return 'vendor_eval';
   if (/\b(strategy|roadmap|initiative|budget|plan)\b/.test(lower)) return 'strategic';
+  if (/\b(capital.?alloc|deploy.?capital|fund.?size|commit.?capital)\b/.test(lower)) return 'capital_allocation';
+  if (/\b(investment.?thesis|thesis.?review|investment.?memo)\b/.test(lower)) return 'investment_thesis';
+  if (/\b(exit|divest|portfolio.?sale|realiz|liquidat)\b/.test(lower)) return 'portfolio_exit';
+  if (/\b(m&a|merger|acqui|takeover|buyout|lbo|bolt.?on)\b/.test(lower)) return 'm_and_a';
 
   return undefined;
 }
