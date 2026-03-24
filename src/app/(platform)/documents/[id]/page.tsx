@@ -805,7 +805,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               analysisId={analysis.id}
               prior={prior}
               onUpdated={beliefDelta => {
-                setPrior(prev => (prev ? { ...prev, beliefDelta, postAnalysisAction: 'updated' } : prev));
+                setPrior(prev =>
+                  prev ? { ...prev, beliefDelta, postAnalysisAction: 'updated' } : prev
+                );
               }}
             />
           ) : (

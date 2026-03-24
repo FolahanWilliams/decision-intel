@@ -23,7 +23,10 @@ const log = createLogger('JournalIngestRoute');
 function extractDecisions(content: string): string[] {
   const decisions: string[] = [];
 
-  const segments = content.split(/[.\n]+/).map(s => s.trim()).filter(s => s.length > 0);
+  const segments = content
+    .split(/[.\n]+/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
 
   for (const segment of segments) {
     if (isDecisionMessage(segment)) {
@@ -135,7 +138,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    log.info(`Email journal entry ingested: ${entry.id} from ${from} (decisions: ${extractedDecisions.length})`);
+    log.info(
+      `Email journal entry ingested: ${entry.id} from ${from} (decisions: ${extractedDecisions.length})`
+    );
     return NextResponse.json(
       {
         id: entry.id,
@@ -148,7 +153,11 @@ export async function POST(request: NextRequest) {
     const msg = error instanceof Error ? error.message : String(error);
     if (msg.includes('P2021') || msg.includes('P2022')) {
       log.debug('JournalEntry table not available (schema drift)');
-      return NextResponse.json({ id: 'schema-drift-noop', extractedDecisions: [], status: 'pending' });
+      return NextResponse.json({
+        id: 'schema-drift-noop',
+        extractedDecisions: [],
+        status: 'pending',
+      });
     }
     log.error('Failed to ingest email journal entry:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

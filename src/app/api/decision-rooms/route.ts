@@ -33,16 +33,11 @@ export async function POST(request: NextRequest) {
     const { title, documentId, analysisId, participantUserIds } = body;
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Missing required field: title' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required field: title' }, { status: 400 });
     }
 
     // Build participant creates — always include the creator
-    const participantCreates = [
-      { userId: user.id, role: 'creator' },
-    ];
+    const participantCreates = [{ userId: user.id, role: 'creator' }];
 
     if (Array.isArray(participantUserIds)) {
       for (const uid of participantUserIds) {
@@ -136,7 +131,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     if (msg.includes('P2021') || msg.includes('P2022')) {
-      return NextResponse.json({ rooms: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } });
+      return NextResponse.json({
+        rooms: [],
+        pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+      });
     }
     log.error('Failed to list decision rooms:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

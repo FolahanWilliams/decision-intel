@@ -52,7 +52,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!analysis || analysis.document.userId !== user.id) {
-      return NextResponse.json({ error: 'Analysis not found or not owned by you' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Analysis not found or not owned by you' },
+        { status: 403 }
+      );
     }
 
     const prior = await prisma.decisionPrior.upsert({

@@ -1756,7 +1756,8 @@ export default function LandingPage() {
                   {
                     step: '2',
                     label: 'Track Outcomes',
-                    description: 'Platform enforces outcome reporting — success, failure, and lessons learned close the loop',
+                    description:
+                      'Platform enforces outcome reporting — success, failure, and lessons learned close the loop',
                     color: '#A3E635',
                   },
                   {

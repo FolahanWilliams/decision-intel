@@ -99,8 +99,8 @@ export function BiasGenomeBenchmark({ userBiasRates }: BiasGenomeBenchmarkProps)
             lineHeight: 1.5,
           }}
         >
-          No industry benchmark data available yet. Benchmarks are built from anonymous,
-          aggregated data across consenting organizations.
+          No industry benchmark data available yet. Benchmarks are built from anonymous, aggregated
+          data across consenting organizations.
         </p>
       </div>
     );

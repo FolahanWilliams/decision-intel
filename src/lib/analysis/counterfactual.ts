@@ -141,8 +141,7 @@ export async function computeCounterfactuals(
     const monetaryInfo = await getMonetaryValue(analysisId);
 
     // 5. Compute global baseline success rate (decisions without any of the target biases)
-    const isSuccess = (outcome: string) =>
-      outcome === 'success' || outcome === 'partial_success';
+    const isSuccess = (outcome: string) => outcome === 'success' || outcome === 'partial_success';
 
     // 6. For each bias type, compute counterfactual scenario
     const scenarios: CounterfactualScenario[] = [];
@@ -154,12 +153,9 @@ export async function computeCounterfactuals(
       const withBiasSuccesses = withBias.filter(o => isSuccess(o.outcome)).length;
       const withoutBiasSuccesses = withoutBias.filter(o => isSuccess(o.outcome)).length;
 
-      const successRateWith = withBias.length > 0
-        ? (withBiasSuccesses / withBias.length) * 100
-        : 0;
-      const successRateWithout = withoutBias.length > 0
-        ? (withoutBiasSuccesses / withoutBias.length) * 100
-        : 0;
+      const successRateWith = withBias.length > 0 ? (withBiasSuccesses / withBias.length) * 100 : 0;
+      const successRateWithout =
+        withoutBias.length > 0 ? (withoutBiasSuccesses / withoutBias.length) * 100 : 0;
 
       const expectedImprovement = successRateWithout - successRateWith;
 
@@ -170,9 +166,10 @@ export async function computeCounterfactuals(
 
       // Apply CausalEdge strength as a multiplier on confidence
       const causalStrength = causalStrengths.get(biasType);
-      const adjustedConfidence = causalStrength != null
-        ? Math.min(1, confidence * (0.5 + Math.abs(causalStrength) * 0.5))
-        : confidence;
+      const adjustedConfidence =
+        causalStrength != null
+          ? Math.min(1, confidence * (0.5 + Math.abs(causalStrength) * 0.5))
+          : confidence;
 
       // Monetary impact estimate
       let estimatedMonetaryImpact: number | null = null;
@@ -200,31 +197,33 @@ export async function computeCounterfactuals(
     // 7. Compute aggregates
     // Aggregate improvement: assuming independent biases, combine probabilities
     // P(improved) = 1 - product(1 - improvement_i/100)
-    const aggregateImprovement = scenarios.length > 0
-      ? Number(
-          (
-            (1 -
-              scenarios.reduce(
-                (prod, s) => prod * (1 - Math.max(0, s.expectedImprovement) / 100),
-                1
-              )) *
-            100
-          ).toFixed(1)
-        )
-      : 0;
+    const aggregateImprovement =
+      scenarios.length > 0
+        ? Number(
+            (
+              (1 -
+                scenarios.reduce(
+                  (prod, s) => prod * (1 - Math.max(0, s.expectedImprovement) / 100),
+                  1
+                )) *
+              100
+            ).toFixed(1)
+          )
+        : 0;
 
     // Confidence-weighted aggregate
     const totalWeight = scenarios.reduce((s, sc) => s + sc.confidence, 0);
-    const weightedImprovement = totalWeight > 0
-      ? Number(
-          (
-            scenarios.reduce(
-              (s, sc) => s + Math.max(0, sc.expectedImprovement) * sc.confidence,
-              0
-            ) / totalWeight
-          ).toFixed(1)
-        )
-      : 0;
+    const weightedImprovement =
+      totalWeight > 0
+        ? Number(
+            (
+              scenarios.reduce(
+                (s, sc) => s + Math.max(0, sc.expectedImprovement) * sc.confidence,
+                0
+              ) / totalWeight
+            ).toFixed(1)
+          )
+        : 0;
 
     return {
       analysisId,
@@ -362,11 +361,7 @@ async function getMonetaryValue(
  * For small samples (< 5), confidence is low.
  * For large samples (> 50), confidence approaches 1.
  */
-function wilsonConfidence(
-  sampleSize: number,
-  successes: number,
-  total: number
-): number {
+function wilsonConfidence(sampleSize: number, successes: number, total: number): number {
   if (total === 0 || sampleSize === 0) return 0;
 
   // Base confidence from sample size (logistic curve centered at ~20)
@@ -379,8 +374,7 @@ function wilsonConfidence(
   const denominator = 1 + (z * z) / total;
   // center not needed for confidence calc, only halfWidth matters
   const halfWidth =
-    (z * Math.sqrt((pHat * (1 - pHat) + (z * z) / (4 * total)) / total)) /
-    denominator;
+    (z * Math.sqrt((pHat * (1 - pHat) + (z * z) / (4 * total)) / total)) / denominator;
 
   // Narrower interval = higher confidence
   const intervalConfidence = halfWidth > 0 ? Math.max(0, 1 - halfWidth * 2) : 0;

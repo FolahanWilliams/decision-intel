@@ -466,9 +466,7 @@ export async function calculateBiasCosts(
     }
 
     // Compute average impact score for outcomes WITHOUT each bias type (baseline)
-    const allImpactScores = outcomes
-      .filter(o => o.impactScore != null)
-      .map(o => o.impactScore!);
+    const allImpactScores = outcomes.filter(o => o.impactScore != null).map(o => o.impactScore!);
     const globalAvgImpact =
       allImpactScores.length > 0
         ? allImpactScores.reduce((s, v) => s + v, 0) / allImpactScores.length
@@ -489,7 +487,13 @@ export async function calculateBiasCosts(
     for (const o of outcomes) {
       for (const bias of o.confirmedBiases) {
         if (!biasMap[bias]) {
-          biasMap[bias] = { failed: 0, total: 0, impactScores: [], monetaryVals: [], currency: 'GBP' };
+          biasMap[bias] = {
+            failed: 0,
+            total: 0,
+            impactScores: [],
+            monetaryVals: [],
+            currency: 'GBP',
+          };
         }
         biasMap[bias].total++;
         if (o.outcome === 'failure') {
@@ -690,12 +694,14 @@ export async function getQuarterlyImpact(
         .filter(o => o.impactScore != null)
         .map(o => o.impactScore!);
 
-      const avgChanged = changedImpacts.length > 0
-        ? changedImpacts.reduce((s, v) => s + v, 0) / changedImpacts.length
-        : 0;
-      const avgUnchanged = unchangedImpacts.length > 0
-        ? unchangedImpacts.reduce((s, v) => s + v, 0) / unchangedImpacts.length
-        : 0;
+      const avgChanged =
+        changedImpacts.length > 0
+          ? changedImpacts.reduce((s, v) => s + v, 0) / changedImpacts.length
+          : 0;
+      const avgUnchanged =
+        unchangedImpacts.length > 0
+          ? unchangedImpacts.reduce((s, v) => s + v, 0) / unchangedImpacts.length
+          : 0;
 
       // Guard: only compute savings if both groups have impact data
       // to avoid inflated estimates from comparing against zero baseline

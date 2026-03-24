@@ -22,7 +22,10 @@ function extractDecisions(content: string): string[] {
   const decisions: string[] = [];
 
   // Split content into sentences/lines and check each
-  const segments = content.split(/[.\n]+/).map(s => s.trim()).filter(s => s.length > 0);
+  const segments = content
+    .split(/[.\n]+/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
 
   for (const segment of segments) {
     if (isDecisionMessage(segment)) {
@@ -105,7 +108,11 @@ export async function POST(request: NextRequest) {
     const msg = error instanceof Error ? error.message : String(error);
     if (msg.includes('P2021') || msg.includes('P2022')) {
       log.debug('JournalEntry table not available (schema drift)');
-      return NextResponse.json({ id: 'schema-drift-noop', extractedDecisions: [], status: 'pending' });
+      return NextResponse.json({
+        id: 'schema-drift-noop',
+        extractedDecisions: [],
+        status: 'pending',
+      });
     }
     log.error('Failed to create journal entry:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

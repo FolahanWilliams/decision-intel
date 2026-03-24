@@ -62,12 +62,23 @@ export function CounterfactualPanel({ analysisId }: CounterfactualPanelProps) {
       }
     }
     fetchData();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [analysisId]);
 
   if (loading) {
     return (
-      <div style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '13px' }}>
+      <div
+        style={{
+          padding: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          color: 'var(--text-muted)',
+          fontSize: '13px',
+        }}
+      >
         <Loader2 size={14} className="animate-spin" />
         Computing counterfactuals...
       </div>
@@ -102,8 +113,16 @@ export function CounterfactualPanel({ analysisId }: CounterfactualPanelProps) {
           <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
             Counterfactual Analysis
           </span>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginTop: '1px' }}>
-            What if these biases were removed? Based on {data.scenarios.reduce((s, sc) => s + sc.historicalSampleSize, 0)} historical decisions
+          <span
+            style={{
+              fontSize: '11px',
+              color: 'var(--text-muted)',
+              display: 'block',
+              marginTop: '1px',
+            }}
+          >
+            What if these biases were removed? Based on{' '}
+            {data.scenarios.reduce((s, sc) => s + sc.historicalSampleSize, 0)} historical decisions
           </span>
         </div>
       </div>
@@ -123,10 +142,16 @@ export function CounterfactualPanel({ analysisId }: CounterfactualPanelProps) {
           <TrendingUp size={14} style={{ color: '#60a5fa' }} />
           <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
             Removing all detected biases would improve expected success rate by{' '}
-            <span style={{ fontWeight: 700, color: '#60a5fa', fontFamily: "'JetBrains Mono', monospace" }}>
+            <span
+              style={{
+                fontWeight: 700,
+                color: '#60a5fa',
+                fontFamily: "'JetBrains Mono', monospace",
+              }}
+            >
               +{data.weightedImprovement.toFixed(1)}pp
-            </span>
-            {' '}(confidence-weighted)
+            </span>{' '}
+            (confidence-weighted)
           </span>
         </div>
       )}
@@ -141,7 +166,8 @@ export function CounterfactualPanel({ analysisId }: CounterfactualPanelProps) {
             transition={{ delay: i * 0.05 }}
             style={{
               padding: '10px 18px',
-              borderBottom: i < data.scenarios.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none',
+              borderBottom:
+                i < data.scenarios.length - 1 ? '1px solid rgba(255, 255, 255, 0.03)' : 'none',
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
@@ -149,12 +175,18 @@ export function CounterfactualPanel({ analysisId }: CounterfactualPanelProps) {
           >
             <AlertTriangle size={12} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', display: 'block' }}>
+              <span
+                style={{
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  display: 'block',
+                }}
+              >
                 Without {formatBiasName(scenario.biasRemoved)}
               </span>
               <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                {scenario.historicalSampleSize} similar decisions
-                {' '}&middot;{' '}
+                {scenario.historicalSampleSize} similar decisions &middot;{' '}
                 <span style={{ color: getConfidenceColor(scenario.confidence) }}>
                   {(scenario.confidence * 100).toFixed(0)}% confidence
                 </span>
@@ -173,7 +205,12 @@ export function CounterfactualPanel({ analysisId }: CounterfactualPanelProps) {
               </span>
               {scenario.estimatedMonetaryImpact != null && scenario.estimatedMonetaryImpact > 0 && (
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block' }}>
-                  ~{scenario.currency === 'GBP' ? '£' : scenario.currency === 'USD' ? '$' : scenario.currency}
+                  ~
+                  {scenario.currency === 'GBP'
+                    ? '£'
+                    : scenario.currency === 'USD'
+                      ? '$'
+                      : scenario.currency}
                   {scenario.estimatedMonetaryImpact.toLocaleString()}
                 </span>
               )}

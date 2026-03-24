@@ -90,7 +90,10 @@ export async function generateNudges(
   try {
     const { selectVariant } = await import('./ab-testing');
     for (let i = 0; i < filteredNudges.length; i++) {
-      const assignment = await selectVariant(filteredNudges[i].nudgeType, (context.decision as unknown as Record<string, unknown>)?.userId as string || '');
+      const assignment = await selectVariant(
+        filteredNudges[i].nudgeType,
+        ((context.decision as unknown as Record<string, unknown>)?.userId as string) || ''
+      );
       if (assignment) {
         filteredNudges[i] = {
           ...filteredNudges[i],

@@ -1,7 +1,15 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { BookOpen, Mail, Calendar, MessageSquare, ArrowRight, Loader2, CheckCircle } from 'lucide-react';
+import {
+  BookOpen,
+  Mail,
+  Calendar,
+  MessageSquare,
+  ArrowRight,
+  Loader2,
+  CheckCircle,
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -65,9 +73,7 @@ export function JournalWidget() {
         body: JSON.stringify({ decisionStatement }),
       });
       if (res.ok) {
-        setEntries(prev => prev.map(e =>
-          e.id === entryId ? { ...e, status: 'processed' } : e
-        ));
+        setEntries(prev => prev.map(e => (e.id === entryId ? { ...e, status: 'processed' } : e)));
       }
     } catch {
       // Silent fail
@@ -120,15 +126,23 @@ export function JournalWidget() {
           <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
             Decision Journal
           </span>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginTop: '1px' }}>
-            {pendingEntries.length} captured decision{pendingEntries.length !== 1 ? 's' : ''} awaiting review
+          <span
+            style={{
+              fontSize: '11px',
+              color: 'var(--text-muted)',
+              display: 'block',
+              marginTop: '1px',
+            }}
+          >
+            {pendingEntries.length} captured decision{pendingEntries.length !== 1 ? 's' : ''}{' '}
+            awaiting review
           </span>
         </div>
       </div>
 
       <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
         <AnimatePresence>
-          {pendingEntries.map((entry) => {
+          {pendingEntries.map(entry => {
             const Icon = SOURCE_ICONS[entry.source] || BookOpen;
             const sourceLabel = SOURCE_LABELS[entry.source] || entry.source;
             const isConverting = converting === entry.id;
@@ -146,10 +160,22 @@ export function JournalWidget() {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <Icon size={14} style={{ color: 'var(--text-muted)', marginTop: '2px', flexShrink: 0 }} />
+                  <Icon
+                    size={14}
+                    style={{ color: 'var(--text-muted)', marginTop: '2px', flexShrink: 0 }}
+                  />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          color: 'var(--text-primary)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap' as const,
+                        }}
+                      >
                         {entry.title}
                       </span>
                       <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0 }}>
@@ -158,10 +184,22 @@ export function JournalWidget() {
                     </div>
 
                     {entry.extractedDecisions.length > 0 && (
-                      <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div
+                        style={{
+                          marginTop: '6px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '4px',
+                        }}
+                      >
                         {entry.extractedDecisions.slice(0, 3).map((decision, i) => (
-                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', flex: 1 }}>
+                          <div
+                            key={i}
+                            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                          >
+                            <span
+                              style={{ fontSize: '11px', color: 'var(--text-secondary)', flex: 1 }}
+                            >
                               {decision.length > 80 ? decision.slice(0, 80) + '...' : decision}
                             </span>
                             {!isProcessed && (
@@ -182,7 +220,11 @@ export function JournalWidget() {
                                   gap: '3px',
                                 }}
                               >
-                                {isConverting ? <Loader2 size={8} className="animate-spin" /> : <ArrowRight size={8} />}
+                                {isConverting ? (
+                                  <Loader2 size={8} className="animate-spin" />
+                                ) : (
+                                  <ArrowRight size={8} />
+                                )}
                                 Audit
                               </button>
                             )}
@@ -192,9 +234,18 @@ export function JournalWidget() {
                     )}
 
                     {isProcessed && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          marginTop: '4px',
+                        }}
+                      >
                         <CheckCircle size={10} style={{ color: '#22c55e' }} />
-                        <span style={{ fontSize: '10px', color: '#22c55e' }}>Converted to decision audit</span>
+                        <span style={{ fontSize: '10px', color: '#22c55e' }}>
+                          Converted to decision audit
+                        </span>
                       </div>
                     )}
                   </div>

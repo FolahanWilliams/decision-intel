@@ -113,9 +113,7 @@ export async function selectVariant(
  * Compute experiment results by querying Nudge records
  * with experimentId and variantId fields.
  */
-export async function getExperimentResults(
-  experimentId: string
-): Promise<ExperimentResult[]> {
+export async function getExperimentResults(experimentId: string): Promise<ExperimentResult[]> {
   try {
     // Fetch the experiment to get variant labels
     let experiment: {
@@ -172,9 +170,7 @@ export async function getExperimentResults(
     }
 
     // Collect humanDecisionIds to look up beliefDelta via DecisionPrior
-    const decisionIds = nudges
-      .map(n => n.humanDecisionId)
-      .filter((id): id is string => id != null);
+    const decisionIds = nudges.map(n => n.humanDecisionId).filter((id): id is string => id != null);
 
     const beliefDeltas: Map<string, number> = new Map();
     if (decisionIds.length > 0) {
@@ -196,9 +192,7 @@ export async function getExperimentResults(
           });
 
           const analysisToDecision = new Map(
-            decisions
-              .filter(d => d.linkedAnalysisId)
-              .map(d => [d.linkedAnalysisId!, d.id])
+            decisions.filter(d => d.linkedAnalysisId).map(d => [d.linkedAnalysisId!, d.id])
           );
 
           for (const prior of priors) {
@@ -215,12 +209,15 @@ export async function getExperimentResults(
     }
 
     // Group nudges by variantId
-    const grouped: Record<string, {
-      impressions: number;
-      acknowledged: number;
-      helpful: number;
-      beliefDeltas: number[];
-    }> = {};
+    const grouped: Record<
+      string,
+      {
+        impressions: number;
+        acknowledged: number;
+        helpful: number;
+        beliefDeltas: number[];
+      }
+    > = {};
 
     for (const variant of variants) {
       grouped[variant.id] = {
@@ -263,9 +260,7 @@ export async function getExperimentResults(
         helpful: stats.helpful,
         beliefDeltaAvg,
         effectivenessRate:
-          stats.impressions > 0
-            ? Number((stats.helpful / stats.impressions).toFixed(3))
-            : 0,
+          stats.impressions > 0 ? Number((stats.helpful / stats.impressions).toFixed(3)) : 0,
       };
     });
 
@@ -289,9 +284,7 @@ export async function getExperimentResults(
  * Uses simplified Thompson sampling — variant with highest
  * (helpful + 1) / (impressions + 2) gets proportionally more traffic.
  */
-export async function autoOptimizeExperiment(
-  experimentId: string
-): Promise<void> {
+export async function autoOptimizeExperiment(experimentId: string): Promise<void> {
   try {
     const results = await getExperimentResults(experimentId);
 
@@ -300,7 +293,9 @@ export async function autoOptimizeExperiment(
     // Minimum total impressions before optimizing
     const totalImpressions = results.reduce((s, r) => s + r.impressions, 0);
     if (totalImpressions < 20) {
-      log.info(`Experiment ${experimentId}: only ${totalImpressions} impressions, skipping optimization`);
+      log.info(
+        `Experiment ${experimentId}: only ${totalImpressions} impressions, skipping optimization`
+      );
       return;
     }
 
@@ -352,9 +347,7 @@ export async function autoOptimizeExperiment(
       throw err;
     }
 
-    log.info(
-      `Experiment ${experimentId}: traffic updated — ${JSON.stringify(newSplit)}`
-    );
+    log.info(`Experiment ${experimentId}: traffic updated — ${JSON.stringify(newSplit)}`);
   } catch (error) {
     const code = (error as { code?: string }).code;
     const msg = error instanceof Error ? error.message : String(error);

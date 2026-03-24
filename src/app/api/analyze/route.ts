@@ -48,7 +48,9 @@ export async function POST(request: NextRequest) {
     // Outcome enforcement gate — block when too many outcomes are overdue
     const outcomeGate = await checkOutcomeGate(effectiveUserId);
     if (!outcomeGate.allowed) {
-      log.info(`Outcome gate: blocking user ${effectiveUserId} with ${outcomeGate.pendingCount} unreported outcomes`);
+      log.info(
+        `Outcome gate: blocking user ${effectiveUserId} with ${outcomeGate.pendingCount} unreported outcomes`
+      );
       return NextResponse.json(
         {
           error: 'Outcome reporting required before new analyses',

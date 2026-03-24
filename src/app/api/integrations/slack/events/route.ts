@@ -92,14 +92,18 @@ export async function POST(req: NextRequest) {
           if (preDecision.frame) {
             try {
               const frameTeamId = payload.team_id;
-              let frameInstallation: { installedByUserId: string; orgId: string | null } | null = null;
+              let frameInstallation: { installedByUserId: string; orgId: string | null } | null =
+                null;
               if (frameTeamId) {
                 frameInstallation = await prisma.slackInstallation.findFirst({
                   where: { teamId: frameTeamId, status: 'active' },
                   select: { installedByUserId: true, orgId: true },
                 });
               }
-              const frameUserId = frameInstallation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || 'system-slack';
+              const frameUserId =
+                frameInstallation?.installedByUserId ||
+                process.env.SLACK_SYSTEM_USER_ID ||
+                'system-slack';
               const frameOrgId = frameInstallation?.orgId || frameTeamId || null;
 
               await prisma.decisionFrame.create({
