@@ -323,6 +323,7 @@ export async function POST(request: NextRequest) {
           // the same transaction block. So the fallback MUST run in a
           // separate transaction instead of inside the same one.
           let schemaDrift = false;
+          let createdAnalysisId: string | null = null;
 
           try {
             await prisma.$transaction(async tx => {
@@ -416,6 +417,8 @@ export async function POST(request: NextRequest) {
                   ),
                 } satisfies Prisma.AnalysisUncheckedCreateInput,
               });
+
+              createdAnalysisId = newAnalysis.id;
 
               // Create version snapshot if this is a new version
               if (nextVersion > 1 && previousAnalysis) {
@@ -530,19 +533,12 @@ export async function POST(request: NextRequest) {
           // Sets outcomeDueAt to 30 days from now as the default review date.
           // Users can adjust via the OutcomeTimeframePicker on the detail page.
           try {
-            const outcomeDueAt = new Date();
-            outcomeDueAt.setDate(outcomeDueAt.getDate() + 30);
+            if (createdAnalysisId) {
+              const outcomeDueAt = new Date();
+              outcomeDueAt.setDate(outcomeDueAt.getDate() + 30);
 
-            // Find the just-created analysis to get its ID
-            const latestAnalysis = await prisma.analysis.findFirst({
-              where: { documentId },
-              orderBy: { createdAt: 'desc' },
-              select: { id: true },
-            });
-
-            if (latestAnalysis) {
               await prisma.analysis.update({
-                where: { id: latestAnalysis.id },
+                where: { id: createdAnalysisId },
                 data: {
                   outcomeStatus: 'pending_outcome',
                   outcomeDueAt,

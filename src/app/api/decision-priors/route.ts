@@ -45,6 +45,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify the analysis belongs to this user before writing a prior
+    const analysis = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      select: { document: { select: { userId: true } } },
+    });
+
+    if (!analysis || analysis.document.userId !== user.id) {
+      return NextResponse.json({ error: 'Analysis not found or not owned by you' }, { status: 403 });
+    }
+
     const prior = await prisma.decisionPrior.upsert({
       where: { analysisId },
       create: {
@@ -114,6 +124,11 @@ export async function PATCH(request: NextRequest) {
 
     if (!existing) {
       return NextResponse.json({ error: 'No prior found for this analysis' }, { status: 404 });
+    }
+
+    // Verify ownership
+    if (existing.userId !== user.id) {
+      return NextResponse.json({ error: 'Not authorized to update this prior' }, { status: 403 });
     }
 
     // Calculate belief delta: how much did the analysis change their position?

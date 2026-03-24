@@ -59,7 +59,7 @@ export function OutcomeGateBanner({
         {pendingAnalysisIds.length > 0 && (
           <span style={{ marginLeft: '8px' }}>
             <Link
-              href={`/documents/${pendingAnalysisIds[0]}`}
+              href="/dashboard?view=browse&status=complete"
               style={{
                 color: '#fbbf24',
                 fontWeight: 600,
@@ -306,7 +306,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                         Analysis #{i + 1}
                       </span>
                       <Link
-                        href={`/documents/${id}`}
+                        href="/dashboard?view=browse&status=complete"
                         onClick={e => e.stopPropagation()}
                         style={{ color: 'var(--text-muted)', fontSize: '11px' }}
                       >
@@ -430,7 +430,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                 <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
                   For detailed reporting with bias verification and lessons learned,{' '}
                   <Link
-                    href={`/documents/${gateInfo.pendingAnalysisIds[0] || ''}`}
+                    href="/dashboard?view=browse&status=complete"
                     style={{
                       color: 'var(--text-primary)',
                       textDecoration: 'underline',

@@ -697,6 +697,21 @@ export async function getQuarterlyImpact(
         ? unchangedImpacts.reduce((s, v) => s + v, 0) / unchangedImpacts.length
         : 0;
 
+      // Guard: only compute savings if both groups have impact data
+      // to avoid inflated estimates from comparing against zero baseline
+      if (unchangedImpacts.length === 0 || changedImpacts.length === 0) {
+        // Not enough data to compute meaningful savings — skip monetary calc
+        return {
+          ...emptySummary,
+          totalDecisions: allOutcomes.length,
+          improvedDecisions: changedPositive.length,
+          topCostlyBiases: biasCosts
+            .filter(b => b.estimatedCost != null)
+            .slice(0, 5)
+            .map(b => ({ biasType: b.biasType, estimatedCost: b.estimatedCost! })),
+        };
+      }
+
       const impactGap = avgChanged - avgUnchanged;
 
       // Calculate total monetary savings across changed-positive decisions

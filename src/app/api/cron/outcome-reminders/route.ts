@@ -139,8 +139,8 @@ export async function GET(request: NextRequest) {
             userId,
             analyses.map(a => ({ analysisId: a.analysisId, filename: a.filename }))
           );
+          remindersSent++;
         }
-        remindersSent++;
       } catch (emailErr) {
         log.warn(
           `Email reminder failed for user ${userId}: ` +

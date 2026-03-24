@@ -346,10 +346,12 @@ export function PostAnalysisPrior({ analysisId, prior, onUpdated }: PostAnalysis
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(!!prior.postAnalysisAction);
   const [expanded, setExpanded] = useState(!prior.postAnalysisAction);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleSubmit = useCallback(async () => {
     if (!postAction.trim()) return;
     setSaving(true);
+    setSaveError(null);
 
     try {
       const res = await fetch('/api/decision-priors', {
@@ -366,9 +368,12 @@ export function PostAnalysisPrior({ analysisId, prior, onUpdated }: PostAnalysis
         setSaved(true);
         setExpanded(false);
         onUpdated?.(data.beliefDelta);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setSaveError(data.error || 'Failed to save');
       }
     } catch {
-      // Silent fail
+      setSaveError('Network error — please try again');
     } finally {
       setSaving(false);
     }
@@ -503,6 +508,10 @@ export function PostAnalysisPrior({ analysisId, prior, onUpdated }: PostAnalysis
               }}
             />
           </div>
+
+          {saveError && (
+            <p style={{ fontSize: '12px', color: '#ef4444', margin: 0 }}>{saveError}</p>
+          )}
 
           {!saved && (
             <button
