@@ -261,6 +261,8 @@ export async function processMeeting(meetingId: string, userId: string): Promise
             message: nudge.message,
             severity: nudge.severity,
             channel: nudge.channel,
+            ...(nudge.experimentId && { experimentId: nudge.experimentId }),
+            ...(nudge.variantId && { variantId: nudge.variantId }),
           },
         })
         .catch(err => log.error('Failed to persist nudge:', err));

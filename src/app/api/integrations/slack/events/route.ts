@@ -281,7 +281,7 @@ async function processSlackDecision(
     }
 
     // Generate and persist nudges, deliver critical ones back to Slack
-    const nudges = generateNudges({ decision: input, auditResult });
+    const nudges = await generateNudges({ decision: input, auditResult });
     const sourceRef = input.sourceRef; // e.g. "C12345:1234567890.123456"
 
     for (const nudge of nudges) {
@@ -294,6 +294,8 @@ async function processSlackDecision(
             message: nudge.message,
             severity: nudge.severity,
             channel: 'slack',
+            ...(nudge.experimentId && { experimentId: nudge.experimentId }),
+            ...(nudge.variantId && { variantId: nudge.variantId }),
           },
         })
         .catch(err => {
