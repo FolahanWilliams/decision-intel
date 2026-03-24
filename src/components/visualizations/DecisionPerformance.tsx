@@ -22,6 +22,7 @@ import {
   AlertCircle,
   CheckCircle,
   Award,
+  Brain,
 } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -57,6 +58,13 @@ interface DashboardData {
   biasCosts: BiasCostEntry[];
   personaLeaderboard: PersonaLeaderboardEntry[];
   pendingOutcomes: number;
+  priorIntelligence?: {
+    totalPriors: number;
+    avgConfidence: number;
+    avgBeliefDelta: number;
+    mindChangedRate: number;
+    priorsByConfidenceBand: Array<{ band: string; count: number; avgDelta: number }>;
+  };
 }
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
@@ -240,11 +248,27 @@ export default function DecisionPerformance() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch('/api/outcomes/dashboard');
-        if (!res.ok) {
-          throw new Error(`Failed to load dashboard (${res.status})`);
+
+        const [dashboardResult, calibrationResult] = await Promise.allSettled([
+          fetch('/api/outcomes/dashboard'),
+          fetch('/api/calibration'),
+        ]);
+
+        if (dashboardResult.status === 'rejected' || !dashboardResult.value.ok) {
+          const status = dashboardResult.status === 'fulfilled' ? dashboardResult.value.status : 0;
+          throw new Error(`Failed to load dashboard (${status})`);
         }
-        const json = await res.json();
+
+        const json = await dashboardResult.value.json();
+
+        // Merge calibration data if available
+        if (calibrationResult.status === 'fulfilled' && calibrationResult.value.ok) {
+          const calData = await calibrationResult.value.json();
+          if (calData.totalPriors != null) {
+            json.priorIntelligence = calData;
+          }
+        }
+
         if (!cancelled) {
           setData(json);
         }
@@ -858,6 +882,161 @@ export default function DecisionPerformance() {
           )}
         </motion.div>
       </div>
+
+      {/* ── Prior Intelligence ──────────────────────────────────────── */}
+      {data.priorIntelligence && data.priorIntelligence.totalPriors > 0 && (
+        <motion.div
+          custom={7}
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          style={glassCard}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-sm)',
+              marginBottom: 'var(--spacing-md)',
+            }}
+          >
+            <Brain size={18} style={{ color: '#a78bfa' }} />
+            <span
+              style={{
+                color: 'var(--text-primary)',
+                fontSize: 16,
+                fontWeight: 600,
+              }}
+            >
+              Prior Intelligence
+            </span>
+          </div>
+
+          {/* Headline metrics */}
+          <div
+            style={{
+              display: 'flex',
+              gap: 'var(--spacing-md)',
+              flexWrap: 'wrap',
+              marginBottom: 'var(--spacing-lg)',
+            }}
+          >
+            {[
+              { label: 'Priors Recorded', value: String(data.priorIntelligence.totalPriors) },
+              { label: 'Avg Confidence', value: formatPercent(data.priorIntelligence.avgConfidence) },
+              { label: 'Mind Changed', value: formatPercent(data.priorIntelligence.mindChangedRate) },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                style={{
+                  flex: '1 1 140px',
+                  background: 'rgba(255,255,255,0.04)',
+                  borderRadius: 12,
+                  padding: 'var(--spacing-md)',
+                  textAlign: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    color: 'var(--text-primary)',
+                    fontSize: 24,
+                    fontWeight: 700,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  {stat.value}
+                </div>
+                <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Confidence Band Distribution */}
+          {data.priorIntelligence.priorsByConfidenceBand.some((b) => b.count > 0) && (
+            <>
+              <div
+                style={{
+                  color: 'var(--text-muted)',
+                  fontSize: 12,
+                  marginBottom: 'var(--spacing-sm)',
+                }}
+              >
+                Belief Delta by Confidence Band
+              </div>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart
+                  data={data.priorIntelligence.priorsByConfidenceBand}
+                  layout="vertical"
+                  margin={{ left: 8, right: 16, top: 4, bottom: 4 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="rgba(255,255,255,0.06)"
+                    horizontal={false}
+                  />
+                  <XAxis
+                    type="number"
+                    tick={{ fill: CHART_COLORS.zinc400, fontSize: 11 }}
+                    axisLine={{ stroke: CHART_COLORS.zinc600 }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="band"
+                    width={130}
+                    tick={{ fill: CHART_COLORS.zinc200, fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    contentStyle={tooltipStyle}
+                    formatter={(value: number, name: string) => {
+                      if (name === 'count') return [value, 'Priors'];
+                      return [value, name];
+                    }}
+                  />
+                  <Bar dataKey="count" name="count" radius={[0, 6, 6, 0]} maxBarSize={28}>
+                    {data.priorIntelligence.priorsByConfidenceBand.map((entry, idx) => {
+                      // Color intensity based on avgDelta
+                      const intensity = Math.min(1, (entry.avgDelta || 0) / 80);
+                      const fill =
+                        intensity > 0.5
+                          ? '#a78bfa'
+                          : intensity > 0.2
+                            ? CHART_COLORS.zinc200
+                            : CHART_COLORS.zinc400;
+                      return <Cell key={idx} fill={fill} fillOpacity={0.7} />;
+                    })}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </>
+          )}
+
+          {/* Calibration quality indicator */}
+          <div
+            style={{
+              marginTop: 'var(--spacing-md)',
+              padding: 'var(--spacing-sm) var(--spacing-md)',
+              background: 'rgba(255,255,255,0.03)',
+              borderRadius: 10,
+              fontSize: 13,
+              color: 'var(--text-muted)',
+              borderLeft: '3px solid #a78bfa',
+            }}
+          >
+            {data.priorIntelligence.avgBeliefDelta > 30
+              ? 'Analysis significantly shifts your decisions \u2014 strong calibration value'
+              : data.priorIntelligence.avgBeliefDelta > 10
+                ? 'Analysis moderately adjusts your positions'
+                : data.priorIntelligence.totalPriors < 3
+                  ? 'Record more priors to build your calibration curve'
+                  : 'Your pre-analysis positions are well-calibrated'}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
