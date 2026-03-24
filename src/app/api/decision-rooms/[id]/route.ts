@@ -12,10 +12,7 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DecisionRoomDetailRoute');
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -66,7 +63,9 @@ export async function GET(
         }
         return {
           ...bp,
-          defaultAction: userHasSubmitted ? '[hidden until all submit]' : '[submit your prior first]',
+          defaultAction: userHasSubmitted
+            ? '[hidden until all submit]'
+            : '[submit your prior first]',
           reasoning: null,
           isRevealed: false,
         };
@@ -93,10 +92,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -159,10 +155,7 @@ export async function PATCH(
       // Only creator or existing participants can add people
       const isParticipant = room.participants.some(p => p.userId === user.id);
       if (!isParticipant) {
-        return NextResponse.json(
-          { error: 'Not a participant in this room' },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: 'Not a participant in this room' }, { status: 403 });
       }
 
       const existingUserIds = new Set(room.participants.map(p => p.userId));

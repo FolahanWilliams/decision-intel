@@ -24,10 +24,7 @@ import type { HumanDecisionInput } from '@/types/human-audit';
 
 const log = createLogger('JournalConvertRoute');
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -49,7 +46,11 @@ export async function POST(
 
     const { decisionStatement, decisionType } = body;
 
-    if (!decisionStatement || typeof decisionStatement !== 'string' || decisionStatement.trim().length === 0) {
+    if (
+      !decisionStatement ||
+      typeof decisionStatement !== 'string' ||
+      decisionStatement.trim().length === 0
+    ) {
       return NextResponse.json(
         { error: 'Missing required field: decisionStatement' },
         { status: 400 }
@@ -71,7 +72,10 @@ export async function POST(
 
     if (entry.linkedDecisionId) {
       return NextResponse.json(
-        { error: 'This journal entry has already been converted', linkedDecisionId: entry.linkedDecisionId },
+        {
+          error: 'This journal entry has already been converted',
+          linkedDecisionId: entry.linkedDecisionId,
+        },
         { status: 409 }
       );
     }
@@ -110,13 +114,19 @@ export async function POST(
     });
 
     // Fire-and-forget: cognitive audit
-    runCognitiveAudit(humanDecision.id, {
-      source: decisionSource,
-      sourceRef: entry.sourceRef || undefined,
-      decisionType: (decisionType || entry.decisionType || undefined) as HumanDecisionInput['decisionType'],
-      participants: entry.participants,
-      content: decisionStatement.trim(),
-    }, user.id).catch(err => {
+    runCognitiveAudit(
+      humanDecision.id,
+      {
+        source: decisionSource,
+        sourceRef: entry.sourceRef || undefined,
+        decisionType: (decisionType ||
+          entry.decisionType ||
+          undefined) as HumanDecisionInput['decisionType'],
+        participants: entry.participants,
+        content: decisionStatement.trim(),
+      },
+      user.id
+    ).catch(err => {
       log.error(`Background audit failed for converted journal entry ${entryId}:`, err);
     });
 
@@ -163,7 +173,8 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
     const validatedNoiseStats = CognitiveAuditNoiseStats.safeParse(auditResult.noiseStats).success
       ? auditResult.noiseStats
       : CognitiveAuditNoiseStats.parse({});
-    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail).success
+    const validatedSentiment = CognitiveAuditSentiment.safeParse(auditResult.sentimentDetail)
+      .success
       ? auditResult.sentimentDetail
       : CognitiveAuditSentiment.parse({});
     const validatedCompliance = auditResult.complianceResult
@@ -201,7 +212,9 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
             sentimentDetail: toPrismaJson(validatedSentiment),
             complianceResult: validatedCompliance ? toPrismaJson(validatedCompliance) : undefined,
             preMortem: validatedPreMortem ? toPrismaJson(validatedPreMortem) : undefined,
-            logicalAnalysis: validatedLogicalAnalysis ? toPrismaJson(validatedLogicalAnalysis) : undefined,
+            logicalAnalysis: validatedLogicalAnalysis
+              ? toPrismaJson(validatedLogicalAnalysis)
+              : undefined,
             swotAnalysis: validatedSwot ? toPrismaJson(validatedSwot) : undefined,
             teamConsensusFlag: auditResult.teamConsensusFlag,
             dissenterCount: auditResult.dissenterCount,
@@ -235,7 +248,9 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
       return;
     }
 
-    log.info(`Cognitive audit complete for journal conversion ${decisionId}: score=${auditResult.decisionQualityScore}`);
+    log.info(
+      `Cognitive audit complete for journal conversion ${decisionId}: score=${auditResult.decisionQualityScore}`
+    );
   } catch (error) {
     log.error(`Cognitive audit failed for journal conversion ${decisionId}:`, error);
     await prisma.humanDecision

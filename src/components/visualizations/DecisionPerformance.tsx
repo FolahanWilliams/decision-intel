@@ -923,9 +923,15 @@ export default function DecisionPerformance() {
           >
             {[
               { label: 'Priors Recorded', value: String(data.priorIntelligence.totalPriors) },
-              { label: 'Avg Confidence', value: formatPercent(data.priorIntelligence.avgConfidence) },
-              { label: 'Mind Changed', value: formatPercent(data.priorIntelligence.mindChangedRate) },
-            ].map((stat) => (
+              {
+                label: 'Avg Confidence',
+                value: formatPercent(data.priorIntelligence.avgConfidence),
+              },
+              {
+                label: 'Mind Changed',
+                value: formatPercent(data.priorIntelligence.mindChangedRate),
+              },
+            ].map(stat => (
               <div
                 key={stat.label}
                 style={{
@@ -954,7 +960,7 @@ export default function DecisionPerformance() {
           </div>
 
           {/* Confidence Band Distribution */}
-          {data.priorIntelligence.priorsByConfidenceBand.some((b) => b.count > 0) && (
+          {data.priorIntelligence.priorsByConfidenceBand.some(b => b.count > 0) && (
             <>
               <div
                 style={{

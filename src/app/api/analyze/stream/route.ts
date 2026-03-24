@@ -118,7 +118,9 @@ export async function POST(request: NextRequest) {
     const outcomeGate = await checkOutcomeGate(userId);
 
     if (!outcomeGate.allowed) {
-      log.info(`Outcome gate: blocking user ${userId} with ${outcomeGate.pendingCount} unreported outcomes`);
+      log.info(
+        `Outcome gate: blocking user ${userId} with ${outcomeGate.pendingCount} unreported outcomes`
+      );
       return NextResponse.json(
         {
           error: 'Outcome reporting required before new analyses',
@@ -537,13 +539,15 @@ export async function POST(request: NextRequest) {
               const outcomeDueAt = new Date();
               outcomeDueAt.setDate(outcomeDueAt.getDate() + 30);
 
-              await prisma.analysis.update({
-                where: { id: createdAnalysisId },
-                data: {
-                  outcomeStatus: 'pending_outcome',
-                  outcomeDueAt,
-                },
-              }).catch(() => {}); // Schema drift — column may not exist yet
+              await prisma.analysis
+                .update({
+                  where: { id: createdAnalysisId },
+                  data: {
+                    outcomeStatus: 'pending_outcome',
+                    outcomeDueAt,
+                  },
+                })
+                .catch(() => {}); // Schema drift — column may not exist yet
             }
           } catch (stubErr) {
             log.warn(

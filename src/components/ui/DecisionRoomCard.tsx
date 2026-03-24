@@ -1,17 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Users,
-  Lock,
-  Unlock,
-  CheckCircle,
-  Loader2,
-  Target,
-  Eye,
-  EyeOff,
-  Plus,
-} from 'lucide-react';
+import { Users, Lock, Unlock, CheckCircle, Loader2, Target, Eye, EyeOff, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -196,7 +186,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
         </div>
       ) : (
         <div>
-          {rooms.map((room) => (
+          {rooms.map(room => (
             <div
               key={room.id}
               style={{
@@ -316,7 +306,9 @@ export function BlindPriorForm({ roomId, onSubmitted }: BlindPriorFormProps) {
       >
         <CheckCircle size={16} style={{ color: '#22c55e' }} />
         <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Prior submitted blindly.</span>{' '}
+          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+            Prior submitted blindly.
+          </span>{' '}
           Your position will be revealed once all participants have submitted.
         </span>
       </motion.div>
@@ -326,35 +318,95 @@ export function BlindPriorForm({ roomId, onSubmitted }: BlindPriorFormProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       <div>
-        <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase' as const, letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
+        <label
+          style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+            textTransform: 'uppercase' as const,
+            letterSpacing: '0.05em',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            marginBottom: '6px',
+          }}
+        >
           <EyeOff size={10} /> Your position (blind — others cannot see this yet)
         </label>
         <textarea
           value={action}
-          onChange={(e) => setAction(e.target.value)}
+          onChange={e => setAction(e.target.value)}
           placeholder="What would you decide right now?"
           rows={2}
-          style={{ width: '100%', padding: '10px 12px', fontSize: '13px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: 'var(--text-primary)', resize: 'vertical' }}
+          style={{
+            width: '100%',
+            padding: '10px 12px',
+            fontSize: '13px',
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '8px',
+            color: 'var(--text-primary)',
+            resize: 'vertical',
+          }}
         />
       </div>
       <div>
-        <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+        <label
+          style={{
+            fontSize: '11px',
+            fontWeight: 600,
+            color: 'var(--text-secondary)',
+            display: 'flex',
+            justifyContent: 'space-between',
+          }}
+        >
           <span>Confidence</span>
           <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>{confidence}%</span>
         </label>
-        <input type="range" min={0} max={100} value={confidence} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfidence(Number(e.target.value))} style={{ width: '100%' }} />
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={confidence}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setConfidence(Number(e.target.value))
+          }
+          style={{ width: '100%' }}
+        />
       </div>
       <textarea
         value={reasoning}
-        onChange={(e) => setReasoning(e.target.value)}
+        onChange={e => setReasoning(e.target.value)}
         placeholder="Brief reasoning (optional)"
         rows={1}
-        style={{ width: '100%', padding: '8px 12px', fontSize: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', color: 'var(--text-primary)', resize: 'vertical' }}
+        style={{
+          width: '100%',
+          padding: '8px 12px',
+          fontSize: '12px',
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '8px',
+          color: 'var(--text-primary)',
+          resize: 'vertical',
+        }}
       />
       <button
         onClick={handleSubmit}
         disabled={saving || !action.trim()}
-        style={{ padding: '9px 20px', background: action.trim() ? '#a78bfa' : 'rgba(255,255,255,0.04)', border: 'none', borderRadius: '8px', color: action.trim() ? '#fff' : 'var(--text-muted)', fontSize: '13px', fontWeight: 600, cursor: saving ? 'wait' : 'pointer', width: 'fit-content', display: 'flex', alignItems: 'center', gap: '6px' }}
+        style={{
+          padding: '9px 20px',
+          background: action.trim() ? '#a78bfa' : 'rgba(255,255,255,0.04)',
+          border: 'none',
+          borderRadius: '8px',
+          color: action.trim() ? '#fff' : 'var(--text-muted)',
+          fontSize: '13px',
+          fontWeight: 600,
+          cursor: saving ? 'wait' : 'pointer',
+          width: 'fit-content',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+        }}
       >
         {saving ? <Loader2 size={14} className="animate-spin" /> : <Eye size={14} />}
         Submit Blind Prior

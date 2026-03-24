@@ -249,9 +249,7 @@ export function OutcomeTimeframePicker({
           />
         </div>
 
-        {error && (
-          <p style={{ fontSize: '12px', color: '#ef4444', margin: 0 }}>{error}</p>
-        )}
+        {error && <p style={{ fontSize: '12px', color: '#ef4444', margin: 0 }}>{error}</p>}
 
         {/* Save */}
         {(selectedDays || customDate) && (
@@ -274,11 +272,7 @@ export function OutcomeTimeframePicker({
               width: 'fit-content',
             }}
           >
-            {saving ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Calendar size={14} />
-            )}
+            {saving ? <Loader2 size={14} className="animate-spin" /> : <Calendar size={14} />}
             Set Review Date
           </button>
         )}

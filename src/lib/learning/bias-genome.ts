@@ -190,9 +190,7 @@ export async function computeBiasGenome(): Promise<BiasGenomeResult> {
       const successRate = Number(((stats.successes / stats.present) * 100).toFixed(1));
       const costDelta = Number((successRate - baseSuccessRate * 100).toFixed(1));
       const confirmationRate =
-        stats.totalRated > 0
-          ? Number(((stats.confirmed / stats.totalRated) * 100).toFixed(1))
-          : 0;
+        stats.totalRated > 0 ? Number(((stats.confirmed / stats.totalRated) * 100).toFixed(1)) : 0;
 
       genome.push({
         biasType,

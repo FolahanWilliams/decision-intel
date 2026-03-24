@@ -35,10 +35,7 @@ export async function GET(req: NextRequest) {
   const analysisId = searchParams.get('analysisId');
 
   if (!analysisId) {
-    return NextResponse.json(
-      { error: 'analysisId query parameter is required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'analysisId query parameter is required' }, { status: 400 });
   }
 
   try {

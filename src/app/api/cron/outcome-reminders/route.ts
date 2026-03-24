@@ -106,11 +106,11 @@ export async function GET(request: NextRequest) {
     // Get document owners for sending reminders
     const documentIds = [...new Set(overdueAnalyses.map(a => a.documentId))];
     const documents: Array<{ id: string; userId: string; filename: string }> =
-      await prisma.document.findMany({
+      (await prisma.document.findMany({
         where: { id: { in: documentIds } },
         select: { id: true, userId: true, filename: true },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      }) as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      })) as any;
 
     const docMap = new Map(documents.map(d => [d.id, d]));
 
@@ -130,8 +130,7 @@ export async function GET(request: NextRequest) {
       try {
         // Dynamic import — notifyOutcomeReminder may not exist yet
         const emailModule = await import('@/lib/notifications/email');
-        const notifyFn = (emailModule as Record<string, unknown>)
-          .notifyOutcomeReminder as
+        const notifyFn = (emailModule as Record<string, unknown>).notifyOutcomeReminder as
           | ((uid: string, items: Array<{ analysisId: string; filename: string }>) => Promise<void>)
           | undefined;
         if (notifyFn) {
@@ -169,7 +168,8 @@ export async function GET(request: NextRequest) {
         if (slackDecision?.sourceRef) {
           const [slackChannel] = slackDecision.sourceRef.split(':');
           if (slackChannel) {
-            const { formatNudgeForSlack, deliverSlackNudge } = await import('@/lib/integrations/slack/handler');
+            const { formatNudgeForSlack, deliverSlackNudge } =
+              await import('@/lib/integrations/slack/handler');
             // Find teamId from installation
             const slackInstall = slackDecision.orgId
               ? await prisma.slackInstallation.findFirst({
@@ -178,15 +178,13 @@ export async function GET(request: NextRequest) {
                 })
               : null;
 
-            const reminderPayload = formatNudgeForSlack(
-              {
-                nudgeType: 'pre_decision_coaching',
-                triggerReason: 'Outcome overdue',
-                message: `This decision is overdue for outcome reporting. How did it turn out? Report the outcome to improve future analysis accuracy.`,
-                severity: 'warning',
-                channel: 'slack',
-              }
-            );
+            const reminderPayload = formatNudgeForSlack({
+              nudgeType: 'pre_decision_coaching',
+              triggerReason: 'Outcome overdue',
+              message: `This decision is overdue for outcome reporting. How did it turn out? Report the outcome to improve future analysis accuracy.`,
+              severity: 'warning',
+              channel: 'slack',
+            });
             reminderPayload.channel = slackChannel;
             await deliverSlackNudge(reminderPayload, slackInstall?.teamId).catch(() => {});
             slackRemindersSent++;

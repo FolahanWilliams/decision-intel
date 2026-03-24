@@ -106,8 +106,8 @@ export function DecisionPriorCapture({
         <CheckCircle size={16} style={{ color: '#22c55e', flexShrink: 0 }} />
         <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
           <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Prior recorded.</span>{' '}
-          Your pre-analysis position ({confidence}% confidence) will be compared to the post-analysis
-          outcome to build your calibration curve.
+          Your pre-analysis position ({confidence}% confidence) will be compared to the
+          post-analysis outcome to build your calibration curve.
         </div>
       </motion.div>
     );
@@ -138,7 +138,12 @@ export function DecisionPriorCapture({
             Record Your Prior
           </span>
           <span
-            style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}
+            style={{
+              fontSize: '11px',
+              color: 'var(--text-muted)',
+              display: 'block',
+              marginTop: '2px',
+            }}
           >
             Capture your position before the AI audit — this powers your calibration curve
           </span>
@@ -289,9 +294,7 @@ export function DecisionPriorCapture({
           />
         </div>
 
-        {error && (
-          <p style={{ fontSize: '12px', color: '#ef4444', margin: 0 }}>{error}</p>
-        )}
+        {error && <p style={{ fontSize: '12px', color: '#ef4444', margin: 0 }}>{error}</p>}
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -313,11 +316,7 @@ export function DecisionPriorCapture({
               gap: '6px',
             }}
           >
-            {saving ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Target size={14} />
-            )}
+            {saving ? <Loader2 size={14} className="animate-spin" /> : <Target size={14} />}
             Lock In Prior
           </button>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -411,7 +410,8 @@ export function PostAnalysisPrior({ analysisId, prior, onUpdated }: PostAnalysis
                 fontSize: '11px',
                 padding: '2px 10px',
                 borderRadius: '10px',
-                background: prior.beliefDelta > 0 ? 'rgba(251, 191, 36, 0.15)' : 'rgba(34, 197, 94, 0.15)',
+                background:
+                  prior.beliefDelta > 0 ? 'rgba(251, 191, 36, 0.15)' : 'rgba(34, 197, 94, 0.15)',
                 color: prior.beliefDelta > 0 ? '#fbbf24' : '#22c55e',
                 fontWeight: 600,
               }}

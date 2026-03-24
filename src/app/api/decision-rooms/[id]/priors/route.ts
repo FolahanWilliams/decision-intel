@@ -12,10 +12,7 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DecisionRoomPriorsRoute');
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -38,13 +35,15 @@ export async function POST(
     const { defaultAction, confidence, reasoning } = body;
 
     if (!defaultAction || typeof defaultAction !== 'string' || defaultAction.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Missing required field: defaultAction' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required field: defaultAction' }, { status: 400 });
     }
 
-    if (confidence == null || typeof confidence !== 'number' || confidence < 0 || confidence > 100) {
+    if (
+      confidence == null ||
+      typeof confidence !== 'number' ||
+      confidence < 0 ||
+      confidence > 100
+    ) {
       return NextResponse.json(
         { error: 'confidence must be a number between 0 and 100' },
         { status: 400 }
@@ -62,10 +61,7 @@ export async function POST(
     }
 
     if (room.status !== 'open') {
-      return NextResponse.json(
-        { error: 'Room is not open for submissions' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Room is not open for submissions' }, { status: 400 });
     }
 
     const isParticipant = room.participants.some(p => p.userId === user.id);
@@ -108,10 +104,7 @@ export async function POST(
   }
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -159,7 +152,9 @@ export async function GET(
         }
         return {
           ...bp,
-          defaultAction: userHasSubmitted ? '[hidden until all submit]' : '[submit your prior first]',
+          defaultAction: userHasSubmitted
+            ? '[hidden until all submit]'
+            : '[submit your prior first]',
           reasoning: null,
           isRevealed: false,
         };

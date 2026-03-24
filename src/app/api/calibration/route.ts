@@ -42,15 +42,14 @@ export async function GET() {
     const avgConfidence = priors.reduce((sum, p) => sum + p.confidence, 0) / totalPriors;
 
     // Belief delta stats (only priors that have a beliefDelta value)
-    const priorsWithDelta = priors.filter((p) => p.beliefDelta != null);
+    const priorsWithDelta = priors.filter(p => p.beliefDelta != null);
     const avgBeliefDelta =
       priorsWithDelta.length > 0
-        ? priorsWithDelta.reduce((sum, p) => sum + (p.beliefDelta ?? 0), 0) /
-          priorsWithDelta.length
+        ? priorsWithDelta.reduce((sum, p) => sum + (p.beliefDelta ?? 0), 0) / priorsWithDelta.length
         : 0;
 
     // Mind changed rate: % of priors where beliefDelta > 0 (out of those with a delta)
-    const mindChangedCount = priorsWithDelta.filter((p) => (p.beliefDelta ?? 0) > 0).length;
+    const mindChangedCount = priorsWithDelta.filter(p => (p.beliefDelta ?? 0) > 0).length;
     const mindChangedRate =
       priorsWithDelta.length > 0 ? (mindChangedCount / priorsWithDelta.length) * 100 : 0;
 
@@ -62,9 +61,11 @@ export async function GET() {
       { label: 'Very High (75-100)', min: 75, max: 100 },
     ];
 
-    const priorsByConfidenceBand = bands.map((band) => {
-      const inBand = priors.filter((p) => p.confidence >= band.min && p.confidence < (band.max === 100 ? 101 : band.max));
-      const bandWithDelta = inBand.filter((p) => p.beliefDelta != null);
+    const priorsByConfidenceBand = bands.map(band => {
+      const inBand = priors.filter(
+        p => p.confidence >= band.min && p.confidence < (band.max === 100 ? 101 : band.max)
+      );
+      const bandWithDelta = inBand.filter(p => p.beliefDelta != null);
       const avgDelta =
         bandWithDelta.length > 0
           ? bandWithDelta.reduce((sum, p) => sum + (p.beliefDelta ?? 0), 0) / bandWithDelta.length
@@ -77,9 +78,10 @@ export async function GET() {
     });
 
     // Recent 5 priors
-    const recentPriors = priors.slice(0, 5).map((p) => ({
+    const recentPriors = priors.slice(0, 5).map(p => ({
       analysisId: p.analysisId,
-      defaultAction: p.defaultAction.length > 60 ? p.defaultAction.slice(0, 60) + '...' : p.defaultAction,
+      defaultAction:
+        p.defaultAction.length > 60 ? p.defaultAction.slice(0, 60) + '...' : p.defaultAction,
       confidence: p.confidence,
       beliefDelta: p.beliefDelta,
       createdAt: p.createdAt,

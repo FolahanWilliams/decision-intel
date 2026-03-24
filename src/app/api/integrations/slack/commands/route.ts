@@ -119,12 +119,16 @@ async function handleOutcomeCommand(params: {
     });
 
     // Mark analysis as outcome_logged (schema drift safe)
-    prisma.analysis.update({
-      where: { id: recentDecision.linkedAnalysisId },
-      data: { outcomeStatus: 'outcome_logged' },
-    }).catch(() => {});
+    prisma.analysis
+      .update({
+        where: { id: recentDecision.linkedAnalysisId },
+        data: { outcomeStatus: 'outcome_logged' },
+      })
+      .catch(() => {});
 
-    log.info(`Outcome reported via Slack /outcome: ${outcome} for analysis ${recentDecision.linkedAnalysisId}`);
+    log.info(
+      `Outcome reported via Slack /outcome: ${outcome} for analysis ${recentDecision.linkedAnalysisId}`
+    );
 
     return NextResponse.json({
       response_type: 'in_channel',
