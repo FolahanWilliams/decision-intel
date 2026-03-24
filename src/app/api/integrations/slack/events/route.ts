@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
               const frameTeamId = payload.team_id;
               let frameInstallation: { installedByUserId: string; orgId: string | null } | null = null;
               if (frameTeamId) {
-                frameInstallation = await prisma.slackInstallation.findUnique({
+                frameInstallation = await prisma.slackInstallation.findFirst({
                   where: { teamId: frameTeamId, status: 'active' },
                   select: { installedByUserId: true, orgId: true },
                 });

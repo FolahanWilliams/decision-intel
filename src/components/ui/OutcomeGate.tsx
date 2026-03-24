@@ -430,7 +430,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                 <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
                   For detailed reporting with bias verification and lessons learned,{' '}
                   <Link
-                    href={`/documents/${gateInfo.pendingAnalysisIds[0]}`}
+                    href={`/documents/${gateInfo.pendingAnalysisIds[0] || ''}`}
                     style={{
                       color: 'var(--text-primary)',
                       textDecoration: 'underline',

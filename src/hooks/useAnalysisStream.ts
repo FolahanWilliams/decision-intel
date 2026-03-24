@@ -121,15 +121,13 @@ export function useAnalysisStream(options: StreamOptions) {
               pendingAnalysisIds: errorData.pendingAnalysisIds || [],
               message: errorData.message || errorMessage,
             });
-            throw new Error(errorData.message || 'Outcome reporting required');
+            // Don't throw inside the try — set message and fall through
+            errorMessage = errorData.message || 'Outcome reporting required';
+          } else {
+            errorMessage = errorData.error || errorMessage;
           }
-          errorMessage = errorData.error || errorMessage;
-        } catch (parseErr) {
-          // Re-throw if it's our outcome gate error
-          if (parseErr instanceof Error && parseErr.message.includes('Outcome reporting')) {
-            throw parseErr;
-          }
-          /* ignore other parse errors */
+        } catch {
+          /* ignore JSON parse errors — use status-based message */
         }
         throw new Error(errorMessage);
       }

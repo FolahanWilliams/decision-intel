@@ -75,7 +75,7 @@ async function handleOutcomeCommand(params: {
 
   try {
     // Find the most recent overdue analysis for decisions from this Slack channel
-    const installation = await prisma.slackInstallation.findUnique({
+    const installation = await prisma.slackInstallation.findFirst({
       where: { teamId: params.teamId, status: 'active' },
       select: { installedByUserId: true, orgId: true },
     });
