@@ -176,7 +176,7 @@ export async function getExperimentResults(
       .map(n => n.humanDecisionId)
       .filter((id): id is string => id != null);
 
-    let beliefDeltas: Map<string, number> = new Map();
+    const beliefDeltas: Map<string, number> = new Map();
     if (decisionIds.length > 0) {
       try {
         // HumanDecision → linkedAnalysisId → DecisionPrior.beliefDelta

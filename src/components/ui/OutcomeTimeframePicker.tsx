@@ -135,7 +135,7 @@ export function OutcomeTimeframePicker({
         <CheckCircle size={16} style={{ color: '#22c55e', flexShrink: 0 }} />
         <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
           <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Review date set.</span>{' '}
-          You'll receive a reminder when it's time to report the outcome.
+          You&apos;ll receive a reminder when it&apos;s time to report the outcome.
         </span>
       </motion.div>
     );
@@ -173,7 +173,7 @@ export function OutcomeTimeframePicker({
               marginTop: '2px',
             }}
           >
-            Set a review date — we'll remind you to report the real-world result
+            Set a review date — we&apos;ll remind you to report the real-world result
           </span>
         </div>
       </div>
