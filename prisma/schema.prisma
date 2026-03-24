@@ -877,3 +877,39 @@ model ToxicPattern {
   @@index([failureRate])
 }
 
+// ─── Decision Knowledge Graph (Moat: Wiz-Inspired Decision Graph) ────────
+
+model DecisionEdge {
+  id            String   @id @default(cuid())
+  orgId         String?
+
+  // Source node (polymorphic: can be Analysis or HumanDecision)
+  sourceType    String   // "analysis" | "human_decision"
+  sourceId      String
+
+  // Target node (polymorphic)
+  targetType    String   // "analysis" | "human_decision"
+  targetId      String
+
+  // Edge metadata
+  edgeType      String   // "influenced_by" | "escalated_from" | "reversed" | "depends_on" | "similar_to" | "shared_bias" | "same_participants"
+  strength      Float    // 0-1
+  confidence    Float    // 0-1
+  description   String?
+  metadata      Json?
+
+  // Provenance
+  createdBy     String   @default("system") // "system" | userId
+  isManual      Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([sourceType, sourceId, targetType, targetId, edgeType])
+  @@index([orgId])
+  @@index([sourceType, sourceId])
+  @@index([targetType, targetId])
+  @@index([edgeType])
+  @@index([strength])
+}
+

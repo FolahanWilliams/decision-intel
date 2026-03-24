@@ -283,6 +283,27 @@ export async function analyzeDocument(
       );
     }
 
+    // Decision Graph edge inference (non-blocking)
+    try {
+      const savedForGraph = await prisma.analysis.findFirst({
+        where: { documentId },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      });
+      if (savedForGraph) {
+        const { inferEdgesForAnalysis } = await import('@/lib/graph/edge-inference');
+        const edgeCount = await inferEdgesForAnalysis(savedForGraph.id, document.orgId ?? null);
+        if (edgeCount > 0) {
+          log.info(`Inferred ${edgeCount} graph edge(s) for analysis ${savedForGraph.id}`);
+        }
+      }
+    } catch (edgeError) {
+      log.warn(
+        'Failed to infer graph edges (non-critical): ' +
+          (edgeError instanceof Error ? edgeError.message : String(edgeError))
+      );
+    }
+
     // Cache the result for future use (non-blocking)
     try {
       await cacheAnalysis(cacheKey, result as unknown as Record<string, unknown>);
