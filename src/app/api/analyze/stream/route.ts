@@ -526,6 +526,36 @@ export async function POST(request: NextRequest) {
             );
           });
 
+          // Auto-create outcome tracking stub (fire and forget).
+          // Sets outcomeDueAt to 30 days from now as the default review date.
+          // Users can adjust via the OutcomeTimeframePicker on the detail page.
+          try {
+            const outcomeDueAt = new Date();
+            outcomeDueAt.setDate(outcomeDueAt.getDate() + 30);
+
+            // Find the just-created analysis to get its ID
+            const latestAnalysis = await prisma.analysis.findFirst({
+              where: { documentId },
+              orderBy: { createdAt: 'desc' },
+              select: { id: true },
+            });
+
+            if (latestAnalysis) {
+              await prisma.analysis.update({
+                where: { id: latestAnalysis.id },
+                data: {
+                  outcomeStatus: 'pending_outcome',
+                  outcomeDueAt,
+                },
+              }).catch(() => {}); // Schema drift — column may not exist yet
+            }
+          } catch (stubErr) {
+            log.warn(
+              'Outcome stub creation failed (non-critical): ' +
+                (stubErr instanceof Error ? stubErr.message : String(stubErr))
+            );
+          }
+
           // Send email notification (fire and forget)
           if (user?.email) {
             import('@/lib/notifications/email')

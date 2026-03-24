@@ -30,6 +30,7 @@ const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
 import { OutcomeReporter } from './OutcomeReporter';
 import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/DecisionPriorCapture';
+import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -817,6 +818,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               }}
             />
           )}
+        </div>
+      )}
+
+      {/* Outcome Timeframe Picker — set when to review */}
+      {analysis && (
+        <div className="mb-lg">
+          <OutcomeTimeframePicker
+            analysisId={analysis.id}
+            currentDueAt={(analysis as unknown as { outcomeDueAt?: string }).outcomeDueAt}
+          />
         </div>
       )}
 

@@ -63,6 +63,10 @@ model Analysis {
   version         Int             @default(1)
   promptVersionId String?         // FK to PromptVersion used for this analysis
 
+  // Outcome tracking — mandatory flywheel
+  outcomeStatus   String          @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
+  outcomeDueAt    DateTime?       // When outcome should be reported
+
   document            Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
   biases              BiasInstance[]
   versions     AnalysisVersion[]

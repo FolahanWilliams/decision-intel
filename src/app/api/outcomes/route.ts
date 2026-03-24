@@ -113,6 +113,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Mark analysis as outcome_logged (fire and forget)
+    prisma.analysis
+      .update({
+        where: { id: analysisId },
+        data: { outcomeStatus: 'outcome_logged' },
+      })
+      .catch(() => {}); // Schema drift — column may not exist yet
+
     log.info(`Outcome reported for analysis ${analysisId}: ${outcome}`);
     return NextResponse.json(result);
   } catch (error: unknown) {
