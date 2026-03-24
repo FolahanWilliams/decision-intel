@@ -63,6 +63,10 @@ export async function generateNudges(
   const shallowNudge = checkCognitiveMisering(context);
   if (shallowNudge) nudges.push(shallowNudge);
 
+  // 7. Toxic Combination — compound risk from co-occurring biases + context
+  const toxicNudge = checkToxicCombination(auditResult);
+  if (toxicNudge) nudges.push(toxicNudge);
+
   // Escalate critical nudges from Slack decisions to Slack delivery
   if (decision.source === 'slack' && decision.channel) {
     for (const nudge of nudges) {
@@ -279,4 +283,77 @@ function checkCognitiveMisering(context: NudgeTriggerContext): NudgeDefinition |
     severity,
     channel: 'dashboard',
   };
+}
+
+function checkToxicCombination(
+  auditResult: NudgeTriggerContext['auditResult']
+): NudgeDefinition | null {
+  const biases = auditResult.biasFindings;
+  if (biases.length < 2) return null;
+
+  const biasTypes = biases.map(b => b.biasType.toLowerCase());
+  const biasSet = new Set(biasTypes);
+
+  // Check known toxic pairs inline (no async DB call — nudge engine is synchronous)
+  const toxicPairs: Array<{
+    biases: string[];
+    label: string;
+    contextCheck: () => boolean;
+  }> = [
+    {
+      biases: ['groupthink', 'confirmation_bias'],
+      label: 'The Echo Chamber',
+      contextCheck: () => auditResult.dissenterCount === 0,
+    },
+    {
+      biases: ['sunk_cost_fallacy', 'anchoring'],
+      label: 'The Sunk Ship',
+      contextCheck: () => true,
+    },
+    {
+      biases: ['overconfidence_bias', 'confirmation_bias'],
+      label: 'The Optimism Trap',
+      contextCheck: () => true,
+    },
+    {
+      biases: ['groupthink', 'authority_bias'],
+      label: 'The Yes Committee',
+      contextCheck: () => auditResult.teamConsensusFlag,
+    },
+  ];
+
+  for (const pair of toxicPairs) {
+    const allPresent = pair.biases.every(b => biasSet.has(b));
+    if (!allPresent || !pair.contextCheck()) continue;
+
+    const severities = pair.biases.map(
+      bt => biases.find(b => b.biasType.toLowerCase() === bt)?.severity ?? 'low'
+    );
+    const hasCritical = severities.includes('critical') || severities.includes('high');
+
+    return {
+      nudgeType: 'toxic_combination',
+      triggerReason: `Toxic combination "${pair.label}" detected: ${pair.biases.join(' + ')}. These biases compound each other's effect on decision quality.`,
+      message: `Compound risk alert — "${pair.label}": ${pair.biases.join(' + ')} detected together. This bias combination historically correlates with significantly worse outcomes. Consider pausing to address each bias independently before proceeding.`,
+      severity: hasCritical ? 'critical' : 'warning',
+      channel: 'dashboard',
+    };
+  }
+
+  // Generic check: 3+ high/critical biases = toxic regardless of type
+  const severeCount = biases.filter(
+    b => b.severity === 'high' || b.severity === 'critical'
+  ).length;
+
+  if (severeCount >= 3) {
+    return {
+      nudgeType: 'toxic_combination',
+      triggerReason: `${severeCount} high/critical biases detected simultaneously: ${biases.filter(b => b.severity === 'high' || b.severity === 'critical').map(b => b.biasType).join(', ')}`,
+      message: `Compound risk alert: ${severeCount} severe biases active simultaneously. Multiple high-severity biases compounding on each other substantially increase decision risk. Consider structured de-biasing before proceeding.`,
+      severity: 'critical',
+      channel: 'dashboard',
+    };
+  }
+
+  return null;
 }

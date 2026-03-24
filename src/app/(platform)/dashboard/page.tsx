@@ -44,6 +44,7 @@ import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
 import { JournalWidget } from '@/components/ui/JournalWidget';
+import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('Dashboard');
@@ -952,6 +953,9 @@ export default function Dashboard() {
           }}
         />
       )}
+
+      {/* Decision Triage — top decisions needing attention */}
+      <DecisionTriageWidget />
 
       {/* Decision Journal — captured decisions from email/calendar */}
       <div className="mb-lg">

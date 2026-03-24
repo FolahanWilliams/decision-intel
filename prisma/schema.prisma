@@ -74,6 +74,7 @@ model Analysis {
   outcome      DecisionOutcome?
   prior        DecisionPrior?
   complianceAssessments ComplianceAssessment[]
+  toxicCombinations ToxicCombination[]
 
   @@index([documentId])
 }
@@ -830,5 +831,49 @@ model ApiKeyUsage {
 
   @@index([keyId])
   @@index([createdAt])
+}
+
+// ─── Toxic Combination Detection (Wiz-Inspired Moat) ─────────────────────
+
+model ToxicCombination {
+  id                String    @id @default(cuid())
+  orgId             String?
+  analysisId        String?
+  biasTypes         String[]  // e.g., ["confirmation_bias", "anchoring"]
+  contextFactors    Json      // { monetaryStakes: "high", dissentAbsent: true, timePressure: true }
+  toxicScore        Float     // compound risk score (0-100)
+  historicalFailRate Float?   // how often this combo led to failures
+  sampleSize        Int       @default(0)
+  patternLabel      String?   // e.g., "The Echo Chamber"
+  status            String    @default("active") // active, acknowledged, mitigated
+  acknowledgedAt    DateTime?
+  acknowledgedBy    String?
+  mitigationNotes   String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  analysis Analysis? @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([analysisId])
+  @@index([toxicScore])
+  @@index([status])
+}
+
+model ToxicPattern {
+  id             String   @id @default(cuid())
+  orgId          String?  // null = global pattern
+  biasTypes      String[] // the bias combination
+  contextPattern Json     // required context factors for match
+  failureRate    Float    // 0-1, from historical outcomes
+  avgImpactDelta Float    // avg impact score difference vs baseline
+  sampleSize     Int
+  label          String?  // human-readable name, e.g., "The Echo Chamber"
+  description    String?  // why this combo is dangerous
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([failureRate])
 }
 
