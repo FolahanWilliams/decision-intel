@@ -141,3 +141,47 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+/**
+ * GET /api/decision-priors?analysisId=xxx
+ * Fetches an existing prior for a given analysis.
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const analysisId = request.nextUrl.searchParams.get('analysisId');
+    if (!analysisId) {
+      return NextResponse.json({ error: 'analysisId query parameter required' }, { status: 400 });
+    }
+
+    const prior = await prisma.decisionPrior.findUnique({
+      where: { analysisId },
+    });
+
+    if (!prior) {
+      return NextResponse.json({ prior: null });
+    }
+
+    // Verify ownership
+    if (prior.userId !== user.id) {
+      return NextResponse.json({ prior: null });
+    }
+
+    return NextResponse.json({ prior });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg.includes('P2021') || msg.includes('P2022')) {
+      return NextResponse.json({ prior: null });
+    }
+    log.error('Failed to fetch decision prior:', msg);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

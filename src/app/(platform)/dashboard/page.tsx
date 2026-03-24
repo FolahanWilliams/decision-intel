@@ -38,9 +38,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
+import type { OutcomeGateInfo } from '@/hooks/useAnalysisStream';
 import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('Dashboard');
@@ -192,6 +194,14 @@ export default function Dashboard() {
     mutate: mutateDocs,
   } = useDocuments(true, docsPage);
 
+  // Outcome gate state for soft/hard gate UI
+  const [outcomeReminder, setOutcomeReminder] = useState<{
+    pendingCount: number;
+    analysisIds: string[];
+  } | null>(null);
+  const [showOutcomeGateModal, setShowOutcomeGateModal] = useState(false);
+  const [outcomeGateInfo, setOutcomeGateInfo] = useState<OutcomeGateInfo | null>(null);
+
   // SSE: streaming analysis with typed events, auto-retry, AbortController cleanup
   const {
     startAnalysis,
@@ -199,9 +209,21 @@ export default function Dashboard() {
     steps: analysisSteps,
     progress: currentProgress,
     timedOut: streamTimedOut,
+    outcomeGate,
   } = useAnalysisStream({
     stepNames: ANALYSIS_STEPS.map(s => s.name),
+    onOutcomeReminder: (count, ids) => {
+      setOutcomeReminder({ pendingCount: count, analysisIds: ids });
+    },
   });
+
+  // Show outcome gate modal when the hook detects a hard gate
+  useEffect(() => {
+    if (outcomeGate) {
+      setOutcomeGateInfo(outcomeGate);
+      setShowOutcomeGateModal(true);
+    }
+  }, [outcomeGate]);
 
   // Sync analysis progress to the global floating progress bar
   useEffect(() => {
@@ -901,6 +923,34 @@ export default function Dashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Outcome Gate Banner (soft gate — 3-4 pending outcomes) */}
+      <AnimatePresence>
+        {outcomeReminder && (
+          <div className="mb-lg">
+            <OutcomeGateBanner
+              pendingCount={outcomeReminder.pendingCount}
+              pendingAnalysisIds={outcomeReminder.analysisIds}
+              onDismiss={() => setOutcomeReminder(null)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Outcome Gate Modal (hard gate — 5+ pending outcomes, blocks analysis) */}
+      {showOutcomeGateModal && outcomeGateInfo && (
+        <OutcomeGateModal
+          gateInfo={outcomeGateInfo}
+          onClose={() => {
+            setShowOutcomeGateModal(false);
+            setOutcomeGateInfo(null);
+          }}
+          onOutcomeSubmitted={() => {
+            // Refresh the docs list after outcome submitted
+            mutateDocs(undefined, { revalidate: true });
+          }}
+        />
+      )}
 
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
       {activeView === 'upload' && (
