@@ -33,6 +33,7 @@ import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/Decisio
 import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
+import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinationCard';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -204,6 +205,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
     beliefDelta?: number;
   } | null>(null);
   const [priorLoading, setPriorLoading] = useState(false);
+
+  // Toxic combinations state
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [toxicCombinations, setToxicCombinations] = useState<any[]>([]);
 
   // URL-based tab state (#7)
   const tabFromUrl = searchParams.get('tab') as TabId | null;
@@ -451,6 +456,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       })
       .catch(() => {})
       .finally(() => setPriorLoading(false));
+  }, [analysis?.id]);
+
+  // Fetch toxic combinations for this analysis
+  useEffect(() => {
+    if (!analysis?.id) return;
+    fetch(`/api/toxic-combinations?analysisId=${analysis.id}`)
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (data?.combinations) setToxicCombinations(data.combinations);
+      })
+      .catch(() => {});
   }, [analysis?.id]);
 
   const handleMarkdownExport = useCallback(async () => {
@@ -851,6 +867,39 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {analysis && (
         <div className="mb-lg">
           <CounterfactualPanel analysisId={analysis.id} />
+        </div>
+      )}
+
+      {/* Toxic Combinations — compound risk detection */}
+      {toxicCombinations.length > 0 && (
+        <div className="mb-lg">
+          <ToxicCombinationCard
+            combinations={toxicCombinations}
+            onAcknowledge={async (id) => {
+              const res = await fetch('/api/toxic-combinations', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: 'acknowledged' }),
+              });
+              if (res.ok) {
+                setToxicCombinations(prev =>
+                  prev.map(c => c.id === id ? { ...c, status: 'acknowledged' } : c)
+                );
+              }
+            }}
+            onMitigate={async (id, notes) => {
+              const res = await fetch('/api/toxic-combinations', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: 'mitigated', mitigationNotes: notes }),
+              });
+              if (res.ok) {
+                setToxicCombinations(prev =>
+                  prev.map(c => c.id === id ? { ...c, status: 'mitigated', mitigationNotes: notes } : c)
+                );
+              }
+            }}
+          />
         </div>
       )}
 

@@ -252,6 +252,37 @@ export async function analyzeDocument(
       );
     }
 
+    // Toxic Combination Detection (non-blocking, fire-and-forget)
+    try {
+      const savedAnalysis = await prisma.analysis.findFirst({
+        where: { documentId },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      });
+      if (savedAnalysis) {
+        const { detectToxicCombinations } = await import('@/lib/learning/toxic-combinations');
+        const toxicResult = await detectToxicCombinations(savedAnalysis.id, document.orgId ?? null);
+        if (toxicResult.flaggedCount > 0) {
+          log.info(
+            `Detected ${toxicResult.flaggedCount} toxic combination(s) for analysis ${savedAnalysis.id}`
+          );
+          if (onProgress) {
+            onProgress({
+              type: 'step',
+              step: `Toxic Combinations: ${toxicResult.flaggedCount} compound risk pattern(s) detected`,
+              status: 'complete',
+              progress: 99,
+            });
+          }
+        }
+      }
+    } catch (toxicError) {
+      log.warn(
+        'Failed to detect toxic combinations (non-critical): ' +
+          (toxicError instanceof Error ? toxicError.message : String(toxicError))
+      );
+    }
+
     // Cache the result for future use (non-blocking)
     try {
       await cacheAnalysis(cacheKey, result as unknown as Record<string, unknown>);

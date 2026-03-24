@@ -35,7 +35,8 @@ export type NudgeType =
   | 'pre_mortem_trigger'
   | 'noise_check'
   | 'shallow_verification'
-  | 'pre_decision_coaching';
+  | 'pre_decision_coaching'
+  | 'toxic_combination';
 
 export type NudgeSeverity = 'info' | 'warning' | 'critical';
 
@@ -169,6 +170,11 @@ export const NUDGE_TEMPLATES: Record<NudgeType, { icon: string; template: string
     icon: '\u{1F3AF}',
     template:
       'Deliberation detected — cognitive bias signals identified. Consider reviewing the coaching nudge before committing to a decision.',
+  },
+  toxic_combination: {
+    icon: '\u{1F6A8}',
+    template:
+      'Toxic combination detected: {patternLabel}. {biasCount} co-occurring biases combined with {contextSummary} create a compound risk pattern historically associated with {failureRate}% failure rate.',
   },
 };
 
