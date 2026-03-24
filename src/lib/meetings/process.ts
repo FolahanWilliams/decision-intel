@@ -250,7 +250,7 @@ export async function processMeeting(meetingId: string, userId: string): Promise
     ).catch(err => log.error('Meeting embedding failed:', err));
 
     // Generate nudges
-    const nudges = generateNudges({ decision: input, auditResult });
+    const nudges = await generateNudges({ decision: input, auditResult });
     for (const nudge of nudges) {
       await prisma.nudge
         .create({

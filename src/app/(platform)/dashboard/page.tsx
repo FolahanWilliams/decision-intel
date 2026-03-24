@@ -43,6 +43,7 @@ import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
+import { JournalWidget } from '@/components/ui/JournalWidget';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('Dashboard');
@@ -951,6 +952,11 @@ export default function Dashboard() {
           }}
         />
       )}
+
+      {/* Decision Journal — captured decisions from email/calendar */}
+      <div className="mb-lg">
+        <JournalWidget />
+      </div>
 
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
       {activeView === 'upload' && (

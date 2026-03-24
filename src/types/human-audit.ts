@@ -115,6 +115,8 @@ export interface NudgeDefinition {
   message: string;
   severity: NudgeSeverity;
   channel: NudgeChannel;
+  experimentId?: string;
+  variantId?: string;
 }
 
 export interface NudgeTriggerContext {

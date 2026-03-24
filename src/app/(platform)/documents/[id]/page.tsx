@@ -31,6 +31,8 @@ import { BiasDetailModal } from './BiasDetailModal';
 import { OutcomeReporter } from './OutcomeReporter';
 import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/DecisionPriorCapture';
 import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
+import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
+import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -840,6 +842,20 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             biases={biases}
             twins={analysis.simulation?.twins}
           />
+        </div>
+      )}
+
+      {/* Counterfactual Analysis */}
+      {analysis && (
+        <div className="mb-lg">
+          <CounterfactualPanel analysisId={analysis.id} />
+        </div>
+      )}
+
+      {/* Decision Room — collaborative blind priors */}
+      {document && (
+        <div className="mb-lg">
+          <DecisionRoomList documentId={document.id} analysisId={analysis?.id} />
         </div>
       )}
 
