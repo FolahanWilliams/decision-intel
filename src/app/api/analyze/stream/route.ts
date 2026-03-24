@@ -10,6 +10,7 @@ import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
+import { checkOutcomeGate, formatOutcomeReminder } from '@/lib/learning/outcome-gate';
 import {
   NoiseStatsSchema,
   FactCheckSchema,
@@ -110,6 +111,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
+    // ── Outcome enforcement gate ──────────────────────────────────────
+    // The behavioral data flywheel only works when users close the loop.
+    // Soft-gate: warn when 3+ analyses lack outcomes (>30 days old).
+    // Hard-gate: block new analyses when 5+ outcomes are overdue.
+    const outcomeGate = await checkOutcomeGate(userId);
+
+    if (!outcomeGate.allowed) {
+      log.info(`Outcome gate: blocking user ${userId} with ${outcomeGate.pendingCount} unreported outcomes`);
+      return NextResponse.json(
+        {
+          error: 'Outcome reporting required before new analyses',
+          code: 'OUTCOME_GATE',
+          pendingOutcomes: outcomeGate.pendingCount,
+          pendingAnalysisIds: outcomeGate.pendingAnalysisIds,
+          message: outcomeGate.message,
+        },
+        { status: 423 }
+      );
+    }
+
     // Guard against concurrent analysis — block if one is already in
     // flight, but allow re-analysis of completed documents (e.g. "Run
     // Live Audit" on the detail page).
@@ -170,6 +191,12 @@ export async function POST(request: NextRequest) {
         heartbeatInterval = setInterval(() => {
           controller.enqueue(encoder.encode(formatSSEHeartbeat()));
         }, 15000); // Send heartbeat every 15 seconds
+
+        // Emit outcome reminder as first event if user has pending outcomes
+        const outcomeReminder = formatOutcomeReminder(outcomeGate);
+        if (outcomeReminder) {
+          sendUpdate(outcomeReminder as unknown as ProgressUpdate);
+        }
 
         // Track completed nodes for progress calculation
         const completedNodes = checkpoint?.completedNodes

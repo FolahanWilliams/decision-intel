@@ -5,6 +5,7 @@ import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
+import { checkOutcomeGate } from '@/lib/learning/outcome-gate';
 
 const log = createLogger('AnalyzeRoute');
 
@@ -41,6 +42,22 @@ export async function POST(request: NextRequest) {
           status: 429,
           headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) },
         }
+      );
+    }
+
+    // Outcome enforcement gate — block when too many outcomes are overdue
+    const outcomeGate = await checkOutcomeGate(effectiveUserId);
+    if (!outcomeGate.allowed) {
+      log.info(`Outcome gate: blocking user ${effectiveUserId} with ${outcomeGate.pendingCount} unreported outcomes`);
+      return NextResponse.json(
+        {
+          error: 'Outcome reporting required before new analyses',
+          code: 'OUTCOME_GATE',
+          pendingOutcomes: outcomeGate.pendingCount,
+          pendingAnalysisIds: outcomeGate.pendingAnalysisIds,
+          message: outcomeGate.message,
+        },
+        { status: 423 }
       );
     }
 
