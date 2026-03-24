@@ -380,6 +380,372 @@ export async function getCrossDocumentPatterns(
  * A positive improvementPct means the platform is getting better at detecting
  * real biases (fewer false positives over time).
  */
+// ─── £ Impact Functions ──────────────────────────────────────────────────────
+
+export interface BiasCostEstimate {
+  biasType: string;
+  /** Number of decisions where this bias was present and outcome was negative */
+  failedDecisions: number;
+  /** Number of decisions where this bias was present */
+  totalDecisions: number;
+  /** Average impact score deficit when this bias is present vs absent */
+  impactDelta: number;
+  /** Estimated monetary cost (only if monetaryValue was set on the DecisionFrame) */
+  estimatedCost: number | null;
+  /** Currency */
+  currency: string;
+}
+
+/**
+ * Calculate the estimated monetary cost of each bias type based on
+ * historical outcome data and optional DecisionFrame monetary values.
+ */
+export async function calculateBiasCosts(
+  orgId?: string | null,
+  userId?: string
+): Promise<BiasCostEstimate[]> {
+  try {
+    // Build where clause
+    const where: Record<string, unknown> = {};
+    if (orgId) where.orgId = orgId;
+    if (userId) where.userId = userId;
+
+    // Fetch all outcomes with confirmed biases
+    const outcomes = await prisma.decisionOutcome.findMany({
+      where,
+      select: {
+        id: true,
+        outcome: true,
+        impactScore: true,
+        confirmedBiases: true,
+        analysisId: true,
+      },
+    });
+
+    if (outcomes.length === 0) {
+      return [];
+    }
+
+    // Try to get monetary values from DecisionFrames via Document join
+    let monetaryValues: Map<string, { value: number; currency: string }> = new Map();
+    try {
+      // Get analysisIds from outcomes, then find their documents, then find DecisionFrames
+      const analysisIds = outcomes.map(o => o.analysisId);
+      const analyses = await prisma.analysis.findMany({
+        where: { id: { in: analysisIds } },
+        select: { id: true, documentId: true },
+      });
+
+      const docIds = analyses.map(a => a.documentId);
+      const docToAnalysis = new Map(analyses.map(a => [a.documentId, a.id]));
+
+      const frames = await prisma.decisionFrame.findMany({
+        where: { documentId: { in: docIds } },
+        select: { documentId: true, monetaryValue: true, currency: true },
+      });
+
+      for (const frame of frames) {
+        if (frame.documentId && frame.monetaryValue != null) {
+          const analysisId = docToAnalysis.get(frame.documentId);
+          if (analysisId) {
+            monetaryValues.set(analysisId, {
+              value: Number(frame.monetaryValue),
+              currency: frame.currency ?? 'GBP',
+            });
+          }
+        }
+      }
+    } catch (frameErr) {
+      const msg = frameErr instanceof Error ? frameErr.message : String(frameErr);
+      const code = (frameErr as { code?: string }).code;
+      if (code === 'P2021' || code === 'P2022' || msg.includes('does not exist')) {
+        log.debug('Schema drift fetching DecisionFrame monetary values — skipping');
+      } else {
+        log.warn('Failed to fetch DecisionFrame monetary values:', msg);
+      }
+    }
+
+    // Compute average impact score for outcomes WITHOUT each bias type (baseline)
+    const allImpactScores = outcomes
+      .filter(o => o.impactScore != null)
+      .map(o => o.impactScore!);
+    const globalAvgImpact =
+      allImpactScores.length > 0
+        ? allImpactScores.reduce((s, v) => s + v, 0) / allImpactScores.length
+        : 0;
+
+    // Build per-bias stats
+    const biasMap: Record<
+      string,
+      {
+        failed: number;
+        total: number;
+        impactScores: number[];
+        monetaryVals: number[];
+        currency: string;
+      }
+    > = {};
+
+    for (const o of outcomes) {
+      for (const bias of o.confirmedBiases) {
+        if (!biasMap[bias]) {
+          biasMap[bias] = { failed: 0, total: 0, impactScores: [], monetaryVals: [], currency: 'GBP' };
+        }
+        biasMap[bias].total++;
+        if (o.outcome === 'failure') {
+          biasMap[bias].failed++;
+        }
+        if (o.impactScore != null) {
+          biasMap[bias].impactScores.push(o.impactScore);
+        }
+        const mv = monetaryValues.get(o.analysisId);
+        if (mv) {
+          biasMap[bias].monetaryVals.push(mv.value);
+          biasMap[bias].currency = mv.currency;
+        }
+      }
+    }
+
+    // Calculate cost estimates
+    const estimates: BiasCostEstimate[] = Object.entries(biasMap).map(([biasType, stats]) => {
+      const avgWithBias =
+        stats.impactScores.length > 0
+          ? stats.impactScores.reduce((s, v) => s + v, 0) / stats.impactScores.length
+          : 0;
+      const impactDelta = Number((globalAvgImpact - avgWithBias).toFixed(2));
+
+      let estimatedCost: number | null = null;
+      if (stats.monetaryVals.length > 0) {
+        const avgMonetary =
+          stats.monetaryVals.reduce((s, v) => s + v, 0) / stats.monetaryVals.length;
+        estimatedCost = Number(((impactDelta / 100) * avgMonetary).toFixed(2));
+      }
+
+      return {
+        biasType,
+        failedDecisions: stats.failed,
+        totalDecisions: stats.total,
+        impactDelta,
+        estimatedCost,
+        currency: stats.currency,
+      };
+    });
+
+    // Sort by estimatedCost desc (or impactDelta if no monetary values)
+    estimates.sort((a, b) => {
+      if (a.estimatedCost != null && b.estimatedCost != null) {
+        return b.estimatedCost - a.estimatedCost;
+      }
+      if (a.estimatedCost != null) return -1;
+      if (b.estimatedCost != null) return 1;
+      return b.impactDelta - a.impactDelta;
+    });
+
+    return estimates;
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    const code = (error as { code?: string }).code;
+
+    if (code === 'P2021' || code === 'P2022' || msg.includes('does not exist')) {
+      log.debug('Schema drift in calculateBiasCosts — table not available');
+      return [];
+    }
+
+    log.error('Failed to calculate bias costs:', error);
+    throw error;
+  }
+}
+
+export interface QuarterlyImpactSummary {
+  totalDecisions: number;
+  improvedDecisions: number;
+  estimatedSavings: number | null;
+  currency: string;
+  topCostlyBiases: Array<{ biasType: string; estimatedCost: number }>;
+}
+
+/**
+ * Calculate "Bias cost avoided this quarter" by comparing decisions where
+ * a bias was detected AND the user changed their action (beliefDelta > 0)
+ * AND the outcome was positive, vs decisions where the bias was detected
+ * but the user didn't change.
+ */
+export async function getQuarterlyImpact(
+  orgId?: string | null,
+  userId?: string
+): Promise<QuarterlyImpactSummary> {
+  const emptySummary: QuarterlyImpactSummary = {
+    totalDecisions: 0,
+    improvedDecisions: 0,
+    estimatedSavings: null,
+    currency: 'GBP',
+    topCostlyBiases: [],
+  };
+
+  try {
+    // Current quarter boundaries
+    const now = new Date();
+    const quarterMonth = Math.floor(now.getMonth() / 3) * 3;
+    const quarterStart = new Date(now.getFullYear(), quarterMonth, 1);
+
+    // Build where clause for outcomes this quarter
+    const outcomeWhere: Record<string, unknown> = {
+      reportedAt: { gte: quarterStart },
+    };
+    if (orgId) outcomeWhere.orgId = orgId;
+    if (userId) outcomeWhere.userId = userId;
+
+    // Fetch outcomes with their priors (to check beliefDelta)
+    const outcomes = await prisma.decisionOutcome.findMany({
+      where: outcomeWhere,
+      select: {
+        id: true,
+        analysisId: true,
+        outcome: true,
+        impactScore: true,
+        confirmedBiases: true,
+        analysis: {
+          select: {
+            id: true,
+            documentId: true,
+            prior: {
+              select: {
+                beliefDelta: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (outcomes.length === 0) {
+      return emptySummary;
+    }
+
+    // Try to get monetary values
+    let monetaryValues: Map<string, { value: number; currency: string }> = new Map();
+    try {
+      const docIds = outcomes
+        .map(o => o.analysis?.documentId)
+        .filter((id): id is string => id != null);
+
+      if (docIds.length > 0) {
+        const frames = await prisma.decisionFrame.findMany({
+          where: { documentId: { in: docIds } },
+          select: { documentId: true, monetaryValue: true, currency: true },
+        });
+
+        const docToAnalysisId = new Map(
+          outcomes
+            .filter(o => o.analysis?.documentId)
+            .map(o => [o.analysis!.documentId, o.analysisId])
+        );
+
+        for (const frame of frames) {
+          if (frame.documentId && frame.monetaryValue != null) {
+            const analysisId = docToAnalysisId.get(frame.documentId);
+            if (analysisId) {
+              monetaryValues.set(analysisId, {
+                value: Number(frame.monetaryValue),
+                currency: frame.currency ?? 'GBP',
+              });
+            }
+          }
+        }
+      }
+    } catch (frameErr) {
+      const code = (frameErr as { code?: string }).code;
+      if (code === 'P2021' || code === 'P2022') {
+        log.debug('Schema drift fetching monetary values for quarterly impact');
+      }
+    }
+
+    // Separate into "changed" (beliefDelta > 0) and "unchanged" buckets
+    const changedPositive: typeof outcomes = []; // Changed mind AND positive outcome
+    const unchangedNegative: typeof outcomes = []; // Didn't change AND negative outcome
+
+    for (const o of outcomes) {
+      const beliefDelta = o.analysis?.prior?.beliefDelta ?? 0;
+      const isPositive = o.outcome === 'success' || o.outcome === 'partial_success';
+      const isNegative = o.outcome === 'failure';
+
+      if (beliefDelta > 0 && isPositive) {
+        changedPositive.push(o);
+      }
+      if (beliefDelta === 0 && isNegative) {
+        unchangedNegative.push(o);
+      }
+    }
+
+    // Estimate savings: for each "changed + positive" decision, the saving is
+    // the monetary value * (impactDelta between unchanged-negative and changed-positive groups)
+    let estimatedSavings: number | null = null;
+    let currency = 'GBP';
+
+    if (changedPositive.length > 0) {
+      const changedImpacts = changedPositive
+        .filter(o => o.impactScore != null)
+        .map(o => o.impactScore!);
+      const unchangedImpacts = unchangedNegative
+        .filter(o => o.impactScore != null)
+        .map(o => o.impactScore!);
+
+      const avgChanged = changedImpacts.length > 0
+        ? changedImpacts.reduce((s, v) => s + v, 0) / changedImpacts.length
+        : 0;
+      const avgUnchanged = unchangedImpacts.length > 0
+        ? unchangedImpacts.reduce((s, v) => s + v, 0) / unchangedImpacts.length
+        : 0;
+
+      const impactGap = avgChanged - avgUnchanged;
+
+      // Calculate total monetary savings across changed-positive decisions
+      let totalSavings = 0;
+      let hasMonetary = false;
+      for (const o of changedPositive) {
+        const mv = monetaryValues.get(o.analysisId);
+        if (mv) {
+          totalSavings += (impactGap / 100) * mv.value;
+          currency = mv.currency;
+          hasMonetary = true;
+        }
+      }
+
+      if (hasMonetary) {
+        estimatedSavings = Number(totalSavings.toFixed(2));
+      }
+    }
+
+    // Get top costly biases from the full bias cost calculation
+    const biasCosts = await calculateBiasCosts(orgId, userId);
+    const topCostlyBiases = biasCosts
+      .filter(b => b.estimatedCost != null && b.estimatedCost > 0)
+      .slice(0, 5)
+      .map(b => ({ biasType: b.biasType, estimatedCost: b.estimatedCost! }));
+
+    return {
+      totalDecisions: outcomes.length,
+      improvedDecisions: changedPositive.length,
+      estimatedSavings,
+      currency,
+      topCostlyBiases,
+    };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    const code = (error as { code?: string }).code;
+
+    if (code === 'P2021' || code === 'P2022' || msg.includes('does not exist')) {
+      log.debug('Schema drift in getQuarterlyImpact — table not available');
+      return emptySummary;
+    }
+
+    log.error('Failed to compute quarterly impact:', error);
+    throw error;
+  }
+}
+
+// ─── Accuracy Improvement ────────────────────────────────────────────────────
+
 export async function getAccuracyImprovement(orgId: string): Promise<AccuracyImprovement> {
   const BUCKET_SIZE = 10; // Compare first 10 vs last 10
 

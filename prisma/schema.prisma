@@ -221,10 +221,11 @@ model Organization {
   name      String
   slug      String       @unique
   avatarUrl String?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  invites   TeamInvite[]
-  members   TeamMember[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  isAnonymized Boolean      @default(false) // Consent to anonymous aggregation
+  invites      TeamInvite[]
+  members      TeamMember[]
 
   @@index([slug])
 }
@@ -667,6 +668,8 @@ model DecisionFrame {
   successCriteria   String[]
   failureCriteria   String[]
   stakeholders      String[]
+  monetaryValue     Decimal?  // Estimated decision value
+  currency          String?   @default("GBP") // ISO currency code
   documentId        String?  @unique
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
