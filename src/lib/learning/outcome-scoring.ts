@@ -427,7 +427,7 @@ export async function calculateBiasCosts(
     }
 
     // Try to get monetary values from DecisionFrames via Document join
-    let monetaryValues: Map<string, { value: number; currency: string }> = new Map();
+    const monetaryValues: Map<string, { value: number; currency: string }> = new Map();
     try {
       // Get analysisIds from outcomes, then find their documents, then find DecisionFrames
       const analysisIds = outcomes.map(o => o.analysisId);
@@ -623,7 +623,7 @@ export async function getQuarterlyImpact(
     }
 
     // Try to get monetary values
-    let monetaryValues: Map<string, { value: number; currency: string }> = new Map();
+    const monetaryValues: Map<string, { value: number; currency: string }> = new Map();
     try {
       const docIds = outcomes
         .map(o => o.analysis?.documentId)

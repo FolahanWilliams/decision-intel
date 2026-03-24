@@ -8,6 +8,7 @@
  * "forward all emails matching 'decision' to journal@decision-intel.com"
  */
 
+import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { toPrismaStringArray } from '@/lib/utils/prisma-json';
@@ -61,7 +62,6 @@ function verifyIngestSecret(request: NextRequest): boolean {
   if (provided.length !== expected.length) return false;
 
   try {
-    const crypto = require('crypto');
     return crypto.timingSafeEqual(provided, expected);
   } catch {
     return false;
