@@ -97,9 +97,10 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
       'groupthink',
       'optimism_bias',
       'confirmation_bias',
+      'zeigarnik_effect',
     ],
     primaryBias: 'planning_fallacy',
-    toxicCombinations: ['Blind Sprint', 'Optimism Trap'],
+    toxicCombinations: ['Blind Sprint', 'Optimism Trap', 'Deadline Panic'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: true,

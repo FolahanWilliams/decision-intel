@@ -31,6 +31,8 @@ export interface DocumentContext {
   timelineWeeks: number | null; // weeks until decision deadline
   documentAgeWeeks: number; // how old the document is
   wordCount: number;
+  /** Optional raw document content for biological/physiological signal detection */
+  rawContent?: string;
 }
 
 export interface CompoundScore {
@@ -96,6 +98,100 @@ const LARGE_GROUP_THRESHOLD = 12;
 const LARGE_GROUP_MULTIPLIER = 1.15; // large groups → more social biases
 
 // ---------------------------------------------------------------------------
+// Biological / physiological signal detection
+// ---------------------------------------------------------------------------
+
+// Winner Effect: success-streak language → testosterone/dopamine loop amplifies
+// risk appetite and overconfidence-family biases
+const WINNER_EFFECT_PATTERNS = [
+  /record\s+(profits?|revenue|quarter|year|growth|highs?)/i,
+  /outperform(ed|ing|s)?\b/i,
+  /consecutive\s+(wins?|successe?s?|quarters?)/i,
+  /best\s+(quarter|year|period|results?|performance)\s+(ever|in\s+history|on\s+record)/i,
+  /exceed(ed|ing|s)?\s+(all\s+)?(targets?|expectations?|forecasts?|estimates?)/i,
+  /\b(momentum|winning\s+streak|unstoppable|on\s+a\s+roll)\b/i,
+  /\b(unbeatable|market\s+leader|dominant\s+position|ahead\s+of\s+the\s+pack)\b/i,
+  /\b(triple-?digit|double-?digit)\s+growth\b/i,
+  /all[- ]time\s+high/i,
+];
+
+// Cortisol/Stress: crisis language → impairs prefrontal cortex, amplifies
+// System 1 biases (anchoring, availability, framing, loss aversion)
+const STRESS_SIGNAL_PATTERNS = [
+  /\b(volatile|volatility|turbul(ent|ence)|unstable|chaotic)\s*(market|environment|conditions?)?\b/i,
+  /\bunprecedented\b/i,
+  /\b(emergency|urgent|crisis|catastroph(e|ic)|meltdown)\b/i,
+  /\b(must\s+act\s+now|no\s+time\s+to\s+wait|immediate\s+action|time\s+is\s+running\s+out)\b/i,
+  /\brunning\s+out\s+of\s+(time|runway|cash|options)\b/i,
+  /\b(severe|extreme|acute)\s+(pressure|stress|risk|downturn|decline)\b/i,
+  /\b(existential\s+threat|survival\s+mode|do\s+or\s+die|now\s+or\s+never)\b/i,
+  /\b(hemorrhaging|bleeding)\s+(cash|money|revenue|customers)\b/i,
+  /\b(free[- ]?fall|death\s+spiral|collapse|implod(e|ing))\b/i,
+];
+
+// Biases amplified by Winner Effect (overconfidence family)
+const WINNER_EFFECT_BIASES = new Set([
+  'overconfidence_bias',
+  'planning_fallacy',
+  'halo_effect',
+  'gamblers_fallacy',
+]);
+
+// Biases amplified by Cortisol/Stress (System 1 family)
+const STRESS_AMPLIFIED_BIASES = new Set([
+  'anchoring_bias',
+  'availability_heuristic',
+  'framing_effect',
+  'loss_aversion',
+  'cognitive_misering',
+  'recency_bias',
+  'selective_perception',
+]);
+
+const WINNER_EFFECT_MULTIPLIER = 1.2; // ×1.15-1.25 range, using midpoint
+const STRESS_SIGNAL_MULTIPLIER = 1.18; // ×1.15-1.20 range, using midpoint
+
+/**
+ * Detect Winner Effect signals in document content.
+ * Success-streak language indicates testosterone/dopamine loop that amplifies
+ * risk appetite and overconfidence-family biases.
+ */
+export function detectWinnerEffect(content: string): {
+  detected: boolean;
+  matchCount: number;
+  matches: string[];
+} {
+  if (!content) return { detected: false, matchCount: 0, matches: [] };
+  const matches: string[] = [];
+  for (const pattern of WINNER_EFFECT_PATTERNS) {
+    const match = content.match(pattern);
+    if (match) matches.push(match[0]);
+  }
+  // Require 2+ pattern matches to reduce false positives
+  return { detected: matches.length >= 2, matchCount: matches.length, matches };
+}
+
+/**
+ * Detect cortisol/stress signals in document content.
+ * Crisis language indicates impaired prefrontal cortex processing that
+ * amplifies System 1 biases.
+ */
+export function detectStressSignals(content: string): {
+  detected: boolean;
+  matchCount: number;
+  matches: string[];
+} {
+  if (!content) return { detected: false, matchCount: 0, matches: [] };
+  const matches: string[] = [];
+  for (const pattern of STRESS_SIGNAL_PATTERNS) {
+    const match = content.match(pattern);
+    if (match) matches.push(match[0]);
+  }
+  // Require 2+ pattern matches to reduce false positives
+  return { detected: matches.length >= 2, matchCount: matches.length, matches };
+}
+
+// ---------------------------------------------------------------------------
 // Interaction weight defaults (used when ontology not available)
 // Full ontology provides richer weights via interaction-matrix.ts
 // ---------------------------------------------------------------------------
@@ -126,6 +222,16 @@ const DEFAULT_INTERACTION_WEIGHTS: Record<string, number> = {
   'groupthink::authority_bias': 1.4,
   'anchoring_bias::overconfidence_bias': 1.2,
   'cognitive_misering::status_quo_bias': 1.2,
+  'halo_effect::confirmation_bias': 1.3,
+  'halo_effect::authority_bias': 1.2,
+  'halo_effect::selective_perception': 1.3,
+  'gamblers_fallacy::overconfidence_bias': 1.3,
+  'gamblers_fallacy::sunk_cost_fallacy': 1.2,
+  'zeigarnik_effect::planning_fallacy': 1.4,
+  'zeigarnik_effect::cognitive_misering': 1.2,
+  'paradox_of_choice::status_quo_bias': 1.4,
+  'paradox_of_choice::cognitive_misering': 1.3,
+  'paradox_of_choice::loss_aversion': 1.3,
 };
 
 // ---------------------------------------------------------------------------
@@ -137,7 +243,7 @@ const DEFAULT_INTERACTION_WEIGHTS: Record<string, number> = {
  *
  * Priority chain:
  * 1. Caller-supplied weights (e.g. org-calibrated)
- * 2. Full 16×16 ontology interaction matrix (interaction-matrix.ts)
+ * 2. Full 20×20 ontology interaction matrix (interaction-matrix.ts)
  * 3. Hardcoded DEFAULT_INTERACTION_WEIGHTS (fallback)
  */
 function getInteractionWeight(
@@ -170,7 +276,8 @@ function getInteractionWeight(
 function computeBiasCompoundSeverity(
   bias: DetectedBias,
   allBiases: DetectedBias[],
-  interactionWeights?: Record<string, number>
+  interactionWeights?: Record<string, number>,
+  biologicalSignals?: { winnerEffect: boolean; stressSignals: boolean }
 ): BiasCompoundScore {
   let rawSeverity = SEVERITY_NUMERIC[bias.severity] ?? 8;
 
@@ -196,6 +303,20 @@ function computeBiasCompoundSeverity(
         `${other.type} (${weight > 1 ? '+' : ''}${((weight - 1) * 100).toFixed(0)}%)`
       );
     }
+  }
+
+  // Biological signal amplification — targeted per bias family
+  if (biologicalSignals?.winnerEffect && WINNER_EFFECT_BIASES.has(bias.type)) {
+    interactionMultiplier *= WINNER_EFFECT_MULTIPLIER;
+    contributingInteractions.push(
+      `Winner Effect (+${((WINNER_EFFECT_MULTIPLIER - 1) * 100).toFixed(0)}%)`
+    );
+  }
+  if (biologicalSignals?.stressSignals && STRESS_AMPLIFIED_BIASES.has(bias.type)) {
+    interactionMultiplier *= STRESS_SIGNAL_MULTIPLIER;
+    contributingInteractions.push(
+      `Stress/Cortisol (+${((STRESS_SIGNAL_MULTIPLIER - 1) * 100).toFixed(0)}%)`
+    );
   }
 
   // Cap the compound multiplier per-bias to prevent runaway
@@ -287,6 +408,29 @@ function computeContextMultiplier(context: DocumentContext): {
     });
   }
 
+  // Biological / physiological signal multipliers
+  if (context.rawContent) {
+    const winnerResult = detectWinnerEffect(context.rawContent);
+    if (winnerResult.detected) {
+      multiplier *= WINNER_EFFECT_MULTIPLIER;
+      adjustments.push({
+        source: 'winner_effect',
+        description: `Winner Effect detected (${winnerResult.matchCount} signals: ${winnerResult.matches.slice(0, 3).join(', ')}) — success-streak language amplifies overconfidence`,
+        delta: WINNER_EFFECT_MULTIPLIER - 1.0,
+      });
+    }
+
+    const stressResult = detectStressSignals(context.rawContent);
+    if (stressResult.detected) {
+      multiplier *= STRESS_SIGNAL_MULTIPLIER;
+      adjustments.push({
+        source: 'stress_cortisol',
+        description: `Stress/cortisol signals detected (${stressResult.matchCount} signals: ${stressResult.matches.slice(0, 3).join(', ')}) — crisis language amplifies System 1 biases`,
+        delta: STRESS_SIGNAL_MULTIPLIER - 1.0,
+      });
+    }
+  }
+
   return { multiplier, adjustments };
 }
 
@@ -308,12 +452,20 @@ export function computeCompoundScore(
 ): CompoundScore {
   const adjustments: ScoreAdjustment[] = [];
 
-  // 1. Compute compound severity for each bias
+  // 1. Detect biological / physiological signals from content
+  const biologicalSignals = context.rawContent
+    ? {
+        winnerEffect: detectWinnerEffect(context.rawContent).detected,
+        stressSignals: detectStressSignals(context.rawContent).detected,
+      }
+    : undefined;
+
+  // 2. Compute compound severity for each bias
   const biasScores = detectedBiases.map(b =>
-    computeBiasCompoundSeverity(b, detectedBiases, options?.interactionWeights)
+    computeBiasCompoundSeverity(b, detectedBiases, options?.interactionWeights, biologicalSignals)
   );
 
-  // 2. Compute total compound penalty
+  // 3. Compute total compound penalty
   const totalRawPenalty = biasScores.reduce((sum, bs) => sum + bs.rawSeverity, 0);
   const totalCompoundPenalty = biasScores.reduce((sum, bs) => sum + bs.compoundSeverity, 0);
   const compoundMultiplier = totalRawPenalty > 0 ? totalCompoundPenalty / totalRawPenalty : 1.0;
@@ -324,7 +476,7 @@ export function computeCompoundScore(
     delta: -(totalCompoundPenalty - totalRawPenalty) * 0.3, // scaled impact
   });
 
-  // 3. Apply org-specific calibration if available
+  // 4. Apply org-specific calibration if available
   if (options?.orgCalibration) {
     for (const bs of biasScores) {
       const orgWeight = options.orgCalibration[bs.biasType];
@@ -340,7 +492,7 @@ export function computeCompoundScore(
     }
   }
 
-  // 4. Context adjustment
+  // 5. Context adjustment
   const { multiplier: contextAdjustment, adjustments: contextAdj } =
     computeContextMultiplier(context);
   adjustments.push(...contextAdj);
@@ -351,7 +503,7 @@ export function computeCompoundScore(
     bs.compoundSeverity *= contextAdjustment;
   }
 
-  // 5. Historical correlation adjustment from failure case database
+  // 6. Historical correlation adjustment from failure case database
   const correlationResult = computeCorrelationMultiplier(
     detectedBiases.map(b => b.type),
     {
@@ -370,7 +522,7 @@ export function computeCompoundScore(
     });
   }
 
-  // 6. Confidence decay based on document age
+  // 7. Confidence decay based on document age
   const confidenceDecay = computeConfidenceDecay(context.documentAgeWeeks);
   if (confidenceDecay < 1.0) {
     adjustments.push({
@@ -380,7 +532,7 @@ export function computeCompoundScore(
     });
   }
 
-  // 7. Compute calibrated score
+  // 8. Compute calibrated score
   // Start from raw score, apply compound penalty differential
   const penaltyDelta = (totalCompoundPenalty * contextAdjustment - totalRawPenalty) * 0.3;
   const calibratedScore = Math.max(0, Math.min(100, rawQualityScore - penaltyDelta));

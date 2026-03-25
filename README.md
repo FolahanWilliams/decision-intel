@@ -196,9 +196,12 @@ A unique **decision simulation engine** that creates virtual boardroom personas 
 ### Causal AI Layer
 
 Organization-specific **Structural Causal Models (SCM)** that learn which biases actually cause poor outcomes in *your* organization:
-- **Causal Edge Discovery** — Learns relationships between biases and decision quality from outcome data (e.g., "confirmation bias → high noise score")
+- **Constraint-Based Causal Discovery (PC Algorithm)** — Builds directed acyclic graphs from outcome data using conditional independence tests (chi-squared with Yates' correction). Minimum 20 outcomes to construct a DAG; 50+ for high-confidence causal claims
+- **Do-Calculus Interventional Queries** — Pearl-style backdoor adjustment answers "What would happen if we removed confirmation bias?" using `P(Y | do(X)) = Σ_Z P(Y | X, Z) P(Z)` with stratified confounder adjustment
 - **Danger Multipliers** — Organization-specific learned weights that amplify bias severity based on historical impact
-- **Counterfactual Reasoning** — "What would the outcome have been if this bias were absent?"
+- **Correlation Fallback** — For organizations with <20 outcomes, gracefully falls back to correlation-based causal weights while building toward full SCM
+- **Biological/Physiological Signal Detection** — Winner Effect (success-streak language amplifies overconfidence-family biases ×1.2) and Cortisol/Stress signals (crisis language amplifies System 1 biases ×1.18) detected via NLP pattern matching on document content
+- **System 1 vs System 2 Ratio Scoring** — DQI process maturity component penalizes heuristic-dominant decisions (>70% System 1 biases) and rewards deliberative processes
 
 ### Outcomes-First Workflow (Decision Framing)
 
@@ -298,9 +301,9 @@ Step through your analysis like a debugger steps through code. The **Replay** ta
 
 ### Bias Education Library
 
-A comprehensive learning resource for all 16 cognitive biases, accessible at `/dashboard/bias-library`:
+A comprehensive learning resource for all 20 cognitive biases, accessible at `/dashboard/bias-library`:
 
-- **16 Rich Education Cards** — Each bias includes a real-world business case study (Kodak, Bay of Pigs, Theranos, Concorde, etc.), 3 actionable debiasing techniques, academic references, difficulty rating, and related biases
+- **20 Rich Education Cards** — Each bias includes a real-world business case study (Kodak, Bay of Pigs, Theranos, Concorde, etc.), 3 actionable debiasing techniques, academic references, difficulty rating, and related biases. Includes 4 newly-added biases: Halo Effect, Gambler's Fallacy, Zeigarnik Effect, and Paradox of Choice
 - **"Your Detected Biases" Banner** — Aggregates bias detections across all your documents, showing which biases appear most in your decision-making
 - **Search & Filter** — Filter by category (Judgment, Group Dynamics, Overconfidence, Risk Assessment, Information) or search by name
 - **Integrated Learning** — The BiasDetailModal on document pages now includes a "Learn & Debias" section with real-world examples and debiasing techniques inline
@@ -358,10 +361,11 @@ An organizational memory system that maps relationships between decisions, outco
 - **Keyboard Navigation** — Arrow keys, Escape, +/- zoom, F fit, / search
 
 #### Intelligence Engine
-- **Auto-Inferred Edges** — Shared biases, semantic similarity (via RAG), participant overlap, outcome cascades, temporal sequences, and reversals detected automatically
+- **Auto-Inferred Edges** — Shared biases, semantic similarity (via RAG), participant overlap, outcome cascades, temporal sequences, reversals, and **cross-department/cross-silo** edges detected automatically
 - **PageRank Centrality** — Iterative power method identifies most influential decision nodes
-- **Graph Anti-Pattern Detection** — Echo chamber clusters, cascade failures, bias concentration, isolated high-risk decisions
-- **Cascade Risk Scoring** — Multi-factor cluster-level failure risk for pending decisions
+- **Graph Anti-Pattern Detection** — Echo chamber clusters, cascade failures, bias concentration, isolated high-risk decisions, **knowledge fragmentation** across organizational silos
+- **Cascade Risk Scoring** — Multi-factor cluster-level failure risk for pending decisions with **quality escalation chain detection** (degrading score sequences across influenced_by edges)
+- **Granger-Causal Temporal Edges** — Temporal edges validated via conditional correlation testing (score correlation + shared bias overlap + temporal proximity) rather than simple time-window heuristics
 - **Entity Disambiguation** — Canonical resolution for participant names (Levenshtein + nickname mappings)
 - **Predictive Toxicity Alerts** — Organization risk state with trend detection (improving/stable/worsening)
 
@@ -912,7 +916,7 @@ On any analyzed document, open the **Replay** tab to:
 ### Bias Library
 
 Navigate to `/dashboard/bias-library` to:
-- Browse all 16 cognitive biases with real-world examples (Kodak, Bay of Pigs, Theranos, etc.)
+- Browse all 20 cognitive biases with real-world examples (Kodak, Bay of Pigs, Theranos, etc.)
 - Learn 3 actionable debiasing techniques for each bias
 - See which biases have appeared in your own documents
 - Filter by category and search by name

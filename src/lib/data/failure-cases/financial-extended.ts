@@ -291,9 +291,10 @@ export const FINANCIAL_EXTENDED_CASES: FailureCase[] = [
       'hindsight_bias',
       'recency_bias',
       'authority_bias',
+      'gamblers_fallacy',
     ],
     primaryBias: 'anchoring_bias',
-    toxicCombinations: ['Recency Spiral', 'Yes Committee'],
+    toxicCombinations: ['Recency Spiral', 'Yes Committee', 'Doubling Down'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: true,
@@ -368,9 +369,10 @@ export const FINANCIAL_EXTENDED_CASES: FailureCase[] = [
       'selective_perception',
       'cognitive_misering',
       'groupthink',
+      'halo_effect',
     ],
     primaryBias: 'authority_bias',
-    toxicCombinations: ['Echo Chamber', 'Yes Committee'],
+    toxicCombinations: ['Echo Chamber', 'Yes Committee', 'Golden Child'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: false,

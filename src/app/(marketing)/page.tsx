@@ -1164,7 +1164,7 @@ export default function LandingPage() {
               >
                 {[
                   'Every IC memo scored against calibrated baselines',
-                  '15+ cognitive bias signatures detected',
+                  '20 cognitive bias signatures with biological risk multipliers',
                   'Autonomous outcome detection closes the feedback loop',
                   'Decision Twin boardroom simulates dissent before you vote',
                 ].map((text, i) => (

@@ -125,3 +125,98 @@ export function computeCascadeRisk(
 
   return results.sort((a, b) => b.riskScore - a.riskScore);
 }
+
+// ─── Quality Escalation Chain Detection ────────────────────────────────────
+
+export interface EscalationChain {
+  nodeIds: string[];
+  scores: number[];
+  degradation: number; // total score drop across the chain
+  severity: number;
+  description: string;
+}
+
+/**
+ * Detect escalation chains where decision quality degrades across connected nodes.
+ * Pattern: A → B → C where score(A) > score(B) > score(C) and edges are influenced_by.
+ * Flags as "quality cascade" risk for proactive nudge alerts.
+ */
+export function detectEscalationChains(nodes: RiskNode[], edges: RiskEdge[]): EscalationChain[] {
+  const chains: EscalationChain[] = [];
+  const nodeMap = new Map(nodes.map(n => [n.id, n]));
+
+  // Build directed adjacency from influenced_by edges
+  // influenced_by: source was influenced by target, so target → source is the causal direction
+  const outgoing = new Map<string, string[]>();
+  for (const e of edges) {
+    if (e.edgeType !== 'influenced_by') continue;
+    // e.source was influenced by e.target → causal chain: target → source
+    const from = e.target;
+    const to = e.source;
+    if (!outgoing.has(from)) outgoing.set(from, []);
+    outgoing.get(from)!.push(to);
+  }
+
+  // DFS to find degrading chains (score decreases along the path)
+  function findDegradingChains(
+    startId: string,
+    path: string[],
+    scores: number[],
+    visited: Set<string>
+  ): void {
+    const neighbors = outgoing.get(startId) || [];
+
+    for (const nextId of neighbors) {
+      if (visited.has(nextId)) continue;
+      const nextNode = nodeMap.get(nextId);
+      if (!nextNode) continue;
+
+      const lastScore = scores[scores.length - 1];
+      // Quality must degrade: next score must be lower
+      if (nextNode.score >= lastScore) continue;
+
+      const newPath = [...path, nextId];
+      const newScores = [...scores, nextNode.score];
+
+      // Record chain if length >= 3
+      if (newPath.length >= 3) {
+        const degradation = newScores[0] - newScores[newScores.length - 1];
+        const severity = Math.round(Math.min(100, degradation + newPath.length * 10));
+
+        chains.push({
+          nodeIds: newPath,
+          scores: newScores,
+          degradation: Math.round(degradation),
+          severity,
+          description: `Quality cascade: ${newPath.length} decisions with degrading scores (${newScores.map(s => Math.round(s)).join(' → ')}). Each decision influenced the next, with worsening quality.`,
+        });
+      }
+
+      // Continue DFS (limit chain length to prevent combinatorial explosion)
+      if (newPath.length < 6) {
+        visited.add(nextId);
+        findDegradingChains(nextId, newPath, newScores, visited);
+        visited.delete(nextId);
+      }
+    }
+  }
+
+  // Start from each node
+  for (const node of nodes) {
+    if (!outgoing.has(node.id)) continue;
+    const visited = new Set<string>([node.id]);
+    findDegradingChains(node.id, [node.id], [node.score], visited);
+  }
+
+  // Deduplicate: keep the longest chain for each starting node
+  const bestChains = new Map<string, EscalationChain>();
+  for (const chain of chains) {
+    const key = chain.nodeIds[0];
+    const existing = bestChains.get(key);
+    if (!existing || chain.nodeIds.length > existing.nodeIds.length) {
+      bestChains.set(key, chain);
+    }
+  }
+
+  return [...bestChains.values()].sort((a, b) => b.severity - a.severity);
+}
