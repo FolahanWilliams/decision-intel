@@ -136,6 +136,15 @@ export async function PATCH(req: NextRequest) {
       details: { wasHelpful: body.wasHelpful },
     }).catch(() => {});
 
+    // Adjust graph edge weights from nudge feedback (fire-and-forget flywheel)
+    if (body.wasHelpful !== undefined) {
+      import('@/lib/graph/edge-learning')
+        .then(({ adjustEdgeWeightsFromNudgeFeedback }) =>
+          adjustEdgeWeightsFromNudgeFeedback(body.nudgeId, body.wasHelpful!)
+        )
+        .catch(() => {});
+    }
+
     return NextResponse.json({ acknowledged: true });
   } catch (error) {
     log.error('Nudge acknowledge error:', error);

@@ -121,8 +121,25 @@ export async function POST(req: NextRequest) {
       })
       .catch(() => {}); // Schema drift — column may not exist yet
 
+    // Adjust graph edge weights from outcome (fire-and-forget flywheel)
+    let contradictions: Array<{ contradictedBias: string; expectedOutcome: string; actualOutcome: string }> = [];
+    try {
+      const { adjustEdgeWeightsFromOutcome, detectOutcomeContradictions } = await import('@/lib/graph/edge-learning');
+      const edgesUpdated = await adjustEdgeWeightsFromOutcome(
+        analysisId, outcome, confirmedBiases || [], falsPositiveBiases || []
+      );
+      if (edgesUpdated > 0) {
+        log.info(`Adjusted ${edgesUpdated} edge weight(s) from outcome for ${analysisId}`);
+      }
+
+      // Detect contradictions between biases and outcome
+      contradictions = await detectOutcomeContradictions(analysisId, outcome);
+    } catch (flyErr) {
+      log.warn('Outcome flywheel failed (non-critical):', flyErr);
+    }
+
     log.info(`Outcome reported for analysis ${analysisId}: ${outcome}`);
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, contradictions });
   } catch (error: unknown) {
     const code = (error as { code?: string }).code;
     if (code === 'P2021' || code === 'P2022') {
