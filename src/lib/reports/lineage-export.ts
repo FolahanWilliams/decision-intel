@@ -16,7 +16,12 @@ export interface DecisionLineageRecord {
   score: number;
   participants: string[];
   biasesDetected: Array<{ type: string; severity: string }>;
-  nudgesServed: Array<{ type: string; severity: string; acknowledged: boolean; helpful: boolean | null }>;
+  nudgesServed: Array<{
+    type: string;
+    severity: string;
+    acknowledged: boolean;
+    helpful: boolean | null;
+  }>;
   outcome: { result: string; impactScore: number | null; lessonsLearned: string | null } | null;
   connectedDecisions: Array<{ id: string; edgeType: string; strength: number; direction: string }>;
 }
@@ -51,25 +56,30 @@ export async function generateLineageExport(
 
     // Batch fetch edges
     let edges: Array<{
-      sourceId: string; targetId: string; edgeType: string; strength: number;
+      sourceId: string;
+      targetId: string;
+      edgeType: string;
+      strength: number;
     }> = [];
     try {
       edges = await prisma.decisionEdge.findMany({
         where: {
           orgId,
-          OR: [
-            { sourceId: { in: analysisIds } },
-            { targetId: { in: analysisIds } },
-          ],
+          OR: [{ sourceId: { in: analysisIds } }, { targetId: { in: analysisIds } }],
         },
         select: { sourceId: true, targetId: true, edgeType: true, strength: true },
       });
-    } catch { /* schema drift */ }
+    } catch {
+      /* schema drift */
+    }
 
     // Batch fetch nudges linked to analyses (via humanDecisionId or targetUserId)
     let nudges: Array<{
-      humanDecisionId: string | null; nudgeType: string; severity: string;
-      acknowledgedAt: Date | null; wasHelpful: boolean | null;
+      humanDecisionId: string | null;
+      nudgeType: string;
+      severity: string;
+      acknowledgedAt: Date | null;
+      wasHelpful: boolean | null;
     }> = [];
     try {
       nudges = await prisma.nudge.findMany({
@@ -85,18 +95,29 @@ export async function generateLineageExport(
           wasHelpful: true,
         },
       });
-    } catch { /* schema drift */ }
+    } catch {
+      /* schema drift */
+    }
 
     // Build edge lookup
-    const edgesByNode = new Map<string, Array<{ id: string; edgeType: string; strength: number; direction: string }>>();
+    const edgesByNode = new Map<
+      string,
+      Array<{ id: string; edgeType: string; strength: number; direction: string }>
+    >();
     for (const e of edges) {
       if (!edgesByNode.has(e.sourceId)) edgesByNode.set(e.sourceId, []);
       edgesByNode.get(e.sourceId)!.push({
-        id: e.targetId, edgeType: e.edgeType, strength: e.strength, direction: 'outgoing',
+        id: e.targetId,
+        edgeType: e.edgeType,
+        strength: e.strength,
+        direction: 'outgoing',
       });
       if (!edgesByNode.has(e.targetId)) edgesByNode.set(e.targetId, []);
       edgesByNode.get(e.targetId)!.push({
-        id: e.sourceId, edgeType: e.edgeType, strength: e.strength, direction: 'incoming',
+        id: e.sourceId,
+        edgeType: e.edgeType,
+        strength: e.strength,
+        direction: 'incoming',
       });
     }
 
@@ -117,11 +138,13 @@ export async function generateLineageExport(
           acknowledged: n.acknowledgedAt !== null,
           helpful: n.wasHelpful,
         })),
-      outcome: a.outcome ? {
-        result: a.outcome.outcome,
-        impactScore: a.outcome.impactScore,
-        lessonsLearned: a.outcome.lessonsLearned,
-      } : null,
+      outcome: a.outcome
+        ? {
+            result: a.outcome.outcome,
+            impactScore: a.outcome.impactScore,
+            lessonsLearned: a.outcome.lessonsLearned,
+          }
+        : null,
       connectedDecisions: (edgesByNode.get(a.id) || []).slice(0, 20),
     }));
 
@@ -147,9 +170,18 @@ function escapeCSV(val: unknown): string {
 
 export function lineageToCSV(records: DecisionLineageRecord[]): string {
   const headers = [
-    'Decision ID', 'Type', 'Label', 'Timestamp', 'Score',
-    'Biases', 'Bias Severities', 'Outcome', 'Impact Score',
-    'Nudges Served', 'Nudges Acknowledged', 'Connected Decisions',
+    'Decision ID',
+    'Type',
+    'Label',
+    'Timestamp',
+    'Score',
+    'Biases',
+    'Bias Severities',
+    'Outcome',
+    'Impact Score',
+    'Nudges Served',
+    'Nudges Acknowledged',
+    'Connected Decisions',
   ];
 
   const rows = records.map(r => [

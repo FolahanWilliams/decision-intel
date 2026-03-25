@@ -299,9 +299,14 @@ export async function analyzeDocument(
           // Check graph patterns for nudges (after edges exist)
           try {
             const { checkGraphNudgesForAnalysis } = await import('@/lib/nudges/engine');
-            const nudgeCount = await checkGraphNudgesForAnalysis(savedForGraph.id, document.orgId ?? null);
+            const nudgeCount = await checkGraphNudgesForAnalysis(
+              savedForGraph.id,
+              document.orgId ?? null
+            );
             if (nudgeCount > 0) {
-              log.info(`Created ${nudgeCount} graph-pattern nudge(s) for analysis ${savedForGraph.id}`);
+              log.info(
+                `Created ${nudgeCount} graph-pattern nudge(s) for analysis ${savedForGraph.id}`
+              );
             }
           } catch (nudgeErr) {
             log.warn('Graph nudge check failed (non-critical):', nudgeErr);

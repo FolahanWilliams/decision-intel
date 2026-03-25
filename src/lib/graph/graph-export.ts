@@ -43,7 +43,11 @@ export async function exportToPng(svgElement: SVGSVGElement): Promise<Blob> {
       canvas.width = svgElement.clientWidth * 2;
       canvas.height = svgElement.clientHeight * 2;
       const ctx = canvas.getContext('2d');
-      if (!ctx) { URL.revokeObjectURL(url); reject(new Error('Canvas context unavailable')); return; }
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        reject(new Error('Canvas context unavailable'));
+        return;
+      }
       ctx.fillStyle = '#09090b';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.scale(2, 2);
@@ -123,9 +127,8 @@ export function exportToDot(nodes: ExportNode[], edges: ExportEdge[]): string {
  * Trigger a download of a blob or string content.
  */
 export function downloadFile(content: Blob | string, filename: string, mimeType?: string) {
-  const blob = typeof content === 'string'
-    ? new Blob([content], { type: mimeType || 'text/plain' })
-    : content;
+  const blob =
+    typeof content === 'string' ? new Blob([content], { type: mimeType || 'text/plain' }) : content;
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

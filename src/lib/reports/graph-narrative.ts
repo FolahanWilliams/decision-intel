@@ -22,9 +22,7 @@ function getGenAI(): GoogleGenerativeAI {
  * Generate a 3-5 paragraph executive narrative summarizing the
  * decision knowledge graph state, patterns, and recommendations.
  */
-export async function generateGraphNarrative(
-  report: GraphNetworkReport
-): Promise<string> {
+export async function generateGraphNarrative(report: GraphNetworkReport): Promise<string> {
   try {
     const ai = getGenAI();
     const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash' });
@@ -45,10 +43,15 @@ ${report.riskState.factors.length > 0 ? `Risk factors: ${report.riskState.factor
 ${report.antiPatterns.map(p => `- ${p.patternType}: ${p.description} (severity: ${p.severity})`).join('\n')}
 
 **Most Influential Decisions (by PageRank):**
-${report.topNodes.slice(0, 5).map(n => `- "${n.label}" (type: ${n.type}, score: ${n.score}, connections: ${n.degree})`).join('\n')}
+${report.topNodes
+  .slice(0, 5)
+  .map(n => `- "${n.label}" (type: ${n.type}, score: ${n.score}, connections: ${n.degree})`)
+  .join('\n')}
 
 **Edge Type Distribution:**
-${Object.entries(report.edgeTypeDistribution).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
+${Object.entries(report.edgeTypeDistribution)
+  .map(([k, v]) => `- ${k}: ${v}`)
+  .join('\n')}
 
 **Cascade Risks (pending decisions at elevated risk):**
 ${report.cascadeRisks.length > 0 ? report.cascadeRisks.map(r => `- Risk score ${r.riskScore}: ${r.reason}`).join('\n') : 'No elevated cascade risks.'}

@@ -49,7 +49,9 @@ export function RecommendationsPanel({ analysisId }: RecommendationsPanelProps) 
     }
 
     fetchRecommendations();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [analysisId]);
 
   if (loading) {

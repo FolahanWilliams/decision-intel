@@ -81,9 +81,7 @@ export async function contributeAnonymizedPatterns(orgId: string): Promise<numbe
  * Fetch federated (cross-org) patterns matching the given bias types.
  * Returns anonymized insights from the global pattern pool.
  */
-export async function fetchFederatedPatterns(
-  biasTypes: string[]
-): Promise<FederatedInsight[]> {
+export async function fetchFederatedPatterns(biasTypes: string[]): Promise<FederatedInsight[]> {
   try {
     // Find global patterns (orgId = null) that overlap with the given biases
     const patterns = await prisma.toxicPattern.findMany({

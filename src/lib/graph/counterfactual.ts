@@ -124,7 +124,5 @@ export function computeCounterfactualPaths(
     }
   }
 
-  return results
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, 5);
+  return results.sort((a, b) => b.similarity - a.similarity).slice(0, 5);
 }

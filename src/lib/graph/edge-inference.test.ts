@@ -116,10 +116,7 @@ describe('inferEdgesForAnalysis', () => {
     mockPrisma.analysis.findMany.mockResolvedValue([
       {
         id: 'analysis-2',
-        biases: [
-          { biasType: 'confirmation_bias' },
-          { biasType: 'anchoring_bias' },
-        ],
+        biases: [{ biasType: 'confirmation_bias' }, { biasType: 'anchoring_bias' }],
       },
     ]);
 

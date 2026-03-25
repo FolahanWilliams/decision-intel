@@ -1,11 +1,6 @@
 // ─── Node Types ─────────────────────────────────────────────────────────────
 
-export type GraphNodeType =
-  | 'analysis'
-  | 'human_decision'
-  | 'person'
-  | 'bias_pattern'
-  | 'outcome';
+export type GraphNodeType = 'analysis' | 'human_decision' | 'person' | 'bias_pattern' | 'outcome';
 
 // ─── Edge Types ─────────────────────────────────────────────────────────────
 

@@ -56,9 +56,7 @@ export async function generateRecommendations(
       take: 20,
     });
 
-    const connectedIds = edges.map(e =>
-      e.sourceId === analysisId ? e.targetId : e.sourceId
-    );
+    const connectedIds = edges.map(e => (e.sourceId === analysisId ? e.targetId : e.sourceId));
 
     if (connectedIds.length === 0) return [];
 
@@ -86,9 +84,10 @@ export async function generateRecommendations(
       if (conn.outcome.outcome === 'success' && scoreDiff > 10) {
         // Find biases present in current but absent in successful decision
         const avoidedBiases = [...currentBiases].filter(b => !connBiases.has(b));
-        const description = avoidedBiases.length > 0
-          ? `"${conn.document.filename}" scored ${Math.round(scoreDiff)} points higher and avoided: ${avoidedBiases.slice(0, 3).join(', ')}.${conn.outcome.lessonsLearned ? ` Lesson: ${conn.outcome.lessonsLearned.slice(0, 150)}` : ''}`
-          : `"${conn.document.filename}" scored ${Math.round(scoreDiff)} points higher with a successful outcome.${conn.outcome.lessonsLearned ? ` Lesson: ${conn.outcome.lessonsLearned.slice(0, 150)}` : ''}`;
+        const description =
+          avoidedBiases.length > 0
+            ? `"${conn.document.filename}" scored ${Math.round(scoreDiff)} points higher and avoided: ${avoidedBiases.slice(0, 3).join(', ')}.${conn.outcome.lessonsLearned ? ` Lesson: ${conn.outcome.lessonsLearned.slice(0, 150)}` : ''}`
+            : `"${conn.document.filename}" scored ${Math.round(scoreDiff)} points higher with a successful outcome.${conn.outcome.lessonsLearned ? ` Lesson: ${conn.outcome.lessonsLearned.slice(0, 150)}` : ''}`;
 
         recommendations.push({
           type: 'precedent',

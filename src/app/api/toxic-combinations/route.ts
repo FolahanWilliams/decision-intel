@@ -57,10 +57,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     log.error('Failed to fetch toxic combinations:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch toxic combinations' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch toxic combinations' }, { status: 500 });
   }
 }
 
@@ -104,9 +101,6 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json(updated);
   } catch (error) {
     log.error('Failed to update toxic combination:', error);
-    return NextResponse.json(
-      { error: 'Failed to update toxic combination' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update toxic combination' }, { status: 500 });
   }
 }

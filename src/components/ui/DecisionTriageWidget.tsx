@@ -106,7 +106,9 @@ export function DecisionTriageWidget() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm font-mono font-medium ${getScoreColor(d.triageScore)}`}>
+                    <span
+                      className={`text-sm font-mono font-medium ${getScoreColor(d.triageScore)}`}
+                    >
                       {d.triageScore.toFixed(1)}
                     </span>
                     <ChevronRight size={14} className="text-zinc-600" />

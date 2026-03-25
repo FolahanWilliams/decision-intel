@@ -346,14 +346,15 @@ function checkToxicCombination(
   }
 
   // Generic check: 3+ high/critical biases = toxic regardless of type
-  const severeCount = biases.filter(
-    b => b.severity === 'high' || b.severity === 'critical'
-  ).length;
+  const severeCount = biases.filter(b => b.severity === 'high' || b.severity === 'critical').length;
 
   if (severeCount >= 3) {
     return {
       nudgeType: 'toxic_combination',
-      triggerReason: `${severeCount} high/critical biases detected simultaneously: ${biases.filter(b => b.severity === 'high' || b.severity === 'critical').map(b => b.biasType).join(', ')}`,
+      triggerReason: `${severeCount} high/critical biases detected simultaneously: ${biases
+        .filter(b => b.severity === 'high' || b.severity === 'critical')
+        .map(b => b.biasType)
+        .join(', ')}`,
       message: `Compound risk alert: ${severeCount} severe biases active simultaneously. Multiple high-severity biases compounding on each other substantially increase decision risk. Consider structured de-biasing before proceeding.`,
       severity: 'critical',
       channel: 'dashboard',
@@ -386,18 +387,13 @@ async function checkGraphPattern(context: NudgeTriggerContext): Promise<NudgeDef
     if (edges.length < 1) return null;
 
     // 1-hop neighbors
-    const hop1Ids = edges.map(e =>
-      e.sourceId === decisionId ? e.targetId : e.sourceId
-    );
+    const hop1Ids = edges.map(e => (e.sourceId === decisionId ? e.targetId : e.sourceId));
 
     // 2-hop neighbors (expand the search radius)
     const hop2Edges = await prisma.decisionEdge.findMany({
       where: {
         orgId,
-        OR: [
-          { sourceId: { in: hop1Ids } },
-          { targetId: { in: hop1Ids } },
-        ],
+        OR: [{ sourceId: { in: hop1Ids } }, { targetId: { in: hop1Ids } }],
       },
       select: { sourceId: true, targetId: true, edgeType: true },
       take: 50,
@@ -469,9 +465,7 @@ export async function checkGraphNudgesForAnalysis(
 
     if (edges.length < 2) return 0;
 
-    const connectedIds = edges.map(e =>
-      e.sourceId === analysisId ? e.targetId : e.sourceId
-    );
+    const connectedIds = edges.map(e => (e.sourceId === analysisId ? e.targetId : e.sourceId));
 
     const failedOutcomes = await prisma.decisionOutcome.count({
       where: {

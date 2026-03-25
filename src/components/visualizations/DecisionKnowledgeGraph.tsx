@@ -79,13 +79,18 @@ interface DecisionKnowledgeGraphProps {
 
 const NODE_TYPE_CONFIG: Record<
   NodeType,
-  { label: string; color: string; shape: 'circle' | 'rect' | 'diamond' | 'triangle' | 'star'; size: number }
+  {
+    label: string;
+    color: string;
+    shape: 'circle' | 'rect' | 'diamond' | 'triangle' | 'star';
+    size: number;
+  }
 > = {
-  analysis:        { label: 'Analysis',        color: '#3b82f6', shape: 'circle',   size: 1.0 },
-  human_decision:  { label: 'Human Decision',  color: '#8b5cf6', shape: 'rect',     size: 1.0 },
-  person:          { label: 'Person',           color: '#14b8a6', shape: 'diamond',  size: 0.6 },
-  bias_pattern:    { label: 'Bias Pattern',     color: '#f59e0b', shape: 'triangle', size: 0.65 },
-  outcome:         { label: 'Outcome',          color: '#6366f1', shape: 'star',     size: 0.55 },
+  analysis: { label: 'Analysis', color: '#3b82f6', shape: 'circle', size: 1.0 },
+  human_decision: { label: 'Human Decision', color: '#8b5cf6', shape: 'rect', size: 1.0 },
+  person: { label: 'Person', color: '#14b8a6', shape: 'diamond', size: 0.6 },
+  bias_pattern: { label: 'Bias Pattern', color: '#f59e0b', shape: 'triangle', size: 0.65 },
+  outcome: { label: 'Outcome', color: '#6366f1', shape: 'star', size: 0.55 },
 };
 
 // ─── Edge Style Config ──────────────────────────────────────────────────────
@@ -152,7 +157,7 @@ function renderNodeShape(
   selection: d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown>,
   d: GraphNode,
   r: number,
-  isHighlighted: boolean,
+  isHighlighted: boolean
 ) {
   const el = d3.select(selection.node()!);
   const fill = getNodeFill(d);
@@ -163,18 +168,22 @@ function renderNodeShape(
   switch (config?.shape) {
     case 'rect':
       el.append('rect')
-        .attr('x', -r).attr('y', -r)
-        .attr('width', r * 2).attr('height', r * 2)
+        .attr('x', -r)
+        .attr('y', -r)
+        .attr('width', r * 2)
+        .attr('height', r * 2)
         .attr('rx', 6)
         .attr('fill', fill)
-        .attr('stroke', strokeColor).attr('stroke-width', strokeWidth);
+        .attr('stroke', strokeColor)
+        .attr('stroke-width', strokeWidth);
       break;
     case 'diamond': {
       const pts = `0,${-r} ${r},0 0,${r} ${-r},0`;
       el.append('polygon')
         .attr('points', pts)
         .attr('fill', fill)
-        .attr('stroke', strokeColor).attr('stroke-width', strokeWidth);
+        .attr('stroke', strokeColor)
+        .attr('stroke-width', strokeWidth);
       break;
     }
     case 'triangle': {
@@ -183,7 +192,8 @@ function renderNodeShape(
       el.append('polygon')
         .attr('points', pts)
         .attr('fill', fill)
-        .attr('stroke', strokeColor).attr('stroke-width', strokeWidth);
+        .attr('stroke', strokeColor)
+        .attr('stroke-width', strokeWidth);
       break;
     }
     case 'star': {
@@ -191,7 +201,7 @@ function renderNodeShape(
       const innerR = r * 0.45;
       const points: string[] = [];
       for (let i = 0; i < 5; i++) {
-        const outerAngle = (Math.PI / 2) + (i * 2 * Math.PI / 5);
+        const outerAngle = Math.PI / 2 + (i * 2 * Math.PI) / 5;
         const innerAngle = outerAngle + Math.PI / 5;
         points.push(`${Math.cos(outerAngle) * outerR},${-Math.sin(outerAngle) * outerR}`);
         points.push(`${Math.cos(innerAngle) * innerR},${-Math.sin(innerAngle) * innerR}`);
@@ -199,14 +209,16 @@ function renderNodeShape(
       el.append('polygon')
         .attr('points', points.join(' '))
         .attr('fill', fill)
-        .attr('stroke', strokeColor).attr('stroke-width', strokeWidth);
+        .attr('stroke', strokeColor)
+        .attr('stroke-width', strokeWidth);
       break;
     }
     default: // circle
       el.append('circle')
         .attr('r', r)
         .attr('fill', fill)
-        .attr('stroke', strokeColor).attr('stroke-width', strokeWidth);
+        .attr('stroke', strokeColor)
+        .attr('stroke-width', strokeWidth);
       break;
   }
 }
@@ -234,7 +246,7 @@ export function DecisionKnowledgeGraph({
   const [edgeFilter, setEdgeFilter] = useState<string>('all');
   const [minStrength, setMinStrength] = useState(0.3);
   const [visibleNodeTypes, setVisibleNodeTypes] = useState<Set<NodeType>>(
-    new Set(['analysis', 'human_decision', 'person', 'bias_pattern', 'outcome']),
+    new Set(['analysis', 'human_decision', 'person', 'bias_pattern', 'outcome'])
   );
 
   // Playback state
@@ -368,14 +380,26 @@ export function DecisionKnowledgeGraph({
     }
 
     // Always include highlighted node; show isolated decision nodes if no filter active
-    const nodes = visibleNodes.filter(n =>
-      n.id === highlightNodeId ||
-      connectedIds.has(n.id) ||
-      ((n.type === 'analysis' || n.type === 'human_decision') && edgeFilter === 'all' && minStrength <= 0.3)
+    const nodes = visibleNodes.filter(
+      n =>
+        n.id === highlightNodeId ||
+        connectedIds.has(n.id) ||
+        ((n.type === 'analysis' || n.type === 'human_decision') &&
+          edgeFilter === 'all' &&
+          minStrength <= 0.3)
     );
 
     return { nodes, edges, stats: graphData.stats };
-  }, [graphData, edgeFilter, minStrength, highlightNodeId, visibleNodeTypes, playbackEnabled, playback, isolatedClusterId]);
+  }, [
+    graphData,
+    edgeFilter,
+    minStrength,
+    highlightNodeId,
+    visibleNodeTypes,
+    playbackEnabled,
+    playback,
+    isolatedClusterId,
+  ]);
 
   // D3 Force Simulation
   useEffect(() => {
@@ -396,7 +420,11 @@ export function DecisionKnowledgeGraph({
     }));
 
     // Size scale (for decision nodes sized by bias count)
-    const maxBiases = d3.max(simNodes.filter(d => d.type === 'analysis' || d.type === 'human_decision'), d => d.biasCount) || 1;
+    const maxBiases =
+      d3.max(
+        simNodes.filter(d => d.type === 'analysis' || d.type === 'human_decision'),
+        d => d.biasCount
+      ) || 1;
     const sizeScale = d3.scaleLinear().domain([0, maxBiases]).range([12, 28]);
 
     // Simulation — lighter charge for larger multi-type graphs
@@ -525,7 +553,9 @@ export function DecisionKnowledgeGraph({
       const isHighlighted = d.id === highlightNodeId;
       renderNodeShape(
         d3.select(this) as unknown as d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown>,
-        d, r, isHighlighted,
+        d,
+        r,
+        isHighlighted
       );
     });
 
@@ -544,7 +574,7 @@ export function DecisionKnowledgeGraph({
     node
       .append('text')
       .text(d => {
-        const maxLen = (d.type === 'person' || d.type === 'bias_pattern') ? 16 : 20;
+        const maxLen = d.type === 'person' || d.type === 'bias_pattern' ? 16 : 20;
         return d.label.length > maxLen ? d.label.slice(0, maxLen - 2) + '...' : d.label;
       })
       .attr('text-anchor', 'middle')
@@ -554,14 +584,14 @@ export function DecisionKnowledgeGraph({
         return config ? config.color : '#a1a1aa';
       })
       .attr('font-size', d =>
-        (d.type === 'person' || d.type === 'bias_pattern' || d.type === 'outcome') ? '9px' : '10px'
+        d.type === 'person' || d.type === 'bias_pattern' || d.type === 'outcome' ? '9px' : '10px'
       )
       .attr('font-weight', d => (d.type === 'bias_pattern' ? '500' : '400'))
       .attr('pointer-events', 'none');
 
     // Apply search/path highlights
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    node.selectAll('circle, rect, polygon').each(function(this: any, d: any) {
+    node.selectAll('circle, rect, polygon').each(function (this: any, d: any) {
       const n = d as GraphNode;
       const el = d3.select(this);
       if (searchResults.size > 0 && searchResults.has(n.id)) {
@@ -575,11 +605,9 @@ export function DecisionKnowledgeGraph({
 
     // Apply path highlighting to edges
     if (highlightedPathEdges.size > 0) {
-      link.attr('stroke-width', (d: GraphEdge) =>
-        highlightedPathEdges.has(d.id) ? 4 : 0.5
-      ).attr('stroke-opacity', (d: GraphEdge) =>
-        highlightedPathEdges.has(d.id) ? 0.9 : 0.1
-      );
+      link
+        .attr('stroke-width', (d: GraphEdge) => (highlightedPathEdges.has(d.id) ? 4 : 0.5))
+        .attr('stroke-opacity', (d: GraphEdge) => (highlightedPathEdges.has(d.id) ? 0.9 : 0.1));
     }
 
     // Click handler
@@ -603,9 +631,11 @@ export function DecisionKnowledgeGraph({
     });
 
     // Edge click handler
-    link.on('click', (_event: MouseEvent, d: GraphEdge) => {
-      setSelectedEdge(d);
-    }).style('cursor', 'pointer');
+    link
+      .on('click', (_event: MouseEvent, d: GraphEdge) => {
+        setSelectedEdge(d);
+      })
+      .style('cursor', 'pointer');
 
     // Simulation tick
     simulation.on('tick', () => {
@@ -625,24 +655,32 @@ export function DecisionKnowledgeGraph({
     return () => {
       simulation.stop();
     };
-  }, [filteredData, dimensions, highlightNodeId, onNodeSelect, pathMode, pathStart, pathEnd, searchResults, highlightedPath, highlightedPathEdges]);
+  }, [
+    filteredData,
+    dimensions,
+    highlightNodeId,
+    onNodeSelect,
+    pathMode,
+    pathStart,
+    pathEnd,
+    searchResults,
+    highlightedPath,
+    highlightedPathEdges,
+  ]);
 
   // Zoom controls
-  const handleZoom = useCallback(
-    (factor: number) => {
-      if (!svgRef.current) return;
-      const svg = d3.select(svgRef.current);
-      const currentTransform = d3.zoomTransform(svgRef.current);
-      svg
-        .transition()
-        .duration(300)
-        .call(
-          d3.zoom<SVGSVGElement, unknown>().transform as never,
-          currentTransform.scale(factor) as never
-        );
-    },
-    []
-  );
+  const handleZoom = useCallback((factor: number) => {
+    if (!svgRef.current) return;
+    const svg = d3.select(svgRef.current);
+    const currentTransform = d3.zoomTransform(svgRef.current);
+    svg
+      .transition()
+      .duration(300)
+      .call(
+        d3.zoom<SVGSVGElement, unknown>().transform as never,
+        currentTransform.scale(factor) as never
+      );
+  }, []);
 
   // Edge confirm/dismiss handlers
   const handleConfirmEdge = useCallback(async (edgeId: string) => {
@@ -652,31 +690,40 @@ export function DecisionKnowledgeGraph({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: edgeId, confidence: 1.0 }),
       });
-    } catch { /* non-critical */ }
+    } catch {
+      /* non-critical */
+    }
   }, []);
 
   const handleDismissEdge = useCallback(async (edgeId: string) => {
     try {
       await fetch(`/api/decision-graph/edges?id=${edgeId}`, { method: 'DELETE' });
-    } catch { /* non-critical */ }
+    } catch {
+      /* non-critical */
+    }
   }, []);
 
   // Export handlers
-  const handleExport = useCallback(async (format: 'png' | 'svg' | 'dot') => {
-    if (!svgRef.current || !filteredData) return;
-    try {
-      if (format === 'png') {
-        const blob = await exportToPng(svgRef.current);
-        downloadFile(blob, 'decision-graph.png');
-      } else if (format === 'svg') {
-        const svgStr = exportToSvg(svgRef.current);
-        downloadFile(svgStr, 'decision-graph.svg', 'image/svg+xml');
-      } else if (format === 'dot') {
-        const dot = exportToDot(filteredData.nodes, filteredData.edges);
-        downloadFile(dot, 'decision-graph.dot', 'text/vnd.graphviz');
+  const handleExport = useCallback(
+    async (format: 'png' | 'svg' | 'dot') => {
+      if (!svgRef.current || !filteredData) return;
+      try {
+        if (format === 'png') {
+          const blob = await exportToPng(svgRef.current);
+          downloadFile(blob, 'decision-graph.png');
+        } else if (format === 'svg') {
+          const svgStr = exportToSvg(svgRef.current);
+          downloadFile(svgStr, 'decision-graph.svg', 'image/svg+xml');
+        } else if (format === 'dot') {
+          const dot = exportToDot(filteredData.nodes, filteredData.edges);
+          downloadFile(dot, 'decision-graph.dot', 'text/vnd.graphviz');
+        }
+      } catch {
+        /* non-critical */
       }
-    } catch { /* non-critical */ }
-  }, [filteredData]);
+    },
+    [filteredData]
+  );
 
   // Keyboard navigation
   useEffect(() => {
@@ -705,10 +752,10 @@ export function DecisionKnowledgeGraph({
         // Fit to viewport
         if (svgRef.current) {
           const svg = d3.select(svgRef.current);
-          svg.transition().duration(300).call(
-            d3.zoom<SVGSVGElement, unknown>().transform as never,
-            d3.zoomIdentity as never
-          );
+          svg
+            .transition()
+            .duration(300)
+            .call(d3.zoom<SVGSVGElement, unknown>().transform as never, d3.zoomIdentity as never);
         }
         return;
       }
@@ -765,7 +812,9 @@ export function DecisionKnowledgeGraph({
             >
               <option value="all">All edges</option>
               {Object.entries(EDGE_STYLES).map(([key, style]) => (
-                <option key={key} value={key}>{style.label}</option>
+                <option key={key} value={key}>
+                  {style.label}
+                </option>
               ))}
             </select>
 
@@ -785,16 +834,26 @@ export function DecisionKnowledgeGraph({
             </div>
 
             {/* Zoom */}
-            <button onClick={() => handleZoom(1.3)} className="p-1 rounded hover:bg-white/10 text-zinc-400">
+            <button
+              onClick={() => handleZoom(1.3)}
+              className="p-1 rounded hover:bg-white/10 text-zinc-400"
+            >
               <ZoomIn size={14} />
             </button>
-            <button onClick={() => handleZoom(0.7)} className="p-1 rounded hover:bg-white/10 text-zinc-400">
+            <button
+              onClick={() => handleZoom(0.7)}
+              className="p-1 rounded hover:bg-white/10 text-zinc-400"
+            >
               <ZoomOut size={14} />
             </button>
 
             {/* Path mode toggle */}
             <button
-              onClick={() => { setPathMode(!pathMode); setPathStart(null); setPathEnd(null); }}
+              onClick={() => {
+                setPathMode(!pathMode);
+                setPathStart(null);
+                setPathEnd(null);
+              }}
               className={`p-1 rounded text-zinc-400 ${pathMode ? 'bg-green-500/20 text-green-400' : 'hover:bg-white/10'}`}
               title="Path finding mode"
             >
@@ -818,9 +877,24 @@ export function DecisionKnowledgeGraph({
                 <Download size={14} />
               </button>
               <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-zinc-900 border border-white/10 rounded shadow-lg z-20">
-                <button onClick={() => handleExport('png')} className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left">PNG</button>
-                <button onClick={() => handleExport('svg')} className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left">SVG</button>
-                <button onClick={() => handleExport('dot')} className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left">DOT</button>
+                <button
+                  onClick={() => handleExport('png')}
+                  className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left"
+                >
+                  PNG
+                </button>
+                <button
+                  onClick={() => handleExport('svg')}
+                  className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left"
+                >
+                  SVG
+                </button>
+                <button
+                  onClick={() => handleExport('dot')}
+                  className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left"
+                >
+                  DOT
+                </button>
               </div>
             </div>
           </div>
@@ -829,37 +903,37 @@ export function DecisionKnowledgeGraph({
         {/* Node type toggles */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-[10px] text-zinc-500 uppercase tracking-wider mr-1">Show:</span>
-          {(Object.entries(NODE_TYPE_CONFIG) as [NodeType, typeof NODE_TYPE_CONFIG[NodeType]][]).map(
-            ([type, config]) => {
-              const isVisible = visibleNodeTypes.has(type);
-              const count = graphData.nodes.filter(n => n.type === type).length;
-              if (count === 0) return null;
-              return (
-                <button
-                  key={type}
-                  onClick={() => {
-                    setVisibleNodeTypes(prev => {
-                      const next = new Set(prev);
-                      if (next.has(type)) next.delete(type);
-                      else next.add(type);
-                      return next;
-                    });
-                  }}
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] transition-all"
-                  style={{
-                    backgroundColor: isVisible ? `${config.color}20` : 'transparent',
-                    border: `1px solid ${isVisible ? config.color + '60' : 'rgba(255,255,255,0.08)'}`,
-                    color: isVisible ? config.color : 'var(--text-muted)',
-                    opacity: isVisible ? 1 : 0.5,
-                  }}
-                >
-                  {isVisible ? <Eye size={10} /> : <EyeOff size={10} />}
-                  {config.label}
-                  <span className="text-[10px] opacity-60">{count}</span>
-                </button>
-              );
-            },
-          )}
+          {(
+            Object.entries(NODE_TYPE_CONFIG) as [NodeType, (typeof NODE_TYPE_CONFIG)[NodeType]][]
+          ).map(([type, config]) => {
+            const isVisible = visibleNodeTypes.has(type);
+            const count = graphData.nodes.filter(n => n.type === type).length;
+            if (count === 0) return null;
+            return (
+              <button
+                key={type}
+                onClick={() => {
+                  setVisibleNodeTypes(prev => {
+                    const next = new Set(prev);
+                    if (next.has(type)) next.delete(type);
+                    else next.add(type);
+                    return next;
+                  });
+                }}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] transition-all"
+                style={{
+                  backgroundColor: isVisible ? `${config.color}20` : 'transparent',
+                  border: `1px solid ${isVisible ? config.color + '60' : 'rgba(255,255,255,0.08)'}`,
+                  color: isVisible ? config.color : 'var(--text-muted)',
+                  opacity: isVisible ? 1 : 0.5,
+                }}
+              >
+                {isVisible ? <Eye size={10} /> : <EyeOff size={10} />}
+                {config.label}
+                <span className="text-[10px] opacity-60">{count}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Search + Path mode + Playback controls row */}
@@ -881,10 +955,19 @@ export function DecisionKnowledgeGraph({
           {pathMode && (
             <div className="flex items-center gap-2 text-[10px] text-green-400">
               <Route size={10} />
-              {!pathStart ? 'Click start node' : !pathEnd ? 'Click end node' : `Path: ${highlightedPath.size} nodes`}
+              {!pathStart
+                ? 'Click start node'
+                : !pathEnd
+                  ? 'Click end node'
+                  : `Path: ${highlightedPath.size} nodes`}
               {(pathStart || pathEnd) && (
-                <button onClick={() => { setPathStart(null); setPathEnd(null); }}
-                  className="text-zinc-500 hover:text-zinc-300">
+                <button
+                  onClick={() => {
+                    setPathStart(null);
+                    setPathEnd(null);
+                  }}
+                  className="text-zinc-500 hover:text-zinc-300"
+                >
                   <X size={10} />
                 </button>
               )}
@@ -896,8 +979,10 @@ export function DecisionKnowledgeGraph({
             <div className="flex items-center gap-1.5 text-[10px] text-blue-400">
               <Boxes size={10} />
               Cluster isolated
-              <button onClick={() => setIsolatedClusterId(null)}
-                className="px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 hover:text-zinc-200">
+              <button
+                onClick={() => setIsolatedClusterId(null)}
+                className="px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 hover:text-zinc-200"
+              >
                 Show all
               </button>
             </div>
@@ -920,7 +1005,10 @@ export function DecisionKnowledgeGraph({
                 onChange={e => playback.seekTo(parseInt(e.target.value))}
                 className="w-24 h-1 accent-blue-500"
               />
-              <span className="text-[10px] text-zinc-500" style={{ fontFamily: "'JetBrains Mono'" }}>
+              <span
+                className="text-[10px] text-zinc-500"
+                style={{ fontFamily: "'JetBrains Mono'" }}
+              >
                 {playback.currentDate.toLocaleDateString()}
               </span>
             </div>
@@ -965,10 +1053,13 @@ export function DecisionKnowledgeGraph({
                 // Fit viewport on click
                 if (svgRef.current) {
                   const svg = d3.select(svgRef.current);
-                  svg.transition().duration(300).call(
-                    d3.zoom<SVGSVGElement, unknown>().transform as never,
-                    d3.zoomIdentity as never
-                  );
+                  svg
+                    .transition()
+                    .duration(300)
+                    .call(
+                      d3.zoom<SVGSVGElement, unknown>().transform as never,
+                      d3.zoomIdentity as never
+                    );
                 }
               }}
             />
@@ -982,7 +1073,7 @@ export function DecisionKnowledgeGraph({
             edges={filteredData.edges}
             allNodes={filteredData.nodes}
             onClose={() => setSelectedNode(null)}
-            onNavigateToNode={(nodeId) => {
+            onNavigateToNode={nodeId => {
               const found = filteredData.nodes.find(n => n.id === nodeId);
               if (found) {
                 setSelectedNode(found);
@@ -998,35 +1089,51 @@ export function DecisionKnowledgeGraph({
       {/* Legend */}
       <div className="px-4 py-2 border-t border-white/5 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-zinc-500">
         {/* Node shapes */}
-        <span className="text-[10px] uppercase tracking-wider text-zinc-600 w-full mb-0.5">Nodes</span>
-        {(Object.entries(NODE_TYPE_CONFIG) as [NodeType, typeof NODE_TYPE_CONFIG[NodeType]][]).map(
-          ([type, config]) => (
-            <div key={type} className="flex items-center gap-1.5">
-              <svg width="12" height="12" viewBox="-6 -6 12 12">
-                {config.shape === 'circle' && <circle r="5" fill={config.color} />}
-                {config.shape === 'rect' && <rect x="-5" y="-5" width="10" height="10" rx="2" fill={config.color} />}
-                {config.shape === 'diamond' && <polygon points="0,-5 5,0 0,5 -5,0" fill={config.color} />}
-                {config.shape === 'triangle' && <polygon points="0,-5 5,4 -5,4" fill={config.color} />}
-                {config.shape === 'star' && <polygon points="0,-5 1.5,-1.5 5,-1.5 2.5,1 3.5,5 0,2.5 -3.5,5 -2.5,1 -5,-1.5 -1.5,-1.5" fill={config.color} />}
-              </svg>
-              <span>{config.label}</span>
-            </div>
-          ),
-        )}
+        <span className="text-[10px] uppercase tracking-wider text-zinc-600 w-full mb-0.5">
+          Nodes
+        </span>
+        {(
+          Object.entries(NODE_TYPE_CONFIG) as [NodeType, (typeof NODE_TYPE_CONFIG)[NodeType]][]
+        ).map(([type, config]) => (
+          <div key={type} className="flex items-center gap-1.5">
+            <svg width="12" height="12" viewBox="-6 -6 12 12">
+              {config.shape === 'circle' && <circle r="5" fill={config.color} />}
+              {config.shape === 'rect' && (
+                <rect x="-5" y="-5" width="10" height="10" rx="2" fill={config.color} />
+              )}
+              {config.shape === 'diamond' && (
+                <polygon points="0,-5 5,0 0,5 -5,0" fill={config.color} />
+              )}
+              {config.shape === 'triangle' && (
+                <polygon points="0,-5 5,4 -5,4" fill={config.color} />
+              )}
+              {config.shape === 'star' && (
+                <polygon
+                  points="0,-5 1.5,-1.5 5,-1.5 2.5,1 3.5,5 0,2.5 -3.5,5 -2.5,1 -5,-1.5 -1.5,-1.5"
+                  fill={config.color}
+                />
+              )}
+            </svg>
+            <span>{config.label}</span>
+          </div>
+        ))}
         {/* Edge types */}
-        <span className="text-[10px] uppercase tracking-wider text-zinc-600 w-full mt-1 mb-0.5">Edges</span>
+        <span className="text-[10px] uppercase tracking-wider text-zinc-600 w-full mt-1 mb-0.5">
+          Edges
+        </span>
         {Object.entries(EDGE_STYLES).map(([key, style]) => (
           <div key={key} className="flex items-center gap-1.5">
             <svg width="16" height="4" viewBox="0 0 16 4">
               <line
-                x1="0" y1="2" x2="16" y2="2"
+                x1="0"
+                y1="2"
+                x2="16"
+                y2="2"
                 stroke={style.color}
                 strokeWidth="2"
                 strokeDasharray={style.dashArray || undefined}
               />
-              {style.directed && (
-                <polygon points="12,0 16,2 12,4" fill={style.color} />
-              )}
+              {style.directed && <polygon points="12,0 16,2 12,4" fill={style.color} />}
             </svg>
             <span>{style.label}</span>
           </div>

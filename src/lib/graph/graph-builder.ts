@@ -152,7 +152,7 @@ export async function buildDecisionGraph(params: {
 
   log.info(
     `Building graph for org=${orgId} timeRange=${timeRangeDays}d limit=${safeLimit}` +
-      (highlightNodeId ? ` highlight=${highlightNodeId} depth=${depth}` : ''),
+      (highlightNodeId ? ` highlight=${highlightNodeId} depth=${depth}` : '')
   );
 
   const nodes: GraphNode[] = [];
@@ -175,7 +175,7 @@ export async function buildDecisionGraph(params: {
     targetId: string,
     targetType: string,
     edgeType: string,
-    strength: number = 0.5,
+    strength: number = 0.5
   ) => {
     implicitEdgeCounter++;
     allEdges.push({
@@ -195,34 +195,36 @@ export async function buildDecisionGraph(params: {
 
   // ── Step 1: Analysis nodes ───────────────────────────────────────────────
 
-  const analyses = !includeType('analysis') ? [] : await prisma.analysis.findMany({
-    where: {
-      document: { orgId },
-      createdAt: { gte: since },
-    },
-    include: {
-      biases: { select: { id: true, biasType: true, severity: true } },
-      document: {
-        select: {
-          id: true,
-          filename: true,
-          decisionFrame: {
+  const analyses = !includeType('analysis')
+    ? []
+    : await prisma.analysis.findMany({
+        where: {
+          document: { orgId },
+          createdAt: { gte: since },
+        },
+        include: {
+          biases: { select: { id: true, biasType: true, severity: true } },
+          document: {
             select: {
-              monetaryValue: true,
-              stakeholders: true,
+              id: true,
+              filename: true,
+              decisionFrame: {
+                select: {
+                  monetaryValue: true,
+                  stakeholders: true,
+                },
+              },
             },
           },
+          outcome: { select: { id: true, outcome: true, impactScore: true } },
+          toxicCombinations: {
+            where: { status: 'active' },
+            select: { id: true },
+          },
         },
-      },
-      outcome: { select: { id: true, outcome: true, impactScore: true } },
-      toxicCombinations: {
-        where: { status: 'active' },
-        select: { id: true },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: safeLimit,
-  });
+        orderBy: { createdAt: 'desc' },
+        take: safeLimit,
+      });
 
   for (const a of analyses) {
     addNode({
@@ -245,26 +247,27 @@ export async function buildDecisionGraph(params: {
 
   // ── Step 2: HumanDecision nodes ──────────────────────────────────────────
 
-  const humanDecisions = !includeType('human_decision') ? [] : await prisma.humanDecision.findMany({
-    where: {
-      orgId,
-      createdAt: { gte: since },
-    },
-    include: {
-      cognitiveAudit: {
-        select: { decisionQualityScore: true, dissenterCount: true },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: Math.max(50, safeLimit - nodes.length),
-  });
+  const humanDecisions = !includeType('human_decision')
+    ? []
+    : await prisma.humanDecision.findMany({
+        where: {
+          orgId,
+          createdAt: { gte: since },
+        },
+        include: {
+          cognitiveAudit: {
+            select: { decisionQualityScore: true, dissenterCount: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: Math.max(50, safeLimit - nodes.length),
+      });
 
   for (const hd of humanDecisions) {
     addNode({
       id: hd.id,
       type: 'human_decision',
-      label:
-        hd.content.slice(0, 80) + (hd.content.length > 80 ? '...' : ''),
+      label: hd.content.slice(0, 80) + (hd.content.length > 80 ? '...' : ''),
       score: hd.cognitiveAudit?.decisionQualityScore ?? 50,
       outcome: undefined,
       biasCount: 0,
@@ -357,14 +360,7 @@ export async function buildDecisionGraph(params: {
     for (const decisionId of decisionIds) {
       const targetNode = nodeMap.get(decisionId);
       if (targetNode) {
-        addImplicitEdge(
-          personId,
-          'person',
-          decisionId,
-          targetNode.type,
-          'same_participants',
-          0.6,
-        );
+        addImplicitEdge(personId, 'person', decisionId, targetNode.type, 'same_participants', 0.6);
       }
     }
   }
@@ -409,14 +405,7 @@ export async function buildDecisionGraph(params: {
 
     // Create implicit edges from bias_pattern -> each analysis that has it
     for (const analysisId of analysisIds) {
-      addImplicitEdge(
-        biasId,
-        'bias_pattern',
-        analysisId,
-        'analysis',
-        'shared_bias',
-        0.7,
-      );
+      addImplicitEdge(biasId, 'bias_pattern', analysisId, 'analysis', 'shared_bias', 0.7);
     }
   }
 
@@ -426,7 +415,7 @@ export async function buildDecisionGraph(params: {
   // Query DecisionOutcome for analyses in scope. Each becomes an outcome node
   // linked to its parent analysis.
 
-  const analysisIdsInScope = analyses.map((a) => a.id);
+  const analysisIdsInScope = analyses.map(a => a.id);
   const outcomes =
     analysisIdsInScope.length > 0
       ? await prisma.decisionOutcome.findMany({
@@ -455,14 +444,7 @@ export async function buildDecisionGraph(params: {
     });
 
     // Link outcome -> analysis
-    addImplicitEdge(
-      o.id,
-      'outcome',
-      o.analysisId,
-      'analysis',
-      'depends_on',
-      1.0,
-    );
+    addImplicitEdge(o.id, 'outcome', o.analysisId, 'analysis', 'depends_on', 1.0);
   }
 
   log.debug(`Created ${outcomes.length} outcome nodes`);
@@ -491,17 +473,11 @@ export async function buildDecisionGraph(params: {
       highlightNodeId && depth === 1
         ? {
             orgId,
-            OR: [
-              { sourceId: highlightNodeId },
-              { targetId: highlightNodeId },
-            ],
+            OR: [{ sourceId: highlightNodeId }, { targetId: highlightNodeId }],
           }
         : {
             orgId,
-            OR: [
-              { sourceId: { in: allNodeIds } },
-              { targetId: { in: allNodeIds } },
-            ],
+            OR: [{ sourceId: { in: allNodeIds } }, { targetId: { in: allNodeIds } }],
           };
 
     explicitEdges = await prisma.decisionEdge.findMany({
@@ -527,7 +503,7 @@ export async function buildDecisionGraph(params: {
     const prismaError = err as { code?: string };
     if (prismaError.code === 'P2021' || prismaError.code === 'P2022') {
       log.warn(
-        `DecisionEdge query failed with ${prismaError.code} (schema drift) — returning graph without explicit edges`,
+        `DecisionEdge query failed with ${prismaError.code} (schema drift) — returning graph without explicit edges`
       );
     } else {
       throw err;
@@ -577,7 +553,7 @@ export async function buildDecisionGraph(params: {
 
     // Remove edges not connecting neighbor nodes
     const prunedEdges = allEdges.filter(
-      (e) => neighborIds.has(e.source) && neighborIds.has(e.target),
+      e => neighborIds.has(e.source) && neighborIds.has(e.target)
     );
 
     // Rebuild clusters from pruned set
@@ -588,9 +564,7 @@ export async function buildDecisionGraph(params: {
     const clusters = uf.clusters();
     const stats = computeStats(prunedNodes, prunedEdges, clusters);
 
-    log.info(
-      `Highlight subgraph: ${prunedNodes.length} nodes, ${prunedEdges.length} edges`,
-    );
+    log.info(`Highlight subgraph: ${prunedNodes.length} nodes, ${prunedEdges.length} edges`);
 
     return {
       nodes: prunedNodes,
@@ -629,7 +603,7 @@ export async function buildDecisionGraph(params: {
   }
 
   log.info(
-    `Graph built: ${stats.totalNodes} nodes, ${stats.totalEdges} edges, ${stats.clusters} clusters`,
+    `Graph built: ${stats.totalNodes} nodes, ${stats.totalEdges} edges, ${stats.clusters} clusters`
   );
 
   return { nodes, edges: allEdges, clusters, stats, antiPatterns };
@@ -640,7 +614,7 @@ export async function buildDecisionGraph(params: {
 function computeStats(
   nodes: GraphNode[],
   edges: GraphEdge[],
-  clusters: GraphCluster[],
+  clusters: GraphCluster[]
 ): GraphStats {
   const degreeMap = new Map<string, number>();
   let inferredEdges = 0;
@@ -672,9 +646,6 @@ function computeStats(
     manualEdges,
     clusters: clusters.length,
     mostConnectedNode,
-    avgDegree:
-      nodes.length > 0
-        ? Number((totalDegree / nodes.length).toFixed(1))
-        : 0,
+    avgDegree: nodes.length > 0 ? Number((totalDegree / nodes.length).toFixed(1)) : 0,
   };
 }

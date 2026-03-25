@@ -25,37 +25,42 @@ export async function computeOrgBenchmarks(orgId: string): Promise<OrgBenchmark[
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
     // Gather org metrics
-    const [orgOutcomes, orgAnalyses, orgEdges, orgNudges, orgAcknowledgedNudges] = await Promise.all([
-      prisma.decisionOutcome.findMany({
-        where: { orgId, reportedAt: { gte: ninetyDaysAgo } },
-        select: { outcome: true, impactScore: true },
-      }),
-      prisma.analysis.count({
-        where: { document: { orgId }, createdAt: { gte: ninetyDaysAgo } },
-      }),
-      prisma.decisionEdge.count({
-        where: { orgId, createdAt: { gte: ninetyDaysAgo } },
-      }),
-      prisma.nudge.count({
-        where: { orgId, createdAt: { gte: ninetyDaysAgo } },
-      }),
-      prisma.nudge.count({
-        where: { orgId, acknowledgedAt: { not: null }, createdAt: { gte: ninetyDaysAgo } },
-      }),
-    ]);
+    const [orgOutcomes, orgAnalyses, orgEdges, orgNudges, orgAcknowledgedNudges] =
+      await Promise.all([
+        prisma.decisionOutcome.findMany({
+          where: { orgId, reportedAt: { gte: ninetyDaysAgo } },
+          select: { outcome: true, impactScore: true },
+        }),
+        prisma.analysis.count({
+          where: { document: { orgId }, createdAt: { gte: ninetyDaysAgo } },
+        }),
+        prisma.decisionEdge.count({
+          where: { orgId, createdAt: { gte: ninetyDaysAgo } },
+        }),
+        prisma.nudge.count({
+          where: { orgId, createdAt: { gte: ninetyDaysAgo } },
+        }),
+        prisma.nudge.count({
+          where: { orgId, acknowledgedAt: { not: null }, createdAt: { gte: ninetyDaysAgo } },
+        }),
+      ]);
 
     // Compute org-level metrics
-    const successCount = orgOutcomes.filter(o => o.outcome === 'success' || o.outcome === 'partial_success').length;
+    const successCount = orgOutcomes.filter(
+      o => o.outcome === 'success' || o.outcome === 'partial_success'
+    ).length;
     const outcomeCount = orgOutcomes.filter(o => o.outcome !== 'too_early').length;
     const successRate = outcomeCount > 0 ? Math.round((successCount / outcomeCount) * 100) : 0;
 
     const withImpact = orgOutcomes.filter(o => o.impactScore != null);
-    const avgImpact = withImpact.length > 0
-      ? Math.round(withImpact.reduce((s, o) => s + (o.impactScore || 0), 0) / withImpact.length)
-      : 0;
+    const avgImpact =
+      withImpact.length > 0
+        ? Math.round(withImpact.reduce((s, o) => s + (o.impactScore || 0), 0) / withImpact.length)
+        : 0;
 
     const graphDensity = orgAnalyses > 0 ? Math.round((orgEdges / orgAnalyses) * 10) / 10 : 0;
-    const nudgeAcceptance = orgNudges > 0 ? Math.round((orgAcknowledgedNudges / orgNudges) * 100) : 0;
+    const nudgeAcceptance =
+      orgNudges > 0 ? Math.round((orgAcknowledgedNudges / orgNudges) * 100) : 0;
 
     // Get peer benchmarks from TeamCognitiveProfile aggregates
     const allProfiles = await prisma.teamCognitiveProfile.findMany({

@@ -34,9 +34,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     log.error('Failed to triage decisions:', error);
-    return NextResponse.json(
-      { error: 'Failed to triage decisions' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to triage decisions' }, { status: 500 });
   }
 }

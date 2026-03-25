@@ -71,10 +71,7 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
       prisma.decisionOutcome.findMany({
         where: {
           orgId,
-          OR: [
-            { confirmedBiases: { isEmpty: false } },
-            { falsPositiveBiases: { isEmpty: false } },
-          ],
+          OR: [{ confirmedBiases: { isEmpty: false } }, { falsPositiveBiases: { isEmpty: false } }],
         },
         select: { confirmedBiases: true, falsPositiveBiases: true },
       }),
@@ -124,18 +121,19 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
     ]);
 
     // 1. Outcome tracking rate (20%)
-    const outcomeTrackingRate = totalAnalyses > 0
-      ? Math.min(100, (outcomeCount / totalAnalyses) * 100)
-      : 0;
+    const outcomeTrackingRate =
+      totalAnalyses > 0 ? Math.min(100, (outcomeCount / totalAnalyses) * 100) : 0;
 
     // 2. Bias detection accuracy (20%)
     let biasAccuracy = 50; // default if no feedback
     if (outcomesWithBiasFeedback.length > 0) {
       const totalConfirmed = outcomesWithBiasFeedback.reduce(
-        (sum, o) => sum + o.confirmedBiases.length, 0
+        (sum, o) => sum + o.confirmedBiases.length,
+        0
       );
       const totalFP = outcomesWithBiasFeedback.reduce(
-        (sum, o) => sum + o.falsPositiveBiases.length, 0
+        (sum, o) => sum + o.falsPositiveBiases.length,
+        0
       );
       const total = totalConfirmed + totalFP;
       biasAccuracy = total > 0 ? (totalConfirmed / total) * 100 : 50;
@@ -156,21 +154,16 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
     // 4. Nudge responsiveness (15%)
     const totalNudges = nudgeStats.reduce((sum, s) => sum + s._count.id, 0);
     const helpfulNudges = nudgeStats.find(s => s.wasHelpful === true)?._count.id ?? 0;
-    const nudgeResponsiveness = totalNudges > 0
-      ? (helpfulNudges / totalNudges) * 100
-      : 50;
+    const nudgeResponsiveness = totalNudges > 0 ? (helpfulNudges / totalNudges) * 100 : 50;
 
     // 5. Dissent health (15%)
     const totalAudits = dissentStats.length;
     const auditsWithDissent = dissentStats.filter(a => a.dissenterCount > 0).length;
-    const dissentHealth = totalAudits > 0
-      ? (auditsWithDissent / totalAudits) * 100
-      : 50;
+    const dissentHealth = totalAudits > 0 ? (auditsWithDissent / totalAudits) * 100 : 50;
 
     // 6. Prior submission rate (15%)
-    const priorSubmissionRate = totalAnalyses > 0
-      ? Math.min(100, (priorCount / totalAnalyses) * 100)
-      : 0;
+    const priorSubmissionRate =
+      totalAnalyses > 0 ? Math.min(100, (priorCount / totalAnalyses) * 100) : 0;
 
     // Weighted composite score
     const breakdown: MaturityBreakdown = {
@@ -184,15 +177,16 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
 
     const score = Math.round(
       breakdown.outcomeTrackingRate * 0.2 +
-      breakdown.biasAccuracy * 0.2 +
-      breakdown.qualityTrend * 0.15 +
-      breakdown.nudgeResponsiveness * 0.15 +
-      breakdown.dissentHealth * 0.15 +
-      breakdown.priorSubmissionRate * 0.15
+        breakdown.biasAccuracy * 0.2 +
+        breakdown.qualityTrend * 0.15 +
+        breakdown.nudgeResponsiveness * 0.15 +
+        breakdown.dissentHealth * 0.15 +
+        breakdown.priorSubmissionRate * 0.15
     );
 
     // Grade
-    const grade = score >= 85 ? 'A' : score >= 70 ? 'B' : score >= 55 ? 'C' : score >= 40 ? 'D' : 'F';
+    const grade =
+      score >= 85 ? 'A' : score >= 70 ? 'B' : score >= 55 ? 'C' : score >= 40 ? 'D' : 'F';
 
     // Peer benchmark (anonymized average from all consenting orgs)
     let peerBenchmark: number | null = null;
@@ -220,8 +214,7 @@ export async function computeMaturityScore(orgId: string): Promise<MaturityScore
         // Simplified benchmark: average the raw outcome/analysis ratio
         if (peerOutcomes.length > 0 && peerAnalyses.length > 0) {
           peerBenchmark = Math.round(
-            (peerOutcomes.reduce((s, p) => s + p._count.id, 0) /
-              Math.max(1, peerAnalyses.length)) *
+            (peerOutcomes.reduce((s, p) => s + p._count.id, 0) / Math.max(1, peerAnalyses.length)) *
               10
           );
           peerBenchmark = Math.min(100, peerBenchmark);

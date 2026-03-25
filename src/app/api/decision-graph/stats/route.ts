@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
     }
 
     const totalNodes = nodeIds.size;
-    const avgDegree = totalNodes > 0 ? Math.round((edgeCount * 2 / totalNodes) * 100) / 100 : 0;
+    const avgDegree = totalNodes > 0 ? Math.round(((edgeCount * 2) / totalNodes) * 100) / 100 : 0;
 
     return NextResponse.json({
       totalNodes,

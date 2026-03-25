@@ -34,9 +34,7 @@ export function GraphStatsCard() {
         const orgId = teamData?.orgId || teamData?.organization?.id;
         if (!orgId || cancelled) return;
 
-        const res = await fetch(
-          `/api/decision-graph?orgId=${encodeURIComponent(orgId)}&limit=1`
-        );
+        const res = await fetch(`/api/decision-graph?orgId=${encodeURIComponent(orgId)}&limit=1`);
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled && data.stats) {
@@ -45,12 +43,16 @@ export function GraphStatsCard() {
 
         // Fetch risk state
         try {
-          const riskRes = await fetch(`/api/decision-graph/risk-state?orgId=${encodeURIComponent(orgId)}`);
+          const riskRes = await fetch(
+            `/api/decision-graph/risk-state?orgId=${encodeURIComponent(orgId)}`
+          );
           if (riskRes.ok && !cancelled) {
             const riskData = await riskRes.json();
             setRiskState(riskData);
           }
-        } catch { /* non-critical */ }
+        } catch {
+          /* non-critical */
+        }
       } catch {
         // Non-critical — silently fail
       } finally {
@@ -59,7 +61,9 @@ export function GraphStatsCard() {
     }
 
     fetchStats();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (loading) {
@@ -96,12 +100,22 @@ export function GraphStatsCard() {
               <span
                 className="flex items-center gap-xs px-2 py-0.5 rounded-full text-[10px] font-semibold"
                 style={{
-                  background: riskState.overallRisk === 'critical' ? 'rgba(239,68,68,0.15)' :
-                    riskState.overallRisk === 'high' ? 'rgba(249,115,22,0.15)' :
-                    riskState.overallRisk === 'moderate' ? 'rgba(234,179,8,0.15)' : 'rgba(34,197,94,0.15)',
-                  color: riskState.overallRisk === 'critical' ? '#ef4444' :
-                    riskState.overallRisk === 'high' ? '#f97316' :
-                    riskState.overallRisk === 'moderate' ? '#eab308' : '#22c55e',
+                  background:
+                    riskState.overallRisk === 'critical'
+                      ? 'rgba(239,68,68,0.15)'
+                      : riskState.overallRisk === 'high'
+                        ? 'rgba(249,115,22,0.15)'
+                        : riskState.overallRisk === 'moderate'
+                          ? 'rgba(234,179,8,0.15)'
+                          : 'rgba(34,197,94,0.15)',
+                  color:
+                    riskState.overallRisk === 'critical'
+                      ? '#ef4444'
+                      : riskState.overallRisk === 'high'
+                        ? '#f97316'
+                        : riskState.overallRisk === 'moderate'
+                          ? '#eab308'
+                          : '#22c55e',
                 }}
                 title={riskState.factors.map(f => f.description).join('\n')}
               >
@@ -120,7 +134,7 @@ export function GraphStatsCard() {
         </div>
 
         <div className="grid grid-4 gap-sm">
-          {miniStats.map((stat) => (
+          {miniStats.map(stat => (
             <div
               key={stat.label}
               style={{

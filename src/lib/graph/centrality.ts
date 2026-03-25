@@ -87,8 +87,14 @@ export function computeDegreeCentrality(
   for (const edge of edges) {
     const src = result.get(edge.source);
     const tgt = result.get(edge.target);
-    if (src) { src.out++; src.total++; }
-    if (tgt) { tgt.in++; tgt.total++; }
+    if (src) {
+      src.out++;
+      src.total++;
+    }
+    if (tgt) {
+      tgt.in++;
+      tgt.total++;
+    }
   }
 
   return result;

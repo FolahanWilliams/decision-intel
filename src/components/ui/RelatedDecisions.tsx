@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  GitBranch,
-  ChevronDown,
-  ChevronUp,
-  Brain,
-  ArrowRight,
-  Link2,
-} from 'lucide-react';
+import { GitBranch, ChevronDown, ChevronUp, Brain, ArrowRight, Link2 } from 'lucide-react';
 
 interface RelatedEdge {
   id: string;
@@ -95,7 +88,11 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
             {connectedNodes.length}
           </span>
         </h3>
-        {expanded ? <ChevronUp size={14} className="text-zinc-500" /> : <ChevronDown size={14} className="text-zinc-500" />}
+        {expanded ? (
+          <ChevronUp size={14} className="text-zinc-500" />
+        ) : (
+          <ChevronDown size={14} className="text-zinc-500" />
+        )}
       </button>
 
       {expanded && (
@@ -124,9 +121,7 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
                         {edgeStyle.label}
                       </span>
                     )}
-                    {edge && (
-                      <span>({(edge.strength * 100).toFixed(0)}% strength)</span>
-                    )}
+                    {edge && <span>({(edge.strength * 100).toFixed(0)}% strength)</span>}
                     <span className="flex items-center gap-1">
                       <Brain size={10} /> {node.biasCount} biases
                     </span>

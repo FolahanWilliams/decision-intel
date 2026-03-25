@@ -25,7 +25,12 @@ interface PatternCluster {
 }
 
 export interface GraphAntiPattern {
-  patternType: 'echo_chamber_cluster' | 'cascade_failure' | 'bias_concentration' | 'reversal_chain' | 'isolated_high_risk';
+  patternType:
+    | 'echo_chamber_cluster'
+    | 'cascade_failure'
+    | 'bias_concentration'
+    | 'reversal_chain'
+    | 'isolated_high_risk';
   severity: number;
   nodeIds: string[];
   description: string;
@@ -45,8 +50,8 @@ export function detectGraphAntiPatterns(
   for (const cluster of clusters) {
     if (cluster.nodeIds.length < 3) continue;
     const clusterNodes = nodes.filter(n => cluster.nodeIds.includes(n.id));
-    const clusterEdges = edges.filter(e =>
-      cluster.nodeIds.includes(e.source) && cluster.nodeIds.includes(e.target)
+    const clusterEdges = edges.filter(
+      e => cluster.nodeIds.includes(e.source) && cluster.nodeIds.includes(e.target)
     );
 
     const echoChamber = detectEchoChamberCluster(cluster, clusterNodes, clusterEdges);
@@ -85,14 +90,15 @@ function detectEchoChamberCluster(
 
   if (biasRatio < 0.6 || failureRate < 0.3) return null;
 
-  const severity = Math.round(Math.min(100, (biasRatio * 50 + failureRate * 50)));
+  const severity = Math.round(Math.min(100, biasRatio * 50 + failureRate * 50));
 
   return {
     patternType: 'echo_chamber_cluster',
     severity,
     nodeIds: cluster.nodeIds,
     description: `Cluster of ${cluster.nodeIds.length} decisions with ${Math.round(biasRatio * 100)}% bias-linked edges and ${Math.round(failureRate * 100)}% failure rate. Decisions are reinforcing each other's biases.`,
-    recommendation: 'Introduce independent reviewers to this decision cluster. Consider structured devil\'s advocate reviews for pending decisions.',
+    recommendation:
+      "Introduce independent reviewers to this decision cluster. Consider structured devil's advocate reviews for pending decisions.",
   };
 }
 
@@ -100,10 +106,7 @@ function detectEchoChamberCluster(
  * Cascade Failure: chain of 3+ decisions connected by escalated_from edges
  * where earlier decisions have failure outcomes.
  */
-function detectCascadeFailure(
-  nodes: PatternNode[],
-  edges: PatternEdge[]
-): GraphAntiPattern[] {
+function detectCascadeFailure(nodes: PatternNode[], edges: PatternEdge[]): GraphAntiPattern[] {
   const patterns: GraphAntiPattern[] = [];
   const escalationEdges = edges.filter(e => e.edgeType === 'escalated_from');
 
@@ -118,7 +121,9 @@ function detectCascadeFailure(
   for (const [, chain] of chains) {
     if (chain.length < 3) continue;
 
-    const chainNodes = chain.map(id => nodes.find(n => n.id === id)).filter(Boolean) as PatternNode[];
+    const chainNodes = chain
+      .map(id => nodes.find(n => n.id === id))
+      .filter(Boolean) as PatternNode[];
     const failures = chainNodes.filter(n => n.outcome === 'failure');
 
     if (failures.length < 2) continue;
@@ -130,7 +135,8 @@ function detectCascadeFailure(
       severity,
       nodeIds: chain,
       description: `Cascade of ${chain.length} linked decisions with ${failures.length} failures. Failed decisions are spawning follow-up decisions that also fail.`,
-      recommendation: 'Break the escalation cycle. Address root causes in the earliest failed decision before proceeding with subsequent decisions.',
+      recommendation:
+        'Break the escalation cycle. Address root causes in the earliest failed decision before proceeding with subsequent decisions.',
     });
   }
 
@@ -144,8 +150,8 @@ function detectBiasConcentration(
   cluster: PatternCluster,
   nodes: PatternNode[]
 ): GraphAntiPattern | null {
-  const decisions = nodes.filter(n =>
-    (n.type === 'analysis' || n.type === 'human_decision') && n.biasCount > 0
+  const decisions = nodes.filter(
+    n => (n.type === 'analysis' || n.type === 'human_decision') && n.biasCount > 0
   );
   if (decisions.length < 4) return null;
 
@@ -160,7 +166,8 @@ function detectBiasConcentration(
     severity,
     nodeIds: cluster.nodeIds,
     description: `Cluster of ${decisions.length} decisions averaging ${Math.round(avgScore)}/100 quality score. Concentrated bias patterns suggest systemic decision-making issues.`,
-    recommendation: 'Review the common factors across these decisions. Consider team-level bias awareness training focused on the recurring patterns.',
+    recommendation:
+      'Review the common factors across these decisions. Consider team-level bias awareness training focused on the recurring patterns.',
   };
 }
 
@@ -168,10 +175,7 @@ function detectBiasConcentration(
  * Isolated High Risk: high-stakes decision nodes with no graph connections
  * (no edges at all), meaning no historical context is being leveraged.
  */
-function detectIsolatedHighRisk(
-  nodes: PatternNode[],
-  edges: PatternEdge[]
-): GraphAntiPattern[] {
+function detectIsolatedHighRisk(nodes: PatternNode[], edges: PatternEdge[]): GraphAntiPattern[] {
   const connectedIds = new Set<string>();
   for (const e of edges) {
     connectedIds.add(e.source);
@@ -180,9 +184,10 @@ function detectIsolatedHighRisk(
 
   const patterns: GraphAntiPattern[] = [];
   const isolated = nodes.filter(
-    n => (n.type === 'analysis' || n.type === 'human_decision') &&
-         !connectedIds.has(n.id) &&
-         n.score < 50
+    n =>
+      (n.type === 'analysis' || n.type === 'human_decision') &&
+      !connectedIds.has(n.id) &&
+      n.score < 50
   );
 
   if (isolated.length >= 3) {
@@ -191,7 +196,8 @@ function detectIsolatedHighRisk(
       severity: Math.round(Math.min(80, 30 + isolated.length * 5)),
       nodeIds: isolated.map(n => n.id),
       description: `${isolated.length} low-scoring decisions have no graph connections. These decisions are being made without leveraging organizational knowledge.`,
-      recommendation: 'Ensure new decisions reference past analyses. Use the search and recommendation features to find relevant precedents.',
+      recommendation:
+        'Ensure new decisions reference past analyses. Use the search and recommendation features to find relevant precedents.',
     });
   }
 

@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
             const analysisId = docToAnalysis.get(r.documentId);
             return {
               ...r,
-              graphEdgeCount: analysisId ? (countMap.get(analysisId) || 0) : 0,
+              graphEdgeCount: analysisId ? countMap.get(analysisId) || 0 : 0,
             };
           });
         }

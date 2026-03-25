@@ -876,7 +876,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         <div className="mb-lg">
           <ToxicCombinationCard
             combinations={toxicCombinations}
-            onAcknowledge={async (id) => {
+            onAcknowledge={async id => {
               const res = await fetch('/api/toxic-combinations', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -884,7 +884,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               });
               if (res.ok) {
                 setToxicCombinations(prev =>
-                  prev.map(c => c.id === id ? { ...c, status: 'acknowledged' } : c)
+                  prev.map(c => (c.id === id ? { ...c, status: 'acknowledged' } : c))
                 );
               }
             }}
@@ -896,7 +896,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               });
               if (res.ok) {
                 setToxicCombinations(prev =>
-                  prev.map(c => c.id === id ? { ...c, status: 'mitigated', mitigationNotes: notes } : c)
+                  prev.map(c =>
+                    c.id === id ? { ...c, status: 'mitigated', mitigationNotes: notes } : c
+                  )
                 );
               }
             }}

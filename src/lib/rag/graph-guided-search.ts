@@ -69,10 +69,7 @@ export async function graphGuidedSearch(
         const hop2Edges = await prisma.decisionEdge.findMany({
           where: {
             orgId,
-            OR: [
-              { sourceId: { in: hop1Ids } },
-              { targetId: { in: hop1Ids } },
-            ],
+            OR: [{ sourceId: { in: hop1Ids } }, { targetId: { in: hop1Ids } }],
           },
           select: { sourceId: true, targetId: true },
           take: 100,
@@ -104,7 +101,9 @@ export async function graphGuidedSearch(
       select: { id: true, documentId: true },
     });
     docToAnalysis = new Map(analyses.map(a => [a.documentId, a.id]));
-  } catch { /* non-critical */ }
+  } catch {
+    /* non-critical */
+  }
 
   // Step 4: Compute combined scores
   const results: GraphGuidedResult[] = semanticResults.map(r => {
@@ -129,11 +128,13 @@ export async function graphGuidedSearch(
       outcomeBoost,
       combinedScore,
       biases: r.biases,
-      outcome: r.outcome ? {
-        result: r.outcome.result,
-        impactScore: r.outcome.impactScore,
-        lessonsLearned: r.outcome.lessonsLearned,
-      } : undefined,
+      outcome: r.outcome
+        ? {
+            result: r.outcome.result,
+            impactScore: r.outcome.impactScore,
+            lessonsLearned: r.outcome.lessonsLearned,
+          }
+        : undefined,
     };
   });
 
@@ -156,7 +157,11 @@ export async function ensembleSearch(
 ): Promise<GraphGuidedResult[]> {
   // Strategy 1: Graph-guided search
   const graphResults = await graphGuidedSearch(
-    queryText, contextAnalysisId || null, userId, orgId, limit * 2
+    queryText,
+    contextAnalysisId || null,
+    userId,
+    orgId,
+    limit * 2
   );
 
   // Strategy 2: Bias pattern matching (find docs with similar bias profiles)
@@ -175,10 +180,7 @@ export async function ensembleSearch(
           where: {
             orgId,
             edgeType: 'shared_bias',
-            OR: [
-              { sourceId: contextAnalysisId },
-              { targetId: contextAnalysisId },
-            ],
+            OR: [{ sourceId: contextAnalysisId }, { targetId: contextAnalysisId }],
           },
           select: { sourceId: true, targetId: true, strength: true },
           orderBy: { strength: 'desc' },
@@ -202,7 +204,9 @@ export async function ensembleSearch(
           .map(b => ({ documentId: analysisToDoc.get(b.documentId) || b.documentId, rank: b.rank }))
           .filter(b => b.documentId);
       }
-    } catch { /* non-critical */ }
+    } catch {
+      /* non-critical */
+    }
   }
 
   // Reciprocal Rank Fusion (k=60)

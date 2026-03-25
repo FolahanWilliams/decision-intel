@@ -24,10 +24,7 @@ export default function DecisionGraphPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <Breadcrumbs
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Decision Graph' },
-        ]}
+        items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Decision Graph' }]}
       />
 
       <div className="flex items-center justify-between mb-6">
@@ -37,7 +34,8 @@ export default function DecisionGraphPage() {
             Decision Knowledge Graph
           </h1>
           <p className="text-sm text-zinc-500 mt-1">
-            Explore how decisions connect, cascade, and influence each other across your organization.
+            Explore how decisions connect, cascade, and influence each other across your
+            organization.
           </p>
         </div>
 

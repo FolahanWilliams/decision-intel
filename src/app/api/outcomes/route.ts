@@ -122,11 +122,19 @@ export async function POST(req: NextRequest) {
       .catch(() => {}); // Schema drift — column may not exist yet
 
     // Adjust graph edge weights from outcome (fire-and-forget flywheel)
-    let contradictions: Array<{ contradictedBias: string; expectedOutcome: string; actualOutcome: string }> = [];
+    let contradictions: Array<{
+      contradictedBias: string;
+      expectedOutcome: string;
+      actualOutcome: string;
+    }> = [];
     try {
-      const { adjustEdgeWeightsFromOutcome, detectOutcomeContradictions } = await import('@/lib/graph/edge-learning');
+      const { adjustEdgeWeightsFromOutcome, detectOutcomeContradictions } =
+        await import('@/lib/graph/edge-learning');
       const edgesUpdated = await adjustEdgeWeightsFromOutcome(
-        analysisId, outcome, confirmedBiases || [], falsPositiveBiases || []
+        analysisId,
+        outcome,
+        confirmedBiases || [],
+        falsPositiveBiases || []
       );
       if (edgesUpdated > 0) {
         log.info(`Adjusted ${edgesUpdated} edge weight(s) from outcome for ${analysisId}`);
