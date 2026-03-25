@@ -91,6 +91,10 @@ export async function inferEdgesForAnalysis(
     const cascadeEdges = await findOutcomeCascadeEdges(analysis, orgId);
     candidates.push(...cascadeEdges);
 
+    // 5. Reversal edges (contradictory decisions)
+    const reversalEdges = await findReversalEdges(analysis, orgId);
+    candidates.push(...reversalEdges);
+
     // Persist edges (upsert to avoid duplicates)
     let created = 0;
     for (const edge of candidates) {
@@ -379,6 +383,69 @@ async function findOutcomeCascadeEdges(
   }
 
   return edges;
+}
+
+// ─── Reversal Edge Detection ────────────────────────────────────────────────
+
+/**
+ * Detect contradictory decisions: same topic (high semantic similarity)
+ * but opposite outcomes. Creates 'reversed' edge type.
+ */
+async function findReversalEdges(
+  analysis: AnalysisWithBiases,
+  _orgId: string | null
+): Promise<EdgeCandidate[]> {
+  const currentOutcome = analysis.outcome?.outcome;
+  if (!currentOutcome || currentOutcome === 'too_early') return [];
+
+  try {
+    const { searchSimilarWithOutcomes } = await import('@/lib/rag/embeddings');
+    const similar = await searchSimilarWithOutcomes(
+      analysis.document.content?.slice(0, 3000) || analysis.document.filename || '',
+      analysis.document.userId,
+      5
+    );
+
+    const edges: EdgeCandidate[] = [];
+    for (const match of similar) {
+      if (!match.outcome?.result) continue;
+      if (match.documentId === analysis.document.id) continue;
+
+      // Check for opposite outcomes (similarity > 0.8)
+      if (match.similarity < 0.8) continue;
+
+      const isReversed = (
+        (currentOutcome === 'success' && match.outcome.result === 'failure') ||
+        (currentOutcome === 'failure' && match.outcome.result === 'success')
+      );
+
+      if (!isReversed) continue;
+
+      // Find the analysis ID for this document
+      const relatedAnalysis = await prisma.analysis.findFirst({
+        where: { documentId: match.documentId },
+        select: { id: true },
+      });
+
+      if (!relatedAnalysis) continue;
+
+      edges.push({
+        sourceType: 'analysis',
+        sourceId: analysis.id,
+        targetType: 'analysis',
+        targetId: relatedAnalysis.id,
+        edgeType: 'reversed',
+        strength: Math.min(1, match.similarity),
+        confidence: 0.6,
+        description: `Contradictory outcomes on similar topic (${Math.round(match.similarity * 100)}% similarity). Current: ${currentOutcome}, Previous: ${match.outcome.result}.`,
+        metadata: { similarity: match.similarity, currentOutcome, previousOutcome: match.outcome.result },
+      });
+    }
+
+    return edges;
+  } catch {
+    return [];
+  }
 }
 
 // ─── Batch Temporal Inference ───────────────────────────────────────────────
