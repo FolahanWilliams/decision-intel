@@ -74,8 +74,8 @@ export function buildEnrichedBiasPrompt(industry?: string): string {
   if (!industry) return BIAS_DETECTIVE_PROMPT;
 
   try {
-    // Dynamic import to avoid circular deps — this is called at runtime
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // Synchronous dynamic import to avoid circular deps at module load time
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { getIndustryProfile } = require('@/lib/ontology/industry-profiles');
     const profile = getIndustryProfile(industry);
     if (!profile) return BIAS_DETECTIVE_PROMPT;

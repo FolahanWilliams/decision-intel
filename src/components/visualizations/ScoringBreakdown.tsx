@@ -64,7 +64,7 @@ function MultiplierBadge({ value }: { value: number }) {
   );
 }
 
-export function ScoringBreakdown({ compoundScoring, bayesianPriors, overallScore }: ScoringBreakdownProps) {
+export function ScoringBreakdown({ compoundScoring, bayesianPriors, overallScore: _overallScore }: ScoringBreakdownProps) {
   if (!compoundScoring && !bayesianPriors) return null;
 
   return (
