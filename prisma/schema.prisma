@@ -935,3 +935,16 @@ model DraftOutcome {
   @@index([status])
 }
 
+model CausalDAG {
+  id            String   @id @default(cuid())
+  orgId         String   @unique
+  nodes         String[] // bias types + context factors + "outcome"
+  edges         Json     // [{ from, to, strength, confounders[] }]
+  sampleSize    Int
+  algorithm     String   @default("constraint_based") // constraint_based | score_based
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orgId])
+}
+

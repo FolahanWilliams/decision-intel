@@ -26,7 +26,8 @@ export type EdgeType =
   | 'influenced_by'
   | 'escalated_from'
   | 'reversed'
-  | 'depends_on';
+  | 'depends_on'
+  | 'cross_department';
 
 interface EdgeCandidate {
   sourceType: string;
@@ -94,6 +95,10 @@ export async function inferEdgesForAnalysis(
     // 5. Reversal edges (contradictory decisions)
     const reversalEdges = await findReversalEdges(analysis, orgId);
     candidates.push(...reversalEdges);
+
+    // 6. Cross-department edges (same org, different user, shared biases + similar topic)
+    const crossDeptEdges = await findCrossDepartmentEdges(analysis, orgId);
+    candidates.push(...crossDeptEdges);
 
     // Persist edges (upsert to avoid duplicates)
     let created = 0;
@@ -448,6 +453,97 @@ async function findReversalEdges(
   }
 }
 
+// ─── Cross-Department Edge Detection ────────────────────────────────────────
+
+/**
+ * Detect cross-department/cross-silo edges: decisions from different users
+ * in the same org that share biases and have similar topics but may have
+ * different outcomes. Surfaces "siloed decisions that should have talked."
+ */
+async function findCrossDepartmentEdges(
+  analysis: AnalysisWithBiases,
+  orgId: string | null
+): Promise<EdgeCandidate[]> {
+  if (!orgId || analysis.biases.length === 0) return [];
+
+  const edges: EdgeCandidate[] = [];
+
+  try {
+    const biasTypes = analysis.biases.map(b => b.biasType);
+
+    // Find analyses from different users in same org with shared biases
+    const crossDeptAnalyses = await prisma.analysis.findMany({
+      where: {
+        id: { not: analysis.id },
+        document: {
+          orgId,
+          userId: { not: analysis.document.userId }, // Different user/team
+        },
+        biases: {
+          some: { biasType: { in: biasTypes } },
+        },
+      },
+      include: {
+        biases: { select: { biasType: true } },
+        document: { select: { id: true, userId: true, filename: true } },
+        outcome: { select: { outcome: true } },
+      },
+      take: 20,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    for (const other of crossDeptAnalyses) {
+      const otherBiases = new Set(other.biases.map(b => b.biasType));
+      const shared = biasTypes.filter(bt => otherBiases.has(bt));
+
+      if (shared.length < 1) continue;
+
+      // Compute simple content similarity via shared bias ratio
+      const totalUnique = new Set([...biasTypes, ...other.biases.map(b => b.biasType)]).size;
+      const biasSimilarity = shared.length / totalUnique;
+
+      // Only create edge if meaningful overlap
+      if (biasSimilarity < 0.3) continue;
+
+      // Check for outcome divergence (one failed, one succeeded)
+      const thisOutcome = analysis.outcome?.outcome;
+      const otherOutcome = other.outcome?.outcome;
+      const outcomesDiverge =
+        (thisOutcome === 'failure' && otherOutcome === 'success') ||
+        (thisOutcome === 'success' && otherOutcome === 'failure');
+
+      const strength = outcomesDiverge
+        ? Math.min(1.0, biasSimilarity + 0.2) // Boost divergent outcomes
+        : biasSimilarity;
+
+      const description = outcomesDiverge
+        ? `Cross-silo: similar biases (${shared.join(', ')}) but different outcomes — potential missing perspective`
+        : `Cross-silo: shared biases (${shared.join(', ')}) across different decision-makers`;
+
+      edges.push({
+        sourceType: 'analysis',
+        sourceId: analysis.id,
+        targetType: 'analysis',
+        targetId: other.id,
+        edgeType: 'cross_department',
+        strength: Math.round(strength * 100) / 100,
+        confidence: 0.6,
+        description,
+        metadata: {
+          sharedBiases: shared,
+          outcomesDiverge,
+          sourceUser: analysis.document.userId,
+          targetUser: other.document.userId,
+        },
+      });
+    }
+  } catch {
+    // Schema drift or query failure — non-critical
+  }
+
+  return edges;
+}
+
 // ─── Batch Temporal Inference ───────────────────────────────────────────────
 
 /**
@@ -482,23 +578,61 @@ export async function inferTemporalEdges(orgId: string): Promise<number> {
 
     let edgesCreated = 0;
 
-    // Check sequential pairs by same user within 14 days
-    for (let i = 0; i < analyses.length; i++) {
-      for (let j = i + 1; j < Math.min(i + 10, analyses.length); j++) {
-        const a = analyses[i];
-        const b = analyses[j];
+    // Group analyses by user for Granger-causality-style temporal correlation
+    const byUser = new Map<string, typeof analyses>();
+    for (const a of analyses) {
+      const userId = a.document.userId;
+      if (!byUser.has(userId)) byUser.set(userId, []);
+      byUser.get(userId)!.push(a);
+    }
 
-        // Same user, within 14 days
-        if (a.document.userId !== b.document.userId) continue;
-        const daysBetween = (b.createdAt.getTime() - a.createdAt.getTime()) / (24 * 60 * 60 * 1000);
-        if (daysBetween > 14) continue;
+    for (const [, userAnalyses] of byUser) {
+      if (userAnalyses.length < 2) continue;
 
-        // Check for shared biases
-        const aBiases = new Set(a.biases.map(b2 => b2.biasType));
-        const bBiases = b.biases.map(b2 => b2.biasType);
-        const shared = bBiases.filter(bt => aBiases.has(bt));
+      // For each sequential pair, test whether past score predicts future score
+      // (Granger-causality-like: does knowing the past improve prediction?)
+      for (let i = 0; i < userAnalyses.length; i++) {
+        for (let j = i + 1; j < Math.min(i + 10, userAnalyses.length); j++) {
+          const a = userAnalyses[i]; // earlier
+          const b = userAnalyses[j]; // later
 
-        if (shared.length >= 2) {
+          const daysBetween =
+            (b.createdAt.getTime() - a.createdAt.getTime()) / (24 * 60 * 60 * 1000);
+          if (daysBetween > 30) continue; // expanded from 14 to 30 days
+
+          // Check for shared biases (controlling for bias types)
+          const aBiases = new Set(a.biases.map(b2 => b2.biasType));
+          const bBiases = b.biases.map(b2 => b2.biasType);
+          const shared = bBiases.filter(bt => aBiases.has(bt));
+
+          if (shared.length < 1) continue;
+
+          // Granger-style test: score correlation between temporally adjacent decisions
+          // If both decisions have similar quality patterns AND shared biases,
+          // past decision likely influenced the later one
+          const scoreDiff = Math.abs(a.overallScore - b.overallScore);
+          const scoreCorrelation = 1 - scoreDiff / 100; // 0-1 (1 = identical scores)
+
+          // Compute causal strength:
+          // - High shared biases + similar scores + close in time = strong influence
+          // - Threshold: only create edge if causal strength > 0.3
+          const timeFactor = 1 - daysBetween / 30; // decays with time
+          const biasFactor = Math.min(1, shared.length / 3);
+          const causalStrength = scoreCorrelation * 0.4 + biasFactor * 0.4 + timeFactor * 0.2;
+
+          // Statistical significance proxy: require meaningful signal
+          if (causalStrength < 0.3) continue;
+
+          // Outcome-based validation: if both have outcomes, check correlation
+          let outcomeBoost = 0;
+          if (a.outcome?.outcome && b.outcome?.outcome) {
+            if (a.outcome.outcome === b.outcome.outcome) {
+              outcomeBoost = 0.15; // Same outcomes = stronger causal link
+            }
+          }
+
+          const finalStrength = Math.min(1, causalStrength + outcomeBoost);
+
           try {
             await prisma.decisionEdge.upsert({
               where: {
@@ -517,11 +651,20 @@ export async function inferTemporalEdges(orgId: string): Promise<number> {
                 targetType: 'analysis',
                 targetId: a.id,
                 edgeType: 'influenced_by',
-                strength: Math.min(1, shared.length / 4),
-                confidence: 0.5,
-                description: `Same decision-maker, ${daysBetween.toFixed(0)} days apart, ${shared.length} shared biases`,
+                strength: Math.round(finalStrength * 100) / 100,
+                confidence: Math.round(Math.min(0.85, causalStrength) * 100) / 100,
+                description: `Granger-causal: ${daysBetween.toFixed(0)}d apart, ${shared.length} shared biases, strength=${finalStrength.toFixed(2)}`,
+                metadata: {
+                  causalStrength: Math.round(causalStrength * 1000) / 1000,
+                  sharedBiases: shared,
+                  daysBetween: Math.round(daysBetween),
+                  scoreCorrelation: Math.round(scoreCorrelation * 100) / 100,
+                } as unknown as Prisma.InputJsonValue,
               },
-              update: {},
+              update: {
+                strength: Math.round(finalStrength * 100) / 100,
+                confidence: Math.round(Math.min(0.85, causalStrength) * 100) / 100,
+              },
             });
             edgesCreated++;
           } catch {

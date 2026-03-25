@@ -21,9 +21,10 @@ export const RETAIL_CONSUMER_EXTENDED_CASES: FailureCase[] = [
       'authority_bias',
       'confirmation_bias',
       'optimism_bias',
+      'halo_effect',
     ],
     primaryBias: 'overconfidence_bias',
-    toxicCombinations: ['Blind Sprint', 'Optimism Trap'],
+    toxicCombinations: ['Blind Sprint', 'Optimism Trap', 'Golden Child'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: true,

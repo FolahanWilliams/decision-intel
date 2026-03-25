@@ -147,6 +147,34 @@ export const BIAS_NODES: BiasNode[] = [
     prevalence: 0.8,
     detectability: 0.2,
   },
+  {
+    id: 'halo_effect',
+    category: 'judgment',
+    cognitiveSystem: 'system1',
+    prevalence: 0.72,
+    detectability: 0.4,
+  },
+  {
+    id: 'gamblers_fallacy',
+    category: 'judgment',
+    cognitiveSystem: 'system1',
+    prevalence: 0.65,
+    detectability: 0.55,
+  },
+  {
+    id: 'zeigarnik_effect',
+    category: 'decision',
+    cognitiveSystem: 'system2',
+    prevalence: 0.6,
+    detectability: 0.3,
+  },
+  {
+    id: 'paradox_of_choice',
+    category: 'decision',
+    cognitiveSystem: 'both',
+    prevalence: 0.68,
+    detectability: 0.4,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -1349,6 +1377,207 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
     mechanism:
       'Recent stability makes the current state feel permanent and natural, increasing resistance to change.',
     citation: 'Tversky & Kahneman 1974, "Judgment under Uncertainty"',
+  },
+
+  // ---- Halo Effect relationships ----
+  {
+    from: 'halo_effect',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Positive first impression from a halo (brand prestige, leader charisma) reinforces confirmatory seeking — decision-makers search for evidence that validates the favorable impression.',
+    citation:
+      'Nisbett & Wilson 1977, "The Halo Effect: Evidence for Unconscious Alteration of Judgments"',
+  },
+  {
+    from: 'halo_effect',
+    to: 'authority_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'A positive halo from an authority figure magnifies deference: prestige, charisma, or past success makes their opinions feel unchallengeable.',
+    citation: 'Thorndike 1920, "A Constant Error in Psychological Ratings"',
+  },
+  {
+    from: 'halo_effect',
+    to: 'selective_perception',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'The halo acts as a perceptual filter — positive traits in one domain cause decision-makers to overlook red flags in unrelated domains.',
+    citation: 'Nisbett & Wilson 1977, "The Halo Effect"',
+  },
+  {
+    from: 'halo_effect',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Association with a prestigious entity inflates confidence that the venture will succeed, reducing risk scrutiny.',
+    citation: 'Rosenzweig 2007, "The Halo Effect: How Managers Let Themselves Be Deceived"',
+  },
+  {
+    from: 'halo_effect',
+    to: 'groupthink',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'When a leader carries a strong halo, group members are reluctant to voice dissent for fear of appearing disloyal to a "proven winner."',
+    citation: 'Rosenzweig 2007, "The Halo Effect"',
+  },
+
+  // ---- Gambler's Fallacy relationships ----
+  {
+    from: 'gamblers_fallacy',
+    to: 'overconfidence_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Misjudging independent events as self-correcting fuels certainty — "we\'re due for a win" feels like a logical deduction rather than a probability error.',
+    citation: 'Tversky & Kahneman 1971, "Belief in the Law of Small Numbers"',
+  },
+  {
+    from: 'gamblers_fallacy',
+    to: 'availability_heuristic',
+    type: 'correlates',
+    weight: 1.1,
+    mechanism:
+      'Recent sequence of outcomes (losses or wins) is highly available in memory, feeding the fallacious expectation of mean reversion.',
+    citation:
+      'Tversky & Kahneman 1973, "Availability: A Heuristic for Judging Frequency and Probability"',
+  },
+  {
+    from: 'gamblers_fallacy',
+    to: 'recency_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Overweighting the most recent streak drives the fallacy — a sequence of losses makes a "correction" feel imminent.',
+    citation: 'Tversky & Kahneman 1971, "Belief in the Law of Small Numbers"',
+  },
+  {
+    from: 'gamblers_fallacy',
+    to: 'planning_fallacy',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Expecting mean reversion leads to optimistic forecasts — "our last 3 projects ran over budget, so this one will come in under" ignores structural causes.',
+    citation: 'Kahneman & Lovallo 1993, "Timid Choices and Bold Forecasts"',
+  },
+  {
+    from: 'gamblers_fallacy',
+    to: 'sunk_cost_fallacy',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'The belief that a reversal is imminent justifies continued investment in a losing position — "we\'ve lost so much, a win must be coming."',
+    citation: 'Staw 1976, "Knee-Deep in the Big Muddy"',
+  },
+
+  // ---- Zeigarnik Effect relationships ----
+  {
+    from: 'zeigarnik_effect',
+    to: 'planning_fallacy',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Incomplete task anxiety compresses perceived timelines — the psychological discomfort of open tasks drives unrealistically aggressive schedules to achieve closure.',
+    citation:
+      'Zeigarnik 1927, "On Finished and Unfinished Tasks"; Baumeister & Tierney 2011, "Willpower"',
+  },
+  {
+    from: 'zeigarnik_effect',
+    to: 'cognitive_misering',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Task overload from incomplete items forces shallow processing — working memory is consumed by open loops, leaving little capacity for deep analysis.',
+    citation:
+      'Masicampo & Baumeister 2011, "Consider It Done! Plan Making Can Eliminate the Cognitive Effects of Unfulfilled Goals"',
+  },
+  {
+    from: 'zeigarnik_effect',
+    to: 'status_quo_bias',
+    type: 'mitigates',
+    weight: 0.85,
+    mechanism:
+      'The discomfort of unfinished tasks can paradoxically overcome status quo inertia — decision-makers rush to change the state to achieve closure.',
+    citation: 'Zeigarnik 1927, "On Finished and Unfinished Tasks"',
+  },
+  {
+    from: 'zeigarnik_effect',
+    to: 'loss_aversion',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Open tasks feel like unrealized losses, amplifying loss-averse behavior and driving premature closure to "stop the bleeding."',
+    citation: 'Baumeister & Tierney 2011, "Willpower"',
+  },
+  {
+    from: 'zeigarnik_effect',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.1,
+    mechanism:
+      'Pressure to close open tasks leads to premature confidence in incomplete analyses — marking something "done" feels better than admitting uncertainty.',
+    citation: 'Masicampo & Baumeister 2011, "Consider It Done!"',
+  },
+
+  // ---- Paradox of Choice relationships ----
+  {
+    from: 'paradox_of_choice',
+    to: 'status_quo_bias',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Option overload triggers decision fatigue, defaulting to the current state because evaluating alternatives requires too much cognitive effort.',
+    citation: 'Schwartz 2004, "The Paradox of Choice: Why More Is Less"',
+  },
+  {
+    from: 'paradox_of_choice',
+    to: 'cognitive_misering',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Too many options overwhelm System 2, forcing a retreat to System 1 heuristics — the first satisficing answer is accepted without verification.',
+    citation: 'Iyengar & Lepper 2000, "When Choice Is Demotivating"',
+  },
+  {
+    from: 'paradox_of_choice',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'When overwhelmed by options, decision-makers anchor on the first or most salient option rather than systematically evaluating all alternatives.',
+    citation: 'Schwartz 2004, "The Paradox of Choice"',
+  },
+  {
+    from: 'paradox_of_choice',
+    to: 'loss_aversion',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'More options increase anticipated regret — every unchosen alternative represents a potential loss, paralyzing decision-makers.',
+    citation: 'Schwartz 2004, "The Paradox of Choice"',
+  },
+  {
+    from: 'paradox_of_choice',
+    to: 'framing_effect',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Decision fatigue from too many options makes decision-makers more susceptible to how remaining options are framed.',
+    citation: 'Iyengar & Lepper 2000, "When Choice Is Demotivating"',
+  },
+  {
+    from: 'paradox_of_choice',
+    to: 'bandwagon_effect',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'When overwhelmed by options, the popular choice becomes a cognitive shortcut — "if everyone else chose X, it must be good enough."',
+    citation: 'Schwartz 2004, "The Paradox of Choice"',
   },
 ];
 

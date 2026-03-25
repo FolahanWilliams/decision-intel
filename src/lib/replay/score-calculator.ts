@@ -13,6 +13,8 @@ export interface CounterfactualResult {
   projectedScore: number;
   delta: number;
   explanation: string;
+  /** Method used: 'simulation' for standard, 'scm' when Structural Causal Model is available */
+  causalMethod?: 'simulation' | 'scm';
 }
 
 /**

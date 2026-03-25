@@ -215,9 +215,10 @@ export const ENERGY_INFRASTRUCTURE_CASES: FailureCase[] = [
       'planning_fallacy',
       'framing_effect',
       'authority_bias',
+      'zeigarnik_effect',
     ],
     primaryBias: 'sunk_cost_fallacy',
-    toxicCombinations: ['Sunk Ship', 'Blind Sprint'],
+    toxicCombinations: ['Sunk Ship', 'Blind Sprint', 'Deadline Panic'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: false,

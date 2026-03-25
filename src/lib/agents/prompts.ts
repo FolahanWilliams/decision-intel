@@ -22,6 +22,10 @@ Taxonomy of Biases to Detect:
 14. Selective Perception - Filtering based on expectations or desires
 15. Recency Bias - Overweighting recent events over historical patterns
 16. Cognitive Misering - Accepting the first plausible answer without verifying evidence; shallow analysis disproportionate to the stakes; rubber-stamping decisions without genuine scrutiny
+17. Halo Effect - An initial positive impression (e.g. charismatic leader, prestigious brand, past success) causes decision-makers to overlook flaws, risks, or negative data points in unrelated domains
+18. Gambler's Fallacy - Misjudging independent events as having "memory" — e.g. "we've had 3 bad quarters, so the next must be good" or "the market always bounces back after a dip"
+19. Zeigarnik Effect - Incomplete or open tasks create anxiety that drives rushed, poorly-considered decisions to gain closure, rather than leaving the question open for more data
+20. Paradox of Choice - Decision fatigue or paralysis caused by too many options, leading to either status quo inaction, shallow satisficing, or defaulting to the popular choice
 
 COMPOUND BIAS INTERACTIONS — When you detect one bias, actively look for its amplifiers:
 • Confirmation Bias + Anchoring Bias (1.4x amplification) — Seeking confirming evidence strengthens initial anchors
@@ -34,6 +38,12 @@ COMPOUND BIAS INTERACTIONS — When you detect one bias, actively look for its a
 • Availability Heuristic + Recency Bias (1.4x) — Recent vivid events dominate risk assessment
 • Overconfidence + Selective Perception (1.2x) — High confidence reduces willingness to see contradicting data
 • Cognitive Misering + Status Quo Bias (1.2x) — Low-effort thinking defaults to current state
+• Halo Effect + Confirmation Bias (1.3x) — Positive first impression triggers confirmatory evidence seeking
+• Halo Effect + Authority Bias (1.2x) — Prestigious halo amplifies deference to authority figures
+• Gambler's Fallacy + Overconfidence (1.3x) — Misjudging probability fuels false certainty about outcomes
+• Zeigarnik Effect + Planning Fallacy (1.4x) — Incomplete task anxiety compresses timelines unrealistically
+• Paradox of Choice + Status Quo Bias (1.4x) — Option overload triggers default to current state
+• Paradox of Choice + Cognitive Misering (1.3x) — Too many options forces shallow, heuristic-based decisions
 
 TOXIC COMBINATIONS to flag explicitly:
 • "Echo Chamber" — Groupthink + Confirmation Bias present together
@@ -41,6 +51,10 @@ TOXIC COMBINATIONS to flag explicitly:
 • "Yes Committee" — Authority Bias + Groupthink
 • "Optimism Trap" — Overconfidence + Confirmation Bias
 • "Status Quo Lock" — Status Quo Bias + Anchoring Bias or Loss Aversion
+• "Golden Child" — Halo Effect + Confirmation Bias + Authority Bias (prestige blinds scrutiny)
+• "Doubling Down" — Gambler's Fallacy + Sunk Cost Fallacy (belief in reversal justifies continued investment)
+• "Analysis Paralysis" — Paradox of Choice + Cognitive Misering + Status Quo Bias (overwhelm → inaction)
+• "Deadline Panic" — Zeigarnik Effect + Planning Fallacy + Cognitive Misering (open tasks → rushed decisions)
 
 Analysis Instructions:
 - Read the text CAREFULLY and look for subtle signs of each bias

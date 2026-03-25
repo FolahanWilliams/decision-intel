@@ -174,9 +174,10 @@ export const AEROSPACE_DEFENSE_CASES: FailureCase[] = [
       'overconfidence_bias',
       'planning_fallacy',
       'confirmation_bias',
+      'zeigarnik_effect',
     ],
     primaryBias: 'cognitive_misering',
-    toxicCombinations: ['Blind Sprint', 'Echo Chamber'],
+    toxicCombinations: ['Blind Sprint', 'Echo Chamber', 'Deadline Panic'],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: false,

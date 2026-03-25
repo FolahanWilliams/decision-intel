@@ -30,7 +30,8 @@ export interface GraphAntiPattern {
     | 'cascade_failure'
     | 'bias_concentration'
     | 'reversal_chain'
-    | 'isolated_high_risk';
+    | 'isolated_high_risk'
+    | 'knowledge_fragmentation';
   severity: number;
   nodeIds: string[];
   description: string;
@@ -66,6 +67,9 @@ export function detectGraphAntiPatterns(
 
   const isolatedRisks = detectIsolatedHighRisk(nodes, edges);
   patterns.push(...isolatedRisks);
+
+  const fragmentationPatterns = detectKnowledgeFragmentation(nodes, edges, clusters);
+  patterns.push(...fragmentationPatterns);
 
   return patterns.sort((a, b) => b.severity - a.severity);
 }
@@ -199,6 +203,95 @@ function detectIsolatedHighRisk(nodes: PatternNode[], edges: PatternEdge[]): Gra
       recommendation:
         'Ensure new decisions reference past analyses. Use the search and recommendation features to find relevant precedents.',
     });
+  }
+
+  return patterns;
+}
+
+/**
+ * Knowledge Fragmentation: detect clusters with no cross-department edges,
+ * where failed decisions in one silo had successful counterparts in another.
+ * Surfaces "missing perspective" insights where silos should have collaborated.
+ */
+function detectKnowledgeFragmentation(
+  nodes: PatternNode[],
+  edges: PatternEdge[],
+  clusters: PatternCluster[]
+): GraphAntiPattern[] {
+  const patterns: GraphAntiPattern[] = [];
+
+  // Find clusters with no cross_department edges
+  const crossDeptEdges = edges.filter(e => e.edgeType === 'cross_department');
+  const crossConnectedClusters = new Set<string>();
+
+  for (const edge of crossDeptEdges) {
+    for (const cluster of clusters) {
+      if (cluster.nodeIds.includes(edge.source) || cluster.nodeIds.includes(edge.target)) {
+        crossConnectedClusters.add(cluster.id);
+      }
+    }
+  }
+
+  // Identify fragmented clusters: no cross-department edges + contain failures
+  const fragmentedClusters = clusters.filter(c => {
+    if (crossConnectedClusters.has(c.id)) return false;
+    if (c.nodeIds.length < 2) return false;
+
+    const clusterNodes = nodes.filter(n => c.nodeIds.includes(n.id));
+    const failures = clusterNodes.filter(n => n.outcome === 'failure');
+    return failures.length > 0;
+  });
+
+  if (fragmentedClusters.length < 2) return patterns;
+
+  // Check if failed decisions in one cluster have successful counterparts in another
+  for (let i = 0; i < fragmentedClusters.length; i++) {
+    for (let j = i + 1; j < fragmentedClusters.length; j++) {
+      const clusterA = fragmentedClusters[i];
+      const clusterB = fragmentedClusters[j];
+
+      const nodesA = nodes.filter(n => clusterA.nodeIds.includes(n.id));
+      const nodesB = nodes.filter(n => clusterB.nodeIds.includes(n.id));
+
+      const failuresA = nodesA.filter(n => n.outcome === 'failure');
+      const successesB = nodesB.filter(n => n.outcome === 'success');
+      const failuresB = nodesB.filter(n => n.outcome === 'failure');
+      const successesA = nodesA.filter(n => n.outcome === 'success');
+
+      // Pattern: one cluster has failures, the other has successes
+      const hasCounterpart =
+        (failuresA.length > 0 && successesB.length > 0) ||
+        (failuresB.length > 0 && successesA.length > 0);
+
+      if (!hasCounterpart) continue;
+
+      // Check if clusters share any similar biases (via shared_bias edges)
+      const sharedBiasEdges = edges.filter(
+        e =>
+          e.edgeType === 'shared_bias' &&
+          ((clusterA.nodeIds.includes(e.source) && clusterB.nodeIds.includes(e.target)) ||
+            (clusterB.nodeIds.includes(e.source) && clusterA.nodeIds.includes(e.target)))
+      );
+
+      if (sharedBiasEdges.length === 0) continue;
+
+      const allNodeIds = [...clusterA.nodeIds, ...clusterB.nodeIds];
+      const failureCount = failuresA.length + failuresB.length;
+      const severity = Math.round(
+        Math.min(90, 40 + failureCount * 10 + sharedBiasEdges.length * 5)
+      );
+
+      patterns.push({
+        patternType: 'knowledge_fragmentation',
+        severity,
+        nodeIds: allNodeIds,
+        description: `${fragmentedClusters.length} siloed decision clusters with no cross-department edges. Failed decisions in one group had successful counterparts in another — ${failureCount} failures could have been informed by peers' successes.`,
+        recommendation:
+          'Break decision silos: set up cross-team decision reviews, create shared decision templates, and use the knowledge graph to surface similar decisions from other teams before finalizing.',
+      });
+
+      break; // One fragmentation pattern per pair is sufficient
+    }
   }
 
   return patterns;

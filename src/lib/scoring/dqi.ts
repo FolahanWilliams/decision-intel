@@ -52,6 +52,8 @@ export interface DQIInput {
     outcomeTracked: boolean;
     participantCount: number;
     documentLength: number; // word count
+    /** Ratio of System 1 biases to total detected biases (0-1). Optional. */
+    system1Ratio?: number;
   };
   /** Compliance results */
   compliance: {
@@ -89,6 +91,8 @@ export interface DQIResult {
     potentialGain: number;
     suggestion: string;
   };
+  /** System 1 vs System 2 bias ratio (0-1, where 1.0 = all System 1) */
+  system1Ratio: number | null;
   /** Methodology version for reproducibility */
   methodologyVersion: string;
 }
@@ -270,13 +274,29 @@ function scoreProcessMaturity(process: DQIInput['process']): DQIComponent {
     score += 5;
   }
 
+  // System 1 vs System 2 ratio adjustment
+  // High System 1 ratio (>70%) signals heuristic-dominant decision → penalty
+  // Mixed or System 2 dominant signals deliberative process → bonus
+  if (process.system1Ratio !== undefined) {
+    if (process.system1Ratio > 0.7) {
+      score -= 8; // heuristic-dominant penalty
+    } else if (process.system1Ratio < 0.4) {
+      score += 5; // deliberative bonus
+    }
+  }
+
   // Cap bonus but don't penalize below baseline
-  score = Math.min(100, score);
+  score = Math.max(30, Math.min(100, score));
 
   const indicators: string[] = [];
   if (process.dissentPresent) indicators.push('dissent present');
   if (process.priorSubmitted) indicators.push('prior recorded');
   if (process.outcomeTracked) indicators.push('outcome tracked');
+  if (process.system1Ratio !== undefined) {
+    if (process.system1Ratio > 0.7) indicators.push('heuristic-dominant (System 1 >70%)');
+    else if (process.system1Ratio < 0.4)
+      indicators.push('deliberative process (System 2 dominant)');
+  }
 
   const detail =
     indicators.length > 0
@@ -447,6 +467,7 @@ export function computeDQI(input: DQIInput): DQIResult {
     components,
     percentile: null, // requires benchmark database
     topImprovement,
+    system1Ratio: input.process.system1Ratio ?? null,
     methodologyVersion: METHODOLOGY_VERSION,
   };
 
