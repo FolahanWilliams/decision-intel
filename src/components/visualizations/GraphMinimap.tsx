@@ -30,7 +30,13 @@ const MINIMAP_WIDTH = 140;
 const MINIMAP_HEIGHT = 90;
 
 export function GraphMinimap({
-  nodes, viewportX, viewportY, viewportScale, graphWidth, graphHeight, onViewportClick,
+  nodes,
+  viewportX,
+  viewportY,
+  viewportScale,
+  graphWidth,
+  graphHeight,
+  onViewportClick,
 }: GraphMinimapProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 

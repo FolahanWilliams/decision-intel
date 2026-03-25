@@ -198,14 +198,10 @@ export async function detectToxicCombinations(
 
       // Don't duplicate named patterns
       const biasKey = [...pattern.biasTypes].sort().join('+');
-      const isDuplicate = combinations.some(
-        c => [...c.biasTypes].sort().join('+') === biasKey
-      );
+      const isDuplicate = combinations.some(c => [...c.biasTypes].sort().join('+') === biasKey);
       if (isDuplicate) {
         // Enrich the existing combo with learned failure rate
-        const existing = combinations.find(
-          c => [...c.biasTypes].sort().join('+') === biasKey
-        );
+        const existing = combinations.find(c => [...c.biasTypes].sort().join('+') === biasKey);
         if (existing) {
           existing.historicalFailRate = pattern.failureRate;
           existing.sampleSize = pattern.sampleSize;
@@ -219,12 +215,7 @@ export async function detectToxicCombinations(
 
       // Convert failure rate to score (0-100)
       const baseScore = pattern.failureRate * 100;
-      const calibratedScore = await calibrateScore(
-        baseScore,
-        pattern.biasTypes,
-        context,
-        orgId
-      );
+      const calibratedScore = await calibrateScore(baseScore, pattern.biasTypes, context, orgId);
 
       combinations.push({
         biasTypes: pattern.biasTypes,
@@ -387,10 +378,7 @@ async function gatherContextFactors(
 
 // ─── Scoring ────────────────────────────────────────────────────────────────
 
-function matchesContext(
-  required: Partial<ContextFactors>,
-  actual: ContextFactors
-): boolean {
+function matchesContext(required: Partial<ContextFactors>, actual: ContextFactors): boolean {
   if (required.dissentAbsent && !actual.dissentAbsent) return false;
   if (required.unanimousConsensus && !actual.unanimousConsensus) return false;
   if (required.timePressure && !actual.timePressure) return false;
@@ -470,7 +458,7 @@ async function calibrateScore(
         // Negative strength means bias correlates with poor outcomes
         // Scale: -1 (very dangerous) to +1 (actually helpful)
         // Convert to multiplier: 0.7 (helpful bias) to 1.5 (dangerous bias)
-        const causalMultiplier = 1.0 + (-avgStrength * 0.5);
+        const causalMultiplier = 1.0 + -avgStrength * 0.5;
         const clampedMultiplier = Math.max(0.7, Math.min(1.5, causalMultiplier));
         calibratedScore *= clampedMultiplier;
       }
@@ -536,7 +524,9 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
     });
 
     if (outcomes.length < 10) {
-      log.info(`Insufficient outcome data for org ${orgId} (${outcomes.length} outcomes, need 10+)`);
+      log.info(
+        `Insufficient outcome data for org ${orgId} (${outcomes.length} outcomes, need 10+)`
+      );
       return 0;
     }
 
@@ -592,9 +582,10 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
       const biasTypes = key.split('+');
 
       // Find if this matches a named pattern for labeling
-      const namedMatch = NAMED_PATTERNS.find(np =>
-        np.biasTypes.every(bt => biasTypes.includes(bt)) &&
-        biasTypes.every(bt => np.biasTypes.includes(bt))
+      const namedMatch = NAMED_PATTERNS.find(
+        np =>
+          np.biasTypes.every(bt => biasTypes.includes(bt)) &&
+          biasTypes.every(bt => np.biasTypes.includes(bt))
       );
 
       try {
@@ -611,7 +602,9 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
             avgImpactDelta: Number(avgImpactDelta.toFixed(1)),
             sampleSize: total,
             label: namedMatch?.label ?? null,
-            description: namedMatch?.description ?? `Bias combination ${key} has a ${(failureRate * 100).toFixed(0)}% failure rate in your organization.`,
+            description:
+              namedMatch?.description ??
+              `Bias combination ${key} has a ${(failureRate * 100).toFixed(0)}% failure rate in your organization.`,
           },
           update: {
             failureRate: Number(failureRate.toFixed(3)),

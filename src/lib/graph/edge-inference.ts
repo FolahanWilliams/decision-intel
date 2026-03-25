@@ -270,9 +270,7 @@ async function findParticipantEdges(
   if (stakeholders.length === 0) return [];
 
   // Normalize participants for comparison
-  const normalizedStakeholders = new Set(
-    stakeholders.map(s => s.toLowerCase().trim())
-  );
+  const normalizedStakeholders = new Set(stakeholders.map(s => s.toLowerCase().trim()));
 
   // Find other analyses with overlapping stakeholders within 30 days
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -297,12 +295,11 @@ async function findParticipantEdges(
   const edges: EdgeCandidate[] = [];
 
   for (const frame of otherFrames) {
-    const otherStakeholders = new Set(
-      frame.stakeholders.map(s => s.toLowerCase().trim())
-    );
+    const otherStakeholders = new Set(frame.stakeholders.map(s => s.toLowerCase().trim()));
 
     const overlap = [...normalizedStakeholders].filter(s => otherStakeholders.has(s));
-    const overlapRatio = overlap.length / Math.max(normalizedStakeholders.size, otherStakeholders.size);
+    const overlapRatio =
+      overlap.length / Math.max(normalizedStakeholders.size, otherStakeholders.size);
 
     if (overlapRatio < 0.5 || overlap.length < 2) continue;
 
@@ -414,10 +411,9 @@ async function findReversalEdges(
       // Check for opposite outcomes (similarity > 0.8)
       if (match.similarity < 0.8) continue;
 
-      const isReversed = (
+      const isReversed =
         (currentOutcome === 'success' && match.outcome.result === 'failure') ||
-        (currentOutcome === 'failure' && match.outcome.result === 'success')
-      );
+        (currentOutcome === 'failure' && match.outcome.result === 'success');
 
       if (!isReversed) continue;
 
@@ -438,7 +434,11 @@ async function findReversalEdges(
         strength: Math.min(1, match.similarity),
         confidence: 0.6,
         description: `Contradictory outcomes on similar topic (${Math.round(match.similarity * 100)}% similarity). Current: ${currentOutcome}, Previous: ${match.outcome.result}.`,
-        metadata: { similarity: match.similarity, currentOutcome, previousOutcome: match.outcome.result },
+        metadata: {
+          similarity: match.similarity,
+          currentOutcome,
+          previousOutcome: match.outcome.result,
+        },
       });
     }
 
@@ -490,8 +490,7 @@ export async function inferTemporalEdges(orgId: string): Promise<number> {
 
         // Same user, within 14 days
         if (a.document.userId !== b.document.userId) continue;
-        const daysBetween =
-          (b.createdAt.getTime() - a.createdAt.getTime()) / (24 * 60 * 60 * 1000);
+        const daysBetween = (b.createdAt.getTime() - a.createdAt.getTime()) / (24 * 60 * 60 * 1000);
         if (daysBetween > 14) continue;
 
         // Check for shared biases

@@ -46,9 +46,7 @@ interface ToxicCombinationCardProps {
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function formatBiasType(type: string): string {
-  return type
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function getSeverityColor(score: number): {
@@ -83,10 +81,26 @@ function getSeverityColor(score: number): {
 
 function getContextIcons(context: ContextFactors) {
   const icons: Array<{ icon: typeof Clock; label: string; active: boolean }> = [
-    { icon: DollarSign, label: `Stakes: ${context.monetaryStakes}`, active: context.monetaryStakes !== 'low' && context.monetaryStakes !== 'unknown' },
-    { icon: Users, label: context.dissentAbsent ? 'No dissent' : 'Dissent present', active: context.dissentAbsent },
-    { icon: Clock, label: context.timePressure ? 'Time pressure' : 'No urgency', active: context.timePressure },
-    { icon: Zap, label: context.unanimousConsensus ? 'Unanimous' : 'Diverse views', active: context.unanimousConsensus },
+    {
+      icon: DollarSign,
+      label: `Stakes: ${context.monetaryStakes}`,
+      active: context.monetaryStakes !== 'low' && context.monetaryStakes !== 'unknown',
+    },
+    {
+      icon: Users,
+      label: context.dissentAbsent ? 'No dissent' : 'Dissent present',
+      active: context.dissentAbsent,
+    },
+    {
+      icon: Clock,
+      label: context.timePressure ? 'Time pressure' : 'No urgency',
+      active: context.timePressure,
+    },
+    {
+      icon: Zap,
+      label: context.unanimousConsensus ? 'Unanimous' : 'Diverse views',
+      active: context.unanimousConsensus,
+    },
   ];
   return icons.filter(i => i.active);
 }
@@ -107,9 +121,7 @@ export function ToxicCombinationCard({
     <div className="space-y-3">
       <div className="flex items-center gap-2 mb-4">
         <ShieldAlert className="h-5 w-5 text-red-400" />
-        <h3 className="text-lg font-semibold text-white">
-          Toxic Combinations
-        </h3>
+        <h3 className="text-lg font-semibold text-white">Toxic Combinations</h3>
         <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-300">
           {combinations.length} detected
         </span>
@@ -134,13 +146,9 @@ export function ToxicCombinationCard({
                 <div className="flex items-center gap-2 mb-1">
                   <AlertTriangle className={`h-4 w-4 ${colors.text}`} />
                   {combo.patternLabel ? (
-                    <span className={`font-semibold ${colors.text}`}>
-                      {combo.patternLabel}
-                    </span>
+                    <span className={`font-semibold ${colors.text}`}>{combo.patternLabel}</span>
                   ) : (
-                    <span className={`font-medium ${colors.text}`}>
-                      Compound Risk Pattern
-                    </span>
+                    <span className={`font-medium ${colors.text}`}>Compound Risk Pattern</span>
                   )}
                   <span className={`text-xs px-2 py-0.5 rounded-full ${colors.badge}`}>
                     Score: {Math.round(combo.toxicScore)}
@@ -223,7 +231,7 @@ export function ToxicCombinationCard({
                   <div className="flex gap-2 mt-2">
                     {onAcknowledge && (
                       <button
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           onAcknowledge(combo.id);
                         }}
@@ -244,7 +252,7 @@ export function ToxicCombinationCard({
                           className="flex-1 text-xs px-3 py-1.5 rounded bg-white/5 border border-white/10 text-zinc-300 placeholder-zinc-600 focus:outline-none focus:border-green-500/50"
                         />
                         <button
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             if (mitigationInput.trim()) {
                               onMitigate(combo.id, mitigationInput.trim());

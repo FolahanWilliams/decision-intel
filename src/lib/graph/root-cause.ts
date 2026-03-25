@@ -89,7 +89,8 @@ export async function attributeRootCauses(
       });
     }
 
-    const neighborFailureRate = connectedIds.length > 0 ? neighborFailures / connectedIds.length : 0;
+    const neighborFailureRate =
+      connectedIds.length > 0 ? neighborFailures / connectedIds.length : 0;
 
     // Compute attribution scores
     const attributions: RootCauseAttribution[] = [];
@@ -121,7 +122,8 @@ export async function attributeRootCauses(
       }
 
       // Factor 4: Severity weight
-      const severityWeight = bias.severity === 'critical' ? 0.1 : bias.severity === 'high' ? 0.05 : 0;
+      const severityWeight =
+        bias.severity === 'critical' ? 0.1 : bias.severity === 'high' ? 0.05 : 0;
       contributionScore += severityWeight;
 
       // Clamp to [-1, 1]
@@ -136,7 +138,9 @@ export async function attributeRootCauses(
       });
     }
 
-    return attributions.sort((a, b) => Math.abs(b.contributionScore) - Math.abs(a.contributionScore));
+    return attributions.sort(
+      (a, b) => Math.abs(b.contributionScore) - Math.abs(a.contributionScore)
+    );
   } catch (error) {
     const code = (error as { code?: string })?.code;
     if (code === 'P2021' || code === 'P2022') return [];

@@ -14,7 +14,12 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DecisionGraphAPI');
 
-const EMPTY_GRAPH = { nodes: [], edges: [], clusters: [], stats: { totalNodes: 0, totalEdges: 0, clusters: 0, mostConnectedNode: null, avgDegree: 0 } };
+const EMPTY_GRAPH = {
+  nodes: [],
+  edges: [],
+  clusters: [],
+  stats: { totalNodes: 0, totalEdges: 0, clusters: 0, mostConnectedNode: null, avgDegree: 0 },
+};
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
@@ -34,7 +39,10 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get('limit') || '200', 10), 500);
   const nodeTypesParam = searchParams.get('nodeTypes');
   const nodeTypes = nodeTypesParam
-    ? nodeTypesParam.split(',').map(t => t.trim()).filter(Boolean)
+    ? nodeTypesParam
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean)
     : null;
 
   if (!orgId) {
@@ -63,9 +71,6 @@ export async function GET(req: NextRequest) {
     }
 
     log.error('Failed to fetch decision graph:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch decision graph' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to fetch decision graph' }, { status: 500 });
   }
 }

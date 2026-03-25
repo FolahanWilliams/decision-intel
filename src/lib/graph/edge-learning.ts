@@ -26,7 +26,14 @@ export async function adjustEdgeWeightsFromOutcome(
       where: {
         OR: [{ sourceId: analysisId }, { targetId: analysisId }],
       },
-      select: { id: true, sourceId: true, targetId: true, edgeType: true, strength: true, confidence: true },
+      select: {
+        id: true,
+        sourceId: true,
+        targetId: true,
+        edgeType: true,
+        strength: true,
+        confidence: true,
+      },
     });
 
     if (edges.length === 0) return 0;
@@ -110,10 +117,7 @@ export async function adjustEdgeWeightsFromNudgeFeedback(
     // Find edges connected to this human decision
     const edges = await prisma.decisionEdge.findMany({
       where: {
-        OR: [
-          { sourceId: nudge.humanDecisionId },
-          { targetId: nudge.humanDecisionId },
-        ],
+        OR: [{ sourceId: nudge.humanDecisionId }, { targetId: nudge.humanDecisionId }],
         edgeType: { in: ['shared_bias', 'similar_to', 'escalated_from'] },
       },
       select: { id: true, confidence: true },
@@ -122,18 +126,24 @@ export async function adjustEdgeWeightsFromNudgeFeedback(
 
     const delta = wasHelpful ? 0.03 : -0.02;
 
-    await Promise.all(edges.map(edge => {
-      const newConfidence = Math.max(0, Math.min(1, edge.confidence + delta));
-      return prisma.decisionEdge.update({
-        where: { id: edge.id },
-        data: { confidence: newConfidence },
-      }).catch(err => {
-        log.warn(`Edge confidence update failed for ${edge.id}:`, err);
-      });
-    }));
+    await Promise.all(
+      edges.map(edge => {
+        const newConfidence = Math.max(0, Math.min(1, edge.confidence + delta));
+        return prisma.decisionEdge
+          .update({
+            where: { id: edge.id },
+            data: { confidence: newConfidence },
+          })
+          .catch(err => {
+            log.warn(`Edge confidence update failed for ${edge.id}:`, err);
+          });
+      })
+    );
 
     if (edges.length > 0) {
-      log.info(`Adjusted ${edges.length} edge confidence(s) from nudge feedback (helpful=${wasHelpful})`);
+      log.info(
+        `Adjusted ${edges.length} edge confidence(s) from nudge feedback (helpful=${wasHelpful})`
+      );
     }
   } catch (error) {
     const code = (error as { code?: string })?.code;
@@ -168,7 +178,11 @@ export async function detectOutcomeContradictions(
     const orgId = analysis?.document?.orgId;
     if (!orgId) return [];
 
-    const contradictions: Array<{ contradictedBias: string; expectedOutcome: string; actualOutcome: string }> = [];
+    const contradictions: Array<{
+      contradictedBias: string;
+      expectedOutcome: string;
+      actualOutcome: string;
+    }> = [];
 
     // Look at causal edges to determine expected impact direction
     const causalEdges = await prisma.causalEdge.findMany({

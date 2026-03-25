@@ -118,7 +118,11 @@ export function resolveEntities(rawNames: string[]): Map<string, CanonicalEntity
 
       const dist = levenshtein(a, b);
       // Only merge if distance is very small relative to name length
-      if (dist <= 1 && Math.min(a.length, b.length) >= 4 && dist < Math.min(a.length, b.length) * 0.2) {
+      if (
+        dist <= 1 &&
+        Math.min(a.length, b.length) >= 4 &&
+        dist < Math.min(a.length, b.length) * 0.2
+      ) {
         // Prefer longer name as canonical
         const canonical = a.length >= b.length ? a : b;
         const alias = a.length >= b.length ? b : a;

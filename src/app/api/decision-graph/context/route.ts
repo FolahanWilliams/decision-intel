@@ -34,13 +34,7 @@ export async function GET(req: NextRequest) {
   const safeText = text.slice(0, 5000);
 
   try {
-    const results = await graphGuidedSearch(
-      safeText,
-      contextAnalysisId || null,
-      user.id,
-      orgId,
-      5
-    );
+    const results = await graphGuidedSearch(safeText, contextAnalysisId || null, user.id, orgId, 5);
 
     // Summarize risk signals
     const failures = results.filter(r => r.outcome?.result === 'failure');
@@ -61,9 +55,10 @@ export async function GET(req: NextRequest) {
         totalRelated: results.length,
         successCount: successes.length,
         failureCount: failures.length,
-        avgSimilarity: results.length > 0
-          ? Math.round(results.reduce((s, r) => s + r.semanticScore, 0) / results.length * 100)
-          : 0,
+        avgSimilarity:
+          results.length > 0
+            ? Math.round((results.reduce((s, r) => s + r.semanticScore, 0) / results.length) * 100)
+            : 0,
       },
     });
   } catch (error) {

@@ -41,9 +41,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     log.error('Graph edge inference cron failed:', error);
-    return NextResponse.json(
-      { error: 'Graph edge inference failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Graph edge inference failed' }, { status: 500 });
   }
 }

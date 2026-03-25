@@ -65,10 +65,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(edge, { status: 201 });
   } catch (error) {
     log.error('Failed to create edge:', error);
-    return NextResponse.json(
-      { error: 'Failed to create edge' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create edge' }, { status: 500 });
   }
 }
 
@@ -98,7 +95,8 @@ export async function PATCH(req: NextRequest) {
 
     const updateData: Record<string, unknown> = {};
     if (typeof strength === 'number') updateData.strength = Math.max(0, Math.min(1, strength));
-    if (typeof confidence === 'number') updateData.confidence = Math.max(0, Math.min(1, confidence));
+    if (typeof confidence === 'number')
+      updateData.confidence = Math.max(0, Math.min(1, confidence));
     if (typeof description === 'string') updateData.description = description;
     if (metadata !== undefined) updateData.metadata = metadata;
 
@@ -120,10 +118,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json(updated);
   } catch (error) {
     log.error('Failed to update edge:', error);
-    return NextResponse.json(
-      { error: 'Failed to update edge' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update edge' }, { status: 500 });
   }
 }
 
@@ -149,9 +144,6 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     log.error('Failed to delete edge:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete edge' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete edge' }, { status: 500 });
   }
 }

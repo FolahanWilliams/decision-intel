@@ -33,9 +33,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     log.error('Failed to compute maturity score:', error);
-    return NextResponse.json(
-      { error: 'Failed to compute maturity score' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to compute maturity score' }, { status: 500 });
   }
 }

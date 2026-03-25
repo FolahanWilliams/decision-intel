@@ -89,7 +89,7 @@ export async function generateGraphReport(
       });
 
     // Network density
-    const maxEdges = nodes.length * (nodes.length - 1) / 2;
+    const maxEdges = (nodes.length * (nodes.length - 1)) / 2;
     const density = maxEdges > 0 ? Math.round((edges.length / maxEdges) * 1000) / 1000 : 0;
 
     // Isolated nodes (no edges)
@@ -119,9 +119,11 @@ export async function generateGraphReport(
     const riskState = await computeOrgRiskState(orgId);
 
     // Avg cluster size
-    const avgClusterSize = clusters.length > 0
-      ? Math.round(clusters.reduce((s, c) => s + c.nodeIds.length, 0) / clusters.length * 10) / 10
-      : 0;
+    const avgClusterSize =
+      clusters.length > 0
+        ? Math.round((clusters.reduce((s, c) => s + c.nodeIds.length, 0) / clusters.length) * 10) /
+          10
+        : 0;
 
     return {
       generatedAt: new Date().toISOString(),

@@ -21,9 +21,7 @@ interface WeeklyStats {
  * Detect temporal anomalies by comparing current week metrics
  * to a rolling 4-week average. Alerts on > 2 standard deviations.
  */
-export function detectTemporalAnomalies(
-  weeklyData: WeeklyStats[]
-): GraphAnomaly[] {
+export function detectTemporalAnomalies(weeklyData: WeeklyStats[]): GraphAnomaly[] {
   if (weeklyData.length < 5) return [];
 
   const anomalies: GraphAnomaly[] = [];
@@ -84,7 +82,7 @@ export function detectTemporalAnomalies(
 
   // Outcome shift: check ratio of bias edges to total edges
   const currentBiasRatio = current.edges > 0 ? current.biasEdges / current.edges : 0;
-  const baselineBiasRatios = baseline.map(w => w.edges > 0 ? w.biasEdges / w.edges : 0);
+  const baselineBiasRatios = baseline.map(w => (w.edges > 0 ? w.biasEdges / w.edges : 0));
   const meanBiasRatio = mean(baselineBiasRatios);
 
   if (meanBiasRatio > 0 && currentBiasRatio > meanBiasRatio * 1.5 && currentBiasRatio > 0.4) {

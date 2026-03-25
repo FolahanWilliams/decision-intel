@@ -41,10 +41,7 @@ export interface TriageResult {
 /**
  * Triage active decisions for an org, returning the top N by risk-adjusted impact.
  */
-export async function triageDecisions(
-  orgId: string,
-  limit: number = 5
-): Promise<TriageResult> {
+export async function triageDecisions(orgId: string, limit: number = 5): Promise<TriageResult> {
   try {
     // Fetch pending analyses with related data
     const analyses = await prisma.analysis.findMany({
@@ -97,21 +94,24 @@ export async function triageDecisions(
           0,
           (analysis.outcomeDueAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)
         );
-        if (daysRemaining < 1) timeUrgency = 3.0; // overdue
+        if (daysRemaining < 1)
+          timeUrgency = 3.0; // overdue
         else if (daysRemaining < 7) timeUrgency = 2.0;
         else if (daysRemaining < 30) timeUrgency = 1.5;
       }
 
       // 5. Toxic combination multiplier
-      const maxToxicScore = analysis.toxicCombinations.length > 0
-        ? Math.max(...analysis.toxicCombinations.map(t => t.toxicScore))
-        : 0;
+      const maxToxicScore =
+        analysis.toxicCombinations.length > 0
+          ? Math.max(...analysis.toxicCombinations.map(t => t.toxicScore))
+          : 0;
       const toxicMultiplier = maxToxicScore > 0 ? 1.0 + maxToxicScore / 50 : 1.0;
 
       // Composite triage score
-      const triageScore = Math.round(
-        scoreInverse * monetaryWeight * normalizedBiasWeight * timeUrgency * toxicMultiplier * 100
-      ) / 100;
+      const triageScore =
+        Math.round(
+          scoreInverse * monetaryWeight * normalizedBiasWeight * timeUrgency * toxicMultiplier * 100
+        ) / 100;
 
       // Determine top risk factor
       const factors: Array<{ label: string; weight: number }> = [

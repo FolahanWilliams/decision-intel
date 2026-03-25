@@ -70,7 +70,9 @@ export function computeCascadeRisk(
 
     // Count failures in cluster
     const clusterNodes = cluster.nodeIds.map(id => nodeMap.get(id)).filter(Boolean) as RiskNode[];
-    const decisions = clusterNodes.filter(n => n.type === 'analysis' || n.type === 'human_decision');
+    const decisions = clusterNodes.filter(
+      n => n.type === 'analysis' || n.type === 'human_decision'
+    );
     const failures = decisions.filter(n => n.outcome === 'failure');
     const withOutcome = decisions.filter(n => n.outcome);
     const clusterFailureRate = withOutcome.length > 0 ? failures.length / withOutcome.length : 0;
@@ -96,7 +98,7 @@ export function computeCascadeRisk(
     riskScore += Math.min(30, relatedFailures.length * 10);
 
     // Factor 3: Low decision score (0-20 points)
-    riskScore += Math.max(0, (50 - node.score) / 50 * 20);
+    riskScore += Math.max(0, ((50 - node.score) / 50) * 20);
 
     // Factor 4: High bias count (0-10 points)
     riskScore += Math.min(10, node.biasCount * 2);
@@ -106,7 +108,8 @@ export function computeCascadeRisk(
     if (riskScore < 20) continue;
 
     const reasons: string[] = [];
-    if (clusterFailureRate > 0.5) reasons.push(`cluster failure rate ${Math.round(clusterFailureRate * 100)}%`);
+    if (clusterFailureRate > 0.5)
+      reasons.push(`cluster failure rate ${Math.round(clusterFailureRate * 100)}%`);
     if (relatedFailures.length > 0) reasons.push(`${relatedFailures.length} connected failure(s)`);
     if (node.score < 50) reasons.push(`low quality score ${Math.round(node.score)}`);
     if (node.biasCount > 3) reasons.push(`${node.biasCount} biases detected`);

@@ -46,15 +46,21 @@ export function useGraphPlayback({ nodes, intervalMs = 1000 }: UseGraphPlaybackP
   const play = useCallback(() => setIsPlaying(true), []);
   const pause = useCallback(() => setIsPlaying(false), []);
 
-  const seekTo = useCallback((week: number) => {
-    setCurrentWeek(Math.max(0, Math.min(week, totalWeeks - 1)));
-  }, [totalWeeks]);
+  const seekTo = useCallback(
+    (week: number) => {
+      setCurrentWeek(Math.max(0, Math.min(week, totalWeeks - 1)));
+    },
+    [totalWeeks]
+  );
 
-  const filterNode = useCallback((node: PlaybackNode) => {
-    if (!weekBoundaries.length) return true;
-    const nodeTime = new Date(node.createdAt).getTime();
-    return nodeTime <= currentDate.getTime();
-  }, [weekBoundaries.length, currentDate]);
+  const filterNode = useCallback(
+    (node: PlaybackNode) => {
+      if (!weekBoundaries.length) return true;
+      const nodeTime = new Date(node.createdAt).getTime();
+      return nodeTime <= currentDate.getTime();
+    },
+    [weekBoundaries.length, currentDate]
+  );
 
   // Auto-advance when playing
   useEffect(() => {

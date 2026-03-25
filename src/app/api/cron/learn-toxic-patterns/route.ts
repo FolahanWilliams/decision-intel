@@ -40,7 +40,9 @@ export async function GET(req: NextRequest) {
     }
 
     const totalPatterns = results.reduce((sum, r) => sum + r.patternsLearned, 0);
-    log.info(`Toxic pattern learning complete: ${totalPatterns} patterns across ${results.length} orgs`);
+    log.info(
+      `Toxic pattern learning complete: ${totalPatterns} patterns across ${results.length} orgs`
+    );
 
     return NextResponse.json({
       success: true,
@@ -50,9 +52,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     log.error('Toxic pattern learning cron failed:', error);
-    return NextResponse.json(
-      { error: 'Toxic pattern learning failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Toxic pattern learning failed' }, { status: 500 });
   }
 }

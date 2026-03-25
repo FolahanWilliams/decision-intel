@@ -40,7 +40,10 @@ export async function GET(req: NextRequest) {
     });
 
     // Bucket by week
-    const weekBuckets = new Map<string, { edges: number; biasEdges: number; similarityEdges: number }>();
+    const weekBuckets = new Map<
+      string,
+      { edges: number; biasEdges: number; similarityEdges: number }
+    >();
 
     for (const edge of edges) {
       const d = new Date(edge.createdAt);

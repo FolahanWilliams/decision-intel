@@ -3,8 +3,18 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  X, ChevronDown, ChevronUp, Brain, AlertTriangle, CheckCircle,
-  Clock, GitBranch, Users, ArrowRight, Check, Trash2,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Brain,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  GitBranch,
+  Users,
+  ArrowRight,
+  Check,
+  Trash2,
 } from 'lucide-react';
 
 interface GraphNode {
@@ -67,7 +77,13 @@ function getScoreColor(score: number): string {
 }
 
 export function GraphDetailPanel({
-  node, edges, allNodes, onClose, onNavigateToNode, onConfirmEdge, onDismissEdge,
+  node,
+  edges,
+  allNodes,
+  onClose,
+  onNavigateToNode,
+  onConfirmEdge,
+  onDismissEdge,
 }: GraphDetailPanelProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['connections']));
 
@@ -101,13 +117,17 @@ export function GraphDetailPanel({
   const typeColor = NODE_TYPE_COLORS[node.type] || '#71717a';
 
   return (
-    <div className="w-80 border-l border-white/10 bg-zinc-900/80 backdrop-blur-sm overflow-y-auto"
-      style={{ maxHeight: '100%' }}>
+    <div
+      className="w-80 border-l border-white/10 bg-zinc-900/80 backdrop-blur-sm overflow-y-auto"
+      style={{ maxHeight: '100%' }}
+    >
       {/* Header */}
       <div className="p-4 border-b border-white/10">
         <div className="flex items-center justify-between mb-2">
-          <span className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase"
-            style={{ background: `${typeColor}20`, color: typeColor }}>
+          <span
+            className="px-2 py-0.5 rounded text-[10px] font-semibold uppercase"
+            style={{ background: `${typeColor}20`, color: typeColor }}
+          >
             {node.type.replace('_', ' ')}
           </span>
           <button onClick={onClose} className="text-zinc-500 hover:text-zinc-300">
@@ -124,13 +144,19 @@ export function GraphDetailPanel({
       {(node.type === 'analysis' || node.type === 'human_decision') && (
         <div className="p-4 border-b border-white/10 grid grid-cols-3 gap-2">
           <div className="text-center">
-            <div className="text-lg font-bold" style={{ color: getScoreColor(node.score), fontFamily: "'JetBrains Mono'" }}>
+            <div
+              className="text-lg font-bold"
+              style={{ color: getScoreColor(node.score), fontFamily: "'JetBrains Mono'" }}
+            >
               {Math.round(node.score)}
             </div>
             <div className="text-[10px] text-zinc-500">Score</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-bold text-zinc-300" style={{ fontFamily: "'JetBrains Mono'" }}>
+            <div
+              className="text-lg font-bold text-zinc-300"
+              style={{ fontFamily: "'JetBrains Mono'" }}
+            >
               {node.biasCount}
             </div>
             <div className="text-[10px] text-zinc-500">Biases</div>
@@ -162,7 +188,9 @@ export function GraphDetailPanel({
               </span>
             ))}
             {node.participants.length > 8 && (
-              <span className="text-[10px] text-zinc-500">+{node.participants.length - 8} more</span>
+              <span className="text-[10px] text-zinc-500">
+                +{node.participants.length - 8} more
+              </span>
             )}
           </div>
         </SectionToggle>
@@ -190,7 +218,10 @@ export function GraphDetailPanel({
                   <span className="text-[10px] text-zinc-400">
                     {EDGE_TYPE_LABELS[edge.edgeType] || edge.edgeType}
                   </span>
-                  <span className="text-[10px] text-zinc-500" style={{ fontFamily: "'JetBrains Mono'" }}>
+                  <span
+                    className="text-[10px] text-zinc-500"
+                    style={{ fontFamily: "'JetBrains Mono'" }}
+                  >
                     {Math.round(edge.strength * 100)}%
                   </span>
                 </div>
@@ -204,14 +235,18 @@ export function GraphDetailPanel({
                 {isInferred && (
                   <div className="flex gap-1 mt-1.5">
                     {onConfirmEdge && (
-                      <button onClick={() => onConfirmEdge(edge.id)}
-                        className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 text-[10px] hover:bg-green-500/20">
+                      <button
+                        onClick={() => onConfirmEdge(edge.id)}
+                        className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 text-[10px] hover:bg-green-500/20"
+                      >
                         <Check size={10} /> Confirm
                       </button>
                     )}
                     {onDismissEdge && (
-                      <button onClick={() => onDismissEdge(edge.id)}
-                        className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 text-[10px] hover:bg-red-500/20">
+                      <button
+                        onClick={() => onDismissEdge(edge.id)}
+                        className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 text-[10px] hover:bg-red-500/20"
+                      >
                         <Trash2 size={10} /> Dismiss
                       </button>
                     )}
@@ -227,9 +262,11 @@ export function GraphDetailPanel({
       <div className="p-4 border-t border-white/10">
         {(node.type === 'analysis' || node.type === 'human_decision') && (
           <Link
-            href={node.type === 'analysis'
-              ? `/dashboard/cognitive-audits/${node.id}`
-              : `/dashboard/decision-graph?highlight=${node.id}`}
+            href={
+              node.type === 'analysis'
+                ? `/dashboard/cognitive-audits/${node.id}`
+                : `/dashboard/decision-graph?highlight=${node.id}`
+            }
             className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300"
           >
             <Brain size={12} /> View full {node.type === 'analysis' ? 'analysis' : 'decision'}
@@ -241,15 +278,26 @@ export function GraphDetailPanel({
 }
 
 function SectionToggle({
-  title, icon, expanded, onToggle, count, children,
+  title,
+  icon,
+  expanded,
+  onToggle,
+  count,
+  children,
 }: {
-  title: string; icon: React.ReactNode; expanded: boolean;
-  onToggle: () => void; count: number; children: React.ReactNode;
+  title: string;
+  icon: React.ReactNode;
+  expanded: boolean;
+  onToggle: () => void;
+  count: number;
+  children: React.ReactNode;
 }) {
   return (
     <div className="border-b border-white/10">
-      <button onClick={onToggle}
-        className="w-full flex items-center justify-between p-3 text-xs text-zinc-400 hover:text-zinc-300">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between p-3 text-xs text-zinc-400 hover:text-zinc-300"
+      >
         <span className="flex items-center gap-1.5">
           {icon} {title}
           <span className="text-zinc-600">({count})</span>
