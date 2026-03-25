@@ -77,9 +77,7 @@ const SIMILAR_BIAS_GROUPS: string[][] = [
 ];
 
 function areSimilarBiases(a: string, b: string): boolean {
-  return SIMILAR_BIAS_GROUPS.some(
-    (group) => group.includes(a) && group.includes(b),
-  );
+  return SIMILAR_BIAS_GROUPS.some(group => group.includes(a) && group.includes(b));
 }
 
 // ---------------------------------------------------------------------------
@@ -97,9 +95,7 @@ const SEVERITY_ORDER: Record<string, number> = {
 // Core classification
 // ---------------------------------------------------------------------------
 
-function classifyBiasDisagreements(
-  outputs: ModelOutput[],
-): ClassifiedDisagreement[] {
+function classifyBiasDisagreements(outputs: ModelOutput[]): ClassifiedDisagreement[] {
   const disagreements: ClassifiedDisagreement[] = [];
   let idCounter = 0;
 
@@ -118,7 +114,7 @@ function classifyBiasDisagreements(
     const severities: Map<string, string> = new Map();
 
     for (const output of outputs) {
-      const found = output.biases.find((b) => b.type === biasType);
+      const found = output.biases.find(b => b.type === biasType);
       if (found) {
         detectingModels.push(output.modelId);
         severities.set(output.modelId, found.severity);
@@ -129,8 +125,7 @@ function classifyBiasDisagreements(
 
     // Detection disagreement
     if (missingModels.length > 0 && detectingModels.length > 0) {
-      const severity =
-        detectingModels.length > missingModels.length ? 'minor' : 'moderate';
+      const severity = detectingModels.length > missingModels.length ? 'minor' : 'moderate';
 
       disagreements.push({
         id: `disagree_${++idCounter}`,
@@ -138,10 +133,7 @@ function classifyBiasDisagreements(
         severity,
         description: `${biasType} detected by ${detectingModels.join(', ')} but not by ${missingModels.join(', ')}.`,
         modelsInvolved: [...detectingModels, ...missingModels],
-        likelyCorrect:
-          detectingModels.length > missingModels.length
-            ? detectingModels[0]
-            : null,
+        likelyCorrect: detectingModels.length > missingModels.length ? detectingModels[0] : null,
         confidence: detectingModels.length / outputs.length,
         recommendation:
           detectingModels.length >= 2
@@ -160,14 +152,13 @@ function classifyBiasDisagreements(
           numeric: SEVERITY_ORDER[sev] ?? 2,
         }));
         const maxGap =
-          Math.max(...sevValues.map((s) => s.numeric)) -
-          Math.min(...sevValues.map((s) => s.numeric));
+          Math.max(...sevValues.map(s => s.numeric)) - Math.min(...sevValues.map(s => s.numeric));
 
         disagreements.push({
           id: `disagree_${++idCounter}`,
           type: 'severity',
           severity: maxGap >= 2 ? 'major' : 'minor',
-          description: `${biasType} severity disagreement: ${sevValues.map((s) => `${s.model}=${s.severity}`).join(', ')}.`,
+          description: `${biasType} severity disagreement: ${sevValues.map(s => `${s.model}=${s.severity}`).join(', ')}.`,
           modelsInvolved: detectingModels,
           likelyCorrect: null, // Use median
           confidence: 0.7,
@@ -187,8 +178,8 @@ function classifyBiasDisagreements(
     for (const output2 of outputs) {
       if (output1.modelId >= output2.modelId) continue;
 
-      const biases1 = new Set(output1.biases.map((b) => b.type));
-      const biases2 = new Set(output2.biases.map((b) => b.type));
+      const biases1 = new Set(output1.biases.map(b => b.type));
+      const biases2 = new Set(output2.biases.map(b => b.type));
 
       // Biases in output1 but not output2
       for (const b1 of biases1) {
@@ -216,17 +207,13 @@ function classifyBiasDisagreements(
   return disagreements;
 }
 
-function classifyScoreDisagreements(
-  outputs: ModelOutput[],
-): ClassifiedDisagreement[] {
+function classifyScoreDisagreements(outputs: ModelOutput[]): ClassifiedDisagreement[] {
   const disagreements: ClassifiedDisagreement[] = [];
   let idCounter = 100;
 
   for (let i = 0; i < outputs.length; i++) {
     for (let j = i + 1; j < outputs.length; j++) {
-      const scoreDiff = Math.abs(
-        outputs[i].qualityScore - outputs[j].qualityScore,
-      );
+      const scoreDiff = Math.abs(outputs[i].qualityScore - outputs[j].qualityScore);
 
       if (scoreDiff > 15) {
         const severity: 'minor' | 'moderate' | 'major' =
@@ -271,16 +258,14 @@ function classifyScoreDisagreements(
 /**
  * Classify all disagreements between model outputs into actionable categories.
  */
-export function classifyDisagreements(
-  outputs: ModelOutput[],
-): DisagreementReport {
+export function classifyDisagreements(outputs: ModelOutput[]): DisagreementReport {
   if (outputs.length < 2) {
     return {
       totalDisagreements: 0,
       byType: {},
       bySeverity: {},
       disagreements: [],
-      consensusBiases: outputs[0]?.biases.map((b) => b.type) ?? [],
+      consensusBiases: outputs[0]?.biases.map(b => b.type) ?? [],
       contestedBiases: [],
       overallAgreementScore: 100,
       recommendation: 'Single model output — no disagreements to analyze.',
@@ -309,9 +294,7 @@ export function classifyDisagreements(
   const consensusBiases: string[] = [];
   const contestedBiases: string[] = [];
   for (const biasType of allBiasTypes) {
-    const detectCount = outputs.filter((o) =>
-      o.biases.some((b) => b.type === biasType),
-    ).length;
+    const detectCount = outputs.filter(o => o.biases.some(b => b.type === biasType)).length;
     if (detectCount === outputs.length) {
       consensusBiases.push(biasType);
     } else {
@@ -323,19 +306,14 @@ export function classifyDisagreements(
   const majorCount = bySeverity['major'] ?? 0;
   const moderateCount = bySeverity['moderate'] ?? 0;
   const minorCount = bySeverity['minor'] ?? 0;
-  const agreementScore = Math.max(
-    0,
-    100 - majorCount * 20 - moderateCount * 10 - minorCount * 3,
-  );
+  const agreementScore = Math.max(0, 100 - majorCount * 20 - moderateCount * 10 - minorCount * 3);
 
   // Overall recommendation
   let recommendation: string;
   if (agreementScore >= 80) {
-    recommendation =
-      'High model agreement. Analysis results are reliable.';
+    recommendation = 'High model agreement. Analysis results are reliable.';
   } else if (agreementScore >= 60) {
-    recommendation =
-      'Moderate agreement. Focus on contested biases for manual review.';
+    recommendation = 'Moderate agreement. Focus on contested biases for manual review.';
   } else {
     recommendation =
       'Low agreement — document contains significant ambiguity. Recommend human expert review of contested findings.';
@@ -346,8 +324,7 @@ export function classifyDisagreements(
     byType,
     bySeverity,
     disagreements: allDisagreements.sort(
-      (a, b) =>
-        (SEVERITY_ORDER[b.severity] ?? 0) - (SEVERITY_ORDER[a.severity] ?? 0),
+      (a, b) => (SEVERITY_ORDER[b.severity] ?? 0) - (SEVERITY_ORDER[a.severity] ?? 0)
     ),
     consensusBiases,
     contestedBiases,

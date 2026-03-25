@@ -18,10 +18,30 @@ interface DQIBadgeProps {
 }
 
 const GRADE_COLORS: Record<string, { bg: string; text: string; ring: string; arc: string }> = {
-  A: { bg: 'bg-green-500/10', text: 'text-green-400', ring: 'stroke-green-500', arc: 'stroke-green-400' },
-  B: { bg: 'bg-lime-500/10', text: 'text-lime-400', ring: 'stroke-lime-500', arc: 'stroke-lime-400' },
-  C: { bg: 'bg-yellow-500/10', text: 'text-yellow-400', ring: 'stroke-yellow-500', arc: 'stroke-yellow-400' },
-  D: { bg: 'bg-orange-500/10', text: 'text-orange-400', ring: 'stroke-orange-500', arc: 'stroke-orange-400' },
+  A: {
+    bg: 'bg-green-500/10',
+    text: 'text-green-400',
+    ring: 'stroke-green-500',
+    arc: 'stroke-green-400',
+  },
+  B: {
+    bg: 'bg-lime-500/10',
+    text: 'text-lime-400',
+    ring: 'stroke-lime-500',
+    arc: 'stroke-lime-400',
+  },
+  C: {
+    bg: 'bg-yellow-500/10',
+    text: 'text-yellow-400',
+    ring: 'stroke-yellow-500',
+    arc: 'stroke-yellow-400',
+  },
+  D: {
+    bg: 'bg-orange-500/10',
+    text: 'text-orange-400',
+    ring: 'stroke-orange-500',
+    arc: 'stroke-orange-400',
+  },
   F: { bg: 'bg-red-500/10', text: 'text-red-400', ring: 'stroke-red-500', arc: 'stroke-red-400' },
 };
 
@@ -115,9 +135,7 @@ export function DQIBadge({
           <div className={`text-xs font-medium ${colors.text}`}>
             {GRADE_LABELS[grade] ?? 'Unknown'} Decision Quality
           </div>
-          <div className="text-[10px] text-zinc-500 mt-0.5">
-            DQI v1.0
-          </div>
+          <div className="text-[10px] text-zinc-500 mt-0.5">DQI v1.0</div>
         </div>
       )}
 
@@ -144,9 +162,7 @@ export function DQIBadge({
                     style={{ width: `${comp.score}%` }}
                   />
                 </div>
-                <span className={`text-[10px] font-mono ${compColors.text} w-6`}>
-                  {comp.score}
-                </span>
+                <span className={`text-[10px] font-mono ${compColors.text} w-6`}>{comp.score}</span>
               </div>
             );
           })}

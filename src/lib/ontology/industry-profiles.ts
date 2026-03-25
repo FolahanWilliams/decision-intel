@@ -33,7 +33,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'disposition_effect',
         name: 'Disposition Effect',
-        description: 'Tendency to sell winning investments too early and hold losing ones too long.',
+        description:
+          'Tendency to sell winning investments too early and hold losing ones too long.',
         parentBias: 'loss_aversion',
         industrySpecific: true,
         detectionPrompt:
@@ -45,7 +46,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'herding_behavior',
         name: 'Herding / Herd Behavior',
-        description: 'Following the investment decisions of peers rather than independent analysis.',
+        description:
+          'Following the investment decisions of peers rather than independent analysis.',
         parentBias: 'bandwagon_effect',
         industrySpecific: true,
         detectionPrompt:
@@ -57,7 +59,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'home_bias',
         name: 'Home Bias',
-        description: 'Overweighting domestic or familiar investments relative to their global opportunity cost.',
+        description:
+          'Overweighting domestic or familiar investments relative to their global opportunity cost.',
         parentBias: 'status_quo_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -69,11 +72,12 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'myopic_loss_aversion',
         name: 'Myopic Loss Aversion',
-        description: 'Excessive risk aversion driven by evaluating performance over too-short time horizons.',
+        description:
+          'Excessive risk aversion driven by evaluating performance over too-short time horizons.',
         parentBias: 'loss_aversion',
         industrySpecific: true,
         detectionPrompt:
-          'Look for decision-making driven by quarterly or monthly performance rather than the investment\'s stated time horizon. Watch for portfolio changes after short-term drawdowns in long-term strategies.',
+          "Look for decision-making driven by quarterly or monthly performance rather than the investment's stated time horizon. Watch for portfolio changes after short-term drawdowns in long-term strategies.",
         exampleScenario:
           'A fund board reduces equity allocation after a 10% quarterly drawdown in a strategy with a 10-year horizon, locking in losses and missing the recovery.',
         riskMultiplier: 1.5,
@@ -81,7 +85,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'survivorship_bias_finance',
         name: 'Survivorship Bias',
-        description: 'Evaluating strategies based only on surviving funds/companies while ignoring failures.',
+        description:
+          'Evaluating strategies based only on surviving funds/companies while ignoring failures.',
         parentBias: 'selective_perception',
         industrySpecific: true,
         detectionPrompt:
@@ -93,7 +98,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'winners_curse',
         name: "Winner's Curse",
-        description: 'Overpaying in competitive auctions or deal processes due to the winner systematically overvaluing the asset.',
+        description:
+          'Overpaying in competitive auctions or deal processes due to the winner systematically overvaluing the asset.',
         parentBias: 'overconfidence_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -104,11 +110,23 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       },
     ],
     highRiskCombinations: [
-      { biases: ['herding_behavior', 'overconfidence_bias'], reason: 'Consensus trades with high leverage create systemic risk — the 2008 crisis pattern.' },
-      { biases: ['disposition_effect', 'sunk_cost_fallacy'], reason: 'Holding losers while cutting winners destroys portfolio returns and compounds path dependency.' },
-      { biases: ['myopic_loss_aversion', 'recency_bias'], reason: 'Short-term losses trigger panic selling, missing long-term mean reversion.' },
+      {
+        biases: ['herding_behavior', 'overconfidence_bias'],
+        reason:
+          'Consensus trades with high leverage create systemic risk — the 2008 crisis pattern.',
+      },
+      {
+        biases: ['disposition_effect', 'sunk_cost_fallacy'],
+        reason:
+          'Holding losers while cutting winners destroys portfolio returns and compounds path dependency.',
+      },
+      {
+        biases: ['myopic_loss_aversion', 'recency_bias'],
+        reason: 'Short-term losses trigger panic selling, missing long-term mean reversion.',
+      },
     ],
-    regulatoryContext: 'FCA Consumer Duty, MiFID II suitability, SEC Regulation Best Interest, Basel III capital adequacy.',
+    regulatoryContext:
+      'FCA Consumer Duty, MiFID II suitability, SEC Regulation Best Interest, Basel III capital adequacy.',
   },
 
   healthcare: {
@@ -118,7 +136,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'premature_closure',
         name: 'Premature Closure',
-        description: 'Accepting a diagnosis or conclusion before all relevant information has been gathered.',
+        description:
+          'Accepting a diagnosis or conclusion before all relevant information has been gathered.',
         parentBias: 'anchoring_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -130,7 +149,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'anchoring_chief_complaint',
         name: 'Anchoring on Chief Complaint',
-        description: 'Fixating on the initial presentation or primary complaint while missing co-occurring conditions.',
+        description:
+          'Fixating on the initial presentation or primary complaint while missing co-occurring conditions.',
         parentBias: 'anchoring_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -142,7 +162,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'diagnosis_momentum',
         name: 'Diagnosis Momentum',
-        description: 'Once a label is applied, subsequent decision-makers accept it without independent verification.',
+        description:
+          'Once a label is applied, subsequent decision-makers accept it without independent verification.',
         parentBias: 'authority_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -154,7 +175,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'therapeutic_inertia',
         name: 'Therapeutic Inertia',
-        description: 'Failure to initiate or intensify treatment when indicated, due to comfort with the current approach.',
+        description:
+          'Failure to initiate or intensify treatment when indicated, due to comfort with the current approach.',
         parentBias: 'status_quo_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -166,7 +188,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'commission_bias',
         name: 'Commission Bias',
-        description: 'Preference for action over inaction, even when inaction may be the better clinical choice.',
+        description:
+          'Preference for action over inaction, even when inaction may be the better clinical choice.',
         parentBias: 'overconfidence_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -177,10 +200,18 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       },
     ],
     highRiskCombinations: [
-      { biases: ['premature_closure', 'confirmation_bias'], reason: 'Early diagnosis locks in selective data collection, missing contradictory evidence.' },
-      { biases: ['diagnosis_momentum', 'authority_bias'], reason: 'Labels from senior clinicians propagate unchallenged through the review chain.' },
+      {
+        biases: ['premature_closure', 'confirmation_bias'],
+        reason:
+          'Early diagnosis locks in selective data collection, missing contradictory evidence.',
+      },
+      {
+        biases: ['diagnosis_momentum', 'authority_bias'],
+        reason: 'Labels from senior clinicians propagate unchallenged through the review chain.',
+      },
     ],
-    regulatoryContext: 'FDA 21 CFR, EMA guidelines, HIPAA, clinical trial regulations (ICH-GCP), WHO Essential Medicines.',
+    regulatoryContext:
+      'FDA 21 CFR, EMA guidelines, HIPAA, clinical trial regulations (ICH-GCP), WHO Essential Medicines.',
   },
 
   legal: {
@@ -202,7 +233,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'outcome_bias_sentencing',
         name: 'Outcome Bias in Evaluation',
-        description: 'Judging the quality of a decision by its outcome rather than the quality of the decision process.',
+        description:
+          'Judging the quality of a decision by its outcome rather than the quality of the decision process.',
         parentBias: 'hindsight_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -226,7 +258,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'precedent_anchoring',
         name: 'Precedent Anchoring',
-        description: 'Over-relying on past cases or precedent when current circumstances are materially different.',
+        description:
+          'Over-relying on past cases or precedent when current circumstances are materially different.',
         parentBias: 'anchoring_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -238,7 +271,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'severity_escalation',
         name: 'Severity Escalation Bias',
-        description: 'Tendency to escalate penalties or responses disproportionately to demonstrate seriousness.',
+        description:
+          'Tendency to escalate penalties or responses disproportionately to demonstrate seriousness.',
         parentBias: 'availability_heuristic',
         industrySpecific: true,
         detectionPrompt:
@@ -249,10 +283,17 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       },
     ],
     highRiskCombinations: [
-      { biases: ['hindsight_liability', 'outcome_bias_sentencing'], reason: 'Judging decisions by outcomes creates a culture of defensive decision-making.' },
-      { biases: ['precedent_anchoring', 'status_quo_bias'], reason: 'Over-reliance on precedent prevents adaptation to novel situations.' },
+      {
+        biases: ['hindsight_liability', 'outcome_bias_sentencing'],
+        reason: 'Judging decisions by outcomes creates a culture of defensive decision-making.',
+      },
+      {
+        biases: ['precedent_anchoring', 'status_quo_bias'],
+        reason: 'Over-reliance on precedent prevents adaptation to novel situations.',
+      },
     ],
-    regulatoryContext: 'Bar ethics rules, judicial conduct codes, corporate governance codes, fiduciary duty standards.',
+    regulatoryContext:
+      'Bar ethics rules, judicial conduct codes, corporate governance codes, fiduciary duty standards.',
   },
 
   technology: {
@@ -262,7 +303,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'feature_creep_bias',
         name: 'Feature Creep Bias',
-        description: 'Continuously adding features rather than shipping, driven by the belief that more features equals better product.',
+        description:
+          'Continuously adding features rather than shipping, driven by the belief that more features equals better product.',
         parentBias: 'planning_fallacy',
         industrySpecific: true,
         detectionPrompt:
@@ -274,7 +316,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'not_invented_here',
         name: 'Not-Invented-Here Syndrome',
-        description: 'Rejecting external solutions in favor of building internally, even when external solutions are superior.',
+        description:
+          'Rejecting external solutions in favor of building internally, even when external solutions are superior.',
         parentBias: 'overconfidence_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -286,7 +329,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'shiny_object_syndrome',
         name: 'Shiny Object Syndrome',
-        description: 'Chasing new technologies or trends without evaluating fit for the actual problem.',
+        description:
+          'Chasing new technologies or trends without evaluating fit for the actual problem.',
         parentBias: 'recency_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -298,7 +342,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'tech_debt_blindness',
         name: 'Technical Debt Blindness',
-        description: 'Ignoring accumulating technical debt because it is not immediately visible in product metrics.',
+        description:
+          'Ignoring accumulating technical debt because it is not immediately visible in product metrics.',
         parentBias: 'cognitive_misering',
         industrySpecific: true,
         detectionPrompt:
@@ -310,7 +355,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'survivorship_bias_metrics',
         name: 'Survivorship Bias in Metrics',
-        description: 'Measuring only successful users/transactions while ignoring drop-offs, failures, and silent churn.',
+        description:
+          'Measuring only successful users/transactions while ignoring drop-offs, failures, and silent churn.',
         parentBias: 'selective_perception',
         industrySpecific: true,
         detectionPrompt:
@@ -321,10 +367,18 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       },
     ],
     highRiskCombinations: [
-      { biases: ['feature_creep_bias', 'planning_fallacy'], reason: 'Scope expansion + timeline optimism = perpetual delay and missed market windows.' },
-      { biases: ['not_invented_here', 'overconfidence_bias'], reason: 'Building everything custom while believing your team is exceptional leads to wasted engineering effort.' },
+      {
+        biases: ['feature_creep_bias', 'planning_fallacy'],
+        reason: 'Scope expansion + timeline optimism = perpetual delay and missed market windows.',
+      },
+      {
+        biases: ['not_invented_here', 'overconfidence_bias'],
+        reason:
+          'Building everything custom while believing your team is exceptional leads to wasted engineering effort.',
+      },
     ],
-    regulatoryContext: 'EU AI Act, GDPR, CCPA, SOC 2, ISO 27001, industry-specific compliance (HIPAA for healthtech, PCI-DSS for fintech).',
+    regulatoryContext:
+      'EU AI Act, GDPR, CCPA, SOC 2, ISO 27001, industry-specific compliance (HIPAA for healthtech, PCI-DSS for fintech).',
   },
 
   energy_industrial: {
@@ -334,7 +388,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'normalcy_bias',
         name: 'Normalcy Bias',
-        description: 'Assuming that because a disaster has never happened, it will not happen in the future.',
+        description:
+          'Assuming that because a disaster has never happened, it will not happen in the future.',
         parentBias: 'status_quo_bias',
         industrySpecific: true,
         detectionPrompt:
@@ -346,7 +401,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'safety_complacency',
         name: 'Safety Complacency',
-        description: 'Reduced vigilance after long periods without incidents, leading to erosion of safety protocols.',
+        description:
+          'Reduced vigilance after long periods without incidents, leading to erosion of safety protocols.',
         parentBias: 'availability_heuristic',
         industrySpecific: true,
         detectionPrompt:
@@ -358,7 +414,8 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'production_pressure',
         name: 'Production Pressure Bias',
-        description: 'Prioritizing production targets or schedule over safety when the two conflict.',
+        description:
+          'Prioritizing production targets or schedule over safety when the two conflict.',
         parentBias: 'sunk_cost_fallacy',
         industrySpecific: true,
         detectionPrompt:
@@ -370,33 +427,44 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
       {
         id: 'regulatory_capture',
         name: 'Regulatory Capture Bias',
-        description: 'When regulators adopt the perspective and priorities of the industry they regulate.',
+        description:
+          'When regulators adopt the perspective and priorities of the industry they regulate.',
         parentBias: 'authority_bias',
         industrySpecific: true,
         detectionPrompt:
           'Look for regulatory decisions that consistently favor industry interests over public safety. Watch for revolving-door references, industry-funded research cited as independent, or deference to industry self-regulation.',
         exampleScenario:
-          'A mining safety regulator allows a company to self-certify emergency ventilation systems after the regulator\'s lead inspector is hired by the mining company.',
+          "A mining safety regulator allows a company to self-certify emergency ventilation systems after the regulator's lead inspector is hired by the mining company.",
         riskMultiplier: 1.4,
       },
       {
         id: 'decommissioning_avoidance',
         name: 'Decommissioning Avoidance',
-        description: 'Extending the life of aging infrastructure beyond safe limits to avoid decommissioning costs.',
+        description:
+          'Extending the life of aging infrastructure beyond safe limits to avoid decommissioning costs.',
         parentBias: 'loss_aversion',
         industrySpecific: true,
         detectionPrompt:
           'Look for decisions to extend equipment or facility life based primarily on avoiding replacement costs rather than safety-informed lifecycle analysis. Watch for "life extension studies" that consistently find infrastructure safe to continue.',
         exampleScenario:
-          'A utility extends a 50-year-old nuclear reactor\'s license by 20 years based on an industry-funded life extension study, despite increasing maintenance incidents and embrittlement concerns.',
+          "A utility extends a 50-year-old nuclear reactor's license by 20 years based on an industry-funded life extension study, despite increasing maintenance incidents and embrittlement concerns.",
         riskMultiplier: 1.5,
       },
     ],
     highRiskCombinations: [
-      { biases: ['normalcy_bias', 'safety_complacency'], reason: 'No recent incidents + "it can\'t happen here" = catastrophic surprise when it does.' },
-      { biases: ['production_pressure', 'authority_bias'], reason: 'Schedule pressure from leadership overrides field engineer safety concerns — the Challenger pattern.' },
+      {
+        biases: ['normalcy_bias', 'safety_complacency'],
+        reason:
+          'No recent incidents + "it can\'t happen here" = catastrophic surprise when it does.',
+      },
+      {
+        biases: ['production_pressure', 'authority_bias'],
+        reason:
+          'Schedule pressure from leadership overrides field engineer safety concerns — the Challenger pattern.',
+      },
     ],
-    regulatoryContext: 'OSHA, EPA, NRC, NTSB investigations, ISO 45001, API standards, IAEA safety standards.',
+    regulatoryContext:
+      'OSHA, EPA, NRC, NTSB investigations, ISO 45001, API standards, IAEA safety standards.',
   },
 };
 
@@ -423,29 +491,82 @@ export function detectIndustry(content: string): string | null {
 
   const industryKeywords: Record<string, string[]> = {
     financial_services: [
-      'portfolio', 'investment', 'fund', 'equity', 'bond', 'hedge',
-      'banking', 'trading', 'derivatives', 'capital adequacy', 'risk-weighted',
-      'AUM', 'fiduciary', 'suitability', 'KYC', 'Basel', 'MiFID',
+      'portfolio',
+      'investment',
+      'fund',
+      'equity',
+      'bond',
+      'hedge',
+      'banking',
+      'trading',
+      'derivatives',
+      'capital adequacy',
+      'risk-weighted',
+      'AUM',
+      'fiduciary',
+      'suitability',
+      'KYC',
+      'Basel',
+      'MiFID',
     ],
     healthcare: [
-      'clinical trial', 'FDA', 'patient', 'diagnosis', 'pharmaceutical',
-      'drug', 'therapy', 'medical device', 'EHR', 'HIPAA', 'efficacy',
-      'adverse event', 'placebo', 'randomized',
+      'clinical trial',
+      'FDA',
+      'patient',
+      'diagnosis',
+      'pharmaceutical',
+      'drug',
+      'therapy',
+      'medical device',
+      'EHR',
+      'HIPAA',
+      'efficacy',
+      'adverse event',
+      'placebo',
+      'randomized',
     ],
     legal: [
-      'litigation', 'compliance', 'enforcement', 'statute', 'regulation',
-      'precedent', 'liability', 'indemnity', 'fiduciary duty', 'injunction',
-      'settlement', 'arbitration',
+      'litigation',
+      'compliance',
+      'enforcement',
+      'statute',
+      'regulation',
+      'precedent',
+      'liability',
+      'indemnity',
+      'fiduciary duty',
+      'injunction',
+      'settlement',
+      'arbitration',
     ],
     technology: [
-      'software', 'API', 'deployment', 'microservices', 'cloud',
-      'machine learning', 'sprint', 'agile', 'technical debt',
-      'SaaS', 'platform', 'open source', 'DevOps',
+      'software',
+      'API',
+      'deployment',
+      'microservices',
+      'cloud',
+      'machine learning',
+      'sprint',
+      'agile',
+      'technical debt',
+      'SaaS',
+      'platform',
+      'open source',
+      'DevOps',
     ],
     energy_industrial: [
-      'pipeline', 'refinery', 'drilling', 'turbine', 'reactor',
-      'emissions', 'decommission', 'safety incident', 'OSHA',
-      'environmental impact', 'megawatt', 'blowout preventer',
+      'pipeline',
+      'refinery',
+      'drilling',
+      'turbine',
+      'reactor',
+      'emissions',
+      'decommission',
+      'safety incident',
+      'OSHA',
+      'environmental impact',
+      'megawatt',
+      'blowout preventer',
     ],
   };
 

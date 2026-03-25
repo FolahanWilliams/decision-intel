@@ -133,12 +133,14 @@ export function OverviewTab({
                 <div className="flex-1 min-w-[200px]">
                   <h3 className="text-lg font-semibold mb-1">{dqiData.gradeLabel}</h3>
                   <p className="text-sm text-muted mb-4">
-                    Decision Quality Index — a composite score across bias load, noise, evidence, process maturity, and compliance.
+                    Decision Quality Index — a composite score across bias load, noise, evidence,
+                    process maturity, and compliance.
                   </p>
                   {dqiData.topImprovement && (
                     <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded">
                       <div className="text-xs font-semibold text-blue-300 mb-1">
-                        Top Improvement: {dqiData.topImprovement.component} (+{dqiData.topImprovement.potentialGain.toFixed(1)} pts potential)
+                        Top Improvement: {dqiData.topImprovement.component} (+
+                        {dqiData.topImprovement.potentialGain.toFixed(1)} pts potential)
                       </div>
                       <p className="text-xs text-muted">{dqiData.topImprovement.suggestion}</p>
                     </div>

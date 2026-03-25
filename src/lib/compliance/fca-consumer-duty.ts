@@ -163,14 +163,21 @@ export function assessFCAConsumerDuty(analysis: AnalysisResult): FCAAssessmentRe
           const finding: FCAFinding = {
             rule: `${tp.provision.section} — ${tp.provision.title}`,
             description: tp.explanation,
-            severity: tp.aggregateRiskWeight >= 0.7 ? 'critical'
-              : tp.aggregateRiskWeight >= 0.5 ? 'high'
-              : tp.aggregateRiskWeight >= 0.3 ? 'medium' : 'low',
+            severity:
+              tp.aggregateRiskWeight >= 0.7
+                ? 'critical'
+                : tp.aggregateRiskWeight >= 0.5
+                  ? 'high'
+                  : tp.aggregateRiskWeight >= 0.3
+                    ? 'medium'
+                    : 'low',
             biasTypes: tp.triggeringBiases,
-            remediation: fcaAssessment.remediationSteps
-              .filter(s => s.targetProvision === tp.provision.id)
-              .map(s => s.action)
-              .join(' ') || `Address ${tp.triggeringBiases.join(', ')} affecting ${tp.provision.title}.`,
+            remediation:
+              fcaAssessment.remediationSteps
+                .filter(s => s.targetProvision === tp.provision.id)
+                .map(s => s.action)
+                .join(' ') ||
+              `Address ${tp.triggeringBiases.join(', ')} affecting ${tp.provision.title}.`,
           };
           graphFindings.push(finding);
 

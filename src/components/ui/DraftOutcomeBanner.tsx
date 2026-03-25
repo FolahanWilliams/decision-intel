@@ -23,10 +23,14 @@ function formatSource(source: string): string {
 
 function outcomeBadge(outcome: string): string {
   switch (outcome) {
-    case 'success': return 'bg-green-500/15 text-green-400';
-    case 'partial_success': return 'bg-yellow-500/15 text-yellow-400';
-    case 'failure': return 'bg-red-500/15 text-red-400';
-    default: return 'bg-zinc-500/15 text-zinc-400';
+    case 'success':
+      return 'bg-green-500/15 text-green-400';
+    case 'partial_success':
+      return 'bg-yellow-500/15 text-yellow-400';
+    case 'failure':
+      return 'bg-red-500/15 text-red-400';
+    default:
+      return 'bg-zinc-500/15 text-zinc-400';
   }
 }
 
@@ -98,10 +102,7 @@ export function DraftOutcomeBanner() {
       {expanded && (
         <div className="mt-3 space-y-3">
           {drafts.map(draft => (
-            <div
-              key={draft.id}
-              className="rounded-md border border-border bg-card p-3 space-y-2"
-            >
+            <div key={draft.id} className="rounded-md border border-border bg-card p-3 space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate">{draft.analysisTitle}</div>
@@ -111,7 +112,9 @@ export function DraftOutcomeBanner() {
                     </div>
                   )}
                 </div>
-                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${outcomeBadge(draft.outcome)}`}>
+                <span
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${outcomeBadge(draft.outcome)}`}
+                >
                   {draft.outcome.replace(/_/g, ' ')}
                 </span>
               </div>

@@ -78,9 +78,9 @@ export interface NoiseDecomposition {
 // ---------------------------------------------------------------------------
 
 const NOISE_THRESHOLDS = {
-  low: 8,       // stdDev < 8
+  low: 8, // stdDev < 8
   moderate: 15, // stdDev < 15
-  high: 25,     // stdDev < 25
+  high: 25, // stdDev < 25
   // >= 25 is critical
 };
 
@@ -99,14 +99,16 @@ const NOISE_THRESHOLDS = {
  * - MSE_level = variance of judge means (systematic severity differences)
  * - MSE_pattern = residual variance after removing level noise
  */
-function decomposeNoise(
-  assessments: JudgeAssessment[],
-): { levelNoise: number; patternNoise: number; totalNoise: number } {
+function decomposeNoise(assessments: JudgeAssessment[]): {
+  levelNoise: number;
+  patternNoise: number;
+  totalNoise: number;
+} {
   if (assessments.length < 2) {
     return { levelNoise: 0, patternNoise: 0, totalNoise: 0 };
   }
 
-  const scores = assessments.map((a) => a.qualityScore);
+  const scores = assessments.map(a => a.qualityScore);
   const grandMean = scores.reduce((s, v) => s + v, 0) / scores.length;
 
   // Level noise: variance of judge means from grand mean
@@ -119,17 +121,13 @@ function decomposeNoise(
 
   // Pattern noise: disagreement in WHICH biases were detected
   // Compute Jaccard distance between bias sets
-  const biasSets = assessments.map(
-    (a) => new Set(a.detectedBiases.map((b) => b.type)),
-  );
+  const biasSets = assessments.map(a => new Set(a.detectedBiases.map(b => b.type)));
   let patternDisagreement = 0;
   let pairCount = 0;
   for (let i = 0; i < biasSets.length; i++) {
     for (let j = i + 1; j < biasSets.length; j++) {
       const union = new Set([...biasSets[i], ...biasSets[j]]);
-      const intersection = new Set(
-        [...biasSets[i]].filter((b) => biasSets[j].has(b)),
-      );
+      const intersection = new Set([...biasSets[i]].filter(b => biasSets[j].has(b)));
       const jaccard = union.size > 0 ? 1 - intersection.size / union.size : 0;
       patternDisagreement += jaccard;
       pairCount++;
@@ -153,9 +151,7 @@ function decomposeNoise(
 /**
  * Classify specific disagreements between judges.
  */
-function classifyDisagreements(
-  assessments: JudgeAssessment[],
-): DisagreementDetail[] {
+function classifyDisagreements(assessments: JudgeAssessment[]): DisagreementDetail[] {
   const disagreements: DisagreementDetail[] = [];
 
   // Detection disagreements: bias found by some judges but not others
@@ -168,7 +164,7 @@ function classifyDisagreements(
     const detectingJudges: string[] = [];
     const missingJudges: string[] = [];
     for (const a of assessments) {
-      if (a.detectedBiases.some((b) => b.type === biasType)) {
+      if (a.detectedBiases.some(b => b.type === biasType)) {
         detectingJudges.push(a.judgeId);
       } else {
         missingJudges.push(a.judgeId);
@@ -188,21 +184,21 @@ function classifyDisagreements(
   for (const biasType of allBiasTypes) {
     const severities: Array<{ judge: string; severity: string }> = [];
     for (const a of assessments) {
-      const bias = a.detectedBiases.find((b) => b.type === biasType);
+      const bias = a.detectedBiases.find(b => b.type === biasType);
       if (bias) {
         severities.push({ judge: a.judgeId, severity: bias.severity });
       }
     }
     if (severities.length >= 2) {
-      const uniqueSeverities = new Set(severities.map((s) => s.severity));
+      const uniqueSeverities = new Set(severities.map(s => s.severity));
       if (uniqueSeverities.size > 1) {
         const sevOrder = ['low', 'medium', 'high', 'critical'];
-        const indices = severities.map((s) => sevOrder.indexOf(s.severity));
+        const indices = severities.map(s => sevOrder.indexOf(s.severity));
         const maxGap = Math.max(...indices) - Math.min(...indices);
         disagreements.push({
           type: 'severity',
-          description: `${biasType}: severity disagreement (${severities.map((s) => `${s.judge}=${s.severity}`).join(', ')})`,
-          judges: severities.map((s) => s.judge),
+          description: `${biasType}: severity disagreement (${severities.map(s => `${s.judge}=${s.severity}`).join(', ')})`,
+          judges: severities.map(s => s.judge),
           magnitude: maxGap / 3, // 0-1 based on severity gap
         });
       }
@@ -212,9 +208,7 @@ function classifyDisagreements(
   // Factual disagreement: large score differences (>20 points)
   for (let i = 0; i < assessments.length; i++) {
     for (let j = i + 1; j < assessments.length; j++) {
-      const scoreDiff = Math.abs(
-        assessments[i].qualityScore - assessments[j].qualityScore,
-      );
+      const scoreDiff = Math.abs(assessments[i].qualityScore - assessments[j].qualityScore);
       if (scoreDiff > 20) {
         disagreements.push({
           type: 'factual',
@@ -235,7 +229,7 @@ function classifyDisagreements(
 function computeReliability(assessments: JudgeAssessment[]): number {
   if (assessments.length < 2) return 1.0;
 
-  const scores = assessments.map((a) => a.qualityScore);
+  const scores = assessments.map(a => a.qualityScore);
   const mean = scores.reduce((s, v) => s + v, 0) / scores.length;
 
   // Observed disagreement
@@ -269,9 +263,7 @@ function computeReliability(assessments: JudgeAssessment[]): number {
  * providers (multi-model jury). Within-model variance mostly captures
  * LLM sampling noise, not genuine analytical disagreement.
  */
-export function decomposeDecisionNoise(
-  assessments: JudgeAssessment[],
-): NoiseDecomposition {
+export function decomposeDecisionNoise(assessments: JudgeAssessment[]): NoiseDecomposition {
   if (assessments.length < 2) {
     return {
       totalNoise: 0,
@@ -281,7 +273,7 @@ export function decomposeDecisionNoise(
       classification: 'low',
       isMultiModel: false,
       disagreements: [],
-      judgeStats: assessments.map((a) => ({
+      judgeStats: assessments.map(a => ({
         judgeId: a.judgeId,
         meanScore: a.qualityScore,
         biasCount: a.detectedBiases.length,
@@ -293,7 +285,7 @@ export function decomposeDecisionNoise(
   }
 
   // Check if multi-model
-  const providers = new Set(assessments.map((a) => a.provider ?? 'same'));
+  const providers = new Set(assessments.map(a => a.provider ?? 'same'));
   const isMultiModel = providers.size > 1;
 
   // Decompose noise
@@ -306,14 +298,12 @@ export function decomposeDecisionNoise(
   const reliability = computeReliability(assessments);
 
   // Per-judge stats
-  const grandMean =
-    assessments.reduce((s, a) => s + a.qualityScore, 0) / assessments.length;
-  const judgeStats = assessments.map((a) => ({
+  const grandMean = assessments.reduce((s, a) => s + a.qualityScore, 0) / assessments.length;
+  const judgeStats = assessments.map(a => ({
     judgeId: a.judgeId,
     meanScore: a.qualityScore,
     biasCount: a.detectedBiases.length,
-    deviationFromConsensus:
-      Math.round(Math.abs(a.qualityScore - grandMean) * 10) / 10,
+    deviationFromConsensus: Math.round(Math.abs(a.qualityScore - grandMean) * 10) / 10,
   }));
 
   // Classification
@@ -326,31 +316,29 @@ export function decomposeDecisionNoise(
   // Summary
   const summaryParts: string[] = [];
   summaryParts.push(
-    `${classification.charAt(0).toUpperCase() + classification.slice(1)} noise detected (${totalNoise.toFixed(1)} total).`,
+    `${classification.charAt(0).toUpperCase() + classification.slice(1)} noise detected (${totalNoise.toFixed(1)} total).`
   );
   if (isMultiModel) {
     summaryParts.push(
-      `Multi-model jury (${[...providers].join(', ')}) provides high-confidence noise measurement.`,
+      `Multi-model jury (${[...providers].join(', ')}) provides high-confidence noise measurement.`
     );
   } else {
     summaryParts.push(
-      'Single-model jury — noise reflects sampling variance, not genuine analytical disagreement.',
+      'Single-model jury — noise reflects sampling variance, not genuine analytical disagreement.'
     );
   }
   if (levelNoise > patternNoise) {
     summaryParts.push(
-      `Level noise dominates (${levelNoise.toFixed(1)}): judges disagree on overall severity.`,
+      `Level noise dominates (${levelNoise.toFixed(1)}): judges disagree on overall severity.`
     );
   } else if (patternNoise > levelNoise) {
     summaryParts.push(
-      `Pattern noise dominates (${patternNoise.toFixed(1)}): judges disagree on which biases are present.`,
+      `Pattern noise dominates (${patternNoise.toFixed(1)}): judges disagree on which biases are present.`
     );
   }
   if (disagreements.length > 0) {
     const topDisagreement = disagreements[0];
-    summaryParts.push(
-      `Key disagreement: ${topDisagreement.description}.`,
-    );
+    summaryParts.push(`Key disagreement: ${topDisagreement.description}.`);
   }
 
   return {
@@ -373,7 +361,7 @@ export function decomposeDecisionNoise(
  */
 export function compareNoiseRegimes(
   singleModelNoise: NoiseDecomposition,
-  multiModelNoise: NoiseDecomposition,
+  multiModelNoise: NoiseDecomposition
 ): {
   samplingNoiseEstimate: number;
   analyticalNoiseEstimate: number;
@@ -382,10 +370,7 @@ export function compareNoiseRegimes(
   // Multi-model noise includes both real analytical disagreement + model-specific priors
   // Single-model noise is mostly sampling noise
   const samplingNoise = singleModelNoise.totalNoise;
-  const analyticalNoise = Math.max(
-    0,
-    multiModelNoise.totalNoise - samplingNoise * 0.5,
-  );
+  const analyticalNoise = Math.max(0, multiModelNoise.totalNoise - samplingNoise * 0.5);
 
   let recommendation: string;
   if (analyticalNoise > samplingNoise * 2) {

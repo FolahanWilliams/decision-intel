@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     if (!analysisId) {
       return NextResponse.json(
         { error: 'Missing required parameter: analysisId' },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -94,18 +94,12 @@ export async function GET(request: NextRequest) {
 
     // Count fact-check results
     const verifications = factCheckRaw?.verifications ?? [];
-    const verifiedClaims = verifications.filter(
-      (v) => v?.verdict === 'VERIFIED',
-    ).length;
-    const contradictedClaims = verifications.filter(
-      (v) => v?.verdict === 'CONTRADICTED',
-    ).length;
+    const verifiedClaims = verifications.filter(v => v?.verdict === 'VERIFIED').length;
+    const contradictedClaims = verifications.filter(v => v?.verdict === 'CONTRADICTED').length;
 
     // Check for dissent in simulation
     const twins = simulationRaw?.twins ?? [];
-    const dissentPresent = twins.some(
-      (t) => t?.vote === 'REJECT' || t?.vote === 'REVISE',
-    );
+    const dissentPresent = twins.some(t => t?.vote === 'REJECT' || t?.vote === 'REVISE');
 
     // Check for decision prior
     let priorSubmitted = false;
@@ -133,13 +127,13 @@ export async function GET(request: NextRequest) {
     const wordCount = documentContent.split(/\s+/).filter(Boolean).length;
 
     const dqiInput: DQIInput = {
-      biases: (biasesRaw ?? []).map((b) => ({
+      biases: (biasesRaw ?? []).map(b => ({
         type: b.biasType ?? b.type ?? 'unknown',
         severity: (b.severity as 'low' | 'medium' | 'high' | 'critical') ?? 'medium',
         confidence: b.confidence ?? 0.5,
       })),
       noiseStats: {
-        mean: noiseRaw?.mean ?? (analysis.overallScore ?? 50),
+        mean: noiseRaw?.mean ?? analysis.overallScore ?? 50,
         stdDev: noiseRaw?.stdDev ?? 0,
         judgeCount: noiseRaw?.scores?.length ?? 1,
       },
@@ -158,15 +152,19 @@ export async function GET(request: NextRequest) {
       },
       compliance: {
         riskScore: complianceRaw?.riskScore ?? 0,
-        frameworksChecked: complianceRaw?.regulatoryGraph?.frameworksChecked?.length
-          ?? complianceRaw?.regulations?.length ?? 0,
-        violationsFound: complianceRaw?.regulatoryGraph?.totalFindings
-          ?? (complianceRaw?.regulations?.length ?? 0),
+        frameworksChecked:
+          complianceRaw?.regulatoryGraph?.frameworksChecked?.length ??
+          complianceRaw?.regulations?.length ??
+          0,
+        violationsFound:
+          complianceRaw?.regulatoryGraph?.totalFindings ?? complianceRaw?.regulations?.length ?? 0,
       },
     };
 
     // Wire compound scoring if available in compliance JSON
-    const compoundData = (complianceRaw as { compoundScoring?: { calibratedScore?: number } } | null)?.compoundScoring;
+    const compoundData = (
+      complianceRaw as { compoundScoring?: { calibratedScore?: number } } | null
+    )?.compoundScoring;
     if (compoundData?.calibratedScore !== undefined) {
       dqiInput.compoundScore = compoundData.calibratedScore;
     }
@@ -177,13 +175,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { analysisId, dqi, badge },
-      { headers: { 'Cache-Control': 'private, max-age=60, stale-while-revalidate=30' } },
+      { headers: { 'Cache-Control': 'private, max-age=60, stale-while-revalidate=30' } }
     );
   } catch (error) {
     log.error('DQI computation failed', { error });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

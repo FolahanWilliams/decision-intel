@@ -95,11 +95,11 @@ export interface DQIResult {
 
 export interface DQIComponent {
   name: string;
-  score: number;       // 0-100
-  weight: number;      // 0-1
-  weighted: number;    // score * weight
-  grade: string;       // A-F
-  detail: string;      // human-readable explanation
+  score: number; // 0-100
+  weight: number; // 0-1
+  weighted: number; // score * weight
+  grade: string; // A-F
+  detail: string; // human-readable explanation
 }
 
 // ---------------------------------------------------------------------------
@@ -107,9 +107,9 @@ export interface DQIComponent {
 // ---------------------------------------------------------------------------
 
 const WEIGHTS = {
-  biasLoad: 0.30,
-  noiseLevel: 0.20,
-  evidenceQuality: 0.20,
+  biasLoad: 0.3,
+  noiseLevel: 0.2,
+  evidenceQuality: 0.2,
   processMaturity: 0.15,
   complianceRisk: 0.15,
 };
@@ -140,9 +140,7 @@ const METHODOLOGY_VERSION = '1.0.0';
 // Component scoring functions
 // ---------------------------------------------------------------------------
 
-function scoreBiasLoad(
-  biases: DQIInput['biases'],
-): DQIComponent {
+function scoreBiasLoad(biases: DQIInput['biases']): DQIComponent {
   // Start at 100, subtract weighted penalties per bias
   let totalPenalty = 0;
   for (const bias of biases) {
@@ -160,8 +158,8 @@ function scoreBiasLoad(
   if (biases.length === 0) {
     detail = 'No cognitive biases detected.';
   } else {
-    const criticalCount = biases.filter((b) => b.severity === 'critical').length;
-    const highCount = biases.filter((b) => b.severity === 'high').length;
+    const criticalCount = biases.filter(b => b.severity === 'critical').length;
+    const highCount = biases.filter(b => b.severity === 'high').length;
     detail = `${biases.length} biases detected`;
     if (criticalCount > 0) detail += ` (${criticalCount} critical)`;
     else if (highCount > 0) detail += ` (${highCount} high severity)`;
@@ -178,9 +176,7 @@ function scoreBiasLoad(
   };
 }
 
-function scoreNoiseLevel(
-  noiseStats: DQIInput['noiseStats'],
-): DQIComponent {
+function scoreNoiseLevel(noiseStats: DQIInput['noiseStats']): DQIComponent {
   // Lower noise = higher score
   // stdDev of 0 = 100, stdDev of 30+ = 0
   const noisePenalty = Math.min(100, noiseStats.stdDev * 3.33);
@@ -209,9 +205,7 @@ function scoreNoiseLevel(
   };
 }
 
-function scoreEvidenceQuality(
-  factCheck: DQIInput['factCheck'],
-): DQIComponent {
+function scoreEvidenceQuality(factCheck: DQIInput['factCheck']): DQIComponent {
   // Weighted combination of verification rate and fact-check score
   let score: number;
 
@@ -219,15 +213,10 @@ function scoreEvidenceQuality(
     // No claims to verify — neutral score
     score = 70;
   } else {
-    const verificationRate =
-      factCheck.verifiedClaims / factCheck.totalClaims;
-    const contradictionPenalty =
-      (factCheck.contradictedClaims / factCheck.totalClaims) * 40;
+    const verificationRate = factCheck.verifiedClaims / factCheck.totalClaims;
+    const contradictionPenalty = (factCheck.contradictedClaims / factCheck.totalClaims) * 40;
 
-    score = Math.max(
-      0,
-      Math.min(100, verificationRate * 80 + 20 - contradictionPenalty),
-    );
+    score = Math.max(0, Math.min(100, verificationRate * 80 + 20 - contradictionPenalty));
 
     // Blend with the raw fact-check score
     score = score * 0.6 + factCheck.score * 0.4;
@@ -254,9 +243,7 @@ function scoreEvidenceQuality(
   };
 }
 
-function scoreProcessMaturity(
-  process: DQIInput['process'],
-): DQIComponent {
+function scoreProcessMaturity(process: DQIInput['process']): DQIComponent {
   // Score based on decision hygiene indicators
   let score = 40; // baseline
 
@@ -306,9 +293,7 @@ function scoreProcessMaturity(
   };
 }
 
-function scoreComplianceRisk(
-  compliance: DQIInput['compliance'],
-): DQIComponent {
+function scoreComplianceRisk(compliance: DQIInput['compliance']): DQIComponent {
   // Invert risk score (high risk = low score)
   const score = Math.max(0, 100 - compliance.riskScore);
 
@@ -346,39 +331,42 @@ function getComponentGrade(score: number): string {
   return 'F';
 }
 
-function findTopImprovement(
-  components: DQIResult['components'],
-): DQIResult['topImprovement'] {
+function findTopImprovement(components: DQIResult['components']): DQIResult['topImprovement'] {
   const improvable = [
     {
       component: 'Bias Load',
       score: components.biasLoad.score,
       weight: components.biasLoad.weight,
-      suggestion: 'Apply debiasing techniques: assign a Devil\'s Advocate, use pre-mortem analysis, and consider the opposite.',
+      suggestion:
+        "Apply debiasing techniques: assign a Devil's Advocate, use pre-mortem analysis, and consider the opposite.",
     },
     {
       component: 'Noise Level',
       score: components.noiseLevel.score,
       weight: components.noiseLevel.weight,
-      suggestion: 'Improve assessment consistency with structured evaluation criteria and decision journals.',
+      suggestion:
+        'Improve assessment consistency with structured evaluation criteria and decision journals.',
     },
     {
       component: 'Evidence Quality',
       score: components.evidenceQuality.score,
       weight: components.evidenceQuality.weight,
-      suggestion: 'Strengthen evidence base: cite specific data, cross-reference claims, and acknowledge uncertainties.',
+      suggestion:
+        'Strengthen evidence base: cite specific data, cross-reference claims, and acknowledge uncertainties.',
     },
     {
       component: 'Process Maturity',
       score: components.processMaturity.score,
       weight: components.processMaturity.weight,
-      suggestion: 'Record a decision prior before analysis, ensure dissenting views are captured, and track outcomes.',
+      suggestion:
+        'Record a decision prior before analysis, ensure dissenting views are captured, and track outcomes.',
     },
     {
       component: 'Compliance Risk',
       score: components.complianceRisk.score,
       weight: components.complianceRisk.weight,
-      suggestion: 'Address regulatory violations and ensure decision documentation meets compliance requirements.',
+      suggestion:
+        'Address regulatory violations and ensure decision documentation meets compliance requirements.',
     },
   ];
 
@@ -444,7 +432,9 @@ export function computeDQI(input: DQIInput): DQIResult {
   finalScore = Math.max(0, Math.min(100, finalScore));
 
   // Determine grade
-  const gradeInfo = GRADE_THRESHOLDS.find((g) => finalScore >= g.min) ?? GRADE_THRESHOLDS[GRADE_THRESHOLDS.length - 1];
+  const gradeInfo =
+    GRADE_THRESHOLDS.find(g => finalScore >= g.min) ??
+    GRADE_THRESHOLDS[GRADE_THRESHOLDS.length - 1];
 
   // Find top improvement
   const topImprovement = findTopImprovement(components);

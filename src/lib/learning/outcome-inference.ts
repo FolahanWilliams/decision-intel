@@ -11,11 +11,7 @@
  * quality while reducing the friction that breaks the feedback loop.
  */
 
-import {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { searchSimilarDocuments } from '@/lib/rag/embeddings';
@@ -54,9 +50,18 @@ function getModel() {
     },
     safetySettings: [
       { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
     ],
   });
 }
@@ -68,7 +73,7 @@ function buildOutcomeInferencePrompt(
   successCriteria: string[],
   failureCriteria: string[],
   evidence: string,
-  source: 'document' | 'slack' | 'web_intelligence',
+  source: 'document' | 'slack' | 'web_intelligence'
 ): string {
   return `You are an outcome detection specialist. Analyze the provided evidence to determine whether a prior decision's outcome has become apparent.
 
@@ -116,7 +121,7 @@ export async function detectOutcomeFromDocument(
   newDocumentId: string,
   newDocContent: string,
   userId: string,
-  orgId: string | null,
+  orgId: string | null
 ): Promise<OutcomeInferenceResult[]> {
   const results: OutcomeInferenceResult[] = [];
 
@@ -126,7 +131,7 @@ export async function detectOutcomeFromDocument(
       newDocContent.slice(0, 2000), // Limit query length
       userId,
       10,
-      newDocumentId, // Exclude self
+      newDocumentId // Exclude self
     );
 
     if (similar.length === 0) return results;
@@ -160,9 +165,7 @@ export async function detectOutcomeFromDocument(
     });
 
     // Filter to same org
-    const orgFiltered = pendingAnalyses.filter(a =>
-      orgId ? a.document.orgId === orgId : true,
-    );
+    const orgFiltered = pendingAnalyses.filter(a => (orgId ? a.document.orgId === orgId : true));
 
     if (orgFiltered.length === 0) return results;
 
@@ -175,7 +178,7 @@ export async function detectOutcomeFromDocument(
 
       // Check similarity threshold — need strong semantic match
       const similarity = similar.find(s => s.documentId === analysis.documentId)?.similarity ?? 0;
-      if (similarity < 0.70) continue;
+      if (similarity < 0.7) continue;
 
       try {
         const prompt = buildOutcomeInferencePrompt(
@@ -183,7 +186,7 @@ export async function detectOutcomeFromDocument(
           frame.successCriteria,
           frame.failureCriteria,
           newDocContent.slice(0, 4000),
-          'document',
+          'document'
         );
 
         const result = await model.generateContent(prompt);
@@ -207,7 +210,7 @@ export async function detectOutcomeFromDocument(
           await saveDraftOutcome(analysis.id, inference);
 
           log.info(
-            `Document outcome detected for analysis ${analysis.id}: ${parsed.outcome} (confidence: ${parsed.confidence})`,
+            `Document outcome detected for analysis ${analysis.id}: ${parsed.outcome} (confidence: ${parsed.confidence})`
           );
         }
       } catch (err) {
@@ -258,7 +261,9 @@ export function isOutcomeMessage(text: string): boolean {
 /**
  * Quick-classify outcome direction from Slack text without LLM.
  */
-function classifyOutcomeDirection(text: string): 'success' | 'failure' | 'partial_success' | 'inconclusive' {
+function classifyOutcomeDirection(
+  text: string
+): 'success' | 'failure' | 'partial_success' | 'inconclusive' {
   const hasSuccess = SUCCESS_SIGNALS.some(p => p.test(text));
   const hasFailure = FAILURE_SIGNALS.some(p => p.test(text));
   const hasMixed = MIXED_SIGNALS.some(p => p.test(text));
@@ -277,7 +282,7 @@ export async function detectOutcomeFromSlack(
   messageText: string,
   channel: string,
   threadTs: string | undefined,
-  _teamId: string,
+  _teamId: string
 ): Promise<OutcomeInferenceResult[]> {
   const results: OutcomeInferenceResult[] = [];
 
@@ -303,101 +308,84 @@ export async function detectOutcomeFromSlack(
       .map(d => d.linkedAnalysisId)
       .filter((id): id is string => id !== null);
 
-    const pendingAnalyses = linkedAnalysisIds.length > 0
-      ? await prisma.analysis.findMany({
-          where: {
-            id: { in: linkedAnalysisIds },
-            outcomeStatus: 'pending_outcome',
-            outcome: null,
-          },
-          select: {
-            id: true,
-            summary: true,
-            document: {
-              select: {
-                decisionFrame: {
-                  select: {
-                    decisionStatement: true,
-                    successCriteria: true,
-                    failureCriteria: true,
+    const pendingAnalyses =
+      linkedAnalysisIds.length > 0
+        ? await prisma.analysis.findMany({
+            where: {
+              id: { in: linkedAnalysisIds },
+              outcomeStatus: 'pending_outcome',
+              outcome: null,
+            },
+            select: {
+              id: true,
+              summary: true,
+              document: {
+                select: {
+                  decisionFrame: {
+                    select: {
+                      decisionStatement: true,
+                      successCriteria: true,
+                      failureCriteria: true,
+                    },
                   },
                 },
               },
             },
-          },
-          take: 5,
-        })
-      : [];
+            take: 5,
+          })
+        : [];
 
     if (pendingAnalyses.length === 0) return results;
 
     const sourceRef = threadTs ? `slack:${channel}:${threadTs}` : `slack:${channel}`;
 
     for (const analysis of pendingAnalyses) {
-        const frame = analysis.document.decisionFrame;
+      const frame = analysis.document.decisionFrame;
 
-        if (frame && frame.successCriteria.length > 0) {
-          // Use LLM for high-quality inference
-          try {
-            const model = getModel();
-            const prompt = buildOutcomeInferencePrompt(
-              frame.decisionStatement,
-              frame.successCriteria,
-              frame.failureCriteria,
-              messageText,
-              'slack',
+      if (frame && frame.successCriteria.length > 0) {
+        // Use LLM for high-quality inference
+        try {
+          const model = getModel();
+          const prompt = buildOutcomeInferencePrompt(
+            frame.decisionStatement,
+            frame.successCriteria,
+            frame.failureCriteria,
+            messageText,
+            'slack'
+          );
+
+          const result = await model.generateContent(prompt);
+          const text = result.response.text();
+          const parsed = JSON.parse(text);
+
+          if (parsed.outcomeDetected && parsed.confidence >= 0.6) {
+            const inference: OutcomeInferenceResult = {
+              outcomeDetected: true,
+              outcome: parsed.outcome,
+              confidence: parsed.confidence,
+              evidence: parsed.evidence || [],
+              matchedCriteria: parsed.matchedCriteria || [],
+              source: 'slack',
+              sourceRef,
+            };
+
+            results.push(inference);
+            await saveDraftOutcome(analysis.id, inference);
+
+            log.info(
+              `Slack outcome detected for analysis ${analysis.id}: ${parsed.outcome} (confidence: ${parsed.confidence})`
             );
-
-            const result = await model.generateContent(prompt);
-            const text = result.response.text();
-            const parsed = JSON.parse(text);
-
-            if (parsed.outcomeDetected && parsed.confidence >= 0.6) {
-              const inference: OutcomeInferenceResult = {
-                outcomeDetected: true,
-                outcome: parsed.outcome,
-                confidence: parsed.confidence,
-                evidence: parsed.evidence || [],
-                matchedCriteria: parsed.matchedCriteria || [],
-                source: 'slack',
-                sourceRef,
-              };
-
-              results.push(inference);
-              await saveDraftOutcome(analysis.id, inference);
-
-              log.info(
-                `Slack outcome detected for analysis ${analysis.id}: ${parsed.outcome} (confidence: ${parsed.confidence})`,
-              );
-            }
-          } catch (err) {
-            log.warn(`Failed LLM inference for Slack outcome, falling back to pattern match`, err);
-
-            // Fallback: pattern-based classification (lower confidence)
-            const direction = classifyOutcomeDirection(messageText);
-            if (direction !== 'inconclusive') {
-              const inference: OutcomeInferenceResult = {
-                outcomeDetected: true,
-                outcome: direction,
-                confidence: 0.5, // Lower confidence for pattern-only
-                evidence: [messageText.slice(0, 200)],
-                matchedCriteria: [],
-                source: 'slack',
-                sourceRef,
-              };
-
-              results.push(inference);
-              await saveDraftOutcome(analysis.id, inference);
-            }
           }
-        } else {
-          // No decision frame — use pattern matching only
+        } catch (err) {
+          log.warn(`Failed LLM inference for Slack outcome, falling back to pattern match`, err);
+
+          // Fallback: pattern-based classification (lower confidence)
           const direction = classifyOutcomeDirection(messageText);
           if (direction !== 'inconclusive') {
             const inference: OutcomeInferenceResult = {
               outcomeDetected: true,
               outcome: direction,
-              confidence: 0.45,
+              confidence: 0.5, // Lower confidence for pattern-only
               evidence: [messageText.slice(0, 200)],
               matchedCriteria: [],
               source: 'slack',
@@ -408,6 +396,24 @@ export async function detectOutcomeFromSlack(
             await saveDraftOutcome(analysis.id, inference);
           }
         }
+      } else {
+        // No decision frame — use pattern matching only
+        const direction = classifyOutcomeDirection(messageText);
+        if (direction !== 'inconclusive') {
+          const inference: OutcomeInferenceResult = {
+            outcomeDetected: true,
+            outcome: direction,
+            confidence: 0.45,
+            evidence: [messageText.slice(0, 200)],
+            matchedCriteria: [],
+            source: 'slack',
+            sourceRef,
+          };
+
+          results.push(inference);
+          await saveDraftOutcome(analysis.id, inference);
+        }
+      }
     }
   } catch (err) {
     log.error('Slack outcome detection failed:', err);
@@ -424,7 +430,7 @@ export async function detectOutcomeFromSlack(
  * Called by the cron job. Rate-limited to maxSearches per run.
  */
 export async function detectOutcomesFromWeb(
-  maxSearches: number = 10,
+  maxSearches: number = 10
 ): Promise<OutcomeInferenceResult[]> {
   const results: OutcomeInferenceResult[] = [];
 
@@ -466,9 +472,7 @@ export async function detectOutcomesFromWeb(
     });
 
     // Prioritize: highest monetary value and most overdue
-    const candidates = pendingAnalyses
-      .filter(a => a.document.decisionFrame)
-      .slice(0, maxSearches);
+    const candidates = pendingAnalyses.filter(a => a.document.decisionFrame).slice(0, maxSearches);
 
     if (candidates.length === 0) return results;
 
@@ -493,10 +497,22 @@ export async function detectOutcomesFromWeb(
             maxOutputTokens: 4096,
           },
           safetySettings: [
-            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            {
+              category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+              category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+              threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
           ],
         });
 
@@ -542,7 +558,7 @@ Respond with JSON:
           await saveDraftOutcome(analysis.id, inference);
 
           log.info(
-            `Web outcome detected for analysis ${analysis.id}: ${parsed.outcome} (confidence: ${parsed.confidence})`,
+            `Web outcome detected for analysis ${analysis.id}: ${parsed.outcome} (confidence: ${parsed.confidence})`
           );
         }
       } catch (err) {
@@ -563,8 +579,25 @@ Respond with JSON:
 function buildWebSearchQuery(decisionStatement: string): string | null {
   // Look for proper nouns, company names, product names
   const words = decisionStatement.split(/\s+/);
-  const properNouns = words.filter(w =>
-    /^[A-Z][a-z]+/.test(w) && !['The', 'This', 'That', 'When', 'Where', 'What', 'How', 'Why', 'Our', 'Their', 'We', 'Should', 'Whether', 'If'].includes(w)
+  const properNouns = words.filter(
+    w =>
+      /^[A-Z][a-z]+/.test(w) &&
+      ![
+        'The',
+        'This',
+        'That',
+        'When',
+        'Where',
+        'What',
+        'How',
+        'Why',
+        'Our',
+        'Their',
+        'We',
+        'Should',
+        'Whether',
+        'If',
+      ].includes(w)
   );
 
   if (properNouns.length === 0) return null;
@@ -585,7 +618,7 @@ function buildWebSearchQuery(decisionStatement: string): string | null {
  */
 export async function saveDraftOutcome(
   analysisId: string,
-  inference: OutcomeInferenceResult,
+  inference: OutcomeInferenceResult
 ): Promise<void> {
   try {
     // Check for existing draft for this analysis + source combo
@@ -645,7 +678,7 @@ export async function saveDraftOutcome(
  */
 export async function confirmDraftOutcome(
   draftId: string,
-  userId: string,
+  userId: string
 ): Promise<{ success: boolean; outcomeId?: string }> {
   try {
     const draft = await prisma.draftOutcome.findUnique({
@@ -697,7 +730,7 @@ export async function confirmDraftOutcome(
       const orgId = draft.analysis.document.orgId;
       if (orgId) {
         runFullRecalibration(orgId).catch(err =>
-          log.warn('Recalibration after outcome confirmation failed:', err),
+          log.warn('Recalibration after outcome confirmation failed:', err)
         );
       }
     } catch {
@@ -737,19 +770,21 @@ export async function dismissDraftOutcome(draftId: string): Promise<boolean> {
  */
 export async function getPendingDraftOutcomes(
   userId: string,
-  orgId?: string | null,
-): Promise<Array<{
-  id: string;
-  analysisId: string;
-  outcome: string;
-  confidence: number;
-  evidence: string[];
-  source: string;
-  sourceRef: string;
-  createdAt: Date;
-  analysisTitle: string;
-  decisionStatement: string | null;
-}>> {
+  orgId?: string | null
+): Promise<
+  Array<{
+    id: string;
+    analysisId: string;
+    outcome: string;
+    confidence: number;
+    evidence: string[];
+    source: string;
+    sourceRef: string;
+    createdAt: Date;
+    analysisTitle: string;
+    decisionStatement: string | null;
+  }>
+> {
   try {
     const drafts = await prisma.draftOutcome.findMany({
       where: {

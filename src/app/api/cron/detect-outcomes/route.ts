@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     const elapsed = Date.now() - start;
     log.info(
-      `Web outcome detection complete: ${results.length} outcome(s) detected in ${elapsed}ms`,
+      `Web outcome detection complete: ${results.length} outcome(s) detected in ${elapsed}ms`
     );
 
     return NextResponse.json({
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     log.error('Web outcome detection cron failed:', err);
     return NextResponse.json(
       { error: 'Internal error', message: err instanceof Error ? err.message : String(err) },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

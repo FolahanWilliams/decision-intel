@@ -58,7 +58,7 @@ export async function PATCH(req: NextRequest) {
     if (!draftId || !action) {
       return NextResponse.json(
         { error: 'draftId and action (confirm|dismiss) are required' },
-        { status: 400 },
+        { status: 400 }
       );
     }
 

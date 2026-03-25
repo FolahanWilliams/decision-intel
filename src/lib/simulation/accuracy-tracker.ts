@@ -76,10 +76,8 @@ interface RawPersonaData {
  * Weighting: 40% backtest + 60% live (adjusted by sample size confidence)
  */
 function computeBlendedAccuracy(data: RawPersonaData): number {
-  const backtestAcc =
-    data.backtestTotal > 0 ? data.backtestCorrect / data.backtestTotal : 0.5;
-  const liveAcc =
-    data.liveTotal > 0 ? data.liveCorrect / data.liveTotal : 0.5;
+  const backtestAcc = data.backtestTotal > 0 ? data.backtestCorrect / data.backtestTotal : 0.5;
+  const liveAcc = data.liveTotal > 0 ? data.liveCorrect / data.liveTotal : 0.5;
 
   // Wilson score interval for confidence weighting
   const backtestConfidence = Math.min(1.0, data.backtestTotal / 50);
@@ -107,10 +105,7 @@ function computeBlendedAccuracy(data: RawPersonaData): number {
  * - accuracy > 0.8: weight = 1.6 (upweight significantly)
  * - accuracy > 0.9: weight = 2.0 (maximum)
  */
-function computeRecommendedWeight(
-  accuracy: number,
-  sampleSize: number,
-): number {
+function computeRecommendedWeight(accuracy: number, sampleSize: number): number {
   // Need minimum sample size to deviate from baseline
   if (sampleSize < 5) return 1.0;
 
@@ -130,7 +125,7 @@ function computeRecommendedWeight(
  */
 function findIndustryStrengths(
   industryCorrect: Record<string, number>,
-  industryTotal: Record<string, number>,
+  industryTotal: Record<string, number>
 ): { strong: string[]; weak: string[] } {
   const accuracies: Array<{ industry: string; accuracy: number; total: number }> = [];
 
@@ -143,12 +138,8 @@ function findIndustryStrengths(
 
   accuracies.sort((a, b) => b.accuracy - a.accuracy);
 
-  const strong = accuracies
-    .filter((a) => a.accuracy >= 0.7)
-    .map((a) => a.industry);
-  const weak = accuracies
-    .filter((a) => a.accuracy < 0.5)
-    .map((a) => a.industry);
+  const strong = accuracies.filter(a => a.accuracy >= 0.7).map(a => a.industry);
+  const weak = accuracies.filter(a => a.accuracy < 0.5).map(a => a.industry);
 
   return { strong, weak };
 }
@@ -162,35 +153,24 @@ function findIndustryStrengths(
  *
  * Called after backtesting runs and/or when live outcome data is available.
  */
-export function buildAccuracyReport(
-  rawData: RawPersonaData[],
-): AccuracyReport {
-  const personas: PersonaAccuracyRecord[] = rawData.map((data) => {
+export function buildAccuracyReport(rawData: RawPersonaData[]): AccuracyReport {
+  const personas: PersonaAccuracyRecord[] = rawData.map(data => {
     const backtestAccuracy =
       data.backtestTotal > 0
         ? Math.round((data.backtestCorrect / data.backtestTotal) * 1000) / 1000
         : 0;
     const liveAccuracy =
-      data.liveTotal > 0
-        ? Math.round((data.liveCorrect / data.liveTotal) * 1000) / 1000
-        : 0;
-    const blendedAccuracy =
-      Math.round(computeBlendedAccuracy(data) * 1000) / 1000;
+      data.liveTotal > 0 ? Math.round((data.liveCorrect / data.liveTotal) * 1000) / 1000 : 0;
+    const blendedAccuracy = Math.round(computeBlendedAccuracy(data) * 1000) / 1000;
     const riskFlagRate =
       data.riskFlagsTotal > 0
         ? Math.round((data.riskFlagsCorrect / data.riskFlagsTotal) * 1000) / 1000
         : 0;
 
-    const { strong, weak } = findIndustryStrengths(
-      data.industryCorrect,
-      data.industryTotal,
-    );
+    const { strong, weak } = findIndustryStrengths(data.industryCorrect, data.industryTotal);
 
     const totalSamples = data.backtestTotal + data.liveTotal;
-    const recommendedWeight = computeRecommendedWeight(
-      blendedAccuracy,
-      totalSamples,
-    );
+    const recommendedWeight = computeRecommendedWeight(blendedAccuracy, totalSamples);
 
     return {
       personaName: data.personaName,
@@ -210,18 +190,10 @@ export function buildAccuracyReport(
   personas.sort((a, b) => b.blendedAccuracy - a.blendedAccuracy);
 
   // Overall accuracy: weighted average across all personas
-  const totalCorrect = rawData.reduce(
-    (s, d) => s + d.backtestCorrect + d.liveCorrect,
-    0,
-  );
-  const totalSamples = rawData.reduce(
-    (s, d) => s + d.backtestTotal + d.liveTotal,
-    0,
-  );
+  const totalCorrect = rawData.reduce((s, d) => s + d.backtestCorrect + d.liveCorrect, 0);
+  const totalSamples = rawData.reduce((s, d) => s + d.backtestTotal + d.liveTotal, 0);
   const overallAccuracy =
-    totalSamples > 0
-      ? Math.round((totalCorrect / totalSamples) * 1000) / 1000
-      : 0;
+    totalSamples > 0 ? Math.round((totalCorrect / totalSamples) * 1000) / 1000 : 0;
 
   // Industry leaders
   const industryLeaders: Record<string, string> = {};
@@ -277,7 +249,7 @@ export function mergeBacktestAndLiveData(
     wasCorrect: boolean;
     flaggedActualRisk: boolean;
     industry: string;
-  }>,
+  }>
 ): RawPersonaData[] {
   const dataMap = new Map<string, RawPersonaData>();
 
@@ -305,11 +277,9 @@ export function mergeBacktestAndLiveData(
     if (result.wasCorrect) entry.backtestCorrect++;
     entry.riskFlagsTotal++;
     if (result.flaggedActualRisk) entry.riskFlagsCorrect++;
-    entry.industryTotal[result.industry] =
-      (entry.industryTotal[result.industry] ?? 0) + 1;
+    entry.industryTotal[result.industry] = (entry.industryTotal[result.industry] ?? 0) + 1;
     if (result.wasCorrect) {
-      entry.industryCorrect[result.industry] =
-        (entry.industryCorrect[result.industry] ?? 0) + 1;
+      entry.industryCorrect[result.industry] = (entry.industryCorrect[result.industry] ?? 0) + 1;
     }
   }
 
@@ -320,11 +290,9 @@ export function mergeBacktestAndLiveData(
     if (result.wasCorrect) entry.liveCorrect++;
     entry.riskFlagsTotal++;
     if (result.flaggedActualRisk) entry.riskFlagsCorrect++;
-    entry.industryTotal[result.industry] =
-      (entry.industryTotal[result.industry] ?? 0) + 1;
+    entry.industryTotal[result.industry] = (entry.industryTotal[result.industry] ?? 0) + 1;
     if (result.wasCorrect) {
-      entry.industryCorrect[result.industry] =
-        (entry.industryCorrect[result.industry] ?? 0) + 1;
+      entry.industryCorrect[result.industry] = (entry.industryCorrect[result.industry] ?? 0) + 1;
     }
   }
 

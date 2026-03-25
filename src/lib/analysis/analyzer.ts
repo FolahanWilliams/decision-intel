@@ -329,7 +329,7 @@ export async function analyzeDocument(
         documentId,
         document.content.slice(0, 6000),
         document.userId,
-        document.orgId ?? null,
+        document.orgId ?? null
       );
       if (draftOutcomes.length > 0) {
         log.info(

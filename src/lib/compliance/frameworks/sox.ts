@@ -23,7 +23,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       section: 'Section 302',
       title: 'CEO/CFO Certification of Financial Reports',
       description:
-        'The CEO and CFO must personally certify that financial statements fairly present the company\'s financial condition and results of operations. They must certify that they have evaluated the effectiveness of disclosure controls and reported any significant deficiencies.',
+        "The CEO and CFO must personally certify that financial statements fairly present the company's financial condition and results of operations. They must certify that they have evaluated the effectiveness of disclosure controls and reported any significant deficiencies.",
       riskLevel: 'critical',
       keywords: [
         'CEO certification',
@@ -40,7 +40,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       section: 'Section 404',
       title: 'Internal Controls Assessment',
       description:
-        'Management must establish and maintain an adequate internal control structure and procedures for financial reporting. An annual assessment of internal controls must be included in the annual report, and the external auditor must attest to management\'s assessment.',
+        "Management must establish and maintain an adequate internal control structure and procedures for financial reporting. An annual assessment of internal controls must be included in the annual report, and the external auditor must attest to management's assessment.",
       riskLevel: 'critical',
       keywords: [
         'internal controls',
@@ -136,7 +136,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Internal control risk assessments driven by recently publicised corporate failures rather than systematic risk analysis. Control resources allocated to prevent the last scandal rather than the next one.',
       example:
-        'After a peer company\'s fraud involving journal entry manipulation, the firm over-invests in journal entry testing while under-resourcing controls over revenue recognition — the firm\'s actual highest-risk area.',
+        "After a peer company's fraud involving journal entry manipulation, the firm over-invests in journal entry testing while under-resourcing controls over revenue recognition — the firm's actual highest-risk area.",
     },
     {
       biasType: 'availability_heuristic',
@@ -145,7 +145,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Document retention decisions influenced by vivid memories of enforcement actions rather than systematic assessment of retention requirements, leading to inconsistent compliance.',
       example:
-        'After hearing about a competitor\'s destruction-of-evidence penalty, a team over-preserves email communications but neglects to retain equally important Slack messages and shared drive files.',
+        "After hearing about a competitor's destruction-of-evidence penalty, a team over-preserves email communications but neglects to retain equally important Slack messages and shared drive files.",
     },
 
     // ── groupthink ─────────────────────────────────────────────────────
@@ -154,7 +154,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'sox_section_302',
       riskWeight: 0.8,
       mechanism:
-        'Executive leadership teams develop shared narratives about financial performance that suppress dissent. Board and audit committee members fail to challenge management\'s presentation of financial results.',
+        "Executive leadership teams develop shared narratives about financial performance that suppress dissent. Board and audit committee members fail to challenge management's presentation of financial results.",
       example:
         'An executive team collectively agrees to characterise a one-time gain as recurring revenue in their certification narrative, with no member willing to raise the aggressive accounting treatment in front of the CEO.',
     },
@@ -183,9 +183,9 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'sox_section_404',
       riskWeight: 0.6,
       mechanism:
-        'Internal audit teams defer to management\'s assessment of control effectiveness rather than forming independent opinions. The authority of process owners overrides testing evidence.',
+        "Internal audit teams defer to management's assessment of control effectiveness rather than forming independent opinions. The authority of process owners overrides testing evidence.",
       example:
-        'An internal auditor finds evidence of a control override but accepts the VP of Finance\'s explanation that it was a one-time exception, rather than classifying it as a control failure requiring remediation.',
+        "An internal auditor finds evidence of a control override but accepts the VP of Finance's explanation that it was a one-time exception, rather than classifying it as a control failure requiring remediation.",
     },
     {
       biasType: 'authority_bias',
@@ -203,7 +203,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'sox_section_404',
       riskWeight: 0.45,
       mechanism:
-        'Adoption of control frameworks and testing methodologies because they are industry standard, without assessing whether they address the firm\'s specific risk profile.',
+        "Adoption of control frameworks and testing methodologies because they are industry standard, without assessing whether they address the firm's specific risk profile.",
       example:
         'A company adopts a peer\'s SOX testing program verbatim because "everyone in the industry uses this approach," without customising it for their unique business processes, transaction types, and IT environment.',
     },
@@ -214,7 +214,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'sox_section_302',
       riskWeight: 0.8,
       mechanism:
-        'Executives overconfident in their understanding of the company\'s financial position, certifying statements without adequate diligence. Overconfidence in personal judgment substitutes for rigorous verification.',
+        "Executives overconfident in their understanding of the company's financial position, certifying statements without adequate diligence. Overconfidence in personal judgment substitutes for rigorous verification.",
       example:
         'A CEO certifies annual financial statements based on a 30-minute briefing and personal conviction that "I know this business," without reviewing the detailed sub-certification process or control testing results.',
     },
@@ -298,7 +298,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Control frameworks maintained in their current form because change is perceived as risky and disruptive, even when business processes have evolved beyond what the existing controls were designed to address.',
       example:
-        'A company\'s SOX control matrix has not been materially updated in 5 years despite two major acquisitions and a cloud migration, because the compliance team prefers the stability of the existing framework over the disruption of redesign.',
+        "A company's SOX control matrix has not been materially updated in 5 years despite two major acquisitions and a cloud migration, because the compliance team prefers the stability of the existing framework over the disruption of redesign.",
     },
     {
       biasType: 'status_quo_bias',
@@ -307,7 +307,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Document retention policies maintained without updates as communication and storage technologies evolve, creating gaps in retention for newer channels while over-retaining for traditional formats.',
       example:
-        'A firm\'s document retention policy covers email and physical records in detail but has no provisions for Slack messages, Teams chats, or cloud collaboration documents, because the policy has not been updated since 2015.',
+        "A firm's document retention policy covers email and physical records in detail but has no provisions for Slack messages, Teams chats, or cloud collaboration documents, because the policy has not been updated since 2015.",
     },
 
     // ── framing_effect ─────────────────────────────────────────────────
@@ -356,7 +356,7 @@ export const SOX_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'sox_section_302',
       riskWeight: 0.5,
       mechanism:
-        'Certification decisions disproportionately influenced by the most recent quarter\'s performance rather than the full fiscal year, leading to certifications that reflect recent trends more than overall financial position.',
+        "Certification decisions disproportionately influenced by the most recent quarter's performance rather than the full fiscal year, leading to certifications that reflect recent trends more than overall financial position.",
       example:
         'A CEO certifies annual financial statements with an optimistic tone based on a strong Q4, despite Q1-Q3 results indicating the company narrowly met its covenants and faced liquidity stress during the middle of the year.',
     },

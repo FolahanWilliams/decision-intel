@@ -9,9 +9,7 @@
  * simply calling an LLM with the same prompts.
  */
 
-import {
-  getInteractionWeight as getMatrixWeight,
-} from '@/lib/ontology/interaction-matrix';
+import { getInteractionWeight as getMatrixWeight } from '@/lib/ontology/interaction-matrix';
 import { BIAS_NODES } from '@/lib/ontology/bias-graph';
 import { computeCorrelationMultiplier } from '@/lib/data/case-correlations';
 
@@ -145,7 +143,7 @@ const DEFAULT_INTERACTION_WEIGHTS: Record<string, number> = {
 function getInteractionWeight(
   biasA: string,
   biasB: string,
-  interactionWeights?: Record<string, number>,
+  interactionWeights?: Record<string, number>
 ): number {
   // 1. Caller-supplied overrides take priority
   if (interactionWeights) {
@@ -172,7 +170,7 @@ function getInteractionWeight(
 function computeBiasCompoundSeverity(
   bias: DetectedBias,
   allBiases: DetectedBias[],
-  interactionWeights?: Record<string, number>,
+  interactionWeights?: Record<string, number>
 ): BiasCompoundScore {
   let rawSeverity = SEVERITY_NUMERIC[bias.severity] ?? 8;
 
@@ -195,7 +193,7 @@ function computeBiasCompoundSeverity(
       const effectiveWeight = 1.0 + (weight - 1.0) * other.confidence;
       interactionMultiplier *= effectiveWeight;
       contributingInteractions.push(
-        `${other.type} (${weight > 1 ? '+' : ''}${((weight - 1) * 100).toFixed(0)}%)`,
+        `${other.type} (${weight > 1 ? '+' : ''}${((weight - 1) * 100).toFixed(0)}%)`
       );
     }
   }
@@ -306,13 +304,13 @@ export function computeCompoundScore(
   options?: {
     interactionWeights?: Record<string, number>;
     orgCalibration?: Record<string, number>; // per-bias-type calibrated weights
-  },
+  }
 ): CompoundScore {
   const adjustments: ScoreAdjustment[] = [];
 
   // 1. Compute compound severity for each bias
-  const biasScores = detectedBiases.map((b) =>
-    computeBiasCompoundSeverity(b, detectedBiases, options?.interactionWeights),
+  const biasScores = detectedBiases.map(b =>
+    computeBiasCompoundSeverity(b, detectedBiases, options?.interactionWeights)
   );
 
   // 2. Compute total compound penalty
@@ -322,7 +320,7 @@ export function computeCompoundScore(
 
   adjustments.push({
     source: 'compound_interactions',
-    description: `${biasScores.filter((b) => b.interactionMultiplier > 1.05).length} amplifying bias interactions`,
+    description: `${biasScores.filter(b => b.interactionMultiplier > 1.05).length} amplifying bias interactions`,
     delta: -(totalCompoundPenalty - totalRawPenalty) * 0.3, // scaled impact
   });
 
@@ -331,7 +329,11 @@ export function computeCompoundScore(
     for (const bs of biasScores) {
       const orgWeight = options.orgCalibration[bs.biasType];
       if (orgWeight !== undefined) {
-        const scaleFactor = orgWeight / (SEVERITY_NUMERIC[detectedBiases.find((b) => b.type === bs.biasType)?.severity ?? 'medium'] || 8);
+        const scaleFactor =
+          orgWeight /
+          (SEVERITY_NUMERIC[
+            detectedBiases.find(b => b.type === bs.biasType)?.severity ?? 'medium'
+          ] || 8);
         bs.compoundSeverity *= scaleFactor;
         bs.contextMultiplier *= scaleFactor;
       }
@@ -339,7 +341,8 @@ export function computeCompoundScore(
   }
 
   // 4. Context adjustment
-  const { multiplier: contextAdjustment, adjustments: contextAdj } = computeContextMultiplier(context);
+  const { multiplier: contextAdjustment, adjustments: contextAdj } =
+    computeContextMultiplier(context);
   adjustments.push(...contextAdj);
 
   // Apply context to each bias score
@@ -356,7 +359,7 @@ export function computeCompoundScore(
       dissentAbsent: !context.dissentPresent,
       timePressure: context.timelineWeeks !== null && context.timelineWeeks < 4,
       participantCount: context.participantCount,
-    },
+    }
   );
 
   if (correlationResult.multiplier > 1.0) {

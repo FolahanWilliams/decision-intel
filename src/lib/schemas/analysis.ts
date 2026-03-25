@@ -104,16 +104,24 @@ export const CompoundScoringSchema = z
     compoundMultiplier: z.number(),
     contextAdjustment: z.number(),
     confidenceDecay: z.number(),
-    amplifyingInteractions: z.array(z.object({
-      bias: z.string(),
-      multiplier: z.number(),
-      interactions: z.array(z.string()),
-    })).default([]),
-    adjustments: z.array(z.object({
-      source: z.string(),
-      delta: z.number(),
-      description: z.string(),
-    })).default([]),
+    amplifyingInteractions: z
+      .array(
+        z.object({
+          bias: z.string(),
+          multiplier: z.number(),
+          interactions: z.array(z.string()),
+        })
+      )
+      .default([]),
+    adjustments: z
+      .array(
+        z.object({
+          source: z.string(),
+          delta: z.number(),
+          description: z.string(),
+        })
+      )
+      .default([]),
   })
   .optional();
 
@@ -123,12 +131,16 @@ export const BayesianPriorsSchema = z
     beliefDelta: z.number(),
     informationGain: z.number(),
     priorInfluence: z.number(),
-    biasAdjustments: z.array(z.object({
-      biasType: z.string(),
-      priorConfidence: z.number(),
-      posteriorConfidence: z.number(),
-      direction: z.enum(['increased', 'decreased', 'unchanged']),
-      reason: z.string(),
-    })).default([]),
+    biasAdjustments: z
+      .array(
+        z.object({
+          biasType: z.string(),
+          priorConfidence: z.number(),
+          posteriorConfidence: z.number(),
+          direction: z.enum(['increased', 'decreased', 'unchanged']),
+          reason: z.string(),
+        })
+      )
+      .default([]),
   })
   .optional();
