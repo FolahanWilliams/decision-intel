@@ -1165,7 +1165,7 @@ export default function LandingPage() {
                 {[
                   'Every IC memo scored against calibrated baselines',
                   '15+ cognitive bias signatures detected',
-                  'Mandatory outcome tracking proves decision ROI',
+                  'Autonomous outcome detection closes the feedback loop',
                   'Decision Twin boardroom simulates dissent before you vote',
                 ].map((text, i) => (
                   <div
@@ -1279,10 +1279,10 @@ export default function LandingPage() {
                 icon: TrendingUp,
                 title: 'Track & Improve',
                 description:
-                  'Log actual outcomes. See your Confidence vs Reality calibration curve. Watch "This bias cost you X" calculations compound your advantage over time.',
+                  'Outcomes are detected automatically from follow-up documents, Slack messages, and web intelligence. Confirm with one click and watch your calibration curve sharpen over time.',
                 color: '#22c55e',
                 details: [
-                  'Mandatory outcome tracking',
+                  'Autonomous outcome detection',
                   'Calibration dashboards',
                   'Bias cost estimates',
                 ],
@@ -1766,7 +1766,7 @@ export default function LandingPage() {
                     step: '3',
                     label: 'Learn',
                     description:
-                      'Every outcome retrains the system. Over time, you see exactly which biases cost your organization money — your data, not generic warnings',
+                      'Outcomes detected automatically from documents, Slack, and web intelligence. Over time, you see exactly which biases cost your organization money — your data, not generic warnings',
                     color: '#A3E635',
                   },
                   {
@@ -1858,9 +1858,9 @@ export default function LandingPage() {
             {[
               {
                 icon: Fingerprint,
-                title: 'Mandatory Outcome Flywheel',
+                title: 'Autonomous Outcome Flywheel',
                 description:
-                  'The platform enforces outcome reporting — you cannot run new analyses until prior decisions are closed out. Every outcome sharpens your bias detection and calibrates your Decision Twins.',
+                  'Outcomes are detected automatically from follow-up documents, Slack messages, and web news — then confirmed with one click. Every outcome sharpens your bias detection and calibrates your Decision Twins.',
                 stat: 'Compounding data advantage',
                 color: '#FFFFFF',
               },
@@ -2359,7 +2359,7 @@ export default function LandingPage() {
               },
               {
                 q: 'How does outcome tracking work?',
-                a: 'After each decision analysis, the platform prompts you to report the actual outcome (success, partial, failure) at configurable intervals (30/60/90 days, 6 months, 1 year). Outcome reporting is enforced — if you have 5+ analyses awaiting outcomes, new analyses are gated until you close the loop. This deliberate friction ensures the calibration flywheel keeps spinning: your bias severity weights, Decision Twin accuracy, and org-specific causal models all improve with every tracked outcome.',
+                a: 'The platform autonomously detects outcomes from three channels: follow-up documents (via semantic matching), Slack messages (outcome language detection), and web intelligence (public news search for named entities). Detected outcomes appear as draft notifications you confirm or dismiss with one click. You can also manually report outcomes at configurable intervals. If you have 5+ analyses awaiting outcomes, new analyses are gated until you close the loop. Every tracked outcome sharpens your bias severity weights, Decision Twin accuracy, and org-specific causal models.',
               },
               {
                 q: 'What is a Decision Twin?',
