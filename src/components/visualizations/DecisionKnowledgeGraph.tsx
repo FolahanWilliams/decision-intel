@@ -8,20 +8,22 @@ import {
   ZoomIn,
   ZoomOut,
   X,
-  ChevronRight,
-  AlertTriangle,
-  CheckCircle,
   Clock,
-  GitBranch,
-  Users,
-  Brain,
-  Link2,
-  User,
-  Target,
   Eye,
   EyeOff,
+  Play,
+  Pause,
+  Search,
+  Route,
+  Boxes,
+  Download,
 } from 'lucide-react';
-import Link from 'next/link';
+import { useGraphPlayback } from '@/hooks/useGraphPlayback';
+import { bfsShortestPath } from '@/lib/graph/pathfinding';
+import { exportToPng, exportToSvg, exportToDot, downloadFile } from '@/lib/graph/graph-export';
+import { GraphDetailPanel } from './GraphDetailPanel';
+import { ClusterSummaryPanel } from './ClusterSummaryPanel';
+import { GraphMinimap } from './GraphMinimap';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -224,6 +226,7 @@ export function DecisionKnowledgeGraph({
     nodes: GraphNode[];
     edges: GraphEdge[];
     stats: GraphStats;
+    clusters?: Array<{ id: string; nodeIds: string[] }>;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
@@ -233,6 +236,29 @@ export function DecisionKnowledgeGraph({
   const [visibleNodeTypes, setVisibleNodeTypes] = useState<Set<NodeType>>(
     new Set(['analysis', 'human_decision', 'person', 'bias_pattern', 'outcome']),
   );
+
+  // Playback state
+  const [playbackEnabled, setPlaybackEnabled] = useState(false);
+
+  // Path finding state
+  const [pathMode, setPathMode] = useState(false);
+  const [pathStart, setPathStart] = useState<string | null>(null);
+  const [pathEnd, setPathEnd] = useState<string | null>(null);
+  const [highlightedPath, setHighlightedPath] = useState<Set<string>>(new Set());
+  const [highlightedPathEdges, setHighlightedPathEdges] = useState<Set<string>>(new Set());
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Set<string>>(new Set());
+
+  // Cluster drill-down
+  const [isolatedClusterId, setIsolatedClusterId] = useState<string | null>(null);
+
+  // Edge interaction
+  const [, setSelectedEdge] = useState<GraphEdge | null>(null);
+
+  // Minimap state
+  const [zoomTransform, setZoomTransform] = useState({ x: 0, y: 0, k: 1 });
 
   // Fetch graph data
   useEffect(() => {
@@ -262,12 +288,64 @@ export function DecisionKnowledgeGraph({
     return () => obs.disconnect();
   }, []);
 
+  // Playback hook
+  const playback = useGraphPlayback({
+    nodes: graphData?.nodes ?? [],
+    intervalMs: 800,
+  });
+
+  // Search logic
+  useEffect(() => {
+    if (!searchQuery.trim() || !graphData) {
+      setSearchResults(new Set());
+      return;
+    }
+    const q = searchQuery.toLowerCase();
+    const matches = new Set(
+      graphData.nodes
+        .filter(n => n.label.toLowerCase().includes(q) || n.type.includes(q))
+        .map(n => n.id)
+    );
+    setSearchResults(matches);
+  }, [searchQuery, graphData]);
+
+  // Path finding computation
+  useEffect(() => {
+    if (!pathStart || !pathEnd || !graphData) {
+      setHighlightedPath(new Set());
+      setHighlightedPathEdges(new Set());
+      return;
+    }
+    const result = bfsShortestPath(graphData.nodes, graphData.edges, pathStart, pathEnd);
+    if (result) {
+      setHighlightedPath(new Set(result.path));
+      setHighlightedPathEdges(new Set(result.edges.map(e => e.id)));
+    } else {
+      setHighlightedPath(new Set());
+      setHighlightedPathEdges(new Set());
+    }
+  }, [pathStart, pathEnd, graphData]);
+
   // Filter edges and nodes
   const filteredData = useMemo(() => {
     if (!graphData) return null;
 
-    // First, filter nodes by visible types
-    const visibleNodes = graphData.nodes.filter(n => visibleNodeTypes.has(n.type as NodeType));
+    // First, filter nodes by visible types + playback + cluster isolation
+    let visibleNodes = graphData.nodes.filter(n => visibleNodeTypes.has(n.type as NodeType));
+
+    // Playback filter: only show nodes created before current playback date
+    if (playbackEnabled && playback.hasPlayback) {
+      visibleNodes = visibleNodes.filter(n => playback.filterNode(n));
+    }
+
+    // Cluster isolation
+    if (isolatedClusterId && graphData.clusters) {
+      const cluster = graphData.clusters.find((c: { id: string }) => c.id === isolatedClusterId);
+      if (cluster) {
+        const clusterIds = new Set(cluster.nodeIds);
+        visibleNodes = visibleNodes.filter(n => clusterIds.has(n.id));
+      }
+    }
     const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
 
     // Filter edges: both ends must be in visible node set + match edge filter + strength
@@ -297,7 +375,7 @@ export function DecisionKnowledgeGraph({
     );
 
     return { nodes, edges, stats: graphData.stats };
-  }, [graphData, edgeFilter, minStrength, highlightNodeId, visibleNodeTypes]);
+  }, [graphData, edgeFilter, minStrength, highlightNodeId, visibleNodeTypes, playbackEnabled, playback, isolatedClusterId]);
 
   // D3 Force Simulation
   useEffect(() => {
@@ -361,6 +439,7 @@ export function DecisionKnowledgeGraph({
       .scaleExtent([0.3, 4])
       .on('zoom', event => {
         g.attr('transform', event.transform);
+        setZoomTransform({ x: event.transform.x, y: event.transform.y, k: event.transform.k });
       });
     svg.call(zoom);
 
@@ -480,14 +559,53 @@ export function DecisionKnowledgeGraph({
       .attr('font-weight', d => (d.type === 'bias_pattern' ? '500' : '400'))
       .attr('pointer-events', 'none');
 
+    // Apply search/path highlights
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    node.selectAll('circle, rect, polygon').each(function(this: any, d: any) {
+      const n = d as GraphNode;
+      const el = d3.select(this);
+      if (searchResults.size > 0 && searchResults.has(n.id)) {
+        el.attr('stroke', '#ffffff').attr('stroke-width', 3);
+      } else if (highlightedPath.size > 0 && highlightedPath.has(n.id)) {
+        el.attr('stroke', '#22c55e').attr('stroke-width', 3);
+      } else if (highlightedPath.size > 0 || searchResults.size > 0) {
+        el.attr('opacity', 0.3);
+      }
+    });
+
+    // Apply path highlighting to edges
+    if (highlightedPathEdges.size > 0) {
+      link.attr('stroke-width', (d: GraphEdge) =>
+        highlightedPathEdges.has(d.id) ? 4 : 0.5
+      ).attr('stroke-opacity', (d: GraphEdge) =>
+        highlightedPathEdges.has(d.id) ? 0.9 : 0.1
+      );
+    }
+
     // Click handler
     node.on('click', (_event, d) => {
+      if (pathMode) {
+        if (!pathStart) {
+          setPathStart(d.id);
+        } else if (!pathEnd) {
+          setPathEnd(d.id);
+        } else {
+          setPathStart(d.id);
+          setPathEnd(null);
+        }
+        return;
+      }
       const found = nodes.find(n => n.id === d.id);
       if (found) {
         setSelectedNode(found);
         onNodeSelect?.(d.id, d.type);
       }
     });
+
+    // Edge click handler
+    link.on('click', (_event: MouseEvent, d: GraphEdge) => {
+      setSelectedEdge(d);
+    }).style('cursor', 'pointer');
 
     // Simulation tick
     simulation.on('tick', () => {
@@ -507,7 +625,7 @@ export function DecisionKnowledgeGraph({
     return () => {
       simulation.stop();
     };
-  }, [filteredData, dimensions, highlightNodeId, onNodeSelect]);
+  }, [filteredData, dimensions, highlightNodeId, onNodeSelect, pathMode, pathStart, pathEnd, searchResults, highlightedPath, highlightedPathEdges]);
 
   // Zoom controls
   const handleZoom = useCallback(
@@ -525,6 +643,82 @@ export function DecisionKnowledgeGraph({
     },
     []
   );
+
+  // Edge confirm/dismiss handlers
+  const handleConfirmEdge = useCallback(async (edgeId: string) => {
+    try {
+      await fetch('/api/decision-graph/edges', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: edgeId, confidence: 1.0 }),
+      });
+    } catch { /* non-critical */ }
+  }, []);
+
+  const handleDismissEdge = useCallback(async (edgeId: string) => {
+    try {
+      await fetch(`/api/decision-graph/edges?id=${edgeId}`, { method: 'DELETE' });
+    } catch { /* non-critical */ }
+  }, []);
+
+  // Export handlers
+  const handleExport = useCallback(async (format: 'png' | 'svg' | 'dot') => {
+    if (!svgRef.current || !filteredData) return;
+    try {
+      if (format === 'png') {
+        const blob = await exportToPng(svgRef.current);
+        downloadFile(blob, 'decision-graph.png');
+      } else if (format === 'svg') {
+        const svgStr = exportToSvg(svgRef.current);
+        downloadFile(svgStr, 'decision-graph.svg', 'image/svg+xml');
+      } else if (format === 'dot') {
+        const dot = exportToDot(filteredData.nodes, filteredData.edges);
+        downloadFile(dot, 'decision-graph.dot', 'text/vnd.graphviz');
+      }
+    } catch { /* non-critical */ }
+  }, [filteredData]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    container.tabIndex = 0;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedNode(null);
+        setSelectedEdge(null);
+        if (pathMode) {
+          setPathMode(false);
+          setPathStart(null);
+          setPathEnd(null);
+        }
+        return;
+      }
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        const searchInput = container.querySelector<HTMLInputElement>('[data-graph-search]');
+        searchInput?.focus();
+        return;
+      }
+      if (e.key === 'f' && !e.metaKey && !e.ctrlKey) {
+        // Fit to viewport
+        if (svgRef.current) {
+          const svg = d3.select(svgRef.current);
+          svg.transition().duration(300).call(
+            d3.zoom<SVGSVGElement, unknown>().transform as never,
+            d3.zoomIdentity as never
+          );
+        }
+        return;
+      }
+      if (e.key === '+' || e.key === '=') handleZoom(1.3);
+      if (e.key === '-') handleZoom(0.7);
+    };
+
+    container.addEventListener('keydown', handleKeyDown);
+    return () => container.removeEventListener('keydown', handleKeyDown);
+  }, [pathMode, handleZoom]);
 
   if (loading) {
     return (
@@ -597,6 +791,38 @@ export function DecisionKnowledgeGraph({
             <button onClick={() => handleZoom(0.7)} className="p-1 rounded hover:bg-white/10 text-zinc-400">
               <ZoomOut size={14} />
             </button>
+
+            {/* Path mode toggle */}
+            <button
+              onClick={() => { setPathMode(!pathMode); setPathStart(null); setPathEnd(null); }}
+              className={`p-1 rounded text-zinc-400 ${pathMode ? 'bg-green-500/20 text-green-400' : 'hover:bg-white/10'}`}
+              title="Path finding mode"
+            >
+              <Route size={14} />
+            </button>
+
+            {/* Playback toggle */}
+            {playback.hasPlayback && (
+              <button
+                onClick={() => setPlaybackEnabled(!playbackEnabled)}
+                className={`p-1 rounded text-zinc-400 ${playbackEnabled ? 'bg-blue-500/20 text-blue-400' : 'hover:bg-white/10'}`}
+                title="Temporal playback"
+              >
+                <Clock size={14} />
+              </button>
+            )}
+
+            {/* Export dropdown */}
+            <div className="relative group">
+              <button className="p-1 rounded hover:bg-white/10 text-zinc-400" title="Export">
+                <Download size={14} />
+              </button>
+              <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-zinc-900 border border-white/10 rounded shadow-lg z-20">
+                <button onClick={() => handleExport('png')} className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left">PNG</button>
+                <button onClick={() => handleExport('svg')} className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left">SVG</button>
+                <button onClick={() => handleExport('dot')} className="block w-full px-3 py-1.5 text-xs text-zinc-300 hover:bg-white/5 text-left">DOT</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -635,168 +861,137 @@ export function DecisionKnowledgeGraph({
             },
           )}
         </div>
+
+        {/* Search + Path mode + Playback controls row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Search */}
+          <div className="flex items-center gap-1 flex-1 min-w-[150px] max-w-[250px]">
+            <Search size={12} className="text-zinc-500" />
+            <input
+              data-graph-search
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search nodes... (press /)"
+              className="w-full text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-zinc-300 outline-none focus:border-white/30"
+            />
+          </div>
+
+          {/* Path mode info */}
+          {pathMode && (
+            <div className="flex items-center gap-2 text-[10px] text-green-400">
+              <Route size={10} />
+              {!pathStart ? 'Click start node' : !pathEnd ? 'Click end node' : `Path: ${highlightedPath.size} nodes`}
+              {(pathStart || pathEnd) && (
+                <button onClick={() => { setPathStart(null); setPathEnd(null); }}
+                  className="text-zinc-500 hover:text-zinc-300">
+                  <X size={10} />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Cluster isolation indicator */}
+          {isolatedClusterId && (
+            <div className="flex items-center gap-1.5 text-[10px] text-blue-400">
+              <Boxes size={10} />
+              Cluster isolated
+              <button onClick={() => setIsolatedClusterId(null)}
+                className="px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 hover:text-zinc-200">
+                Show all
+              </button>
+            </div>
+          )}
+
+          {/* Playback controls */}
+          {playbackEnabled && playback.hasPlayback && (
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                onClick={playback.isPlaying ? playback.pause : playback.play}
+                className="p-1 rounded hover:bg-white/10 text-zinc-400"
+              >
+                {playback.isPlaying ? <Pause size={12} /> : <Play size={12} />}
+              </button>
+              <input
+                type="range"
+                min="0"
+                max={playback.totalWeeks - 1}
+                value={playback.currentWeek}
+                onChange={e => playback.seekTo(parseInt(e.target.value))}
+                className="w-24 h-1 accent-blue-500"
+              />
+              <span className="text-[10px] text-zinc-500" style={{ fontFamily: "'JetBrains Mono'" }}>
+                {playback.currentDate.toLocaleDateString()}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Cluster summary when isolated */}
+      {isolatedClusterId && filteredData && (
+        <ClusterSummaryPanel
+          clusterId={isolatedClusterId}
+          nodes={filteredData.nodes}
+          edges={filteredData.edges}
+          onClose={() => setIsolatedClusterId(null)}
+        />
+      )}
 
       {/* Graph + Detail Panel */}
       <div className="flex">
         {/* Graph Canvas */}
-        <div ref={containerRef} className="flex-1" style={{ minHeight: 500 }}>
+        <div ref={containerRef} className="flex-1 relative" style={{ minHeight: 500 }}>
           <svg
             ref={svgRef}
             width={dimensions.width}
             height={dimensions.height}
             className="bg-zinc-950/50"
           />
+          {/* Minimap */}
+          {filteredData && filteredData.nodes.length > 5 && (
+            <GraphMinimap
+              nodes={filteredData.nodes.map(n => ({
+                x: (n as GraphNode & { x?: number }).x ?? 0,
+                y: (n as GraphNode & { y?: number }).y ?? 0,
+                type: n.type,
+              }))}
+              viewportX={zoomTransform.x}
+              viewportY={zoomTransform.y}
+              viewportScale={zoomTransform.k}
+              graphWidth={dimensions.width}
+              graphHeight={dimensions.height}
+              onViewportClick={() => {
+                // Fit viewport on click
+                if (svgRef.current) {
+                  const svg = d3.select(svgRef.current);
+                  svg.transition().duration(300).call(
+                    d3.zoom<SVGSVGElement, unknown>().transform as never,
+                    d3.zoomIdentity as never
+                  );
+                }
+              }}
+            />
+          )}
         </div>
 
-        {/* Node Detail Panel */}
-        {selectedNode && (
-          <div className="w-72 border-l border-white/10 p-4 space-y-3 bg-zinc-900/50">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold text-white truncate flex-1">
-                {selectedNode.label}
-              </h4>
-              <button
-                onClick={() => setSelectedNode(null)}
-                className="text-zinc-500 hover:text-zinc-300"
-              >
-                <X size={14} />
-              </button>
-            </div>
-
-            <div className="space-y-2 text-xs">
-              {/* Node type badge */}
-              <div className="flex items-center gap-2">
-                <span
-                  className="px-1.5 py-0.5 rounded text-[10px] font-medium"
-                  style={{
-                    backgroundColor: `${NODE_TYPE_CONFIG[selectedNode.type as NodeType]?.color ?? '#64748b'}22`,
-                    color: NODE_TYPE_CONFIG[selectedNode.type as NodeType]?.color ?? '#64748b',
-                  }}
-                >
-                  {NODE_TYPE_CONFIG[selectedNode.type as NodeType]?.label ?? selectedNode.type}
-                </span>
-              </div>
-
-              {/* ── Decision node details ── */}
-              {(selectedNode.type === 'analysis' || selectedNode.type === 'human_decision') && (
-                <>
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-500">Score:</span>
-                    <span className="font-medium" style={{ color: getScoreColor(selectedNode.score) }}>
-                      {selectedNode.score}/100
-                    </span>
-                  </div>
-                  {selectedNode.outcome && (
-                    <div className="flex items-center gap-2">
-                      {selectedNode.outcome === 'success' ? (
-                        <CheckCircle size={12} className="text-green-400" />
-                      ) : selectedNode.outcome === 'failure' ? (
-                        <AlertTriangle size={12} className="text-red-400" />
-                      ) : (
-                        <Clock size={12} className="text-zinc-400" />
-                      )}
-                      <span className="text-zinc-300 capitalize">{selectedNode.outcome}</span>
-                    </div>
-                  )}
-                  {selectedNode.biasCount > 0 && (
-                    <div className="flex items-center gap-2">
-                      <Brain size={12} className="text-zinc-500" />
-                      <span className="text-zinc-300">{selectedNode.biasCount} biases detected</span>
-                    </div>
-                  )}
-                  {selectedNode.toxicComboCount > 0 && (
-                    <div className="flex items-center gap-2 text-red-400">
-                      <AlertTriangle size={12} />
-                      <span>{selectedNode.toxicComboCount} toxic combination(s)</span>
-                    </div>
-                  )}
-                  {selectedNode.participants.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      <Users size={12} className="text-zinc-500" />
-                      <span className="text-zinc-300">
-                        {selectedNode.participants.slice(0, 3).join(', ')}
-                        {selectedNode.participants.length > 3 && ` +${selectedNode.participants.length - 3}`}
-                      </span>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* ── Person node details ── */}
-              {selectedNode.type === 'person' && (
-                <div className="flex items-center gap-2">
-                  <User size={12} className="text-teal-400" />
-                  <span className="text-zinc-300">Appears in multiple decisions</span>
-                </div>
-              )}
-
-              {/* ── Bias pattern node details ── */}
-              {selectedNode.type === 'bias_pattern' && (
-                <>
-                  <div className="flex items-center gap-2">
-                    <Brain size={12} className="text-amber-400" />
-                    <span className="text-zinc-300">Found in {selectedNode.biasCount} analyses</span>
-                  </div>
-                </>
-              )}
-
-              {/* ── Outcome node details ── */}
-              {selectedNode.type === 'outcome' && (
-                <div className="flex items-center gap-2">
-                  {selectedNode.label === 'success' ? (
-                    <CheckCircle size={12} className="text-green-400" />
-                  ) : selectedNode.label === 'failure' ? (
-                    <AlertTriangle size={12} className="text-red-400" />
-                  ) : (
-                    <Target size={12} className="text-indigo-400" />
-                  )}
-                  <span className="text-zinc-300 capitalize">{selectedNode.label}</span>
-                  {selectedNode.score > 0 && (
-                    <span className="text-zinc-500">Impact: {selectedNode.score}</span>
-                  )}
-                </div>
-              )}
-
-              {/* Connected edges */}
-              {filteredData && (
-                <div className="pt-2 border-t border-white/10">
-                  <p className="text-zinc-500 mb-1 flex items-center gap-1">
-                    <Link2 size={10} />
-                    Connections
-                  </p>
-                  {filteredData.edges
-                    .filter(e => {
-                      const sid = typeof e.source === 'string' ? e.source : e.source.id;
-                      const tid = typeof e.target === 'string' ? e.target : e.target.id;
-                      return sid === selectedNode.id || tid === selectedNode.id;
-                    })
-                    .slice(0, 8)
-                    .map(e => {
-                      const style = EDGE_STYLES[e.edgeType];
-                      return (
-                        <div key={e.id} className="flex items-center gap-1.5 py-0.5 text-zinc-400">
-                          <GitBranch size={10} style={{ color: style?.color }} />
-                          <span className="truncate">{style?.label ?? e.edgeType}</span>
-                          <span className="text-zinc-600">({(e.strength * 100).toFixed(0)}%)</span>
-                        </div>
-                      );
-                    })}
-                </div>
-              )}
-
-              {/* Link to detail page */}
-              {selectedNode.type === 'analysis' && (
-                <Link
-                  href={`/documents/${selectedNode.id}`}
-                  className="flex items-center gap-1 text-blue-400 hover:text-blue-300 pt-2"
-                >
-                  View full analysis
-                  <ChevronRight size={12} />
-                </Link>
-              )}
-            </div>
-          </div>
+        {/* Node Detail Panel — replaced with GraphDetailPanel */}
+        {selectedNode && filteredData && (
+          <GraphDetailPanel
+            node={selectedNode}
+            edges={filteredData.edges}
+            allNodes={filteredData.nodes}
+            onClose={() => setSelectedNode(null)}
+            onNavigateToNode={(nodeId) => {
+              const found = filteredData.nodes.find(n => n.id === nodeId);
+              if (found) {
+                setSelectedNode(found);
+                onNodeSelect?.(nodeId, found.type);
+              }
+            }}
+            onConfirmEdge={handleConfirmEdge}
+            onDismissEdge={handleDismissEdge}
+          />
         )}
       </div>
 
