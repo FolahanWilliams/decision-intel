@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { detectTemporalAnomalies } from '@/lib/graph/anomaly-detection';
 
 const log = createLogger('DecisionGraphTrendsAPI');
 
@@ -66,11 +67,15 @@ export async function GET(req: NextRequest) {
     const biasEdges = edges.filter(e => e.edgeType === 'shared_bias');
     const totalEdges = edges.length;
 
+    // Detect temporal anomalies
+    const anomalies = detectTemporalAnomalies(weeklyData);
+
     return NextResponse.json({
       weeklyData,
       totalEdges,
       biasEdges: biasEdges.length,
       weeks,
+      anomalies,
     });
   } catch (error) {
     const code = (error as { code?: string })?.code;
