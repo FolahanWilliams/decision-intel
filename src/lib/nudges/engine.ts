@@ -383,32 +383,58 @@ async function checkGraphPattern(context: NudgeTriggerContext): Promise<NudgeDef
       take: 20,
     });
 
-    if (edges.length < 2) return null;
+    if (edges.length < 1) return null;
 
-    // Check if connected decisions have poor outcomes
-    const connectedIds = edges.map(e =>
+    // 1-hop neighbors
+    const hop1Ids = edges.map(e =>
       e.sourceId === decisionId ? e.targetId : e.sourceId
     );
 
+    // 2-hop neighbors (expand the search radius)
+    const hop2Edges = await prisma.decisionEdge.findMany({
+      where: {
+        orgId,
+        OR: [
+          { sourceId: { in: hop1Ids } },
+          { targetId: { in: hop1Ids } },
+        ],
+      },
+      select: { sourceId: true, targetId: true, edgeType: true },
+      take: 50,
+    });
+
+    const allConnectedIds = new Set(hop1Ids);
+    for (const e of hop2Edges) {
+      allConnectedIds.add(e.sourceId);
+      allConnectedIds.add(e.targetId);
+    }
+    allConnectedIds.delete(decisionId);
+
     const failedOutcomes = await prisma.decisionOutcome.count({
       where: {
-        analysisId: { in: connectedIds },
+        analysisId: { in: [...allConnectedIds] },
         outcome: { in: ['failure', 'negative', 'poor'] },
       },
     });
 
     if (failedOutcomes === 0) return null;
 
-    const failRate = failedOutcomes / connectedIds.length;
+    const failRate = failedOutcomes / allConnectedIds.size;
     const biasEdges = edges.filter(e => e.edgeType === 'shared_bias').length;
+    const escalationEdges = edges.filter(e => e.edgeType === 'escalated_from').length;
 
-    if (failRate < 0.5 && biasEdges < 2) return null;
+    if (failRate < 0.3 && biasEdges < 2 && escalationEdges === 0) return null;
+
+    const reasons: string[] = [];
+    if (biasEdges > 0) reasons.push(`${biasEdges} shared bias pattern(s)`);
+    if (escalationEdges > 0) reasons.push(`${escalationEdges} escalation chain(s)`);
+    reasons.push(`${failedOutcomes} failed decision(s) within 2 hops`);
 
     return {
       nudgeType: 'graph_pattern_warning',
-      triggerReason: `This decision shares ${biasEdges} bias pattern(s) with ${failedOutcomes} previously failed decision(s) in the knowledge graph.`,
-      message: `Graph analysis detected a concerning pattern: ${failedOutcomes} connected decision(s) with similar characteristics ended in failure. Review past outcomes before proceeding.`,
-      severity: failRate >= 0.5 ? 'critical' : 'warning',
+      triggerReason: reasons.join(', ') + ' in the knowledge graph.',
+      message: `Graph analysis detected a concerning pattern: ${failedOutcomes} connected decision(s) within 2 hops ended in failure. ${escalationEdges > 0 ? 'This decision is part of an escalation chain. ' : ''}Review past outcomes before proceeding.`,
+      severity: failRate >= 0.5 || escalationEdges > 0 ? 'critical' : 'warning',
       channel: 'dashboard',
     };
   } catch (error) {

@@ -15,6 +15,9 @@
 
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { computePageRank } from './centrality';
+import { detectGraphAntiPatterns, type GraphAntiPattern } from './graph-patterns';
+import { resolveEntities } from './entity-resolution';
 
 const log = createLogger('GraphBuilder');
 
@@ -31,6 +34,7 @@ export interface GraphNode {
   participants: string[];
   monetaryValue: number | null;
   createdAt: string;
+  pageRank?: number;
 }
 
 export interface GraphEdge {
@@ -67,6 +71,7 @@ export interface DecisionGraphResult {
   edges: GraphEdge[];
   clusters: GraphCluster[];
   stats: GraphStats;
+  antiPatterns: GraphAntiPattern[];
 }
 
 // ─── Union-Find for Cluster Detection ────────────────────────────────────────
@@ -277,12 +282,21 @@ export async function buildDecisionGraph(params: {
   // HumanDecision.participants, and Meeting.participants.
   // Only create person nodes for names appearing in 2+ decisions.
 
-  const personAppearances = new Map<string, string[]>(); // normalized name -> decision node ids
+  const personAppearances = new Map<string, string[]>(); // canonical name -> decision node ids
+
+  // Collect all raw names for entity resolution
+  const allRawNames: string[] = [];
+  for (const node of nodes) {
+    if (node.type !== 'analysis' && node.type !== 'human_decision') continue;
+    allRawNames.push(...node.participants);
+  }
+  const entityMap = resolveEntities(allRawNames);
 
   for (const node of nodes) {
     if (node.type !== 'analysis' && node.type !== 'human_decision') continue;
     for (const raw of node.participants) {
-      const name = raw.toLowerCase().trim();
+      const entity = entityMap.get(raw.toLowerCase().trim());
+      const name = entity?.canonicalName || raw.toLowerCase().trim();
       if (!name) continue;
       if (!personAppearances.has(name)) personAppearances.set(name, []);
       personAppearances.get(name)!.push(node.id);
@@ -583,6 +597,7 @@ export async function buildDecisionGraph(params: {
       edges: prunedEdges,
       clusters,
       stats,
+      antiPatterns: [],
     };
   }
 
@@ -599,11 +614,25 @@ export async function buildDecisionGraph(params: {
 
   const stats = computeStats(nodes, allEdges, clusters);
 
+  // ── Step 9: PageRank centrality scoring ─────────────────────────────────
+
+  const pageRanks = computePageRank(nodes, allEdges);
+  for (const node of nodes) {
+    node.pageRank = pageRanks.get(node.id) ?? 0;
+  }
+
+  // ── Step 10: Anti-pattern detection ────────────────────────────────────
+
+  const antiPatterns = detectGraphAntiPatterns(nodes, allEdges, clusters);
+  if (antiPatterns.length > 0) {
+    log.info(`Detected ${antiPatterns.length} graph anti-pattern(s)`);
+  }
+
   log.info(
     `Graph built: ${stats.totalNodes} nodes, ${stats.totalEdges} edges, ${stats.clusters} clusters`,
   );
 
-  return { nodes, edges: allEdges, clusters, stats };
+  return { nodes, edges: allEdges, clusters, stats, antiPatterns };
 }
 
 // ─── Stats Computation ──────────────────────────────────────────────────────
