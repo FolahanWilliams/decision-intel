@@ -1277,6 +1277,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     biases={biases}
                     uploadedAt={document.uploadedAt}
                     analysisCreatedAt={analysis?.createdAt}
+                    analysisId={analysis?.id}
                   />
                 </ErrorBoundary>
               )}

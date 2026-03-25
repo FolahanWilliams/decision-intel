@@ -15,6 +15,7 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { DEFAULT_BIAS_SEVERITY_WEIGHTS } from './constants';
+import { computeSeedWeights, getSeedInteractionWeights } from '@/lib/data/seed-weights';
 
 const log = createLogger('ToxicCombinations');
 
@@ -226,6 +227,48 @@ export async function detectToxicCombinations(
         historicalFailRate: pattern.failureRate,
         sampleSize: pattern.sampleSize,
       });
+    }
+
+    // Fallback: If no learned patterns exist, use seed weights from failure case database
+    if (learnedPatterns.length === 0) {
+      try {
+        const seedWeights = computeSeedWeights();
+        const seedInteractions = getSeedInteractionWeights();
+
+        for (const seed of seedWeights) {
+          // Check if any bias pair from this seed pattern matches current biases
+          const topPairs = Object.entries(seed.biasCooccurrence)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 3);
+
+          for (const [pairKey] of topPairs) {
+            const [biasA, biasB] = pairKey.split('::');
+            if (biasSet.has(biasA) && biasSet.has(biasB)) {
+              const biasKey = [biasA, biasB].sort().join('+');
+              const isDuplicate = combinations.some(c => [...c.biasTypes].sort().join('+') === biasKey);
+              if (isDuplicate) continue;
+
+              const interactionWeight = seedInteractions[pairKey] ?? 0.1;
+              const baseScore = Math.min(85, seed.avgImpactScore * interactionWeight * 1.5);
+              const calibratedScore = await calibrateScore(baseScore, [biasA, biasB], context, orgId);
+
+              if (calibratedScore >= 35) {
+                combinations.push({
+                  biasTypes: [biasA, biasB],
+                  contextFactors: context,
+                  toxicScore: calibratedScore,
+                  patternLabel: `${seed.patternLabel} (historical)`,
+                  patternDescription: `Historical failure pattern "${seed.patternLabel}" — this bias combination appeared in ${seed.sampleSize} documented failure cases with avg impact ${seed.avgImpactScore}/100.`,
+                  historicalFailRate: seed.baseFailureRate,
+                  sampleSize: seed.sampleSize,
+                });
+              }
+            }
+          }
+        }
+      } catch (seedErr) {
+        log.debug('Seed weights unavailable:', seedErr);
+      }
     }
 
     // Generate ad-hoc pairs for biases not covered by patterns

@@ -9,7 +9,7 @@ import {
   type Tool,
 } from '@google/generative-ai';
 import {
-  BIAS_DETECTIVE_PROMPT,
+  buildEnrichedBiasPrompt,
   NOISE_JUDGE_PROMPT,
   STRUCTURER_PROMPT,
   INTELLIGENCE_EXTRACTION_PROMPT,
@@ -321,12 +321,27 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
       ? `\n\nEXTERNAL INTELLIGENCE CONTEXT (use to validate claims and identify biases):\n${sanitizeForPrompt(intelContext, 'intelligence_context')}`
       : '';
 
+    // Detect industry for enriched prompt (non-blocking)
+    let detectedIndustry: string | undefined;
+    try {
+      const { detectIndustry } = await import('@/lib/ontology/industry-profiles');
+      detectedIndustry = detectIndustry(content) ?? undefined;
+      if (detectedIndustry) {
+        log.info(`Industry detected: ${detectedIndustry}`);
+      }
+    } catch {
+      // Industry detection is optional enrichment
+    }
+
+    // Build prompt with ontology context (compound interactions + industry biases)
+    const biasPrompt = buildEnrichedBiasPrompt(detectedIndustry);
+
     // Use Grounded Model for primary detection with retry logic
     const result = await withRetry(
       () =>
         withTimeout(
           getGroundedModel().generateContent([
-            BIAS_DETECTIVE_PROMPT,
+            biasPrompt,
             `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
             `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.${intelPrompt}`,
           ])
@@ -768,6 +783,49 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
       searchQueries: [],
     };
 
+    // Enrich with structured regulatory graph assessment (non-blocking)
+    try {
+      const { assessCompliance } = await import('@/lib/compliance/regulatory-graph');
+      const biasesForCompliance = (state.biasAnalysis || []).map((b: { biasType?: string; severity?: string; confidence?: number }) => ({
+        type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
+        severity: (b.severity || 'medium') as 'low' | 'medium' | 'high' | 'critical',
+        confidence: b.confidence || 0.5,
+      }));
+
+      if (biasesForCompliance.length > 0) {
+        const regulatoryAssessments = assessCompliance(biasesForCompliance);
+        if (regulatoryAssessments.length > 0) {
+          // Merge regulatory graph triggered provisions into compliance data
+          const graphRegulations = regulatoryAssessments.flatMap(a =>
+            a.triggeredProvisions.map(tp => ({
+              framework: a.framework.name,
+              provision: tp.provision.title,
+              riskWeight: tp.aggregateRiskWeight,
+              mechanism: tp.explanation,
+              biasTypes: tp.triggeringBiases,
+            }))
+          );
+
+          complianceData.regulatoryGraph = {
+            frameworksChecked: regulatoryAssessments.map(a => a.framework.name),
+            totalFindings: graphRegulations.length,
+            highestRisk: regulatoryAssessments.reduce((max: number, a) => Math.max(max, a.overallRiskScore), 0),
+            findings: graphRegulations.slice(0, 20), // top 20 findings
+          };
+
+          // Update risk score to incorporate regulatory graph
+          const graphRiskScore = complianceData.regulatoryGraph.highestRisk;
+          if (graphRiskScore > complianceData.riskScore) {
+            complianceData.riskScore = Math.round((complianceData.riskScore + graphRiskScore) / 2);
+          }
+
+          log.info(`Regulatory graph: ${regulatoryAssessments.length} frameworks, ${graphRegulations.length} findings`);
+        }
+      }
+    } catch (regError) {
+      log.debug('Regulatory graph enrichment unavailable: ' + (regError instanceof Error ? regError.message : String(regError)));
+    }
+
     log.info(
       `Verification complete. Fact score: ${enrichedFactCheck.score}, Compliance: ${complianceData.status}`
     );
@@ -1176,20 +1234,113 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     log.debug('Causal weights unavailable — using static severity only');
   }
 
-  // 1. Bias Deductions (Weighted by Severity + Causal Danger Multiplier)
-  const biasDeductions = (state.biasAnalysis || []).reduce(
-    (acc: number, b: { severity?: string; biasType?: string }) => {
-      const severity = (b.severity || 'low').toLowerCase();
-      const basePenalty = severityWeights[severity] || 5;
-      // Apply causal multiplier: >1 amplifies (dangerous), <1 dampens (benign)
-      const biasKey = (b.biasType || '').toLowerCase().replace(/\s+/g, '_');
-      const multiplier = causalMultipliers.get(biasKey) ?? 1.0;
-      // Clamp multiplier to [0.3, 2.5] to prevent extreme swings
-      const clampedMultiplier = Math.max(0.3, Math.min(2.5, multiplier));
-      return acc + Math.round(basePenalty * clampedMultiplier);
-    },
-    0
-  );
+  // 1. Bias Deductions (Compound Scoring with Ontology Interaction Weights)
+  //    Uses the proprietary compound scoring engine for interaction-weighted
+  //    bias severity instead of simple additive penalties.
+  let compoundScoreResult: Awaited<ReturnType<typeof import('@/lib/scoring/compound-engine').computeCompoundScore>> | null = null;
+  let biasDeductions = 0;
+
+  try {
+    const { computeCompoundScore } = await import('@/lib/scoring/compound-engine');
+    const detectedBiases = (state.biasAnalysis || []).map((b: { biasType?: string; severity?: string; confidence?: number; excerpt?: string }) => ({
+      type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
+      severity: ((b.severity || 'low').toLowerCase()) as 'low' | 'medium' | 'high' | 'critical',
+      confidence: b.confidence || 0.5,
+      excerpt: b.excerpt,
+    }));
+
+    // Build org calibration from causal multipliers
+    const orgCalibration: Record<string, number> = {};
+    for (const [key, val] of causalMultipliers.entries()) {
+      orgCalibration[key] = Math.max(0.3, Math.min(2.5, val)) * (severityWeights[(detectedBiases.find(b => b.type === key)?.severity || 'medium')] || 15);
+    }
+
+    // Estimate document context from state
+    const wordCount = (state.structuredContent || '').split(/\s+/).length;
+    const hasDissent = state.cognitiveAnalysis?.blindSpotGap != null && state.cognitiveAnalysis.blindSpotGap > 50;
+    const speakers = state.speakers || [];
+
+    compoundScoreResult = computeCompoundScore(100, detectedBiases, {
+      monetaryStakes: 'unknown',
+      participantCount: speakers.length,
+      dissentPresent: hasDissent,
+      timelineWeeks: null,
+      documentAgeWeeks: 0,
+      wordCount,
+    }, {
+      orgCalibration: Object.keys(orgCalibration).length > 0 ? orgCalibration : undefined,
+    });
+
+    // Use compound-adjusted deduction (difference between raw and calibrated)
+    biasDeductions = Math.round(100 - compoundScoreResult.calibratedScore);
+    log.info(
+      `Compound scoring: raw_penalty=${compoundScoreResult.rawScore - compoundScoreResult.calibratedScore}, ` +
+      `multiplier=${compoundScoreResult.compoundMultiplier}, ` +
+      `context=${compoundScoreResult.contextAdjustment}, ` +
+      `interactions=${compoundScoreResult.biasScores.filter(b => b.interactionMultiplier > 1.05).length}`
+    );
+  } catch {
+    // Fallback to simple additive scoring if compound engine fails
+    log.debug('Compound scoring unavailable — using simple additive penalties');
+    biasDeductions = (state.biasAnalysis || []).reduce(
+      (acc: number, b: { severity?: string; biasType?: string }) => {
+        const severity = (b.severity || 'low').toLowerCase();
+        const basePenalty = severityWeights[severity] || 5;
+        const biasKey = (b.biasType || '').toLowerCase().replace(/\s+/g, '_');
+        const multiplier = causalMultipliers.get(biasKey) ?? 1.0;
+        const clampedMultiplier = Math.max(0.3, Math.min(2.5, multiplier));
+        return acc + Math.round(basePenalty * clampedMultiplier);
+      },
+      0
+    );
+  }
+
+  // 1b. Bayesian Prior Integration
+  // If a DecisionPrior exists for this analysis, apply Bayesian updating to
+  // adjust bias confidence scores using the user's pre-analysis belief.
+  let bayesianResult: Awaited<ReturnType<typeof import('@/lib/scoring/bayesian-priors').applyBayesianPriors>> | null = null;
+  try {
+    // Look up the most recent prior for this user+document combination
+    // Priors are linked to analyses, so find any prior for analyses of this document
+    const priorRecord = await prisma.decisionPrior.findFirst({
+      where: {
+        userId: state.userId,
+        analysis: { documentId: state.documentId },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (priorRecord) {
+      const { applyBayesianPriors } = await import('@/lib/scoring/bayesian-priors');
+      const detectedBiasesForBayes = (state.biasAnalysis || []).map((b: { biasType?: string; confidence?: number; severity?: string }) => ({
+        type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
+        confidence: b.confidence || 0.5,
+        severity: (b.severity || 'medium').toLowerCase(),
+      }));
+
+      bayesianResult = applyBayesianPriors(
+        100 - biasDeductions, // raw score after bias deductions
+        detectedBiasesForBayes,
+        {
+          beliefScore: (priorRecord.confidence ?? 50) / 100,
+          confidence: (priorRecord.confidence ?? 50) / 100,
+          flaggedConcerns: priorRecord.evidenceToChange ? [priorRecord.evidenceToChange] : undefined,
+        },
+      );
+
+      // Apply Bayesian-adjusted score influence (blend 80% compound + 20% Bayesian)
+      if (bayesianResult) {
+        const bayesianDeduction = Math.round(100 - bayesianResult.adjustedScore);
+        biasDeductions = Math.round(biasDeductions * 0.8 + bayesianDeduction * 0.2);
+        log.info(
+          `Bayesian priors applied: belief_delta=${bayesianResult.beliefDelta}, ` +
+          `info_gain=${bayesianResult.informationGain}, adjusted=${bayesianResult.adjustedScore}`
+        );
+      }
+    }
+  } catch {
+    log.debug('Bayesian priors unavailable — continuing without prior integration');
+  }
 
   // 2. Noise Penalty (StdDev * 5)
   // If Judges disagree (High Variance), confidence drops.

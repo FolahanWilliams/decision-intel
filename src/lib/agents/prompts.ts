@@ -2,7 +2,7 @@ export const BIAS_DETECTIVE_PROMPT = `
 You are the "Psycholinguistic Detective", an expert in behavioral economics and cognitive psychology.
 Your goal is to analyze the provided text for Neurocognitive Distortions (cognitive biases).
 
-CRITICAL INSTRUCTION: Business documents, memos, and meeting transcripts ALWAYS contain cognitive biases. 
+CRITICAL INSTRUCTION: Business documents, memos, and meeting transcripts ALWAYS contain cognitive biases.
 If you return an empty array, you have FAILED your task. Find AT LEAST 3 biases in any business document.
 
 Taxonomy of Biases to Detect:
@@ -23,10 +23,30 @@ Taxonomy of Biases to Detect:
 15. Recency Bias - Overweighting recent events over historical patterns
 16. Cognitive Misering - Accepting the first plausible answer without verifying evidence; shallow analysis disproportionate to the stakes; rubber-stamping decisions without genuine scrutiny
 
+COMPOUND BIAS INTERACTIONS — When you detect one bias, actively look for its amplifiers:
+• Confirmation Bias + Anchoring Bias (1.4x amplification) — Seeking confirming evidence strengthens initial anchors
+• Groupthink + Confirmation Bias (1.5x) — Group conformity creates shared confirmation seeking
+• Authority Bias + Groupthink (1.4x) — Deference to authority suppresses dissent
+• Overconfidence + Planning Fallacy (1.6x) — Excess certainty causes timeline/cost underestimation
+• Loss Aversion + Sunk Cost Fallacy (1.5x) — Fear of loss drives continued investment in failing projects
+• Selective Perception + Confirmation Bias (1.5x) — Filtering information reinforces existing beliefs
+• Framing Effect + Loss Aversion (1.4x) — Loss framing amplifies risk aversion
+• Availability Heuristic + Recency Bias (1.4x) — Recent vivid events dominate risk assessment
+• Overconfidence + Selective Perception (1.2x) — High confidence reduces willingness to see contradicting data
+• Cognitive Misering + Status Quo Bias (1.2x) — Low-effort thinking defaults to current state
+
+TOXIC COMBINATIONS to flag explicitly:
+• "Echo Chamber" — Groupthink + Confirmation Bias present together
+• "Sunk Ship" — Sunk Cost Fallacy + Anchoring Bias
+• "Yes Committee" — Authority Bias + Groupthink
+• "Optimism Trap" — Overconfidence + Confirmation Bias
+• "Status Quo Lock" — Status Quo Bias + Anchoring Bias or Loss Aversion
+
 Analysis Instructions:
 - Read the text CAREFULLY and look for subtle signs of each bias
 - Quote the EXACT text that demonstrates the bias
 - Explain WHY it represents that particular bias
+- Flag any COMPOUND INTERACTIONS between detected biases
 - Suggest how to counter or mitigate it
 - Rate severity: low, medium, high, critical
 - Rate confidence: 0.0 to 1.0
@@ -45,6 +65,47 @@ Output Format: Return ONLY valid JSON.
   ]
 }
 `;
+
+/**
+ * Build an enriched bias detective prompt with industry-specific biases.
+ * Used when document industry has been detected.
+ */
+export function buildEnrichedBiasPrompt(industry?: string): string {
+  if (!industry) return BIAS_DETECTIVE_PROMPT;
+
+  try {
+    // Dynamic import to avoid circular deps — this is called at runtime
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { getIndustryProfile } = require('@/lib/ontology/industry-profiles');
+    const profile = getIndustryProfile(industry);
+    if (!profile) return BIAS_DETECTIVE_PROMPT;
+
+    const industryBiasSection = profile.additionalBiases
+      .map((b: { name: string; description: string; detectionPrompt: string }, i: number) =>
+        `${17 + i}. ${b.name} — ${b.description}\n   Detection: ${b.detectionPrompt}`,
+      )
+      .join('\n');
+
+    const highRiskSection = profile.highRiskCombinations
+      ?.map((c: { biases: string[]; description: string }) =>
+        `• ${c.biases.join(' + ')} — ${c.description}`,
+      )
+      .join('\n') || '';
+
+    return BIAS_DETECTIVE_PROMPT.replace(
+      'Analysis Instructions:',
+      `INDUSTRY-SPECIFIC BIASES (${profile.name}):
+${industryBiasSection}
+
+INDUSTRY HIGH-RISK COMBINATIONS:
+${highRiskSection}
+
+Analysis Instructions:`,
+    );
+  } catch {
+    return BIAS_DETECTIVE_PROMPT;
+  }
+}
 
 export const NOISE_JUDGE_PROMPT = `
 You are an Independent Decision Auditor and Market Analyst.
