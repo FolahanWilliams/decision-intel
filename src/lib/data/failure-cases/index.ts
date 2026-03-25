@@ -2,6 +2,7 @@ import { FailureCase } from './types';
 import { FINANCIAL_SERVICES_CASES } from './financial-services';
 import { TECHNOLOGY_CASES } from './technology';
 import { HEALTHCARE_CASES, ENERGY_INDUSTRIAL_CASES } from './healthcare-energy';
+import { RETAIL_CASES, GOVERNMENT_DEFENSE_CASES, ADDITIONAL_FINANCIAL_CASES, ADDITIONAL_TECH_CASES } from './retail-government';
 
 export type { FailureCase } from './types';
 
@@ -10,6 +11,10 @@ export const FAILURE_CASES: FailureCase[] = [
   ...TECHNOLOGY_CASES,
   ...HEALTHCARE_CASES,
   ...ENERGY_INDUSTRIAL_CASES,
+  ...RETAIL_CASES,
+  ...GOVERNMENT_DEFENSE_CASES,
+  ...ADDITIONAL_FINANCIAL_CASES,
+  ...ADDITIONAL_TECH_CASES,
 ];
 
 export function getCasesByIndustry(industry: string): FailureCase[] {
