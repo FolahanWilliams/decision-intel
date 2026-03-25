@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
                   {
                     nudgeType: 'pre_decision_coaching',
                     triggerReason: 'Decision frame captured — collecting prior',
-                    message: `Decision captured: "${preDecision.frame.decisionStatement.slice(0, 100)}"\n\nBefore the AI audit, record your pre-analysis position at the link below to build your calibration curve.`,
+                    message: `Decision captured: "${preDecision.frame.decisionStatement.slice(0, 100)}"\n\nBefore the AI audit, reply in this thread with your position and confidence (e.g. "approve 80%" or "reject 30%") to build your calibration curve.`,
                     severity: 'info',
                     channel: 'slack',
                   },
@@ -144,8 +144,62 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          // TODO: DecisionPrior capture from thread replies will happen via the web UI
-          // after the user clicks through from the Slack thread prompt above.
+          // Capture DecisionPrior from Slack thread replies
+          // If a user replies in the thread with their position (e.g. "approve 80%" or "reject, 40%"),
+          // we parse it and create a DecisionPrior record directly from Slack.
+          try {
+            const event = payload.event;
+            const replyText = event?.text?.toLowerCase()?.trim() || '';
+            const threadTs = event?.thread_ts;
+
+            // Only process thread replies (not top-level messages)
+            if (threadTs && replyText.length > 0) {
+              // Parse confidence from reply: look for patterns like "approve 80", "reject 30%", "pass, high confidence"
+              const confidenceMatch = replyText.match(/(\d{1,3})\s*%?/);
+              const actionMatch = replyText.match(/\b(approve|reject|pass|abstain|yes|no)\b/i);
+
+              if (actionMatch || confidenceMatch) {
+                const confidence = confidenceMatch
+                  ? Math.min(100, parseInt(confidenceMatch[1]))
+                  : 50;
+                const action = actionMatch?.[1] || 'undecided';
+
+                // Find the HumanDecision for this thread (created from the pre-decision message)
+                const sourceRef = `${event?.channel}:${threadTs}`;
+                const humanDecision = await prisma.humanDecision.findFirst({
+                  where: { source: 'slack', sourceRef },
+                  select: { id: true, userId: true, linkedAnalysisId: true },
+                  orderBy: { createdAt: 'desc' },
+                });
+
+                if (humanDecision?.linkedAnalysisId) {
+                  await prisma.decisionPrior.upsert({
+                    where: { analysisId: humanDecision.linkedAnalysisId },
+                    create: {
+                      analysisId: humanDecision.linkedAnalysisId,
+                      userId: humanDecision.userId,
+                      defaultAction: action,
+                      confidence,
+                      evidenceToChange: replyText,
+                    },
+                    update: {
+                      defaultAction: action,
+                      confidence,
+                      evidenceToChange: replyText,
+                    },
+                  });
+                  log.info(
+                    `DecisionPrior captured from Slack thread reply (confidence: ${confidence}%, action: ${action})`
+                  );
+                }
+              }
+            }
+          } catch (priorErr) {
+            const msg = priorErr instanceof Error ? priorErr.message : String(priorErr);
+            if (!msg.includes('P2021') && !msg.includes('P2022')) {
+              log.warn('DecisionPrior capture from Slack failed (non-critical):', msg);
+            }
+          }
 
           return NextResponse.json({ ok: true, preDecision: true });
         }

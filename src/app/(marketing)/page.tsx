@@ -756,7 +756,7 @@ export default function LandingPage() {
                       className="btn btn-primary glow"
                       style={{ padding: '14px 32px', fontSize: '0.9rem' }}
                     >
-                      Start Free Trial <ArrowRight className="w-4 h-4 ml-2 inline" />
+                      Get Early Access <ArrowRight className="w-4 h-4 ml-2 inline" />
                     </Link>
                   </GlassRipple>
                   <GlassHover>
@@ -877,14 +877,14 @@ export default function LandingPage() {
           >
             {[
               {
-                value: 15000,
-                suffix: '+',
-                label: 'Investment Decisions Audited',
+                value: 15,
+                suffix: '',
+                label: 'Cognitive Biases Detected',
                 color: '#FFFFFF',
               },
-              { value: 47, suffix: '%', label: 'Avg Noise Reduction', color: '#22c55e' },
-              { value: 12, suffix: '%', label: 'EBITDA Recovered', color: '#FFFFFF' },
-              { value: 18, suffix: '-Mo', label: 'Data Advantage', color: '#FFFFFF' },
+              { value: 3, suffix: 'x', label: 'Independent AI Judges', color: '#22c55e' },
+              { value: 10, suffix: '', label: 'Agent Analysis Pipeline', color: '#FFFFFF' },
+              { value: 60, suffix: 's', label: 'Full Audit Turnaround', color: '#FFFFFF' },
             ].map((stat, i) => (
               <motion.div
                 key={i}
@@ -1063,10 +1063,10 @@ export default function LandingPage() {
                 style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}
               >
                 {[
-                  'IC members score identical deals 30-40% apart',
+                  'IC members score identical deals 30-40% apart (Kahneman, Noise)',
                   'Anchoring to entry multiples distorts exit analysis',
                   'No longitudinal tracking of decision accuracy',
-                  '12-15% of EBITDA lost to unaudited cognitive errors',
+                  'Estimated 8-15% of returns lost to unaudited cognitive errors',
                 ].map((text, i) => (
                   <div
                     key={i}
@@ -1765,7 +1765,7 @@ export default function LandingPage() {
                     step: '3',
                     label: 'Learn',
                     description:
-                      'Every outcome retrains the system. "Anchoring cost you 12% across 8 deals" — your data, not generic warnings',
+                      'Every outcome retrains the system. Over time, you see exactly which biases cost your fund money — your data, not generic warnings',
                     color: '#A3E635',
                   },
                   {
@@ -1859,8 +1859,8 @@ export default function LandingPage() {
                 icon: Fingerprint,
                 title: 'Mandatory Outcome Flywheel',
                 description:
-                  'The platform enforces outcome reporting — you cannot run new analyses until prior decisions are closed out. After 6 months, this dataset becomes your 18-month competitive moat.',
-                stat: '18-month data advantage',
+                  'The platform enforces outcome reporting — you cannot run new analyses until prior decisions are closed out. Every outcome sharpens your bias detection and calibrates your Decision Twins.',
+                stat: 'Compounding data advantage',
                 color: '#FFFFFF',
               },
               {
@@ -1883,7 +1883,7 @@ export default function LandingPage() {
                 icon: Lock,
                 title: 'Pre-Decision Capture',
                 description:
-                  'Slack integration detects IC deliberation threads in real time. Cognitive coaching nudges arrive before the vote — catching biases mid-conversation.',
+                  'Slack integration detects IC deliberation threads and delivers cognitive coaching nudges before the vote. Reply with your position to build your calibration curve — all without leaving Slack.',
                 stat: 'Always-on decision OS',
                 color: '#22c55e',
               },
@@ -1989,24 +1989,22 @@ export default function LandingPage() {
                   lineHeight: 1.8,
                 }}
               >
-                &ldquo;Why not use a generic bias scanner at half the price?&rdquo; Because after 6
-                months on Decision Intel, your fund has learned that{' '}
+                &ldquo;Why not use a generic bias scanner at half the price?&rdquo; Because Decision
+                Intel is the only platform that{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                  anchoring to entry multiples cost you 18% across 12 deals
+                  closes the loop between bias detection and actual outcomes
                 </span>
-                , that{' '}
+                . Over time, it learns{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                  your Fiscal Conservative twin was most accurate on Series B+ decisions
+                  which biases actually cost your fund money
                 </span>
-                , and that{' '}
+                , which Decision Twin personas are most accurate for your deal types, and{' '}
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-                  pre-decision nudges in #investment-committee improved outcomes by 23%
+                  how your decisions cascade and compound through your Knowledge Graph
                 </span>
-                . And your Decision Knowledge Graph maps how 200+ decisions cascaded, which
-                participants drove the best outcomes, and where echo chambers formed. A generic tool
-                starts from zero every session. Decision Intel compounds from every outcome your
-                fund has ever tracked. That&apos;s an 18-month head start no competitor can
-                shortcut.
+                . A generic scanner gives the same output on day 1 and day 365. Decision Intel
+                compounds from every outcome you track — building an organizational decision memory
+                that no competitor can replicate.
               </div>
             </div>
           </motion.div>
@@ -2302,7 +2300,7 @@ export default function LandingPage() {
                       fontWeight: 600,
                     }}
                   >
-                    Start Free Trial
+                    Get Early Access
                   </Link>
                 </div>
               </div>
@@ -2464,8 +2462,8 @@ export default function LandingPage() {
                 marginRight: 'auto',
               }}
             >
-              Join PE/VC funds and investment committees using Decision Intel to track, score, and
-              continuously improve decision performance — with measurable ROI.
+              Be among the first PE/VC funds and investment committees to audit decision quality
+              with AI — track biases, measure noise, and build organizational decision memory.
             </p>
             <div
               style={{
@@ -2485,7 +2483,7 @@ export default function LandingPage() {
                   fontWeight: 600,
                 }}
               >
-                Get Started Free <ArrowRight className="w-4 h-4 ml-2 inline" />
+                Get Early Access <ArrowRight className="w-4 h-4 ml-2 inline" />
               </Link>
               <a
                 href="#solution"
@@ -2512,7 +2510,7 @@ export default function LandingPage() {
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
-                Free tier available
+                Free during early access
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
@@ -2583,7 +2581,7 @@ export default function LandingPage() {
                   { label: 'Features', href: '#features' },
                   { label: 'ROI Calculator', href: '#roi' },
                   { label: 'How It Works', href: '#solution' },
-                  { label: 'Pricing', href: '#' },
+                  { label: 'Early Access', href: '#cta' },
                 ].map((link, i) => (
                   <a
                     key={i}
