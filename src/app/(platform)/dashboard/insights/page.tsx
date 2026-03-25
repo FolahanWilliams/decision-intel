@@ -46,6 +46,8 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
+import { useGraphTrends } from '@/hooks/useGraphTrends';
+import { Network } from 'lucide-react';
 
 /* ── Reusable sub-components ─────────────────────────────────── */
 
@@ -269,6 +271,19 @@ export default function InsightsPage() {
   const [refreshTime, setRefreshTime] = useState('');
   const [trendRange, setTrendRange] = useState('1M');
   const { trends: trendData, isLoading: trendsLoading } = useTrends(trendRange);
+  const [graphOrgId, setGraphOrgId] = useState<string | null>(null);
+  const { graphTrends } = useGraphTrends(graphOrgId);
+
+  // Fetch orgId for graph trends
+  useEffect(() => {
+    fetch('/api/team')
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        const id = data?.orgId || data?.organization?.id;
+        if (id) setGraphOrgId(id);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     setRefreshTime(new Date().toISOString().replace('T', ' ').slice(0, 19));
@@ -1623,6 +1638,83 @@ export default function InsightsPage() {
           </>
         )}
       </div>
+
+      {/* ── [10] NETWORK INTELLIGENCE ────────────────────── */}
+      {graphTrends && graphTrends.weeklyData.length > 0 && (
+        <>
+          <SectionLabel index={10}>NETWORK INTELLIGENCE</SectionLabel>
+          <div className="animate-slide-up" style={{ animationDelay: '0.85s' }}>
+            <div className="grid grid-3 gap-md" style={{ marginBottom: 'var(--spacing-md)' }}>
+              <StatCard
+                label="Graph Edges"
+                value={graphTrends.totalEdges}
+                icon={<Network size={16} />}
+                color="var(--accent-primary)"
+                delay={0.86}
+              />
+              <StatCard
+                label="Bias Connections"
+                value={graphTrends.biasEdges}
+                icon={<AlertTriangle size={16} />}
+                color="var(--warning)"
+                delay={0.88}
+              />
+              <StatCard
+                label="Weeks Tracked"
+                value={graphTrends.weeks}
+                icon={<Activity size={16} />}
+                color="var(--success)"
+                delay={0.9}
+              />
+            </div>
+
+            {/* Edge growth area chart */}
+            <div className="card card-glow" style={{ marginBottom: 'var(--spacing-md)' }}>
+              <div className="card-header">
+                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  Edge Growth Over Time
+                </span>
+              </div>
+              <div className="card-body" style={{ height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={graphTrends.weeklyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                    <XAxis
+                      dataKey="week"
+                      tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
+                      tickFormatter={(v: string) => v.slice(5)}
+                    />
+                    <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--bg-primary)',
+                        border: '1px solid var(--border-color)',
+                        fontSize: '11px',
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="edges"
+                      name="Total Edges"
+                      stroke="var(--accent-primary)"
+                      fill="var(--accent-primary)"
+                      fillOpacity={0.15}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="biasEdges"
+                      name="Bias Edges"
+                      stroke="var(--warning)"
+                      fill="var(--warning)"
+                      fillOpacity={0.1}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* ── Footer timestamp ────────────────────────────── */}
       <div

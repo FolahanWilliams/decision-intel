@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, type ReactNode } from 'react';
-import { Search, FileText, Loader2, ArrowRight, TrendingUp } from 'lucide-react';
+import { Search, FileText, Loader2, ArrowRight, TrendingUp, GitBranch } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/ToastContext';
 
@@ -41,6 +41,7 @@ interface SearchResult {
   similarity: number;
   score: number;
   biases: string[];
+  graphEdgeCount?: number;
 }
 
 export default function SearchPage() {
@@ -205,6 +206,15 @@ export default function SearchPage() {
                       {typeof result.score === 'number' && result.score > 0 && (
                         <span className="badge badge-secondary">
                           Score: {Math.round(result.score)}
+                        </span>
+                      )}
+                      {typeof result.graphEdgeCount === 'number' && result.graphEdgeCount > 0 && (
+                        <span
+                          className="flex items-center gap-xs"
+                          style={{ color: 'var(--accent-primary)' }}
+                        >
+                          <GitBranch size={12} />
+                          {result.graphEdgeCount} connection{result.graphEdgeCount !== 1 ? 's' : ''}
                         </span>
                       )}
                     </div>

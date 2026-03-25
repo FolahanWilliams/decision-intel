@@ -295,6 +295,17 @@ export async function analyzeDocument(
         const edgeCount = await inferEdgesForAnalysis(savedForGraph.id, document.orgId ?? null);
         if (edgeCount > 0) {
           log.info(`Inferred ${edgeCount} graph edge(s) for analysis ${savedForGraph.id}`);
+
+          // Check graph patterns for nudges (after edges exist)
+          try {
+            const { checkGraphNudgesForAnalysis } = await import('@/lib/nudges/engine');
+            const nudgeCount = await checkGraphNudgesForAnalysis(savedForGraph.id, document.orgId ?? null);
+            if (nudgeCount > 0) {
+              log.info(`Created ${nudgeCount} graph-pattern nudge(s) for analysis ${savedForGraph.id}`);
+            }
+          } catch (nudgeErr) {
+            log.warn('Graph nudge check failed (non-critical):', nudgeErr);
+          }
         }
       }
     } catch (edgeError) {

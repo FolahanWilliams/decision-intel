@@ -52,10 +52,67 @@ export async function POST(request: NextRequest) {
       typeof documentId === 'string' ? documentId : undefined
     );
 
+    // Enrich results with graph edge counts (non-blocking best-effort)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let enrichedResults: any[] = results;
+    try {
+      const docIds = results.map((r: { documentId: string }) => r.documentId);
+      if (docIds.length > 0) {
+        // Find analysis IDs for these documents
+        const analyses = await prisma.analysis.findMany({
+          where: { documentId: { in: docIds } },
+          select: { id: true, documentId: true },
+        });
+
+        if (analyses.length > 0) {
+          const analysisIds = analyses.map(a => a.id);
+          const docToAnalysis = new Map(analyses.map(a => [a.documentId, a.id]));
+
+          // Batch query edge counts
+          const edgeCounts = await prisma.decisionEdge.groupBy({
+            by: ['sourceId'],
+            where: {
+              sourceId: { in: analysisIds },
+            },
+            _count: { id: true },
+          });
+
+          const targetCounts = await prisma.decisionEdge.groupBy({
+            by: ['targetId'],
+            where: {
+              targetId: { in: analysisIds },
+            },
+            _count: { id: true },
+          });
+
+          const countMap = new Map<string, number>();
+          for (const e of edgeCounts) {
+            countMap.set(e.sourceId, (countMap.get(e.sourceId) || 0) + e._count.id);
+          }
+          for (const e of targetCounts) {
+            countMap.set(e.targetId, (countMap.get(e.targetId) || 0) + e._count.id);
+          }
+
+          enrichedResults = results.map((r: { documentId: string }) => {
+            const analysisId = docToAnalysis.get(r.documentId);
+            return {
+              ...r,
+              graphEdgeCount: analysisId ? (countMap.get(analysisId) || 0) : 0,
+            };
+          });
+        }
+      }
+    } catch (enrichErr) {
+      const code = (enrichErr as { code?: string })?.code;
+      if (code !== 'P2021' && code !== 'P2022') {
+        log.warn('Search graph enrichment failed (non-critical):', enrichErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      results,
-      count: results.length,
+      results: enrichedResults,
+      count: enrichedResults.length,
     });
   } catch (error) {
     log.error('Search API error:', error);
