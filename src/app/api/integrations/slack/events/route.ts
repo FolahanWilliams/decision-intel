@@ -204,6 +204,16 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ ok: true, preDecision: true });
         }
 
+        // Check for outcome signals in non-decision messages (fire-and-forget)
+        try {
+          const { processSlackOutcomeSignal } = await import('@/lib/integrations/slack/handler');
+          processSlackOutcomeSignal(payload).catch(err => {
+            log.warn('Slack outcome signal processing failed (non-critical):', err);
+          });
+        } catch {
+          // outcome-inference module not available — skip silently
+        }
+
         // Not a decision-relevant message — acknowledge silently
         return NextResponse.json({ ok: true });
       }

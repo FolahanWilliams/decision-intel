@@ -75,6 +75,7 @@ model Analysis {
   prior        DecisionPrior?
   complianceAssessments ComplianceAssessment[]
   toxicCombinations ToxicCombination[]
+  draftOutcomes     DraftOutcome[]
 
   @@index([documentId])
 }
@@ -911,5 +912,26 @@ model DecisionEdge {
   @@index([targetType, targetId])
   @@index([edgeType])
   @@index([strength])
+}
+
+// ─── Autonomous Outcome Detection ────────────────────────────────────────
+
+model DraftOutcome {
+  id              String   @id @default(cuid())
+  analysisId      String
+  outcome         String   // success | partial_success | failure | inconclusive
+  confidence      Float
+  evidence        String[] // quotes or article titles
+  matchedCriteria String[]
+  source          String   // document | slack | web_intelligence
+  sourceRef       String   // document ID, slack ts, or URL
+  status          String   @default("pending_review") // pending_review | confirmed | dismissed
+  createdAt       DateTime @default(now())
+  reviewedAt      DateTime?
+
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId])
+  @@index([status])
 }
 
