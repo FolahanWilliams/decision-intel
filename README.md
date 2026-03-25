@@ -207,10 +207,27 @@ Captures decision context *before* document upload to prevent biases from influe
 - **Decision Priors (Structured RLHF)** — Records the decision-maker's pre-analysis belief and confidence level
 - **Belief Delta Tracking** — Measures how much the analysis shifted the decision-maker's position
 
+### Autonomous Outcome Detection Engine
+
+Three autonomous channels detect decision outcomes without manual reporting — the key friction point that breaks feedback loops in competing platforms:
+
+| Channel | Source | How It Works | Confidence Threshold |
+|:--------|:-------|:-------------|:--------------------|
+| **Document Upload** | New documents in same org | RAG embeddings match new docs to prior pending decisions (>0.70 cosine similarity), then LLM compares against DecisionFrame success/failure criteria | 0.70 |
+| **Slack Messages** | Outcome language in decision channels | Pattern detection for success/failure/mixed signals (e.g., "exceeded expectations", "pulled the plug", "mixed results"), with LLM refinement against criteria | 0.60 |
+| **Web Intelligence** | Daily cron with Google Search grounding | For decisions involving named entities, searches for public outcome signals in news articles. Rate-limited to 10 searches/day | 0.80 |
+
+All detections create **DraftOutcomes** requiring one-click user confirmation — never auto-submits to the calibration engine. This preserves data quality while eliminating the friction that prevents users from closing the feedback loop.
+
+- **Dashboard Banner** — Expandable notification showing pending draft outcomes with evidence quotes
+- **Document Detail Card** — Inline outcome card on each analysis with confirm/dismiss actions
+- **Graceful Degradation** — Each channel is independent; if Slack isn't connected or web search is disabled, the others still work
+
 ### Behavioral Data Flywheel
 
 A continuous improvement loop that makes the platform smarter over time:
-- **Outcome Tracking** — Report actual decision outcomes and compare against predictions
+- **Autonomous Outcome Detection** — Three channels (documents, Slack, web) auto-detect outcomes; one-click confirmation feeds the calibration engine
+- **Manual Outcome Tracking** — Fallback manual reporting at configurable intervals (30/60/90 days, 6 months, 1 year)
 - **Calibration Profiles** — Per-organization learned weights for bias severity, nudge thresholds, and twin accuracy
 - **Nudge Effectiveness** — Tracks which coaching interventions actually improved decisions
 - **Weekly Recalibration** — Automated cron job recalibrates models based on accumulated outcome data
@@ -228,6 +245,8 @@ Password-protected, expiring links for sharing analyses with external stakeholde
 Enterprise-grade Slack integration for real-time decision intelligence:
 - **OAuth Installation** — Full Slack OAuth flow with encrypted bot token storage (AES-256-GCM)
 - **Decision Detection** — Automatically identifies decisions being made in Slack channels
+- **Pre-Decision Coaching** — Detects deliberation threads and delivers cognitive nudges before the vote
+- **Outcome Detection** — Recognizes outcome language in decision channels and creates draft outcomes for one-click confirmation
 - **Real-Time Nudges** — Delivers cognitive bias alerts directly in Slack when decisions are detected
 - **Decision Ingestion** — Routes Slack decisions into the cognitive audit pipeline for full analysis
 
