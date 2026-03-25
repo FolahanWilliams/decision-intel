@@ -35,6 +35,7 @@ import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinationCard';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
+import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -917,6 +918,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {analysis && (
         <div className="mb-lg">
           <RelatedDecisions analysisId={analysis.id} />
+        </div>
+      )}
+
+      {/* Graph-Powered Recommendations */}
+      {analysis && (
+        <div className="mb-lg">
+          <RecommendationsPanel analysisId={analysis.id} />
         </div>
       )}
 

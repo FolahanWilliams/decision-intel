@@ -1668,6 +1668,46 @@ export default function InsightsPage() {
               />
             </div>
 
+            {/* Anomaly alerts */}
+            {graphTrends.anomalies && graphTrends.anomalies.length > 0 && (
+              <div className="space-y-2" style={{ marginBottom: 'var(--spacing-md)' }}>
+                {graphTrends.anomalies.map((a, i) => (
+                  <div
+                    key={i}
+                    className="card flex items-start gap-sm"
+                    style={{
+                      padding: 'var(--spacing-sm) var(--spacing-md)',
+                      borderLeft: `3px solid ${a.severity > 60 ? 'var(--error)' : 'var(--warning)'}`,
+                    }}
+                  >
+                    <AlertTriangle
+                      size={14}
+                      style={{
+                        color: a.severity > 60 ? 'var(--error)' : 'var(--warning)',
+                        marginTop: '2px',
+                        flexShrink: 0,
+                      }}
+                    />
+                    <div>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          color: 'var(--text-secondary)',
+                          textTransform: 'capitalize',
+                        }}
+                      >
+                        {a.type.replace(/_/g, ' ')}
+                      </span>
+                      <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        {a.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Edge growth area chart */}
             <div className="card card-glow" style={{ marginBottom: 'var(--spacing-md)' }}>
               <div className="card-header">

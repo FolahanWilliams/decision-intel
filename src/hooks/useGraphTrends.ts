@@ -9,11 +9,19 @@ interface GraphTrendWeek {
   similarityEdges: number;
 }
 
+interface GraphAnomaly {
+  type: string;
+  severity: number;
+  description: string;
+  detectedAt: string;
+}
+
 interface GraphTrendsData {
   weeklyData: GraphTrendWeek[];
   totalEdges: number;
   biasEdges: number;
   weeks: number;
+  anomalies?: GraphAnomaly[];
 }
 
 export function useGraphTrends(orgId: string | null, weeks = 12) {
