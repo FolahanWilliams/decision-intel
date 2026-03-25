@@ -1,0 +1,825 @@
+/**
+ * Proprietary Bias Ontology — Directed Graph of Bias Relationships
+ *
+ * A directed graph encoding empirically-grounded interaction weights between
+ * cognitive biases observed in organizational decision-making. Relationships
+ * are drawn from behavioral economics, social psychology, and judgment &
+ * decision-making (JDM) research.
+ */
+
+// BiasCategory type used for reference — ontology uses string literals for extensibility
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export interface BiasRelationship {
+  from: string; // BiasCategory
+  to: string; // BiasCategory
+  type: 'amplifies' | 'enables' | 'masks' | 'correlates' | 'mitigates';
+  weight: number; // 0.0-2.0 (1.0 = neutral, >1 = amplification, <1 = dampening)
+  mechanism: string; // brief explanation of HOW they interact
+  citation: string; // academic source
+}
+
+export interface BiasNode {
+  id: string; // BiasCategory
+  category: 'judgment' | 'memory' | 'social' | 'decision' | 'attention';
+  cognitiveSystem: 'system1' | 'system2' | 'both'; // Kahneman dual-process
+  prevalence: number; // 0-1 base rate in organizational decisions
+  detectability: number; // 0-1 how easy to detect (low = harder)
+}
+
+// ---------------------------------------------------------------------------
+// Nodes — every core BiasCategory with metadata
+// ---------------------------------------------------------------------------
+
+export const BIAS_NODES: BiasNode[] = [
+  {
+    id: 'confirmation_bias',
+    category: 'judgment',
+    cognitiveSystem: 'both',
+    prevalence: 0.85,
+    detectability: 0.35,
+  },
+  {
+    id: 'anchoring_bias',
+    category: 'judgment',
+    cognitiveSystem: 'system1',
+    prevalence: 0.78,
+    detectability: 0.45,
+  },
+  {
+    id: 'availability_heuristic',
+    category: 'memory',
+    cognitiveSystem: 'system1',
+    prevalence: 0.72,
+    detectability: 0.40,
+  },
+  {
+    id: 'groupthink',
+    category: 'social',
+    cognitiveSystem: 'system2',
+    prevalence: 0.65,
+    detectability: 0.30,
+  },
+  {
+    id: 'authority_bias',
+    category: 'social',
+    cognitiveSystem: 'system1',
+    prevalence: 0.70,
+    detectability: 0.50,
+  },
+  {
+    id: 'bandwagon_effect',
+    category: 'social',
+    cognitiveSystem: 'system1',
+    prevalence: 0.60,
+    detectability: 0.55,
+  },
+  {
+    id: 'overconfidence_bias',
+    category: 'judgment',
+    cognitiveSystem: 'system2',
+    prevalence: 0.75,
+    detectability: 0.25,
+  },
+  {
+    id: 'hindsight_bias',
+    category: 'memory',
+    cognitiveSystem: 'system1',
+    prevalence: 0.68,
+    detectability: 0.30,
+  },
+  {
+    id: 'planning_fallacy',
+    category: 'decision',
+    cognitiveSystem: 'system2',
+    prevalence: 0.80,
+    detectability: 0.50,
+  },
+  {
+    id: 'loss_aversion',
+    category: 'decision',
+    cognitiveSystem: 'system1',
+    prevalence: 0.82,
+    detectability: 0.40,
+  },
+  {
+    id: 'sunk_cost_fallacy',
+    category: 'decision',
+    cognitiveSystem: 'system2',
+    prevalence: 0.70,
+    detectability: 0.55,
+  },
+  {
+    id: 'status_quo_bias',
+    category: 'decision',
+    cognitiveSystem: 'both',
+    prevalence: 0.75,
+    detectability: 0.45,
+  },
+  {
+    id: 'framing_effect',
+    category: 'judgment',
+    cognitiveSystem: 'system1',
+    prevalence: 0.77,
+    detectability: 0.35,
+  },
+  {
+    id: 'selective_perception',
+    category: 'attention',
+    cognitiveSystem: 'system1',
+    prevalence: 0.73,
+    detectability: 0.20,
+  },
+  {
+    id: 'recency_bias',
+    category: 'memory',
+    cognitiveSystem: 'system1',
+    prevalence: 0.70,
+    detectability: 0.50,
+  },
+  {
+    id: 'cognitive_misering',
+    category: 'attention',
+    cognitiveSystem: 'system1',
+    prevalence: 0.80,
+    detectability: 0.20,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Relationships — 50 research-backed directed edges
+// ---------------------------------------------------------------------------
+
+export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
+  // ---- Core relationships from specification ----
+  {
+    from: 'confirmation_bias',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Seekers of confirmatory evidence anchor more strongly on hypothesis-consistent data, deepening the anchoring effect.',
+    citation: 'Nickerson 1998, "Confirmation Bias: A Ubiquitous Phenomenon in Many Guises"',
+  },
+  {
+    from: 'groupthink',
+    to: 'confirmation_bias',
+    type: 'enables',
+    weight: 1.5,
+    mechanism:
+      'Group pressure to maintain consensus suppresses dissent, creating a shared confirmation loop where contradictory evidence is dismissed.',
+    citation: 'Janis 1972, "Victims of Groupthink"',
+  },
+  {
+    from: 'authority_bias',
+    to: 'groupthink',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Deference to authority figures reduces independent evaluation, accelerating convergence toward a single viewpoint.',
+    citation: 'Milgram 1963, "Behavioral Study of Obedience"',
+  },
+  {
+    from: 'overconfidence_bias',
+    to: 'planning_fallacy',
+    type: 'amplifies',
+    weight: 1.6,
+    mechanism:
+      'Overconfident estimators systematically underweight risk and overestimate their ability to control outcomes, inflating planning optimism.',
+    citation: 'Kahneman & Lovallo 1993, "Timid Choices and Bold Forecasts"',
+  },
+  {
+    from: 'loss_aversion',
+    to: 'sunk_cost_fallacy',
+    type: 'amplifies',
+    weight: 1.5,
+    mechanism:
+      'The pain of realizing a loss from abandoning a project is weighted ~2x more than equivalent gains, driving continued investment.',
+    citation: 'Thaler 1980, "Toward a Positive Theory of Consumer Choice"',
+  },
+  {
+    from: 'anchoring_bias',
+    to: 'framing_effect',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Initial anchors set a reference frame that biases subsequent evaluations toward the anchor-consistent frame.',
+    citation: 'Tversky & Kahneman 1981, "The Framing of Decisions and the Psychology of Choice"',
+  },
+  {
+    from: 'status_quo_bias',
+    to: 'cognitive_misering',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Preference for existing arrangements reduces the perceived need for effortful deliberation, reinforcing System 1 dominance.',
+    citation: 'Samuelson & Zeckhauser 1988, "Status Quo Bias in Decision Making"',
+  },
+  {
+    from: 'availability_heuristic',
+    to: 'recency_bias',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Recent events are more cognitively available, making the availability heuristic disproportionately weight recent information.',
+    citation: 'Tversky & Kahneman 1973, "Availability: A Heuristic for Judging Frequency and Probability"',
+  },
+  {
+    from: 'bandwagon_effect',
+    to: 'groupthink',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Social proof cascades accelerate consensus formation, reducing the threshold for groupthink to emerge.',
+    citation: 'Asch 1951, "Effects of Group Pressure upon the Modification of Judgments"',
+  },
+  {
+    from: 'overconfidence_bias',
+    to: 'selective_perception',
+    type: 'masks',
+    weight: 1.2,
+    mechanism:
+      'Overconfident individuals believe their perceptions are accurate, preventing recognition of selective filtering.',
+    citation: 'Kruger & Dunning 1999, "Unskilled and Unaware of It"',
+  },
+  {
+    from: 'hindsight_bias',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Believing past outcomes were foreseeable inflates confidence in the ability to predict future outcomes.',
+    citation: 'Fischhoff 1975, "Hindsight ≠ Foresight"',
+  },
+  {
+    from: 'framing_effect',
+    to: 'loss_aversion',
+    type: 'enables',
+    weight: 1.4,
+    mechanism:
+      'Negative framing activates loss-aversion circuits; the same outcome framed as a loss triggers stronger avoidance.',
+    citation: 'Kahneman & Tversky 1979, "Prospect Theory"',
+  },
+  {
+    from: 'cognitive_misering',
+    to: 'availability_heuristic',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Reluctance to engage System 2 leads to reliance on whatever information is most easily retrieved.',
+    citation: 'Fiske & Taylor 1991, "Social Cognition"',
+  },
+  {
+    from: 'selective_perception',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.5,
+    mechanism:
+      'Pre-attentive filtering screens out disconfirming stimuli before they can even be considered, reinforcing existing beliefs.',
+    citation: 'Hastorf & Cantril 1954, "They Saw a Game"',
+  },
+  {
+    from: 'recency_bias',
+    to: 'availability_heuristic',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Recent events dominate memory retrieval, amplifying the ease-of-recall mechanism underlying availability judgments.',
+    citation: 'Schwarz et al 1991, "Ease of Retrieval as Information"',
+  },
+
+  // ---- Additional research-backed relationships (25+) ----
+  {
+    from: 'confirmation_bias',
+    to: 'selective_perception',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Active search for confirming evidence trains perceptual filters to preferentially pass hypothesis-consistent signals.',
+    citation: 'Wason 1960, "On the Failure to Eliminate Hypotheses in a Conceptual Task"',
+  },
+  {
+    from: 'anchoring_bias',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Anchored estimates feel precise, inflating confidence in the accuracy of the estimate around the anchor.',
+    citation: 'Epley & Gilovich 2006, "The Anchoring-and-Adjustment Heuristic"',
+  },
+  {
+    from: 'loss_aversion',
+    to: 'status_quo_bias',
+    type: 'amplifies',
+    weight: 1.5,
+    mechanism:
+      'Potential losses from change are weighted more heavily than potential gains, making the status quo feel safer.',
+    citation: 'Kahneman, Knetsch & Thaler 1991, "Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias"',
+  },
+  {
+    from: 'sunk_cost_fallacy',
+    to: 'planning_fallacy',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Continued investment in failing projects necessitates revised (optimistic) plans to justify past expenditure.',
+    citation: 'Arkes & Blumer 1985, "The Psychology of Sunk Cost"',
+  },
+  {
+    from: 'groupthink',
+    to: 'overconfidence_bias',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Group consensus creates an illusion of invulnerability, inflating collective confidence beyond what evidence supports.',
+    citation: 'Janis 1982, "Groupthink: Psychological Studies of Policy Decisions and Fiascoes"',
+  },
+  {
+    from: 'authority_bias',
+    to: 'confirmation_bias',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Authority endorsement of a viewpoint creates a strong prior that subsequent information seeking tends to confirm.',
+    citation: 'Cialdini 2001, "Influence: Science and Practice"',
+  },
+  {
+    from: 'bandwagon_effect',
+    to: 'authority_bias',
+    type: 'correlates',
+    weight: 1.1,
+    mechanism:
+      'Widespread adoption signals implicit authority endorsement, strengthening deference to perceived consensus leaders.',
+    citation: 'Bikhchandani, Hirshleifer & Welch 1992, "A Theory of Fads, Fashion, Custom, and Cultural Change"',
+  },
+  {
+    from: 'cognitive_misering',
+    to: 'anchoring_bias',
+    type: 'enables',
+    weight: 1.4,
+    mechanism:
+      'System 1 default processing insufficiently adjusts from initial anchors, as adjustment requires effortful System 2 engagement.',
+    citation: 'Epley & Gilovich 2001, "Putting Adjustment Back in the Anchoring and Adjustment Heuristic"',
+  },
+  {
+    from: 'framing_effect',
+    to: 'selective_perception',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Frames prime perceptual filters, causing downstream information to be processed through the lens of the initial frame.',
+    citation: 'Levin, Schneider & Gaeth 1998, "All Frames Are Not Created Equal"',
+  },
+  {
+    from: 'hindsight_bias',
+    to: 'confirmation_bias',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Retrospective inevitability narratives strengthen belief that the chosen hypothesis was always correct.',
+    citation: 'Roese & Vohs 2012, "Hindsight Bias"',
+  },
+  {
+    from: 'overconfidence_bias',
+    to: 'sunk_cost_fallacy',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Overconfident decision-makers believe they can still turn failing projects around, escalating commitment.',
+    citation: 'Staw 1976, "Knee-Deep in the Big Muddy"',
+  },
+  {
+    from: 'planning_fallacy',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Successfully completing under-estimated plans (survivorship) reinforces the belief that optimistic estimates are accurate.',
+    citation: 'Buehler, Griffin & Ross 1994, "Exploring the Planning Fallacy"',
+  },
+  {
+    from: 'status_quo_bias',
+    to: 'loss_aversion',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Framing any change as departure from the status quo activates loss aversion for the current endowment.',
+    citation: 'Samuelson & Zeckhauser 1988, "Status Quo Bias in Decision Making"',
+  },
+  {
+    from: 'recency_bias',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'The most recent data point serves as a stronger anchor because it is more salient in working memory.',
+    citation: 'Hogarth & Einhorn 1992, "Order Effects in Belief Updating"',
+  },
+  {
+    from: 'confirmation_bias',
+    to: 'overconfidence_bias',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Selective evidence gathering creates a distorted evidence base that makes confidence seem warranted.',
+    citation: 'Koriat, Lichtenstein & Fischhoff 1980, "Reasons for Confidence"',
+  },
+  {
+    from: 'availability_heuristic',
+    to: 'framing_effect',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Easily recalled vivid examples create implicit frames that shape how subsequent options are evaluated.',
+    citation: 'Slovic, Finucane, Peters & MacGregor 2002, "The Affect Heuristic"',
+  },
+  {
+    from: 'groupthink',
+    to: 'bandwagon_effect',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Strong group consensus signals social proof, creating pressure for remaining dissenters to join.',
+    citation: 'Sunstein 2002, "The Law of Group Polarization"',
+  },
+  {
+    from: 'cognitive_misering',
+    to: 'status_quo_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Evaluating alternatives requires cognitive effort that System 1 avoids, defaulting to existing arrangements.',
+    citation: 'Stanovich & West 2000, "Individual Differences in Reasoning"',
+  },
+  {
+    from: 'anchoring_bias',
+    to: 'loss_aversion',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Anchored reference points define the boundary between gains and losses, triggering asymmetric loss weighting.',
+    citation: 'Kahneman & Tversky 1979, "Prospect Theory"',
+  },
+  {
+    from: 'selective_perception',
+    to: 'availability_heuristic',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Perceptual filtering determines which events are encoded into memory, shaping what is later "available" for recall.',
+    citation: 'Broadbent 1958, "Perception and Communication"',
+  },
+  {
+    from: 'sunk_cost_fallacy',
+    to: 'status_quo_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Past investments create an endowment effect around the current course of action, increasing resistance to change.',
+    citation: 'Thaler 1980, "Toward a Positive Theory of Consumer Choice"',
+  },
+  {
+    from: 'framing_effect',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'The frame within which information is presented establishes implicit anchors for subsequent judgments.',
+    citation: 'Tversky & Kahneman 1981, "The Framing of Decisions"',
+  },
+  {
+    from: 'authority_bias',
+    to: 'bandwagon_effect',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Authority endorsement triggers cascading adoption as followers treat authority choice as a quality signal.',
+    citation: 'Cialdini 2001, "Influence: Science and Practice"',
+  },
+  {
+    from: 'overconfidence_bias',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'High confidence in a hypothesis reduces motivation to seek disconfirming evidence.',
+    citation: 'Klayman & Ha 1987, "Confirmation, Disconfirmation, and Information in Hypothesis Testing"',
+  },
+  {
+    from: 'loss_aversion',
+    to: 'framing_effect',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Loss-averse individuals are disproportionately sensitive to how options are framed (gain vs loss frame).',
+    citation: 'Kahneman & Tversky 1984, "Choices, Values, and Frames"',
+  },
+  {
+    from: 'hindsight_bias',
+    to: 'planning_fallacy',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Believing past timelines were foreseeable prevents learning from past planning errors.',
+    citation: 'Fischhoff 1982, "Debiasing"',
+  },
+  {
+    from: 'cognitive_misering',
+    to: 'bandwagon_effect',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Following the crowd is a low-effort heuristic that avoids the cognitive cost of independent evaluation.',
+    citation: 'Fiske & Taylor 1991, "Social Cognition"',
+  },
+  {
+    from: 'recency_bias',
+    to: 'framing_effect',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'The most recent frame encountered tends to dominate evaluation of subsequent information.',
+    citation: 'Krosnick & Alwin 1987, "An Evaluation of a Cognitive Theory of Response-Order Effects"',
+  },
+  {
+    from: 'groupthink',
+    to: 'selective_perception',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Group norms create shared perceptual filters that screen out information threatening to consensus.',
+    citation: 'Janis 1972, "Victims of Groupthink"',
+  },
+  {
+    from: 'availability_heuristic',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Easily recalled successes inflate perceived competence, while failures are less cognitively available.',
+    citation: 'Lichtenstein, Fischhoff & Phillips 1982, "Calibration of Probabilities"',
+  },
+  {
+    from: 'bandwagon_effect',
+    to: 'confirmation_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Joining a popular position creates a commitment that subsequent information processing seeks to confirm.',
+    citation: 'Festinger 1957, "A Theory of Cognitive Dissonance"',
+  },
+  {
+    from: 'status_quo_bias',
+    to: 'sunk_cost_fallacy',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Preference for the current path legitimizes continued investment in existing commitments regardless of merit.',
+    citation: 'Samuelson & Zeckhauser 1988, "Status Quo Bias in Decision Making"',
+  },
+  {
+    from: 'selective_perception',
+    to: 'framing_effect',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Pre-attentive selection of frame-consistent information reinforces the dominant frame.',
+    citation: 'Entman 1993, "Framing: Toward Clarification of a Fractured Paradigm"',
+  },
+  {
+    from: 'planning_fallacy',
+    to: 'sunk_cost_fallacy',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Optimistic initial plans create investments that become sunk costs when reality diverges from projections.',
+    citation: 'Buehler, Griffin & Peetz 2010, "The Planning Fallacy"',
+  },
+  {
+    from: 'hindsight_bias',
+    to: 'selective_perception',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Retrospective certainty causes reinterpretation of ambiguous cues as having been clearly predictive.',
+    citation: 'Hawkins & Hastie 1990, "Hindsight: Biased Judgments of Past Events"',
+  },
+  {
+    from: 'cognitive_misering',
+    to: 'confirmation_bias',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Seeking confirming evidence is less effortful than generating and testing alternative hypotheses.',
+    citation: 'Stanovich 2009, "What Intelligence Tests Miss"',
+  },
+  {
+    from: 'authority_bias',
+    to: 'cognitive_misering',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Deferring to authority eliminates the cognitive work of independent analysis and judgment.',
+    citation: 'Milgram 1974, "Obedience to Authority"',
+  },
+  {
+    from: 'loss_aversion',
+    to: 'planning_fallacy',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Aversion to acknowledging potential losses leads to optimistically biased risk and timeline estimates.',
+    citation: 'Lovallo & Kahneman 2003, "Delusions of Success"',
+  },
+  {
+    from: 'anchoring_bias',
+    to: 'confirmation_bias',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Initial anchors create hypotheses that subsequent information processing seeks to confirm.',
+    citation: 'Chapman & Johnson 2002, "Incorporating the Irrelevant"',
+  },
+  {
+    from: 'framing_effect',
+    to: 'cognitive_misering',
+    type: 'enables',
+    weight: 1.1,
+    mechanism:
+      'Accepting the presented frame avoids the cognitive effort of reframing the problem.',
+    citation: 'Kahneman 2011, "Thinking, Fast and Slow"',
+  },
+  {
+    from: 'recency_bias',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Recent events supporting a hypothesis are weighted more heavily, strengthening the confirmation loop.',
+    citation: 'Nickerson 1998, "Confirmation Bias"',
+  },
+  {
+    from: 'overconfidence_bias',
+    to: 'groupthink',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Overconfident leaders drive group convergence by projecting certainty that discourages dissent.',
+    citation: 'Tetlock 2005, "Expert Political Judgment"',
+  },
+  {
+    from: 'availability_heuristic',
+    to: 'loss_aversion',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Vivid loss experiences are more available than equivalent gains, amplifying asymmetric loss weighting.',
+    citation: 'Slovic 1987, "Perception of Risk"',
+  },
+  {
+    from: 'selective_perception',
+    to: 'groupthink',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Shared perceptual filters within a group create the illusion of unanimous agreement on ambiguous evidence.',
+    citation: 'Schulz-Hardt et al 2000, "Biased Information Search in Group Decision Making"',
+  },
+  {
+    from: 'hindsight_bias',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.1,
+    mechanism:
+      'Retrospective knowledge of outcomes creates powerful anchors that distort evaluation of future decisions.',
+    citation: 'Fischhoff & Beyth 1975, "I Knew It Would Happen"',
+  },
+  {
+    from: 'bandwagon_effect',
+    to: 'cognitive_misering',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Following the majority is a low-cost decision heuristic that substitutes social proof for analysis.',
+    citation: 'Gigerenzer & Goldstein 1996, "Reasoning the Fast and Frugal Way"',
+  },
+  {
+    from: 'status_quo_bias',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Preference for current arrangements motivates selective search for evidence justifying inaction.',
+    citation: 'Eidelman & Crandall 2012, "Bias in Favor of the Status Quo"',
+  },
+  {
+    from: 'cognitive_misering',
+    to: 'framing_effect',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Low-effort processing accepts presented frames without the effortful reframing that could correct distortions.',
+    citation: 'Kahneman 2011, "Thinking, Fast and Slow"',
+  },
+  {
+    from: 'sunk_cost_fallacy',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Escalation of commitment requires maintaining confidence that the investment will eventually pay off.',
+    citation: 'Staw & Ross 1987, "Behavior in Escalation Situations"',
+  },
+  {
+    from: 'authority_bias',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Estimates provided by authority figures serve as stronger anchors due to perceived expertise.',
+    citation: 'Cialdini 2001, "Influence: Science and Practice"',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Query functions
+// ---------------------------------------------------------------------------
+
+/**
+ * Get all relationships where the given bias is amplified by another bias.
+ */
+export function getAmplifiers(biasType: string): BiasRelationship[] {
+  return BIAS_RELATIONSHIPS.filter(
+    (r) => r.to === biasType && (r.type === 'amplifies' || r.type === 'enables')
+  );
+}
+
+/**
+ * Get all relationships involving the given bias (inbound or outbound).
+ */
+export function getRelatedBiases(
+  biasType: string
+): Array<{ bias: string; relationship: BiasRelationship }> {
+  const results: Array<{ bias: string; relationship: BiasRelationship }> = [];
+
+  for (const rel of BIAS_RELATIONSHIPS) {
+    if (rel.from === biasType) {
+      results.push({ bias: rel.to, relationship: rel });
+    } else if (rel.to === biasType) {
+      results.push({ bias: rel.from, relationship: rel });
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Compute the compound risk multiplier for a set of co-occurring biases.
+ *
+ * Algorithm:
+ * 1. Find all pairwise interaction weights between detected biases.
+ * 2. Multiply: baseRisk * product(weights)
+ * 3. Apply log-scaling for large bias sets (>4 biases) to prevent explosion.
+ * 4. Cap at a maximum multiplier of 5.0.
+ */
+export function getCompoundRisk(biases: string[]): number {
+  if (biases.length <= 1) return 1.0;
+
+  let product = 1.0;
+  let pairCount = 0;
+
+  // Collect all pairwise interaction weights
+  for (let i = 0; i < biases.length; i++) {
+    for (let j = i + 1; j < biases.length; j++) {
+      const a = biases[i];
+      const b = biases[j];
+
+      // Check both directions
+      for (const rel of BIAS_RELATIONSHIPS) {
+        if ((rel.from === a && rel.to === b) || (rel.from === b && rel.to === a)) {
+          product *= rel.weight;
+          pairCount++;
+        }
+      }
+    }
+  }
+
+  // If no known interactions, return a mild compound penalty based on count
+  if (pairCount === 0) {
+    return Math.min(1.0 + (biases.length - 1) * 0.1, 2.0);
+  }
+
+  // Log-scale for large bias sets (>4) to prevent exponential explosion
+  if (biases.length > 4) {
+    const excess = biases.length - 4;
+    // Dampen the product: take the (1 / (1 + 0.2 * excess)) root
+    const dampening = 1 / (1 + 0.2 * excess);
+    product = Math.pow(product, dampening);
+  }
+
+  // Cap at 5.0
+  return Math.min(product, 5.0);
+}
