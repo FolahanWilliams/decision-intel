@@ -21,7 +21,7 @@ const TIMEFRAME_OPTIONS = [
   { days: 60, label: '60 days', description: 'Standard review cycle' },
   { days: 90, label: '90 days', description: 'Quarterly review' },
   { days: 180, label: '6 months', description: 'Strategic decision' },
-  { days: 365, label: '1 year', description: 'Long-term investment' },
+  { days: 365, label: '1 year', description: 'Long-term strategic' },
 ] as const;
 
 /**

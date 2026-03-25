@@ -177,7 +177,7 @@ export function DecisionPriorCapture({
           <textarea
             value={defaultAction}
             onChange={e => setDefaultAction(e.target.value)}
-            placeholder="e.g. Proceed with the investment at the proposed valuation..."
+            placeholder="e.g. Proceed with the proposal as presented..."
             rows={2}
             style={{
               width: '100%',

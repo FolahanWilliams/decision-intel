@@ -145,7 +145,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
               <input
                 value={newTitle}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTitle(e.target.value)}
-                placeholder="Room title (e.g. Q4 Investment Review)"
+                placeholder="Room title (e.g. Q4 Strategy Review)"
                 style={{
                   flex: 1,
                   padding: '8px 12px',
