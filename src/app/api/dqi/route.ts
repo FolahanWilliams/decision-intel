@@ -165,18 +165,10 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    // Wire compound scoring if available in analysis metadata
-    try {
-      const metaRecord = await prisma.$queryRawUnsafe<Array<{ metadata: unknown }>>(
-        `SELECT metadata FROM "Analysis" WHERE id = $1 LIMIT 1`,
-        analysisId,
-      );
-      const meta = metaRecord?.[0]?.metadata as { compoundScore?: number } | null;
-      if (meta?.compoundScore !== undefined) {
-        dqiInput.compoundScore = meta.compoundScore;
-      }
-    } catch {
-      // metadata column may not exist (schema drift) — continue without compound score
+    // Wire compound scoring if available in compliance JSON
+    const compoundData = (complianceRaw as { compoundScoring?: { calibratedScore?: number } } | null)?.compoundScoring;
+    if (compoundData?.calibratedScore !== undefined) {
+      dqiInput.compoundScore = compoundData.calibratedScore;
     }
 
     // ── Compute DQI ───────────────────────────────────────────────────

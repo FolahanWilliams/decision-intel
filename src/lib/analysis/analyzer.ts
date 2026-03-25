@@ -129,11 +129,13 @@ export async function analyzeDocument(
                 ? result.factCheck
                 : FactCheckSchema.parse({})
             ),
-            compliance: toPrismaJson(
-              ComplianceSchema.safeParse(result.compliance).success
+            compliance: toPrismaJson({
+              ...(ComplianceSchema.safeParse(result.compliance).success
                 ? result.compliance
-                : ComplianceSchema.parse({})
-            ),
+                : ComplianceSchema.parse({})),
+              ...(result.compoundScoring ? { compoundScoring: result.compoundScoring } : {}),
+              ...(result.bayesianPriors ? { bayesianPriors: result.bayesianPriors } : {}),
+            }),
             preMortem: toPrismaJson(result.preMortem),
             sentiment: toPrismaJson(
               SentimentSchema.safeParse(result.sentiment).success

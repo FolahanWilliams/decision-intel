@@ -371,11 +371,13 @@ export async function POST(request: NextRequest) {
                       ? report.factCheck
                       : FactCheckSchema.parse({})
                   ),
-                  compliance: toPrismaJson(
-                    ComplianceSchema.safeParse(report.compliance).success
-                      ? report.compliance
-                      : ComplianceSchema.parse({})
-                  ),
+                  compliance: toPrismaJson({
+                    ...(ComplianceSchema.safeParse(report.compliance).success
+                      ? (report.compliance as Record<string, unknown>)
+                      : ComplianceSchema.parse({})),
+                    ...(report.compoundScoring ? { compoundScoring: report.compoundScoring } : {}),
+                    ...(report.bayesianPriors ? { bayesianPriors: report.bayesianPriors } : {}),
+                  }),
                   preMortem: toPrismaJson(report.preMortem),
                   sentiment: toPrismaJson(
                     SentimentSchema.safeParse(report.sentiment).success

@@ -1428,6 +1428,23 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
               .map(c => ({ company: c.company, outcome: c.outcome, biasTypes: c.biasTypes })),
           }
         : undefined,
+      compoundScoring: compoundScoreResult ? {
+        calibratedScore: compoundScoreResult.calibratedScore,
+        compoundMultiplier: compoundScoreResult.compoundMultiplier,
+        contextAdjustment: compoundScoreResult.contextAdjustment,
+        confidenceDecay: compoundScoreResult.confidenceDecay,
+        amplifyingInteractions: compoundScoreResult.biasScores
+          .filter(b => b.interactionMultiplier > 1.05)
+          .map(b => ({ bias: b.biasType, multiplier: b.interactionMultiplier, interactions: b.contributingInteractions })),
+        adjustments: compoundScoreResult.adjustments,
+      } : undefined,
+      bayesianPriors: bayesianResult ? {
+        adjustedScore: bayesianResult.adjustedScore,
+        beliefDelta: bayesianResult.beliefDelta,
+        informationGain: bayesianResult.informationGain,
+        priorInfluence: bayesianResult.priorInfluence,
+        biasAdjustments: bayesianResult.biasAdjustments,
+      } : undefined,
     } satisfies AnalysisResult,
   };
 }
