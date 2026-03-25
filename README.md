@@ -86,6 +86,7 @@ Automated regulatory alignment checking:
 - **FCA Consumer Duty** — Products, price, support, understanding outcomes with framework-specific scoring
 - **SOX Compliance** — Sarbanes-Oxley internal controls assessment
 - **Basel III** — Banking regulatory capital and risk requirements
+- **EU AI Act** — Automated decision risk assessment and transparency requirements
 - **SEC disclosure** requirements
 - **GDPR readiness** — Automated PII anonymization before analysis
 - **Remediation Plans** — Auto-generated remediation steps for failing assessments
@@ -102,6 +103,87 @@ Generates failure scenarios *before* decisions are made:
 - **SWOT Analysis** — Structured strengths/weaknesses/opportunities/threats
 - **Cognitive Blind Spots** — Red-team counter-arguments with verified sources
 - **Sentiment Analysis** — Emotional tone scoring across document sections
+
+### Proprietary Scoring & Intelligence Engine
+
+The platform's core differentiator: a deterministic, mathematically rigorous scoring layer that runs **after** LLM analysis. Competitors can call the same LLMs — they cannot replicate the scoring math, the ontology, or the 113-case statistical database.
+
+#### Decision Quality Index (DQI)
+
+A branded **0-100 composite score** (like FICO for decisions) with letter grades (A-F) computed from 5 weighted dimensions:
+
+| Component | Weight | Measures |
+|:----------|:-------|:---------|
+| **Bias Load** | 30% | Severity-weighted bias count vs. document complexity |
+| **Noise Level** | 20% | Inter-judge variance from triple-judge noise measurement |
+| **Evidence Quality** | 20% | Fact-check verification rate and source reliability |
+| **Process Maturity** | 15% | Prior submitted, outcomes tracked, dissent present |
+| **Compliance Risk** | 15% | Regulatory framework violation score |
+
+Grades: **A** (85-100), **B** (70-84), **C** (55-69), **D** (40-54), **F** (0-39). Surfaced as an SVG badge on every analysis with component breakdown and top improvement recommendation.
+
+#### Compound Scoring Engine
+
+Deterministic post-LLM scoring that transforms raw bias detections into calibrated, context-adjusted risk scores:
+
+- **16x16 Interaction Matrix** — 256 empirically-grounded pairwise interaction weights between all cognitive biases (e.g., confirmation_bias + groupthink = 1.35x amplification)
+- **Context Multipliers** — Monetary stakes (1.0-1.6x), absent dissent (+0.25), time pressure (+0.15), group size effects
+- **Detectability Weighting** — Hard-to-detect biases (low detectability in the ontology) get 3-8% severity boost when found at high confidence — finding them is more meaningful
+- **Historical Correlation** — Cross-references detected bias combinations against the 113-case failure database to compute empirical amplification ratios
+- **Confidence Decay** — Sigmoid temporal decay (documents older than 6 months get progressively reduced confidence)
+- **Org Calibration** — Per-organization learned weights that adjust severity based on historical outcomes
+
+#### Bayesian Prior Integration
+
+When users submit a **Decision Prior** (pre-analysis belief and confidence), the platform applies formal Bayesian updating:
+
+- **Posterior Confidence** — Research-backed base rates (per bias) combined with LLM detection to produce calibrated posterior probabilities
+- **Belief Delta** — Measures how much the analysis should shift the decision-maker's position
+- **Information Gain** — KL divergence quantifying the new information in the analysis vs. the prior
+- **Per-Bias Adjustment** — Each detected bias gets individual prior/posterior confidence with direction (increased/decreased/unchanged) and reasoning
+
+#### Toxic Combination Detection
+
+Inspired by **Wiz's cloud security graph** — detects when multiple individually-benign biases co-occur with contextual risk factors to create compound decision risk. Surfaces only the **top ~5% of risky decisions**, eliminating alert fatigue:
+
+- **7 Named Patterns**: Echo Chamber, Sunk Ship, Blind Sprint, Yes Committee, Optimism Trap, Status Quo Lock, Recency Spiral
+- **Context Amplifiers**: Monetary stakes, absent dissent, time pressure, unanimous consensus, small group size
+- **Historical Failure Rates**: Each pattern linked to real-world failure cases with documented outcomes
+- **Org Calibration**: Pattern thresholds and severity weights adjust from your organization's actual decision outcomes
+- **Actionable Workflow**: Acknowledge, investigate, or mitigate detected patterns with audit trail
+
+#### Bias Interaction Ontology
+
+A proprietary **directed graph** encoding empirically-grounded relationships between cognitive biases:
+
+- **5 Interaction Types**: amplifies, enables, masks, correlates, mitigates — each with weight (0.0-2.0) and academic citation
+- **Dual-Process Framework**: Every bias tagged as System 1 (fast/intuitive), System 2 (slow/deliberate), or both (Kahneman)
+- **Research-Backed Metadata**: Per-bias prevalence (base rate in organizations: 0.60-0.85), detectability (how hard to find: 0.20-0.55), and cognitive category
+- **5 Industry Profiles**: Financial services, healthcare, legal, technology, energy — each with industry-specific additional biases and risk multipliers
+
+#### Cross-Case Correlation Engine
+
+**113 annotated real-world decision failures** sourced from SEC filings, NTSB reports, GAO audits, FDA actions, FCA enforcement, and academic case studies — spanning 8 industries:
+
+| Industry | Cases | Avg Impact | Catastrophic Rate |
+|:---------|:------|:-----------|:------------------|
+| Aerospace | 9 | 91.1 | 89% |
+| Energy | 11 | 90.3 | 100% |
+| Government | 13 | 88.7 | 69% |
+| Automotive | 7 | 87.3 | 71% |
+| Financial Services | 28 | 85.2 | 79% |
+| Healthcare | 11 | 84.4 | 73% |
+| Technology | 23 | 77.3 | 70% |
+| Retail | 11 | 73.4 | 73% |
+
+The engine computes:
+- **Bias Co-Occurrence Matrix** — Which bias pairs amplify each other (e.g., loss_aversion + planning_fallacy = 1.2x amplification)
+- **Industry Risk Profiles** — Per-industry top biases, dominant toxic patterns, context factor distributions
+- **Temporal Patterns** — Detection lag shrinking from 43.5 years (1970s) to 0.2 years (2020s)
+- **Severity Predictors** — Factors most predictive of catastrophic outcomes, ranked by statistical lift
+- **Context Amplifiers** — Which conditions worsen failure severity (very_high_stakes = 1.12x lift)
+
+These correlations feed directly into the compound scoring engine via `computeCorrelationMultiplier()`, giving every analysis the benefit of 113 documented failures.
 
 ### Boardroom Simulation (Decision Twin)
 
@@ -179,7 +261,7 @@ Real-time intelligence enrichment from external sources:
 
 - **News & Signals** — 14 RSS feeds across psychology, business, regulatory, industry, and academic sources (HBR, McKinsey, MIT Sloan, SEC EDGAR, FCA, Reuters, BBC Business, SSRN, and more)
 - **Research Papers** — Semantic Scholar integration for academic research matching
-- **Case Studies** — Historical decision failures (Enron, Nokia, etc.) matched by bias type
+- **Case Studies** — 113 annotated historical decision failures across 8 industries (Lehman Brothers, Boeing 737 MAX, Fukushima, VW Dieselgate, etc.) matched by bias type, toxic pattern, and industry
 - **Macro Context** — FRED economic indicators for market backdrop
 - **Intelligence Hub** — Dedicated dashboard page with filterable news grid, research counts, and freshness monitoring
 

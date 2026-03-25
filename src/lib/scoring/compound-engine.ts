@@ -12,6 +12,8 @@
 import {
   getInteractionWeight as getMatrixWeight,
 } from '@/lib/ontology/interaction-matrix';
+import { BIAS_NODES } from '@/lib/ontology/bias-graph';
+import { computeCorrelationMultiplier } from '@/lib/data/case-correlations';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -172,7 +174,16 @@ function computeBiasCompoundSeverity(
   allBiases: DetectedBias[],
   interactionWeights?: Record<string, number>,
 ): BiasCompoundScore {
-  const rawSeverity = SEVERITY_NUMERIC[bias.severity] ?? 8;
+  let rawSeverity = SEVERITY_NUMERIC[bias.severity] ?? 8;
+
+  // Apply detectability boost from ontology — hard-to-detect biases found
+  // at high confidence are more meaningful (3-8% severity adjustment)
+  const biasNode = BIAS_NODES.find(n => n.id === bias.type);
+  if (biasNode) {
+    const detectabilityBoost = 1.0 + (1.0 - biasNode.detectability) * 0.15;
+    rawSeverity *= detectabilityBoost;
+  }
+
   let interactionMultiplier = 1.0;
   const contributingInteractions: string[] = [];
 
@@ -337,7 +348,26 @@ export function computeCompoundScore(
     bs.compoundSeverity *= contextAdjustment;
   }
 
-  // 5. Confidence decay based on document age
+  // 5. Historical correlation adjustment from failure case database
+  const correlationResult = computeCorrelationMultiplier(
+    detectedBiases.map(b => b.type),
+    {
+      monetaryStakes: context.monetaryStakes,
+      dissentAbsent: !context.dissentPresent,
+      timePressure: context.timelineWeeks !== null && context.timelineWeeks < 4,
+      participantCount: context.participantCount,
+    },
+  );
+
+  if (correlationResult.multiplier > 1.0) {
+    adjustments.push({
+      source: 'historical_correlation',
+      description: `${correlationResult.matchedPairs.length} bias pair(s) historically amplify severity (×${correlationResult.multiplier})`,
+      delta: -(correlationResult.multiplier - 1.0) * 5,
+    });
+  }
+
+  // 6. Confidence decay based on document age
   const confidenceDecay = computeConfidenceDecay(context.documentAgeWeeks);
   if (confidenceDecay < 1.0) {
     adjustments.push({
@@ -347,7 +377,7 @@ export function computeCompoundScore(
     });
   }
 
-  // 6. Compute calibrated score
+  // 7. Compute calibrated score
   // Start from raw score, apply compound penalty differential
   const penaltyDelta = (totalCompoundPenalty * contextAdjustment - totalRawPenalty) * 0.3;
   const calibratedScore = Math.max(0, Math.min(100, rawQualityScore - penaltyDelta));
