@@ -72,6 +72,61 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function PATCH(req: NextRequest) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { id, strength, confidence, description, metadata } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'id is required' }, { status: 400 });
+    }
+
+    // Verify the edge exists and user has access (same org)
+    const existing = await prisma.decisionEdge.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Edge not found' }, { status: 404 });
+    }
+
+    const updateData: Record<string, unknown> = {};
+    if (typeof strength === 'number') updateData.strength = Math.max(0, Math.min(1, strength));
+    if (typeof confidence === 'number') updateData.confidence = Math.max(0, Math.min(1, confidence));
+    if (typeof description === 'string') updateData.description = description;
+    if (metadata !== undefined) updateData.metadata = metadata;
+
+    // "Confirm" pattern: setting confidence to 1.0 marks as manually confirmed
+    if (confidence === 1.0) {
+      updateData.isManual = true;
+      updateData.createdBy = user.id;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: 'No update fields provided' }, { status: 400 });
+    }
+
+    const updated = await prisma.decisionEdge.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    log.error('Failed to update edge:', error);
+    return NextResponse.json(
+      { error: 'Failed to update edge' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(req: NextRequest) {
   const supabase = await createClient();
   const {

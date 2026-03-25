@@ -16,6 +16,7 @@ import { createLogger } from '@/lib/utils/logger';
 import type { NudgeDefinition, NudgeTriggerContext, NudgeSeverity } from '@/types/human-audit';
 import type { BiasDetectionResult } from '@/types';
 import type { NudgeThresholdCalibration } from '@/lib/learning/feedback-loop';
+import { prisma } from '@/lib/prisma';
 
 const log = createLogger('NudgeEngine');
 
@@ -66,6 +67,10 @@ export async function generateNudges(
   // 7. Toxic Combination — compound risk from co-occurring biases + context
   const toxicNudge = checkToxicCombination(auditResult);
   if (toxicNudge) nudges.push(toxicNudge);
+
+  // 8. Graph Pattern Warning — decision shares bias patterns with recent failures in the graph
+  const graphNudge = await checkGraphPattern(context);
+  if (graphNudge) nudges.push(graphNudge);
 
   // Escalate critical nudges from Slack decisions to Slack delivery
   if (decision.source === 'slack' && decision.channel) {
@@ -356,4 +361,122 @@ function checkToxicCombination(
   }
 
   return null;
+}
+
+// ─── Graph Pattern Nudge ──────────────────────────────────────────────────────
+
+async function checkGraphPattern(context: NudgeTriggerContext): Promise<NudgeDefinition | null> {
+  try {
+    const decision = context.decision as unknown as Record<string, unknown>;
+    const decisionId = decision?.id as string | undefined;
+    const orgId = decision?.orgId as string | undefined;
+    if (!decisionId || !orgId) return null;
+
+    // Find edges connecting this decision to other nodes
+    const edges = await prisma.decisionEdge.findMany({
+      where: {
+        orgId,
+        OR: [{ sourceId: decisionId }, { targetId: decisionId }],
+        edgeType: { in: ['shared_bias', 'escalated_from', 'similar_to'] },
+      },
+      select: { sourceId: true, targetId: true, edgeType: true, strength: true },
+      take: 20,
+    });
+
+    if (edges.length < 2) return null;
+
+    // Check if connected decisions have poor outcomes
+    const connectedIds = edges.map(e =>
+      e.sourceId === decisionId ? e.targetId : e.sourceId
+    );
+
+    const failedOutcomes = await prisma.decisionOutcome.count({
+      where: {
+        analysisId: { in: connectedIds },
+        outcome: { in: ['failure', 'negative', 'poor'] },
+      },
+    });
+
+    if (failedOutcomes === 0) return null;
+
+    const failRate = failedOutcomes / connectedIds.length;
+    const biasEdges = edges.filter(e => e.edgeType === 'shared_bias').length;
+
+    if (failRate < 0.5 && biasEdges < 2) return null;
+
+    return {
+      nudgeType: 'graph_pattern_warning',
+      triggerReason: `This decision shares ${biasEdges} bias pattern(s) with ${failedOutcomes} previously failed decision(s) in the knowledge graph.`,
+      message: `Graph analysis detected a concerning pattern: ${failedOutcomes} connected decision(s) with similar characteristics ended in failure. Review past outcomes before proceeding.`,
+      severity: failRate >= 0.5 ? 'critical' : 'warning',
+      channel: 'dashboard',
+    };
+  } catch (error) {
+    const code = (error as { code?: string })?.code;
+    if (code === 'P2021' || code === 'P2022') return null;
+    log.warn('Graph pattern check failed (non-critical):', error);
+    return null;
+  }
+}
+
+/**
+ * Standalone graph-nudge generator for document analyses.
+ * Called from the post-analysis hook (after edge inference) to generate
+ * graph-pattern nudges for analyses that aren't HumanDecisions.
+ */
+export async function checkGraphNudgesForAnalysis(
+  analysisId: string,
+  orgId: string | null
+): Promise<number> {
+  if (!orgId) return 0;
+
+  try {
+    const edges = await prisma.decisionEdge.findMany({
+      where: {
+        orgId,
+        OR: [{ sourceId: analysisId }, { targetId: analysisId }],
+        edgeType: { in: ['shared_bias', 'similar_to'] },
+      },
+      select: { sourceId: true, targetId: true, edgeType: true, strength: true },
+      take: 20,
+    });
+
+    if (edges.length < 2) return 0;
+
+    const connectedIds = edges.map(e =>
+      e.sourceId === analysisId ? e.targetId : e.sourceId
+    );
+
+    const failedOutcomes = await prisma.decisionOutcome.count({
+      where: {
+        analysisId: { in: connectedIds },
+        outcome: { in: ['failure', 'negative', 'poor'] },
+      },
+    });
+
+    if (failedOutcomes === 0) return 0;
+
+    const biasEdges = edges.filter(e => e.edgeType === 'shared_bias').length;
+    if (biasEdges < 2) return 0;
+
+    // Create nudge record directly (no HumanDecision pipeline)
+    await prisma.nudge.create({
+      data: {
+        nudgeType: 'graph_pattern_warning',
+        message: `Graph analysis: ${failedOutcomes} connected decision(s) with shared bias patterns ended in failure. This analysis shares ${biasEdges} bias pattern(s) with them.`,
+        severity: failedOutcomes >= 2 ? 'critical' : 'warning',
+        triggerReason: `Analysis ${analysisId} shares bias patterns with ${failedOutcomes} failed decision(s).`,
+        channel: 'dashboard',
+        // Link to a HumanDecision if one exists for this analysis, otherwise use a placeholder
+        humanDecisionId: analysisId,
+      },
+    });
+
+    return 1;
+  } catch (error) {
+    const code = (error as { code?: string })?.code;
+    if (code === 'P2021' || code === 'P2022') return 0;
+    log.warn('Graph nudge check for analysis failed (non-critical):', error);
+    return 0;
+  }
 }

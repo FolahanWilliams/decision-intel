@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { cn } from '@/lib/utils';
+import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 
 interface PageProps {
   params: {
@@ -131,6 +133,23 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
           </div>
         </div>
       )}
+
+      {/* Decision Graph Links */}
+      <div className="flex items-center gap-4 mt-8 mb-4">
+        <Link
+          href={`/dashboard/decision-graph?highlight=${params.id}`}
+          className={cn(
+            'inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium',
+            'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+            'hover:bg-blue-500/20 transition-colors'
+          )}
+        >
+          View in Decision Graph
+        </Link>
+      </div>
+
+      {/* Related Decisions from Knowledge Graph */}
+      <RelatedDecisions analysisId={params.id} />
     </div>
   );
 }

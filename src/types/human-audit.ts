@@ -36,7 +36,8 @@ export type NudgeType =
   | 'noise_check'
   | 'shallow_verification'
   | 'pre_decision_coaching'
-  | 'toxic_combination';
+  | 'toxic_combination'
+  | 'graph_pattern_warning';
 
 export type NudgeSeverity = 'info' | 'warning' | 'critical';
 
@@ -175,6 +176,11 @@ export const NUDGE_TEMPLATES: Record<NudgeType, { icon: string; template: string
     icon: '\u{1F6A8}',
     template:
       'Toxic combination detected: {patternLabel}. {biasCount} co-occurring biases combined with {contextSummary} create a compound risk pattern historically associated with {failureRate}% failure rate.',
+  },
+  graph_pattern_warning: {
+    icon: '\u{1F578}\u{FE0F}',
+    template:
+      'Graph analysis detected a concerning pattern: connected decisions with similar characteristics ended in failure. Review past outcomes before proceeding.',
   },
 };
 

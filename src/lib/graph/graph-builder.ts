@@ -273,9 +273,9 @@ export async function buildDecisionGraph(params: {
   log.debug(`Fetched ${humanDecisions.length} human decision nodes`);
 
   // ── Step 3: Person nodes (inferred) ──────────────────────────────────────
-  // Extract unique participant names from DecisionFrame.stakeholders and
-  // HumanDecision.participants. Only create person nodes for names appearing
-  // in 2+ decisions.
+  // Extract unique participant names from DecisionFrame.stakeholders,
+  // HumanDecision.participants, and Meeting.participants.
+  // Only create person nodes for names appearing in 2+ decisions.
 
   const personAppearances = new Map<string, string[]>(); // normalized name -> decision node ids
 
@@ -286,6 +286,36 @@ export async function buildDecisionGraph(params: {
       if (!name) continue;
       if (!personAppearances.has(name)) personAppearances.set(name, []);
       personAppearances.get(name)!.push(node.id);
+    }
+  }
+
+  // Also extract participants from Meetings (even those without HumanDecisions)
+  try {
+    const meetings = await prisma.meeting.findMany({
+      where: {
+        orgId: params.orgId,
+        createdAt: { gte: since },
+        participants: { isEmpty: false },
+      },
+      select: { id: true, participants: true, humanDecisionId: true },
+      take: 100,
+    });
+
+    for (const meeting of meetings) {
+      // Use the linked HumanDecision ID if available, else the meeting ID
+      const nodeId = meeting.humanDecisionId || `meeting_${meeting.id}`;
+      for (const raw of meeting.participants) {
+        const name = raw.toLowerCase().trim();
+        if (!name) continue;
+        if (!personAppearances.has(name)) personAppearances.set(name, []);
+        const ids = personAppearances.get(name)!;
+        if (!ids.includes(nodeId)) ids.push(nodeId);
+      }
+    }
+  } catch (meetingErr) {
+    const code = (meetingErr as { code?: string })?.code;
+    if (code !== 'P2021' && code !== 'P2022') {
+      log.warn('Meeting participant extraction failed (non-critical):', meetingErr);
     }
   }
 

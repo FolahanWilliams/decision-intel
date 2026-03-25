@@ -66,6 +66,7 @@ export const NUDGE_TYPE_LABELS: Record<string, string> = {
   pre_mortem_trigger: 'Pre-Mortem Trigger',
   noise_check: 'Noise Check',
   shallow_verification: 'Shallow Verification',
+  graph_pattern_warning: 'Graph Pattern Warning',
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
