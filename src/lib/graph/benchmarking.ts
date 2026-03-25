@@ -49,8 +49,9 @@ export async function computeOrgBenchmarks(orgId: string): Promise<OrgBenchmark[
     const outcomeCount = orgOutcomes.filter(o => o.outcome !== 'too_early').length;
     const successRate = outcomeCount > 0 ? Math.round((successCount / outcomeCount) * 100) : 0;
 
-    const avgImpact = orgOutcomes.filter(o => o.impactScore != null).length > 0
-      ? Math.round(orgOutcomes.filter(o => o.impactScore != null).reduce((s, o) => s + (o.impactScore || 0), 0) / orgOutcomes.filter(o => o.impactScore != null).length)
+    const withImpact = orgOutcomes.filter(o => o.impactScore != null);
+    const avgImpact = withImpact.length > 0
+      ? Math.round(withImpact.reduce((s, o) => s + (o.impactScore || 0), 0) / withImpact.length)
       : 0;
 
     const graphDensity = orgAnalyses > 0 ? Math.round((orgEdges / orgAnalyses) * 10) / 10 : 0;

@@ -96,7 +96,7 @@ export async function generateRecommendations(
           description,
           relatedAnalysisId: conn.id,
           relatedDocumentId: conn.document.id,
-          confidence: Math.min(1, scoreDiff / 50),
+          confidence: Math.min(1, Math.max(0, scoreDiff / 50)),
           outcome: conn.outcome.outcome,
           scoreDiff,
         });

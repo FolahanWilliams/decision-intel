@@ -31,13 +31,19 @@ export async function exportToPng(svgElement: SVGSVGElement): Promise<Blob> {
   const url = URL.createObjectURL(svgBlob);
 
   return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Image load timeout'));
+    }, 10000);
+
     const img = new Image();
     img.onload = () => {
+      clearTimeout(timeout);
       const canvas = document.createElement('canvas');
       canvas.width = svgElement.clientWidth * 2;
       canvas.height = svgElement.clientHeight * 2;
       const ctx = canvas.getContext('2d');
-      if (!ctx) { reject(new Error('Canvas context unavailable')); return; }
+      if (!ctx) { URL.revokeObjectURL(url); reject(new Error('Canvas context unavailable')); return; }
       ctx.fillStyle = '#09090b';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.scale(2, 2);
@@ -48,7 +54,11 @@ export async function exportToPng(svgElement: SVGSVGElement): Promise<Blob> {
         else reject(new Error('Failed to create PNG blob'));
       }, 'image/png');
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Failed to load SVG')); };
+    img.onerror = () => {
+      clearTimeout(timeout);
+      URL.revokeObjectURL(url);
+      reject(new Error('Failed to load SVG'));
+    };
     img.src = url;
   });
 }
