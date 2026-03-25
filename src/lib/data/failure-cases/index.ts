@@ -3,6 +3,14 @@ import { FINANCIAL_SERVICES_CASES } from './financial-services';
 import { TECHNOLOGY_CASES } from './technology';
 import { HEALTHCARE_CASES, ENERGY_INDUSTRIAL_CASES } from './healthcare-energy';
 import { RETAIL_CASES, GOVERNMENT_DEFENSE_CASES, ADDITIONAL_FINANCIAL_CASES, ADDITIONAL_TECH_CASES } from './retail-government';
+import { FINANCIAL_EXTENDED_CASES } from './financial-extended';
+import { TECHNOLOGY_EXTENDED_CASES } from './technology-extended';
+import { HEALTHCARE_EXTENDED_CASES } from './healthcare-extended';
+import { AEROSPACE_DEFENSE_CASES } from './aerospace-defense';
+import { ENERGY_INFRASTRUCTURE_CASES } from './energy-infrastructure';
+import { GOVERNMENT_POLICY_CASES } from './government-policy';
+import { RETAIL_CONSUMER_EXTENDED_CASES } from './retail-consumer-extended';
+import { AUTOMOTIVE_MANUFACTURING_CASES } from './automotive-manufacturing';
 
 export type { FailureCase } from './types';
 
@@ -15,6 +23,14 @@ export const FAILURE_CASES: FailureCase[] = [
   ...GOVERNMENT_DEFENSE_CASES,
   ...ADDITIONAL_FINANCIAL_CASES,
   ...ADDITIONAL_TECH_CASES,
+  ...FINANCIAL_EXTENDED_CASES,
+  ...TECHNOLOGY_EXTENDED_CASES,
+  ...HEALTHCARE_EXTENDED_CASES,
+  ...AEROSPACE_DEFENSE_CASES,
+  ...ENERGY_INFRASTRUCTURE_CASES,
+  ...GOVERNMENT_POLICY_CASES,
+  ...RETAIL_CONSUMER_EXTENDED_CASES,
+  ...AUTOMOTIVE_MANUFACTURING_CASES,
 ];
 
 export function getCasesByIndustry(industry: string): FailureCase[] {
@@ -26,7 +42,12 @@ export function getCasesByBias(biasType: string): FailureCase[] {
 }
 
 export function getCasesByToxicPattern(patternLabel: string): FailureCase[] {
-  return FAILURE_CASES.filter((c) => c.toxicCombinations.includes(patternLabel));
+  const normalized = patternLabel.replace(/^The\s+/i, '').toLowerCase();
+  return FAILURE_CASES.filter((c) =>
+    c.toxicCombinations.some(
+      (p) => p.replace(/^The\s+/i, '').toLowerCase() === normalized,
+    ),
+  );
 }
 
 export function searchCases(query: string): FailureCase[] {

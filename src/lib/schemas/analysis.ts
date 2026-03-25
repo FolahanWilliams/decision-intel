@@ -97,3 +97,38 @@ export const MemorySchema = z
     similarEvents: z.array(z.record(z.string(), z.unknown())).default([]),
   })
   .optional();
+
+export const CompoundScoringSchema = z
+  .object({
+    calibratedScore: z.number(),
+    compoundMultiplier: z.number(),
+    contextAdjustment: z.number(),
+    confidenceDecay: z.number(),
+    amplifyingInteractions: z.array(z.object({
+      bias: z.string(),
+      multiplier: z.number(),
+      interactions: z.array(z.string()),
+    })).default([]),
+    adjustments: z.array(z.object({
+      source: z.string(),
+      delta: z.number(),
+      description: z.string(),
+    })).default([]),
+  })
+  .optional();
+
+export const BayesianPriorsSchema = z
+  .object({
+    adjustedScore: z.number(),
+    beliefDelta: z.number(),
+    informationGain: z.number(),
+    priorInfluence: z.number(),
+    biasAdjustments: z.array(z.object({
+      biasType: z.string(),
+      priorConfidence: z.number(),
+      posteriorConfidence: z.number(),
+      direction: z.enum(['increased', 'decreased', 'unchanged']),
+      reason: z.string(),
+    })).default([]),
+  })
+  .optional();

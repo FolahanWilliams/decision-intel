@@ -34,6 +34,7 @@ import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinationCard';
+import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
@@ -112,7 +113,23 @@ interface Analysis {
   noiseStats?: { mean: number; stdDev: number; variance: number };
   noiseBenchmarks?: NoiseBenchmark[];
   factCheck?: FactCheck;
-  compliance?: ComplianceResult;
+  compliance?: ComplianceResult & {
+    compoundScoring?: {
+      calibratedScore: number;
+      compoundMultiplier: number;
+      contextAdjustment: number;
+      confidenceDecay: number;
+      amplifyingInteractions: Array<{ bias: string; multiplier: number; interactions: string[] }>;
+      adjustments: Array<{ source: string; delta: number; description: string }>;
+    };
+    bayesianPriors?: {
+      adjustedScore: number;
+      beliefDelta: number;
+      informationGain: number;
+      priorInfluence: number;
+      biasAdjustments: Array<{ biasType: string; priorConfidence: number; posteriorConfidence: number; direction: string; reason: string }>;
+    };
+  };
   swotAnalysis?: SwotAnalysisResult;
   logicalAnalysis?: LogicalAnalysisResult;
   cognitiveAnalysis?: CognitiveAnalysisResult;
@@ -1516,6 +1533,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         <ErrorBoundary sectionName="Regulatory Horizon">
           <div className="mb-xl">
             <RegulatoryHorizonWidget compliance={analysis.compliance} />
+          </div>
+        </ErrorBoundary>
+      )}
+      {analysis?.compliance && (analysis.compliance.compoundScoring || analysis.compliance.bayesianPriors) && (
+        <ErrorBoundary sectionName="Scoring Breakdown">
+          <div className="mb-xl">
+            <ScoringBreakdown
+              compoundScoring={analysis.compliance.compoundScoring}
+              bayesianPriors={analysis.compliance.bayesianPriors}
+              overallScore={analysis.overallScore}
+            />
           </div>
         </ErrorBoundary>
       )}

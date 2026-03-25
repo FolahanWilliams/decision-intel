@@ -63,6 +63,41 @@ export interface AnalysisResult {
   intelligenceContext?: IntelligenceContextSummary;
   biasWebImageUrl?: string | null;
   preMortemImageUrl?: string | null;
+  compoundScoring?: CompoundScoringResult;
+  bayesianPriors?: BayesianPriorsResult;
+}
+
+/** Compound scoring engine output — persisted for UI surfacing */
+export interface CompoundScoringResult {
+  calibratedScore: number;
+  compoundMultiplier: number;
+  contextAdjustment: number;
+  confidenceDecay: number;
+  amplifyingInteractions: Array<{
+    bias: string;
+    multiplier: number;
+    interactions: string[];
+  }>;
+  adjustments: Array<{
+    source: string;
+    delta: number;
+    description: string;
+  }>;
+}
+
+/** Bayesian prior integration output — persisted for UI surfacing */
+export interface BayesianPriorsResult {
+  adjustedScore: number;
+  beliefDelta: number;
+  informationGain: number;
+  priorInfluence: number;
+  biasAdjustments: Array<{
+    biasType: string;
+    priorConfidence: number;
+    posteriorConfidence: number;
+    direction: 'increased' | 'decreased' | 'unchanged';
+    reason: string;
+  }>;
 }
 
 /** Lightweight summary of intelligence context stored with analysis results */
