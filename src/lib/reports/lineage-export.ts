@@ -137,6 +137,14 @@ export async function generateLineageExport(
 /**
  * Convert lineage records to CSV format.
  */
+function escapeCSV(val: unknown): string {
+  const str = String(val ?? '');
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
 export function lineageToCSV(records: DecisionLineageRecord[]): string {
   const headers = [
     'Decision ID', 'Type', 'Label', 'Timestamp', 'Score',
@@ -145,18 +153,18 @@ export function lineageToCSV(records: DecisionLineageRecord[]): string {
   ];
 
   const rows = records.map(r => [
-    r.decisionId,
-    r.decisionType,
-    `"${r.label.replace(/"/g, '""')}"`,
-    r.timestamp,
-    r.score,
-    `"${r.biasesDetected.map(b => b.type).join('; ')}"`,
-    `"${r.biasesDetected.map(b => b.severity).join('; ')}"`,
-    r.outcome?.result || 'pending',
-    r.outcome?.impactScore ?? '',
-    r.nudgesServed.length,
-    r.nudgesServed.filter(n => n.acknowledged).length,
-    r.connectedDecisions.length,
+    escapeCSV(r.decisionId),
+    escapeCSV(r.decisionType),
+    escapeCSV(r.label),
+    escapeCSV(r.timestamp),
+    escapeCSV(r.score),
+    escapeCSV(r.biasesDetected.map(b => b.type).join('; ')),
+    escapeCSV(r.biasesDetected.map(b => b.severity).join('; ')),
+    escapeCSV(r.outcome?.result || 'pending'),
+    escapeCSV(r.outcome?.impactScore ?? ''),
+    escapeCSV(r.nudgesServed.length),
+    escapeCSV(r.nudgesServed.filter(n => n.acknowledged).length),
+    escapeCSV(r.connectedDecisions.length),
   ]);
 
   return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');

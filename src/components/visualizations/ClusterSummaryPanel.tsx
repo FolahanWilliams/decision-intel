@@ -29,7 +29,7 @@ interface ClusterSummaryPanelProps {
   onClose: () => void;
 }
 
-export function ClusterSummaryPanel({ clusterId, nodes, edges, onClose }: ClusterSummaryPanelProps) {
+export function ClusterSummaryPanel({ clusterId: _clusterId, nodes, edges, onClose }: ClusterSummaryPanelProps) {
   const stats = useMemo(() => {
     const decisions = nodes.filter(n => n.type === 'analysis' || n.type === 'human_decision');
     const avgScore = decisions.length > 0

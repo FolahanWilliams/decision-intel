@@ -242,6 +242,62 @@ A VS Code-style command palette (`Cmd+K` / `Ctrl+K`) with intelligent search:
 - **Audit Trail** — Complete logging of all user actions for compliance
 - **Comparative Analysis** — Cross-document trend analysis and benchmarking
 
+### Decision Knowledge Graph
+
+An organizational memory system that maps relationships between decisions, outcomes, people, and biases. Inspired by Wiz's Security Graph for cloud infrastructure, this graph maps decision dependency chains to find failure cascades and compounding organizational risk. **The longer a company uses it, the harder it is to leave** — the graph's value compounds with every decision added.
+
+#### Interactive Visualization
+- **D3 Force-Directed Graph** — 5 node types (analysis, human_decision, person, bias_pattern, outcome) with 7 edge types
+- **Temporal Playback** — Timeline slider to animate graph evolution week-by-week
+- **Path Finding** — BFS/Dijkstra algorithms to trace causal chains between decisions
+- **Cluster Drill-Down** — Isolate connected components with failure rates, shared biases, participant overlap
+- **Graph Search** — Find nodes by name, type, or pattern with auto-highlight
+- **Minimap** — Canvas overview showing viewport position in large graphs
+- **Graph Export** — PNG (2x retina), SVG, Graphviz DOT format download
+- **Keyboard Navigation** — Arrow keys, Escape, +/- zoom, F fit, / search
+
+#### Intelligence Engine
+- **Auto-Inferred Edges** — Shared biases, semantic similarity (via RAG), participant overlap, outcome cascades, temporal sequences, and reversals detected automatically
+- **PageRank Centrality** — Iterative power method identifies most influential decision nodes
+- **Graph Anti-Pattern Detection** — Echo chamber clusters, cascade failures, bias concentration, isolated high-risk decisions
+- **Cascade Risk Scoring** — Multi-factor cluster-level failure risk for pending decisions
+- **Entity Disambiguation** — Canonical resolution for participant names (Levenshtein + nickname mappings)
+- **Predictive Toxicity Alerts** — Organization risk state with trend detection (improving/stable/worsening)
+
+#### Self-Improving Flywheel
+- **Outcome-Driven Edge Learning** — Edge strength/confidence adjusts automatically when outcomes are reported
+- **Nudge Feedback Loop** — Helpful nudge responses reinforce graph patterns, unhelpful responses weaken them
+- **Outcome Contradiction Detection** — Flags biases that contradicted actual outcomes
+- **Root Cause Attribution** — Links specific biases to outcomes via CausalEdge data and graph topology
+
+#### Advanced Search & Recommendations
+- **Graph-Guided RAG** — Re-ranks semantic search results by graph distance and outcome weighting
+- **Decision Recommendations** — "Similar decisions that succeeded avoided these biases"
+- **Ensemble Retrieval** — Reciprocal rank fusion combining semantic, graph distance, and bias pattern matching
+- **Pre-Decision Context** — Proactive risk signals and related decisions during decision capture
+
+#### Reporting & Cross-Org Intelligence
+- **Graph Network Analysis Report** — SNA metrics (density, clustering coefficient, avg path length) with AI-generated executive narrative
+- **Temporal Anomaly Alerts** — Z-score based alerts for fragmentation, centralization, bias surges
+- **Cross-Org Federated Learning** — Anonymized toxic pattern sharing across consenting organizations
+- **Org Benchmarking** — Decision quality, success rate, and graph connectivity compared against peer data
+- **Decision Lineage Export** — Compliance-ready audit trails with full provenance chains (JSON + CSV)
+
+#### API Endpoints
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| `/api/decision-graph` | GET | Full graph (nodes, edges, clusters, stats, anti-patterns) |
+| `/api/decision-graph/edges` | POST/PATCH/DELETE | Create, update, or remove edges |
+| `/api/decision-graph/stats` | GET | Lightweight graph statistics |
+| `/api/decision-graph/trends` | GET | Weekly edge growth with anomaly detection |
+| `/api/decision-graph/risk-state` | GET | Organization risk level with factors |
+| `/api/decision-graph/root-cause` | GET | Bias-to-outcome attribution |
+| `/api/decision-graph/recommendations` | GET | Graph-powered decision recommendations |
+| `/api/decision-graph/context` | GET | Pre-decision intelligence context |
+| `/api/decision-graph/report` | GET | Full SNA report with AI narrative |
+| `/api/decision-graph/lineage` | GET | Compliance audit trail export |
+| `/api/decision-graph/benchmarks` | GET | Org performance benchmarks |
+
 ### Meeting Command Center
 
 A live monitoring dashboard for ongoing meetings at `/meetings/command-center`:
@@ -305,6 +361,7 @@ A parallel analysis product that audits spoken and written decisions from multip
 │  /activity-feed  /chat  /trends  /stats  /cron/sync  /health           │
 │  /v1/analyze  /v1/documents  /v1/insights  /v1/keys                    │
 │  /human-decisions  /decision-frames  /decision-priors  /learning       │
+│  /decision-graph  /decision-graph/edges  /decision-graph/report        │
 │  /team  /integrations/slack  /upload/bulk  /personas  /outcomes        │
 └──────────────────────────────────┬──────────────────────────────────────┘
                                    │
@@ -350,6 +407,7 @@ A parallel analysis product that audits spoken and written decisions from multip
 │  AuditLogs │ UserSettings │ CacheEntries │ RateLimits │ IntelSync      │
 │  Organizations │ TeamMembers │ TeamInvites │ TeamCognitiveProfiles      │
 │  CausalEdges │ CalibrationProfiles │ DecisionPriors │ DecisionFrames  │
+│  DecisionEdges │ ToxicCombinations │ ToxicPatterns                      │
 │  ComplianceAssessments │ ShareLinks │ ApiKeys │ BatchUploads             │
 │  AnalysisVersions │ PromptVersions │ FailedAnalyses │ NotificationLogs│
 │  SlackInstallations │ Meetings │ MeetingTranscripts                    │
@@ -462,6 +520,17 @@ src/
 │   │   ├── team/                  # Members, invites, activity
 │   │   ├── personas/              # Custom boardroom persona management
 │   │   ├── outcomes/              # Decision outcome tracking
+│   │   ├── decision-graph/        # Knowledge graph (11 sub-routes)
+│   │   │   ├── edges/             # Edge CRUD (POST/PATCH/DELETE)
+│   │   │   ├── stats/             # Lightweight graph stats
+│   │   │   ├── trends/            # Weekly trends + anomaly detection
+│   │   │   ├── risk-state/        # Org risk level
+│   │   │   ├── root-cause/        # Bias-to-outcome attribution
+│   │   │   ├── recommendations/   # Graph-powered recommendations
+│   │   │   ├── context/           # Pre-decision intelligence
+│   │   │   ├── report/            # SNA report + AI narrative
+│   │   │   ├── lineage/           # Compliance audit trail export
+│   │   │   └── benchmarks/        # Org performance benchmarks
 │   │   ├── search/                # Vector similarity search
 │   │   ├── audit/                 # Audit log queries
 │   │   ├── admin/                 # Error tracking, retry, prompt management
@@ -475,6 +544,23 @@ src/
 │   ├── analysis/                  # LangGraph pipeline orchestration
 │   │   └── analyzer.ts            # Main graph builder & execution
 │   ├── agents/                    # 15 AI agent node implementations
+│   ├── graph/                     # Decision Knowledge Graph
+│   │   ├── graph-builder.ts       # 10-step graph construction pipeline
+│   │   ├── edge-inference.ts      # Auto-inferred edges (5 algorithms)
+│   │   ├── edge-learning.ts       # Outcome/nudge-driven weight adjustment
+│   │   ├── centrality.ts          # PageRank, degree, betweenness centrality
+│   │   ├── graph-patterns.ts      # Anti-pattern detection (echo chambers, cascades)
+│   │   ├── cascade-risk.ts        # Cluster-level failure risk scoring
+│   │   ├── entity-resolution.ts   # Participant name disambiguation
+│   │   ├── risk-state.ts          # Org-wide predictive risk assessment
+│   │   ├── root-cause.ts          # Bias-to-outcome attribution
+│   │   ├── counterfactual.ts      # Alternative path analysis
+│   │   ├── anomaly-detection.ts   # Temporal anomaly detection
+│   │   ├── federated-learning.ts  # Cross-org pattern sharing
+│   │   ├── benchmarking.ts        # Org performance benchmarks
+│   │   ├── recommendations.ts     # Decision recommendations
+│   │   ├── pathfinding.ts         # BFS/Dijkstra path algorithms
+│   │   └── graph-export.ts        # PNG/SVG/DOT export utilities
 │   ├── learning/                  # Behavioral Data Flywheel
 │   │   ├── causal-learning.ts     # Org-specific causal weight discovery
 │   │   ├── outcome-scoring.ts     # Accuracy tracking from outcomes
@@ -503,12 +589,17 @@ src/
 │   │   └── score-calculator.ts    # Counterfactual score projection engine
 │   ├── research/                  # Semantic Scholar paper matching
 │   ├── rag/                       # Embeddings & vector search (pgvector)
+│   │   ├── embeddings.ts          # Gemini embeddings, semantic search
+│   │   └── graph-guided-search.ts # Graph-guided RAG & ensemble retrieval
 │   ├── tools/                     # External data (Finnhub, FRED macro)
 │   ├── reports/
 │   │   ├── pdf-generator.ts       # Full PDF report with jsPDF
 │   │   ├── csv-generator.ts       # CSV data export
 │   │   ├── markdown-generator.ts  # Markdown report generation
-│   │   └── json-generator.ts      # Structured JSON export
+│   │   ├── json-generator.ts      # Structured JSON export
+│   │   ├── graph-report.ts        # Graph SNA metrics report
+│   │   ├── graph-narrative.ts     # AI-generated executive narrative
+│   │   └── lineage-export.ts      # Compliance audit trail export
 │   ├── utils/
 │   │   ├── api-auth.ts            # API key validation & scope checking
 │   │   ├── cache.ts               # Postgres-based caching (TTL)

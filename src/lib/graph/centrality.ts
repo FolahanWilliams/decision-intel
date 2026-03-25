@@ -161,7 +161,8 @@ export function computeBetweennessCentrality(
     while (stack.length > 0) {
       const w = stack.pop()!;
       for (const v of pred.get(w) || []) {
-        const d = delta.get(v)! + (sigma.get(v)! / sigma.get(w)!) * (1 + delta.get(w)!);
+        const sigmaW = sigma.get(w) || 1;
+        const d = delta.get(v)! + (sigma.get(v)! / sigmaW) * (1 + delta.get(w)!);
         delta.set(v, d);
       }
       if (w !== s.id) {

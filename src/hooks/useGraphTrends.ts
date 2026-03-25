@@ -18,7 +18,7 @@ interface GraphTrendsData {
 
 export function useGraphTrends(orgId: string | null, weeks = 12) {
   const { data, error, isLoading } = useSWR<GraphTrendsData>(
-    orgId ? `/api/decision-graph/trends?orgId=${orgId}&weeks=${weeks}` : null,
+    orgId ? `/api/decision-graph/trends?orgId=${encodeURIComponent(orgId)}&weeks=${weeks}` : null,
     fetcher,
     { revalidateOnFocus: false }
   );

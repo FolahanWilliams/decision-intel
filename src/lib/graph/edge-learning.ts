@@ -122,13 +122,15 @@ export async function adjustEdgeWeightsFromNudgeFeedback(
 
     const delta = wasHelpful ? 0.03 : -0.02;
 
-    for (const edge of edges) {
+    await Promise.all(edges.map(edge => {
       const newConfidence = Math.max(0, Math.min(1, edge.confidence + delta));
-      await prisma.decisionEdge.update({
+      return prisma.decisionEdge.update({
         where: { id: edge.id },
         data: { confidence: newConfidence },
+      }).catch(err => {
+        log.warn(`Edge confidence update failed for ${edge.id}:`, err);
       });
-    }
+    }));
 
     if (edges.length > 0) {
       log.info(`Adjusted ${edges.length} edge confidence(s) from nudge feedback (helpful=${wasHelpful})`);
