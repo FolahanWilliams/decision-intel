@@ -145,7 +145,7 @@ export function assessFCAConsumerDuty(analysis: AnalysisResult): FCAAssessmentRe
   };
 
   // Step 1: Enrich with regulatory-graph assessment (single source of truth for bias mappings)
-  let graphFindings: FCAFinding[] = [];
+  const graphFindings: FCAFinding[] = [];
   try {
     const biasesForGraph = biases.map(b => ({
       type: b.biasType.toLowerCase().replace(/\s+/g, '_'),
