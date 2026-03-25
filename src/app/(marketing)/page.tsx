@@ -1743,34 +1743,37 @@ export default function LandingPage() {
                   marginBottom: '24px',
                 }}
               >
-                The Behavioral Data Flywheel
+                The Decision Intelligence Stack
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {[
                   {
                     step: '1',
                     label: 'Analyze',
-                    description: 'AI audits your decisions and detects cognitive biases',
+                    description:
+                      'AI detects cognitive biases and quantifies decision noise across your investment committee',
                     color: '#FFFFFF',
                   },
                   {
                     step: '2',
-                    label: 'Track Outcomes',
+                    label: 'Graph',
                     description:
-                      'Platform enforces outcome reporting — success, failure, and lessons learned close the loop',
-                    color: '#A3E635',
+                      'Maps relationships between decisions — which ones cascade, which biases compound, where echo chambers form',
+                    color: '#60a5fa',
                   },
                   {
                     step: '3',
-                    label: 'Recalibrate',
-                    description: 'Platform learns which biases matter most for your org',
-                    color: '#22c55e',
+                    label: 'Learn',
+                    description:
+                      'Every outcome retrains the system. "Anchoring cost you 12% across 8 deals" — your data, not generic warnings',
+                    color: '#A3E635',
                   },
                   {
                     step: '4',
-                    label: 'Improve',
-                    description: 'Next analysis is more accurate — tuned to your patterns',
-                    color: '#FFFFFF',
+                    label: 'Act',
+                    description:
+                      'Pre-decision nudges and historical precedent recommendations prevent repeat failures before the vote',
+                    color: '#22c55e',
                   },
                 ].map((item, i) => (
                   <motion.div
@@ -1844,19 +1847,19 @@ export default function LandingPage() {
                   opacity: 0.6,
                 }}
               >
-                Every cycle compounds your competitive advantage
+                Each layer feeds the next. The longer you use it, the wider your moat.
               </div>
             </div>
           </motion.div>
 
           {/* Moat Pillars */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-5 max-w-7xl mx-auto">
             {[
               {
                 icon: Fingerprint,
                 title: 'Mandatory Outcome Flywheel',
                 description:
-                  'The platform enforces outcome reporting — you cannot run new analyses until prior decisions are closed out. Your Confidence vs Reality calibration curve sharpens with every data point. After 6 months, this dataset becomes your 18-month competitive moat.',
+                  'The platform enforces outcome reporting — you cannot run new analyses until prior decisions are closed out. After 6 months, this dataset becomes your 18-month competitive moat.',
                 stat: '18-month data advantage',
                 color: '#FFFFFF',
               },
@@ -1864,24 +1867,32 @@ export default function LandingPage() {
                 icon: RefreshCw,
                 title: 'Auto-Recalibrating',
                 description:
-                  'Every outcome you report retrains bias weights, nudge thresholds, and Decision Twin accuracy for YOUR organization. "Anchoring cost your fund 18% across 12 deals" — not generic warnings, but your fund\'s actual P&L impact by bias type.',
-                stat: 'Auto-recalibrates every 5 decisions',
+                  "Every outcome retrains bias weights, nudge thresholds, and Decision Twin accuracy for YOUR org. Not generic warnings — your fund's actual P&L impact by bias type.",
+                stat: 'Learns from every decision',
                 color: '#A3E635',
+              },
+              {
+                icon: Network,
+                title: 'Decision Knowledge Graph',
+                description:
+                  'Every decision becomes a node. Every outcome, a validated edge. Your organization builds an irreplaceable map of how decisions cascade and where failure patterns hide.',
+                stat: 'Organizational decision memory',
+                color: '#60a5fa',
               },
               {
                 icon: Lock,
                 title: 'Pre-Decision Capture',
                 description:
-                  'Slack integration detects IC deliberation threads in real time. Cognitive coaching nudges arrive before the vote — "This thread shows anchoring to entry multiple. Want a 2-minute counterfactual?"',
+                  'Slack integration detects IC deliberation threads in real time. Cognitive coaching nudges arrive before the vote — catching biases mid-conversation.',
                 stat: 'Always-on decision OS',
                 color: '#22c55e',
               },
               {
-                icon: Network,
+                icon: Shield,
                 title: 'Regulator-Ready',
                 description:
-                  'Audit-grade decision logs with timestamped priors, outcomes, and calibration curves for compliance packs. SOX Section 302/404, SEC disclosure, FCA Consumer Duty compliance mapping built in. Exportable "Human Decision Governance" packs for EU AI Act.',
-                stat: 'Regulator-ready audit packs',
+                  'Audit-grade decision logs with timestamped priors, outcomes, and calibration curves. SOX 302/404, SEC, FCA Consumer Duty, EU AI Act compliance built in.',
+                stat: 'Compliance audit packs',
                 color: '#FFFFFF',
               },
             ].map((pillar, i) => (
@@ -1991,9 +2002,11 @@ export default function LandingPage() {
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                   pre-decision nudges in #investment-committee improved outcomes by 23%
                 </span>
-                . A generic tool starts from zero every session. Decision Intel compounds from every
-                outcome your fund has ever tracked — and enforces outcome reporting so the data
-                keeps flowing. That&apos;s an 18-month head start no competitor can shortcut.
+                . And your Decision Knowledge Graph maps how 200+ decisions cascaded, which
+                participants drove the best outcomes, and where echo chambers formed. A generic tool
+                starts from zero every session. Decision Intel compounds from every outcome your
+                fund has ever tracked. That&apos;s an 18-month head start no competitor can
+                shortcut.
               </div>
             </div>
           </motion.div>

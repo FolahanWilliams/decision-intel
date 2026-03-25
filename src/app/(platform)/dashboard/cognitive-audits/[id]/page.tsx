@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { cn } from '@/lib/utils';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
+import { RootCauseSection } from '@/components/ui/RootCauseSection';
 
 interface PageProps {
   params: {
@@ -147,6 +148,11 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
           View in Decision Graph
         </Link>
       </div>
+
+      {/* Root Cause Attribution */}
+      {analysis.document.orgId && (
+        <RootCauseSection analysisId={params.id} orgId={analysis.document.orgId} />
+      )}
 
       {/* Related Decisions from Knowledge Graph */}
       <RelatedDecisions analysisId={params.id} />

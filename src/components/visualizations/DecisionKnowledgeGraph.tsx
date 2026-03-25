@@ -17,6 +17,8 @@ import {
   Route,
   Boxes,
   Download,
+  AlertTriangle,
+  ChevronDown,
 } from 'lucide-react';
 import { useGraphPlayback } from '@/hooks/useGraphPlayback';
 import { bfsShortestPath } from '@/lib/graph/pathfinding';
@@ -40,6 +42,7 @@ interface GraphNode {
   participants: string[];
   monetaryValue: number | null;
   createdAt: string;
+  pageRank?: number;
   // D3 simulation fields
   x?: number;
   y?: number;
@@ -131,11 +134,21 @@ function getNodeFill(d: GraphNode): string {
   return NODE_TYPE_CONFIG[d.type]?.color ?? '#64748b';
 }
 
-function getNodeRadius(d: GraphNode, sizeScale: d3.ScaleLinear<number, number>): number {
+function getNodeMetricValue(d: GraphNode, metric: 'biasCount' | 'pageRank' | 'score'): number {
+  if (metric === 'pageRank') return (d.pageRank ?? 0) * 10;
+  if (metric === 'score') return d.score / 10;
+  return d.biasCount;
+}
+
+function getNodeRadius(
+  d: GraphNode,
+  sizeScale: d3.ScaleLinear<number, number>,
+  metric: 'biasCount' | 'pageRank' | 'score' = 'biasCount'
+): number {
   const typeConfig = NODE_TYPE_CONFIG[d.type];
   const baseSize = typeConfig ? typeConfig.size : 1.0;
   if (d.type === 'analysis' || d.type === 'human_decision') {
-    return sizeScale(d.biasCount) * baseSize;
+    return sizeScale(getNodeMetricValue(d, metric)) * baseSize;
   }
   // Person/bias_pattern size by connection count (biasCount repurposed as occurrence count)
   if (d.type === 'bias_pattern') {
@@ -239,6 +252,13 @@ export function DecisionKnowledgeGraph({
     edges: GraphEdge[];
     stats: GraphStats;
     clusters?: Array<{ id: string; nodeIds: string[] }>;
+    antiPatterns?: Array<{
+      patternType: string;
+      severity: number;
+      nodeIds: string[];
+      description: string;
+      recommendation: string;
+    }>;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
@@ -265,6 +285,12 @@ export function DecisionKnowledgeGraph({
 
   // Cluster drill-down
   const [isolatedClusterId, setIsolatedClusterId] = useState<string | null>(null);
+
+  // Size metric
+  const [sizeMetric, setSizeMetric] = useState<'biasCount' | 'pageRank' | 'score'>('biasCount');
+
+  // Anti-pattern warnings
+  const [antiPatternsExpanded, setAntiPatternsExpanded] = useState(false);
 
   // Edge interaction
   const [, setSelectedEdge] = useState<GraphEdge | null>(null);
@@ -419,13 +445,12 @@ export function DecisionKnowledgeGraph({
       target: typeof e.target === 'string' ? e.target : e.target.id,
     }));
 
-    // Size scale (for decision nodes sized by bias count)
-    const maxBiases =
-      d3.max(
-        simNodes.filter(d => d.type === 'analysis' || d.type === 'human_decision'),
-        d => d.biasCount
-      ) || 1;
-    const sizeScale = d3.scaleLinear().domain([0, maxBiases]).range([12, 28]);
+    // Size scale (for decision nodes sized by selected metric)
+    const decisionNodes = simNodes.filter(
+      d => d.type === 'analysis' || d.type === 'human_decision'
+    );
+    const maxMetric = d3.max(decisionNodes, d => getNodeMetricValue(d, sizeMetric)) || 1;
+    const sizeScale = d3.scaleLinear().domain([0, maxMetric]).range([12, 28]);
 
     // Simulation — lighter charge for larger multi-type graphs
     const nodeCount = simNodes.length;
@@ -448,7 +473,7 @@ export function DecisionKnowledgeGraph({
       .force(
         'collision',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        d3.forceCollide().radius((d: any) => getNodeRadius(d, sizeScale) + 6)
+        d3.forceCollide().radius((d: any) => getNodeRadius(d, sizeScale, sizeMetric) + 6)
       )
       .force('x', d3.forceX(width / 2).strength(0.04))
       .force('y', d3.forceY(height / 2).strength(0.04));
@@ -536,7 +561,7 @@ export function DecisionKnowledgeGraph({
       if (d.type !== 'analysis' && d.type !== 'human_decision') return;
       const ringColor = getOutcomeRing(d.outcome);
       if (ringColor) {
-        const r = getNodeRadius(d, sizeScale);
+        const r = getNodeRadius(d, sizeScale, sizeMetric);
         d3.select(this)
           .append('circle')
           .attr('r', r + 4)
@@ -549,7 +574,7 @@ export function DecisionKnowledgeGraph({
 
     // Node shapes — dispatched by type (circle, rect, diamond, triangle, star)
     node.each(function (d) {
-      const r = getNodeRadius(d, sizeScale);
+      const r = getNodeRadius(d, sizeScale, sizeMetric);
       const isHighlighted = d.id === highlightNodeId;
       renderNodeShape(
         d3.select(this) as unknown as d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown>,
@@ -563,8 +588,8 @@ export function DecisionKnowledgeGraph({
     node
       .filter(d => d.toxicComboCount > 0)
       .append('circle')
-      .attr('cx', d => getNodeRadius(d, sizeScale) - 4)
-      .attr('cy', d => -(getNodeRadius(d, sizeScale) - 4))
+      .attr('cx', d => getNodeRadius(d, sizeScale, sizeMetric) - 4)
+      .attr('cy', d => -(getNodeRadius(d, sizeScale, sizeMetric) - 4))
       .attr('r', 5)
       .attr('fill', '#ef4444')
       .attr('stroke', '#1e1e2e')
@@ -578,7 +603,7 @@ export function DecisionKnowledgeGraph({
         return d.label.length > maxLen ? d.label.slice(0, maxLen - 2) + '...' : d.label;
       })
       .attr('text-anchor', 'middle')
-      .attr('dy', d => getNodeRadius(d, sizeScale) + 14)
+      .attr('dy', d => getNodeRadius(d, sizeScale, sizeMetric) + 14)
       .attr('fill', d => {
         const config = NODE_TYPE_CONFIG[d.type];
         return config ? config.color : '#a1a1aa';
@@ -666,6 +691,7 @@ export function DecisionKnowledgeGraph({
     searchResults,
     highlightedPath,
     highlightedPathEdges,
+    sizeMetric,
   ]);
 
   // Zoom controls
@@ -816,6 +842,17 @@ export function DecisionKnowledgeGraph({
                   {style.label}
                 </option>
               ))}
+            </select>
+
+            {/* Size metric selector */}
+            <select
+              value={sizeMetric}
+              onChange={e => setSizeMetric(e.target.value as 'biasCount' | 'pageRank' | 'score')}
+              className="text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-zinc-300"
+            >
+              <option value="biasCount">Size: Bias Count</option>
+              <option value="pageRank">Size: PageRank</option>
+              <option value="score">Size: Score</option>
             </select>
 
             {/* Strength filter */}
@@ -1015,6 +1052,55 @@ export function DecisionKnowledgeGraph({
           )}
         </div>
       </div>
+
+      {/* Anti-pattern warnings */}
+      {graphData.antiPatterns && graphData.antiPatterns.length > 0 && (
+        <div className="px-4 py-2 border-b border-white/5">
+          <button
+            onClick={() => setAntiPatternsExpanded(!antiPatternsExpanded)}
+            className="flex items-center gap-2 text-xs w-full"
+          >
+            <AlertTriangle size={14} className="text-amber-400" />
+            <span className="text-amber-400 font-semibold">
+              {graphData.antiPatterns.length} structural risk
+              {graphData.antiPatterns.length !== 1 ? 's' : ''} detected
+            </span>
+            <ChevronDown
+              size={12}
+              className={`text-zinc-500 transition-transform ${antiPatternsExpanded ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {antiPatternsExpanded && (
+            <div className="mt-2 space-y-2">
+              {graphData.antiPatterns.map(
+                (
+                  pattern: {
+                    patternType: string;
+                    severity: number;
+                    description: string;
+                    recommendation: string;
+                  },
+                  i: number
+                ) => (
+                  <div
+                    key={i}
+                    className="p-2 rounded bg-amber-500/5 border border-amber-500/10 text-xs"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-amber-400 capitalize">
+                        {pattern.patternType.replace(/_/g, ' ')}
+                      </span>
+                      <span className="text-zinc-500">severity: {pattern.severity}</span>
+                    </div>
+                    <p className="text-zinc-400 mb-1">{pattern.description}</p>
+                    <p className="text-zinc-500 italic">{pattern.recommendation}</p>
+                  </div>
+                )
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Cluster summary when isolated */}
       {isolatedClusterId && filteredData && (
