@@ -84,7 +84,7 @@ export default function DecisionGraphPage() {
       setReportLoading(true);
       try {
         const res = await fetch(
-          `/api/decision-graph/report?orgId=${encodeURIComponent(orgId)}&timeRange=${timeRange}&narrative=true`
+          `/api/decision-graph/report?orgId=${encodeURIComponent(orgId!)}&timeRange=${timeRange}&narrative=true`
         );
         if (res.ok && !cancelled) {
           const data = await res.json();
