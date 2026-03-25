@@ -1,43 +1,33 @@
 /**
- * Public API — GET /api/v1/dqi?analysisId=xxx
+ * Internal API — GET /api/dqi?analysisId=xxx
  *
  * Returns the Decision Quality Index (DQI) for a given analysis.
- * The DQI is a single 0-100 score with component breakdown, letter grade,
- * and actionable improvement recommendations.
- *
- * Auth: API key (Bearer di_live_xxx) — requires "read:analyses" scope.
+ * Uses Supabase session auth (for frontend use).
+ * For external/API-key access, use /api/v1/dqi.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { validateApiKey, type ValidateError } from '@/lib/api/auth';
+import { createClient } from '@/utils/supabase/server';
 import { computeDQI, generateDQIBadge, type DQIInput } from '@/lib/scoring/dqi';
 import { createLogger } from '@/lib/utils/logger';
 
-const log = createLogger('DQIRoute');
+const log = createLogger('DQIInternalRoute');
 
 export async function GET(request: NextRequest) {
   try {
-    // ── Auth ──────────────────────────────────────────────────────────
-    const authResult = await validateApiKey(request);
-    if (!authResult.success) {
-      const err = authResult as ValidateError;
-      return NextResponse.json(
-        { error: err.error },
-        { status: err.status, headers: err.headers },
-      );
-    }
-    const { context } = authResult;
+    // ── Auth (Supabase session) ───────────────────────────────────────
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
 
-    // ── Scope check ────────────────────────────────────────────────────
-    if (!context.scopes.includes('read:analyses')) {
-      return NextResponse.json(
-        { error: 'Insufficient permissions. Requires read:analyses scope.' },
-        { status: 403 },
-      );
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // ── Parse params ────────────────────────────────────────────────────
+    // ── Parse params ──────────────────────────────────────────────────
     const analysisId = request.nextUrl.searchParams.get('analysisId');
     if (!analysisId) {
       return NextResponse.json(
@@ -46,11 +36,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // ── Fetch analysis ──────────────────────────────────────────────────
+    // ── Fetch analysis ────────────────────────────────────────────────
     const analysis = await prisma.analysis.findFirst({
       where: {
         id: analysisId,
-        document: { userId: context.userId },
+        document: { userId },
       },
       select: {
         id: true,
@@ -61,23 +51,19 @@ export async function GET(request: NextRequest) {
         compliance: true,
         simulation: true,
         document: {
-          select: {
-            content: true,
-          },
+          select: { content: true },
         },
       },
     });
 
     if (!analysis) {
-      return NextResponse.json(
-        { error: 'Analysis not found' },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: 'Analysis not found' }, { status: 404 });
     }
 
-    // ── Build DQI input ─────────────────────────────────────────────────
+    // ── Build DQI input ───────────────────────────────────────────────
     const biasesRaw = analysis.biases as Array<{
       type?: string;
+      biasType?: string;
       severity?: string;
       confidence?: number;
     }> | null;
@@ -99,8 +85,6 @@ export async function GET(request: NextRequest) {
       regulatoryGraph?: {
         frameworksChecked?: string[];
         totalFindings?: number;
-        highestRisk?: string;
-        findings?: Array<unknown>;
       };
     } | null;
 
@@ -150,7 +134,7 @@ export async function GET(request: NextRequest) {
 
     const dqiInput: DQIInput = {
       biases: (biasesRaw ?? []).map((b) => ({
-        type: b.type ?? 'unknown',
+        type: b.biasType ?? b.type ?? 'unknown',
         severity: (b.severity as 'low' | 'medium' | 'high' | 'critical') ?? 'medium',
         confidence: b.confidence ?? 0.5,
       })),
@@ -181,7 +165,7 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    // ── Wire compound scoring into DQI ──────────────────────────────────
+    // Wire compound scoring if available in analysis metadata
     try {
       const metaRecord = await prisma.$queryRawUnsafe<Array<{ metadata: unknown }>>(
         `SELECT metadata FROM "Analysis" WHERE id = $1 LIMIT 1`,
@@ -192,25 +176,17 @@ export async function GET(request: NextRequest) {
         dqiInput.compoundScore = meta.compoundScore;
       }
     } catch {
-      // metadata column may not exist (schema drift)
+      // metadata column may not exist (schema drift) — continue without compound score
     }
 
-    // ── Compute DQI ─────────────────────────────────────────────────────
+    // ── Compute DQI ───────────────────────────────────────────────────
     const dqi = computeDQI(dqiInput);
     const badge = generateDQIBadge(dqi);
 
-    // ── Check format preference ─────────────────────────────────────────
-    const format = request.nextUrl.searchParams.get('format');
-
-    if (format === 'badge') {
-      return NextResponse.json({ badge });
-    }
-
-    return NextResponse.json({
-      analysisId,
-      dqi,
-      badge,
-    });
+    return NextResponse.json(
+      { analysisId, dqi, badge },
+      { headers: { 'Cache-Control': 'private, max-age=60, stale-while-revalidate=30' } },
+    );
   } catch (error) {
     log.error('DQI computation failed', { error });
     return NextResponse.json(

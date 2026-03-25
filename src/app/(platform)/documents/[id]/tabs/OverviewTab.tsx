@@ -9,6 +9,7 @@ import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline
 import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
 import { RiskHeatMap } from '@/components/visualizations/RiskHeatMap';
 import { DecisionTimeline } from '@/components/visualizations/DecisionTimeline';
+import { DQIBadge } from '@/components/visualizations/DQIBadge';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ResearchInsight } from '@/types';
 
@@ -22,11 +23,31 @@ interface BiasFrequencyData {
   timeline: Array<{ date: string; count: number }>;
 }
 
+interface DQIData {
+  score: number;
+  grade: string;
+  gradeLabel: string;
+  components: {
+    biasLoad: { score: number; grade: string };
+    noiseLevel: { score: number; grade: string };
+    evidenceQuality: { score: number; grade: string };
+    processMaturity: { score: number; grade: string };
+    complianceRisk: { score: number; grade: string };
+  };
+  topImprovement: {
+    component: string;
+    currentScore: number;
+    potentialGain: number;
+    suggestion: string;
+  };
+}
+
 interface OverviewTabProps {
   documentContent: string;
   biases: BiasInstance[];
   uploadedAt: string;
   analysisCreatedAt?: string;
+  analysisId?: string;
 }
 
 const SEVERITY_BADGE_STYLES: Record<string, string> = {
@@ -48,11 +69,14 @@ export function OverviewTab({
   biases,
   uploadedAt,
   analysisCreatedAt,
+  analysisId,
 }: OverviewTabProps) {
   // Fetch historical bias frequencies for sparklines
   const [biasFrequencies, setBiasFrequencies] = useState<Record<string, BiasFrequencyData> | null>(
     null
   );
+  // Fetch DQI score for this analysis
+  const [dqiData, setDqiData] = useState<DQIData | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,8 +95,61 @@ export function OverviewTab({
     };
   }, []);
 
+  // Fetch DQI when analysisId is available
+  useEffect(() => {
+    if (!analysisId) return;
+    let cancelled = false;
+    fetch(`/api/dqi?analysisId=${analysisId}`)
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (!cancelled && data?.dqi) {
+          setDqiData(data.dqi);
+        }
+      })
+      .catch(() => {
+        // DQI is non-critical; silently degrade
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [analysisId]);
+
   return (
     <div className="flex flex-col gap-lg">
+      {/* 0. Decision Quality Index — top-level quality score */}
+      {dqiData && (
+        <ErrorBoundary sectionName="Decision Quality Index">
+          <div className="card">
+            <div className="card-body">
+              <div className="flex items-start gap-6 flex-wrap">
+                <DQIBadge
+                  score={dqiData.score}
+                  grade={dqiData.grade}
+                  size="lg"
+                  showLabel
+                  showBreakdown
+                  components={dqiData.components}
+                />
+                <div className="flex-1 min-w-[200px]">
+                  <h3 className="text-lg font-semibold mb-1">{dqiData.gradeLabel}</h3>
+                  <p className="text-sm text-muted mb-4">
+                    Decision Quality Index — a composite score across bias load, noise, evidence, process maturity, and compliance.
+                  </p>
+                  {dqiData.topImprovement && (
+                    <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded">
+                      <div className="text-xs font-semibold text-blue-300 mb-1">
+                        Top Improvement: {dqiData.topImprovement.component} (+{dqiData.topImprovement.potentialGain.toFixed(1)} pts potential)
+                      </div>
+                      <p className="text-xs text-muted">{dqiData.topImprovement.suggestion}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </ErrorBoundary>
+      )}
+
       {/* 1. Document Text Highlighter — replaces old BiasHeatmap with sidebar linking */}
       <ErrorBoundary sectionName="Document Bias Highlighter">
         <DocumentTextHighlighter content={documentContent} biases={biases} />

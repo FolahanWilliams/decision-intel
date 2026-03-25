@@ -16,6 +16,7 @@
 
 import { createLogger } from '@/lib/utils/logger';
 import type { AnalysisResult } from '@/types';
+import { assessCompliance } from './regulatory-graph';
 
 const log = createLogger('FCAConsumerDuty');
 
@@ -143,7 +144,57 @@ export function assessFCAConsumerDuty(analysis: AnalysisResult): FCAAssessmentRe
     consumer_support: { penalties: 0, findings: [] },
   };
 
-  // Step 1: Map biases to FCA outcomes
+  // Step 1: Enrich with regulatory-graph assessment (single source of truth for bias mappings)
+  let graphFindings: FCAFinding[] = [];
+  try {
+    const biasesForGraph = biases.map(b => ({
+      type: b.biasType.toLowerCase().replace(/\s+/g, '_'),
+      severity: b.severity.toLowerCase(),
+      confidence: b.confidence ?? 0.7,
+    }));
+
+    if (biasesForGraph.length > 0) {
+      const assessments = assessCompliance(biasesForGraph, ['fca_consumer_duty']);
+      const fcaAssessment = assessments[0];
+
+      if (fcaAssessment) {
+        // Convert regulatory-graph findings into FCA findings
+        for (const tp of fcaAssessment.triggeredProvisions) {
+          const finding: FCAFinding = {
+            rule: `${tp.provision.section} — ${tp.provision.title}`,
+            description: tp.explanation,
+            severity: tp.aggregateRiskWeight >= 0.7 ? 'critical'
+              : tp.aggregateRiskWeight >= 0.5 ? 'high'
+              : tp.aggregateRiskWeight >= 0.3 ? 'medium' : 'low',
+            biasTypes: tp.triggeringBiases,
+            remediation: fcaAssessment.remediationSteps
+              .filter(s => s.targetProvision === tp.provision.id)
+              .map(s => s.action)
+              .join(' ') || `Address ${tp.triggeringBiases.join(', ')} affecting ${tp.provision.title}.`,
+          };
+          graphFindings.push(finding);
+
+          // Map to outcome categories via bias mappings
+          const affectedCategories = new Set<string>();
+          for (const bias of tp.triggeringBiases) {
+            for (const cat of BIAS_FCA_MAPPING[bias] || []) {
+              affectedCategories.add(cat);
+            }
+          }
+          for (const cat of affectedCategories) {
+            if (outcomeAccumulators[cat]) {
+              outcomeAccumulators[cat].findings.push(finding);
+              outcomeAccumulators[cat].penalties += getSeverityPenalty(finding.severity) * 1.2;
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    log.warn('Regulatory graph assessment failed, falling back to local patterns', err);
+  }
+
+  // Step 2: Map biases to FCA outcomes (local penalty calculation)
   const biasTypeSet = new Set(biases.map(b => b.biasType.toLowerCase().replace(/\s+/g, '_')));
 
   for (const bias of biases) {
@@ -158,8 +209,8 @@ export function assessFCAConsumerDuty(analysis: AnalysisResult): FCAAssessmentRe
     }
   }
 
-  // Step 2: Check enforcement patterns
-  const allFindings: FCAFinding[] = [];
+  // Step 3: Check enforcement patterns (FCA-specific pattern matching)
+  const enforcementFindings: FCAFinding[] = [];
 
   for (const pattern of FCA_ENFORCEMENT_PATTERNS) {
     const matchingBiases = pattern.triggerBiases.filter(b => biasTypeSet.has(b));
@@ -172,7 +223,7 @@ export function assessFCAConsumerDuty(analysis: AnalysisResult): FCAAssessmentRe
         remediation: generateRemediation(pattern.pattern, matchingBiases),
       };
 
-      allFindings.push(finding);
+      enforcementFindings.push(finding);
 
       // Add finding to relevant outcome categories
       const affectedCategories = new Set<string>();
@@ -190,7 +241,10 @@ export function assessFCAConsumerDuty(analysis: AnalysisResult): FCAAssessmentRe
     }
   }
 
-  // Step 3: Factor in existing compliance findings
+  // Merge findings: regulatory-graph + enforcement patterns (deduplicated)
+  const allFindings = [...graphFindings, ...enforcementFindings];
+
+  // Step 4: Factor in existing compliance findings
   if (compliance) {
     const compliancePenalty = (compliance.riskScore / 100) * 20;
     outcomeAccumulators.products_services.penalties += compliancePenalty * 0.3;
@@ -199,7 +253,7 @@ export function assessFCAConsumerDuty(analysis: AnalysisResult): FCAAssessmentRe
     outcomeAccumulators.consumer_support.penalties += compliancePenalty * 0.2;
   }
 
-  // Step 4: Calculate final scores
+  // Step 5: Calculate final scores
   const outcomes: FCAOutcomeScore[] = Object.entries(outcomeAccumulators).map(
     ([category, data]) => {
       const score = Math.max(0, Math.min(100, Math.round(100 - data.penalties)));
@@ -220,14 +274,14 @@ export function assessFCAConsumerDuty(analysis: AnalysisResult): FCAAssessmentRe
   const overallScore = Math.round(outcomes.reduce((sum, o) => sum + o.score, 0) / outcomes.length);
   const overallRiskLevel = scoreToRiskLevel(overallScore);
 
-  // Step 5: Generate remediation plan
+  // Step 6: Generate remediation plan
   const remediationPlan = generateRemediationPlan(allFindings, outcomes);
 
   const summary = buildSummary(overallScore, overallRiskLevel, outcomes, allFindings);
 
   log.info(
     `FCA Consumer Duty assessment: overall=${overallScore} (${overallRiskLevel}), ` +
-      `findings=${allFindings.length}, biases=${biases.length}`
+      `findings=${allFindings.length} (graph=${graphFindings.length}, enforcement=${enforcementFindings.length}), biases=${biases.length}`
   );
 
   return {

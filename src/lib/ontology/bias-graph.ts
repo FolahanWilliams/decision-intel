@@ -742,6 +742,607 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
       'Estimates provided by authority figures serve as stronger anchors due to perceived expertise.',
     citation: 'Cialdini 2001, "Influence: Science and Practice"',
   },
+
+  // ---- Hindsight cluster ----
+  {
+    from: 'hindsight_bias',
+    to: 'authority_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Retrospective certainty leads people to believe authorities "should have known," inflating expectations of expert foresight.',
+    citation: 'Fischhoff 1975, "Hindsight ≠ Foresight"',
+  },
+  {
+    from: 'recency_bias',
+    to: 'hindsight_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Recent events feel more vivid and thus more predictable in retrospect, strengthening the knew-it-all-along effect.',
+    citation: 'Roese & Vohs 2012, "Hindsight Bias"',
+  },
+  {
+    from: 'hindsight_bias',
+    to: 'groupthink',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Shared hindsight narratives reinforce group consensus that the chosen path was always obvious, suppressing future dissent.',
+    citation: 'Roese & Vohs 2012, "Hindsight Bias"',
+  },
+  {
+    from: 'hindsight_bias',
+    to: 'loss_aversion',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Retrospective clarity about missed opportunities intensifies the perceived pain of losses that feel like they were avoidable.',
+    citation: 'Fischhoff 1975, "Hindsight ≠ Foresight"',
+  },
+
+  // ---- Loss aversion cluster ----
+  {
+    from: 'loss_aversion',
+    to: 'groupthink',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Fear of incurring losses from deviating creates conformity pressure, as dissent risks personal and group losses.',
+    citation: 'Kahneman, Knetsch & Thaler 1991, "Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias"',
+  },
+  {
+    from: 'loss_aversion',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'People anchor to purchase prices or initial investments to avoid realizing losses relative to that reference point.',
+    citation: 'Kahneman & Tversky 1979, "Prospect Theory"',
+  },
+  {
+    from: 'loss_aversion',
+    to: 'cognitive_misering',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'The emotional discomfort of contemplating losses discourages effortful analysis of risk trade-offs.',
+    citation: 'Kahneman 2011, "Thinking, Fast and Slow"',
+  },
+  {
+    from: 'loss_aversion',
+    to: 'selective_perception',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Loss-averse individuals selectively attend to threat-related information, filtering out gain-related signals.',
+    citation: 'Kahneman & Tversky 1979, "Prospect Theory"',
+  },
+
+  // ---- Availability ↔ anchoring ----
+  {
+    from: 'availability_heuristic',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Vivid, easily recalled examples become implicit numerical anchors that dominate subsequent estimation.',
+    citation: 'Tversky & Kahneman 1974, "Judgment under Uncertainty"',
+  },
+  {
+    from: 'anchoring_bias',
+    to: 'availability_heuristic',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Anchored values prime retrieval of anchor-consistent memories, making them more cognitively available.',
+    citation: 'Tversky & Kahneman 1974, "Judgment under Uncertainty"',
+  },
+
+  // ---- Social bias cluster expansion ----
+  {
+    from: 'groupthink',
+    to: 'authority_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Group consensus elevates the perceived authority of the group leader, strengthening deference to their judgment.',
+    citation: 'Janis 1982, "Groupthink: Psychological Studies of Policy Decisions and Fiascoes"',
+  },
+  {
+    from: 'authority_bias',
+    to: 'selective_perception',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Deference to authority primes perceptual filters to prioritize information consistent with the authority position.',
+    citation: 'Milgram 1963, "Behavioral Study of Obedience"',
+  },
+  {
+    from: 'authority_bias',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Authority endorsement inflates confidence in endorsed conclusions beyond what the evidence warrants.',
+    citation: 'Cialdini 2001, "Influence: Science and Practice"',
+  },
+  {
+    from: 'bandwagon_effect',
+    to: 'overconfidence_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Widespread adoption creates social validation that inflates individual confidence in the popular choice.',
+    citation: 'Asch 1951, "Effects of Group Pressure upon the Modification of Judgments"',
+  },
+  {
+    from: 'bandwagon_effect',
+    to: 'selective_perception',
+    type: 'enables',
+    weight: 1.1,
+    mechanism:
+      'Joining a popular position activates perceptual filters that screen out evidence against the consensus view.',
+    citation: 'Asch 1951, "Effects of Group Pressure upon the Modification of Judgments"',
+  },
+
+  // ---- Planning / temporal cluster ----
+  {
+    from: 'planning_fallacy',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Initial project estimates become powerful anchors that resist adjustment even as evidence of overrun accumulates.',
+    citation: 'Buehler, Griffin & Ross 1994, "Exploring the Planning Fallacy"',
+  },
+  {
+    from: 'planning_fallacy',
+    to: 'recency_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Planners base estimates on the most recent similar task rather than the full distribution of past experience.',
+    citation: 'Buehler, Griffin & Ross 1994, "Exploring the Planning Fallacy"',
+  },
+  {
+    from: 'planning_fallacy',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Once an optimistic plan is committed, planners selectively seek evidence that the timeline is achievable.',
+    citation: 'Buehler, Griffin & Peetz 2010, "The Planning Fallacy"',
+  },
+  {
+    from: 'planning_fallacy',
+    to: 'loss_aversion',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Acknowledging a plan is behind schedule feels like admitting a loss, triggering avoidance of realistic reassessment.',
+    citation: 'Lovallo & Kahneman 2003, "Delusions of Success"',
+  },
+  {
+    from: 'recency_bias',
+    to: 'overconfidence_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Recent successes are overweighted in self-assessment, inflating confidence in future performance.',
+    citation: 'Tversky & Kahneman 1974, "Judgment under Uncertainty"',
+  },
+
+  // ---- Framing / perception cluster ----
+  {
+    from: 'framing_effect',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'A favorable initial frame triggers confirmatory information search that reinforces the frame-consistent hypothesis.',
+    citation: 'Nickerson 1998, "Confirmation Bias: A Ubiquitous Phenomenon in Many Guises"',
+  },
+  {
+    from: 'framing_effect',
+    to: 'groupthink',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'A shared frame narrows the range of acceptable positions, accelerating convergence toward group consensus.',
+    citation: 'Sunstein & Hastie 2015, "Wiser: Getting Beyond Groupthink"',
+  },
+  {
+    from: 'selective_perception',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Selectively perceived data points become de facto anchors because they are the only evidence considered.',
+    citation: 'Tversky & Kahneman 1974, "Judgment under Uncertainty"',
+  },
+  {
+    from: 'selective_perception',
+    to: 'overconfidence_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Filtering out disconfirming information creates an artificially consistent evidence base that inflates confidence.',
+    citation: 'Kruger & Dunning 1999, "Unskilled and Unaware of It"',
+  },
+  {
+    from: 'selective_perception',
+    to: 'recency_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Perceptual filters preferentially encode recent stimuli, making recent events disproportionately salient in memory.',
+    citation: 'Broadbent 1958, "Perception and Communication"',
+  },
+
+  // ---- Cross-cluster bridges ----
+  {
+    from: 'sunk_cost_fallacy',
+    to: 'groupthink',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Shared investment in a course of action creates collective commitment that suppresses individual dissent.',
+    citation: 'Arkes & Blumer 1985, "The Psychology of Sunk Cost"',
+  },
+  {
+    from: 'sunk_cost_fallacy',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Escalated commitment motivates selective search for evidence that the investment will eventually pay off.',
+    citation: 'Arkes & Blumer 1985, "The Psychology of Sunk Cost"',
+  },
+  {
+    from: 'sunk_cost_fallacy',
+    to: 'loss_aversion',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'The larger the sunk cost, the more painful abandonment feels, intensifying loss-averse continuation.',
+    citation: 'Thaler 1980, "Toward a Positive Theory of Consumer Choice"',
+  },
+  {
+    from: 'overconfidence_bias',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Overconfident individuals set narrower confidence intervals, effectively creating tighter anchors for estimation.',
+    citation: 'Tversky & Kahneman 1974, "Judgment under Uncertainty"',
+  },
+  {
+    from: 'availability_heuristic',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Easily recalled hypothesis-consistent examples create a biased evidence sample that reinforces existing beliefs.',
+    citation: 'Nickerson 1998, "Confirmation Bias: A Ubiquitous Phenomenon in Many Guises"',
+  },
+  {
+    from: 'availability_heuristic',
+    to: 'selective_perception',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'High-availability categories prime perceptual attention, causing people to notice category-consistent stimuli more readily.',
+    citation: 'Slovic et al 1982, "Facts versus Fears"',
+  },
+  {
+    from: 'cognitive_misering',
+    to: 'authority_bias',
+    type: 'enables',
+    weight: 1.3,
+    mechanism:
+      'Deferring to authority is a low-effort heuristic that substitutes expert judgment for independent analysis.',
+    citation: 'Fiske & Taylor 1991, "Social Cognition"',
+  },
+  {
+    from: 'cognitive_misering',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Shallow processing fails to generate counterarguments, leaving initial confidence estimates unchallenged.',
+    citation: 'Stanovich & West 2000, "Individual Differences in Reasoning"',
+  },
+
+  // ---- New relationships: confirmation bias outbound ----
+  {
+    from: 'confirmation_bias',
+    to: 'groupthink',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Individual confirmation tendencies compound in groups as members selectively share belief-consistent evidence, accelerating false consensus.',
+    citation: 'Nickerson 1998, "Confirmation Bias: A Ubiquitous Phenomenon in Many Guises"',
+  },
+  {
+    from: 'confirmation_bias',
+    to: 'sunk_cost_fallacy',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Selective evidence gathering favors information supporting the wisdom of past investments, reinforcing escalation of commitment.',
+    citation: 'Arkes & Blumer 1985, "The Psychology of Sunk Cost"',
+  },
+  {
+    from: 'confirmation_bias',
+    to: 'loss_aversion',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Confirmatory search for threat information amplifies the salience of potential losses relative to equivalent gains.',
+    citation: 'Kahneman & Tversky 1979, "Prospect Theory"',
+  },
+  {
+    from: 'confirmation_bias',
+    to: 'planning_fallacy',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Planners selectively attend to evidence consistent with optimistic timelines, ignoring base-rate data on delays.',
+    citation: 'Buehler, Griffin & Ross 1994, "Exploring the Planning Fallacy"',
+  },
+  {
+    from: 'confirmation_bias',
+    to: 'status_quo_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Selective search for evidence favoring existing arrangements makes the status quo appear more justified than alternatives.',
+    citation: 'Eidelman & Crandall 2012, "Bias in Favor of the Status Quo"',
+  },
+
+  // ---- Anchoring outbound gaps ----
+  {
+    from: 'anchoring_bias',
+    to: 'planning_fallacy',
+    type: 'amplifies',
+    weight: 1.4,
+    mechanism:
+      'Initial time or cost anchors constrain subsequent estimation, causing insufficient adjustment toward realistic figures.',
+    citation: 'Epley & Gilovich 2006, "The Anchoring-and-Adjustment Heuristic"',
+  },
+  {
+    from: 'anchoring_bias',
+    to: 'status_quo_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Existing metrics and benchmarks serve as anchors that make any departure from current performance seem unreasonable.',
+    citation: 'Tversky & Kahneman 1974, "Judgment under Uncertainty"',
+  },
+  {
+    from: 'anchoring_bias',
+    to: 'sunk_cost_fallacy',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Anchoring to the original investment amount magnifies the perceived magnitude of the sunk cost, making abandonment harder.',
+    citation: 'Arkes & Blumer 1985, "The Psychology of Sunk Cost"',
+  },
+
+  // ---- Groupthink outbound gaps ----
+  {
+    from: 'groupthink',
+    to: 'loss_aversion',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Group cohesion makes deviating from consensus feel like a social loss, intensifying individual loss aversion around group decisions.',
+    citation: 'Janis 1982, "Groupthink: Psychological Studies of Policy Decisions and Fiascoes"',
+  },
+  {
+    from: 'groupthink',
+    to: 'sunk_cost_fallacy',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Collective investment in a group decision creates shared sunk costs that no individual wants to be first to write off.',
+    citation: 'Sunstein & Hastie 2015, "Wiser: Getting Beyond Groupthink"',
+  },
+  {
+    from: 'groupthink',
+    to: 'status_quo_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Group consensus around existing policy makes challenging the status quo a dual violation of both social norms and established practice.',
+    citation: 'Janis 1982, "Groupthink: Psychological Studies of Policy Decisions and Fiascoes"',
+  },
+  {
+    from: 'groupthink',
+    to: 'planning_fallacy',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Groups suppress pessimistic estimates to maintain cohesion, producing collectively overoptimistic plans.',
+    citation: 'Sunstein & Hastie 2015, "Wiser: Getting Beyond Groupthink"',
+  },
+  {
+    from: 'groupthink',
+    to: 'framing_effect',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Group consensus imposes a dominant frame that members adopt uncritically, suppressing alternative framings.',
+    citation: 'Janis 1982, "Groupthink: Psychological Studies of Policy Decisions and Fiascoes"',
+  },
+
+  // ---- Overconfidence outbound gaps ----
+  {
+    from: 'overconfidence_bias',
+    to: 'loss_aversion',
+    type: 'mitigates',
+    weight: 0.8,
+    mechanism:
+      'Overconfident individuals underweight the probability of losses, temporarily reducing loss-averse behavior in risky decisions.',
+    citation: 'Kahneman & Lovallo 1993, "Timid Choices and Bold Forecasts"',
+  },
+  {
+    from: 'overconfidence_bias',
+    to: 'status_quo_bias',
+    type: 'mitigates',
+    weight: 0.85,
+    mechanism:
+      'Overconfident decision-makers are more willing to depart from the status quo, believing they can manage the risks of change.',
+    citation: 'Kahneman & Lovallo 1993, "Timid Choices and Bold Forecasts"',
+  },
+
+  // ---- Hindsight outbound gaps ----
+  {
+    from: 'hindsight_bias',
+    to: 'availability_heuristic',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Outcome knowledge makes outcome-consistent cues more cognitively available, biasing future frequency and probability judgments.',
+    citation: 'Fischhoff 1975, "Hindsight ≠ Foresight"',
+  },
+  {
+    from: 'hindsight_bias',
+    to: 'status_quo_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Believing past outcomes were inevitable makes current arrangements feel like the natural and correct state of affairs.',
+    citation: 'Roese & Vohs 2012, "Hindsight Bias"',
+  },
+
+  // ---- Loss aversion outbound gaps ----
+  {
+    from: 'loss_aversion',
+    to: 'confirmation_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Fear of realizing losses motivates selective search for information confirming that the current position will recover.',
+    citation: 'Kahneman, Knetsch & Thaler 1991, "Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias"',
+  },
+  {
+    from: 'loss_aversion',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'The need to justify holding losing positions inflates subjective confidence that the situation will improve.',
+    citation: 'Thaler 1980, "Toward a Positive Theory of Consumer Choice"',
+  },
+
+  // ---- Status quo outbound gaps ----
+  {
+    from: 'status_quo_bias',
+    to: 'groupthink',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Organizational inertia normalizes existing consensus, making challenges to the status quo feel like threats to group identity.',
+    citation: 'Samuelson & Zeckhauser 1988, "Status Quo Bias in Decision Making"',
+  },
+  {
+    from: 'status_quo_bias',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Current performance metrics and processes serve as default anchors from which alternatives are insufficiently adjusted.',
+    citation: 'Samuelson & Zeckhauser 1988, "Status Quo Bias in Decision Making"',
+  },
+  {
+    from: 'status_quo_bias',
+    to: 'planning_fallacy',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Preference for existing plans makes it difficult to acknowledge that current timelines and budgets are unrealistic.',
+    citation: 'Samuelson & Zeckhauser 1988, "Status Quo Bias in Decision Making"',
+  },
+
+  // ---- Sunk cost outbound gaps ----
+  {
+    from: 'sunk_cost_fallacy',
+    to: 'anchoring_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'The magnitude of past investment creates a powerful anchor that distorts evaluation of future expected returns.',
+    citation: 'Arkes & Blumer 1985, "The Psychology of Sunk Cost"',
+  },
+  {
+    from: 'sunk_cost_fallacy',
+    to: 'selective_perception',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Commitment to a failing investment activates perceptual filters that preferentially notice progress signals and ignore warning signs.',
+    citation: 'Staw 1976, "Knee-Deep in the Big Muddy"',
+  },
+  {
+    from: 'sunk_cost_fallacy',
+    to: 'cognitive_misering',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Continuing the current course is the low-effort default; reassessing sunk costs requires effortful counterfactual reasoning.',
+    citation: 'Arkes & Blumer 1985, "The Psychology of Sunk Cost"',
+  },
+
+  // ---- Framing outbound gaps ----
+  {
+    from: 'framing_effect',
+    to: 'status_quo_bias',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Framing change as risky and the current state as safe amplifies preference for existing arrangements.',
+    citation: 'Kahneman & Tversky 1984, "Choices, Values, and Frames"',
+  },
+  {
+    from: 'framing_effect',
+    to: 'sunk_cost_fallacy',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Framing abandonment as "wasting" prior investment rather than as cutting losses amplifies sunk cost reasoning.',
+    citation: 'Thaler 1980, "Toward a Positive Theory of Consumer Choice"',
+  },
+  {
+    from: 'framing_effect',
+    to: 'overconfidence_bias',
+    type: 'enables',
+    weight: 1.2,
+    mechanism:
+      'Positively framed outcomes inflate subjective probability estimates, boosting confidence beyond calibrated levels.',
+    citation: 'Levin, Schneider & Gaeth 1998, "All Frames Are Not Created Equal"',
+  },
+
+  // ---- Recency outbound gaps ----
+  {
+    from: 'recency_bias',
+    to: 'planning_fallacy',
+    type: 'amplifies',
+    weight: 1.3,
+    mechanism:
+      'Overweighting the most recent project outcome (especially if successful) leads to systematically optimistic estimates for the next one.',
+    citation: 'Buehler, Griffin & Ross 1994, "Exploring the Planning Fallacy"',
+  },
+  {
+    from: 'recency_bias',
+    to: 'status_quo_bias',
+    type: 'amplifies',
+    weight: 1.2,
+    mechanism:
+      'Recent stability makes the current state feel permanent and natural, increasing resistance to change.',
+    citation: 'Tversky & Kahneman 1974, "Judgment under Uncertainty"',
+  },
 ];
 
 // ---------------------------------------------------------------------------

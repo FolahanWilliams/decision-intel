@@ -9,7 +9,9 @@
  * simply calling an LLM with the same prompts.
  */
 
-// Deterministic scoring — no runtime logging needed
+import {
+  getInteractionWeight as getMatrixWeight,
+} from '@/lib/ontology/interaction-matrix';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -132,17 +134,33 @@ const DEFAULT_INTERACTION_WEIGHTS: Record<string, number> = {
 
 /**
  * Look up the pairwise interaction weight between two biases.
- * Checks both orderings (a::b and b::a).
+ *
+ * Priority chain:
+ * 1. Caller-supplied weights (e.g. org-calibrated)
+ * 2. Full 16×16 ontology interaction matrix (interaction-matrix.ts)
+ * 3. Hardcoded DEFAULT_INTERACTION_WEIGHTS (fallback)
  */
 function getInteractionWeight(
   biasA: string,
   biasB: string,
   interactionWeights?: Record<string, number>,
 ): number {
-  const weights = interactionWeights ?? DEFAULT_INTERACTION_WEIGHTS;
+  // 1. Caller-supplied overrides take priority
+  if (interactionWeights) {
+    const keyAB = `${biasA}::${biasB}`;
+    const keyBA = `${biasB}::${biasA}`;
+    const callerWeight = interactionWeights[keyAB] ?? interactionWeights[keyBA];
+    if (callerWeight !== undefined) return callerWeight;
+  }
+
+  // 2. Full ontology matrix (256 cells, research-backed)
+  const matrixWeight = getMatrixWeight(biasA, biasB);
+  if (matrixWeight !== 1.0) return matrixWeight;
+
+  // 3. Hardcoded defaults
   const keyAB = `${biasA}::${biasB}`;
   const keyBA = `${biasB}::${biasA}`;
-  return weights[keyAB] ?? weights[keyBA] ?? 1.0;
+  return DEFAULT_INTERACTION_WEIGHTS[keyAB] ?? DEFAULT_INTERACTION_WEIGHTS[keyBA] ?? 1.0;
 }
 
 /**
