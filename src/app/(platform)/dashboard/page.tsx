@@ -43,6 +43,7 @@ import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
+import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
 import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { createClientLogger } from '@/lib/utils/logger';
@@ -952,6 +953,11 @@ export default function Dashboard() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Draft Outcome Detection Banner */}
+      <div className="mb-lg">
+        <DraftOutcomeBanner />
+      </div>
 
       {/* Outcome Gate Modal (hard gate — 5+ pending outcomes, blocks analysis) */}
       {showOutcomeGateModal && outcomeGateInfo && (

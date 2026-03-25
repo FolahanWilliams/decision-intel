@@ -515,3 +515,43 @@ export function slackEventToPreDecisionInput(payload: SlackWebhookPayload): {
 
   return { input, biases, nudge, frame };
 }
+
+// ─── Outcome Detection ────────────────────────────────────────────────────
+
+/**
+ * Process a Slack event for potential outcome signals.
+ *
+ * Checks if the message contains outcome language (success/failure indicators)
+ * and if it's in a channel where prior decisions were captured. If both conditions
+ * are met, creates a DraftOutcome for user review.
+ *
+ * Call this alongside isDecisionMessage/isPreDecisionMessage in the Slack
+ * event handler to cover all three message types.
+ */
+export async function processSlackOutcomeSignal(payload: SlackWebhookPayload): Promise<{
+  detected: boolean;
+  draftCount: number;
+}> {
+  const event = payload.event;
+  if (!event || event.type !== 'message') return { detected: false, draftCount: 0 };
+
+  try {
+    const { isOutcomeMessage, detectOutcomeFromSlack } = await import(
+      '@/lib/learning/outcome-inference'
+    );
+
+    if (!isOutcomeMessage(event.text)) return { detected: false, draftCount: 0 };
+
+    const results = await detectOutcomeFromSlack(
+      event.text,
+      event.channel,
+      event.thread_ts,
+      payload.team_id ?? '',
+    );
+
+    return { detected: results.length > 0, draftCount: results.length };
+  } catch (err) {
+    log.warn('Slack outcome detection failed (non-critical):', err);
+    return { detected: false, draftCount: 0 };
+  }
+}

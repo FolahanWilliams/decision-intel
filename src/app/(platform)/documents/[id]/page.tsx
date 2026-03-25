@@ -29,6 +29,7 @@ import { formatDate } from '@/lib/constants/human-audit';
 const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
 import { OutcomeReporter } from './OutcomeReporter';
+import { DraftOutcomeCard } from '@/components/ui/DraftOutcomeCard';
 import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/DecisionPriorCapture';
 import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
@@ -867,6 +868,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             analysisId={analysis.id}
             currentDueAt={(analysis as unknown as { outcomeDueAt?: string }).outcomeDueAt}
           />
+        </div>
+      )}
+
+      {/* Auto-Detected Outcome (Draft) */}
+      {analysis && (
+        <div className="mb-lg">
+          <DraftOutcomeCard analysisId={analysis.id} />
         </div>
       )}
 

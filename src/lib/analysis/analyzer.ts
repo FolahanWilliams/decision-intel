@@ -322,6 +322,27 @@ export async function analyzeDocument(
       );
     }
 
+    // Autonomous Outcome Detection — Channel 1: Document Upload (non-blocking)
+    try {
+      const { detectOutcomeFromDocument } = await import('@/lib/learning/outcome-inference');
+      const draftOutcomes = await detectOutcomeFromDocument(
+        documentId,
+        document.content.slice(0, 6000),
+        document.userId,
+        document.orgId ?? null,
+      );
+      if (draftOutcomes.length > 0) {
+        log.info(
+          `Detected ${draftOutcomes.length} potential outcome(s) from document ${documentId}`
+        );
+      }
+    } catch (outcomeError) {
+      log.warn(
+        'Failed to detect outcomes from document (non-critical): ' +
+          (outcomeError instanceof Error ? outcomeError.message : String(outcomeError))
+      );
+    }
+
     // Cache the result for future use (non-blocking)
     try {
       await cacheAnalysis(cacheKey, result as unknown as Record<string, unknown>);
