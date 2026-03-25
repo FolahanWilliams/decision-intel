@@ -55,14 +55,15 @@ Upload a document. Get a complete cognitive audit in under 60 seconds.
 ### Core Analysis Pipeline
 
 #### Cognitive Bias Detection
-Scans documents for **15 distinct cognitive biases** with confidence scores, severity ratings, and exact excerpts:
+Scans documents for **20 distinct cognitive biases** with confidence scores, severity ratings, and exact excerpts:
 
 | Category | Biases Detected |
 |:---------|:---------------|
-| **Judgment** | Confirmation Bias, Anchoring, Availability Heuristic, Framing Effect, Status Quo Bias |
+| **Judgment** | Confirmation Bias, Anchoring, Availability Heuristic, Framing Effect, Status Quo Bias, Halo Effect, Gambler's Fallacy |
 | **Group Dynamics** | Groupthink, Authority Bias, Bandwagon Effect |
-| **Overconfidence** | Overconfidence Bias, Planning Fallacy, Dunning-Kruger Effect |
-| **Risk Assessment** | Loss Aversion, Sunk Cost Fallacy, Survivorship Bias |
+| **Overconfidence** | Overconfidence Bias, Planning Fallacy, Hindsight Bias |
+| **Risk Assessment** | Loss Aversion, Sunk Cost Fallacy, Selective Perception |
+| **Decision** | Cognitive Misering, Zeigarnik Effect, Paradox of Choice |
 | **Information** | Recency Bias |
 
 Each bias finding includes a scientific explanation, real-world research citations, and **coaching-mode suggestions** for mitigation.
@@ -126,7 +127,7 @@ Grades: **A** (85-100), **B** (70-84), **C** (55-69), **D** (40-54), **F** (0-39
 
 Deterministic post-LLM scoring that transforms raw bias detections into calibrated, context-adjusted risk scores:
 
-- **16x16 Interaction Matrix** — 256 empirically-grounded pairwise interaction weights between all cognitive biases (e.g., confirmation_bias + groupthink = 1.35x amplification)
+- **20x20 Interaction Matrix** — 400 empirically-grounded pairwise interaction weights between all cognitive biases (e.g., confirmation_bias + groupthink = 1.35x amplification)
 - **Context Multipliers** — Monetary stakes (1.0-1.6x), absent dissent (+0.25), time pressure (+0.15), group size effects
 - **Detectability Weighting** — Hard-to-detect biases (low detectability in the ontology) get 3-8% severity boost when found at high confidence — finding them is more meaningful
 - **Historical Correlation** — Cross-references detected bias combinations against the 113-case failure database to compute empirical amplification ratios

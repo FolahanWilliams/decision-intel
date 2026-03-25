@@ -90,12 +90,16 @@ const STAKES_MULTIPLIER: Record<string, number> = {
   very_high: 1.6,
 };
 
+/** Absence of dissent amplifies groupthink-related biases (Janis 1972, Surowiecki 2005) */
 const DISSENT_ABSENT_MULTIPLIER = 1.25;
+/** Time pressure impairs System 2 deliberation, shifting to heuristic processing (Kahneman 2011) */
 const TIME_PRESSURE_MULTIPLIER_BASE = 1.15;
+/** Groups <4 lack cognitive diversity per Hackman's research on team effectiveness */
 const SMALL_GROUP_THRESHOLD = 4;
 const SMALL_GROUP_MULTIPLIER = 1.1;
+/** Groups >12 trigger social loafing and diffusion of responsibility (Latané et al. 1979) */
 const LARGE_GROUP_THRESHOLD = 12;
-const LARGE_GROUP_MULTIPLIER = 1.15; // large groups → more social biases
+const LARGE_GROUP_MULTIPLIER = 1.15;
 
 // ---------------------------------------------------------------------------
 // Biological / physiological signal detection
@@ -148,8 +152,10 @@ const STRESS_AMPLIFIED_BIASES = new Set([
   'selective_perception',
 ]);
 
-const WINNER_EFFECT_MULTIPLIER = 1.2; // ×1.15-1.25 range, using midpoint
-const STRESS_SIGNAL_MULTIPLIER = 1.18; // ×1.15-1.20 range, using midpoint
+/** Winner Effect: success streaks elevate testosterone/dopamine, amplifying risk-taking (Robertson 2012) */
+const WINNER_EFFECT_MULTIPLIER = 1.2;
+/** Cortisol stress response impairs prefrontal cortex analytical processing (Arnsten 2009) */
+const STRESS_SIGNAL_MULTIPLIER = 1.18;
 
 /**
  * Detect Winner Effect signals in document content.
