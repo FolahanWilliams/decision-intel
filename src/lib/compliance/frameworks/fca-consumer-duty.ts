@@ -60,7 +60,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       section: 'PRIN 2A.4',
       title: 'Consumer Understanding Outcome',
       description:
-        'Firms must support retail customers\' understanding through communications that are clear, fair, and not misleading. Information must be provided in a way that enables customers to make effective, timely, and properly informed decisions.',
+        "Firms must support retail customers' understanding through communications that are clear, fair, and not misleading. Information must be provided in a way that enables customers to make effective, timely, and properly informed decisions.",
       riskLevel: 'medium',
       keywords: [
         'communications',
@@ -78,7 +78,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       section: 'PRIN 2A.5',
       title: 'Consumer Support Outcome',
       description:
-        'Firms must provide a level of support that meets consumers\' needs throughout the lifecycle of the product or service. Support must be accessible, responsive, and must not create unreasonable barriers to switching, claiming, or complaining.',
+        "Firms must provide a level of support that meets consumers' needs throughout the lifecycle of the product or service. Support must be accessible, responsive, and must not create unreasonable barriers to switching, claiming, or complaining.",
       riskLevel: 'medium',
       keywords: [
         'customer support',
@@ -128,7 +128,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       provisionId: 'fca_cd_products_services',
       riskWeight: 0.5,
       mechanism:
-        'Product design anchored to existing product features rather than fresh assessment of target market needs. Iterative product development anchors to the current version rather than the customer\'s actual requirements.',
+        "Product design anchored to existing product features rather than fresh assessment of target market needs. Iterative product development anchors to the current version rather than the customer's actual requirements.",
       example:
         'A mortgage product retains a complex offset feature because the original design included it, even though research shows the target market rarely uses or understands the feature.',
     },
@@ -170,7 +170,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       mechanism:
         'Product governance committees reach consensus too quickly, failing to challenge whether products genuinely meet target market needs. Dissenters self-censor to maintain group harmony.',
       example:
-        'A product governance board approves a structured product for retail distribution despite one member\'s unvoiced concerns about suitability, because the committee culture discourages dissent.',
+        "A product governance board approves a structured product for retail distribution despite one member's unvoiced concerns about suitability, because the committee culture discourages dissent.",
     },
     {
       biasType: 'groupthink',
@@ -190,7 +190,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       mechanism:
         'Frontline staff defer to management directives on support processes without questioning whether those processes serve consumer interests. Complaints are handled per management protocol rather than customer need.',
       example:
-        'A complaints handler follows a senior manager\'s instruction to apply a standardised resolution template rather than exercising judgment to provide fair individual redress for a vulnerable customer.',
+        "A complaints handler follows a senior manager's instruction to apply a standardised resolution template rather than exercising judgment to provide fair individual redress for a vulnerable customer.",
     },
     {
       biasType: 'authority_bias',
@@ -199,7 +199,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       mechanism:
         'Product design decisions driven by senior leadership preferences rather than evidence-based target market analysis. Junior product managers defer to executive opinions on customer needs.',
       example:
-        'A CEO\'s conviction that customers want app-based investing drives product design away from the advisory model that the target market of older, less digitally-engaged customers actually needs.',
+        "A CEO's conviction that customers want app-based investing drives product design away from the advisory model that the target market of older, less digitally-engaged customers actually needs.",
     },
 
     // ── bandwagon_effect ───────────────────────────────────────────────
@@ -217,9 +217,9 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       provisionId: 'fca_cd_consumer_understanding',
       riskWeight: 0.45,
       mechanism:
-        'Communication formats and disclosure approaches copied from industry peers rather than designed to meet the specific comprehension needs of the firm\'s target market.',
+        "Communication formats and disclosure approaches copied from industry peers rather than designed to meet the specific comprehension needs of the firm's target market.",
       example:
-        'A firm adopts a competitor\'s Key Information Document format verbatim, assuming that industry-standard templates automatically satisfy the Consumer Understanding outcome, without testing comprehension with their own customer base.',
+        "A firm adopts a competitor's Key Information Document format verbatim, assuming that industry-standard templates automatically satisfy the Consumer Understanding outcome, without testing comprehension with their own customer base.",
     },
 
     // ── overconfidence_bias ─────────────────────────────────────────────
@@ -230,7 +230,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       mechanism:
         'Overconfidence in communication clarity leads to assuming customers understand complex products without adequate testing. Firms overestimate the effectiveness of their disclosures and underestimate customer confusion.',
       example:
-        'A firm\'s compliance team is confident that their KIID effectively communicates fund risks, but customer testing reveals that 60% of the target market cannot correctly identify the maximum potential loss.',
+        "A firm's compliance team is confident that their KIID effectively communicates fund risks, but customer testing reveals that 60% of the target market cannot correctly identify the maximum potential loss.",
     },
     {
       biasType: 'overconfidence_bias',
@@ -290,7 +290,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       mechanism:
         'Fear of revenue loss prevents firms from reducing fees or restructuring charges even when fair value assessments indicate current pricing does not represent good value for consumers.',
       example:
-        'A value assessment reveals that an investment product\'s charges exceed the benefits delivered, but the firm resists fee reductions because the projected revenue loss outweighs the regulatory risk in management\'s mental calculus.',
+        "A value assessment reveals that an investment product's charges exceed the benefits delivered, but the firm resists fee reductions because the projected revenue loss outweighs the regulatory risk in management's mental calculus.",
     },
     {
       biasType: 'loss_aversion',
@@ -368,7 +368,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       provisionId: 'fca_cd_products_services',
       riskWeight: 0.6,
       mechanism:
-        'Product governance teams selectively perceive market data that supports existing product strategies, filtering out signals that customers\' needs have changed or that products are causing harm.',
+        "Product governance teams selectively perceive market data that supports existing product strategies, filtering out signals that customers' needs have changed or that products are causing harm.",
       example:
         'A product review team focuses on net sales figures (positive) while ignoring rising complaint volumes and decreasing customer retention rates that indicate the product is underperforming for the target market.',
     },
@@ -377,7 +377,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       provisionId: 'fca_cd_consumer_support',
       riskWeight: 0.5,
       mechanism:
-        'Customer support metrics selectively interpreted to present a positive picture. Management perceives support quality as adequate by focusing on metrics that look good while ignoring those that don\'t.',
+        "Customer support metrics selectively interpreted to present a positive picture. Management perceives support quality as adequate by focusing on metrics that look good while ignoring those that don't.",
       example:
         'A firm reports high first-call resolution rates but ignores the 40% of customers who abandon the call queue before reaching an agent, selectively perceiving only completed interactions as representative.',
     },
@@ -419,7 +419,7 @@ export const FCA_CONSUMER_DUTY: RegulatoryFramework = {
       mechanism:
         'Product governance teams default to heuristic-based assessments rather than investing the analytical effort needed for rigorous target market analysis and ongoing product review.',
       example:
-        'A product governance committee spends 10 minutes reviewing a complex product\'s target market assessment, applying quick heuristics rather than engaging with the detailed customer outcome data available.',
+        "A product governance committee spends 10 minutes reviewing a complex product's target market assessment, applying quick heuristics rather than engaging with the detailed customer outcome data available.",
     },
   ],
 };

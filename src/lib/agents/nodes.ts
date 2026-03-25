@@ -786,11 +786,13 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
     // Enrich with structured regulatory graph assessment (non-blocking)
     try {
       const { assessCompliance } = await import('@/lib/compliance/regulatory-graph');
-      const biasesForCompliance = (state.biasAnalysis || []).map((b: { biasType?: string; severity?: string; confidence?: number }) => ({
-        type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
-        severity: (b.severity || 'medium') as 'low' | 'medium' | 'high' | 'critical',
-        confidence: b.confidence || 0.5,
-      }));
+      const biasesForCompliance = (state.biasAnalysis || []).map(
+        (b: { biasType?: string; severity?: string; confidence?: number }) => ({
+          type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
+          severity: (b.severity || 'medium') as 'low' | 'medium' | 'high' | 'critical',
+          confidence: b.confidence || 0.5,
+        })
+      );
 
       if (biasesForCompliance.length > 0) {
         const regulatoryAssessments = assessCompliance(biasesForCompliance);
@@ -809,7 +811,10 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
           complianceData.regulatoryGraph = {
             frameworksChecked: regulatoryAssessments.map(a => a.framework.name),
             totalFindings: graphRegulations.length,
-            highestRisk: regulatoryAssessments.reduce((max: number, a) => Math.max(max, a.overallRiskScore), 0),
+            highestRisk: regulatoryAssessments.reduce(
+              (max: number, a) => Math.max(max, a.overallRiskScore),
+              0
+            ),
             findings: graphRegulations.slice(0, 20), // top 20 findings
           };
 
@@ -819,11 +824,16 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
             complianceData.riskScore = Math.round((complianceData.riskScore + graphRiskScore) / 2);
           }
 
-          log.info(`Regulatory graph: ${regulatoryAssessments.length} frameworks, ${graphRegulations.length} findings`);
+          log.info(
+            `Regulatory graph: ${regulatoryAssessments.length} frameworks, ${graphRegulations.length} findings`
+          );
         }
       }
     } catch (regError) {
-      log.debug('Regulatory graph enrichment unavailable: ' + (regError instanceof Error ? regError.message : String(regError)));
+      log.debug(
+        'Regulatory graph enrichment unavailable: ' +
+          (regError instanceof Error ? regError.message : String(regError))
+      );
     }
 
     log.info(
@@ -1237,47 +1247,59 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
   // 1. Bias Deductions (Compound Scoring with Ontology Interaction Weights)
   //    Uses the proprietary compound scoring engine for interaction-weighted
   //    bias severity instead of simple additive penalties.
-  let compoundScoreResult: Awaited<ReturnType<typeof import('@/lib/scoring/compound-engine').computeCompoundScore>> | null = null;
+  let compoundScoreResult: Awaited<
+    ReturnType<typeof import('@/lib/scoring/compound-engine').computeCompoundScore>
+  > | null = null;
   let biasDeductions = 0;
 
   try {
     const { computeCompoundScore } = await import('@/lib/scoring/compound-engine');
-    const detectedBiases = (state.biasAnalysis || []).map((b: { biasType?: string; severity?: string; confidence?: number; excerpt?: string }) => ({
-      type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
-      severity: ((b.severity || 'low').toLowerCase()) as 'low' | 'medium' | 'high' | 'critical',
-      confidence: b.confidence || 0.5,
-      excerpt: b.excerpt,
-    }));
+    const detectedBiases = (state.biasAnalysis || []).map(
+      (b: { biasType?: string; severity?: string; confidence?: number; excerpt?: string }) => ({
+        type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
+        severity: (b.severity || 'low').toLowerCase() as 'low' | 'medium' | 'high' | 'critical',
+        confidence: b.confidence || 0.5,
+        excerpt: b.excerpt,
+      })
+    );
 
     // Build org calibration from causal multipliers
     const orgCalibration: Record<string, number> = {};
     for (const [key, val] of causalMultipliers.entries()) {
-      orgCalibration[key] = Math.max(0.3, Math.min(2.5, val)) * (severityWeights[(detectedBiases.find(b => b.type === key)?.severity || 'medium')] || 15);
+      orgCalibration[key] =
+        Math.max(0.3, Math.min(2.5, val)) *
+        (severityWeights[detectedBiases.find(b => b.type === key)?.severity || 'medium'] || 15);
     }
 
     // Estimate document context from state
     const wordCount = (state.structuredContent || '').split(/\s+/).length;
-    const hasDissent = state.cognitiveAnalysis?.blindSpotGap != null && state.cognitiveAnalysis.blindSpotGap > 50;
+    const hasDissent =
+      state.cognitiveAnalysis?.blindSpotGap != null && state.cognitiveAnalysis.blindSpotGap > 50;
     const speakers = state.speakers || [];
 
-    compoundScoreResult = computeCompoundScore(100, detectedBiases, {
-      monetaryStakes: 'unknown',
-      participantCount: speakers.length,
-      dissentPresent: hasDissent,
-      timelineWeeks: null,
-      documentAgeWeeks: 0,
-      wordCount,
-    }, {
-      orgCalibration: Object.keys(orgCalibration).length > 0 ? orgCalibration : undefined,
-    });
+    compoundScoreResult = computeCompoundScore(
+      100,
+      detectedBiases,
+      {
+        monetaryStakes: 'unknown',
+        participantCount: speakers.length,
+        dissentPresent: hasDissent,
+        timelineWeeks: null,
+        documentAgeWeeks: 0,
+        wordCount,
+      },
+      {
+        orgCalibration: Object.keys(orgCalibration).length > 0 ? orgCalibration : undefined,
+      }
+    );
 
     // Use compound-adjusted deduction (difference between raw and calibrated)
     biasDeductions = Math.round(100 - compoundScoreResult.calibratedScore);
     log.info(
       `Compound scoring: raw_penalty=${compoundScoreResult.rawScore - compoundScoreResult.calibratedScore}, ` +
-      `multiplier=${compoundScoreResult.compoundMultiplier}, ` +
-      `context=${compoundScoreResult.contextAdjustment}, ` +
-      `interactions=${compoundScoreResult.biasScores.filter(b => b.interactionMultiplier > 1.05).length}`
+        `multiplier=${compoundScoreResult.compoundMultiplier}, ` +
+        `context=${compoundScoreResult.contextAdjustment}, ` +
+        `interactions=${compoundScoreResult.biasScores.filter(b => b.interactionMultiplier > 1.05).length}`
     );
   } catch {
     // Fallback to simple additive scoring if compound engine fails
@@ -1298,7 +1320,9 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
   // 1b. Bayesian Prior Integration
   // If a DecisionPrior exists for this analysis, apply Bayesian updating to
   // adjust bias confidence scores using the user's pre-analysis belief.
-  let bayesianResult: Awaited<ReturnType<typeof import('@/lib/scoring/bayesian-priors').applyBayesianPriors>> | null = null;
+  let bayesianResult: Awaited<
+    ReturnType<typeof import('@/lib/scoring/bayesian-priors').applyBayesianPriors>
+  > | null = null;
   try {
     // Look up the most recent prior for this user+document combination
     // Priors are linked to analyses, so find any prior for analyses of this document
@@ -1312,11 +1336,13 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
 
     if (priorRecord) {
       const { applyBayesianPriors } = await import('@/lib/scoring/bayesian-priors');
-      const detectedBiasesForBayes = (state.biasAnalysis || []).map((b: { biasType?: string; confidence?: number; severity?: string }) => ({
-        type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
-        confidence: b.confidence || 0.5,
-        severity: (b.severity || 'medium').toLowerCase(),
-      }));
+      const detectedBiasesForBayes = (state.biasAnalysis || []).map(
+        (b: { biasType?: string; confidence?: number; severity?: string }) => ({
+          type: (b.biasType || '').toLowerCase().replace(/\s+/g, '_'),
+          confidence: b.confidence || 0.5,
+          severity: (b.severity || 'medium').toLowerCase(),
+        })
+      );
 
       bayesianResult = applyBayesianPriors(
         100 - biasDeductions, // raw score after bias deductions
@@ -1324,8 +1350,10 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
         {
           beliefScore: (priorRecord.confidence ?? 50) / 100,
           confidence: (priorRecord.confidence ?? 50) / 100,
-          flaggedConcerns: priorRecord.evidenceToChange ? [priorRecord.evidenceToChange] : undefined,
-        },
+          flaggedConcerns: priorRecord.evidenceToChange
+            ? [priorRecord.evidenceToChange]
+            : undefined,
+        }
       );
 
       // Apply Bayesian-adjusted score influence (blend 80% compound + 20% Bayesian)
@@ -1334,7 +1362,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
         biasDeductions = Math.round(biasDeductions * 0.8 + bayesianDeduction * 0.2);
         log.info(
           `Bayesian priors applied: belief_delta=${bayesianResult.beliefDelta}, ` +
-          `info_gain=${bayesianResult.informationGain}, adjusted=${bayesianResult.adjustedScore}`
+            `info_gain=${bayesianResult.informationGain}, adjusted=${bayesianResult.adjustedScore}`
         );
       }
     }
@@ -1428,23 +1456,31 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
               .map(c => ({ company: c.company, outcome: c.outcome, biasTypes: c.biasTypes })),
           }
         : undefined,
-      compoundScoring: compoundScoreResult ? {
-        calibratedScore: compoundScoreResult.calibratedScore,
-        compoundMultiplier: compoundScoreResult.compoundMultiplier,
-        contextAdjustment: compoundScoreResult.contextAdjustment,
-        confidenceDecay: compoundScoreResult.confidenceDecay,
-        amplifyingInteractions: compoundScoreResult.biasScores
-          .filter(b => b.interactionMultiplier > 1.05)
-          .map(b => ({ bias: b.biasType, multiplier: b.interactionMultiplier, interactions: b.contributingInteractions })),
-        adjustments: compoundScoreResult.adjustments,
-      } : undefined,
-      bayesianPriors: bayesianResult ? {
-        adjustedScore: bayesianResult.adjustedScore,
-        beliefDelta: bayesianResult.beliefDelta,
-        informationGain: bayesianResult.informationGain,
-        priorInfluence: bayesianResult.priorInfluence,
-        biasAdjustments: bayesianResult.biasAdjustments,
-      } : undefined,
+      compoundScoring: compoundScoreResult
+        ? {
+            calibratedScore: compoundScoreResult.calibratedScore,
+            compoundMultiplier: compoundScoreResult.compoundMultiplier,
+            contextAdjustment: compoundScoreResult.contextAdjustment,
+            confidenceDecay: compoundScoreResult.confidenceDecay,
+            amplifyingInteractions: compoundScoreResult.biasScores
+              .filter(b => b.interactionMultiplier > 1.05)
+              .map(b => ({
+                bias: b.biasType,
+                multiplier: b.interactionMultiplier,
+                interactions: b.contributingInteractions,
+              })),
+            adjustments: compoundScoreResult.adjustments,
+          }
+        : undefined,
+      bayesianPriors: bayesianResult
+        ? {
+            adjustedScore: bayesianResult.adjustedScore,
+            beliefDelta: bayesianResult.beliefDelta,
+            informationGain: bayesianResult.informationGain,
+            priorInfluence: bayesianResult.priorInfluence,
+            biasAdjustments: bayesianResult.biasAdjustments,
+          }
+        : undefined,
     } satisfies AnalysisResult,
   };
 }

@@ -43,7 +43,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       section: 'Pillar 2 — Supervisory Review',
       title: 'Supervisory Review and Internal Capital Adequacy',
       description:
-        'Banks must have an internal capital adequacy assessment process (ICAAP) that considers all material risks, including those not fully captured in Pillar 1. Supervisors evaluate banks\' risk profiles and may impose additional capital requirements.',
+        "Banks must have an internal capital adequacy assessment process (ICAAP) that considers all material risks, including those not fully captured in Pillar 1. Supervisors evaluate banks' risk profiles and may impose additional capital requirements.",
       riskLevel: 'high',
       keywords: [
         'ICAAP',
@@ -61,7 +61,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       section: 'Pillar 3 — Market Discipline',
       title: 'Disclosure Requirements',
       description:
-        'Banks must publish detailed information about their risk profile, capital adequacy, and risk management practices. Disclosures must be sufficient to allow market participants to assess the bank\'s risk profile and the adequacy of its capital.',
+        "Banks must publish detailed information about their risk profile, capital adequacy, and risk management practices. Disclosures must be sufficient to allow market participants to assess the bank's risk profile and the adequacy of its capital.",
       riskLevel: 'high',
       keywords: [
         'disclosure',
@@ -127,7 +127,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'ICAAP assessments selectively incorporate stress scenarios and risk factors that confirm existing capital levels are adequate, rather than genuinely stress-testing capital adequacy under adverse conditions.',
       example:
-        'A bank\'s ICAAP uses stress scenarios calibrated to historical crises that the bank weathered successfully, confirming capital adequacy, while excluding hypothetical scenarios (e.g., a cyber-event combined with market stress) that might challenge it.',
+        "A bank's ICAAP uses stress scenarios calibrated to historical crises that the bank weathered successfully, confirming capital adequacy, while excluding hypothetical scenarios (e.g., a cyber-event combined with market stress) that might challenge it.",
     },
 
     // ── anchoring_bias ─────────────────────────────────────────────────
@@ -138,7 +138,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Risk weight calculations anchored to initial calibrations or regulatory minimums rather than independently derived from current portfolio risk. IRB model parameters anchored to historical calibration periods that may not reflect current conditions.',
       example:
-        'A bank\'s loss-given-default (LGD) estimates are anchored to a calibration performed in 2018 using benign-period data, and subsequent recalibrations make only marginal adjustments rather than fundamental reassessments based on updated through-the-cycle data.',
+        "A bank's loss-given-default (LGD) estimates are anchored to a calibration performed in 2018 using benign-period data, and subsequent recalibrations make only marginal adjustments rather than fundamental reassessments based on updated through-the-cycle data.",
     },
     {
       biasType: 'anchoring_bias',
@@ -158,7 +158,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Risk identification in the ICAAP dominated by recently materialised or widely publicised risks, while harder-to-imagine but potentially more severe risks are underweighted in the assessment.',
       example:
-        'After the 2023 banking stress, a bank\'s ICAAP extensively covers interest rate risk and deposit flight scenarios but underweights operational risk from AI model failures — a risk with no recent vivid precedent but potentially severe impact.',
+        "After the 2023 banking stress, a bank's ICAAP extensively covers interest rate risk and deposit flight scenarios but underweights operational risk from AI model failures — a risk with no recent vivid precedent but potentially severe impact.",
     },
     {
       biasType: 'availability_heuristic',
@@ -167,7 +167,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Liquidity risk management influenced by the most recent liquidity event, leading to over-preparation for the last crisis type while underestimating novel liquidity stress channels.',
       example:
-        'A bank over-invests in government bond HQLA buffers after a sovereign debt scare, while its actual highest liquidity risk — social media-driven retail deposit runs — receives no specific scenario planning because it hasn\'t happened to this bank yet.',
+        "A bank over-invests in government bond HQLA buffers after a sovereign debt scare, while its actual highest liquidity risk — social media-driven retail deposit runs — receives no specific scenario planning because it hasn't happened to this bank yet.",
     },
 
     // ── groupthink ─────────────────────────────────────────────────────
@@ -185,9 +185,9 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'basel3_pillar2_supervisory',
       riskWeight: 0.7,
       mechanism:
-        'ICAAP governance groups develop shared assumptions about the bank\'s risk profile that become immune to challenge. Stress scenario selection reflects group consensus rather than rigorous independent analysis.',
+        "ICAAP governance groups develop shared assumptions about the bank's risk profile that become immune to challenge. Stress scenario selection reflects group consensus rather than rigorous independent analysis.",
       example:
-        'A bank\'s risk committee collectively assumes that their diversified business model protects against severe stress, and the ICAAP stress scenarios implicitly reflect this shared belief rather than testing whether diversification benefits hold under extreme conditions.',
+        "A bank's risk committee collectively assumes that their diversified business model protects against severe stress, and the ICAAP stress scenarios implicitly reflect this shared belief rather than testing whether diversification benefits hold under extreme conditions.",
     },
 
     // ── authority_bias ─────────────────────────────────────────────────
@@ -196,9 +196,9 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'basel3_pillar1_capital',
       riskWeight: 0.6,
       mechanism:
-        'Risk analysts defer to senior risk officers\' judgment on model parameter choices, even when quantitative evidence suggests different calibrations. The authority of the CRO shapes risk assessments more than data.',
+        "Risk analysts defer to senior risk officers' judgment on model parameter choices, even when quantitative evidence suggests different calibrations. The authority of the CRO shapes risk assessments more than data.",
       example:
-        'A junior risk analyst\'s model back-testing reveals that PD estimates are systematically low for SME exposures, but she does not escalate the finding because the head of credit risk modelling personally calibrated those parameters.',
+        "A junior risk analyst's model back-testing reveals that PD estimates are systematically low for SME exposures, but she does not escalate the finding because the head of credit risk modelling personally calibrated those parameters.",
     },
     {
       biasType: 'authority_bias',
@@ -218,7 +218,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Risk modelling approaches adopted because peer banks use them, creating systemic risk through model monoculture. Banks gravitate toward similar risk models, creating correlated under-estimation of risk across the system.',
       example:
-        'Multiple banks adopt the same vendor\'s credit risk model, and all calibrate it using similar data periods, creating a systemic blind spot where all institutions simultaneously underestimate PDs for the same asset class.',
+        "Multiple banks adopt the same vendor's credit risk model, and all calibrate it using similar data periods, creating a systemic blind spot where all institutions simultaneously underestimate PDs for the same asset class.",
     },
     {
       biasType: 'bandwagon_effect',
@@ -245,9 +245,9 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'basel3_lcr',
       riskWeight: 0.65,
       mechanism:
-        'Overconfidence in the bank\'s ability to monetise HQLA under stress conditions, or in the accuracy of outflow projections, leading to liquidity buffers that are adequate on paper but insufficient in practice.',
+        "Overconfidence in the bank's ability to monetise HQLA under stress conditions, or in the accuracy of outflow projections, leading to liquidity buffers that are adequate on paper but insufficient in practice.",
       example:
-        'A bank\'s treasury is confident it can liquidate its government bond portfolio within 24 hours, but under actual market stress, bid-ask spreads widen dramatically and the bank can only monetise 60% of the expected amount at acceptable prices.',
+        "A bank's treasury is confident it can liquidate its government bond portfolio within 24 hours, but under actual market stress, bid-ask spreads widen dramatically and the bank can only monetise 60% of the expected amount at acceptable prices.",
     },
 
     // ── hindsight_bias ─────────────────────────────────────────────────
@@ -267,7 +267,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'After a risk event, Pillar 3 disclosures are retrospectively judged as inadequate, creating pressure to over-disclose in ways that produce noise rather than genuinely useful information for market participants.',
       example:
-        'After a trading loss, regulators and analysts criticise the bank\'s prior Pillar 3 disclosures for not highlighting the specific risk that materialised, even though the disclosure was comprehensive about market risk categories and VaR limits at the time.',
+        "After a trading loss, regulators and analysts criticise the bank's prior Pillar 3 disclosures for not highlighting the specific risk that materialised, even though the disclosure was comprehensive about market risk categories and VaR limits at the time.",
     },
 
     // ── planning_fallacy ───────────────────────────────────────────────
@@ -287,7 +287,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Liquidity contingency plans underestimate the time needed to execute recovery actions under stress, creating a gap between planned and achievable liquidity generation in a crisis.',
       example:
-        'A bank\'s liquidity contingency plan assumes it can execute a repo programme within 48 hours of a stress event, but operational reality under stress (counterparty reluctance, legal documentation, settlement delays) means execution takes 2 weeks.',
+        "A bank's liquidity contingency plan assumes it can execute a repo programme within 48 hours of a stress event, but operational reality under stress (counterparty reluctance, legal documentation, settlement delays) means execution takes 2 weeks.",
     },
 
     // ── loss_aversion ──────────────────────────────────────────────────
@@ -298,7 +298,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Loss aversion in capital allocation leads banks to resist releasing capital from profitable business lines to build buffers, because the immediate loss of returns is felt more acutely than the probabilistic benefit of higher resilience.',
       example:
-        'A bank resists increasing its countercyclical capital buffer because the immediate reduction in ROE from holding additional capital outweighs management\'s assessment of the probability-weighted benefit of the buffer in a downturn.',
+        "A bank resists increasing its countercyclical capital buffer because the immediate reduction in ROE from holding additional capital outweighs management's assessment of the probability-weighted benefit of the buffer in a downturn.",
     },
     {
       biasType: 'loss_aversion',
@@ -307,7 +307,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Loss aversion drives banks to maintain cheaper short-term wholesale funding rather than transitioning to more expensive but more stable long-term funding, because the funding cost increase is felt as an immediate loss.',
       example:
-        'A bank\'s treasury maintains a heavy reliance on overnight repo funding because switching to 1-year term funding would cost 80bps more, with the immediate NIM impact outweighing the NSFR compliance benefit in management\'s decision-making.',
+        "A bank's treasury maintains a heavy reliance on overnight repo funding because switching to 1-year term funding would cost 80bps more, with the immediate NIM impact outweighing the NSFR compliance benefit in management's decision-making.",
     },
 
     // ── sunk_cost_fallacy ──────────────────────────────────────────────
@@ -318,7 +318,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Continued use of legacy risk models because of the significant investment in their development and regulatory approval, even when newer approaches would provide more accurate risk measurement.',
       example:
-        'A bank continues using an IRB model approved in 2016 because the original development cost was EUR 15M and the regulatory approval process took 3 years, even though the model\'s discrimination power has deteriorated significantly.',
+        "A bank continues using an IRB model approved in 2016 because the original development cost was EUR 15M and the regulatory approval process took 3 years, even though the model's discrimination power has deteriorated significantly.",
     },
     {
       biasType: 'sunk_cost_fallacy',
@@ -327,7 +327,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'ICAAP processes maintained in their current form because of prior investment in developing the methodology, rather than redesigning to address evolved risk profiles and supervisory expectations.',
       example:
-        'A bank\'s ICAAP stress testing infrastructure was built at significant cost for a pre-COVID risk environment, and the bank continues using the same scenario framework rather than investing in a new one that captures current systemic risks.',
+        "A bank's ICAAP stress testing infrastructure was built at significant cost for a pre-COVID risk environment, and the bank continues using the same scenario framework rather than investing in a new one that captures current systemic risks.",
     },
 
     // ── status_quo_bias ────────────────────────────────────────────────
@@ -345,9 +345,9 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'basel3_pillar3_disclosure',
       riskWeight: 0.45,
       mechanism:
-        'Disclosure templates and reporting formats maintained year-over-year without evolution, even as the bank\'s risk profile changes and new disclosure requirements emerge, because existing processes are entrenched.',
+        "Disclosure templates and reporting formats maintained year-over-year without evolution, even as the bank's risk profile changes and new disclosure requirements emerge, because existing processes are entrenched.",
       example:
-        'A bank\'s Pillar 3 report uses the same format and narrative structure for 5 consecutive years, with only numerical updates, failing to incorporate new disclosure requirements on climate risk, operational resilience, and digital asset exposures.',
+        "A bank's Pillar 3 report uses the same format and narrative structure for 5 consecutive years, with only numerical updates, failing to incorporate new disclosure requirements on climate risk, operational resilience, and digital asset exposures.",
     },
 
     // ── framing_effect ─────────────────────────────────────────────────
@@ -356,9 +356,9 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'basel3_pillar3_disclosure',
       riskWeight: 0.65,
       mechanism:
-        'Risk disclosures framed to present the bank\'s risk profile favourably, emphasising strengths while technically disclosing but de-emphasising material risks. The framing reduces the effectiveness of market discipline.',
+        "Risk disclosures framed to present the bank's risk profile favourably, emphasising strengths while technically disclosing but de-emphasising material risks. The framing reduces the effectiveness of market discipline.",
       example:
-        'A bank\'s Pillar 3 report leads with its strong CET1 ratio and conservative risk culture narrative, while burying information about a 40% increase in Level 3 assets and a growing maturity mismatch in a technical appendix.',
+        "A bank's Pillar 3 report leads with its strong CET1 ratio and conservative risk culture narrative, while burying information about a 40% increase in Level 3 assets and a growing maturity mismatch in a technical appendix.",
     },
     {
       biasType: 'framing_effect',
@@ -387,7 +387,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'ICAAP risk identification processes selectively perceive risks that fit the existing risk taxonomy while missing emerging risks that do not fit neatly into established categories.',
       example:
-        'A bank\'s ICAAP captures traditional credit, market, and operational risks but selectively filters out interconnection risks between these categories (e.g., cyber-event triggering credit losses) because the risk taxonomy does not accommodate cross-category risks.',
+        "A bank's ICAAP captures traditional credit, market, and operational risks but selectively filters out interconnection risks between these categories (e.g., cyber-event triggering credit losses) because the risk taxonomy does not accommodate cross-category risks.",
     },
 
     // ── recency_bias ───────────────────────────────────────────────────
@@ -416,7 +416,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'basel3_pillar1_capital',
       riskWeight: 0.5,
       mechanism:
-        'Risk teams apply minimal cognitive effort to complex risk calculations, defaulting to standardised approaches or vendor model defaults rather than investing analytical effort in calibrations specific to the bank\'s portfolio.',
+        "Risk teams apply minimal cognitive effort to complex risk calculations, defaulting to standardised approaches or vendor model defaults rather than investing analytical effort in calibrations specific to the bank's portfolio.",
       example:
         'A bank uses vendor-default correlation assumptions in its IRB credit portfolio model without verifying whether these correlations reflect actual default dependencies in its specific loan book, because the analytical effort to derive bank-specific correlations is substantial.',
     },
@@ -425,7 +425,7 @@ export const BASEL3_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'basel3_pillar3_disclosure',
       riskWeight: 0.45,
       mechanism:
-        'Disclosure teams apply minimal effort to narrative disclosures, producing boilerplate text that technically meets requirements but does not provide market participants with genuine insight into the bank\'s risk profile.',
+        "Disclosure teams apply minimal effort to narrative disclosures, producing boilerplate text that technically meets requirements but does not provide market participants with genuine insight into the bank's risk profile.",
       example:
         'A bank\'s Pillar 3 qualitative disclosures are copied from the prior year with minimal updates, containing generic statements about "robust risk management" rather than specific, current information about how the bank\'s risk profile has evolved.',
     },

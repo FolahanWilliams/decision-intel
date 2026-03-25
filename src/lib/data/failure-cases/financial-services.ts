@@ -8,8 +8,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2008,
     yearDiscovered: 2008,
-    summary: 'Lehman Brothers filed for the largest bankruptcy in U.S. history after accumulating massive exposure to subprime mortgage-backed securities. Senior leadership dismissed internal risk warnings and external market signals, maintaining leveraged positions that ultimately proved catastrophic.',
-    decisionContext: 'Whether to reduce exposure to mortgage-backed securities and lower leverage ratios as the housing market showed signs of stress in 2007-2008.',
+    summary:
+      'Lehman Brothers filed for the largest bankruptcy in U.S. history after accumulating massive exposure to subprime mortgage-backed securities. Senior leadership dismissed internal risk warnings and external market signals, maintaining leveraged positions that ultimately proved catastrophic.',
+    decisionContext:
+      'Whether to reduce exposure to mortgage-backed securities and lower leverage ratios as the housing market showed signs of stress in 2007-2008.',
     outcome: 'catastrophic_failure',
     impactScore: 100,
     estimatedLoss: '$639B',
@@ -28,7 +30,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'When internal risk officers are overruled or sidelined, the organization loses its critical feedback loop.',
       'Groupthink at the board level can prevent timely recognition of systemic market shifts.',
     ],
-    source: 'Lehman Brothers Holdings Inc. Chapter 11 Proceedings, SDNY Case No. 08-13555; Financial Crisis Inquiry Commission Report (2011)',
+    source:
+      'Lehman Brothers Holdings Inc. Chapter 11 Proceedings, SDNY Case No. 08-13555; Financial Crisis Inquiry Commission Report (2011)',
     sourceType: 'sec_filing',
   },
   {
@@ -38,8 +41,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2007,
     yearDiscovered: 2007,
-    summary: 'Two Bear Stearns hedge funds heavily invested in collateralized debt obligations backed by subprime mortgages collapsed, triggering a liquidity crisis that led to the firm\'s fire-sale acquisition by JPMorgan Chase. Fund managers anchored to historical CDO performance and ignored deteriorating fundamentals.',
-    decisionContext: 'Whether to maintain or reduce leveraged positions in subprime CDOs as delinquency rates began rising in early 2007.',
+    summary:
+      "Two Bear Stearns hedge funds heavily invested in collateralized debt obligations backed by subprime mortgages collapsed, triggering a liquidity crisis that led to the firm's fire-sale acquisition by JPMorgan Chase. Fund managers anchored to historical CDO performance and ignored deteriorating fundamentals.",
+    decisionContext:
+      'Whether to maintain or reduce leveraged positions in subprime CDOs as delinquency rates began rising in early 2007.',
     outcome: 'catastrophic_failure',
     impactScore: 85,
     estimatedLoss: '$1.6B',
@@ -58,7 +63,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Leverage amplifies losses exponentially when underlying asset correlations increase during stress.',
       'Liquidity risk in structured products is often underestimated until a crisis materializes.',
     ],
-    source: 'SEC Litigation Release No. 22306 (2012); Bear Stearns Asset Management investor communications',
+    source:
+      'SEC Litigation Release No. 22306 (2012); Bear Stearns Asset Management investor communications',
     sourceType: 'sec_filing',
   },
   {
@@ -68,8 +74,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2012,
     yearDiscovered: 2012,
-    summary: 'JPMorgan\'s Chief Investment Office accumulated massive synthetic credit derivative positions that resulted in $6.2 billion in trading losses. Trader Bruno Iksil\'s positions grew unchecked as risk models were manipulated and senior management dismissed early warnings.',
-    decisionContext: 'Whether to reduce or hedge the CIO\'s growing synthetic credit portfolio as positions exceeded internal risk limits in early 2012.',
+    summary:
+      "JPMorgan's Chief Investment Office accumulated massive synthetic credit derivative positions that resulted in $6.2 billion in trading losses. Trader Bruno Iksil's positions grew unchecked as risk models were manipulated and senior management dismissed early warnings.",
+    decisionContext:
+      "Whether to reduce or hedge the CIO's growing synthetic credit portfolio as positions exceeded internal risk limits in early 2012.",
     outcome: 'failure',
     impactScore: 75,
     estimatedLoss: '$6.2B',
@@ -88,7 +96,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'When traders mark their own positions, conflicts of interest can obscure true risk exposure.',
       'A culture where challenging senior traders is discouraged allows losses to compound.',
     ],
-    source: 'U.S. Senate Permanent Subcommittee on Investigations, "JPMorgan Chase Whale Trades" Report (2013)',
+    source:
+      'U.S. Senate Permanent Subcommittee on Investigations, "JPMorgan Chase Whale Trades" Report (2013)',
     sourceType: 'case_study',
   },
   {
@@ -98,12 +107,20 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 1995,
     yearDiscovered: 1995,
-    summary: 'Nick Leeson, a derivatives trader in Barings\' Singapore office, accumulated $1.3 billion in hidden losses through unauthorized speculative trades on Nikkei futures. The 233-year-old bank collapsed when the losses were discovered, as management had granted Leeson unsupervised authority over both trading and settlement.',
-    decisionContext: 'Whether to maintain Leeson\'s dual role overseeing both trading execution and back-office settlement without independent oversight.',
+    summary:
+      "Nick Leeson, a derivatives trader in Barings' Singapore office, accumulated $1.3 billion in hidden losses through unauthorized speculative trades on Nikkei futures. The 233-year-old bank collapsed when the losses were discovered, as management had granted Leeson unsupervised authority over both trading and settlement.",
+    decisionContext:
+      "Whether to maintain Leeson's dual role overseeing both trading execution and back-office settlement without independent oversight.",
     outcome: 'catastrophic_failure',
     impactScore: 90,
     estimatedLoss: '$1.3B',
-    biasesPresent: ['authority_bias', 'overconfidence_bias', 'status_quo_bias', 'groupthink', 'cognitive_misering'],
+    biasesPresent: [
+      'authority_bias',
+      'overconfidence_bias',
+      'status_quo_bias',
+      'groupthink',
+      'cognitive_misering',
+    ],
     primaryBias: 'authority_bias',
     toxicCombinations: ['Yes Committee'],
     contextFactors: {
@@ -128,12 +145,20 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 1998,
     yearDiscovered: 1998,
-    summary: 'LTCM, a hedge fund staffed by Nobel laureates and renowned traders, nearly collapsed the global financial system when its highly leveraged convergence trades failed during the Russian financial crisis. The fund\'s models assumed historical correlations would hold, leading to $4.6 billion in losses and a Federal Reserve-coordinated bailout.',
-    decisionContext: 'Whether to reduce leverage and position concentration as emerging market volatility increased in mid-1998, or to trust that models based on historical data would hold.',
+    summary:
+      "LTCM, a hedge fund staffed by Nobel laureates and renowned traders, nearly collapsed the global financial system when its highly leveraged convergence trades failed during the Russian financial crisis. The fund's models assumed historical correlations would hold, leading to $4.6 billion in losses and a Federal Reserve-coordinated bailout.",
+    decisionContext:
+      'Whether to reduce leverage and position concentration as emerging market volatility increased in mid-1998, or to trust that models based on historical data would hold.',
     outcome: 'catastrophic_failure',
     impactScore: 95,
     estimatedLoss: '$4.6B',
-    biasesPresent: ['overconfidence_bias', 'anchoring_bias', 'cognitive_misering', 'groupthink', 'confirmation_bias'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'anchoring_bias',
+      'cognitive_misering',
+      'groupthink',
+      'confirmation_bias',
+    ],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Echo Chamber', 'Optimism Trap'],
     contextFactors: {
@@ -148,7 +173,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'The presence of Nobel laureates and star talent does not immunize an organization against overconfidence.',
       'Extreme leverage transforms manageable losses into systemic crises.',
     ],
-    source: 'Roger Lowenstein, "When Genius Failed" (2000); President\'s Working Group on Financial Markets Report (1999)',
+    source:
+      'Roger Lowenstein, "When Genius Failed" (2000); President\'s Working Group on Financial Markets Report (1999)',
     sourceType: 'academic_paper',
   },
   {
@@ -158,8 +184,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2001,
     yearDiscovered: 2001,
-    summary: 'Enron used special purpose entities and mark-to-market accounting to hide billions in debt and inflate profits. A culture of intimidation silenced internal dissent while the board repeatedly approved complex off-balance-sheet structures they did not fully understand, resulting in the largest corporate bankruptcy at the time.',
-    decisionContext: 'Whether to approve increasingly complex off-balance-sheet financing structures proposed by CFO Andrew Fastow, despite their opacity and conflict-of-interest concerns.',
+    summary:
+      'Enron used special purpose entities and mark-to-market accounting to hide billions in debt and inflate profits. A culture of intimidation silenced internal dissent while the board repeatedly approved complex off-balance-sheet structures they did not fully understand, resulting in the largest corporate bankruptcy at the time.',
+    decisionContext:
+      'Whether to approve increasingly complex off-balance-sheet financing structures proposed by CFO Andrew Fastow, despite their opacity and conflict-of-interest concerns.',
     outcome: 'catastrophic_failure',
     impactScore: 95,
     estimatedLoss: '$74B',
@@ -176,9 +204,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     lessonsLearned: [
       'Boards that defer to charismatic executives without independent scrutiny become rubber stamps for fraud.',
       'Confirmation bias in auditing relationships (Arthur Andersen) allowed accounting irregularities to persist for years.',
-      'Whistleblower protections are essential; Sherron Watkins\' warnings were ignored because the culture punished dissent.',
+      "Whistleblower protections are essential; Sherron Watkins' warnings were ignored because the culture punished dissent.",
     ],
-    source: 'U.S. Senate Committee on Governmental Affairs, "The Role of the Board of Directors in Enron\'s Collapse" (2002)',
+    source:
+      'U.S. Senate Committee on Governmental Affairs, "The Role of the Board of Directors in Enron\'s Collapse" (2002)',
     sourceType: 'case_study',
   },
   {
@@ -188,12 +217,20 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2008,
     yearDiscovered: 2008,
-    summary: 'AIG\'s Financial Products division sold approximately $500 billion in credit default swaps on mortgage-backed CDOs without adequate reserves. When housing prices collapsed, AIG faced margin calls it could not meet, requiring a $182 billion federal bailout to prevent cascading counterparty failures.',
-    decisionContext: 'Whether to continue underwriting credit default swaps on mortgage-backed securities without posting collateral or building loss reserves against a potential housing downturn.',
+    summary:
+      "AIG's Financial Products division sold approximately $500 billion in credit default swaps on mortgage-backed CDOs without adequate reserves. When housing prices collapsed, AIG faced margin calls it could not meet, requiring a $182 billion federal bailout to prevent cascading counterparty failures.",
+    decisionContext:
+      'Whether to continue underwriting credit default swaps on mortgage-backed securities without posting collateral or building loss reserves against a potential housing downturn.',
     outcome: 'catastrophic_failure',
     impactScore: 100,
     estimatedLoss: '$182B',
-    biasesPresent: ['overconfidence_bias', 'anchoring_bias', 'confirmation_bias', 'cognitive_misering', 'groupthink'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'anchoring_bias',
+      'confirmation_bias',
+      'cognitive_misering',
+      'groupthink',
+    ],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Optimism Trap', 'Echo Chamber'],
     contextFactors: {
@@ -206,9 +243,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     lessonsLearned: [
       'Selling insurance without reserves against tail risk is a business model that guarantees eventual catastrophe.',
       'Anchoring to AAA credit ratings on structured products masked the true default correlation risk.',
-      'Counterparty risk concentration can transform a single firm\'s failure into a systemic crisis.',
+      "Counterparty risk concentration can transform a single firm's failure into a systemic crisis.",
     ],
-    source: 'Financial Crisis Inquiry Commission Report (2011); Congressional Oversight Panel, "The AIG Rescue" (2010)',
+    source:
+      'Financial Crisis Inquiry Commission Report (2011); Congressional Oversight Panel, "The AIG Rescue" (2010)',
     sourceType: 'sec_filing',
   },
   {
@@ -218,8 +256,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2020,
     yearDiscovered: 2020,
-    summary: 'German payments company Wirecard fabricated €1.9 billion in cash balances held in Philippine bank accounts. Despite years of investigative journalism by the Financial Times exposing irregularities, German regulators and auditors sided with the company, even filing criminal complaints against the journalists.',
-    decisionContext: 'Whether to investigate or dismiss repeated allegations of accounting fraud raised by short sellers and journalists between 2015 and 2020.',
+    summary:
+      'German payments company Wirecard fabricated €1.9 billion in cash balances held in Philippine bank accounts. Despite years of investigative journalism by the Financial Times exposing irregularities, German regulators and auditors sided with the company, even filing criminal complaints against the journalists.',
+    decisionContext:
+      'Whether to investigate or dismiss repeated allegations of accounting fraud raised by short sellers and journalists between 2015 and 2020.',
     outcome: 'catastrophic_failure',
     impactScore: 85,
     estimatedLoss: '€1.9B',
@@ -238,7 +278,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Shooting the messenger (attacking journalists and short sellers) is a red flag for confirmation bias in governance.',
       'Third-party audits are insufficient safeguards when auditors face conflicts of interest and fail to verify basic claims.',
     ],
-    source: 'German Parliamentary Inquiry into Wirecard (2021); FT investigative series by Dan McCrum (2015-2020)',
+    source:
+      'German Parliamentary Inquiry into Wirecard (2021); FT investigative series by Dan McCrum (2015-2020)',
     sourceType: 'news_investigation',
   },
   {
@@ -248,12 +289,20 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2021,
     yearDiscovered: 2021,
-    summary: 'Credit Suisse lost $5.5 billion when family office Archegos Capital defaulted on margin calls from highly leveraged total return swap positions. Despite receiving multiple internal warnings about Archegos\'s concentrated exposure, the prime brokerage division chose to maintain the profitable relationship rather than reduce limits.',
-    decisionContext: 'Whether to enforce margin requirements and reduce exposure to Archegos Capital as the family office\'s concentrated leveraged positions grew beyond normal risk thresholds.',
+    summary:
+      "Credit Suisse lost $5.5 billion when family office Archegos Capital defaulted on margin calls from highly leveraged total return swap positions. Despite receiving multiple internal warnings about Archegos's concentrated exposure, the prime brokerage division chose to maintain the profitable relationship rather than reduce limits.",
+    decisionContext:
+      "Whether to enforce margin requirements and reduce exposure to Archegos Capital as the family office's concentrated leveraged positions grew beyond normal risk thresholds.",
     outcome: 'failure',
     impactScore: 75,
     estimatedLoss: '$5.5B',
-    biasesPresent: ['anchoring_bias', 'status_quo_bias', 'cognitive_misering', 'loss_aversion', 'overconfidence_bias'],
+    biasesPresent: [
+      'anchoring_bias',
+      'status_quo_bias',
+      'cognitive_misering',
+      'loss_aversion',
+      'overconfidence_bias',
+    ],
     primaryBias: 'anchoring_bias',
     toxicCombinations: ['Status Quo Lock'],
     contextFactors: {
@@ -268,7 +317,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Status quo bias in risk management means limits that should be tightened remain unchanged until it is too late.',
       'When multiple banks have the same exposure, the first to act minimizes losses while the last absorbs the worst.',
     ],
-    source: 'Credit Suisse Special Committee Report on Archegos (2021); SEC complaint against Archegos principals',
+    source:
+      'Credit Suisse Special Committee Report on Archegos (2021); SEC complaint against Archegos principals',
     sourceType: 'case_study',
   },
   {
@@ -278,8 +328,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2022,
     yearDiscovered: 2022,
-    summary: 'FTX, valued at $32 billion, collapsed in days after it was revealed that customer deposits had been commingled with its sister trading firm Alameda Research. The company operated without a board of directors, and investors performed minimal due diligence, deferring to founder Sam Bankman-Fried\'s perceived authority.',
-    decisionContext: 'Whether investors, auditors, and regulators should have demanded standard corporate governance structures, independent boards, and segregation of customer funds before extending trust and capital.',
+    summary:
+      "FTX, valued at $32 billion, collapsed in days after it was revealed that customer deposits had been commingled with its sister trading firm Alameda Research. The company operated without a board of directors, and investors performed minimal due diligence, deferring to founder Sam Bankman-Fried's perceived authority.",
+    decisionContext:
+      'Whether investors, auditors, and regulators should have demanded standard corporate governance structures, independent boards, and segregation of customer funds before extending trust and capital.',
     outcome: 'catastrophic_failure',
     impactScore: 90,
     estimatedLoss: '$32B',
@@ -295,10 +347,11 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     },
     lessonsLearned: [
       'Authority bias toward charismatic founders can cause sophisticated investors to abandon basic due diligence.',
-      'The absence of a functioning board of directors is a critical governance red flag regardless of a company\'s valuation.',
+      "The absence of a functioning board of directors is a critical governance red flag regardless of a company's valuation.",
       'Commingling customer funds with proprietary trading is a fundamental violation of fiduciary duty that no amount of innovation justifies.',
     ],
-    source: 'FTX Debtors\' First Interim Report, Chapter 11 Case No. 22-11068 (2023); SEC v. Samuel Bankman-Fried complaint',
+    source:
+      "FTX Debtors' First Interim Report, Chapter 11 Case No. 22-11068 (2023); SEC v. Samuel Bankman-Fried complaint",
     sourceType: 'sec_filing',
   },
   {
@@ -308,8 +361,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2023,
     yearDiscovered: 2023,
-    summary: 'SVB collapsed after a bank run triggered by unrealized losses on its long-duration bond portfolio. Management had concentrated deposits in the tech/VC sector and invested heavily in long-term treasuries and MBS without adequate interest rate hedging, anchoring to the prolonged low-rate environment.',
-    decisionContext: 'Whether to hedge interest rate risk on the held-to-maturity bond portfolio or maintain unhedged positions as rates began rising rapidly in 2022.',
+    summary:
+      'SVB collapsed after a bank run triggered by unrealized losses on its long-duration bond portfolio. Management had concentrated deposits in the tech/VC sector and invested heavily in long-term treasuries and MBS without adequate interest rate hedging, anchoring to the prolonged low-rate environment.',
+    decisionContext:
+      'Whether to hedge interest rate risk on the held-to-maturity bond portfolio or maintain unhedged positions as rates began rising rapidly in 2022.',
     outcome: 'catastrophic_failure',
     impactScore: 90,
     estimatedLoss: '$209B',
@@ -328,7 +383,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Concentrated depositor bases in a single industry amplify run risk when that industry faces a downturn.',
       'Recency bias in risk models that rely on recent low-volatility periods systematically underestimate tail risks.',
     ],
-    source: 'Federal Reserve Board Review of the Federal Reserve\'s Supervision and Regulation of SVB (2023)',
+    source:
+      "Federal Reserve Board Review of the Federal Reserve's Supervision and Regulation of SVB (2023)",
     sourceType: 'case_study',
   },
   {
@@ -338,12 +394,20 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2011,
     yearDiscovered: 2011,
-    summary: 'Under CEO Jon Corzine\'s leadership, MF Global made a $6.3 billion bet on European sovereign debt using repo-to-maturity transactions. When European debt prices fell, margin calls drained the firm\'s liquidity, and $1.6 billion in customer funds were improperly used to meet obligations.',
-    decisionContext: 'Whether to approve CEO Corzine\'s strategy of leveraged bets on European sovereign bonds as a path to transforming MF Global from a brokerage into an investment bank.',
+    summary:
+      "Under CEO Jon Corzine's leadership, MF Global made a $6.3 billion bet on European sovereign debt using repo-to-maturity transactions. When European debt prices fell, margin calls drained the firm's liquidity, and $1.6 billion in customer funds were improperly used to meet obligations.",
+    decisionContext:
+      "Whether to approve CEO Corzine's strategy of leveraged bets on European sovereign bonds as a path to transforming MF Global from a brokerage into an investment bank.",
     outcome: 'catastrophic_failure',
     impactScore: 75,
     estimatedLoss: '$1.6B',
-    biasesPresent: ['overconfidence_bias', 'anchoring_bias', 'authority_bias', 'groupthink', 'sunk_cost_fallacy'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'anchoring_bias',
+      'authority_bias',
+      'groupthink',
+      'sunk_cost_fallacy',
+    ],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Yes Committee', 'Sunk Ship'],
     contextFactors: {
@@ -354,11 +418,11 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       participantCount: 7,
     },
     lessonsLearned: [
-      'A CEO\'s prior political stature and reputation can create authority bias that suppresses board-level risk oversight.',
+      "A CEO's prior political stature and reputation can create authority bias that suppresses board-level risk oversight.",
       'Concentrated directional bets funded by customer money violate the fundamental trust of brokerage operations.',
       'Anchoring to past success in government bond markets ignores the different risk profile of sovereign credit exposure.',
     ],
-    source: 'CFTC v. MF Global Inc. complaint; SIPA Trustee\'s Report on MF Global (2013)',
+    source: "CFTC v. MF Global Inc. complaint; SIPA Trustee's Report on MF Global (2013)",
     sourceType: 'sec_filing',
   },
   {
@@ -368,8 +432,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2016,
     yearDiscovered: 2016,
-    summary: 'Wells Fargo employees created over 3.5 million unauthorized bank and credit card accounts to meet aggressive cross-selling targets. The practice persisted for over a decade as management dismissed internal complaints and the board failed to investigate systemic misconduct.',
-    decisionContext: 'Whether to maintain aggressive cross-selling quotas and the "eight is great" strategy despite mounting evidence of employee misconduct and unauthorized account creation.',
+    summary:
+      'Wells Fargo employees created over 3.5 million unauthorized bank and credit card accounts to meet aggressive cross-selling targets. The practice persisted for over a decade as management dismissed internal complaints and the board failed to investigate systemic misconduct.',
+    decisionContext:
+      'Whether to maintain aggressive cross-selling quotas and the "eight is great" strategy despite mounting evidence of employee misconduct and unauthorized account creation.',
     outcome: 'failure',
     impactScore: 80,
     estimatedLoss: '$3B',
@@ -388,7 +454,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'When employees who report problems are fired rather than heard, the organization eliminates its own early warning system.',
       'Authority bias toward a storied corporate culture ("the Wells Fargo way") prevented leaders from acknowledging systemic fraud.',
     ],
-    source: 'Wells Fargo Board Independent Directors Report (2017); CFPB Consent Order No. 2016-CFPB-0015',
+    source:
+      'Wells Fargo Board Independent Directors Report (2017); CFPB Consent Order No. 2016-CFPB-0015',
     sourceType: 'case_study',
   },
   {
@@ -398,12 +465,20 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2017,
     yearDiscovered: 2017,
-    summary: 'Deutsche Bank\'s Moscow branch facilitated $10 billion in mirror trades that moved money out of Russia between 2011 and 2015. Compliance failures and a culture of status quo acceptance allowed suspicious transactions to continue despite red flags, resulting in $630 million in regulatory fines.',
-    decisionContext: 'Whether to investigate and halt suspicious mirror trading patterns between the Moscow and London offices that compliance teams had flagged multiple times.',
+    summary:
+      "Deutsche Bank's Moscow branch facilitated $10 billion in mirror trades that moved money out of Russia between 2011 and 2015. Compliance failures and a culture of status quo acceptance allowed suspicious transactions to continue despite red flags, resulting in $630 million in regulatory fines.",
+    decisionContext:
+      'Whether to investigate and halt suspicious mirror trading patterns between the Moscow and London offices that compliance teams had flagged multiple times.',
     outcome: 'failure',
     impactScore: 65,
     estimatedLoss: '$630M',
-    biasesPresent: ['status_quo_bias', 'cognitive_misering', 'groupthink', 'confirmation_bias', 'selective_perception'],
+    biasesPresent: [
+      'status_quo_bias',
+      'cognitive_misering',
+      'groupthink',
+      'confirmation_bias',
+      'selective_perception',
+    ],
     primaryBias: 'status_quo_bias',
     toxicCombinations: ['Echo Chamber'],
     contextFactors: {
@@ -428,8 +503,10 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     industry: 'financial_services',
     year: 2008,
     yearDiscovered: 2008,
-    summary: 'Bernie Madoff operated the largest Ponzi scheme in history for at least 17 years, fabricating returns for thousands of investors. Despite Harry Markopolos submitting detailed fraud evidence to the SEC multiple times starting in 2000, regulators deferred to Madoff\'s authority and reputation as a former NASDAQ chairman.',
-    decisionContext: 'Whether the SEC and feeder funds should investigate Madoff\'s consistently above-market returns and opaque operational structure, or continue to defer to his industry authority and reputation.',
+    summary:
+      "Bernie Madoff operated the largest Ponzi scheme in history for at least 17 years, fabricating returns for thousands of investors. Despite Harry Markopolos submitting detailed fraud evidence to the SEC multiple times starting in 2000, regulators deferred to Madoff's authority and reputation as a former NASDAQ chairman.",
+    decisionContext:
+      "Whether the SEC and feeder funds should investigate Madoff's consistently above-market returns and opaque operational structure, or continue to defer to his industry authority and reputation.",
     outcome: 'catastrophic_failure',
     impactScore: 95,
     estimatedLoss: '$64.8B',
@@ -448,7 +525,8 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Bandwagon effect among investors created social proof that substituted for independent due diligence.',
       'Consistent, market-beating returns with no drawdowns are themselves a red flag that should trigger deeper scrutiny.',
     ],
-    source: 'SEC Office of Inspector General Report No. 509 (2009); Harry Markopolos, "No One Would Listen" (2010)',
+    source:
+      'SEC Office of Inspector General Report No. 509 (2009); Harry Markopolos, "No One Would Listen" (2010)',
     sourceType: 'sec_filing',
   },
 ];

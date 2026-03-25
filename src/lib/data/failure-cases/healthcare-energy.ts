@@ -8,12 +8,20 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     industry: 'healthcare',
     year: 2004,
     yearDiscovered: 2004,
-    summary: 'Merck voluntarily withdrew its blockbuster painkiller Vioxx after a study confirmed it doubled the risk of heart attacks and strokes. Internal documents later revealed Merck scientists had identified cardiovascular risks years earlier but selectively presented data to regulators and physicians to protect $2.5 billion in annual revenue.',
-    decisionContext: 'Whether to investigate and disclose emerging cardiovascular risk signals from clinical trials or continue marketing Vioxx while designing studies to minimize unfavorable findings.',
+    summary:
+      'Merck voluntarily withdrew its blockbuster painkiller Vioxx after a study confirmed it doubled the risk of heart attacks and strokes. Internal documents later revealed Merck scientists had identified cardiovascular risks years earlier but selectively presented data to regulators and physicians to protect $2.5 billion in annual revenue.',
+    decisionContext:
+      'Whether to investigate and disclose emerging cardiovascular risk signals from clinical trials or continue marketing Vioxx while designing studies to minimize unfavorable findings.',
     outcome: 'catastrophic_failure',
     impactScore: 90,
     estimatedLoss: '$4.85B',
-    biasesPresent: ['confirmation_bias', 'selective_perception', 'groupthink', 'loss_aversion', 'authority_bias'],
+    biasesPresent: [
+      'confirmation_bias',
+      'selective_perception',
+      'groupthink',
+      'loss_aversion',
+      'authority_bias',
+    ],
     primaryBias: 'confirmation_bias',
     toxicCombinations: ['Echo Chamber'],
     contextFactors: {
@@ -38,12 +46,20 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     industry: 'healthcare',
     year: 1996,
     yearDiscovered: 2020,
-    summary: 'Purdue Pharma aggressively marketed OxyContin as a low-addiction-risk painkiller, contributing to the opioid epidemic that has killed over 500,000 Americans. The company knew its claims about addiction risk were false but continued its marketing campaign for over two decades, driven by confirmation bias around its own flawed studies.',
-    decisionContext: 'Whether to market OxyContin with claims of low addiction potential based on limited and misleading evidence, and whether to continue aggressive sales tactics as addiction reports mounted.',
+    summary:
+      'Purdue Pharma aggressively marketed OxyContin as a low-addiction-risk painkiller, contributing to the opioid epidemic that has killed over 500,000 Americans. The company knew its claims about addiction risk were false but continued its marketing campaign for over two decades, driven by confirmation bias around its own flawed studies.',
+    decisionContext:
+      'Whether to market OxyContin with claims of low addiction potential based on limited and misleading evidence, and whether to continue aggressive sales tactics as addiction reports mounted.',
     outcome: 'catastrophic_failure',
     impactScore: 100,
     estimatedLoss: '$8.3B',
-    biasesPresent: ['confirmation_bias', 'loss_aversion', 'groupthink', 'authority_bias', 'selective_perception'],
+    biasesPresent: [
+      'confirmation_bias',
+      'loss_aversion',
+      'groupthink',
+      'authority_bias',
+      'selective_perception',
+    ],
     primaryBias: 'confirmation_bias',
     toxicCombinations: ['Echo Chamber'],
     contextFactors: {
@@ -58,7 +74,8 @@ export const HEALTHCARE_CASES: FailureCase[] = [
       'Loss aversion around a profitable product line can cause companies to ignore catastrophic societal harm.',
       'Regulatory capture and aggressive lobbying can delay corrective action by years, amplifying public health damage.',
     ],
-    source: 'DOJ Settlement with Purdue Pharma (2020); Patrick Radden Keefe, "Empire of Pain" (2021)',
+    source:
+      'DOJ Settlement with Purdue Pharma (2020); Patrick Radden Keefe, "Empire of Pain" (2021)',
     sourceType: 'case_study',
   },
   {
@@ -68,12 +85,20 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     industry: 'healthcare',
     year: 1970,
     yearDiscovered: 2020,
-    summary: 'J&J faced tens of thousands of lawsuits alleging its talcum powder products contained asbestos and caused ovarian cancer. Internal documents revealed the company was aware of potential contamination as early as the 1970s but chose to maintain the product line rather than switch to corn starch alternatives.',
-    decisionContext: 'Whether to reformulate or discontinue talc-based baby powder products after internal testing detected trace asbestos contamination and epidemiological studies suggested cancer risk.',
+    summary:
+      'J&J faced tens of thousands of lawsuits alleging its talcum powder products contained asbestos and caused ovarian cancer. Internal documents revealed the company was aware of potential contamination as early as the 1970s but chose to maintain the product line rather than switch to corn starch alternatives.',
+    decisionContext:
+      'Whether to reformulate or discontinue talc-based baby powder products after internal testing detected trace asbestos contamination and epidemiological studies suggested cancer risk.',
     outcome: 'failure',
     impactScore: 75,
     estimatedLoss: '$3.9B',
-    biasesPresent: ['status_quo_bias', 'confirmation_bias', 'loss_aversion', 'selective_perception', 'cognitive_misering'],
+    biasesPresent: [
+      'status_quo_bias',
+      'confirmation_bias',
+      'loss_aversion',
+      'selective_perception',
+      'cognitive_misering',
+    ],
     primaryBias: 'status_quo_bias',
     toxicCombinations: ['Status Quo Lock'],
     contextFactors: {
@@ -88,7 +113,8 @@ export const HEALTHCARE_CASES: FailureCase[] = [
       'Confirmation bias in internal safety reviews leads to dismissing unfavorable findings rather than acting on precautionary principles.',
       'Loss aversion around an iconic product brand can override scientific evidence and basic consumer safety obligations.',
     ],
-    source: 'Reuters investigation, "Johnson & Johnson Knew for Decades that Asbestos Lurked in Its Baby Powder" (2018)',
+    source:
+      'Reuters investigation, "Johnson & Johnson Knew for Decades that Asbestos Lurked in Its Baby Powder" (2018)',
     sourceType: 'news_investigation',
   },
   {
@@ -98,12 +124,20 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     industry: 'aerospace',
     year: 2018,
     yearDiscovered: 2019,
-    summary: 'Boeing\'s 737 MAX aircraft crashed twice in five months, killing 346 people. The MCAS flight control system, designed to compensate for engine placement changes, relied on a single angle-of-attack sensor and was not disclosed to pilots. Boeing prioritized schedule and cost over safety, committing sunk cost fallacy by building on the aging 737 platform rather than designing a new aircraft.',
-    decisionContext: 'Whether to design a new narrowbody aircraft or retrofit the 50-year-old 737 airframe with larger engines, adding software patches to compensate for aerodynamic compromises.',
+    summary:
+      "Boeing's 737 MAX aircraft crashed twice in five months, killing 346 people. The MCAS flight control system, designed to compensate for engine placement changes, relied on a single angle-of-attack sensor and was not disclosed to pilots. Boeing prioritized schedule and cost over safety, committing sunk cost fallacy by building on the aging 737 platform rather than designing a new aircraft.",
+    decisionContext:
+      'Whether to design a new narrowbody aircraft or retrofit the 50-year-old 737 airframe with larger engines, adding software patches to compensate for aerodynamic compromises.',
     outcome: 'catastrophic_failure',
     impactScore: 100,
     estimatedLoss: '$20B',
-    biasesPresent: ['overconfidence_bias', 'sunk_cost_fallacy', 'authority_bias', 'groupthink', 'planning_fallacy'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'sunk_cost_fallacy',
+      'authority_bias',
+      'groupthink',
+      'planning_fallacy',
+    ],
     primaryBias: 'sunk_cost_fallacy',
     toxicCombinations: ['Sunk Ship', 'Yes Committee'],
     contextFactors: {
@@ -116,9 +150,10 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     lessonsLearned: [
       'Sunk cost fallacy in the 737 platform investment led Boeing to patch an aging design rather than invest in a purpose-built replacement.',
       'Overconfidence in software solutions to compensate for hardware compromises introduced single points of failure.',
-      'Authority bias within the FAA\'s delegated inspection program allowed Boeing to self-certify safety-critical systems.',
+      "Authority bias within the FAA's delegated inspection program allowed Boeing to self-certify safety-critical systems.",
     ],
-    source: 'U.S. House Committee on Transportation and Infrastructure, "Final Committee Report on the Boeing 737 MAX" (2020)',
+    source:
+      'U.S. House Committee on Transportation and Infrastructure, "Final Committee Report on the Boeing 737 MAX" (2020)',
     sourceType: 'case_study',
   },
   {
@@ -128,12 +163,20 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     industry: 'government',
     year: 2014,
     yearDiscovered: 2014,
-    summary: 'The Phoenix VA Health Care System and other facilities maintained secret wait lists to hide that veterans were waiting months for medical appointments. At least 40 veterans died while waiting for care. A culture of status quo acceptance and metric manipulation persisted across the VA system for years.',
-    decisionContext: 'Whether to report accurate wait times and request additional resources, or manipulate scheduling data to meet performance targets and avoid scrutiny.',
+    summary:
+      'The Phoenix VA Health Care System and other facilities maintained secret wait lists to hide that veterans were waiting months for medical appointments. At least 40 veterans died while waiting for care. A culture of status quo acceptance and metric manipulation persisted across the VA system for years.',
+    decisionContext:
+      'Whether to report accurate wait times and request additional resources, or manipulate scheduling data to meet performance targets and avoid scrutiny.',
     outcome: 'catastrophic_failure',
     impactScore: 90,
     estimatedLoss: '40+ veteran deaths',
-    biasesPresent: ['status_quo_bias', 'groupthink', 'cognitive_misering', 'authority_bias', 'confirmation_bias'],
+    biasesPresent: [
+      'status_quo_bias',
+      'groupthink',
+      'cognitive_misering',
+      'authority_bias',
+      'confirmation_bias',
+    ],
     primaryBias: 'status_quo_bias',
     toxicCombinations: ['Echo Chamber', 'Yes Committee'],
     contextFactors: {
@@ -158,12 +201,20 @@ export const HEALTHCARE_CASES: FailureCase[] = [
     industry: 'healthcare',
     year: 2014,
     yearDiscovered: 2018,
-    summary: 'Theranos deployed its unreliable Edison blood testing devices in Walgreens stores, delivering inaccurate results to real patients. Patients received false positives and negatives for conditions including cancer and HIV, leading to unnecessary treatments, emotional distress, and delayed diagnoses for serious conditions.',
-    decisionContext: 'Whether to deploy blood testing devices in retail pharmacies for patient use before the technology had been validated through proper clinical trials and regulatory review.',
+    summary:
+      'Theranos deployed its unreliable Edison blood testing devices in Walgreens stores, delivering inaccurate results to real patients. Patients received false positives and negatives for conditions including cancer and HIV, leading to unnecessary treatments, emotional distress, and delayed diagnoses for serious conditions.',
+    decisionContext:
+      'Whether to deploy blood testing devices in retail pharmacies for patient use before the technology had been validated through proper clinical trials and regulatory review.',
     outcome: 'catastrophic_failure',
     impactScore: 80,
     estimatedLoss: '$9B valuation destroyed; patient safety compromised',
-    biasesPresent: ['authority_bias', 'confirmation_bias', 'groupthink', 'overconfidence_bias', 'planning_fallacy'],
+    biasesPresent: [
+      'authority_bias',
+      'confirmation_bias',
+      'groupthink',
+      'overconfidence_bias',
+      'planning_fallacy',
+    ],
     primaryBias: 'authority_bias',
     toxicCombinations: ['Yes Committee', 'Echo Chamber'],
     contextFactors: {
@@ -174,11 +225,12 @@ export const HEALTHCARE_CASES: FailureCase[] = [
       participantCount: 6,
     },
     lessonsLearned: [
-      'Authority bias led Walgreens to trust Theranos\'s claims and deploy unvalidated medical devices in their pharmacies.',
+      "Authority bias led Walgreens to trust Theranos's claims and deploy unvalidated medical devices in their pharmacies.",
       'Confirmation bias caused Theranos to cherry-pick quality control results and dismiss failed test runs.',
       'Patient safety must never be subordinated to commercial launch timelines, regardless of investor pressure.',
     ],
-    source: 'FDA Warning Letter to Theranos Inc. (2015); CMS Inspection Report (2016); John Carreyrou, "Bad Blood" (2018)',
+    source:
+      'FDA Warning Letter to Theranos Inc. (2015); CMS Inspection Report (2016); John Carreyrou, "Bad Blood" (2018)',
     sourceType: 'fda_action',
   },
 ];
@@ -191,12 +243,20 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     industry: 'energy',
     year: 2010,
     yearDiscovered: 2010,
-    summary: 'The Deepwater Horizon drilling rig exploded in the Gulf of Mexico, killing 11 workers and causing the largest marine oil spill in history. BP and its contractors ignored multiple warning signs including failed cement tests and anomalous pressure readings, prioritizing schedule adherence over safety protocols.',
-    decisionContext: 'Whether to proceed with well completion operations despite failed negative pressure tests and multiple indicators that the cement barrier at the well bottom was compromised.',
+    summary:
+      'The Deepwater Horizon drilling rig exploded in the Gulf of Mexico, killing 11 workers and causing the largest marine oil spill in history. BP and its contractors ignored multiple warning signs including failed cement tests and anomalous pressure readings, prioritizing schedule adherence over safety protocols.',
+    decisionContext:
+      'Whether to proceed with well completion operations despite failed negative pressure tests and multiple indicators that the cement barrier at the well bottom was compromised.',
     outcome: 'catastrophic_failure',
     impactScore: 100,
     estimatedLoss: '$65B',
-    biasesPresent: ['overconfidence_bias', 'sunk_cost_fallacy', 'cognitive_misering', 'groupthink', 'authority_bias'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'sunk_cost_fallacy',
+      'cognitive_misering',
+      'groupthink',
+      'authority_bias',
+    ],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Blind Sprint', 'Sunk Ship'],
     contextFactors: {
@@ -211,7 +271,8 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
       'Sunk cost fallacy in well completion means teams push forward with a compromised well rather than abandoning costly work.',
       'Multiple independent warning signs dismissed in sequence represent a systemic failure of organizational decision-making.',
     ],
-    source: 'National Commission on the BP Deepwater Horizon Oil Spill and Offshore Drilling, Final Report (2011)',
+    source:
+      'National Commission on the BP Deepwater Horizon Oil Spill and Offshore Drilling, Final Report (2011)',
     sourceType: 'case_study',
   },
   {
@@ -221,12 +282,20 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     industry: 'automotive',
     year: 2015,
     yearDiscovered: 2015,
-    summary: 'Volkswagen installed "defeat device" software in 11 million diesel vehicles worldwide to cheat on emissions tests. The cars emitted up to 40 times the legal limit of nitrogen oxides during real driving. The scheme was driven by engineering leadership\'s commitment to meeting impossible performance targets set by senior management.',
-    decisionContext: 'Whether to install software that detected and altered vehicle behavior during emissions testing, or to admit that clean diesel technology could not simultaneously meet performance, fuel economy, and emissions targets.',
+    summary:
+      'Volkswagen installed "defeat device" software in 11 million diesel vehicles worldwide to cheat on emissions tests. The cars emitted up to 40 times the legal limit of nitrogen oxides during real driving. The scheme was driven by engineering leadership\'s commitment to meeting impossible performance targets set by senior management.',
+    decisionContext:
+      'Whether to install software that detected and altered vehicle behavior during emissions testing, or to admit that clean diesel technology could not simultaneously meet performance, fuel economy, and emissions targets.',
     outcome: 'catastrophic_failure',
     impactScore: 95,
     estimatedLoss: '$33B',
-    biasesPresent: ['groupthink', 'authority_bias', 'sunk_cost_fallacy', 'framing_effect', 'overconfidence_bias'],
+    biasesPresent: [
+      'groupthink',
+      'authority_bias',
+      'sunk_cost_fallacy',
+      'framing_effect',
+      'overconfidence_bias',
+    ],
     primaryBias: 'groupthink',
     toxicCombinations: ['Yes Committee', 'Sunk Ship'],
     contextFactors: {
@@ -241,7 +310,8 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
       'Groupthink in engineering teams can normalize fraud when "everyone knows" about the deception but no one escalates.',
       'Sunk cost in the "clean diesel" marketing strategy made admitting technical failure seem more costly than cheating.',
     ],
-    source: 'EPA Notice of Violation to VW (2015); German Bundestag Investigation Committee Report (2017)',
+    source:
+      'EPA Notice of Violation to VW (2015); German Bundestag Investigation Committee Report (2017)',
     sourceType: 'case_study',
   },
   {
@@ -251,12 +321,20 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     industry: 'energy',
     year: 2015,
     yearDiscovered: 2018,
-    summary: 'GE acquired Alstom\'s power division for $10.6 billion in 2015, betting on continued growth in gas turbine demand. The acquisition coincided with a structural shift toward renewable energy, and GE ultimately wrote down $22 billion in goodwill. CEO Jeff Immelt\'s confidence in the deal suppressed internal dissent.',
-    decisionContext: 'Whether to acquire Alstom\'s power and grid business at a premium valuation while the global energy market was shifting from fossil fuels to renewables.',
+    summary:
+      "GE acquired Alstom's power division for $10.6 billion in 2015, betting on continued growth in gas turbine demand. The acquisition coincided with a structural shift toward renewable energy, and GE ultimately wrote down $22 billion in goodwill. CEO Jeff Immelt's confidence in the deal suppressed internal dissent.",
+    decisionContext:
+      "Whether to acquire Alstom's power and grid business at a premium valuation while the global energy market was shifting from fossil fuels to renewables.",
     outcome: 'catastrophic_failure',
     impactScore: 85,
     estimatedLoss: '$22B',
-    biasesPresent: ['anchoring_bias', 'overconfidence_bias', 'sunk_cost_fallacy', 'confirmation_bias', 'planning_fallacy'],
+    biasesPresent: [
+      'anchoring_bias',
+      'overconfidence_bias',
+      'sunk_cost_fallacy',
+      'confirmation_bias',
+      'planning_fallacy',
+    ],
     primaryBias: 'anchoring_bias',
     toxicCombinations: ['Sunk Ship', 'Optimism Trap'],
     contextFactors: {
@@ -271,7 +349,8 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
       'Sunk cost fallacy led GE to double down on power after the acquisition rather than pivoting when demand dropped.',
       'Overconfidence in integration capabilities led to overpaying for an asset in a declining market.',
     ],
-    source: 'GE 2018 Annual Report (goodwill impairment); Thomas Gryta and Ted Mann, "Lights Out: Pride, Delusion, and the Fall of General Electric" (2020)',
+    source:
+      'GE 2018 Annual Report (goodwill impairment); Thomas Gryta and Ted Mann, "Lights Out: Pride, Delusion, and the Fall of General Electric" (2020)',
     sourceType: 'sec_filing',
   },
   {
@@ -281,12 +360,20 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     industry: 'energy',
     year: 2018,
     yearDiscovered: 2018,
-    summary: 'PG&E\'s failure to maintain aging transmission infrastructure caused the Camp Fire, the deadliest and most destructive wildfire in California history. The fire killed 85 people and destroyed 18,804 structures. PG&E had deferred maintenance and vegetation management for years despite knowing its equipment posed wildfire risks.',
-    decisionContext: 'Whether to invest in replacing aging transmission lines and aggressive vegetation management in high-risk wildfire zones, or to continue deferring maintenance to reduce operating costs.',
+    summary:
+      "PG&E's failure to maintain aging transmission infrastructure caused the Camp Fire, the deadliest and most destructive wildfire in California history. The fire killed 85 people and destroyed 18,804 structures. PG&E had deferred maintenance and vegetation management for years despite knowing its equipment posed wildfire risks.",
+    decisionContext:
+      'Whether to invest in replacing aging transmission lines and aggressive vegetation management in high-risk wildfire zones, or to continue deferring maintenance to reduce operating costs.',
     outcome: 'catastrophic_failure',
     impactScore: 100,
     estimatedLoss: '$13.5B',
-    biasesPresent: ['status_quo_bias', 'cognitive_misering', 'loss_aversion', 'anchoring_bias', 'planning_fallacy'],
+    biasesPresent: [
+      'status_quo_bias',
+      'cognitive_misering',
+      'loss_aversion',
+      'anchoring_bias',
+      'planning_fallacy',
+    ],
     primaryBias: 'status_quo_bias',
     toxicCombinations: ['Status Quo Lock'],
     contextFactors: {
@@ -311,12 +398,20 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     industry: 'energy',
     year: 2011,
     yearDiscovered: 2011,
-    summary: 'Solar panel manufacturer Solyndra received a $535 million federal loan guarantee and then filed for bankruptcy within two years. The company\'s cylindrical panel design was more expensive than conventional flat panels, and plummeting silicon prices destroyed its cost advantage. Leadership and government backers ignored market signals indicating the technology was economically unviable.',
-    decisionContext: 'Whether to extend a $535 million federal loan guarantee to Solyndra despite declining silicon prices that were eroding the company\'s cost competitiveness against conventional solar panels.',
+    summary:
+      "Solar panel manufacturer Solyndra received a $535 million federal loan guarantee and then filed for bankruptcy within two years. The company's cylindrical panel design was more expensive than conventional flat panels, and plummeting silicon prices destroyed its cost advantage. Leadership and government backers ignored market signals indicating the technology was economically unviable.",
+    decisionContext:
+      "Whether to extend a $535 million federal loan guarantee to Solyndra despite declining silicon prices that were eroding the company's cost competitiveness against conventional solar panels.",
     outcome: 'catastrophic_failure',
     impactScore: 60,
     estimatedLoss: '$535M',
-    biasesPresent: ['overconfidence_bias', 'confirmation_bias', 'planning_fallacy', 'anchoring_bias', 'bandwagon_effect'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'confirmation_bias',
+      'planning_fallacy',
+      'anchoring_bias',
+      'bandwagon_effect',
+    ],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Optimism Trap'],
     contextFactors: {
@@ -331,7 +426,8 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
       'Planning fallacy in clean energy ventures often overestimates market adoption timelines and underestimates competitive threats.',
       'Government loan guarantees should incorporate dynamic reassessment triggers tied to market condition changes.',
     ],
-    source: 'U.S. House Energy and Commerce Committee Investigation (2011); DOE Loan Programs Office records',
+    source:
+      'U.S. House Energy and Commerce Committee Investigation (2011); DOE Loan Programs Office records',
     sourceType: 'case_study',
   },
   {
@@ -341,12 +437,20 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     industry: 'aerospace',
     year: 1986,
     yearDiscovered: 1986,
-    summary: 'The Space Shuttle Challenger broke apart 73 seconds after launch, killing all seven crew members. Morton Thiokol engineers had warned that O-ring seals in the solid rocket boosters would fail in cold temperatures, but NASA management overrode their objections due to schedule pressure and political considerations.',
-    decisionContext: 'Whether to proceed with the Challenger launch on January 28, 1986, despite engineer warnings that cold temperatures could cause O-ring failure in the solid rocket booster joints.',
+    summary:
+      'The Space Shuttle Challenger broke apart 73 seconds after launch, killing all seven crew members. Morton Thiokol engineers had warned that O-ring seals in the solid rocket boosters would fail in cold temperatures, but NASA management overrode their objections due to schedule pressure and political considerations.',
+    decisionContext:
+      'Whether to proceed with the Challenger launch on January 28, 1986, despite engineer warnings that cold temperatures could cause O-ring failure in the solid rocket booster joints.',
     outcome: 'catastrophic_failure',
     impactScore: 100,
     estimatedLoss: '$3.2B (shuttle replacement cost); 7 lives',
-    biasesPresent: ['groupthink', 'authority_bias', 'availability_heuristic', 'overconfidence_bias', 'framing_effect'],
+    biasesPresent: [
+      'groupthink',
+      'authority_bias',
+      'availability_heuristic',
+      'overconfidence_bias',
+      'framing_effect',
+    ],
     primaryBias: 'groupthink',
     toxicCombinations: ['Yes Committee'],
     contextFactors: {
@@ -361,7 +465,8 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
       'Authority bias caused Thiokol engineers to reverse their no-launch recommendation when pressured by NASA management.',
       'Availability heuristic led NASA to treat prior successful launches with O-ring erosion as evidence of safety rather than warning signs.',
     ],
-    source: 'Presidential Commission on the Space Shuttle Challenger Accident (Rogers Commission Report, 1986); NASA Report RSC-86-0137',
+    source:
+      'Presidential Commission on the Space Shuttle Challenger Accident (Rogers Commission Report, 1986); NASA Report RSC-86-0137',
     sourceType: 'ntsb_report',
   },
   {
@@ -371,12 +476,20 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
     industry: 'aerospace',
     year: 2003,
     yearDiscovered: 2003,
-    summary: 'The Space Shuttle Columbia disintegrated during re-entry, killing all seven crew members. Foam debris had struck the orbiter\'s wing during launch, but NASA management dismissed requests for on-orbit inspection and classified the foam strike as an accepted risk based on prior missions where foam strikes had not caused catastrophic failure.',
-    decisionContext: 'Whether to request Department of Defense satellite imagery to inspect potential thermal protection system damage on Columbia\'s wing after foam was observed striking it during launch.',
+    summary:
+      "The Space Shuttle Columbia disintegrated during re-entry, killing all seven crew members. Foam debris had struck the orbiter's wing during launch, but NASA management dismissed requests for on-orbit inspection and classified the foam strike as an accepted risk based on prior missions where foam strikes had not caused catastrophic failure.",
+    decisionContext:
+      "Whether to request Department of Defense satellite imagery to inspect potential thermal protection system damage on Columbia's wing after foam was observed striking it during launch.",
     outcome: 'catastrophic_failure',
     impactScore: 100,
     estimatedLoss: '$13B (shuttle program costs); 7 lives',
-    biasesPresent: ['groupthink', 'status_quo_bias', 'anchoring_bias', 'overconfidence_bias', 'authority_bias'],
+    biasesPresent: [
+      'groupthink',
+      'status_quo_bias',
+      'anchoring_bias',
+      'overconfidence_bias',
+      'authority_bias',
+    ],
     primaryBias: 'groupthink',
     toxicCombinations: ['Echo Chamber', 'Status Quo Lock'],
     contextFactors: {
@@ -391,7 +504,8 @@ export const ENERGY_INDUSTRIAL_CASES: FailureCase[] = [
       'Status quo bias in risk assessments means that known problems are reclassified as "accepted risks" rather than addressed.',
       'Anchoring to past mission success in the presence of unresolved anomalies creates an illusion of safety that masks accumulating risk.',
     ],
-    source: 'Columbia Accident Investigation Board (CAIB) Report, Volume I (2003); NASA SP-2003-4101',
+    source:
+      'Columbia Accident Investigation Board (CAIB) Report, Volume I (2003); NASA SP-2003-4101',
     sourceType: 'ntsb_report',
   },
 ];

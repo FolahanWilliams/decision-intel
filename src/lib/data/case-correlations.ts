@@ -173,63 +173,81 @@ function computeIndustryProfiles(cases: FailureCase[]): IndustryRiskProfile[] {
     byIndustry.set(c.industry, list);
   }
 
-  return [...byIndustry.entries()].map(([industry, industryCases]) => {
-    const avgImpact = industryCases.reduce((s, c) => s + c.impactScore, 0) / industryCases.length;
-    const catastrophicCount = industryCases.filter(c => c.outcome === 'catastrophic_failure').length;
+  return [...byIndustry.entries()]
+    .map(([industry, industryCases]) => {
+      const avgImpact = industryCases.reduce((s, c) => s + c.impactScore, 0) / industryCases.length;
+      const catastrophicCount = industryCases.filter(
+        c => c.outcome === 'catastrophic_failure'
+      ).length;
 
-    // Top biases
-    const biasCounts = new Map<string, { count: number; totalImpact: number }>();
-    for (const c of industryCases) {
-      for (const bias of c.biasesPresent) {
-        const entry = biasCounts.get(bias) ?? { count: 0, totalImpact: 0 };
-        entry.count++;
-        entry.totalImpact += c.impactScore;
-        biasCounts.set(bias, entry);
+      // Top biases
+      const biasCounts = new Map<string, { count: number; totalImpact: number }>();
+      for (const c of industryCases) {
+        for (const bias of c.biasesPresent) {
+          const entry = biasCounts.get(bias) ?? { count: 0, totalImpact: 0 };
+          entry.count++;
+          entry.totalImpact += c.impactScore;
+          biasCounts.set(bias, entry);
+        }
       }
-    }
-    const topBiases = [...biasCounts.entries()]
-      .map(([bias, s]) => ({ bias, frequency: s.count / industryCases.length, avgImpact: Math.round((s.totalImpact / s.count) * 10) / 10 }))
-      .sort((a, b) => b.frequency - a.frequency)
-      .slice(0, 5);
+      const topBiases = [...biasCounts.entries()]
+        .map(([bias, s]) => ({
+          bias,
+          frequency: s.count / industryCases.length,
+          avgImpact: Math.round((s.totalImpact / s.count) * 10) / 10,
+        }))
+        .sort((a, b) => b.frequency - a.frequency)
+        .slice(0, 5);
 
-    // Top patterns
-    const patternCounts = new Map<string, { count: number; totalImpact: number }>();
-    for (const c of industryCases) {
-      for (const p of c.toxicCombinations) {
-        const entry = patternCounts.get(p) ?? { count: 0, totalImpact: 0 };
-        entry.count++;
-        entry.totalImpact += c.impactScore;
-        patternCounts.set(p, entry);
+      // Top patterns
+      const patternCounts = new Map<string, { count: number; totalImpact: number }>();
+      for (const c of industryCases) {
+        for (const p of c.toxicCombinations) {
+          const entry = patternCounts.get(p) ?? { count: 0, totalImpact: 0 };
+          entry.count++;
+          entry.totalImpact += c.impactScore;
+          patternCounts.set(p, entry);
+        }
       }
-    }
-    const topPatterns = [...patternCounts.entries()]
-      .map(([pattern, s]) => ({ pattern, frequency: s.count / industryCases.length, avgImpact: Math.round((s.totalImpact / s.count) * 10) / 10 }))
-      .sort((a, b) => b.frequency - a.frequency)
-      .slice(0, 3);
+      const topPatterns = [...patternCounts.entries()]
+        .map(([pattern, s]) => ({
+          pattern,
+          frequency: s.count / industryCases.length,
+          avgImpact: Math.round((s.totalImpact / s.count) * 10) / 10,
+        }))
+        .sort((a, b) => b.frequency - a.frequency)
+        .slice(0, 3);
 
-    // Context profile
-    const highStakes = industryCases.filter(c => c.contextFactors.monetaryStakes === 'very_high' || c.contextFactors.monetaryStakes === 'high').length;
-    const dissentAbsent = industryCases.filter(c => c.contextFactors.dissentAbsent).length;
-    const timePressure = industryCases.filter(c => c.contextFactors.timePressure).length;
-    const unanimous = industryCases.filter(c => c.contextFactors.unanimousConsensus).length;
-    const avgParticipants = industryCases.reduce((s, c) => s + c.contextFactors.participantCount, 0) / industryCases.length;
+      // Context profile
+      const highStakes = industryCases.filter(
+        c =>
+          c.contextFactors.monetaryStakes === 'very_high' ||
+          c.contextFactors.monetaryStakes === 'high'
+      ).length;
+      const dissentAbsent = industryCases.filter(c => c.contextFactors.dissentAbsent).length;
+      const timePressure = industryCases.filter(c => c.contextFactors.timePressure).length;
+      const unanimous = industryCases.filter(c => c.contextFactors.unanimousConsensus).length;
+      const avgParticipants =
+        industryCases.reduce((s, c) => s + c.contextFactors.participantCount, 0) /
+        industryCases.length;
 
-    return {
-      industry,
-      caseCount: industryCases.length,
-      avgImpactScore: Math.round(avgImpact * 10) / 10,
-      catastrophicRate: Math.round((catastrophicCount / industryCases.length) * 100) / 100,
-      topBiases,
-      topPatterns,
-      contextProfile: {
-        highStakesRate: Math.round((highStakes / industryCases.length) * 100) / 100,
-        dissentAbsentRate: Math.round((dissentAbsent / industryCases.length) * 100) / 100,
-        timePressureRate: Math.round((timePressure / industryCases.length) * 100) / 100,
-        unanimousRate: Math.round((unanimous / industryCases.length) * 100) / 100,
-        avgParticipantCount: Math.round(avgParticipants * 10) / 10,
-      },
-    };
-  }).sort((a, b) => b.avgImpactScore - a.avgImpactScore);
+      return {
+        industry,
+        caseCount: industryCases.length,
+        avgImpactScore: Math.round(avgImpact * 10) / 10,
+        catastrophicRate: Math.round((catastrophicCount / industryCases.length) * 100) / 100,
+        topBiases,
+        topPatterns,
+        contextProfile: {
+          highStakesRate: Math.round((highStakes / industryCases.length) * 100) / 100,
+          dissentAbsentRate: Math.round((dissentAbsent / industryCases.length) * 100) / 100,
+          timePressureRate: Math.round((timePressure / industryCases.length) * 100) / 100,
+          unanimousRate: Math.round((unanimous / industryCases.length) * 100) / 100,
+          avgParticipantCount: Math.round(avgParticipants * 10) / 10,
+        },
+      };
+    })
+    .sort((a, b) => b.avgImpactScore - a.avgImpactScore);
 }
 
 function computeTemporalPatterns(cases: FailureCase[]): TemporalPattern[] {
@@ -244,8 +262,11 @@ function computeTemporalPatterns(cases: FailureCase[]): TemporalPattern[] {
   return [...byDecade.entries()]
     .map(([decade, decadeCases]) => {
       const avgImpact = decadeCases.reduce((s, c) => s + c.impactScore, 0) / decadeCases.length;
-      const catastrophicCount = decadeCases.filter(c => c.outcome === 'catastrophic_failure').length;
-      const avgLag = decadeCases.reduce((s, c) => s + (c.yearDiscovered - c.year), 0) / decadeCases.length;
+      const catastrophicCount = decadeCases.filter(
+        c => c.outcome === 'catastrophic_failure'
+      ).length;
+      const avgLag =
+        decadeCases.reduce((s, c) => s + (c.yearDiscovered - c.year), 0) / decadeCases.length;
 
       // Dominant biases
       const biasCounts = new Map<string, number>();
@@ -298,7 +319,8 @@ function computeSeverityPredictors(cases: FailureCase[]): SeverityPredictor[] {
 
     const catRateWith = withBias.filter(isCatastrophic).length / withBias.length;
     const avgImpactWith = withBias.reduce((s, c) => s + c.impactScore, 0) / withBias.length;
-    const avgImpactWithout = withoutBias.reduce((s, c) => s + c.impactScore, 0) / withoutBias.length;
+    const avgImpactWithout =
+      withoutBias.reduce((s, c) => s + c.impactScore, 0) / withoutBias.length;
 
     predictors.push({
       factor: bias,
@@ -321,9 +343,10 @@ function computeSeverityPredictors(cases: FailureCase[]): SeverityPredictor[] {
 
     const catRateWith = withPattern.filter(isCatastrophic).length / withPattern.length;
     const avgImpactWith = withPattern.reduce((s, c) => s + c.impactScore, 0) / withPattern.length;
-    const avgImpactWithout = withoutPattern.length > 0
-      ? withoutPattern.reduce((s, c) => s + c.impactScore, 0) / withoutPattern.length
-      : baseAvgImpact;
+    const avgImpactWithout =
+      withoutPattern.length > 0
+        ? withoutPattern.reduce((s, c) => s + c.impactScore, 0) / withoutPattern.length
+        : baseAvgImpact;
 
     predictors.push({
       factor: pattern,
@@ -354,7 +377,8 @@ function computeSeverityPredictors(cases: FailureCase[]): SeverityPredictor[] {
 
     const catRateWith = withFactor.filter(isCatastrophic).length / withFactor.length;
     const avgImpactWith = withFactor.reduce((s, c) => s + c.impactScore, 0) / withFactor.length;
-    const avgImpactWithout = withoutFactor.reduce((s, c) => s + c.impactScore, 0) / withoutFactor.length;
+    const avgImpactWithout =
+      withoutFactor.reduce((s, c) => s + c.impactScore, 0) / withoutFactor.length;
 
     predictors.push({
       factor,
@@ -370,10 +394,13 @@ function computeSeverityPredictors(cases: FailureCase[]): SeverityPredictor[] {
 
   // Structural predictors
   const structuralTests: Array<{ factor: string; test: (c: FailureCase) => boolean }> = [
-    { factor: 'detection_lag_>2yr', test: c => (c.yearDiscovered - c.year) > 2 },
+    { factor: 'detection_lag_>2yr', test: c => c.yearDiscovered - c.year > 2 },
     { factor: '5+_biases_present', test: c => c.biasesPresent.length >= 5 },
     { factor: '2+_toxic_patterns', test: c => c.toxicCombinations.length >= 2 },
-    { factor: 'dissent_absent_AND_unanimous', test: c => c.contextFactors.dissentAbsent && c.contextFactors.unanimousConsensus },
+    {
+      factor: 'dissent_absent_AND_unanimous',
+      test: c => c.contextFactors.dissentAbsent && c.contextFactors.unanimousConsensus,
+    },
   ];
 
   for (const { factor, test } of structuralTests) {
@@ -383,7 +410,8 @@ function computeSeverityPredictors(cases: FailureCase[]): SeverityPredictor[] {
 
     const catRateWith = withFactor.filter(isCatastrophic).length / withFactor.length;
     const avgImpactWith = withFactor.reduce((s, c) => s + c.impactScore, 0) / withFactor.length;
-    const avgImpactWithout = withoutFactor.reduce((s, c) => s + c.impactScore, 0) / withoutFactor.length;
+    const avgImpactWithout =
+      withoutFactor.reduce((s, c) => s + c.impactScore, 0) / withoutFactor.length;
 
     predictors.push({
       factor,
@@ -409,41 +437,49 @@ function computeContextAmplifiers(cases: FailureCase[]): ContextAmplifier[] {
     { name: 'small_group', test: c => c.contextFactors.participantCount <= 8 },
   ];
 
-  return factors.map(({ name, test }) => {
-    const withFactor = cases.filter(test);
-    const withoutFactor = cases.filter(c => !test(c));
-    const avgWith = withFactor.length > 0
-      ? withFactor.reduce((s, c) => s + c.impactScore, 0) / withFactor.length
-      : 0;
-    const avgWithout = withoutFactor.length > 0
-      ? withoutFactor.reduce((s, c) => s + c.impactScore, 0) / withoutFactor.length
-      : 0;
+  return factors
+    .map(({ name, test }) => {
+      const withFactor = cases.filter(test);
+      const withoutFactor = cases.filter(c => !test(c));
+      const avgWith =
+        withFactor.length > 0
+          ? withFactor.reduce((s, c) => s + c.impactScore, 0) / withFactor.length
+          : 0;
+      const avgWithout =
+        withoutFactor.length > 0
+          ? withoutFactor.reduce((s, c) => s + c.impactScore, 0) / withoutFactor.length
+          : 0;
 
-    // Find biases most amplified by this context
-    const biasCounts = new Map<string, { count: number; totalImpact: number }>();
-    for (const c of withFactor) {
-      for (const bias of c.biasesPresent) {
-        const entry = biasCounts.get(bias) ?? { count: 0, totalImpact: 0 };
-        entry.count++;
-        entry.totalImpact += c.impactScore;
-        biasCounts.set(bias, entry);
+      // Find biases most amplified by this context
+      const biasCounts = new Map<string, { count: number; totalImpact: number }>();
+      for (const c of withFactor) {
+        for (const bias of c.biasesPresent) {
+          const entry = biasCounts.get(bias) ?? { count: 0, totalImpact: 0 };
+          entry.count++;
+          entry.totalImpact += c.impactScore;
+          biasCounts.set(bias, entry);
+        }
       }
-    }
-    const amplifiedBiases = [...biasCounts.entries()]
-      .map(([bias, s]) => ({ bias, frequency: s.count / Math.max(withFactor.length, 1), avgImpact: Math.round((s.totalImpact / s.count) * 10) / 10 }))
-      .sort((a, b) => b.avgImpact - a.avgImpact)
-      .slice(0, 5);
+      const amplifiedBiases = [...biasCounts.entries()]
+        .map(([bias, s]) => ({
+          bias,
+          frequency: s.count / Math.max(withFactor.length, 1),
+          avgImpact: Math.round((s.totalImpact / s.count) * 10) / 10,
+        }))
+        .sort((a, b) => b.avgImpact - a.avgImpact)
+        .slice(0, 5);
 
-    return {
-      contextFactor: name,
-      avgImpactWithFactor: Math.round(avgWith * 10) / 10,
-      avgImpactWithoutFactor: Math.round(avgWithout * 10) / 10,
-      countWith: withFactor.length,
-      countWithout: withoutFactor.length,
-      lift: avgWithout > 0 ? Math.round((avgWith / avgWithout) * 100) / 100 : 0,
-      amplifiedBiases,
-    };
-  }).sort((a, b) => b.lift - a.lift);
+      return {
+        contextFactor: name,
+        avgImpactWithFactor: Math.round(avgWith * 10) / 10,
+        avgImpactWithoutFactor: Math.round(avgWithout * 10) / 10,
+        countWith: withFactor.length,
+        countWithout: withoutFactor.length,
+        lift: avgWithout > 0 ? Math.round((avgWith / avgWithout) * 100) / 100 : 0,
+        amplifiedBiases,
+      };
+    })
+    .sort((a, b) => b.lift - a.lift);
 }
 
 // ---------------------------------------------------------------------------
@@ -507,8 +543,12 @@ export function computeCorrelationMultiplier(
     timePressure?: boolean;
     unanimousConsensus?: boolean;
     participantCount?: number;
-  },
-): { multiplier: number; matchedPairs: BiasCooccurrenceEntry[]; matchedPredictors: SeverityPredictor[] } {
+  }
+): {
+  multiplier: number;
+  matchedPairs: BiasCooccurrenceEntry[];
+  matchedPredictors: SeverityPredictor[];
+} {
   const correlations = computeCrossCaseCorrelations();
 
   // Find all co-occurring bias pairs in the detected set
@@ -517,7 +557,7 @@ export function computeCorrelationMultiplier(
   for (let i = 0; i < sortedBiases.length; i++) {
     for (let j = i + 1; j < sortedBiases.length; j++) {
       const match = correlations.biasCooccurrences.find(
-        e => e.biasA === sortedBiases[i] && e.biasB === sortedBiases[j],
+        e => e.biasA === sortedBiases[i] && e.biasB === sortedBiases[j]
       );
       if (match) matchedPairs.push(match);
     }
@@ -530,13 +570,18 @@ export function computeCorrelationMultiplier(
       matchedPredictors.push(predictor);
     }
     if (predictor.category === 'context') {
-      if (predictor.factor === 'very_high_stakes' && context.monetaryStakes === 'very_high') matchedPredictors.push(predictor);
-      if (predictor.factor === 'dissent_absent' && context.dissentAbsent) matchedPredictors.push(predictor);
-      if (predictor.factor === 'time_pressure' && context.timePressure) matchedPredictors.push(predictor);
-      if (predictor.factor === 'unanimous_consensus' && context.unanimousConsensus) matchedPredictors.push(predictor);
+      if (predictor.factor === 'very_high_stakes' && context.monetaryStakes === 'very_high')
+        matchedPredictors.push(predictor);
+      if (predictor.factor === 'dissent_absent' && context.dissentAbsent)
+        matchedPredictors.push(predictor);
+      if (predictor.factor === 'time_pressure' && context.timePressure)
+        matchedPredictors.push(predictor);
+      if (predictor.factor === 'unanimous_consensus' && context.unanimousConsensus)
+        matchedPredictors.push(predictor);
     }
     if (predictor.category === 'structural') {
-      if (predictor.factor === '5+_biases_present' && detectedBiases.length >= 5) matchedPredictors.push(predictor);
+      if (predictor.factor === '5+_biases_present' && detectedBiases.length >= 5)
+        matchedPredictors.push(predictor);
     }
   }
 

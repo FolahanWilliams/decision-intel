@@ -69,20 +69,20 @@ const BIAS_BASE_RATES: Record<string, number> = {
   availability_heuristic: 0.58, // Tversky & Kahneman (1973)
   groupthink: 0.45, // Janis (1972): moderate in structured orgs
   authority_bias: 0.52, // Milgram (1963): common in hierarchies
-  bandwagon_effect: 0.40, // Asch (1951): depends on group dynamics
+  bandwagon_effect: 0.4, // Asch (1951): depends on group dynamics
   overconfidence_bias: 0.68, // Moore & Healy (2008): very common
   hindsight_bias: 0.63, // Fischhoff (1975): high in retrospective
   planning_fallacy: 0.71, // Kahneman & Lovallo (1993)
-  loss_aversion: 0.60, // Kahneman & Tversky (1979)
+  loss_aversion: 0.6, // Kahneman & Tversky (1979)
   sunk_cost_fallacy: 0.55, // Arkes & Blumer (1985)
-  status_quo_bias: 0.50, // Samuelson & Zeckhauser (1988)
+  status_quo_bias: 0.5, // Samuelson & Zeckhauser (1988)
   framing_effect: 0.62, // Tversky & Kahneman (1981)
   selective_perception: 0.48, // Hastorf & Cantril (1954)
   recency_bias: 0.53, // evidence from serial position research
   cognitive_misering: 0.57, // Fiske & Taylor (1991)
 };
 
-const DEFAULT_BASE_RATE = 0.50;
+const DEFAULT_BASE_RATE = 0.5;
 
 // ---------------------------------------------------------------------------
 // Core Bayesian functions
@@ -102,7 +102,7 @@ function bayesianUpdate(
   llmConfidence: number,
   baseRate: number,
   userPrior: DecisionPrior,
-  biasType: string,
+  biasType: string
 ): { posterior: number; direction: 'increased' | 'decreased' | 'unchanged' } {
   // Adjust base rate based on user's prior belief and confidence
   // High user confidence in good outcome → lower bias prior
@@ -135,10 +135,7 @@ function bayesianUpdate(
  * Compute information gain (KL divergence) between prior and posterior.
  * Higher values = the analysis revealed more new information.
  */
-function computeInformationGain(
-  priorBelief: number,
-  posteriorBelief: number,
-): number {
+function computeInformationGain(priorBelief: number, posteriorBelief: number): number {
   // Simplified KL divergence for binary outcome
   const p = Math.max(0.01, Math.min(0.99, posteriorBelief));
   const q = Math.max(0.01, Math.min(0.99, priorBelief));
@@ -162,19 +159,14 @@ function computeInformationGain(
 export function applyBayesianPriors(
   rawScore: number,
   detectedBiases: Array<{ type: string; confidence: number; severity: string }>,
-  prior: DecisionPrior,
+  prior: DecisionPrior
 ): BayesianResult {
   const biasAdjustments: PriorAdjustment[] = [];
 
   // Apply Bayesian update to each detected bias
   for (const bias of detectedBiases) {
     const baseRate = BIAS_BASE_RATES[bias.type] ?? DEFAULT_BASE_RATE;
-    const { posterior, direction } = bayesianUpdate(
-      bias.confidence,
-      baseRate,
-      prior,
-      bias.type,
-    );
+    const { posterior, direction } = bayesianUpdate(bias.confidence, baseRate, prior, bias.type);
 
     let reason: string;
     if (direction === 'increased') {
@@ -200,10 +192,8 @@ export function applyBayesianPriors(
   // If user was very confident and analysis found many biases → bigger delta
   const avgConfidenceShift =
     biasAdjustments.length > 0
-      ? biasAdjustments.reduce(
-          (sum, a) => sum + (a.posteriorConfidence - a.priorConfidence),
-          0,
-        ) / biasAdjustments.length
+      ? biasAdjustments.reduce((sum, a) => sum + (a.posteriorConfidence - a.priorConfidence), 0) /
+        biasAdjustments.length
       : 0;
 
   // Scale the quality score adjustment by the confidence shift magnitude
@@ -216,10 +206,7 @@ export function applyBayesianPriors(
   const beliefDelta = analysisBeliefImplied - prior.beliefScore;
 
   // Information gain
-  const informationGain = computeInformationGain(
-    prior.beliefScore,
-    analysisBeliefImplied,
-  );
+  const informationGain = computeInformationGain(prior.beliefScore, analysisBeliefImplied);
 
   // Prior influence: how much the prior changed the overall assessment
   const priorInfluence = Math.abs(adjustedScore - rawScore) / 100;

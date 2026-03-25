@@ -54,27 +54,27 @@ export const BIAS_NODES: BiasNode[] = [
     category: 'memory',
     cognitiveSystem: 'system1',
     prevalence: 0.72,
-    detectability: 0.40,
+    detectability: 0.4,
   },
   {
     id: 'groupthink',
     category: 'social',
     cognitiveSystem: 'system2',
     prevalence: 0.65,
-    detectability: 0.30,
+    detectability: 0.3,
   },
   {
     id: 'authority_bias',
     category: 'social',
     cognitiveSystem: 'system1',
-    prevalence: 0.70,
-    detectability: 0.50,
+    prevalence: 0.7,
+    detectability: 0.5,
   },
   {
     id: 'bandwagon_effect',
     category: 'social',
     cognitiveSystem: 'system1',
-    prevalence: 0.60,
+    prevalence: 0.6,
     detectability: 0.55,
   },
   {
@@ -89,27 +89,27 @@ export const BIAS_NODES: BiasNode[] = [
     category: 'memory',
     cognitiveSystem: 'system1',
     prevalence: 0.68,
-    detectability: 0.30,
+    detectability: 0.3,
   },
   {
     id: 'planning_fallacy',
     category: 'decision',
     cognitiveSystem: 'system2',
-    prevalence: 0.80,
-    detectability: 0.50,
+    prevalence: 0.8,
+    detectability: 0.5,
   },
   {
     id: 'loss_aversion',
     category: 'decision',
     cognitiveSystem: 'system1',
     prevalence: 0.82,
-    detectability: 0.40,
+    detectability: 0.4,
   },
   {
     id: 'sunk_cost_fallacy',
     category: 'decision',
     cognitiveSystem: 'system2',
-    prevalence: 0.70,
+    prevalence: 0.7,
     detectability: 0.55,
   },
   {
@@ -131,21 +131,21 @@ export const BIAS_NODES: BiasNode[] = [
     category: 'attention',
     cognitiveSystem: 'system1',
     prevalence: 0.73,
-    detectability: 0.20,
+    detectability: 0.2,
   },
   {
     id: 'recency_bias',
     category: 'memory',
     cognitiveSystem: 'system1',
-    prevalence: 0.70,
-    detectability: 0.50,
+    prevalence: 0.7,
+    detectability: 0.5,
   },
   {
     id: 'cognitive_misering',
     category: 'attention',
     cognitiveSystem: 'system1',
-    prevalence: 0.80,
-    detectability: 0.20,
+    prevalence: 0.8,
+    detectability: 0.2,
   },
 ];
 
@@ -225,7 +225,8 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
     weight: 1.4,
     mechanism:
       'Recent events are more cognitively available, making the availability heuristic disproportionately weight recent information.',
-    citation: 'Tversky & Kahneman 1973, "Availability: A Heuristic for Judging Frequency and Probability"',
+    citation:
+      'Tversky & Kahneman 1973, "Availability: A Heuristic for Judging Frequency and Probability"',
   },
   {
     from: 'bandwagon_effect',
@@ -317,7 +318,8 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
     weight: 1.5,
     mechanism:
       'Potential losses from change are weighted more heavily than potential gains, making the status quo feel safer.',
-    citation: 'Kahneman, Knetsch & Thaler 1991, "Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias"',
+    citation:
+      'Kahneman, Knetsch & Thaler 1991, "Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias"',
   },
   {
     from: 'sunk_cost_fallacy',
@@ -353,7 +355,8 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
     weight: 1.1,
     mechanism:
       'Widespread adoption signals implicit authority endorsement, strengthening deference to perceived consensus leaders.',
-    citation: 'Bikhchandani, Hirshleifer & Welch 1992, "A Theory of Fads, Fashion, Custom, and Cultural Change"',
+    citation:
+      'Bikhchandani, Hirshleifer & Welch 1992, "A Theory of Fads, Fashion, Custom, and Cultural Change"',
   },
   {
     from: 'cognitive_misering',
@@ -362,7 +365,8 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
     weight: 1.4,
     mechanism:
       'System 1 default processing insufficiently adjusts from initial anchors, as adjustment requires effortful System 2 engagement.',
-    citation: 'Epley & Gilovich 2001, "Putting Adjustment Back in the Anchoring and Adjustment Heuristic"',
+    citation:
+      'Epley & Gilovich 2001, "Putting Adjustment Back in the Anchoring and Adjustment Heuristic"',
   },
   {
     from: 'framing_effect',
@@ -504,9 +508,9 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
     to: 'confirmation_bias',
     type: 'amplifies',
     weight: 1.3,
-    mechanism:
-      'High confidence in a hypothesis reduces motivation to seek disconfirming evidence.',
-    citation: 'Klayman & Ha 1987, "Confirmation, Disconfirmation, and Information in Hypothesis Testing"',
+    mechanism: 'High confidence in a hypothesis reduces motivation to seek disconfirming evidence.',
+    citation:
+      'Klayman & Ha 1987, "Confirmation, Disconfirmation, and Information in Hypothesis Testing"',
   },
   {
     from: 'loss_aversion',
@@ -542,7 +546,8 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
     weight: 1.2,
     mechanism:
       'The most recent frame encountered tends to dominate evaluation of subsequent information.',
-    citation: 'Krosnick & Alwin 1987, "An Evaluation of a Cognitive Theory of Response-Order Effects"',
+    citation:
+      'Krosnick & Alwin 1987, "An Evaluation of a Cognitive Theory of Response-Order Effects"',
   },
   {
     from: 'groupthink',
@@ -789,7 +794,8 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
     weight: 1.3,
     mechanism:
       'Fear of incurring losses from deviating creates conformity pressure, as dissent risks personal and group losses.',
-    citation: 'Kahneman, Knetsch & Thaler 1991, "Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias"',
+    citation:
+      'Kahneman, Knetsch & Thaler 1991, "Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias"',
   },
   {
     from: 'loss_aversion',
@@ -1225,7 +1231,8 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
     weight: 1.3,
     mechanism:
       'Fear of realizing losses motivates selective search for information confirming that the current position will recover.',
-    citation: 'Kahneman, Knetsch & Thaler 1991, "Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias"',
+    citation:
+      'Kahneman, Knetsch & Thaler 1991, "Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias"',
   },
   {
     from: 'loss_aversion',
@@ -1354,7 +1361,7 @@ export const BIAS_RELATIONSHIPS: BiasRelationship[] = [
  */
 export function getAmplifiers(biasType: string): BiasRelationship[] {
   return BIAS_RELATIONSHIPS.filter(
-    (r) => r.to === biasType && (r.type === 'amplifies' || r.type === 'enables')
+    r => r.to === biasType && (r.type === 'amplifies' || r.type === 'enables')
   );
 }
 

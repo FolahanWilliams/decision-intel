@@ -245,12 +245,19 @@ export async function detectToxicCombinations(
             const [biasA, biasB] = pairKey.split('::');
             if (biasSet.has(biasA) && biasSet.has(biasB)) {
               const biasKey = [biasA, biasB].sort().join('+');
-              const isDuplicate = combinations.some(c => [...c.biasTypes].sort().join('+') === biasKey);
+              const isDuplicate = combinations.some(
+                c => [...c.biasTypes].sort().join('+') === biasKey
+              );
               if (isDuplicate) continue;
 
               const interactionWeight = seedInteractions[pairKey] ?? 0.1;
               const baseScore = Math.min(85, seed.avgImpactScore * interactionWeight * 1.5);
-              const calibratedScore = await calibrateScore(baseScore, [biasA, biasB], context, orgId);
+              const calibratedScore = await calibrateScore(
+                baseScore,
+                [biasA, biasB],
+                context,
+                orgId
+              );
 
               if (calibratedScore >= 35) {
                 combinations.push({

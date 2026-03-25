@@ -8,12 +8,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 1975,
     yearDiscovered: 2012,
-    summary: 'Kodak invented the digital camera in 1975 but suppressed the technology to protect its lucrative film business. Over three decades, leadership repeatedly chose to defend the status quo rather than cannibalize existing revenue, ultimately filing for bankruptcy in 2012 as digital photography rendered film obsolete.',
-    decisionContext: 'Whether to invest in and commercialize digital photography technology or continue prioritizing the highly profitable film and chemical processing business.',
+    summary:
+      'Kodak invented the digital camera in 1975 but suppressed the technology to protect its lucrative film business. Over three decades, leadership repeatedly chose to defend the status quo rather than cannibalize existing revenue, ultimately filing for bankruptcy in 2012 as digital photography rendered film obsolete.',
+    decisionContext:
+      'Whether to invest in and commercialize digital photography technology or continue prioritizing the highly profitable film and chemical processing business.',
     outcome: 'catastrophic_failure',
     impactScore: 90,
     estimatedLoss: '$31B',
-    biasesPresent: ['status_quo_bias', 'confirmation_bias', 'loss_aversion', 'anchoring_bias', 'sunk_cost_fallacy'],
+    biasesPresent: [
+      'status_quo_bias',
+      'confirmation_bias',
+      'loss_aversion',
+      'anchoring_bias',
+      'sunk_cost_fallacy',
+    ],
     primaryBias: 'status_quo_bias',
     toxicCombinations: ['Status Quo Lock', 'Sunk Ship'],
     contextFactors: {
@@ -28,7 +36,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Status quo bias is most dangerous when current profits are high, as it creates an illusion that the existing model is permanent.',
       'Companies must be willing to cannibalize their own products before competitors do it for them.',
     ],
-    source: 'Chunka Mui, "How Kodak Failed" (Forbes, 2012); Kodak Chapter 11 filing, SDNY Case No. 12-10202',
+    source:
+      'Chunka Mui, "How Kodak Failed" (Forbes, 2012); Kodak Chapter 11 filing, SDNY Case No. 12-10202',
     sourceType: 'case_study',
   },
   {
@@ -38,12 +47,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 2007,
     yearDiscovered: 2013,
-    summary: 'Nokia held 49.4% global mobile phone market share in 2007 but failed to respond to the iPhone and Android revolution. Internal organizational politics, overconfidence in the Symbian platform, and a culture of fear that suppressed bad news led to Nokia\'s mobile division being sold to Microsoft for $7.2 billion in 2013, down from a peak market capitalization of $250 billion.',
-    decisionContext: 'Whether to abandon the aging Symbian operating system in favor of a modern touch-based smartphone platform after Apple launched the iPhone in 2007.',
+    summary:
+      "Nokia held 49.4% global mobile phone market share in 2007 but failed to respond to the iPhone and Android revolution. Internal organizational politics, overconfidence in the Symbian platform, and a culture of fear that suppressed bad news led to Nokia's mobile division being sold to Microsoft for $7.2 billion in 2013, down from a peak market capitalization of $250 billion.",
+    decisionContext:
+      'Whether to abandon the aging Symbian operating system in favor of a modern touch-based smartphone platform after Apple launched the iPhone in 2007.',
     outcome: 'catastrophic_failure',
     impactScore: 95,
     estimatedLoss: '$243B',
-    biasesPresent: ['status_quo_bias', 'overconfidence_bias', 'groupthink', 'confirmation_bias', 'loss_aversion'],
+    biasesPresent: [
+      'status_quo_bias',
+      'overconfidence_bias',
+      'groupthink',
+      'confirmation_bias',
+      'loss_aversion',
+    ],
     primaryBias: 'status_quo_bias',
     toxicCombinations: ['Echo Chamber', 'Status Quo Lock'],
     contextFactors: {
@@ -58,7 +75,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'A culture of fear where middle management hides bad news from senior leadership creates a fatal information asymmetry.',
       'Platform transitions require decisive action; incremental improvements to legacy systems cannot close a generational gap.',
     ],
-    source: 'Timo O. Vuori and Quy N. Huy, "Distributed Attention and Shared Emotions in the Innovation Process," Administrative Science Quarterly (2016)',
+    source:
+      'Timo O. Vuori and Quy N. Huy, "Distributed Attention and Shared Emotions in the Innovation Process," Administrative Science Quarterly (2016)',
     sourceType: 'academic_paper',
   },
   {
@@ -68,12 +86,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 2000,
     yearDiscovered: 2010,
-    summary: 'In 2000, Netflix co-founder Reed Hastings offered to sell the company to Blockbuster for $50 million. Blockbuster\'s CEO John Antioco and his team declined, anchored to the brick-and-mortar rental model and overconfident in their market position. Blockbuster filed for bankruptcy in 2010.',
-    decisionContext: 'Whether to acquire Netflix and invest in DVD-by-mail and eventual streaming technology, or continue focusing on the existing store-based rental business model.',
+    summary:
+      "In 2000, Netflix co-founder Reed Hastings offered to sell the company to Blockbuster for $50 million. Blockbuster's CEO John Antioco and his team declined, anchored to the brick-and-mortar rental model and overconfident in their market position. Blockbuster filed for bankruptcy in 2010.",
+    decisionContext:
+      'Whether to acquire Netflix and invest in DVD-by-mail and eventual streaming technology, or continue focusing on the existing store-based rental business model.',
     outcome: 'catastrophic_failure',
     impactScore: 85,
     estimatedLoss: '$6B',
-    biasesPresent: ['anchoring_bias', 'status_quo_bias', 'overconfidence_bias', 'confirmation_bias', 'loss_aversion'],
+    biasesPresent: [
+      'anchoring_bias',
+      'status_quo_bias',
+      'overconfidence_bias',
+      'confirmation_bias',
+      'loss_aversion',
+    ],
     primaryBias: 'anchoring_bias',
     toxicCombinations: ['Status Quo Lock', 'Optimism Trap'],
     contextFactors: {
@@ -85,10 +111,11 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     },
     lessonsLearned: [
       'Anchoring to an existing distribution model prevents incumbents from recognizing that convenience and technology will reshape customer expectations.',
-      'Late fees represented 16% of Blockbuster\'s revenue, creating a perverse incentive to resist customer-friendly disruption.',
+      "Late fees represented 16% of Blockbuster's revenue, creating a perverse incentive to resist customer-friendly disruption.",
       'Overconfidence in physical retail presence is not a sustainable competitive moat when digital alternatives emerge.',
     ],
-    source: 'Greg Satell, "A Look Back at Why Blockbuster Really Failed" (Forbes, 2014); Blockbuster Inc. Chapter 11 filing (2010)',
+    source:
+      'Greg Satell, "A Look Back at Why Blockbuster Really Failed" (Forbes, 2014); Blockbuster Inc. Chapter 11 filing (2010)',
     sourceType: 'case_study',
   },
   {
@@ -98,8 +125,10 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 2008,
     yearDiscovered: 2017,
-    summary: 'Yahoo\'s board rejected Microsoft\'s $44.6 billion acquisition offer in 2008, with CEO Jerry Yang holding out for a higher price. The company continued to decline, ultimately selling its core internet business to Verizon for $4.48 billion in 2017, a 90% decline from the rejected offer.',
-    decisionContext: 'Whether to accept Microsoft\'s $31-per-share acquisition bid or hold out for a higher offer based on the belief that Yahoo\'s independent value would increase.',
+    summary:
+      "Yahoo's board rejected Microsoft's $44.6 billion acquisition offer in 2008, with CEO Jerry Yang holding out for a higher price. The company continued to decline, ultimately selling its core internet business to Verizon for $4.48 billion in 2017, a 90% decline from the rejected offer.",
+    decisionContext:
+      "Whether to accept Microsoft's $31-per-share acquisition bid or hold out for a higher offer based on the belief that Yahoo's independent value would increase.",
     outcome: 'catastrophic_failure',
     impactScore: 80,
     estimatedLoss: '$44.6B',
@@ -118,7 +147,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Board members must evaluate offers against realistic future scenarios, not best-case projections.',
       'Overconfidence in a turnaround strategy without concrete evidence is not a substitute for a certain premium offer.',
     ],
-    source: 'Microsoft SEC filing of acquisition proposal (2008); Yahoo-Verizon acquisition agreement (2017)',
+    source:
+      'Microsoft SEC filing of acquisition proposal (2008); Yahoo-Verizon acquisition agreement (2017)',
     sourceType: 'sec_filing',
   },
   {
@@ -128,8 +158,10 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 2003,
     yearDiscovered: 2018,
-    summary: 'Theranos claimed to have revolutionized blood testing with proprietary technology that could run hundreds of tests from a single drop of blood. The technology never worked as claimed, yet the company raised over $700 million, reaching a $9 billion valuation as investors and board members deferred to founder Elizabeth Holmes\'s authority.',
-    decisionContext: 'Whether investors and board members should have demanded independent validation of Theranos\'s technology claims before investing hundreds of millions of dollars.',
+    summary:
+      "Theranos claimed to have revolutionized blood testing with proprietary technology that could run hundreds of tests from a single drop of blood. The technology never worked as claimed, yet the company raised over $700 million, reaching a $9 billion valuation as investors and board members deferred to founder Elizabeth Holmes's authority.",
+    decisionContext:
+      "Whether investors and board members should have demanded independent validation of Theranos's technology claims before investing hundreds of millions of dollars.",
     outcome: 'catastrophic_failure',
     impactScore: 85,
     estimatedLoss: '$9B',
@@ -148,7 +180,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Confirmation bias led investors to accept curated demos rather than demanding rigorous independent validation.',
       'When a company aggressively litigates against whistleblowers rather than addressing their claims, it signals systemic deception.',
     ],
-    source: 'John Carreyrou, "Bad Blood: Secrets and Lies in a Silicon Valley Startup" (2018); SEC v. Theranos complaint (2018)',
+    source:
+      'John Carreyrou, "Bad Blood: Secrets and Lies in a Silicon Valley Startup" (2018); SEC v. Theranos complaint (2018)',
     sourceType: 'news_investigation',
   },
   {
@@ -158,12 +191,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 2019,
     yearDiscovered: 2019,
-    summary: 'WeWork\'s attempted IPO in 2019 exposed massive governance failures and unsustainable economics, causing its valuation to plummet from $47 billion to under $8 billion. Founder Adam Neumann exercised unchecked authority while SoftBank and other investors inflated the valuation through groupthink-driven funding rounds.',
-    decisionContext: 'Whether to proceed with a public offering at a $47 billion valuation despite governance red flags including related-party transactions, dual-class shares, and a founder-controlled board.',
+    summary:
+      "WeWork's attempted IPO in 2019 exposed massive governance failures and unsustainable economics, causing its valuation to plummet from $47 billion to under $8 billion. Founder Adam Neumann exercised unchecked authority while SoftBank and other investors inflated the valuation through groupthink-driven funding rounds.",
+    decisionContext:
+      'Whether to proceed with a public offering at a $47 billion valuation despite governance red flags including related-party transactions, dual-class shares, and a founder-controlled board.',
     outcome: 'catastrophic_failure',
     impactScore: 80,
     estimatedLoss: '$39B',
-    biasesPresent: ['overconfidence_bias', 'authority_bias', 'groupthink', 'bandwagon_effect', 'framing_effect'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'authority_bias',
+      'groupthink',
+      'bandwagon_effect',
+      'framing_effect',
+    ],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Yes Committee', 'Optimism Trap'],
     contextFactors: {
@@ -178,7 +219,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Concentrated investor relationships (SoftBank) can create an echo chamber that validates increasingly unrealistic valuations.',
       'Governance structures that grant founders unchecked control are a warning sign, not a feature.',
     ],
-    source: 'WeWork S-1 Filing (2019, withdrawn); Eliot Brown and Maureen Farrell, "The Cult of We" (2021)',
+    source:
+      'WeWork S-1 Filing (2019, withdrawn); Eliot Brown and Maureen Farrell, "The Cult of We" (2021)',
     sourceType: 'sec_filing',
   },
   {
@@ -188,12 +230,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 2020,
     yearDiscovered: 2020,
-    summary: 'Quibi raised $1.75 billion to launch a mobile-only short-form video platform, shutting down just six months after launch. Founders Jeffrey Katzenberg and Meg Whitman were overconfident in the concept, ignored market research showing weak demand, and planned around assumptions that proved false when COVID-19 changed viewing habits.',
-    decisionContext: 'Whether to launch a premium mobile-only streaming service with short-form content in a market already saturated with free alternatives like YouTube and TikTok.',
+    summary:
+      'Quibi raised $1.75 billion to launch a mobile-only short-form video platform, shutting down just six months after launch. Founders Jeffrey Katzenberg and Meg Whitman were overconfident in the concept, ignored market research showing weak demand, and planned around assumptions that proved false when COVID-19 changed viewing habits.',
+    decisionContext:
+      'Whether to launch a premium mobile-only streaming service with short-form content in a market already saturated with free alternatives like YouTube and TikTok.',
     outcome: 'catastrophic_failure',
     impactScore: 70,
     estimatedLoss: '$1.75B',
-    biasesPresent: ['overconfidence_bias', 'confirmation_bias', 'planning_fallacy', 'groupthink', 'anchoring_bias'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'confirmation_bias',
+      'planning_fallacy',
+      'groupthink',
+      'anchoring_bias',
+    ],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Optimism Trap'],
     contextFactors: {
@@ -208,7 +258,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Planning fallacy led to overly optimistic subscriber projections that never materialized.',
       'Confirmation bias in market research means hearing what you want from focus groups rather than what the data actually shows.',
     ],
-    source: 'Quibi investor communications (2020); Lucas Shaw, "Inside the Meltdown of Quibi" (Bloomberg Businessweek, 2020)',
+    source:
+      'Quibi investor communications (2020); Lucas Shaw, "Inside the Meltdown of Quibi" (Bloomberg Businessweek, 2020)',
     sourceType: 'news_investigation',
   },
   {
@@ -218,12 +269,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 2011,
     yearDiscovered: 2019,
-    summary: 'Google invested over $500 million in Google+, a social network designed to compete with Facebook. Despite low user engagement and internal data showing the platform was failing, Google continued investing and even integrated Google+ into other products, forcing adoption rather than earning it organically.',
-    decisionContext: 'Whether to continue investing in and forcing adoption of Google+ across Google\'s product ecosystem despite consistently low engagement metrics.',
+    summary:
+      'Google invested over $500 million in Google+, a social network designed to compete with Facebook. Despite low user engagement and internal data showing the platform was failing, Google continued investing and even integrated Google+ into other products, forcing adoption rather than earning it organically.',
+    decisionContext:
+      "Whether to continue investing in and forcing adoption of Google+ across Google's product ecosystem despite consistently low engagement metrics.",
     outcome: 'failure',
     impactScore: 55,
     estimatedLoss: '$500M+',
-    biasesPresent: ['confirmation_bias', 'overconfidence_bias', 'bandwagon_effect', 'sunk_cost_fallacy', 'planning_fallacy'],
+    biasesPresent: [
+      'confirmation_bias',
+      'overconfidence_bias',
+      'bandwagon_effect',
+      'sunk_cost_fallacy',
+      'planning_fallacy',
+    ],
     primaryBias: 'confirmation_bias',
     toxicCombinations: ['Optimism Trap'],
     contextFactors: {
@@ -235,10 +294,11 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     },
     lessonsLearned: [
       'Forcing user adoption through product integration is not a substitute for genuine product-market fit.',
-      'Confirmation bias led leadership to interpret forced signups as organic growth, masking the platform\'s fundamental engagement problem.',
+      "Confirmation bias led leadership to interpret forced signups as organic growth, masking the platform's fundamental engagement problem.",
       'Overconfidence in engineering capability ignores the network effects that protect established social platforms.',
     ],
-    source: 'Ars Technica post-mortem analysis (2019); Google official blog announcement of Google+ shutdown (2018)',
+    source:
+      'Ars Technica post-mortem analysis (2019); Google official blog announcement of Google+ shutdown (2018)',
     sourceType: 'post_mortem',
   },
   {
@@ -248,12 +308,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 2015,
     yearDiscovered: 2022,
-    summary: 'IBM invested over $5 billion acquiring companies and building Watson Health, promising AI-driven healthcare transformation. The technology consistently failed to deliver on marketing claims, with oncology recommendations sometimes being unsafe. IBM sold the division for approximately $1 billion in 2022.',
-    decisionContext: 'Whether to continue investing billions in Watson Health\'s AI-driven oncology and healthcare analytics products despite repeated failures to match clinical accuracy claims in real-world settings.',
+    summary:
+      'IBM invested over $5 billion acquiring companies and building Watson Health, promising AI-driven healthcare transformation. The technology consistently failed to deliver on marketing claims, with oncology recommendations sometimes being unsafe. IBM sold the division for approximately $1 billion in 2022.',
+    decisionContext:
+      "Whether to continue investing billions in Watson Health's AI-driven oncology and healthcare analytics products despite repeated failures to match clinical accuracy claims in real-world settings.",
     outcome: 'failure',
     impactScore: 70,
     estimatedLoss: '$5B',
-    biasesPresent: ['overconfidence_bias', 'planning_fallacy', 'confirmation_bias', 'sunk_cost_fallacy', 'anchoring_bias'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'planning_fallacy',
+      'confirmation_bias',
+      'sunk_cost_fallacy',
+      'anchoring_bias',
+    ],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Optimism Trap', 'Sunk Ship'],
     contextFactors: {
@@ -268,7 +336,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Planning fallacy in AI healthcare deployments consistently underestimates the difficulty of working with messy, unstructured clinical data.',
       'Confirmation bias led IBM to showcase cherry-picked success stories while ignoring systemic accuracy failures.',
     ],
-    source: 'Casey Ross and Ike Swetlitz, "IBM\'s Watson Supercomputer Recommended Unsafe and Incorrect Cancer Treatments" (STAT News, 2018)',
+    source:
+      'Casey Ross and Ike Swetlitz, "IBM\'s Watson Supercomputer Recommended Unsafe and Incorrect Cancer Treatments" (STAT News, 2018)',
     sourceType: 'news_investigation',
   },
   {
@@ -278,12 +347,20 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     industry: 'technology',
     year: 2013,
     yearDiscovered: 2017,
-    summary: 'Juicero raised $120 million to build a $400 internet-connected juice press that squeezed proprietary pre-packaged fruit pouches. Bloomberg reporters demonstrated the pouches could be squeezed by hand just as effectively, exposing the product as an over-engineered solution to a nonexistent problem.',
-    decisionContext: 'Whether to invest $120 million in a Wi-Fi-connected juicing machine requiring proprietary pouches, rather than validating whether consumers needed or wanted the product.',
+    summary:
+      'Juicero raised $120 million to build a $400 internet-connected juice press that squeezed proprietary pre-packaged fruit pouches. Bloomberg reporters demonstrated the pouches could be squeezed by hand just as effectively, exposing the product as an over-engineered solution to a nonexistent problem.',
+    decisionContext:
+      'Whether to invest $120 million in a Wi-Fi-connected juicing machine requiring proprietary pouches, rather than validating whether consumers needed or wanted the product.',
     outcome: 'catastrophic_failure',
     impactScore: 40,
     estimatedLoss: '$120M',
-    biasesPresent: ['overconfidence_bias', 'confirmation_bias', 'planning_fallacy', 'groupthink', 'bandwagon_effect'],
+    biasesPresent: [
+      'overconfidence_bias',
+      'confirmation_bias',
+      'planning_fallacy',
+      'groupthink',
+      'bandwagon_effect',
+    ],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: ['Optimism Trap'],
     contextFactors: {
@@ -298,7 +375,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Planning fallacy in hardware startups is especially dangerous because physical products cannot pivot as easily as software.',
       'Basic product validation (can a human squeeze the pouch by hand?) should precede any significant capital investment.',
     ],
-    source: 'Ellen Huet and Olivia Zaleski, "Silicon Valley\'s $400 Juicer May Be Feeling the Squeeze" (Bloomberg, 2017)',
+    source:
+      'Ellen Huet and Olivia Zaleski, "Silicon Valley\'s $400 Juicer May Be Feeling the Squeeze" (Bloomberg, 2017)',
     sourceType: 'news_investigation',
   },
 ];

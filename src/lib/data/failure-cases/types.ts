@@ -2,7 +2,15 @@ export interface FailureCase {
   id: string;
   title: string;
   company: string;
-  industry: 'financial_services' | 'technology' | 'healthcare' | 'energy' | 'automotive' | 'retail' | 'aerospace' | 'government';
+  industry:
+    | 'financial_services'
+    | 'technology'
+    | 'healthcare'
+    | 'energy'
+    | 'automotive'
+    | 'retail'
+    | 'aerospace'
+    | 'government';
   year: number;
   yearDiscovered: number;
   summary: string;
@@ -22,5 +30,13 @@ export interface FailureCase {
   };
   lessonsLearned: string[];
   source: string;
-  sourceType: 'sec_filing' | 'ntsb_report' | 'fda_action' | 'fca_enforcement' | 'case_study' | 'post_mortem' | 'academic_paper' | 'news_investigation';
+  sourceType:
+    | 'sec_filing'
+    | 'ntsb_report'
+    | 'fda_action'
+    | 'fca_enforcement'
+    | 'case_study'
+    | 'post_mortem'
+    | 'academic_paper'
+    | 'news_investigation';
 }

@@ -536,9 +536,8 @@ export async function processSlackOutcomeSignal(payload: SlackWebhookPayload): P
   if (!event || event.type !== 'message') return { detected: false, draftCount: 0 };
 
   try {
-    const { isOutcomeMessage, detectOutcomeFromSlack } = await import(
-      '@/lib/learning/outcome-inference'
-    );
+    const { isOutcomeMessage, detectOutcomeFromSlack } =
+      await import('@/lib/learning/outcome-inference');
 
     if (!isOutcomeMessage(event.text)) return { detected: false, draftCount: 0 };
 
@@ -546,7 +545,7 @@ export async function processSlackOutcomeSignal(payload: SlackWebhookPayload): P
       event.text,
       event.channel,
       event.thread_ts,
-      payload.team_id ?? '',
+      payload.team_id ?? ''
     );
 
     return { detected: results.length > 0, draftCount: results.length };

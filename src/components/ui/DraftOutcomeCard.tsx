@@ -23,10 +23,14 @@ function formatSource(source: string): string {
 
 function outcomeBadge(outcome: string): string {
   switch (outcome) {
-    case 'success': return 'bg-green-500/15 text-green-400';
-    case 'partial_success': return 'bg-yellow-500/15 text-yellow-400';
-    case 'failure': return 'bg-red-500/15 text-red-400';
-    default: return 'bg-zinc-500/15 text-zinc-400';
+    case 'success':
+      return 'bg-green-500/15 text-green-400';
+    case 'partial_success':
+      return 'bg-yellow-500/15 text-yellow-400';
+    case 'failure':
+      return 'bg-red-500/15 text-red-400';
+    default:
+      return 'bg-zinc-500/15 text-zinc-400';
   }
 }
 
@@ -42,7 +46,7 @@ export function DraftOutcomeCard({ analysisId }: DraftOutcomeCardProps) {
       const data = await res.json();
       // Filter to this analysis only
       const relevant = (data.drafts || []).filter(
-        (d: { analysisId: string }) => d.analysisId === analysisId,
+        (d: { analysisId: string }) => d.analysisId === analysisId
       );
       setDrafts(relevant);
     } catch {
@@ -86,7 +90,9 @@ export function DraftOutcomeCard({ analysisId }: DraftOutcomeCardProps) {
       {drafts.map(draft => (
         <div key={draft.id} className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${outcomeBadge(draft.outcome)}`}>
+            <span
+              className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${outcomeBadge(draft.outcome)}`}
+            >
               {draft.outcome.replace(/_/g, ' ')}
             </span>
             <span className="text-xs text-muted-foreground">

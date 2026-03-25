@@ -14,21 +14,21 @@ const log = createLogger('RegulatoryGraph');
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface RegulatoryProvision {
-  id: string;                    // e.g. 'fca_cd_outcome_1'
-  framework: string;             // e.g. 'fca_consumer_duty'
-  section: string;               // e.g. 'PRIN 2A.2'
-  title: string;                 // e.g. 'Products and Services Outcome'
-  description: string;           // detailed description
+  id: string; // e.g. 'fca_cd_outcome_1'
+  framework: string; // e.g. 'fca_consumer_duty'
+  section: string; // e.g. 'PRIN 2A.2'
+  title: string; // e.g. 'Products and Services Outcome'
+  description: string; // detailed description
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
-  keywords: string[];            // for document matching
+  keywords: string[]; // for document matching
 }
 
 export interface BiasRegulationMapping {
-  biasType: string;              // BiasCategory
-  provisionId: string;           // RegulatoryProvision.id
-  riskWeight: number;            // 0-1: how strongly this bias violates this provision
-  mechanism: string;             // HOW the bias creates regulatory risk
-  example: string;               // concrete example of this violation
+  biasType: string; // BiasCategory
+  provisionId: string; // RegulatoryProvision.id
+  riskWeight: number; // 0-1: how strongly this bias violates this provision
+  mechanism: string; // HOW the bias creates regulatory risk
+  example: string; // concrete example of this violation
 }
 
 export interface RegulatoryFramework {
@@ -43,7 +43,7 @@ export interface RegulatoryFramework {
 
 export interface RegulatoryAssessment {
   framework: RegulatoryFramework;
-  overallRiskScore: number;      // 0-100
+  overallRiskScore: number; // 0-100
   overallRiskLevel: 'low' | 'medium' | 'high' | 'critical';
   triggeredProvisions: Array<{
     provision: RegulatoryProvision;
@@ -131,9 +131,7 @@ export function getBiasRegulatoryRisk(
   }> = [];
 
   for (const fw of getAllRegisteredFrameworks()) {
-    const mappings = fw.biasMappings.filter(
-      m => m.biasType === biasType
-    );
+    const mappings = fw.biasMappings.filter(m => m.biasType === biasType);
     for (const mapping of mappings) {
       const provision = fw.provisions.find(p => p.id === mapping.provisionId);
       results.push({

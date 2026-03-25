@@ -41,7 +41,10 @@ export function computeSeedWeights(): SeedWeight[] {
     .sort((a, b) => b.avgImpactScore - a.avgImpactScore);
 }
 
-export function getSeedBiasCorrelations(): Record<string, { failureCorrelation: number; avgImpact: number; sampleSize: number }> {
+export function getSeedBiasCorrelations(): Record<
+  string,
+  { failureCorrelation: number; avgImpact: number; sampleSize: number }
+> {
   const biasStats: Record<string, { totalImpact: number; count: number }> = {};
 
   for (const c of FAILURE_CASES) {
@@ -52,7 +55,10 @@ export function getSeedBiasCorrelations(): Record<string, { failureCorrelation: 
     }
   }
 
-  const result: Record<string, { failureCorrelation: number; avgImpact: number; sampleSize: number }> = {};
+  const result: Record<
+    string,
+    { failureCorrelation: number; avgImpact: number; sampleSize: number }
+  > = {};
   for (const [bias, stats] of Object.entries(biasStats)) {
     result[bias] = {
       failureCorrelation: 1.0, // all cases are failures by design

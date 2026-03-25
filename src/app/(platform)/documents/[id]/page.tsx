@@ -128,7 +128,13 @@ interface Analysis {
       beliefDelta: number;
       informationGain: number;
       priorInfluence: number;
-      biasAdjustments: Array<{ biasType: string; priorConfidence: number; posteriorConfidence: number; direction: string; reason: string }>;
+      biasAdjustments: Array<{
+        biasType: string;
+        priorConfidence: number;
+        posteriorConfidence: number;
+        direction: string;
+        reason: string;
+      }>;
     };
   };
   swotAnalysis?: SwotAnalysisResult;
@@ -1544,17 +1550,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           </div>
         </ErrorBoundary>
       )}
-      {analysis?.compliance && (analysis.compliance.compoundScoring || analysis.compliance.bayesianPriors) && (
-        <ErrorBoundary sectionName="Scoring Breakdown">
-          <div className="mb-xl">
-            <ScoringBreakdown
-              compoundScoring={analysis.compliance.compoundScoring}
-              bayesianPriors={analysis.compliance.bayesianPriors}
-              overallScore={analysis.overallScore}
-            />
-          </div>
-        </ErrorBoundary>
-      )}
+      {analysis?.compliance &&
+        (analysis.compliance.compoundScoring || analysis.compliance.bayesianPriors) && (
+          <ErrorBoundary sectionName="Scoring Breakdown">
+            <div className="mb-xl">
+              <ScoringBreakdown
+                compoundScoring={analysis.compliance.compoundScoring}
+                bayesianPriors={analysis.compliance.bayesianPriors}
+                overallScore={analysis.overallScore}
+              />
+            </div>
+          </ErrorBoundary>
+        )}
       {analysis?.institutionalMemory && (
         <ErrorBoundary sectionName="Institutional Memory">
           <div className="mb-xl">

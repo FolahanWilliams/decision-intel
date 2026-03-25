@@ -2,7 +2,12 @@ import { FailureCase } from './types';
 import { FINANCIAL_SERVICES_CASES } from './financial-services';
 import { TECHNOLOGY_CASES } from './technology';
 import { HEALTHCARE_CASES, ENERGY_INDUSTRIAL_CASES } from './healthcare-energy';
-import { RETAIL_CASES, GOVERNMENT_DEFENSE_CASES, ADDITIONAL_FINANCIAL_CASES, ADDITIONAL_TECH_CASES } from './retail-government';
+import {
+  RETAIL_CASES,
+  GOVERNMENT_DEFENSE_CASES,
+  ADDITIONAL_FINANCIAL_CASES,
+  ADDITIONAL_TECH_CASES,
+} from './retail-government';
 import { FINANCIAL_EXTENDED_CASES } from './financial-extended';
 import { TECHNOLOGY_EXTENDED_CASES } from './technology-extended';
 import { HEALTHCARE_EXTENDED_CASES } from './healthcare-extended';
@@ -34,30 +39,28 @@ export const FAILURE_CASES: FailureCase[] = [
 ];
 
 export function getCasesByIndustry(industry: string): FailureCase[] {
-  return FAILURE_CASES.filter((c) => c.industry === industry);
+  return FAILURE_CASES.filter(c => c.industry === industry);
 }
 
 export function getCasesByBias(biasType: string): FailureCase[] {
-  return FAILURE_CASES.filter((c) => c.biasesPresent.includes(biasType));
+  return FAILURE_CASES.filter(c => c.biasesPresent.includes(biasType));
 }
 
 export function getCasesByToxicPattern(patternLabel: string): FailureCase[] {
   const normalized = patternLabel.replace(/^The\s+/i, '').toLowerCase();
-  return FAILURE_CASES.filter((c) =>
-    c.toxicCombinations.some(
-      (p) => p.replace(/^The\s+/i, '').toLowerCase() === normalized,
-    ),
+  return FAILURE_CASES.filter(c =>
+    c.toxicCombinations.some(p => p.replace(/^The\s+/i, '').toLowerCase() === normalized)
   );
 }
 
 export function searchCases(query: string): FailureCase[] {
   const q = query.toLowerCase();
   return FAILURE_CASES.filter(
-    (c) =>
+    c =>
       c.title.toLowerCase().includes(q) ||
       c.company.toLowerCase().includes(q) ||
       c.summary.toLowerCase().includes(q) ||
-      c.decisionContext.toLowerCase().includes(q),
+      c.decisionContext.toLowerCase().includes(q)
   );
 }
 
@@ -79,7 +82,7 @@ export function getCaseStatistics() {
   return {
     totalCases: FAILURE_CASES.length,
     byIndustry,
-    byBias: Object.entries(byBias).sort(([,a], [,b]) => b - a),
-    byPattern: Object.entries(byPattern).sort(([,a], [,b]) => b - a),
+    byBias: Object.entries(byBias).sort(([, a], [, b]) => b - a),
+    byPattern: Object.entries(byPattern).sort(([, a], [, b]) => b - a),
   };
 }

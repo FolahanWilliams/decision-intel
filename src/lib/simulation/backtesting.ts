@@ -120,10 +120,7 @@ function shouldReject(outcome: BacktestCase['actualOutcome']): boolean {
   return outcome === 'failure' || outcome === 'catastrophic_failure';
 }
 
-function isCorrectVote(
-  vote: string,
-  actualOutcome: BacktestCase['actualOutcome'],
-): boolean {
+function isCorrectVote(vote: string, actualOutcome: BacktestCase['actualOutcome']): boolean {
   const bad = shouldReject(actualOutcome);
   if (bad) return vote === 'REJECT' || vote === 'REVISE';
   return vote === 'APPROVE' || vote === 'REVISE'; // REVISE is acceptable for partial_success
@@ -138,7 +135,7 @@ function isCorrectVote(
  */
 export function evaluateBacktest(
   testCase: BacktestCase,
-  simulation: SimulationOutput,
+  simulation: SimulationOutput
 ): BacktestResult {
   // --- Outcome prediction ---
   const bad = shouldReject(testCase.actualOutcome);
@@ -146,13 +143,13 @@ export function evaluateBacktest(
   const outcomePredicted = bad === simulationSaysBad;
 
   // --- Persona voting accuracy ---
-  const personaResults = simulation.personaVotes.map((pv) => {
+  const personaResults = simulation.personaVotes.map(pv => {
     const wasCorrect = isCorrectVote(pv.vote, testCase.actualOutcome);
-    const flaggedActualRisk = pv.flaggedRisks.some((risk) =>
+    const flaggedActualRisk = pv.flaggedRisks.some(risk =>
       testCase.materializedRisk
         .toLowerCase()
         .split(/\s+/)
-        .some((word) => word.length > 3 && risk.toLowerCase().includes(word)),
+        .some(word => word.length > 3 && risk.toLowerCase().includes(word))
     );
     return {
       name: pv.personaName,
@@ -162,35 +159,29 @@ export function evaluateBacktest(
     };
   });
 
-  const correctVotes = personaResults.filter((p) => p.wasCorrect).length;
+  const correctVotes = personaResults.filter(p => p.wasCorrect).length;
   const majorityCorrect = correctVotes > simulation.personaVotes.length / 2;
 
   const mostAccuratePersonas = personaResults
-    .filter((p) => p.wasCorrect && p.flaggedActualRisk)
-    .map((p) => p.name);
+    .filter(p => p.wasCorrect && p.flaggedActualRisk)
+    .map(p => p.name);
 
   // Devil's Advocate
   const devilsAdvocate = personaResults.find(
-    (p) =>
+    p =>
       p.name.toLowerCase().includes('devil') ||
       p.name.toLowerCase().includes('advocate') ||
-      p.name.toLowerCase().includes('contrarian'),
+      p.name.toLowerCase().includes('contrarian')
   );
   const devilsAdvocateAccurate = devilsAdvocate?.flaggedActualRisk ?? false;
 
   // --- Bias detection accuracy ---
-  const detectedBiasTypes = new Set(
-    simulation.detectedBiases.map((b) => b.type),
-  );
+  const detectedBiasTypes = new Set(simulation.detectedBiases.map(b => b.type));
   const confirmedSet = new Set(testCase.confirmedBiases);
 
-  const truePositives = testCase.confirmedBiases.filter((b) =>
-    detectedBiasTypes.has(b),
-  ).length;
-  const biasRecall =
-    confirmedSet.size > 0 ? truePositives / confirmedSet.size : 1;
-  const biasPrecision =
-    detectedBiasTypes.size > 0 ? truePositives / detectedBiasTypes.size : 1;
+  const truePositives = testCase.confirmedBiases.filter(b => detectedBiasTypes.has(b)).length;
+  const biasRecall = confirmedSet.size > 0 ? truePositives / confirmedSet.size : 1;
+  const biasPrecision = detectedBiasTypes.size > 0 ? truePositives / detectedBiasTypes.size : 1;
   const biasF1 =
     biasRecall + biasPrecision > 0
       ? (2 * biasRecall * biasPrecision) / (biasRecall + biasPrecision)
@@ -198,12 +189,12 @@ export function evaluateBacktest(
 
   // --- Pre-mortem accuracy ---
   const preMortemHit =
-    simulation.preMortemScenarios?.some((scenario) =>
+    simulation.preMortemScenarios?.some(scenario =>
       testCase.materializedRisk
         .toLowerCase()
         .split(/\s+/)
-        .filter((w) => w.length > 3)
-        .some((word) => scenario.toLowerCase().includes(word)),
+        .filter(w => w.length > 3)
+        .some(word => scenario.toLowerCase().includes(word))
     ) ?? false;
 
   // --- Score delta ---
@@ -231,7 +222,7 @@ export function evaluateBacktest(
  */
 export function summarizeBacktests(
   results: BacktestResult[],
-  caseMetadata?: Array<{ caseId: string; industry: string }>,
+  caseMetadata?: Array<{ caseId: string; industry: string }>
 ): BacktestSummary {
   if (results.length === 0) {
     return {
@@ -252,38 +243,29 @@ export function summarizeBacktests(
   const totalCases = results.length;
 
   // Outcome accuracy
-  const outcomeAccuracy =
-    results.filter((r) => r.outcomePredicted).length / totalCases;
+  const outcomeAccuracy = results.filter(r => r.outcomePredicted).length / totalCases;
 
   // Bias detection averages
-  const avgBiasRecall =
-    results.reduce((s, r) => s + r.biasRecall, 0) / totalCases;
-  const avgBiasPrecision =
-    results.reduce((s, r) => s + r.biasPrecision, 0) / totalCases;
-  const avgBiasF1 =
-    results.reduce((s, r) => s + r.biasF1, 0) / totalCases;
+  const avgBiasRecall = results.reduce((s, r) => s + r.biasRecall, 0) / totalCases;
+  const avgBiasPrecision = results.reduce((s, r) => s + r.biasPrecision, 0) / totalCases;
+  const avgBiasF1 = results.reduce((s, r) => s + r.biasF1, 0) / totalCases;
 
   // Devil's Advocate hit rate
-  const daResults = results.filter((r) => r.personaResults.some(
-    (p) =>
-      p.name.toLowerCase().includes('devil') ||
-      p.name.toLowerCase().includes('advocate'),
-  ));
+  const daResults = results.filter(r =>
+    r.personaResults.some(
+      p => p.name.toLowerCase().includes('devil') || p.name.toLowerCase().includes('advocate')
+    )
+  );
   const devilsAdvocateHitRate =
     daResults.length > 0
-      ? daResults.filter((r) => r.devilsAdvocateAccurate).length /
-        daResults.length
+      ? daResults.filter(r => r.devilsAdvocateAccurate).length / daResults.length
       : 0;
 
   // Pre-mortem hit rate
-  const preMortemHitRate =
-    results.filter((r) => r.preMortemHit).length / totalCases;
+  const preMortemHitRate = results.filter(r => r.preMortemHit).length / totalCases;
 
   // Per-persona ranking
-  const personaStats: Record<
-    string,
-    { correct: number; total: number; riskFlags: number }
-  > = {};
+  const personaStats: Record<string, { correct: number; total: number; riskFlags: number }> = {};
   for (const result of results) {
     for (const pr of result.personaResults) {
       if (!personaStats[pr.name]) {
@@ -301,21 +283,15 @@ export function summarizeBacktests(
       correctVotes: stats.correct,
       totalVotes: stats.total,
       accuracy: Math.round((stats.correct / stats.total) * 1000) / 1000,
-      riskFlagRate:
-        Math.round((stats.riskFlags / stats.total) * 1000) / 1000,
+      riskFlagRate: Math.round((stats.riskFlags / stats.total) * 1000) / 1000,
     }))
     .sort((a, b) => b.accuracy - a.accuracy);
 
   // By industry
   const byIndustry: Record<string, { cases: number; accuracy: number }> = {};
   if (caseMetadata) {
-    const industryMap = new Map(
-      caseMetadata.map((c) => [c.caseId, c.industry]),
-    );
-    const industryResults: Record<
-      string,
-      { total: number; correct: number }
-    > = {};
+    const industryMap = new Map(caseMetadata.map(c => [c.caseId, c.industry]));
+    const industryResults: Record<string, { total: number; correct: number }> = {};
     for (const result of results) {
       const industry = industryMap.get(result.caseId) ?? 'unknown';
       if (!industryResults[industry]) {
@@ -327,8 +303,7 @@ export function summarizeBacktests(
     for (const [industry, stats] of Object.entries(industryResults)) {
       byIndustry[industry] = {
         cases: stats.total,
-        accuracy:
-          Math.round((stats.correct / stats.total) * 1000) / 1000,
+        accuracy: Math.round((stats.correct / stats.total) * 1000) / 1000,
       };
     }
   }
@@ -340,8 +315,7 @@ export function summarizeBacktests(
     avgBiasPrecision: Math.round(avgBiasPrecision * 1000) / 1000,
     avgBiasF1: Math.round(avgBiasF1 * 1000) / 1000,
     personaRanking,
-    devilsAdvocateHitRate:
-      Math.round(devilsAdvocateHitRate * 1000) / 1000,
+    devilsAdvocateHitRate: Math.round(devilsAdvocateHitRate * 1000) / 1000,
     preMortemHitRate: Math.round(preMortemHitRate * 1000) / 1000,
     byIndustry,
     results,

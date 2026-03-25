@@ -81,16 +81,19 @@ export function buildEnrichedBiasPrompt(industry?: string): string {
     if (!profile) return BIAS_DETECTIVE_PROMPT;
 
     const industryBiasSection = profile.additionalBiases
-      .map((b: { name: string; description: string; detectionPrompt: string }, i: number) =>
-        `${17 + i}. ${b.name} — ${b.description}\n   Detection: ${b.detectionPrompt}`,
+      .map(
+        (b: { name: string; description: string; detectionPrompt: string }, i: number) =>
+          `${17 + i}. ${b.name} — ${b.description}\n   Detection: ${b.detectionPrompt}`
       )
       .join('\n');
 
-    const highRiskSection = profile.highRiskCombinations
-      ?.map((c: { biases: string[]; description: string }) =>
-        `• ${c.biases.join(' + ')} — ${c.description}`,
-      )
-      .join('\n') || '';
+    const highRiskSection =
+      profile.highRiskCombinations
+        ?.map(
+          (c: { biases: string[]; description: string }) =>
+            `• ${c.biases.join(' + ')} — ${c.description}`
+        )
+        .join('\n') || '';
 
     return BIAS_DETECTIVE_PROMPT.replace(
       'Analysis Instructions:',
@@ -100,7 +103,7 @@ ${industryBiasSection}
 INDUSTRY HIGH-RISK COMBINATIONS:
 ${highRiskSection}
 
-Analysis Instructions:`,
+Analysis Instructions:`
     );
   } catch {
     return BIAS_DETECTIVE_PROMPT;
