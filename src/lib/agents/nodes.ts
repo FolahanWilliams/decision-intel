@@ -1287,6 +1287,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
         timelineWeeks: null,
         documentAgeWeeks: 0,
         wordCount,
+        rawContent: state.structuredContent || undefined,
       },
       {
         orgCalibration: Object.keys(orgCalibration).length > 0 ? orgCalibration : undefined,

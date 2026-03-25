@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { computeDQI, generateDQIBadge, type DQIInput } from '@/lib/scoring/dqi';
+import { BIAS_NODES } from '@/lib/ontology/bias-graph';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DQIInternalRoute');
@@ -149,6 +150,17 @@ export async function GET(request: NextRequest) {
         outcomeTracked,
         participantCount: twins.length,
         documentLength: wordCount,
+        system1Ratio: (() => {
+          const biasTypes = (biasesRaw ?? []).map(
+            (b: { biasType?: string; type?: string }) => b.biasType ?? b.type ?? ''
+          );
+          if (biasTypes.length === 0) return undefined;
+          const system1Count = biasTypes.filter((t: string) => {
+            const node = BIAS_NODES.find(n => n.id === t);
+            return node?.cognitiveSystem === 'system1';
+          }).length;
+          return system1Count / biasTypes.length;
+        })(),
       },
       compliance: {
         riskScore: complianceRaw?.riskScore ?? 0,
