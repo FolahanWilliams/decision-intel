@@ -28,6 +28,10 @@ const staticTitles: Record<string, string> = {
   settings: 'Settings',
   team: 'Team',
   'bias-library': 'Bias Library',
+  'decision-quality': 'Decision Quality',
+  'ai-assistant': 'AI Assistant',
+  analytics: 'Analytics',
+  'decision-dna': 'Decision DNA',
   submit: 'New Analysis',
   effectiveness: 'Effectiveness',
 };

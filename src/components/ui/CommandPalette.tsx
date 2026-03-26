@@ -126,12 +126,20 @@ export function CommandPalette() {
         keywords: ['files', 'uploads'],
       },
       {
-        id: 'insights',
-        label: 'Insights & Trends',
-        description: 'Charts and bias breakdowns',
+        id: 'analytics',
+        label: 'Analytics — Trends & Insights',
+        description: 'Charts, bias breakdowns, and decision DNA',
         icon: <BarChart3 size={16} />,
-        action: () => navigate('/dashboard/insights'),
-        keywords: ['charts', 'visualizations', 'trends'],
+        action: () => navigate('/dashboard/analytics?view=trends'),
+        keywords: ['charts', 'visualizations', 'trends', 'insights', 'dna'],
+      },
+      {
+        id: 'decision-dna',
+        label: 'Analytics — Decision DNA',
+        description: 'Your unique decision profile',
+        icon: <BarChart3 size={16} />,
+        action: () => navigate('/dashboard/analytics?view=dna'),
+        keywords: ['profile', 'dna', 'style', 'bias'],
       },
       {
         id: 'search',
@@ -150,12 +158,20 @@ export function CommandPalette() {
         keywords: ['diff', 'side by side'],
       },
       {
-        id: 'chat',
-        label: 'Second Brain Chat',
+        id: 'ai-assistant-copilot',
+        label: 'AI Assistant — Decision Copilot',
+        description: 'AI agents that help you build better decisions',
+        icon: <Zap size={16} />,
+        action: () => navigate('/dashboard/ai-assistant?mode=copilot'),
+        keywords: ['copilot', 'agent', 'decision', 'advisor'],
+      },
+      {
+        id: 'ai-assistant-chat',
+        label: 'AI Assistant — Document Chat',
         description: 'Ask questions about your documents',
         icon: <MessageSquare size={16} />,
-        action: () => navigate('/dashboard/chat'),
-        keywords: ['ask', 'question', 'rag', 'ai'],
+        action: () => navigate('/dashboard/ai-assistant?mode=chat'),
+        keywords: ['ask', 'question', 'rag', 'ai', 'chat'],
       },
       {
         id: 'bias-library',
@@ -166,12 +182,12 @@ export function CommandPalette() {
         keywords: ['education', 'learn', 'bias', 'debiasing'],
       },
       {
-        id: 'cognitive-audits',
-        label: 'Cognitive Audits',
+        id: 'decision-quality',
+        label: 'Decision Quality — Audits',
         description: 'Audit human decisions',
         icon: <BrainCircuit size={16} />,
-        action: () => navigate('/dashboard/cognitive-audits'),
-        keywords: ['human', 'audit'],
+        action: () => navigate('/dashboard/decision-quality?tab=audits'),
+        keywords: ['human', 'audit', 'quality'],
       },
       {
         id: 'meetings',
@@ -182,12 +198,12 @@ export function CommandPalette() {
         keywords: ['recording', 'transcript'],
       },
       {
-        id: 'nudges',
-        label: 'Nudges',
+        id: 'decision-quality-nudges',
+        label: 'Decision Quality — Nudges',
         description: 'Decision coaching alerts',
         icon: <Bell size={16} />,
-        action: () => navigate('/dashboard/nudges'),
-        keywords: ['coaching', 'alerts', 'intervention'],
+        action: () => navigate('/dashboard/decision-quality?tab=nudges'),
+        keywords: ['coaching', 'alerts', 'nudges', 'intervention'],
       },
       {
         id: 'audit-log',
@@ -229,9 +245,20 @@ export function CommandPalette() {
         description: 'Start a fresh conversation',
         icon: <Zap size={16} />,
         action: () => {
-          navigate('/dashboard/chat');
+          navigate('/dashboard/ai-assistant?mode=chat');
         },
         keywords: ['conversation', 'new', 'start'],
+      },
+      {
+        id: 'new-decision',
+        label: 'New Decision',
+        description: 'Choose what you want to do',
+        icon: <Upload size={16} />,
+        action: () => {
+          setOpen(false);
+          window.dispatchEvent(new Event('open-new-decision-modal'));
+        },
+        keywords: ['new', 'create', 'start', 'decision'],
       },
       {
         id: 'shortcuts',

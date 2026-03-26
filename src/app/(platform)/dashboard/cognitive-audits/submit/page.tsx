@@ -207,7 +207,7 @@ export default function SubmitDecisionPage() {
       <Breadcrumbs
         items={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Cognitive Audits', href: '/dashboard/cognitive-audits' },
+          { label: 'Cognitive Audits', href: '/dashboard/decision-quality?tab=audits' },
           { label: 'Submit Decision' },
         ]}
       />
@@ -519,7 +519,7 @@ export default function SubmitDecisionPage() {
 
         {/* Actions */}
         <div className="flex items-center justify-between mt-lg">
-          <Link href="/dashboard/cognitive-audits" className="btn btn-secondary">
+          <Link href="/dashboard/decision-quality?tab=audits" className="btn btn-secondary">
             <ArrowLeft size={16} /> Cancel
           </Link>
           <button

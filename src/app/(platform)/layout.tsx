@@ -5,6 +5,7 @@ import {
   AnalysisProgressFloat,
 } from '@/components/ui/AnalysisProgressBar';
 import { CommandPalette } from '@/components/ui/CommandPalette';
+import { NewDecisionModal } from '@/components/ui/NewDecisionModal';
 import { LiquidGlassEffect } from '@/components/ui/LiquidGlassEffect';
 import { LiquidGlassAdvanced } from '@/components/ui/LiquidGlassAdvanced';
 
@@ -35,6 +36,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
       </div>
       <AnalysisProgressFloat />
       <CommandPalette />
+      <NewDecisionModal />
     </AnalysisProgressProvider>
   );
 }

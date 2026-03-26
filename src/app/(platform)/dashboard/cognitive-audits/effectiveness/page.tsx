@@ -88,7 +88,7 @@ export default function EffectivenessPage() {
       <Breadcrumbs
         items={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Cognitive Audits', href: '/dashboard/cognitive-audits' },
+          { label: 'Cognitive Audits', href: '/dashboard/decision-quality?tab=audits' },
           { label: 'Effectiveness' },
         ]}
       />
@@ -479,7 +479,7 @@ export default function EffectivenessPage() {
 
       {/* Back link */}
       <div className="mt-xl">
-        <Link href="/dashboard/cognitive-audits" className="btn btn-secondary">
+        <Link href="/dashboard/decision-quality?tab=audits" className="btn btn-secondary">
           <ArrowLeft size={16} /> Back to Cognitive Audits
         </Link>
       </div>
