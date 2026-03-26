@@ -109,7 +109,8 @@ export async function computeOrgCausalWeights(
     const biasStats = new Map<string, { failures: number; successes: number; partials: number }>();
 
     for (const outcome of outcomesList) {
-      const biases = outcome.analysis?.biases ?? {};
+      const biases = outcome.analysis?.biases;
+      if (!biases || typeof biases !== 'object') continue;
       const biasTypes = Object.keys(biases);
 
       for (const biasType of biasTypes) {

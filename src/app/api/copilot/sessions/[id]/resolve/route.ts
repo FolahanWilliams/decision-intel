@@ -40,8 +40,16 @@ export async function POST(
       helpfulAgents,
     } = body;
 
-    if (!chosenOption || typeof chosenOption !== 'string') {
+    if (!chosenOption || typeof chosenOption !== 'string' || !chosenOption.trim()) {
       return NextResponse.json({ error: 'chosenOption is required' }, { status: 400 });
+    }
+
+    // Validate optional fields
+    if (outcome && !['success', 'partial_success', 'failure', 'inconclusive'].includes(outcome)) {
+      return NextResponse.json({ error: 'Invalid outcome value' }, { status: 400 });
+    }
+    if (impactScore != null && (typeof impactScore !== 'number' || impactScore < 1 || impactScore > 10)) {
+      return NextResponse.json({ error: 'impactScore must be 1-10' }, { status: 400 });
     }
 
     // Verify session exists and belongs to user

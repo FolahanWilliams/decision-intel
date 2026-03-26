@@ -149,8 +149,9 @@ function scoreBiasLoad(biases: DQIInput['biases']): DQIComponent {
   let totalPenalty = 0;
   for (const bias of biases) {
     const cost = BIAS_SEVERITY_COST[bias.severity] ?? 6;
-    // Weight by confidence: low-confidence detections penalize less
-    totalPenalty += cost * bias.confidence;
+    // Clamp confidence to [0, 1] — malformed AI output can exceed bounds
+    const confidence = Math.max(0, Math.min(1, bias.confidence ?? 0.5));
+    totalPenalty += cost * confidence;
   }
 
   // Diminishing returns: first few biases hurt more

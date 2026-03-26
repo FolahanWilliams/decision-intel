@@ -179,8 +179,10 @@ export async function GET() {
       const bucket = Math.min(9, Math.floor(overallScore / 10));
       scoreBuckets[bucket]++;
 
-      // Scatter
-      scatterData.push({ id: a.documentId, overallScore, noiseScore });
+      // Scatter — only include analyses with valid scores
+      if (overallScore > 0 || noiseScore > 0) {
+        scatterData.push({ id: a.documentId, overallScore, noiseScore });
+      }
 
       // Fact check
       const fc = a.factCheck as { score?: number; verifications?: { verdict?: string }[] } | null;
@@ -338,14 +340,16 @@ export async function GET() {
     // Derived: weekly trend
     const weeklyTrend = [...weeklyMap.entries()]
       .sort(([a], [b]) => a.localeCompare(b))
+      .filter(([, d]) => d.scores.length > 0)
       .map(([week, d]) => ({
         week: week.slice(5), // "MM-DD" for display
         avgScore: Math.round(d.scores.reduce((s, v) => s + v, 0) / d.scores.length),
         avgNoise: Math.round(d.noise.reduce((s, v) => s + v, 0) / d.noise.length),
         count: d.scores.length,
       }));
+    // Require at least 3 weeks of data for a meaningful trend delta
     const trendDelta =
-      weeklyTrend.length >= 2
+      weeklyTrend.length >= 3
         ? weeklyTrend[weeklyTrend.length - 1].avgScore - weeklyTrend[0].avgScore
         : 0;
 

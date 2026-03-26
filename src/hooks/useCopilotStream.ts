@@ -261,6 +261,17 @@ export function useCopilotStream(): UseCopilotStreamReturn {
     }
   }, [sessionId]);
 
+  // Streaming safety timeout — auto-clear if streaming hangs for >60s
+  useEffect(() => {
+    if (!isStreaming) return;
+    const timer = setTimeout(() => {
+      setIsStreaming(false);
+      setActiveAgent(null);
+      setError('Response timed out. Please try again.');
+    }, 60_000);
+    return () => clearTimeout(timer);
+  }, [isStreaming]);
+
   // Abort on unmount
   useEffect(() => {
     return () => {
