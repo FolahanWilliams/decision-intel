@@ -994,3 +994,23 @@ model ApiUsage {
   @@index([userId, createdAt])
 }
 
+// ─── Stripe Billing ──────────────────────────────────────────────────────
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String
+  orgId                String?
+  stripeCustomerId     String    @unique
+  stripeSubscriptionId String    @unique
+  plan                 String    @default("free") // "free", "pro", "team", "enterprise"
+  status               String    @default("active") // "active", "trialing", "past_due", "canceled"
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([status])
+}
+

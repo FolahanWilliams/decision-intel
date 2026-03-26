@@ -18,6 +18,7 @@ const EXEMPT_PATHS = [
   '/api/integrations/slack/events', // Slack sends its own signature
   '/api/cron/', // Uses Bearer token authentication
   '/api/health', // Read-only health check
+  '/api/stripe/webhook', // Stripe sends its own signature verification
 ];
 
 /**
