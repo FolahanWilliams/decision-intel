@@ -140,6 +140,7 @@ export interface CopilotDoneEvent {
   type: 'done';
   turnId: string;
   agent: CopilotAgentType;
+  sessionId?: string;
 }
 
 export interface CopilotErrorEvent {

@@ -24,6 +24,17 @@ export interface CopilotSource {
   score: number;
 }
 
+export interface ResolveSessionData {
+  chosenOption: string;
+  outcome?: string;
+  impactScore?: number;
+  lessonsLearned?: string;
+  whatWorked?: string;
+  whatFailed?: string;
+  wouldChooseSame?: boolean;
+  helpfulAgents?: string[];
+}
+
 interface UseCopilotStreamReturn {
   messages: CopilotMessage[];
   isStreaming: boolean;
@@ -34,6 +45,7 @@ interface UseCopilotStreamReturn {
   startNewSession: (decisionPrompt: string) => void;
   clearMessages: () => void;
   loadSession: (sessionId: string) => Promise<void>;
+  resolveSession: (data: ResolveSessionData) => Promise<{ session: unknown; outcome: unknown; message: string } | undefined>;
 }
 
 let messageCounter = 0;
@@ -229,6 +241,26 @@ export function useCopilotStream(): UseCopilotStreamReturn {
     }
   }, []);
 
+  const resolveSession = useCallback(async (data: ResolveSessionData) => {
+    if (!sessionId) return;
+    try {
+      const res = await fetch(`/api/copilot/sessions/${sessionId}/resolve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Failed to resolve session');
+      }
+      return await res.json();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to resolve session';
+      setError(message);
+      throw err;
+    }
+  }, [sessionId]);
+
   // Abort on unmount
   useEffect(() => {
     return () => {
@@ -246,5 +278,6 @@ export function useCopilotStream(): UseCopilotStreamReturn {
     startNewSession,
     clearMessages,
     loadSession,
+    resolveSession,
   };
 }

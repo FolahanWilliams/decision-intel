@@ -9,8 +9,11 @@ import {
   Loader2,
   ChevronRight,
   Brain,
+  CheckCircle2,
+  Menu,
 } from 'lucide-react';
 import { CopilotChat } from '@/components/copilot/CopilotChat';
+import { ResolveDecisionModal } from '@/components/copilot/ResolveDecisionModal';
 import { useCopilotStream } from '@/hooks/useCopilotStream';
 import { type CopilotAgentType } from '@/lib/copilot/types';
 
@@ -28,6 +31,8 @@ export default function CopilotPage() {
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [showPromptInput, setShowPromptInput] = useState(false);
   const [promptInput, setPromptInput] = useState('');
+  const [showResolveModal, setShowResolveModal] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
 
   const {
     messages,
@@ -39,6 +44,7 @@ export default function CopilotPage() {
     startNewSession,
     clearMessages,
     loadSession,
+    resolveSession,
   } = useCopilotStream();
 
   // Load sessions on mount
@@ -99,12 +105,29 @@ export default function CopilotPage() {
     sendMessage(text, forcedAgent);
   };
 
+  const handleResolve = async (data: Parameters<typeof resolveSession>[0]) => {
+    const result = await resolveSession(data);
+    // Refresh sessions to show updated status
+    fetchSessions();
+    return result;
+  };
+
   const hasActiveSession = messages.length > 0 || showPromptInput;
+  const currentSession = sessions.find(s => s.id === sessionId);
+  const canResolve = sessionId && messages.length > 0 && currentSession?.status !== 'resolved';
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden">
+      {/* Mobile sidebar toggle */}
+      <button
+        onClick={() => setShowSidebar(!showSidebar)}
+        className="lg:hidden fixed top-[4.5rem] left-3 z-40 rounded-lg border border-zinc-700 bg-zinc-800 p-2 text-zinc-300 hover:bg-zinc-700"
+      >
+        <Menu className="h-4 w-4" />
+      </button>
+
       {/* Sidebar — Session List */}
-      <div className="w-72 flex-shrink-0 border-r border-zinc-800 bg-zinc-900/50 flex flex-col">
+      <div className={`${showSidebar ? 'fixed inset-y-0 left-0 z-30 pt-16' : 'hidden'} lg:relative lg:block lg:pt-0 w-72 flex-shrink-0 border-r border-zinc-800 bg-zinc-900/50 flex flex-col`}>
         <div className="p-4 border-b border-zinc-800">
           <button
             onClick={handleNewDecision}
@@ -135,9 +158,13 @@ export default function CopilotPage() {
                     ? 'bg-zinc-700/50 text-zinc-100'
                     : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
                 }`}
-                onClick={() => loadSession(s.id)}
+                onClick={() => { loadSession(s.id); setShowSidebar(false); }}
               >
-                <Brain className="h-4 w-4 flex-shrink-0" />
+                {s.status === 'resolved' ? (
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-500" />
+                ) : (
+                  <Brain className="h-4 w-4 flex-shrink-0" />
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{s.title}</p>
                   <div className="flex items-center gap-2 text-xs text-zinc-500">
@@ -145,6 +172,9 @@ export default function CopilotPage() {
                     <span>{new Date(s.updatedAt).toLocaleDateString()}</span>
                     <span className="text-zinc-600">|</span>
                     <span>{s.turnCount} turns</span>
+                    {s.status === 'resolved' && (
+                      <span className="text-green-500 font-medium">Resolved</span>
+                    )}
                     {s.dqiScore != null && (
                       <>
                         <span className="text-zinc-600">|</span>
@@ -246,6 +276,8 @@ export default function CopilotPage() {
             error={error}
             activeAgent={activeAgent}
             onSendMessage={handleSendMessage}
+            onResolve={canResolve ? () => setShowResolveModal(true) : undefined}
+            onDismissError={() => {/* error is managed by hook state */}}
           />
         ) : (
           /* Empty State */
@@ -272,6 +304,22 @@ export default function CopilotPage() {
           </div>
         )}
       </div>
+
+      {/* Resolve Decision Modal */}
+      {showResolveModal && (
+        <ResolveDecisionModal
+          onResolve={handleResolve}
+          onClose={() => setShowResolveModal(false)}
+        />
+      )}
+
+      {/* Mobile sidebar backdrop */}
+      {showSidebar && (
+        <div
+          className="fixed inset-0 z-20 bg-black/40 lg:hidden"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
     </div>
   );
 }

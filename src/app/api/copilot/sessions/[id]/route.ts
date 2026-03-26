@@ -34,8 +34,19 @@ export async function GET(
         status: true,
         dqiScore: true,
         decisionSummary: true,
+        chosenOption: true,
         createdAt: true,
         updatedAt: true,
+        outcome: {
+          select: {
+            id: true,
+            outcome: true,
+            impactScore: true,
+            lessonsLearned: true,
+            helpfulAgents: true,
+            reportedAt: true,
+          },
+        },
         turns: {
           orderBy: { createdAt: 'asc' },
           select: {
@@ -65,6 +76,11 @@ export async function GET(
         status: session.status,
         dqiScore: session.dqiScore,
         decisionSummary: session.decisionSummary,
+        chosenOption: session.chosenOption,
+        outcome: session.outcome ? {
+          ...session.outcome,
+          reportedAt: session.outcome.reportedAt.toISOString(),
+        } : null,
         createdAt: session.createdAt.toISOString(),
         updatedAt: session.updatedAt.toISOString(),
         turns: session.turns.map(t => ({
