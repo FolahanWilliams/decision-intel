@@ -23,7 +23,7 @@ import {
 const log = createLogger('Analyzer');
 
 export interface ProgressUpdate {
-  type: 'step' | 'bias' | 'noise' | 'summary' | 'complete' | 'error';
+  type: 'step' | 'bias' | 'noise' | 'summary' | 'complete' | 'error' | 'toxicCombinations';
   step?: string;
   description?: string;
   status?: 'running' | 'complete' | 'error';
@@ -31,6 +31,14 @@ export interface ProgressUpdate {
   result?: unknown;
   message?: string;
   progress: number;
+  combinations?: Array<{
+    patternLabel: string;
+    patternDescription: string;
+    biasTypes: string[];
+    toxicScore: number;
+    historicalFailRate: number;
+    sampleSize: number;
+  }>;
 }
 
 export async function analyzeDocument(
@@ -275,6 +283,52 @@ export async function analyzeDocument(
               status: 'complete',
               progress: 99,
             });
+          }
+          // Emit toxic combinations via progress callback for SSE streaming
+          if (onProgress) {
+            onProgress({
+              type: 'toxicCombinations',
+              progress: 99,
+              combinations: toxicResult.combinations.slice(0, 5).map(c => ({
+                patternLabel: c.patternLabel ?? 'Unknown Pattern',
+                patternDescription: c.patternDescription ?? '',
+                biasTypes: c.biasTypes,
+                toxicScore: c.toxicScore,
+                historicalFailRate: c.historicalFailRate ?? 0,
+                sampleSize: c.sampleSize,
+              })),
+            });
+          }
+
+          // Push Slack alert for critical toxic combinations
+          if (document.orgId) {
+            const topCombo = toxicResult.combinations[0];
+            if (topCombo && topCombo.toxicScore >= 70) {
+              const alertChannel = process.env.SLACK_ALERT_CHANNEL;
+              if (alertChannel) {
+                (async () => {
+                  try {
+                    const install = await prisma.slackInstallation.findFirst({
+                      where: { orgId: document.orgId!, status: 'active' },
+                      select: { teamId: true },
+                    });
+                    if (install) {
+                      const { deliverSlackNudge } = await import('@/lib/integrations/slack/handler');
+                      const severity = topCombo.toxicScore >= 85 ? ':rotating_light:' : ':warning:';
+                      await deliverSlackNudge(
+                        {
+                          channel: alertChannel,
+                          text: `${severity} *Compound Risk Detected*\n"${topCombo.patternLabel}" (score: ${Math.round(topCombo.toxicScore)}/100) in "${document.filename}"\nBiases: ${topCombo.biasTypes.join(', ')}`,
+                        },
+                        install.teamId
+                      );
+                    }
+                  } catch (err) {
+                    log.debug('Slack toxic alert failed (non-fatal):', err instanceof Error ? err.message : String(err));
+                  }
+                })();
+              }
+            }
           }
         }
       }

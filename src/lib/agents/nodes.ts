@@ -1400,16 +1400,45 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
   const diversityScore = state.cognitiveAnalysis?.blindSpotGap ?? 100;
   const diversityPenalty = (100 - diversityScore) * 0.3;
 
+  // 6. Outcome Feedback Loop — penalize biases historically linked to failures
+  let feedbackAdjustment = 0;
+  try {
+    const detectedBiasTypes = (state.biasAnalysis || []).map(b => normalizeBiasType(b.biasType));
+    if (detectedBiasTypes.length > 0) {
+      // Find edges where the detected biases overlap with historically failed patterns
+      const failedEdges = await prisma.decisionEdge.findMany({
+        where: {
+          edgeType: 'shared_bias',
+          strength: { gte: 0.5 },
+          confidence: { gte: 0.3 },
+        },
+        select: { strength: true, confidence: true, metadata: true },
+        take: 50,
+      });
+
+      // Sum weighted penalty from failed edges (strength * confidence)
+      for (const edge of failedEdges) {
+        const meta = edge.metadata as Record<string, unknown> | null;
+        if (meta?.outcomeResult === 'negative' || meta?.outcomeResult === 'failure') {
+          feedbackAdjustment += edge.strength * edge.confidence * 3;
+        }
+      }
+      feedbackAdjustment = Math.min(feedbackAdjustment, 25); // Cap at 25 points
+    }
+  } catch (feedbackErr) {
+    log.debug('Outcome feedback query failed (non-fatal):', feedbackErr instanceof Error ? feedbackErr.message : String(feedbackErr));
+  }
+
   // Calculate Base
   const baseScore = 100;
   let overallScore =
-    baseScore - biasDeductions - noisePenalty - trustPenalty - logicPenalty - diversityPenalty;
+    baseScore - biasDeductions - noisePenalty - trustPenalty - logicPenalty - diversityPenalty - feedbackAdjustment;
 
   // Clamp 0-100
   overallScore = Math.max(0, Math.min(100, Math.round(overallScore)));
 
   log.info(
-    `Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) - Diversity(${diversityPenalty.toFixed(1)}) = ${overallScore}`
+    `Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) - Diversity(${diversityPenalty.toFixed(1)}) - Feedback(${feedbackAdjustment.toFixed(1)}) = ${overallScore}`
   );
 
   return {

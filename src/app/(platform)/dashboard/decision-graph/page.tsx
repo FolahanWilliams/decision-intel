@@ -14,6 +14,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  Download,
 } from 'lucide-react';
 
 interface GraphReport {
@@ -123,6 +124,63 @@ export default function DecisionGraphPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Export buttons */}
+          <button
+            onClick={() => {
+              const svg = document.querySelector('.card svg') as SVGSVGElement;
+              if (!svg) return;
+              const serializer = new XMLSerializer();
+              const svgString = serializer.serializeToString(svg);
+              const blob = new Blob([svgString], { type: 'image/svg+xml' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'decision-graph.svg';
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors"
+            title="Export as SVG"
+          >
+            <Download size={14} />
+            SVG
+          </button>
+          <button
+            onClick={() => {
+              const svg = document.querySelector('.card svg') as SVGSVGElement;
+              if (!svg) return;
+              const serializer = new XMLSerializer();
+              const svgString = serializer.serializeToString(svg);
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              const img = new Image();
+              const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+              const url = URL.createObjectURL(svgBlob);
+              img.onload = () => {
+                canvas.width = img.width * 2;
+                canvas.height = img.height * 2;
+                ctx?.scale(2, 2);
+                ctx?.drawImage(img, 0, 0);
+                canvas.toBlob(blob => {
+                  if (!blob) return;
+                  const pngUrl = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = pngUrl;
+                  a.download = 'decision-graph.png';
+                  a.click();
+                  URL.revokeObjectURL(pngUrl);
+                }, 'image/png');
+                URL.revokeObjectURL(url);
+              };
+              img.src = url;
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors"
+            title="Export as PNG"
+          >
+            <Download size={14} />
+            PNG
+          </button>
+
           {/* Tab switcher */}
           <div className="flex rounded-lg overflow-hidden border border-white/10">
             <button

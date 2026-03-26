@@ -559,6 +559,43 @@ export async function POST(request: NextRequest) {
             );
           }
 
+          // Toxic Combination Detection (non-blocking)
+          try {
+            if (createdAnalysisId) {
+              const { detectToxicCombinations } = await import('@/lib/learning/toxic-combinations');
+              const toxicResult = await detectToxicCombinations(createdAnalysisId, doc.orgId ?? null);
+              if (toxicResult.flaggedCount > 0) {
+                log.info(
+                  `Detected ${toxicResult.flaggedCount} toxic combination(s) for analysis ${createdAnalysisId}`
+                );
+                sendUpdate({
+                  type: 'step',
+                  step: `Toxic Combinations: ${toxicResult.flaggedCount} compound risk pattern(s) detected`,
+                  status: 'complete',
+                  progress: 99,
+                } as ProgressUpdate);
+
+                // Emit toxic combinations detail for client rendering
+                sendUpdate({
+                  type: 'toxicCombinations',
+                  combinations: toxicResult.combinations.slice(0, 5).map(c => ({
+                    patternLabel: c.patternLabel,
+                    patternDescription: c.patternDescription,
+                    biasTypes: c.biasTypes,
+                    toxicScore: c.toxicScore,
+                    historicalFailRate: c.historicalFailRate,
+                    sampleSize: c.sampleSize,
+                  })),
+                } as unknown as ProgressUpdate);
+              }
+            }
+          } catch (toxicError) {
+            log.warn(
+              'Failed to detect toxic combinations (non-critical): ' +
+                (toxicError instanceof Error ? toxicError.message : String(toxicError))
+            );
+          }
+
           // Send email notification (fire and forget)
           if (user?.email) {
             import('@/lib/notifications/email')

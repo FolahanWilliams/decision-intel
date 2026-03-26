@@ -979,14 +979,16 @@ export default function Dashboard() {
 
       {/* Decision Journal — captured decisions from email/calendar */}
       <div className="mb-lg">
-        <JournalWidget />
+        <ErrorBoundary sectionName="Journal">
+          <JournalWidget />
+        </ErrorBoundary>
       </div>
 
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
       {activeView === 'upload' && (
         <>
           {/* Onboarding Guide for new users */}
-          <OnboardingGuide />
+          <OnboardingGuide documentCount={totalDocs ?? 0} />
 
           {/* Upload Confirmation Modal */}
           <AnimatePresence>
@@ -1051,6 +1053,7 @@ export default function Dashboard() {
           </AnimatePresence>
 
           {/* Upload Zone - Enhanced with drag feedback */}
+          <ErrorBoundary sectionName="Upload">
           {!uploading && !pendingFile ? (
             <div
               className={`upload-zone mb-xl liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
@@ -1236,8 +1239,10 @@ export default function Dashboard() {
               </div>
             </div>
           ) : null}
+          </ErrorBoundary>
 
           {/* Currently Analyzing Section */}
+          <ErrorBoundary sectionName="Documents">
           {uploadedDocs.filter(d => d.status === 'analyzing').length > 0 && (
             <div className="section">
               <h2 className="section-header flex items-center gap-2">
@@ -1408,6 +1413,8 @@ export default function Dashboard() {
               </motion.div>
             </div>
           )}
+
+          </ErrorBoundary>
 
           {/* Empty state - only show when no documents */}
           {uploadedDocs.length === 0 && !loadingDocs && (

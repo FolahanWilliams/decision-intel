@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, startTransition } from 'react';
-import { Upload, BarChart3, Shield, X, ArrowRight } from 'lucide-react';
+import { Upload, BarChart3, Shield, X, ArrowRight, CheckCircle } from 'lucide-react';
 
 const STEPS = [
   {
@@ -27,13 +27,20 @@ const STEPS = [
 
 const STORAGE_KEY = 'decision-intel-onboarding-dismissed';
 
-export function OnboardingGuide() {
+export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number }) {
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
     if (!localStorage.getItem(STORAGE_KEY)) startTransition(() => setDismissed(false));
   }, []);
-  const [currentStep, setCurrentStep] = useState(0);
+  const hasDocuments = documentCount > 0;
+  const [currentStep, setCurrentStep] = useState(hasDocuments ? 1 : 0);
+
+  const isStepCompleted = (index: number): boolean => {
+    if (index === 0) return hasDocuments;
+    if (index === 1) return documentCount >= 1 && currentStep > 1;
+    return false;
+  };
 
   const handleDismiss = () => {
     setDismissed(true);
@@ -108,13 +115,14 @@ export function OnboardingGuide() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: index <= currentStep ? '#FFFFFF' : 'var(--bg-tertiary)',
-                  color: index <= currentStep ? '#080808' : 'var(--text-muted)',
+                  background: isStepCompleted(index) ? '#22c55e' : index <= currentStep ? '#FFFFFF' : 'var(--bg-tertiary)',
+                  color: isStepCompleted(index) ? '#FFFFFF' : index <= currentStep ? '#080808' : 'var(--text-muted)',
                   fontSize: '12px',
                   fontWeight: 700,
+                  borderRadius: '50%',
                 }}
               >
-                {index + 1}
+                {isStepCompleted(index) ? <CheckCircle size={18} /> : index + 1}
               </div>
               <span
                 style={{
