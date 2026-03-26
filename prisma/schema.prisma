@@ -1006,14 +1006,37 @@ model CopilotSession {
   resolvedAt      DateTime?
   decisionSummary String?       @db.Text
   dqiScore        Float?
+  chosenOption    String?       // Which option the user ultimately chose
   metadata        Json?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   turns           CopilotTurn[]
+  outcome         CopilotOutcome?
 
   @@index([userId, updatedAt])
   @@index([orgId])
   @@index([status])
+}
+
+model CopilotOutcome {
+  id              String         @id @default(cuid())
+  sessionId       String         @unique
+  userId          String
+  orgId           String?
+  outcome         String         // success | partial_success | failure | inconclusive
+  impactScore     Int?           // 1-10
+  lessonsLearned  String?        @db.Text
+  whatWorked      String?        @db.Text
+  whatFailed      String?        @db.Text
+  wouldChooseSame Boolean?       // Would you make the same decision again?
+  helpfulAgents   String[]       // Which copilot agents were most helpful?
+  reportedAt      DateTime       @default(now())
+  session         CopilotSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([outcome])
+  @@index([reportedAt])
 }
 
 model CopilotTurn {

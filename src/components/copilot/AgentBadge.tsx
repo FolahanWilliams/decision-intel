@@ -1,13 +1,14 @@
 'use client';
 
 import { type CopilotAgentType, AGENT_LABELS, AGENT_COLORS } from '@/lib/copilot/types';
-import { Lightbulb, ShieldAlert, Telescope, BarChart3 } from 'lucide-react';
+import { Lightbulb, ShieldAlert, Telescope, BarChart3, Brain } from 'lucide-react';
 
 const AGENT_ICONS: Record<CopilotAgentType, React.ComponentType<{ className?: string }>> = {
   idea_builder: Lightbulb,
   devils_advocate: ShieldAlert,
   scenario_explorer: Telescope,
   synthesizer: BarChart3,
+  personal_twin: Brain,
 };
 
 interface AgentBadgeProps {
