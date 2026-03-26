@@ -481,7 +481,6 @@ function FAQItem({
 
 export default function LandingPage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [activeDemo, setActiveDemo] = useState<'chaos' | 'order'>('chaos');
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [annualDecisions, setAnnualDecisions] = useState(5000);
   const [avgDecisionValue, setAvgDecisionValue] = useState(10000);
@@ -504,6 +503,7 @@ export default function LandingPage() {
   const socialRef = useRef(null);
   const roiRef = useRef(null);
   const faqRef = useRef(null);
+  const pricingRef = useRef(null);
   const ctaRef = useRef(null);
 
   const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
@@ -513,6 +513,7 @@ export default function LandingPage() {
   const moatInView = useInView(moatRef, { once: true, margin: '-100px' });
   const socialInView = useInView(socialRef, { once: true, margin: '-100px' });
   const roiInView = useInView(roiRef, { once: true, margin: '-100px' });
+  const pricingInView = useInView(pricingRef, { once: true, margin: '-100px' });
   const faqInView = useInView(faqRef, { once: true, margin: '-100px' });
   const ctaInView = useInView(ctaRef, { once: true, margin: '-100px' });
 
@@ -711,7 +712,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.03em',
                   }}
                 >
-                  The only system that tracks, scores, and
+                  Your last satisfactory decision had{' '}
                   <span
                     className="block"
                     style={{
@@ -722,7 +723,7 @@ export default function LandingPage() {
                       paddingBottom: '4px',
                     }}
                   >
-                    improves executive decision performance over time
+                    3&ndash;5 cognitive biases in it.
                   </span>
                 </motion.h1>
 
@@ -738,10 +739,8 @@ export default function LandingPage() {
                     maxWidth: '540px',
                   }}
                 >
-                  Every decision your team makes generates proprietary data that makes your next
-                  analysis more accurate. After 90 days, your org-specific bias detection is{' '}
-                  <span style={{ color: '#22c55e', fontWeight: 700 }}>3x more precise</span> than
-                  any generic tool.
+                  You just didn&apos;t know. Decision Intel finds them automatically — before they
+                  cost you millions.
                 </motion.p>
 
                 <motion.div
@@ -756,12 +755,12 @@ export default function LandingPage() {
                       className="btn btn-primary glow"
                       style={{ padding: '14px 32px', fontSize: '0.9rem' }}
                     >
-                      Get Early Access <ArrowRight className="w-4 h-4 ml-2 inline" />
+                      Start Free <ArrowRight className="w-4 h-4 ml-2 inline" />
                     </Link>
                   </GlassRipple>
                   <GlassHover>
                     <a
-                      href="#solution"
+                      href="#problem"
                       className="btn btn-secondary"
                       style={{ padding: '14px 32px', fontSize: '0.9rem' }}
                     >
@@ -863,7 +862,7 @@ export default function LandingPage() {
 
       <SectionDivider variant="glow" color="rgba(255, 255, 255, 0.06)" />
 
-      {/* Social Proof Stats */}
+      {/* Market Stats Bar */}
       <section
         ref={socialRef}
         className="py-16 relative"
@@ -873,43 +872,82 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={socialInView ? { opacity: 1, y: 0 } : {}}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+            className="max-w-4xl mx-auto"
+            style={{
+              ...glassCardLight,
+              padding: '32px',
+            }}
           >
-            {[
-              {
-                value: 15,
-                suffix: '',
-                label: 'Cognitive Biases Detected',
-                color: '#FFFFFF',
-              },
-              { value: 3, suffix: 'x', label: 'Independent AI Judges', color: '#22c55e' },
-              { value: 10, suffix: '', label: 'Agent Analysis Pipeline', color: '#FFFFFF' },
-              { value: 60, suffix: 's', label: 'Full Audit Turnaround', color: '#FFFFFF' },
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={socialInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
-              >
-                <div
-                  style={{
-                    fontSize: 'clamp(2rem, 4vw, 2.8rem)',
-                    fontWeight: 800,
-                    color: stat.color,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    lineHeight: 1,
-                    marginBottom: '8px',
-                  }}
+            <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16">
+              {[
+                {
+                  value: 36,
+                  suffix: 'B+',
+                  prefix: '$',
+                  label: 'Market by 2030',
+                  cite: 'Grand View Research',
+                  color: '#FFFFFF',
+                },
+                {
+                  value: 28,
+                  suffix: '%',
+                  prefix: '',
+                  label: 'Rate decisions "good"',
+                  cite: 'McKinsey',
+                  color: '#FFFFFF',
+                },
+                {
+                  value: 6.9,
+                  suffix: 'pp',
+                  prefix: '',
+                  label: 'ROI improvement from debiasing',
+                  cite: 'McKinsey',
+                  color: '#22c55e',
+                },
+              ].map((stat, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={socialInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: i * 0.15 }}
+                  className="text-center"
                 >
-                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                </div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
+                  <div
+                    style={{
+                      fontSize: 'clamp(2rem, 4vw, 2.8rem)',
+                      fontWeight: 800,
+                      color: stat.color,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      lineHeight: 1,
+                      marginBottom: '8px',
+                    }}
+                  >
+                    {stat.prefix}
+                    <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '0.85rem',
+                      color: 'var(--text-muted)',
+                      fontWeight: 500,
+                      marginBottom: '4px',
+                    }}
+                  >
+                    {stat.label}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '0.7rem',
+                      color: 'var(--text-muted)',
+                      opacity: 0.5,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {stat.cite}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
@@ -939,7 +977,7 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              The Hidden Tax on Strategic Decisions
+              Feel the Real Cost of Cognitive Bias
             </h2>
             <p
               style={{
@@ -949,261 +987,306 @@ export default function LandingPage() {
                 lineHeight: 1.7,
               }}
             >
-              Teams evaluating identical proposals produce wildly varying recommendations. Cognitive
-              bias and decision noise silently erode decision quality across investment committees,
-              boardrooms, and strategy teams — and nobody is measuring it.
+              These aren&apos;t hypotheticals. They&apos;re happening in your organization right
+              now.
             </p>
           </motion.div>
 
-          {/* Mobile tab switcher */}
-          <div className="flex md:hidden gap-2 mb-6 max-w-6xl mx-auto">
-            <button
-              onClick={() => setActiveDemo('chaos')}
-              style={{
-                flex: 1,
-                padding: '10px 16px',
-                borderRadius: '12px',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer',
-                background:
-                  activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255,255,255,0.04)',
-                color: activeDemo === 'chaos' ? '#ef4444' : 'var(--text-muted)',
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                borderColor:
-                  activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.08)',
-              }}
-            >
-              <AlertTriangle className="w-4 h-4 inline mr-2" />
-              Without
-            </button>
-            <button
-              onClick={() => setActiveDemo('order')}
-              style={{
-                flex: 1,
-                padding: '10px 16px',
-                borderRadius: '12px',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer',
-                background:
-                  activeDemo === 'order' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255,255,255,0.04)',
-                color: activeDemo === 'order' ? '#22c55e' : 'var(--text-muted)',
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                borderColor:
-                  activeDemo === 'order' ? 'rgba(34, 197, 94, 0.25)' : 'rgba(255,255,255,0.08)',
-              }}
-            >
-              <Shield className="w-4 h-4 inline mr-2" />
-              With
-            </button>
-          </div>
-
           <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Without Decision Intel */}
+            {/* Card 1: The Anchoring Trap */}
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={problemInView ? { opacity: 1, x: 0 } : {}}
-              className={`cursor-pointer transition-all duration-300 ${activeDemo !== 'chaos' ? 'hidden md:block' : ''}`}
-              onClick={() => setActiveDemo('chaos')}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0 }}
               style={{
-                background:
-                  activeDemo === 'chaos' ? 'rgba(239, 68, 68, 0.06)' : 'rgba(8, 11, 20, 0.55)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border:
-                  activeDemo === 'chaos'
-                    ? '1px solid rgba(239, 68, 68, 0.25)'
-                    : '1px solid rgba(255, 255, 255, 0.10)',
-                borderRadius: '20px',
-                boxShadow:
-                  activeDemo === 'chaos'
-                    ? '0 12px 40px rgba(239, 68, 68, 0.12), 0 1px 0 rgba(255,255,255,0.06) inset'
-                    : '0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255,255,255,0.05) inset',
-                overflow: 'hidden',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '28px',
               }}
             >
-              <div
+              <Target className="w-6 h-6 mb-4" style={{ color: '#fbbf24' }} />
+              <h3
                 style={{
-                  padding: '20px 24px',
-                  borderBottom: '1px solid rgba(239, 68, 68, 0.12)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  fontSize: '1.15rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '12px',
                 }}
               >
-                <div className="flex items-center gap-3">
-                  <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />
-                  <h3 style={{ fontSize: '1.1rem', color: '#ef4444', fontWeight: 700 }}>
-                    Without Decision Intel
-                  </h3>
-                </div>
-                {activeDemo === 'chaos' && (
-                  <span
-                    style={{
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      padding: '4px 10px',
-                      borderRadius: '9999px',
-                      background: 'rgba(239, 68, 68, 0.12)',
-                      color: '#ef4444',
-                      backdropFilter: 'blur(8px)',
-                    }}
-                  >
-                    Active
-                  </span>
-                )}
-              </div>
-
-              <div
-                style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}
+                The Anchoring Trap
+              </h3>
+              <p
+                style={{
+                  fontSize: '0.9rem',
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.7,
+                  marginBottom: '16px',
+                }}
               >
-                {[
-                  'Decision-makers score identical proposals 30-40% apart (Kahneman, Noise)',
-                  'Anchoring to entry multiples distorts exit analysis',
-                  'No longitudinal tracking of decision accuracy',
-                  'Estimated 8-15% of returns lost to unaudited cognitive errors',
-                ].map((text, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '12px',
-                      padding: '14px',
-                      background: 'rgba(239, 68, 68, 0.04)',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(239, 68, 68, 0.08)',
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: '#ef4444',
-                        fontWeight: 700,
-                        fontSize: '0.75rem',
-                        flexShrink: 0,
-                        fontFamily: "'JetBrains Mono', monospace",
-                      }}
-                    >
-                      {i === 3 ? 'FTL' : 'ERR'}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: '0.9rem',
-                        color: i === 3 ? 'var(--text-primary)' : 'var(--text-muted)',
-                      }}
-                    >
-                      {text}
-                    </span>
-                  </div>
-                ))}
+                Your M&amp;A team anchored on the seller&apos;s asking price instead of intrinsic
+                value.
+              </p>
+              <div
+                style={{
+                  background: 'rgba(251, 191, 36, 0.06)',
+                  border: '1px solid rgba(251, 191, 36, 0.12)',
+                  borderRadius: '10px',
+                  padding: '14px',
+                  marginBottom: '12px',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: 600,
+                    marginBottom: '4px',
+                  }}
+                >
+                  65% more likely to overpay
+                </p>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  Malmendier &amp; Tate, 2008 — CEO overconfidence and M&amp;A
+                </p>
               </div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                &ldquo;Microsoft paid $7.2B for Nokia — later written off entirely as a &lsquo;case
+                study in cognitive distortion.&rsquo;&rdquo;
+              </p>
             </motion.div>
 
-            {/* With Decision Intel */}
+            {/* Card 2: The Sunk Cost Spiral */}
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={problemInView ? { opacity: 1, x: 0 } : {}}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className={`cursor-pointer transition-all duration-300 ${activeDemo !== 'order' ? 'hidden md:block' : ''}`}
-              onClick={() => setActiveDemo('order')}
               style={{
-                background:
-                  activeDemo === 'order' ? 'rgba(34, 197, 94, 0.06)' : 'rgba(8, 11, 20, 0.55)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border:
-                  activeDemo === 'order'
-                    ? '1px solid rgba(34, 197, 94, 0.25)'
-                    : '1px solid rgba(255, 255, 255, 0.10)',
-                borderRadius: '20px',
-                boxShadow:
-                  activeDemo === 'order'
-                    ? '0 12px 40px rgba(34, 197, 94, 0.12), 0 1px 0 rgba(255,255,255,0.06) inset'
-                    : '0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255,255,255,0.05) inset',
-                overflow: 'hidden',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '28px',
               }}
             >
-              <div
+              <RefreshCw className="w-6 h-6 mb-4" style={{ color: '#ef4444' }} />
+              <h3
                 style={{
-                  padding: '20px 24px',
-                  borderBottom: '1px solid rgba(34, 197, 94, 0.1)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  fontSize: '1.15rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '12px',
                 }}
               >
-                <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5" style={{ color: '#22c55e' }} />
-                  <h3 style={{ fontSize: '1.1rem', color: '#22c55e', fontWeight: 700 }}>
-                    With Decision Intel
-                  </h3>
-                </div>
-                {activeDemo === 'order' && (
-                  <span
-                    style={{
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      padding: '4px 10px',
-                      borderRadius: '9999px',
-                      background: 'rgba(34, 197, 94, 0.12)',
-                      color: '#22c55e',
-                    }}
-                  >
-                    Active
-                  </span>
-                )}
-              </div>
-
-              <div
-                style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}
+                The Sunk Cost Spiral
+              </h3>
+              <p
+                style={{
+                  fontSize: '0.9rem',
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.7,
+                  marginBottom: '16px',
+                }}
               >
-                {[
-                  'Every IC memo scored against calibrated baselines',
-                  '20 cognitive bias signatures with biological risk multipliers',
-                  'Autonomous outcome detection closes the feedback loop',
-                  'Decision Twin boardroom simulates dissent before you vote',
-                ].map((text, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '12px',
-                      padding: '14px',
-                      background: 'rgba(34, 197, 94, 0.04)',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(34, 197, 94, 0.08)',
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: '#22c55e',
-                        fontWeight: 700,
-                        fontSize: '0.75rem',
-                        flexShrink: 0,
-                        fontFamily: "'JetBrains Mono', monospace",
-                      }}
-                    >
-                      {i === 3 ? 'OPT' : 'SYS'}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: '0.9rem',
-                        color: i === 3 ? 'var(--text-primary)' : 'var(--text-muted)',
-                      }}
-                    >
-                      {text}
-                    </span>
-                  </div>
-                ))}
+                Your board kept funding a failing initiative because millions were already spent.
+              </p>
+              <div
+                style={{
+                  background: 'rgba(239, 68, 68, 0.06)',
+                  border: '1px solid rgba(239, 68, 68, 0.12)',
+                  borderRadius: '10px',
+                  padding: '14px',
+                  marginBottom: '12px',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: 600,
+                    marginBottom: '4px',
+                  }}
+                >
+                  189% average cost overrun
+                </p>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  Standish Group CHAOS Report — IT project failure statistics
+                </p>
               </div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                &ldquo;German utility RWE lost &euro;10B — their CFO admitted they fell victim to
+                status quo and confirmation biases in combination.&rdquo;
+              </p>
+            </motion.div>
+
+            {/* Card 3: The Groupthink Effect */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '28px',
+              }}
+            >
+              <AlertTriangle className="w-6 h-6 mb-4" style={{ color: '#ef4444' }} />
+              <h3
+                style={{
+                  fontSize: '1.15rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '12px',
+                }}
+              >
+                The Groupthink Tax
+              </h3>
+              <p
+                style={{
+                  fontSize: '0.9rem',
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.7,
+                  marginBottom: '16px',
+                }}
+              >
+                Your strategy team agreed with the loudest voice in the room — not the best
+                analysis.
+              </p>
+              <div
+                style={{
+                  background: 'rgba(239, 68, 68, 0.06)',
+                  border: '1px solid rgba(239, 68, 68, 0.12)',
+                  borderRadius: '10px',
+                  padding: '14px',
+                  marginBottom: '12px',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: 600,
+                    marginBottom: '4px',
+                  }}
+                >
+                  Only 28% of executives rate strategic decision quality in their company as
+                  &ldquo;generally good.&rdquo;
+                </p>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  McKinsey survey of 2,207 executives
+                </p>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#22c55e', fontWeight: 600 }}>
+                Debiased decision processes improve ROI by 6.9 percentage points.
+              </p>
+            </motion.div>
+
+            {/* Card 4: The Overconfidence Tax */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '28px',
+              }}
+            >
+              <TrendingUp className="w-6 h-6 mb-4" style={{ color: '#fbbf24' }} />
+              <h3
+                style={{
+                  fontSize: '1.15rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '12px',
+                }}
+              >
+                The Overconfidence Premium
+              </h3>
+              <p
+                style={{
+                  fontSize: '0.9rem',
+                  color: 'var(--text-muted)',
+                  lineHeight: 1.7,
+                  marginBottom: '16px',
+                }}
+              >
+                Your leadership team&apos;s revenue forecast was 30% too optimistic — again.
+              </p>
+              <div
+                style={{
+                  background: 'rgba(251, 191, 36, 0.06)',
+                  border: '1px solid rgba(251, 191, 36, 0.12)',
+                  borderRadius: '10px',
+                  padding: '14px',
+                  marginBottom: '12px',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: 600,
+                    marginBottom: '4px',
+                  }}
+                >
+                  &ldquo;The most robust finding in psychology&rdquo;
+                </p>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  Daniel Kahneman — Nobel Prize in Economics
+                </p>
+              </div>
+              <p style={{ fontSize: '0.85rem', color: '#22c55e', fontWeight: 600 }}>
+                Reference class forecasting reduces estimation errors by 70%.
+              </p>
             </motion.div>
           </div>
+
+          {/* Closing tagline */}
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            style={{
+              textAlign: 'center',
+              marginTop: '48px',
+              fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              textShadow: '0 0 40px rgba(255, 255, 255, 0.15)',
+              maxWidth: '700px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            Decision Intel catches all of this. Automatically. In minutes, not months.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 }}
+            style={{ textAlign: 'center', marginTop: '16px' }}
+          >
+            <Link
+              href="/login"
+              style={{
+                color: '#22c55e',
+                fontSize: '0.95rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+              }}
+              className="hover:underline"
+            >
+              Try Free &rarr;
+            </Link>
+          </motion.div>
         </div>
       </section>
 
@@ -2009,6 +2092,267 @@ export default function LandingPage() {
               </div>
             </div>
           </motion.div>
+
+          {/* Competitive Comparison Table */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={moatInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.8 }}
+            className="max-w-5xl mx-auto mt-20"
+          >
+            <h3
+              style={{
+                fontSize: 'clamp(1.3rem, 2.2vw, 1.8rem)',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                marginBottom: '24px',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Decision Intel vs. Traditional Consulting
+            </h3>
+
+            {/* Desktop Table */}
+            <div
+              className="hidden md:block"
+              style={{
+                borderRadius: '16px',
+                overflow: 'hidden',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+              }}
+            >
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255, 255, 255, 0.06)' }}>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '14px 20px',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        color: 'var(--text-muted)',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        width: '22%',
+                      }}
+                    >
+                      Dimension
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '14px 20px',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        color: 'var(--text-muted)',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        width: '39%',
+                      }}
+                    >
+                      McKinsey/BCG
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '14px 20px',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        width: '39%',
+                      }}
+                    >
+                      Decision Intel
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      dimension: 'Cost',
+                      consulting: '$500K\u2013$2M per engagement',
+                      di: '$199/mo per team',
+                    },
+                    {
+                      dimension: 'Speed',
+                      consulting: '6\u201312 week engagements',
+                      di: 'Minutes per document',
+                    },
+                    {
+                      dimension: 'Auditor bias',
+                      consulting: 'Consultants have their own biases',
+                      di: 'AI doesn\u2019t have ego or politics',
+                    },
+                    {
+                      dimension: 'Continuity',
+                      consulting: 'Point-in-time snapshot',
+                      di: 'Continuous monitoring',
+                    },
+                    {
+                      dimension: 'Scale',
+                      consulting: 'One engagement at a time',
+                      di: 'Every decision, every team',
+                    },
+                    {
+                      dimension: 'Data flywheel',
+                      consulting: 'Report sits in a drawer',
+                      di: 'Outcomes improve accuracy over time',
+                    },
+                  ].map((row, i) => (
+                    <tr
+                      key={i}
+                      style={{
+                        background:
+                          i % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.04)',
+                      }}
+                    >
+                      <td
+                        style={{
+                          padding: '14px 20px',
+                          fontSize: '0.88rem',
+                          fontWeight: 600,
+                          color: 'var(--text-primary)',
+                          borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+                        }}
+                      >
+                        {row.dimension}
+                      </td>
+                      <td
+                        style={{
+                          padding: '14px 20px',
+                          fontSize: '0.85rem',
+                          color: 'rgba(161, 161, 170, 0.8)',
+                          borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+                        }}
+                      >
+                        {row.consulting}
+                      </td>
+                      <td
+                        style={{
+                          padding: '14px 20px',
+                          fontSize: '0.85rem',
+                          color: 'rgba(134, 239, 172, 0.9)',
+                          fontWeight: 500,
+                          borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                        }}
+                      >
+                        <CheckCircle2
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            flexShrink: 0,
+                            color: 'rgba(34, 197, 94, 0.7)',
+                          }}
+                        />
+                        {row.di}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Stacked Cards */}
+            <div
+              className="md:hidden"
+              style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+            >
+              {[
+                {
+                  dimension: 'Cost',
+                  consulting: '$500K\u2013$2M per engagement',
+                  di: '$199/mo per team',
+                },
+                {
+                  dimension: 'Speed',
+                  consulting: '6\u201312 week engagements',
+                  di: 'Minutes per document',
+                },
+                {
+                  dimension: 'Auditor bias',
+                  consulting: 'Consultants have their own biases',
+                  di: 'AI doesn\u2019t have ego or politics',
+                },
+                {
+                  dimension: 'Continuity',
+                  consulting: 'Point-in-time snapshot',
+                  di: 'Continuous monitoring',
+                },
+                {
+                  dimension: 'Scale',
+                  consulting: 'One engagement at a time',
+                  di: 'Every decision, every team',
+                },
+                {
+                  dimension: 'Data flywheel',
+                  consulting: 'Report sits in a drawer',
+                  di: 'Outcomes improve accuracy over time',
+                },
+              ].map((row, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={moatInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: 0.9 + i * 0.08 }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      marginBottom: '10px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    {row.dimension}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '0.82rem',
+                      color: 'rgba(161, 161, 170, 0.8)',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>Consulting:</span>{' '}
+                    {row.consulting}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: '0.82rem',
+                      color: 'rgba(134, 239, 172, 0.9)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <CheckCircle2
+                      style={{
+                        width: '13px',
+                        height: '13px',
+                        flexShrink: 0,
+                        color: 'rgba(34, 197, 94, 0.7)',
+                      }}
+                    />
+                    <span>
+                      <span style={{ fontWeight: 600 }}>Decision Intel:</span> {row.di}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -2312,6 +2656,435 @@ export default function LandingPage() {
 
       <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.06)" />
 
+      {/* Pricing Section */}
+      <section
+        id="pricing"
+        ref={pricingRef}
+        className="py-32 relative"
+        style={{ background: 'var(--bg-primary)' }}
+      >
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.02) 0%, transparent 60%)',
+          }}
+        />
+        <div className="relative z-10" style={containerStyle}>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={pricingInView ? { opacity: 1, y: 0 } : {}}
+            className="mb-16 max-w-3xl mx-auto text-center"
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '8px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Simple, Transparent Pricing
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
+              Start free. Scale as your team&apos;s decision quality improves.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {/* Free Tier */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={pricingInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.1 }}
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '28px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '4px',
+                }}
+              >
+                Free
+              </h3>
+              <div style={{ marginBottom: '20px' }}>
+                <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  $0
+                </span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/month</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  marginBottom: '24px',
+                  flex: 1,
+                }}
+              >
+                {['3 analyses/month', '10 page max', '5 bias types', 'Docs support'].map(
+                  (feature, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '0.84rem',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      <CheckCircle2
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          flexShrink: 0,
+                          color: 'rgba(255, 255, 255, 0.3)',
+                        }}
+                      />
+                      {feature}
+                    </div>
+                  )
+                )}
+              </div>
+              <Link
+                href="/login"
+                style={{
+                  display: 'inline-flex',
+                  justifyContent: 'center',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  background: 'transparent',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                Start Free
+              </Link>
+            </motion.div>
+
+            {/* Pro Tier — Highlighted */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={pricingInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.2 }}
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '16px',
+                padding: '28px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+                position: 'relative',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-12px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: '#FFFFFF',
+                  color: '#000000',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  padding: '4px 14px',
+                  borderRadius: '9999px',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                Most Popular
+              </div>
+              <h3
+                style={{
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '4px',
+                }}
+              >
+                Pro
+              </h3>
+              <div style={{ marginBottom: '20px' }}>
+                <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  $49
+                </span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/month</span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  marginBottom: '24px',
+                  flex: 1,
+                }}
+              >
+                {[
+                  '30 analyses/month',
+                  '50 page max',
+                  'All 20 bias types',
+                  'Noise analysis',
+                  'Outcome tracking',
+                  'Email support',
+                ].map((feature, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '0.84rem',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    <CheckCircle2
+                      style={{
+                        width: '14px',
+                        height: '14px',
+                        flexShrink: 0,
+                        color: 'rgba(255, 255, 255, 0.3)',
+                      }}
+                    />
+                    {feature}
+                  </div>
+                ))}
+              </div>
+              <Link
+                href="/login?plan=pro"
+                style={{
+                  display: 'inline-flex',
+                  justifyContent: 'center',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: '#FFFFFF',
+                  color: '#000000',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 0 20px rgba(255, 255, 255, 0.15)',
+                }}
+              >
+                Start Pro Trial
+              </Link>
+            </motion.div>
+
+            {/* Team Tier */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={pricingInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.3 }}
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '28px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '4px',
+                }}
+              >
+                Team
+              </h3>
+              <div style={{ marginBottom: '4px' }}>
+                <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  $199
+                </span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/month</span>
+              </div>
+              <div
+                style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '20px' }}
+              >
+                up to 10 seats
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  marginBottom: '24px',
+                  flex: 1,
+                }}
+              >
+                {[
+                  '150 analyses/month',
+                  '100 page max',
+                  'All 20 bias types',
+                  'Noise + Compliance (FCA/SOX/Basel)',
+                  'Org + sharing',
+                  'Slack integration',
+                  'Priority support',
+                ].map((feature, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '0.84rem',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    <CheckCircle2
+                      style={{
+                        width: '14px',
+                        height: '14px',
+                        flexShrink: 0,
+                        color: 'rgba(255, 255, 255, 0.3)',
+                      }}
+                    />
+                    {feature}
+                  </div>
+                ))}
+              </div>
+              <Link
+                href="/login?plan=team"
+                style={{
+                  display: 'inline-flex',
+                  justifyContent: 'center',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  background: 'transparent',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                Start Team Trial
+              </Link>
+            </motion.div>
+
+            {/* Enterprise Tier */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={pricingInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.4 }}
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '28px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: '4px',
+                }}
+              >
+                Enterprise
+              </h3>
+              <div style={{ marginBottom: '20px' }}>
+                <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  Custom
+                </span>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  marginBottom: '24px',
+                  flex: 1,
+                }}
+              >
+                {[
+                  'Unlimited everything',
+                  'Custom frameworks',
+                  'SSO + audit log + API',
+                  'Dedicated CSM',
+                ].map((feature, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '0.84rem',
+                      color: 'var(--text-muted)',
+                    }}
+                  >
+                    <CheckCircle2
+                      style={{
+                        width: '14px',
+                        height: '14px',
+                        flexShrink: 0,
+                        color: 'rgba(255, 255, 255, 0.3)',
+                      }}
+                    />
+                    {feature}
+                  </div>
+                ))}
+              </div>
+              <a
+                href="mailto:hello@decisionintel.ai"
+                style={{
+                  display: 'inline-flex',
+                  justifyContent: 'center',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  background: 'transparent',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                Contact Sales
+              </a>
+            </motion.div>
+          </div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={pricingInView ? { opacity: 1 } : {}}
+            transition={{ delay: 0.6 }}
+            style={{
+              textAlign: 'center',
+              color: 'var(--text-muted)',
+              fontSize: '0.82rem',
+              marginTop: '24px',
+            }}
+          >
+            All paid plans include a 14-day free trial. No credit card required to start.
+          </motion.p>
+        </div>
+      </section>
+
+      <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.06)" />
+
       {/* FAQ Section */}
       <section
         id="faq"
@@ -2484,7 +3257,7 @@ export default function LandingPage() {
                   fontWeight: 600,
                 }}
               >
-                Get Early Access <ArrowRight className="w-4 h-4 ml-2 inline" />
+                Start Free <ArrowRight className="w-4 h-4 ml-2 inline" />
               </Link>
               <a
                 href="#solution"
