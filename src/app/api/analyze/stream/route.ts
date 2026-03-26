@@ -419,6 +419,7 @@ export async function POST(request: NextRequest) {
                         : undefined
                       : undefined
                   ),
+                  metaVerdict: (report.metaVerdict as string) || null,
                 } satisfies Prisma.AnalysisUncheckedCreateInput,
               });
 
