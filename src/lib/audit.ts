@@ -23,7 +23,9 @@ export type AuditAction =
   | 'SIMULATE_COGNITIVE_AUDIT'
   // Meeting Intelligence
   | 'UPLOAD_MEETING'
-  | 'MEETING_TRANSCRIBED';
+  | 'MEETING_TRANSCRIBED'
+  // Decision Copilot
+  | 'COPILOT_MESSAGE';
 
 export interface AuditLogParams {
   action: AuditAction;

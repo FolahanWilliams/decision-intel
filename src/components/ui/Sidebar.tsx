@@ -22,6 +22,7 @@ import {
   Users,
   Zap,
   Network,
+  Sparkles,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -334,6 +335,15 @@ export default function Sidebar() {
             label="Decision Graph"
             description="Map relationships between decisions"
             active={pathname === '/dashboard/decision-graph'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/copilot"
+            icon={<Sparkles size={18} />}
+            label="Copilot"
+            description="AI agents that help you build better decisions"
+            active={pathname === '/dashboard/copilot'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />

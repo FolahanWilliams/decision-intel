@@ -1,0 +1,159 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { Send, Loader2, Sparkles, Swords, Telescope, BarChart3 } from 'lucide-react';
+import { AgentBadge } from './AgentBadge';
+import { type CopilotMessage } from '@/hooks/useCopilotStream';
+import { type CopilotAgentType } from '@/lib/copilot/types';
+
+interface CopilotChatProps {
+  messages: CopilotMessage[];
+  isStreaming: boolean;
+  error: string | null;
+  activeAgent: CopilotAgentType | null;
+  onSendMessage: (text: string, forcedAgent?: CopilotAgentType) => void;
+}
+
+const QUICK_ACTIONS: Array<{ label: string; icon: React.ComponentType<{ className?: string }>; agent: CopilotAgentType; prompt: string }> = [
+  { label: 'Challenge this', icon: Swords, agent: 'devils_advocate', prompt: 'Challenge the assumptions in what we have so far. What could go wrong?' },
+  { label: 'What if...?', icon: Telescope, agent: 'scenario_explorer', prompt: 'Explore different scenarios — what happens under best and worst case conditions?' },
+  { label: 'Summarize & Score', icon: BarChart3, agent: 'synthesizer', prompt: 'Summarize everything discussed and rank the options with a decision quality assessment.' },
+];
+
+export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendMessage }: CopilotChatProps) {
+  const [input, setInput] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Focus input on mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (input.trim() && !isStreaming) {
+      onSendMessage(input.trim());
+      setInput('');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
+  return (
+    <div className="flex h-full flex-col">
+      {/* Messages */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 && (
+          <div className="flex h-full items-center justify-center text-zinc-500">
+            <div className="text-center space-y-2">
+              <Sparkles className="mx-auto h-8 w-8 text-zinc-400" />
+              <p className="text-sm">Start the conversation — your copilot agents are ready.</p>
+            </div>
+          </div>
+        )}
+
+        {messages.map(msg => (
+          <div
+            key={msg.id}
+            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                msg.role === 'user'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-zinc-800 text-zinc-100 border border-zinc-700'
+              }`}
+            >
+              {msg.role === 'agent' && msg.agentType && (
+                <div className="mb-2">
+                  <AgentBadge agentType={msg.agentType} />
+                </div>
+              )}
+              <div className="text-sm whitespace-pre-wrap leading-relaxed">
+                {msg.content}
+                {msg.isStreaming && (
+                  <span className="ml-1 inline-block h-4 w-1 animate-pulse bg-zinc-400" />
+                )}
+              </div>
+              {msg.sources && msg.sources.length > 0 && (
+                <div className="mt-2 border-t border-zinc-600 pt-2">
+                  <p className="text-xs text-zinc-400 mb-1">Sources:</p>
+                  {msg.sources.map((s, i) => (
+                    <span key={i} className="text-xs text-zinc-500 mr-2">
+                      {s.filename} ({Math.round(s.similarity * 100)}%)
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+
+        {error && (
+          <div className="rounded-lg bg-red-900/30 border border-red-800 p-3 text-sm text-red-300">
+            {error}
+          </div>
+        )}
+      </div>
+
+      {/* Quick actions */}
+      {messages.length > 0 && !isStreaming && (
+        <div className="border-t border-zinc-800 px-4 py-2 flex gap-2 flex-wrap">
+          {QUICK_ACTIONS.map(action => (
+            <button
+              key={action.agent}
+              onClick={() => onSendMessage(action.prompt, action.agent)}
+              className="inline-flex items-center gap-1 rounded-full border border-zinc-700 bg-zinc-800/50 px-3 py-1.5 text-xs text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition-colors"
+            >
+              <action.icon className="h-3 w-3" />
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Input */}
+      <form onSubmit={handleSubmit} className="border-t border-zinc-800 p-4">
+        <div className="flex items-end gap-2">
+          <div className="relative flex-1">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={activeAgent ? `${activeAgent.replace(/_/g, ' ')} is thinking...` : 'Type your message...'}
+              disabled={isStreaming}
+              rows={1}
+              className="w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+              style={{ maxHeight: '120px' }}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={!input.trim() || isStreaming}
+            className="flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isStreaming ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
