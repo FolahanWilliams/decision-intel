@@ -837,7 +837,10 @@ tr:hover td {
   .justify-between { justify-content: space-between; }
   .gap-sm { gap: var(--spacing-sm); }
   .gap-md { gap: var(--spacing-md); }
+  .mb-sm { margin-bottom: var(--spacing-sm); }
+  .mb-lg { margin-bottom: var(--spacing-lg); }
   .mb-xl { margin-bottom: var(--spacing-xl); }
+  .text-muted { color: var(--text-muted); }
   .ml-md { margin-left: var(--spacing-md); }
   .mt-md { margin-top: var(--spacing-md); }
   * {
