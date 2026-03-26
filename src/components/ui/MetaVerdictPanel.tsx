@@ -10,7 +10,10 @@ interface MetaVerdictPanelProps {
 export function MetaVerdictPanel({ verdict }: MetaVerdictPanelProps) {
   const [expanded, setExpanded] = useState(false);
 
-  if (!verdict || verdict === 'No significant adversarial points detected; proposal cleared baseline checks.') {
+  if (
+    !verdict ||
+    verdict === 'No significant adversarial points detected; proposal cleared baseline checks.'
+  ) {
     return null;
   }
 
@@ -55,9 +58,12 @@ export function MetaVerdictPanel({ verdict }: MetaVerdictPanelProps) {
             META-JUDGE
           </span>
         </div>
-        {needsTruncation && (
-          expanded ? <ChevronUp size={16} style={{ color: 'var(--text-muted)' }} /> : <ChevronDown size={16} style={{ color: 'var(--text-muted)' }} />
-        )}
+        {needsTruncation &&
+          (expanded ? (
+            <ChevronUp size={16} style={{ color: 'var(--text-muted)' }} />
+          ) : (
+            <ChevronDown size={16} style={{ color: 'var(--text-muted)' }} />
+          ))}
       </div>
       <div className="card-body" style={{ padding: 'var(--spacing-md) var(--spacing-lg)' }}>
         <p
@@ -72,7 +78,10 @@ export function MetaVerdictPanel({ verdict }: MetaVerdictPanelProps) {
         </p>
         {needsTruncation && !expanded && (
           <button
-            onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
+            onClick={e => {
+              e.stopPropagation();
+              setExpanded(true);
+            }}
             style={{
               marginTop: '8px',
               fontSize: '12px',

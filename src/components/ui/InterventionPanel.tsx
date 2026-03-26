@@ -212,10 +212,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
               loading || selectedBiasTypes.size === 0
                 ? 'rgba(255, 255, 255, 0.05)'
                 : 'rgba(167, 139, 250, 0.15)',
-            color:
-              loading || selectedBiasTypes.size === 0
-                ? 'var(--text-muted)'
-                : '#c4b5fd',
+            color: loading || selectedBiasTypes.size === 0 ? 'var(--text-muted)' : '#c4b5fd',
             transition: 'all 0.15s ease',
           }}
         >
@@ -463,7 +460,10 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
                 color: 'var(--text-muted)',
               }}
             >
-              <CheckCircle2 size={12} style={{ color: '#22c55e', flexShrink: 0, marginTop: '1px' }} />
+              <CheckCircle2
+                size={12}
+                style={{ color: '#22c55e', flexShrink: 0, marginTop: '1px' }}
+              />
               <span>
                 Adjusted for confounders:{' '}
                 {result.adjustedFor.map(v => getBiasDisplayName(v)).join(', ')}

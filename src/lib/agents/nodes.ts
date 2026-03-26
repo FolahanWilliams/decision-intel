@@ -1426,13 +1426,22 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       feedbackAdjustment = Math.min(feedbackAdjustment, 25); // Cap at 25 points
     }
   } catch (feedbackErr) {
-    log.debug('Outcome feedback query failed (non-fatal):', feedbackErr instanceof Error ? feedbackErr.message : String(feedbackErr));
+    log.debug(
+      'Outcome feedback query failed (non-fatal):',
+      feedbackErr instanceof Error ? feedbackErr.message : String(feedbackErr)
+    );
   }
 
   // Calculate Base
   const baseScore = 100;
   let overallScore =
-    baseScore - biasDeductions - noisePenalty - trustPenalty - logicPenalty - diversityPenalty - feedbackAdjustment;
+    baseScore -
+    biasDeductions -
+    noisePenalty -
+    trustPenalty -
+    logicPenalty -
+    diversityPenalty -
+    feedbackAdjustment;
 
   // Clamp 0-100
   overallScore = Math.max(0, Math.min(100, Math.round(overallScore)));

@@ -313,7 +313,8 @@ export async function analyzeDocument(
                       select: { teamId: true },
                     });
                     if (install) {
-                      const { deliverSlackNudge } = await import('@/lib/integrations/slack/handler');
+                      const { deliverSlackNudge } =
+                        await import('@/lib/integrations/slack/handler');
                       const severity = topCombo.toxicScore >= 85 ? ':rotating_light:' : ':warning:';
                       await deliverSlackNudge(
                         {
@@ -324,7 +325,10 @@ export async function analyzeDocument(
                       );
                     }
                   } catch (err) {
-                    log.debug('Slack toxic alert failed (non-fatal):', err instanceof Error ? err.message : String(err));
+                    log.debug(
+                      'Slack toxic alert failed (non-fatal):',
+                      err instanceof Error ? err.message : String(err)
+                    );
                   }
                 })();
               }

@@ -431,7 +431,8 @@ export default function ChatPage() {
                         {s.title}
                       </div>
                       <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: 2 }}>
-                        {s.messages.length || s.messageCount || 0} messages · {formatDate(s.updatedAt)}
+                        {s.messages.length || s.messageCount || 0} messages ·{' '}
+                        {formatDate(s.updatedAt)}
                       </div>
                     </button>
                     <button

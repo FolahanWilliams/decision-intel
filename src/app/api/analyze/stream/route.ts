@@ -563,7 +563,10 @@ export async function POST(request: NextRequest) {
           try {
             if (createdAnalysisId) {
               const { detectToxicCombinations } = await import('@/lib/learning/toxic-combinations');
-              const toxicResult = await detectToxicCombinations(createdAnalysisId, doc.orgId ?? null);
+              const toxicResult = await detectToxicCombinations(
+                createdAnalysisId,
+                doc.orgId ?? null
+              );
               if (toxicResult.flaggedCount > 0) {
                 log.info(
                   `Detected ${toxicResult.flaggedCount} toxic combination(s) for analysis ${createdAnalysisId}`

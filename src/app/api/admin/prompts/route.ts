@@ -29,7 +29,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e => e.trim().toLowerCase());
+    const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e =>
+      e.trim().toLowerCase()
+    );
     if (!user.email || !adminEmails.includes(user.email.toLowerCase())) {
       log.warn(`Non-admin user ${user.id} attempted to access prompt management`);
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -99,7 +101,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e => e.trim().toLowerCase());
+    const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e =>
+      e.trim().toLowerCase()
+    );
     if (!user.email || !adminEmails.includes(user.email.toLowerCase())) {
       log.warn(`Non-admin user ${user.id} attempted to modify prompts`);
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

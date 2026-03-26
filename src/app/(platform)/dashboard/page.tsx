@@ -1054,366 +1054,370 @@ export default function Dashboard() {
 
           {/* Upload Zone - Enhanced with drag feedback */}
           <ErrorBoundary sectionName="Upload">
-          {!uploading && !pendingFile ? (
-            <div
-              className={`upload-zone mb-xl liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => document.getElementById('file-input')?.click()}
-              role="button"
-              tabIndex={0}
-              aria-label="Upload document. Drop a file or click to browse."
-              onKeyDown={e => {
-                if (e.key === 'Enter' || e.key === ' ')
-                  document.getElementById('file-input')?.click();
-              }}
-            >
-              <input
-                type="file"
-                id="file-input"
-                hidden
-                accept=".pdf,.txt,.md,.docx"
-                disabled={uploading}
-                onChange={handleFileSelect}
-              />
-              <div className="flex items-center gap-md">
-                <div
-                  style={{
-                    width: 48,
-                    height: 48,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 'var(--radius-lg)',
-                    background: isDragOver
-                      ? 'rgba(255, 255, 255, 0.12)'
-                      : 'rgba(255, 255, 255, 0.06)',
-                    border: `1px solid ${isDragOver ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.1)'}`,
-                    transition: 'all 0.2s ease',
-                    transform: isDragOver ? 'scale(1.1)' : 'scale(1)',
-                  }}
-                >
-                  {isDragOver ? (
-                    <CloudUpload size={24} className="text-accent-primary" />
-                  ) : (
-                    <Upload size={24} className="text-accent-primary" />
-                  )}
-                </div>
-                <div>
-                  <p className="font-medium">
-                    {isDragOver ? 'Drop to upload' : 'Drop document here or click to browse'}
-                  </p>
-                  <p className="text-sm text-muted">PDF, TXT, MD, DOCX · Max 5 MB</p>
+            {!uploading && !pendingFile ? (
+              <div
+                className={`upload-zone mb-xl liquid-glass-iridescent liquid-glass-shimmer ${isDragOver ? 'dragover' : ''}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => document.getElementById('file-input')?.click()}
+                role="button"
+                tabIndex={0}
+                aria-label="Upload document. Drop a file or click to browse."
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ')
+                    document.getElementById('file-input')?.click();
+                }}
+              >
+                <input
+                  type="file"
+                  id="file-input"
+                  hidden
+                  accept=".pdf,.txt,.md,.docx"
+                  disabled={uploading}
+                  onChange={handleFileSelect}
+                />
+                <div className="flex items-center gap-md">
+                  <div
+                    style={{
+                      width: 48,
+                      height: 48,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 'var(--radius-lg)',
+                      background: isDragOver
+                        ? 'rgba(255, 255, 255, 0.12)'
+                        : 'rgba(255, 255, 255, 0.06)',
+                      border: `1px solid ${isDragOver ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.1)'}`,
+                      transition: 'all 0.2s ease',
+                      transform: isDragOver ? 'scale(1.1)' : 'scale(1)',
+                    }}
+                  >
+                    {isDragOver ? (
+                      <CloudUpload size={24} className="text-accent-primary" />
+                    ) : (
+                      <Upload size={24} className="text-accent-primary" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium">
+                      {isDragOver ? 'Drop to upload' : 'Drop document here or click to browse'}
+                    </p>
+                    <p className="text-sm text-muted">PDF, TXT, MD, DOCX · Max 5 MB</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : uploading ? (
-            <div className="card mb-xl">
-              <div className="card-body">
-                {/* Progress Header — two-phase: uploading then analyzing */}
-                <div className="flex items-center justify-between mb-md">
-                  <div className="flex items-center gap-sm">
-                    {uploadPhase === 'uploading' ? (
-                      <CloudUpload size={16} className="text-accent-primary" />
-                    ) : (
-                      <Loader2 size={16} className="animate-spin text-accent-primary" />
-                    )}
-                    <span className="text-sm font-medium">
-                      {uploadPhase === 'uploading'
-                        ? 'Uploading document...'
-                        : 'Analyzing document...'}
-                    </span>
-                  </div>
-                  <span
-                    className="text-sm font-semibold"
-                    style={{ color: 'var(--text-highlight)' }}
-                  >
-                    {uploadPhase === 'uploading' ? `${uploadProgress}%` : `${currentProgress}%`}
-                  </span>
-                </div>
-
-                {/* Progress Bar - Enhanced */}
-                <div className="progress-bar mb-md">
-                  <div
-                    className="progress-bar-fill"
-                    style={{
-                      width: `${uploadPhase === 'uploading' ? uploadProgress : currentProgress}%`,
-                      transition: 'width 0.3s ease',
-                    }}
-                  />
-                </div>
-
-                {/* Phase indicator */}
-                <div className="flex items-center gap-md mb-md text-xs text-muted">
-                  <span
-                    className={
-                      uploadPhase === 'uploading'
-                        ? 'text-accent-primary font-medium'
-                        : 'text-success'
-                    }
-                  >
-                    {uploadPhase === 'analyzing' ? '✓ ' : ''}Upload
-                  </span>
-                  <span style={{ color: 'var(--border-hover)' }}>→</span>
-                  <span
-                    className={uploadPhase === 'analyzing' ? 'text-accent-primary font-medium' : ''}
-                  >
-                    Analysis
-                  </span>
-                </div>
-
-                {/* Analysis Steps */}
-                <div className="grid grid-cols-3 md:grid-cols-7 gap-xs mt-md">
-                  {analysisSteps.map((step, i) => (
-                    <div
-                      key={i}
-                      className="flex flex-col items-center gap-1 text-center"
-                      title={step.name}
-                    >
-                      <div
-                        style={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: 'var(--radius-full)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          background:
-                            step.status === 'complete'
-                              ? 'rgba(34, 197, 94, 0.15)'
-                              : step.status === 'running'
-                                ? 'rgba(255, 255, 255, 0.10)'
-                                : 'var(--bg-tertiary)',
-                          border: `1px solid ${
-                            step.status === 'complete'
-                              ? 'rgba(34, 197, 94, 0.3)'
-                              : step.status === 'running'
-                                ? 'rgba(255, 255, 255, 0.25)'
-                                : 'var(--border-color)'
-                          }`,
-                          transition: 'all var(--transition-normal)',
-                        }}
-                      >
-                        {step.status === 'complete' ? (
-                          <CheckCircle size={14} style={{ color: 'var(--success)' }} />
-                        ) : step.status === 'running' ? (
-                          <Loader2
-                            size={14}
-                            className="animate-spin"
-                            style={{ color: 'var(--accent-primary)' }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: 6,
-                              height: 6,
-                              borderRadius: '50%',
-                              background: 'var(--border-hover)',
-                            }}
-                          />
-                        )}
-                      </div>
-                      <span
-                        className="text-xs text-muted hidden md:block"
-                        style={{ lineHeight: 1.2, maxWidth: 60 }}
-                      >
-                        {ANALYSIS_STEPS[i]?.name.split(' ').slice(0, 2).join(' ')}
+            ) : uploading ? (
+              <div className="card mb-xl">
+                <div className="card-body">
+                  {/* Progress Header — two-phase: uploading then analyzing */}
+                  <div className="flex items-center justify-between mb-md">
+                    <div className="flex items-center gap-sm">
+                      {uploadPhase === 'uploading' ? (
+                        <CloudUpload size={16} className="text-accent-primary" />
+                      ) : (
+                        <Loader2 size={16} className="animate-spin text-accent-primary" />
+                      )}
+                      <span className="text-sm font-medium">
+                        {uploadPhase === 'uploading'
+                          ? 'Uploading document...'
+                          : 'Analyzing document...'}
                       </span>
                     </div>
-                  ))}
-                </div>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: 'var(--text-highlight)' }}
+                    >
+                      {uploadPhase === 'uploading' ? `${uploadProgress}%` : `${currentProgress}%`}
+                    </span>
+                  </div>
 
-                {/* Cancel */}
-                <div className="flex justify-end mt-md">
-                  <button
-                    onClick={() => {
-                      cancelAnalysis();
-                      setUploading(false);
-                    }}
-                    className="text-xs text-muted hover:text-error transition-colors"
-                  >
-                    Cancel analysis
-                  </button>
+                  {/* Progress Bar - Enhanced */}
+                  <div className="progress-bar mb-md">
+                    <div
+                      className="progress-bar-fill"
+                      style={{
+                        width: `${uploadPhase === 'uploading' ? uploadProgress : currentProgress}%`,
+                        transition: 'width 0.3s ease',
+                      }}
+                    />
+                  </div>
+
+                  {/* Phase indicator */}
+                  <div className="flex items-center gap-md mb-md text-xs text-muted">
+                    <span
+                      className={
+                        uploadPhase === 'uploading'
+                          ? 'text-accent-primary font-medium'
+                          : 'text-success'
+                      }
+                    >
+                      {uploadPhase === 'analyzing' ? '✓ ' : ''}Upload
+                    </span>
+                    <span style={{ color: 'var(--border-hover)' }}>→</span>
+                    <span
+                      className={
+                        uploadPhase === 'analyzing' ? 'text-accent-primary font-medium' : ''
+                      }
+                    >
+                      Analysis
+                    </span>
+                  </div>
+
+                  {/* Analysis Steps */}
+                  <div className="grid grid-cols-3 md:grid-cols-7 gap-xs mt-md">
+                    {analysisSteps.map((step, i) => (
+                      <div
+                        key={i}
+                        className="flex flex-col items-center gap-1 text-center"
+                        title={step.name}
+                      >
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 'var(--radius-full)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background:
+                              step.status === 'complete'
+                                ? 'rgba(34, 197, 94, 0.15)'
+                                : step.status === 'running'
+                                  ? 'rgba(255, 255, 255, 0.10)'
+                                  : 'var(--bg-tertiary)',
+                            border: `1px solid ${
+                              step.status === 'complete'
+                                ? 'rgba(34, 197, 94, 0.3)'
+                                : step.status === 'running'
+                                  ? 'rgba(255, 255, 255, 0.25)'
+                                  : 'var(--border-color)'
+                            }`,
+                            transition: 'all var(--transition-normal)',
+                          }}
+                        >
+                          {step.status === 'complete' ? (
+                            <CheckCircle size={14} style={{ color: 'var(--success)' }} />
+                          ) : step.status === 'running' ? (
+                            <Loader2
+                              size={14}
+                              className="animate-spin"
+                              style={{ color: 'var(--accent-primary)' }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
+                                background: 'var(--border-hover)',
+                              }}
+                            />
+                          )}
+                        </div>
+                        <span
+                          className="text-xs text-muted hidden md:block"
+                          style={{ lineHeight: 1.2, maxWidth: 60 }}
+                        >
+                          {ANALYSIS_STEPS[i]?.name.split(' ').slice(0, 2).join(' ')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Cancel */}
+                  <div className="flex justify-end mt-md">
+                    <button
+                      onClick={() => {
+                        cancelAnalysis();
+                        setUploading(false);
+                      }}
+                      className="text-xs text-muted hover:text-error transition-colors"
+                    >
+                      Cancel analysis
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
           </ErrorBoundary>
 
           {/* Currently Analyzing Section */}
           <ErrorBoundary sectionName="Documents">
-          {uploadedDocs.filter(d => d.status === 'analyzing').length > 0 && (
-            <div className="section">
-              <h2 className="section-header flex items-center gap-2">
-                <Loader2 size={18} className="animate-spin text-accent-primary" />
-                Currently Analyzing
-              </h2>
-              <div className="space-y-3">
-                {uploadedDocs
-                  .filter(d => d.status === 'analyzing')
-                  .map(doc => (
-                    <div
-                      key={doc.id}
-                      className="card"
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        borderColor: 'rgba(255, 255, 255, 0.15)',
-                      }}
-                    >
-                      <div className="card-body flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div
-                            style={{
-                              width: 36,
-                              height: 36,
-                              borderRadius: 'var(--radius-md)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              background: 'rgba(255, 255, 255, 0.06)',
-                            }}
-                          >
-                            <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
-                          </div>
-                          <div>
-                            <span className="font-medium text-sm">{doc.filename}</span>
-                            <p className="text-xs text-muted mt-0.5">
-                              Analysis in progress — results will appear when complete
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="progress-bar" style={{ width: 80 }}>
-                            <div
-                              className="progress-bar-fill animate-pulse"
-                              style={{ width: '60%' }}
-                            />
-                          </div>
-                          <Loader2
-                            size={16}
-                            className="animate-spin text-accent-primary shrink-0"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recent Analyses Section */}
-          {uploadedDocs.filter(d => d.status === 'complete').length > 0 && (
-            <div className="section">
-              <div
-                className="flex items-center justify-between"
-                style={{ marginBottom: 'var(--spacing-md)' }}
-              >
-                <h2 className="section-header flex items-center gap-2" style={{ marginBottom: 0 }}>
-                  <CheckCircle size={18} className="text-green-500" />
-                  Recent Analyses
+            {uploadedDocs.filter(d => d.status === 'analyzing').length > 0 && (
+              <div className="section">
+                <h2 className="section-header flex items-center gap-2">
+                  <Loader2 size={18} className="animate-spin text-accent-primary" />
+                  Currently Analyzing
                 </h2>
-                <button
-                  onClick={() => setActiveView('browse')}
-                  className="text-sm text-secondary hover:text-primary hover:underline flex items-center gap-1"
-                >
-                  View All <ChevronRight size={14} />
-                </button>
-              </div>
-              <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: {},
-                  visible: { transition: { staggerChildren: 0.06 } },
-                }}
-              >
-                {uploadedDocs
-                  .filter(d => d.status === 'complete')
-                  .slice(0, 6)
-                  .map(doc => (
-                    <motion.div
-                      key={doc.id}
-                      variants={{
-                        hidden: { opacity: 0, y: 16 },
-                        visible: { opacity: 1, y: 0 },
-                      }}
-                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                      whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                    >
-                      <Link
-                        href={`/documents/${doc.id}`}
-                        className="card group hover:border-white/20 transition-all"
-                        style={{ textDecoration: 'none', display: 'block' }}
+                <div className="space-y-3">
+                  {uploadedDocs
+                    .filter(d => d.status === 'analyzing')
+                    .map(doc => (
+                      <div
+                        key={doc.id}
+                        className="card"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.06)',
+                          borderColor: 'rgba(255, 255, 255, 0.15)',
+                        }}
                       >
-                        <div className="card-body">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div
-                                style={{
-                                  width: 32,
-                                  height: 32,
-                                  flexShrink: 0,
-                                  borderRadius: 'var(--radius-md)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  background: 'rgba(255, 255, 255, 0.06)',
-                                }}
-                              >
-                                <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
-                              </div>
-                              <span className="font-medium text-sm truncate max-w-[130px]">
-                                {doc.filename}
-                              </span>
+                        <div className="card-body flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div
+                              style={{
+                                width: 36,
+                                height: 36,
+                                borderRadius: 'var(--radius-md)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: 'rgba(255, 255, 255, 0.06)',
+                              }}
+                            >
+                              <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
                             </div>
-                            {doc.score !== undefined && (
-                              <span
-                                className="text-sm font-bold shrink-0 ml-2"
-                                style={{
-                                  color:
-                                    doc.score >= 70
-                                      ? 'var(--success)'
-                                      : doc.score >= 40
-                                        ? 'var(--warning)'
-                                        : 'var(--error)',
-                                }}
-                              >
-                                {Math.round(doc.score)}%
-                              </span>
-                            )}
+                            <div>
+                              <span className="font-medium text-sm">{doc.filename}</span>
+                              <p className="text-xs text-muted mt-0.5">
+                                Analysis in progress — results will appear when complete
+                              </p>
+                            </div>
                           </div>
-                          {doc.score !== undefined && (
-                            <div className="progress-bar mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="progress-bar" style={{ width: 80 }}>
                               <div
-                                className="progress-bar-fill"
-                                style={{
-                                  width: `${doc.score}%`,
-                                  background:
-                                    doc.score >= 70
-                                      ? 'linear-gradient(90deg, #22c55e, #16a34a)'
-                                      : doc.score >= 40
-                                        ? 'linear-gradient(90deg, #f59e0b, #d97706)'
-                                        : 'linear-gradient(90deg, #ef4444, #dc2626)',
-                                }}
+                                className="progress-bar-fill animate-pulse"
+                                style={{ width: '60%' }}
                               />
                             </div>
-                          )}
-                          <div className="flex items-center justify-between text-xs text-muted">
-                            <span>{formatDate(doc.uploadedAt)}</span>
-                            <span className="flex items-center gap-1 group-hover:text-primary transition-colors">
-                              View Analysis <ArrowRight size={12} />
-                            </span>
+                            <Loader2
+                              size={16}
+                              className="animate-spin text-accent-primary shrink-0"
+                            />
                           </div>
                         </div>
-                      </Link>
-                    </motion.div>
-                  ))}
-              </motion.div>
-            </div>
-          )}
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
 
+            {/* Recent Analyses Section */}
+            {uploadedDocs.filter(d => d.status === 'complete').length > 0 && (
+              <div className="section">
+                <div
+                  className="flex items-center justify-between"
+                  style={{ marginBottom: 'var(--spacing-md)' }}
+                >
+                  <h2
+                    className="section-header flex items-center gap-2"
+                    style={{ marginBottom: 0 }}
+                  >
+                    <CheckCircle size={18} className="text-green-500" />
+                    Recent Analyses
+                  </h2>
+                  <button
+                    onClick={() => setActiveView('browse')}
+                    className="text-sm text-secondary hover:text-primary hover:underline flex items-center gap-1"
+                  >
+                    View All <ChevronRight size={14} />
+                  </button>
+                </div>
+                <motion.div
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: { transition: { staggerChildren: 0.06 } },
+                  }}
+                >
+                  {uploadedDocs
+                    .filter(d => d.status === 'complete')
+                    .slice(0, 6)
+                    .map(doc => (
+                      <motion.div
+                        key={doc.id}
+                        variants={{
+                          hidden: { opacity: 0, y: 16 },
+                          visible: { opacity: 1, y: 0 },
+                        }}
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                      >
+                        <Link
+                          href={`/documents/${doc.id}`}
+                          className="card group hover:border-white/20 transition-all"
+                          style={{ textDecoration: 'none', display: 'block' }}
+                        >
+                          <div className="card-body">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div
+                                  style={{
+                                    width: 32,
+                                    height: 32,
+                                    flexShrink: 0,
+                                    borderRadius: 'var(--radius-md)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'rgba(255, 255, 255, 0.06)',
+                                  }}
+                                >
+                                  <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
+                                </div>
+                                <span className="font-medium text-sm truncate max-w-[130px]">
+                                  {doc.filename}
+                                </span>
+                              </div>
+                              {doc.score !== undefined && (
+                                <span
+                                  className="text-sm font-bold shrink-0 ml-2"
+                                  style={{
+                                    color:
+                                      doc.score >= 70
+                                        ? 'var(--success)'
+                                        : doc.score >= 40
+                                          ? 'var(--warning)'
+                                          : 'var(--error)',
+                                  }}
+                                >
+                                  {Math.round(doc.score)}%
+                                </span>
+                              )}
+                            </div>
+                            {doc.score !== undefined && (
+                              <div className="progress-bar mb-2">
+                                <div
+                                  className="progress-bar-fill"
+                                  style={{
+                                    width: `${doc.score}%`,
+                                    background:
+                                      doc.score >= 70
+                                        ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                        : doc.score >= 40
+                                          ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+                                          : 'linear-gradient(90deg, #ef4444, #dc2626)',
+                                  }}
+                                />
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between text-xs text-muted">
+                              <span>{formatDate(doc.uploadedAt)}</span>
+                              <span className="flex items-center gap-1 group-hover:text-primary transition-colors">
+                                View Analysis <ArrowRight size={12} />
+                              </span>
+                            </div>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    ))}
+                </motion.div>
+              </div>
+            )}
           </ErrorBoundary>
 
           {/* Empty state - only show when no documents */}

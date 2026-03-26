@@ -119,8 +119,11 @@ export async function POST(req: NextRequest) {
         where: { id: analysisId },
         data: { outcomeStatus: 'outcome_logged' },
       })
-      .catch((err) => {
-        log.warn('Failed to update outcomeStatus to outcome_logged:', err instanceof Error ? err.message : String(err));
+      .catch(err => {
+        log.warn(
+          'Failed to update outcomeStatus to outcome_logged:',
+          err instanceof Error ? err.message : String(err)
+        );
       });
 
     // Adjust graph edge weights from outcome (fire-and-forget flywheel)

@@ -46,10 +46,7 @@ export async function GET(request: NextRequest) {
         channel: 'slack',
         deliveredAt: null,
         failureCount: { lt: MAX_RETRIES },
-        OR: [
-          { nextRetryAt: null, failureCount: { gt: 0 } },
-          { nextRetryAt: { lte: now } },
-        ],
+        OR: [{ nextRetryAt: null, failureCount: { gt: 0 } }, { nextRetryAt: { lte: now } }],
       },
       take: 20,
       orderBy: { createdAt: 'asc' },
@@ -62,9 +59,8 @@ export async function GET(request: NextRequest) {
     let succeeded = 0;
     let failed = 0;
 
-    const { deliverSlackNudge, formatNudgeForSlack } = await import(
-      '@/lib/integrations/slack/handler'
-    );
+    const { deliverSlackNudge, formatNudgeForSlack } =
+      await import('@/lib/integrations/slack/handler');
 
     for (const nudge of pendingNudges) {
       try {
@@ -109,16 +105,21 @@ export async function GET(request: NextRequest) {
         const backoffMs = 30_000 * Math.pow(2, newFailureCount - 1);
         const nextRetry = new Date(now.getTime() + backoffMs);
 
-        await prisma.nudge.update({
-          where: { id: nudge.id },
-          data: {
-            failureCount: newFailureCount,
-            lastAttemptAt: now,
-            nextRetryAt: newFailureCount < MAX_RETRIES ? nextRetry : null,
-          },
-        }).catch(() => {});
+        await prisma.nudge
+          .update({
+            where: { id: nudge.id },
+            data: {
+              failureCount: newFailureCount,
+              lastAttemptAt: now,
+              nextRetryAt: newFailureCount < MAX_RETRIES ? nextRetry : null,
+            },
+          })
+          .catch(() => {});
 
-        log.warn(`Nudge ${nudge.id} retry failed (attempt ${newFailureCount}/${MAX_RETRIES}):`, err instanceof Error ? err.message : String(err));
+        log.warn(
+          `Nudge ${nudge.id} retry failed (attempt ${newFailureCount}/${MAX_RETRIES}):`,
+          err instanceof Error ? err.message : String(err)
+        );
         failed++;
       }
     }

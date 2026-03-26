@@ -88,7 +88,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'title is required' }, { status: 400 });
     }
     if (!Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json({ error: 'messages array is required and must not be empty' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'messages array is required and must not be empty' },
+        { status: 400 }
+      );
     }
 
     // Validate messages

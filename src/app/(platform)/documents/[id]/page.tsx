@@ -1245,9 +1245,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       )}
 
       {/* Toxic Combination Alert Banner */}
-      {toxicCombinations.length > 0 && (
-        <ToxicAlertBanner combinations={toxicCombinations} />
-      )}
+      {toxicCombinations.length > 0 && <ToxicAlertBanner combinations={toxicCombinations} />}
 
       {/* Tabs + Content */}
       <div className="grid" style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}>

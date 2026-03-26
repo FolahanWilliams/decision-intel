@@ -115,8 +115,16 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: isStepCompleted(index) ? '#22c55e' : index <= currentStep ? '#FFFFFF' : 'var(--bg-tertiary)',
-                  color: isStepCompleted(index) ? '#FFFFFF' : index <= currentStep ? '#080808' : 'var(--text-muted)',
+                  background: isStepCompleted(index)
+                    ? '#22c55e'
+                    : index <= currentStep
+                      ? '#FFFFFF'
+                      : 'var(--bg-tertiary)',
+                  color: isStepCompleted(index)
+                    ? '#FFFFFF'
+                    : index <= currentStep
+                      ? '#080808'
+                      : 'var(--text-muted)',
                   fontSize: '12px',
                   fontWeight: 700,
                   borderRadius: '50%',

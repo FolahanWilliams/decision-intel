@@ -143,7 +143,13 @@ export const AUTOMOTIVE_MANUFACTURING_CASES: FailureCase[] = [
       'zeigarnik_effect',
     ],
     primaryBias: 'framing_effect',
-    toxicCombinations: ['Blind Sprint', 'Yes Committee', 'Optimism Trap', 'Golden Child', 'Deadline Panic'],
+    toxicCombinations: [
+      'Blind Sprint',
+      'Yes Committee',
+      'Optimism Trap',
+      'Golden Child',
+      'Deadline Panic',
+    ],
     contextFactors: {
       monetaryStakes: 'very_high',
       dissentAbsent: false,

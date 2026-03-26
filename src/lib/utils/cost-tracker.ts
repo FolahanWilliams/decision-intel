@@ -51,6 +51,9 @@ export function trackApiUsage(params: TrackUsageParams): void {
     })
     .catch(err => {
       // Schema drift or DB issue — non-fatal
-      log.debug('Failed to track API usage (non-fatal):', err instanceof Error ? err.message : String(err));
+      log.debug(
+        'Failed to track API usage (non-fatal):',
+        err instanceof Error ? err.message : String(err)
+      );
     });
 }
