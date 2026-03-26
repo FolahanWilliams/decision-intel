@@ -59,6 +59,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               speakers: true,
               biasWebImageUrl: true,
               preMortemImageUrl: true,
+              metaVerdict: true,
             },
           },
         },

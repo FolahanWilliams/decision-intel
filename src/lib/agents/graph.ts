@@ -51,7 +51,16 @@ const GraphState = Annotation.Root({
     default: () => [],
   }),
   biasAnalysis: Annotation<BiasDetectionResult[]>({
-    reducer: (x, y) => [...(x || []), ...(y || [])],
+    reducer: (x, y) => {
+      const merged = [...(x || []), ...(y || [])];
+      const seen = new Set<string>();
+      return merged.filter(b => {
+        const key = `${b.biasType}:${b.excerpt?.slice(0, 50) || ''}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    },
     default: () => [],
   }),
   noiseScores: Annotation<number[]>({
@@ -116,6 +125,10 @@ const GraphState = Annotation.Root({
   intelligenceContext: Annotation<IntelligenceContext | undefined>({
     reducer: (x, y) => y ?? x,
     default: () => undefined,
+  }),
+  metaVerdict: Annotation<string | null>({
+    reducer: (x, y) => y ?? x,
+    default: () => null,
   }),
 });
 

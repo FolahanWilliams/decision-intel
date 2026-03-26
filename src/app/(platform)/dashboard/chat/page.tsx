@@ -32,6 +32,7 @@ interface ChatSession {
   messages: ChatMessage[];
   pinnedDocId: string | null;
   updatedAt: string;
+  messageCount?: number; // from server (when messages not loaded)
 }
 
 function loadSessions(): ChatSession[] {
@@ -49,6 +50,38 @@ function saveSessions(sessions: ChatSession[]) {
   } catch {
     /* quota exceeded — silently skip */
   }
+}
+
+/** Fire-and-forget: persist session to server */
+function syncSessionToServer(session: ChatSession) {
+  const payload = {
+    id: session.id,
+    title: session.title,
+    pinnedDocId: session.pinnedDocId,
+    messages: session.messages
+      .filter(m => !m.isStreaming)
+      .map(m => ({
+        role: m.role,
+        content: m.content,
+        sources: m.sources ?? undefined,
+      })),
+  };
+  fetch('/api/chat/sessions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(() => {
+    /* fire-and-forget — localStorage is the fallback */
+  });
+}
+
+/** Fire-and-forget: delete session from server */
+function deleteSessionFromServer(sessionId: string) {
+  fetch(`/api/chat/sessions?id=${encodeURIComponent(sessionId)}`, {
+    method: 'DELETE',
+  }).catch(() => {
+    /* fire-and-forget */
+  });
 }
 
 export default function ChatPage() {
@@ -69,9 +102,55 @@ export default function ChatPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load sessions and bookmarks from localStorage on mount
+  // Load sessions from server (source of truth) with localStorage fallback, and bookmarks
   useEffect(() => {
-    setSessions(loadSessions());
+    const localSessions = loadSessions();
+    setSessions(localSessions);
+
+    // Fetch from server and merge
+    fetch('/api/chat/sessions')
+      .then(res => (res.ok ? res.json() : Promise.reject(res.status)))
+      .then(data => {
+        const serverSessions: Array<{
+          id: string;
+          title: string;
+          pinnedDocId: string | null;
+          updatedAt: string;
+          messageCount: number;
+        }> = data.sessions || [];
+
+        if (serverSessions.length === 0 && localSessions.length === 0) return;
+
+        const serverIds = new Set(serverSessions.map(s => s.id));
+
+        // Keep local-only sessions (not yet on server) and push them to server
+        const localOnly = localSessions.filter(s => !serverIds.has(s.id));
+        for (const ls of localOnly) {
+          syncSessionToServer(ls);
+        }
+
+        // Merge: server sessions take priority, supplement with local messages if available
+        const merged: ChatSession[] = serverSessions.map(ss => {
+          const local = localSessions.find(ls => ls.id === ss.id);
+          return {
+            id: ss.id,
+            title: ss.title,
+            pinnedDocId: ss.pinnedDocId,
+            updatedAt: ss.updatedAt,
+            messages: local?.messages || [], // full messages only available from localStorage
+            messageCount: ss.messageCount,
+          };
+        });
+
+        // Append local-only sessions
+        const combined = [...merged, ...localOnly].slice(0, MAX_SAVED_SESSIONS);
+        setSessions(combined);
+        saveSessions(combined);
+      })
+      .catch(() => {
+        // Server unavailable — localStorage is already loaded above
+      });
+
     try {
       const saved = localStorage.getItem('decision-intel-chat-bookmarks');
       if (saved) setBookmarks(new Set(JSON.parse(saved)));
@@ -80,7 +159,7 @@ export default function ChatPage() {
     }
   }, []);
 
-  // Auto-save current conversation whenever messages change
+  // Auto-save current conversation whenever messages change (localStorage + server)
   useEffect(() => {
     if (messages.length === 0 || messages.some(m => m.isStreaming)) return;
 
@@ -104,6 +183,10 @@ export default function ChatPage() {
       const existing = prev.filter(s => s.id !== sessionId);
       const next = [updated, ...existing].slice(0, MAX_SAVED_SESSIONS);
       saveSessions(next);
+
+      // Fire-and-forget sync to server
+      syncSessionToServer(updated);
+
       return next;
     });
   }, [messages, activeSessionId, pinnedDocId]);
@@ -132,6 +215,8 @@ export default function ChatPage() {
         saveSessions(next);
         return next;
       });
+      // Fire-and-forget delete from server
+      deleteSessionFromServer(sessionId);
       if (activeSessionId === sessionId) {
         setActiveSessionId(null);
       }
@@ -346,7 +431,7 @@ export default function ChatPage() {
                         {s.title}
                       </div>
                       <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: 2 }}>
-                        {s.messages.length} messages · {formatDate(s.updatedAt)}
+                        {s.messages.length || s.messageCount || 0} messages · {formatDate(s.updatedAt)}
                       </div>
                     </button>
                     <button

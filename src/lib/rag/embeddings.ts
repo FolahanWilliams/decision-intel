@@ -389,7 +389,7 @@ export async function storeHumanDecisionEmbedding(
  */
 function assertSafeId(value: string, fieldName: string): void {
   // Supabase user IDs: UUID format / alphanumeric + hyphen
-  if (!/^[a-zA-Z0-9_\-|]+$/.test(value)) {
+  if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
     throw new Error(`Invalid ${fieldName} format`);
   }
 }

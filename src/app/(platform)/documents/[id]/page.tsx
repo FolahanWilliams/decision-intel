@@ -34,6 +34,8 @@ import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/Decisio
 import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
 import { InterventionPanel } from '@/components/ui/InterventionPanel';
+import { MetaVerdictPanel } from '@/components/ui/MetaVerdictPanel';
+import { ToxicAlertBanner } from '@/components/ui/ToxicAlertBanner';
 import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinationCard';
 import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
@@ -162,6 +164,7 @@ interface Analysis {
   };
   institutionalMemory?: InstitutionalMemoryResult;
   intelligenceContext?: IntelligenceContextSummary;
+  metaVerdict?: string;
 }
 
 interface Document {
@@ -911,6 +914,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
+      {/* MetaVerdict — adversarial analysis */}
+      {analysis?.metaVerdict && (
+        <ErrorBoundary sectionName="MetaVerdict">
+          <MetaVerdictPanel verdict={analysis.metaVerdict} />
+        </ErrorBoundary>
+      )}
+
       {/* Toxic Combinations — compound risk detection */}
       {toxicCombinations.length > 0 && (
         <div className="mb-lg">
@@ -1232,6 +1242,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             </div>
           </div>
         </ErrorBoundary>
+      )}
+
+      {/* Toxic Combination Alert Banner */}
+      {toxicCombinations.length > 0 && (
+        <ToxicAlertBanner combinations={toxicCombinations} />
       )}
 
       {/* Tabs + Content */}

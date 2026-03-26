@@ -274,8 +274,15 @@ export function CommandPalette() {
         description: 'Download data in CSV, JSON, or PDF',
         icon: <Download size={16} />,
         action: () => {
-          // Trigger export modal or function
-          console.log('Export triggered');
+          // Generate CSV export of visible documents
+          const docs = document.querySelectorAll('[data-document-row]');
+          if (docs.length > 0) {
+            // Dispatch export event for the documents page to handle
+            window.dispatchEvent(new CustomEvent('command-palette-export', { detail: { format: 'csv' } }));
+          } else {
+            // Fallback: print current page as PDF
+            window.print();
+          }
           setOpen(false);
         },
         keywords: ['download', 'csv', 'json', 'pdf', 'export'],
@@ -319,8 +326,7 @@ export function CommandPalette() {
         description: 'Apply filters to current data',
         icon: <Filter size={16} />,
         action: () => {
-          // Trigger filter panel
-          console.log('Filter triggered');
+          window.dispatchEvent(new CustomEvent('command-palette-filter'));
           setOpen(false);
         },
         keywords: ['filter', 'sort', 'search', 'refine'],
@@ -431,7 +437,12 @@ export function CommandPalette() {
       // Export shortcut
       if (e.metaKey && e.key === 'e' && !open) {
         e.preventDefault();
-        console.log('Export triggered via shortcut');
+        const docs = document.querySelectorAll('[data-document-row]');
+        if (docs.length > 0) {
+          window.dispatchEvent(new CustomEvent('command-palette-export', { detail: { format: 'csv' } }));
+        } else {
+          window.print();
+        }
       }
       // Copy link shortcut
       if (e.metaKey && e.shiftKey && e.key === 'C') {
