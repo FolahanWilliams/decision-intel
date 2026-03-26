@@ -272,3 +272,107 @@ export function memoizeWithTTL<T extends (...args: unknown[]) => ReturnType<T>>(
     return result;
   }) as T;
 }
+
+/**
+ * Circuit Breaker states
+ */
+type CircuitState = 'closed' | 'open' | 'half-open';
+
+/**
+ * Circuit Breaker pattern for external service calls.
+ * Prevents cascading failures by short-circuiting requests when a service is down.
+ *
+ * States:
+ * - closed: Normal operation, tracking failures
+ * - open: Service is down, reject immediately for recovery period
+ * - half-open: After recovery period, allow one probe request
+ */
+export class CircuitBreaker {
+  private state: CircuitState = 'closed';
+  private failureCount = 0;
+  private lastFailureTime = 0;
+  private readonly name: string;
+  private readonly failureThreshold: number;
+  private readonly recoveryTimeMs: number;
+
+  constructor(name: string, failureThreshold = 5, recoveryTimeMs = 60_000) {
+    this.name = name;
+    this.failureThreshold = failureThreshold;
+    this.recoveryTimeMs = recoveryTimeMs;
+  }
+
+  /**
+   * Execute a function through the circuit breaker
+   */
+  async execute<T>(fn: () => Promise<T>): Promise<T> {
+    if (this.state === 'open') {
+      if (Date.now() - this.lastFailureTime >= this.recoveryTimeMs) {
+        this.state = 'half-open';
+        log.info(`[CircuitBreaker:${this.name}] Transitioning to half-open, allowing probe request`);
+      } else {
+        throw new Error(`[CircuitBreaker:${this.name}] Circuit is OPEN — service unavailable, retry after ${Math.ceil((this.recoveryTimeMs - (Date.now() - this.lastFailureTime)) / 1000)}s`);
+      }
+    }
+
+    try {
+      const result = await fn();
+      this.onSuccess();
+      return result;
+    } catch (error) {
+      this.onFailure();
+      throw error;
+    }
+  }
+
+  private onSuccess(): void {
+    if (this.state === 'half-open') {
+      log.info(`[CircuitBreaker:${this.name}] Probe succeeded, closing circuit`);
+    }
+    this.failureCount = 0;
+    this.state = 'closed';
+  }
+
+  private onFailure(): void {
+    this.failureCount++;
+    this.lastFailureTime = Date.now();
+
+    if (this.failureCount >= this.failureThreshold) {
+      this.state = 'open';
+      log.warn(`[CircuitBreaker:${this.name}] Circuit OPENED after ${this.failureCount} failures`);
+    } else if (this.state === 'half-open') {
+      this.state = 'open';
+      log.warn(`[CircuitBreaker:${this.name}] Probe failed, circuit remains OPEN`);
+    }
+  }
+
+  /** Current circuit state */
+  getState(): CircuitState {
+    return this.state;
+  }
+
+  /** Reset the circuit breaker */
+  reset(): void {
+    this.state = 'closed';
+    this.failureCount = 0;
+    this.lastFailureTime = 0;
+  }
+}
+
+/**
+ * Pre-configured circuit breakers for external services
+ */
+export const circuitBreakers = {
+  gemini: new CircuitBreaker('Gemini', 5, 60_000),
+  slack: new CircuitBreaker('Slack', 3, 30_000),
+  resend: new CircuitBreaker('Resend', 3, 30_000),
+} as const;
+
+/**
+ * Convenience wrapper: execute fn through a named circuit breaker
+ */
+export async function withCircuitBreaker<T>(
+  name: keyof typeof circuitBreakers,
+  fn: () => Promise<T>
+): Promise<T> {
+  return circuitBreakers[name].execute(fn);
+}
