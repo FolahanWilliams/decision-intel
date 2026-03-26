@@ -799,13 +799,13 @@ export default function LandingPage() {
                     </Link>
                   </GlassRipple>
                   <GlassHover>
-                    <a
-                      href="#problem"
+                    <Link
+                      href="/demo"
                       className="btn btn-secondary"
                       style={{ padding: '14px 32px', fontSize: '0.9rem' }}
                     >
-                      See How It Works
-                    </a>
+                      See a Live Demo
+                    </Link>
                   </GlassHover>
                 </motion.div>
 
@@ -1515,6 +1515,243 @@ export default function LandingPage() {
             </span>
             <div style={{ width: '120px', height: '1px', background: 'rgba(255,255,255,0.08)' }} />
           </div>
+        </div>
+      </section>
+
+      <SectionDivider variant="glow" color="rgba(255, 255, 255, 0.06)" />
+
+      {/* Case Study — What Decision Intel Would Have Caught */}
+      <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
+        <div className="relative z-10" style={containerStyle}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto"
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.6rem, 2.8vw, 2.2rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '12px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                textAlign: 'center',
+              }}
+            >
+              What Decision Intel Would Have Caught
+            </h2>
+            <p
+              style={{
+                color: 'var(--text-muted)',
+                fontSize: '0.95rem',
+                lineHeight: 1.7,
+                textAlign: 'center',
+                marginBottom: '40px',
+              }}
+            >
+              We ran our engine on one of the most infamous strategic decisions in tech history.
+            </p>
+
+            {/* Case Study Card */}
+            <div
+              style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '16px',
+                padding: '32px 28px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  flexWrap: 'wrap',
+                  gap: '16px',
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontSize: '0.7rem',
+                      color: 'rgba(239, 68, 68, 0.8)',
+                      fontWeight: 700,
+                      letterSpacing: '0.08em',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    CASE STUDY
+                  </div>
+                  <h3
+                    style={{
+                      fontSize: '1.3rem',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    Microsoft-Nokia: The $7.6B Write-Down
+                  </h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+                    In 2013, Microsoft acquired Nokia&apos;s Devices &amp; Services division for
+                    $7.2B. Two years later, they wrote down $7.6B — more than the entire purchase
+                    price.
+                  </p>
+                </div>
+                <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                  <div
+                    style={{
+                      fontSize: '2.8rem',
+                      fontWeight: 800,
+                      color: '#ef4444',
+                      lineHeight: 1,
+                    }}
+                  >
+                    38
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>/ 100</div>
+                  <div
+                    style={{
+                      fontSize: '0.68rem',
+                      color: '#ef4444',
+                      fontWeight: 600,
+                      marginTop: '2px',
+                    }}
+                  >
+                    Decision Quality
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Findings */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '10px',
+                }}
+              >
+                {[
+                  {
+                    label: 'Anchoring Bias',
+                    sev: 'critical',
+                    detail: 'Price anchored to seller\u2019s ask',
+                  },
+                  { label: 'Confirmation Bias', sev: 'high', detail: 'Cherry-picked market data' },
+                  {
+                    label: 'Sunk Cost Fallacy',
+                    sev: 'high',
+                    detail: '$1B prior commitment framing',
+                  },
+                  { label: 'Overconfidence', sev: 'high', detail: '15% market share projection' },
+                  { label: 'Groupthink', sev: 'medium', detail: 'Unanimous board, zero dissent' },
+                  {
+                    label: 'Status Quo Bias',
+                    sev: 'medium',
+                    detail: 'Windows Phone doubling down',
+                  },
+                ].map((bias, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#fff' }}>
+                        {bias.label}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.6rem',
+                          padding: '1px 6px',
+                          borderRadius: '8px',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          background:
+                            bias.sev === 'critical'
+                              ? 'rgba(239, 68, 68, 0.1)'
+                              : bias.sev === 'high'
+                                ? 'rgba(249, 115, 22, 0.1)'
+                                : 'rgba(234, 179, 8, 0.1)',
+                          color:
+                            bias.sev === 'critical'
+                              ? '#ef4444'
+                              : bias.sev === 'high'
+                                ? '#f97316'
+                                : '#eab308',
+                        }}
+                      >
+                        {bias.sev}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '0.72rem',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      {bias.detail}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.3)',
+                    margin: 0,
+                    fontStyle: 'italic',
+                  }}
+                >
+                  Analysis based on publicly available strategic documents and press releases.
+                </p>
+                <Link
+                  href="/demo"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    background: '#FFFFFF',
+                    color: '#000000',
+                    fontSize: '0.84rem',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  See the Full Analysis <ArrowRight size={14} />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -3648,10 +3885,10 @@ export default function LandingPage() {
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {[
-                  { label: 'API Documentation', href: '#' },
-                  { label: 'Research Papers', href: '#' },
-                  { label: 'Blog', href: '#' },
-                  { label: 'Support', href: '#' },
+                  { label: 'Live Demo', href: '/demo' },
+                  { label: 'Pricing', href: '#pricing' },
+                  { label: 'FAQ', href: '#faq' },
+                  { label: 'Contact', href: 'mailto:hello@decisionintel.ai' },
                 ].map((link, i) => (
                   <a
                     key={i}
@@ -3715,10 +3952,14 @@ export default function LandingPage() {
             </span>
             <div className="flex items-center gap-4">
               {[
-                { icon: Github, href: '#', label: 'GitHub' },
-                { icon: Twitter, href: '#', label: 'Twitter' },
-                { icon: Linkedin, href: '#', label: 'LinkedIn' },
-                { icon: Mail, href: '#', label: 'Email' },
+                { icon: Github, href: 'https://github.com/FolahanWilliams', label: 'GitHub' },
+                { icon: Twitter, href: 'https://x.com/decisionintelai', label: 'Twitter' },
+                {
+                  icon: Linkedin,
+                  href: 'https://linkedin.com/company/decision-intel',
+                  label: 'LinkedIn',
+                },
+                { icon: Mail, href: 'mailto:hello@decisionintel.ai', label: 'Email' },
               ].map((social, i) => (
                 <a
                   key={i}
