@@ -8,6 +8,8 @@
 export {
   computeCompoundScore,
   computeConfidenceDecay,
+  detectWinnerEffect,
+  detectStressSignals,
   type CompoundScore,
   type DetectedBias,
   type DocumentContext,

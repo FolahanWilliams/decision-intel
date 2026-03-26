@@ -10,6 +10,8 @@ import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
 import { RiskHeatMap } from '@/components/visualizations/RiskHeatMap';
 import { DecisionTimeline } from '@/components/visualizations/DecisionTimeline';
 import { DQIBadge } from '@/components/visualizations/DQIBadge';
+import { System1GaugeBar } from '@/components/visualizations/System1GaugeBar';
+import { BiologicalRiskBadge } from '@/components/ui/BiologicalRiskBadge';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ResearchInsight } from '@/types';
 
@@ -27,6 +29,7 @@ interface DQIData {
   score: number;
   grade: string;
   gradeLabel: string;
+  system1Ratio: number | null;
   components: {
     biasLoad: { score: number; grade: string };
     noiseLevel: { score: number; grade: string };
@@ -48,6 +51,7 @@ interface OverviewTabProps {
   uploadedAt: string;
   analysisCreatedAt?: string;
   analysisId?: string;
+  compoundAdjustments?: Array<{ source: string; delta: number; description: string }>;
 }
 
 const SEVERITY_BADGE_STYLES: Record<string, string> = {
@@ -70,6 +74,7 @@ export function OverviewTab({
   uploadedAt,
   analysisCreatedAt,
   analysisId,
+  compoundAdjustments,
 }: OverviewTabProps) {
   // Fetch historical bias frequencies for sparklines
   const [biasFrequencies, setBiasFrequencies] = useState<Record<string, BiasFrequencyData> | null>(
@@ -131,11 +136,21 @@ export function OverviewTab({
                   components={dqiData.components}
                 />
                 <div className="flex-1 min-w-[200px]">
-                  <h3 className="text-lg font-semibold mb-1">{dqiData.gradeLabel}</h3>
-                  <p className="text-sm text-muted mb-4">
+                  <div className="flex items-center gap-3 mb-1 flex-wrap">
+                    <h3 className="text-lg font-semibold">{dqiData.gradeLabel}</h3>
+                    {compoundAdjustments && compoundAdjustments.length > 0 && (
+                      <BiologicalRiskBadge adjustments={compoundAdjustments} size="sm" />
+                    )}
+                  </div>
+                  <p className="text-sm text-muted mb-3">
                     Decision Quality Index — a composite score across bias load, noise, evidence,
                     process maturity, and compliance.
                   </p>
+                  {dqiData.system1Ratio !== null && dqiData.system1Ratio !== undefined && (
+                    <div className="mb-3">
+                      <System1GaugeBar ratio={dqiData.system1Ratio} height={16} />
+                    </div>
+                  )}
                   {dqiData.topImprovement && (
                     <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded">
                       <div className="text-xs font-semibold text-blue-300 mb-1">

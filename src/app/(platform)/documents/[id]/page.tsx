@@ -33,6 +33,7 @@ import { DraftOutcomeCard } from '@/components/ui/DraftOutcomeCard';
 import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/DecisionPriorCapture';
 import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
+import { InterventionPanel } from '@/components/ui/InterventionPanel';
 import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinationCard';
 import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
@@ -903,6 +904,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </div>
       )}
 
+      {/* What-If Intervention Panel — causal do-calculus */}
+      {analysis && biases.length > 0 && (
+        <div className="mb-lg">
+          <InterventionPanel analysisId={analysis.id} biases={biases} />
+        </div>
+      )}
+
       {/* Toxic Combinations — compound risk detection */}
       {toxicCombinations.length > 0 && (
         <div className="mb-lg">
@@ -1309,6 +1317,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     uploadedAt={document.uploadedAt}
                     analysisCreatedAt={analysis?.createdAt}
                     analysisId={analysis?.id}
+                    compoundAdjustments={analysis?.compliance?.compoundScoring?.adjustments}
                   />
                 </ErrorBoundary>
               )}

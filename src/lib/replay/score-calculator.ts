@@ -162,7 +162,12 @@ export function calculateCounterfactualScore(
   const explanation =
     reasons.length > 0 ? reasons.join('. ') + '.' : 'No changes applied — score remains the same.';
 
-  return { projectedScore: adjustedScore, delta, explanation };
+  return {
+    projectedScore: adjustedScore,
+    delta,
+    explanation,
+    causalMethod: causalEffects ? 'scm' : 'simulation',
+  };
 }
 
 /**

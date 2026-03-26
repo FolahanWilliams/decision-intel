@@ -672,7 +672,9 @@ function chiSquaredIndependence(
   // Approximate p-value using chi-squared CDF with 1 df
   // Using Wilson-Hilferty approximation
   if (chi2 <= 0) return 1.0;
-  const z = Math.pow(chi2, 1 / 3) - (1 - 2 / 9);
+  // Wilson-Hilferty approximation for chi-squared CDF with 1 df
+  const k = 1; // degrees of freedom
+  const z = (Math.pow(chi2 / k, 1 / 3) - (1 - 2 / (9 * k))) / Math.sqrt(2 / (9 * k));
   const pValue = 1 - 0.5 * (1 + erf(z / Math.sqrt(2)));
   return Math.max(0, Math.min(1, pValue));
 }

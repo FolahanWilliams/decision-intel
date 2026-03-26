@@ -2,13 +2,17 @@
 
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { BiasInstance } from '@/types';
-import { AlertTriangle, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, ChevronRight, Eye, EyeOff, Search } from 'lucide-react';
+import { getBiasDisplayName } from '@/lib/utils/bias-normalize';
+import { getBiasColor, resetBiasColors, type BiasColorSet } from '@/lib/utils/bias-colors';
 
 interface DocumentTextHighlighterProps {
   content: string;
   biases: BiasInstance[];
   /** Called when user clicks a bias — parent can use for cross-tab linking */
   onBiasSelect?: (bias: BiasInstance) => void;
+  /** Start in detective mode (color-coded by bias type, not severity) */
+  defaultDetectiveMode?: boolean;
 }
 
 const SEVERITY_COLORS: Record<
@@ -99,21 +103,45 @@ export function DocumentTextHighlighter({
   content,
   biases,
   onBiasSelect,
+  defaultDetectiveMode = false,
 }: DocumentTextHighlighterProps) {
   const [selectedBiasIdx, setSelectedBiasIdx] = useState<number | null>(null);
   const [severityFilter, setSeverityFilter] = useState<string | null>(null);
   const [showHighlights, setShowHighlights] = useState(true);
+  const [detectiveMode, setDetectiveMode] = useState(defaultDetectiveMode);
+  const [biasTypeFilter, setBiasTypeFilter] = useState<string | null>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const sidebarRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
   const highlightRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
+
+  // Assign colors to each unique bias type for detective mode
+  const biasTypeColors = useMemo(() => {
+    resetBiasColors();
+    const uniqueTypes = Array.from(new Set(biases.map(b => b.biasType)));
+    const map = new Map<string, BiasColorSet>();
+    for (const t of uniqueTypes) {
+      map.set(t, getBiasColor(t));
+    }
+    return map;
+  }, [biases]);
+
+  const uniqueBiasTypes = useMemo(
+    () => Array.from(new Set(biases.map(b => b.biasType))),
+    [biases]
+  );
 
   const segments = useMemo(() => buildSegments(content, biases), [content, biases]);
 
   const filteredBiasIndices = useMemo(() => {
     return biases
       .map((_, i) => i)
-      .filter(i => !severityFilter || biases[i].severity.toLowerCase() === severityFilter);
-  }, [biases, severityFilter]);
+      .filter(i => {
+        if (detectiveMode) {
+          return !biasTypeFilter || biases[i].biasType === biasTypeFilter;
+        }
+        return !severityFilter || biases[i].severity.toLowerCase() === severityFilter;
+      });
+  }, [biases, severityFilter, detectiveMode, biasTypeFilter]);
 
   const handleBiasClick = useCallback(
     (idx: number) => {
@@ -145,10 +173,15 @@ export function DocumentTextHighlighter({
     [biases, onBiasSelect]
   );
 
-  // Keyboard: Escape to deselect
+  // Keyboard: Escape to deselect, D to toggle detective mode
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setSelectedBiasIdx(null);
+      if (e.key === 'd' || e.key === 'D') {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+        setDetectiveMode(prev => !prev);
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -173,27 +206,72 @@ export function DocumentTextHighlighter({
             <AlertTriangle size={18} className="text-warning" />
             Document Bias Highlighter
           </h3>
-          <div className="flex items-center gap-2">
-            {/* Severity filter pills */}
-            {severities.map(s => {
-              const colors = getSeverityColor(s);
-              const count = severityCounts[s];
-              if (count === 0) return null;
-              return (
-                <button
-                  key={s}
-                  onClick={() => setSeverityFilter(prev => (prev === s ? null : s))}
-                  className={`text-[10px] font-bold uppercase px-2 py-0.5 border transition-all duration-150 ${
-                    severityFilter === s
-                      ? `${colors.bg} ${colors.text} ${colors.border} ring-1 ring-offset-1 ring-offset-transparent`
-                      : `border-border text-muted hover:${colors.text}`
-                  }`}
-                  aria-pressed={severityFilter === s}
-                >
-                  {s} ({count})
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-2 flex-wrap">
+            {detectiveMode ? (
+              /* Bias-type filter pills in detective mode */
+              <>
+                {uniqueBiasTypes.map(biasType => {
+                  const color = biasTypeColors.get(biasType);
+                  const count = biases.filter(b => b.biasType === biasType).length;
+                  return (
+                    <button
+                      key={biasType}
+                      onClick={() => setBiasTypeFilter(prev => (prev === biasType ? null : biasType))}
+                      className="text-[10px] font-semibold px-2 py-0.5 border rounded-full transition-all duration-150"
+                      style={{
+                        backgroundColor: biasTypeFilter === biasType ? color?.bg : 'transparent',
+                        color: color?.text ?? '#a1a1aa',
+                        borderColor: biasTypeFilter === biasType ? color?.border : 'var(--border)',
+                      }}
+                      aria-pressed={biasTypeFilter === biasType}
+                    >
+                      {getBiasDisplayName(biasType)} ({count})
+                    </button>
+                  );
+                })}
+              </>
+            ) : (
+              /* Severity filter pills in normal mode */
+              <>
+                {severities.map(s => {
+                  const colors = getSeverityColor(s);
+                  const count = severityCounts[s];
+                  if (count === 0) return null;
+                  return (
+                    <button
+                      key={s}
+                      onClick={() => setSeverityFilter(prev => (prev === s ? null : s))}
+                      className={`text-[10px] font-bold uppercase px-2 py-0.5 border transition-all duration-150 ${
+                        severityFilter === s
+                          ? `${colors.bg} ${colors.text} ${colors.border} ring-1 ring-offset-1 ring-offset-transparent`
+                          : `border-border text-muted hover:${colors.text}`
+                      }`}
+                      aria-pressed={severityFilter === s}
+                    >
+                      {s} ({count})
+                    </button>
+                  );
+                })}
+              </>
+            )}
+            {/* Detective mode toggle */}
+            <button
+              onClick={() => {
+                setDetectiveMode(p => !p);
+                setBiasTypeFilter(null);
+                setSeverityFilter(null);
+              }}
+              className={`p-1 transition-colors rounded ${
+                detectiveMode
+                  ? 'text-purple-400 bg-purple-500/15'
+                  : 'text-muted hover:text-foreground'
+              }`}
+              title={detectiveMode ? 'Exit Detective Mode (D)' : 'Enter Detective Mode (D)'}
+              aria-label={detectiveMode ? 'Exit Detective Mode' : 'Enter Detective Mode'}
+              aria-pressed={detectiveMode}
+            >
+              <Search size={14} />
+            </button>
             {/* Toggle highlights */}
             <button
               onClick={() => setShowHighlights(p => !p)}
@@ -220,12 +298,76 @@ export function DocumentTextHighlighter({
         >
           {segments.map((seg, i) => {
             if (seg.biasIndex === null) {
-              return <span key={i}>{seg.text}</span>;
+              return (
+                <span
+                  key={i}
+                  style={detectiveMode && showHighlights ? { opacity: 0.55 } : undefined}
+                >
+                  {seg.text}
+                </span>
+              );
             }
 
             const bias = biases[seg.biasIndex];
-            const colors = getSeverityColor(bias.severity);
             const isSelected = selectedBiasIdx === seg.biasIndex;
+
+            if (detectiveMode) {
+              // Detective mode: color by bias type with inline labels
+              const typeColor = biasTypeColors.get(bias.biasType);
+              const isTypeFiltered = biasTypeFilter && bias.biasType !== biasTypeFilter;
+              const isVisible = showHighlights && !isTypeFiltered;
+
+              return (
+                <span
+                  key={i}
+                  ref={el => {
+                    if (el) highlightRefs.current.set(seg.biasIndex!, el);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${getBiasDisplayName(bias.biasType)} (${bias.severity})`}
+                  className={`relative cursor-pointer transition-all duration-200 ${
+                    isVisible ? 'underline decoration-2' : ''
+                  }`}
+                  style={isVisible ? {
+                    backgroundColor: typeColor?.bg,
+                    textDecorationColor: typeColor?.underline,
+                    ...(isSelected ? {
+                      outline: `2px solid ${typeColor?.border}`,
+                      outlineOffset: '1px',
+                    } : {}),
+                  } : { opacity: 0.55 }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleHighlightClick(seg.biasIndex!);
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleHighlightClick(seg.biasIndex!);
+                    }
+                  }}
+                >
+                  {/* Floating bias type label */}
+                  {isVisible && (
+                    <span
+                      className="absolute -top-5 left-0 text-[9px] font-bold px-1 py-px rounded whitespace-nowrap pointer-events-none z-10"
+                      style={{
+                        backgroundColor: typeColor?.border,
+                        color: '#fff',
+                      }}
+                    >
+                      {getBiasDisplayName(bias.biasType)}
+                    </span>
+                  )}
+                  {seg.text}
+                </span>
+              );
+            }
+
+            // Normal mode: color by severity
+            const colors = getSeverityColor(bias.severity);
             const isFiltered = severityFilter && bias.severity.toLowerCase() !== severityFilter;
             const isVisible = showHighlights && !isFiltered;
 
@@ -275,8 +417,58 @@ export function DocumentTextHighlighter({
           </div>
           {filteredBiasIndices.map(idx => {
             const bias = biases[idx];
-            const colors = getSeverityColor(bias.severity);
             const isSelected = selectedBiasIdx === idx;
+
+            if (detectiveMode) {
+              // Detective mode sidebar: colored by bias type
+              const typeColor = biasTypeColors.get(bias.biasType);
+              return (
+                <button
+                  key={idx}
+                  ref={el => {
+                    if (el) sidebarRefs.current.set(idx, el);
+                  }}
+                  onClick={() => handleBiasClick(idx)}
+                  className={`w-full text-left p-3 border-b border-border transition-all duration-150 group border-l-2`}
+                  style={{
+                    backgroundColor: isSelected ? typeColor?.bg : undefined,
+                    borderLeftColor: isSelected ? typeColor?.border ?? 'transparent' : 'transparent',
+                  }}
+                  aria-pressed={isSelected}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span
+                      className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: typeColor?.bg,
+                        color: typeColor?.text,
+                      }}
+                    >
+                      {getBiasDisplayName(bias.biasType)}
+                    </span>
+                    <ChevronRight
+                      size={12}
+                      className={`text-muted transition-transform ${isSelected ? 'rotate-90' : 'group-hover:translate-x-0.5'}`}
+                    />
+                  </div>
+                  <p className="text-[11px] text-muted italic line-clamp-2">
+                    &quot;{bias.excerpt}&quot;
+                  </p>
+                  {isSelected && (
+                    <div className="mt-2 pt-2 border-t border-border/50 space-y-2">
+                      <p className="text-[11px] text-muted">{bias.explanation}</p>
+                      <div className="p-2 bg-accent-primary/10 border border-accent-primary/20 text-[11px] text-accent-primary">
+                        <span className="font-semibold block mb-0.5">Suggestion</span>
+                        {bias.suggestion}
+                      </div>
+                    </div>
+                  )}
+                </button>
+              );
+            }
+
+            // Normal mode sidebar
+            const colors = getSeverityColor(bias.severity);
 
             return (
               <button
@@ -325,7 +517,8 @@ export function DocumentTextHighlighter({
       </div>
 
       <div className="p-2 text-center text-[10px] text-muted border-t border-border bg-secondary/20">
-        Click highlighted text or sidebar items to link them &bull; Press Esc to deselect
+        Click highlighted text or sidebar items to link them &bull; Press Esc to deselect &bull; Press D for{' '}
+        {detectiveMode ? 'normal mode' : 'detective mode'}
       </div>
     </div>
   );

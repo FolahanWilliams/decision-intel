@@ -70,7 +70,7 @@ const NAMED_PATTERNS: NamedPattern[] = [
     label: 'The Sunk Ship',
     description:
       'Sunk cost fallacy + anchoring bias with high monetary stakes leads to doubling down on failing strategies because of prior investment.',
-    biasTypes: ['sunk_cost_fallacy', 'anchoring'],
+    biasTypes: ['sunk_cost_fallacy', 'anchoring_bias'],
     contextRequired: { monetaryStakes: 'high' },
     baseScore: 80,
   },
@@ -102,7 +102,7 @@ const NAMED_PATTERNS: NamedPattern[] = [
     label: 'The Status Quo Lock',
     description:
       'Status quo bias + anchoring + absent dissent: the team defaults to "how we\'ve always done it" with nobody pushing for change.',
-    biasTypes: ['status_quo_bias', 'anchoring'],
+    biasTypes: ['status_quo_bias', 'anchoring_bias'],
     contextRequired: { dissentAbsent: true },
     baseScore: 70,
   },
@@ -113,6 +113,30 @@ const NAMED_PATTERNS: NamedPattern[] = [
     biasTypes: ['recency_bias', 'availability_heuristic'],
     contextRequired: { timePressure: true },
     baseScore: 72,
+  },
+  {
+    label: 'The Golden Child',
+    description:
+      'Halo effect + confirmation bias + authority bias: a charismatic leader or prestigious brand creates an aura that blinds the team to red flags.',
+    biasTypes: ['halo_effect', 'confirmation_bias', 'authority_bias'],
+    contextRequired: {},
+    baseScore: 82,
+  },
+  {
+    label: 'The Doubling Down',
+    description:
+      "Gambler's fallacy + overconfidence + sunk cost: the belief that losses must reverse leads to escalating commitment on a losing position.",
+    biasTypes: ['gamblers_fallacy', 'overconfidence_bias', 'sunk_cost_fallacy'],
+    contextRequired: { monetaryStakes: 'high' },
+    baseScore: 85,
+  },
+  {
+    label: 'The Deadline Panic',
+    description:
+      'Zeigarnik effect + planning fallacy under time pressure: incomplete-task anxiety compresses timelines and drives rushed decisions to achieve closure.',
+    biasTypes: ['zeigarnik_effect', 'planning_fallacy'],
+    contextRequired: { timePressure: true },
+    baseScore: 78,
   },
 ];
 
