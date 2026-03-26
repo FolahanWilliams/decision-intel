@@ -485,6 +485,7 @@ export default function LandingPage() {
   const [annualDecisions, setAnnualDecisions] = useState(5000);
   const [avgDecisionValue, setAvgDecisionValue] = useState(10000);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [isAnnual, setIsAnnual] = useState(false);
 
   const handleCheckout = async (plan: 'pro' | 'team') => {
     setCheckoutLoading(plan);
@@ -2210,9 +2211,9 @@ export default function LandingPage() {
                 <tbody>
                   {[
                     {
-                      dimension: 'Cost',
+                      dimension: 'Annual cost',
                       consulting: '$500K\u2013$2M per engagement',
-                      di: '$199/mo per team',
+                      di: 'From $1,548/yr \u2014 0.3% of one engagement',
                     },
                     {
                       dimension: 'Speed',
@@ -2303,9 +2304,9 @@ export default function LandingPage() {
             >
               {[
                 {
-                  dimension: 'Cost',
+                  dimension: 'Annual cost',
                   consulting: '$500K\u2013$2M per engagement',
-                  di: '$199/mo per team',
+                  di: 'From $1,548/yr \u2014 0.3% of one engagement',
                 },
                 {
                   dimension: 'Speed',
@@ -2392,6 +2393,99 @@ export default function LandingPage() {
               ))}
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      <SectionDivider variant="wave" color="rgba(255, 255, 255, 0.06)" />
+
+      {/* Anti-SaaS Positioning Section */}
+      <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
+        <div className="relative z-10" style={containerStyle}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-14 max-w-3xl mx-auto text-center"
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '12px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              AI Is Replacing Commodity SaaS. We&apos;re the Opposite.
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
+              Most software tools are being commoditized by AI. Decision Intel is fundamentally
+              different — it doesn&apos;t get replaced by AI. It <em>is</em> the AI.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[
+              {
+                icon: Zap,
+                title: 'Most SaaS is being replaced by AI.',
+                body: 'Generic dashboards, form builders, and workflow tools are commoditized by LLMs that build them on demand. Decision Intel is fundamentally different — every improvement in foundation models makes our bias detection more accurate, not more replaceable.',
+              },
+              {
+                icon: TrendingUp,
+                title: 'Our moat grows with every decision you track.',
+                body: 'SaaS tools store your data but don\u2019t learn from it. Decision Intel builds a proprietary calibration dataset from your verified outcomes. After 6 months, your instance knows which biases cost YOUR organization the most. No competitor can replicate that.',
+              },
+              {
+                icon: Brain,
+                title: 'Cognitive bias detection requires AI. There is no manual alternative.',
+                body: 'You can\u2019t detect anchoring bias by reading more carefully. You can\u2019t measure decision noise with a spreadsheet. The 188 documented biases operate below conscious awareness — only systematic AI analysis surfaces them reliably.',
+              },
+            ].map((card, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  padding: '28px 24px',
+                }}
+              >
+                <card.icon
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    color: 'rgba(34, 197, 94, 0.7)',
+                    marginBottom: '16px',
+                  }}
+                />
+                <h3
+                  style={{
+                    fontSize: '1rem',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    marginBottom: '10px',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {card.title}
+                </h3>
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-muted)',
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {card.body}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -2724,12 +2818,74 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              Simple, Transparent Pricing
+              What Would You Pay to Avoid Your Next $10M Mistake?
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
-              Start free. Scale as your team&apos;s decision quality improves.
+              A single consulting engagement costs $500K–$2M. Decision Intel runs continuously for
+              less than the cost of one junior analyst.
             </p>
           </motion.div>
+
+          {/* Annual / Monthly Toggle */}
+          <div className="flex justify-center mb-10">
+            <div
+              style={{
+                display: 'inline-flex',
+                borderRadius: '9999px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: 'rgba(255, 255, 255, 0.03)',
+                padding: '4px',
+              }}
+            >
+              <button
+                onClick={() => setIsAnnual(false)}
+                style={{
+                  padding: '8px 20px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  background: !isAnnual ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+                  color: !isAnnual ? 'var(--text-primary)' : 'var(--text-muted)',
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setIsAnnual(true)}
+                style={{
+                  padding: '8px 20px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  background: isAnnual ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+                  color: isAnnual ? 'var(--text-primary)' : 'var(--text-muted)',
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                Annual
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    color: 'rgba(34, 197, 94, 0.9)',
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                  }}
+                >
+                  Save 20%
+                </span>
+              </button>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {/* Free Tier */}
@@ -2796,6 +2952,16 @@ export default function LandingPage() {
                   )
                 )}
               </div>
+              <p
+                style={{
+                  fontSize: '0.78rem',
+                  color: 'var(--text-muted)',
+                  fontStyle: 'italic',
+                  marginBottom: '12px',
+                }}
+              >
+                For analysts exploring decision science.
+              </p>
               <Link
                 href="/login"
                 style={{
@@ -2846,7 +3012,7 @@ export default function LandingPage() {
                   letterSpacing: '0.02em',
                 }}
               >
-                Most Popular
+                Best for Individuals
               </div>
               <h3
                 style={{
@@ -2860,9 +3026,11 @@ export default function LandingPage() {
               </h3>
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  $49
+                  {isAnnual ? '$103' : '$129'}
                 </span>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/month</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  /month{isAnnual ? ', billed annually' : ''}
+                </span>
               </div>
               <div
                 style={{
@@ -2874,12 +3042,12 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  '30 analyses/month',
-                  '50 page max',
+                  '50 analyses/month',
+                  '100 page documents',
                   'All 20 bias types',
-                  'Noise analysis',
-                  'Outcome tracking',
-                  'Email support',
+                  'Noise analysis + Decision Twins',
+                  'Outcome tracking + calibration',
+                  'Priority email support',
                 ].map((feature, i) => (
                   <div
                     key={i}
@@ -2903,6 +3071,16 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
+              <p
+                style={{
+                  fontSize: '0.78rem',
+                  color: 'var(--text-muted)',
+                  fontStyle: 'italic',
+                  marginBottom: '12px',
+                }}
+              >
+                For strategists and investment professionals making high-stakes calls.
+              </p>
               <button
                 onClick={() => handleCheckout('pro')}
                 disabled={checkoutLoading === 'pro'}
@@ -2933,13 +3111,31 @@ export default function LandingPage() {
               transition={{ delay: 0.3 }}
               style={{
                 background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
                 borderRadius: '16px',
                 padding: '28px 24px',
                 display: 'flex',
                 flexDirection: 'column',
+                position: 'relative',
               }}
             >
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-12px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: 'rgba(34, 197, 94, 0.9)',
+                  color: '#000000',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  padding: '4px 14px',
+                  borderRadius: '9999px',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                Best for Teams
+              </div>
               <h3
                 style={{
                   fontSize: '1.1rem',
@@ -2952,9 +3148,11 @@ export default function LandingPage() {
               </h3>
               <div style={{ marginBottom: '4px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  $199
+                  {isAnnual ? '$399' : '$499'}
                 </span>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/month</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  /month{isAnnual ? ', billed annually' : ''}
+                </span>
               </div>
               <div
                 style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '20px' }}
@@ -2971,13 +3169,13 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  '150 analyses/month',
-                  '100 page max',
+                  '250 analyses/month',
+                  '200 page documents',
                   'All 20 bias types',
-                  'Noise + Compliance (FCA/SOX/Basel)',
-                  'Org + sharing',
-                  'Slack integration',
-                  'Priority support',
+                  'Compliance frameworks (FCA/SOX/Basel)',
+                  'Team cognitive profiles + sharing',
+                  'Slack integration + API access',
+                  'Dedicated support channel',
                 ].map((feature, i) => (
                   <div
                     key={i}
@@ -3001,6 +3199,16 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
+              <p
+                style={{
+                  fontSize: '0.78rem',
+                  color: 'var(--text-muted)',
+                  fontStyle: 'italic',
+                  marginBottom: '12px',
+                }}
+              >
+                For strategy teams, investment committees, and executive leadership.
+              </p>
               <button
                 onClick={() => handleCheckout('team')}
                 disabled={checkoutLoading === 'team'}
@@ -3062,10 +3270,12 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  'Unlimited everything',
-                  'Custom frameworks',
-                  'SSO + audit log + API',
+                  'Unlimited analyses + documents',
+                  'Custom compliance frameworks',
+                  'SSO + audit log + full API',
                   'Dedicated CSM',
+                  'Custom model fine-tuning',
+                  'On-premise deployment option',
                 ].map((feature, i) => (
                   <div
                     key={i}
@@ -3089,6 +3299,16 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
+              <p
+                style={{
+                  fontSize: '0.78rem',
+                  color: 'var(--text-muted)',
+                  fontStyle: 'italic',
+                  marginBottom: '12px',
+                }}
+              >
+                For organizations embedding decision quality into operations.
+              </p>
               <a
                 href="mailto:hello@decisionintel.ai"
                 style={{
@@ -3121,7 +3341,8 @@ export default function LandingPage() {
               marginTop: '24px',
             }}
           >
-            All paid plans include a 14-day free trial. No credit card required to start.
+            All paid plans include a 14-day free trial. No credit card required to start. For
+            context: a single McKinsey engagement costs more than 80 years of Decision Intel Team.
           </motion.p>
         </div>
       </section>

@@ -27,15 +27,15 @@ export const PLANS = {
   pro: {
     name: 'Pro',
     priceId: process.env.STRIPE_PRO_PRICE_ID || '',
-    analysesPerMonth: 30,
-    maxPages: 50,
+    analysesPerMonth: 50,
+    maxPages: 100,
     biasTypes: 20,
   },
   team: {
     name: 'Team',
     priceId: process.env.STRIPE_TEAM_PRICE_ID || '',
-    analysesPerMonth: 150,
-    maxPages: 100,
+    analysesPerMonth: 250,
+    maxPages: 200,
     biasTypes: 20,
   },
   enterprise: {
