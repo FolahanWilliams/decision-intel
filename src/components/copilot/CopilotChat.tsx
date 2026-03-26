@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Sparkles, Swords, Telescope, BarChart3, Brain } from 'lucide-react';
+import { Send, Loader2, Sparkles, Swords, Telescope, BarChart3, Brain, CheckCircle, X } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { AgentBadge } from './AgentBadge';
 import { type CopilotMessage } from '@/hooks/useCopilotStream';
 import { type CopilotAgentType } from '@/lib/copilot/types';
@@ -12,6 +13,8 @@ interface CopilotChatProps {
   error: string | null;
   activeAgent: CopilotAgentType | null;
   onSendMessage: (text: string, forcedAgent?: CopilotAgentType) => void;
+  onResolve?: () => void;
+  onDismissError?: () => void;
 }
 
 const QUICK_ACTIONS: Array<{ label: string; icon: React.ComponentType<{ className?: string }>; agent: CopilotAgentType; prompt: string }> = [
@@ -21,7 +24,7 @@ const QUICK_ACTIONS: Array<{ label: string; icon: React.ComponentType<{ classNam
   { label: 'What would I do?', icon: Brain, agent: 'personal_twin', prompt: 'Based on my decision history and patterns, what would I likely do here? Give me my personal twin\'s perspective.' },
 ];
 
-export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendMessage }: CopilotChatProps) {
+export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendMessage, onResolve, onDismissError }: CopilotChatProps) {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -83,8 +86,12 @@ export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendM
                   <AgentBadge agentType={msg.agentType} />
                 </div>
               )}
-              <div className="text-sm whitespace-pre-wrap leading-relaxed">
-                {msg.content}
+              <div className="text-sm leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2">
+                {msg.role === 'agent' ? (
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                ) : (
+                  <span className="whitespace-pre-wrap">{msg.content}</span>
+                )}
                 {msg.isStreaming && (
                   <span className="ml-1 inline-block h-4 w-1 animate-pulse bg-zinc-400" />
                 )}
@@ -104,8 +111,13 @@ export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendM
         ))}
 
         {error && (
-          <div className="rounded-lg bg-red-900/30 border border-red-800 p-3 text-sm text-red-300">
-            {error}
+          <div className="rounded-lg bg-red-900/30 border border-red-800 p-3 text-sm text-red-300 flex items-center justify-between">
+            <span>{error}</span>
+            {onDismissError && (
+              <button onClick={onDismissError} className="ml-2 text-red-400 hover:text-red-200">
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -123,6 +135,15 @@ export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendM
               {action.label}
             </button>
           ))}
+          {onResolve && (
+            <button
+              onClick={onResolve}
+              className="inline-flex items-center gap-1 rounded-full border border-green-700 bg-green-900/30 px-3 py-1.5 text-xs text-green-300 hover:bg-green-800/40 hover:text-green-200 transition-colors ml-auto"
+            >
+              <CheckCircle className="h-3 w-3" />
+              Resolve Decision
+            </button>
+          )}
         </div>
       )}
 

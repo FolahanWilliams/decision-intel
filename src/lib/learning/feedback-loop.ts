@@ -178,7 +178,7 @@ export async function recalibrateBiasSeverity(
   const MIN_SAMPLE_SIZE = 5;
 
   try {
-    // Fetch all outcomes with bias feedback
+    // Fetch all outcomes with bias feedback (from both analysis and copilot workflows)
     const outcomes = await prisma.decisionOutcome.findMany({
       where: {
         ...(orgId ? { orgId } : {}),
@@ -192,11 +192,28 @@ export async function recalibrateBiasSeverity(
       },
     });
 
+    // Also load copilot outcomes to increase sample size for org-level metrics
+    let copilotOutcomeCount = 0;
+    try {
+      const copilotOutcomes = await prisma.copilotOutcome.findMany({
+        where: {
+          ...(orgId ? { orgId } : {}),
+          outcome: { in: ['success', 'partial_success', 'failure'] },
+        },
+        select: { outcome: true, impactScore: true },
+      });
+      copilotOutcomeCount = copilotOutcomes.length;
+    } catch {
+      // CopilotOutcome table may not exist yet (schema drift)
+    }
+
+    const totalSampleSize = outcomes.length + copilotOutcomeCount;
+
     if (outcomes.length < MIN_SAMPLE_SIZE) {
       log.info(
-        `Insufficient outcome data for bias calibration: ${outcomes.length}/${MIN_SAMPLE_SIZE}`
+        `Insufficient outcome data for bias calibration: ${outcomes.length}/${MIN_SAMPLE_SIZE} (+ ${copilotOutcomeCount} copilot outcomes)`
       );
-      return { updated: false, sampleSize: outcomes.length };
+      return { updated: false, sampleSize: totalSampleSize };
     }
 
     // Aggregate per-bias-type confirmation rates
@@ -298,18 +315,18 @@ export async function recalibrateBiasSeverity(
         userId: null,
         profileType: 'bias_severity',
         calibrationData: JSON.parse(JSON.stringify(calibrationData)) as Prisma.InputJsonValue,
-        sampleSize: outcomes.length,
+        sampleSize: totalSampleSize,
         lastCalibratedAt: new Date(),
       },
       update: {
         calibrationData: JSON.parse(JSON.stringify(calibrationData)) as Prisma.InputJsonValue,
-        sampleSize: outcomes.length,
+        sampleSize: totalSampleSize,
         lastCalibratedAt: new Date(),
       },
     });
 
     log.info(
-      `Bias severity calibrated for ${orgId || 'global'}: ${Object.keys(confirmationRates).length} bias types, ${outcomes.length} outcomes`
+      `Bias severity calibrated for ${orgId || 'global'}: ${Object.keys(confirmationRates).length} bias types, ${outcomes.length} analysis outcomes + ${copilotOutcomeCount} copilot outcomes`
     );
     return { updated: true, sampleSize: outcomes.length };
   } catch (error) {
@@ -441,12 +458,32 @@ export async function recalibrateTwinWeights(
       },
     });
 
-    if (outcomes.length < MIN_SAMPLE_SIZE) {
-      log.info(`Insufficient twin data for calibration: ${outcomes.length}/${MIN_SAMPLE_SIZE}`);
-      return { updated: false, sampleSize: outcomes.length };
+    // Also load copilot outcomes — helpfulAgents maps to "most accurate twin" equivalent
+    let copilotTwinData: Array<{ helpfulAgents: string[]; outcome: string; impactScore: number | null }> = [];
+    try {
+      copilotTwinData = await prisma.copilotOutcome.findMany({
+        where: {
+          ...(orgId ? { orgId } : {}),
+          helpfulAgents: { isEmpty: false },
+        },
+        select: {
+          helpfulAgents: true,
+          outcome: true,
+          impactScore: true,
+        },
+      });
+    } catch {
+      // CopilotOutcome table may not exist yet (schema drift)
     }
 
-    // Aggregate per-persona
+    const totalSampleSize = outcomes.length + copilotTwinData.length;
+
+    if (totalSampleSize < MIN_SAMPLE_SIZE) {
+      log.info(`Insufficient twin data for calibration: ${totalSampleSize}/${MIN_SAMPLE_SIZE}`);
+      return { updated: false, sampleSize: totalSampleSize };
+    }
+
+    // Aggregate per-persona from DecisionOutcome
     const twinStats: Record<
       string,
       { total: number; successfulPredictions: number; totalImpact: number }
@@ -466,10 +503,27 @@ export async function recalibrateTwinWeights(
       }
     }
 
+    // Merge copilot outcomes — each helpful agent in a successful outcome gets credited
+    for (const co of copilotTwinData) {
+      const isSuccess = co.outcome === 'success' || co.outcome === 'partial_success';
+      for (const agent of co.helpfulAgents) {
+        if (!twinStats[agent]) {
+          twinStats[agent] = { total: 0, successfulPredictions: 0, totalImpact: 0 };
+        }
+        twinStats[agent].total++;
+        if (isSuccess) {
+          twinStats[agent].successfulPredictions++;
+        }
+        if (co.impactScore) {
+          twinStats[agent].totalImpact += co.impactScore;
+        }
+      }
+    }
+
     const personas: TwinWeightCalibration['personas'] = {};
     for (const [name, stats] of Object.entries(twinStats)) {
       personas[name] = {
-        accuracyRate: Number((stats.total / outcomes.length).toFixed(3)),
+        accuracyRate: Number((stats.total / totalSampleSize).toFixed(3)),
         avgImpact: stats.total > 0 ? Number((stats.totalImpact / stats.total).toFixed(1)) : 0,
         sampleSize: stats.total,
       };
@@ -490,18 +544,18 @@ export async function recalibrateTwinWeights(
         userId: null,
         profileType: 'twin_weight',
         calibrationData: JSON.parse(JSON.stringify(calibrationData)) as Prisma.InputJsonValue,
-        sampleSize: outcomes.length,
+        sampleSize: totalSampleSize,
         lastCalibratedAt: new Date(),
       },
       update: {
         calibrationData: JSON.parse(JSON.stringify(calibrationData)) as Prisma.InputJsonValue,
-        sampleSize: outcomes.length,
+        sampleSize: totalSampleSize,
         lastCalibratedAt: new Date(),
       },
     });
 
     log.info(
-      `Twin weights calibrated for ${orgId || 'global'}: ${Object.keys(personas).length} personas, ${outcomes.length} outcomes`
+      `Twin weights calibrated for ${orgId || 'global'}: ${Object.keys(personas).length} personas, ${outcomes.length} analysis + ${copilotTwinData.length} copilot outcomes`
     );
     return { updated: true, sampleSize: outcomes.length };
   } catch (error) {
