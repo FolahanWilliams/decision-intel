@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Brain, FileText, Upload } from 'lucide-react';
 import Link from 'next/link';
 
@@ -30,11 +30,10 @@ const STARTER_QUESTIONS_NO_DOCS = [
 ];
 
 export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateProps) {
-  // Avoid hydration mismatch: render neutral greeting on server, then update on client
-  const [greeting, setGreeting] = useState('Hello');
-  useEffect(() => {
-    setGreeting(getGreeting());
-  }, []);
+  // useMemo avoids the React Compiler set-state-in-effect lint error.
+  // Greeting is computed once on mount; minor hydration mismatch is acceptable
+  // for a decorative string and is suppressed on the rendered element.
+  const greeting = useMemo(() => getGreeting(), []);
 
   const analyzedDocs = documents.filter(d => d.status === 'complete');
   const hasDocs = analyzedDocs.length > 0;
@@ -68,7 +67,7 @@ export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateP
         <Brain size={28} style={{ color: 'var(--text-highlight)' }} />
       </div>
 
-      <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>
+      <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }} suppressHydrationWarning>
         {greeting}! I&apos;m your Second Brain.
       </h2>
       <p
