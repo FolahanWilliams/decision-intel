@@ -265,7 +265,13 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
     outcome: 'catastrophic_failure',
     impactScore: 85,
     estimatedLoss: '€1.9B',
-    biasesPresent: ['confirmation_bias', 'authority_bias', 'groupthink', 'selective_perception', 'halo_effect'],
+    biasesPresent: [
+      'confirmation_bias',
+      'authority_bias',
+      'groupthink',
+      'selective_perception',
+      'halo_effect',
+    ],
     primaryBias: 'confirmation_bias',
     toxicCombinations: ['Echo Chamber', 'Yes Committee', 'Golden Child'],
     contextFactors: {

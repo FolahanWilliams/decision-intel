@@ -25,24 +25,20 @@ function getZone(ratio: number) {
 }
 
 function getZoneLabel(ratio: number) {
-  if (ratio < 0.4) return { text: 'Deliberative process', color: 'text-blue-400', bg: 'bg-blue-500/15' };
-  if (ratio <= 0.6) return { text: 'Balanced process', color: 'text-zinc-400', bg: 'bg-zinc-500/15' };
-  if (ratio <= 0.8) return { text: 'Heuristic-leaning', color: 'text-orange-400', bg: 'bg-orange-500/15' };
+  if (ratio < 0.4)
+    return { text: 'Deliberative process', color: 'text-blue-400', bg: 'bg-blue-500/15' };
+  if (ratio <= 0.6)
+    return { text: 'Balanced process', color: 'text-zinc-400', bg: 'bg-zinc-500/15' };
+  if (ratio <= 0.8)
+    return { text: 'Heuristic-leaning', color: 'text-orange-400', bg: 'bg-orange-500/15' };
   return { text: 'Heuristic-dominant', color: 'text-red-400', bg: 'bg-red-500/15' };
 }
 
-export function System1GaugeBar({
-  ratio,
-  showLabels = true,
-  height = 20,
-}: System1GaugeBarProps) {
+export function System1GaugeBar({ ratio, showLabels = true, height = 20 }: System1GaugeBarProps) {
   if (ratio === null || ratio === undefined) {
     return (
       <div className="flex items-center gap-2 py-2">
-        <div
-          className="flex-1 rounded-full bg-zinc-800/60"
-          style={{ height }}
-        />
+        <div className="flex-1 rounded-full bg-zinc-800/60" style={{ height }} />
         <span className="text-xs text-muted whitespace-nowrap">Insufficient data</span>
       </div>
     );
@@ -88,14 +84,8 @@ export function System1GaugeBar({
           }}
         >
           {/* Zone markers at 40% and 60% */}
-          <div
-            className="absolute top-0 bottom-0 w-px bg-zinc-600/40"
-            style={{ left: '40%' }}
-          />
-          <div
-            className="absolute top-0 bottom-0 w-px bg-zinc-600/40"
-            style={{ left: '60%' }}
-          />
+          <div className="absolute top-0 bottom-0 w-px bg-zinc-600/40" style={{ left: '40%' }} />
+          <div className="absolute top-0 bottom-0 w-px bg-zinc-600/40" style={{ left: '60%' }} />
         </div>
 
         {/* Animated marker */}
@@ -106,10 +96,7 @@ export function System1GaugeBar({
           animate={{ left: `${clampedRatio * 100}%` }}
           transition={{ type: 'spring', stiffness: 80, damping: 15, delay: 0.2 }}
         >
-          <div
-            className="relative flex flex-col items-center"
-            style={{ marginLeft: -10 }}
-          >
+          <div className="relative flex flex-col items-center" style={{ marginLeft: -10 }}>
             {/* Triangle pointer */}
             <div
               className="w-0 h-0"
@@ -140,9 +127,7 @@ export function System1GaugeBar({
         >
           {zoneLabel.text}
         </span>
-        <span className="text-xs text-muted">
-          {pct}% heuristic
-        </span>
+        <span className="text-xs text-muted">{pct}% heuristic</span>
       </div>
     </div>
   );

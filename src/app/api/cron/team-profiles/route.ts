@@ -67,9 +67,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const orgIds = orgsWithAnalyses
-      .map((o) => o.orgId)
-      .filter((id): id is string => id != null);
+    const orgIds = orgsWithAnalyses.map(o => o.orgId).filter((id): id is string => id != null);
 
     if (orgIds.length === 0) {
       return NextResponse.json({
@@ -104,14 +102,13 @@ export async function GET(req: NextRequest) {
           analyses.reduce((sum, a) => sum + a.overallScore, 0) / analyses.length;
 
         // avgNoiseScore
-        const avgNoiseScore =
-          analyses.reduce((sum, a) => sum + a.noiseScore, 0) / analyses.length;
+        const avgNoiseScore = analyses.reduce((sum, a) => sum + a.noiseScore, 0) / analyses.length;
 
         // totalDecisions
         const totalDecisions = analyses.length;
 
         // topBiases: frequency count of bias types across all analyses
-        const analysisIds = analyses.map((a) => a.id);
+        const analysisIds = analyses.map(a => a.id);
         const biasInstances = await prisma.biasInstance.findMany({
           where: { analysisId: { in: analysisIds } },
           select: { biasType: true, severity: true },
@@ -173,12 +170,11 @@ export async function GET(req: NextRequest) {
           const weekEnd = new Date(now.getTime() - i * 7 * 24 * 60 * 60 * 1000);
           const weekStart = new Date(weekEnd.getTime() - 7 * 24 * 60 * 60 * 1000);
           const weekAnalyses = analyses.filter(
-            (a) => a.createdAt >= weekStart && a.createdAt < weekEnd
+            a => a.createdAt >= weekStart && a.createdAt < weekEnd
           );
           if (weekAnalyses.length > 0) {
             const avgScore =
-              weekAnalyses.reduce((sum, a) => sum + a.overallScore, 0) /
-              weekAnalyses.length;
+              weekAnalyses.reduce((sum, a) => sum + a.overallScore, 0) / weekAnalyses.length;
             consistencyTrend.push({
               date: weekStart.toISOString().split('T')[0],
               score: Math.round(avgScore * 100) / 100,
@@ -201,9 +197,7 @@ export async function GET(req: NextRequest) {
             topBiases: toPrismaJson(topBiases) as Prisma.InputJsonValue,
             totalDecisions,
             nudgeEffectiveness: toPrismaJson(nudgeEffectiveness),
-            consistencyTrend: toPrismaJson(
-              consistencyTrend.length > 0 ? consistencyTrend : null
-            ),
+            consistencyTrend: toPrismaJson(consistencyTrend.length > 0 ? consistencyTrend : null),
           },
           create: {
             orgId,
@@ -214,9 +208,7 @@ export async function GET(req: NextRequest) {
             topBiases: toPrismaJson(topBiases) as Prisma.InputJsonValue,
             totalDecisions,
             nudgeEffectiveness: toPrismaJson(nudgeEffectiveness),
-            consistencyTrend: toPrismaJson(
-              consistencyTrend.length > 0 ? consistencyTrend : null
-            ),
+            consistencyTrend: toPrismaJson(consistencyTrend.length > 0 ? consistencyTrend : null),
           },
         });
 

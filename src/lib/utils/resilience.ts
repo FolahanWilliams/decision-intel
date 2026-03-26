@@ -308,9 +308,13 @@ export class CircuitBreaker {
     if (this.state === 'open') {
       if (Date.now() - this.lastFailureTime >= this.recoveryTimeMs) {
         this.state = 'half-open';
-        log.info(`[CircuitBreaker:${this.name}] Transitioning to half-open, allowing probe request`);
+        log.info(
+          `[CircuitBreaker:${this.name}] Transitioning to half-open, allowing probe request`
+        );
       } else {
-        throw new Error(`[CircuitBreaker:${this.name}] Circuit is OPEN — service unavailable, retry after ${Math.ceil((this.recoveryTimeMs - (Date.now() - this.lastFailureTime)) / 1000)}s`);
+        throw new Error(
+          `[CircuitBreaker:${this.name}] Circuit is OPEN — service unavailable, retry after ${Math.ceil((this.recoveryTimeMs - (Date.now() - this.lastFailureTime)) / 1000)}s`
+        );
       }
     }
 

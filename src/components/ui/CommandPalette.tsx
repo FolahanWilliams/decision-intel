@@ -278,7 +278,9 @@ export function CommandPalette() {
           const docs = document.querySelectorAll('[data-document-row]');
           if (docs.length > 0) {
             // Dispatch export event for the documents page to handle
-            window.dispatchEvent(new CustomEvent('command-palette-export', { detail: { format: 'csv' } }));
+            window.dispatchEvent(
+              new CustomEvent('command-palette-export', { detail: { format: 'csv' } })
+            );
           } else {
             // Fallback: print current page as PDF
             window.print();
@@ -439,7 +441,9 @@ export function CommandPalette() {
         e.preventDefault();
         const docs = document.querySelectorAll('[data-document-row]');
         if (docs.length > 0) {
-          window.dispatchEvent(new CustomEvent('command-palette-export', { detail: { format: 'csv' } }));
+          window.dispatchEvent(
+            new CustomEvent('command-palette-export', { detail: { format: 'csv' } })
+          );
         } else {
           window.print();
         }

@@ -161,9 +161,7 @@ export async function GET(request: NextRequest) {
         participantCount: twins.length,
         documentLength: wordCount,
         system1Ratio: (() => {
-          const biasTypes = (biasesRaw ?? []).map(
-            (b: { type?: string }) => b.type ?? ''
-          );
+          const biasTypes = (biasesRaw ?? []).map((b: { type?: string }) => b.type ?? '');
           if (biasTypes.length === 0) return undefined;
           const system1Count = biasTypes.filter((t: string) => {
             const node = BIAS_NODES.find(n => n.id === t);

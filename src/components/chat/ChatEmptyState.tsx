@@ -67,7 +67,10 @@ export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateP
         <Brain size={28} style={{ color: 'var(--text-highlight)' }} />
       </div>
 
-      <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }} suppressHydrationWarning>
+      <h2
+        style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}
+        suppressHydrationWarning
+      >
         {greeting}! I&apos;m your Second Brain.
       </h2>
       <p

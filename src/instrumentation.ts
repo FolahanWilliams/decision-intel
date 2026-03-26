@@ -7,7 +7,10 @@ export async function register() {
       assertEnvValid();
       console.log('[Instrumentation] ✓ Environment variables validated');
     } catch (err) {
-      console.error('[Instrumentation] ✗ Environment validation failed:', err instanceof Error ? err.message : err);
+      console.error(
+        '[Instrumentation] ✗ Environment validation failed:',
+        err instanceof Error ? err.message : err
+      );
       // Don't crash the server — just warn loudly
     }
   }

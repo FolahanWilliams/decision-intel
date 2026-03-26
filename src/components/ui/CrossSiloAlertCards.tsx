@@ -26,45 +26,44 @@ interface CrossSiloAlertCardsProps {
   onExplorePattern?: (nodeIds: string[]) => void;
 }
 
-const PATTERN_CONFIG: Record<
-  string,
-  { icon: typeof Layers; label: string; accentClass: string }
-> = {
-  knowledge_fragmentation: {
-    icon: Layers,
-    label: 'Knowledge Fragmentation',
-    accentClass: 'purple',
-  },
-  echo_chamber_cluster: {
-    icon: Radio,
-    label: 'Echo Chamber',
-    accentClass: 'amber',
-  },
-  cascade_failure: {
-    icon: TrendingDown,
-    label: 'Cascade Failure',
-    accentClass: 'red',
-  },
-  isolated_high_risk: {
-    icon: Unplug,
-    label: 'Isolated High Risk',
-    accentClass: 'orange',
-  },
-  bias_concentration: {
-    icon: AlertTriangle,
-    label: 'Bias Concentration',
-    accentClass: 'yellow',
-  },
-  reversal_chain: {
-    icon: TrendingDown,
-    label: 'Reversal Chain',
-    accentClass: 'red',
-  },
-};
+const PATTERN_CONFIG: Record<string, { icon: typeof Layers; label: string; accentClass: string }> =
+  {
+    knowledge_fragmentation: {
+      icon: Layers,
+      label: 'Knowledge Fragmentation',
+      accentClass: 'purple',
+    },
+    echo_chamber_cluster: {
+      icon: Radio,
+      label: 'Echo Chamber',
+      accentClass: 'amber',
+    },
+    cascade_failure: {
+      icon: TrendingDown,
+      label: 'Cascade Failure',
+      accentClass: 'red',
+    },
+    isolated_high_risk: {
+      icon: Unplug,
+      label: 'Isolated High Risk',
+      accentClass: 'orange',
+    },
+    bias_concentration: {
+      icon: AlertTriangle,
+      label: 'Bias Concentration',
+      accentClass: 'yellow',
+    },
+    reversal_chain: {
+      icon: TrendingDown,
+      label: 'Reversal Chain',
+      accentClass: 'red',
+    },
+  };
 
 function getSeverityStyle(severity: number) {
   if (severity >= 70) return { border: 'border-red-500/30', bg: 'bg-red-500/5', dot: 'bg-red-400' };
-  if (severity >= 40) return { border: 'border-amber-500/30', bg: 'bg-amber-500/5', dot: 'bg-amber-400' };
+  if (severity >= 40)
+    return { border: 'border-amber-500/30', bg: 'bg-amber-500/5', dot: 'bg-amber-400' };
   return { border: 'border-green-500/30', bg: 'bg-green-500/5', dot: 'bg-green-400' };
 }
 
@@ -84,12 +83,7 @@ export function CrossSiloAlertCards({ antiPatterns, onExplorePattern }: CrossSil
         {significant
           .sort((a, b) => b.severity - a.severity)
           .map((pattern, i) => (
-            <AlertCard
-              key={i}
-              pattern={pattern}
-              onExplore={onExplorePattern}
-              delay={i * 60}
-            />
+            <AlertCard key={i} pattern={pattern} onExplore={onExplorePattern} delay={i * 60} />
           ))}
       </div>
     </div>

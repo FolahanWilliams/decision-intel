@@ -138,9 +138,7 @@ export default function JournalPage() {
         body: JSON.stringify({}),
       });
       if (res.ok) {
-        setEntries(prev =>
-          prev.map(e => (e.id === entryId ? { ...e, status: 'processed' } : e))
-        );
+        setEntries(prev => prev.map(e => (e.id === entryId ? { ...e, status: 'processed' } : e)));
       }
     } catch {
       // Silent fail
@@ -327,8 +325,7 @@ export default function JournalPage() {
                 sourceFilter === filter.key
                   ? '1px solid rgba(255, 255, 255, 0.2)'
                   : '1px solid rgba(255, 255, 255, 0.06)',
-              color:
-                sourceFilter === filter.key ? 'var(--text-primary)' : 'var(--text-muted)',
+              color: sourceFilter === filter.key ? 'var(--text-primary)' : 'var(--text-muted)',
               cursor: 'pointer',
             }}
           >
@@ -348,15 +345,12 @@ export default function JournalPage() {
             onClick={() => setStatusFilter(tab.key)}
             className="px-4 py-2 text-xs font-medium transition-colors"
             style={{
-              background:
-                statusFilter === tab.key ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-              color:
-                statusFilter === tab.key ? 'var(--text-primary)' : 'var(--text-muted)',
+              background: statusFilter === tab.key ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+              color: statusFilter === tab.key ? 'var(--text-primary)' : 'var(--text-muted)',
               borderRight: '1px solid rgba(255, 255, 255, 0.06)',
               cursor: 'pointer',
               border: 'none',
-              borderLeft:
-                tab.key !== 'all' ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
+              borderLeft: tab.key !== 'all' ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
             }}
           >
             {tab.label}
@@ -399,12 +393,10 @@ export default function JournalPage() {
           <AnimatePresence>
             {entries.map(entry => {
               const Icon = SOURCE_ICONS[entry.source] || BookOpen;
-              const badgeStyle =
-                STATUS_BADGE_STYLES[entry.status] || STATUS_BADGE_STYLES.pending;
+              const badgeStyle = STATUS_BADGE_STYLES[entry.status] || STATUS_BADGE_STYLES.pending;
               const isConverting = converting === entry.id;
               const isPending = entry.status === 'pending';
-              const statusLabel =
-                entry.status === 'processed' ? 'converted' : entry.status;
+              const statusLabel = entry.status === 'processed' ? 'converted' : entry.status;
 
               return (
                 <motion.div

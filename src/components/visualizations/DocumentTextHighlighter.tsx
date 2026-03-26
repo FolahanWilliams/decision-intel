@@ -125,10 +125,7 @@ export function DocumentTextHighlighter({
     return map;
   }, [biases]);
 
-  const uniqueBiasTypes = useMemo(
-    () => Array.from(new Set(biases.map(b => b.biasType))),
-    [biases]
-  );
+  const uniqueBiasTypes = useMemo(() => Array.from(new Set(biases.map(b => b.biasType))), [biases]);
 
   const segments = useMemo(() => buildSegments(content, biases), [content, biases]);
 
@@ -179,7 +176,8 @@ export function DocumentTextHighlighter({
       if (e.key === 'Escape') setSelectedBiasIdx(null);
       if (e.key === 'd' || e.key === 'D') {
         const target = e.target as HTMLElement;
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+          return;
         setDetectiveMode(prev => !prev);
       }
     };
@@ -216,7 +214,9 @@ export function DocumentTextHighlighter({
                   return (
                     <button
                       key={biasType}
-                      onClick={() => setBiasTypeFilter(prev => (prev === biasType ? null : biasType))}
+                      onClick={() =>
+                        setBiasTypeFilter(prev => (prev === biasType ? null : biasType))
+                      }
                       className="text-[10px] font-semibold px-2 py-0.5 border rounded-full transition-all duration-150"
                       style={{
                         backgroundColor: biasTypeFilter === biasType ? color?.bg : 'transparent',
@@ -329,14 +329,20 @@ export function DocumentTextHighlighter({
                   className={`relative cursor-pointer transition-all duration-200 ${
                     isVisible ? 'underline decoration-2' : ''
                   }`}
-                  style={isVisible ? {
-                    backgroundColor: typeColor?.bg,
-                    textDecorationColor: typeColor?.underline,
-                    ...(isSelected ? {
-                      outline: `2px solid ${typeColor?.border}`,
-                      outlineOffset: '1px',
-                    } : {}),
-                  } : { opacity: 0.55 }}
+                  style={
+                    isVisible
+                      ? {
+                          backgroundColor: typeColor?.bg,
+                          textDecorationColor: typeColor?.underline,
+                          ...(isSelected
+                            ? {
+                                outline: `2px solid ${typeColor?.border}`,
+                                outlineOffset: '1px',
+                              }
+                            : {}),
+                        }
+                      : { opacity: 0.55 }
+                  }
                   onClick={e => {
                     e.stopPropagation();
                     handleHighlightClick(seg.biasIndex!);
@@ -432,7 +438,9 @@ export function DocumentTextHighlighter({
                   className={`w-full text-left p-3 border-b border-border transition-all duration-150 group border-l-2`}
                   style={{
                     backgroundColor: isSelected ? typeColor?.bg : undefined,
-                    borderLeftColor: isSelected ? typeColor?.border ?? 'transparent' : 'transparent',
+                    borderLeftColor: isSelected
+                      ? (typeColor?.border ?? 'transparent')
+                      : 'transparent',
                   }}
                   aria-pressed={isSelected}
                 >
@@ -517,8 +525,8 @@ export function DocumentTextHighlighter({
       </div>
 
       <div className="p-2 text-center text-[10px] text-muted border-t border-border bg-secondary/20">
-        Click highlighted text or sidebar items to link them &bull; Press Esc to deselect &bull; Press D for{' '}
-        {detectiveMode ? 'normal mode' : 'detective mode'}
+        Click highlighted text or sidebar items to link them &bull; Press Esc to deselect &bull;
+        Press D for {detectiveMode ? 'normal mode' : 'detective mode'}
       </div>
     </div>
   );

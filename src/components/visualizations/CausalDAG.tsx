@@ -152,17 +152,11 @@ export function CausalDAG({ orgId }: CausalDAGProps) {
   // Layout computation
   // -----------------------------------------------------------------------
   const computeLayout = useCallback(
-    (
-      dagData: DAGData,
-      width: number,
-      height: number
-    ): { nodes: LayoutNode[]; } => {
+    (dagData: DAGData, width: number, height: number): { nodes: LayoutNode[] } => {
       const { nodes: nodeIds, edges } = dagData;
 
       // Determine which nodes connect directly to outcome
-      const directCauseIds = new Set(
-        edges.filter(e => e.to === 'outcome').map(e => e.from)
-      );
+      const directCauseIds = new Set(edges.filter(e => e.to === 'outcome').map(e => e.from));
 
       // Assign columns: indirect = 0, direct = 1, outcome = 2
       const columnMap: Record<string, number> = {};
@@ -269,10 +263,7 @@ export function CausalDAG({ orgId }: CausalDAGProps) {
       .attr('width', '200%')
       .attr('height', '200%');
 
-    filter
-      .append('feGaussianBlur')
-      .attr('stdDeviation', '4')
-      .attr('result', 'coloredBlur');
+    filter.append('feGaussianBlur').attr('stdDeviation', '4').attr('result', 'coloredBlur');
 
     const feMerge = filter.append('feMerge');
     feMerge.append('feMergeNode').attr('in', 'coloredBlur');
@@ -286,11 +277,7 @@ export function CausalDAG({ orgId }: CausalDAGProps) {
 
       const color = edgeColor(edge.strength);
       const markerId =
-        edge.strength > 0.6
-          ? 'arrow-green'
-          : edge.strength >= 0.3
-            ? 'arrow-amber'
-            : 'arrow-gray';
+        edge.strength > 0.6 ? 'arrow-green' : edge.strength >= 0.3 ? 'arrow-amber' : 'arrow-gray';
 
       g.append('line')
         .attr('x1', source.x)

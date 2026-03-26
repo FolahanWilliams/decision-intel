@@ -54,14 +54,7 @@ export function BiologicalRiskBadge({ adjustments, size = 'md' }: BiologicalRisk
       {biologicalSignals.map(signal => {
         const config = BADGE_CONFIG[signal.source];
         if (!config) return null;
-        return (
-          <SingleBadge
-            key={signal.source}
-            config={config}
-            signal={signal}
-            size={size}
-          />
-        );
+        return <SingleBadge key={signal.source} config={config} signal={signal} size={size} />;
       })}
     </div>
   );
@@ -80,9 +73,8 @@ function SingleBadge({
   const Icon = config.icon;
   const amplification = Math.round(signal.delta * 100);
 
-  const sizeClasses = size === 'sm'
-    ? 'text-[10px] px-1.5 py-0.5 gap-1'
-    : 'text-xs px-2 py-1 gap-1.5';
+  const sizeClasses =
+    size === 'sm' ? 'text-[10px] px-1.5 py-0.5 gap-1' : 'text-xs px-2 py-1 gap-1.5';
 
   const iconSize = size === 'sm' ? 10 : 13;
   const pulseSize = size === 'sm' ? 5 : 6;
@@ -109,9 +101,7 @@ function SingleBadge({
         </span>
         <Icon size={iconSize} />
         <span>{config.label}</span>
-        {size === 'md' && (
-          <span className="opacity-70">+{amplification}%</span>
-        )}
+        {size === 'md' && <span className="opacity-70">+{amplification}%</span>}
       </button>
 
       {/* Tooltip */}

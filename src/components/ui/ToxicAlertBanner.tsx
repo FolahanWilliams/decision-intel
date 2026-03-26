@@ -41,7 +41,14 @@ export function ToxicAlertBanner({ combinations, onViewDetails }: ToxicAlertBann
     >
       <AlertTriangle size={20} style={{ color: c.border, flexShrink: 0 }} />
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+        <div
+          style={{
+            fontSize: '13px',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            marginBottom: '4px',
+          }}
+        >
           Compound Risk: {top.patternLabel || 'Unnamed Pattern'} ({Math.round(top.toxicScore)}/100)
         </div>
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -61,7 +68,14 @@ export function ToxicAlertBanner({ combinations, onViewDetails }: ToxicAlertBann
           ))}
         </div>
         {combinations.length > 1 && (
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+          <span
+            style={{
+              fontSize: '11px',
+              color: 'var(--text-muted)',
+              marginTop: '4px',
+              display: 'block',
+            }}
+          >
             +{combinations.length - 1} more pattern{combinations.length > 2 ? 's' : ''} detected
           </span>
         )}
