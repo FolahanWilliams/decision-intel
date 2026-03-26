@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Brain, FileText, Upload } from 'lucide-react';
 import Link from 'next/link';
 
@@ -9,15 +10,11 @@ interface ChatEmptyStateProps {
 }
 
 function getGreeting(): string {
-  if (typeof window === 'undefined') return 'Hello';
   const hour = new Date().getHours();
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
   return 'Good evening';
 }
-
-// Compute once at module load time (client-only since this is a 'use client' module)
-const GREETING = getGreeting();
 
 const STARTER_QUESTIONS_WITH_DOCS = [
   'What biases were most commonly found across my documents?',
@@ -33,6 +30,12 @@ const STARTER_QUESTIONS_NO_DOCS = [
 ];
 
 export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateProps) {
+  // Avoid hydration mismatch: render neutral greeting on server, then update on client
+  const [greeting, setGreeting] = useState('Hello');
+  useEffect(() => {
+    setGreeting(getGreeting());
+  }, []);
+
   const analyzedDocs = documents.filter(d => d.status === 'complete');
   const hasDocs = analyzedDocs.length > 0;
   const starterQuestions = hasDocs ? STARTER_QUESTIONS_WITH_DOCS : STARTER_QUESTIONS_NO_DOCS;
@@ -66,7 +69,7 @@ export function ChatEmptyState({ documents, onSuggestQuestion }: ChatEmptyStateP
       </div>
 
       <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>
-        {GREETING}! I&apos;m your Second Brain.
+        {greeting}! I&apos;m your Second Brain.
       </h2>
       <p
         style={{

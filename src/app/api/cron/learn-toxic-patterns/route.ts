@@ -12,14 +12,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { learnToxicPatterns } from '@/lib/learning/toxic-combinations';
 import { createLogger } from '@/lib/utils/logger';
+import { timingSafeEqual } from 'crypto';
 
 const log = createLogger('CronLearnToxicPatterns');
+
+/** Constant-time comparison to prevent timing attacks on the cron secret. */
+function safeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  const maxLen = Math.max(bufA.length, bufB.length);
+  const paddedA = Buffer.alloc(maxLen);
+  const paddedB = Buffer.alloc(maxLen);
+  bufA.copy(paddedA);
+  bufB.copy(paddedB);
+  return bufA.length === bufB.length && timingSafeEqual(paddedA, paddedB);
+}
 
 export async function GET(req: NextRequest) {
   // Verify cron secret
   const authHeader = req.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (cronSecret && (!authHeader || !safeCompare(authHeader, `Bearer ${cronSecret}`))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
