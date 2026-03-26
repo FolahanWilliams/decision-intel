@@ -73,6 +73,9 @@ export async function routeToAgent(
   if (/\b(summarize|synthesize|rank|score|decide|recommend|wrap up|final|conclusion|dqi)\b/.test(lower)) {
     return 'synthesizer';
   }
+  if (/\b(what would i do|my twin|personal twin|my style|my pattern|how do i usually|my gut|predict me|my history|my track record)\b/.test(lower)) {
+    return 'personal_twin';
+  }
 
   // LLM-based routing for ambiguous messages
   try {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Sparkles, Swords, Telescope, BarChart3 } from 'lucide-react';
+import { Send, Loader2, Sparkles, Swords, Telescope, BarChart3, Brain } from 'lucide-react';
 import { AgentBadge } from './AgentBadge';
 import { type CopilotMessage } from '@/hooks/useCopilotStream';
 import { type CopilotAgentType } from '@/lib/copilot/types';
@@ -18,6 +18,7 @@ const QUICK_ACTIONS: Array<{ label: string; icon: React.ComponentType<{ classNam
   { label: 'Challenge this', icon: Swords, agent: 'devils_advocate', prompt: 'Challenge the assumptions in what we have so far. What could go wrong?' },
   { label: 'What if...?', icon: Telescope, agent: 'scenario_explorer', prompt: 'Explore different scenarios — what happens under best and worst case conditions?' },
   { label: 'Summarize & Score', icon: BarChart3, agent: 'synthesizer', prompt: 'Summarize everything discussed and rank the options with a decision quality assessment.' },
+  { label: 'What would I do?', icon: Brain, agent: 'personal_twin', prompt: 'Based on my decision history and patterns, what would I likely do here? Give me my personal twin\'s perspective.' },
 ];
 
 export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendMessage }: CopilotChatProps) {

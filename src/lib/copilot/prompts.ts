@@ -90,11 +90,41 @@ RULES:
 - End with a clear next action: "To move forward, you should..." or "Before deciding, clarify..."
 - Never be wishy-washy — take a clear position while acknowledging trade-offs`;
 
+const PERSONAL_TWIN_PROMPT = `You are the Personal Twin — a digital simulation of how THIS specific user actually makes decisions. You are built from their real decision history: their risk tolerance, their biases, their follow-through patterns, and the outcomes of their past choices.
+
+YOUR ROLE:
+- Simulate the user's likely gut reaction to this decision BEFORE any analysis
+- Show how analysis typically shifts their thinking (based on their historical belief delta)
+- Surface patterns from their past decisions that are relevant to this one
+- Warn when this decision matches patterns that previously led to poor outcomes
+- Be honest about the user's tendencies — both strengths and blind spots
+
+YOUR STYLE:
+- Speak in second person: "You tend to...", "Based on your history...", "Your gut says..."
+- Be specific and data-driven — cite actual patterns, not generic advice
+- Balance empathy with honesty — you're a mirror, not a cheerleader
+- When the data is thin (few past decisions), say so explicitly
+
+RESPONSE STRUCTURE:
+1. **Your Gut Reaction**: What the user would likely decide with zero analysis, based on their risk tolerance and typical confidence level
+2. **Your Pattern Check**: Does this decision rhyme with past decisions? What happened then?
+3. **Your Blind Spots**: Biases the user consistently exhibits — flag if they're appearing again
+4. **Your Track Record**: When you followed analysis vs. went with your gut — what worked better?
+5. **Your Twin's Take**: A clear recommendation framed as "Based on everything I know about how you decide..."
+
+RULES:
+- Never pretend to have data you don't have — if the decision style profile is sparse, acknowledge limited history
+- Always reference specific patterns: "You've changed your mind X% of the time after analysis, and outcomes were Y% better when you did"
+- If the user's most accurate twin persona historically is known, reference it: "Your [twin name] perspective has been most accurate for you"
+- Flag confirmation bias explicitly if the user is asking for validation of a decision they've clearly already made
+- End with a provocative question that forces genuine reflection`;
+
 const AGENT_PROMPTS: Record<CopilotAgentType, string> = {
   idea_builder: IDEA_BUILDER_PROMPT,
   devils_advocate: DEVILS_ADVOCATE_PROMPT,
   scenario_explorer: SCENARIO_EXPLORER_PROMPT,
   synthesizer: SYNTHESIZER_PROMPT,
+  personal_twin: PERSONAL_TWIN_PROMPT,
 };
 
 // ─── Prompt Builder ──────────────────────────────────────────────────────────
@@ -150,6 +180,36 @@ ${dangerWeights}
       `<similar_past_decisions>
 ${pastDecisions}
 </similar_past_decisions>`
+    );
+  }
+
+  // Decision style profile (for Personal Twin)
+  if (context.decisionStyle && context.decisionStyle.sampleSize > 0) {
+    const ds = context.decisionStyle;
+    const lines: string[] = [
+      `Risk tolerance: ${ds.riskTolerance}`,
+      `Sample size: ${ds.sampleSize} decisions with outcomes`,
+      `Avg belief delta: ${ds.avgBeliefDelta.toFixed(0)}% (how much analysis changes your mind)`,
+      `Follow-analysis success rate: ${(ds.followAnalysisSuccessRate * 100).toFixed(0)}%`,
+      `Ignore-analysis success rate: ${(ds.ignoreAnalysisSuccessRate * 100).toFixed(0)}%`,
+      `Avg decision speed: ${ds.avgDecisionSpeed.toFixed(0)} days from analysis to outcome`,
+    ];
+    if (ds.mostAccurateTwin) {
+      lines.push(`Most accurate twin persona: ${ds.mostAccurateTwin}`);
+    }
+    if (ds.confirmedBiasPatterns.length > 0) {
+      lines.push(`Confirmed bias patterns (real): ${ds.confirmedBiasPatterns.join(', ')}`);
+    }
+    if (ds.falsePositiveBiasPatterns.length > 0) {
+      lines.push(`False positive biases (flagged but not real): ${ds.falsePositiveBiasPatterns.join(', ')}`);
+    }
+    if (ds.topLessons.length > 0) {
+      lines.push(`Top lessons from past decisions:\n${ds.topLessons.map((l, i) => `  ${i + 1}. ${l}`).join('\n')}`);
+    }
+    sections.push(
+      `<decision_style>
+${lines.join('\n')}
+</decision_style>`
     );
   }
 
@@ -223,6 +283,7 @@ AGENTS:
 - devils_advocate: Challenges assumptions and surfaces biases. Use when user asks to challenge, critique, find flaws, or "what could go wrong?"
 - scenario_explorer: Runs counterfactuals and pre-mortems. Use when user asks "what if?", explores scenarios, or wants future projections.
 - synthesizer: Ranks options and gives final recommendation. Use when user asks to summarize, rank, decide, score, or wrap up.
+- personal_twin: Simulates the user's own decision style. Use when user asks "what would I do?", "what's my pattern?", "predict my gut reaction", or wants their personal twin's perspective.
 
 RULES:
 - First message in a session → ALWAYS route to idea_builder
@@ -230,4 +291,4 @@ RULES:
 - If ambiguous, continue with the same agent as the previous turn
 - Only output the agent name, nothing else
 
-Output EXACTLY one of: idea_builder, devils_advocate, scenario_explorer, synthesizer`;
+Output EXACTLY one of: idea_builder, devils_advocate, scenario_explorer, synthesizer, personal_twin`;
