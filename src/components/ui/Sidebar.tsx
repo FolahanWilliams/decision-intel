@@ -13,17 +13,17 @@ import {
   Search,
   ChevronLeft,
   LogOut as LogOutIcon,
-  MessageSquare,
   GitCompareArrows,
   BrainCircuit,
-  Bell,
   Video,
   BookOpen,
   Users,
   Zap,
   Network,
   Sparkles,
-  Dna,
+  Plus,
+  ChevronRight as ChevronR,
+  PenLine,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -33,6 +33,26 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+    Reference: true,
+    System: true,
+  });
+
+  // Persist collapsed sections to localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('di-sidebar-collapsed');
+      if (saved) setCollapsedSections(JSON.parse(saved));
+    } catch { /* ignore */ }
+  }, []);
+
+  const toggleSection = useCallback((section: string) => {
+    setCollapsedSections(prev => {
+      const next = { ...prev, [section]: !prev[section] };
+      try { localStorage.setItem('di-sidebar-collapsed', JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
@@ -281,6 +301,32 @@ export default function Sidebar() {
             )}
           </button>
 
+          {/* New Decision button */}
+          <button
+            onClick={() => window.dispatchEvent(new Event('open-new-decision-modal'))}
+            title={collapsed ? 'New Decision' : undefined}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              gap: collapsed ? '0' : '10px',
+              width: '100%',
+              padding: collapsed ? '10px' : '10px 14px',
+              marginBottom: '16px',
+              background: 'var(--accent-primary)',
+              border: 'none',
+              borderRadius: 'var(--radius-lg)',
+              color: '#fff',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'opacity 0.15s',
+            }}
+          >
+            <Plus size={16} />
+            {!collapsed && <span>New Decision</span>}
+          </button>
+
           <SectionLabel collapsed={collapsed}>Platform</SectionLabel>
           <NavItem
             href="/dashboard"
@@ -302,31 +348,22 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
 
-          <SectionLabel collapsed={collapsed}>Analysis</SectionLabel>
+          <SectionLabel collapsed={collapsed}>Intelligence</SectionLabel>
           <NavItem
-            href="/dashboard/insights"
+            href="/dashboard/ai-assistant"
+            icon={<Sparkles size={18} />}
+            label="AI Assistant"
+            description="Decision copilot & document chat"
+            active={pathname.startsWith('/dashboard/ai-assistant') || pathname === '/dashboard/copilot' || pathname === '/dashboard/chat'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/analytics"
             icon={<BarChart3 size={18} />}
-            label="Insights & Trends"
-            description="Charts, trends, and bias breakdowns"
-            active={pathname === '/dashboard/insights'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/search"
-            icon={<Search size={18} />}
-            label="Search"
-            description="Semantic search across documents"
-            active={pathname === '/dashboard/search'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/compare"
-            icon={<GitCompareArrows size={18} />}
-            label="Compare"
-            description="Side-by-side document comparison"
-            active={pathname === '/dashboard/compare'}
+            label="Analytics"
+            description="Trends, insights & decision DNA"
+            active={pathname.startsWith('/dashboard/analytics') || pathname === '/dashboard/insights' || pathname === '/dashboard/decision-dna'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
@@ -340,49 +377,22 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
           <NavItem
-            href="/dashboard/copilot"
-            icon={<Sparkles size={18} />}
-            label="Copilot"
-            description="AI agents that help you build better decisions"
-            active={pathname === '/dashboard/copilot'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/decision-dna"
-            icon={<Dna size={18} />}
-            label="Decision DNA"
-            description="Your unique decision profile and learning history"
-            active={pathname === '/dashboard/decision-dna'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/chat"
-            icon={<MessageSquare size={18} />}
-            label="Chat"
-            description="Ask questions about your documents"
-            active={pathname === '/dashboard/chat'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/bias-library"
-            icon={<BookOpen size={18} />}
-            label="Bias Library"
-            description="Learn about cognitive biases"
-            active={pathname === '/dashboard/bias-library'}
+            href="/dashboard/search"
+            icon={<Search size={18} />}
+            label="Search"
+            description="Semantic search across documents"
+            active={pathname === '/dashboard/search'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
 
-          <SectionLabel collapsed={collapsed}>Human Intelligence</SectionLabel>
+          <SectionLabel collapsed={collapsed}>Decisions</SectionLabel>
           <NavItem
-            href="/dashboard/cognitive-audits"
+            href="/dashboard/decision-quality"
             icon={<BrainCircuit size={18} />}
-            label="Cognitive Audits"
-            description="Audit human decisions"
-            active={pathname === '/dashboard/cognitive-audits'}
+            label="Decision Quality"
+            description="Audits & behavioral nudges"
+            active={pathname.startsWith('/dashboard/decision-quality') || pathname.startsWith('/dashboard/cognitive-audits') || pathname === '/dashboard/nudges'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
@@ -395,15 +405,41 @@ export default function Sidebar() {
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
-          <NavItem
-            href="/dashboard/nudges"
-            icon={<Bell size={18} />}
-            label="Nudges"
-            description="Decision coaching alerts"
-            active={pathname === '/dashboard/nudges'}
+
+          <CollapsibleSection
+            label="Reference"
             collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
+            isOpen={!collapsedSections.Reference}
+            onToggle={() => toggleSection('Reference')}
+          >
+            <NavItem
+              href="/dashboard/compare"
+              icon={<GitCompareArrows size={18} />}
+              label="Compare"
+              description="Side-by-side document comparison"
+              active={pathname === '/dashboard/compare'}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/bias-library"
+              icon={<BookOpen size={18} />}
+              label="Bias Library"
+              description="Learn about cognitive biases"
+              active={pathname === '/dashboard/bias-library'}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/journal"
+              icon={<PenLine size={18} />}
+              label="Journal"
+              description="Decision journal entries"
+              active={pathname === '/dashboard/journal'}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+          </CollapsibleSection>
 
           <SectionLabel collapsed={collapsed}>Collaboration</SectionLabel>
           <NavItem
@@ -416,23 +452,29 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
 
-          <SectionLabel collapsed={collapsed}>System</SectionLabel>
-          <NavItem
-            href="/dashboard/audit-log"
-            icon={<ClipboardList size={18} />}
-            label="Audit Log"
-            active={pathname === '/dashboard/audit-log'}
+          <CollapsibleSection
+            label="System"
             collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/settings"
-            icon={<Settings size={18} />}
-            label="Settings"
-            active={pathname === '/dashboard/settings'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
+            isOpen={!collapsedSections.System}
+            onToggle={() => toggleSection('System')}
+          >
+            <NavItem
+              href="/dashboard/audit-log"
+              icon={<ClipboardList size={18} />}
+              label="Audit Log"
+              active={pathname === '/dashboard/audit-log'}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/settings"
+              icon={<Settings size={18} />}
+              label="Settings"
+              active={pathname === '/dashboard/settings'}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+          </CollapsibleSection>
         </nav>
 
         <div
@@ -684,6 +726,73 @@ function NavItem({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function CollapsibleSection({
+  label,
+  collapsed: sidebarCollapsed,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  label: string;
+  collapsed: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  // When sidebar is collapsed (narrow), just show the children items as icons
+  if (sidebarCollapsed) {
+    return (
+      <>
+        <div style={{ height: '20px' }} />
+        {children}
+      </>
+    );
+  }
+
+  return (
+    <div>
+      <button
+        onClick={onToggle}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          width: '100%',
+          padding: '20px 10px 8px',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: 'var(--text-muted)',
+          fontSize: '10px',
+          fontWeight: 600,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+        }}
+      >
+        <ChevronR
+          size={10}
+          style={{
+            transition: 'transform 0.2s ease',
+            transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+          }}
+        />
+        {label}
+      </button>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateRows: isOpen ? '1fr' : '0fr',
+          transition: 'grid-template-rows 0.2s ease',
+        }}
+      >
+        <div style={{ overflow: 'hidden' }}>
+          {children}
+        </div>
+      </div>
     </div>
   );
 }

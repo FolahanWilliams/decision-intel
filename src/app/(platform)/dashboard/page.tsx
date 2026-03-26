@@ -46,6 +46,7 @@ import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
 import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
+import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('Dashboard');
@@ -976,6 +977,11 @@ export default function Dashboard() {
 
       {/* Decision Triage — top decisions needing attention */}
       <DecisionTriageWidget />
+
+      {/* Active Nudges — unacknowledged behavioral nudges */}
+      <ErrorBoundary sectionName="Nudges">
+        <NudgeWidget />
+      </ErrorBoundary>
 
       {/* Decision Journal — captured decisions from email/calendar */}
       <div className="mb-lg">

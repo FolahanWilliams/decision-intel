@@ -14,6 +14,7 @@ import {
   ChevronRight,
   ListChecks,
   Landmark,
+  RefreshCw,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useMeetings } from '@/hooks/useMeetings';
@@ -49,7 +50,7 @@ function formatDuration(seconds: number | null): string {
 
 export default function MeetingsPage() {
   const [page, setPage] = useState(1);
-  const { meetings, total, totalPages, isLoading } = useMeetings(page);
+  const { meetings, total, totalPages, isLoading, error, mutate } = useMeetings(page);
 
   const completeCount = meetings.filter(m => m.status === 'complete').length;
   const processingCount = meetings.filter(m =>
@@ -122,6 +123,19 @@ export default function MeetingsPage() {
               style={{ color: 'var(--accent-primary)' }}
             />
           </div>
+        ) : error ? (
+          <div className="card-body" style={{ textAlign: 'center', padding: '60px' }}>
+            <AlertTriangle size={32} style={{ color: 'var(--error)', marginBottom: '12px' }} />
+            <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '6px' }}>
+              Failed to load meetings
+            </div>
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+              Something went wrong. Please try again.
+            </div>
+            <button onClick={() => mutate()} className="btn btn-secondary">
+              <RefreshCw size={14} /> Retry
+            </button>
+          </div>
         ) : meetings.length === 0 ? (
           <div className="card-body" style={{ textAlign: 'center', padding: '60px' }}>
             <Video size={40} style={{ color: 'var(--text-muted)', marginBottom: '12px' }} />
@@ -137,7 +151,43 @@ export default function MeetingsPage() {
             </Link>
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <>
+          {/* Mobile card view */}
+          <div className="lg:hidden" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+            {meetings.map(meeting => {
+              const audit = meeting.humanDecision?.cognitiveAudit;
+              const quality = audit ? getQualityLevel(audit.decisionQualityScore) : null;
+              const status = STATUS_CONFIG[meeting.status] || STATUS_CONFIG.error;
+              const speakers = meeting.transcript?.speakers;
+              const speakerCount = Array.isArray(speakers) ? speakers.length : (meeting.participants?.length ?? 0);
+
+              return (
+                <Link
+                  key={meeting.id}
+                  href={meeting.status === 'complete' && meeting.humanDecision?.id
+                    ? `/dashboard/cognitive-audits/${meeting.humanDecision.id}`
+                    : `/dashboard/meetings/${meeting.id}`}
+                  style={{ textDecoration: 'none', display: 'block', padding: '14px 16px', borderBottom: '1px solid var(--border-color)' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 600, flex: 1, marginRight: 8 }}>{meeting.title}</div>
+                    <span style={{ fontSize: '10px', padding: '3px 10px', background: status.bg, color: status.color, borderRadius: '4px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                      {status.label}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 16, fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                    <span className="flex items-center gap-xs"><Clock size={11} /> {formatDuration(meeting.durationSeconds)}</span>
+                    <span className="flex items-center gap-xs"><Users size={11} /> {speakerCount} speakers</span>
+                    {quality && <span style={{ color: quality.color, fontWeight: 600 }}>{Math.round(audit!.decisionQualityScore)} quality</span>}
+                    <span>{formatDateShort(meeting.createdAt)}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Desktop table view */}
+          <div className="hidden lg:block" style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
@@ -242,7 +292,7 @@ export default function MeetingsPage() {
                   const speakers = meeting.transcript?.speakers;
                   const speakerCount = Array.isArray(speakers)
                     ? speakers.length
-                    : meeting.participants.length;
+                    : (meeting.participants?.length ?? 0);
                   const isProcessing = ['uploading', 'transcribing', 'analyzing'].includes(
                     meeting.status
                   );
@@ -401,6 +451,7 @@ export default function MeetingsPage() {
               </tbody>
             </table>
           </div>
+          </>
         )}
 
         {/* Pagination */}
