@@ -1383,7 +1383,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
     // Unknown trust — apply moderate penalty instead of assuming perfect (100)
     trustScore = 50;
   } else {
-    trustScore = factCheck.score;
+    trustScore = factCheck.score ?? 50;
   }
   const trustPenalty = (100 - trustScore) * 0.3;
 
@@ -1440,6 +1440,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       cognitiveAnalysis: state.cognitiveAnalysis,
       simulation: state.simulation ?? undefined,
       institutionalMemory: state.institutionalMemory ?? undefined,
+      metaVerdict: state.metaVerdict ?? undefined,
       speakers: state.speakers || [],
       intelligenceContext: state.intelligenceContext
         ? {

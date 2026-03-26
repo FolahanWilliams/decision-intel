@@ -1,6 +1,12 @@
 import { createClient } from '@/utils/supabase/server';
+import { timingSafeEqual } from 'crypto';
 
 const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY?.trim();
+
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
 
 export interface AuthResult {
   userId?: string;
@@ -19,7 +25,7 @@ export async function authenticateApiRequest(request: Request): Promise<AuthResu
 
   // Secure check: ensure EXTENSION_API_KEY is defined and not empty before comparing
   if (!effectiveUserId && EXTENSION_API_KEY && EXTENSION_API_KEY.length > 0) {
-    if (apiKey !== EXTENSION_API_KEY) {
+    if (!apiKey || !safeCompare(apiKey, EXTENSION_API_KEY)) {
       return { error: 'Unauthorized', status: 401 };
     }
     const extUserId = request.headers.get('x-extension-user-id');

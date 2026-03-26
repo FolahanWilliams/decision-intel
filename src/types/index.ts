@@ -65,6 +65,7 @@ export interface AnalysisResult {
   preMortemImageUrl?: string | null;
   compoundScoring?: CompoundScoringResult;
   bayesianPriors?: BayesianPriorsResult;
+  metaVerdict?: string;
 }
 
 /** Compound scoring engine output — persisted for UI surfacing */
