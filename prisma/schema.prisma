@@ -994,6 +994,42 @@ model ApiUsage {
   @@index([userId, createdAt])
 }
 
+// ─── Decision Copilot ────────────────────────────────────────────────────
+
+model CopilotSession {
+  id              String        @id @default(cuid())
+  userId          String
+  orgId           String?
+  title           String        @default("New Decision")
+  decisionPrompt  String        @db.Text
+  status          String        @default("active") // active, resolved, archived
+  resolvedAt      DateTime?
+  decisionSummary String?       @db.Text
+  dqiScore        Float?
+  metadata        Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  turns           CopilotTurn[]
+
+  @@index([userId, updatedAt])
+  @@index([orgId])
+  @@index([status])
+}
+
+model CopilotTurn {
+  id        String         @id @default(cuid())
+  sessionId String
+  role      String         // "user" | "agent"
+  agentType String?        // null for user; "idea_builder" | "devils_advocate" | "scenario_explorer" | "synthesizer"
+  content   String         @db.Text
+  sources   Json?
+  toolCalls Json?
+  createdAt DateTime       @default(now())
+  session   CopilotSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+}
+
 // ─── Stripe Billing ──────────────────────────────────────────────────────
 
 model Subscription {
