@@ -323,7 +323,7 @@ export function CommandPalette() {
         description: 'See patterns over time',
         icon: <TrendingUp size={16} />,
         action: () => {
-          navigate('/dashboard/insights');
+          navigate('/dashboard/analytics?view=trends');
         },
         keywords: ['trends', 'patterns', 'analytics', 'statistics'],
       },
