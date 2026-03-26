@@ -23,6 +23,7 @@ import {
   Zap,
   Network,
   Sparkles,
+  Dna,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -344,6 +345,15 @@ export default function Sidebar() {
             label="Copilot"
             description="AI agents that help you build better decisions"
             active={pathname === '/dashboard/copilot'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/decision-dna"
+            icon={<Dna size={18} />}
+            label="Decision DNA"
+            description="Your unique decision profile and learning history"
+            active={pathname === '/dashboard/decision-dna'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
