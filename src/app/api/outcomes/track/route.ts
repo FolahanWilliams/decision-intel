@@ -73,49 +73,35 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Check if outcome already exists
-    const existingOutcome = await prisma.decisionOutcome.findUnique({
+    // Upsert outcome (avoids race condition with concurrent requests)
+    const decisionOutcome = await prisma.decisionOutcome.upsert({
       where: { analysisId },
+      update: {
+        outcome,
+        timeframe,
+        impactScore,
+        notes,
+        lessonsLearned,
+        confirmedBiases: confirmedBiases || [],
+        falsPositiveBiases: falsPositiveBiases || [],
+        mostAccurateTwin,
+      },
+      create: {
+        analysisId,
+        userId: user.id,
+        orgId,
+        outcome,
+        timeframe,
+        impactScore,
+        notes,
+        lessonsLearned,
+        confirmedBiases: confirmedBiases || [],
+        falsPositiveBiases: falsPositiveBiases || [],
+        mostAccurateTwin,
+      },
     });
 
-    let decisionOutcome;
-    if (existingOutcome) {
-      // Update existing outcome
-      decisionOutcome = await prisma.decisionOutcome.update({
-        where: { id: existingOutcome.id },
-        data: {
-          outcome,
-          timeframe,
-          impactScore,
-          notes,
-          lessonsLearned,
-          confirmedBiases: confirmedBiases || [],
-          falsPositiveBiases: falsPositiveBiases || [],
-          mostAccurateTwin,
-        },
-      });
-
-      log.info(`Updated outcome for analysis ${analysisId}: ${outcome}`);
-    } else {
-      // Create new outcome
-      decisionOutcome = await prisma.decisionOutcome.create({
-        data: {
-          analysisId,
-          userId: user.id,
-          orgId,
-          outcome,
-          timeframe,
-          impactScore,
-          notes,
-          lessonsLearned,
-          confirmedBiases: confirmedBiases || [],
-          falsPositiveBiases: falsPositiveBiases || [],
-          mostAccurateTwin,
-        },
-      });
-
-      log.info(`Created outcome for analysis ${analysisId}: ${outcome}`);
-    }
+    log.info(`Upserted outcome for analysis ${analysisId}: ${outcome}`);
 
     // Update bias accuracy based on confirmed/false positives
     if (confirmedBiases?.length || falsPositiveBiases?.length) {
@@ -147,7 +133,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId: user.id,
         orgId,
-        action: existingOutcome ? 'outcome.update' : 'outcome.create',
+        action: 'outcome.upsert',
         resource: 'outcome',
         resourceId: decisionOutcome.id,
         details: {
@@ -187,20 +173,19 @@ export async function POST(req: NextRequest) {
       select: { outcome: true, impactScore: true },
     });
 
+    const withImpact = outcomes.filter(o => o.impactScore !== null);
     const stats = {
       total: outcomes.length,
       success: outcomes.filter(o => o.outcome === 'success').length,
       partialSuccess: outcomes.filter(o => o.outcome === 'partial_success').length,
       failure: outcomes.filter(o => o.outcome === 'failure').length,
-      averageImpact:
-        outcomes
-          .filter(o => o.impactScore !== null)
-          .reduce((sum, o) => sum + (o.impactScore || 0), 0) /
-          outcomes.filter(o => o.impactScore !== null).length || 0,
+      averageImpact: withImpact.length > 0
+        ? withImpact.reduce((sum, o) => sum + (o.impactScore || 0), 0) / withImpact.length
+        : 0,
     };
 
     return NextResponse.json({
-      message: existingOutcome ? 'Outcome updated' : 'Outcome tracked',
+      message: 'Outcome tracked',
       outcome: decisionOutcome,
       stats,
     });

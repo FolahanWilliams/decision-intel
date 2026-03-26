@@ -28,18 +28,19 @@ export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendM
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const bottomAnchorRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll to bottom on new messages or streaming updates
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    bottomAnchorRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input on mount
+  // Focus input on mount and after error dismissal
   useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+    if (!isStreaming) {
+      inputRef.current?.focus();
+    }
+  }, [isStreaming, error]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,6 +121,9 @@ export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendM
             )}
           </div>
         )}
+
+        {/* Scroll anchor */}
+        <div ref={bottomAnchorRef} />
       </div>
 
       {/* Quick actions */}
