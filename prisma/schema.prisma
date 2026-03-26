@@ -406,6 +406,9 @@ model Nudge {
   wasHelpful      Boolean?
   experimentId    String?        // FK to NudgeExperiment
   variantId       String?        // Which variant was served
+  failureCount  Int       @default(0)
+  lastAttemptAt DateTime?
+  nextRetryAt   DateTime?
   humanDecision   HumanDecision? @relation(fields: [humanDecisionId], references: [id])
 
   @@index([humanDecisionId])
@@ -414,6 +417,7 @@ model Nudge {
   @@index([targetUserId])
   @@index([createdAt])
   @@index([experimentId])
+  @@index([channel, deliveredAt, nextRetryAt])
 }
 
 model NudgeExperiment {
@@ -972,5 +976,21 @@ model ChatMessage {
   session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId, createdAt])
+}
+
+model ApiUsage {
+  id        String   @id @default(cuid())
+  userId    String?
+  orgId     String?
+  provider  String   // "gemini", "slack", "resend", etc.
+  operation String   // "generate", "embed", "send_email", etc.
+  tokens    Int?     // for LLM calls
+  cost      Float?   // estimated cost in USD
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([orgId, createdAt])
+  @@index([provider, createdAt])
+  @@index([userId, createdAt])
 }
 
