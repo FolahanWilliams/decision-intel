@@ -1,12 +1,23 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  // Don't crash at import time — only fail when actually used
-}
+let _stripe: Stripe | null = null;
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  typescript: true,
-});
+/**
+ * Lazily initialize the Stripe client — only throws when actually called,
+ * not at module import / build time.
+ */
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error(
+        'STRIPE_SECRET_KEY is not configured. Add it to your environment variables.'
+      );
+    }
+    _stripe = new Stripe(key, { typescript: true });
+  }
+  return _stripe;
+}
 
 export const PLANS = {
   free: {
