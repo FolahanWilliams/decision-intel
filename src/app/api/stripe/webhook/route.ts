@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import Stripe from 'stripe';
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
+      event = getStripe().webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
     } catch (err) {
       log.error('Webhook signature verification failed:', err);
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
         if (userId && customerId && subscriptionId) {
           // Fetch subscription details for period end
-          const sub = await stripe.subscriptions.retrieve(subscriptionId);
+          const sub = await getStripe().subscriptions.retrieve(subscriptionId);
           const subData = sub as unknown as Record<string, unknown>;
           const periodEnd =
             typeof subData.current_period_end === 'number'

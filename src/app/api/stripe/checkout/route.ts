@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/utils/supabase/server';
-import { stripe, PLANS } from '@/lib/stripe';
+import { getStripe, PLANS } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         : { customer_email: user.email }),
     };
 
-    const session = await stripe.checkout.sessions.create(sessionParams);
+    const session = await getStripe().checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
