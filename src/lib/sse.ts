@@ -67,7 +67,7 @@ export class SSEReader {
    * Processes a raw text chunk from the stream.
    * Invokes callback for each valid valid JSON message found.
    */
-  processChunk(chunk: string, onMessage: (data: unknown, id?: string) => void) {
+  processChunk(chunk: string, onMessage: (data: unknown, id?: string) => void, onParseError?: (raw: string, error: unknown) => void) {
     this.buffer += chunk;
 
     // Split by double newline (SSE standard delimiter)
@@ -103,9 +103,10 @@ export class SSEReader {
           const data = JSON.parse(eventData);
           onMessage(data, eventId);
         } catch (e) {
-          // Intentionally swallowed — malformed SSE chunks are expected
-          // during partial reads. Logged at debug level only.
-          void e;
+          // Notify caller of parse failures for debugging
+          if (onParseError) {
+            onParseError(eventData, e);
+          }
         }
       }
     }

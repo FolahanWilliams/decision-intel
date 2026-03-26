@@ -39,6 +39,8 @@ interface AuditSummary {
 export default function CognitiveAuditsPage() {
   const [page, setPage] = useState(1);
   const { decisions, total, totalPages, isLoading: loading, mutate } = useHumanDecisions(page, 20);
+  const isInitialLoad = loading && decisions.length === 0;
+  const isPaginating = loading && decisions.length > 0;
 
   const [deleteModal, setDeleteModal] = useState<{
     open: boolean;
@@ -93,7 +95,7 @@ export default function CognitiveAuditsPage() {
     }
   };
 
-  if (loading) {
+  if (isInitialLoad) {
     return (
       <div
         className="container"
@@ -334,8 +336,13 @@ export default function CognitiveAuditsPage() {
               <BrainCircuit size={18} /> Human Decision Audits
             </h3>
           </div>
-          <div className="card-body" style={{ padding: 0 }}>
-            {decisions.length === 0 ? (
+          <div className="card-body" style={{ padding: 0, position: 'relative' }}>
+            {isPaginating && (
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'inherit' }}>
+                <Loader2 size={24} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+              </div>
+            )}
+            {decisions.length === 0 && !loading ? (
               <div
                 className="flex flex-col items-center gap-md"
                 style={{ padding: 'var(--spacing-2xl)' }}
