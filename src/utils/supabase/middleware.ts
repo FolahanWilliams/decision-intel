@@ -50,6 +50,7 @@ export async function updateSession(request: NextRequest) {
       !request.nextUrl.pathname.startsWith('/api/analyze') &&
       !request.nextUrl.pathname.startsWith('/api/auth') &&
       !request.nextUrl.pathname.startsWith('/api/share') &&
+      !request.nextUrl.pathname.startsWith('/api/stripe') &&
       !request.nextUrl.pathname.startsWith('/api/cron'));
 
   // Allow extension requests to bypass middleware protection so the route handler

@@ -484,6 +484,45 @@ export default function LandingPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [annualDecisions, setAnnualDecisions] = useState(5000);
   const [avgDecisionValue, setAvgDecisionValue] = useState(10000);
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+
+  const handleCheckout = async (plan: 'pro' | 'team') => {
+    setCheckoutLoading(plan);
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+      if (res.status === 401) {
+        window.location.href = `/login?redirect=${encodeURIComponent('/?scrollTo=pricing')}`;
+        return;
+      }
+      if (res.status === 503) {
+        alert('Stripe is not configured yet. Please check back soon!');
+        return;
+      }
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Failed to start checkout');
+      }
+    } catch {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setCheckoutLoading(null);
+    }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const scrollTarget = params.get('scrollTo');
+    if (scrollTarget) {
+      const el = document.getElementById(scrollTarget);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   const noiseTaxRate = 0.12;
   const potentialLoss = annualDecisions * avgDecisionValue * noiseTaxRate;
@@ -2864,8 +2903,9 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <Link
-                href="/login?plan=pro"
+              <button
+                onClick={() => handleCheckout('pro')}
+                disabled={checkoutLoading === 'pro'}
                 style={{
                   display: 'inline-flex',
                   justifyContent: 'center',
@@ -2876,13 +2916,14 @@ export default function LandingPage() {
                   color: '#000000',
                   fontSize: '0.85rem',
                   fontWeight: 700,
-                  textDecoration: 'none',
+                  cursor: checkoutLoading === 'pro' ? 'wait' : 'pointer',
                   transition: 'all 0.2s ease',
                   boxShadow: '0 0 20px rgba(255, 255, 255, 0.15)',
+                  opacity: checkoutLoading === 'pro' ? 0.7 : 1,
                 }}
               >
-                Start Pro Trial
-              </Link>
+                {checkoutLoading === 'pro' ? 'Redirecting...' : 'Start Pro Trial'}
+              </button>
             </motion.div>
 
             {/* Team Tier */}
@@ -2960,8 +3001,9 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <Link
-                href="/login?plan=team"
+              <button
+                onClick={() => handleCheckout('team')}
+                disabled={checkoutLoading === 'team'}
                 style={{
                   display: 'inline-flex',
                   justifyContent: 'center',
@@ -2972,12 +3014,13 @@ export default function LandingPage() {
                   color: 'var(--text-primary)',
                   fontSize: '0.85rem',
                   fontWeight: 600,
-                  textDecoration: 'none',
+                  cursor: checkoutLoading === 'team' ? 'wait' : 'pointer',
                   transition: 'all 0.2s ease',
+                  opacity: checkoutLoading === 'team' ? 0.7 : 1,
                 }}
               >
-                Start Team Trial
-              </Link>
+                {checkoutLoading === 'team' ? 'Redirecting...' : 'Start Team Trial'}
+              </button>
             </motion.div>
 
             {/* Enterprise Tier */}
