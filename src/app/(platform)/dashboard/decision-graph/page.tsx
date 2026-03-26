@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { DecisionKnowledgeGraph } from '@/components/visualizations/DecisionKnowledgeGraph';
+import { CausalDAG } from '@/components/visualizations/CausalDAG';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { CrossSiloAlertCards } from '@/components/ui/CrossSiloAlertCards';
 import {
   Network,
   FileText,
@@ -12,7 +14,6 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  AlertTriangle,
 } from 'lucide-react';
 
 interface GraphReport {
@@ -338,36 +339,22 @@ export default function DecisionGraphPage() {
               </div>
             )}
 
-            {/* Anti-Patterns */}
+            {/* Anti-Patterns — Cross-Silo Alert Cards */}
             {report.report.antiPatterns.length > 0 && (
-              <div className="card">
-                <div className="card-header">
-                  <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    Structural Risks
-                  </span>
-                </div>
-                <div className="card-body space-y-2">
-                  {report.report.antiPatterns.map((p, i) => (
-                    <div key={i} className="p-3 rounded bg-amber-500/5 border border-amber-500/10">
-                      <div className="flex items-center gap-2 mb-1">
-                        <AlertTriangle size={12} className="text-amber-400" />
-                        <span className="text-xs font-semibold text-amber-400 capitalize">
-                          {p.patternType.replace(/_/g, ' ')}
-                        </span>
-                        <span className="text-[10px] text-zinc-500">
-                          severity {p.severity} | {p.affectedNodes} nodes
-                        </span>
-                      </div>
-                      <p className="text-xs text-zinc-400">{p.description}</p>
-                      <p className="text-xs text-zinc-500 italic mt-1">{p.recommendation}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <CrossSiloAlertCards antiPatterns={report.report.antiPatterns} />
             )}
           </div>
         )}
       </ErrorBoundary>
+
+      {/* Causal DAG — Learned causal structure */}
+      {orgId && (
+        <div className="mt-6">
+          <ErrorBoundary>
+            <CausalDAG orgId={orgId} />
+          </ErrorBoundary>
+        </div>
+      )}
     </div>
   );
 }
