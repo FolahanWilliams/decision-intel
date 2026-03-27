@@ -23,6 +23,7 @@ import { useToast } from '@/components/ui/ToastContext';
 import { createClientLogger } from '@/lib/utils/logger';
 import type { SlackInstallationStatus } from '@/types/human-audit';
 import { PersonaManager } from './PersonaManager';
+import { BillingSection } from '@/components/ui/BillingSection';
 
 const log = createClientLogger('Settings');
 
@@ -195,29 +196,10 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
               </div>
             </div>
             <div>
-              <label className="text-xs text-muted mb-xs font-medium block">Plan</label>
-              <div
-                style={{
-                  padding: 'var(--spacing-md)',
-                  background: 'var(--bg-secondary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--spacing-sm)',
-                }}
-              >
-                <span
-                  style={{
-                    background:
-                      'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.06))',
-                    padding: '2px 8px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                  }}
-                >
-                  PRO
-                </span>
-                Professional Plan
-              </div>
+              <label className="text-xs text-muted mb-xs font-medium block">
+                Plan &amp; Billing
+              </label>
+              <BillingSection />
             </div>
           </div>
         </div>
