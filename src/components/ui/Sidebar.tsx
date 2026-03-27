@@ -43,13 +43,19 @@ export default function Sidebar() {
     try {
       const saved = localStorage.getItem('di-sidebar-collapsed');
       if (saved) setCollapsedSections(JSON.parse(saved));
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   const toggleSection = useCallback((section: string) => {
     setCollapsedSections(prev => {
       const next = { ...prev, [section]: !prev[section] };
-      try { localStorage.setItem('di-sidebar-collapsed', JSON.stringify(next)); } catch { /* ignore */ }
+      try {
+        localStorage.setItem('di-sidebar-collapsed', JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
       return next;
     });
   }, []);
@@ -354,7 +360,11 @@ export default function Sidebar() {
             icon={<Sparkles size={18} />}
             label="AI Assistant"
             description="Decision copilot & document chat"
-            active={pathname.startsWith('/dashboard/ai-assistant') || pathname === '/dashboard/copilot' || pathname === '/dashboard/chat'}
+            active={
+              pathname.startsWith('/dashboard/ai-assistant') ||
+              pathname === '/dashboard/copilot' ||
+              pathname === '/dashboard/chat'
+            }
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
@@ -363,7 +373,11 @@ export default function Sidebar() {
             icon={<BarChart3 size={18} />}
             label="Analytics"
             description="Trends, insights & decision DNA"
-            active={pathname.startsWith('/dashboard/analytics') || pathname === '/dashboard/insights' || pathname === '/dashboard/decision-dna'}
+            active={
+              pathname.startsWith('/dashboard/analytics') ||
+              pathname === '/dashboard/insights' ||
+              pathname === '/dashboard/decision-dna'
+            }
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
@@ -392,7 +406,11 @@ export default function Sidebar() {
             icon={<BrainCircuit size={18} />}
             label="Decision Quality"
             description="Audits & behavioral nudges"
-            active={pathname.startsWith('/dashboard/decision-quality') || pathname.startsWith('/dashboard/cognitive-audits') || pathname === '/dashboard/nudges'}
+            active={
+              pathname.startsWith('/dashboard/decision-quality') ||
+              pathname.startsWith('/dashboard/cognitive-audits') ||
+              pathname === '/dashboard/nudges'
+            }
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
@@ -789,9 +807,7 @@ function CollapsibleSection({
           transition: 'grid-template-rows 0.2s ease',
         }}
       >
-        <div style={{ overflow: 'hidden' }}>
-          {children}
-        </div>
+        <div style={{ overflow: 'hidden' }}>{children}</div>
       </div>
     </div>
   );

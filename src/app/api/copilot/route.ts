@@ -82,9 +82,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate forced agent if provided
-    const validForcedAgent = forcedAgent && COPILOT_AGENTS.includes(forcedAgent as CopilotAgentType)
-      ? (forcedAgent as CopilotAgentType)
-      : undefined;
+    const validForcedAgent =
+      forcedAgent && COPILOT_AGENTS.includes(forcedAgent as CopilotAgentType)
+        ? (forcedAgent as CopilotAgentType)
+        : undefined;
 
     // Resolve or create session
     let session: { id: string; decisionPrompt: string; orgId: string | null };
@@ -226,22 +227,29 @@ export async function POST(request: NextRequest) {
               role: 'agent',
               agentType,
               content: fullResponse,
-              sources: sources.length > 0 ? toPrismaJson(sources.map(s => ({
-                documentId: s.documentId,
-                filename: s.filename,
-                similarity: s.similarity,
-                score: s.score,
-              }))) : undefined,
+              sources:
+                sources.length > 0
+                  ? toPrismaJson(
+                      sources.map(s => ({
+                        documentId: s.documentId,
+                        filename: s.filename,
+                        similarity: s.similarity,
+                        score: s.score,
+                      }))
+                    )
+                  : undefined,
             },
             select: { id: true },
           });
 
           // Update session title if this is the first agent response
           if (history.length === 0) {
-            void prisma.copilotSession.update({
-              where: { id: session.id },
-              data: { title: session.decisionPrompt.slice(0, 100) },
-            }).catch(() => {});
+            void prisma.copilotSession
+              .update({
+                where: { id: session.id },
+                data: { title: session.decisionPrompt.slice(0, 100) },
+              })
+              .catch(() => {});
           }
 
           // Signal completion

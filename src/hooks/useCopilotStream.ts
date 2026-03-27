@@ -2,10 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { SSEReader } from '@/lib/sse';
-import {
-  type CopilotAgentType,
-  AGENT_LABELS,
-} from '@/lib/copilot/types';
+import { type CopilotAgentType, AGENT_LABELS } from '@/lib/copilot/types';
 
 export interface CopilotMessage {
   id: string;
@@ -45,7 +42,9 @@ interface UseCopilotStreamReturn {
   startNewSession: (decisionPrompt: string) => void;
   clearMessages: () => void;
   loadSession: (sessionId: string) => Promise<void>;
-  resolveSession: (data: ResolveSessionData) => Promise<{ session: unknown; outcome: unknown; message: string } | undefined>;
+  resolveSession: (
+    data: ResolveSessionData
+  ) => Promise<{ session: unknown; outcome: unknown; message: string } | undefined>;
 }
 
 let messageCounter = 0;
@@ -171,17 +170,13 @@ export function useCopilotStream(): UseCopilotStreamReturn {
 
         // Safety net
         setMessages(prev =>
-          prev.map(m =>
-            m.id === agentMsg.id && m.isStreaming ? { ...m, isStreaming: false } : m
-          )
+          prev.map(m => (m.id === agentMsg.id && m.isStreaming ? { ...m, isStreaming: false } : m))
         );
       } catch (err) {
         if ((err as Error).name === 'AbortError') return;
         const message = err instanceof Error ? err.message : 'Copilot failed';
         setError(message);
-        setMessages(prev =>
-          prev.filter(m => m.id !== agentMsg.id || m.content.length > 0)
-        );
+        setMessages(prev => prev.filter(m => m.id !== agentMsg.id || m.content.length > 0));
       } finally {
         setIsStreaming(false);
         setActiveAgent(null);
@@ -241,25 +236,28 @@ export function useCopilotStream(): UseCopilotStreamReturn {
     }
   }, []);
 
-  const resolveSession = useCallback(async (data: ResolveSessionData) => {
-    if (!sessionId) return;
-    try {
-      const res = await fetch(`/api/copilot/sessions/${sessionId}/resolve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Failed to resolve session');
+  const resolveSession = useCallback(
+    async (data: ResolveSessionData) => {
+      if (!sessionId) return;
+      try {
+        const res = await fetch(`/api/copilot/sessions/${sessionId}/resolve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.error || 'Failed to resolve session');
+        }
+        return await res.json();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to resolve session';
+        setError(message);
+        throw err;
       }
-      return await res.json();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to resolve session';
-      setError(message);
-      throw err;
-    }
-  }, [sessionId]);
+    },
+    [sessionId]
+  );
 
   // Streaming safety timeout — auto-clear if streaming hangs for >60s
   useEffect(() => {

@@ -29,10 +29,22 @@ function getModel() {
   return genAI.getGenerativeModel({
     model: modelName,
     safetySettings: [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+      },
     ],
     generationConfig: {
       maxOutputTokens: 4096,
@@ -64,16 +76,30 @@ export async function routeToAgent(
   // Keyword-based fast routing (avoids LLM call for obvious cases)
   const lower = userMessage.toLowerCase();
 
-  if (/\b(what could go wrong|challenge|critique|flaw|problem|bias|blind spot|devil|push back|attack)\b/.test(lower)) {
+  if (
+    /\b(what could go wrong|challenge|critique|flaw|problem|bias|blind spot|devil|push back|attack)\b/.test(
+      lower
+    )
+  ) {
     return 'devils_advocate';
   }
-  if (/\b(what if|scenario|imagine|suppose|counterfactual|pre-?mortem|future|simulate)\b/.test(lower)) {
+  if (
+    /\b(what if|scenario|imagine|suppose|counterfactual|pre-?mortem|future|simulate)\b/.test(lower)
+  ) {
     return 'scenario_explorer';
   }
-  if (/\b(summarize|synthesize|rank|score|decide|recommend|wrap up|final|conclusion|dqi)\b/.test(lower)) {
+  if (
+    /\b(summarize|synthesize|rank|score|decide|recommend|wrap up|final|conclusion|dqi)\b/.test(
+      lower
+    )
+  ) {
     return 'synthesizer';
   }
-  if (/\b(what would i do|my twin|personal twin|my style|my pattern|how do i usually|my gut|predict me|my history|my track record)\b/.test(lower)) {
+  if (
+    /\b(what would i do|my twin|personal twin|my style|my pattern|how do i usually|my gut|predict me|my history|my track record)\b/.test(
+      lower
+    )
+  ) {
     return 'personal_twin';
   }
 
@@ -132,7 +158,14 @@ export async function* runCopilotAgent(
   // System context as first exchange
   geminiHistory.push(
     { role: 'user' as const, parts: [{ text: 'System context: ' + systemPrompt }] },
-    { role: 'model' as const, parts: [{ text: 'Understood. I will respond in character as this agent, using the context and conversation history provided.' }] }
+    {
+      role: 'model' as const,
+      parts: [
+        {
+          text: 'Understood. I will respond in character as this agent, using the context and conversation history provided.',
+        },
+      ],
+    }
   );
 
   // Add conversation history
@@ -179,7 +212,7 @@ export async function prepareCopilotTurn(
   forcedAgent?: CopilotAgentType
 ): Promise<CopilotTurnResult> {
   // Build context (reuse if provided, otherwise assemble fresh)
-  const context = existingContext ?? await buildCopilotContext(userId, orgId, decisionPrompt);
+  const context = existingContext ?? (await buildCopilotContext(userId, orgId, decisionPrompt));
 
   // Route to the appropriate agent
   const agentType = await routeToAgent(userMessage, history, forcedAgent);

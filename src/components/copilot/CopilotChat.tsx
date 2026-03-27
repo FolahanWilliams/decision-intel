@@ -1,7 +1,17 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Sparkles, Swords, Telescope, BarChart3, Brain, CheckCircle, X } from 'lucide-react';
+import {
+  Send,
+  Loader2,
+  Sparkles,
+  Swords,
+  Telescope,
+  BarChart3,
+  Brain,
+  CheckCircle,
+  X,
+} from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { AgentBadge } from './AgentBadge';
 import { type CopilotMessage } from '@/hooks/useCopilotStream';
@@ -17,14 +27,49 @@ interface CopilotChatProps {
   onDismissError?: () => void;
 }
 
-const QUICK_ACTIONS: Array<{ label: string; icon: React.ComponentType<{ className?: string }>; agent: CopilotAgentType; prompt: string }> = [
-  { label: 'Challenge this', icon: Swords, agent: 'devils_advocate', prompt: 'Challenge the assumptions in what we have so far. What could go wrong?' },
-  { label: 'What if...?', icon: Telescope, agent: 'scenario_explorer', prompt: 'Explore different scenarios — what happens under best and worst case conditions?' },
-  { label: 'Summarize & Score', icon: BarChart3, agent: 'synthesizer', prompt: 'Summarize everything discussed and rank the options with a decision quality assessment.' },
-  { label: 'What would I do?', icon: Brain, agent: 'personal_twin', prompt: 'Based on my decision history and patterns, what would I likely do here? Give me my personal twin\'s perspective.' },
+const QUICK_ACTIONS: Array<{
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  agent: CopilotAgentType;
+  prompt: string;
+}> = [
+  {
+    label: 'Challenge this',
+    icon: Swords,
+    agent: 'devils_advocate',
+    prompt: 'Challenge the assumptions in what we have so far. What could go wrong?',
+  },
+  {
+    label: 'What if...?',
+    icon: Telescope,
+    agent: 'scenario_explorer',
+    prompt: 'Explore different scenarios — what happens under best and worst case conditions?',
+  },
+  {
+    label: 'Summarize & Score',
+    icon: BarChart3,
+    agent: 'synthesizer',
+    prompt:
+      'Summarize everything discussed and rank the options with a decision quality assessment.',
+  },
+  {
+    label: 'What would I do?',
+    icon: Brain,
+    agent: 'personal_twin',
+    prompt:
+      "Based on my decision history and patterns, what would I likely do here? Give me my personal twin's perspective.",
+  },
 ];
 
-export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendMessage, onResolve, onDismissError }: CopilotChatProps) {
+export function CopilotChat({
+  messages,
+  isStreaming,
+  error,
+  activeAgent,
+  onSendMessage,
+  onResolve,
+  onDismissError,
+}: CopilotChatProps) {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -160,7 +205,11 @@ export function CopilotChat({ messages, isStreaming, error, activeAgent, onSendM
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={activeAgent ? `${activeAgent.replace(/_/g, ' ')} is thinking...` : 'Type your message...'}
+              placeholder={
+                activeAgent
+                  ? `${activeAgent.replace(/_/g, ' ')} is thinking...`
+                  : 'Type your message...'
+              }
               disabled={isStreaming}
               rows={1}
               className="w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"

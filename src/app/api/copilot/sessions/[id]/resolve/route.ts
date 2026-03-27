@@ -14,10 +14,7 @@ const log = createLogger('CopilotResolve');
  * This is the flywheel entry point: every outcome logged here
  * triggers recalibration that makes future agents smarter.
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -48,7 +45,10 @@ export async function POST(
     if (outcome && !['success', 'partial_success', 'failure', 'inconclusive'].includes(outcome)) {
       return NextResponse.json({ error: 'Invalid outcome value' }, { status: 400 });
     }
-    if (impactScore != null && (typeof impactScore !== 'number' || impactScore < 1 || impactScore > 10)) {
+    if (
+      impactScore != null &&
+      (typeof impactScore !== 'number' || impactScore < 1 || impactScore > 10)
+    ) {
       return NextResponse.json({ error: 'impactScore must be 1-10' }, { status: 400 });
     }
 
@@ -103,7 +103,8 @@ export async function POST(
             userId: user.id,
             orgId: session.orgId,
             outcome,
-            impactScore: impactScore != null ? Math.min(10, Math.max(1, Number(impactScore))) : null,
+            impactScore:
+              impactScore != null ? Math.min(10, Math.max(1, Number(impactScore))) : null,
             lessonsLearned: lessonsLearned || null,
             whatWorked: whatWorked || null,
             whatFailed: whatFailed || null,

@@ -23,7 +23,9 @@ function AIAssistantInner() {
         <TabBar
           tabs={TABS}
           activeTab={mode}
-          onTabChange={(key) => router.replace(`/dashboard/ai-assistant?mode=${key}`, { scroll: false })}
+          onTabChange={key =>
+            router.replace(`/dashboard/ai-assistant?mode=${key}`, { scroll: false })
+          }
         />
       </div>
       <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>

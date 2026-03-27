@@ -8,7 +8,13 @@ import { type CausalWeight } from '@/lib/learning/causal-learning';
 
 // ─── Agent Personas ──────────────────────────────────────────────────────────
 
-export const COPILOT_AGENTS = ['idea_builder', 'devils_advocate', 'scenario_explorer', 'synthesizer', 'personal_twin'] as const;
+export const COPILOT_AGENTS = [
+  'idea_builder',
+  'devils_advocate',
+  'scenario_explorer',
+  'synthesizer',
+  'personal_twin',
+] as const;
 export type CopilotAgentType = (typeof COPILOT_AGENTS)[number];
 
 export const AGENT_LABELS: Record<CopilotAgentType, string> = {
@@ -20,11 +26,11 @@ export const AGENT_LABELS: Record<CopilotAgentType, string> = {
 };
 
 export const AGENT_COLORS: Record<CopilotAgentType, string> = {
-  idea_builder: '#3b82f6',      // blue
-  devils_advocate: '#ef4444',    // red
-  scenario_explorer: '#8b5cf6',  // purple
-  synthesizer: '#22c55e',        // green
-  personal_twin: '#f59e0b',     // amber
+  idea_builder: '#3b82f6', // blue
+  devils_advocate: '#ef4444', // red
+  scenario_explorer: '#8b5cf6', // purple
+  synthesizer: '#22c55e', // green
+  personal_twin: '#f59e0b', // amber
 };
 
 // ─── Copilot Context ─────────────────────────────────────────────────────────

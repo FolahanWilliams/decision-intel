@@ -459,7 +459,11 @@ export async function recalibrateTwinWeights(
     });
 
     // Also load copilot outcomes — helpfulAgents maps to "most accurate twin" equivalent
-    let copilotTwinData: Array<{ helpfulAgents: string[]; outcome: string; impactScore: number | null }> = [];
+    let copilotTwinData: Array<{
+      helpfulAgents: string[];
+      outcome: string;
+      impactScore: number | null;
+    }> = [];
     try {
       copilotTwinData = await prisma.copilotOutcome.findMany({
         where: {

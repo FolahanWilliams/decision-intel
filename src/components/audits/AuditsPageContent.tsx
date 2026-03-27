@@ -333,8 +333,23 @@ export function AuditsPageContent() {
           </div>
           <div className="card-body" style={{ padding: 0, position: 'relative' }}>
             {isPaginating && (
-              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'inherit' }}>
-                <Loader2 size={24} className="animate-spin" style={{ color: 'var(--accent-primary)' }} />
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(0,0,0,0.3)',
+                  zIndex: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 'inherit',
+                }}
+              >
+                <Loader2
+                  size={24}
+                  className="animate-spin"
+                  style={{ color: 'var(--accent-primary)' }}
+                />
               </div>
             )}
             {decisions.length === 0 && !loading ? (
@@ -532,7 +547,11 @@ export function AuditsPageContent() {
 
       {/* Quick Actions */}
       <div className="grid grid-3 mt-xl gap-md">
-        <Link href="/dashboard/decision-quality?tab=nudges" className="card" style={{ textDecoration: 'none' }}>
+        <Link
+          href="/dashboard/decision-quality?tab=nudges"
+          className="card"
+          style={{ textDecoration: 'none' }}
+        >
           <div className="card-body flex items-center gap-md">
             <AlertTriangle size={24} style={{ color: 'var(--warning)' }} />
             <div>
@@ -550,7 +569,11 @@ export function AuditsPageContent() {
             </div>
           </div>
         </Link>
-        <Link href="/dashboard/analytics?view=trends" className="card" style={{ textDecoration: 'none' }}>
+        <Link
+          href="/dashboard/analytics?view=trends"
+          className="card"
+          style={{ textDecoration: 'none' }}
+        >
           <div className="card-body flex items-center gap-md">
             <TrendingUp size={24} style={{ color: 'var(--success)' }} />
             <div>

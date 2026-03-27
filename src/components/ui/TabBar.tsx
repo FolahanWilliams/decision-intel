@@ -29,7 +29,7 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
         flexShrink: 0,
       }}
     >
-      {tabs.map((tab) => {
+      {tabs.map(tab => {
         const isActive = tab.key === activeTab;
         return (
           <button
@@ -45,12 +45,8 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
               fontSize: '13px',
               fontWeight: isActive ? 700 : 500,
               color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
-              background: isActive
-                ? 'rgba(255, 255, 255, 0.12)'
-                : 'transparent',
-              border: isActive
-                ? '1px solid rgba(255, 255, 255, 0.1)'
-                : '1px solid transparent',
+              background: isActive ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+              border: isActive ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid transparent',
               borderRadius: '8px',
               cursor: 'pointer',
               transition: 'all 0.2s ease',

@@ -9,10 +9,7 @@ const log = createLogger('CopilotSessionDetail');
  * GET /api/copilot/sessions/[id]
  * Get a single copilot session with all its turns.
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -77,10 +74,12 @@ export async function GET(
         dqiScore: session.dqiScore,
         decisionSummary: session.decisionSummary,
         chosenOption: session.chosenOption,
-        outcome: session.outcome ? {
-          ...session.outcome,
-          reportedAt: session.outcome.reportedAt.toISOString(),
-        } : null,
+        outcome: session.outcome
+          ? {
+              ...session.outcome,
+              reportedAt: session.outcome.reportedAt.toISOString(),
+            }
+          : null,
         createdAt: session.createdAt.toISOString(),
         updatedAt: session.updatedAt.toISOString(),
         turns: session.turns.map(t => ({

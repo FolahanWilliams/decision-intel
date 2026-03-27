@@ -3,10 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { createLogger } from '@/lib/utils/logger';
 import { loadDecisionStyleProfile } from '@/lib/copilot/context';
-import {
-  loadCalibrationProfile,
-  type TwinWeightCalibration,
-} from '@/lib/learning/feedback-loop';
+import { loadCalibrationProfile, type TwinWeightCalibration } from '@/lib/learning/feedback-loop';
 
 const log = createLogger('DecisionDNA');
 
@@ -35,65 +32,70 @@ export async function GET() {
     }
 
     // Execute all queries in parallel
-    const [
-      decisionStyle,
-      twinCalibration,
-      copilotOutcomes,
-      copilotSessions,
-      biasTimelineRaw,
-    ] = await Promise.all([
-      // 1. Deep decision style profile
-      loadDecisionStyleProfile(userId),
+    const [decisionStyle, twinCalibration, copilotOutcomes, copilotSessions, biasTimelineRaw] =
+      await Promise.all([
+        // 1. Deep decision style profile
+        loadDecisionStyleProfile(userId),
 
-      // 2. Agent effectiveness from calibration
-      loadCalibrationProfile<TwinWeightCalibration>('twin_weight', orgId, userId),
+        // 2. Agent effectiveness from calibration
+        loadCalibrationProfile<TwinWeightCalibration>('twin_weight', orgId, userId),
 
-      // 3. Copilot outcomes for history
-      prisma.copilotOutcome.findMany({
-        where: { userId },
-        orderBy: { reportedAt: 'desc' },
-        take: 50,
-        select: {
-          outcome: true,
-          impactScore: true,
-          reportedAt: true,
-          helpfulAgents: true,
-          lessonsLearned: true,
-          session: {
-            select: { title: true, createdAt: true, resolvedAt: true },
-          },
-        },
-      }).catch(() => [] as Array<{
-        outcome: string;
-        impactScore: number | null;
-        reportedAt: Date;
-        helpfulAgents: string[];
-        lessonsLearned: string | null;
-        session: { title: string; createdAt: Date; resolvedAt: Date | null };
-      }>),
+        // 3. Copilot outcomes for history
+        prisma.copilotOutcome
+          .findMany({
+            where: { userId },
+            orderBy: { reportedAt: 'desc' },
+            take: 50,
+            select: {
+              outcome: true,
+              impactScore: true,
+              reportedAt: true,
+              helpfulAgents: true,
+              lessonsLearned: true,
+              session: {
+                select: { title: true, createdAt: true, resolvedAt: true },
+              },
+            },
+          })
+          .catch(
+            () =>
+              [] as Array<{
+                outcome: string;
+                impactScore: number | null;
+                reportedAt: Date;
+                helpfulAgents: string[];
+                lessonsLearned: string | null;
+                session: { title: string; createdAt: Date; resolvedAt: Date | null };
+              }>
+          ),
 
-      // 4. All copilot sessions for velocity tracking
-      prisma.copilotSession.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-        take: 100,
-        select: {
-          createdAt: true,
-          resolvedAt: true,
-          status: true,
-          outcome: {
-            select: { outcome: true },
-          },
-        },
-      }).catch(() => [] as Array<{
-        createdAt: Date;
-        resolvedAt: Date | null;
-        status: string;
-        outcome: { outcome: string } | null;
-      }>),
+        // 4. All copilot sessions for velocity tracking
+        prisma.copilotSession
+          .findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            take: 100,
+            select: {
+              createdAt: true,
+              resolvedAt: true,
+              status: true,
+              outcome: {
+                select: { outcome: true },
+              },
+            },
+          })
+          .catch(
+            () =>
+              [] as Array<{
+                createdAt: Date;
+                resolvedAt: Date | null;
+                status: string;
+                outcome: { outcome: string } | null;
+              }>
+          ),
 
-      // 5. Bias timeline (monthly bucketed)
-      prisma.$queryRaw<Array<{ biasType: string; month: string; count: bigint }>>`
+        // 5. Bias timeline (monthly bucketed)
+        prisma.$queryRaw<Array<{ biasType: string; month: string; count: bigint }>>`
         SELECT bi."biasType",
                TO_CHAR(a."createdAt", 'YYYY-MM') as month,
                COUNT(*)::bigint as count
@@ -104,7 +106,7 @@ export async function GET() {
         GROUP BY bi."biasType", TO_CHAR(a."createdAt", 'YYYY-MM')
         ORDER BY month ASC
       `.catch(() => [] as Array<{ biasType: string; month: string; count: bigint }>),
-    ]);
+      ]);
 
     // Build outcome history
     const outcomeHistory = copilotOutcomes.map(o => ({
@@ -120,9 +122,9 @@ export async function GET() {
     const decisionVelocity = copilotSessions
       .filter(s => s.resolvedAt)
       .map(s => ({
-        deliberationHours: Math.round(
-          (s.resolvedAt!.getTime() - s.createdAt.getTime()) / (1000 * 60 * 60) * 10
-        ) / 10,
+        deliberationHours:
+          Math.round(((s.resolvedAt!.getTime() - s.createdAt.getTime()) / (1000 * 60 * 60)) * 10) /
+          10,
         outcome: s.outcome?.outcome ?? null,
       }));
 
@@ -146,7 +148,10 @@ export async function GET() {
     }
 
     // Merge with calibration data if available
-    const agentEffectiveness: Record<string, { accuracyRate: number; avgImpact: number; sampleSize: number; helpfulCount: number }> = {};
+    const agentEffectiveness: Record<
+      string,
+      { accuracyRate: number; avgImpact: number; sampleSize: number; helpfulCount: number }
+    > = {};
     if (twinCalibration?.personas) {
       for (const [agent, data] of Object.entries(twinCalibration.personas)) {
         agentEffectiveness[agent] = {
@@ -179,9 +184,8 @@ export async function GET() {
     const impactScores = copilotOutcomes
       .filter(o => o.impactScore != null)
       .map(o => o.impactScore!);
-    const avgImpact = impactScores.length > 0
-      ? impactScores.reduce((a, b) => a + b, 0) / impactScores.length
-      : 0;
+    const avgImpact =
+      impactScores.length > 0 ? impactScores.reduce((a, b) => a + b, 0) / impactScores.length : 0;
 
     return NextResponse.json(
       {
