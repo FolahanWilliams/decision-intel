@@ -1,6 +1,6 @@
 import { AuditState } from './types';
 import { parseJSON } from '../utils/json';
-import { AnalysisResult, BiasDetectionResult, NoiseBenchmark } from '../../types';
+import { AnalysisResult, BiasDetectionResult, NoiseBenchmark, CausalIntelligenceResult } from '../../types';
 import {
   GoogleGenerativeAI,
   HarmCategory,
@@ -1051,11 +1051,17 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
     }
 
     // Step 3: Load causal driver rankings (Moat 1: Causal AI Layer)
-    // Tells decision twins which biases ACTUALLY matter for this org
+    // Uses org-specific causal weights (from outcome data) to tell twins
+    // which biases ACTUALLY matter for this org. Falls back to userId-based
+    // lookup if orgId is unavailable.
     let causalDriverBrief = '';
     try {
-      const { learnCausalEdges } = await import('@/lib/learning/causal-learning');
-      const causalWeights = await learnCausalEdges(userId);
+      const { computeOrgCausalWeights, getCausalInsights, doCalculus } = await import(
+        '@/lib/learning/causal-learning'
+      );
+      const effectiveOrgId = state.orgId || userId;
+      const causalWeights = await computeOrgCausalWeights(effectiveOrgId);
+
       if (causalWeights.length > 0) {
         const topDangers = causalWeights
           .filter(w => w.dangerMultiplier >= 1.3 && w.sampleSize >= 3)
@@ -1085,8 +1091,38 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
               ? 'LOWER-RISK biases (de-prioritize in deliberation):\n' + safeLines.join('\n')
               : '');
 
+          // If we have enough dangerous biases, run do-calculus to show twins
+          // the projected impact of eliminating them
+          if (topDangers.length >= 2) {
+            try {
+              const interventionResult = await doCalculus(effectiveOrgId, {
+                remove: topDangers.slice(0, 3).map(w => w.biasType),
+              });
+              if (interventionResult && interventionResult.improvement > 0) {
+                causalDriverBrief +=
+                  `\n\nCAUSAL INTERVENTION ESTIMATE: Removing the top ${Math.min(3, topDangers.length)} dangerous biases would improve decision success rate by ~${Math.round(interventionResult.improvement * 100)}% ` +
+                  `(from ${Math.round(interventionResult.baselineSuccessProbability * 100)}% → ${Math.round(interventionResult.successProbability * 100)}%), ` +
+                  `confidence: ${Math.round(interventionResult.confidence * 100)}% (${interventionResult.method === 'scm_do_calculus' ? 'causal DAG' : 'correlation'}).`;
+              }
+            } catch {
+              // do-calculus is best-effort — don't fail simulation for it
+            }
+          }
+
+          // Add high-level causal insights
+          const totalOutcomes = causalWeights.reduce((max, w) => Math.max(max, w.sampleSize), 0);
+          const insights = getCausalInsights(causalWeights, totalOutcomes);
+          const actionableInsights = insights.filter(
+            i => (i.type === 'danger' || i.type === 'twin') && i.confidence >= 0.5
+          );
+          if (actionableInsights.length > 0) {
+            causalDriverBrief +=
+              '\n\nKEY CAUSAL INSIGHTS:\n' +
+              actionableInsights.map(i => `- [${i.type.toUpperCase()}] ${i.message}`).join('\n');
+          }
+
           log.info(
-            `Causal drivers injected into simulation: ${topDangers.length} dangerous, ${topSafe.length} benign`
+            `Causal drivers injected into simulation: ${topDangers.length} dangerous, ${topSafe.length} benign (org: ${effectiveOrgId})`
           );
         }
       }
@@ -1220,6 +1256,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
 
   // Load calibrated bias severity weights (behavioral data flywheel)
   // Falls back to static defaults if no calibration exists
+  const effectiveOrgId = state.orgId || null;
   let severityWeights: Record<string, number> = {
     low: 5,
     medium: 15,
@@ -1229,8 +1266,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
 
   try {
     const { loadBiasSeverityWeights } = await import('@/lib/learning/feedback-loop');
-    // Attempt to load org-specific weights; userId is used as a proxy for org lookup
-    severityWeights = await loadBiasSeverityWeights(null, state.userId);
+    severityWeights = await loadBiasSeverityWeights(effectiveOrgId, state.userId);
     log.debug('Using calibrated bias severity weights');
   } catch {
     // feedback-loop module or CalibrationProfile table may not exist yet
@@ -1241,15 +1277,22 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
   // If a bias type is causally linked to poor outcomes, amplify its deduction.
   // If a bias type is mostly benign, reduce its deduction.
   let causalMultipliers: Map<string, number> = new Map();
+  let causalWeightsForReport: Array<{
+    biasType: string;
+    dangerMultiplier: number;
+    failureCount: number;
+    successCount: number;
+    sampleSize: number;
+  }> = [];
   try {
-    const { learnCausalEdges } = await import('@/lib/learning/causal-learning');
-    // userId serves as proxy for org lookup when orgId isn't available
-    const causalWeights = await learnCausalEdges(state.userId || '');
+    const { computeOrgCausalWeights } = await import('@/lib/learning/causal-learning');
+    const causalWeights = await computeOrgCausalWeights(effectiveOrgId || state.userId || '');
     if (causalWeights.length > 0) {
       causalMultipliers = new Map(
         causalWeights.map(w => [w.biasType.toLowerCase().replace(/\s+/g, '_'), w.dangerMultiplier])
       );
-      log.debug(`Causal AI active: ${causalWeights.length} bias-outcome edges loaded`);
+      causalWeightsForReport = causalWeights;
+      log.debug(`Causal AI active: ${causalWeights.length} bias-outcome edges loaded (org: ${effectiveOrgId || 'user-level'})`);
     }
   } catch {
     log.debug('Causal weights unavailable — using static severity only');
@@ -1532,6 +1575,86 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             biasAdjustments: bayesianResult.biasAdjustments,
           }
         : undefined,
+      causalIntelligence: await buildCausalIntelligenceReport(
+        effectiveOrgId || state.userId || '',
+        causalWeightsForReport,
+        (state.biasAnalysis || []).map((b: { biasType?: string }) =>
+          (b.biasType || '').toLowerCase().replace(/\s+/g, '_')
+        )
+      ),
     } satisfies AnalysisResult,
+  };
+}
+
+// ============================================================
+// CAUSAL INTELLIGENCE REPORT BUILDER
+// ============================================================
+
+async function buildCausalIntelligenceReport(
+  orgId: string,
+  causalWeights: Array<{
+    biasType: string;
+    dangerMultiplier: number;
+    failureCount: number;
+    successCount: number;
+    sampleSize: number;
+  }>,
+  detectedBiasTypes: string[]
+): Promise<CausalIntelligenceResult | undefined> {
+  if (causalWeights.length === 0) return undefined;
+
+  const topDangers = causalWeights
+    .filter(w => w.dangerMultiplier >= 1.3 && w.sampleSize >= 3)
+    .slice(0, 5)
+    .map(w => ({
+      biasType: w.biasType,
+      dangerMultiplier: w.dangerMultiplier,
+      failureCount: w.failureCount,
+      sampleSize: w.sampleSize,
+    }));
+
+  const benignBiases = causalWeights
+    .filter(w => w.dangerMultiplier <= 0.7 && w.sampleSize >= 3)
+    .slice(0, 5)
+    .map(w => ({
+      biasType: w.biasType,
+      dangerMultiplier: w.dangerMultiplier,
+      sampleSize: w.sampleSize,
+    }));
+
+  const totalOutcomes = Math.max(...causalWeights.map(w => w.sampleSize), 0);
+  const modelConfidence = Math.min(0.95, totalOutcomes / 50);
+
+  // Run do-calculus for biases actually detected in this document
+  let interventionEstimate: CausalIntelligenceResult['interventionEstimate'];
+  const dangerousDetected = detectedBiasTypes.filter(bt =>
+    topDangers.some(d => d.biasType.toLowerCase().replace(/\s+/g, '_') === bt)
+  );
+
+  if (dangerousDetected.length > 0) {
+    try {
+      const { doCalculus } = await import('@/lib/learning/causal-learning');
+      const result = await doCalculus(orgId, { remove: dangerousDetected });
+      if (result && result.improvement > 0) {
+        interventionEstimate = {
+          removedBiases: dangerousDetected,
+          baselineSuccessRate: result.baselineSuccessProbability,
+          projectedSuccessRate: result.successProbability,
+          improvement: result.improvement,
+          confidence: result.confidence,
+          method: result.method,
+        };
+      }
+    } catch {
+      log.debug('do-calculus unavailable for report — skipping intervention estimate');
+    }
+  }
+
+  return {
+    topDangers,
+    benignBiases,
+    interventionEstimate,
+    totalOutcomes,
+    modelConfidence,
   };
 }

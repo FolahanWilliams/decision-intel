@@ -251,7 +251,7 @@ export async function POST(request: NextRequest) {
 
           const auditGraph = await getGraph();
           const eventStream = auditGraph.streamEvents(
-            { originalContent: doc.content, documentId: documentId, userId: userId },
+            { originalContent: doc.content, documentId: documentId, userId: userId, orgId: doc.orgId || '' },
             { version: 'v2' }
           );
 

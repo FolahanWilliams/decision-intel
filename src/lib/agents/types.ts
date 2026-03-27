@@ -15,6 +15,7 @@ export interface AuditState {
   // Input
   documentId: string;
   userId: string;
+  orgId?: string;
   originalContent: string;
 
   // Pipeline safety — set by GDPR anonymizer to gate downstream processing

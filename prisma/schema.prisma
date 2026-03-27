@@ -666,6 +666,18 @@ model CausalEdge {
   @@index([orgId])
 }
 
+model OrgCausalModel {
+  id            String   @id @default(cuid())
+  orgId         String   @unique
+  weights       Json     // CausalWeight[] — per-bias danger multipliers
+  insights      Json     // CausalInsight[] — human-readable findings
+  totalOutcomes Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orgId])
+}
+
 // ─── Structured RLHF (Moat 3) ────────────────────────────────────────────
 
 model DecisionPrior {

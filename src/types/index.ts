@@ -65,7 +65,38 @@ export interface AnalysisResult {
   preMortemImageUrl?: string | null;
   compoundScoring?: CompoundScoringResult;
   bayesianPriors?: BayesianPriorsResult;
+  causalIntelligence?: CausalIntelligenceResult;
   metaVerdict?: string;
+}
+
+/** Causal AI Layer output — org-specific learned causal insights */
+export interface CausalIntelligenceResult {
+  /** Org-specific causal weights for detected biases */
+  topDangers: Array<{
+    biasType: string;
+    dangerMultiplier: number;
+    failureCount: number;
+    sampleSize: number;
+  }>;
+  /** Biases that are mostly benign in this org */
+  benignBiases: Array<{
+    biasType: string;
+    dangerMultiplier: number;
+    sampleSize: number;
+  }>;
+  /** do-calculus intervention estimate (if DAG available) */
+  interventionEstimate?: {
+    removedBiases: string[];
+    baselineSuccessRate: number;
+    projectedSuccessRate: number;
+    improvement: number;
+    confidence: number;
+    method: 'scm_do_calculus' | 'correlation_estimate';
+  };
+  /** Total outcomes powering the causal model */
+  totalOutcomes: number;
+  /** Overall confidence in the causal model */
+  modelConfidence: number;
 }
 
 /** Compound scoring engine output — persisted for UI surfacing */

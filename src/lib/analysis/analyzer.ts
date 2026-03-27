@@ -85,7 +85,7 @@ export async function analyzeDocument(
   try {
     const result = await runAnalysis(document.content, documentId, document.userId, update => {
       if (onProgress) onProgress(update);
-    });
+    }, document.orgId ?? undefined);
 
     // Store analysis in database with Schema Drift Protection
     const foundBiases = result.biases.filter(b => b.found);
@@ -473,7 +473,8 @@ export async function runAnalysis(
   content: string,
   documentId: string,
   userId: string,
-  onProgress?: (update: ProgressUpdate) => void
+  onProgress?: (update: ProgressUpdate) => void,
+  orgId?: string
 ): Promise<AnalysisResult> {
   const auditGraph = await getGraph();
 
@@ -507,7 +508,7 @@ export async function runAnalysis(
     const eventStream =
       typeof auditGraph.streamEvents === 'function'
         ? auditGraph.streamEvents(
-            { originalContent: content, documentId: documentId, userId: userId },
+            { originalContent: content, documentId: documentId, userId: userId, orgId: orgId || '' },
             { version: 'v2' }
           )
         : null;
@@ -590,6 +591,7 @@ export async function runAnalysis(
           originalContent: content,
           documentId: documentId,
           userId: userId,
+          orgId: orgId || '',
         }),
         timeoutPromise,
       ])) as { finalReport: Record<string, unknown> };
