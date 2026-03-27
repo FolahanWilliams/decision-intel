@@ -18,9 +18,19 @@ import {
   Building2,
   FileText,
   Activity,
+  Brain,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useToast } from '@/components/ui/ToastContext';
+import dynamic from 'next/dynamic';
+
+const TeamIntelligenceTab = dynamic(() => import('@/components/ui/TeamIntelligenceTab'), {
+  loading: () => (
+    <div className="flex items-center justify-center" style={{ minHeight: 200 }}>
+      <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
+    </div>
+  ),
+});
 
 interface TeamMember {
   id: string;
@@ -76,7 +86,7 @@ export default function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<'members' | 'activity'>('members');
+  const [activeTab, setActiveTab] = useState<'members' | 'activity' | 'intelligence'>('members');
 
   const fetchTeam = useCallback(async () => {
     try {
@@ -227,7 +237,7 @@ export default function TeamPage() {
         className="flex items-center gap-sm mb-lg"
         style={{ borderBottom: '1px solid var(--liquid-border)', paddingBottom: '0' }}
       >
-        {(['members', 'activity'] as const).map(tab => (
+        {(['members', 'activity', 'intelligence'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -247,13 +257,23 @@ export default function TeamPage() {
               transition: 'all 0.15s',
             }}
           >
-            {tab === 'members' ? <Users size={15} /> : <Activity size={15} />}
-            {tab === 'members' ? 'Members' : 'Team Activity'}
+            {tab === 'members' ? (
+              <Users size={15} />
+            ) : tab === 'activity' ? (
+              <Activity size={15} />
+            ) : (
+              <Brain size={15} />
+            )}
+            {tab === 'members' ? 'Members' : tab === 'activity' ? 'Team Activity' : 'Intelligence'}
           </button>
         ))}
       </div>
 
       {activeTab === 'activity' && <TeamActivityTab />}
+
+      {activeTab === 'intelligence' && org && (
+        <TeamIntelligenceTab orgId={org.id} />
+      )}
 
       {activeTab === 'members' && (
         <>

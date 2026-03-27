@@ -33,6 +33,7 @@ import { DraftOutcomeCard } from '@/components/ui/DraftOutcomeCard';
 import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/DecisionPriorCapture';
 import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
+import { LearningImpactCard } from '@/components/ui/LearningImpactCard';
 import { InterventionPanel } from '@/components/ui/InterventionPanel';
 import { MetaVerdictPanel } from '@/components/ui/MetaVerdictPanel';
 import { ToxicAlertBanner } from '@/components/ui/ToxicAlertBanner';
@@ -897,6 +898,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             biases={biases}
             twins={analysis.simulation?.twins}
           />
+        </div>
+      )}
+
+      {/* Learning Flywheel — what the org learned from this decision */}
+      {analysis && (
+        <div className="mb-lg">
+          <LearningImpactCard analysisId={analysis.id} />
         </div>
       )}
 
