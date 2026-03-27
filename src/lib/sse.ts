@@ -67,7 +67,11 @@ export class SSEReader {
    * Processes a raw text chunk from the stream.
    * Invokes callback for each valid valid JSON message found.
    */
-  processChunk(chunk: string, onMessage: (data: unknown, id?: string) => void, onParseError?: (raw: string, error: unknown) => void) {
+  processChunk(
+    chunk: string,
+    onMessage: (data: unknown, id?: string) => void,
+    onParseError?: (raw: string, error: unknown) => void
+  ) {
     this.buffer += chunk;
 
     // Split by double newline (SSE standard delimiter)

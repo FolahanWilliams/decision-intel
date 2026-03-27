@@ -138,9 +138,10 @@ function formatContextForPrompt(context: CopilotContext): string {
       .slice(0, 5)
       .map(([bias, count]) => `${bias} (${count}x)`)
       .join(', ');
-    const dangerous = context.userProfile.dangerousBiases.length > 0
-      ? `\nDANGER BIASES (historically led to poor outcomes): ${context.userProfile.dangerousBiases.join(', ')}`
-      : '';
+    const dangerous =
+      context.userProfile.dangerousBiases.length > 0
+        ? `\nDANGER BIASES (historically led to poor outcomes): ${context.userProfile.dangerousBiases.join(', ')}`
+        : '';
     sections.push(
       `<user_profile>
 User's decision history: ${context.userProfile.totalAnalyses} past analyses, avg DQI score: ${context.userProfile.avgScore.toFixed(0)}/100
@@ -155,7 +156,10 @@ Top recurring biases: ${topBiases}${dangerous}
       .filter(w => w.dangerMultiplier >= 1.3 && w.sampleSize >= 3)
       .sort((a, b) => b.dangerMultiplier - a.dangerMultiplier)
       .slice(0, 5)
-      .map(w => `${w.biasType}: ${w.dangerMultiplier.toFixed(1)}x danger (${w.failureCount} failures / ${w.sampleSize} total)`)
+      .map(
+        w =>
+          `${w.biasType}: ${w.dangerMultiplier.toFixed(1)}x danger (${w.failureCount} failures / ${w.sampleSize} total)`
+      )
       .join('\n');
     if (dangerWeights) {
       sections.push(
@@ -201,10 +205,14 @@ ${pastDecisions}
       lines.push(`Confirmed bias patterns (real): ${ds.confirmedBiasPatterns.join(', ')}`);
     }
     if (ds.falsePositiveBiasPatterns.length > 0) {
-      lines.push(`False positive biases (flagged but not real): ${ds.falsePositiveBiasPatterns.join(', ')}`);
+      lines.push(
+        `False positive biases (flagged but not real): ${ds.falsePositiveBiasPatterns.join(', ')}`
+      );
     }
     if (ds.topLessons.length > 0) {
-      lines.push(`Top lessons from past decisions:\n${ds.topLessons.map((l, i) => `  ${i + 1}. ${l}`).join('\n')}`);
+      lines.push(
+        `Top lessons from past decisions:\n${ds.topLessons.map((l, i) => `  ${i + 1}. ${l}`).join('\n')}`
+      );
     }
     sections.push(
       `<decision_style>
@@ -262,9 +270,8 @@ export function buildCopilotPrompt(
 ): { systemPrompt: string; userPrompt: string } {
   const agentSystemPrompt = AGENT_PROMPTS[agentType];
   const contextSection = formatContextForPrompt(context);
-  const historySection = history.length > 0
-    ? `\n\nCONVERSATION SO FAR:\n${formatConversationHistory(history)}`
-    : '';
+  const historySection =
+    history.length > 0 ? `\n\nCONVERSATION SO FAR:\n${formatConversationHistory(history)}` : '';
 
   const systemPrompt = `${agentSystemPrompt}${contextSection}
 

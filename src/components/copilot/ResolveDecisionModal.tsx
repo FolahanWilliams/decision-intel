@@ -106,7 +106,8 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
           {/* Outcome (optional) */}
           <div>
             <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-              How did it go? <span className="text-zinc-500">(optional — log later if too early)</span>
+              How did it go?{' '}
+              <span className="text-zinc-500">(optional — log later if too early)</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
               {OUTCOME_OPTIONS.map(opt => (
@@ -204,11 +205,7 @@ export function ResolveDecisionModal({ onResolve, onClose }: ResolveDecisionModa
               disabled={!chosenOption.trim() || isSubmitting}
               className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isSubmitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                'Resolve Decision'
-              )}
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Resolve Decision'}
             </button>
           </div>
         </form>

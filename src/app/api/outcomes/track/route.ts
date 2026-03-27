@@ -179,9 +179,10 @@ export async function POST(req: NextRequest) {
       success: outcomes.filter(o => o.outcome === 'success').length,
       partialSuccess: outcomes.filter(o => o.outcome === 'partial_success').length,
       failure: outcomes.filter(o => o.outcome === 'failure').length,
-      averageImpact: withImpact.length > 0
-        ? withImpact.reduce((sum, o) => sum + (o.impactScore || 0), 0) / withImpact.length
-        : 0,
+      averageImpact:
+        withImpact.length > 0
+          ? withImpact.reduce((sum, o) => sum + (o.impactScore || 0), 0) / withImpact.length
+          : 0,
     };
 
     return NextResponse.json({

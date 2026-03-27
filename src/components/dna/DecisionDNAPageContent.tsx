@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useDecisionDNA } from '@/hooks/useDecisionDNA';
-import { COPILOT_AGENTS, AGENT_LABELS, AGENT_COLORS, type CopilotAgentType } from '@/lib/copilot/types';
+import {
+  COPILOT_AGENTS,
+  AGENT_LABELS,
+  AGENT_COLORS,
+  type CopilotAgentType,
+} from '@/lib/copilot/types';
 // Breadcrumbs handled by parent page
 import { BackToTop } from '@/components/ui/BackToTop';
 import {
@@ -294,12 +299,26 @@ export function DecisionDNAPageContent() {
           }}
         >
           <Brain size={48} style={{ color: 'var(--accent-primary)', margin: '0 auto 16px' }} />
-          <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
+          <h2
+            style={{
+              fontSize: '20px',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginBottom: 8,
+            }}
+          >
             Build Your Decision DNA
           </h2>
-          <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>
-            Start making decisions with the Copilot to build your unique decision profile.
-            The more you decide, the smarter your agents become.
+          <p
+            style={{
+              fontSize: '14px',
+              color: 'var(--text-muted)',
+              marginBottom: 24,
+              lineHeight: 1.6,
+            }}
+          >
+            Start making decisions with the Copilot to build your unique decision profile. The more
+            you decide, the smarter your agents become.
           </p>
           <Link
             href="/dashboard/ai-assistant?mode=copilot"
@@ -316,12 +335,16 @@ export function DecisionDNAPageContent() {
   }
 
   const style = dna.decisionStyle;
-  const riskBadge = RISK_BADGE_COLORS[style?.riskTolerance ?? 'moderate'] ?? RISK_BADGE_COLORS.moderate;
+  const riskBadge =
+    RISK_BADGE_COLORS[style?.riskTolerance ?? 'moderate'] ?? RISK_BADGE_COLORS.moderate;
 
   // Prepare bias bar chart data
   const biasBarData = (() => {
     if (!style) return [];
-    const allBiases = new Map<string, { count: number; type: 'confirmed' | 'false_positive' | 'normal' }>();
+    const allBiases = new Map<
+      string,
+      { count: number; type: 'confirmed' | 'false_positive' | 'normal' }
+    >();
     for (const b of style.confirmedBiasPatterns) {
       allBiases.set(b, { count: (allBiases.get(b)?.count ?? 0) + 1, type: 'confirmed' });
     }
@@ -346,7 +369,12 @@ export function DecisionDNAPageContent() {
         name: name.length > 20 ? name.slice(0, 18) + '…' : name,
         fullName: name,
         count: data.count,
-        fill: data.type === 'confirmed' ? '#ff453a' : data.type === 'false_positive' ? '#8e8e93' : '#38bdf8',
+        fill:
+          data.type === 'confirmed'
+            ? '#ff453a'
+            : data.type === 'false_positive'
+              ? '#8e8e93'
+              : '#38bdf8',
       }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
@@ -389,7 +417,14 @@ export function DecisionDNAPageContent() {
   // Prepare velocity scatter data
   const velocityScatter = dna.decisionVelocity.map((v, i) => ({
     x: v.deliberationHours,
-    y: v.outcome === 'success' ? 3 : v.outcome === 'partial_success' ? 2 : v.outcome === 'failure' ? 1 : 0,
+    y:
+      v.outcome === 'success'
+        ? 3
+        : v.outcome === 'partial_success'
+          ? 2
+          : v.outcome === 'failure'
+            ? 1
+            : 0,
     label: v.outcome ?? 'pending',
     key: i,
   }));
@@ -424,7 +459,14 @@ export function DecisionDNAPageContent() {
         }}
       >
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+          <h1
+            style={{
+              fontSize: '22px',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginBottom: 4,
+            }}
+          >
             Decision DNA
           </h1>
           <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
@@ -447,7 +489,10 @@ export function DecisionDNAPageContent() {
       <div className="grid grid-3 gap-md" style={{ marginBottom: 'var(--spacing-lg)' }}>
         <StatCard
           label="Risk Tolerance"
-          value={(style?.riskTolerance ?? 'moderate').charAt(0).toUpperCase() + (style?.riskTolerance ?? 'moderate').slice(1)}
+          value={
+            (style?.riskTolerance ?? 'moderate').charAt(0).toUpperCase() +
+            (style?.riskTolerance ?? 'moderate').slice(1)
+          }
           icon={<Shield size={20} />}
           color={riskBadge.text}
           delay={0.1}
@@ -488,7 +533,7 @@ export function DecisionDNAPageContent() {
           icon={<TrendingUp size={20} />}
           color="#ff9f0a"
           suffix="%"
-          delay={0.50}
+          delay={0.5}
         />
       </div>
 
@@ -502,15 +547,25 @@ export function DecisionDNAPageContent() {
               Top Biases
             </h3>
             <div style={{ display: 'flex', gap: 12, fontSize: '10px', color: 'var(--text-muted)' }}>
-              <span><span style={{ color: '#ff453a' }}>●</span> Confirmed</span>
-              <span><span style={{ color: '#38bdf8' }}>●</span> Detected</span>
-              <span><span style={{ color: '#8e8e93' }}>●</span> False Positive</span>
+              <span>
+                <span style={{ color: '#ff453a' }}>●</span> Confirmed
+              </span>
+              <span>
+                <span style={{ color: '#38bdf8' }}>●</span> Detected
+              </span>
+              <span>
+                <span style={{ color: '#8e8e93' }}>●</span> False Positive
+              </span>
             </div>
           </div>
           <div className="card-body" style={{ height: 'clamp(220px, 35vw, 320px)' }}>
             {biasBarData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={biasBarData} layout="vertical" margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
+                <BarChart
+                  data={biasBarData}
+                  layout="vertical"
+                  margin={{ left: 10, right: 20, top: 5, bottom: 5 }}
+                >
                   <XAxis type="number" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
                   <YAxis
                     dataKey="name"
@@ -519,7 +574,12 @@ export function DecisionDNAPageContent() {
                     tick={{ fontSize: 10, fill: 'var(--text-secondary)' }}
                   />
                   <Tooltip
-                    contentStyle={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: 8, fontSize: 12 }}
+                    contentStyle={{
+                      background: 'var(--glass-bg)',
+                      border: '1px solid var(--glass-border)',
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
                     labelStyle={{ color: 'var(--text-primary)' }}
                   />
                   <Bar dataKey="count" radius={[0, 4, 4, 0]}>
@@ -530,7 +590,16 @@ export function DecisionDNAPageContent() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 13 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  color: 'var(--text-muted)',
+                  fontSize: 13,
+                }}
+              >
                 No bias data yet
               </div>
             )}
@@ -547,12 +616,20 @@ export function DecisionDNAPageContent() {
           <div className="card-body" style={{ height: 'clamp(220px, 35vw, 320px)' }}>
             {biasAreaData.data.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={biasAreaData.data} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
+                <AreaChart
+                  data={biasAreaData.data}
+                  margin={{ left: 0, right: 10, top: 5, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" />
                   <XAxis dataKey="month" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
                   <YAxis tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
                   <Tooltip
-                    contentStyle={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: 8, fontSize: 12 }}
+                    contentStyle={{
+                      background: 'var(--glass-bg)',
+                      border: '1px solid var(--glass-border)',
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
                   />
                   {biasAreaData.keys.map((key, i) => (
                     <Area
@@ -568,7 +645,16 @@ export function DecisionDNAPageContent() {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 13 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  color: 'var(--text-muted)',
+                  fontSize: 13,
+                }}
+              >
                 No timeline data yet
               </div>
             )}
@@ -588,72 +674,92 @@ export function DecisionDNAPageContent() {
           marginBottom: 'var(--spacing-lg)',
         }}
       >
-        {agentRanking.length > 0 ? (
-          agentRanking.map((item, i) => {
-            const agentColor = AGENT_COLORS[item.agent as CopilotAgentType] ?? '#8e8e93';
-            const isTop = i === 0;
-            return (
-              <div
-                key={item.agent}
-                className="card card-glow"
-                style={{
-                  overflow: 'hidden',
-                  border: isTop ? `1px solid ${agentColor}40` : undefined,
-                }}
-              >
+        {agentRanking.length > 0
+          ? agentRanking.map((item, i) => {
+              const agentColor = AGENT_COLORS[item.agent as CopilotAgentType] ?? '#8e8e93';
+              const isTop = i === 0;
+              return (
                 <div
+                  key={item.agent}
+                  className="card card-glow"
                   style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '2px',
-                    background: agentColor,
-                    opacity: isTop ? 0.6 : 0.3,
+                    overflow: 'hidden',
+                    border: isTop ? `1px solid ${agentColor}40` : undefined,
                   }}
-                />
-                <div className="card-body" style={{ padding: '16px' }}>
-                  {isTop && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-                      <Award size={12} style={{ color: '#ffd60a' }} />
-                      <span style={{ fontSize: '10px', color: '#ffd60a', fontWeight: 600 }}>
-                        MOST EFFECTIVE
-                      </span>
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '2px',
+                      background: agentColor,
+                      opacity: isTop ? 0.6 : 0.3,
+                    }}
+                  />
+                  <div className="card-body" style={{ padding: '16px' }}>
+                    {isTop && (
+                      <div
+                        style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}
+                      >
+                        <Award size={12} style={{ color: '#ffd60a' }} />
+                        <span style={{ fontSize: '10px', color: '#ffd60a', fontWeight: 600 }}>
+                          MOST EFFECTIVE
+                        </span>
+                      </div>
+                    )}
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        color: agentColor,
+                        marginBottom: 12,
+                      }}
+                    >
+                      {AGENT_LABELS[item.agent as CopilotAgentType] ?? item.agent}
                     </div>
-                  )}
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: agentColor, marginBottom: 12 }}>
-                    {AGENT_LABELS[item.agent as CopilotAgentType] ?? item.agent}
-                  </div>
-                  <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'JetBrains Mono', monospace", lineHeight: 1 }}>
-                    {Math.round(item.accuracyRate * 100)}
-                    <span style={{ fontSize: '12px', opacity: 0.5 }}>%</span>
-                  </div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: 4 }}>
-                    accuracy · {item.sampleSize} decisions
-                  </div>
-                  {item.avgImpact > 0 && (
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: 2 }}>
-                      avg impact: {Math.round(item.avgImpact * 10) / 10}/10
+                    <div
+                      style={{
+                        fontSize: '28px',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {Math.round(item.accuracyRate * 100)}
+                      <span style={{ fontSize: '12px', opacity: 0.5 }}>%</span>
                     </div>
-                  )}
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: 4 }}>
+                      accuracy · {item.sampleSize} decisions
+                    </div>
+                    {item.avgImpact > 0 && (
+                      <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: 2 }}>
+                        avg impact: {Math.round(item.avgImpact * 10) / 10}/10
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          : COPILOT_AGENTS.map(agent => (
+              <div key={agent} className="card" style={{ opacity: 0.5 }}>
+                <div className="card-body" style={{ padding: '16px', textAlign: 'center' }}>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: AGENT_COLORS[agent],
+                      marginBottom: 8,
+                    }}
+                  >
+                    {AGENT_LABELS[agent]}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>No data yet</div>
                 </div>
               </div>
-            );
-          })
-        ) : (
-          COPILOT_AGENTS.map(agent => (
-            <div key={agent} className="card" style={{ opacity: 0.5 }}>
-              <div className="card-body" style={{ padding: '16px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: AGENT_COLORS[agent], marginBottom: 8 }}>
-                  {AGENT_LABELS[agent]}
-                </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  No data yet
-                </div>
-              </div>
-            </div>
-          ))
-        )}
+            ))}
       </div>
 
       {/* ── [04] OUTCOME TRACK RECORD ────────────────────────────── */}
@@ -666,7 +772,15 @@ export function DecisionDNAPageContent() {
               Outcome Distribution
             </h3>
           </div>
-          <div className="card-body" style={{ height: 'clamp(220px, 35vw, 300px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            className="card-body"
+            style={{
+              height: 'clamp(220px, 35vw, 300px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             {outcomePieData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -685,7 +799,12 @@ export function DecisionDNAPageContent() {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: 8, fontSize: 12 }}
+                    contentStyle={{
+                      background: 'var(--glass-bg)',
+                      border: '1px solid var(--glass-border)',
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -693,12 +812,24 @@ export function DecisionDNAPageContent() {
               <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>No outcomes yet</div>
             )}
             {outcomePieData.length > 0 && (
-              <div style={{ position: 'absolute', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div
+                style={{ position: 'absolute', display: 'flex', flexDirection: 'column', gap: 6 }}
+              >
                 {outcomePieData.map(d => (
-                  <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '11px' }}>
+                  <div
+                    key={d.name}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '11px' }}
+                  >
                     <div style={{ width: 8, height: 8, borderRadius: '50%', background: d.fill }} />
                     <span style={{ color: 'var(--text-secondary)' }}>{d.name}</span>
-                    <span style={{ color: 'var(--text-muted)', fontFamily: "'JetBrains Mono', monospace" }}>{d.value}</span>
+                    <span
+                      style={{
+                        color: 'var(--text-muted)',
+                        fontFamily: "'JetBrains Mono', monospace",
+                      }}
+                    >
+                      {d.value}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -726,7 +857,11 @@ export function DecisionDNAPageContent() {
                     type="number"
                     name="Hours"
                     tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
-                    label={{ value: 'Hours', position: 'bottom', style: { fontSize: 10, fill: 'var(--text-muted)' } }}
+                    label={{
+                      value: 'Hours',
+                      position: 'bottom',
+                      style: { fontSize: 10, fill: 'var(--text-muted)' },
+                    }}
                   />
                   <YAxis
                     dataKey="y"
@@ -738,7 +873,12 @@ export function DecisionDNAPageContent() {
                     width={55}
                   />
                   <Tooltip
-                    contentStyle={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: 8, fontSize: 12 }}
+                    contentStyle={{
+                      background: 'var(--glass-bg)',
+                      border: '1px solid var(--glass-border)',
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
                     formatter={(value, name) => {
                       const v = Number(value);
                       if (name === 'Hours') return [`${v}h`, 'Deliberation'];
@@ -749,7 +889,16 @@ export function DecisionDNAPageContent() {
                 </ScatterChart>
               </ResponsiveContainer>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 13 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  color: 'var(--text-muted)',
+                  fontSize: 13,
+                }}
+              >
                 No velocity data yet
               </div>
             )}
@@ -771,9 +920,20 @@ export function DecisionDNAPageContent() {
             {style && style.sampleSize > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Followed Analysis</span>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#30d158', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}
+                  >
+                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      Followed Analysis
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        color: '#30d158',
+                        fontFamily: "'JetBrains Mono', monospace",
+                      }}
+                    >
                       {Math.round(style.followAnalysisSuccessRate * 100)}%
                     </span>
                   </div>
@@ -790,9 +950,20 @@ export function DecisionDNAPageContent() {
                   </div>
                 </div>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Went With Gut</span>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#ff9f0a', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <div
+                    style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}
+                  >
+                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                      Went With Gut
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        color: '#ff9f0a',
+                        fontFamily: "'JetBrains Mono', monospace",
+                      }}
+                    >
                       {Math.round(style.ignoreAnalysisSuccessRate * 100)}%
                     </span>
                   </div>
@@ -820,13 +991,26 @@ export function DecisionDNAPageContent() {
                       color: 'var(--text-muted)',
                     }}
                   >
-                    <Award size={12} style={{ display: 'inline', marginRight: 6, color: '#ffd60a' }} />
-                    Most accurate predictor: <strong style={{ color: 'var(--text-primary)' }}>{style.mostAccurateTwin}</strong>
+                    <Award
+                      size={12}
+                      style={{ display: 'inline', marginRight: 6, color: '#ffd60a' }}
+                    />
+                    Most accurate predictor:{' '}
+                    <strong style={{ color: 'var(--text-primary)' }}>
+                      {style.mostAccurateTwin}
+                    </strong>
                   </div>
                 )}
               </div>
             ) : (
-              <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 20 }}>
+              <div
+                style={{
+                  color: 'var(--text-muted)',
+                  fontSize: 13,
+                  textAlign: 'center',
+                  padding: 20,
+                }}
+              >
                 Need more decisions with priors to compare
               </div>
             )}
@@ -837,7 +1021,10 @@ export function DecisionDNAPageContent() {
         <div className="card card-glow">
           <div className="card-header">
             <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-              <Lightbulb size={14} style={{ display: 'inline', marginRight: 6, color: '#ffd60a' }} />
+              <Lightbulb
+                size={14}
+                style={{ display: 'inline', marginRight: 6, color: '#ffd60a' }}
+              />
               Your Top Lessons
             </h3>
           </div>
@@ -857,7 +1044,13 @@ export function DecisionDNAPageContent() {
                       lineHeight: 1.5,
                     }}
                   >
-                    <span style={{ color: 'var(--accent-primary)', fontFamily: "'JetBrains Mono', monospace", marginRight: 8 }}>
+                    <span
+                      style={{
+                        color: 'var(--accent-primary)',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        marginRight: 8,
+                      }}
+                    >
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     {lesson}
@@ -865,7 +1058,14 @@ export function DecisionDNAPageContent() {
                 ))}
               </div>
             ) : (
-              <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 20 }}>
+              <div
+                style={{
+                  color: 'var(--text-muted)',
+                  fontSize: 13,
+                  textAlign: 'center',
+                  padding: 20,
+                }}
+              >
                 Lessons from resolved decisions will appear here
               </div>
             )}

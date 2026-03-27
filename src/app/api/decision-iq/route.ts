@@ -48,23 +48,34 @@ export async function GET() {
         // Schema drift
       }
 
-      const personalScore = totalAnalyses > 0
-        ? Math.min(100, Math.round((outcomeCount / totalAnalyses) * 50 + 25))
-        : 0;
+      const personalScore =
+        totalAnalyses > 0 ? Math.min(100, Math.round((outcomeCount / totalAnalyses) * 50 + 25)) : 0;
 
-      return NextResponse.json({
-        score: personalScore,
-        grade: personalScore >= 85 ? 'A' : personalScore >= 70 ? 'B' : personalScore >= 55 ? 'C' : personalScore >= 40 ? 'D' : 'F',
-        breakdown: null,
-        peerBenchmark: null,
-        totalDecisions: totalAnalyses,
-        accuracyImprovement: null,
-        quarterlyImpact: null,
-        trend: [],
-        isPersonal: true,
-      }, {
-        headers: { 'Cache-Control': 'private, max-age=300, stale-while-revalidate=60' },
-      });
+      return NextResponse.json(
+        {
+          score: personalScore,
+          grade:
+            personalScore >= 85
+              ? 'A'
+              : personalScore >= 70
+                ? 'B'
+                : personalScore >= 55
+                  ? 'C'
+                  : personalScore >= 40
+                    ? 'D'
+                    : 'F',
+          breakdown: null,
+          peerBenchmark: null,
+          totalDecisions: totalAnalyses,
+          accuracyImprovement: null,
+          quarterlyImpact: null,
+          trend: [],
+          isPersonal: true,
+        },
+        {
+          headers: { 'Cache-Control': 'private, max-age=300, stale-while-revalidate=60' },
+        }
+      );
     }
 
     // Parallel fetch all data
@@ -72,11 +83,13 @@ export async function GET() {
       computeMaturityScore(orgId),
       getAccuracyImprovement(orgId).catch(() => null),
       getQuarterlyImpact(orgId).catch(() => null),
-      prisma.teamCognitiveProfile.findFirst({
-        where: { orgId },
-        orderBy: { periodEnd: 'desc' },
-        select: { consistencyTrend: true },
-      }).catch(() => null),
+      prisma.teamCognitiveProfile
+        .findFirst({
+          where: { orgId },
+          orderBy: { periodEnd: 'desc' },
+          select: { consistencyTrend: true },
+        })
+        .catch(() => null),
     ]);
 
     // Extract trend sparkline data from TeamCognitiveProfile
@@ -87,19 +100,22 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({
-      score: maturity.score,
-      grade: maturity.grade,
-      breakdown: maturity.breakdown,
-      peerBenchmark: maturity.peerBenchmark,
-      totalDecisions: maturity.totalDecisions,
-      accuracyImprovement: accuracy,
-      quarterlyImpact: impact,
-      trend,
-      isPersonal: false,
-    }, {
-      headers: { 'Cache-Control': 'private, max-age=300, stale-while-revalidate=60' },
-    });
+    return NextResponse.json(
+      {
+        score: maturity.score,
+        grade: maturity.grade,
+        breakdown: maturity.breakdown,
+        peerBenchmark: maturity.peerBenchmark,
+        totalDecisions: maturity.totalDecisions,
+        accuracyImprovement: accuracy,
+        quarterlyImpact: impact,
+        trend,
+        isPersonal: false,
+      },
+      {
+        headers: { 'Cache-Control': 'private, max-age=300, stale-while-revalidate=60' },
+      }
+    );
   } catch (error) {
     log.error('Decision IQ API failed:', error);
     return NextResponse.json({ error: 'Failed to compute Decision IQ' }, { status: 500 });

@@ -64,10 +64,7 @@ export function LearningImpactCard({ analysisId }: { analysisId: string }) {
     const hasDetails = confirmed.length > 0 || falsePositives.length > 0 || data.edgesUpdated;
 
     return (
-      <div
-        className="card liquid-glass-premium animate-fade-in"
-        style={{ overflow: 'hidden' }}
-      >
+      <div className="card liquid-glass-premium animate-fade-in" style={{ overflow: 'hidden' }}>
         <div
           className="card-header flex items-center justify-between"
           style={{
@@ -96,19 +93,28 @@ export function LearningImpactCard({ analysisId }: { analysisId: string }) {
           <div className="flex items-center gap-sm">
             {/* Summary stats inline */}
             {confirmed.length > 0 && (
-              <span className="flex items-center gap-xs" style={{ fontSize: '11px', color: '#34d399' }}>
+              <span
+                className="flex items-center gap-xs"
+                style={{ fontSize: '11px', color: '#34d399' }}
+              >
                 <CheckCircle size={12} />
                 {confirmed.length} confirmed
               </span>
             )}
             {falsePositives.length > 0 && (
-              <span className="flex items-center gap-xs" style={{ fontSize: '11px', color: '#fbbf24' }}>
+              <span
+                className="flex items-center gap-xs"
+                style={{ fontSize: '11px', color: '#fbbf24' }}
+              >
                 <XCircle size={12} />
                 {falsePositives.length} false pos.
               </span>
             )}
             {(data.edgesUpdated ?? 0) > 0 && (
-              <span className="flex items-center gap-xs" style={{ fontSize: '11px', color: '#38bdf8' }}>
+              <span
+                className="flex items-center gap-xs"
+                style={{ fontSize: '11px', color: '#38bdf8' }}
+              >
                 <GitBranch size={12} />
                 {data.edgesUpdated} edges
               </span>
@@ -145,7 +151,15 @@ export function LearningImpactCard({ analysisId }: { analysisId: string }) {
             {/* Bias pills */}
             {confirmed.length > 0 && (
               <div style={{ marginBottom: 'var(--spacing-sm)' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    marginBottom: '4px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
                   Confirmed Biases
                 </div>
                 <div className="flex flex-wrap gap-xs">
@@ -173,7 +187,15 @@ export function LearningImpactCard({ analysisId }: { analysisId: string }) {
 
             {falsePositives.length > 0 && (
               <div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    marginBottom: '4px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
                   False Positives
                 </div>
                 <div className="flex flex-wrap gap-xs">

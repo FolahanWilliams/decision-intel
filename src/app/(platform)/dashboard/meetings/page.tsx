@@ -152,305 +152,357 @@ export default function MeetingsPage() {
           </div>
         ) : (
           <>
-          {/* Mobile card view */}
-          <div className="lg:hidden" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-            {meetings.map(meeting => {
-              const audit = meeting.humanDecision?.cognitiveAudit;
-              const quality = audit ? getQualityLevel(audit.decisionQualityScore) : null;
-              const status = STATUS_CONFIG[meeting.status] || STATUS_CONFIG.error;
-              const speakers = meeting.transcript?.speakers;
-              const speakerCount = Array.isArray(speakers) ? speakers.length : (meeting.participants?.length ?? 0);
+            {/* Mobile card view */}
+            <div
+              className="lg:hidden"
+              style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}
+            >
+              {meetings.map(meeting => {
+                const audit = meeting.humanDecision?.cognitiveAudit;
+                const quality = audit ? getQualityLevel(audit.decisionQualityScore) : null;
+                const status = STATUS_CONFIG[meeting.status] || STATUS_CONFIG.error;
+                const speakers = meeting.transcript?.speakers;
+                const speakerCount = Array.isArray(speakers)
+                  ? speakers.length
+                  : (meeting.participants?.length ?? 0);
 
-              return (
-                <Link
-                  key={meeting.id}
-                  href={meeting.status === 'complete' && meeting.humanDecision?.id
-                    ? `/dashboard/cognitive-audits/${meeting.humanDecision.id}`
-                    : `/dashboard/meetings/${meeting.id}`}
-                  style={{ textDecoration: 'none', display: 'block', padding: '14px 16px', borderBottom: '1px solid var(--border-color)' }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                    <div style={{ fontSize: '14px', fontWeight: 600, flex: 1, marginRight: 8 }}>{meeting.title}</div>
-                    <span style={{ fontSize: '10px', padding: '3px 10px', background: status.bg, color: status.color, borderRadius: '4px', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                      {status.label}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 16, fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
-                    <span className="flex items-center gap-xs"><Clock size={11} /> {formatDuration(meeting.durationSeconds)}</span>
-                    <span className="flex items-center gap-xs"><Users size={11} /> {speakerCount} speakers</span>
-                    {quality && <span style={{ color: quality.color, fontWeight: 600 }}>{Math.round(audit!.decisionQualityScore)} quality</span>}
-                    <span>{formatDateShort(meeting.createdAt)}</span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Desktop table view */}
-          <div className="hidden lg:block" style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <th
+                return (
+                  <Link
+                    key={meeting.id}
+                    href={
+                      meeting.status === 'complete' && meeting.humanDecision?.id
+                        ? `/dashboard/cognitive-audits/${meeting.humanDecision.id}`
+                        : `/dashboard/meetings/${meeting.id}`
+                    }
                     style={{
-                      textAlign: 'left',
-                      padding: '12px 16px',
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
+                      textDecoration: 'none',
+                      display: 'block',
+                      padding: '14px 16px',
+                      borderBottom: '1px solid var(--border-color)',
                     }}
                   >
-                    MEETING
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'center',
-                      padding: '12px 8px',
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    TYPE
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'center',
-                      padding: '12px 8px',
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    DURATION
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'center',
-                      padding: '12px 8px',
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    SPEAKERS
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'center',
-                      padding: '12px 8px',
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    QUALITY
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'center',
-                      padding: '12px 8px',
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    BIASES
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'center',
-                      padding: '12px 8px',
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    ACTIONS
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'center',
-                      padding: '12px 8px',
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    STATUS
-                  </th>
-                  <th
-                    style={{
-                      textAlign: 'right',
-                      padding: '12px 16px',
-                      fontSize: '11px',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    DATE
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {meetings.map(meeting => {
-                  const audit = meeting.humanDecision?.cognitiveAudit;
-                  const biases = audit ? getBiasArray(audit.biasFindings) : [];
-                  const quality = audit ? getQualityLevel(audit.decisionQualityScore) : null;
-                  const status = STATUS_CONFIG[meeting.status] || STATUS_CONFIG.error;
-                  const speakers = meeting.transcript?.speakers;
-                  const speakerCount = Array.isArray(speakers)
-                    ? speakers.length
-                    : (meeting.participants?.length ?? 0);
-                  const isProcessing = ['uploading', 'transcribing', 'analyzing'].includes(
-                    meeting.status
-                  );
-
-                  return (
-                    <tr
-                      key={meeting.id}
-                      style={{ borderBottom: '1px solid var(--border-color)', cursor: 'pointer' }}
-                      onClick={() => {
-                        if (meeting.status === 'complete' && meeting.humanDecision?.id) {
-                          window.location.href = `/dashboard/cognitive-audits/${meeting.humanDecision.id}`;
-                        } else {
-                          window.location.href = `/dashboard/meetings/${meeting.id}`;
-                        }
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        marginBottom: 8,
                       }}
                     >
-                      <td style={{ padding: '14px 16px' }}>
-                        <div style={{ fontSize: '14px', fontWeight: 600 }}>{meeting.title}</div>
-                        {meeting.fileName && (
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                            {meeting.fileName}
-                          </div>
-                        )}
-                      </td>
-                      <td style={{ textAlign: 'center', padding: '14px 8px' }}>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            padding: '2px 8px',
-                            background: 'var(--bg-tertiary)',
-                            borderRadius: '4px',
-                          }}
-                        >
-                          {MEETING_TYPE_LABELS[meeting.meetingType] || meeting.meetingType}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'center', padding: '14px 8px', fontSize: '13px' }}>
-                        <div className="flex items-center justify-center gap-xs">
-                          <Clock size={12} style={{ color: 'var(--text-muted)' }} />
-                          {formatDuration(meeting.durationSeconds)}
-                        </div>
-                      </td>
-                      <td style={{ textAlign: 'center', padding: '14px 8px', fontSize: '13px' }}>
-                        <div className="flex items-center justify-center gap-xs">
-                          <Users size={12} style={{ color: 'var(--text-muted)' }} />
-                          {speakerCount}
-                        </div>
-                      </td>
-                      <td style={{ textAlign: 'center', padding: '14px 8px' }}>
-                        {quality ? (
-                          <span
-                            style={{
-                              fontSize: '13px',
-                              fontWeight: 700,
-                              color: quality.color,
-                            }}
-                          >
-                            {Math.round(audit!.decisionQualityScore)}
-                          </span>
-                        ) : (
-                          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>--</span>
-                        )}
-                      </td>
-                      <td style={{ textAlign: 'center', padding: '14px 8px' }}>
-                        {biases.length > 0 ? (
-                          <div className="flex items-center justify-center gap-xs">
-                            <AlertTriangle size={12} style={{ color: 'var(--warning)' }} />
-                            <span style={{ fontSize: '13px' }}>{biases.length}</span>
-                          </div>
-                        ) : audit ? (
-                          <CheckCircle size={14} style={{ color: 'var(--success)' }} />
-                        ) : (
-                          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>--</span>
-                        )}
-                      </td>
-                      <td style={{ textAlign: 'center', padding: '14px 8px' }}>
-                        {(() => {
-                          const actions = Array.isArray(meeting.actionItems)
-                            ? meeting.actionItems
-                            : [];
-                          const decisions = Array.isArray(meeting.keyDecisions)
-                            ? meeting.keyDecisions
-                            : [];
-                          const total = actions.length + decisions.length;
-                          if (total > 0) {
-                            return (
-                              <div
-                                className="flex items-center justify-center gap-xs"
-                                style={{ fontSize: '12px' }}
-                              >
-                                {actions.length > 0 && (
-                                  <span className="flex items-center gap-xs" title="Action items">
-                                    <ListChecks
-                                      size={11}
-                                      style={{ color: 'var(--accent-primary)' }}
-                                    />
-                                    {actions.length}
-                                  </span>
-                                )}
-                                {decisions.length > 0 && (
-                                  <span className="flex items-center gap-xs" title="Key decisions">
-                                    <Landmark size={11} style={{ color: 'var(--warning)' }} />
-                                    {decisions.length}
-                                  </span>
-                                )}
-                              </div>
-                            );
-                          }
-                          return (
-                            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>--</span>
-                          );
-                        })()}
-                      </td>
-                      <td style={{ textAlign: 'center', padding: '14px 8px' }}>
-                        <span
-                          style={{
-                            fontSize: '10px',
-                            padding: '3px 10px',
-                            background: status.bg,
-                            color: status.color,
-                            borderRadius: '4px',
-                            fontWeight: 600,
-                          }}
-                        >
-                          {isProcessing && (
-                            <Loader2
-                              size={10}
-                              className="animate-spin"
-                              style={{
-                                display: 'inline',
-                                verticalAlign: 'middle',
-                                marginRight: '4px',
-                              }}
-                            />
-                          )}
-                          {status.label}
-                          {meeting.status === 'transcribing' &&
-                            meeting.transcriptionProgress > 0 && (
-                              <> ({Math.round(meeting.transcriptionProgress)}%)</>
-                            )}
-                        </span>
-                      </td>
-                      <td
+                      <div style={{ fontSize: '14px', fontWeight: 600, flex: 1, marginRight: 8 }}>
+                        {meeting.title}
+                      </div>
+                      <span
                         style={{
-                          textAlign: 'right',
-                          padding: '14px 16px',
-                          fontSize: '12px',
-                          color: 'var(--text-muted)',
+                          fontSize: '10px',
+                          padding: '3px 10px',
+                          background: status.bg,
+                          color: status.color,
+                          borderRadius: '4px',
+                          fontWeight: 600,
+                          whiteSpace: 'nowrap',
                         }}
                       >
-                        {formatDateShort(meeting.createdAt)}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        {status.label}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 16,
+                        fontSize: '12px',
+                        color: 'var(--text-muted)',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <span className="flex items-center gap-xs">
+                        <Clock size={11} /> {formatDuration(meeting.durationSeconds)}
+                      </span>
+                      <span className="flex items-center gap-xs">
+                        <Users size={11} /> {speakerCount} speakers
+                      </span>
+                      {quality && (
+                        <span style={{ color: quality.color, fontWeight: 600 }}>
+                          {Math.round(audit!.decisionQualityScore)} quality
+                        </span>
+                      )}
+                      <span>{formatDateShort(meeting.createdAt)}</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Desktop table view */}
+            <div className="hidden lg:block" style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: '12px 16px',
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      MEETING
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'center',
+                        padding: '12px 8px',
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      TYPE
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'center',
+                        padding: '12px 8px',
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      DURATION
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'center',
+                        padding: '12px 8px',
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      SPEAKERS
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'center',
+                        padding: '12px 8px',
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      QUALITY
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'center',
+                        padding: '12px 8px',
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      BIASES
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'center',
+                        padding: '12px 8px',
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      ACTIONS
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'center',
+                        padding: '12px 8px',
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      STATUS
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'right',
+                        padding: '12px 16px',
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      DATE
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {meetings.map(meeting => {
+                    const audit = meeting.humanDecision?.cognitiveAudit;
+                    const biases = audit ? getBiasArray(audit.biasFindings) : [];
+                    const quality = audit ? getQualityLevel(audit.decisionQualityScore) : null;
+                    const status = STATUS_CONFIG[meeting.status] || STATUS_CONFIG.error;
+                    const speakers = meeting.transcript?.speakers;
+                    const speakerCount = Array.isArray(speakers)
+                      ? speakers.length
+                      : (meeting.participants?.length ?? 0);
+                    const isProcessing = ['uploading', 'transcribing', 'analyzing'].includes(
+                      meeting.status
+                    );
+
+                    return (
+                      <tr
+                        key={meeting.id}
+                        style={{ borderBottom: '1px solid var(--border-color)', cursor: 'pointer' }}
+                        onClick={() => {
+                          if (meeting.status === 'complete' && meeting.humanDecision?.id) {
+                            window.location.href = `/dashboard/cognitive-audits/${meeting.humanDecision.id}`;
+                          } else {
+                            window.location.href = `/dashboard/meetings/${meeting.id}`;
+                          }
+                        }}
+                      >
+                        <td style={{ padding: '14px 16px' }}>
+                          <div style={{ fontSize: '14px', fontWeight: 600 }}>{meeting.title}</div>
+                          {meeting.fileName && (
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                              {meeting.fileName}
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ textAlign: 'center', padding: '14px 8px' }}>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              padding: '2px 8px',
+                              background: 'var(--bg-tertiary)',
+                              borderRadius: '4px',
+                            }}
+                          >
+                            {MEETING_TYPE_LABELS[meeting.meetingType] || meeting.meetingType}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: 'center', padding: '14px 8px', fontSize: '13px' }}>
+                          <div className="flex items-center justify-center gap-xs">
+                            <Clock size={12} style={{ color: 'var(--text-muted)' }} />
+                            {formatDuration(meeting.durationSeconds)}
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'center', padding: '14px 8px', fontSize: '13px' }}>
+                          <div className="flex items-center justify-center gap-xs">
+                            <Users size={12} style={{ color: 'var(--text-muted)' }} />
+                            {speakerCount}
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'center', padding: '14px 8px' }}>
+                          {quality ? (
+                            <span
+                              style={{
+                                fontSize: '13px',
+                                fontWeight: 700,
+                                color: quality.color,
+                              }}
+                            >
+                              {Math.round(audit!.decisionQualityScore)}
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>--</span>
+                          )}
+                        </td>
+                        <td style={{ textAlign: 'center', padding: '14px 8px' }}>
+                          {biases.length > 0 ? (
+                            <div className="flex items-center justify-center gap-xs">
+                              <AlertTriangle size={12} style={{ color: 'var(--warning)' }} />
+                              <span style={{ fontSize: '13px' }}>{biases.length}</span>
+                            </div>
+                          ) : audit ? (
+                            <CheckCircle size={14} style={{ color: 'var(--success)' }} />
+                          ) : (
+                            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>--</span>
+                          )}
+                        </td>
+                        <td style={{ textAlign: 'center', padding: '14px 8px' }}>
+                          {(() => {
+                            const actions = Array.isArray(meeting.actionItems)
+                              ? meeting.actionItems
+                              : [];
+                            const decisions = Array.isArray(meeting.keyDecisions)
+                              ? meeting.keyDecisions
+                              : [];
+                            const total = actions.length + decisions.length;
+                            if (total > 0) {
+                              return (
+                                <div
+                                  className="flex items-center justify-center gap-xs"
+                                  style={{ fontSize: '12px' }}
+                                >
+                                  {actions.length > 0 && (
+                                    <span className="flex items-center gap-xs" title="Action items">
+                                      <ListChecks
+                                        size={11}
+                                        style={{ color: 'var(--accent-primary)' }}
+                                      />
+                                      {actions.length}
+                                    </span>
+                                  )}
+                                  {decisions.length > 0 && (
+                                    <span
+                                      className="flex items-center gap-xs"
+                                      title="Key decisions"
+                                    >
+                                      <Landmark size={11} style={{ color: 'var(--warning)' }} />
+                                      {decisions.length}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            }
+                            return (
+                              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                                --
+                              </span>
+                            );
+                          })()}
+                        </td>
+                        <td style={{ textAlign: 'center', padding: '14px 8px' }}>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              padding: '3px 10px',
+                              background: status.bg,
+                              color: status.color,
+                              borderRadius: '4px',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {isProcessing && (
+                              <Loader2
+                                size={10}
+                                className="animate-spin"
+                                style={{
+                                  display: 'inline',
+                                  verticalAlign: 'middle',
+                                  marginRight: '4px',
+                                }}
+                              />
+                            )}
+                            {status.label}
+                            {meeting.status === 'transcribing' &&
+                              meeting.transcriptionProgress > 0 && (
+                                <> ({Math.round(meeting.transcriptionProgress)}%)</>
+                              )}
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            textAlign: 'right',
+                            padding: '14px 16px',
+                            fontSize: '12px',
+                            color: 'var(--text-muted)',
+                          }}
+                        >
+                          {formatDateShort(meeting.createdAt)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </>
         )}
 

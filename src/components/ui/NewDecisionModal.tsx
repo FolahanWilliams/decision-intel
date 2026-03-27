@@ -73,7 +73,7 @@ export function NewDecisionModal() {
       onClick={handleClose}
     >
       <div
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
         style={{
           width: '90%',
           maxWidth: 520,
@@ -118,7 +118,7 @@ export function NewDecisionModal() {
             padding: '20px',
           }}
         >
-          {OPTIONS.map((opt) => {
+          {OPTIONS.map(opt => {
             const Icon = opt.icon;
             return (
               <button
@@ -141,11 +141,11 @@ export function NewDecisionModal() {
                   textAlign: 'center',
                   color: 'var(--text-primary)',
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={e => {
                   e.currentTarget.style.borderColor = 'var(--accent-primary)';
                   e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   e.currentTarget.style.borderColor = 'var(--border-color)';
                   e.currentTarget.style.background = 'var(--bg-tertiary)';
                 }}

@@ -160,8 +160,7 @@ function LockedSectionsTeaser({ analysis }: { analysis: SharedAnalysis }) {
                     style={{
                       position: 'absolute',
                       inset: 0,
-                      background:
-                        'linear-gradient(180deg, rgba(26, 26, 46, 0) 0%, #1a1a2e 85%)',
+                      background: 'linear-gradient(180deg, rgba(26, 26, 46, 0) 0%, #1a1a2e 85%)',
                     }}
                   />
                 </div>

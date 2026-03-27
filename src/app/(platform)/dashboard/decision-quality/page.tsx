@@ -20,29 +20,21 @@ function DecisionQualityInner() {
 
   return (
     <div>
-      <div
-        className="container"
-        style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 0 }}
-      >
+      <div className="container" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 0 }}>
         <Breadcrumbs
-          items={[
-            { label: 'Dashboard', href: '/dashboard' },
-            { label: 'Decision Quality' },
-          ]}
+          items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Decision Quality' }]}
         />
         <header className="mb-lg">
           <div className="flex items-center gap-md mb-sm">
             <BrainCircuit size={28} style={{ color: 'var(--accent-primary)' }} />
             <h1>Decision Quality</h1>
           </div>
-          <p className="text-muted">
-            Audit human decision quality and track behavioral nudges
-          </p>
+          <p className="text-muted">Audit human decision quality and track behavioral nudges</p>
         </header>
         <TabBar
           tabs={TABS}
           activeTab={tab}
-          onTabChange={(key) =>
+          onTabChange={key =>
             router.replace(`/dashboard/decision-quality?tab=${key}`, { scroll: false })
           }
         />

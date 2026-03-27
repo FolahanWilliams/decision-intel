@@ -127,7 +127,9 @@ export function CopilotPageContent() {
       </button>
 
       {/* Sidebar — Session List */}
-      <div className={`${showSidebar ? 'fixed inset-y-0 left-0 z-30 pt-16' : 'hidden'} lg:relative lg:block lg:pt-0 w-72 flex-shrink-0 border-r border-zinc-800 bg-zinc-900/50 flex flex-col`}>
+      <div
+        className={`${showSidebar ? 'fixed inset-y-0 left-0 z-30 pt-16' : 'hidden'} lg:relative lg:block lg:pt-0 w-72 flex-shrink-0 border-r border-zinc-800 bg-zinc-900/50 flex flex-col`}
+      >
         <div className="p-4 border-b border-zinc-800">
           <button
             onClick={handleNewDecision}
@@ -158,7 +160,10 @@ export function CopilotPageContent() {
                     ? 'bg-zinc-700/50 text-zinc-100'
                     : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
                 }`}
-                onClick={() => { loadSession(s.id); setShowSidebar(false); }}
+                onClick={() => {
+                  loadSession(s.id);
+                  setShowSidebar(false);
+                }}
               >
                 {s.status === 'resolved' ? (
                   <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-green-500" />
@@ -212,8 +217,8 @@ export function CopilotPageContent() {
                   What decision are you working on?
                 </h2>
                 <p className="text-sm text-zinc-400">
-                  Describe the decision, question, or problem you&apos;re thinking through.
-                  Your copilot agents will help you structure, challenge, and refine it.
+                  Describe the decision, question, or problem you&apos;re thinking through. Your
+                  copilot agents will help you structure, challenge, and refine it.
                 </p>
               </div>
 
@@ -277,7 +282,9 @@ export function CopilotPageContent() {
             activeAgent={activeAgent}
             onSendMessage={handleSendMessage}
             onResolve={canResolve ? () => setShowResolveModal(true) : undefined}
-            onDismissError={() => {/* error is managed by hook state */}}
+            onDismissError={() => {
+              /* error is managed by hook state */
+            }}
           />
         ) : (
           /* Empty State */

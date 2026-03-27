@@ -92,9 +92,7 @@ export function DecisionIQCard() {
             {diq.grade}
           </span>
         </div>
-        {hasTrend && (
-          <SparklineChart data={diq.trend} color={gradeColor} width={64} height={24} />
-        )}
+        {hasTrend && <SparklineChart data={diq.trend} color={gradeColor} width={64} height={24} />}
       </div>
 
       {/* Score */}
@@ -178,7 +176,12 @@ export function DecisionIQCard() {
                   />
                 </div>
                 <span
-                  style={{ fontSize: '10px', color: 'var(--text-secondary)', minWidth: '24px', textAlign: 'right' }}
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-secondary)',
+                    minWidth: '24px',
+                    textAlign: 'right',
+                  }}
                 >
                   {Math.round(value)}
                 </span>

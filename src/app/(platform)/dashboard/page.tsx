@@ -1143,16 +1143,40 @@ export default function Dashboard() {
             >
               <FileText size={16} style={{ color: '#6366f1', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '11px', color: '#6366f1', fontWeight: 600, marginBottom: '2px' }}>
+                <div
+                  style={{
+                    fontSize: '11px',
+                    color: '#6366f1',
+                    fontWeight: 600,
+                    marginBottom: '2px',
+                  }}
+                >
                   Decision Frame Active
                 </div>
-                <div style={{ fontSize: '13px', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div
+                  style={{
+                    fontSize: '13px',
+                    color: 'var(--text-primary)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   {activeFrameStatement}
                 </div>
               </div>
               <button
-                onClick={() => { setActiveFrameId(null); setActiveFrameStatement(null); }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px' }}
+                onClick={() => {
+                  setActiveFrameId(null);
+                  setActiveFrameStatement(null);
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                  padding: '4px',
+                }}
               >
                 <X size={14} />
               </button>

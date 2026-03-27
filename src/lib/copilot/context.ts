@@ -178,18 +178,20 @@ export async function loadDecisionStyleProfile(userId: string): Promise<Decision
     }
 
     // Compute risk tolerance from outcome patterns
-    const avgImpact = outcomes
-      .filter(o => o.impactScore != null)
-      .reduce((sum, o) => sum + (o.impactScore ?? 0), 0) / Math.max(outcomes.filter(o => o.impactScore != null).length, 1);
-    const riskTolerance = avgImpact >= 7 ? 'aggressive' : avgImpact >= 4 ? 'moderate' : 'conservative';
+    const avgImpact =
+      outcomes
+        .filter(o => o.impactScore != null)
+        .reduce((sum, o) => sum + (o.impactScore ?? 0), 0) /
+      Math.max(outcomes.filter(o => o.impactScore != null).length, 1);
+    const riskTolerance =
+      avgImpact >= 7 ? 'aggressive' : avgImpact >= 4 ? 'moderate' : 'conservative';
 
     // Compute belief delta
     const deltas = outcomes
       .filter(o => o.analysis?.prior?.beliefDelta != null)
       .map(o => o.analysis!.prior!.beliefDelta!);
-    const avgBeliefDelta = deltas.length > 0
-      ? deltas.reduce((a, b) => a + b, 0) / deltas.length
-      : 0;
+    const avgBeliefDelta =
+      deltas.length > 0 ? deltas.reduce((a, b) => a + b, 0) / deltas.length : 0;
 
     // Follow-analysis vs ignore-analysis success rates
     const withPriors = outcomes.filter(o => o.analysis?.prior);
@@ -199,11 +201,14 @@ export async function loadDecisionStyleProfile(userId: string): Promise<Decision
     });
     const ignored = withPriors.filter(o => {
       const prior = o.analysis?.prior;
-      return prior && (!prior.postAnalysisAction || prior.postAnalysisAction === prior.defaultAction);
+      return (
+        prior && (!prior.postAnalysisAction || prior.postAnalysisAction === prior.defaultAction)
+      );
     });
     const successRate = (arr: typeof outcomes) =>
       arr.length > 0
-        ? arr.filter(o => o.outcome === 'success' || o.outcome === 'partial_success').length / arr.length
+        ? arr.filter(o => o.outcome === 'success' || o.outcome === 'partial_success').length /
+          arr.length
         : 0;
     const followAnalysisSuccessRate = successRate(followed);
     const ignoreAnalysisSuccessRate = successRate(ignored);
@@ -215,9 +220,10 @@ export async function loadDecisionStyleProfile(userId: string): Promise<Decision
         twinCounts.set(o.mostAccurateTwin, (twinCounts.get(o.mostAccurateTwin) || 0) + 1);
       }
     }
-    const mostAccurateTwin = twinCounts.size > 0
-      ? Array.from(twinCounts.entries()).sort((a, b) => b[1] - a[1])[0][0]
-      : null;
+    const mostAccurateTwin =
+      twinCounts.size > 0
+        ? Array.from(twinCounts.entries()).sort((a, b) => b[1] - a[1])[0][0]
+        : null;
 
     // Decision speed
     const speeds = outcomes
@@ -228,9 +234,8 @@ export async function loadDecisionStyleProfile(userId: string): Promise<Decision
         return (outcomeDate.getTime() - analysisDate.getTime()) / (1000 * 60 * 60 * 24);
       })
       .filter(d => d > 0);
-    const avgDecisionSpeed = speeds.length > 0
-      ? speeds.reduce((a, b) => a + b, 0) / speeds.length
-      : 0;
+    const avgDecisionSpeed =
+      speeds.length > 0 ? speeds.reduce((a, b) => a + b, 0) / speeds.length : 0;
 
     // Bias patterns
     const confirmedCounts = new Map<string, number>();
@@ -259,7 +264,13 @@ export async function loadDecisionStyleProfile(userId: string): Promise<Decision
       .map(o => o.lessonsLearned!);
 
     // Also load copilot-specific outcomes
-    let copilotOutcomes: Array<{ outcome: string; lessonsLearned: string | null; whatWorked: string | null; whatFailed: string | null; helpfulAgents: string[] }> = [];
+    let copilotOutcomes: Array<{
+      outcome: string;
+      lessonsLearned: string | null;
+      whatWorked: string | null;
+      whatFailed: string | null;
+      helpfulAgents: string[];
+    }> = [];
     try {
       copilotOutcomes = await prisma.copilotOutcome.findMany({
         where: { userId },

@@ -133,7 +133,11 @@ export function NudgeWidget() {
                   }}
                   title="Helpful"
                 >
-                  {isAcking ? <Loader2 size={14} className="animate-spin" /> : <ThumbsUp size={14} />}
+                  {isAcking ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <ThumbsUp size={14} />
+                  )}
                 </button>
                 <button
                   onClick={() => handleAcknowledge(nudge.id, false)}
