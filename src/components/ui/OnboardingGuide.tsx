@@ -7,24 +7,24 @@ import { Upload, BarChart3, Shield, X, ArrowRight, CheckCircle, FileText } from 
 const STEPS = [
   {
     icon: Upload,
-    title: 'Upload a Document',
-    description: 'Start by uploading a PDF, TXT, MD, or DOCX file for analysis.',
+    title: 'Upload an IC Memo or CIM',
+    description: 'Start by uploading an investment committee memo, CIM, pitch deck, or due diligence report.',
     action: 'Use the upload zone above',
     hasSampleAction: true,
   },
   {
     icon: BarChart3,
-    title: 'Review AI Analysis',
+    title: 'Review Deal-Specific Bias Analysis',
     description:
-      'Our AI scans for cognitive biases, noise, logical fallacies, and compliance risks.',
+      'Our AI detects investment-specific biases: anchoring to entry valuation, sunk cost on follow-ons, confirmation bias in thesis validation, and winner\'s curse in competitive auctions.',
     action: 'Click on a document to view results',
     hasSampleAction: false,
   },
   {
     icon: Shield,
-    title: 'Improve Decisions',
-    description: 'Use the What-If Simulator to test edits and track improvements over time.',
-    action: 'Explore trends and risk audits',
+    title: 'Track IC Decision Quality',
+    description: 'Link deal outcomes (IRR, MOIC) to detected biases. Build your firm\'s institutional memory of what biases actually hurt returns.',
+    action: 'Explore deal pipeline and outcomes',
     hasSampleAction: false,
   },
 ];

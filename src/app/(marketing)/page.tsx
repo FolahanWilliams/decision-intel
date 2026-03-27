@@ -756,7 +756,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.03em',
                   }}
                 >
-                  Your last satisfactory decision had{' '}
+                  Your last IC memo had{' '}
                   <span
                     className="block"
                     style={{
@@ -783,8 +783,8 @@ export default function LandingPage() {
                     maxWidth: '540px',
                   }}
                 >
-                  You just didn&apos;t know. Decision Intel finds them automatically — before they
-                  cost you millions.
+                  Your LPs just don&apos;t know yet. Decision Intel finds them automatically — before
+                  they cost your fund $50M.
                 </motion.p>
 
                 <motion.div
@@ -3151,7 +3151,7 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Free
+                Starter
               </h3>
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
@@ -3168,7 +3168,7 @@ export default function LandingPage() {
                   flex: 1,
                 }}
               >
-                {['3 analyses/month', '10 page max', '5 bias types', 'Docs support'].map(
+                {['3 deal analyses/month', '10 page max', '5 bias types', 'Docs support'].map(
                   (feature, i) => (
                     <div
                       key={i}
@@ -3201,7 +3201,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                For analysts exploring decision science.
+                For deal partners evaluating the platform.
               </p>
               <Link
                 href="/login"
@@ -3253,7 +3253,7 @@ export default function LandingPage() {
                   letterSpacing: '0.02em',
                 }}
               >
-                Best for Individuals
+                Best for Deal Partners
               </div>
               <h3
                 style={{
@@ -3263,7 +3263,7 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Pro
+                IC Pro
               </h3>
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
@@ -3283,11 +3283,11 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  '50 analyses/month',
-                  '100 page documents',
-                  'All 20 bias types',
-                  'Noise analysis + Decision Twins',
-                  'Outcome tracking + calibration',
+                  '50 deal analyses/month',
+                  '100 page IC memos & CIMs',
+                  'All PE/VC bias types',
+                  'Noise analysis + IC simulation',
+                  'Deal outcome tracking (IRR/MOIC)',
                   'Priority email support',
                 ].map((feature, i) => (
                   <div
@@ -3320,7 +3320,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                For strategists and investment professionals making high-stakes calls.
+                For deal partners and analysts running IC memos through the bias gauntlet.
               </p>
               <button
                 onClick={() => handleCheckout('pro')}
@@ -3375,7 +3375,7 @@ export default function LandingPage() {
                   letterSpacing: '0.02em',
                 }}
               >
-                Best for Teams
+                Best for IC Teams
               </div>
               <h3
                 style={{
@@ -3385,7 +3385,7 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Team
+                Fund
               </h3>
               <div style={{ marginBottom: '4px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
@@ -3410,11 +3410,11 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  '250 analyses/month',
-                  '200 page documents',
-                  'All 20 bias types',
-                  'Compliance frameworks (FCA/SOX/Basel)',
-                  'Team cognitive profiles + sharing',
+                  '250 deal analyses/month',
+                  '200 page IC memos & CIMs',
+                  'All PE/VC bias types',
+                  'Deal pipeline + stage tracking',
+                  'Blind IC voting + team profiles',
                   'Slack integration + API access',
                   'Dedicated support channel',
                 ].map((feature, i) => (
@@ -3448,7 +3448,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                For strategy teams, investment committees, and executive leadership.
+                For PE/VC investment committees and deal teams managing full fund portfolios.
               </p>
               <button
                 onClick={() => handleCheckout('team')}
@@ -3494,7 +3494,7 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Enterprise
+                Multi-Fund
               </h3>
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
@@ -3511,11 +3511,11 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  'Unlimited analyses + documents',
-                  'Custom compliance frameworks',
+                  'Unlimited deals + documents',
+                  'Multi-fund portfolio analytics',
                   'SSO + audit log + full API',
                   'Dedicated CSM',
-                  'Custom model fine-tuning',
+                  'Custom bias taxonomies',
                   'On-premise deployment option',
                 ].map((feature, i) => (
                   <div
@@ -3548,7 +3548,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                For organizations embedding decision quality into operations.
+                For PE/VC platforms managing multiple funds with dedicated IC workflows.
               </p>
               <a
                 href="mailto:hello@decisionintel.ai"

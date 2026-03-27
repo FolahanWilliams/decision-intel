@@ -180,16 +180,7 @@ export async function applyOrgWeights(
   >
 > {
   try {
-    const model = await (
-      prisma as unknown as {
-        orgCausalModel: {
-          findUnique: (args: unknown) => Promise<{
-            weights: CausalWeight[];
-            updatedAt?: Date;
-          } | null>;
-        };
-      }
-    ).orgCausalModel.findUnique({
+    const model = await prisma.orgCausalModel.findUnique({
       where: { orgId },
     });
 
@@ -207,7 +198,7 @@ export async function applyOrgWeights(
     }
 
     const weightMap = new Map<string, number>(
-      (model.weights as CausalWeight[]).map(w => [w.biasType, w.dangerMultiplier])
+      (model.weights as unknown as CausalWeight[]).map(w => [w.biasType, w.dangerMultiplier])
     );
 
     const result: Record<
@@ -318,21 +309,19 @@ export async function updateCausalModel(orgId: string): Promise<unknown | null> 
     const totalOutcomes = outcomes.length;
     const insights = getCausalInsights(weights, totalOutcomes);
 
-    const result = await (
-      prisma as unknown as {
-        orgCausalModel: { upsert: (args: unknown) => Promise<unknown> };
-      }
-    ).orgCausalModel.upsert({
+    const weightsJson = JSON.parse(JSON.stringify(weights));
+    const insightsJson = JSON.parse(JSON.stringify(insights));
+    const result = await prisma.orgCausalModel.upsert({
       where: { orgId },
       create: {
         orgId,
-        weights: weights as unknown as Record<string, unknown>[],
-        insights: insights as unknown as Record<string, unknown>[],
+        weights: weightsJson,
+        insights: insightsJson,
         totalOutcomes,
       },
       update: {
-        weights: weights as unknown as Record<string, unknown>[],
-        insights: insights as unknown as Record<string, unknown>[],
+        weights: weightsJson,
+        insights: insightsJson,
         totalOutcomes,
       },
     });
