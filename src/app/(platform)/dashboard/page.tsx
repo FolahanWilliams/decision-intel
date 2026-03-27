@@ -25,6 +25,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -134,7 +135,7 @@ export default function Dashboard() {
     'Total Documents': true,
     Analyzed: true,
     'Avg Quality': true,
-    'In Progress': true,
+    'Decision IQ': true,
   };
   const [kpiVisibility, setKpiVisibility] = useState<Record<string, boolean>>(kpiDefaults);
   const kpiHydrated = useRef(false);
@@ -718,7 +719,7 @@ export default function Dashboard() {
                   <span className="text-sm font-semibold">Show/Hide KPI Cards</span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-sm">
-                  {['Total Documents', 'Analyzed', 'Avg Quality', 'In Progress'].map(kpiName => (
+                  {['Total Documents', 'Analyzed', 'Avg Quality', 'Decision IQ'].map(kpiName => (
                     <label
                       key={kpiName}
                       className="flex items-center gap-xs cursor-pointer p-xs rounded hover:bg-white/5 transition-colors"
@@ -787,66 +788,92 @@ export default function Dashboard() {
                 showSparkline: true,
               },
               {
-                label: 'In Progress',
-                value: uploadedDocs.filter(d => d.status === 'analyzing' || d.status === 'pending')
-                  .length,
-                numericValue: uploadedDocs.filter(
-                  d => d.status === 'analyzing' || d.status === 'pending'
-                ).length,
-                icon: <Clock size={18} />,
+                label: 'Decision IQ',
+                value: -1, // Sentinel: replaced by custom component
+                numericValue: -1,
+                icon: <Brain size={18} />,
                 iconBg: 'rgba(255, 255, 255, 0.06)',
                 iconColor: 'rgba(255, 255, 255, 0.5)',
                 sparkColor: 'rgba(255, 255, 255, 0.4)',
+                isCustom: true,
               },
             ]
               .filter(stat => kpiVisibility[stat.label] !== false)
-              .map(stat => (
-                <motion.div
-                  key={stat.label}
-                  className="stat-card liquid-glass-premium"
-                  variants={{
-                    hidden: { opacity: 0, y: 20, scale: 0.97 },
-                    visible: { opacity: 1, y: 0, scale: 1 },
-                  }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  whileHover={{
-                    y: -4,
-                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
-                  }}
-                >
-                  <div
-                    className="flex items-center justify-between"
-                    style={{ marginBottom: '16px' }}
+              .map(stat => {
+                // Decision IQ uses its own self-contained component
+                if ((stat as Record<string, unknown>).isCustom) {
+                  return (
+                    <motion.div
+                      key={stat.label}
+                      variants={{
+                        hidden: { opacity: 0, y: 20, scale: 0.97 },
+                        visible: { opacity: 1, y: 0, scale: 1 },
+                      }}
+                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                      whileHover={{
+                        y: -4,
+                        boxShadow:
+                          '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
+                      }}
+                    >
+                      <DecisionIQCard />
+                    </motion.div>
+                  );
+                }
+
+                return (
+                  <motion.div
+                    key={stat.label}
+                    className="stat-card liquid-glass-premium"
+                    variants={{
+                      hidden: { opacity: 0, y: 20, scale: 0.97 },
+                      visible: { opacity: 1, y: 0, scale: 1 },
+                    }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    whileHover={{
+                      y: -4,
+                      boxShadow:
+                        '0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.04)',
+                    }}
                   >
                     <div
-                      className="stat-card-icon"
-                      style={{ background: stat.iconBg, color: stat.iconColor, marginBottom: 0 }}
+                      className="flex items-center justify-between"
+                      style={{ marginBottom: '16px' }}
                     >
-                      {stat.icon}
+                      <div
+                        className="stat-card-icon"
+                        style={{
+                          background: stat.iconBg,
+                          color: stat.iconColor,
+                          marginBottom: 0,
+                        }}
+                      >
+                        {stat.icon}
+                      </div>
+                      {stat.showSparkline && sparklineData.length >= 2 && (
+                        <SparklineChart
+                          data={sparklineData}
+                          color={stat.sparkColor}
+                          width={72}
+                          height={28}
+                        />
+                      )}
                     </div>
-                    {stat.showSparkline && sparklineData.length >= 2 && (
-                      <SparklineChart
-                        data={sparklineData}
-                        color={stat.sparkColor}
-                        width={72}
-                        height={28}
-                      />
-                    )}
-                  </div>
-                  <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
-                    {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
-                      <AnimatedNumber
-                        value={stat.numericValue}
-                        suffix={stat.suffix || ''}
-                        duration={900}
-                      />
-                    ) : (
-                      '—'
-                    )}
-                  </div>
-                  <div className="stat-card-label">{stat.label}</div>
-                </motion.div>
-              ))}
+                    <div className="stat-card-value" style={{ color: 'var(--text-highlight)' }}>
+                      {riskSummary.total > 0 || stat.label === 'Total Documents' ? (
+                        <AnimatedNumber
+                          value={stat.numericValue}
+                          suffix={stat.suffix || ''}
+                          duration={900}
+                        />
+                      ) : (
+                        '—'
+                      )}
+                    </div>
+                    <div className="stat-card-label">{stat.label}</div>
+                  </motion.div>
+                );
+              })}
           </motion.div>
         </>
       )}
