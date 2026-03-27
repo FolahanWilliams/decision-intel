@@ -24,6 +24,7 @@ import { createClientLogger } from '@/lib/utils/logger';
 import type { SlackInstallationStatus } from '@/types/human-audit';
 import { PersonaManager } from './PersonaManager';
 import { BillingSection } from '@/components/ui/BillingSection';
+import { ApiKeysSection } from '@/components/ui/ApiKeysSection';
 
 const log = createClientLogger('Settings');
 
@@ -439,6 +440,9 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           </p>
         </div>
       </div>
+
+      {/* API Keys */}
+      <ApiKeysSection />
 
       {/* Boardroom Personas */}
       <PersonaManager />

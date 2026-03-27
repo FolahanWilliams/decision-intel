@@ -48,6 +48,7 @@ function getScoreColor(score: number): string {
 export function DecisionTriageWidget() {
   const [triage, setTriage] = useState<TriageResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch user's org, then triage decisions
@@ -62,10 +63,15 @@ export function DecisionTriageWidget() {
       .then(data => {
         if (data) setTriage(data);
       })
-      .catch(() => {})
+      .catch(() => setError('Failed to load triage data'))
       .finally(() => setLoading(false));
   }, []);
 
+  if (error) {
+    return (
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '8px 0' }}>{error}</div>
+    );
+  }
   if (loading || !triage || triage.decisions.length === 0) return null;
 
   return (

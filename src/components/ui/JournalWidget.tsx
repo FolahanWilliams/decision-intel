@@ -45,6 +45,7 @@ export function JournalWidget() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [converting, setConverting] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchEntries = useCallback(async () => {
     try {
@@ -54,7 +55,7 @@ export function JournalWidget() {
         setEntries(data.entries || []);
       }
     } catch {
-      // Silent fail
+      setError('Failed to load journal entries');
     } finally {
       setLoading(false);
     }
@@ -76,7 +77,7 @@ export function JournalWidget() {
         setEntries(prev => prev.map(e => (e.id === entryId ? { ...e, status: 'processed' } : e)));
       }
     } catch {
-      // Silent fail
+      setError('Failed to convert entry');
     } finally {
       setConverting(null);
     }
@@ -91,11 +92,16 @@ export function JournalWidget() {
       });
       setEntries(prev => prev.filter(e => e.id !== entryId));
     } catch {
-      // Silent fail
+      setError('Failed to dismiss entry');
     }
   }, []);
 
   if (loading) return null;
+  if (error) {
+    return (
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '8px 0' }}>{error}</div>
+    );
+  }
   if (entries.length === 0) return null;
 
   const pendingEntries = entries.filter(e => e.status === 'pending');
