@@ -72,15 +72,17 @@ export async function GET(req: NextRequest) {
         try {
           const biasTypes = analysis.biases.map(b => b.biasType);
           if (biasTypes.length > 0) {
-            similarDecisions = await prisma.biasInstance.groupBy({
-              by: ['analysisId'],
-              where: {
-                biasType: { in: biasTypes },
-                analysisId: { not: analysisId },
-                analysis: { document: { orgId } },
-              },
-              _count: { id: true },
-            }).then(groups => groups.length);
+            similarDecisions = await prisma.biasInstance
+              .groupBy({
+                by: ['analysisId'],
+                where: {
+                  biasType: { in: biasTypes },
+                  analysisId: { not: analysisId },
+                  analysis: { document: { orgId } },
+                },
+                _count: { id: true },
+              })
+              .then(groups => groups.length);
           }
         } catch {
           // Schema drift
@@ -107,7 +109,7 @@ export async function GET(req: NextRequest) {
           message:
             biasCount > 0
               ? `${biasCount} bias${biasCount === 1 ? '' : 'es'} detected — reporting the outcome will teach the platform whether ${biasCount === 1 ? 'it was' : 'they were'} real.`
-              : 'Report this decision\'s outcome to help the platform calibrate future analyses.',
+              : "Report this decision's outcome to help the platform calibrate future analyses.",
         },
       });
     }
@@ -161,9 +163,10 @@ export async function GET(req: NextRequest) {
             const delta = rateAfter - rateBefore;
 
             if (Math.abs(delta) >= 0.5) {
-              orgAccuracyMessage = delta > 0
-                ? `This outcome improved org detection accuracy by ${delta.toFixed(1)}pp`
-                : `This outcome adjusted org detection accuracy by ${delta.toFixed(1)}pp`;
+              orgAccuracyMessage =
+                delta > 0
+                  ? `This outcome improved org detection accuracy by ${delta.toFixed(1)}pp`
+                  : `This outcome adjusted org detection accuracy by ${delta.toFixed(1)}pp`;
             }
           }
         }

@@ -271,9 +271,7 @@ export default function TeamPage() {
 
       {activeTab === 'activity' && <TeamActivityTab />}
 
-      {activeTab === 'intelligence' && org && (
-        <TeamIntelligenceTab orgId={org.id} />
-      )}
+      {activeTab === 'intelligence' && org && <TeamIntelligenceTab orgId={org.id} />}
 
       {activeTab === 'members' && (
         <>

@@ -119,7 +119,10 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
       : 'flat';
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+    <div
+      className="animate-fade-in"
+      style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}
+    >
       {/* Section 1: Team Pulse — 3 mini stat cards */}
       {profile && (
         <div className="card liquid-glass-premium">
@@ -149,7 +152,10 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                   textAlign: 'center',
                 }}
               >
-                <div className="flex items-center justify-center gap-xs" style={{ marginBottom: '4px' }}>
+                <div
+                  className="flex items-center justify-center gap-xs"
+                  style={{ marginBottom: '4px' }}
+                >
                   <span
                     style={{
                       fontSize: '1.5rem',
@@ -160,9 +166,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                   >
                     {Math.round(profile.avgDecisionQuality)}
                   </span>
-                  {trendDirection === 'up' && (
-                    <TrendingUp size={14} style={{ color: '#34d399' }} />
-                  )}
+                  {trendDirection === 'up' && <TrendingUp size={14} style={{ color: '#34d399' }} />}
                   {trendDirection === 'down' && (
                     <TrendingDown size={14} style={{ color: '#f87171' }} />
                   )}
@@ -175,7 +179,13 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                   <div style={{ marginTop: '6px', display: 'flex', justifyContent: 'center' }}>
                     <SparklineChart
                       data={trendData}
-                      color={trendDirection === 'up' ? '#34d399' : trendDirection === 'down' ? '#f87171' : '#A1A1AA'}
+                      color={
+                        trendDirection === 'up'
+                          ? '#34d399'
+                          : trendDirection === 'down'
+                            ? '#f87171'
+                            : '#A1A1AA'
+                      }
                       width={60}
                       height={20}
                     />
@@ -205,8 +215,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                   </span>
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  Avg Noise{' '}
-                  <span style={{ fontSize: '9px', opacity: 0.6 }}>(lower = better)</span>
+                  Avg Noise <span style={{ fontSize: '9px', opacity: 0.6 }}>(lower = better)</span>
                 </div>
               </div>
 
@@ -256,7 +265,11 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
             {causalWeights.slice(0, 5).map((w, idx) => {
               const color = getBiasColor(w.biasType);
               const dangerLevel =
-                w.dangerMultiplier >= 2 ? 'critical' : w.dangerMultiplier >= 1.5 ? 'high' : 'medium';
+                w.dangerMultiplier >= 2
+                  ? 'critical'
+                  : w.dangerMultiplier >= 1.5
+                    ? 'high'
+                    : 'medium';
               return (
                 <div
                   key={w.biasType}
@@ -368,9 +381,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
           <div
             className="card-header flex items-center justify-between"
             style={{ paddingBottom: 'var(--spacing-sm)', cursor: 'pointer' }}
-            onClick={() =>
-              setExpandedSection(expandedSection === 'maturity' ? null : 'maturity')
-            }
+            onClick={() => setExpandedSection(expandedSection === 'maturity' ? null : 'maturity')}
           >
             <h3 className="flex items-center gap-sm text-sm font-semibold">
               <BarChart3 size={16} />
@@ -409,11 +420,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
           {(expandedSection === 'maturity' || !profile) && maturityScore.breakdown && (
             <div className="card-body" style={{ paddingTop: 0 }}>
               {Object.entries(maturityScore.breakdown).map(([key, value]) => (
-                <div
-                  key={key}
-                  className="flex items-center gap-sm"
-                  style={{ marginBottom: '8px' }}
-                >
+                <div key={key} className="flex items-center gap-sm" style={{ marginBottom: '8px' }}>
                   <span
                     style={{
                       fontSize: '12px',
@@ -438,12 +445,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                       style={{
                         width: `${Math.min(100, value)}%`,
                         height: '100%',
-                        background:
-                          value >= 70
-                            ? '#34d399'
-                            : value >= 40
-                              ? '#fbbf24'
-                              : '#f87171',
+                        background: value >= 70 ? '#34d399' : value >= 40 ? '#fbbf24' : '#f87171',
                         borderRadius: '3px',
                         transition: 'width 0.5s ease',
                       }}
@@ -524,8 +526,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                     fontSize: '1.25rem',
                     fontWeight: 700,
                     fontFamily: 'var(--font-mono)',
-                    color:
-                      profile.nudgeEffectiveness.helpfulRate > 0.5 ? '#34d399' : '#fbbf24',
+                    color: profile.nudgeEffectiveness.helpfulRate > 0.5 ? '#34d399' : '#fbbf24',
                   }}
                 >
                   {Math.round(profile.nudgeEffectiveness.helpfulRate * 100)}%
@@ -547,8 +548,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                 style={{
                   width: `${Math.min(100, profile.nudgeEffectiveness.helpfulRate * 100)}%`,
                   height: '100%',
-                  background:
-                    profile.nudgeEffectiveness.helpfulRate > 0.5 ? '#34d399' : '#fbbf24',
+                  background: profile.nudgeEffectiveness.helpfulRate > 0.5 ? '#34d399' : '#fbbf24',
                   borderRadius: '2px',
                 }}
               />

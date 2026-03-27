@@ -67,18 +67,23 @@ export async function GET() {
     ]);
 
     // Transform causal edges into weights the frontend can display
-    const causalWeights = (causalEdges as Array<{
-      fromVar: string;
-      toVar: string;
-      strength: number;
-      confidence: number;
-      sampleSize: number;
-    }>)
-      .filter(e => e.toVar === 'outcome' || e.toVar === 'noise_score' || e.toVar === 'overall_score')
+    const causalWeights = (
+      causalEdges as Array<{
+        fromVar: string;
+        toVar: string;
+        strength: number;
+        confidence: number;
+        sampleSize: number;
+      }>
+    )
+      .filter(
+        e => e.toVar === 'outcome' || e.toVar === 'noise_score' || e.toVar === 'overall_score'
+      )
       .map(e => ({
         biasType: e.fromVar,
         outcomeCorrelation: e.strength,
-        dangerMultiplier: e.strength < 0 ? Math.abs(e.strength) * 3 + 1 : Math.max(0.1, 1 - e.strength),
+        dangerMultiplier:
+          e.strength < 0 ? Math.abs(e.strength) * 3 + 1 : Math.max(0.1, 1 - e.strength),
         sampleSize: e.sampleSize,
         confidence: e.confidence,
       }))
@@ -91,13 +96,20 @@ export async function GET() {
           avgDecisionQuality: profile.avgDecisionQuality,
           avgNoiseScore: profile.avgNoiseScore,
           totalDecisions: profile.totalDecisions,
-          topBiases: profile.topBiases as Array<{ biasType: string; count: number; avgSeverity: string }> | null,
+          topBiases: profile.topBiases as Array<{
+            biasType: string;
+            count: number;
+            avgSeverity: string;
+          }> | null,
           nudgeEffectiveness: profile.nudgeEffectiveness as {
             sent: number;
             acknowledged: number;
             helpfulRate: number;
           } | null,
-          consistencyTrend: profile.consistencyTrend as Array<{ date: string; score: number }> | null,
+          consistencyTrend: profile.consistencyTrend as Array<{
+            date: string;
+            score: number;
+          }> | null,
         }
       : null;
 
@@ -106,7 +118,12 @@ export async function GET() {
         profile: profileData,
         causalWeights,
         maturityScore: maturity
-          ? { score: maturity.score, grade: maturity.grade, breakdown: maturity.breakdown, peerBenchmark: maturity.peerBenchmark }
+          ? {
+              score: maturity.score,
+              grade: maturity.grade,
+              breakdown: maturity.breakdown,
+              peerBenchmark: maturity.peerBenchmark,
+            }
           : null,
       },
       {

@@ -102,11 +102,7 @@ export function BillingSection() {
   const isPaid = data.plan !== 'free' && data.status !== 'none';
   const isUnlimited = data.usage.analysesLimit === -1;
   const usageColor =
-    data.usage.percentUsed > 85
-      ? '#f87171'
-      : data.usage.percentUsed > 60
-        ? '#fbbf24'
-        : '#34d399';
+    data.usage.percentUsed > 85 ? '#f87171' : data.usage.percentUsed > 60 ? '#fbbf24' : '#34d399';
 
   const handlePortal = async () => {
     setPortalLoading(true);
@@ -353,11 +349,7 @@ export function BillingSection() {
               justifyContent: 'center',
             }}
           >
-            {portalLoading ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Zap size={14} />
-            )}
+            {portalLoading ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
             Upgrade to Pro — 14-day free trial
           </button>
         )}
@@ -436,10 +428,7 @@ export function BillingSection() {
                 Cancel Plan
               </button>
             ) : (
-              <div
-                className="flex items-center gap-sm"
-                style={{ marginLeft: 'auto' }}
-              >
+              <div className="flex items-center gap-sm" style={{ marginLeft: 'auto' }}>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                   You&apos;ll keep access until period ends.
                 </span>

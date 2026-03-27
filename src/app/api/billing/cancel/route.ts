@@ -65,9 +65,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    log.info(
-      `Subscription ${action === 'cancel' ? 'canceled' : 'resumed'} for user ${user.id}`
-    );
+    log.info(`Subscription ${action === 'cancel' ? 'canceled' : 'resumed'} for user ${user.id}`);
 
     return NextResponse.json({ success: true, cancelAtPeriodEnd });
   } catch (error) {
