@@ -150,14 +150,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Guard against concurrent analysis — block if one is already in
-    // flight, but allow re-analysis of completed documents (e.g. "Run
-    // Live Audit" on the detail page).
-    // If a document has been stuck in 'analyzing' for more than 10
-    // minutes the previous run likely timed out or crashed — allow a
-    // fresh attempt instead of returning 409 forever.
+    // Guard against concurrent analysis with atomic check-and-set.
+    // Uses updateMany with a predicate to avoid TOCTOU race conditions:
+    // only sets status to 'analyzing' if it's NOT already 'analyzing'
+    // (or if it's been stuck for >10 minutes, indicating a crashed run).
     if (doc.status === 'analyzing') {
-      const STALE_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutes
+      const STALE_THRESHOLD_MS = 10 * 60 * 1000;
       const elapsed = Date.now() - new Date(doc.updatedAt).getTime();
       if (elapsed < STALE_THRESHOLD_MS) {
         return NextResponse.json(
@@ -167,6 +165,24 @@ export async function POST(request: NextRequest) {
       }
       log.warn(
         `Document ${documentId} stuck in 'analyzing' for ${Math.round(elapsed / 60000)}m — allowing re-analysis`
+      );
+    }
+
+    // Atomic lock: only one request can transition a document to 'analyzing'
+    const lockResult = await prisma.document.updateMany({
+      where: {
+        id: documentId,
+        OR: [
+          { status: { not: 'analyzing' } },
+          { updatedAt: { lt: new Date(Date.now() - 10 * 60 * 1000) } },
+        ],
+      },
+      data: { status: 'analyzing' },
+    });
+    if (lockResult.count === 0) {
+      return NextResponse.json(
+        { error: 'Analysis already in progress', status: 'analyzing' },
+        { status: 409 }
       );
     }
 
@@ -224,11 +240,7 @@ export async function POST(request: NextRequest) {
         const totalNodes = Object.keys(NODE_LABELS).length;
 
         try {
-          // Update status to analyzing
-          await prisma.document.update({
-            where: { id: documentId },
-            data: { status: 'analyzing' },
-          });
+          // Status already set to 'analyzing' by atomic lock above
 
           sendUpdate({
             type: 'step',

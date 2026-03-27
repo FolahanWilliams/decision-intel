@@ -261,8 +261,8 @@ export async function POST(request: NextRequest) {
     // Link to DecisionFrame if frameId was provided
     if (frameId) {
       prisma.decisionFrame
-        .update({
-          where: { id: frameId, userId, documentId: null },
+        .updateMany({
+          where: { id: frameId, userId, documentId: { equals: null } },
           data: { documentId: document.id },
         })
         .catch(err => log.warn('Failed to link DecisionFrame:', err));
