@@ -219,6 +219,7 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
     { label: 'Why Us', href: '#why-us' },
     { label: 'ROI', href: '#roi' },
     { label: 'FAQ', href: '#faq' },
+    { label: 'Try Demo', href: '/demo' },
   ];
 
   // Body scroll lock + ESC key handler
@@ -654,6 +655,9 @@ export default function LandingPage() {
             <a href="#roi" className="hover:text-white transition-colors duration-300">
               ROI
             </a>
+            <Link href="/demo" className="hover:text-white transition-colors duration-300 font-semibold">
+              Try Demo
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             <GlassHover>
