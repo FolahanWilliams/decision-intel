@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
+import { getStripe } from '@/lib/stripe';
 
 const log = createLogger('UserRoute');
 
@@ -64,16 +65,50 @@ export async function DELETE() {
       );
     }
 
+    // Cancel Stripe subscription BEFORE deleting data (needs stripeSubscriptionId)
+    try {
+      const sub = await prisma.subscription.findFirst({
+        where: { userId, status: { in: ['active', 'trialing'] } },
+        select: { stripeSubscriptionId: true },
+      });
+      if (sub?.stripeSubscriptionId) {
+        await getStripe().subscriptions.cancel(sub.stripeSubscriptionId);
+        log.info(`Canceled Stripe subscription ${sub.stripeSubscriptionId} for user ${userId}`);
+      }
+    } catch (stripeErr) {
+      log.warn(
+        'Failed to cancel Stripe subscription (continuing with deletion):',
+        stripeErr instanceof Error ? stripeErr.message : String(stripeErr)
+      );
+    }
+
     // Delete all user data atomically.
-    // Order matters: Product B tables (nudges → cognitive audits → human decisions)
-    // must be deleted before Product A (documents cascade to analyses, biases, embeddings).
-    // Audit logs, rate limits, and user settings are independent.
+    // Order matters: dependent tables first (FK constraints), then parents.
+    // Document → Analysis cascade handles BiasInstance, DecisionEmbedding, AnalysisVersion.
     await prisma.$transaction(async tx => {
+      // Outcome & learning data
+      await tx.decisionOutcome.deleteMany({ where: { userId } }).catch(() => {});
+      await tx.decisionPrior.deleteMany({ where: { userId } }).catch(() => {});
+      await tx.decisionFrame.deleteMany({ where: { userId } }).catch(() => {});
+
       // Product B: Nudges → CognitiveAudits → HumanDecisions (FK order)
-      await tx.nudge.deleteMany({ where: { humanDecision: { userId } } });
-      await tx.cognitiveAudit.deleteMany({ where: { humanDecision: { userId } } });
+      await tx.nudge.deleteMany({ where: { humanDecision: { userId } } }).catch(() => {});
+      await tx.cognitiveAudit.deleteMany({ where: { humanDecision: { userId } } }).catch(() => {});
       await tx.humanDecision.deleteMany({ where: { userId } });
-      // Product A + shared
+
+      // Share links + access logs (access cascades from shareLink)
+      await tx.shareLink.deleteMany({ where: { userId } }).catch(() => {});
+
+      // Notifications
+      await tx.notificationLog.deleteMany({ where: { userId } }).catch(() => {});
+
+      // Subscription
+      await tx.subscription.deleteMany({ where: { userId } }).catch(() => {});
+
+      // Team membership (remove from team, don't delete the org)
+      await tx.teamMember.deleteMany({ where: { userId } }).catch(() => {});
+
+      // Product A: Documents cascade to Analyses, BiasInstances, Embeddings
       await tx.auditLog.deleteMany({ where: { userId } });
       await tx.rateLimit.deleteMany({ where: { identifier: userId } });
       await tx.document.deleteMany({ where: { userId } });

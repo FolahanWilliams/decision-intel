@@ -6,6 +6,7 @@ import { parseFile } from '@/lib/utils/file-parser';
 import { getSafeErrorMessage } from '@/lib/utils/error';
 import { createHash } from 'crypto';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('UploadRoute');
@@ -39,8 +40,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Enforce monthly plan limits (check before accepting upload to save bandwidth)
+    const planCheck = await checkAnalysisLimit(userId);
+    if (!planCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: `Monthly analysis limit reached (${planCheck.used}/${planCheck.limit}). Upgrade your plan for more.`,
+          code: 'PLAN_LIMIT',
+          plan: planCheck.plan,
+          used: planCheck.used,
+          limit: planCheck.limit,
+        },
+        { status: 429 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const frameId = formData.get('frameId') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
@@ -239,6 +256,16 @@ export async function POST(request: NextRequest) {
         .delete({ where: { id: document.id } })
         .catch((e: unknown) => log.error('Failed to clean up DB after storage error:', e));
       throw new Error(`Storage Upload Failed: ${uploadError.message}`);
+    }
+
+    // Link to DecisionFrame if frameId was provided
+    if (frameId) {
+      prisma.decisionFrame
+        .update({
+          where: { id: frameId, userId, documentId: null },
+          data: { documentId: document.id },
+        })
+        .catch(err => log.warn('Failed to link DecisionFrame:', err));
     }
 
     return NextResponse.json({

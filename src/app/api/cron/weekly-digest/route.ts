@@ -97,20 +97,32 @@ export async function GET(req: NextRequest) {
           .slice(0, 3)
           .map(([type]) => type.replace(/_/g, ' '));
 
-        // We need the user's email — query from Supabase via a membership or
-        // team member record, or fall back to a best-effort approach
+        // Resolve user email — try TeamMember first, then Supabase auth
+        let userEmail: string | null = null;
         const member = await prisma.teamMember.findFirst({
           where: { userId: settings.userId },
           select: { email: true },
         });
+        userEmail = member?.email || null;
 
-        // If we can't find email, skip
-        if (!member?.email) {
+        // Fallback: query Supabase auth for solo users without team membership
+        if (!userEmail) {
+          try {
+            const { createClient: createAdminClient } = await import('@/utils/supabase/server');
+            const adminSupabase = await createAdminClient();
+            const { data } = await adminSupabase.auth.admin.getUserById(settings.userId);
+            userEmail = data?.user?.email || null;
+          } catch {
+            // Admin API not available or user not found
+          }
+        }
+
+        if (!userEmail) {
           log.warn(`No email found for user ${settings.userId}, skipping digest`);
           continue;
         }
 
-        await sendWeeklyDigest(settings.userId, member.email, {
+        await sendWeeklyDigest(settings.userId, userEmail, {
           documentsAnalyzed: documents.length,
           avgScore,
           topBiases,
