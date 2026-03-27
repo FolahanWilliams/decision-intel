@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -18,7 +19,6 @@ import {
   Video,
   BookOpen,
   Users,
-  Zap,
   Network,
   Sparkles,
   Plus,
@@ -154,20 +154,16 @@ export default function Sidebar() {
         >
           {!collapsed && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
+              <Image
+                src="/logo.png"
+                alt="Decision Intel"
+                width={32}
+                height={32}
                 style={{
-                  width: 32,
-                  height: 32,
                   borderRadius: 'var(--radius-lg)',
-                  background: '#FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 12px rgba(255, 255, 255, 0.1)',
+                  objectFit: 'cover',
                 }}
-              >
-                <Zap size={16} color="#080808" strokeWidth={2.5} />
-              </div>
+              />
               <div>
                 <div style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '-0.5px' }}>
                   <span style={{ color: 'var(--text-highlight)' }}>Decision</span>
@@ -196,21 +192,18 @@ export default function Sidebar() {
             </div>
           )}
           {collapsed && (
-            <div
+            <Image
+              src="/logo.png"
+              alt="Decision Intel"
+              width={32}
+              height={32}
               style={{
-                width: 32,
-                height: 32,
                 borderRadius: 'var(--radius-lg)',
-                background: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                objectFit: 'cover',
                 margin: '0 auto',
-                boxShadow: '0 2px 12px rgba(255, 255, 255, 0.1)',
+                display: 'block',
               }}
-            >
-              <Zap size={16} color="#080808" strokeWidth={2.5} />
-            </div>
+            />
           )}
           <button
             onClick={() => {

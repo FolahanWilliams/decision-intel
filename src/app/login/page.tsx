@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/client';
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import {
   ShieldCheck,
   Brain,
@@ -102,17 +103,16 @@ function LoginContent() {
           {/* Brand */}
           <Link href="/" style={{ textDecoration: 'none', display: 'inline-block' }}>
             <div className="flex items-center gap-3" style={{ marginBottom: '2.5rem' }}>
-              <div
+              <Image
+                src="/logo.png"
+                alt="Decision Intel"
+                width={36}
+                height={36}
                 style={{
-                  padding: '8px',
-                  background: 'rgba(245, 158, 11, 0.12)',
-                  borderRadius: '14px',
-                  border: '1px solid rgba(245, 158, 11, 0.25)',
-                  backdropFilter: 'blur(12px)',
+                  borderRadius: '10px',
+                  objectFit: 'cover',
                 }}
-              >
-                <Brain className="w-5 h-5" style={{ color: '#f59e0b' }} />
-              </div>
+              />
               <span
                 style={{
                   fontWeight: 700,
@@ -273,16 +273,16 @@ function LoginContent() {
           <div className="md:hidden" style={{ textAlign: 'center', marginBottom: '2rem' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
               <div className="flex items-center justify-center gap-3">
-                <div
+                <Image
+                  src="/logo.png"
+                  alt="Decision Intel"
+                  width={36}
+                  height={36}
                   style={{
-                    padding: '8px',
-                    background: 'rgba(245, 158, 11, 0.12)',
-                    borderRadius: '14px',
-                    border: '1px solid rgba(245, 158, 11, 0.25)',
+                    borderRadius: '10px',
+                    objectFit: 'cover',
                   }}
-                >
-                  <Brain className="w-5 h-5" style={{ color: '#f59e0b' }} />
-                </div>
+                />
                 <span
                   style={{
                     fontWeight: 700,
