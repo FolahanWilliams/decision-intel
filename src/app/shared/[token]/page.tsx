@@ -11,6 +11,11 @@ import {
   Eye,
   Clock,
   FileText,
+  Target,
+  Search,
+  Activity,
+  Heart,
+  ArrowRight,
 } from 'lucide-react';
 
 interface SharedAnalysis {
@@ -33,6 +38,143 @@ interface SharedAnalysis {
   metaVerdict: string | null;
   createdAt: string;
 }
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function extractPreviewText(data: unknown, maxLength = 200): string {
+  if (!data) return '';
+  if (typeof data === 'string') return data.slice(0, maxLength);
+  try {
+    const str = JSON.stringify(data);
+    return str
+      .replace(/[{}\[\]"]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, maxLength);
+  } catch {
+    return '';
+  }
+}
+
+const LOCKED_SECTIONS: Array<{
+  key: keyof SharedAnalysis;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+}> = [
+  {
+    key: 'swotAnalysis',
+    title: 'Strategic SWOT',
+    description: 'Strengths, weaknesses, opportunities, and threats identified',
+    icon: <Target size={14} style={{ color: '#6366f1' }} />,
+  },
+  {
+    key: 'factCheck',
+    title: 'Fact Verification',
+    description: 'Claims verified against real-time data sources',
+    icon: <Search size={14} style={{ color: '#6366f1' }} />,
+  },
+  {
+    key: 'preMortem',
+    title: 'Pre-Mortem Scenarios',
+    description: 'Failure scenarios simulated before they happen',
+    icon: <Activity size={14} style={{ color: '#6366f1' }} />,
+  },
+  {
+    key: 'sentiment',
+    title: 'Sentiment Analysis',
+    description: 'Emotional tone and objectivity assessment',
+    icon: <Heart size={14} style={{ color: '#6366f1' }} />,
+  },
+];
+
+function LockedSectionsTeaser({ analysis }: { analysis: SharedAnalysis }) {
+  const available = LOCKED_SECTIONS.filter(s => analysis[s.key] != null);
+  if (available.length === 0) return null;
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <div
+        style={{
+          fontSize: 12,
+          color: '#475569',
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          fontWeight: 600,
+          marginBottom: 12,
+        }}
+      >
+        Full Analysis Includes
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {available.map(section => {
+          const preview = extractPreviewText(analysis[section.key]);
+          return (
+            <div
+              key={section.key}
+              style={{
+                background: '#1a1a2e',
+                border: '1px solid #2d2d44',
+                borderRadius: 12,
+                padding: '16px 20px',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 8,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {section.icon}
+                  <span style={{ fontWeight: 600, fontSize: 14 }}>{section.title}</span>
+                </div>
+                <Lock size={12} style={{ color: '#475569' }} />
+              </div>
+              <div style={{ fontSize: 12, color: '#64748b', marginBottom: 10 }}>
+                {section.description}
+              </div>
+              {preview && (
+                <div
+                  style={{
+                    position: 'relative',
+                    height: 48,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      filter: 'blur(5px)',
+                      fontSize: 13,
+                      color: '#cbd5e1',
+                      lineHeight: 1.6,
+                      userSelect: 'none',
+                    }}
+                  >
+                    {preview}
+                  </div>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background:
+                        'linear-gradient(180deg, rgba(26, 26, 46, 0) 0%, #1a1a2e 85%)',
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Page ────────────────────────────────────────────────────────────────
 
 export default function SharedAnalysisPage() {
   const { token } = useParams<{ token: string }>();
@@ -393,6 +535,7 @@ export default function SharedAnalysisPage() {
             border: '1px solid #2d2d44',
             borderRadius: 12,
             padding: 20,
+            marginBottom: 24,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -421,9 +564,71 @@ export default function SharedAnalysisPage() {
           </div>
         </div>
 
-        {/* Footer */}
-        <div style={{ marginTop: 40, textAlign: 'center', color: '#475569', fontSize: 12 }}>
-          Shared via <strong>Decision Intel</strong> — AI-powered decision auditing
+        {/* ── Locked Content Teaser ──────────────────────────────── */}
+        <LockedSectionsTeaser analysis={analysis} />
+
+        {/* ── Footer CTA ─────────────────────────────────────────── */}
+        <div
+          style={{
+            marginTop: 48,
+            padding: '32px 24px',
+            background: 'linear-gradient(180deg, #1a1a2e 0%, rgba(26, 26, 46, 0) 100%)',
+            borderRadius: 16,
+            border: '1px solid #2d2d44',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              marginBottom: 12,
+            }}
+          >
+            <Shield size={20} style={{ color: '#6366f1' }} />
+            <span style={{ fontSize: 16, fontWeight: 700 }}>
+              <span style={{ color: '#fff' }}>Decision</span>
+              <span style={{ color: '#6366f1', marginLeft: 4 }}>Intel</span>
+            </span>
+          </div>
+          <p
+            style={{
+              color: '#94a3b8',
+              fontSize: 14,
+              lineHeight: 1.6,
+              maxWidth: 420,
+              margin: '0 auto 20px',
+            }}
+          >
+            Detect cognitive biases, simulate boardroom outcomes, and track decision quality over
+            time.
+          </p>
+          <a
+            href="/login"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '12px 28px',
+              background: '#6366f1',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 10,
+              fontWeight: 600,
+              fontSize: 14,
+              textDecoration: 'none',
+              cursor: 'pointer',
+              transition: 'opacity 0.15s',
+            }}
+          >
+            Audit Your Own Decisions
+            <ArrowRight size={16} />
+          </a>
+          <p style={{ color: '#475569', fontSize: 12, marginTop: 12 }}>
+            Free to start &middot; No credit card required
+          </p>
         </div>
       </div>
     </div>
