@@ -184,24 +184,22 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Analysis no longer exists' }, { status: 404 });
     }
 
-    // Update view count and create access log (fire and forget)
-    const updatePromises = [
-      // Update view count
-      prisma.shareLink.update({
-        where: { id: link.id },
-        data: { viewCount: { increment: 1 }, lastViewedAt: new Date() },
-      }),
-      // Create access log entry
-      prisma.shareLinkAccess.create({
-        data: {
-          shareLinkId: link.id,
-          ipAddress: clientIp.slice(0, 45), // Limit IP length for IPv6 compatibility
-          userAgent: req.headers.get('user-agent')?.slice(0, 256) || null,
-        },
-      }),
-    ];
-
-    Promise.all(updatePromises).catch(err => log.warn('Share link tracking failed:', err));
+    // Update view count and create access log atomically (fire and forget)
+    prisma
+      .$transaction([
+        prisma.shareLink.update({
+          where: { id: link.id },
+          data: { viewCount: { increment: 1 }, lastViewedAt: new Date() },
+        }),
+        prisma.shareLinkAccess.create({
+          data: {
+            shareLinkId: link.id,
+            ipAddress: clientIp.slice(0, 45), // Limit IP length for IPv6 compatibility
+            userAgent: req.headers.get('user-agent')?.slice(0, 256) || null,
+          },
+        }),
+      ])
+      .catch(err => log.warn('Share link tracking failed:', err));
 
     // Generate ETag based on analysis updated timestamp and view count
     const etag = `"${analysis.id}-${analysis.updatedAt.getTime()}-${link.viewCount}"`;

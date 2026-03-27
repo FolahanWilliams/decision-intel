@@ -113,18 +113,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Mark analysis as outcome_logged (fire and forget)
-    prisma.analysis
-      .update({
+    // Mark analysis as outcome_logged — awaited to prevent race conditions
+    // where the outcome gate sees a stale status on subsequent requests.
+    try {
+      await prisma.analysis.update({
         where: { id: analysisId },
         data: { outcomeStatus: 'outcome_logged' },
-      })
-      .catch(err => {
-        log.warn(
-          'Failed to update outcomeStatus to outcome_logged:',
-          err instanceof Error ? err.message : String(err)
-        );
       });
+    } catch (err) {
+      log.warn(
+        'Failed to update outcomeStatus to outcome_logged:',
+        err instanceof Error ? err.message : String(err)
+      );
+    }
 
     // Adjust graph edge weights from outcome (fire-and-forget flywheel)
     let contradictions: Array<{
@@ -183,6 +184,16 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Verify the analysis belongs to this user before returning outcome data
+    const analysis = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      select: { document: { select: { userId: true } } },
+    });
+
+    if (!analysis || analysis.document.userId !== user.id) {
+      return NextResponse.json(null);
+    }
+
     const outcome = await prisma.decisionOutcome.findUnique({
       where: { analysisId },
     });
