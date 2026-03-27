@@ -8,6 +8,7 @@ import { getSafeErrorMessage } from '@/lib/utils/error';
 import { safeJsonClone } from '@/lib/utils/json';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
 import { checkOutcomeGate, formatOutcomeReminder } from '@/lib/learning/outcome-gate';
@@ -88,6 +89,21 @@ export async function POST(request: NextRequest) {
           status: 429,
           headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) },
         }
+      );
+    }
+
+    // Enforce monthly plan limits
+    const planCheck = await checkAnalysisLimit(userId);
+    if (!planCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: `Monthly analysis limit reached (${planCheck.used}/${planCheck.limit}). Upgrade your plan for more.`,
+          code: 'PLAN_LIMIT',
+          plan: planCheck.plan,
+          used: planCheck.used,
+          limit: planCheck.limit,
+        },
+        { status: 429 }
       );
     }
 

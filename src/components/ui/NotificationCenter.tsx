@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
 import { Bell, FileText, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import Link from 'next/link';
 
@@ -35,8 +35,45 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
+const TYPE_MAP: Record<string, NotificationType> = {
+  analysis_complete: 'analysis_complete',
+  analysis_error: 'low_score',
+  nudge: 'info',
+  outcome_reminder: 'stale_intel',
+  weekly_digest: 'info',
+  team_invite: 'info',
+};
+
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const serverFetched = useRef(false);
+
+  // Hydrate from server-persisted NotificationLog on first mount
+  useEffect(() => {
+    if (serverFetched.current) return;
+    serverFetched.current = true;
+    fetch('/api/notifications')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (!data?.notifications?.length) return;
+        const serverNotifs: Notification[] = data.notifications.map(
+          (n: { id: string; type: string; subject: string | null; createdAt: string }) => ({
+            id: `server-${n.id}`,
+            type: TYPE_MAP[n.type] || 'info',
+            title: n.subject || n.type.replace(/_/g, ' '),
+            message: '',
+            read: true, // Server notifications are already "delivered"
+            createdAt: new Date(n.createdAt).getTime(),
+          })
+        );
+        setNotifications(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const deduped = serverNotifs.filter(s => !existingIds.has(s.id));
+          return [...prev, ...deduped].sort((a, b) => b.createdAt - a.createdAt).slice(0, 50);
+        });
+      })
+      .catch(() => {});
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

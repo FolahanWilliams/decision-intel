@@ -48,6 +48,7 @@ import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
 import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
+import { useToast } from '@/components/ui/ToastContext';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('Dashboard');
@@ -118,6 +119,10 @@ export default function Dashboard() {
   // Upload confirmation state
   const [pendingFile, setPendingFile] = useState<File | null>(null);
 
+  // Decision Frame context — when user comes from /decisions/new
+  const [activeFrameId, setActiveFrameId] = useState<string | null>(null);
+  const [activeFrameStatement, setActiveFrameStatement] = useState<string | null>(null);
+
   // Search and filter state (debounced for performance on large lists)
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -139,6 +144,30 @@ export default function Dashboard() {
   };
   const [kpiVisibility, setKpiVisibility] = useState<Record<string, boolean>>(kpiDefaults);
   const kpiHydrated = useRef(false);
+
+  // Handle Stripe checkout redirects (?upgraded=true or ?frameId=...)
+  const { showToast } = useToast();
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('upgraded') === 'true') {
+      showToast('Welcome to your upgraded plan! Your new limits are now active.', 'success');
+      window.history.replaceState({}, '', '/dashboard');
+    }
+    const fId = params.get('frameId');
+    if (fId) {
+      setActiveFrameId(fId);
+      setActiveView('upload');
+      // Fetch the decision statement for context
+      fetch(`/api/decision-frames?id=${fId}`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(data => {
+          if (data?.decisionStatement) setActiveFrameStatement(data.decisionStatement);
+        })
+        .catch(() => {});
+      window.history.replaceState({}, '', '/dashboard');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Hydrate KPI visibility from localStorage after mount (avoids hydration mismatch)
   useEffect(() => {
@@ -410,6 +439,9 @@ export default function Dashboard() {
       // Upload file with XHR for progress tracking
       const formData = new FormData();
       formData.append('file', file);
+      if (activeFrameId) {
+        formData.append('frameId', activeFrameId);
+      }
 
       const uploadData = await new Promise<{ id: string; filename: string; cached?: boolean }>(
         (resolve, reject) => {
@@ -1084,6 +1116,37 @@ export default function Dashboard() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Decision Frame Context Banner */}
+          {activeFrameStatement && (
+            <div
+              className="card mb-md animate-fade-in"
+              style={{
+                padding: 'var(--spacing-md)',
+                background: 'rgba(99, 102, 241, 0.08)',
+                border: '1px solid rgba(99, 102, 241, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-sm)',
+              }}
+            >
+              <FileText size={16} style={{ color: '#6366f1', flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '11px', color: '#6366f1', fontWeight: 600, marginBottom: '2px' }}>
+                  Decision Frame Active
+                </div>
+                <div style={{ fontSize: '13px', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {activeFrameStatement}
+                </div>
+              </div>
+              <button
+                onClick={() => { setActiveFrameId(null); setActiveFrameStatement(null); }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px' }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
 
           {/* Upload Zone - Enhanced with drag feedback */}
           <ErrorBoundary sectionName="Upload">
