@@ -126,14 +126,16 @@ model AuditLog {
 }
 
 model UserSettings {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  updatedAt          DateTime @updatedAt
-  analysisAlerts     Boolean  @default(true)
-  createdAt          DateTime @default(now())
-  darkMode           Boolean  @default(true)
-  emailNotifications Boolean  @default(true)
-  weeklyDigest       Boolean  @default(false)
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  updatedAt           DateTime @updatedAt
+  analysisAlerts      Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  darkMode            Boolean  @default(true)
+  emailNotifications  Boolean  @default(true)
+  weeklyDigest        Boolean  @default(false)
+  onboardingCompleted Boolean  @default(false)
+  onboardingStep      Int      @default(0)
 
   @@index([userId])
 }

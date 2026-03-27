@@ -300,3 +300,91 @@ export async function deliverEmailNudge(
   const success = await sendEmail({ to: email, subject, html });
   await logNotification(userId, 'email', 'nudge', subject, success);
 }
+
+/**
+ * Look up a user's email via Supabase admin API.
+ */
+async function getUserEmail(userId: string): Promise<string | null> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceKey) {
+      log.warn('Missing Supabase credentials for admin email lookup');
+      return null;
+    }
+    const supabase = createClient(supabaseUrl, serviceKey);
+    const { data } = await supabase.auth.admin.getUserById(userId);
+    return data?.user?.email ?? null;
+  } catch (e) {
+    log.warn(`Could not fetch email for user ${userId}: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  }
+}
+
+/**
+ * Send outcome reminder email to a user with overdue decision outcomes.
+ */
+export async function notifyOutcomeReminder(
+  userId: string,
+  items: Array<{ analysisId: string; filename: string }>
+): Promise<void> {
+  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch(() => null);
+  if (settings && !settings.emailNotifications) return;
+
+  const email = await getUserEmail(userId);
+  if (!email) {
+    log.warn(`Cannot send outcome reminder — no email found for user ${userId}`);
+    return;
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+  const count = items.length;
+  const subject = `You have ${count} decision outcome${count > 1 ? 's' : ''} to report`;
+
+  const itemsHtml = items
+    .map(
+      (item) => `
+        <tr>
+          <td style="padding: 10px 14px; color: #e2e8f0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+            ${escapeHtml(item.filename)}
+          </td>
+          <td style="padding: 10px 14px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.06);">
+            <a href="${appUrl}/documents/${item.analysisId}"
+               style="color: #6366f1; font-size: 13px; font-weight: 500; text-decoration: none;">
+              Report Outcome
+            </a>
+          </td>
+        </tr>`
+    )
+    .join('');
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto;">
+      <div style="background: #0f0f23; padding: 24px; border-radius: 12px; color: #e2e8f0;">
+        <h2 style="margin: 0 0 8px; color: #fff;">Outcome Reminder</h2>
+        <p style="color: #94a3b8; margin: 0 0 20px;">
+          ${count} decision${count > 1 ? 's are' : ' is'} waiting for outcome reporting.
+          Logging outcomes helps calibrate your future analyses.
+        </p>
+
+        <table style="width: 100%; background: #1a1a2e; border-radius: 8px; border-collapse: collapse; margin-bottom: 20px;">
+          ${itemsHtml}
+        </table>
+
+        <a href="${appUrl}/dashboard"
+           style="display: inline-block; padding: 10px 20px; background: #6366f1; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">
+          Go to Dashboard
+        </a>
+
+        <p style="color: #64748b; font-size: 12px; margin-top: 24px;">
+          You received this because you have email notifications enabled in your
+          <a href="${appUrl}/dashboard/settings" style="color: #6366f1;">settings</a>.
+        </p>
+      </div>
+    </div>
+  `;
+
+  const success = await sendEmail({ to: email, subject, html });
+  await logNotification(userId, 'email', 'outcome_reminder', subject, success);
+}

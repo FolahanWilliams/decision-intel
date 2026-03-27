@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -14,6 +15,32 @@ export async function GET(request: Request) {
       if (redirect && redirect.startsWith('/')) {
         return NextResponse.redirect(`${origin}${redirect}`);
       }
+
+      // Detect first-time users for onboarding
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.id) {
+          const settings = await prisma.userSettings.findUnique({
+            where: { userId: user.id },
+            select: { onboardingCompleted: true },
+          }).catch(() => null);
+
+          if (!settings) {
+            // First-time user — create settings and show welcome modal
+            await prisma.userSettings.create({
+              data: { userId: user.id },
+            }).catch(() => {}); // Ignore if already exists (race condition)
+            return NextResponse.redirect(`${origin}/dashboard?welcome=true`);
+          }
+
+          if (!settings.onboardingCompleted) {
+            return NextResponse.redirect(`${origin}/dashboard?welcome=true`);
+          }
+        }
+      } catch {
+        // Don't break login if onboarding detection fails
+      }
+
       return NextResponse.redirect(`${origin}/dashboard`);
     }
   }
