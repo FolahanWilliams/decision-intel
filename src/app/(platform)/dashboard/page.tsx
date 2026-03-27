@@ -66,6 +66,8 @@ import { SparklineChart } from '@/components/ui/SparklineChart';
 import { DashboardCharts } from '@/components/visualizations/DashboardCharts';
 import DecisionPerformance from '@/components/visualizations/DecisionPerformance';
 import { GraphStatsCard } from '@/components/ui/GraphStatsCard';
+import { useDeals } from '@/hooks/useDeals';
+import { DOCUMENT_TYPES } from '@/types/deals';
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -120,6 +122,11 @@ export default function Dashboard() {
 
   // Upload confirmation state
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [selectedDocType, setSelectedDocType] = useState<string>('');
+  const [selectedDealId, setSelectedDealId] = useState<string>('');
+
+  // Deal list for upload deal selector
+  const { deals: dealsList } = useDeals(undefined, 1, 100);
 
   // Decision Frame context — when user comes from /decisions/new
   const [activeFrameId, setActiveFrameId] = useState<string | null>(null);
@@ -451,6 +458,12 @@ export default function Dashboard() {
       if (activeFrameId) {
         formData.append('frameId', activeFrameId);
       }
+      if (selectedDocType) {
+        formData.append('documentType', selectedDocType);
+      }
+      if (selectedDealId) {
+        formData.append('dealId', selectedDealId);
+      }
 
       const uploadData = await new Promise<{ id: string; filename: string; cached?: boolean }>(
         (resolve, reject) => {
@@ -655,6 +668,8 @@ export default function Dashboard() {
     const file = pendingFile;
     setPendingFile(null);
     await uploadAndAnalyze(file);
+    setSelectedDocType('');
+    setSelectedDealId('');
   };
 
   return (
@@ -1108,9 +1123,51 @@ export default function Dashboard() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-sm">
+                    {/* Document type + Deal selectors */}
+                    <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
+                      <select
+                        value={selectedDocType}
+                        onChange={(e) => setSelectedDocType(e.target.value)}
+                        style={{
+                          padding: '6px 10px',
+                          background: 'rgba(255, 255, 255, 0.06)',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          borderRadius: 6,
+                          color: 'var(--text-primary)',
+                          fontSize: 12,
+                          outline: 'none',
+                          minWidth: 130,
+                        }}
+                      >
+                        <option value="">Document Type</option>
+                        {DOCUMENT_TYPES.map((t) => (
+                          <option key={t.value} value={t.value}>{t.label}</option>
+                        ))}
+                      </select>
+                      <select
+                        value={selectedDealId}
+                        onChange={(e) => setSelectedDealId(e.target.value)}
+                        style={{
+                          padding: '6px 10px',
+                          background: 'rgba(255, 255, 255, 0.06)',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          borderRadius: 6,
+                          color: 'var(--text-primary)',
+                          fontSize: 12,
+                          outline: 'none',
+                          minWidth: 140,
+                        }}
+                      >
+                        <option value="">Link to Deal</option>
+                        {dealsList.map((d) => (
+                          <option key={d.id} value={d.id}>{d.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-sm" style={{ marginTop: 12 }}>
                       <button
-                        onClick={() => setPendingFile(null)}
+                        onClick={() => { setPendingFile(null); setSelectedDocType(''); setSelectedDealId(''); }}
                         className="btn btn-ghost text-sm"
                       >
                         Cancel
