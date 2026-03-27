@@ -92,7 +92,10 @@ export async function DELETE() {
       await tx.decisionFrame.deleteMany({ where: { userId } }).catch(() => {});
 
       // Product B: Nudges → CognitiveAudits → HumanDecisions (FK order)
-      await tx.nudge.deleteMany({ where: { humanDecision: { userId } } }).catch(() => {});
+      // Nudges can be linked via humanDecision OR targetUserId
+      await tx.nudge.deleteMany({
+        where: { OR: [{ humanDecision: { userId } }, { targetUserId: userId }] },
+      }).catch(() => {});
       await tx.cognitiveAudit.deleteMany({ where: { humanDecision: { userId } } }).catch(() => {});
       await tx.humanDecision.deleteMany({ where: { userId } });
 
