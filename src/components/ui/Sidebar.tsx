@@ -24,6 +24,8 @@ import {
   Plus,
   ChevronRight as ChevronR,
   PenLine,
+  Lightbulb,
+  Plug,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -399,6 +401,15 @@ export default function Sidebar() {
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
+          <NavItem
+            href="/dashboard/explainability"
+            icon={<Lightbulb size={18} />}
+            label="Explainability"
+            description="Understand why scores are what they are"
+            active={pathname.startsWith('/dashboard/explainability')}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
 
           <SectionLabel collapsed={collapsed}>Decisions</SectionLabel>
           <NavItem
@@ -481,6 +492,14 @@ export default function Sidebar() {
               icon={<ClipboardList size={18} />}
               label="Audit Log"
               active={pathname === '/dashboard/audit-log'}
+              collapsed={collapsed}
+              onNavigate={closeMobile}
+            />
+            <NavItem
+              href="/dashboard/settings/integrations"
+              icon={<Plug size={18} />}
+              label="Integrations"
+              active={pathname.startsWith('/dashboard/settings/integrations')}
               collapsed={collapsed}
               onNavigate={closeMobile}
             />

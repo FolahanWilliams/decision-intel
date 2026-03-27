@@ -1075,3 +1075,63 @@ model Subscription {
   @@index([status])
 }
 
+// ─── Integration Ecosystem ─────────────────────────────────────────────────
+
+model WebhookSubscription {
+  id          String   @id @default(cuid())
+  orgId       String
+  userId      String
+  url         String   // Target URL
+  secret      String   // HMAC signing secret (encrypted)
+  events      String[] // e.g., ["analysis.completed", "outcome.reported"]
+  active      Boolean  @default(true)
+  failCount   Int      @default(0)
+  lastError   String?
+  lastSuccess DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  deliveries  WebhookDelivery[]
+
+  @@index([orgId])
+  @@index([active])
+}
+
+model WebhookDelivery {
+  id              String   @id @default(cuid())
+  subscriptionId  String
+  event           String
+  payload         Json
+  statusCode      Int?
+  responseBody    String?  @db.Text
+  durationMs      Int?
+  attempt         Int      @default(1)
+  success         Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  subscription    WebhookSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([createdAt])
+}
+
+model IntegrationConnection {
+  id           String    @id @default(cuid())
+  orgId        String
+  userId       String
+  provider     String    // "teams" | "jira" | "linear" | "google_calendar"
+  status       String    @default("active") // active | revoked | expired
+  accessToken  String?   // encrypted
+  refreshToken String?   // encrypted
+  tokenIv      String?
+  tokenTag     String?
+  metadata     Json?     // provider-specific config
+  scopes       String[]
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([orgId, provider])
+  @@index([provider])
+}
+
