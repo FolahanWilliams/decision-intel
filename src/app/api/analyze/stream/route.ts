@@ -259,13 +259,17 @@ export async function POST(request: NextRequest) {
             documentType = (docAny.documentType as string) || '';
             dealId = (docAny.dealId as string) || '';
             if (dealId) {
-              const deal = await prisma.deal.findUnique({
-                where: { id: dealId },
+              // Verify deal belongs to same org as the document
+              const deal = await prisma.deal.findFirst({
+                where: { id: dealId, orgId: doc.orgId || userId },
                 select: { dealType: true, stage: true },
               });
               if (deal) {
                 dealType = deal.dealType;
                 dealStage = deal.stage;
+              } else {
+                log.warn(`Deal ${dealId} referenced by document ${documentId} not found or access denied`);
+                dealId = '';
               }
             }
           } catch {

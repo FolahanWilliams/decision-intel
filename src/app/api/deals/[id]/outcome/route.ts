@@ -11,9 +11,12 @@ const OutcomeSchema = z.object({
   moic: z.number().min(0).max(1000).optional(),
   exitType: z.enum(['ipo', 'trade_sale', 'secondary', 'write_off', 'partial_exit']).optional(),
   exitValue: z.number().positive().optional(),
-  holdPeriod: z.number().int().positive().max(600).optional(), // months, max 50 years
+  holdPeriod: z.number().int().positive().max(180).optional(), // months, max 15 years
   notes: z.string().max(5000).optional(),
-});
+}).refine(
+  (data) => Object.values(data).some(v => v !== undefined),
+  'At least one outcome field must be provided'
+);
 
 export async function POST(
   request: NextRequest,
@@ -64,38 +67,42 @@ export async function POST(
       );
     }
 
-    // Upsert: one outcome per deal
-    const outcome = await prisma.dealOutcome.upsert({
-      where: { dealId },
-      create: {
-        dealId,
-        irr: parsed.data.irr,
-        moic: parsed.data.moic,
-        exitType: parsed.data.exitType,
-        exitValue: parsed.data.exitValue,
-        holdPeriod: parsed.data.holdPeriod,
-        notes: parsed.data.notes,
-      },
-      update: {
-        irr: parsed.data.irr,
-        moic: parsed.data.moic,
-        exitType: parsed.data.exitType,
-        exitValue: parsed.data.exitValue,
-        holdPeriod: parsed.data.holdPeriod,
-        notes: parsed.data.notes,
-      },
-    });
-
-    // If exit data provided, update deal status
-    if (parsed.data.exitType) {
-      await prisma.deal.update({
-        where: { id: dealId },
-        data: {
-          status: parsed.data.exitType === 'write_off' ? 'written_off' : 'exited',
-          exitDate: new Date(),
+    // Atomic upsert + deal status update in a single transaction
+    const outcome = await prisma.$transaction(async (tx) => {
+      const result = await tx.dealOutcome.upsert({
+        where: { dealId },
+        create: {
+          dealId,
+          irr: parsed.data.irr,
+          moic: parsed.data.moic,
+          exitType: parsed.data.exitType,
+          exitValue: parsed.data.exitValue,
+          holdPeriod: parsed.data.holdPeriod,
+          notes: parsed.data.notes,
+        },
+        update: {
+          irr: parsed.data.irr,
+          moic: parsed.data.moic,
+          exitType: parsed.data.exitType,
+          exitValue: parsed.data.exitValue,
+          holdPeriod: parsed.data.holdPeriod,
+          notes: parsed.data.notes,
         },
       });
-    }
+
+      // If exit data provided, update deal status atomically
+      if (parsed.data.exitType) {
+        await tx.deal.update({
+          where: { id: dealId },
+          data: {
+            status: parsed.data.exitType === 'write_off' ? 'written_off' : 'exited',
+            exitDate: new Date(),
+          },
+        });
+      }
+
+      return result;
+    });
 
     log.info(`Deal outcome recorded: deal=${dealId}, IRR=${parsed.data.irr}, MOIC=${parsed.data.moic}`);
 

@@ -7,9 +7,9 @@
 
 ## Slide 1: Title
 
-**Decision Intel — The Cognitive Bias Audit Engine for Enterprise Decisions**
+**Decision Intel — The Cognitive Bias Audit Engine for PE/VC Investment Committees**
 
-*"Every enterprise decision has 3–5 hidden biases. We find them automatically."*
+*"Every IC memo has 3–5 hidden biases. We find them before they cost your fund $50M."*
 
 ---
 

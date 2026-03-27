@@ -20,21 +20,21 @@ interface WelcomeModalProps {
 const TOUR_STEPS = [
   {
     icon: Sparkles,
-    title: 'AI-Powered Analysis',
+    title: 'IC-Specific Bias Detection',
     description:
-      'Upload any decision document and our 15-agent AI pipeline detects cognitive biases, logical fallacies, noise, and compliance risks.',
+      'Upload IC memos, CIMs, pitch decks, or term sheets. Our AI pipeline detects PE/VC-specific biases like anchoring to entry valuation, carry incentive distortion, and winner\'s curse.',
   },
   {
     icon: BarChart3,
-    title: 'Track Decision Quality',
+    title: 'Deal-Level Decision Quality',
     description:
-      'Get a Decision Quality Index (DQI) score for every analysis. Track trends over time and see how your decision-making improves.',
+      'Get a Decision Quality Index (DQI) for every deal document. Track bias patterns across your deal pipeline and identify which biases cost your fund returns.',
   },
   {
     icon: Users,
-    title: 'Team Intelligence',
+    title: 'Investment Committee Intelligence',
     description:
-      'Invite your team to collaborate. Shared analyses, cognitive profiles, and organizational decision patterns help everyone improve.',
+      'Run blind IC votes, simulate boardroom deliberations with PE personas, and build institutional memory that makes your committee sharper with every deal.',
   },
 ];
 

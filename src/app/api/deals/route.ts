@@ -201,21 +201,29 @@ export async function PATCH(request: NextRequest) {
       // Schema drift
     }
 
+    const effectiveOrgId = orgId || user.id;
     const deal = await prisma.deal.findFirst({
-      where: { id, orgId: orgId || user.id },
+      where: { id, orgId: effectiveOrgId },
     });
 
     if (!deal) {
       return NextResponse.json({ error: 'Deal not found' }, { status: 404 });
     }
 
-    const updated = await prisma.deal.update({
-      where: { id },
+    // Use updateMany with orgId predicate to ensure ownership at DB level
+    const updateResult = await prisma.deal.updateMany({
+      where: { id, orgId: effectiveOrgId },
       data: {
         ...parsed.data,
         ...(parsed.data.exitDate ? { exitDate: new Date(parsed.data.exitDate) } : {}),
       },
     });
+
+    if (updateResult.count === 0) {
+      return NextResponse.json({ error: 'Deal not found' }, { status: 404 });
+    }
+
+    const updated = await prisma.deal.findUnique({ where: { id } });
 
     return NextResponse.json(updated);
   } catch (error) {

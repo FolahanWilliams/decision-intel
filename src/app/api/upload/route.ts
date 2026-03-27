@@ -61,6 +61,12 @@ export async function POST(request: NextRequest) {
     const documentType = formData.get('documentType') as string | null;
     const dealId = formData.get('dealId') as string | null;
 
+    // Validate documentType against known investment document types
+    const VALID_DOC_TYPES = ['ic_memo', 'cim', 'pitch_deck', 'term_sheet', 'due_diligence', 'lp_report', 'other'];
+    if (documentType && !VALID_DOC_TYPES.includes(documentType)) {
+      return NextResponse.json({ error: 'Invalid document type' }, { status: 400 });
+    }
+
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
@@ -162,6 +168,21 @@ export async function POST(request: NextRequest) {
       userOrgId = membership?.orgId ?? null;
     } catch {
       // Schema drift — TeamMember table may not exist yet
+    }
+
+    // Verify deal ownership if dealId provided
+    if (dealId) {
+      try {
+        const deal = await prisma.deal.findFirst({
+          where: { id: dealId, orgId: userOrgId || userId },
+        });
+        if (!deal) {
+          return NextResponse.json({ error: 'Deal not found or access denied' }, { status: 400 });
+        }
+      } catch {
+        // Schema drift — Deal table may not exist yet, allow upload without deal link
+        log.warn('Deal ownership check failed (schema drift), proceeding without deal link');
+      }
     }
 
     // Extract text content

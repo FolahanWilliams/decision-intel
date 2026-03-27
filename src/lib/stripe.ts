@@ -19,27 +19,31 @@ export function getStripe(): Stripe {
 
 export const PLANS = {
   free: {
-    name: 'Free',
+    name: 'Starter',
+    description: 'Evaluate the platform with your first IC memos',
     analysesPerMonth: 3,
     maxPages: 10,
     biasTypes: 5,
   },
   pro: {
-    name: 'Pro',
+    name: 'IC Pro',
+    description: 'For individual deal partners and analysts',
     priceId: process.env.STRIPE_PRO_PRICE_ID || '',
     analysesPerMonth: 50,
     maxPages: 100,
     biasTypes: 20,
   },
   team: {
-    name: 'Team',
+    name: 'Fund',
+    description: 'For investment committees and deal teams',
     priceId: process.env.STRIPE_TEAM_PRICE_ID || '',
     analysesPerMonth: 250,
     maxPages: 200,
     biasTypes: 20,
   },
   enterprise: {
-    name: 'Enterprise',
+    name: 'Multi-Fund',
+    description: 'For PE/VC platforms with multiple funds',
     analysesPerMonth: Infinity,
     maxPages: Infinity,
     biasTypes: 20,
