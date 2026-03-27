@@ -57,6 +57,7 @@ import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnal
 import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
 import { WelcomeModal } from '@/components/ui/WelcomeModal';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { BulkUploadPanel } from '@/components/ui/BulkUploadPanel';
 import { formatDate, formatDateShort } from '@/lib/constants/human-audit';
 import { ActivityFeed } from '@/components/ui/ActivityFeed';
 import { useActivityFeed } from '@/hooks/useActivityFeed';
@@ -1372,6 +1373,11 @@ export default function Dashboard() {
                 </div>
               </div>
             ) : null}
+          </ErrorBoundary>
+
+          {/* Bulk Upload */}
+          <ErrorBoundary sectionName="Bulk Upload">
+            <BulkUploadPanel onComplete={() => mutateDocs?.()} />
           </ErrorBoundary>
 
           {/* Currently Analyzing Section */}

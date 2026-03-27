@@ -29,6 +29,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [showCreate, setShowCreate] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchRooms = useCallback(async () => {
     try {
@@ -38,7 +39,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
         setRooms(data.rooms || []);
       }
     } catch {
-      // Silent fail
+      setError('Failed to load decision rooms');
     } finally {
       setLoading(false);
     }
@@ -67,12 +68,17 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
         fetchRooms();
       }
     } catch {
-      // Silent fail
+      setError('Failed to create room');
     } finally {
       setCreating(false);
     }
   }, [newTitle, documentId, analysisId, fetchRooms]);
 
+  if (error) {
+    return (
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '8px 0' }}>{error}</div>
+    );
+  }
   if (loading) return null;
 
   return (
@@ -264,6 +270,7 @@ export function BlindPriorForm({ roomId, onSubmitted }: BlindPriorFormProps) {
   const [reasoning, setReasoning] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleSubmit = useCallback(async () => {
     if (!action.trim()) return;
@@ -283,7 +290,7 @@ export function BlindPriorForm({ roomId, onSubmitted }: BlindPriorFormProps) {
         onSubmitted?.();
       }
     } catch {
-      // Silent fail
+      setSubmitError('Failed to submit prior');
     } finally {
       setSaving(false);
     }
@@ -390,6 +397,9 @@ export function BlindPriorForm({ roomId, onSubmitted }: BlindPriorFormProps) {
           resize: 'vertical',
         }}
       />
+      {submitError && (
+        <div style={{ fontSize: 12, color: '#f87171', padding: '4px 0' }}>{submitError}</div>
+      )}
       <button
         onClick={handleSubmit}
         disabled={saving || !action.trim()}

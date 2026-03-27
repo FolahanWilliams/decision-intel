@@ -38,6 +38,7 @@ export function DraftOutcomeCard({ analysisId }: DraftOutcomeCardProps) {
   const [drafts, setDrafts] = useState<DraftOutcome[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchDrafts = useCallback(async () => {
     try {
@@ -50,7 +51,7 @@ export function DraftOutcomeCard({ analysisId }: DraftOutcomeCardProps) {
       );
       setDrafts(relevant);
     } catch {
-      // Silently fail
+      setError('Failed to load draft outcomes');
     } finally {
       setLoading(false);
     }
@@ -72,12 +73,17 @@ export function DraftOutcomeCard({ analysisId }: DraftOutcomeCardProps) {
         setDrafts(prev => prev.filter(d => d.id !== draftId));
       }
     } catch {
-      // Silent fail
+      setError('Failed to update outcome');
     } finally {
       setActionLoading(null);
     }
   };
 
+  if (error) {
+    return (
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '8px 0' }}>{error}</div>
+    );
+  }
   if (loading || drafts.length === 0) return null;
 
   return (

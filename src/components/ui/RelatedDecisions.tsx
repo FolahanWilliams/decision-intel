@@ -46,6 +46,7 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
     edges: RelatedEdge[];
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Discover orgId then fetch graph
@@ -60,10 +61,15 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
       .then(d => {
         if (d) setData({ nodes: d.nodes, edges: d.edges });
       })
-      .catch(() => {})
+      .catch(() => setError('Failed to load related decisions'))
       .finally(() => setLoading(false));
   }, [analysisId]);
 
+  if (error) {
+    return (
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '8px 0' }}>{error}</div>
+    );
+  }
   if (loading || !data || data.edges.length === 0) return null;
 
   // Get connected nodes (exclude self)

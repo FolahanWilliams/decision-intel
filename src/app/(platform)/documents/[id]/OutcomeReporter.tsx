@@ -119,7 +119,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
     if (!outcome) return;
     setSaving(true);
     try {
-      const res = await fetch('/api/outcomes', {
+      const res = await fetch('/api/outcomes/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
