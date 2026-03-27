@@ -11,12 +11,16 @@ import { SOX_FRAMEWORK } from './sox';
 import { BASEL3_FRAMEWORK } from './basel3';
 import { EU_AI_ACT_FRAMEWORK } from './eu-ai-act';
 import { GDPR_ART22_FRAMEWORK } from './gdpr-automated-decisions';
+import { SEC_REG_D_FRAMEWORK } from './sec-reg-d';
+import { LPOA_FRAMEWORK } from './lpoa';
 
 export { FCA_CONSUMER_DUTY } from './fca-consumer-duty';
 export { SOX_FRAMEWORK } from './sox';
 export { BASEL3_FRAMEWORK } from './basel3';
 export { EU_AI_ACT_FRAMEWORK } from './eu-ai-act';
 export { GDPR_ART22_FRAMEWORK } from './gdpr-automated-decisions';
+export { SEC_REG_D_FRAMEWORK } from './sec-reg-d';
+export { LPOA_FRAMEWORK } from './lpoa';
 
 /**
  * Returns all registered regulatory frameworks.
@@ -29,5 +33,7 @@ export function getAllRegisteredFrameworks(): RegulatoryFramework[] {
     BASEL3_FRAMEWORK,
     EU_AI_ACT_FRAMEWORK,
     GDPR_ART22_FRAMEWORK,
+    SEC_REG_D_FRAMEWORK,
+    LPOA_FRAMEWORK,
   ];
 }

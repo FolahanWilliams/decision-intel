@@ -26,6 +26,7 @@ import {
   PenLine,
   Lightbulb,
   Plug,
+  Briefcase,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -334,6 +335,15 @@ export default function Sidebar() {
             icon={<LayoutDashboard size={18} />}
             label="Dashboard"
             active={pathname === '/dashboard'}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/deals"
+            icon={<Briefcase size={18} />}
+            label="Deal Pipeline"
+            description="Track deals from screening to exit"
+            active={pathname.startsWith('/dashboard/deals')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
