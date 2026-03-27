@@ -108,6 +108,26 @@ export async function POST(request: NextRequest) {
         break;
       }
 
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subId =
+          typeof invoice.subscription === 'string'
+            ? invoice.subscription
+            : invoice.subscription?.id;
+        if (subId) {
+          await prisma.subscription
+            .update({
+              where: { stripeSubscriptionId: subId },
+              data: { status: 'past_due' },
+            })
+            .catch(err => {
+              log.warn(`Failed to mark subscription as past_due:`, err);
+            });
+          log.info(`Marked subscription ${subId} as past_due after payment failure`);
+        }
+        break;
+      }
+
       default:
         log.debug(`Unhandled Stripe event: ${event.type}`);
     }

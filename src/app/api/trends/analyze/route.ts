@@ -6,6 +6,7 @@ import { getRequiredEnvVar } from '@/lib/env';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
+import { trackApiUsage, estimateCost } from '@/lib/utils/cost-tracker';
 
 const log = createLogger('TrendsAnalyzeRoute');
 
@@ -142,6 +143,16 @@ export async function POST() {
       metadata?.groundingChunks
         ?.map((c: { web?: { uri?: string } }) => c.web?.uri)
         .filter((u: unknown): u is string => typeof u === 'string') || [];
+
+    // Track LLM cost (fire and forget)
+    trackApiUsage({
+      userId,
+      provider: 'google',
+      operation: 'market_analysis',
+      tokens: prompt.length + responseText.length,
+      cost: estimateCost('gemini-2.0-flash', prompt.length, responseText.length),
+      metadata: { topics: activeTopics },
+    });
 
     logAudit({
       action: 'SEARCH_MARKET_TRENDS',

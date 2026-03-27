@@ -11,6 +11,7 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
+import { trackApiUsage, estimateCost } from '@/lib/utils/cost-tracker';
 import { checkOutcomeGate, formatOutcomeReminder } from '@/lib/learning/outcome-gate';
 import {
   NoiseStatsSchema,
@@ -548,6 +549,16 @@ export async function POST(request: NextRequest) {
               'Audit log failed (non-critical): ' +
                 (err instanceof Error ? err.message : String(err))
             );
+          });
+
+          // Track LLM cost (fire and forget)
+          trackApiUsage({
+            userId,
+            provider: 'google',
+            operation: 'analyze_document',
+            tokens: doc.content.length, // Approximate token count from content length
+            cost: estimateCost('gemini-2.0-flash', doc.content.length, 4000),
+            metadata: { documentId, filename: doc.filename },
           });
 
           // Auto-create outcome tracking stub (fire and forget).
