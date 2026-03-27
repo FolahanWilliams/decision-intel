@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, startTransition } from 'react';
-import { Upload, BarChart3, Shield, X, ArrowRight, CheckCircle } from 'lucide-react';
+import { useState, useEffect, useCallback, startTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { Upload, BarChart3, Shield, X, ArrowRight, CheckCircle, FileText } from 'lucide-react';
 
 const STEPS = [
   {
@@ -9,6 +10,7 @@ const STEPS = [
     title: 'Upload a Document',
     description: 'Start by uploading a PDF, TXT, MD, or DOCX file for analysis.',
     action: 'Use the upload zone above',
+    hasSampleAction: true,
   },
   {
     icon: BarChart3,
@@ -16,22 +18,53 @@ const STEPS = [
     description:
       'Our AI scans for cognitive biases, noise, logical fallacies, and compliance risks.',
     action: 'Click on a document to view results',
+    hasSampleAction: false,
   },
   {
     icon: Shield,
     title: 'Improve Decisions',
     description: 'Use the What-If Simulator to test edits and track improvements over time.',
     action: 'Explore trends and risk audits',
+    hasSampleAction: false,
   },
 ];
 
 const STORAGE_KEY = 'decision-intel-onboarding-dismissed';
 
+/** Fire-and-forget PATCH to persist onboarding state to the API. */
+function persistOnboardingState(data: { onboardingCompleted?: boolean; onboardingStep?: number }) {
+  fetch('/api/onboarding', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }).catch(() => {}); // best-effort
+}
+
 export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number }) {
+  const router = useRouter();
   const [dismissed, setDismissed] = useState(true);
+  const [loadingSample, setLoadingSample] = useState(false);
 
   useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) startTransition(() => setDismissed(false));
+    // Check localStorage first for instant decision
+    if (localStorage.getItem(STORAGE_KEY)) return;
+
+    // Then verify with API (fall back to showing guide if API fails)
+    fetch('/api/onboarding')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.onboardingCompleted) {
+          localStorage.setItem(STORAGE_KEY, 'true');
+        } else {
+          startTransition(() => setDismissed(false));
+          if (data.onboardingStep > 0) {
+            setCurrentStep(data.onboardingStep);
+          }
+        }
+      })
+      .catch(() => {
+        startTransition(() => setDismissed(false));
+      });
   }, []);
   const hasDocuments = documentCount > 0;
   const [currentStep, setCurrentStep] = useState(hasDocuments ? 1 : 0);
@@ -42,10 +75,32 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
     return false;
   };
 
+  const handleStepChange = useCallback((newStep: number) => {
+    setCurrentStep(newStep);
+    persistOnboardingState({ onboardingStep: newStep });
+  }, []);
+
   const handleDismiss = () => {
     setDismissed(true);
     localStorage.setItem(STORAGE_KEY, 'true');
+    persistOnboardingState({ onboardingCompleted: true });
   };
+
+  const handleTrySample = useCallback(async () => {
+    setLoadingSample(true);
+    try {
+      const res = await fetch('/api/onboarding/sample', { method: 'POST' });
+      const data = await res.json();
+      if (data.documentId) {
+        handleDismiss();
+        router.push(`/documents/${data.documentId}`);
+      }
+    } catch {
+      // Silently fail — user can still upload manually
+    } finally {
+      setLoadingSample(false);
+    }
+  }, [router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (dismissed) return null;
 
@@ -89,7 +144,7 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
           {STEPS.map((step, index) => (
             <button
               key={index}
-              onClick={() => setCurrentStep(index)}
+              onClick={() => handleStepChange(index)}
               style={{
                 flex: 1,
                 display: 'flex',
@@ -159,9 +214,19 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
               {STEPS[currentStep].action}
             </p>
           </div>
+          {STEPS[currentStep].hasSampleAction && !hasDocuments && (
+            <button
+              onClick={handleTrySample}
+              disabled={loadingSample}
+              className="btn btn-secondary flex items-center gap-sm"
+              style={{ flexShrink: 0, opacity: loadingSample ? 0.7 : 1 }}
+            >
+              <FileText size={14} /> {loadingSample ? 'Loading...' : 'Try Sample'}
+            </button>
+          )}
           {currentStep < STEPS.length - 1 && (
             <button
-              onClick={() => setCurrentStep(prev => prev + 1)}
+              onClick={() => handleStepChange(currentStep + 1)}
               className="btn btn-secondary flex items-center gap-sm"
               style={{ flexShrink: 0 }}
             >

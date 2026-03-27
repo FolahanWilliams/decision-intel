@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Record<string, unknown>;
+        const invoice = event.data.object as unknown as Record<string, unknown>;
         const rawSub = invoice.subscription;
         const subId =
           typeof rawSub === 'string'

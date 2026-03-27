@@ -203,6 +203,17 @@ function sanitizeForPrompt(data: unknown, label: string = 'external_data'): stri
   return `<${label}>\n${json}\n</${label}>`;
 }
 
+/** Validate ticker symbols to prevent injection via crafted ticker strings. */
+function isValidTicker(ticker: string): boolean {
+  return /^[A-Z]{1,5}(\.[A-Z]{1,2})?$/.test(ticker.toUpperCase());
+}
+
+/** Strip control characters and cap length to prevent prompt injection via company names. */
+function sanitizeCompanyName(name: string | null | undefined): string | undefined {
+  if (!name) return undefined;
+  return name.replace(/[\n\r\t\x00-\x1f]/g, ' ').trim().slice(0, 200) || undefined;
+}
+
 // ============================================================
 // NODES
 // ============================================================
@@ -687,7 +698,7 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
 
     // Extract fact-check result
     const factCheckData = data?.factCheck;
-    const companyName = factCheckData?.primaryTopic || null;
+    const companyName = sanitizeCompanyName(factCheckData?.primaryTopic);
     if (companyName) log.info(`Identified primary topic: ${companyName}`);
 
     // Fetch financial data if needed (preserves Finnhub integration)
@@ -695,7 +706,7 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
     let fetchedData: Record<string, unknown> = {};
     if (dataRequests.length > 0) {
       const validRequests: DataRequest[] = dataRequests
-        .filter((r: { ticker?: unknown }) => r && r.ticker && typeof r.ticker === 'string')
+        .filter((r: { ticker?: unknown }) => r && r.ticker && typeof r.ticker === 'string' && isValidTicker(r.ticker))
         .map((r: { ticker: string; dataType: string; reason: string; claimToVerify: string }) => ({
           ticker: r.ticker.toUpperCase(),
           dataType: r.dataType,

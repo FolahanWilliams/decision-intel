@@ -55,6 +55,7 @@ const log = createClientLogger('Dashboard');
 import { RiskTrendChart } from './RiskTrendChart';
 import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnalysis';
 import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
+import { WelcomeModal } from '@/components/ui/WelcomeModal';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { formatDate, formatDateShort } from '@/lib/constants/human-audit';
 import { ActivityFeed } from '@/components/ui/ActivityFeed';
@@ -145,12 +146,19 @@ export default function Dashboard() {
   const [kpiVisibility, setKpiVisibility] = useState<Record<string, boolean>>(kpiDefaults);
   const kpiHydrated = useRef(false);
 
-  // Handle Stripe checkout redirects (?upgraded=true or ?frameId=...)
+  // Welcome modal for first-time users (triggered via ?welcome=true from auth callback)
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  // Handle Stripe checkout redirects (?upgraded=true or ?frameId=...) and welcome flow
   const { showToast } = useToast();
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('upgraded') === 'true') {
       showToast('Welcome to your upgraded plan! Your new limits are now active.', 'success');
+      window.history.replaceState({}, '', '/dashboard');
+    }
+    if (params.get('welcome') === 'true') {
+      setShowWelcome(true);
       window.history.replaceState({}, '', '/dashboard');
     }
     const fId = params.get('frameId');
@@ -653,6 +661,9 @@ export default function Dashboard() {
       className="container"
       style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
     >
+      {/* Welcome modal for first-time users */}
+      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
+
       {/* Header with view tabs */}
       <div className="page-header">
         <div>
