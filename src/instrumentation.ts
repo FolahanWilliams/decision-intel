@@ -1,6 +1,9 @@
+import * as Sentry from '@sentry/nextjs';
+
 export async function register() {
-  // Only validate on server
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('../sentry.server.config');
+
     // Import env validation
     const { assertEnvValid } = await import('./lib/env');
     try {
@@ -14,4 +17,10 @@ export async function register() {
       // Don't crash the server — just warn loudly
     }
   }
+
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    await import('../sentry.edge.config');
+  }
 }
+
+export const onRequestError = Sentry.captureRequestError;
