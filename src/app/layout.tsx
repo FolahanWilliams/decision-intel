@@ -43,6 +43,7 @@ import { NotificationProvider } from '@/components/ui/NotificationCenter';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ReducedMotionProvider } from '@/components/ReducedMotionProvider';
 import { DensityProvider } from '@/components/DensityProvider';
+import { WebVitalsReporter } from '@/components/monitoring/WebVitalsReporter';
 import { cn } from '@/lib/utils';
 
 export default function RootLayout({
@@ -63,7 +64,10 @@ export default function RootLayout({
             <ReducedMotionProvider>
               <NotificationProvider>
                 <TooltipProvider>
-                  <ToastProvider>{children}</ToastProvider>
+                  <ToastProvider>
+                    <WebVitalsReporter />
+                    {children}
+                  </ToastProvider>
                 </TooltipProvider>
               </NotificationProvider>
             </ReducedMotionProvider>

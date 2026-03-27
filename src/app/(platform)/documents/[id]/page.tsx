@@ -747,6 +747,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </span>
               )}
               {analysis && (
+                <Link
+                  href={`/dashboard/explainability?analysisId=${analysis.id}`}
+                  className="btn btn-secondary btn-sm flex items-center gap-sm"
+                  aria-label="Explain score"
+                >
+                  <Lightbulb size={14} />
+                  Explain Score
+                </Link>
+              )}
+              {analysis && (
                 <button
                   onClick={() => setShowShareModal(true)}
                   className="btn btn-secondary btn-sm flex items-center gap-sm"

@@ -401,6 +401,29 @@ export async function analyzeDocument(
       );
     }
 
+    // Webhook notification (non-blocking, fire-and-forget)
+    try {
+      const { emitWebhookEvent } = await import('@/lib/integrations/webhooks/engine');
+      const savedForWebhook = await prisma.analysis.findFirst({
+        where: { documentId },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      });
+      if (savedForWebhook) {
+        emitWebhookEvent('analysis.completed', {
+          analysisId: savedForWebhook.id,
+          documentId,
+          score: result.overallScore,
+          biasCount: foundBiases.length,
+        }, document.orgId ?? document.userId);
+      }
+    } catch (webhookError) {
+      log.warn(
+        'Failed to emit webhook (non-critical): ' +
+          (webhookError instanceof Error ? webhookError.message : String(webhookError))
+      );
+    }
+
     // Cache the result for future use (non-blocking)
     try {
       await cacheAnalysis(cacheKey, result as unknown as Record<string, unknown>);
