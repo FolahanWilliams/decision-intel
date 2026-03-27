@@ -58,6 +58,8 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const frameId = formData.get('frameId') as string | null;
+    const documentType = formData.get('documentType') as string | null;
+    const dealId = formData.get('dealId') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
@@ -198,12 +200,14 @@ export async function POST(request: NextRequest) {
           content,
           contentHash,
           status: 'pending',
+          ...(documentType ? { documentType } : {}),
+          ...(dealId ? { dealId } : {}),
         },
       });
     } catch (dbError: unknown) {
       const code = (dbError as { code?: string }).code;
       if (code === 'P2021' || code === 'P2022') {
-        log.warn('Schema drift: contentHash column missing, falling back to create (' + code + ')');
+        log.warn('Schema drift: new columns missing, falling back to core create (' + code + ')');
         document = await prisma.document.create({
           data: {
             userId,
@@ -227,6 +231,8 @@ export async function POST(request: NextRequest) {
             fileSize: file.size,
             content,
             status: 'pending',
+            ...(documentType ? { documentType } : {}),
+            ...(dealId ? { dealId } : {}),
           },
         });
       } else {

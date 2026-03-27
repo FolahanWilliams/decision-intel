@@ -83,9 +83,31 @@ export async function analyzeDocument(
 
   // Run analysis within a transaction for atomicity
   try {
+    // Resolve deal context for PE/VC investment vertical
+    let dealContext: { documentType?: string; dealId?: string; dealType?: string; dealStage?: string } | undefined;
+    try {
+      const docType = (document as Record<string, unknown>).documentType as string | undefined;
+      const docDealId = (document as Record<string, unknown>).dealId as string | undefined;
+      if (docType || docDealId) {
+        dealContext = { documentType: docType || undefined, dealId: docDealId || undefined };
+        if (docDealId) {
+          const deal = await prisma.deal.findUnique({
+            where: { id: docDealId },
+            select: { dealType: true, stage: true },
+          });
+          if (deal) {
+            dealContext.dealType = deal.dealType;
+            dealContext.dealStage = deal.stage;
+          }
+        }
+      }
+    } catch {
+      // Schema drift — documentType/dealId columns or Deal table may not exist yet
+    }
+
     const result = await runAnalysis(document.content, documentId, document.userId, update => {
       if (onProgress) onProgress(update);
-    }, document.orgId ?? undefined);
+    }, document.orgId ?? undefined, dealContext);
 
     // Store analysis in database with Schema Drift Protection
     const foundBiases = result.biases.filter(b => b.found);
@@ -474,7 +496,8 @@ export async function runAnalysis(
   documentId: string,
   userId: string,
   onProgress?: (update: ProgressUpdate) => void,
-  orgId?: string
+  orgId?: string,
+  dealContext?: { documentType?: string; dealId?: string; dealType?: string; dealStage?: string }
 ): Promise<AnalysisResult> {
   const auditGraph = await getGraph();
 
@@ -508,7 +531,16 @@ export async function runAnalysis(
     const eventStream =
       typeof auditGraph.streamEvents === 'function'
         ? auditGraph.streamEvents(
-            { originalContent: content, documentId: documentId, userId: userId, orgId: orgId || '' },
+            {
+              originalContent: content,
+              documentId,
+              userId,
+              orgId: orgId || '',
+              documentType: dealContext?.documentType || '',
+              dealId: dealContext?.dealId || '',
+              dealType: dealContext?.dealType || '',
+              dealStage: dealContext?.dealStage || '',
+            },
             { version: 'v2' }
           )
         : null;
@@ -589,9 +621,13 @@ export async function runAnalysis(
       result = (await Promise.race([
         auditGraph.invoke({
           originalContent: content,
-          documentId: documentId,
-          userId: userId,
+          documentId,
+          userId,
           orgId: orgId || '',
+          documentType: dealContext?.documentType || '',
+          dealId: dealContext?.dealId || '',
+          dealType: dealContext?.dealType || '',
+          dealStage: dealContext?.dealStage || '',
         }),
         timeoutPromise,
       ])) as { finalReport: Record<string, unknown> };

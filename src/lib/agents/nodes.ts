@@ -28,6 +28,12 @@ import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
 import { createLogger } from '../utils/logger';
 import { assembleContext, formatContextForPrompt } from '../intelligence/contextBuilder';
 import { normalizeBiasType } from '../utils/bias-normalize';
+import {
+  isInvestmentDocument,
+  buildInvestmentBiasOverlay,
+  buildInvestmentNoiseOverlay,
+  PE_BOARDROOM_PERSONAS,
+} from '../prompts/investment-vertical';
 
 // ============================================================
 // CONSTANTS
@@ -345,7 +351,14 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
     }
 
     // Build prompt with ontology context (compound interactions + industry biases)
-    const biasPrompt = buildEnrichedBiasPrompt(detectedIndustry);
+    let biasPrompt = buildEnrichedBiasPrompt(detectedIndustry);
+
+    // PE/VC Investment Vertical: Append investment-specific bias detection overlay
+    const investmentOverlay = buildInvestmentBiasOverlay(state.documentType, state.dealStage);
+    if (investmentOverlay) {
+      biasPrompt += `\n\n--- INVESTMENT COMMITTEE CONTEXT ---\n${investmentOverlay}`;
+      log.info(`Using investment-specific bias detection (docType=${state.documentType}, stage=${state.dealStage || 'unknown'})`);
+    }
 
     // Use Grounded Model for primary detection with retry logic
     const result = await withRetry(
@@ -461,11 +474,20 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
         ? `\n\nEXTERNAL BENCHMARKS FOR COMPARISON:\n${macroContext ? `Macro: ${macroContext}\n` : ''}${benchmarkContext ? `Industry: ${benchmarkContext}` : ''}`
         : '';
 
+    // PE/VC Investment Vertical: Append investment noise overlay if applicable
+    const investmentNoiseOverlay = buildInvestmentNoiseOverlay(state.documentType);
+    const noisePrompt = investmentNoiseOverlay
+      ? `${NOISE_JUDGE_PROMPT}\n\n--- INVESTMENT COMMITTEE CONTEXT ---\n${investmentNoiseOverlay}`
+      : NOISE_JUDGE_PROMPT;
+    if (investmentNoiseOverlay) {
+      log.info(`Using investment-specific noise evaluation (docType=${state.documentType})`);
+    }
+
     // Parallel Judges for Noise Scoring
     const promises = [1, 2, 3].map(() =>
       withTimeout(
         getModel().generateContent([
-          NOISE_JUDGE_PROMPT,
+          noisePrompt,
           `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
           `\n(Random Seed: ${Math.random()})`,
         ])
@@ -1131,6 +1153,13 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
     }
 
     // Step 4: Build dynamic prompt with custom personas + outcome awareness
+    // PE/VC Investment Vertical: Use PE boardroom personas when no custom personas
+    // are configured and the document is investment-related
+    if (customPersonas.length === 0 && isInvestmentDocument(state.documentType)) {
+      customPersonas = PE_BOARDROOM_PERSONAS;
+      log.info('Using PE/VC boardroom personas for investment document simulation');
+    }
+
     const { buildSimulationPrompt } = await import('./prompts');
 
     const dynamicPrompt = buildSimulationPrompt({
@@ -1331,11 +1360,19 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       state.cognitiveAnalysis?.blindSpotGap != null && state.cognitiveAnalysis.blindSpotGap > 50;
     const speakers = state.speakers || [];
 
+    // PE/VC Investment Vertical: Auto-set very_high stakes for deal-linked documents
+    // IC review and closing stages get additional weight via the compound engine
+    const monetaryStakes: 'unknown' | 'low' | 'medium' | 'high' | 'very_high' =
+      state.dealType || isInvestmentDocument(state.documentType) ? 'very_high' : 'unknown';
+    if (monetaryStakes === 'very_high') {
+      log.info('PE/VC context: auto-setting monetary stakes to very_high for compound scoring');
+    }
+
     compoundScoreResult = computeCompoundScore(
       100,
       detectedBiases,
       {
-        monetaryStakes: 'unknown',
+        monetaryStakes,
         participantCount: speakers.length,
         dissentPresent: hasDissent,
         timelineWeeks: null,

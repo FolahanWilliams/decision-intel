@@ -38,6 +38,22 @@ const GraphState = Annotation.Root({
     reducer: (x, y) => y ?? x ?? '',
     default: () => '',
   }),
+  documentType: Annotation<string>({
+    reducer: (x, y) => y ?? x ?? '',
+    default: () => '',
+  }),
+  dealId: Annotation<string>({
+    reducer: (x, y) => y ?? x ?? '',
+    default: () => '',
+  }),
+  dealType: Annotation<string>({
+    reducer: (x, y) => y ?? x ?? '',
+    default: () => '',
+  }),
+  dealStage: Annotation<string>({
+    reducer: (x, y) => y ?? x ?? '',
+    default: () => '',
+  }),
   originalContent: Annotation<string>({
     reducer: (x, y) => y ?? x ?? '',
     default: () => '',

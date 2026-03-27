@@ -249,9 +249,41 @@ export async function POST(request: NextRequest) {
             progress: 5,
           });
 
+          // Resolve deal context for PE/VC investment vertical
+          let documentType = '';
+          let dealId = '';
+          let dealType = '';
+          let dealStage = '';
+          try {
+            const docAny = doc as Record<string, unknown>;
+            documentType = (docAny.documentType as string) || '';
+            dealId = (docAny.dealId as string) || '';
+            if (dealId) {
+              const deal = await prisma.deal.findUnique({
+                where: { id: dealId },
+                select: { dealType: true, stage: true },
+              });
+              if (deal) {
+                dealType = deal.dealType;
+                dealStage = deal.stage;
+              }
+            }
+          } catch {
+            // Schema drift — documentType/dealId or Deal table may not exist yet
+          }
+
           const auditGraph = await getGraph();
           const eventStream = auditGraph.streamEvents(
-            { originalContent: doc.content, documentId: documentId, userId: userId, orgId: doc.orgId || '' },
+            {
+              originalContent: doc.content,
+              documentId,
+              userId,
+              orgId: doc.orgId || '',
+              documentType,
+              dealId,
+              dealType,
+              dealStage,
+            },
             { version: 'v2' }
           );
 

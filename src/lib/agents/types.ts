@@ -16,6 +16,10 @@ export interface AuditState {
   documentId: string;
   userId: string;
   orgId?: string;
+  documentType?: string; // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report
+  dealId?: string;
+  dealType?: string; // buyout | growth_equity | venture | secondary | add_on | recapitalization
+  dealStage?: string; // screening | due_diligence | ic_review | closing | portfolio | exited
   originalContent: string;
 
   // Pipeline safety — set by GDPR anonymizer to gate downstream processing
