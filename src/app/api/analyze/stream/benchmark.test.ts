@@ -11,23 +11,43 @@ const mocks = vi.hoisted(() => {
         userId: 'user_123',
         content:
           'This is a test content that needs to be at least fifty characters long to pass the validation check.',
+        status: 'pending',
+        updatedAt: new Date(),
+        filename: 'test-document.txt',
+        orgId: null,
       }),
       update: vi.fn().mockImplementation(async () => {
         await delay(DB_LATENCY);
         return { id: 'doc_123' };
       }),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
     analysis: {
+      findMany: vi.fn().mockResolvedValue([]),
       create: vi.fn().mockImplementation(async () => {
         await delay(DB_LATENCY);
         return { id: 'analysis_123' };
       }),
+      update: vi.fn().mockResolvedValue({ id: 'analysis_123' }),
+    },
+    analysisVersion: {
+      create: vi.fn().mockResolvedValue({ id: 'version_123' }),
     },
     rateLimit: {
       deleteMany: vi.fn().mockResolvedValue({ count: 0 }),
       findUnique: vi.fn().mockResolvedValue(null),
       upsert: vi.fn().mockResolvedValue({ count: 1, resetAt: new Date(Date.now() + 3600000) }),
       update: vi.fn().mockResolvedValue({ count: 2, resetAt: new Date(Date.now() + 3600000) }),
+    },
+    cacheEntry: {
+      findUnique: vi.fn().mockResolvedValue(null),
+      upsert: vi.fn().mockResolvedValue({}),
+      delete: vi.fn().mockResolvedValue({}),
+    },
+    failedAnalysis: {
+      findFirst: vi.fn().mockResolvedValue(null),
+      create: vi.fn().mockResolvedValue({}),
+      update: vi.fn().mockResolvedValue({}),
     },
   };
 });
@@ -38,11 +58,11 @@ vi.mock('next/server', () => {
     NextResponse: class {
       body: unknown;
       status: number;
-      constructor(body: unknown, options: { status?: number }) {
+      constructor(body: unknown, options?: { status?: number; headers?: Record<string, string> }) {
         this.body = body;
         this.status = options?.status || 200;
       }
-      static json(body: unknown, options: { status?: number }) {
+      static json(body: unknown, options?: { status?: number; headers?: Record<string, string> }) {
         return { body, status: options?.status || 200, json: async () => body };
       }
     },
@@ -52,7 +72,10 @@ vi.mock('next/server', () => {
 vi.mock('@/utils/supabase/server', () => ({
   createClient: () =>
     Promise.resolve({
-      auth: { getUser: () => Promise.resolve({ data: { user: { id: 'user_123' } } }) },
+      auth: {
+        getUser: () =>
+          Promise.resolve({ data: { user: { id: 'user_123', email: 'test@example.com' } } }),
+      },
     }),
 }));
 
@@ -121,6 +144,7 @@ vi.mock('@/lib/prisma', () => ({
 
 vi.mock('@/lib/sse', () => ({
   formatSSE: (data: unknown) => JSON.stringify(data),
+  formatSSEHeartbeat: () => ':heartbeat\n\n',
 }));
 
 vi.mock('@/lib/utils/json', () => ({
@@ -144,12 +168,78 @@ vi.mock('@/lib/utils/rate-limit', () => ({
   }),
 }));
 
+vi.mock('@/lib/utils/plan-limits', () => ({
+  checkAnalysisLimit: vi.fn().mockResolvedValue({
+    allowed: true,
+    used: 1,
+    limit: 100,
+    plan: 'pro',
+  }),
+}));
+
+vi.mock('@/lib/utils/logger', () => ({
+  createLogger: () => ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  }),
+}));
+
+vi.mock('@/lib/utils/cost-tracker', () => ({
+  trackApiUsage: vi.fn(),
+  estimateCost: vi.fn().mockReturnValue(0.001),
+}));
+
+vi.mock('@/lib/learning/outcome-gate', () => ({
+  checkOutcomeGate: vi.fn().mockResolvedValue({
+    allowed: true,
+    pendingCount: 0,
+    pendingAnalysisIds: [],
+    message: null,
+  }),
+  formatOutcomeReminder: vi.fn().mockReturnValue(null),
+}));
+
 vi.mock('@/lib/rag/embeddings', () => ({
   storeAnalysisEmbedding: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('@/lib/audit', () => ({
   logAudit: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/learning/toxic-combinations', () => ({
+  detectToxicCombinations: vi.fn().mockResolvedValue({
+    flaggedCount: 0,
+    combinations: [],
+  }),
+}));
+
+vi.mock('@/lib/notifications/email', () => ({
+  notifyAnalysisComplete: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/schemas/analysis', () => {
+  const mockSchema = {
+    safeParse: () => ({ success: true }),
+    parse: (v: unknown) => v ?? {},
+  };
+  return {
+    NoiseStatsSchema: mockSchema,
+    FactCheckSchema: mockSchema,
+    ComplianceSchema: mockSchema,
+    SentimentSchema: mockSchema,
+    LogicalSchema: mockSchema,
+    SwotSchema: mockSchema,
+    CognitiveSchema: mockSchema,
+    SimulationSchema: mockSchema,
+    MemorySchema: mockSchema,
+  };
+});
+
+vi.mock('@prisma/client', () => ({
+  Prisma: {},
 }));
 
 // Import after mocks
