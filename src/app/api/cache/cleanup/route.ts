@@ -29,7 +29,14 @@ function safeCompare(a: string, b: string): boolean {
  * If CRON_SECRET is not configured the endpoint is open (suitable for
  * development / self-hosted deployments with no public exposure).
  */
+// Support GET for the cron dispatcher (which dispatches via GET + Bearer token)
+export { handleCleanup as GET };
+
 export async function POST(request: Request) {
+  return handleCleanup(request);
+}
+
+async function handleCleanup(request: Request) {
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret) {
     const auth = request.headers.get('authorization') ?? '';

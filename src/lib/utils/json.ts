@@ -35,6 +35,7 @@ export const parseJSON = (text: string): any | null => {
     }
   }
 
+  const MAX_DEPTH = 64; // Guard against extremely nested LLM output
   let depth = 0;
   let inString = false;
   for (let i = start; i < text.length; i++) {
@@ -43,6 +44,10 @@ export const parseJSON = (text: string): any | null => {
     if (ch === '"' && prev !== '\\') inString = !inString;
     if (inString) continue;
     if (ch === opening) depth++;
+    if (depth > MAX_DEPTH) {
+      log.error('JSON Parse Error: exceeded max nesting depth of ' + MAX_DEPTH);
+      return null;
+    }
     if (ch === closing) {
       depth--;
       if (depth === 0) {

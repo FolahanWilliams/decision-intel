@@ -10,6 +10,23 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('ModelRouter');
 
+/**
+ * Determines if an error is transient (worth retrying with fallback) vs a client
+ * error (4xx) that would also fail on the fallback provider.
+ */
+function isTransientError(err: unknown): boolean {
+  if (!(err instanceof Error)) return true;
+  const msg = err.message;
+  // Google AI SDK includes HTTP status in error messages like "[429 Too Many Requests]"
+  if (/\b(429|500|502|503|504)\b/.test(msg)) return true;
+  if (/rate.limit|quota|timeout|econnreset|econnrefused|socket hang up|network/i.test(msg))
+    return true;
+  // 4xx client errors are not transient — bad input will also fail on fallback
+  if (/\b(400|401|403|404|422)\b/.test(msg)) return false;
+  // Default: treat unknown errors as transient to preserve existing behavior
+  return true;
+}
+
 export interface GenerateWithFallbackResult {
   text: string;
   model: string;
@@ -60,7 +77,14 @@ export async function generateWithFallback(
 
     const errorMessage =
       primaryError instanceof Error ? primaryError.message : String(primaryError);
-    log.warn(`Gemini failed (${errorMessage}), falling back to Claude`);
+
+    // Only fall back on transient/rate-limit errors, not on client errors (4xx)
+    if (!isTransientError(primaryError)) {
+      log.error(`Gemini failed with non-transient error, not falling back: ${errorMessage}`);
+      throw primaryError;
+    }
+
+    log.warn(`Gemini failed with transient error (${errorMessage}), falling back to Claude`);
 
     try {
       const result = await claudeGenerateText(prompt, {

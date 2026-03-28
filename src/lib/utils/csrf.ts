@@ -116,11 +116,12 @@ function getAllowedHosts(): string[] {
     }
   }
 
-  // When running on Vercel, always allow *.vercel.app so that preview
-  // deployments, branch URLs, and project aliases all pass CSRF checks.
-  // VERCEL_URL is deployment-specific and may differ from the Origin the
-  // browser sends, so a wildcard is the only reliable approach.
-  if (process.env.VERCEL === '1' || process.env.VERCEL_URL) {
+  // When running on Vercel preview deployments (no NEXT_PUBLIC_APP_URL set),
+  // allow *.vercel.app so that preview URLs and branch aliases pass CSRF checks.
+  // In production (NEXT_PUBLIC_APP_URL is set), only the exact production host
+  // and VERCEL_URL are allowed — the wildcard is too broad as it would permit
+  // requests from any Vercel project.
+  if ((process.env.VERCEL === '1' || process.env.VERCEL_URL) && !appUrl) {
     hosts.push('*.vercel.app');
   }
 

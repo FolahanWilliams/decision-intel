@@ -189,9 +189,13 @@ export function getDocumentContent(doc: {
         contentIv: doc.contentIv,
         contentTag: doc.contentTag,
       });
-    } catch {
-      log.error('Document decryption failed — falling back to plaintext content');
+    } catch (err) {
+      // Encrypted fields are present but decryption failed — this is a real error,
+      // not a backward-compat case. Do NOT silently fall back to plaintext.
+      log.error('Document decryption failed for document with encrypted fields', err);
+      throw new Error('Document decryption failed — possible key rotation or data corruption');
     }
   }
+  // Backward compat: old documents without encrypted fields use plaintext
   return doc.content;
 }

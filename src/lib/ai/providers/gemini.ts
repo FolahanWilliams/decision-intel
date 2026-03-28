@@ -10,6 +10,15 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('GeminiProvider');
 
+// Module-level singleton to avoid recreating the SDK client on every call
+let _genAI: GoogleGenerativeAI | null = null;
+function getGenAI(apiKey: string): GoogleGenerativeAI {
+  if (!_genAI) {
+    _genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return _genAI;
+}
+
 export interface GenerateTextResult {
   text: string;
   model: string;
@@ -37,7 +46,7 @@ export async function generateText(
   const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
   const modelName = options?.model ?? getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-2.0-flash');
 
-  const genAI = new GoogleGenerativeAI(apiKey);
+  const genAI = getGenAI(apiKey);
 
   const safetySettings = [
     {
