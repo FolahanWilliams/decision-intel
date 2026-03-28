@@ -233,6 +233,18 @@ export async function deliverSlackNudge(
 
     const data = await response.json();
     if (!data.ok) {
+      // Handle expired / revoked tokens
+      if (
+        data.error === 'token_revoked' ||
+        data.error === 'token_expired' ||
+        data.error === 'invalid_auth' ||
+        data.error === 'account_inactive' ||
+        response.status === 401
+      ) {
+        log.warn(`Slack token invalid (${data.error}) for team ${teamId ?? 'legacy'}, marking installation inactive`);
+        await markInstallationInactive(teamId);
+        return false;
+      }
       log.error('Slack API error:', data.error);
       return false;
     }
@@ -243,6 +255,82 @@ export async function deliverSlackNudge(
     log.error('Failed to deliver Slack nudge:', error);
     return false;
   }
+}
+
+// ─── Token Expiry Recovery ──────────────────────────────────────────────────
+
+/**
+ * Mark a Slack installation as inactive when the bot token is expired or revoked.
+ * This prevents repeated failed API calls and surfaces the issue in the settings UI.
+ */
+async function markInstallationInactive(teamId?: string): Promise<void> {
+  if (!teamId) return;
+  try {
+    await prisma.slackInstallation.update({
+      where: { teamId },
+      data: {
+        status: 'token_expired',
+        revokedAt: new Date(),
+      },
+    });
+    log.info(`Marked Slack installation for team ${teamId} as token_expired`);
+  } catch (err) {
+    log.error(`Failed to mark installation inactive for team ${teamId}:`, err);
+  }
+}
+
+// ─── Safe Event Processing ──────────────────────────────────────────────────
+
+/**
+ * Safely process a Slack webhook event with full error recovery.
+ * Wraps slackEventToDecisionInput + pre-decision + outcome detection in try/catch,
+ * handling token expiry by marking the installation inactive.
+ */
+export async function processSlackEvent(
+  payload: SlackWebhookPayload,
+  orgId?: string | null
+): Promise<{
+  decision: HumanDecisionInput | null;
+  preDecision: Awaited<ReturnType<typeof slackEventToPreDecisionInput>>;
+  outcome: { detected: boolean; draftCount: number };
+}> {
+  const result: {
+    decision: HumanDecisionInput | null;
+    preDecision: Awaited<ReturnType<typeof slackEventToPreDecisionInput>>;
+    outcome: { detected: boolean; draftCount: number };
+  } = {
+    decision: null,
+    preDecision: null,
+    outcome: { detected: false, draftCount: 0 },
+  };
+
+  try {
+    // 1. Check for committed decisions
+    result.decision = slackEventToDecisionInput(payload);
+
+    // 2. Check for pre-decision deliberation
+    result.preDecision = await slackEventToPreDecisionInput(payload, orgId);
+
+    // 3. Check for outcome signals
+    result.outcome = await processSlackOutcomeSignal(payload);
+  } catch (error: unknown) {
+    const teamId = payload.team_id;
+
+    // Detect Slack API auth failures embedded in processing errors
+    if (
+      error instanceof Error &&
+      (error.message?.includes('token_revoked') ||
+        error.message?.includes('invalid_auth') ||
+        error.message?.includes('token_expired'))
+    ) {
+      log.warn(`Token error during event processing for team ${teamId}, marking inactive`);
+      await markInstallationInactive(teamId);
+    } else {
+      log.error(`Slack event processing failed for team ${teamId}:`, error);
+    }
+  }
+
+  return result;
 }
 
 // ─── Pre-Decision Detection ─────────────────────────────────────────────────

@@ -11,6 +11,7 @@ import {
   Link2,
   Mail,
   Loader2,
+  BookOpen,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -47,6 +48,9 @@ export function ShareModal({
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [creatingLink, setCreatingLink] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [caseStudyUrl, setCaseStudyUrl] = useState<string | null>(null);
+  const [creatingCaseStudy, setCreatingCaseStudy] = useState(false);
+  const [caseStudyCopied, setCaseStudyCopied] = useState(false);
   const { showToast } = useToast();
 
   const handlePdfExport = useCallback(async () => {
@@ -99,6 +103,34 @@ export function ShareModal({
       showToast('Failed to create share link', 'error');
     } finally {
       setCreatingLink(false);
+    }
+  }, [analysisId, showToast]);
+
+  const handleCreateCaseStudyLink = useCallback(async () => {
+    if (!analysisId) return;
+    setCreatingCaseStudy(true);
+    try {
+      const res = await fetch('/api/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysisId, isCaseStudy: true }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const url = data.url || `${window.location.origin}/shared/${data.token}?case=true`;
+        setCaseStudyUrl(url);
+        await navigator.clipboard.writeText(url);
+        setCaseStudyCopied(true);
+        setTimeout(() => setCaseStudyCopied(false), 3000);
+        showToast('Case study link created and copied!', 'success');
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Failed to create case study link', 'error');
+      }
+    } catch {
+      showToast('Failed to create case study link', 'error');
+    } finally {
+      setCreatingCaseStudy(false);
     }
   }, [analysisId, showToast]);
 
@@ -293,6 +325,74 @@ export function ShareModal({
                       }}
                     >
                       {shareUrl}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Case Study Link */}
+              {analysisId && (
+                <div>
+                  <Button
+                    variant="outline"
+                    onClick={
+                      caseStudyUrl
+                        ? async () => {
+                            await navigator.clipboard.writeText(caseStudyUrl);
+                            setCaseStudyCopied(true);
+                            setTimeout(() => setCaseStudyCopied(false), 2000);
+                            showToast('Case study link copied!', 'success');
+                          }
+                        : handleCreateCaseStudyLink
+                    }
+                    disabled={creatingCaseStudy}
+                    className="h-auto w-full justify-start gap-3 p-3 text-left"
+                    style={{
+                      background: caseStudyUrl ? 'rgba(99, 102, 241, 0.08)' : undefined,
+                      borderColor: caseStudyUrl ? 'rgba(99, 102, 241, 0.25)' : undefined,
+                    }}
+                  >
+                    {creatingCaseStudy ? (
+                      <Loader2
+                        size={18}
+                        className="animate-spin shrink-0"
+                        style={{ color: 'var(--text-secondary)' }}
+                      />
+                    ) : caseStudyCopied ? (
+                      <Check size={18} className="shrink-0" style={{ color: 'var(--success)' }} />
+                    ) : (
+                      <BookOpen
+                        size={18}
+                        className="shrink-0"
+                        style={{ color: '#6366f1' }}
+                      />
+                    )}
+                    <div>
+                      <div style={{ fontWeight: 500, fontSize: '13px' }}>
+                        {caseStudyUrl
+                          ? caseStudyCopied
+                            ? 'Case study link copied!'
+                            : 'Copy case study link'
+                          : 'Share as Case Study'}
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        {caseStudyUrl
+                          ? 'Anonymized, never expires, all sections unlocked'
+                          : 'Anonymized link with all sections visible (no expiry)'}
+                      </div>
+                    </div>
+                  </Button>
+                  {caseStudyUrl && (
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                        padding: '6px 16px',
+                        wordBreak: 'break-all',
+                        fontFamily: 'monospace',
+                      }}
+                    >
+                      {caseStudyUrl}
                     </div>
                   )}
                 </div>

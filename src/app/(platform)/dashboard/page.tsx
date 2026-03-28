@@ -67,6 +67,11 @@ import { SparklineChart } from '@/components/ui/SparklineChart';
 import { DashboardCharts } from '@/components/visualizations/DashboardCharts';
 import DecisionPerformance from '@/components/visualizations/DecisionPerformance';
 import { GraphStatsCard } from '@/components/ui/GraphStatsCard';
+import dynamic from 'next/dynamic';
+const GraphHealthWidget = dynamic(
+  () => import('@/components/visualizations/GraphHealthWidget').then(m => ({ default: m.GraphHealthWidget })),
+  { ssr: false }
+);
 import { useDeals } from '@/hooks/useDeals';
 import { DOCUMENT_TYPES } from '@/types/deals';
 
@@ -984,6 +989,11 @@ export default function Dashboard() {
           <ErrorBoundary sectionName="Decision Graph">
             <GraphStatsCard />
           </ErrorBoundary>
+          <div className="mt-3">
+            <ErrorBoundary sectionName="Graph Health">
+              <GraphHealthWidget />
+            </ErrorBoundary>
+          </div>
         </motion.div>
       )}
 

@@ -54,7 +54,7 @@ export async function GET() {
     let scoreCount = 0;
     let noiseSum = 0;
     let noiseCount = 0;
-    let successCount = 0;
+    let _successCount = 0;
 
     for (const o of outcomes) {
       // Bias accuracy
@@ -74,7 +74,7 @@ export async function GET() {
       }
 
       if (o.outcome === 'success' || o.outcome === 'partial_success') {
-        successCount++;
+        _successCount++;
       }
     }
 

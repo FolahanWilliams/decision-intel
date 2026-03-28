@@ -580,6 +580,30 @@ export async function POST(request: NextRequest) {
             });
           }
 
+          // Register prompt version and link to analysis (fire and forget)
+          if (createdAnalysisId) {
+            import('@/lib/prompts/registry')
+              .then(async ({ registerPrompt }) => {
+                const promptContent = `model:${process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview'}|nodes:${Object.keys(NODE_LABELS).join(',')}`;
+                const { id: promptVersionId } = await registerPrompt(
+                  'analysis_pipeline',
+                  promptContent
+                );
+                await prisma.analysis
+                  .update({
+                    where: { id: createdAnalysisId! },
+                    data: { promptVersionId },
+                  })
+                  .catch(() => {}); // Schema drift — column may not exist
+              })
+              .catch((err: unknown) => {
+                log.warn(
+                  'Prompt registration failed (non-critical): ' +
+                    (err instanceof Error ? err.message : String(err))
+                );
+              });
+          }
+
           // Store embedding (fire and forget)
           try {
             const { storeAnalysisEmbedding } = await import('@/lib/rag/embeddings');

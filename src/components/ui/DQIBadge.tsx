@@ -74,6 +74,7 @@ export function DQIBadge({
 
   useEffect(() => {
     if (!animate) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync displayedScore when score prop changes without animation
       setDisplayedScore(clampedScore);
       return;
     }

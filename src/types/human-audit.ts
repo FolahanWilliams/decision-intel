@@ -255,6 +255,7 @@ export interface SlackInstallationStatus {
   connected: boolean;
   teamName?: string;
   teamId?: string;
+  botUserId?: string;
   installedAt?: string;
   scopes?: string[];
   status?: string;

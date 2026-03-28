@@ -23,6 +23,7 @@ const TOKEN_COSTS: Record<string, { input: number; output: number }> = {
   'gemini-2.0-flash': { input: 0.0001, output: 0.0004 },
   'gemini-2.5-pro': { input: 0.00125, output: 0.01 },
   'text-embedding-004': { input: 0.00001, output: 0 },
+  'claude-sonnet-4-20250514': { input: 0.003, output: 0.015 },
 };
 
 /**
