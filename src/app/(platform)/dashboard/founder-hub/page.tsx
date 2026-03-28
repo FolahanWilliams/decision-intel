@@ -2011,8 +2011,11 @@ function LiveStats() {
   const [stats, setStats] = useState<Record<string, unknown> | null>(null);
   const [dashboardData, setDashboardData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [lastRefreshed, setLastRefreshed] = useState<string | null>(null);
+  const [error, setError] = useState(false);
 
-  useState(() => {
+  const fetchStats = useCallback(() => {
+    setError(false);
     Promise.all([
       fetch('/api/stats')
         .then(r => (r.ok ? r.json() : null))
@@ -2021,17 +2024,52 @@ function LiveStats() {
         .then(r => (r.ok ? r.json() : null))
         .catch(() => null),
     ]).then(([s, d]) => {
-      setStats(s);
-      setDashboardData(d);
+      if (!s && !d) {
+        setError(true);
+      } else {
+        setStats(s);
+        setDashboardData(d);
+      }
+      setLastRefreshed(new Date().toLocaleTimeString());
       setLoading(false);
     });
-  });
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+    const interval = setInterval(fetchStats, 60_000);
+    return () => clearInterval(interval);
+  }, [fetchStats]);
 
   if (loading) {
     return (
       <div style={card}>
         <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>
           Loading live stats from your database...
+        </p>
+      </div>
+    );
+  }
+
+  if (error && !stats && !dashboardData) {
+    return (
+      <div style={card}>
+        <p style={{ color: '#ef4444', textAlign: 'center', padding: 40 }}>
+          Failed to load stats.{' '}
+          <button
+            onClick={fetchStats}
+            style={{
+              background: 'none',
+              border: '1px solid #ef4444',
+              color: '#ef4444',
+              borderRadius: 6,
+              padding: '4px 12px',
+              cursor: 'pointer',
+              fontSize: 12,
+            }}
+          >
+            Retry
+          </button>
         </p>
       </div>
     );
@@ -2045,11 +2083,35 @@ function LiveStats() {
     <div>
       {/* Hero Stats */}
       <div style={{ ...card, borderTop: '3px solid #22c55e' }}>
-        <div style={sectionTitle}>
-          <TrendingUp size={18} style={{ color: '#22c55e' }} /> Live Product Metrics
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div style={sectionTitle}>
+            <TrendingUp size={18} style={{ color: '#22c55e' }} /> Live Product Metrics
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {lastRefreshed && (
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                Updated {lastRefreshed}
+              </span>
+            )}
+            <button
+              onClick={fetchStats}
+              style={{
+                background: 'var(--bg-tertiary, #0a0a0a)',
+                border: '1px solid var(--border-primary, #222)',
+                color: 'var(--text-secondary)',
+                borderRadius: 6,
+                padding: '4px 10px',
+                cursor: 'pointer',
+                fontSize: 11,
+                fontWeight: 600,
+              }}
+            >
+              Refresh
+            </button>
+          </div>
         </div>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
-          Real-time data from your database. Pull this up during investor meetings or sales calls.
+          Auto-refreshes every 60s. Pull this up during investor meetings or sales calls.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
           {[

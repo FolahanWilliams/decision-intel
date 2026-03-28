@@ -72,24 +72,31 @@ export async function GET(request: Request) {
     // AuditLog may not have SYSTEM_ERROR entries
   }
 
-  return NextResponse.json({
-    window: {
-      minutes: windowMinutes,
-      since: new Date(Date.now() - windowMs).toISOString(),
+  return NextResponse.json(
+    {
+      window: {
+        minutes: windowMinutes,
+        since: new Date(Date.now() - windowMs).toISOString(),
+      },
+      api: {
+        totalRequestsRecorded: getTotalRecorded(),
+        routeSummaries,
+        overallPercentiles,
+      },
+      ai: {
+        period: 'last_24h',
+        costs: aiCosts,
+        totalCost: aiCosts.reduce((s, c) => s + c.totalCost, 0),
+      },
+      errors: {
+        recentCount: recentErrors,
+      },
+      timestamp: new Date().toISOString(),
     },
-    api: {
-      totalRequestsRecorded: getTotalRecorded(),
-      routeSummaries,
-      overallPercentiles,
-    },
-    ai: {
-      period: 'last_24h',
-      costs: aiCosts,
-      totalCost: aiCosts.reduce((s, c) => s + c.totalCost, 0),
-    },
-    errors: {
-      recentCount: recentErrors,
-    },
-    timestamp: new Date().toISOString(),
-  });
+    {
+      headers: {
+        'Cache-Control': 'private, max-age=30, stale-while-revalidate=15',
+      },
+    }
+  );
 }
