@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface Variant {
   id: string;
@@ -508,18 +509,20 @@ export default function ExperimentsDashboard() {
 
   if (selected) {
     return (
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <ExperimentDetail
-          experiment={selected}
-          onBack={() => {
-            setSelected(null);
-            fetchExperiments();
-          }}
-          onRefresh={() => {
-            fetchExperiments();
-          }}
-        />
-      </div>
+      <ErrorBoundary sectionName="Experiment Detail">
+        <div className="max-w-4xl mx-auto py-8 px-4">
+          <ExperimentDetail
+            experiment={selected}
+            onBack={() => {
+              setSelected(null);
+              fetchExperiments();
+            }}
+            onRefresh={() => {
+              fetchExperiments();
+            }}
+          />
+        </div>
+      </ErrorBoundary>
     );
   }
 
@@ -529,6 +532,7 @@ export default function ExperimentsDashboard() {
   );
 
   return (
+    <ErrorBoundary sectionName="A/B Prompt Testing">
     <div className="max-w-4xl mx-auto py-8 px-4">
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -620,5 +624,6 @@ export default function ExperimentsDashboard() {
         onCreated={fetchExperiments}
       />
     </div>
+    </ErrorBoundary>
   );
 }

@@ -78,8 +78,8 @@ async function cacheSet(key: string, value: string, ttlSeconds: number): Promise
       update: { value, expiresAt },
       create: { key, value, expiresAt },
     });
-    // Probabilistic cleanup: ~1% of writes trigger expired-row pruning
-    if (Math.random() < 0.01) {
+    // Probabilistic cleanup: ~5% of writes trigger expired-row pruning
+    if (Math.random() < 0.05) {
       pruneExpiredEntries().catch(() => null);
     }
   } catch (error) {

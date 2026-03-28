@@ -23,6 +23,15 @@ export interface GenerateTextOptions {
   temperature?: number;
 }
 
+// Module-level singleton to avoid recreating the SDK client on every call
+let _client: Anthropic | null = null;
+function getClient(apiKey: string): Anthropic {
+  if (!_client) {
+    _client = new Anthropic({ apiKey });
+  }
+  return _client;
+}
+
 const DEFAULT_MODEL = 'claude-sonnet-4-20250514';
 
 /**
@@ -42,7 +51,7 @@ export async function generateText(
   const modelName = options?.model ?? DEFAULT_MODEL;
   const maxTokens = options?.maxTokens ?? 16384;
 
-  const client = new Anthropic({ apiKey });
+  const client = getClient(apiKey);
 
   const start = Date.now();
   const message = await client.messages.create({

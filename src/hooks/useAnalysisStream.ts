@@ -79,6 +79,14 @@ export function useAnalysisStream(options: StreamOptions) {
   const lastEventIdRef = useRef<string | null>(null);
   const seenEventIdsRef = useRef<Set<string>>(new Set());
 
+  // Store callbacks in refs to avoid recreating readStream when callers pass new arrow functions
+  const onBiasDetectedRef = useRef(onBiasDetected);
+  const onNoiseUpdateRef = useRef(onNoiseUpdate);
+  const onOutcomeReminderRef = useRef(onOutcomeReminder);
+  onBiasDetectedRef.current = onBiasDetected;
+  onNoiseUpdateRef.current = onNoiseUpdate;
+  onOutcomeReminderRef.current = onOutcomeReminder;
+
   // Initialize steps to "pending"
   const resetSteps = useCallback(() => {
     setSteps(stepNames.map(name => ({ name, status: 'pending' })));
@@ -201,14 +209,14 @@ export function useAnalysisStream(options: StreamOptions) {
               case 'bias': {
                 const biasType = update.biasType as string;
                 const biasResult = update.result as { severity?: string } | undefined;
-                onBiasDetected?.(biasType, biasResult?.severity ?? 'unknown');
+                onBiasDetectedRef.current?.(biasType, biasResult?.severity ?? 'unknown');
                 break;
               }
 
               case 'noise': {
                 const noiseResult = update.result as { score?: number } | undefined;
                 if (noiseResult?.score != null) {
-                  onNoiseUpdate?.(noiseResult.score);
+                  onNoiseUpdateRef.current?.(noiseResult.score);
                 }
                 break;
               }
@@ -216,7 +224,7 @@ export function useAnalysisStream(options: StreamOptions) {
               case 'outcome_reminder': {
                 const reminderCount = update.pendingCount as number;
                 const reminderIds = (update.analysisIds as string[]) || [];
-                onOutcomeReminder?.(reminderCount, reminderIds);
+                onOutcomeReminderRef.current?.(reminderCount, reminderIds);
                 break;
               }
 
@@ -243,7 +251,7 @@ export function useAnalysisStream(options: StreamOptions) {
 
       return streamResult;
     },
-    [onBiasDetected, onNoiseUpdate, onOutcomeReminder]
+    [] // Callbacks accessed via refs — no dependencies needed
   );
 
   /**

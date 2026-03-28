@@ -86,6 +86,7 @@ export async function GET() {
     '/api/cron/detect-outcomes',
     '/api/cron/infer-graph-edges',
     '/api/cron/retry-nudges',
+    '/api/cache/cleanup',
   ];
 
   // Jobs that run on Sundays (off-peak ML/calibration)
