@@ -16,7 +16,7 @@ function AnimatedCounter({ value, suffix = '', label, icon }: CounterProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
   const count = useMotionValue(0);
-  const rounded = useTransform(count, (v) => {
+  const rounded = useTransform(count, v => {
     if (v >= 1000) return `${(v / 1000).toFixed(1)}K`;
     return Math.round(v).toLocaleString();
   });
@@ -31,9 +31,7 @@ function AnimatedCounter({ value, suffix = '', label, icon }: CounterProps) {
     <div ref={ref} className="flex flex-col items-center gap-2 px-4 py-3">
       <div className="text-blue-400/80">{icon}</div>
       <div className="flex items-baseline gap-1">
-        <motion.span className="text-3xl font-bold text-white tabular-nums">
-          {rounded}
-        </motion.span>
+        <motion.span className="text-3xl font-bold text-white tabular-nums">{rounded}</motion.span>
         {suffix && <span className="text-lg text-zinc-400">{suffix}</span>}
       </div>
       <span className="text-sm text-zinc-500 text-center">{label}</span>
@@ -54,8 +52,8 @@ export function TractionCounters() {
 
   useEffect(() => {
     fetch('/api/public/outcome-stats')
-      .then((r) => r.json())
-      .then((d) => setData(d))
+      .then(r => r.json())
+      .then(d => setData(d))
       .catch(() => null);
   }, []);
 
@@ -87,7 +85,9 @@ export function TractionCounters() {
         />
       </div>
       <p className="text-xs text-zinc-600 text-center mt-2">
-        {data.isRealData ? 'Live platform data' : 'Research baseline — updated as platform data grows'}
+        {data.isRealData
+          ? 'Live platform data'
+          : 'Research baseline — updated as platform data grows'}
       </p>
     </div>
   );

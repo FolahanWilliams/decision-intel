@@ -86,7 +86,7 @@ export function CaseStudyCard({ study }: { study: CaseStudy }) {
 
       {/* Top Bias Types */}
       <div className="flex flex-wrap gap-1.5">
-        {study.topBiasTypes.map((b) => (
+        {study.topBiasTypes.map(b => (
           <span
             key={b.type}
             className="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-zinc-300"

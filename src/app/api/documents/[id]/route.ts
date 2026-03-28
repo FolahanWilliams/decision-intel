@@ -107,7 +107,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Decrypt content transparently — never send encrypted fields to the client
     const docAny = document as Record<string, unknown>;
     const { contentEncrypted: _ce, contentIv: _ci, contentTag: _ct, ...docFields } = docAny;
-    const decryptedContent = getDocumentContent(document as Parameters<typeof getDocumentContent>[0]);
+    const decryptedContent = getDocumentContent(
+      document as Parameters<typeof getDocumentContent>[0]
+    );
     return NextResponse.json({ ...docFields, content: decryptedContent });
   } catch (error) {
     log.error('Error fetching document:', error);

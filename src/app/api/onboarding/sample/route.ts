@@ -50,9 +50,7 @@ export async function POST() {
 
     const contentHash = createHash('sha256').update(content).digest('hex');
 
-    const encFields = isDocumentEncryptionEnabled()
-      ? encryptDocumentContent(content)
-      : {};
+    const encFields = isDocumentEncryptionEnabled() ? encryptDocumentContent(content) : {};
     const doc = await prisma.document.create({
       data: {
         userId: user.id,

@@ -4,7 +4,16 @@ import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit2, ChevronRight, FileText, Upload, AlertTriangle, Shield, TrendingUp } from 'lucide-react';
+import {
+  ArrowLeft,
+  Edit2,
+  ChevronRight,
+  FileText,
+  Upload,
+  AlertTriangle,
+  Shield,
+  TrendingUp,
+} from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useDeal } from '@/hooks/useDeals';
 import { DealFormModal } from '@/components/deals/DealFormModal';
@@ -515,8 +524,8 @@ function ValueProtectedCard({ dealId }: { dealId: string }) {
 
   useEffect(() => {
     fetch(`/api/deals/${dealId}/roi`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => setRoi(d))
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => setRoi(d))
       .catch(() => null);
   }, [dealId]);
 
@@ -564,13 +573,13 @@ function ValueProtectedCard({ dealId }: { dealId: string }) {
         </div>
       </div>
 
-      {roi.breakdown.filter((b) => b.confirmed).length > 0 && (
+      {roi.breakdown.filter(b => b.confirmed).length > 0 && (
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10 }}>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>
             Confirmed Bias Breakdown
           </div>
           {roi.breakdown
-            .filter((b) => b.confirmed)
+            .filter(b => b.confirmed)
             .map((b, i) => (
               <div
                 key={i}
@@ -595,7 +604,8 @@ function ValueProtectedCard({ dealId }: { dealId: string }) {
       )}
 
       <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 10, fontStyle: 'italic' }}>
-        Methodology: ticket size x research-based loss rate per confirmed bias type (Kahneman, Malmendier & Tate)
+        Methodology: ticket size x research-based loss rate per confirmed bias type (Kahneman,
+        Malmendier & Tate)
       </div>
     </div>
   );

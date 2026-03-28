@@ -21,6 +21,8 @@ import {
   Upload,
   CheckCircle2,
   ClipboardPaste,
+  Play,
+  ExternalLink,
 } from 'lucide-react';
 import { DEMO_ANALYSES, type DemoAnalysis } from './data';
 import { DQIBadge } from '@/components/ui/DQIBadge';
@@ -223,13 +225,29 @@ export default function DemoPage() {
 
       {/* Content */}
       <div className="max-w-[960px] mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-20">
-        {/* Hero — Try It Section */}
+        {/* Video Demo Section — always visible when not in simulation/results */}
+        {!isSimulating && !showResults && (
+          <>
+            <DemoVideoSection />
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 my-12">
+              <div className="flex-1 h-px bg-white/[0.08]" />
+              <span className="text-xs text-slate-500 font-semibold tracking-widest uppercase">
+                Or try it yourself
+              </span>
+              <div className="flex-1 h-px bg-white/[0.08]" />
+            </div>
+          </>
+        )}
+
+        {/* Interactive Demo Section */}
         {!isSimulating && !showResults && (
           <div className="mb-10">
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight">
-                See cognitive bias auditing in action
-              </h1>
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-tight">
+                Interactive Demo
+              </h2>
               <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto">
                 Pick a real-world case study and watch the AI pipeline analyze it in real time. No
                 login required.
@@ -568,6 +586,17 @@ export default function DemoPage() {
                 >
                   Sign Up Free
                 </Link>
+                {DEMO_BOOKING_URL && (
+                  <a
+                    href={DEMO_BOOKING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-7 py-3 rounded-[10px] bg-transparent border border-indigo-500/30 text-indigo-400 font-semibold text-sm no-underline text-center"
+                    onClick={() => trackEvent('demo_cta_clicked', { target: 'book_demo' })}
+                  >
+                    Book a Demo <ExternalLink size={14} className="inline align-middle ml-1" />
+                  </a>
+                )}
               </div>
               <p className="text-slate-600 text-[11px] mt-4">
                 No credit card required &middot; 3 free analyses &middot; 14-day trial on paid plans
@@ -579,6 +608,75 @@ export default function DemoPage() {
               to demonstrate product capabilities. They are not financial or investment advice.
             </p>
           </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Video Demo Section ──────────────────────────────────────────────
+
+const DEMO_VIDEO_URL = process.env.NEXT_PUBLIC_DEMO_VIDEO_URL;
+const DEMO_BOOKING_URL = process.env.NEXT_PUBLIC_DEMO_BOOKING_URL;
+
+function DemoVideoSection() {
+  return (
+    <div className="text-center">
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight">
+        See Decision Intel in Action
+      </h1>
+      <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto mb-8">
+        Watch how the 15-agent pipeline audits real IC memos for cognitive bias, measures decision
+        noise, and generates actionable intelligence.
+      </p>
+
+      {DEMO_VIDEO_URL ? (
+        <div className="rounded-2xl overflow-hidden border border-white/[0.08] bg-[#111111] mb-8">
+          <iframe
+            src={DEMO_VIDEO_URL}
+            allowFullScreen
+            className="w-full border-none"
+            style={{ aspectRatio: '16/9' }}
+            title="Decision Intel Demo"
+          />
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-white/[0.08] bg-[#111111] p-12 sm:p-16 mb-8 flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center">
+            <Play size={28} className="text-white/40 ml-1" />
+          </div>
+          <p className="text-slate-500 text-sm max-w-[400px]">
+            Demo video coming soon. Try the interactive demo below to see the bias detection engine
+            in action.
+          </p>
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Link
+          href="/login"
+          className="px-7 py-3 rounded-[10px] bg-white text-black font-bold text-sm no-underline text-center"
+          onClick={() => trackEvent('demo_video_cta_clicked', { target: 'start_trial' })}
+        >
+          Start Free Trial <ArrowRight size={14} className="inline align-middle ml-1" />
+        </Link>
+        {DEMO_BOOKING_URL ? (
+          <a
+            href={DEMO_BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-7 py-3 rounded-[10px] bg-transparent border border-white/20 text-white font-semibold text-sm no-underline text-center"
+            onClick={() => trackEvent('demo_video_cta_clicked', { target: 'book_call' })}
+          >
+            Book a Call <ExternalLink size={14} className="inline align-middle ml-1" />
+          </a>
+        ) : (
+          <Link
+            href="/#pricing"
+            className="px-7 py-3 rounded-[10px] bg-transparent border border-white/20 text-white font-semibold text-sm no-underline text-center"
+          >
+            View Pricing
+          </Link>
         )}
       </div>
     </div>
