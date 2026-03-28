@@ -231,7 +231,7 @@ export async function POST(req: NextRequest) {
                   await prisma.decisionFrame.update({
                     where: { id: existingFrame.id },
                     data: {
-                      accumulatedBiases: updatedBiases,
+                      accumulatedBiases: toPrismaJson(updatedBiases),
                       escalationLevel: escalated || existingFrame.escalationLevel,
                       nudgeCount: { increment: 1 },
                     },
@@ -318,10 +318,12 @@ export async function POST(req: NextRequest) {
                   threadTs: frameThreadTs || null,
                   nudgeCount: 1,
                   escalationLevel: preDecision.nudge?.severity ?? 'info',
-                  accumulatedBiases: preDecision.biases.map(b => ({
-                    ...b,
-                    detectedAt: new Date().toISOString(),
-                  })),
+                  accumulatedBiases: toPrismaJson(
+                    preDecision.biases.map(b => ({
+                      ...b,
+                      detectedAt: new Date().toISOString(),
+                    }))
+                  ),
                 },
               });
 
@@ -557,7 +559,7 @@ async function processSlackDecision(
       await prisma.humanDecision
         .update({ where: { id: decisionId }, data: { status: 'error' } })
         .catch(() => {});
-      return;
+      return null;
     }
 
     // Generate and persist nudges, deliver critical ones back to Slack
