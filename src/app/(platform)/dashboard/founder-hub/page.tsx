@@ -23,15 +23,26 @@ import {
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-type TabId = 'overview' | 'pipeline' | 'scoring' | 'integrations' | 'moat' | 'market' | 'playbook';
+type TabId =
+  | 'overview'
+  | 'pipeline'
+  | 'scoring'
+  | 'integrations'
+  | 'moat'
+  | 'market'
+  | 'sales'
+  | 'stats'
+  | 'playbook';
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} /> },
   { id: 'pipeline', label: 'Analysis Pipeline', icon: <Brain size={16} /> },
   { id: 'scoring', label: 'Scoring Engine', icon: <BarChart3 size={16} /> },
   { id: 'integrations', label: 'Integrations & Flywheel', icon: <Plug size={16} /> },
-  { id: 'moat', label: 'Competitive Moat', icon: <Shield size={16} /> },
+  { id: 'moat', label: 'Moat & Competitors', icon: <Shield size={16} /> },
   { id: 'market', label: 'Market Strategy', icon: <Target size={16} /> },
+  { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} /> },
+  { id: 'stats', label: 'Live Stats', icon: <TrendingUp size={16} /> },
   { id: 'playbook', label: 'Founder Playbook', icon: <BookOpen size={16} /> },
 ];
 
@@ -424,11 +435,88 @@ SYNTHESIS (Sequential)
           </ul>
         </div>
       </div>
+
+      {/* Technical Architecture Quick Reference */}
+      <div style={{ ...card, borderTop: '3px solid #a78bfa' }}>
+        <div style={sectionTitle}>
+          <Zap size={18} style={{ color: '#a78bfa' }} /> Technical Architecture — Talking Points
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+          Condensed reference for technical conversations (CTOs, technical DD, co-founder
+          discussions).
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          {[
+            {
+              label: 'Stack',
+              value: 'Next.js 16 (App Router) + Prisma ORM + Supabase Postgres + LangGraph',
+            },
+            {
+              label: 'AI Pipeline',
+              value:
+                '15 agents in LangGraph DAG — preprocessing (sequential) → analysis (parallel fan-out) → synthesis (sequential)',
+            },
+            {
+              label: 'Scoring Layer',
+              value:
+                'Deterministic compound scoring POST-LLM — 20x20 bias interaction matrix, context multipliers, biological signal detection',
+            },
+            {
+              label: 'Noise Measurement',
+              value:
+                'Statistical jury: 3 independent Gemini instances score same document → mean, stddev, variance decomposition',
+            },
+            {
+              label: 'RAG / Embeddings',
+              value:
+                'Gemini embedding-001 (768-dim) → pgvector cosine similarity for semantic search and document matching',
+            },
+            {
+              label: 'Causal AI',
+              value:
+                'PC Algorithm for DAG construction, Pearl do-calculus for interventional queries, org-specific danger multipliers',
+            },
+            {
+              label: 'Knowledge Graph',
+              value:
+                '8 edge types auto-inferred, PageRank centrality, Granger-causal temporal inference, BFS multi-touch attribution',
+            },
+            {
+              label: 'Real-Time',
+              value:
+                'SSE streaming for analysis, Slack Events API for decision detection, webhook engine for outbound events',
+            },
+            {
+              label: 'Security',
+              value:
+                'GDPR anonymization pre-analysis, AES-256-GCM token encryption, HMAC-SHA256 Slack verification, bcrypt API keys',
+            },
+            {
+              label: 'Data Moat',
+              value:
+                'CalibrationProfile per-org learned weights, outcome-driven edge learning, cross-org Bias Genome (anonymized)',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{
+                padding: 10,
+                borderRadius: 8,
+                background: 'var(--bg-tertiary, #0a0a0a)',
+                fontSize: 12,
+              }}
+            >
+              <div style={{ fontWeight: 700, color: '#a78bfa', marginBottom: 2 }}>{item.label}</div>
+              <div style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>{item.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
-// ─── Placeholder for remaining tabs (Batch 2 & 3) ──────────────────────────
+// ─── Tab Content: Scoring Engine ────────────────────────────────────────────
 
 function ScoringEngine() {
   return (
@@ -1052,6 +1140,94 @@ function CompetitiveMoat() {
           participating organization.
         </p>
       </div>
+
+      {/* Competitor Landscape */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <Target size={18} style={{ color: '#f59e0b' }} /> Competitor Landscape — Quick Reference
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+          When a prospect mentions one of these tools, here&apos;s your instant response.
+        </p>
+        <div style={{ display: 'grid', gap: 10 }}>
+          {[
+            {
+              name: 'Affinity',
+              what: 'Relationship intelligence CRM for dealmakers. Tracks who-knows-who, auto-logs emails and meetings.',
+              gap: 'Zero decision quality analysis. Tells you WHO to talk to, not WHETHER your thesis is biased.',
+              response:
+                '"Affinity finds the deal. Decision Intel audits the decision to invest. We\'re complementary — plug in after the deal hits IC."',
+              color: '#3b82f6',
+            },
+            {
+              name: 'DealCloud (Intapp)',
+              what: 'Deal management and pipeline CRM for PE/VC. Tracks deal flow, pipeline stages, fund reporting.',
+              gap: 'No cognitive analysis of IC materials. Tracks the deal, not the quality of the decision-making about the deal.',
+              response:
+                '"DealCloud tracks your pipeline. We audit the decisions your pipeline produces. Upload the IC memo from DealCloud — we score it in 60 seconds."',
+              color: '#6366f1',
+            },
+            {
+              name: 'Grata',
+              what: 'AI-powered company search and deal sourcing for private markets.',
+              gap: 'Entirely focused on finding companies to invest in. Nothing on evaluating whether the investment decision is sound.',
+              response:
+                '"Grata finds targets. We stress-test the thesis. Different stage of the funnel entirely."',
+              color: '#22c55e',
+            },
+            {
+              name: 'Blueflame AI',
+              what: 'AI assistant for PE firms — automates CIM summarization, deal screening, data room analysis.',
+              gap: "Summarizes and structures data but doesn't detect cognitive biases, measure noise, or track decision outcomes.",
+              response:
+                '"Blueflame reads the documents faster. We read the decision-maker\'s blind spots. Our 15-agent pipeline detects 20 biases they can\'t see."',
+              color: '#ef4444',
+            },
+            {
+              name: 'ChatGPT / Claude (direct)',
+              what: 'General-purpose LLM. Some firms ask it to "analyze for biases."',
+              gap: 'Single model opinion (no noise measurement), no deterministic scoring, no outcome tracking, no org calibration, no PE-specific biases.',
+              response:
+                '"That\'s one opinion from one model. We use 3 independent judges for noise measurement, a 20x20 bias interaction matrix for compound scoring, and an outcome flywheel that makes us smarter with every deal you close."',
+              color: '#a78bfa',
+            },
+          ].map((comp, i) => (
+            <div
+              key={i}
+              style={{
+                padding: 14,
+                borderRadius: 10,
+                background: 'var(--bg-tertiary, #0a0a0a)',
+                borderLeft: `3px solid ${comp.color}`,
+              }}
+            >
+              <div style={{ fontSize: 14, fontWeight: 700, color: comp.color, marginBottom: 6 }}>
+                {comp.name}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
+                <strong style={{ color: 'var(--text-primary)' }}>What they do:</strong> {comp.what}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
+                <strong style={{ color: 'var(--text-primary)' }}>What they don&apos;t:</strong>{' '}
+                {comp.gap}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: comp.color,
+                  fontStyle: 'italic',
+                  padding: '8px 12px',
+                  background: `${comp.color}08`,
+                  borderRadius: 6,
+                  border: `1px solid ${comp.color}20`,
+                }}
+              >
+                {comp.response}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -1509,6 +1685,439 @@ function MarketStrategy() {
   );
 }
 
+// ─── Tab Content: Sales Toolkit (Objection Handler + Demo Script) ───────────
+
+function SalesToolkit() {
+  return (
+    <div>
+      {/* Objection Handler */}
+      <div style={{ ...card, borderTop: '3px solid #f59e0b' }}>
+        <div style={sectionTitle}>
+          <Shield size={18} style={{ color: '#f59e0b' }} /> Objection Handler
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+          The exact objections PE/VC buyers will raise and your prepared responses.
+        </p>
+        <div style={{ display: 'grid', gap: 10 }}>
+          {[
+            {
+              objection: '"We already have a good IC process."',
+              response:
+                "Great — upload your last 3 IC memos and let's see what the DQI scores look like. Most funds score 45-65 on their first run. The question isn't whether your process is good — it's whether there are blind spots nobody is catching.",
+              tone: 'Curious, not confrontational',
+            },
+            {
+              objection: '"How is this different from just asking ChatGPT?"',
+              response:
+                "ChatGPT gives you one opinion from one model. We use 3 independent judges to measure noise, a 20x20 bias interaction matrix for compound scoring, 11 PE-specific biases that general models don't know to look for, and an outcome flywheel that makes us smarter with every deal you close. It's the difference between asking a friend and hiring a forensic auditor.",
+              tone: 'Technical credibility',
+            },
+            {
+              objection: '"Our deal team would never share IC memos with an external tool."',
+              response:
+                'We GDPR-anonymize every document before it touches AI — names, companies, and numbers are tokenized. The PII never leaves the anonymization layer. Plus, you self-host your data on your own Supabase instance. We can do an on-prem demo if that helps.',
+              tone: 'Address security directly',
+            },
+            {
+              objection: '"We don\'t have budget for another software tool."',
+              response:
+                "A single avoided bad deal saves $50-500M. Even if we prevent one thesis error per vintage year, that's a 500-1000x ROI on a $50K subscription. What's the cost of NOT catching the next anchoring bias in your IC memo?",
+              tone: 'ROI framing',
+            },
+            {
+              objection: '"We tried AI tools before and they weren\'t useful."',
+              response:
+                "Were they general-purpose AI or purpose-built for investment decisions? We have 11 PE-specific biases like anchoring to entry price, carry incentive distortion, and winner's curse that no general tool detects. Plus, our outcome tracking means we calibrate to YOUR fund's actual decision patterns — not generic advice.",
+              tone: 'Specificity wins',
+            },
+            {
+              objection: '"How long until we see value?"',
+              response:
+                "Upload your first IC memo — you'll have a full bias audit with DQI score in under 60 seconds. The Boardroom Simulation alone usually surfaces something nobody in the room raised. First-day value, not first-quarter value.",
+              tone: 'Immediate gratification',
+            },
+            {
+              objection: '"We\'re a small team, we don\'t need this."',
+              response:
+                'Small teams are actually more vulnerable to groupthink and authority bias — fewer voices means blind spots compound. Our Slack integration embeds cognitive coaching directly in your deal discussions, no workflow change required. Think of it as a silent partner who only speaks up when they spot a bias.',
+              tone: 'Turn weakness into strength',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{ padding: 14, borderRadius: 10, background: 'var(--bg-tertiary, #0a0a0a)' }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#f59e0b', marginBottom: 6 }}>
+                {item.objection}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.7,
+                  marginBottom: 6,
+                }}
+              >
+                {item.response}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                Tone: {item.tone}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Demo Script */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <Rocket size={18} style={{ color: '#6366f1' }} /> Demo Script — Step by Step
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
+          Follow this sequence for maximum impact. Total demo time: 8-12 minutes.
+        </p>
+        {[
+          {
+            step: 1,
+            title: 'Setup (30 sec)',
+            action:
+              'Open the dashboard. Have a sample IC memo ready — ideally one from a real deal that had a known outcome (good or bad).',
+            tip: 'If using their own memo, even better. If not, use the sample Acme Corp memo.',
+          },
+          {
+            step: 2,
+            title: 'Upload & Analyze (60 sec)',
+            action:
+              'Drag the IC memo onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 15 agents are doing: "Right now, 3 independent AI judges are scoring this document for noise, while our bias detective is scanning for 31 cognitive biases..."',
+            tip: 'The streaming progress bar is your friend — it creates anticipation.',
+          },
+          {
+            step: 3,
+            title: 'DQI Score Reveal (60 sec)',
+            action:
+              'When the score appears, pause for dramatic effect. "Your IC memo scored 47/100 — that\'s a D grade. Let me show you why."',
+            tip: 'Most memos score 40-65. If it scores high (80+), pivot to: "This is unusually clean — let me show you what we DID find."',
+          },
+          {
+            step: 4,
+            title: 'Bias Walkthrough (2 min)',
+            action:
+              "Click into the Biases tab. Show 2-3 specific biases with their exact excerpts highlighted. \"See here — 'the initial offer of $50M' — that's anchoring to entry price. Your team is using a number they were given rather than independently valuing the asset.\"",
+            tip: 'Always connect the bias to a specific excerpt. Abstract = forgettable. Concrete = compelling.',
+          },
+          {
+            step: 5,
+            title: 'Boardroom Simulation (2 min) — THE WOW MOMENT',
+            action:
+              'Switch to the Boardroom tab. Show the 5 IC personas voting. "Your Risk Committee Chair voted REJECT because of concentration risk. Your Operating Partner flagged execution timeline as unrealistic. Did anyone in your real IC raise these points?"',
+            tip: 'This is usually where the prospect goes quiet and starts thinking about their last deal. Let the silence land.',
+          },
+          {
+            step: 6,
+            title: 'Noise Score (60 sec)',
+            action:
+              'Show the Noise tab. "Three independent judges scored this memo. Two gave it 52, one gave it 71. That 19-point spread IS the noise in your decision process — you\'re getting different answers to the same question."',
+            tip: 'If noise is low, that\'s also a story: "This is consistent — the issues are real, not random."',
+          },
+          {
+            step: 7,
+            title: 'Toxic Combinations (60 sec)',
+            action:
+              'If detected, show the toxic combination card. "\'The Echo Chamber\' — confirmation bias plus groupthink in a high-stakes context. This pattern appears in 73% of our historical failure cases."',
+            tip: 'The named patterns are memorable and shareable. Prospects will mention them to colleagues.',
+          },
+          {
+            step: 8,
+            title: 'Close (60 sec)',
+            action:
+              '"Imagine if every IC memo went through this before the vote. How many of your last 10 deals would have scored differently?" Offer: free pilot — 3 IC memos analyzed, no commitment.',
+            tip: "Don't oversell. The product sells itself after the demo. Just get the pilot started.",
+          },
+        ].map((item, i) => (
+          <div
+            key={i}
+            style={{
+              display: 'flex',
+              gap: 12,
+              padding: '12px 0',
+              borderBottom: i < 7 ? '1px solid var(--border-primary, #222)' : 'none',
+            }}
+          >
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background: '#6366f1',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 14,
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
+            >
+              {item.step}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: 4,
+                }}
+              >
+                {item.title}
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                  marginBottom: 4,
+                }}
+              >
+                {item.action}
+              </div>
+              <div style={{ fontSize: 11, color: '#6366f1', fontStyle: 'italic' }}>
+                Tip: {item.tip}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Quick Pitch Variants */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <MessageSquare size={18} style={{ color: '#3b82f6' }} /> Elevator Pitches (by Audience)
+        </div>
+        <div style={{ display: 'grid', gap: 8 }}>
+          {[
+            {
+              audience: 'PE Managing Partner (30 sec)',
+              pitch:
+                "We're building a cognitive bias auditing engine for IC memos. Upload a memo, get a Decision Quality Score in 60 seconds — think FICO for investment decisions. Our outcome flywheel means we learn which biases actually cost your fund money, so the platform gets sharper with every deal.",
+            },
+            {
+              audience: 'VC Partner (30 sec)',
+              pitch:
+                "We detect 31 cognitive biases in investment documents — 11 specific to PE/VC like anchoring to entry price and winner's curse. Our Boardroom Simulation creates virtual IC members who vote on your thesis. It usually surfaces the objection nobody in the room raised.",
+            },
+            {
+              audience: 'Investor (60 sec)',
+              pitch:
+                "Decision Intel is the cognitive bias auditing engine for PE/VC investment committees. We sit between deal sourcing and capital deployment — the one place in the fund workflow where nobody provides decision quality tools. 15-agent AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. PE/VC software market is $607B going to $995B by 2035 — we're creating a new category in it.",
+            },
+            {
+              audience: 'Technical Audience (30 sec)',
+              pitch:
+                'LangGraph-based 15-agent pipeline with deterministic compound scoring on top of LLM output. 20x20 bias interaction matrix, Bayesian prior integration, Granger-causal temporal inference for our decision knowledge graph. Not a wrapper — we built the scoring math.',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{ padding: 12, borderRadius: 8, background: 'var(--bg-tertiary, #0a0a0a)' }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#3b82f6', marginBottom: 4 }}>
+                {item.audience}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {item.pitch}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Tab Content: Live Stats ────────────────────────────────────────────────
+
+function LiveStats() {
+  const [stats, setStats] = useState<Record<string, unknown> | null>(null);
+  const [dashboardData, setDashboardData] = useState<Record<string, unknown> | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useState(() => {
+    Promise.all([
+      fetch('/api/stats')
+        .then(r => (r.ok ? r.json() : null))
+        .catch(() => null),
+      fetch('/api/outcomes/dashboard?timeRange=all')
+        .then(r => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ]).then(([s, d]) => {
+      setStats(s);
+      setDashboardData(d);
+      setLoading(false);
+    });
+  });
+
+  if (loading) {
+    return (
+      <div style={card}>
+        <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>
+          Loading live stats from your database...
+        </p>
+      </div>
+    );
+  }
+
+  const s = stats as Record<string, number | string | unknown[]> | null;
+  const d = dashboardData as Record<string, unknown> | null;
+  const kpis = d?.kpis as Record<string, number> | undefined;
+
+  return (
+    <div>
+      {/* Hero Stats */}
+      <div style={{ ...card, borderTop: '3px solid #22c55e' }}>
+        <div style={sectionTitle}>
+          <TrendingUp size={18} style={{ color: '#22c55e' }} /> Live Product Metrics
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
+          Real-time data from your database. Pull this up during investor meetings or sales calls.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          {[
+            { value: s?.totalDocuments ?? '—', label: 'Documents Uploaded', color: '#3b82f6' },
+            { value: s?.documentsAnalyzed ?? '—', label: 'Analyses Completed', color: '#22c55e' },
+            {
+              value: s?.avgScore != null ? `${Math.round(s.avgScore as number)}` : '—',
+              label: 'Avg Decision Score',
+              color: '#f59e0b',
+            },
+            { value: kpis?.decisionsTracked ?? '—', label: 'Outcomes Tracked', color: '#a78bfa' },
+          ].map((m, i) => (
+            <div key={i} style={card}>
+              <div style={{ ...stat, color: m.color }}>{String(m.value)}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{m.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Calibration & Accuracy */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={card}>
+          <div style={sectionTitle}>
+            <Target size={16} style={{ color: '#6366f1' }} /> Calibration Metrics
+          </div>
+          <div style={{ display: 'grid', gap: 8 }}>
+            {[
+              { label: 'Decision Accuracy Rate', value: `${kpis?.accuracyRate ?? 0}%` },
+              { label: 'Bias Detection Accuracy', value: `${kpis?.biasDetectionAccuracy ?? 0}%` },
+              { label: 'Avg Impact Score', value: `${kpis?.avgImpactScore ?? 0}/100` },
+              {
+                label: 'Pending Outcomes',
+                value: `${(d as Record<string, unknown>)?.pendingOutcomes ?? 0}`,
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '6px 0',
+                  borderBottom: '1px solid var(--border-primary, #222)',
+                  fontSize: 13,
+                }}
+              >
+                <span style={{ color: 'var(--text-secondary)' }}>{item.label}</span>
+                <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={card}>
+          <div style={sectionTitle}>
+            <Brain size={16} style={{ color: '#8b5cf6' }} /> Top Biases Detected
+          </div>
+          {Array.isArray(s?.topBiases) ? (
+            <div style={{ display: 'grid', gap: 6 }}>
+              {(s.topBiases as Array<{ biasType: string; count: number; displayName?: string }>)
+                .slice(0, 7)
+                .map((b, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '6px 0',
+                      borderBottom: '1px solid var(--border-primary, #222)',
+                      fontSize: 12,
+                    }}
+                  >
+                    <span style={{ color: 'var(--text-secondary)' }}>
+                      {b.displayName || b.biasType?.replace(/_/g, ' ')}
+                    </span>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{b.count}</span>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              No bias data yet. Analyze some documents first.
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Twin Effectiveness */}
+      {Array.isArray((d as Record<string, unknown>)?.twinEffectiveness) &&
+        ((d as Record<string, unknown>).twinEffectiveness as unknown[]).length > 0 && (
+          <div style={card}>
+            <div style={sectionTitle}>
+              <Users size={16} style={{ color: '#a78bfa' }} /> Twin Effectiveness (Live)
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: 8,
+              }}
+            >
+              {(
+                (d as Record<string, unknown>).twinEffectiveness as Array<Record<string, unknown>>
+              ).map((t, i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: 10,
+                    borderRadius: 8,
+                    background: 'var(--bg-tertiary, #0a0a0a)',
+                    fontSize: 12,
+                  }}
+                >
+                  <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
+                    {String(t.twinName)}
+                  </div>
+                  <div style={{ color: 'var(--text-muted)' }}>
+                    {Math.round((t.effectivenessRate as number) * 100)}% accuracy,{' '}
+                    {String(t.dissentCount)} dissents
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      {/* Usage note */}
+      <div style={{ ...card, borderLeft: '3px solid #3b82f6' }}>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>
+          <strong style={{ color: 'var(--text-primary)' }}>Investor meeting tip:</strong> Pull up
+          this tab to show real traction. &quot;We&apos;ve analyzed X documents, tracked Y outcomes,
+          and our bias detection accuracy is Z%. The platform is actively calibrating to our pilot
+          customers&apos; decision patterns.&quot;
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Tab Content: Founder Playbook ──────────────────────────────────────────
 
 function FounderPlaybook() {
@@ -1866,6 +2475,8 @@ export default function FounderHubPage() {
     integrations: <IntegrationsAndFlywheel />,
     moat: <CompetitiveMoat />,
     market: <MarketStrategy />,
+    sales: <SalesToolkit />,
+    stats: <LiveStats />,
     playbook: <FounderPlaybook />,
   };
 
