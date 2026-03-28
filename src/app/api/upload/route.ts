@@ -8,6 +8,7 @@ import { createHash } from 'crypto';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
 import { createLogger } from '@/lib/utils/logger';
+import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
 
 const log = createLogger('UploadRoute');
 
@@ -217,6 +218,9 @@ export async function POST(request: NextRequest) {
     // cuid as the storage filename, making the path deterministic for
     // later deletion: ${userId}/${document.id}${ext}
     // Falls back to plain create if contentHash column is missing (schema drift).
+    const encryptedFields = isDocumentEncryptionEnabled()
+      ? encryptDocumentContent(content)
+      : {};
     let document;
     try {
       document = await prisma.document.create({
@@ -227,6 +231,7 @@ export async function POST(request: NextRequest) {
           fileType: file.type || 'text/plain',
           fileSize: file.size,
           content,
+          ...encryptedFields,
           contentHash,
           status: 'pending',
           ...(documentType ? { documentType } : {}),

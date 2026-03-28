@@ -7,6 +7,7 @@ type Document = NonNullable<Awaited<ReturnType<typeof prisma.document.findUnique
 import { getCachedAnalysis, cacheAnalysis, generateAnalysisCacheKey } from '@/lib/utils/cache';
 import { validateContent } from '@/lib/utils/resilience';
 import { createLogger } from '@/lib/utils/logger';
+import { getDocumentContent } from '@/lib/utils/encryption';
 
 import {
   NoiseStatsSchema,
@@ -63,14 +64,16 @@ export async function analyzeDocument(
     documentId = document.id;
   }
 
+  const content = getDocumentContent(document);
+
   // Validate content before analysis
-  const validation = validateContent(document.content);
+  const validation = validateContent(content);
   if (!validation.valid) {
     throw new Error(validation.error);
   }
 
   // Check cache first
-  const cacheKey = generateAnalysisCacheKey(document.content, document.userId);
+  const cacheKey = generateAnalysisCacheKey(content, document.userId);
   const cached = await getCachedAnalysis(cacheKey);
 
   if (cached) {
@@ -108,7 +111,7 @@ export async function analyzeDocument(
     }
 
     const result = await runAnalysis(
-      document.content,
+      content,
       documentId,
       document.userId,
       update => {
@@ -416,7 +419,7 @@ export async function analyzeDocument(
       const { detectOutcomeFromDocument } = await import('@/lib/learning/outcome-inference');
       const draftOutcomes = await detectOutcomeFromDocument(
         documentId,
-        document.content.slice(0, 6000),
+        content.slice(0, 6000),
         document.userId,
         document.orgId ?? null
       );

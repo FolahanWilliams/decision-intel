@@ -12,6 +12,7 @@ import { createClient } from '@/utils/supabase/server';
 import { computeDQI, generateDQIBadge, type DQIInput } from '@/lib/scoring/dqi';
 import { BIAS_NODES } from '@/lib/ontology/bias-graph';
 import { createLogger } from '@/lib/utils/logger';
+import { getDocumentContent } from '@/lib/utils/encryption';
 
 const log = createLogger('DQIInternalRoute');
 
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
         compliance: true,
         simulation: true,
         document: {
-          select: { content: true },
+          select: { content: true, contentEncrypted: true, contentIv: true, contentTag: true },
         },
       },
     });
@@ -124,7 +125,7 @@ export async function GET(request: NextRequest) {
       // DecisionOutcome table may not exist
     }
 
-    const documentContent = (analysis.document?.content as string) ?? '';
+    const documentContent = analysis.document ? getDocumentContent(analysis.document as Parameters<typeof getDocumentContent>[0]) : '';
     const wordCount = documentContent.split(/\s+/).filter(Boolean).length;
 
     const dqiInput: DQIInput = {

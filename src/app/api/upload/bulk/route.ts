@@ -11,6 +11,7 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { validateContent } from '@/lib/utils/resilience';
+import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
 import { createHash } from 'crypto';
 import { PDFParse } from 'pdf-parse';
 import mammoth from 'mammoth';
@@ -265,7 +266,10 @@ async function processFilesAsync(
         continue;
       }
 
-      // Save document
+      // Save document (with encryption if key is configured)
+      const encFields = isDocumentEncryptionEnabled()
+        ? encryptDocumentContent(content)
+        : {};
       const doc = await prisma.document.create({
         data: {
           userId,
@@ -274,6 +278,7 @@ async function processFilesAsync(
           fileType: file.type,
           fileSize: file.size,
           content,
+          ...encFields,
           contentHash,
           status: 'pending', // Will be processed by background job
         },
