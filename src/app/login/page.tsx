@@ -14,6 +14,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import Link from 'next/link';
+import { trackEvent } from '@/lib/analytics/track';
 
 export default function LoginPage() {
   return (
@@ -51,6 +52,7 @@ function LoginContent() {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
+    trackEvent('signup_started', { provider: 'google' });
     const supabase = createClient();
     const callbackUrl = new URL('/api/auth/callback', location.origin);
     if (redirectTo) {

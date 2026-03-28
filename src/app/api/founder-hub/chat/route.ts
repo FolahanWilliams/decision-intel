@@ -136,6 +136,8 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Counterfactual Analysis API: POST /api/decision-graph/counterfactual for "what-if" decision path computation.
 - Product Analytics: trackEvent() client lib at src/lib/analytics/track.ts. Internal /api/analytics/events endpoint.
 - Prompt Versioning: SHA-256 deduplicated prompt tracking wired to every analysis via promptVersionId.
+- Quick Bias Check: Dashboard modal for instant <5s bias scan via paste. Shared Gemini utility between extension and platform at /api/analyze/quick-score.
+- Demo Conversion Tracking: 10 funnel events wired across demo, login, marketing, analysis, and case study pages via trackEvent() fire-and-forget.
 `.trim();
 
 // ─── Route Handler ──────────────────────────────────────────────────────────

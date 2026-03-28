@@ -1,43 +1,51 @@
 /**
- * POST /api/extension/quick-score
+ * POST /api/analyze/quick-score
  *
- * Lightweight bias-only scan for the browser extension popup.
- * Returns a quick score, grade, and list of detected biases.
+ * Platform quick-score endpoint — lightweight bias-only scan.
+ * Returns a score, grade, and list of detected biases.
  *
- * Auth: Extension API key via x-extension-key header.
+ * Auth: Supabase session cookie (platform users).
  * Rate limit: 30 requests/hour per user.
  * Timeout: 15 seconds max.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateApiRequest } from '@/lib/utils/api-auth';
-import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { z } from 'zod';
+import { createClient } from '@/utils/supabase/server';
 import { runQuickScore } from '@/lib/analysis/quick-score';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 
-const log = createLogger('ExtensionQuickScore');
+const log = createLogger('PlatformQuickScore');
 
 // Cap serverless function duration
 export const maxDuration = 15;
 
-// ─── Route Handler ───────────────────────────────────────────────────────────
+// ─── Validation ─────────────────────────────────────────────────────────────
 
-const MAX_CONTENT_LENGTH = 50_000;
+const QuickScoreInput = z.object({
+  content: z.string().min(1, 'content is required').max(50_000, 'content must be at most 50000 characters'),
+  title: z.string().optional(),
+  url: z.string().optional(),
+});
+
+// ─── Route Handler ──────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
   try {
     // ── Auth ────────────────────────────────────────────────────────────
-    const authResult = await authenticateApiRequest(request);
-    if (authResult.error || !authResult.userId) {
-      return NextResponse.json(
-        { error: authResult.error || 'Unauthorized' },
-        { status: authResult.status || 401 }
-      );
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const userId = user?.id;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const userId = authResult.userId;
 
     // ── Rate limit: 30 req/hour ─────────────────────────────────────────
-    const rateLimitResult = await checkRateLimit(userId, '/api/extension/quick-score', {
+    const rateLimitResult = await checkRateLimit(userId, '/api/analyze/quick-score', {
       windowMs: 60 * 60 * 1000,
       maxRequests: 30,
       failMode: 'closed',
@@ -60,30 +68,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ── Parse body ──────────────────────────────────────────────────────
-    let body: Record<string, unknown>;
+    // ── Parse & validate body ───────────────────────────────────────────
+    let body: unknown;
     try {
       body = await request.json();
     } catch {
       return NextResponse.json({ error: 'Invalid or missing request body' }, { status: 400 });
     }
 
-    const { content, url, title } = body as {
-      content?: string;
-      url?: string;
-      title?: string;
-    };
-
-    if (!content || typeof content !== 'string' || content.trim().length === 0) {
-      return NextResponse.json({ error: 'content is required and must be a non-empty string' }, { status: 400 });
-    }
-
-    if (content.length > MAX_CONTENT_LENGTH) {
+    const parsed = QuickScoreInput.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: `content must be at most ${MAX_CONTENT_LENGTH} characters` },
+        { error: parsed.error.issues[0]?.message || 'Invalid input' },
         { status: 400 }
       );
     }
+
+    const { content, title, url } = parsed.data;
 
     // ── Run quick score ─────────────────────────────────────────────────
     const result = await runQuickScore(content, { title, url });

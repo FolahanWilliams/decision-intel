@@ -18,6 +18,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { DQIBadge } from '@/components/ui/DQIBadge';
+import { trackEvent } from '@/lib/analytics/track';
 
 interface SharedAnalysis {
   id: string;
@@ -261,6 +262,9 @@ export default function SharedAnalysisPage() {
       setAnalysis(data.analysis);
       setExpiresAt(data.expiresAt);
       if (data.isCaseStudy) setIsCaseStudy(true);
+      if (data.isCaseStudy || isCaseStudy) {
+        trackEvent('case_study_viewed');
+      }
       setRequiresPassword(false);
     } catch {
       setError('Network error. Please try again.');
