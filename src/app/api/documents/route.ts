@@ -110,7 +110,7 @@ export async function GET(request: Request) {
     // Transform to include score from latest analysis
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- shape varies with schema drift
     const transformedDocs = documents.map((doc: any) => {
-      const latestAnalysis = doc.analyses[0];
+      const latestAnalysis = Array.isArray(doc.analyses) ? doc.analyses[0] : undefined;
       return {
         id: doc.id,
         filename: doc.filename,

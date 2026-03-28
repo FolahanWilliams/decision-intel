@@ -328,7 +328,7 @@ export async function analyzeDocument(
             if (topCombo && topCombo.toxicScore >= 70) {
               const alertChannel = process.env.SLACK_ALERT_CHANNEL;
               if (alertChannel) {
-                (async () => {
+                void (async () => {
                   try {
                     const install = await prisma.slackInstallation.findFirst({
                       where: { orgId: document.orgId!, status: 'active' },
@@ -347,7 +347,7 @@ export async function analyzeDocument(
                       );
                     }
                   } catch (err) {
-                    log.debug(
+                    log.warn(
                       'Slack toxic alert failed (non-fatal):',
                       err instanceof Error ? err.message : String(err)
                     );
