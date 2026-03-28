@@ -38,6 +38,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
   const [emailNotifications, setEmailNotifications] = useState(initialSettings.emailNotifications);
   const [analysisAlerts, setAnalysisAlerts] = useState(initialSettings.analysisAlerts);
   const [weeklyDigest, setWeeklyDigest] = useState(initialSettings.weeklyDigest);
+  const [emailConfigured, setEmailConfigured] = useState(true); // assume configured until proven otherwise
 
   // Display preferences
   const [darkMode, setDarkMode] = useState(initialSettings.darkMode);
@@ -84,6 +85,18 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
   useEffect(() => {
     fetchSlackStatus();
   }, [fetchSlackStatus]);
+
+  // Check email delivery configuration
+  useEffect(() => {
+    fetch('/api/notifications/status')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (data && typeof data.emailConfigured === 'boolean') {
+          setEmailConfigured(data.emailConfigured);
+        }
+      })
+      .catch(() => {}); // Non-critical — leave as assumed-configured
+  }, []);
 
   // Show toast on OAuth redirect
   useEffect(() => {
@@ -216,6 +229,15 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
         </div>
         <div className="card-body">
           <div className="flex flex-col gap-lg">
+            {!emailConfigured && (
+              <div className="flex items-start gap-sm rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                <span>
+                  Email delivery is not configured. Toggling these settings will save your preferences,
+                  but no emails will be sent until the email provider is set up.
+                </span>
+              </div>
+            )}
             <ToggleOption
               label="Email Notifications"
               description="Receive email updates about your analyses"

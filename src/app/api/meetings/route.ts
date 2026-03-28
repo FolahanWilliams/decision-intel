@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       const code = (dbError as { code?: string }).code;
       if (code === 'P2021' || code === 'P2022') {
         log.warn('Schema drift in meetings list: table not migrated yet');
-        return NextResponse.json({ meetings: [], total: 0, page, totalPages: 0 });
+        return NextResponse.json({ meetings: [], total: 0, page, totalPages: 0, _drifted: true });
       }
       throw dbError;
     }

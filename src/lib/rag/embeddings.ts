@@ -114,9 +114,9 @@ export async function generateEmbeddings(texts: string[]): Promise<number[][]> {
         const embedding = await generateEmbedding(text);
         results.push(embedding);
       } catch (err) {
-        log.error('Single embedding failed, using zero vector:', err);
-        // Return zero vector for failed items to maintain array alignment
-        results.push(new Array(1536).fill(0));
+        log.error('Single embedding failed, skipping item:', err);
+        // Push null for failed items — callers must filter nulls before storing
+        results.push(null as unknown as number[]);
       }
     }
 
@@ -232,10 +232,10 @@ export async function storeAnalysisEmbeddingsBatch(items: EmbeddingInput[]): Pro
       };
     });
 
-    // Filter out any failed embeddings (zero vectors)
+    // Filter out any failed embeddings (null or zero vectors)
     const successful = embeddingData.filter(
       data =>
-        data.embedding && data.embedding.length === 1536 && !data.embedding.every(v => v === 0)
+        data.embedding != null && data.embedding.length === 1536 && !data.embedding.every(v => v === 0)
     );
 
     const failed = embeddingData.length - successful.length;

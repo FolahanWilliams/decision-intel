@@ -42,6 +42,7 @@ export async function GET() {
         totalDecisions: 0,
         genome: [],
         computedAt: new Date().toISOString(),
+        _drifted: true,
       });
     }
     log.error('Failed to fetch Bias Genome:', msg);

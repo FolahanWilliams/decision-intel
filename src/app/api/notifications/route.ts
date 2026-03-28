@@ -42,7 +42,7 @@ export async function GET() {
   } catch (error) {
     const code = (error as { code?: string }).code;
     if (code === 'P2021' || code === 'P2022') {
-      return NextResponse.json({ notifications: [] });
+      return NextResponse.json({ notifications: [], _drifted: true });
     }
     log.error('Notifications API failed:', error);
     return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });

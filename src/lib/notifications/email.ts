@@ -16,6 +16,11 @@ const log = createLogger('EmailNotifications');
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const EMAIL_FROM = process.env.EMAIL_FROM || 'Decision Intel <notifications@decisionintel.app>';
 
+/** Whether email delivery is configured (RESEND_API_KEY is set). */
+export function isEmailConfigured(): boolean {
+  return !!RESEND_API_KEY;
+}
+
 interface EmailPayload {
   to: string;
   subject: string;
@@ -35,8 +40,8 @@ function escapeHtml(str: string): string {
 
 async function sendEmail(payload: EmailPayload): Promise<boolean> {
   if (!RESEND_API_KEY) {
-    log.info(`[DRY RUN] Email to ${payload.to}: ${payload.subject}`);
-    return true; // Succeed silently when no API key configured
+    log.warn(`[DRY RUN] Email not sent (RESEND_API_KEY not configured): ${payload.subject}`);
+    return false;
   }
 
   try {
