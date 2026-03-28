@@ -23,7 +23,7 @@ import {
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-type TabId = 'overview' | 'pipeline' | 'scoring' | 'integrations' | 'moat' | 'playbook';
+type TabId = 'overview' | 'pipeline' | 'scoring' | 'integrations' | 'moat' | 'market' | 'playbook';
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} /> },
@@ -31,6 +31,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'scoring', label: 'Scoring Engine', icon: <BarChart3 size={16} /> },
   { id: 'integrations', label: 'Integrations & Flywheel', icon: <Plug size={16} /> },
   { id: 'moat', label: 'Competitive Moat', icon: <Shield size={16} /> },
+  { id: 'market', label: 'Market Strategy', icon: <Target size={16} /> },
   { id: 'playbook', label: 'Founder Playbook', icon: <BookOpen size={16} /> },
 ];
 
@@ -1055,6 +1056,461 @@ function CompetitiveMoat() {
   );
 }
 
+// ─── Tab Content: Market Strategy ───────────────────────────────────────────
+
+function MarketStrategy() {
+  return (
+    <div>
+      {/* Verdict */}
+      <div style={{ ...card, borderTop: '3px solid #22c55e' }}>
+        <div style={label}>BEACHHEAD MARKET VERDICT</div>
+        <h2
+          style={{
+            fontSize: 22,
+            fontWeight: 800,
+            color: 'var(--text-primary, #fff)',
+            marginBottom: 8,
+            lineHeight: 1.3,
+          }}
+        >
+          PE/VC Investment Committees
+        </h2>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+          Your product is already built for this market. The competitive white space is real. The
+          buyer is accessible. The community dynamics favor rapid word-of-mouth. Everything else
+          requires either rebuilding the product, longer sales cycles, or both.
+        </p>
+      </div>
+
+      {/* Sharpened Value Prop */}
+      <div style={{ ...card, borderLeft: '3px solid #6366f1' }}>
+        <div style={sectionTitle}>
+          <Rocket size={18} style={{ color: '#6366f1' }} /> Investor-Ready Positioning
+        </div>
+        <blockquote
+          style={{
+            margin: 0,
+            padding: '12px 16px',
+            borderLeft: '3px solid #6366f1',
+            fontSize: 14,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.7,
+            fontStyle: 'italic',
+            background: 'rgba(99, 102, 241, 0.04)',
+            borderRadius: '0 8px 8px 0',
+          }}
+        >
+          &quot;Decision Intel is a cognitive bias auditing engine for PE/VC investment committees.
+          We sit between deal sourcing and capital deployment — the one place in the fund workflow
+          where nobody is providing decision quality tools. Our 15-agent AI pipeline analyzes IC
+          memos, CIMs, and due diligence reports to detect the specific biases that destroy fund
+          returns: anchoring to entry price, confirmation bias in thesis validation, sunk cost in
+          portfolio holds, and overconfidence in projections. We produce a proprietary Decision
+          Quality Index — think FICO score for investment decisions — and our outcome tracking
+          flywheel means the platform gets smarter with every deal a fund closes.&quot;
+        </blockquote>
+      </div>
+
+      {/* Market Comparison */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <BarChart3 size={18} style={{ color: '#3b82f6' }} /> Market Comparison
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1.5fr 1fr',
+            gap: 8,
+            fontSize: 12,
+            marginBottom: 8,
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              padding: '8px 0',
+              borderBottom: '2px solid var(--border-primary, #222)',
+            }}
+          >
+            Market
+          </div>
+          <div
+            style={{
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              padding: '8px 0',
+              borderBottom: '2px solid var(--border-primary, #222)',
+            }}
+          >
+            Value at Risk
+          </div>
+          <div
+            style={{
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              padding: '8px 0',
+              borderBottom: '2px solid var(--border-primary, #222)',
+            }}
+          >
+            Sales Cycle
+          </div>
+          <div
+            style={{
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              padding: '8px 0',
+              borderBottom: '2px solid var(--border-primary, #222)',
+            }}
+          >
+            Product Fit
+          </div>
+          <div
+            style={{
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              padding: '8px 0',
+              borderBottom: '2px solid var(--border-primary, #222)',
+            }}
+          >
+            Buyer Access
+          </div>
+          <div
+            style={{
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              padding: '8px 0',
+              borderBottom: '2px solid var(--border-primary, #222)',
+            }}
+          >
+            Verdict
+          </div>
+          {[
+            [
+              'PE/VC ICs',
+              '$50-500M/deal',
+              '1-2 mo',
+              'Built for it',
+              'MP / Head of IC',
+              'BEACHHEAD',
+            ],
+            ['Corporate M&A', '$1-10B/deal', '6-12 mo', 'Needs retool', 'Corp Dev VP', 'Year 2-3'],
+            ['Hedge Funds', '$10M-1B/pos', '3-6 mo', 'Weak (1 PM)', 'PM / CIO', 'Year 3+'],
+            ['Insurance', 'Varies', '12+ mo', 'Wrong problem', 'CUO', 'No'],
+            ['Gov/Defense', '$100M-10B', '18-36 mo', 'FedRAMP req', 'Procurement', 'Year 4+'],
+            ['Corp Boards', 'Varies', '6-12 mo', 'Too diffuse', 'Board Secretary', 'Year 4+'],
+          ].map(([market, value, cycle, fit, buyer, verdict], i) => {
+            const isBeachhead = verdict === 'BEACHHEAD';
+            const verdictColor = isBeachhead ? '#22c55e' : verdict === 'No' ? '#ef4444' : '#f59e0b';
+            return [
+              <div
+                key={`m${i}`}
+                style={{
+                  padding: '8px 0',
+                  borderBottom: '1px solid var(--border-primary, #222)',
+                  fontWeight: isBeachhead ? 700 : 400,
+                  color: isBeachhead ? 'var(--text-primary)' : 'var(--text-secondary)',
+                }}
+              >
+                {market}
+              </div>,
+              <div
+                key={`v${i}`}
+                style={{
+                  padding: '8px 0',
+                  borderBottom: '1px solid var(--border-primary, #222)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                {value}
+              </div>,
+              <div
+                key={`c${i}`}
+                style={{
+                  padding: '8px 0',
+                  borderBottom: '1px solid var(--border-primary, #222)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                {cycle}
+              </div>,
+              <div
+                key={`f${i}`}
+                style={{
+                  padding: '8px 0',
+                  borderBottom: '1px solid var(--border-primary, #222)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                {fit}
+              </div>,
+              <div
+                key={`b${i}`}
+                style={{
+                  padding: '8px 0',
+                  borderBottom: '1px solid var(--border-primary, #222)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                {buyer}
+              </div>,
+              <div
+                key={`d${i}`}
+                style={{ padding: '8px 0', borderBottom: '1px solid var(--border-primary, #222)' }}
+              >
+                <span style={badge(verdictColor)}>{verdict}</span>
+              </div>,
+            ];
+          })}
+        </div>
+      </div>
+
+      {/* Why PE/VC Wins */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <CheckCircle size={18} style={{ color: '#22c55e' }} /> Why PE/VC Wins as Beachhead
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {[
+            {
+              title: 'Product Already Built',
+              desc: '11 PE-specific biases, IC memo analysis, deal pipeline tracking, IRR/MOIC outcome logging, committee rooms with blind prior collection. Zero retooling needed.',
+            },
+            {
+              title: 'Genuine White Space',
+              desc: 'Competitors (Affinity, DealCloud, Grata, Blueflame AI) focus on deal sourcing and CRM. Nobody is doing cognitive bias auditing of the actual decision-making process.',
+            },
+            {
+              title: 'Accessible Buyer',
+              desc: 'PE firms are 5-50 people. The Managing Partner or Head of IC can greenlight a purchase in a single meeting. No procurement department, no 12-month sales cycle.',
+            },
+            {
+              title: 'Community FOMO',
+              desc: 'PE/VC is tight-knit. One flagship fund using Decision Intel creates real fear of missing out among peers. Word-of-mouth is the primary distribution channel.',
+            },
+            {
+              title: 'Quantifiable ROI',
+              desc: 'A single avoided bad deal saves $50M-$500M. On a $50-100K annual contract, that is a 500-1000x ROI. The easiest sales conversation possible.',
+            },
+            {
+              title: 'Academic Backing',
+              desc: "Kahneman's Noise, Malmendier & Tate on winner's curse (65% of auctions), behavioral bias costs 2x management fees in performance drag. The research is on your side.",
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{ padding: 14, borderRadius: 8, background: 'var(--bg-tertiary, #0a0a0a)' }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: 4,
+                }}
+              >
+                {item.title}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                {item.desc}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Why Other Markets Don't Work (Yet) */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <AlertTriangle size={18} style={{ color: '#f59e0b' }} /> Why Not the Others (Yet)
+        </div>
+        <div style={{ display: 'grid', gap: 8 }}>
+          {[
+            {
+              market: 'Corporate M&A',
+              reason:
+                'Highest per-deal value destruction ($8.8B HP-Autonomy, $10B+ Bayer-Monsanto). But buyers are Fortune 500 corp dev teams or advisory firms — 6-12+ month sales cycles, significant product retooling needed. This is your Year 2-3 expansion, not your beachhead.',
+            },
+            {
+              market: 'Hedge Funds',
+              reason:
+                "High decision volume and alpha erosion is well-documented ($4.3B lost on Ackman-Valeant from disposition effect alone). But funds build proprietary tools, are secretive about process, and often have a single PM deciding — your committee workflow doesn't map.",
+            },
+            {
+              market: 'Insurance Underwriting',
+              reason:
+                'The "bias" conversation has shifted to algorithmic/ML bias (NY DFS Circular 2024-7). This is fundamentally a different product — fairness-in-AI, not cognitive bias in human decisions.',
+            },
+            {
+              market: 'Government/Defense',
+              reason:
+                "Jaw-dropping waste ($850B DoD budget, failed audit 7 consecutive years, F-35 cost 3x). But FedRAMP = 12-18 months, procurement = 18-36 months. You'd burn through seed before closing one contract.",
+            },
+            {
+              market: 'Corporate Boards',
+              reason:
+                '85% of leaders report "decision distress." But who\'s the buyer? What document are you analyzing? Too diffuse. The IC memo workflow doesn\'t translate to quarterly board meetings.',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                gap: 10,
+                padding: '10px 12px',
+                borderRadius: 8,
+                background: 'var(--bg-tertiary, #0a0a0a)',
+              }}
+            >
+              <ChevronRight size={14} style={{ color: '#f59e0b', flexShrink: 0, marginTop: 3 }} />
+              <div>
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {item.market}:
+                </span>{' '}
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{item.reason}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Pricing + Market Size */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={card}>
+          <div style={sectionTitle}>
+            <TrendingUp size={16} style={{ color: '#22c55e' }} /> Pricing Rationale
+          </div>
+          <div
+            style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}
+          >
+            $50-100K
+            <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-muted)' }}>/year</span>
+          </div>
+          <ul
+            style={{
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.8,
+              paddingLeft: 14,
+            }}
+          >
+            <li>Mid-market PE fund: $500M fund size</li>
+            <li>Avoid 1 bad deal per vintage = $50-500M saved</li>
+            <li>
+              ROI: <strong style={{ color: '#22c55e' }}>500-1000x</strong> the subscription cost
+            </li>
+            <li>Comparable to DealCloud/Affinity pricing tier</li>
+            <li>Land at $50K, expand to $100K+ with team seats</li>
+          </ul>
+        </div>
+        <div style={card}>
+          <div style={sectionTitle}>
+            <BarChart3 size={16} style={{ color: '#3b82f6' }} /> Market Size
+          </div>
+          <div
+            style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}
+          >
+            $995B
+            <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-muted)' }}>
+              {' '}
+              by 2035
+            </span>
+          </div>
+          <ul
+            style={{
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+              lineHeight: 1.8,
+              paddingLeft: 14,
+            }}
+          >
+            <li>PE/VC software market: $607B → $995B by 2035</li>
+            <li>1,500+ active VC firms globally</li>
+            <li>Thousands of PE funds across mid-market and mega-cap</li>
+            <li>Decision intelligence market: $12.2B → $46.4B by 2030</li>
+            <li>Concentrated enough to be addressable at seed stage</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Expansion Roadmap */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <Rocket size={18} style={{ color: '#6366f1' }} /> Expansion Roadmap
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
+          {[
+            {
+              year: 'Year 1-2',
+              market: 'PE/VC Investment Committees',
+              color: '#22c55e',
+              status: 'NOW',
+              details:
+                'Beachhead. Product built. IC memos, deal pipeline, committee rooms. Land 10-20 flagship funds.',
+            },
+            {
+              year: 'Year 2-3',
+              market: 'M&A Advisory & Corp Dev',
+              color: '#3b82f6',
+              status: 'NEXT',
+              details:
+                'Adjacent. Highest per-deal value destruction. Retool IC memo workflow for deal evaluation memos.',
+            },
+            {
+              year: 'Year 3-4',
+              market: 'Broader Financial Services',
+              color: '#f59e0b',
+              status: 'PLANNED',
+              details:
+                'Hedge funds, credit committees, insurance. Product adaptations for single-PM and underwriting workflows.',
+            },
+            {
+              year: 'Year 4+',
+              market: 'Enterprise Decision Quality',
+              color: '#a78bfa',
+              status: 'VISION',
+              details:
+                'Any org making high-stakes, document-driven decisions. Compliance, risk, boards, procurement.',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{
+                padding: 14,
+                borderRadius: 8,
+                background: 'var(--bg-tertiary, #0a0a0a)',
+                borderTop: `3px solid ${item.color}`,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: item.color }}>
+                  {item.year}
+                </span>
+                <span style={badge(item.color)}>{item.status}</span>
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  marginBottom: 4,
+                }}
+              >
+                {item.market}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                {item.details}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Tab Content: Founder Playbook ──────────────────────────────────────────
+
 function FounderPlaybook() {
   return (
     <div>
@@ -1409,6 +1865,7 @@ export default function FounderHubPage() {
     scoring: <ScoringEngine />,
     integrations: <IntegrationsAndFlywheel />,
     moat: <CompetitiveMoat />,
+    market: <MarketStrategy />,
     playbook: <FounderPlaybook />,
   };
 
