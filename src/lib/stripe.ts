@@ -19,15 +19,15 @@ export function getStripe(): Stripe {
 
 export const PLANS = {
   free: {
-    name: 'Starter',
-    description: 'Evaluate the platform with your first IC memos',
+    name: 'Noise Audit',
+    description: 'One-time diagnostic — see the hidden variance in your IC memos',
     analysesPerMonth: 3,
     maxPages: 10,
     biasTypes: 5,
   },
   pro: {
-    name: 'IC Pro',
-    description: 'For individual deal partners and analysts',
+    name: 'Individual Partner',
+    description: 'For a single deal partner running IC memos through the bias engine',
     priceId: process.env.STRIPE_PRO_PRICE_ID || '',
     analysesPerMonth: 50,
     maxPages: 100,
@@ -35,7 +35,7 @@ export const PLANS = {
   },
   team: {
     name: 'Fund',
-    description: 'For investment committees and deal teams',
+    description: 'For investment committees and deal teams managing full fund portfolios',
     priceId: process.env.STRIPE_TEAM_PRICE_ID || '',
     analysesPerMonth: 250,
     maxPages: 200,
@@ -43,7 +43,7 @@ export const PLANS = {
   },
   enterprise: {
     name: 'Multi-Fund',
-    description: 'For PE/VC platforms with multiple funds',
+    description: 'For PE/VC platforms managing multiple funds with dedicated IC workflows',
     analysesPerMonth: Infinity,
     maxPages: Infinity,
     biasTypes: 20,
