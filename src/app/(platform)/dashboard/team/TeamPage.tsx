@@ -128,6 +128,53 @@ export default function TeamPage() {
     );
   }
 
+  // Error state
+  if (fetchError) {
+    return (
+      <div
+        className="container"
+        style={{
+          paddingTop: 'var(--spacing-2xl)',
+          paddingBottom: 'var(--spacing-2xl)',
+          maxWidth: 900,
+        }}
+      >
+        <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Team' }]} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--spacing-md)',
+            padding: 'var(--spacing-md) var(--spacing-lg)',
+            background: 'rgba(239, 68, 68, 0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
+          <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
+          <span style={{ color: 'var(--text-secondary)', fontSize: '14px', flex: 1 }}>
+            {fetchError}
+          </span>
+          <button
+            onClick={() => { setLoading(true); fetchTeam(); }}
+            style={{
+              padding: '6px 14px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#ef4444',
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // No team yet — show creation prompt
   if (!org) {
     return (
