@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Plus, LayoutList, LayoutGrid, FileText, Filter, X } from 'lucide-react';
+import { Plus, LayoutList, LayoutGrid, FileText, Filter, X, AlertTriangle } from 'lucide-react';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useDeals } from '@/hooks/useDeals';
 import { useUrlFilters } from '@/hooks/useUrlFilters';
@@ -63,7 +63,7 @@ export default function DealsPage() {
 
   const [showForm, setShowForm] = useState(false);
 
-  const { deals, total, totalPages, isLoading, mutate } = useDeals(dealFilters, page, 50);
+  const { deals, total, totalPages, isLoading, error, mutate } = useDeals(dealFilters, page, 50);
 
   const setViewAndSave = useCallback((v: 'list' | 'board') => {
     setView(v);
@@ -306,6 +306,42 @@ export default function DealsPage() {
           </button>
         </div>
       </div>
+
+      {/* Error state */}
+      {error && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            padding: '12px 18px',
+            marginBottom: 16,
+            background: 'rgba(239, 68, 68, 0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            borderRadius: 10,
+          }}
+        >
+          <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
+          <span style={{ color: 'var(--text-secondary)', fontSize: 13, flex: 1 }}>
+            Failed to load deals. Please try again.
+          </span>
+          <button
+            onClick={() => mutate()}
+            style={{
+              padding: '6px 14px',
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#ef4444',
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 6,
+              cursor: 'pointer',
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      )}
 
       {/* Content */}
       {isLoading ? (

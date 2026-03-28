@@ -225,7 +225,7 @@ export function NotificationBell() {
               top: '100%',
               right: 0,
               marginTop: '8px',
-              width: '360px',
+              width: 'min(360px, calc(100vw - 2rem))',
               maxHeight: '400px',
               background: 'var(--bg-secondary)',
               border: '1px solid var(--border-color)',

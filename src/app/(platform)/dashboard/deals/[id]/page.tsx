@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useToast } from '@/components/ui/EnhancedToast';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Edit2, ChevronRight, FileText, Upload, AlertTriangle } from 'lucide-react';
@@ -50,6 +51,7 @@ export default function DealDetailPage() {
   const [activeTab, setActiveTab] = useState<'documents' | 'bias' | 'outcome'>('documents');
   const [showEditForm, setShowEditForm] = useState(false);
   const [advancingStage, setAdvancingStage] = useState(false);
+  const { showToast } = useToast();
 
   const handleAdvanceStage = useCallback(async () => {
     if (!deal) return;
@@ -63,11 +65,18 @@ export default function DealDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: deal.id, stage: next }),
       });
-      if (res.ok) mutate();
+      if (res.ok) {
+        showToast(`Advanced to ${getStageLabel(next)}`, 'success');
+        mutate();
+      } else {
+        showToast('Failed to advance stage. Please try again.', 'error');
+      }
+    } catch {
+      showToast('Failed to advance stage. Please try again.', 'error');
     } finally {
       setAdvancingStage(false);
     }
-  }, [deal, mutate]);
+  }, [deal, mutate, showToast]);
 
   if (isLoading) {
     return (

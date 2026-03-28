@@ -84,20 +84,24 @@ export default function TeamPage() {
   const [org, setOrg] = useState<Organization | null>(null);
   const [myRole, setMyRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'members' | 'activity' | 'intelligence'>('members');
 
   const fetchTeam = useCallback(async () => {
+    setFetchError(null);
     try {
       const res = await fetch('/api/team');
       if (res.ok) {
         const data = await res.json();
         setOrg(data.organization);
         setMyRole(data.role);
+      } else if (res.status >= 500) {
+        setFetchError('Failed to load team data. Please try again.');
       }
     } catch {
-      // Silently fail - user just has no team
+      setFetchError('Failed to load team data. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }

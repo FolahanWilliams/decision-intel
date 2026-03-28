@@ -73,6 +73,7 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const uploadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
@@ -235,7 +236,7 @@ export function CommandPalette() {
         icon: <Upload size={16} />,
         action: () => {
           navigate('/dashboard');
-          setTimeout(() => document.getElementById('file-input')?.click(), 300);
+          uploadTimeoutRef.current = setTimeout(() => document.getElementById('file-input')?.click(), 300);
         },
         keywords: ['new', 'add', 'file'],
       },
@@ -495,6 +496,13 @@ export function CommandPalette() {
     const id = setTimeout(() => inputRef.current?.focus(), 50);
     return () => clearTimeout(id);
   }, [open]);
+
+  // Clean up upload timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (uploadTimeoutRef.current) clearTimeout(uploadTimeoutRef.current);
+    };
+  }, []);
 
   // Scroll selected item into view
   useEffect(() => {

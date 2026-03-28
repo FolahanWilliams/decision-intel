@@ -71,22 +71,22 @@ const STATUS_BADGE_STYLES: Record<string, { bg: string; border: string; color: s
   pending: {
     bg: 'rgba(251, 191, 36, 0.1)',
     border: 'rgba(251, 191, 36, 0.2)',
-    color: '#fbbf24',
+    color: 'var(--warning)',
   },
   converted: {
     bg: 'rgba(34, 197, 94, 0.1)',
     border: 'rgba(34, 197, 94, 0.2)',
-    color: '#22c55e',
+    color: 'var(--success)',
   },
   processed: {
     bg: 'rgba(34, 197, 94, 0.1)',
     border: 'rgba(34, 197, 94, 0.2)',
-    color: '#22c55e',
+    color: 'var(--success)',
   },
   dismissed: {
     bg: 'rgba(161, 161, 170, 0.1)',
     border: 'rgba(161, 161, 170, 0.2)',
-    color: '#a1a1aa',
+    color: 'var(--text-tertiary)',
   },
 };
 
@@ -196,7 +196,7 @@ export default function JournalPage() {
             className="text-2xl font-bold flex items-center gap-2"
             style={{ color: 'var(--text-primary)' }}
           >
-            <BookOpen className="h-6 w-6" style={{ color: '#fbbf24' }} />
+            <BookOpen className="h-6 w-6" style={{ color: 'var(--warning)' }} />
             Decision Journal
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
@@ -240,7 +240,7 @@ export default function JournalPage() {
               }}
             >
               <div className="flex items-center gap-2 mb-3">
-                <Edit size={14} style={{ color: '#fbbf24' }} />
+                <Edit size={14} style={{ color: 'var(--warning)' }} />
                 <span
                   className="text-xs font-semibold uppercase tracking-wider"
                   style={{ color: 'var(--text-muted)' }}
@@ -294,7 +294,7 @@ export default function JournalPage() {
                   style={{
                     background: 'rgba(251, 191, 36, 0.15)',
                     border: '1px solid rgba(251, 191, 36, 0.3)',
-                    color: '#fbbf24',
+                    color: 'var(--warning)',
                     cursor:
                       submitting || !newEntryTitle.trim() || !newEntryContent.trim()
                         ? 'not-allowed'
@@ -304,7 +304,7 @@ export default function JournalPage() {
                   }}
                 >
                   {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
-                  Submit
+                  {submitting ? 'Saving...' : 'Submit'}
                 </button>
               </div>
             </div>
@@ -363,10 +363,10 @@ export default function JournalPage() {
 
       {/* Error Banner */}
       {error && (
-        <div style={{ padding: '12px 16px', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.3)', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--spacing-md)', fontSize: '13px', color: '#f87171' }} className="flex items-center gap-sm">
+        <div style={{ padding: '12px 16px', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.3)', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--spacing-md)', fontSize: '13px', color: 'var(--error)' }} className="flex items-center gap-sm">
           <AlertTriangle size={14} />
           {error}
-          <button onClick={() => { setError(null); fetchEntries(); }} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontWeight: 600, fontSize: '12px' }}>
+          <button onClick={() => { setError(null); fetchEntries(); }} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', fontWeight: 600, fontSize: '12px' }}>
             Retry
           </button>
         </div>
@@ -443,7 +443,7 @@ export default function JournalPage() {
                               className="text-[10px] px-1.5 py-0.5 rounded"
                               style={{
                                 background: 'rgba(99, 102, 241, 0.1)',
-                                color: '#818cf8',
+                                color: 'var(--accent-primary)',
                               }}
                             >
                               {entry.extractedDecisions.length} decision
@@ -481,7 +481,7 @@ export default function JournalPage() {
                           style={{
                             background: 'rgba(34, 197, 94, 0.1)',
                             border: '1px solid rgba(34, 197, 94, 0.2)',
-                            color: '#22c55e',
+                            color: 'var(--success)',
                             cursor: isConverting ? 'wait' : 'pointer',
                           }}
                         >
@@ -497,14 +497,14 @@ export default function JournalPage() {
                       {entry.status === 'processed' && (
                         <CheckCircle
                           size={16}
-                          style={{ color: '#22c55e', flexShrink: 0, marginTop: '2px' }}
+                          style={{ color: 'var(--success)', flexShrink: 0, marginTop: '2px' }}
                         />
                       )}
 
                       {entry.status === 'dismissed' && (
                         <XCircle
                           size={16}
-                          style={{ color: '#a1a1aa', flexShrink: 0, marginTop: '2px' }}
+                          style={{ color: 'var(--text-tertiary)', flexShrink: 0, marginTop: '2px' }}
                         />
                       )}
                     </div>

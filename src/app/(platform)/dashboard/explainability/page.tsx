@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense, useCallback } from 'react';
 import useSWR from 'swr';
-import { FileText, BarChart3, Calendar, Loader2 } from 'lucide-react';
+import { FileText, BarChart3, Calendar, Loader2, AlertTriangle } from 'lucide-react';
 import { ExplainabilityDashboard } from '@/components/explainability/ExplainabilityDashboard';
 
 interface Analysis {
@@ -26,10 +26,10 @@ interface DocumentsResponse {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 function getScoreColor(score: number): string {
-  if (score >= 80) return '#22c55e';
-  if (score >= 60) return '#eab308';
-  if (score >= 40) return '#f97316';
-  return '#ef4444';
+  if (score >= 80) return 'var(--success)';
+  if (score >= 60) return 'var(--warning)';
+  if (score >= 40) return 'var(--accent-warning)';
+  return 'var(--error)';
 }
 
 function formatDate(dateStr: string): string {
@@ -44,7 +44,7 @@ function formatDate(dateStr: string): string {
 function RecentAnalysesPicker() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data, isLoading, error } = useSWR<DocumentsResponse>(
+  const { data, isLoading, error, mutate } = useSWR<DocumentsResponse>(
     '/api/documents?limit=10&sortBy=updatedAt',
     fetcher
   );
@@ -117,9 +117,37 @@ function RecentAnalysesPicker() {
       )}
 
       {error && (
-        <p style={{ color: 'var(--text-secondary)', textAlign: 'center', fontSize: '14px' }}>
-          Failed to load analyses. Please try again later.
-        </p>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--spacing-md)',
+            padding: 'var(--spacing-md) var(--spacing-lg)',
+            background: 'rgba(239, 68, 68, 0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
+          <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
+          <span style={{ color: 'var(--text-secondary)', fontSize: '14px', flex: 1 }}>
+            Failed to load analyses. Please try again.
+          </span>
+          <button
+            onClick={() => mutate()}
+            style={{
+              padding: '6px 14px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#ef4444',
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+            }}
+          >
+            Try Again
+          </button>
+        </div>
       )}
 
       {!isLoading && !error && analysisItems.length === 0 && (
