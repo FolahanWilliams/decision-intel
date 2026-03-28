@@ -25,6 +25,7 @@ import { SSEReader } from '@/lib/sse';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
 import { formatDate } from '@/lib/constants/human-audit';
+import { computeConviction } from '@/lib/scoring/conviction';
 
 const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
@@ -206,6 +207,62 @@ const VALID_TABS: TabId[] = [
   'intelligence',
   'replay',
 ];
+
+// ─── Conviction Score Badge ─────────────────────────────────────────────────
+
+function ConvictionBadge({ analysis }: { analysis: Analysis }) {
+  const conviction = useMemo(() => {
+    const factCheck = analysis.factCheck;
+    const noiseStats = analysis.noiseStats;
+    const logicalAnalysis = analysis.logicalAnalysis;
+    const cognitiveAnalysis = analysis.cognitiveAnalysis;
+
+    let verificationRate: number | null = null;
+    if (factCheck?.verifications && factCheck.verifications.length > 0) {
+      const verified = factCheck.verifications.filter(v => v.verdict === 'VERIFIED').length;
+      verificationRate = verified / factCheck.verifications.length;
+    }
+
+    return computeConviction({
+      factCheckScore: factCheck?.score ?? null,
+      verificationRate,
+      logicalScore: logicalAnalysis?.overallScore ?? null,
+      noiseStdDev: noiseStats?.stdDev ?? null,
+      blindSpotGap: cognitiveAnalysis?.blindSpotGap ?? null,
+    });
+  }, [analysis]);
+
+  const color = conviction.score >= 70 ? '#3b82f6' : conviction.score >= 40 ? '#a78bfa' : '#71717a';
+
+  return (
+    <div style={{ textAlign: 'center', marginRight: '8px' }} title={conviction.interpretation}>
+      <div
+        style={{
+          fontSize: '10px',
+          color: 'var(--text-muted)',
+          fontWeight: 500,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+        }}
+      >
+        Conviction
+      </div>
+      <div
+        style={{
+          fontSize: '36px',
+          fontWeight: 700,
+          lineHeight: 1,
+          fontFamily: "'JetBrains Mono', monospace",
+          color,
+        }}
+      >
+        {conviction.score}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Page ──────────────────────────────────────────────────────────────
 
 export default function DocumentAnalysisPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -737,6 +794,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
             )}
+
+            {/* Conviction Score — computed client-side from existing analysis data */}
+            {analysis && <ConvictionBadge analysis={analysis} />}
 
             <div className="flex items-center gap-sm">
               {document.status === 'complete' && (

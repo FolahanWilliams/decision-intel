@@ -28,6 +28,12 @@ export interface ConsensusResult {
   avgConfidence: number;
   /** Number of distinct action groups */
   actionGroupCount: number;
+  /** 0-100: quality/meaningfulness of dissent (higher = healthier debate) */
+  dissentQuality: number;
+  /** True when all priors agree on the same action — a risk signal per Strebulaev */
+  unanimityWarning: boolean;
+  /** Warning text when unanimity detected, null otherwise */
+  unanimityMessage: string | null;
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -68,6 +74,9 @@ export function computeConsensusScore(priors: BlindPriorInput[]): ConsensusResul
       dissenterIds: [],
       avgConfidence: 0,
       actionGroupCount: 0,
+      dissentQuality: 0,
+      unanimityWarning: false,
+      unanimityMessage: null,
     };
   }
 
@@ -78,6 +87,9 @@ export function computeConsensusScore(priors: BlindPriorInput[]): ConsensusResul
       dissenterIds: [],
       avgConfidence: priors[0].confidence,
       actionGroupCount: 1,
+      dissentQuality: 0,
+      unanimityWarning: false,
+      unanimityMessage: null,
     };
   }
 
@@ -136,8 +148,30 @@ export function computeConsensusScore(priors: BlindPriorInput[]): ConsensusResul
   else if (score >= 30) convergenceLevel = 'weak';
   else convergenceLevel = 'divided';
 
+  // Dissent quality: measures how meaningful/healthy the disagreement is
+  // High dissent quality = wide confidence spread + multiple action groups + clear minority
+  // Low dissent quality = everyone agrees at similar confidence (groupthink risk)
+  let dissentQuality: number;
+  if (actionGroupCount <= 1 && confStdDev < 10) {
+    // Unanimous with similar confidence — no meaningful dissent
+    dissentQuality = 0;
+  } else {
+    const diversityScore = Math.min(50, (actionGroupCount - 1) * 25); // 0-50 from action diversity
+    const confidenceSpreadScore = Math.min(30, confStdDev); // 0-30 from confidence range
+    const dissenterRatio = priors.length > 0 ? (dissenterIds.length / priors.length) * 20 : 0; // 0-20
+    dissentQuality = Math.round(
+      Math.min(100, diversityScore + confidenceSpreadScore + dissenterRatio)
+    );
+  }
+
+  // Unanimity warning: Strebulaev (Stanford GSB, 2024) shows consensus-seeking ICs underperform
+  const unanimityWarning = actionGroupCount <= 1 && priors.length >= 2;
+  const unanimityMessage = unanimityWarning
+    ? `Unanimous agreement detected across all ${priors.length} committee members. Stanford research (Strebulaev, 2024) shows consensus-seeking investment committees have lower IPO rates. Consider: was genuine dissent suppressed, or is this a rare case of true alignment?`
+    : null;
+
   log.debug(
-    `Consensus: score=${score}, level=${convergenceLevel}, groups=${actionGroupCount}, dissenters=${dissenterIds.length}`
+    `Consensus: score=${score}, level=${convergenceLevel}, groups=${actionGroupCount}, dissenters=${dissenterIds.length}, dissentQuality=${dissentQuality}, unanimity=${unanimityWarning}`
   );
 
   return {
@@ -146,5 +180,8 @@ export function computeConsensusScore(priors: BlindPriorInput[]): ConsensusResul
     dissenterIds,
     avgConfidence: Number(avgConfidence.toFixed(1)),
     actionGroupCount,
+    dissentQuality,
+    unanimityWarning,
+    unanimityMessage,
   };
 }
