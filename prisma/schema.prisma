@@ -722,6 +722,7 @@ model DecisionFrame {
   linkedDecisionId  String?  // FK to HumanDecision when deliberation becomes decision
   nudgeCount        Int      @default(0) // How many nudges delivered in this thread
   escalationLevel   String   @default("none") // "none" | "info" | "warning" | "critical"
+  accumulatedBiases Json?    // Array of {bias, signal, detectedAt} across all thread messages
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

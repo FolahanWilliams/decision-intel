@@ -184,7 +184,7 @@ export function formatNudgeForSlack(nudge: NudgeDefinition, threadTs?: string): 
  * Multi-tenant: looks up the encrypted token from SlackInstallation.
  * Legacy fallback: uses SLACK_BOT_TOKEN env var (single-tenant mode).
  */
-async function resolveToken(teamId?: string): Promise<string | null> {
+export async function resolveToken(teamId?: string): Promise<string | null> {
   // Multi-tenant: look up per-workspace token
   if (teamId) {
     try {
@@ -412,25 +412,84 @@ const PRE_DECISION_NUDGE_TEMPLATES: Record<
   },
 };
 
+/** Action prompt per bias type for org-calibrated messages */
+const BIAS_ACTION_PROMPTS: Record<string, string> = {
+  anchoring: "What would a fair assessment look like if you hadn't seen the initial number?",
+  confirmation_bias: 'Actively seek disconfirming evidence before committing.',
+  sunk_cost: 'If you were starting fresh today, would you still choose this path?',
+  groupthink: 'Assign a formal dissenter before voting.',
+  availability_bias: 'Check base-rate data — recent events may be overweighted.',
+  overconfidence: 'What would need to be true for this to fail?',
+};
+
+/**
+ * Human-readable labels for bias types
+ */
+const BIAS_LABELS: Record<string, string> = {
+  anchoring: 'Anchoring bias',
+  confirmation_bias: 'Confirmation bias',
+  sunk_cost: 'Sunk cost fallacy',
+  groupthink: 'Groupthink',
+  availability_bias: 'Availability bias',
+  overconfidence: 'Overconfidence',
+};
+
 /**
  * Generate a coaching nudge for a pre-decision message based on detected biases.
- * Returns the highest-severity nudge, or null if no biases were detected.
+ * When orgId is provided, enriches the message with org-specific calibration data
+ * (confirmation rates, failure correlations) from outcome history.
  */
-export function generatePreDecisionNudge(
+export async function generatePreDecisionNudge(
   text: string,
-  biases: { bias: string; signal: string }[]
-): { message: string; severity: 'info' | 'warning' | 'critical' } | null {
+  biases: { bias: string; signal: string }[],
+  orgId?: string | null
+): Promise<{ message: string; severity: 'info' | 'warning' | 'critical' } | null> {
   if (!text || biases.length === 0) return null;
 
   const severityRank = { info: 0, warning: 1, critical: 2 };
   let highestNudge: { message: string; severity: 'info' | 'warning' | 'critical' } | null = null;
 
-  for (const { bias } of biases) {
+  // Try to load org calibration data for richer messages
+  let orgBiasStats: Map<string, { confirmationRate: number; failureCorrelation: number }> | null =
+    null;
+  if (orgId) {
+    try {
+      const { getOrgBiasHistory } = await import('@/lib/learning/outcome-scoring');
+      const history = await getOrgBiasHistory(orgId);
+      if (history.totalOutcomes >= 3) {
+        orgBiasStats = new Map(
+          history.biasStats.map(s => [
+            s.biasType,
+            { confirmationRate: s.confirmationRate, failureCorrelation: s.failureCorrelation },
+          ])
+        );
+      }
+    } catch {
+      // Outcome scoring not available — fall back to static templates
+    }
+  }
+
+  for (const { bias, signal } of biases) {
     const template = PRE_DECISION_NUDGE_TEMPLATES[bias];
     if (!template) continue;
 
+    let message: string;
+    const orgStats = orgBiasStats?.get(bias);
+    const label = BIAS_LABELS[bias] || bias.replace(/_/g, ' ');
+    const action = BIAS_ACTION_PROMPTS[bias] || template.message;
+
+    if (orgStats && orgStats.confirmationRate > 0) {
+      // Org-calibrated message with real data
+      const confPct = Math.round(orgStats.confirmationRate * 100);
+      const failRate = orgStats.failureCorrelation.toFixed(1);
+      message = `You mentioned _"${signal}"_ — *${label}* detected. In your org, this bias was confirmed ${confPct}% of the time and correlated with ${failRate}x higher failure rate. ${action}`;
+    } else {
+      // Fall back to static template
+      message = template.message;
+    }
+
     if (!highestNudge || severityRank[template.severity] > severityRank[highestNudge.severity]) {
-      highestNudge = { message: template.message, severity: template.severity };
+      highestNudge = { message, severity: template.severity };
     }
   }
 
@@ -490,18 +549,21 @@ export function extractDecisionFrame(
  * deliberation phase and returns coaching nudges, bias signals, and
  * an extracted Decision Frame for the /api/decision-frames endpoint.
  */
-export function slackEventToPreDecisionInput(payload: SlackWebhookPayload): {
+export async function slackEventToPreDecisionInput(
+  payload: SlackWebhookPayload,
+  orgId?: string | null
+): Promise<{
   input: HumanDecisionInput;
   biases: { bias: string; signal: string }[];
   nudge: { message: string; severity: 'info' | 'warning' | 'critical' } | null;
   frame: { decisionStatement: string; stakeholders: string[] } | null;
-} | null {
+} | null> {
   const event = payload.event;
   if (!event || event.type !== 'message') return null;
   if (!isPreDecisionMessage(event.text)) return null;
 
   const biases = detectMessageBiases(event.text);
-  const nudge = generatePreDecisionNudge(event.text, biases);
+  const nudge = await generatePreDecisionNudge(event.text, biases, orgId);
   const frame = extractDecisionFrame(event.text);
 
   const input: HumanDecisionInput = {
@@ -586,5 +648,317 @@ export async function processSlackOutcomeSignal(payload: SlackWebhookPayload): P
   } catch (err) {
     log.warn('Slack outcome detection failed (non-critical):', err);
     return { detected: false, draftCount: 0 };
+  }
+}
+
+// ─── Audit Summary Card ─────────────────────────────────────────────────────
+
+/**
+ * Format a cognitive audit result as a rich Block Kit summary card for Slack.
+ * Posted to threads when a decision commitment is detected.
+ */
+export function formatAuditSummaryForSlack(
+  audit: {
+    decisionQualityScore: number;
+    noiseScore: number;
+    biasFindings: Array<{ biasType: string; severity: string }>;
+    summary: string;
+    analysisUrl?: string;
+  },
+  threadTs?: string
+): SlackNudgePayload {
+  const scoreEmoji =
+    audit.decisionQualityScore >= 70
+      ? ':large_green_circle:'
+      : audit.decisionQualityScore >= 40
+        ? ':large_yellow_circle:'
+        : ':red_circle:';
+
+  const severityEmoji: Record<string, string> = {
+    critical: ':rotating_light:',
+    high: ':warning:',
+    medium: ':large_orange_diamond:',
+    low: ':small_blue_diamond:',
+  };
+
+  const topBiases = audit.biasFindings.slice(0, 3);
+  const biasLines = topBiases
+    .map(
+      b =>
+        `${severityEmoji[b.severity] || ':white_small_square:'} ${b.biasType.replace(/_/g, ' ')} _(${b.severity})_`
+    )
+    .join('\n');
+
+  const summaryText =
+    audit.summary.length > 200 ? audit.summary.slice(0, 197) + '...' : audit.summary;
+
+  const blocks: Array<Record<string, unknown>> = [
+    {
+      type: 'header',
+      text: { type: 'plain_text', text: 'Decision Audit Complete', emoji: true },
+    },
+    {
+      type: 'section',
+      fields: [
+        {
+          type: 'mrkdwn',
+          text: `*Decision Score*\n${scoreEmoji} ${audit.decisionQualityScore}/100`,
+        },
+        { type: 'mrkdwn', text: `*Noise Score*\n${audit.noiseScore}/100` },
+        { type: 'mrkdwn', text: `*Biases Detected*\n${audit.biasFindings.length}` },
+      ],
+    },
+  ];
+
+  if (topBiases.length > 0) {
+    blocks.push({
+      type: 'section',
+      text: { type: 'mrkdwn', text: `*Top Biases*\n${biasLines}` },
+    });
+  }
+
+  blocks.push(
+    {
+      type: 'section',
+      text: { type: 'mrkdwn', text: `_${summaryText}_` },
+    },
+    { type: 'divider' }
+  );
+
+  if (audit.analysisUrl) {
+    blocks.push({
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'View Full Analysis' },
+          url: audit.analysisUrl,
+          style: 'primary',
+        },
+      ],
+    });
+  }
+
+  blocks.push({
+    type: 'context',
+    elements: [{ type: 'mrkdwn', text: '_Powered by Decision Intel cognitive audit engine_' }],
+  });
+
+  return {
+    channel: '',
+    text: `Decision Audit: Score ${audit.decisionQualityScore}/100, ${audit.biasFindings.length} biases detected`,
+    blocks: blocks as SlackNudgePayload['blocks'],
+    thread_ts: threadTs,
+  };
+}
+
+// ─── App Home ───────────────────────────────────────────────────────────────
+
+/**
+ * Publish the App Home tab for a Slack user.
+ * Shows calibration level, recent decisions, pending outcomes, and twin effectiveness.
+ */
+export async function publishAppHome(slackUserId: string, teamId?: string): Promise<void> {
+  const token = await resolveToken(teamId);
+  if (!token) {
+    log.warn('Cannot publish App Home: no bot token available');
+    return;
+  }
+
+  // Resolve org context
+  let orgId: string | null = null;
+  let userId: string | null = null;
+  if (teamId) {
+    try {
+      const installation = await prisma.slackInstallation.findFirst({
+        where: { teamId, status: 'active' },
+        select: { orgId: true, installedByUserId: true },
+      });
+      orgId = installation?.orgId ?? null;
+      userId = installation?.installedByUserId ?? null;
+    } catch {
+      // Schema drift
+    }
+  }
+
+  // Fetch data for App Home
+  const blocks: Array<Record<string, unknown>> = [
+    {
+      type: 'header',
+      text: { type: 'plain_text', text: 'Decision Intelligence Dashboard', emoji: true },
+    },
+  ];
+
+  // Calibration & pending outcomes
+  let pendingCount = 0;
+  let calibrationLevel = 'Bronze';
+  try {
+    const { checkOutcomeGate } = await import('@/lib/learning/outcome-gate');
+    const gate = await checkOutcomeGate(userId || 'system');
+    pendingCount = gate.pendingCount;
+
+    // Determine level from milestone count
+    try {
+      const totalOutcomes = await prisma.decisionOutcome.count({
+        where: orgId ? { orgId } : { userId: userId || '' },
+      });
+      calibrationLevel =
+        totalOutcomes >= 30
+          ? 'Platinum'
+          : totalOutcomes >= 15
+            ? 'Gold'
+            : totalOutcomes >= 5
+              ? 'Silver'
+              : 'Bronze';
+    } catch {
+      /* schema drift */
+    }
+  } catch {
+    /* outcome gate not available */
+  }
+
+  const levelEmoji: Record<string, string> = {
+    Bronze: ':3rd_place_medal:',
+    Silver: ':2nd_place_medal:',
+    Gold: ':1st_place_medal:',
+    Platinum: ':gem:',
+  };
+
+  blocks.push(
+    {
+      type: 'section',
+      fields: [
+        {
+          type: 'mrkdwn',
+          text: `*Calibration Level*\n${levelEmoji[calibrationLevel] || ''} ${calibrationLevel}`,
+        },
+        { type: 'mrkdwn', text: `*Pending Outcomes*\n${pendingCount} awaiting review` },
+      ],
+    },
+    { type: 'divider' },
+    {
+      type: 'section',
+      text: { type: 'mrkdwn', text: '*Recent Decisions*' },
+    }
+  );
+
+  // Recent decisions with scores
+  try {
+    const recentDecisions = await prisma.humanDecision.findMany({
+      where: orgId ? { orgId } : { userId: userId || '' },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      select: {
+        id: true,
+        content: true,
+        decisionType: true,
+        createdAt: true,
+        cognitiveAudit: {
+          select: { decisionQualityScore: true },
+        },
+      },
+    });
+
+    if (recentDecisions.length === 0) {
+      blocks.push({
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: '_No decisions captured yet. Start discussing decisions in channels where the bot is invited._',
+        },
+      });
+    } else {
+      for (const d of recentDecisions) {
+        const score = d.cognitiveAudit?.decisionQualityScore;
+        const scoreStr = score != null ? `${score}/100` : 'Pending';
+        const title = d.content.slice(0, 60) + (d.content.length > 60 ? '...' : '');
+        const type = d.decisionType ? ` · ${d.decisionType.replace(/_/g, ' ')}` : '';
+        blocks.push({
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `*${scoreStr}* — ${title}${type}`,
+          },
+        });
+      }
+    }
+  } catch {
+    blocks.push({
+      type: 'section',
+      text: { type: 'mrkdwn', text: '_Unable to load recent decisions._' },
+    });
+  }
+
+  // Twin effectiveness
+  blocks.push({ type: 'divider' });
+  try {
+    const { computeTwinEffectiveness } = await import('@/lib/learning/twin-effectiveness');
+    const twins = await computeTwinEffectiveness(orgId, userId || undefined);
+    if (twins.length > 0) {
+      blocks.push({
+        type: 'section',
+        text: { type: 'mrkdwn', text: '*Top Decision Twins*' },
+      });
+      for (const t of twins.slice(0, 3)) {
+        const rate = Math.round(t.effectivenessRate * 100);
+        blocks.push({
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `*${t.twinName}* — ${rate}% dissent accuracy (${t.dissentCount} dissents, ${t.sampleSize} decisions)`,
+          },
+        });
+      }
+    }
+  } catch {
+    /* twin effectiveness not available */
+  }
+
+  // Open Dashboard button
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
+  blocks.push(
+    { type: 'divider' },
+    {
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Open Dashboard' },
+          url: `${appUrl}/dashboard`,
+          style: 'primary',
+        },
+      ],
+    }
+  );
+
+  // Publish to Slack
+  try {
+    const res = await fetch('https://slack.com/api/views.publish', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        user_id: slackUserId,
+        view: {
+          type: 'home',
+          blocks,
+        },
+      }),
+    });
+
+    const data = await res.json();
+    if (!data.ok) {
+      if (data.error === 'missing_scope' || data.error === 'not_allowed_token_type') {
+        log.debug('App Home requires views:write scope — not available for this installation');
+      } else {
+        log.warn('Failed to publish App Home:', data.error);
+      }
+    } else {
+      log.debug(`App Home published for user ${slackUserId}`);
+    }
+  } catch (err) {
+    log.warn('App Home publish request failed:', err);
   }
 }

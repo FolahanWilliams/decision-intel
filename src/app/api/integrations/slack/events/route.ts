@@ -23,6 +23,8 @@ import {
   detectMessageBiases,
   generatePreDecisionNudge,
   getEscalatedSeverity,
+  formatAuditSummaryForSlack,
+  publishAppHome,
 } from '@/lib/integrations/slack/handler';
 import { prisma } from '@/lib/prisma';
 import { toPrismaStringArray, toPrismaJson } from '@/lib/utils/prisma-json';
@@ -67,6 +69,14 @@ export async function POST(req: NextRequest) {
 
     // Handle event callbacks
     if (payload.type === 'event_callback') {
+      // App Home tab opened
+      if (payload.event?.type === 'app_home_opened' && payload.event?.tab === 'home') {
+        void publishAppHome(payload.event.user, payload.team_id).catch(err => {
+          log.warn('App Home publish failed:', err);
+        });
+        return NextResponse.json({ ok: true });
+      }
+
       const decisionInput = slackEventToDecisionInput(payload);
 
       if (!decisionInput) {
@@ -84,6 +94,8 @@ export async function POST(req: NextRequest) {
                 escalationLevel: true,
                 nudgeCount: true,
                 linkedDecisionId: true,
+                accumulatedBiases: true,
+                orgId: true,
               },
             });
 
@@ -142,49 +154,92 @@ export async function POST(req: NextRequest) {
                     `Pre-decision thread resolved to decision ${humanDecision.id} in frame ${existingFrame.id}`
                   );
 
-                  // Run audit in background
+                  // Run audit in background, then post summary card to thread
                   const decisionInputForAudit = slackEventToDecisionInput(payload);
                   if (decisionInputForAudit) {
-                    processSlackDecision(humanDecision.id, decisionInputForAudit, teamId).catch(
-                      err => {
+                    processSlackDecision(humanDecision.id, decisionInputForAudit, teamId)
+                      .then(auditResult => {
+                        if (auditResult) {
+                          const summaryCard = formatAuditSummaryForSlack(
+                            {
+                              decisionQualityScore: auditResult.decisionQualityScore,
+                              noiseScore: auditResult.noiseScore,
+                              biasFindings:
+                                (auditResult.biasFindings as Array<{
+                                  biasType: string;
+                                  severity: string;
+                                }>) || [],
+                              summary: auditResult.summary,
+                              analysisUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com'}/dashboard`,
+                            },
+                            event?.ts
+                          );
+                          summaryCard.channel = threadChannel;
+                          deliverSlackNudge(summaryCard, teamId).catch(() => {});
+                        }
+                      })
+                      .catch(err => {
                         log.error(`Background audit for linked decision failed:`, err);
-                      }
-                    );
+                      });
                   }
                 }
               } else {
-                // Check for escalation: new biases detected in ongoing thread
-                const newBiases = detectMessageBiases(messageText);
-                const escalated = getEscalatedSeverity(existingFrame.escalationLevel, newBiases);
+                // Thread-aware bias accumulation: only nudge for NEW biases not seen before
+                const allDetected = detectMessageBiases(messageText);
+                const existingBiasTypes = new Set(
+                  ((existingFrame.accumulatedBiases as Array<{ bias: string }>) ?? []).map(
+                    b => b.bias
+                  )
+                );
+                const newBiases = allDetected.filter(b => !existingBiasTypes.has(b.bias));
 
-                if (escalated) {
-                  const nudge = generatePreDecisionNudge(messageText, newBiases);
+                if (newBiases.length > 0) {
+                  const escalated = getEscalatedSeverity(existingFrame.escalationLevel, newBiases);
+                  const nudge = await generatePreDecisionNudge(
+                    messageText,
+                    newBiases,
+                    existingFrame.orgId
+                  );
+
                   if (nudge) {
+                    const severity = escalated || nudge.severity;
                     const slackPayload = formatNudgeForSlack(
                       {
                         nudgeType: 'pre_decision_coaching',
-                        triggerReason: `Escalated: ${newBiases.map(b => b.bias).join(', ')}`,
+                        triggerReason: `New biases: ${newBiases.map(b => b.bias).join(', ')}`,
                         message: nudge.message,
-                        severity: escalated,
+                        severity,
                         channel: 'slack',
                       },
                       threadTs
                     );
                     slackPayload.channel = threadChannel;
                     deliverSlackNudge(slackPayload, payload.team_id).catch(err => {
-                      log.error('Escalated nudge delivery failed:', err);
+                      log.error('Thread nudge delivery failed:', err);
                     });
-
-                    await prisma.decisionFrame.update({
-                      where: { id: existingFrame.id },
-                      data: {
-                        escalationLevel: escalated,
-                        nudgeCount: { increment: 1 },
-                      },
-                    });
-
-                    log.info(`Nudge escalated to ${escalated} in frame ${existingFrame.id}`);
                   }
+
+                  // Accumulate biases on the frame
+                  const updatedBiases = [
+                    ...((existingFrame.accumulatedBiases as Array<unknown>) ?? []),
+                    ...newBiases.map(b => ({
+                      ...b,
+                      detectedAt: new Date().toISOString(),
+                    })),
+                  ];
+
+                  await prisma.decisionFrame.update({
+                    where: { id: existingFrame.id },
+                    data: {
+                      accumulatedBiases: updatedBiases,
+                      escalationLevel: escalated || existingFrame.escalationLevel,
+                      nudgeCount: { increment: 1 },
+                    },
+                  });
+
+                  log.info(
+                    `Thread bias accumulation: ${newBiases.length} new bias(es) in frame ${existingFrame.id}`
+                  );
                 }
               }
             }
@@ -197,7 +252,20 @@ export async function POST(req: NextRequest) {
         }
 
         // Check for pre-decision deliberation messages and deliver coaching nudges
-        const preDecision = slackEventToPreDecisionInput(payload);
+        // Resolve org context for calibrated nudges
+        let preDecisionOrgId: string | null = null;
+        if (payload.team_id) {
+          try {
+            const inst = await prisma.slackInstallation.findFirst({
+              where: { teamId: payload.team_id, status: 'active' },
+              select: { orgId: true },
+            });
+            preDecisionOrgId = inst?.orgId ?? null;
+          } catch {
+            /* schema drift */
+          }
+        }
+        const preDecision = await slackEventToPreDecisionInput(payload, preDecisionOrgId);
         if (preDecision?.nudge) {
           const teamId = payload.team_id;
           const [channel, threadTs] = (preDecision.input.sourceRef ?? '').split(':');
@@ -250,6 +318,10 @@ export async function POST(req: NextRequest) {
                   threadTs: frameThreadTs || null,
                   nudgeCount: 1,
                   escalationLevel: preDecision.nudge?.severity ?? 'info',
+                  accumulatedBiases: preDecision.biases.map(b => ({
+                    ...b,
+                    detectedAt: new Date().toISOString(),
+                  })),
                 },
               });
 
@@ -422,7 +494,12 @@ async function processSlackDecision(
   decisionId: string,
   input: Parameters<typeof analyzeHumanDecision>[0],
   teamId?: string
-) {
+): Promise<{
+  decisionQualityScore: number;
+  noiseScore: number;
+  biasFindings: unknown;
+  summary: string;
+} | null> {
   try {
     const auditResult = await analyzeHumanDecision(input, { decisionId });
 
@@ -530,10 +607,17 @@ async function processSlackDecision(
     }
 
     log.info(`Slack decision ${decisionId} audited: score=${auditResult.decisionQualityScore}`);
+    return {
+      decisionQualityScore: auditResult.decisionQualityScore,
+      noiseScore: auditResult.noiseScore,
+      biasFindings: auditResult.biasFindings,
+      summary: auditResult.summary,
+    };
   } catch (error) {
     log.error(`Slack decision audit failed for ${decisionId}:`, error);
     await prisma.humanDecision
       .update({ where: { id: decisionId }, data: { status: 'error' } })
       .catch(() => {});
+    return null;
   }
 }

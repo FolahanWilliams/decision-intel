@@ -19,6 +19,7 @@ const SLACK_SCOPES = [
   'groups:history', // Read messages in private channels (if invited)
   'groups:read', // List private channels
   'users:read', // Resolve user display names for anonymization
+  'commands', // Slash commands (/di)
 ].join(',');
 
 export async function GET(req: NextRequest) {
