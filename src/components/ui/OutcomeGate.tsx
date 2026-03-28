@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, lazy, Suspense } from 'react';
-import { AlertTriangle, ArrowRight, CheckCircle, Clock, Loader2, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle, Clock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 

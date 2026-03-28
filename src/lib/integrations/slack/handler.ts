@@ -544,7 +544,7 @@ export function getEscalatedSeverity(
 
   // Only escalate upward
   if (targetIdx > currentIdx) {
-    return targetSeverity === 'none' ? null : targetSeverity;
+    return targetSeverity;
   }
 
   return null;
