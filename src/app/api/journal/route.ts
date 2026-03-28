@@ -144,51 +144,44 @@ export async function GET(request: NextRequest) {
     let entries;
     let total: number;
 
-    try {
-      [entries, total] = await Promise.all([
-        prisma.journalEntry.findMany({
-          where,
-          orderBy: { createdAt: 'desc' },
-          skip,
-          take: limit,
-          include: {
-            linkedDecision: {
-              select: {
-                id: true,
-                content: true,
-                status: true,
-                cognitiveAudit: {
-                  select: {
-                    decisionQualityScore: true,
-                    summary: true,
-                  },
-                },
-              },
-            },
-          },
-        }),
-        prisma.journalEntry.count({ where }),
-      ]);
-    } catch (includeError) {
-      const includeMsg = includeError instanceof Error ? includeError.message : String(includeError);
-      if (includeMsg.includes('P2021') || includeMsg.includes('P2022')) {
-        // Schema drift — fall back to basic query without include
-        [entries, total] = await Promise.all([
-          prisma.journalEntry.findMany({
-            where,
-            orderBy: { createdAt: 'desc' },
-            skip,
-            take: limit,
-          }),
-          prisma.journalEntry.count({ where }),
-        ]);
-      } else {
-        throw includeError;
+    [entries, total] = await Promise.all([
+      prisma.journalEntry.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.journalEntry.count({ where }),
+    ]);
+
+    // Batch-fetch linked decisions to avoid N+1 queries.
+    // linkedDecisionId is a plain string column (no Prisma relation),
+    // so we resolve it with a separate query.
+    const linkedIds = entries
+      .map((e: { linkedDecisionId?: string | null }) => e.linkedDecisionId)
+      .filter((id: string | null | undefined): id is string => !!id);
+
+    let linkedDecisionMap: Map<string, Record<string, unknown>> = new Map();
+    if (linkedIds.length > 0) {
+      try {
+        const decisions = await prisma.humanDecision.findMany({
+          where: { id: { in: linkedIds } },
+          select: { id: true, content: true, status: true },
+        });
+        linkedDecisionMap = new Map(decisions.map((d: { id: string; content: string; status: string }) => [d.id, d]));
+      } catch {
+        // Schema drift — HumanDecision table may not exist yet
       }
     }
 
+    // Attach linked decisions to entries
+    const enrichedEntries = entries.map((e: { linkedDecisionId?: string | null }) => ({
+      ...e,
+      linkedDecision: e.linkedDecisionId ? linkedDecisionMap.get(e.linkedDecisionId) ?? null : null,
+    }));
+
     return NextResponse.json({
-      entries,
+      entries: enrichedEntries,
       pagination: {
         page,
         limit,

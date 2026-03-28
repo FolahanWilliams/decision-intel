@@ -34,12 +34,13 @@ import { POST, GET, PATCH } from './route';
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
 function makeRequest(method: string, body?: unknown, url?: string) {
-  const init: RequestInit = { method };
+  const init: Record<string, unknown> = { method };
   if (body !== undefined) {
     init.body = JSON.stringify(body);
     init.headers = { 'Content-Type': 'application/json' };
   }
-  return new NextRequest(new URL(url || 'http://localhost/api/deals'), init);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return new NextRequest(new URL(url || 'http://localhost/api/deals'), init as any);
 }
 
 const VALID_DEAL = {
