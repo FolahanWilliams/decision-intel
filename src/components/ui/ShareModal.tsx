@@ -361,11 +361,7 @@ export function ShareModal({
                     ) : caseStudyCopied ? (
                       <Check size={18} className="shrink-0" style={{ color: 'var(--success)' }} />
                     ) : (
-                      <BookOpen
-                        size={18}
-                        className="shrink-0"
-                        style={{ color: '#6366f1' }}
-                      />
+                      <BookOpen size={18} className="shrink-0" style={{ color: '#6366f1' }} />
                     )}
                     <div>
                       <div style={{ fontWeight: 500, fontSize: '13px' }}>

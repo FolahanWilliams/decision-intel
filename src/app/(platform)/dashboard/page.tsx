@@ -69,7 +69,10 @@ import DecisionPerformance from '@/components/visualizations/DecisionPerformance
 import { GraphStatsCard } from '@/components/ui/GraphStatsCard';
 import dynamic from 'next/dynamic';
 const GraphHealthWidget = dynamic(
-  () => import('@/components/visualizations/GraphHealthWidget').then(m => ({ default: m.GraphHealthWidget })),
+  () =>
+    import('@/components/visualizations/GraphHealthWidget').then(m => ({
+      default: m.GraphHealthWidget,
+    })),
   { ssr: false }
 );
 import { useDeals } from '@/hooks/useDeals';

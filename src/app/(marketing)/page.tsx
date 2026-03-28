@@ -2846,7 +2846,10 @@ export default function LandingPage() {
                     onChange={e => {
                       setAnnualDecisions(Number(e.target.value));
                       if (roiTimerRef.current) clearTimeout(roiTimerRef.current);
-                      roiTimerRef.current = setTimeout(() => trackEvent('roi_calculator_used'), 1000);
+                      roiTimerRef.current = setTimeout(
+                        () => trackEvent('roi_calculator_used'),
+                        1000
+                      );
                     }}
                     aria-label="Annual Decisions"
                     className="w-full h-1 appearance-none cursor-pointer outline-none"
@@ -2892,7 +2895,10 @@ export default function LandingPage() {
                     onChange={e => {
                       setAvgDecisionValue(Number(e.target.value));
                       if (roiTimerRef.current) clearTimeout(roiTimerRef.current);
-                      roiTimerRef.current = setTimeout(() => trackEvent('roi_calculator_used'), 1000);
+                      roiTimerRef.current = setTimeout(
+                        () => trackEvent('roi_calculator_used'),
+                        1000
+                      );
                     }}
                     aria-label="Average Decision Value"
                     className="w-full h-1 appearance-none cursor-pointer outline-none"

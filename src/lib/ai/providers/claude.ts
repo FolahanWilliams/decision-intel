@@ -32,7 +32,7 @@ const DEFAULT_MODEL = 'claude-sonnet-4-20250514';
  */
 export async function generateText(
   prompt: string,
-  options?: GenerateTextOptions,
+  options?: GenerateTextOptions
 ): Promise<GenerateTextResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
   if (!apiKey) {
@@ -61,7 +61,7 @@ export async function generateText(
   // Extract text from content blocks
   const text = message.content
     .filter((block): block is Anthropic.TextBlock => block.type === 'text')
-    .map((block) => block.text)
+    .map(block => block.text)
     .join('');
 
   log.debug(`Claude response (${modelName}): ${text.length} chars in ${latencyMs}ms`);

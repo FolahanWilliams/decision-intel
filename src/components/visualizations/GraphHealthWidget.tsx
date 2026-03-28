@@ -128,7 +128,9 @@ export function GraphHealthWidget() {
         {/* Isolated Nodes */}
         <div className="rounded-md bg-muted/50 p-3">
           <p className="text-xs text-muted-foreground mb-1">Isolated Nodes</p>
-          <p className={`text-lg font-semibold ${isolatedNodes > 0 ? 'text-warning' : 'text-foreground'}`}>
+          <p
+            className={`text-lg font-semibold ${isolatedNodes > 0 ? 'text-warning' : 'text-foreground'}`}
+          >
             {isolatedNodes}
           </p>
         </div>
@@ -136,7 +138,9 @@ export function GraphHealthWidget() {
         {/* Anti-patterns */}
         <div className="rounded-md bg-muted/50 p-3">
           <p className="text-xs text-muted-foreground mb-1">Anti-patterns</p>
-          <p className={`text-lg font-semibold flex items-center gap-1 ${antiPatternCount > 0 ? 'text-error' : 'text-foreground'}`}>
+          <p
+            className={`text-lg font-semibold flex items-center gap-1 ${antiPatternCount > 0 ? 'text-error' : 'text-foreground'}`}
+          >
             {antiPatternCount > 0 && <AlertTriangle size={14} />}
             {antiPatternCount}
           </p>

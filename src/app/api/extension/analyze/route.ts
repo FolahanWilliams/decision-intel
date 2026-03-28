@@ -129,9 +129,7 @@ export async function POST(request: NextRequest) {
     const sanitized = errorMessage.slice(0, 200).replace(/[<>]/g, '');
 
     const isHealableError =
-      sanitized.includes('JSON') ||
-      sanitized.includes('SAFETY') ||
-      sanitized.includes('blocked');
+      sanitized.includes('JSON') || sanitized.includes('SAFETY') || sanitized.includes('blocked');
 
     return NextResponse.json(
       {

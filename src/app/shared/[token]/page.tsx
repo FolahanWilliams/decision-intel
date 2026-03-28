@@ -183,12 +183,13 @@ function UnlockedSections({ analysis }: { analysis: SharedAnalysis }) {
     <div style={{ marginBottom: 24 }}>
       {sections.map(section => {
         const data = analysis[section.key];
-        const content = typeof data === 'string'
-          ? data
-          : JSON.stringify(data, null, 2)
-              .replace(/[{}\[\]"]/g, ' ')
-              .replace(/\s+/g, ' ')
-              .trim();
+        const content =
+          typeof data === 'string'
+            ? data
+            : JSON.stringify(data, null, 2)
+                .replace(/[{}\[\]"]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
         return (
           <div
             key={section.key}
@@ -213,7 +214,15 @@ function UnlockedSections({ analysis }: { analysis: SharedAnalysis }) {
               {section.icon}
               {section.title}
             </h3>
-            <p style={{ color: '#cbd5e1', lineHeight: 1.7, margin: 0, fontSize: 14, whiteSpace: 'pre-wrap' }}>
+            <p
+              style={{
+                color: '#cbd5e1',
+                lineHeight: 1.7,
+                margin: 0,
+                fontSize: 14,
+                whiteSpace: 'pre-wrap',
+              }}
+            >
               {content}
             </p>
           </div>
@@ -477,7 +486,15 @@ export default function SharedAnalysisPage() {
               Analyzed {formattedCreatedAt}
             </p>
           </div>
-          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div
+            style={{
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
             {isCaseStudy ? (
               <DQIBadge score={analysis.overallScore} size="lg" showGrade animate />
             ) : (

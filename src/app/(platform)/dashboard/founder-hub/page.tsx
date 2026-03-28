@@ -259,19 +259,62 @@ function ProductOverview() {
         <div style={sectionTitle}>
           <Zap size={18} style={{ color: '#8b5cf6' }} /> Recently Shipped
         </div>
-        <ul style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.8, paddingLeft: 16 }}>
-          <li><strong>Enhanced Public Demo</strong> — Streaming simulation UX with 3 sample docs, DQI badge, no login required at <code>/demo</code></li>
-          <li><strong>Data-Backed ROI Calculator</strong> — Live outcome stats replace hardcoded Kahneman baselines when ≥10 outcomes exist</li>
-          <li><strong>Case Study Export</strong> — One-click anonymized, branded shareable analyses with permanent links for LP reporting</li>
-          <li><strong>Browser Extension</strong> — Chrome extension with quick-score popup (&lt;5s) and full analysis sidepanel</li>
-          <li><strong>A/B Prompt Testing</strong> — Experiment CRUD with Thompson sampling auto-optimization dashboard at <code>/dashboard/experiments</code></li>
-          <li><strong>Multi-Model Fallback</strong> — Gemini → Claude failover routing (set <code>AI_FALLBACK_ENABLED=true</code>)</li>
-          <li><strong>Graph Health Widget</strong> — Real-time knowledge graph density, isolated nodes, anti-pattern tracking on dashboard</li>
-          <li><strong>Counterfactual Analysis API</strong> — &quot;What-if&quot; decision path computation with narrative explanations</li>
-          <li><strong>Product Analytics</strong> — Internal event tracking across conversion funnel (<code>trackEvent()</code> fire-and-forget)</li>
-          <li><strong>Prompt Versioning</strong> — SHA-256 deduplicated prompt tracking wired to every analysis</li>
-          <li><strong>Quick Bias Check</strong> — Dashboard modal for instant &lt;5s bias scan via paste, shared Gemini utility across extension + platform</li>
-          <li><strong>Demo Conversion Tracking</strong> — 10 funnel events wired: demo, login, hero CTA, ROI calculator, analysis completion, case study views</li>
+        <ul
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary, #b4b4bc)',
+            lineHeight: 1.8,
+            paddingLeft: 16,
+          }}
+        >
+          <li>
+            <strong>Enhanced Public Demo</strong> — Streaming simulation UX with 3 sample docs, DQI
+            badge, no login required at <code>/demo</code>
+          </li>
+          <li>
+            <strong>Data-Backed ROI Calculator</strong> — Live outcome stats replace hardcoded
+            Kahneman baselines when ≥10 outcomes exist
+          </li>
+          <li>
+            <strong>Case Study Export</strong> — One-click anonymized, branded shareable analyses
+            with permanent links for LP reporting
+          </li>
+          <li>
+            <strong>Browser Extension</strong> — Chrome extension with quick-score popup (&lt;5s)
+            and full analysis sidepanel
+          </li>
+          <li>
+            <strong>A/B Prompt Testing</strong> — Experiment CRUD with Thompson sampling
+            auto-optimization dashboard at <code>/dashboard/experiments</code>
+          </li>
+          <li>
+            <strong>Multi-Model Fallback</strong> — Gemini → Claude failover routing (set{' '}
+            <code>AI_FALLBACK_ENABLED=true</code>)
+          </li>
+          <li>
+            <strong>Graph Health Widget</strong> — Real-time knowledge graph density, isolated
+            nodes, anti-pattern tracking on dashboard
+          </li>
+          <li>
+            <strong>Counterfactual Analysis API</strong> — &quot;What-if&quot; decision path
+            computation with narrative explanations
+          </li>
+          <li>
+            <strong>Product Analytics</strong> — Internal event tracking across conversion funnel (
+            <code>trackEvent()</code> fire-and-forget)
+          </li>
+          <li>
+            <strong>Prompt Versioning</strong> — SHA-256 deduplicated prompt tracking wired to every
+            analysis
+          </li>
+          <li>
+            <strong>Quick Bias Check</strong> — Dashboard modal for instant &lt;5s bias scan via
+            paste, shared Gemini utility across extension + platform
+          </li>
+          <li>
+            <strong>Demo Conversion Tracking</strong> — 10 funnel events wired: demo, login, hero
+            CTA, ROI calculator, analysis completion, case study views
+          </li>
         </ul>
       </div>
     </div>
@@ -854,10 +897,27 @@ function IntegrationsAndFlywheel() {
             </div>
           ))}
         </div>
-        <ul style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.8, paddingLeft: 16, marginTop: 12 }}>
-          <li><strong>Setup Guide UI:</strong> Step-by-step wizard in Settings → Integrations with connection status indicators</li>
-          <li><strong>Token Expiry Detection:</strong> Automatic detection of revoked/expired tokens with markInstallationInactive()</li>
-          <li><strong>Error Recovery:</strong> Graceful handling of auth failures in nudge delivery with structured logging</li>
+        <ul
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary, #b4b4bc)',
+            lineHeight: 1.8,
+            paddingLeft: 16,
+            marginTop: 12,
+          }}
+        >
+          <li>
+            <strong>Setup Guide UI:</strong> Step-by-step wizard in Settings → Integrations with
+            connection status indicators
+          </li>
+          <li>
+            <strong>Token Expiry Detection:</strong> Automatic detection of revoked/expired tokens
+            with markInstallationInactive()
+          </li>
+          <li>
+            <strong>Error Recovery:</strong> Graceful handling of auth failures in nudge delivery
+            with structured logging
+          </li>
         </ul>
       </div>
 
@@ -866,12 +926,32 @@ function IntegrationsAndFlywheel() {
         <div style={sectionTitle}>
           <Zap size={18} style={{ color: '#f59e0b' }} /> Browser Extension (Chrome)
         </div>
-        <ul style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.8, paddingLeft: 16 }}>
-          <li><strong>Quick Score Popup:</strong> &lt;5 second bias-only scan from any webpage. Sends to <code>/api/extension/quick-score</code></li>
-          <li><strong>Full Analysis Sidepanel:</strong> Complete 15-agent pipeline from the browser. Calls <code>/api/extension/analyze</code></li>
-          <li><strong>Auth:</strong> API key + user ID via extension options. Rate limited: 30 req/hr (quick) / 10 req/hr (full)</li>
-          <li><strong>Content Script:</strong> Annotates page text with detected biases inline</li>
-          <li><strong>PDF Support:</strong> Extracts text from PDF tabs for analysis</li>
+        <ul
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary, #b4b4bc)',
+            lineHeight: 1.8,
+            paddingLeft: 16,
+          }}
+        >
+          <li>
+            <strong>Quick Score Popup:</strong> &lt;5 second bias-only scan from any webpage. Sends
+            to <code>/api/extension/quick-score</code>
+          </li>
+          <li>
+            <strong>Full Analysis Sidepanel:</strong> Complete 15-agent pipeline from the browser.
+            Calls <code>/api/extension/analyze</code>
+          </li>
+          <li>
+            <strong>Auth:</strong> API key + user ID via extension options. Rate limited: 30 req/hr
+            (quick) / 10 req/hr (full)
+          </li>
+          <li>
+            <strong>Content Script:</strong> Annotates page text with detected biases inline
+          </li>
+          <li>
+            <strong>PDF Support:</strong> Extracts text from PDF tabs for analysis
+          </li>
         </ul>
       </div>
 
@@ -880,11 +960,30 @@ function IntegrationsAndFlywheel() {
         <div style={sectionTitle}>
           <BarChart3 size={18} style={{ color: '#06b6d4' }} /> Product Analytics
         </div>
-        <ul style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.8, paddingLeft: 16 }}>
-          <li><strong>Client Library:</strong> <code>trackEvent(name, properties)</code> — fire-and-forget, no await needed</li>
-          <li><strong>API Endpoint:</strong> <code>POST /api/analytics/events</code> — stores in AnalyticsEvent table, auth optional</li>
-          <li><strong>Key Events:</strong> demo_viewed, demo_sample_selected, roi_calculator_used, case_study_shared, extension_installed, slack_connected, signup_started, first_analysis_completed</li>
-          <li><strong>Schema Drift Safe:</strong> Returns 200 silently if table doesn&apos;t exist</li>
+        <ul
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary, #b4b4bc)',
+            lineHeight: 1.8,
+            paddingLeft: 16,
+          }}
+        >
+          <li>
+            <strong>Client Library:</strong> <code>trackEvent(name, properties)</code> —
+            fire-and-forget, no await needed
+          </li>
+          <li>
+            <strong>API Endpoint:</strong> <code>POST /api/analytics/events</code> — stores in
+            AnalyticsEvent table, auth optional
+          </li>
+          <li>
+            <strong>Key Events:</strong> demo_viewed, demo_sample_selected, roi_calculator_used,
+            case_study_shared, extension_installed, slack_connected, signup_started,
+            first_analysis_completed
+          </li>
+          <li>
+            <strong>Schema Drift Safe:</strong> Returns 200 silently if table doesn&apos;t exist
+          </li>
         </ul>
       </div>
 
@@ -1930,7 +2029,7 @@ function SalesToolkit() {
             {
               objection: '"Can I try it before committing?"',
               response:
-                'Absolutely — visit /demo right now. Pick from 3 sample IC memos and watch the full 15-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own IC memos and we\'ll run a free pilot with full DQI scoring and bias reports.',
+                "Absolutely — visit /demo right now. Pick from 3 sample IC memos and watch the full 15-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own IC memos and we'll run a free pilot with full DQI scoring and bias reports.",
               tone: 'Zero friction',
             },
           ].map((item, i) => (
@@ -2372,8 +2471,8 @@ function LiveStats() {
           <TrendingUp size={16} style={{ color: '#8b5cf6' }} /> Demo &amp; Conversion Funnel
         </div>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
-          Track with <code>trackEvent()</code> from <code>src/lib/analytics/track.ts</code>.
-          Query via <code>GET /api/analytics/events?name=demo_viewed</code>.
+          Track with <code>trackEvent()</code> from <code>src/lib/analytics/track.ts</code>. Query
+          via <code>GET /api/analytics/events?name=demo_viewed</code>.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
           {[
@@ -2400,7 +2499,9 @@ function LiveStats() {
               <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>
                 {item.label}
               </div>
-              <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+              <div
+                style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--text-secondary)' }}
+              >
                 {item.event}
               </div>
             </div>
