@@ -6,6 +6,14 @@ import { z } from 'zod';
 
 const log = createLogger('DealsRoute');
 
+async function resolveOrgId(userId: string): Promise<string | null> {
+  const membership = await prisma.teamMember.findFirst({
+    where: { userId },
+    select: { orgId: true },
+  });
+  return membership?.orgId || null;
+}
+
 const CreateDealSchema = z.object({
   name: z.string().min(1).max(200),
   dealType: z.enum([
@@ -45,11 +53,7 @@ export async function POST(request: NextRequest) {
     // Resolve org membership
     let orgId: string | null = null;
     try {
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId: user.id },
-        select: { orgId: true },
-      });
-      orgId = membership?.orgId ?? null;
+      orgId = await resolveOrgId(user.id);
     } catch {
       // Schema drift
     }
@@ -111,11 +115,7 @@ export async function GET(request: NextRequest) {
     // Resolve org membership
     let orgId: string | null = null;
     try {
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId: user.id },
-        select: { orgId: true },
-      });
-      orgId = membership?.orgId ?? null;
+      orgId = await resolveOrgId(user.id);
     } catch {
       // Schema drift
     }
@@ -192,11 +192,7 @@ export async function PATCH(request: NextRequest) {
     // Verify ownership via org
     let orgId: string | null = null;
     try {
-      const membership = await prisma.teamMember.findFirst({
-        where: { userId: user.id },
-        select: { orgId: true },
-      });
-      orgId = membership?.orgId ?? null;
+      orgId = await resolveOrgId(user.id);
     } catch {
       // Schema drift
     }

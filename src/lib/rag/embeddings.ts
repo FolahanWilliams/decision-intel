@@ -439,34 +439,40 @@ export async function searchSimilarDocuments(
       similarity: number;
     }>;
 
+    // Use parameterized queries for userId/excludeDocumentId.
+    // The embedding vector and limit are validated above and safe to interpolate
+    // (vector is server-generated floats, limit is Math.floor'd int).
     if (excludeDocumentId) {
       assertSafeId(excludeDocumentId, 'excludeDocumentId');
-      results = await prisma.$queryRawUnsafe<typeof results>(`
-                SELECT
-                    de."documentId" as document_id,
-                    de.content,
-                    de.metadata,
-                    1 - (de.embedding <=> '${embeddingVector}'::vector) as similarity
-                FROM "DecisionEmbedding" de
-                JOIN "Document" d ON d.id = de."documentId"
-                WHERE d."userId" = '${userId}'
-                AND de."documentId" != '${excludeDocumentId}'
-                ORDER BY de.embedding <=> '${embeddingVector}'::vector
-                LIMIT ${safeLimit}
-            `);
+      results = await prisma.$queryRawUnsafe<typeof results>(
+        `SELECT
+            de."documentId" as document_id,
+            de.content,
+            de.metadata,
+            1 - (de.embedding <=> '${embeddingVector}'::vector) as similarity
+        FROM "DecisionEmbedding" de
+        JOIN "Document" d ON d.id = de."documentId"
+        WHERE d."userId" = $1
+        AND de."documentId" != $2
+        ORDER BY de.embedding <=> '${embeddingVector}'::vector
+        LIMIT ${safeLimit}`,
+        userId,
+        excludeDocumentId
+      );
     } else {
-      results = await prisma.$queryRawUnsafe<typeof results>(`
-                SELECT
-                    de."documentId" as document_id,
-                    de.content,
-                    de.metadata,
-                    1 - (de.embedding <=> '${embeddingVector}'::vector) as similarity
-                FROM "DecisionEmbedding" de
-                JOIN "Document" d ON d.id = de."documentId"
-                WHERE d."userId" = '${userId}'
-                ORDER BY de.embedding <=> '${embeddingVector}'::vector
-                LIMIT ${safeLimit}
-            `);
+      results = await prisma.$queryRawUnsafe<typeof results>(
+        `SELECT
+            de."documentId" as document_id,
+            de.content,
+            de.metadata,
+            1 - (de.embedding <=> '${embeddingVector}'::vector) as similarity
+        FROM "DecisionEmbedding" de
+        JOIN "Document" d ON d.id = de."documentId"
+        WHERE d."userId" = $1
+        ORDER BY de.embedding <=> '${embeddingVector}'::vector
+        LIMIT ${safeLimit}`,
+        userId
+      );
     }
 
     return results.map(r => {

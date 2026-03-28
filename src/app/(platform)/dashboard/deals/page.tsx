@@ -190,6 +190,7 @@ export default function DealsPage() {
           value={dealFilters.stage || ''}
           onChange={e => updateFilter('stage', e.target.value)}
           style={selectStyle}
+          aria-label="Filter by stage"
         >
           <option value="">All Stages</option>
           {DEAL_STAGES.map(s => (
@@ -203,6 +204,7 @@ export default function DealsPage() {
           value={dealFilters.status || ''}
           onChange={e => updateFilter('status', e.target.value)}
           style={selectStyle}
+          aria-label="Filter by status"
         >
           <option value="">All Statuses</option>
           {DEAL_STATUSES.map(s => (
@@ -216,6 +218,7 @@ export default function DealsPage() {
           value={dealFilters.dealType || ''}
           onChange={e => updateFilter('dealType', e.target.value)}
           style={selectStyle}
+          aria-label="Filter by deal type"
         >
           <option value="">All Types</option>
           {DEAL_TYPES.map(t => (
@@ -229,6 +232,7 @@ export default function DealsPage() {
           value={dealFilters.sector || ''}
           onChange={e => updateFilter('sector', e.target.value)}
           style={selectStyle}
+          aria-label="Sort deals by"
         >
           <option value="">All Sectors</option>
           {SECTORS.map(s => (
@@ -241,6 +245,7 @@ export default function DealsPage() {
         {hasFilters && (
           <button
             onClick={clearFilters}
+            aria-label="Clear all filters"
             style={{
               background: 'none',
               border: 'none',

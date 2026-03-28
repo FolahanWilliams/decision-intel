@@ -77,37 +77,53 @@ export async function GET(req: NextRequest) {
       // ---------------------------------------------------------------
       // 1. Overall accuracy stats
       // ---------------------------------------------------------------
-      const outcomes = await prisma.decisionOutcome.findMany({
-        where: {
-          ...ownerFilter,
-          reportedAt: { gte: startDate, lte: endDate },
-        },
-        select: {
-          analysisId: true,
-          outcome: true,
-          impactScore: true,
-          confirmedBiases: true,
-          falsPositiveBiases: true,
-          mostAccurateTwin: true,
-          reportedAt: true,
-        },
-      });
+      const outcomeWhere = {
+        ...ownerFilter,
+        reportedAt: { gte: startDate, lte: endDate },
+      };
 
-      const totalDecisions = outcomes.length;
-      const successes = outcomes.filter(
-        o => o.outcome === 'success' || o.outcome === 'partial_success'
-      ).length;
+      // Use Prisma groupBy/aggregate for counts and averages instead of
+      // fetching all rows and iterating in-memory.
+      const [outcomeCounts, impactAgg, outcomes] = await Promise.all([
+        // GroupBy outcome to get success/partial_success/failure counts
+        prisma.decisionOutcome.groupBy({
+          by: ['outcome'],
+          where: outcomeWhere,
+          _count: { id: true },
+        }),
+        // Aggregate for average impact score
+        prisma.decisionOutcome.aggregate({
+          where: { ...outcomeWhere, impactScore: { not: null } },
+          _avg: { impactScore: true },
+        }),
+        // Still need full rows for JSON-field aggregations (bias stats, calibration join)
+        prisma.decisionOutcome.findMany({
+          where: outcomeWhere,
+          select: {
+            analysisId: true,
+            outcome: true,
+            impactScore: true,
+            confirmedBiases: true,
+            falsPositiveBiases: true,
+            mostAccurateTwin: true,
+            reportedAt: true,
+          },
+        }),
+      ]);
+
+      const totalDecisions = outcomeCounts.reduce((sum, g) => sum + g._count.id, 0);
+      const successes = outcomeCounts
+        .filter(g => g.outcome === 'success' || g.outcome === 'partial_success')
+        .reduce((sum, g) => sum + g._count.id, 0);
       const successRate = totalDecisions > 0 ? Math.round((successes / totalDecisions) * 100) : 0;
 
-      const withImpact = outcomes.filter(o => o.impactScore !== null);
-      const avgImpactScore =
-        withImpact.length > 0
-          ? Math.round(
-              withImpact.reduce((sum, o) => sum + (o.impactScore || 0), 0) / withImpact.length
-            )
-          : 0;
+      const avgImpactScore = impactAgg._avg.impactScore
+        ? Math.round(impactAgg._avg.impactScore)
+        : 0;
 
-      // Compute bias detection accuracy: confirmed / (confirmed + false positives)
+      // Bias detection accuracy: confirmed / (confirmed + false positives).
+      // Cannot use groupBy here because confirmedBiases and falsPositiveBiases
+      // are JSON array fields — Prisma groupBy does not support JSON aggregation.
       let totalConfirmed = 0;
       let totalFalsePositives = 0;
       for (const o of outcomes) {
@@ -196,6 +212,9 @@ export async function GET(req: NextRequest) {
       // ---------------------------------------------------------------
       const overallSuccessRate = totalDecisions > 0 ? (successes / totalDecisions) * 100 : 0;
 
+      // Cannot use groupBy here because confirmedBiases is a JSON array field.
+      // Each outcome can have multiple biases, requiring per-element iteration
+      // that Prisma's groupBy API does not support.
       const biasStats: Record<string, { successes: number; failures: number; total: number }> = {};
 
       for (const o of outcomes) {
@@ -225,15 +244,24 @@ export async function GET(req: NextRequest) {
       // ---------------------------------------------------------------
       // 4. Decision Twin accuracy rankings → persona leaderboard
       // ---------------------------------------------------------------
-      const twinMap: Record<string, { predictions: number; correct: number }> = {};
+      // Use Prisma groupBy on [mostAccurateTwin, outcome] to compute
+      // twin leaderboard at the database level instead of in-memory.
+      const twinGroups = await prisma.decisionOutcome.groupBy({
+        by: ['mostAccurateTwin', 'outcome'],
+        where: {
+          ...outcomeWhere,
+          mostAccurateTwin: { not: null },
+        },
+        _count: { id: true },
+      });
 
-      for (const o of outcomes) {
-        if (!o.mostAccurateTwin) continue;
-        const twin = o.mostAccurateTwin;
+      const twinMap: Record<string, { predictions: number; correct: number }> = {};
+      for (const g of twinGroups) {
+        const twin = g.mostAccurateTwin!;
         if (!twinMap[twin]) twinMap[twin] = { predictions: 0, correct: 0 };
-        twinMap[twin].predictions++;
-        if (o.outcome === 'success' || o.outcome === 'partial_success') {
-          twinMap[twin].correct++;
+        twinMap[twin].predictions += g._count.id;
+        if (g.outcome === 'success' || g.outcome === 'partial_success') {
+          twinMap[twin].correct += g._count.id;
         }
       }
 

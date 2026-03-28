@@ -4,28 +4,16 @@
  * Query params: provider, days (default 30)
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { verifyAdmin, ADMIN_DENIED } from '@/lib/utils/admin';
 
 const log = createLogger('AdminUsage');
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user?.id || !user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e =>
-      e.trim().toLowerCase()
-    );
-    if (!adminEmails.includes(user.email.toLowerCase())) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const admin = await verifyAdmin();
+    if (!admin) return ADMIN_DENIED;
 
     const { searchParams } = new URL(request.url);
     const provider = searchParams.get('provider');
