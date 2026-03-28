@@ -16,6 +16,7 @@ import {
   Send,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -367,21 +368,11 @@ export default function JournalPage() {
           </span>
         </div>
       ) : entries.length === 0 ? (
-        <div
-          className="text-center py-16 rounded-xl"
-          style={{
-            background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
-          }}
-        >
-          <BookOpen size={32} style={{ color: 'var(--text-muted)', margin: '0 auto 12px' }} />
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            No journal entries found.
-          </p>
-          <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-            Create a manual entry or connect email/calendar/Slack integrations.
-          </p>
-        </div>
+        <EnhancedEmptyState
+          type="generic"
+          title="No journal entries found"
+          description="Create a manual entry or connect email/calendar/Slack integrations."
+        />
       ) : (
         <div className="relative">
           {/* Timeline line */}

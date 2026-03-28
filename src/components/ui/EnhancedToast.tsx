@@ -22,11 +22,18 @@ export interface Toast {
   persistent?: boolean;
 }
 
+interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface ToastContextValue {
   toasts: Toast[];
   addToast: (toast: Omit<Toast, 'id'>) => string;
   removeToast: (id: string) => void;
   clearAllToasts: () => void;
+  /** Backwards-compatible API matching the old ToastContext */
+  showToast: (message: string, type?: ToastType, action?: ToastAction) => void;
 }
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
@@ -205,8 +212,21 @@ export function EnhancedToastProvider({ children }: { children: React.ReactNode 
     setToasts([]);
   }, []);
 
+  /** Backwards-compatible wrapper for the old showToast(message, type, action) API */
+  const showToast = useCallback(
+    (message: string, type: ToastType = 'info', action?: ToastAction) => {
+      addToast({
+        type,
+        title: message,
+        ...(action && { action }),
+        duration: type === 'error' || type === 'warning' ? 8000 : 3000,
+      });
+    },
+    [addToast]
+  );
+
   return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast, clearAllToasts }}>
+    <ToastContext.Provider value={{ toasts, addToast, removeToast, clearAllToasts, showToast }}>
       {children}
       <AnimatePresence mode="sync">
         {toasts.map((toast, index) => (
@@ -271,3 +291,6 @@ export function useToastActions() {
     },
   };
 }
+
+/** Drop-in replacement alias for the old ToastProvider */
+export const ToastProvider = EnhancedToastProvider;

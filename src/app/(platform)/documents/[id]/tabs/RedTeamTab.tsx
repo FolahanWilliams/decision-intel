@@ -17,7 +17,7 @@ import {
   ThumbsUp,
   ThumbsDown,
 } from 'lucide-react';
-import { useToast } from '@/components/ui/ToastContext';
+import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('RedTeamTab');

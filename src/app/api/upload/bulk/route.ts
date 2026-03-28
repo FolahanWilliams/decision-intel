@@ -12,6 +12,8 @@ import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { validateContent } from '@/lib/utils/resilience';
 import { createHash } from 'crypto';
+import pdfParse from 'pdf-parse';
+import mammoth from 'mammoth';
 
 const log = createLogger('BulkUpload');
 
@@ -219,10 +221,27 @@ async function processFilesAsync(
       if (file.type === 'text/plain' || file.type === 'text/markdown') {
         content = new TextDecoder().decode(buffer);
       } else if (file.type === 'application/pdf') {
-        // PDF parsing would go here - for now, skip
-        throw new Error('PDF parsing not yet implemented in bulk upload');
+        const pdfData = await pdfParse(Buffer.from(buffer));
+        content = pdfData.text;
+        if (!content.trim()) {
+          throw new Error('PDF contains no extractable text (may be image-only)');
+        }
+      } else if (
+        file.type ===
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ) {
+        const result = await mammoth.extractRawText({ buffer: Buffer.from(buffer) });
+        content = result.value;
+        if (!content.trim()) {
+          throw new Error('DOCX contains no extractable text');
+        }
+      } else if (
+        file.type ===
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ) {
+        throw new Error('Excel spreadsheet support coming soon. Please export as CSV or text.');
       } else {
-        throw new Error(`File type ${file.type} processing not implemented`);
+        throw new Error(`Unsupported file type: ${file.type}`);
       }
 
       // Validate content

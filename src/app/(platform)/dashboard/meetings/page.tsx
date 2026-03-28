@@ -17,6 +17,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useMeetings } from '@/hooks/useMeetings';
 import { getBiasArray, getQualityLevel, formatDateShort } from '@/lib/constants/human-audit';
 
@@ -137,19 +138,10 @@ export default function MeetingsPage() {
             </button>
           </div>
         ) : meetings.length === 0 ? (
-          <div className="card-body" style={{ textAlign: 'center', padding: '60px' }}>
-            <Video size={40} style={{ color: 'var(--text-muted)', marginBottom: '12px' }} />
-            <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '6px' }}>
-              No meetings yet
-            </div>
-            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-              Upload a meeting recording to get started with AI-powered transcription and cognitive
-              auditing.
-            </div>
-            <Link href="/dashboard/cognitive-audits/submit" className="btn btn-primary">
-              <Upload size={14} /> Upload First Meeting
-            </Link>
-          </div>
+          <EnhancedEmptyState
+            type="meetings"
+            actions={[{ label: 'Upload First Meeting', href: '/dashboard/cognitive-audits/submit', variant: 'primary' }]}
+          />
         ) : (
           <>
             {/* Mobile card view */}

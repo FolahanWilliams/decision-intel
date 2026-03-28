@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Info, PlayCircle, Loader2, RefreshCw, CheckCircle } from 'lucide-react';
 import { BiasInstance } from '@/types';
-import { useToast } from '@/components/ui/ToastContext';
+import { useToast } from '@/components/ui/EnhancedToast';
 
 const SEVERITY_COLORS: Record<string, string> = {
   low: 'var(--severity-low)',

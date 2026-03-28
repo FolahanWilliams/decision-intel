@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Plus, LayoutList, LayoutGrid, FileText, Filter, X } from 'lucide-react';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useDeals } from '@/hooks/useDeals';
+import { useUrlFilters } from '@/hooks/useUrlFilters';
 import { DealFormModal } from '@/components/deals/DealFormModal';
 import { DealKanban } from '@/components/deals/DealKanban';
 import {
@@ -36,39 +38,46 @@ const selectStyle: React.CSSProperties = {
 };
 
 export default function DealsPage() {
-  const [filters, setFilters] = useState<DealFilters>({});
-  const [page, setPage] = useState(1);
-  const [view, setView] = useState<'list' | 'board'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('deals-view') as 'list' | 'board') || 'list';
-    }
-    return 'list';
+  const { filters: urlFilters, setFilter, clearFilters, hasActiveFilters } = useUrlFilters({
+    page: 1,
   });
+
+  // Derive DealFilters from URL state for useDeals
+  const dealFilters = useMemo<DealFilters>(() => {
+    const f: DealFilters = {};
+    if (urlFilters.stage) f.stage = String(urlFilters.stage);
+    if (urlFilters.status) f.status = String(urlFilters.status);
+    if (urlFilters.dealType) f.dealType = String(urlFilters.dealType);
+    if (urlFilters.sector) f.sector = String(urlFilters.sector);
+    return f;
+  }, [urlFilters.stage, urlFilters.status, urlFilters.dealType, urlFilters.sector]);
+
+  const page = urlFilters.page ?? 1;
+
+  // View toggle state — read from localStorage via useEffect to avoid hydration mismatch
+  const [view, setView] = useState<'list' | 'board'>('list');
+  useEffect(() => {
+    const saved = localStorage.getItem('deals-view') as 'list' | 'board' | null;
+    if (saved) setView(saved);
+  }, []);
+
   const [showForm, setShowForm] = useState(false);
 
-  const { deals, total, totalPages, isLoading, mutate } = useDeals(filters, page, 50);
+  const { deals, total, totalPages, isLoading, mutate } = useDeals(dealFilters, page, 50);
 
   const setViewAndSave = useCallback((v: 'list' | 'board') => {
     setView(v);
     localStorage.setItem('deals-view', v);
   }, []);
 
-  const updateFilter = useCallback((key: keyof DealFilters, value: string) => {
-    setFilters(prev => {
-      const next = { ...prev };
-      if (value) next[key] = value;
-      else delete next[key];
-      return next;
-    });
-    setPage(1);
-  }, []);
+  const updateFilter = useCallback(
+    (key: keyof DealFilters, value: string) => {
+      setFilter(key, value || undefined);
+    },
+    [setFilter]
+  );
 
-  const clearFilters = useCallback(() => {
-    setFilters({});
-    setPage(1);
-  }, []);
-
-  const hasFilters = Object.values(filters).some(Boolean);
+  const hasFilters = hasActiveFilters;
 
   const handleStageChange = useCallback(
     async (dealId: string, newStage: string): Promise<boolean> => {
@@ -178,7 +187,7 @@ export default function DealsPage() {
         <Filter size={14} style={{ color: 'var(--text-muted)' }} />
 
         <select
-          value={filters.stage || ''}
+          value={dealFilters.stage || ''}
           onChange={e => updateFilter('stage', e.target.value)}
           style={selectStyle}
         >
@@ -191,7 +200,7 @@ export default function DealsPage() {
         </select>
 
         <select
-          value={filters.status || ''}
+          value={dealFilters.status || ''}
           onChange={e => updateFilter('status', e.target.value)}
           style={selectStyle}
         >
@@ -204,7 +213,7 @@ export default function DealsPage() {
         </select>
 
         <select
-          value={filters.dealType || ''}
+          value={dealFilters.dealType || ''}
           onChange={e => updateFilter('dealType', e.target.value)}
           style={selectStyle}
         >
@@ -217,7 +226,7 @@ export default function DealsPage() {
         </select>
 
         <select
-          value={filters.sector || ''}
+          value={dealFilters.sector || ''}
           onChange={e => updateFilter('sector', e.target.value)}
           style={selectStyle}
         >
@@ -309,32 +318,12 @@ export default function DealsPage() {
           ))}
         </div>
       ) : deals.length === 0 ? (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '60px 20px',
-            background: 'rgba(255, 255, 255, 0.02)',
-            borderRadius: 12,
-            border: '1px dashed rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          <div style={{ fontSize: 40, marginBottom: 12 }}>&#128188;</div>
-          <div
-            style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}
-          >
-            No deals yet
-          </div>
-          <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
-            Create your first deal to start tracking your pipeline.
-          </div>
-          <button
-            onClick={() => setShowForm(true)}
-            className="btn btn-primary"
-            style={{ padding: '8px 20px', fontSize: 13 }}
-          >
-            <Plus size={14} /> Create Deal
-          </button>
-        </div>
+        <EnhancedEmptyState
+          type="generic"
+          title="No deals yet"
+          description="Create your first deal to start tracking your pipeline."
+          actions={[{ label: 'Create Deal', onClick: () => setShowForm(true), variant: 'primary' }]}
+        />
       ) : view === 'board' ? (
         <DealKanban deals={deals} onStageChange={handleStageChange} />
       ) : (
@@ -431,7 +420,7 @@ export default function DealsPage() {
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 20 }}>
               <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
+                onClick={() => setFilter('page', Math.max(1, page - 1))}
                 disabled={page <= 1}
                 className="btn btn-ghost"
                 style={{ padding: '6px 14px', fontSize: 12 }}
@@ -449,7 +438,7 @@ export default function DealsPage() {
                 Page {page} of {totalPages}
               </span>
               <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => setFilter('page', Math.min(totalPages, page + 1))}
                 disabled={page >= totalPages}
                 className="btn btn-ghost"
                 style={{ padding: '6px 14px', fontSize: 12 }}

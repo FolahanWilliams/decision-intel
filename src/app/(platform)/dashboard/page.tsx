@@ -43,12 +43,13 @@ import type { OutcomeGateInfo } from '@/hooks/useAnalysisStream';
 import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
 import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
-import { useToast } from '@/components/ui/ToastContext';
+import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('Dashboard');
@@ -1897,15 +1898,14 @@ export default function Dashboard() {
                   ))}
                 </div>
               ) : uploadedDocs.length === 0 ? (
-                <EmptyState
-                  icon={FileText}
-                  title="No documents yet"
-                  description="Upload a document to start analyzing for biases, noise, and compliance risks."
-                  action={{
+                <EnhancedEmptyState
+                  type="documents"
+                  actions={[{
                     label: 'Go to Upload',
                     onClick: () => setActiveView('upload'),
-                    icon: Upload,
-                  }}
+                    variant: 'primary',
+                    icon: <Upload className="w-4 h-4" />,
+                  }]}
                 />
               ) : filteredDocs.length === 0 ? (
                 <div className="flex flex-col items-center gap-sm p-xl text-center">

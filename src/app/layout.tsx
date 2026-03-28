@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-import { ToastProvider } from '@/components/ui/ToastContext';
+import { ToastProvider } from '@/components/ui/EnhancedToast';
 import { ThemeProvider } from '@/components/theme-provider';
 import { NotificationProvider } from '@/components/ui/NotificationCenter';
 import { TooltipProvider } from '@/components/ui/tooltip';

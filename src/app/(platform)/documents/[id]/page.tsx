@@ -20,7 +20,7 @@ import {
   Vote,
   Globe,
 } from 'lucide-react';
-import { useToast } from '@/components/ui/ToastContext';
+import { useToast } from '@/components/ui/EnhancedToast';
 import { SSEReader } from '@/lib/sse';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
