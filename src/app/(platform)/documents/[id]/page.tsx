@@ -166,6 +166,7 @@ interface Analysis {
   institutionalMemory?: InstitutionalMemoryResult;
   intelligenceContext?: IntelligenceContextSummary;
   metaVerdict?: string;
+  outcomeStatus?: string;
 }
 
 interface Document {
@@ -1447,7 +1448,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               )}
               {activeTab === 'boardroom' && (
                 <ErrorBoundary sectionName="Boardroom Simulation">
-                  <BoardroomTab simulation={analysis?.simulation} />
+                  <BoardroomTab
+                    simulation={analysis?.simulation}
+                    hasOutcome={analysis?.outcomeStatus === 'outcome_logged'}
+                  />
                 </ErrorBoundary>
               )}
               {activeTab === 'simulator' && (

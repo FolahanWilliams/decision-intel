@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import { AlertTriangle, ArrowRight, CheckCircle, Clock, Loader2, X } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const CalibrationScorecard = lazy(() => import('@/components/visualizations/CalibrationScorecard'));
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -40,56 +42,45 @@ export function OutcomeGateBanner({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       style={{
-        padding: '12px 16px',
-        background: 'rgba(251, 191, 36, 0.08)',
-        border: '1px solid rgba(251, 191, 36, 0.2)',
-        borderRadius: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
+        borderRadius: '12px',
+        overflow: 'hidden',
       }}
     >
-      <Clock size={18} style={{ color: '#fbbf24', flexShrink: 0 }} />
-      <div style={{ flex: 1, fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-        <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-          {pendingCount} analyses awaiting outcomes.
-        </span>{' '}
-        Reporting outcomes improves your calibration accuracy and unlocks personalized bias
-        detection.
-        {pendingAnalysisIds.length > 0 && (
-          <span style={{ marginLeft: '8px' }}>
-            <Link
-              href="/dashboard?view=browse&status=complete"
-              style={{
-                color: '#fbbf24',
-                fontWeight: 600,
-                textDecoration: 'underline',
-                textUnderlineOffset: '2px',
-              }}
-            >
-              Report now
-            </Link>
-          </span>
-        )}
-      </div>
+      <Suspense
+        fallback={
+          <div style={{ padding: 12, background: 'var(--bg-secondary)', borderRadius: 12 }}>
+            <Clock size={16} style={{ color: '#fbbf24' }} />
+          </div>
+        }
+      >
+        <CalibrationScorecard
+          pendingCount={pendingCount}
+          pendingAnalysisIds={pendingAnalysisIds}
+          gateLevel="soft"
+          onReportOutcome={() => {
+            window.location.href = '/dashboard?view=browse&status=complete';
+          }}
+        />
+      </Suspense>
       {onDismiss && (
-        <button
-          onClick={() => {
-            setDismissed(true);
-            onDismiss();
-          }}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--text-muted)',
-            padding: '4px',
-            flexShrink: 0,
-          }}
-          aria-label="Dismiss"
-        >
-          <X size={14} />
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px 8px' }}>
+          <button
+            onClick={() => {
+              setDismissed(true);
+              onDismiss();
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-muted)',
+              fontSize: 12,
+              padding: '4px 8px',
+            }}
+          >
+            Dismiss
+          </button>
+        </div>
       )}
     </motion.div>
   );
@@ -208,6 +199,20 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
               {gateInfo.pendingCount} analyses need outcome reports before new analyses
             </p>
           </div>
+        </div>
+
+        {/* Calibration Progress */}
+        <div style={{ padding: '16px 24px 0' }}>
+          <Suspense fallback={null}>
+            <CalibrationScorecard
+              pendingCount={gateInfo.pendingCount}
+              pendingAnalysisIds={gateInfo.pendingAnalysisIds}
+              gateLevel="hard"
+              onReportOutcome={() => {
+                // Scroll to analysis selection below
+              }}
+            />
+          </Suspense>
         </div>
 
         {/* Body */}
