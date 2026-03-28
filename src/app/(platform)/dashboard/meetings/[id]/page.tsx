@@ -1163,6 +1163,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
         </div>
       )}
     </div>
+    </ErrorBoundary>
   );
 }
 
