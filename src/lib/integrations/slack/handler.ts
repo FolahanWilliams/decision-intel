@@ -241,7 +241,9 @@ export async function deliverSlackNudge(
         data.error === 'account_inactive' ||
         response.status === 401
       ) {
-        log.warn(`Slack token invalid (${data.error}) for team ${teamId ?? 'legacy'}, marking installation inactive`);
+        log.warn(
+          `Slack token invalid (${data.error}) for team ${teamId ?? 'legacy'}, marking installation inactive`
+        );
         await markInstallationInactive(teamId);
         return false;
       }

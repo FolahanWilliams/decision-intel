@@ -105,7 +105,14 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
         }}
       >
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 16,
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Zap size={20} style={{ color: 'var(--accent-primary)' }} />
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
@@ -150,7 +157,14 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
             />
 
             {/* Char count + scan button */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: 12,
+              }}
+            >
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                 {content.length.toLocaleString()} / {MAX_CHARS.toLocaleString()} chars
               </span>
@@ -220,7 +234,14 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
             {/* Biases */}
             {result.biases.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
-                <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
+                <div
+                  style={{
+                    fontSize: '0.8125rem',
+                    fontWeight: 600,
+                    color: 'var(--text-secondary)',
+                    marginBottom: 4,
+                  }}
+                >
                   Detected Biases ({result.biases.length})
                 </div>
                 {result.biases.map((bias, i) => {
@@ -235,7 +256,14 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
                         border: '1px solid rgba(255, 255, 255, 0.08)',
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: 4,
+                        }}
+                      >
                         <span style={{ fontSize: '0.8125rem', fontWeight: 600 }}>{bias.type}</span>
                         <span
                           style={{
@@ -252,7 +280,13 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
                         </span>
                       </div>
                       {bias.excerpt && (
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                        <div
+                          style={{
+                            fontSize: '0.75rem',
+                            color: 'var(--text-muted)',
+                            fontStyle: 'italic',
+                          }}
+                        >
                           &ldquo;{bias.excerpt}&rdquo;
                         </div>
                       )}

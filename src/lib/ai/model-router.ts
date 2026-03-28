@@ -36,7 +36,7 @@ export interface GenerateWithFallbackOptions {
  */
 export async function generateWithFallback(
   prompt: string,
-  options?: GenerateWithFallbackOptions,
+  options?: GenerateWithFallbackOptions
 ): Promise<GenerateWithFallbackResult> {
   const fallbackEnabled = process.env.AI_FALLBACK_ENABLED === 'true';
 
@@ -68,9 +68,7 @@ export async function generateWithFallback(
         temperature: options?.temperature,
       });
 
-      log.info(
-        `Request served by Claude fallback (${result.model}) in ${result.latencyMs}ms`,
-      );
+      log.info(`Request served by Claude fallback (${result.model}) in ${result.latencyMs}ms`);
 
       return {
         ...result,
@@ -80,13 +78,11 @@ export async function generateWithFallback(
     } catch (fallbackError) {
       const fallbackMessage =
         fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
-      log.error(
-        `Both providers failed. Gemini: ${errorMessage}. Claude: ${fallbackMessage}`,
-      );
+      log.error(`Both providers failed. Gemini: ${errorMessage}. Claude: ${fallbackMessage}`);
 
       // Re-throw the fallback error but include context about both failures
       throw new Error(
-        `All AI providers failed. Gemini: ${errorMessage}. Claude: ${fallbackMessage}`,
+        `All AI providers failed. Gemini: ${errorMessage}. Claude: ${fallbackMessage}`
       );
     }
   }

@@ -4,11 +4,7 @@
  * Extracts the call pattern from agents/nodes.ts into a reusable provider
  * function with a model-agnostic return type.
  */
-import {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { createLogger } from '@/lib/utils/logger';
 
@@ -36,11 +32,10 @@ export interface GenerateTextOptions {
  */
 export async function generateText(
   prompt: string,
-  options?: GenerateTextOptions,
+  options?: GenerateTextOptions
 ): Promise<GenerateTextResult> {
   const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
-  const modelName =
-    options?.model ?? getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-2.0-flash');
+  const modelName = options?.model ?? getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-2.0-flash');
 
   const genAI = new GoogleGenerativeAI(apiKey);
 

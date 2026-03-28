@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
   // Default traffic split: equal distribution
   const finalSplit =
     trafficSplit ??
-    Object.fromEntries(variants.map((v) => [v.id, Math.floor(100 / variants.length)]));
+    Object.fromEntries(variants.map(v => [v.id, Math.floor(100 / variants.length)]));
 
   // Ensure split sums to ~100
   const splitSum = Object.values(finalSplit).reduce((a, b) => a + b, 0);

@@ -76,9 +76,16 @@ export async function POST(req: NextRequest) {
 
     const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/shared/${link.token}${isCaseStudy ? '?case=true' : ''}`;
 
-    log.info(`Share link created for analysis ${analysisId} by ${user.id}${isCaseStudy ? ' (case study)' : ''}`);
+    log.info(
+      `Share link created for analysis ${analysisId} by ${user.id}${isCaseStudy ? ' (case study)' : ''}`
+    );
     return NextResponse.json(
-      { token: link.token, url: shareUrl, expiresAt: link.expiresAt, isCaseStudy: link.isCaseStudy },
+      {
+        token: link.token,
+        url: shareUrl,
+        expiresAt: link.expiresAt,
+        isCaseStudy: link.isCaseStudy,
+      },
       { status: 201 }
     );
   } catch (error) {
@@ -228,9 +235,10 @@ export async function GET(req: NextRequest) {
         biases: analysis.biases.map(b => ({
           biasType: b.biasType,
           severity: b.severity,
-          excerpt: link.isCaseStudy && b.excerpt.length > 100
-            ? b.excerpt.slice(0, 100) + '...'
-            : b.excerpt,
+          excerpt:
+            link.isCaseStudy && b.excerpt.length > 100
+              ? b.excerpt.slice(0, 100) + '...'
+              : b.excerpt,
           explanation: b.explanation,
           suggestion: b.suggestion,
         })),

@@ -101,374 +101,383 @@ function SlackDetailSection({
 
   return (
     <>
-    <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-    <div
-      style={{
-        padding: '24px',
-        background: 'var(--liquid-tint)',
-        border: '1px solid var(--liquid-border)',
-        borderRadius: 'var(--radius-lg)',
-        backdropFilter: 'blur(var(--liquid-blur))',
-      }}
-    >
-      {/* Header */}
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          marginBottom: '20px',
+          padding: '24px',
+          background: 'var(--liquid-tint)',
+          border: '1px solid var(--liquid-border)',
+          borderRadius: 'var(--radius-lg)',
+          backdropFilter: 'blur(var(--liquid-blur))',
         }}
       >
+        {/* Header */}
         <div
           style={{
-            width: 44,
-            height: 44,
-            borderRadius: 'var(--radius-md)',
-            background: '#4A154B15',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
+            gap: '12px',
+            marginBottom: '20px',
           }}
         >
-          <MessageSquare size={22} style={{ color: '#4A154B' }} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 600, color: 'var(--text-primary)' }}>
-              Slack Integration
-            </h3>
-            {/* Status indicator */}
-            {slackLoading ? (
-              <Loader2
-                size={14}
-                style={{ color: 'var(--text-muted)', animation: 'spin 1s linear infinite' }}
-              />
-            ) : (
-              <span
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  fontSize: '11px',
-                  fontWeight: 500,
-                  color: isConnected && !isTokenExpired ? '#22c55e' : isTokenExpired ? '#f59e0b' : 'var(--text-muted)',
-                  background:
-                    isConnected && !isTokenExpired
-                      ? 'rgba(34, 197, 94, 0.1)'
-                      : isTokenExpired
-                        ? 'rgba(245, 158, 11, 0.1)'
-                        : 'rgba(255, 255, 255, 0.06)',
-                  padding: '2px 8px',
-                  borderRadius: 'var(--radius-sm)',
-                }}
-              >
-                <span
-                  style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: '50%',
-                    background:
-                      isConnected && !isTokenExpired ? '#22c55e' : isTokenExpired ? '#f59e0b' : '#6b7280',
-                    display: 'inline-block',
-                  }}
-                />
-                {isConnected && !isTokenExpired
-                  ? 'Connected'
-                  : isTokenExpired
-                    ? 'Token Expired'
-                    : 'Disconnected'}
-              </span>
-            )}
-          </div>
-          <span
-            style={{
-              fontSize: '10px',
-              color: 'var(--text-muted)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
-            Collaboration
-          </span>
-        </div>
-      </div>
-
-      {/* Error state */}
-      {slackError && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '8px',
-            padding: '10px 14px',
-            marginBottom: '16px',
-            background: 'rgba(239, 68, 68, 0.08)',
-            border: '1px solid rgba(239, 68, 68, 0.2)',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '12px',
-            color: '#f87171',
-            lineHeight: 1.5,
-          }}
-        >
-          <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: '1px' }} />
-          {slackError}
-        </div>
-      )}
-
-      {/* Token expired warning */}
-      {isTokenExpired && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '8px',
-            padding: '10px 14px',
-            marginBottom: '16px',
-            background: 'rgba(245, 158, 11, 0.08)',
-            border: '1px solid rgba(245, 158, 11, 0.2)',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '12px',
-            color: '#fbbf24',
-            lineHeight: 1.5,
-          }}
-        >
-          <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: '1px' }} />
-          Your Slack token has expired. Please reconnect to restore the integration.
-        </div>
-      )}
-
-      {/* Connected state */}
-      {isConnected && !isTokenExpired && (
-        <div style={{ marginBottom: '20px' }}>
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '12px',
-              marginBottom: '16px',
+              width: 44,
+              height: 44,
+              borderRadius: 'var(--radius-md)',
+              background: '#4A154B15',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
             }}
           >
-            <div
-              style={{
-                padding: '12px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(255, 255, 255, 0.04)',
-              }}
-            >
-              <div
-                style={{
-                  fontSize: '10px',
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  marginBottom: '4px',
-                }}
-              >
-                Workspace
-              </div>
-              <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
-                {slackStatus.teamName || 'Unknown'}
-              </div>
-            </div>
-            <div
-              style={{
-                padding: '12px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(255, 255, 255, 0.04)',
-              }}
-            >
-              <div
-                style={{
-                  fontSize: '10px',
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  marginBottom: '4px',
-                }}
-              >
-                Connected
-              </div>
-              <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
-                {slackStatus.installedAt
-                  ? new Date(slackStatus.installedAt).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })
-                  : 'Unknown'}
-              </div>
-            </div>
+            <MessageSquare size={22} style={{ color: '#4A154B' }} />
           </div>
-
-          {/* Scopes */}
-          {slackStatus.scopes && slackStatus.scopes.length > 0 && (
-            <div style={{ marginBottom: '16px' }}>
-              <div
-                style={{
-                  fontSize: '10px',
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  marginBottom: '6px',
-                }}
-              >
-                Granted Scopes
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                {slackStatus.scopes.map(scope => (
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Slack Integration
+              </h3>
+              {/* Status indicator */}
+              {slackLoading ? (
+                <Loader2
+                  size={14}
+                  style={{ color: 'var(--text-muted)', animation: 'spin 1s linear infinite' }}
+                />
+              ) : (
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    fontSize: '11px',
+                    fontWeight: 500,
+                    color:
+                      isConnected && !isTokenExpired
+                        ? '#22c55e'
+                        : isTokenExpired
+                          ? '#f59e0b'
+                          : 'var(--text-muted)',
+                    background:
+                      isConnected && !isTokenExpired
+                        ? 'rgba(34, 197, 94, 0.1)'
+                        : isTokenExpired
+                          ? 'rgba(245, 158, 11, 0.1)'
+                          : 'rgba(255, 255, 255, 0.06)',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                  }}
+                >
                   <span
-                    key={scope}
                     style={{
-                      fontSize: '10px',
-                      padding: '2px 6px',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(255, 255, 255, 0.06)',
-                      color: 'var(--text-secondary)',
-                      fontFamily: 'monospace',
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      background:
+                        isConnected && !isTokenExpired
+                          ? '#22c55e'
+                          : isTokenExpired
+                            ? '#f59e0b'
+                            : '#6b7280',
+                      display: 'inline-block',
                     }}
-                  >
-                    {scope}
-                  </span>
-                ))}
-              </div>
+                  />
+                  {isConnected && !isTokenExpired
+                    ? 'Connected'
+                    : isTokenExpired
+                      ? 'Token Expired'
+                      : 'Disconnected'}
+                </span>
+              )}
             </div>
-          )}
+            <span
+              style={{
+                fontSize: '10px',
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Collaboration
+            </span>
+          </div>
+        </div>
 
-          {/* Disconnect button */}
-          <button
-            onClick={onDisconnect}
-            disabled={disconnecting}
+        {/* Error state */}
+        {slackError && (
+          <div
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 14px',
-              fontSize: '12px',
-              fontWeight: 500,
-              color: '#f87171',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '8px',
+              padding: '10px 14px',
+              marginBottom: '16px',
               background: 'rgba(239, 68, 68, 0.08)',
               border: '1px solid rgba(239, 68, 68, 0.2)',
               borderRadius: 'var(--radius-md)',
-              cursor: disconnecting ? 'not-allowed' : 'pointer',
-              opacity: disconnecting ? 0.6 : 1,
+              fontSize: '12px',
+              color: '#f87171',
+              lineHeight: 1.5,
             }}
           >
-            {disconnecting ? (
-              <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
-            ) : (
-              <Unplug size={12} />
-            )}
-            {disconnecting ? 'Disconnecting...' : 'Disconnect Workspace'}
-          </button>
-        </div>
-      )}
+            <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: '1px' }} />
+            {slackError}
+          </div>
+        )}
 
-      {/* Disconnected / expired state - show connect button */}
-      {(!isConnected || isTokenExpired) && !slackLoading && (
-        <div style={{ marginBottom: '20px' }}>
-          <p
+        {/* Token expired warning */}
+        {isTokenExpired && (
+          <div
             style={{
-              fontSize: '13px',
-              color: 'var(--text-secondary)',
-              lineHeight: 1.6,
-              marginBottom: '14px',
-            }}
-          >
-            {isTokenExpired
-              ? 'Reconnect your Slack workspace to resume decision capture and bias detection nudges.'
-              : 'Connect your Slack workspace to enable real-time decision capture, bias detection nudges, and outcome tracking.'}
-          </p>
-          <a
-            href="/api/integrations/slack/oauth"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 18px',
-              fontSize: '13px',
-              fontWeight: 600,
-              color: '#fff',
-              background: '#4A154B',
-              border: 'none',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '8px',
+              padding: '10px 14px',
+              marginBottom: '16px',
+              background: 'rgba(245, 158, 11, 0.08)',
+              border: '1px solid rgba(245, 158, 11, 0.2)',
               borderRadius: 'var(--radius-md)',
-              cursor: 'pointer',
-              textDecoration: 'none',
+              fontSize: '12px',
+              color: '#fbbf24',
+              lineHeight: 1.5,
             }}
           >
-            {isTokenExpired ? 'Reconnect Slack' : 'Connect Slack'} <ExternalLink size={13} />
-          </a>
-        </div>
-      )}
+            <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: '1px' }} />
+            Your Slack token has expired. Please reconnect to restore the integration.
+          </div>
+        )}
 
-      {/* Slash commands documentation */}
-      <div
-        style={{
-          borderTop: '1px solid var(--liquid-border)',
-          paddingTop: '18px',
-          marginTop: '4px',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            marginBottom: '12px',
-          }}
-        >
-          <Terminal size={14} style={{ color: 'var(--text-muted)' }} />
-          <h4
-            style={{
-              fontSize: '13px',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-            }}
-          >
-            Available Slash Commands
-          </h4>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {SLASH_COMMANDS.map(cmd => (
+        {/* Connected state */}
+        {isConnected && !isTokenExpired && (
+          <div style={{ marginBottom: '20px' }}>
             <div
-              key={cmd.command}
               style={{
-                display: 'flex',
-                alignItems: 'baseline',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
                 gap: '12px',
-                padding: '6px 10px',
-                borderRadius: 'var(--radius-sm)',
-                background: 'rgba(255, 255, 255, 0.02)',
+                marginBottom: '16px',
               }}
             >
-              <code
+              <div
                 style={{
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
-                  fontWeight: 600,
-                  color: '#a78bfa',
-                  whiteSpace: 'nowrap',
-                  minWidth: '110px',
+                  padding: '12px',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid rgba(255, 255, 255, 0.04)',
                 }}
               >
-                {cmd.command}
-              </code>
-              <span
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Workspace
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
+                  {slackStatus.teamName || 'Unknown'}
+                </div>
+              </div>
+              <div
                 style={{
-                  fontSize: '12px',
-                  color: 'var(--text-secondary)',
+                  padding: '12px',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid rgba(255, 255, 255, 0.04)',
                 }}
               >
-                {cmd.description}
-              </span>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Connected
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
+                  {slackStatus.installedAt
+                    ? new Date(slackStatus.installedAt).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })
+                    : 'Unknown'}
+                </div>
+              </div>
             </div>
-          ))}
+
+            {/* Scopes */}
+            {slackStatus.scopes && slackStatus.scopes.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    marginBottom: '6px',
+                  }}
+                >
+                  Granted Scopes
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                  {slackStatus.scopes.map(scope => (
+                    <span
+                      key={scope}
+                      style={{
+                        fontSize: '10px',
+                        padding: '2px 6px',
+                        borderRadius: 'var(--radius-sm)',
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        color: 'var(--text-secondary)',
+                        fontFamily: 'monospace',
+                      }}
+                    >
+                      {scope}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Disconnect button */}
+            <button
+              onClick={onDisconnect}
+              disabled={disconnecting}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                fontSize: '12px',
+                fontWeight: 500,
+                color: '#f87171',
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                borderRadius: 'var(--radius-md)',
+                cursor: disconnecting ? 'not-allowed' : 'pointer',
+                opacity: disconnecting ? 0.6 : 1,
+              }}
+            >
+              {disconnecting ? (
+                <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
+              ) : (
+                <Unplug size={12} />
+              )}
+              {disconnecting ? 'Disconnecting...' : 'Disconnect Workspace'}
+            </button>
+          </div>
+        )}
+
+        {/* Disconnected / expired state - show connect button */}
+        {(!isConnected || isTokenExpired) && !slackLoading && (
+          <div style={{ marginBottom: '20px' }}>
+            <p
+              style={{
+                fontSize: '13px',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.6,
+                marginBottom: '14px',
+              }}
+            >
+              {isTokenExpired
+                ? 'Reconnect your Slack workspace to resume decision capture and bias detection nudges.'
+                : 'Connect your Slack workspace to enable real-time decision capture, bias detection nudges, and outcome tracking.'}
+            </p>
+            <a
+              href="/api/integrations/slack/oauth"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 18px',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#fff',
+                background: '#4A154B',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                cursor: 'pointer',
+                textDecoration: 'none',
+              }}
+            >
+              {isTokenExpired ? 'Reconnect Slack' : 'Connect Slack'} <ExternalLink size={13} />
+            </a>
+          </div>
+        )}
+
+        {/* Slash commands documentation */}
+        <div
+          style={{
+            borderTop: '1px solid var(--liquid-border)',
+            paddingTop: '18px',
+            marginTop: '4px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              marginBottom: '12px',
+            }}
+          >
+            <Terminal size={14} style={{ color: 'var(--text-muted)' }} />
+            <h4
+              style={{
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+              }}
+            >
+              Available Slash Commands
+            </h4>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {SLASH_COMMANDS.map(cmd => (
+              <div
+                key={cmd.command}
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: '12px',
+                  padding: '6px 10px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'rgba(255, 255, 255, 0.02)',
+                }}
+              >
+                <code
+                  style={{
+                    fontSize: '12px',
+                    fontFamily: 'monospace',
+                    fontWeight: 600,
+                    color: '#a78bfa',
+                    whiteSpace: 'nowrap',
+                    minWidth: '110px',
+                  }}
+                >
+                  {cmd.command}
+                </code>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  {cmd.description}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

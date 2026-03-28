@@ -75,7 +75,10 @@ export async function POST(request: NextRequest) {
     };
 
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
-      return NextResponse.json({ error: 'content is required and must be a non-empty string' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'content is required and must be a non-empty string' },
+        { status: 400 }
+      );
     }
 
     if (content.length > MAX_CONTENT_LENGTH) {
@@ -100,7 +103,10 @@ export async function POST(request: NextRequest) {
     log.error('Quick score error:', error);
 
     if (message.includes('timed out')) {
-      return NextResponse.json({ error: 'Analysis timed out. Try with shorter content.' }, { status: 504 });
+      return NextResponse.json(
+        { error: 'Analysis timed out. Try with shorter content.' },
+        { status: 504 }
+      );
     }
 
     if (message.includes('Failed to parse')) {

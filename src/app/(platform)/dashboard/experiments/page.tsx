@@ -60,7 +60,7 @@ function CreateExperimentModal({
 
   const addVariant = () => {
     const letter = String.fromCharCode(65 + variantInputs.length);
-    setVariantInputs((prev) => [
+    setVariantInputs(prev => [
       ...prev,
       { id: letter, label: `Variant ${letter}`, template: '', severity: 'medium' },
     ]);
@@ -68,13 +68,11 @@ function CreateExperimentModal({
 
   const removeVariant = (idx: number) => {
     if (variantInputs.length <= 2) return;
-    setVariantInputs((prev) => prev.filter((_, i) => i !== idx));
+    setVariantInputs(prev => prev.filter((_, i) => i !== idx));
   };
 
   const updateVariant = (idx: number, field: string, value: string) => {
-    setVariantInputs((prev) =>
-      prev.map((v, i) => (i === idx ? { ...v, [field]: value } : v))
-    );
+    setVariantInputs(prev => prev.map((v, i) => (i === idx ? { ...v, [field]: value } : v)));
   };
 
   const handleSubmit = async () => {
@@ -83,7 +81,7 @@ function CreateExperimentModal({
       setError('Name and nudge type are required');
       return;
     }
-    if (variantInputs.some((v) => !v.template.trim())) {
+    if (variantInputs.some(v => !v.template.trim())) {
       setError('All variants must have a template');
       return;
     }
@@ -132,7 +130,7 @@ function CreateExperimentModal({
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="e.g. Anchoring bias nudge v2"
               className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700"
             />
@@ -143,7 +141,7 @@ function CreateExperimentModal({
             <input
               type="text"
               value={nudgeType}
-              onChange={(e) => setNudgeType(e.target.value)}
+              onChange={e => setNudgeType(e.target.value)}
               placeholder="e.g. anchoring_bias"
               className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700"
             />
@@ -153,10 +151,7 @@ function CreateExperimentModal({
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium">Variants</label>
               {variantInputs.length < 10 && (
-                <button
-                  onClick={addVariant}
-                  className="text-sm text-blue-600 hover:text-blue-700"
-                >
+                <button onClick={addVariant} className="text-sm text-blue-600 hover:text-blue-700">
                   + Add Variant
                 </button>
               )}
@@ -177,14 +172,14 @@ function CreateExperimentModal({
                   </div>
                   <textarea
                     value={v.template}
-                    onChange={(e) => updateVariant(idx, 'template', e.target.value)}
+                    onChange={e => updateVariant(idx, 'template', e.target.value)}
                     placeholder="Nudge template text..."
                     rows={2}
                     className="w-full px-3 py-2 border rounded-lg text-sm dark:bg-zinc-800 dark:border-zinc-700"
                   />
                   <select
                     value={v.severity}
-                    onChange={(e) => updateVariant(idx, 'severity', e.target.value)}
+                    onChange={e => updateVariant(idx, 'severity', e.target.value)}
                     className="mt-2 px-2 py-1 border rounded text-sm dark:bg-zinc-800 dark:border-zinc-700"
                   >
                     <option value="low">Low severity</option>
@@ -222,17 +217,17 @@ function CreateExperimentModal({
 // ─── Variant Results Bar Chart ──────────────────────────────────────────────
 
 function VariantBarChart({ results }: { results: ExperimentResult[] }) {
-  const maxImpressions = Math.max(...results.map((r) => r.impressions), 1);
+  const maxImpressions = Math.max(...results.map(r => r.impressions), 1);
 
   return (
     <div className="space-y-3">
-      {results.map((r) => (
+      {results.map(r => (
         <div key={r.variantId} className="space-y-1">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium">{r.label}</span>
             <span className="text-zinc-500">
-              {r.impressions} impressions &middot;{' '}
-              {(r.effectivenessRate * 100).toFixed(1)}% effective
+              {r.impressions} impressions &middot; {(r.effectivenessRate * 100).toFixed(1)}%
+              effective
             </span>
           </div>
           <div className="flex gap-1 h-6">
@@ -309,7 +304,9 @@ function ExperimentDetail({
     }
   }, [experiment.id]);
 
-  useEffect(() => { fetchResults(); }, [fetchResults]);
+  useEffect(() => {
+    fetchResults();
+  }, [fetchResults]);
 
   const handleOptimize = async () => {
     setOptimizing(true);
@@ -345,20 +342,20 @@ function ExperimentDetail({
   };
 
   // Find winner: variant with highest effectiveness rate and enough impressions
-  const winner = results.length > 0
-    ? results.reduce((best, r) =>
-        r.effectivenessRate > best.effectivenessRate && r.impressions >= 10 ? r : best,
-      results[0])
-    : null;
+  const winner =
+    results.length > 0
+      ? results.reduce(
+          (best, r) =>
+            r.effectivenessRate > best.effectivenessRate && r.impressions >= 10 ? r : best,
+          results[0]
+        )
+      : null;
 
   const hasConverged = winner && winner.effectivenessRate > 0 && winner.impressions >= 30;
 
   return (
     <div>
-      <button
-        onClick={onBack}
-        className="text-sm text-blue-600 hover:text-blue-700 mb-4"
-      >
+      <button onClick={onBack} className="text-sm text-blue-600 hover:text-blue-700 mb-4">
         &larr; Back to experiments
       </button>
 
@@ -429,8 +426,8 @@ function ExperimentDetail({
       {hasConverged && winner && (
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
           <p className="text-green-800 dark:text-green-200 font-medium">
-            Winner: {winner.label} — {(winner.effectivenessRate * 100).toFixed(1)}%
-            effectiveness ({winner.impressions} impressions)
+            Winner: {winner.label} — {(winner.effectivenessRate * 100).toFixed(1)}% effectiveness (
+            {winner.impressions} impressions)
           </p>
         </div>
       )}
@@ -440,7 +437,13 @@ function ExperimentDetail({
         <h3 className="font-semibold mb-3">Traffic Split</h3>
         <div className="flex h-4 rounded-full overflow-hidden">
           {Object.entries(experiment.trafficSplit).map(([variantId, pct], i) => {
-            const colors = ['bg-blue-500', 'bg-green-500', 'bg-amber-500', 'bg-purple-500', 'bg-pink-500'];
+            const colors = [
+              'bg-blue-500',
+              'bg-green-500',
+              'bg-amber-500',
+              'bg-purple-500',
+              'bg-pink-500',
+            ];
             return (
               <div
                 key={variantId}
@@ -466,7 +469,9 @@ function ExperimentDetail({
         {loading ? (
           <p className="text-zinc-400 text-sm">Loading results...</p>
         ) : results.length === 0 ? (
-          <p className="text-zinc-400 text-sm">No results yet. Data will appear as nudges are delivered.</p>
+          <p className="text-zinc-400 text-sm">
+            No results yet. Data will appear as nudges are delivered.
+          </p>
         ) : (
           <VariantBarChart results={results} />
         )}
@@ -497,7 +502,9 @@ export default function ExperimentsDashboard() {
     }
   }, []);
 
-  useEffect(() => { fetchExperiments(); }, [fetchExperiments]);
+  useEffect(() => {
+    fetchExperiments();
+  }, [fetchExperiments]);
 
   if (selected) {
     return (
@@ -573,7 +580,7 @@ export default function ExperimentsDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y dark:divide-zinc-700">
-              {sorted.map((exp) => (
+              {sorted.map(exp => (
                 <tr
                   key={exp.id}
                   onClick={() => setSelected(exp)}

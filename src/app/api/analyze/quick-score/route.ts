@@ -24,7 +24,10 @@ export const maxDuration = 15;
 // ─── Validation ─────────────────────────────────────────────────────────────
 
 const QuickScoreInput = z.object({
-  content: z.string().min(1, 'content is required').max(50_000, 'content must be at most 50000 characters'),
+  content: z
+    .string()
+    .min(1, 'content is required')
+    .max(50_000, 'content must be at most 50000 characters'),
   title: z.string().optional(),
   url: z.string().optional(),
 });
@@ -101,7 +104,10 @@ export async function POST(request: NextRequest) {
     log.error('Quick score error:', error);
 
     if (message.includes('timed out')) {
-      return NextResponse.json({ error: 'Analysis timed out. Try with shorter content.' }, { status: 504 });
+      return NextResponse.json(
+        { error: 'Analysis timed out. Try with shorter content.' },
+        { status: 504 }
+      );
     }
 
     if (message.includes('Failed to parse')) {
