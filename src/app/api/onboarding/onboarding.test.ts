@@ -130,7 +130,7 @@ describe('PATCH /api/onboarding', () => {
     const res = await PATCH(req);
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body.error).toBe('Invalid input');
+    expect(body.error).toBe('Validation failed');
   });
 
   it('returns 400 on invalid input (onboardingStep: 999)', async () => {
@@ -138,7 +138,7 @@ describe('PATCH /api/onboarding', () => {
     const res = await PATCH(req);
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body.error).toBe('Invalid input');
+    expect(body.error).toBe('Validation failed');
   });
 
   it('returns 400 when body is empty object', async () => {
