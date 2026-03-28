@@ -2009,12 +2009,13 @@ export default function LandingPage() {
                   color: 'var(--text-primary)',
                 }}
               >
-                Sub-second
+                Real-Time
                 <br />
-                Analysis
+                Streaming
               </h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                High-performance edge computing infrastructure.
+                15-agent pipeline streams results as each stage completes. Quick scan in under 5
+                seconds.
               </p>
             </motion.div>
 
@@ -2283,7 +2284,7 @@ export default function LandingPage() {
                 icon: Shield,
                 title: 'Regulator-Ready',
                 description:
-                  'Audit-grade decision logs with timestamped priors, outcomes, and calibration curves. SOX 302/404, SEC, FCA Consumer Duty, EU AI Act compliance built in.',
+                  'Audit-grade decision logs with timestamped priors, outcomes, and calibration curves. Compliance mapping for SOX 302/404, SEC, FCA Consumer Duty, and EU AI Act frameworks.',
                 stat: 'Compliance audit packs',
                 color: '#FFFFFF',
               },
@@ -3049,6 +3050,20 @@ export default function LandingPage() {
                   </div>
                 </div>
 
+                <p
+                  style={{
+                    fontSize: '0.7rem',
+                    color: 'var(--text-muted)',
+                    opacity: 0.6,
+                    marginTop: '12px',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {outcomeStats?.isRealData
+                    ? 'Based on real platform outcome data.'
+                    : 'Estimates based on published research baselines (Kahneman et al., "Noise", 2021). Actual results will vary by organisation and decision type.'}
+                </p>
+
                 <div
                   style={{ paddingTop: '24px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}
                 >
@@ -3565,7 +3580,7 @@ export default function LandingPage() {
                   'SSO + audit log + full API',
                   'Dedicated CSM',
                   'Custom bias taxonomies',
-                  'On-premise deployment option',
+                  'Private cloud deployment (coming soon)',
                 ].map((feature, i) => (
                   <div
                     key={i}
@@ -3678,7 +3693,7 @@ export default function LandingPage() {
             {[
               {
                 q: 'How is investment data protected?',
-                a: 'All documents are encrypted at rest (AES-256) and in transit (TLS 1.3). We run on SOC 2 Type II audited infrastructure, and PII is automatically detected and redacted before analysis. Your data is never used to train models and is deleted upon request. We support on-prem deployment for organizations requiring full data sovereignty.',
+                a: 'All documents are encrypted at rest (AES-256) and in transit (TLS 1.3). We are hosted on SOC 2 Type II certified infrastructure (Vercel and Supabase), and PII is automatically detected and redacted before analysis. Your data is never used to train models and is deleted upon request.',
               },
               {
                 q: 'How long does integration take?',
@@ -3690,11 +3705,11 @@ export default function LandingPage() {
               },
               {
                 q: 'What is a Decision Twin?',
-                a: 'Decision Twins are AI-simulated boardroom personas (e.g. Fiscal Conservative, Growth Advocate, Compliance Guard) that independently evaluate your proposal. Research shows that simulated dissent improves outcomes by 15-25%. The platform tracks which twin was most accurate over time.',
+                a: "Decision Twins are AI-simulated boardroom personas (e.g. Fiscal Conservative, Growth Advocate, Compliance Guard) that independently evaluate your proposal. Academic research on structured devil's advocacy and red-teaming (Schwenk, 1990; Schweiger et al., 1986) demonstrates that formalised dissent significantly improves decision quality by surfacing blind spots committees miss. The platform tracks which twin was most accurate over time.",
               },
               {
                 q: 'What compliance standards do you support?',
-                a: 'Built-in mapping for SOX Section 302/404, SEC disclosure requirements, FCA Consumer Duty, and EU AI Act governance. Exportable audit trails with full decision lineage, bias detection logs, and outcome verification for regulator-ready governance packs.',
+                a: 'The platform provides compliance mapping tools for SOX Section 302/404, SEC disclosure requirements, FCA Consumer Duty, and EU AI Act frameworks. Exportable audit trails include full decision lineage, bias detection logs, and outcome verification to support your governance and reporting workflows. Note: Decision Intel assists with compliance preparation — it does not certify or guarantee regulatory compliance.',
               },
               {
                 q: 'How is this different from a generic AI bias scanner?',
@@ -3842,7 +3857,7 @@ export default function LandingPage() {
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
-                SOC 2 compliant
+                Hosted on SOC 2 certified infra
               </span>
             </div>
           </motion.div>
