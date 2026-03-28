@@ -16,6 +16,9 @@ interface DecisionRoom {
   createdAt: string;
   decisionType?: string;
   consensusScore?: number;
+  dissentQuality?: number;
+  unanimityWarning?: boolean;
+  unanimityMessage?: string;
   biasBriefing?: {
     overallScore?: number;
     biases?: Array<{ biasType: string; severity: string }>;
@@ -278,13 +281,46 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                     <span
                       style={{
                         fontSize: '11px',
-                        color: room.consensusScore >= 60 ? '#22c55e' : '#f59e0b',
+                        color: room.unanimityWarning
+                          ? '#ef4444'
+                          : room.consensusScore >= 60
+                            ? '#22c55e'
+                            : '#f59e0b',
                       }}
                     >
-                      Consensus: {Math.round(room.consensusScore)}%
+                      {room.unanimityWarning ? 'Unanimous' : 'Consensus'}:{' '}
+                      {Math.round(room.consensusScore)}%
+                    </span>
+                  )}
+                  {room.dissentQuality != null && room.dissentQuality > 0 && (
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        color: room.dissentQuality >= 40 ? '#22c55e' : '#71717a',
+                      }}
+                    >
+                      Dissent: {room.dissentQuality}/100
                     </span>
                   )}
                 </div>
+                {/* Unanimity Warning Banner */}
+                {room.unanimityWarning && (
+                  <div
+                    style={{
+                      marginTop: 6,
+                      padding: '6px 10px',
+                      borderRadius: 6,
+                      background: 'rgba(239, 68, 68, 0.06)',
+                      border: '1px solid rgba(239, 68, 68, 0.15)',
+                      fontSize: 11,
+                      color: '#ef4444',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {room.unanimityMessage ||
+                      'Unanimous agreement detected. Stanford research (Strebulaev, 2024) shows consensus-seeking ICs have lower IPO rates. Was genuine dissent suppressed?'}
+                  </div>
+                )}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {room.status === 'open' ? (
