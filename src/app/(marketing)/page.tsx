@@ -214,13 +214,9 @@ const glassCardLightClasses = 'liquid-glass border border-white/10 rounded-[20px
 // Mobile nav overlay
 function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const links = [
-    { label: 'The Problem', href: '#problem' },
     { label: 'How It Works', href: '#solution' },
-    { label: 'Features', href: '#features' },
-    { label: 'Why Us', href: '#why-us' },
-    { label: 'ROI', href: '#roi' },
-    { label: 'FAQ', href: '#faq' },
-    { label: 'Try Demo', href: '/demo' },
+    { label: 'Pricing', href: '#pricing' },
+    { label: 'Demo', href: '/demo' },
   ];
 
   // Body scroll lock + ESC key handler
@@ -301,12 +297,12 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
               />
               <GlassRipple>
                 <Link
-                  href="/login"
+                  href="/demo"
                   onClick={onClose}
                   className="btn btn-primary glow"
                   style={{ textAlign: 'center', padding: '14px', fontSize: '0.9rem' }}
                 >
-                  Get Started
+                  Request Demo
                 </Link>
               </GlassRipple>
               <Link
@@ -662,26 +658,17 @@ export default function LandingPage() {
             className="hidden md:flex items-center gap-8"
             style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}
           >
-            <a href="#problem" className="hover:text-white transition-colors duration-300">
-              The Problem
-            </a>
             <a href="#solution" className="hover:text-white transition-colors duration-300">
               How It Works
             </a>
-            <a href="#features" className="hover:text-white transition-colors duration-300">
-              Features
-            </a>
-            <a href="#why-us" className="hover:text-white transition-colors duration-300">
-              Why Us
-            </a>
-            <a href="#roi" className="hover:text-white transition-colors duration-300">
-              ROI
+            <a href="#pricing" className="hover:text-white transition-colors duration-300">
+              Pricing
             </a>
             <Link
               href="/demo"
               className="hover:text-white transition-colors duration-300 font-semibold"
             >
-              Try Demo
+              Demo
             </Link>
           </div>
           <div className="flex items-center gap-3">
@@ -696,11 +683,11 @@ export default function LandingPage() {
             </GlassHover>
             <GlassRipple>
               <Link
-                href="/login"
+                href="/demo"
                 className="btn btn-primary hidden sm:inline-flex"
                 style={{ fontSize: '0.85rem' }}
               >
-                Get Started
+                Request Demo
               </Link>
             </GlassRipple>
             <button
@@ -765,7 +752,7 @@ export default function LandingPage() {
                       boxShadow: '0 0 8px rgba(34,197,94,0.5)',
                     }}
                   />
-                  <span>Built for Decision-Critical Teams</span>
+                  <span>Built for PE/VC Investment Committees</span>
                 </motion.div>
 
                 <motion.h1
@@ -820,12 +807,12 @@ export default function LandingPage() {
                 >
                   <GlassRipple>
                     <Link
-                      href="/login"
+                      href="/demo"
                       className="btn btn-primary glow"
                       style={{ padding: '14px 32px', fontSize: '0.9rem' }}
-                      onClick={() => trackEvent('hero_cta_clicked', { target: 'start_free' })}
+                      onClick={() => trackEvent('hero_cta_clicked', { target: 'request_demo' })}
                     >
-                      Start Free <ArrowRight className="w-4 h-4 ml-2 inline" />
+                      Request a Demo <ArrowRight className="w-4 h-4 ml-2 inline" />
                     </Link>
                   </GlassRipple>
                   <GlassHover>
@@ -3215,13 +3202,13 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Starter
+                Noise Audit
               </h3>
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                   $0
                 </span>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/month</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}> one-time</span>
               </div>
               <div
                 style={{
@@ -3232,7 +3219,7 @@ export default function LandingPage() {
                   flex: 1,
                 }}
               >
-                {['3 deal analyses/month', '10 page max', '5 bias types', 'Docs support'].map(
+                {['3 deal analyses', '10 page max', '5 bias types', 'Docs support'].map(
                   (feature, i) => (
                     <div
                       key={i}
@@ -3265,7 +3252,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                For deal partners evaluating the platform.
+                One-time diagnostic — see the hidden variance in your IC memos.
               </p>
               <Link
                 href="/login"
@@ -3283,7 +3270,7 @@ export default function LandingPage() {
                   transition: 'all 0.2s ease',
                 }}
               >
-                Start Free
+                Run Your Noise Audit
               </Link>
             </motion.div>
 
@@ -3327,11 +3314,11 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                IC Pro
+                Individual Partner
               </h3>
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {isAnnual ? '$103' : '$129'}
+                  {isAnnual ? '$279' : '$349'}
                 </span>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                   /month{isAnnual ? ', billed annually' : ''}
@@ -3439,7 +3426,7 @@ export default function LandingPage() {
                   letterSpacing: '0.02em',
                 }}
               >
-                Best for IC Teams
+                Most Popular
               </div>
               <h3
                 style={{
@@ -3453,7 +3440,7 @@ export default function LandingPage() {
               </h3>
               <div style={{ marginBottom: '4px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {isAnnual ? '$399' : '$499'}
+                  {isAnnual ? '$1,599' : '$1,999'}
                 </span>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                   /month{isAnnual ? ', billed annually' : ''}
@@ -3561,9 +3548,10 @@ export default function LandingPage() {
                 Multi-Fund
               </h3>
               <div style={{ marginBottom: '20px' }}>
-                <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  Custom
+                <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  Starting at $25K
                 </span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/year</span>
               </div>
               <div
                 style={{
@@ -3646,8 +3634,9 @@ export default function LandingPage() {
               marginTop: '24px',
             }}
           >
-            All paid plans include a 14-day free trial. No credit card required to start. For
-            context: a single McKinsey engagement costs more than 80 years of Decision Intel Team.
+            All paid plans include a 14-day free trial. No credit card required to start. The
+            average mid-market PE fund loses $23M per vintage year to bias-driven decisions. Decision
+            Intel costs less than 0.1% of that.
           </motion.p>
         </div>
       </section>
@@ -3770,7 +3759,7 @@ export default function LandingPage() {
               }}
             >
               <Target className="w-3.5 h-3.5" />
-              Built for decision-critical teams
+              Built for PE/VC Investment Committees
             </div>
             <h2
               style={{
@@ -3818,7 +3807,7 @@ export default function LandingPage() {
               }}
             >
               <Link
-                href="/login"
+                href="/demo"
                 className="btn btn-primary glow"
                 style={{
                   padding: '16px 40px',
@@ -3826,7 +3815,7 @@ export default function LandingPage() {
                   fontWeight: 600,
                 }}
               >
-                Start Free <ArrowRight className="w-4 h-4 ml-2 inline" />
+                Request a Demo <ArrowRight className="w-4 h-4 ml-2 inline" />
               </Link>
               <a
                 href="#solution"
@@ -3853,7 +3842,7 @@ export default function LandingPage() {
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
-                Free during early access
+                14-day free trial on all plans
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
