@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import {
   Shield,
   AlertTriangle,
@@ -17,6 +17,7 @@ import {
   Heart,
   ArrowRight,
 } from 'lucide-react';
+import { DQIBadge } from '@/components/ui/DQIBadge';
 
 interface SharedAnalysis {
   id: string;
@@ -173,16 +174,66 @@ function LockedSectionsTeaser({ analysis }: { analysis: SharedAnalysis }) {
   );
 }
 
+function UnlockedSections({ analysis }: { analysis: SharedAnalysis }) {
+  const sections = LOCKED_SECTIONS.filter(s => analysis[s.key] != null);
+  if (sections.length === 0) return null;
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      {sections.map(section => {
+        const data = analysis[section.key];
+        const content = typeof data === 'string'
+          ? data
+          : JSON.stringify(data, null, 2)
+              .replace(/[{}\[\]"]/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+        return (
+          <div
+            key={section.key}
+            style={{
+              background: '#1a1a2e',
+              border: '1px solid #2d2d44',
+              borderRadius: 12,
+              padding: 20,
+              marginBottom: 16,
+            }}
+          >
+            <h3
+              style={{
+                fontSize: 15,
+                fontWeight: 600,
+                marginBottom: 12,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              {section.icon}
+              {section.title}
+            </h3>
+            <p style={{ color: '#cbd5e1', lineHeight: 1.7, margin: 0, fontSize: 14, whiteSpace: 'pre-wrap' }}>
+              {content}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Main Page ────────────────────────────────────────────────────────────────
 
 export default function SharedAnalysisPage() {
   const { token } = useParams<{ token: string }>();
+  const searchParams = useSearchParams();
   const [analysis, setAnalysis] = useState<SharedAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [requiresPassword, setRequiresPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [isCaseStudy, setIsCaseStudy] = useState(searchParams.get('case') === 'true');
 
   const fetchAnalysis = async (pwd?: string) => {
     setLoading(true);
@@ -209,6 +260,7 @@ export default function SharedAnalysisPage() {
 
       setAnalysis(data.analysis);
       setExpiresAt(data.expiresAt);
+      if (data.isCaseStudy) setIsCaseStudy(true);
       setRequiresPassword(false);
     } catch {
       setError('Network error. Please try again.');
@@ -342,6 +394,21 @@ export default function SharedAnalysisPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0f0f23', color: '#e2e8f0' }}>
+      {/* Case Study Banner */}
+      {isCaseStudy && (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%)',
+            padding: '14px 24px',
+            textAlign: 'center',
+          }}
+        >
+          <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', letterSpacing: '0.04em' }}>
+            Case Study — Anonymized Decision Audit
+          </span>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div
         style={{ background: '#1a1a2e', borderBottom: '1px solid #2d2d44', padding: '12px 24px' }}
@@ -361,7 +428,9 @@ export default function SharedAnalysisPage() {
               <span style={{ color: '#fff' }}>Decision</span>
               <span style={{ color: '#6366f1', marginLeft: 4 }}>Intel</span>
             </span>
-            <span style={{ fontSize: 11, color: '#64748b', marginLeft: 8 }}>Shared Analysis</span>
+            <span style={{ fontSize: 11, color: '#64748b', marginLeft: 8 }}>
+              {isCaseStudy ? 'Case Study' : 'Shared Analysis'}
+            </span>
           </div>
           <div
             style={{
@@ -375,7 +444,7 @@ export default function SharedAnalysisPage() {
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <Eye size={12} /> Read-only
             </span>
-            {expiresAt && (
+            {expiresAt && !isCaseStudy && (
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <Clock size={12} /> Expires {formattedExpiry}
               </span>
@@ -404,11 +473,17 @@ export default function SharedAnalysisPage() {
               Analyzed {formattedCreatedAt}
             </p>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 42, fontWeight: 700, color: scoreColor, lineHeight: 1 }}>
-              {Math.round(analysis.overallScore)}
-            </div>
-            <div style={{ fontSize: 12, color: '#94a3b8' }}>/ 100</div>
+          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            {isCaseStudy ? (
+              <DQIBadge score={analysis.overallScore} size="lg" showGrade animate />
+            ) : (
+              <>
+                <div style={{ fontSize: 42, fontWeight: 700, color: scoreColor, lineHeight: 1 }}>
+                  {Math.round(analysis.overallScore)}
+                </div>
+                <div style={{ fontSize: 12, color: '#94a3b8' }}>/ 100</div>
+              </>
+            )}
           </div>
         </div>
 
@@ -563,15 +638,21 @@ export default function SharedAnalysisPage() {
           </div>
         </div>
 
-        {/* ── Locked Content Teaser ──────────────────────────────── */}
-        <LockedSectionsTeaser analysis={analysis} />
+        {/* ── Sections: unlocked for case studies, teaser otherwise ── */}
+        {isCaseStudy ? (
+          <UnlockedSections analysis={analysis} />
+        ) : (
+          <LockedSectionsTeaser analysis={analysis} />
+        )}
 
         {/* ── Footer CTA ─────────────────────────────────────────── */}
         <div
           style={{
             marginTop: 48,
             padding: '32px 24px',
-            background: 'linear-gradient(180deg, #1a1a2e 0%, rgba(26, 26, 46, 0) 100%)',
+            background: isCaseStudy
+              ? 'linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, #1a1a2e 40%, rgba(26, 26, 46, 0) 100%)'
+              : 'linear-gradient(180deg, #1a1a2e 0%, rgba(26, 26, 46, 0) 100%)',
             borderRadius: 16,
             border: '1px solid #2d2d44',
             textAlign: 'center',
@@ -588,8 +669,18 @@ export default function SharedAnalysisPage() {
           >
             <Shield size={20} style={{ color: '#6366f1' }} />
             <span style={{ fontSize: 16, fontWeight: 700 }}>
-              <span style={{ color: '#fff' }}>Decision</span>
-              <span style={{ color: '#6366f1', marginLeft: 4 }}>Intel</span>
+              {isCaseStudy ? (
+                <>
+                  <span style={{ color: '#94a3b8' }}>Powered by </span>
+                  <span style={{ color: '#fff' }}>Decision</span>
+                  <span style={{ color: '#6366f1', marginLeft: 4 }}>Intel</span>
+                </>
+              ) : (
+                <>
+                  <span style={{ color: '#fff' }}>Decision</span>
+                  <span style={{ color: '#6366f1', marginLeft: 4 }}>Intel</span>
+                </>
+              )}
             </span>
           </div>
           <p
@@ -622,7 +713,7 @@ export default function SharedAnalysisPage() {
               transition: 'opacity 0.15s',
             }}
           >
-            Audit Your Own Decisions
+            {isCaseStudy ? 'Try Decision Intel' : 'Audit Your Own Decisions'}
             <ArrowRight size={16} />
           </a>
           <p style={{ color: '#475569', fontSize: 12, marginTop: 12 }}>

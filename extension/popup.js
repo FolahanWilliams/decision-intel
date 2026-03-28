@@ -96,18 +96,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!apiKey) throw new Error('Extension API Key not configured. Go to Options.');
 
-      // 4. Try streaming endpoint first, fall back to standard
-      addStep('Connecting', 'Initiating audit pipeline...', 'running');
+      // 4. Get extension user ID
+      const userIdStorage = await chrome.storage.local.get(['EXTENSION_USER_ID']);
+      const extensionUserId = userIdStorage.EXTENSION_USER_ID || 'anonymous';
+
+      // 5. Try quick-score endpoint first, fall back to streaming, then standard
+      addStep('Connecting', 'Running quick bias scan...', 'running');
 
       let result;
       try {
-        result = await analyzeWithStreaming(apiBaseUrl, apiKey, contentData);
-      } catch {
-        // Fall back to non-streaming endpoint
+        result = await quickScore(apiBaseUrl, apiKey, extensionUserId, contentData, tab);
         completeStep(1);
-        addStep('Analyzing', 'Using standard analysis...', 'running');
-        result = await analyzeStandard(apiBaseUrl, apiKey, contentData);
-        completeStep(2);
+      } catch {
+        // Fall back to streaming endpoint
+        completeStep(1);
+        addStep('Analyzing', 'Running full analysis...', 'running');
+        try {
+          result = await analyzeWithStreaming(apiBaseUrl, apiKey, extensionUserId, contentData);
+        } catch {
+          // Fall back to non-streaming endpoint
+          completeStep(pipelineSteps.querySelectorAll('.pipeline-step').length - 1);
+          addStep('Analyzing', 'Using standard analysis...', 'running');
+          result = await analyzeStandard(apiBaseUrl, apiKey, extensionUserId, contentData);
+          completeStep(pipelineSteps.querySelectorAll('.pipeline-step').length - 1);
+        }
       }
 
       lastResult = result;
@@ -130,9 +142,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ─── Quick Score (Extension API) ──────────────────────────────────────────
+
+  async function quickScore(apiBaseUrl, apiKey, extensionUserId, contentData, tab) {
+    const QUICK_SCORE_URL = apiBaseUrl + '/api/extension/quick-score';
+
+    const response = await fetch(QUICK_SCORE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-extension-key': apiKey,
+        'x-extension-user-id': extensionUserId,
+      },
+      body: JSON.stringify({
+        content: contentData.text,
+        url: tab.url || undefined,
+        title: contentData.title || tab.title || undefined,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Quick score endpoint unavailable: ' + response.statusText);
+    }
+
+    const data = await response.json();
+
+    // Map quick-score response to the result format expected by renderResults
+    return {
+      overallScore: data.score,
+      noiseScore: null,
+      biases: (data.biases || []).map((b) => ({
+        biasType: b.type,
+        severity: b.severity,
+        excerpt: b.excerpt,
+        found: true,
+      })),
+      summary: 'Quick scan completed. Grade: ' + data.grade,
+      processedAt: data.processedAt,
+    };
+  }
+
   // ─── Streaming Analysis (SSE) ────────────────────────────────────────────
 
-  async function analyzeWithStreaming(apiBaseUrl, apiKey, contentData) {
+  async function analyzeWithStreaming(apiBaseUrl, apiKey, extensionUserId, contentData) {
     const STREAM_URL = apiBaseUrl + '/api/analyze/stream';
 
     const response = await fetch(STREAM_URL, {
@@ -140,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
       headers: {
         'Content-Type': 'application/json',
         'x-extension-key': apiKey,
+        'x-extension-user-id': extensionUserId,
       },
       body: JSON.stringify({
         text: contentData.text,
@@ -223,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ─── Standard (non-streaming) Analysis ───────────────────────────────────
 
-  async function analyzeStandard(apiBaseUrl, apiKey, contentData) {
+  async function analyzeStandard(apiBaseUrl, apiKey, extensionUserId, contentData) {
     const API_URL = apiBaseUrl + '/api/analyze';
 
     const response = await fetch(API_URL, {
@@ -231,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
       headers: {
         'Content-Type': 'application/json',
         'x-extension-key': apiKey,
+        'x-extension-user-id': extensionUserId,
       },
       body: JSON.stringify({
         text: contentData.text,

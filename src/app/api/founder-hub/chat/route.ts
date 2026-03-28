@@ -124,6 +124,18 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Sell the Bias Genome to investors: "World's first dataset of which cognitive biases predict failure, by industry."
 - Counterfactual engine is underexposed. Get it into UI and sales deck — it's the ROI story.
 - Consider a "Decision Score" that's external-facing — like a credit score for organizational decision quality.
+
+=== RECENTLY SHIPPED FEATURES (March 2026) ===
+- Enhanced Public Demo: Streaming simulation UX with 3 sample docs at /demo, no login required. DQI badge animation.
+- Data-Backed ROI Calculator: Live outcome stats from /api/public/outcome-stats replace Kahneman defaults when ≥10 outcomes exist.
+- Case Study Export: One-click anonymized shareable analyses with permanent links. Available via Share modal.
+- Browser Extension: Chrome extension with quick-score popup (<5s) at /api/extension/quick-score and full analysis sidepanel at /api/extension/analyze.
+- A/B Prompt Testing: Experiment dashboard at /dashboard/experiments. Thompson sampling auto-optimization. Per-variant effectiveness tracking.
+- Multi-Model Fallback: Gemini → Claude failover routing via src/lib/ai/model-router.ts. Set AI_FALLBACK_ENABLED=true.
+- Graph Health Widget: Real-time knowledge graph density, isolated nodes, anti-pattern tracking on main dashboard.
+- Counterfactual Analysis API: POST /api/decision-graph/counterfactual for "what-if" decision path computation.
+- Product Analytics: trackEvent() client lib at src/lib/analytics/track.ts. Internal /api/analytics/events endpoint.
+- Prompt Versioning: SHA-256 deduplicated prompt tracking wired to every analysis via promptVersionId.
 `.trim();
 
 // ─── Route Handler ──────────────────────────────────────────────────────────

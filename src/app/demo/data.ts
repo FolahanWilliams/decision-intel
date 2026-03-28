@@ -549,8 +549,254 @@ export const DEMO_PHOENIX: DemoAnalysis = {
   },
 };
 
+// ─── Example 3: Series B Investment Memo ────────────────────────────
+
+export const DEMO_SERIES_B: DemoAnalysis = {
+  id: 'demo-meridian-series-b',
+  documentName: 'Meridian Health Technologies — Series B Investment Thesis ($45M Round)',
+  shortName: 'Meridian Series B',
+  overallScore: 58,
+  noiseScore: 42,
+  createdAt: '2025-06-12T09:00:00Z',
+  summary:
+    'This Series B investment memo presents a mixed-quality thesis for a $45M round at $380M pre-money valuation. Meridian Health Technologies has demonstrated genuine product-market fit in remote patient monitoring with $12M ARR growing 140% YoY, and its FDA 510(k) clearance for two device classes is a meaningful regulatory moat. However, the memo exhibits moderate cognitive bias contamination across 5 dimensions. TAM estimates are anchored to top-down projections without bottom-up validation, the regulatory timeline for the De Novo pathway assumes best-case FDA review cadence, and recent high-profile healthtech exits (Livongo, Nuvance) are used as comparable benchmarks without adjusting for materially different market conditions. The investment case has substance but the risk analysis is underweight relative to the capital being deployed.',
+  metaVerdict:
+    "CONDITIONAL APPROVE — The underlying business has defensible strengths: real clinical validation, meaningful revenue traction, and a regulatory moat that takes 18–24 months to replicate. However, approval should be contingent on specific due diligence: (1) Commission independent bottom-up TAM analysis for the three target therapeutic areas, ignoring management's top-down $28B figure, (2) Engage a regulatory affairs consultant to stress-test the De Novo classification timeline under realistic FDA backlog assumptions, (3) Require key-person insurance and retention packages for the CTO and VP of Regulatory Affairs before close, (4) Negotiate milestone-based tranche structure tied to FDA submission milestones rather than a single close, (5) Obtain reimbursement pre-authorization letters from at least two major payers before committing the full round.",
+  noiseStats: { mean: 42, stdDev: 9.6, variance: 92.16 },
+  noiseBenchmarks: [
+    { label: 'This Document', value: 42 },
+    { label: 'Series B Average', value: 35 },
+    { label: 'Healthcare VC Best', value: 14 },
+  ],
+  biases: [
+    {
+      biasType: 'anchoring_bias',
+      severity: 'high',
+      excerpt:
+        'The remote patient monitoring market is projected to reach $28.2B by 2028, representing a massive TAM opportunity. At current growth rates, Meridian is positioned to capture 2-4% of this addressable market within five years.',
+      explanation:
+        "The $28.2B TAM figure is a top-down estimate from a single industry report (Grand View Research) and is used as the anchor for Meridian's revenue projections. No bottom-up analysis validates whether the segments Meridian actually serves — chronic cardiac monitoring, post-surgical remote recovery, and diabetes management devices — collectively represent $28B or a much smaller serviceable addressable market. The 2-4% capture rate is applied to the inflated top-down number, making projected revenues appear 3-5x more attainable than a bottoms-up model would suggest.",
+      suggestion:
+        "Replace the top-down TAM with a bottom-up SAM analysis: count the actual number of patients in Meridian's three therapeutic areas, multiply by realistic per-patient revenue, and apply adoption curves from comparable medical device launches. The serviceable market is likely $4-7B, not $28B.",
+      confidence: 0.91,
+    },
+    {
+      biasType: 'optimism_bias',
+      severity: 'high',
+      excerpt:
+        'We anticipate De Novo classification approval by Q1 2026, enabling expansion into the continuous glucose monitoring segment. The FDA has been increasingly supportive of digital health innovations, and our pre-submission meetings have been encouraging.',
+      explanation:
+        'The memo assumes best-case FDA review timelines despite the De Novo pathway averaging 14-18 months from submission to decision, with recent healthcare AI/device reviews trending longer due to increased FDA scrutiny post-2023. "Encouraging pre-submission meetings" are standard FDA process and do not predict approval timeline or outcome. The Q1 2026 target implies a 10-month review cycle, which would be in the fastest 15% of De Novo decisions historically.',
+      suggestion:
+        'Model three regulatory timeline scenarios: Optimistic (12 months, 20% probability), Base (18 months, 50%), and Extended (24+ months with additional data requests, 30%). Stress-test the financial model under each scenario, particularly the cash runway implications of the Extended case.',
+      confidence: 0.88,
+    },
+    {
+      biasType: 'availability_bias',
+      severity: 'medium',
+      excerpt:
+        "The Livongo acquisition by Teladoc at $18.5B and Nuvance Health's successful IPO demonstrate that healthtech companies with clinical validation can achieve exceptional outcomes. Meridian's clinical data package is comparable in rigor to these benchmarks.",
+      explanation:
+        'The memo anchors exit expectations to Livongo ($18.5B acquisition) and Nuvance, both of which occurred during the 2020-2021 healthtech valuation peak. These are cognitively "available" because they were high-profile, but they represent outlier outcomes during an unprecedented market environment. Post-2022 healthtech multiples contracted 60-70%, making these comparables misleading for a 2025-2027 exit horizon. Additionally, Livongo had $289M ARR at acquisition versus Meridian\'s $12M.',
+      suggestion:
+        'Use post-2023 healthtech exit multiples as the primary comparable set. Median Series B-to-exit outcomes for digital health companies show 3-5x returns, not the 15-20x implied by Livongo-era comparisons. Include at least five recent healthtech exits or late-stage rounds to establish a realistic range.',
+      confidence: 0.85,
+    },
+    {
+      biasType: 'groupthink',
+      severity: 'medium',
+      excerpt:
+        "The investment committee reviewed the opportunity across three sessions and reached strong consensus that Meridian represents a compelling risk-adjusted return. All partners noted the strength of the clinical data and the management team's execution track record.",
+      explanation:
+        'Three committee sessions reaching "strong consensus" with all partners aligned is presented as validation of the thesis quality. However, unanimous agreement in a venture partnership evaluating a $45M commitment should raise questions about whether dissenting views were adequately surfaced. No red team analysis, no documentation of the strongest bear case arguments, and no discussion of what would make this investment fail.',
+      suggestion:
+        "Before final commitment, require one partner to formally present the bear case with equal rigor and time allocation as the bull case. Document the top three reasons this investment could result in a total loss and the committee's specific responses to each.",
+      confidence: 0.82,
+    },
+    {
+      biasType: 'framing_effect',
+      severity: 'medium',
+      excerpt:
+        'At $380M pre-money, Meridian is valued at 31.7x trailing ARR — a significant discount to the healthtech median of 42x for companies with comparable growth profiles and clinical validation.',
+      explanation:
+        'The valuation is framed as a "discount" by selecting a favorable comparison set. The 42x median is drawn from peak-era healthtech multiples and companies with significantly higher ARR bases. Current (2025) healthtech Series B rounds are closing at 15-25x ARR for companies with $10-15M ARR. At 31.7x, Meridian is actually at a premium to the current market, not a discount.',
+      suggestion:
+        "Reframe the valuation analysis using the current market: gather the last 20 healthtech Series B rounds from the trailing 12 months, filter for companies with $8-20M ARR and 100%+ growth, and present the actual percentile where $380M pre-money falls. Be transparent about whether this is a premium or discount in today's market.",
+      confidence: 0.87,
+    },
+  ],
+  simulation: {
+    overallVerdict: 'CONDITIONAL APPROVE',
+    twins: [
+      {
+        name: 'CFO Alex',
+        role: 'Financial Rigor',
+        vote: 'APPROVE',
+        confidence: 0.68,
+        rationale:
+          '$12M ARR growing 140% YoY with 72% gross margins is a strong financial profile. Unit economics are heading in the right direction. However, the 31.7x valuation requires continued execution at this growth rate for at least 4 more quarters to justify the entry price. Approve with a milestone-based tranche structure.',
+      },
+      {
+        name: 'Strategy Director Maya',
+        role: 'Market Analysis',
+        vote: 'APPROVE',
+        confidence: 0.65,
+        rationale:
+          'The FDA 510(k) clearance creates a genuine 18-24 month regulatory moat. Remote patient monitoring has structural tailwinds from CMS reimbursement expansion and hospital-at-home mandates. The TAM is overstated but the real SAM is still large enough to support the thesis. Approve contingent on bottoms-up TAM validation.',
+      },
+      {
+        name: 'Risk Officer James',
+        role: 'Downside Protection',
+        vote: 'CONDITIONAL',
+        confidence: 0.55,
+        rationale:
+          'Key person risk on CTO and VP Regulatory is severe — the De Novo pathway knowledge is concentrated in two individuals. Reimbursement risk is underweighted: CMS rate-setting for RPM codes is under active review and could compress margins 20-30%. Conditional on key-person insurance, retention packages, and reimbursement sensitivity analysis.',
+      },
+      {
+        name: 'Growth Advocate Priya',
+        role: 'Opportunity Assessment',
+        vote: 'REJECT',
+        confidence: 0.6,
+        rationale:
+          'The growth narrative relies too heavily on the De Novo classification timeline, which is optimistic. If the FDA pathway takes 24 months instead of 10, the company burns through the Series B without accessing the CGM market and needs a bridge or down round. The exit comparables are outdated. I would reconsider at a $280-320M pre-money valuation with tranche protections.',
+      },
+    ],
+  },
+  logicalFallacies: [
+    {
+      name: 'Cherry Picking',
+      severity: 'high',
+      excerpt: "Livongo acquisition at $18.5B... Meridian's clinical data is comparable",
+      explanation:
+        'Selects the single most successful healthtech exit of the past decade as the primary comparable while omitting the dozens of healthtech companies that failed, were acqui-hired, or exited below their last private round during the same period. Survivorship bias in comparable selection inflates expected returns.',
+      score: 30,
+    },
+    {
+      name: 'Hasty Generalization',
+      severity: 'medium',
+      excerpt: 'FDA has been increasingly supportive of digital health innovations',
+      explanation:
+        "Generalizes from FDA's overall Digital Health Innovation Action Plan to predict a specific regulatory outcome for Meridian's De Novo submission. The FDA's general posture toward digital health does not predict the timeline or outcome for any individual device classification. In fact, De Novo review times have increased in recent quarters.",
+      score: 45,
+    },
+    {
+      name: 'False Cause',
+      severity: 'medium',
+      excerpt:
+        '140% YoY growth demonstrates clear product-market fit and validates the $28B TAM opportunity',
+      explanation:
+        "Conflates the company's growth rate with TAM validation. A company can grow rapidly in a small market niche without that growth validating a $28B market estimate. Revenue growth validates demand for the specific product, not the size of the theoretical total market.",
+      score: 50,
+    },
+  ],
+  swot: {
+    strengths: [
+      'FDA 510(k) clearance for two device classes creates 18-24 month regulatory moat',
+      '$12M ARR growing 140% YoY with 72% gross margins and improving unit economics',
+      'Published peer-reviewed clinical validation (NEJM Digital Medicine, JAMA Network Open) — rare for a Series B company',
+      'Established hospital system partnerships with 14 health networks covering 2,200+ beds',
+      'CTO has 3 prior FDA submissions with 100% clearance rate',
+    ],
+    weaknesses: [
+      'TAM analysis relies on top-down estimates without bottom-up validation of serviceable market',
+      'Key person risk concentrated in CTO and VP of Regulatory Affairs',
+      'Reimbursement strategy assumes current CMS RPM codes remain stable — rates under active review',
+      'De Novo classification timeline assumes best-case FDA review cadence',
+    ],
+    opportunities: [
+      'CMS Hospital-at-Home waiver expansion creating $3.2B incremental RPM demand',
+      'De Novo CGM classification would open second major therapeutic vertical',
+      'International expansion via CE Mark pathway — EU MDR compliance already in progress',
+      'Platform potential: clinical data assets could support pharma partnerships for real-world evidence',
+    ],
+    threats: [
+      'CMS reimbursement rate review for RPM codes (CPT 99453-99458) could compress margins 20-30%',
+      'Apple, Google, and Samsung investing heavily in consumer health monitoring with potential to move upstream',
+      'FDA De Novo pathway delays averaging 3-6 months beyond stated targets in recent quarters',
+      'Post-2023 healthtech valuation compression means exit multiples may not support $380M entry price',
+    ],
+    strategicAdvice:
+      'Meridian has real strengths that distinguish it from speculative healthtech investments: clinical validation, regulatory clearance, and meaningful revenue traction. The investment thesis has substance. However, the risk analysis is underweight in three critical areas: regulatory timeline assumptions, reimbursement stability, and key person concentration. A conditional approval with tranche-based funding tied to FDA milestones would align the investment structure with the actual risk profile.',
+  },
+  compliance: {
+    frameworks: [
+      {
+        name: 'FDA 21 CFR Part 820 (Quality System Regulation)',
+        status: 'compliant',
+        score: 78,
+        findings: [
+          'Design controls documentation referenced for 510(k)-cleared devices appears complete',
+          'Post-market surveillance plan documented for cleared device classes',
+          'CAPA (Corrective and Preventive Action) system in place but audit trail coverage unclear for De Novo candidate device',
+        ],
+      },
+      {
+        name: 'HIPAA (Health Insurance Portability and Accountability)',
+        status: 'partial',
+        score: 62,
+        findings: [
+          'BAA (Business Associate Agreement) templates referenced for hospital partnerships',
+          'PHI data handling architecture described at high level but encryption-at-rest implementation details not specified',
+          'Incident response plan exists but breach notification timeline compliance not validated',
+          'No third-party HIPAA audit report referenced in the memo',
+        ],
+      },
+      {
+        name: 'SEC Regulation D (Private Placement)',
+        status: 'partial',
+        score: 58,
+        findings: [
+          'Risk factors section present but does not adequately disclose regulatory timeline uncertainty',
+          'Forward-looking statements lack sufficient cautionary language regarding reimbursement assumptions',
+          'Material risk of key person departure not disclosed as a specific risk factor',
+        ],
+      },
+    ],
+    overallRisk:
+      'Compliance posture is mixed: strong on FDA quality systems for cleared devices, but partial on HIPAA operational controls and SEC disclosure adequacy. The investment memo itself does not meet best-practice standards for risk disclosure in a Series B private placement, particularly regarding regulatory timeline and reimbursement risks. These gaps are correctable but should be addressed before close.',
+  },
+  preMortem: {
+    scenarios: [
+      {
+        title: 'FDA De Novo Pathway Delay',
+        probability: 0.45,
+        impact: 'severe',
+        description:
+          'The De Novo classification for the continuous glucose monitoring device takes 24+ months instead of the projected 10 months. Meridian burns through 70% of the Series B without accessing the CGM market, forcing a bridge round at unfavorable terms or a pivot to slower-growth therapeutic areas.',
+      },
+      {
+        title: 'CMS Reimbursement Rate Compression',
+        probability: 0.35,
+        impact: 'high',
+        description:
+          "CMS finalizes RPM code rate reductions of 25% in the 2026 Physician Fee Schedule, compressing Meridian's gross margins from 72% to 54%. The unit economics that justified the $380M valuation no longer hold, and the company must fundamentally restructure its pricing model.",
+      },
+      {
+        title: 'Key Person Departure',
+        probability: 0.25,
+        impact: 'severe',
+        description:
+          'The CTO (who holds the institutional knowledge for the De Novo submission) departs for a competing healthtech startup or a FAANG health division. The FDA submission is delayed 12+ months while a replacement navigates the existing regulatory strategy, and two key FDA reviewer relationships are lost.',
+      },
+      {
+        title: 'Competitive Moat Erosion',
+        probability: 0.3,
+        impact: 'high',
+        description:
+          "Apple launches a clinical-grade RPM feature integrated with Apple Health and secures FDA clearance through its established 510(k) pathway. Hospital systems begin piloting the Apple solution due to patient familiarity and zero hardware procurement costs. Meridian's customer acquisition cost doubles within two quarters.",
+      },
+    ],
+  },
+  outcome: {
+    what: 'Meridian secured $45M at $380M pre-money. Initial FDA pathway was restructured after 18-month review delay, validating the pre-mortem scenario.',
+    when: 'August 2025 — close completed; FDA delay confirmed by Q4 2026',
+    impact:
+      'The De Novo classification required two additional rounds of clinical data submission, pushing CGM market entry to Q3 2027. Meridian raised a $20M bridge round at flat valuation to extend runway. Core RPM business continued growing at 95% YoY, partially offsetting the regulatory setback.',
+  },
+};
+
 // Combined list for the demo selector
-export const DEMO_ANALYSES: DemoAnalysis[] = [DEMO_NOKIA, DEMO_PHOENIX];
+export const DEMO_ANALYSES: DemoAnalysis[] = [DEMO_NOKIA, DEMO_PHOENIX, DEMO_SERIES_B];
 
 // Backwards compatibility
 export const DEMO_ANALYSIS = DEMO_NOKIA;

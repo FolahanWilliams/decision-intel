@@ -81,16 +81,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!apiKey) throw new Error('Extension API Key not configured. Go to Options.');
 
-      addStep('Connecting', 'Initiating audit pipeline...', 'running');
+      const userIdStorage = await chrome.storage.local.get(['EXTENSION_USER_ID']);
+      const extensionUserId = userIdStorage.EXTENSION_USER_ID || 'anonymous';
+
+      addStep('Connecting', 'Initiating full analysis...', 'running');
 
       let result;
       try {
-        result = await analyzeWithStreaming(apiBaseUrl, apiKey, contentData);
-      } catch {
+        result = await analyzeWithExtensionApi(apiBaseUrl, apiKey, extensionUserId, contentData, tab);
         completeStep(1);
-        addStep('Analyzing', 'Using standard analysis...', 'running');
-        result = await analyzeStandard(apiBaseUrl, apiKey, contentData);
-        completeStep(2);
+      } catch {
+        // Fall back to streaming endpoint
+        completeStep(1);
+        addStep('Analyzing', 'Trying streaming analysis...', 'running');
+        try {
+          result = await analyzeWithStreaming(apiBaseUrl, apiKey, extensionUserId, contentData);
+        } catch {
+          completeStep(pipelineSteps.querySelectorAll('.pipeline-step').length - 1);
+          addStep('Analyzing', 'Using standard analysis...', 'running');
+          result = await analyzeStandard(apiBaseUrl, apiKey, extensionUserId, contentData);
+          completeStep(pipelineSteps.querySelectorAll('.pipeline-step').length - 1);
+        }
       }
 
       lastResult = result;
@@ -110,12 +121,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ─── Extension Analyze API ───────────────────────────────────────────────
+
+  async function analyzeWithExtensionApi(apiBaseUrl, apiKey, extensionUserId, contentData, tab) {
+    const response = await fetch(apiBaseUrl + '/api/extension/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-extension-key': apiKey,
+        'x-extension-user-id': extensionUserId,
+      },
+      body: JSON.stringify({
+        content: contentData.text,
+        url: tab.url || undefined,
+        title: contentData.title || tab.title || undefined,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Extension analyze endpoint unavailable: ' + response.statusText);
+    }
+
+    return response.json();
+  }
+
   // ─── Streaming ───────────────────────────────────────────────────────────
 
-  async function analyzeWithStreaming(apiBaseUrl, apiKey, contentData) {
+  async function analyzeWithStreaming(apiBaseUrl, apiKey, extensionUserId, contentData) {
     const response = await fetch(apiBaseUrl + '/api/analyze/stream', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-extension-key': apiKey },
+      headers: { 'Content-Type': 'application/json', 'x-extension-key': apiKey, 'x-extension-user-id': extensionUserId },
       body: JSON.stringify({
         text: contentData.text,
         filename: contentData.title || 'Web Page',
@@ -174,10 +209,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (data.progress) progressBar.style.width = Math.min(95, data.progress) + '%';
   }
 
-  async function analyzeStandard(apiBaseUrl, apiKey, contentData) {
+  async function analyzeStandard(apiBaseUrl, apiKey, extensionUserId, contentData) {
     const response = await fetch(apiBaseUrl + '/api/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-extension-key': apiKey },
+      headers: { 'Content-Type': 'application/json', 'x-extension-key': apiKey, 'x-extension-user-id': extensionUserId },
       body: JSON.stringify({
         text: contentData.text,
         filename: contentData.title || 'Web Page',

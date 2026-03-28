@@ -32,6 +32,7 @@ export async function GET() {
       select: {
         teamId: true,
         teamName: true,
+        botUserId: true,
         scopes: true,
         status: true,
         createdAt: true,
@@ -43,6 +44,7 @@ export async function GET() {
           connected: true,
           teamName: installation.teamName,
           teamId: installation.teamId,
+          botUserId: installation.botUserId ?? undefined,
           installedAt: installation.createdAt.toISOString(),
           scopes: installation.scopes,
           status: installation.status,

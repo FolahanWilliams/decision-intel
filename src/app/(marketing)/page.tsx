@@ -485,6 +485,13 @@ export default function LandingPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [annualDecisions, setAnnualDecisions] = useState(5000);
   const [avgDecisionValue, setAvgDecisionValue] = useState(10000);
+  const [outcomeStats, setOutcomeStats] = useState<{
+    totalOutcomes: number;
+    noiseReductionRate: number;
+    biasAffectedRate: number;
+    isRealData: boolean;
+    source: string;
+  } | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [isAnnual, setIsAnnual] = useState(false);
 
@@ -526,7 +533,19 @@ export default function LandingPage() {
     }
   }, []);
 
-  const noiseTaxRate = 0.12;
+  // Fetch real outcome stats for ROI calculator
+  useEffect(() => {
+    fetch('/api/public/outcome-stats')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (data) setOutcomeStats(data);
+      })
+      .catch(() => {
+        /* use defaults */
+      });
+  }, []);
+
+  const noiseTaxRate = outcomeStats?.noiseReductionRate ?? 0.12;
   const potentialLoss = annualDecisions * avgDecisionValue * noiseTaxRate;
   const potentialSavings = potentialLoss * 0.6;
 
@@ -2885,9 +2904,17 @@ export default function LandingPage() {
                     opacity: 0.7,
                   }}
                 >
-                  {`// Baseline noise tax derived from Kahneman et al.`}
+                  {outcomeStats?.isRealData
+                    ? `// Based on ${outcomeStats.totalOutcomes} real decisions tracked`
+                    : `// Baseline noise tax derived from Kahneman et al.`}
                   <br />
-                  const NOISE_TAX = 0.12;
+                  const NOISE_TAX = {noiseTaxRate.toFixed(2)};
+                  {outcomeStats?.isRealData && (
+                    <>
+                      <br />
+                      {`// source: platform_data`}
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

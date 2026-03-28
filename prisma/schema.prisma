@@ -530,11 +530,12 @@ model ShareLink {
   analysisId   String
   userId       String
   orgId        String?
-  expiresAt    DateTime
+  expiresAt    DateTime?
   revokedAt    DateTime?
   password     String?
   viewCount    Int       @default(0)
   lastViewedAt DateTime?
+  isCaseStudy  Boolean   @default(false)
   createdAt    DateTime  @default(now())
 
   analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
@@ -1092,6 +1093,21 @@ model CopilotTurn {
   session   CopilotSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId, createdAt])
+}
+
+// ─── Product Analytics ──────────────────────────────────────────────────
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  name       String
+  properties Json     @default("{}")
+  userId     String?
+  sessionId  String?
+  createdAt  DateTime @default(now())
+
+  @@index([name])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 // ─── Stripe Billing ──────────────────────────────────────────────────────

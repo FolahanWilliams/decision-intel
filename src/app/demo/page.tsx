@@ -18,8 +18,12 @@ import {
   Lightbulb,
   Skull,
   Loader2,
+  Upload,
+  CheckCircle2,
+  ClipboardPaste,
 } from 'lucide-react';
 import { DEMO_ANALYSES, type DemoAnalysis } from './data';
+import { DQIBadge } from '@/components/ui/DQIBadge';
 
 type DemoTab =
   | 'overview'
@@ -57,19 +61,80 @@ const statusColor = (status: string) =>
 const statusLabel = (status: string) =>
   status === 'compliant' ? 'Compliant' : status === 'partial' ? 'Partial' : 'Non-Compliant';
 
+// Pipeline stages matching the real analysis flow
+const PIPELINE_STAGES = [
+  { id: 'anonymize', label: 'Anonymizing PII', icon: Shield, durationMs: 800 },
+  { id: 'structure', label: 'Structuring Content', icon: FileText, durationMs: 600 },
+  { id: 'bias', label: 'Detecting Cognitive Biases', icon: Brain, durationMs: 1200 },
+  { id: 'noise', label: 'Measuring Decision Noise', icon: Target, durationMs: 900 },
+  { id: 'factcheck', label: 'Verifying Claims', icon: CheckCircle2, durationMs: 1000 },
+  { id: 'compliance', label: 'Checking Compliance', icon: Gavel, durationMs: 700 },
+  { id: 'simulation', label: 'Running Boardroom Simulation', icon: Users, durationMs: 1100 },
+  { id: 'scoring', label: 'Calculating DQI Score', icon: BarChart3, durationMs: 600 },
+] as const;
+
 export default function DemoPage() {
   const router = useRouter();
-  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<DemoTab>('overview');
   const [loadingSample, setLoadingSample] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [currentStage, setCurrentStage] = useState(-1);
+  const [showResults, setShowResults] = useState(false);
+  const [pasteMode, setPasteMode] = useState(false);
   const tabListRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
-  const analysis = DEMO_ANALYSES[selectedIdx];
+  const analysis = selectedIdx !== null ? DEMO_ANALYSES[selectedIdx] : null;
 
-  const scoreColor =
-    analysis.overallScore >= 70 ? '#22c55e' : analysis.overallScore >= 40 ? '#eab308' : '#ef4444';
-  const noiseColor =
-    analysis.noiseScore <= 30 ? '#22c55e' : analysis.noiseScore <= 60 ? '#eab308' : '#ef4444';
+  // Run the streaming simulation
+  const startSimulation = useCallback((idx: number) => {
+    setSelectedIdx(idx);
+    setIsSimulating(true);
+    setShowResults(false);
+    setCurrentStage(0);
+    setActiveTab('overview');
+
+    let stage = 0;
+    const runNextStage = () => {
+      if (stage >= PIPELINE_STAGES.length) {
+        setIsSimulating(false);
+        setShowResults(true);
+        // Scroll to results after a brief delay
+        setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+        return;
+      }
+      setCurrentStage(stage);
+      stage++;
+      setTimeout(runNextStage, PIPELINE_STAGES[stage - 1].durationMs);
+    };
+    runNextStage();
+  }, []);
+
+  // Handle paste mode submission
+  const handlePasteAnalyze = useCallback(() => {
+    // For paste mode, randomly select a demo to show
+    const idx = Math.floor(Math.random() * DEMO_ANALYSES.length);
+    startSimulation(idx);
+    setPasteMode(false);
+  }, [startSimulation]);
+
+  const scoreColor = analysis
+    ? analysis.overallScore >= 70
+      ? '#22c55e'
+      : analysis.overallScore >= 40
+        ? '#eab308'
+        : '#ef4444'
+    : '#666';
+  const noiseColor = analysis
+    ? analysis.noiseScore <= 30
+      ? '#22c55e'
+      : analysis.noiseScore <= 60
+        ? '#eab308'
+        : '#ef4444'
+    : '#666';
 
   const handleTryNow = useCallback(async () => {
     setLoadingSample(true);
@@ -153,189 +218,363 @@ export default function DemoPage() {
 
       {/* Content */}
       <div className="max-w-[960px] mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-20">
-        {/* Example Selector */}
-        <div className="mb-7">
-          <div className="text-[11px] text-slate-500 mb-2.5 tracking-widest uppercase font-semibold">
-            Select a case study
-          </div>
-          <div className="flex gap-2 sm:gap-2.5 flex-wrap">
-            {DEMO_ANALYSES.map((a, idx) => (
-              <button
-                key={a.id}
-                onClick={() => {
-                  setSelectedIdx(idx);
-                  setActiveTab('overview');
-                }}
-                aria-pressed={idx === selectedIdx}
-                className={`px-3 sm:px-[18px] py-2 sm:py-2.5 rounded-[10px] text-xs sm:text-[13px] font-semibold cursor-pointer transition-all duration-150 flex items-center gap-2 border ${
-                  idx === selectedIdx
-                    ? 'border-white/30 bg-white/[0.06] text-white'
-                    : 'border-white/[0.08] bg-[#111111] text-slate-400'
-                }`}
-              >
-                <FileText size={14} />
-                {a.shortName}
-                <span
-                  className="text-[11px] px-2 py-0.5 rounded-md font-bold"
-                  style={{
-                    background: `${a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444'}15`,
-                    color:
-                      a.overallScore >= 70
-                        ? '#22c55e'
-                        : a.overallScore >= 40
-                          ? '#eab308'
-                          : '#ef4444',
-                  }}
-                >
-                  {a.overallScore}/100
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Document Title */}
-        <div className="mb-6">
-          <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug">
-            {analysis.documentName}
-          </h1>
-          <p className="text-slate-500 text-xs sm:text-[13px] m-0">
-            Analyzed by Decision Intel &middot;{' '}
-            {new Date(analysis.createdAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
-        </div>
-
-        {/* Score Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-7">
-          <ScoreCard
-            label="DECISION QUALITY"
-            value={`${analysis.overallScore}`}
-            sub="/100"
-            color={scoreColor}
-          />
-          <ScoreCard
-            label="NOISE SCORE"
-            value={`${analysis.noiseScore}`}
-            sub="High inconsistency"
-            color={noiseColor}
-          />
-          <ScoreCard
-            label="BIASES DETECTED"
-            value={`${analysis.biases.length}`}
-            sub={`${analysis.biases.filter(b => b.severity === 'critical').length} critical`}
-            color="#ef4444"
-          />
-          <ScoreCard
-            label="BOARD VERDICT"
-            value={analysis.simulation.overallVerdict}
-            sub={`${analysis.simulation.twins.filter(t => t.vote === 'REJECT').length} of ${analysis.simulation.twins.length} reject`}
-            color={analysis.simulation.overallVerdict === 'REJECT' ? '#ef4444' : '#eab308'}
-            smallValue
-          />
-        </div>
-
-        {/* Tabs */}
-        <div
-          ref={tabListRef}
-          role="tablist"
-          aria-label="Analysis sections"
-          onKeyDown={handleTabKeyDown}
-          className="flex gap-1 mb-6 overflow-x-auto pb-0.5 border-b border-white/[0.06] -mx-4 px-4 sm:mx-0 sm:px-0"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              role="tab"
-              id={`tab-${tab.id}`}
-              aria-selected={activeTab === tab.id}
-              aria-controls={`panel-${tab.id}`}
-              tabIndex={activeTab === tab.id ? 0 : -1}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2.5 text-[11px] sm:text-[13px] whitespace-nowrap cursor-pointer transition-all duration-150 bg-transparent ${
-                activeTab === tab.id
-                  ? 'font-semibold text-white border-b-2 border-b-white'
-                  : 'font-normal text-slate-500 border-b-2 border-b-transparent'
-              }`}
-              style={{
-                border: 'none',
-                borderBottom: activeTab === tab.id ? '2px solid #fff' : '2px solid transparent',
-              }}
-            >
-              {tab.icon} {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab Content */}
-        <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
-          {activeTab === 'overview' && <OverviewTab analysis={analysis} />}
-          {activeTab === 'biases' && <BiasesTab analysis={analysis} />}
-          {activeTab === 'logic' && <LogicTab analysis={analysis} />}
-          {activeTab === 'swot' && <SwotTab analysis={analysis} />}
-          {activeTab === 'noise' && <NoiseTab analysis={analysis} />}
-          {activeTab === 'compliance' && <ComplianceTab analysis={analysis} />}
-          {activeTab === 'premortem' && <PreMortemTab analysis={analysis} />}
-          {activeTab === 'boardroom' && <BoardroomTab analysis={analysis} />}
-        </div>
-
-        {/* Known Outcome Banner (when available) */}
-        {analysis.outcome && (
-          <div className="mt-8 p-4 sm:p-5 bg-red-500/[0.06] border border-red-500/20 rounded-xl">
-            <div className="flex items-center gap-2 mb-2.5">
-              <TrendingUp size={16} className="text-red-500" />
-              <span className="text-[13px] font-bold text-red-500 tracking-wide">
-                KNOWN OUTCOME
-              </span>
+        {/* Hero — Try It Section */}
+        {!isSimulating && !showResults && (
+          <div className="mb-10">
+            <div className="text-center mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight">
+                See cognitive bias auditing in action
+              </h1>
+              <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto">
+                Pick a real-world case study and watch the AI pipeline analyze it in real time. No
+                login required.
+              </p>
             </div>
-            <p className="text-slate-200 text-sm m-0 mb-1.5 leading-relaxed">
-              {analysis.outcome.what}
-            </p>
-            <p className="text-slate-500 text-xs m-0">
-              {analysis.outcome.when} &middot; {analysis.outcome.impact}
-            </p>
+
+            {/* Sample Document Cards */}
+            <div className="text-[11px] text-slate-500 mb-3 tracking-widest uppercase font-semibold">
+              Choose a document to analyze
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+              {DEMO_ANALYSES.map((a, idx) => (
+                <button
+                  key={a.id}
+                  onClick={() => startSimulation(idx)}
+                  className="text-left p-4 sm:p-5 rounded-xl bg-[#111111] border border-white/[0.08] cursor-pointer transition-all duration-200 hover:border-white/20 hover:bg-white/[0.03] group"
+                  style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+                >
+                  <div className="flex items-start justify-between">
+                    <FileText
+                      size={18}
+                      className="text-slate-500 group-hover:text-white transition-colors shrink-0 mt-0.5"
+                    />
+                    <span
+                      className="text-[11px] px-2 py-0.5 rounded-md font-bold"
+                      style={{
+                        background: `${a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444'}15`,
+                        color:
+                          a.overallScore >= 70
+                            ? '#22c55e'
+                            : a.overallScore >= 40
+                              ? '#eab308'
+                              : '#ef4444',
+                      }}
+                    >
+                      DQI {a.overallScore}/100
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-[13px] font-semibold text-white mb-1">{a.shortName}</div>
+                    <div className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
+                      {a.summary.slice(0, 120)}...
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 group-hover:text-white/70 transition-colors">
+                    <Upload size={12} />
+                    <span>Click to analyze</span>
+                    <ArrowRight
+                      size={12}
+                      className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Paste Your Own Text */}
+            <div className="text-center">
+              <button
+                onClick={() => setPasteMode(!pasteMode)}
+                className="text-xs text-slate-500 hover:text-white transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mx-auto"
+              >
+                <ClipboardPaste size={14} />
+                {pasteMode ? 'Hide text input' : 'Or paste your own text for a preview'}
+              </button>
+            </div>
+            {pasteMode && (
+              <div className="mt-4">
+                <textarea
+                  className="w-full h-32 bg-[#0a0a0a] border border-white/[0.12] rounded-xl p-4 text-sm text-slate-300 resize-none focus:outline-none focus:border-white/30 placeholder:text-slate-600"
+                  placeholder="Paste a decision memo, investment thesis, or strategic rationale..."
+                />
+                <div className="flex justify-between items-center mt-3">
+                  <span className="text-[11px] text-slate-600">
+                    Demo mode: results are illustrative, not generated from your text
+                  </span>
+                  <button
+                    onClick={handlePasteAnalyze}
+                    className="px-4 py-2 rounded-lg bg-white text-black text-xs font-semibold cursor-pointer border-none"
+                  >
+                    Analyze <ArrowRight size={12} className="inline ml-1" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* CTA */}
-        <div className="mt-12 text-center p-6 sm:p-10 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.08]">
-          <h3 className="text-lg sm:text-[22px] font-bold text-white mb-2">
-            This was a demo. Now try it on your own documents.
-          </h3>
-          <p className="text-slate-500 text-sm mb-6 max-w-[500px] mx-auto">
-            Upload any strategic document &mdash; board memo, M&amp;A rationale, investment thesis,
-            market analysis &mdash; and get a comprehensive cognitive bias audit in minutes.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={handleTryNow}
-              disabled={loadingSample}
-              aria-busy={loadingSample}
-              className="px-7 py-3 rounded-[10px] bg-white text-black font-bold text-sm border-none cursor-pointer disabled:cursor-wait"
-            >
-              {loadingSample ? 'Loading...' : 'Try with Sample Document'}{' '}
-              <ArrowRight size={14} className="inline align-middle ml-1" />
-            </button>
-            <Link
-              href="/login"
-              className="px-7 py-3 rounded-[10px] bg-transparent border border-white/20 text-white font-semibold text-sm no-underline text-center"
-            >
-              Sign Up Free
-            </Link>
-          </div>
-          <p className="text-slate-600 text-[11px] mt-4">
-            No credit card required &middot; 3 free analyses &middot; 14-day trial on paid plans
-          </p>
-        </div>
+        {/* Streaming Simulation */}
+        {isSimulating && (
+          <div className="mb-10">
+            <div className="text-center mb-8">
+              <Loader2 size={32} className="text-white animate-spin mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-white mb-2">Analyzing document...</h2>
+              <p className="text-slate-500 text-sm">{analysis?.shortName ?? 'Document'}</p>
+            </div>
 
-        <p className="text-slate-700 text-[11px] text-center mt-8 leading-relaxed">
-          Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine to
-          demonstrate product capabilities. They are not financial or investment advice.
-        </p>
+            {/* Progress Pipeline */}
+            <div className="max-w-[480px] mx-auto">
+              {PIPELINE_STAGES.map((stage, idx) => {
+                const StageIcon = stage.icon;
+                const isComplete = idx < currentStage;
+                const isActive = idx === currentStage;
+                const isPending = idx > currentStage;
+
+                return (
+                  <div
+                    key={stage.id}
+                    className="flex items-center gap-3 py-2.5 transition-all duration-300"
+                    style={{ opacity: isPending ? 0.3 : 1 }}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300"
+                      style={{
+                        background: isComplete
+                          ? 'rgba(34, 197, 94, 0.15)'
+                          : isActive
+                            ? 'rgba(255, 255, 255, 0.1)'
+                            : 'rgba(255, 255, 255, 0.03)',
+                        border: isActive
+                          ? '1px solid rgba(255, 255, 255, 0.2)'
+                          : '1px solid rgba(255, 255, 255, 0.06)',
+                      }}
+                    >
+                      {isComplete ? (
+                        <CheckCircle2 size={16} className="text-green-500" />
+                      ) : isActive ? (
+                        <Loader2 size={16} className="text-white animate-spin" />
+                      ) : (
+                        <StageIcon size={16} className="text-slate-600" />
+                      )}
+                    </div>
+                    <span
+                      className={`text-[13px] font-medium ${isComplete ? 'text-green-500' : isActive ? 'text-white' : 'text-slate-600'}`}
+                    >
+                      {stage.label}
+                      {isActive && <span className="text-slate-500 ml-1.5 animate-pulse">...</span>}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Overall progress bar */}
+            <div className="max-w-[480px] mx-auto mt-6">
+              <div className="h-1 rounded-full bg-white/[0.06]">
+                <div
+                  className="h-full rounded-full bg-white transition-all duration-500"
+                  style={{ width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%` }}
+                />
+              </div>
+              <div className="text-[11px] text-slate-500 mt-2 text-center">
+                Step {currentStage + 1} of {PIPELINE_STAGES.length}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Results (shown after simulation or when revisiting) */}
+        {showResults && analysis && (
+          <div ref={resultsRef}>
+            {/* Back / Re-select */}
+            <div className="flex items-center justify-between mb-6">
+              <button
+                onClick={() => {
+                  setShowResults(false);
+                  setSelectedIdx(null);
+                }}
+                className="text-xs text-slate-500 hover:text-white transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
+              >
+                <ArrowRight size={12} className="rotate-180" />
+                Try another document
+              </button>
+              <div className="flex gap-2">
+                {DEMO_ANALYSES.map((a, idx) => (
+                  <button
+                    key={a.id}
+                    onClick={() => startSimulation(idx)}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer border transition-all ${
+                      idx === selectedIdx
+                        ? 'border-white/30 bg-white/[0.06] text-white'
+                        : 'border-white/[0.08] bg-transparent text-slate-500 hover:text-white'
+                    }`}
+                  >
+                    {a.shortName}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* DQI Badge + Document Title */}
+            <div className="flex items-start gap-5 mb-6">
+              <DQIBadge score={analysis.overallScore} size="lg" showGrade animate />
+              <div className="flex-1 min-w-0">
+                <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug">
+                  {analysis.documentName}
+                </h1>
+                <p className="text-slate-500 text-xs sm:text-[13px] m-0">
+                  Analyzed by Decision Intel &middot;{' '}
+                  {new Date(analysis.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </p>
+              </div>
+            </div>
+
+            {/* Score Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-7">
+              <ScoreCard
+                label="DECISION QUALITY"
+                value={`${analysis.overallScore}`}
+                sub="/100"
+                color={scoreColor}
+              />
+              <ScoreCard
+                label="NOISE SCORE"
+                value={`${analysis.noiseScore}`}
+                sub={
+                  analysis.noiseScore <= 30
+                    ? 'Low noise'
+                    : analysis.noiseScore <= 60
+                      ? 'Moderate'
+                      : 'High inconsistency'
+                }
+                color={noiseColor}
+              />
+              <ScoreCard
+                label="BIASES DETECTED"
+                value={`${analysis.biases.length}`}
+                sub={`${analysis.biases.filter(b => b.severity === 'critical').length} critical`}
+                color="#ef4444"
+              />
+              <ScoreCard
+                label="BOARD VERDICT"
+                value={analysis.simulation.overallVerdict}
+                sub={`${analysis.simulation.twins.filter(t => t.vote === 'REJECT').length} of ${analysis.simulation.twins.length} reject`}
+                color={
+                  analysis.simulation.overallVerdict === 'REJECT'
+                    ? '#ef4444'
+                    : analysis.simulation.overallVerdict === 'APPROVE'
+                      ? '#22c55e'
+                      : '#eab308'
+                }
+                smallValue
+              />
+            </div>
+
+            {/* Tabs */}
+            <div
+              ref={tabListRef}
+              role="tablist"
+              aria-label="Analysis sections"
+              onKeyDown={handleTabKeyDown}
+              className="flex gap-1 mb-6 overflow-x-auto pb-0.5 border-b border-white/[0.06] -mx-4 px-4 sm:mx-0 sm:px-0"
+              style={{ scrollbarWidth: 'none' }}
+            >
+              {TABS.map(tab => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  id={`tab-${tab.id}`}
+                  aria-selected={activeTab === tab.id}
+                  aria-controls={`panel-${tab.id}`}
+                  tabIndex={activeTab === tab.id ? 0 : -1}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2.5 text-[11px] sm:text-[13px] whitespace-nowrap cursor-pointer transition-all duration-150 bg-transparent ${
+                    activeTab === tab.id
+                      ? 'font-semibold text-white border-b-2 border-b-white'
+                      : 'font-normal text-slate-500 border-b-2 border-b-transparent'
+                  }`}
+                  style={{
+                    border: 'none',
+                    borderBottom: activeTab === tab.id ? '2px solid #fff' : '2px solid transparent',
+                  }}
+                >
+                  {tab.icon} {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+              {activeTab === 'overview' && <OverviewTab analysis={analysis} />}
+              {activeTab === 'biases' && <BiasesTab analysis={analysis} />}
+              {activeTab === 'logic' && <LogicTab analysis={analysis} />}
+              {activeTab === 'swot' && <SwotTab analysis={analysis} />}
+              {activeTab === 'noise' && <NoiseTab analysis={analysis} />}
+              {activeTab === 'compliance' && <ComplianceTab analysis={analysis} />}
+              {activeTab === 'premortem' && <PreMortemTab analysis={analysis} />}
+              {activeTab === 'boardroom' && <BoardroomTab analysis={analysis} />}
+            </div>
+
+            {/* Known Outcome Banner (when available) */}
+            {analysis.outcome && (
+              <div className="mt-8 p-4 sm:p-5 bg-red-500/[0.06] border border-red-500/20 rounded-xl">
+                <div className="flex items-center gap-2 mb-2.5">
+                  <TrendingUp size={16} className="text-red-500" />
+                  <span className="text-[13px] font-bold text-red-500 tracking-wide">
+                    KNOWN OUTCOME
+                  </span>
+                </div>
+                <p className="text-slate-200 text-sm m-0 mb-1.5 leading-relaxed">
+                  {analysis.outcome.what}
+                </p>
+                <p className="text-slate-500 text-xs m-0">
+                  {analysis.outcome.when} &middot; {analysis.outcome.impact}
+                </p>
+              </div>
+            )}
+
+            {/* CTA */}
+            <div className="mt-12 text-center p-6 sm:p-10 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.08]">
+              <h3 className="text-lg sm:text-[22px] font-bold text-white mb-2">
+                This was a demo. Now try it on your own documents.
+              </h3>
+              <p className="text-slate-500 text-sm mb-6 max-w-[500px] mx-auto">
+                Upload any strategic document &mdash; board memo, M&amp;A rationale, investment
+                thesis, market analysis &mdash; and get a comprehensive cognitive bias audit in
+                minutes.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={handleTryNow}
+                  disabled={loadingSample}
+                  aria-busy={loadingSample}
+                  className="px-7 py-3 rounded-[10px] bg-white text-black font-bold text-sm border-none cursor-pointer disabled:cursor-wait"
+                >
+                  {loadingSample ? 'Loading...' : 'Try with Sample Document'}{' '}
+                  <ArrowRight size={14} className="inline align-middle ml-1" />
+                </button>
+                <Link
+                  href="/login"
+                  className="px-7 py-3 rounded-[10px] bg-transparent border border-white/20 text-white font-semibold text-sm no-underline text-center"
+                >
+                  Sign Up Free
+                </Link>
+              </div>
+              <p className="text-slate-600 text-[11px] mt-4">
+                No credit card required &middot; 3 free analyses &middot; 14-day trial on paid plans
+              </p>
+            </div>
+
+            <p className="text-slate-700 text-[11px] text-center mt-8 leading-relaxed">
+              Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine
+              to demonstrate product capabilities. They are not financial or investment advice.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

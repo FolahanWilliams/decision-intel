@@ -20,6 +20,7 @@ const CreateShareSchema = z.object({
   analysisId: z.string().min(1),
   expiresInDays: z.number().min(1).max(90).default(7),
   password: z.string().min(4).max(100).optional(),
+  isCaseStudy: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { analysisId, expiresInDays, password } = CreateShareSchema.parse(body);
+    const { analysisId, expiresInDays, password, isCaseStudy } = CreateShareSchema.parse(body);
 
     // Verify user owns the document associated with this analysis
     const analysis = await prisma.analysis.findUnique({
@@ -67,16 +68,17 @@ export async function POST(req: NextRequest) {
         analysisId,
         userId: user.id,
         orgId: analysis.document.orgId,
-        expiresAt: new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000),
+        expiresAt: isCaseStudy ? null : new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000),
         password: passwordHash,
+        isCaseStudy,
       },
     });
 
-    const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/shared/${link.token}`;
+    const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/shared/${link.token}${isCaseStudy ? '?case=true' : ''}`;
 
-    log.info(`Share link created for analysis ${analysisId} by ${user.id}`);
+    log.info(`Share link created for analysis ${analysisId} by ${user.id}${isCaseStudy ? ' (case study)' : ''}`);
     return NextResponse.json(
-      { token: link.token, url: shareUrl, expiresAt: link.expiresAt },
+      { token: link.token, url: shareUrl, expiresAt: link.expiresAt, isCaseStudy: link.isCaseStudy },
       { status: 201 }
     );
   } catch (error) {
@@ -125,7 +127,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'This share link has been revoked' }, { status: 410 });
     }
 
-    if (link.expiresAt < new Date()) {
+    if (link.expiresAt && link.expiresAt < new Date()) {
       return NextResponse.json({ error: 'This share link has expired' }, { status: 410 });
     }
 
@@ -226,7 +228,9 @@ export async function GET(req: NextRequest) {
         biases: analysis.biases.map(b => ({
           biasType: b.biasType,
           severity: b.severity,
-          excerpt: b.excerpt,
+          excerpt: link.isCaseStudy && b.excerpt.length > 100
+            ? b.excerpt.slice(0, 100) + '...'
+            : b.excerpt,
           explanation: b.explanation,
           suggestion: b.suggestion,
         })),
@@ -239,6 +243,7 @@ export async function GET(req: NextRequest) {
       },
       sharedBy: link.userId,
       expiresAt: link.expiresAt,
+      isCaseStudy: link.isCaseStudy,
     };
 
     return NextResponse.json(responseData, {
