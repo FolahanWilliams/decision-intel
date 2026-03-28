@@ -58,7 +58,7 @@ export function CausalGraph({
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'force' | 'radial' | 'timeline'>('force');
+  const [viewMode, setViewMode] = useState<'force' | 'radial'>('force');
   const [filterThreshold, setFilterThreshold] = useState(0.3);
   const [showOnlyDangerous, setShowOnlyDangerous] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -313,12 +313,11 @@ export function CausalGraph({
         <div className="flex flex-wrap items-center gap-4">
           <Tabs
             value={viewMode}
-            onValueChange={(v: string) => setViewMode(v as 'force' | 'radial' | 'timeline')}
+            onValueChange={(v: string) => setViewMode(v as 'force' | 'radial')}
           >
             <TabsList>
               <TabsTrigger value="force">Force Graph</TabsTrigger>
               <TabsTrigger value="radial">Radial View</TabsTrigger>
-              <TabsTrigger value="timeline">Timeline</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -374,9 +373,7 @@ export function CausalGraph({
 
         {viewMode === 'radial' && <RadialView data={graphData} dimensions={dimensions} />}
 
-        {viewMode === 'timeline' && (
-          <TimelineView weights={weights} timeRange={timeRange} dimensions={dimensions} />
-        )}
+
       </Card>
 
       {/* Insights Panel */}
@@ -504,31 +501,6 @@ function RadialView({
   }, [data, dimensions]);
 
   return <svg ref={svgRef} width={dimensions.width} height={dimensions.height} />;
-}
-
-// Timeline View Component
-function TimelineView({
-  weights: _weights,
-  timeRange: _timeRange,
-  dimensions,
-}: {
-  weights: CausalWeight[];
-  timeRange?: { from: Date; to: Date };
-  dimensions: { width: number; height: number };
-}) {
-  // Placeholder for timeline implementation
-  return (
-    <div
-      className="flex items-center justify-center text-muted-foreground"
-      style={{ height: dimensions.height }}
-    >
-      <div className="text-center">
-        <Activity className="h-12 w-12 mx-auto mb-2 opacity-50" />
-        <p>Timeline view coming soon</p>
-        <p className="text-sm">Will show bias evolution over time</p>
-      </div>
-    </div>
-  );
 }
 
 // Insight Card Component

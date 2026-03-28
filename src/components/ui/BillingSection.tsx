@@ -329,8 +329,8 @@ export function BillingSection() {
           </span>
         </div>
 
-        {/* Upgrade CTA for free users */}
-        {data.plan === 'free' && (
+        {/* Upgrade CTA for free users (only when billing is configured) */}
+        {data.plan === 'free' && data.upgradeAvailable !== false && (
           <button
             onClick={() => handleUpgrade('pro')}
             disabled={portalLoading}

@@ -100,50 +100,6 @@ export interface CausalIntelligenceResult {
 }
 
 /** Compound scoring engine output — persisted for UI surfacing */
-export interface CompoundScoringResult {
-  calibratedScore: number;
-  compoundMultiplier: number;
-  contextAdjustment: number;
-  confidenceDecay: number;
-  amplifyingInteractions: Array<{
-    bias: string;
-    multiplier: number;
-    interactions: string[];
-  }>;
-  adjustments: Array<{
-    source: string;
-    delta: number;
-    description: string;
-  }>;
-}
-
-/** Bayesian prior integration output — persisted for UI surfacing */
-export interface BayesianPriorsResult {
-  adjustedScore: number;
-  beliefDelta: number;
-  informationGain: number;
-  priorInfluence: number;
-  biasAdjustments: Array<{
-    biasType: string;
-    priorConfidence: number;
-    posteriorConfidence: number;
-    direction: 'increased' | 'decreased' | 'unchanged';
-    reason: string;
-  }>;
-}
-
-/** Lightweight summary of intelligence context stored with analysis results */
-export interface IntelligenceContextSummary {
-  newsCount: number;
-  researchCount: number;
-  caseStudyCount: number;
-  macroSummary: string;
-  industryBenchmarkCount: number;
-  assembledAt: string;
-  topNews?: Array<{ title: string; source: string; link: string }>;
-  topCaseStudies?: Array<{ company: string; outcome: string; biasTypes: string[] }>;
-}
-
 export interface SimulationResult {
   overallVerdict: 'APPROVED' | 'REJECTED' | 'MIXED';
   twins: DecisionTwin[];
@@ -257,30 +213,6 @@ export interface NoiseBenchmark {
   sourceUrl?: string;
 }
 
-export interface DocumentWithAnalysis {
-  id: string;
-  filename: string;
-  fileType: string;
-  fileSize: number;
-  content: string;
-  uploadedAt: Date;
-  status: string;
-  analyses: Array<{
-    id: string;
-    overallScore: number;
-    noiseScore: number;
-    summary: string;
-    createdAt: Date;
-    biases: Array<{
-      id: string;
-      biasType: string;
-      severity: string;
-      excerpt: string;
-      explanation: string;
-      suggestion: string;
-    }>;
-  }>;
-}
 
 export type BiasCategory =
   | 'confirmation_bias'

@@ -77,7 +77,7 @@ model Analysis {
   shareLinks   ShareLink[]
   outcome      DecisionOutcome?
   prior        DecisionPrior?
-  complianceAssessments ComplianceAssessment[]
+
   toxicCombinations ToxicCombination[]
   draftOutcomes     DraftOutcome[]
 
@@ -816,23 +816,6 @@ model JournalEntry {
   @@index([createdAt])
 }
 
-model ComplianceAssessment {
-  id              String   @id @default(cuid())
-  analysisId      String
-  framework       String   // "FCA_CONSUMER_DUTY" | "SOX" | "BASEL_III"
-  outcomeScores   Json     // { "products_services": 85, "price_value": 72, ... }
-  findings        Json     // detailed regulatory findings
-  riskLevel       String   // "low" | "medium" | "high" | "critical"
-  remediationPlan Json?    // suggested remediation steps
-  createdAt       DateTime @default(now())
-
-  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
-
-  @@index([analysisId])
-  @@index([framework])
-  @@index([riskLevel])
-}
-
 // ─── Public API Keys ──────────────────────────────────────────────────────
 
 model ApiKey {
@@ -973,19 +956,6 @@ model DraftOutcome {
   @@index([status])
 }
 
-model CausalDAG {
-  id            String   @id @default(cuid())
-  orgId         String   @unique
-  nodes         String[] // bias types + context factors + "outcome"
-  edges         Json     // [{ from, to, strength, confounders[] }]
-  sampleSize    Int
-  algorithm     String   @default("constraint_based") // constraint_based | score_based
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@index([orgId])
-}
-
 // ─── PE/VC Deal Management ───────────────────────────────────────────────
 
 model Deal {
@@ -1003,29 +973,13 @@ model Deal {
   status        String        @default("active") // active | passed | invested | written_off | exited
   exitDate      DateTime?
   documents     Document[]
-  outcome       DealOutcome?
+
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
   @@index([orgId, stage])
   @@index([orgId, status])
   @@index([orgId, dealType])
-}
-
-model DealOutcome {
-  id          String   @id @default(cuid())
-  dealId      String   @unique
-  deal        Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  irr         Float?                          // Internal Rate of Return (%)
-  moic        Float?                          // Multiple on Invested Capital
-  exitType    String?                         // ipo | trade_sale | secondary | write_off | partial_exit
-  exitValue   Decimal?
-  holdPeriod  Int?                            // months
-  notes       String?  @db.Text
-  reportedAt  DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([dealId])
 }
 
 // ─── Chat Persistence ─────────────────────────────────────────────────────
@@ -1037,21 +991,9 @@ model ChatSession {
   pinnedDocId     String?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  messages        ChatMessage[]
+
 
   @@index([userId, updatedAt])
-}
-
-model ChatMessage {
-  id        String      @id @default(cuid())
-  sessionId String
-  role      String      // "user" | "assistant"
-  content   String      @db.Text
-  sources   Json?       // ChatSource[]
-  createdAt DateTime    @default(now())
-  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  @@index([sessionId, createdAt])
 }
 
 model ApiUsage {
@@ -1187,26 +1129,6 @@ model WebhookDelivery {
 
   @@index([subscriptionId])
   @@index([createdAt])
-}
-
-model IntegrationConnection {
-  id           String    @id @default(cuid())
-  orgId        String
-  userId       String
-  provider     String    // "teams" | "jira" | "linear" | "google_calendar"
-  status       String    @default("active") // active | revoked | expired
-  accessToken  String?   // encrypted
-  refreshToken String?   // encrypted
-  tokenIv      String?
-  tokenTag     String?
-  metadata     Json?     // provider-specific config
-  scopes       String[]
-  expiresAt    DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  @@unique([orgId, provider])
-  @@index([provider])
 }
 
 // ─── Multi-Touch Decision Attribution ────────────────────────────────────
