@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://decisionintel.io';
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

@@ -15,7 +15,7 @@
 
 [![CI/CD](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml)
 
-**[Live Demo](https://decision-intel-chi.vercel.app/)** | **[Architecture](#architecture)** | **[Getting Started](#getting-started)** | **[Roadmap](#roadmap)**
+**[Live Demo](https://www.decision-intel.com/)** | **[Architecture](#architecture)** | **[Getting Started](#getting-started)** | **[Roadmap](#roadmap)**
 
 ---
 
