@@ -40,7 +40,10 @@ function stddev(values: number[]): number {
 }
 
 function normalizeAction(action: string): string {
-  return action.toLowerCase().trim().replace(/[^a-z0-9\s]/g, '');
+  return action
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s]/g, '');
 }
 
 // ─── Core ───────────────────────────────────────────────────────────────────

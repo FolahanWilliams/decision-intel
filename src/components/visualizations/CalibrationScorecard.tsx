@@ -92,10 +92,7 @@ export default function CalibrationScorecard({
     const outcomesRemaining = Math.max(0, nextLevel.minOutcomes - outcomes);
     const accuracyMet = accuracy >= nextLevel.minAccuracy;
     outcomesNeeded = outcomesRemaining;
-    progressPct = Math.min(
-      100,
-      Math.round((outcomes / nextLevel.minOutcomes) * 100)
-    );
+    progressPct = Math.min(100, Math.round((outcomes / nextLevel.minOutcomes) * 100));
 
     if (outcomesRemaining > 0 && accuracyMet) {
       progressMessage = `${outcomesRemaining} more outcome${outcomesRemaining !== 1 ? 's' : ''} to reach ${nextLevel.name}.`;
@@ -118,7 +115,14 @@ export default function CalibrationScorecard({
       }}
     >
       {/* Header with level badge */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 16,
+        }}
+      >
         <div>
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary, #fff)' }}>
             Calibration Level

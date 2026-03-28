@@ -93,18 +93,25 @@ export async function POST(req: NextRequest) {
               // Check if deliberation has escalated to a commitment
               if (isDecisionMessage(messageText)) {
                 const teamId = payload.team_id;
-                let frameInstallation: { installedByUserId: string; orgId: string | null } | null = null;
+                let frameInstallation: { installedByUserId: string; orgId: string | null } | null =
+                  null;
                 if (teamId) {
                   frameInstallation = await prisma.slackInstallation.findFirst({
                     where: { teamId, status: 'active' },
                     select: { installedByUserId: true, orgId: true },
                   });
                 }
-                const frameUserId = frameInstallation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || 'system-slack';
+                const frameUserId =
+                  frameInstallation?.installedByUserId ||
+                  process.env.SLACK_SYSTEM_USER_ID ||
+                  'system-slack';
                 const frameOrgId = frameInstallation?.orgId || teamId || null;
 
                 // Create HumanDecision from the commitment message
-                const contentHash = (await import('crypto')).createHash('sha256').update(messageText).digest('hex');
+                const contentHash = (await import('crypto'))
+                  .createHash('sha256')
+                  .update(messageText)
+                  .digest('hex');
                 const existingDecision = await prisma.humanDecision.findUnique({
                   where: { contentHash },
                   select: { id: true },
@@ -131,23 +138,24 @@ export async function POST(req: NextRequest) {
                     data: { linkedDecisionId: humanDecision.id },
                   });
 
-                  log.info(`Pre-decision thread resolved to decision ${humanDecision.id} in frame ${existingFrame.id}`);
+                  log.info(
+                    `Pre-decision thread resolved to decision ${humanDecision.id} in frame ${existingFrame.id}`
+                  );
 
                   // Run audit in background
                   const decisionInputForAudit = slackEventToDecisionInput(payload);
                   if (decisionInputForAudit) {
-                    processSlackDecision(humanDecision.id, decisionInputForAudit, teamId).catch(err => {
-                      log.error(`Background audit for linked decision failed:`, err);
-                    });
+                    processSlackDecision(humanDecision.id, decisionInputForAudit, teamId).catch(
+                      err => {
+                        log.error(`Background audit for linked decision failed:`, err);
+                      }
+                    );
                   }
                 }
               } else {
                 // Check for escalation: new biases detected in ongoing thread
                 const newBiases = detectMessageBiases(messageText);
-                const escalated = getEscalatedSeverity(
-                  existingFrame.escalationLevel,
-                  newBiases
-                );
+                const escalated = getEscalatedSeverity(existingFrame.escalationLevel, newBiases);
 
                 if (escalated) {
                   const nudge = generatePreDecisionNudge(messageText, newBiases);

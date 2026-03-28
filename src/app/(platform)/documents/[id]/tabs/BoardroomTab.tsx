@@ -44,8 +44,8 @@ export function BoardroomTab({ simulation, orgId, hasOutcome }: BoardroomTabProp
                       <TwinEffectivenessReport orgId={orgId} timeRange="all" />
                     ) : (
                       <div className="text-center p-4 text-muted" style={{ fontSize: 13 }}>
-                        Report outcomes to unlock twin accuracy insights. Each outcome teaches
-                        the platform which twins&apos; dissent actually matters.
+                        Report outcomes to unlock twin accuracy insights. Each outcome teaches the
+                        platform which twins&apos; dissent actually matters.
                       </div>
                     )}
                   </div>
