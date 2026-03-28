@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import type { ActivityItem } from '@/app/api/activity-feed/route';
 
@@ -23,6 +23,15 @@ export function useActivityFeed(options?: UseActivityFeedOptions) {
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Abort any in-flight loadMore on unmount
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, []);
+
   const typesParam = types?.length ? `&types=${types.join(',')}` : '';
   const url = `/api/activity-feed?limit=${limit}${typesParam}`;
 
@@ -40,8 +49,12 @@ export function useActivityFeed(options?: UseActivityFeedOptions) {
       return;
     }
 
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
-      const res = await fetch(`${url}&cursor=${encodeURIComponent(nextCursor)}`);
+      const res = await fetch(`${url}&cursor=${encodeURIComponent(nextCursor)}`, { signal: controller.signal });
       const result: ActivityFeedResponse = await res.json();
       setExtraActivities(prev => [...prev, ...result.activities]);
       setCursor(result.nextCursor);

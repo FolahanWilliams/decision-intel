@@ -33,7 +33,10 @@ export async function authenticateApiRequest(request: Request): Promise<AuthResu
     if (extUserId && !/^[a-zA-Z0-9_-]{1,128}$/.test(extUserId)) {
       return { error: 'Invalid extension user ID format', status: 400 };
     }
-    effectiveUserId = extUserId ? `ext_${extUserId}` : 'extension_guest';
+    if (!extUserId) {
+      return { error: 'Extension user ID required (x-extension-user-id header)', status: 401 };
+    }
+    effectiveUserId = `ext_${extUserId}`;
   }
 
   if (!effectiveUserId) {

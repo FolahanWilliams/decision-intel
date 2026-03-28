@@ -16,6 +16,7 @@ import {
   Landmark,
   RefreshCw,
 } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useMeetings } from '@/hooks/useMeetings';
@@ -59,6 +60,7 @@ export default function MeetingsPage() {
   ).length;
 
   return (
+    <ErrorBoundary sectionName="Meetings">
     <div
       className="container"
       style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
@@ -529,5 +531,6 @@ export default function MeetingsPage() {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

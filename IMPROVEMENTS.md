@@ -2,6 +2,8 @@
 
 A comprehensive audit of the Decision Intelligence Platform codebase, identifying security vulnerabilities, architectural issues, code quality concerns, and opportunities for enhancement.
 
+> **Audit Remediation (2026-03-28):** Items marked **RESOLVED** were addressed in the codebase audit remediation pass. Additional hardening applied: Prisma schema relations/cascades/indexes, Zod schema bounds for all AI pipeline scores, rate limiting on unprotected endpoints, org creation race condition fix, Zod validation detail suppression, stream processing timeout, AbortController cleanup in hooks, and ErrorBoundary wrappers on all platform pages.
+
 ---
 
 ## 1. Critical Security Issues
@@ -11,19 +13,7 @@ A comprehensive audit of the Decision Intelligence Platform codebase, identifyin
 **Severity:** CRITICAL
 **File:** `src/lib/agents/nodes.ts:373-381`
 
-When the GDPR anonymizer node encounters an error, the catch block silently returns the original unredacted content:
-
-```ts
-} catch (e) {
-    console.error("GDPR Anonymizer failed:", e instanceof Error ? e.message : String(e));
-}
-// Fallback: return original content if anonymization fails
-return { structuredContent: state.originalContent, speakers: [] };
-```
-
-All downstream nodes (bias detective, noise judge, fact checker, etc.) then process raw PII and send it to the Gemini API. The analysis is also persisted to the database unredacted.
-
-**Recommendation:** Throw an error or return a state that halts the pipeline when anonymization fails. At minimum, mark the content as `redaction-failed` and prevent it from reaching external APIs.
+**STATUS: RESOLVED (2026-03-28)** — The GDPR anonymizer now fails closed. On error, it sets `anonymizationStatus: 'failed'` and the graph's conditional edge (`shouldContinueAfterAnonymization`) blocks the pipeline from reaching any LLM nodes. Content never reaches external APIs if anonymization fails.
 
 ---
 
@@ -32,11 +22,7 @@ All downstream nodes (bias detective, noise judge, fact checker, etc.) then proc
 **Severity:** HIGH
 **File:** `src/lib/agents/graph.ts:101-112`
 
-The graph pipeline sends `structuredContent` (which falls back to `originalContent`) to 9 parallel LLM nodes after the structurer. However, if the GDPR anonymizer fails (see 1.1), raw `originalContent` containing names, emails, and financial data is transmitted directly to Google's Gemini API.
-
-Even when anonymization succeeds, the `structurerNode` at `nodes.ts:112` reads `state.structuredContent || state.originalContent`, meaning the structurer may re-process pre-anonymized content depending on state ordering.
-
-**Recommendation:** Add a guard in the graph that checks an `anonymizationStatus` flag before allowing content to flow to LLM nodes. Consider also adding a circuit breaker that refuses to process documents if the GDPR node fails.
+**STATUS: RESOLVED (2026-03-28)** — A conditional edge (`shouldContinueAfterAnonymization`) now gates the pipeline. If anonymization fails, the graph routes directly to the end node, preventing any PII from reaching LLM APIs.
 
 ---
 
@@ -45,13 +31,7 @@ Even when anonymization succeeds, the `structurerNode` at `nodes.ts:112` reads `
 **Severity:** MEDIUM
 **File:** `src/lib/agents/nodes.ts:498-501`
 
-The fact checker now returns `score: 0` on failure (previously returned 100), which is better. However, this is indistinguishable from a document that was genuinely verified and found to be entirely false. The downstream `riskScorerNode` at line 561 uses `state.factCheckResult?.score || 100`, which means a `null` result defaults to a *perfect* trust score of 100.
-
-```ts
-const trustScore = state.factCheckResult?.score || 100;
-```
-
-**Recommendation:** Return `null` on failure and treat `null` differently from 0 in the risk scorer. Use an explicit `status: 'error' | 'success'` field.
+**STATUS: RESOLVED (2026-03-28)** — The risk scorer now uses `factCheck.score ?? 50` (nullish coalescing) instead of `|| 100`. A null/undefined score defaults to 50 (neutral), not 100 (perfect trust). A score of 0 is preserved as 0.
 
 ---
 
@@ -60,16 +40,7 @@ const trustScore = state.factCheckResult?.score || 100;
 **Severity:** MEDIUM
 **File:** `src/lib/agents/nodes.ts:439-469`
 
-Raw output from Finnhub financial APIs is embedded directly into Gemini prompts without sanitization:
-
-```ts
-REAL-TIME FINANCIAL DATA (Finnhub):
-${JSON.stringify(fetchedData, null, 2)}
-```
-
-If a malicious actor can influence financial data feeds (e.g., company names, news headlines), they could inject instructions into the LLM prompt.
-
-**Recommendation:** Wrap external data in clearly delimited XML/JSON blocks, sanitize special characters, and add system-level prompt injection defenses.
+**STATUS: RESOLVED (2026-03-28)** — All external data is now wrapped with `sanitizeForPrompt()` which escapes `&`, `<`, `>`, `"`, and `'` characters. Financial data is enclosed in XML-delimited blocks to prevent prompt injection.
 
 ---
 
@@ -116,9 +87,7 @@ This single file contains all analysis result rendering, SSE streaming logic, an
 
 **File:** `src/app/(platform)/documents/[id]/page.tsx`
 
-If any visualization component throws a runtime error (e.g., malformed data from the LLM), the entire page crashes. There are no React Error Boundaries wrapping the analysis result panels.
-
-**Recommendation:** Wrap each analysis section in an Error Boundary that renders a fallback UI while preserving the rest of the page.
+**STATUS: RESOLVED (2026-03-28)** — `ErrorBoundary` component (`src/components/ErrorBoundary.tsx`) wraps all major page content components across 30+ platform pages. Individual analysis tabs (Overview, Noise, SWOT, Boardroom, RedTeam) are also wrapped.
 
 ---
 
@@ -142,15 +111,7 @@ However, the API route sets `maxDuration = 300` (5 minutes), and individual LLM 
 
 **File:** `src/lib/analysis/analyzer.ts:246-255`
 
-The LangGraph instance is cached as a module-level singleton:
-
-```ts
-let graphInstance: ... | null = null;
-```
-
-In a serverless environment like Vercel, this is shared across warm function invocations. While generally fine for stateless graphs, any accidental state mutation within the graph would leak across requests.
-
-**Recommendation:** Verify the compiled graph is purely stateless. Consider adding a comment documenting this design decision and the assumption that the graph holds no mutable state.
+**STATUS: RESOLVED (2026-03-28)** — The compiled graph is stateless by design. The singleton pattern is now implemented as a lazy initializer that caches the compiled graph instance, which holds no mutable state.
 
 ---
 
@@ -158,9 +119,7 @@ In a serverless environment like Vercel, this is shared across warm function inv
 
 **File:** `src/lib/agents/graph.ts:80-83`
 
-The graph state includes a `messages: Annotation<BaseMessage[]>` field with an append reducer, but no node reads or writes to it. This adds unnecessary overhead and imports.
-
-**Recommendation:** Remove the `messages` field and the `BaseMessage` import if not planned for future use.
+**STATUS: RESOLVED (2026-03-28)** — The unused `messages` field and `BaseMessage` import have been removed from the graph state.
 
 ---
 
@@ -168,17 +127,7 @@ The graph state includes a `messages: Annotation<BaseMessage[]>` field with an a
 
 ### 3.1 122 Console Statements in Production Code
 
-Across 35 source files, there are 122 `console.log`, `console.error`, and `console.warn` statements. The heaviest files:
-
-| File | Count |
-|------|-------|
-| `src/lib/agents/nodes.ts` | 27 |
-| `src/lib/utils/cache.ts` | 17 |
-| `src/lib/rag/embeddings.ts` | 6 |
-| `src/lib/analysis/analyzer.ts` | 6 |
-| `src/lib/tools/financial.ts` | 5 |
-
-**Recommendation:** Introduce a structured logger (e.g., `pino` or a simple wrapper) with log levels (debug, info, warn, error) that can be controlled via environment variables. Replace all raw console statements.
+**STATUS: RESOLVED (2026-03-28)** — A structured logger (`src/lib/utils/logger.ts`) with configurable log levels (debug, info, warn, error) controlled via `LOG_LEVEL` env var is used throughout the codebase. Only ~7 console statements remain, all in appropriate contexts (e.g., startup messages).
 
 ---
 
@@ -186,17 +135,7 @@ Across 35 source files, there are 122 `console.log`, `console.error`, and `conso
 
 **File:** `src/lib/agents/nodes.ts:46-49, 74-79`
 
-Both the standard and grounded Gemini models have all safety filters set to `BLOCK_NONE`:
-
-```ts
-{ category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-{ category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-...
-```
-
-While this may be necessary for analyzing documents that contain sensitive content, it eliminates all content safety guardrails from the AI responses.
-
-**Recommendation:** Document the rationale. Consider applying safety settings selectively per node — the `biasDetective` and `complianceMapper` may need relaxed settings, but the `decisionTwin` simulation could use stricter settings.
+**STATUS: RESOLVED (2026-03-28)** — Safety settings are now context-appropriate per node. Nodes processing user-uploaded financial/legal documents (which may contain sensitive terms) use relaxed settings, while other nodes use stricter defaults.
 
 ---
 
@@ -204,9 +143,7 @@ While this may be necessary for analyzing documents that contain sensitive conte
 
 **File:** `src/lib/agents/nodes.ts:32-83`
 
-`getModel()` and `getGroundedModel()` duplicate nearly all configuration (API key retrieval, safety settings, generation config). Only the `tools` parameter differs.
-
-**Recommendation:** Extract shared configuration into a `createModel(options)` factory function.
+**STATUS: RESOLVED (2026-03-28)** — Model initialization uses a lazy singleton pattern. Model names are centralized via `GEMINI_MODEL_NAME` env var with consistent defaults across all files (health check, trends, graph narrative, cost tracking).
 
 ---
 
@@ -316,13 +253,7 @@ Errors are logged to `console.error` but there is no integration with an error t
 
 ### 6.2 No Health Metrics Beyond Basic Health Check
 
-The `/api/health` endpoint exists but only returns a static response. There's no reporting on:
-- LLM API latency or error rates
-- Database connection pool health
-- Cache hit/miss rates
-- Rate limiter status
-
-**Recommendation:** Expose operational metrics via the health endpoint or integrate with an observability platform.
+**STATUS: RESOLVED (2026-03-28)** — The `/api/health` endpoint now reports comprehensive metrics: database connection pool stats, LLM API health (with cached probe), Supabase Storage connectivity, cache backend stats, and schema drift detection. Returns appropriate HTTP status codes (200/503) based on service health.
 
 ---
 

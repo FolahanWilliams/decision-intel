@@ -14,6 +14,7 @@ import {
   X,
   FileAudio,
 } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SOURCE_LABELS } from '@/lib/constants/human-audit';
 
@@ -196,6 +197,7 @@ export default function SubmitDecisionPage() {
   };
 
   return (
+    <ErrorBoundary sectionName="Submit Decision">
     <div
       className="container"
       style={{
@@ -546,5 +548,6 @@ export default function SubmitDecisionPage() {
         </div>
       </form>
     </div>
+    </ErrorBoundary>
   );
 }

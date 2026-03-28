@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Users,
 } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 /**
  * Decision Framing Page (Moat 4: Outcomes-First Workflow)
@@ -99,6 +100,7 @@ export default function NewDecisionPage() {
   }
 
   return (
+    <ErrorBoundary sectionName="New Decision">
     <div className="mx-auto max-w-3xl px-4 py-8">
       {/* Header */}
       <div className="mb-8">
@@ -292,5 +294,6 @@ export default function NewDecisionPage() {
         </div>
       </form>
     </div>
+    </ErrorBoundary>
   );
 }

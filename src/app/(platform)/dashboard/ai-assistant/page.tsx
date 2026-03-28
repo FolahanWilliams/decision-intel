@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Sparkles, MessageSquare } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { TabBar } from '@/components/ui/TabBar';
 import { CopilotPageContent } from '@/components/copilot/CopilotPageContent';
 import { ChatPageContent } from '@/components/chat/ChatPageContent';
@@ -37,8 +38,10 @@ function AIAssistantInner() {
 
 export default function AIAssistantPage() {
   return (
-    <Suspense fallback={null}>
-      <AIAssistantInner />
-    </Suspense>
+    <ErrorBoundary sectionName="AI Assistant">
+      <Suspense fallback={null}>
+        <AIAssistantInner />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

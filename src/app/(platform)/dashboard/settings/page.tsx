@@ -1,3 +1,4 @@
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { getUserSettings } from '@/app/actions/settings';
 import SettingsForm from './SettingsForm';
 import { createClient } from '@/utils/supabase/server';
@@ -16,5 +17,9 @@ export default async function SettingsPage() {
     darkMode: true,
   };
 
-  return <SettingsForm initialSettings={settings || defaultSettings} userEmail={user?.email} />;
+  return (
+    <ErrorBoundary sectionName="Settings">
+      <SettingsForm initialSettings={settings || defaultSettings} userEmail={user?.email} />
+    </ErrorBoundary>
+  );
 }

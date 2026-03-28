@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase/server';
 import { cn } from '@/lib/utils';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { RootCauseSection } from '@/components/ui/RootCauseSection';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface PageProps {
   params: {
@@ -59,6 +60,7 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
   }
 
   return (
+    <ErrorBoundary sectionName="Cognitive Audit Detail">
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Cognitive Audit Detail</h1>
@@ -157,5 +159,6 @@ export default async function CognitiveAuditDetailPage({ params }: PageProps) {
       {/* Related Decisions from Knowledge Graph */}
       <RelatedDecisions analysisId={params.id} />
     </div>
+    </ErrorBoundary>
   );
 }

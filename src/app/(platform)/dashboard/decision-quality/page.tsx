@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BrainCircuit, Bell } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TabBar } from '@/components/ui/TabBar';
 import { AuditsPageContent } from '@/components/audits/AuditsPageContent';
@@ -48,8 +49,10 @@ function DecisionQualityInner() {
 
 export default function DecisionQualityPage() {
   return (
-    <Suspense fallback={null}>
-      <DecisionQualityInner />
-    </Suspense>
+    <ErrorBoundary sectionName="Decision Quality">
+      <Suspense fallback={null}>
+        <DecisionQualityInner />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

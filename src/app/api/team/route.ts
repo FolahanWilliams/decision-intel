@@ -80,22 +80,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, slug } = CreateOrgSchema.parse(body);
 
-    // Check if user already owns an org
-    const existing = await prisma.teamMember.findFirst({
-      where: { userId: user.id, role: 'owner' },
-    });
-    if (existing) {
-      return NextResponse.json({ error: 'You already own an organization' }, { status: 409 });
-    }
-
-    // Check slug uniqueness
-    const slugExists = await prisma.organization.findUnique({ where: { slug } });
-    if (slugExists) {
-      return NextResponse.json({ error: 'This team URL is already taken' }, { status: 409 });
-    }
-
-    // Create org + owner membership in a transaction
+    // Atomically check uniqueness + create inside a single transaction
     const org = await prisma.$transaction(async tx => {
+      const existing = await tx.teamMember.findFirst({
+        where: { userId: user.id, role: 'owner' },
+      });
+      if (existing) throw new Error('ALREADY_OWNS_ORG');
+
+      const slugExists = await tx.organization.findUnique({ where: { slug } });
+      if (slugExists) throw new Error('SLUG_TAKEN');
+
       const newOrg = await tx.organization.create({
         data: { name, slug },
       });
@@ -114,13 +108,21 @@ export async function POST(req: NextRequest) {
       });
 
       return newOrg;
+    }).catch((err: Error) => {
+      if (err.message === 'ALREADY_OWNS_ORG') return { _conflict: 'You already own an organization' } as const;
+      if (err.message === 'SLUG_TAKEN') return { _conflict: 'This team URL is already taken' } as const;
+      throw err;
     });
+
+    if ('_conflict' in org) {
+      return NextResponse.json({ error: org._conflict }, { status: 409 });
+    }
 
     log.info(`Organization created: ${org.id} by ${user.id}`);
     return NextResponse.json(org, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.issues[0].message }, { status: 400 });
+      return NextResponse.json({ error: 'Validation failed' }, { status: 400 });
     }
     log.error('Failed to create organization:', error);
     return NextResponse.json({ error: 'Failed to create organization' }, { status: 500 });
@@ -177,7 +179,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(updated);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.issues[0].message }, { status: 400 });
+      return NextResponse.json({ error: 'Validation failed' }, { status: 400 });
     }
     log.error('Failed to update organization:', error);
     return NextResponse.json({ error: 'Failed to update organization' }, { status: 500 });

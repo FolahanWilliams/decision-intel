@@ -295,6 +295,13 @@ export async function POST(request: NextRequest) {
 
           let result: Record<string, unknown> | null = null;
 
+          // Safety timeout: close stream 5s before Vercel maxDuration
+          const streamAbsoluteTimeout = setTimeout(() => {
+            log.error('Stream absolute timeout (235s) exceeded — closing');
+            sendUpdate({ type: 'error', message: 'Analysis timeout exceeded. Please try again with a shorter document.', progress: 0 });
+            controller.close();
+          }, 235_000);
+
           for await (const event of eventStream) {
             // Track node start events
             if (event.event === 'on_chain_start' && event.name && NODE_LABELS[event.name]) {
@@ -607,7 +614,7 @@ export async function POST(request: NextRequest) {
             provider: 'google',
             operation: 'analyze_document',
             tokens: doc.content.length, // Approximate token count from content length
-            cost: estimateCost('gemini-2.0-flash', doc.content.length, 4000),
+            cost: estimateCost(process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview', doc.content.length, 4000),
             metadata: { documentId, filename: doc.filename },
           });
 
@@ -705,6 +712,7 @@ export async function POST(request: NextRequest) {
 
           if (heartbeatInterval) {
             clearInterval(heartbeatInterval);
+            clearTimeout(streamAbsoluteTimeout);
           }
           controller.close();
         } catch (error) {
@@ -777,6 +785,7 @@ export async function POST(request: NextRequest) {
 
           if (heartbeatInterval) {
             clearInterval(heartbeatInterval);
+            clearTimeout(streamAbsoluteTimeout);
           }
           controller.close();
         }

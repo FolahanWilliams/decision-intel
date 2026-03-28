@@ -11,15 +11,15 @@ import { z } from 'zod';
 
 export const NoiseStatsSchema = z
   .object({
-    mean: z.number().default(0),
-    stdDev: z.number().default(0),
-    variance: z.number().default(0),
+    mean: z.number().min(0).max(100).default(0),
+    stdDev: z.number().min(0).default(0),
+    variance: z.number().min(0).default(0),
   })
   .default({ mean: 0, stdDev: 0, variance: 0 });
 
 export const FactCheckSchema = z
   .object({
-    score: z.number().default(0),
+    score: z.number().min(0).max(100).default(0),
     summary: z.string().default('Unavailable'),
     verifications: z.array(z.record(z.string(), z.unknown())).default([]),
     flags: z.array(z.string()).default([]),
@@ -32,7 +32,7 @@ export const FactCheckSchema = z
 export const ComplianceSchema = z
   .object({
     status: z.string().default('WARN'),
-    riskScore: z.number().default(0),
+    riskScore: z.number().min(0).max(100).default(0),
     summary: z.string().default('Compliance check unavailable'),
     regulations: z.array(z.record(z.string(), z.unknown())).default([]),
     searchQueries: z.array(z.string()).optional(),
@@ -47,14 +47,17 @@ export const ComplianceSchema = z
 
 export const SentimentSchema = z
   .object({
-    score: z.number().default(0),
-    label: z.string().default('Neutral'),
+    score: z.number().min(0).max(100).default(0),
+    label: z
+      .enum(['Positive', 'Negative', 'Neutral', 'Mixed'])
+      .catch('Neutral')
+      .default('Neutral'),
   })
   .default({ score: 0, label: 'Neutral' });
 
 export const LogicalSchema = z
   .object({
-    score: z.number().default(100),
+    score: z.number().min(0).max(100).default(100),
     fallacies: z.array(z.record(z.string(), z.unknown())).default([]),
   })
   .default({ score: 100, fallacies: [] });
@@ -71,7 +74,7 @@ export const SwotSchema = z
 
 export const CognitiveSchema = z
   .object({
-    blindSpotGap: z.number().default(0),
+    blindSpotGap: z.number().min(0).max(100).default(0),
     blindSpots: z
       .array(
         z.object({
@@ -93,7 +96,7 @@ export const SimulationSchema = z
 
 export const MemorySchema = z
   .object({
-    recallScore: z.number().default(0),
+    recallScore: z.number().min(0).max(100).default(0),
     similarEvents: z.array(z.record(z.string(), z.unknown())).default([]),
   })
   .optional();

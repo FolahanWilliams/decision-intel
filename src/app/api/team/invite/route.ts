@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
@@ -26,6 +27,15 @@ export async function POST(req: NextRequest) {
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Rate limit: 10 invites per hour
+  const rateLimitResult = await checkRateLimit(user.id, '/api/team/invite', {
+    windowMs: 60 * 60 * 1000,
+    maxRequests: 10,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
   }
 
   try {
@@ -101,7 +111,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(invite, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.issues[0].message }, { status: 400 });
+      return NextResponse.json({ error: 'Validation failed' }, { status: 400 });
     }
     log.error('Failed to create invite:', error);
     return NextResponse.json({ error: 'Failed to send invite' }, { status: 500 });

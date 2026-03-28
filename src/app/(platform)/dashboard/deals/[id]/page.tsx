@@ -5,6 +5,7 @@ import { useToast } from '@/components/ui/EnhancedToast';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Edit2, ChevronRight, FileText, Upload, AlertTriangle } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useDeal } from '@/hooks/useDeals';
 import { DealFormModal } from '@/components/deals/DealFormModal';
 import { DealOutcomeForm } from '@/components/deals/DealOutcomeForm';
@@ -119,6 +120,7 @@ export default function DealDetailPage() {
   const nextStage = getNextStage(deal.stage);
 
   return (
+    <ErrorBoundary sectionName="Deal Detail">
     <div className="container" style={{ maxWidth: 1000, padding: '24px 20px' }}>
       {/* Back link */}
       <Link
@@ -298,6 +300,7 @@ export default function DealDetailPage() {
         onSuccess={() => mutate()}
       />
     </div>
+    </ErrorBoundary>
   );
 }
 

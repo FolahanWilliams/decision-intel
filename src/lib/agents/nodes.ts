@@ -210,7 +210,9 @@ function sanitizeForPrompt(data: unknown, label: string = 'external_data'): stri
   const json = JSON.stringify(data, null, 2)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
   return `<${label}>\n${json}\n</${label}>`;
 }
 

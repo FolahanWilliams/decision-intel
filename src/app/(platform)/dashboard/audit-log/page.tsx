@@ -1,3 +1,4 @@
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import {
@@ -68,6 +69,7 @@ export default async function AuditLogPage({
   );
 
   return (
+    <ErrorBoundary sectionName="Audit Log">
     <div className="container py-8">
       <header className="mb-8">
         <div className="flex items-start justify-between">
@@ -227,5 +229,6 @@ export default async function AuditLogPage({
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

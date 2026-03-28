@@ -19,6 +19,7 @@ import {
   Upload,
   Activity,
 } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useMeetings, type MeetingSummary } from '@/hooks/useMeetings';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -375,6 +376,7 @@ export default function MeetingCommandCenterPage() {
   const snapshot = teamData?.snapshot;
 
   return (
+    <ErrorBoundary sectionName="Meeting Command Center">
     <div
       style={{
         padding: 'var(--spacing-xl)',
@@ -668,5 +670,6 @@ export default function MeetingCommandCenterPage() {
         )}
       </section>
     </div>
+    </ErrorBoundary>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Search, Filter, BookOpen, Brain } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BIAS_CATEGORIES, type BiasCategory } from '@/types';
 import { BiasEducationCard } from '@/components/ui/BiasEducationCard';
 import { useDocuments } from '@/hooks/useDocuments';
@@ -79,6 +80,7 @@ export default function BiasLibraryPage() {
   };
 
   return (
+    <ErrorBoundary sectionName="Bias Library">
     <div
       style={{
         maxWidth: '1100px',
@@ -274,5 +276,6 @@ export default function BiasLibraryPage() {
         ))}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }
