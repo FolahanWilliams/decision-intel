@@ -41,6 +41,9 @@ import {
   TrendingUp,
   TrendingDown,
   Download,
+  Loader2,
+  ExternalLink,
+  Globe,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 // Breadcrumbs handled by parent page
@@ -273,6 +276,31 @@ export function InsightsPageContent() {
   const { trends: trendData, isLoading: trendsLoading } = useTrends(trendRange);
   const [graphOrgId, setGraphOrgId] = useState<string | null>(null);
   const { graphTrends } = useGraphTrends(graphOrgId);
+  const [marketAnalysis, setMarketAnalysis] = useState<{
+    summary: string;
+    impactAssessment: { category: string; status: string; details: string }[];
+    searchSources: string[];
+  } | null>(null);
+  const [marketAnalysisLoading, setMarketAnalysisLoading] = useState(false);
+  const [marketAnalysisError, setMarketAnalysisError] = useState<string | null>(null);
+
+  const handleRunMarketAnalysis = async () => {
+    setMarketAnalysisLoading(true);
+    setMarketAnalysisError(null);
+    try {
+      const res = await fetch('/api/trends/analyze', { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok) {
+        setMarketAnalysisError(json.error || 'Market analysis failed');
+      } else {
+        setMarketAnalysis(json);
+      }
+    } catch {
+      setMarketAnalysisError('Failed to connect to market analysis service');
+    } finally {
+      setMarketAnalysisLoading(false);
+    }
+  };
 
   // Fetch orgId for graph trends
   useEffect(() => {
@@ -1355,27 +1383,159 @@ export function InsightsPageContent() {
               </button>
             ))}
           </div>
-          {trendData && trendData.trendData.length > 0 && (
+          <div className="flex items-center gap-sm">
             <button
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                const csvContent = [
-                  ['Date', 'Score', 'Noise', 'Volume'].join(','),
-                  ...trendData.trendData.map(d => [d.date, d.score, d.noise, d.volume].join(',')),
-                ].join('\n');
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `trends-${trendRange}.csv`;
-                a.click();
-                URL.revokeObjectURL(url);
+              className="btn btn-sm"
+              onClick={handleRunMarketAnalysis}
+              disabled={marketAnalysisLoading}
+              style={{
+                background: 'rgba(99, 102, 241, 0.1)',
+                border: '1px solid rgba(99, 102, 241, 0.3)',
+                color: '#818cf8',
+                fontSize: '11px',
+                fontWeight: 600,
               }}
             >
-              <Download size={12} /> Export
+              {marketAnalysisLoading ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <Globe size={12} />
+              )}
+              {marketAnalysisLoading ? 'Analyzing...' : 'Market Intelligence'}
             </button>
-          )}
+            {trendData && trendData.trendData.length > 0 && (
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => {
+                  const csvContent = [
+                    ['Date', 'Score', 'Noise', 'Volume'].join(','),
+                    ...trendData.trendData.map(d => [d.date, d.score, d.noise, d.volume].join(',')),
+                  ].join('\n');
+                  const blob = new Blob([csvContent], { type: 'text/csv' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `trends-${trendRange}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+              >
+                <Download size={12} /> Export
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Market Analysis Results */}
+        {marketAnalysisError && (
+          <div
+            className="card mb-md"
+            style={{ border: '1px solid rgba(248, 113, 113, 0.3)' }}
+          >
+            <div className="card-body flex items-center gap-sm" style={{ padding: '12px 16px' }}>
+              <AlertTriangle size={14} style={{ color: '#f87171', flexShrink: 0 }} />
+              <span style={{ fontSize: '12px', color: '#f87171' }}>{marketAnalysisError}</span>
+            </div>
+          </div>
+        )}
+
+        {marketAnalysis && (
+          <div className="card mb-md" style={{ border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+            <div className="card-header flex items-center justify-between">
+              <div className="flex items-center gap-sm">
+                <Globe size={14} style={{ color: '#818cf8' }} />
+                <h3 style={{ fontSize: '13px', color: '#818cf8' }}>Market Intelligence</h3>
+              </div>
+              <button
+                className="btn btn-sm btn-secondary"
+                onClick={() => setMarketAnalysis(null)}
+                style={{ fontSize: '10px', padding: '2px 8px' }}
+              >
+                Dismiss
+              </button>
+            </div>
+            <div className="card-body" style={{ padding: '12px 16px' }}>
+              {/* Summary */}
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '12px' }}>
+                {marketAnalysis.summary.split('\n').map((line, i) => (
+                  <span key={i}>
+                    {line}
+                    {i < marketAnalysis.summary.split('\n').length - 1 && <br />}
+                  </span>
+                ))}
+              </div>
+
+              {/* Impact Assessment Grid */}
+              {marketAnalysis.impactAssessment.length > 0 && (
+                <div className="grid grid-3 gap-sm" style={{ marginBottom: '12px' }}>
+                  {marketAnalysis.impactAssessment.map((item) => {
+                    const statusColor =
+                      item.status === 'High' ? '#f87171' : item.status === 'Medium' ? '#fbbf24' : '#34d399';
+                    return (
+                      <div
+                        key={item.category}
+                        style={{
+                          padding: '10px 12px',
+                          background: 'rgba(255, 255, 255, 0.03)',
+                          borderRadius: 'var(--radius-sm)',
+                          border: `1px solid ${statusColor}20`,
+                        }}
+                      >
+                        <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                            {item.category}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: statusColor,
+                              padding: '1px 6px',
+                              borderRadius: '4px',
+                              background: `${statusColor}15`,
+                            }}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
+                          {item.details}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Sources */}
+              {marketAnalysis.searchSources.length > 0 && (
+                <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Sources:</span>
+                  {marketAnalysis.searchSources.slice(0, 5).map((url, i) => (
+                    <a
+                      key={i}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-xs"
+                      style={{
+                        fontSize: '10px',
+                        color: '#818cf8',
+                        textDecoration: 'none',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        background: 'rgba(99, 102, 241, 0.08)',
+                      }}
+                    >
+                      <ExternalLink size={8} />
+                      {new URL(url).hostname.replace('www.', '')}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {trendsLoading ? (
           <div className="card animate-pulse">
