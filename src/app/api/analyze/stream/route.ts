@@ -239,6 +239,7 @@ export async function POST(request: NextRequest) {
           : new Set<string>();
         const totalNodes = Object.keys(NODE_LABELS).length;
 
+        let streamAbsoluteTimeout: ReturnType<typeof setTimeout> | undefined;
         try {
           // Status already set to 'analyzing' by atomic lock above
 
@@ -296,7 +297,8 @@ export async function POST(request: NextRequest) {
           let result: Record<string, unknown> | null = null;
 
           // Safety timeout: close stream 5s before Vercel maxDuration
-          const streamAbsoluteTimeout = setTimeout(() => {
+          // Declared as let so it's accessible in the catch block
+          streamAbsoluteTimeout = setTimeout(() => {
             log.error('Stream absolute timeout (235s) exceeded — closing');
             sendUpdate({ type: 'error', message: 'Analysis timeout exceeded. Please try again with a shorter document.', progress: 0 });
             controller.close();
