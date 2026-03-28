@@ -27,7 +27,6 @@ import {
   Lightbulb,
   Plug,
   Briefcase,
-  Rocket,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -512,14 +511,6 @@ export default function Sidebar() {
               icon={<Settings size={18} />}
               label="Settings"
               active={pathname === '/dashboard/settings'}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
-            <NavItem
-              href="/dashboard/founder-hub"
-              icon={<Rocket size={18} />}
-              label="Founder Hub"
-              active={pathname === '/dashboard/founder-hub'}
               collapsed={collapsed}
               onNavigate={closeMobile}
             />

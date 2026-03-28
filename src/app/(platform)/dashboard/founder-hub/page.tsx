@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Rocket,
   Brain,
@@ -18,6 +18,7 @@ import {
   CheckCircle,
   Network,
   MessageSquare,
+  Lock,
 } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -1305,8 +1306,102 @@ function FounderPlaybook() {
 
 // ─── Main Page ──────────────────────────────────────────────────────────────
 
+// Password for founder-only access. Set via env var or hardcode for simplicity.
+const FOUNDER_PASS = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS || 'decisionintel2024';
+
 export default function FounderHubPage() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [unlocked, setUnlocked] = useState(false);
+  const [passInput, setPassInput] = useState('');
+  const [passError, setPassError] = useState(false);
+
+  const handleUnlock = useCallback(() => {
+    if (passInput === FOUNDER_PASS) {
+      setUnlocked(true);
+      setPassError(false);
+    } else {
+      setPassError(true);
+    }
+  }, [passInput]);
+
+  // Password gate
+  if (!unlocked) {
+    return (
+      <div
+        className="max-w-md mx-auto px-4"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '60vh',
+        }}
+      >
+        <Lock size={40} style={{ color: 'var(--text-muted, #71717a)', marginBottom: 16 }} />
+        <h2
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: 'var(--text-primary, #fff)',
+            marginBottom: 8,
+          }}
+        >
+          Founder Access Only
+        </h2>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--text-muted, #71717a)',
+            marginBottom: 20,
+            textAlign: 'center',
+          }}
+        >
+          This page is private. Enter the access code to continue.
+        </p>
+        <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+          <input
+            type="password"
+            value={passInput}
+            onChange={e => {
+              setPassInput(e.target.value);
+              setPassError(false);
+            }}
+            onKeyDown={e => e.key === 'Enter' && handleUnlock()}
+            placeholder="Access code"
+            style={{
+              flex: 1,
+              padding: '10px 14px',
+              fontSize: 14,
+              borderRadius: 8,
+              border: `1px solid ${passError ? '#ef4444' : 'var(--border-primary, #333)'}`,
+              background: 'var(--bg-secondary, #111)',
+              color: 'var(--text-primary, #fff)',
+              outline: 'none',
+            }}
+            autoFocus
+          />
+          <button
+            onClick={handleUnlock}
+            style={{
+              padding: '10px 20px',
+              fontSize: 14,
+              fontWeight: 600,
+              borderRadius: 8,
+              border: 'none',
+              background: '#6366f1',
+              color: '#fff',
+              cursor: 'pointer',
+            }}
+          >
+            Unlock
+          </button>
+        </div>
+        {passError && (
+          <p style={{ fontSize: 12, color: '#ef4444', marginTop: 8 }}>Incorrect access code.</p>
+        )}
+      </div>
+    );
+  }
 
   const TAB_CONTENT: Record<TabId, React.ReactNode> = {
     overview: <ProductOverview />,
