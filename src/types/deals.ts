@@ -34,12 +34,12 @@ export const DEAL_STAGES: SelectOption[] = [
 ];
 
 export const STAGE_COLORS: Record<string, string> = {
-  screening: '#6366f1',     // indigo
+  screening: '#6366f1', // indigo
   due_diligence: '#f59e0b', // amber
-  ic_review: '#8b5cf6',     // violet
-  closing: '#3b82f6',       // blue
-  portfolio: '#10b981',     // emerald
-  exited: '#6b7280',        // gray
+  ic_review: '#8b5cf6', // violet
+  closing: '#3b82f6', // blue
+  portfolio: '#10b981', // emerald
+  exited: '#6b7280', // gray
 };
 
 // ─── Deal Statuses ───────────────────────────────────────────────────────────
@@ -168,23 +168,23 @@ export interface DealFilters {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 export function getStageLabel(stage: string): string {
-  return DEAL_STAGES.find((s) => s.value === stage)?.label || stage;
+  return DEAL_STAGES.find(s => s.value === stage)?.label || stage;
 }
 
 export function getDealTypeLabel(dealType: string): string {
-  return DEAL_TYPES.find((t) => t.value === dealType)?.label || dealType;
+  return DEAL_TYPES.find(t => t.value === dealType)?.label || dealType;
 }
 
 export function getDocTypeLabel(docType: string): string {
-  return DOCUMENT_TYPES.find((d) => d.value === docType)?.label || docType;
+  return DOCUMENT_TYPES.find(d => d.value === docType)?.label || docType;
 }
 
 export function getExitTypeLabel(exitType: string): string {
-  return EXIT_TYPES.find((e) => e.value === exitType)?.label || exitType;
+  return EXIT_TYPES.find(e => e.value === exitType)?.label || exitType;
 }
 
 export function getNextStage(currentStage: string): string | null {
-  const idx = DEAL_STAGES.findIndex((s) => s.value === currentStage);
+  const idx = DEAL_STAGES.findIndex(s => s.value === currentStage);
   if (idx === -1 || idx === DEAL_STAGES.length - 1) return null;
   return DEAL_STAGES[idx + 1].value;
 }

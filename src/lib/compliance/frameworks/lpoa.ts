@@ -62,7 +62,7 @@ export const LPOA_FRAMEWORK: RegulatoryFramework = {
       section: 'Key Person',
       title: 'Key Person Provisions',
       description:
-        'Identifies the individuals whose continued involvement is material to the fund\'s investment program and specifies the consequences of a key person event, including suspension of the investment period, LP notification requirements, and reinstatement vote procedures.',
+        "Identifies the individuals whose continued involvement is material to the fund's investment program and specifies the consequences of a key person event, including suspension of the investment period, LP notification requirements, and reinstatement vote procedures.",
       riskLevel: 'high',
       keywords: [
         'key person',
@@ -80,7 +80,7 @@ export const LPOA_FRAMEWORK: RegulatoryFramework = {
       section: 'Investment Program',
       title: 'Investment Restrictions',
       description:
-        'Defines the permitted scope of the fund\'s investment activities, including concentration limits, geographic restrictions, sector mandates, leverage caps, and co-investment policies. These restrictions protect LPs by ensuring the GP invests within the agreed strategy parameters.',
+        "Defines the permitted scope of the fund's investment activities, including concentration limits, geographic restrictions, sector mandates, leverage caps, and co-investment policies. These restrictions protect LPs by ensuring the GP invests within the agreed strategy parameters.",
       riskLevel: 'medium',
       keywords: [
         'investment restrictions',
@@ -139,7 +139,7 @@ export const LPOA_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Waterfall negotiations anchor to the GP\'s initial term sheet proposals, particularly on carried interest percentages and preferred return hurdle rates. LPs anchor to industry-standard "2 and 20" structures rather than independently assessing whether the economics are appropriate for the specific fund strategy and risk profile.',
       example:
-        'An LP negotiating a first-time fund\'s terms anchors to the 20% carried interest standard despite the fund pursuing a low-risk credit strategy where 15% carry would be market-appropriate, resulting in an economic structure that over-compensates the GP relative to the value delivered.',
+        "An LP negotiating a first-time fund's terms anchors to the 20% carried interest standard despite the fund pursuing a low-risk credit strategy where 15% carry would be market-appropriate, resulting in an economic structure that over-compensates the GP relative to the value delivered.",
     },
     {
       biasType: 'anchoring_bias',
@@ -177,9 +177,9 @@ export const LPOA_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'lpoa_key_person',
       riskWeight: 0.8,
       mechanism:
-        'Deference to the founding partner\'s authority prevents the LP Advisory Committee from triggering key person provisions even when circumstances warrant it. The GP\'s track record and reputation create an authority halo that makes LPs reluctant to exercise their contractual rights.',
+        "Deference to the founding partner's authority prevents the LP Advisory Committee from triggering key person provisions even when circumstances warrant it. The GP's track record and reputation create an authority halo that makes LPs reluctant to exercise their contractual rights.",
       example:
-        'A fund\'s founding partner reduces their time commitment to 50% after launching a second venture, clearly triggering the key person clause, but no LP raises the issue because the founder\'s reputation and prior returns create deference that overrides contractual governance.',
+        "A fund's founding partner reduces their time commitment to 50% after launching a second venture, clearly triggering the key person clause, but no LP raises the issue because the founder's reputation and prior returns create deference that overrides contractual governance.",
     },
 
     // ── groupthink ──────────────────────────────────────────────────────
@@ -210,7 +210,7 @@ export const LPOA_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'GPs issue follow-on capital calls to support underperforming portfolio companies because of capital already invested, rather than objectively assessing whether incremental investment serves LP interests. The sunk cost of prior draws justifies further drawdowns that compound losses.',
       example:
-        'A GP calls $15 million in additional capital to fund a struggling portfolio company\'s bridge round, citing the $40 million already invested, despite the company missing every milestone and the bridge terms being highly dilutive — throwing good money after bad to avoid recognizing a loss.',
+        "A GP calls $15 million in additional capital to fund a struggling portfolio company's bridge round, citing the $40 million already invested, despite the company missing every milestone and the bridge terms being highly dilutive — throwing good money after bad to avoid recognizing a loss.",
     },
     {
       biasType: 'sunk_cost_fallacy',
@@ -281,9 +281,9 @@ export const LPOA_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'lpoa_reporting',
       riskWeight: 0.6,
       mechanism:
-        'LP evaluation of GP performance disproportionately weights recent quarterly results rather than full-cycle track record analysis. Recency bias in interpreting reports leads LPs to overreact to recent marks — both positive and negative — and make re-up decisions based on the most recent vintage rather than the GP\'s complete history.',
+        "LP evaluation of GP performance disproportionately weights recent quarterly results rather than full-cycle track record analysis. Recency bias in interpreting reports leads LPs to overreact to recent marks — both positive and negative — and make re-up decisions based on the most recent vintage rather than the GP's complete history.",
       example:
-        'An LP commits to a GP\'s Fund V based on the strong recent markups in Fund IV\'s quarterly report, without recognizing that the markups are driven by unrealized paper gains in a frothy market and that the GP\'s Funds I through III showed significant value erosion in the two years following similar markup patterns.',
+        "An LP commits to a GP's Fund V based on the strong recent markups in Fund IV's quarterly report, without recognizing that the markups are driven by unrealized paper gains in a frothy market and that the GP's Funds I through III showed significant value erosion in the two years following similar markup patterns.",
     },
     {
       biasType: 'recency_bias',

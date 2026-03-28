@@ -2,14 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import {
-  Plus,
-  LayoutList,
-  LayoutGrid,
-  FileText,
-  Filter,
-  X,
-} from 'lucide-react';
+import { Plus, LayoutList, LayoutGrid, FileText, Filter, X } from 'lucide-react';
 import { useDeals } from '@/hooks/useDeals';
 import { DealFormModal } from '@/components/deals/DealFormModal';
 import { DealKanban } from '@/components/deals/DealKanban';
@@ -61,7 +54,7 @@ export default function DealsPage() {
   }, []);
 
   const updateFilter = useCallback((key: keyof DealFilters, value: string) => {
-    setFilters((prev) => {
+    setFilters(prev => {
       const next = { ...prev };
       if (value) next[key] = value;
       else delete next[key];
@@ -104,7 +97,14 @@ export default function DealsPage() {
   return (
     <div className="container" style={{ maxWidth: 1200, padding: '24px 20px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 20,
+        }}
+      >
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
             Deal Pipeline
@@ -116,7 +116,13 @@ export default function DealsPage() {
         <button
           onClick={() => setShowForm(true)}
           className="btn btn-primary"
-          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', fontSize: 13 }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '8px 16px',
+            fontSize: 13,
+          }}
         >
           <Plus size={14} /> New Deal
         </button>
@@ -132,7 +138,7 @@ export default function DealsPage() {
             flexWrap: 'wrap',
           }}
         >
-          {DEAL_STAGES.map((stage) => {
+          {DEAL_STAGES.map(stage => {
             const count = stageCounts[stage.value] || 0;
             if (count === 0) return null;
             const color = STAGE_COLORS[stage.value];
@@ -171,24 +177,56 @@ export default function DealsPage() {
       >
         <Filter size={14} style={{ color: 'var(--text-muted)' }} />
 
-        <select value={filters.stage || ''} onChange={(e) => updateFilter('stage', e.target.value)} style={selectStyle}>
+        <select
+          value={filters.stage || ''}
+          onChange={e => updateFilter('stage', e.target.value)}
+          style={selectStyle}
+        >
           <option value="">All Stages</option>
-          {DEAL_STAGES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          {DEAL_STAGES.map(s => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
         </select>
 
-        <select value={filters.status || ''} onChange={(e) => updateFilter('status', e.target.value)} style={selectStyle}>
+        <select
+          value={filters.status || ''}
+          onChange={e => updateFilter('status', e.target.value)}
+          style={selectStyle}
+        >
           <option value="">All Statuses</option>
-          {DEAL_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          {DEAL_STATUSES.map(s => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
         </select>
 
-        <select value={filters.dealType || ''} onChange={(e) => updateFilter('dealType', e.target.value)} style={selectStyle}>
+        <select
+          value={filters.dealType || ''}
+          onChange={e => updateFilter('dealType', e.target.value)}
+          style={selectStyle}
+        >
           <option value="">All Types</option>
-          {DEAL_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+          {DEAL_TYPES.map(t => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
         </select>
 
-        <select value={filters.sector || ''} onChange={(e) => updateFilter('sector', e.target.value)} style={selectStyle}>
+        <select
+          value={filters.sector || ''}
+          onChange={e => updateFilter('sector', e.target.value)}
+          style={selectStyle}
+        >
           <option value="">All Sectors</option>
-          {SECTORS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          {SECTORS.map(s => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
         </select>
 
         {hasFilters && (
@@ -258,7 +296,7 @@ export default function DealsPage() {
       {/* Content */}
       {isLoading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3].map(i => (
             <div
               key={i}
               style={{
@@ -281,7 +319,9 @@ export default function DealsPage() {
           }}
         >
           <div style={{ fontSize: 40, marginBottom: 12 }}>&#128188;</div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>
+          <div
+            style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}
+          >
             No deals yet
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
@@ -301,7 +341,7 @@ export default function DealsPage() {
         <>
           {/* List View */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {deals.map((deal) => {
+            {deals.map(deal => {
               const stageColor = STAGE_COLORS[deal.stage] || '#6b7280';
               const typeColor = DEAL_TYPE_COLORS[deal.dealType] || '#6b7280';
               return (
@@ -363,7 +403,14 @@ export default function DealsPage() {
                     </span>
 
                     {/* Ticket size */}
-                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', minWidth: 80, textAlign: 'right' }}>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: 'var(--text-secondary)',
+                        minWidth: 80,
+                        textAlign: 'right',
+                      }}
+                    >
                       {formatTicketSize(deal.ticketSize, deal.currency)}
                     </span>
 
@@ -384,18 +431,25 @@ export default function DealsPage() {
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 20 }}>
               <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
                 className="btn btn-ghost"
                 style={{ padding: '6px 14px', fontSize: 12 }}
               >
                 Previous
               </button>
-              <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
                 Page {page} of {totalPages}
               </span>
               <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
                 className="btn btn-ghost"
                 style={{ padding: '6px 14px', fontSize: 12 }}
@@ -408,11 +462,7 @@ export default function DealsPage() {
       )}
 
       {/* Deal Form Modal */}
-      <DealFormModal
-        open={showForm}
-        onOpenChange={setShowForm}
-        onSuccess={() => mutate()}
-      />
+      <DealFormModal open={showForm} onOpenChange={setShowForm} onSuccess={() => mutate()} />
     </div>
   );
 }

@@ -17,7 +17,11 @@ interface CounterfactualData {
   weightedImprovement: number;
 }
 
-export function CounterfactualScenarios({ counterfactuals }: { counterfactuals: CounterfactualData }) {
+export function CounterfactualScenarios({
+  counterfactuals,
+}: {
+  counterfactuals: CounterfactualData;
+}) {
   if (counterfactuals.scenarios.length === 0) {
     return (
       <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
@@ -33,7 +37,13 @@ export function CounterfactualScenarios({ counterfactuals }: { counterfactuals: 
 
   return (
     <div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: '12px',
+        }}
+      >
         {sorted.map((scenario, idx) => (
           <div
             key={idx}
@@ -44,7 +54,14 @@ export function CounterfactualScenarios({ counterfactuals }: { counterfactuals: 
               borderRadius: 'var(--radius-md)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '10px',
+              }}
+            >
               <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
                 Remove {formatBiasName(scenario.biasRemoved)}
               </span>
@@ -77,19 +94,47 @@ export function CounterfactualScenarios({ counterfactuals }: { counterfactuals: 
             {/* Success rate comparison */}
             <div style={{ display: 'flex', gap: '12px', marginBottom: '8px' }}>
               <div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
                   With bias
                 </div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: '#ef4444', fontFamily: "'JetBrains Mono', monospace" }}>
+                <div
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: '#ef4444',
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
                   {(scenario.successRateWithBias * 100).toFixed(0)}%
                 </div>
               </div>
               <div style={{ color: 'var(--text-muted)', alignSelf: 'center' }}>&rarr;</div>
               <div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
                   Without bias
                 </div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: '#22c55e', fontFamily: "'JetBrains Mono', monospace" }}>
+                <div
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: '#22c55e',
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
                   {(scenario.successRateWithoutBias * 100).toFixed(0)}%
                 </div>
               </div>
@@ -97,17 +142,35 @@ export function CounterfactualScenarios({ counterfactuals }: { counterfactuals: 
 
             {/* Confidence bar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ flex: 1, height: '3px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px' }}>
+              <div
+                style={{
+                  flex: 1,
+                  height: '3px',
+                  background: 'rgba(255,255,255,0.06)',
+                  borderRadius: '2px',
+                }}
+              >
                 <div
                   style={{
                     width: `${scenario.confidence * 100}%`,
                     height: '100%',
-                    background: scenario.confidence > 0.7 ? '#22c55e' : scenario.confidence > 0.4 ? '#eab308' : '#ef4444',
+                    background:
+                      scenario.confidence > 0.7
+                        ? '#22c55e'
+                        : scenario.confidence > 0.4
+                          ? '#eab308'
+                          : '#ef4444',
                     borderRadius: '2px',
                   }}
                 />
               </div>
-              <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'JetBrains Mono', monospace" }}>
+              <span
+                style={{
+                  fontSize: '10px',
+                  color: 'var(--text-muted)',
+                  fontFamily: "'JetBrains Mono', monospace",
+                }}
+              >
                 {(scenario.confidence * 100).toFixed(0)}% conf
               </span>
             </div>
@@ -164,7 +227,5 @@ export function CounterfactualScenarios({ counterfactuals }: { counterfactuals: 
 }
 
 function formatBiasName(type: string): string {
-  return type
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }

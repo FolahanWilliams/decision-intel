@@ -3,14 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {
-  ArrowLeft,
-  Edit2,
-  ChevronRight,
-  FileText,
-  Upload,
-  AlertTriangle,
-} from 'lucide-react';
+import { ArrowLeft, Edit2, ChevronRight, FileText, Upload, AlertTriangle } from 'lucide-react';
 import { useDeal } from '@/hooks/useDeals';
 import { DealFormModal } from '@/components/deals/DealFormModal';
 import { DealOutcomeForm } from '@/components/deals/DealOutcomeForm';
@@ -79,17 +72,32 @@ export default function DealDetailPage() {
   if (isLoading) {
     return (
       <div className="container" style={{ maxWidth: 1000, padding: '24px 20px' }}>
-        <div style={{ height: 200, background: 'rgba(255, 255, 255, 0.04)', borderRadius: 12, animation: 'pulse 1.5s infinite' }} />
+        <div
+          style={{
+            height: 200,
+            background: 'rgba(255, 255, 255, 0.04)',
+            borderRadius: 12,
+            animation: 'pulse 1.5s infinite',
+          }}
+        />
       </div>
     );
   }
 
   if (error || !deal) {
     return (
-      <div className="container" style={{ maxWidth: 1000, padding: '24px 20px', textAlign: 'center' }}>
+      <div
+        className="container"
+        style={{ maxWidth: 1000, padding: '24px 20px', textAlign: 'center' }}
+      >
         <AlertTriangle size={40} style={{ color: '#ef4444', marginBottom: 12 }} />
-        <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>Deal not found</div>
-        <Link href="/dashboard/deals" style={{ color: '#6366f1', fontSize: 13, marginTop: 8, display: 'inline-block' }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
+          Deal not found
+        </div>
+        <Link
+          href="/dashboard/deals"
+          style={{ color: '#6366f1', fontSize: 13, marginTop: 8, display: 'inline-block' }}
+        >
           Back to Deal Pipeline
         </Link>
       </div>
@@ -129,7 +137,14 @@ export default function DealDetailPage() {
           marginBottom: 20,
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            marginBottom: 12,
+          }}
+        >
           <div>
             <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
               {deal.name}
@@ -143,14 +158,28 @@ export default function DealDetailPage() {
           <button
             onClick={() => setShowEditForm(true)}
             className="btn btn-ghost"
-            style={{ padding: '6px 12px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+            style={{
+              padding: '6px 12px',
+              fontSize: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
           >
             <Edit2 size={13} /> Edit
           </button>
         </div>
 
         {/* Badges row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flexWrap: 'wrap',
+            marginBottom: 14,
+          }}
+        >
           <span style={badgeStyle(typeColor)}>{getDealTypeLabel(deal.dealType)}</span>
           <span style={badgeStyle(stageColor)}>{getStageLabel(deal.stage)}</span>
           <span style={badgeStyle(statusColor)}>{deal.status}</span>
@@ -160,11 +189,21 @@ export default function DealDetailPage() {
         </div>
 
         {/* Key metrics */}
-        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', fontSize: 12, color: 'var(--text-secondary)' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 24,
+            flexWrap: 'wrap',
+            fontSize: 12,
+            color: 'var(--text-secondary)',
+          }}
+        >
           {deal.ticketSize && (
             <div>
               <span style={{ color: 'var(--text-muted)' }}>Ticket:</span>{' '}
-              <span style={{ fontWeight: 600 }}>{formatTicketSize(deal.ticketSize, deal.currency)}</span>
+              <span style={{ fontWeight: 600 }}>
+                {formatTicketSize(deal.ticketSize, deal.currency)}
+              </span>
             </div>
           )}
           {deal.fundName && (
@@ -187,12 +226,24 @@ export default function DealDetailPage() {
 
         {/* Stage advance */}
         {nextStage && deal.status === 'active' && (
-          <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+          <div
+            style={{
+              marginTop: 14,
+              paddingTop: 14,
+              borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+            }}
+          >
             <button
               onClick={handleAdvanceStage}
               disabled={advancingStage}
               className="btn btn-primary"
-              style={{ padding: '6px 16px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+              style={{
+                padding: '6px 16px',
+                fontSize: 12,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
             >
               Advance to {getStageLabel(nextStage)} <ChevronRight size={14} />
             </button>
@@ -201,8 +252,18 @@ export default function DealDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: 20 }}>
-        <button onClick={() => setActiveTab('documents')} style={tabStyle(activeTab === 'documents')}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 0,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          marginBottom: 20,
+        }}
+      >
+        <button
+          onClick={() => setActiveTab('documents')}
+          style={tabStyle(activeTab === 'documents')}
+        >
           Documents
         </button>
         <button onClick={() => setActiveTab('bias')} style={tabStyle(activeTab === 'bias')}>
@@ -217,12 +278,8 @@ export default function DealDetailPage() {
       {activeTab === 'documents' && (
         <DocumentsTab documents={deal.documents || []} dealId={deal.id} />
       )}
-      {activeTab === 'bias' && (
-        <BiasSummaryTab documents={deal.documents || []} />
-      )}
-      {activeTab === 'outcome' && (
-        <OutcomeTab deal={deal} onUpdate={() => mutate()} />
-      )}
+      {activeTab === 'bias' && <BiasSummaryTab documents={deal.documents || []} />}
+      {activeTab === 'outcome' && <OutcomeTab deal={deal} onUpdate={() => mutate()} />}
 
       {/* Edit modal */}
       <DealFormModal
@@ -237,7 +294,13 @@ export default function DealDetailPage() {
 
 // ─── Documents Tab ────────────────────────────────────────────────────────────
 
-function DocumentsTab({ documents, dealId }: { documents: Array<{ id: string; filename: string; documentType: string | null; status: string }>; dealId: string }) {
+function DocumentsTab({
+  documents,
+  dealId,
+}: {
+  documents: Array<{ id: string; filename: string; documentType: string | null; status: string }>;
+  dealId: string;
+}) {
   const router = useRouter();
 
   if (documents.length === 0) {
@@ -252,7 +315,9 @@ function DocumentsTab({ documents, dealId }: { documents: Array<{ id: string; fi
         }}
       >
         <FileText size={32} style={{ color: 'var(--text-muted)', marginBottom: 8 }} />
-        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>
+        <div
+          style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}
+        >
           No documents linked to this deal
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
@@ -261,7 +326,14 @@ function DocumentsTab({ documents, dealId }: { documents: Array<{ id: string; fi
         <button
           onClick={() => router.push('/dashboard')}
           className="btn btn-primary"
-          style={{ padding: '6px 16px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, margin: '0 auto' }}
+          style={{
+            padding: '6px 16px',
+            fontSize: 12,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            margin: '0 auto',
+          }}
         >
           <Upload size={13} /> Upload Document
         </button>
@@ -271,7 +343,7 @@ function DocumentsTab({ documents, dealId }: { documents: Array<{ id: string; fi
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      {documents.map((doc) => (
+      {documents.map(doc => (
         <Link
           key={doc.id}
           href={`/documents/${doc.id}`}
@@ -288,12 +360,30 @@ function DocumentsTab({ documents, dealId }: { documents: Array<{ id: string; fi
           >
             <FileText size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: 'var(--text-primary)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 {doc.filename}
               </div>
             </div>
             {doc.documentType && (
-              <span style={{ fontSize: 10, fontWeight: 500, color: '#6366f1', background: 'rgba(99, 102, 241, 0.1)', padding: '2px 6px', borderRadius: 4 }}>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 500,
+                  color: '#6366f1',
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  padding: '2px 6px',
+                  borderRadius: 4,
+                }}
+              >
                 {getDocTypeLabel(doc.documentType)}
               </span>
             )}
@@ -301,8 +391,18 @@ function DocumentsTab({ documents, dealId }: { documents: Array<{ id: string; fi
               style={{
                 fontSize: 10,
                 fontWeight: 500,
-                color: doc.status === 'analyzed' ? '#10b981' : doc.status === 'error' ? '#ef4444' : '#f59e0b',
-                background: doc.status === 'analyzed' ? 'rgba(16, 185, 129, 0.1)' : doc.status === 'error' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                color:
+                  doc.status === 'analyzed'
+                    ? '#10b981'
+                    : doc.status === 'error'
+                      ? '#ef4444'
+                      : '#f59e0b',
+                background:
+                  doc.status === 'analyzed'
+                    ? 'rgba(16, 185, 129, 0.1)'
+                    : doc.status === 'error'
+                      ? 'rgba(239, 68, 68, 0.1)'
+                      : 'rgba(245, 158, 11, 0.1)',
                 padding: '2px 6px',
                 borderRadius: 4,
               }}
@@ -318,12 +418,23 @@ function DocumentsTab({ documents, dealId }: { documents: Array<{ id: string; fi
 
 // ─── Bias Summary Tab ─────────────────────────────────────────────────────────
 
-function BiasSummaryTab({ documents }: { documents: Array<{ id: string; filename: string; status: string }> }) {
-  const analyzedCount = documents.filter((d) => d.status === 'analyzed').length;
+function BiasSummaryTab({
+  documents,
+}: {
+  documents: Array<{ id: string; filename: string; status: string }>;
+}) {
+  const analyzedCount = documents.filter(d => d.status === 'analyzed').length;
 
   if (documents.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)', fontSize: 13 }}>
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '40px 20px',
+          color: 'var(--text-muted)',
+          fontSize: 13,
+        }}
+      >
         No documents to summarize. Upload and analyze deal documents first.
       </div>
     );
@@ -350,8 +461,8 @@ function BiasSummaryTab({ documents }: { documents: Array<{ id: string; filename
       {analyzedCount > 0 && (
         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 6 }}>
           {documents
-            .filter((d) => d.status === 'analyzed')
-            .map((doc) => (
+            .filter(d => d.status === 'analyzed')
+            .map(doc => (
               <Link
                 key={doc.id}
                 href={`/documents/${doc.id}`}
@@ -386,9 +497,7 @@ function OutcomeTab({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Display existing outcome */}
-      {deal.outcome && (
-        <DealOutcomeDisplay outcome={deal.outcome} currency={deal.currency} />
-      )}
+      {deal.outcome && <DealOutcomeDisplay outcome={deal.outcome} currency={deal.currency} />}
 
       {/* Outcome notes */}
       {deal.outcome?.notes && (
@@ -400,8 +509,14 @@ function OutcomeTab({
             padding: '14px 18px',
           }}
         >
-          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>Notes</div>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{deal.outcome.notes}</div>
+          <div
+            style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}
+          >
+            Notes
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            {deal.outcome.notes}
+          </div>
         </div>
       )}
 

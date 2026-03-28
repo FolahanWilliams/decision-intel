@@ -69,7 +69,8 @@ export async function GET(
       factCheck: {
         totalClaims: (analysis.factCheck as Record<string, number> | null)?.totalClaims ?? 0,
         verifiedClaims: (analysis.factCheck as Record<string, number> | null)?.verifiedClaims ?? 0,
-        contradictedClaims: (analysis.factCheck as Record<string, number> | null)?.contradictedClaims ?? 0,
+        contradictedClaims:
+          (analysis.factCheck as Record<string, number> | null)?.contradictedClaims ?? 0,
         score: (analysis.factCheck as Record<string, number> | null)?.score ?? 50,
       },
       process: {
@@ -165,7 +166,8 @@ export async function GET(
       {
         type: 'cortisol' as const,
         detected: adjustments.some(
-          a => a.source.toLowerCase().includes('cortisol') || a.source.toLowerCase().includes('stress')
+          a =>
+            a.source.toLowerCase().includes('cortisol') || a.source.toLowerCase().includes('stress')
         ),
         indicators: adjustments
           .filter(
@@ -198,11 +200,9 @@ export async function GET(
 
       if (orgAnalyses.length > 0) {
         orgBaseline = {
-          avgScore:
-            orgAnalyses.reduce((s, a) => s + a.overallScore, 0) / orgAnalyses.length,
+          avgScore: orgAnalyses.reduce((s, a) => s + a.overallScore, 0) / orgAnalyses.length,
           biasFrequency: 0, // computed below
-          noiseAvg:
-            orgAnalyses.reduce((s, a) => s + a.noiseScore, 0) / orgAnalyses.length,
+          noiseAvg: orgAnalyses.reduce((s, a) => s + a.noiseScore, 0) / orgAnalyses.length,
           totalDecisions: orgAnalyses.length,
         };
 
@@ -211,8 +211,7 @@ export async function GET(
             analysis: { document: { orgId } },
           },
         });
-        orgBaseline.biasFrequency =
-          orgAnalyses.length > 0 ? biasCount / orgAnalyses.length : 0;
+        orgBaseline.biasFrequency = orgAnalyses.length > 0 ? biasCount / orgAnalyses.length : 0;
       }
     } catch (e) {
       log.warn('Failed to compute org baseline', e);
@@ -270,9 +269,6 @@ export async function GET(
     });
   } catch (error) {
     log.error('Explainability API error', error);
-    return NextResponse.json(
-      { error: 'Failed to compute explainability data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to compute explainability data' }, { status: 500 });
   }
 }

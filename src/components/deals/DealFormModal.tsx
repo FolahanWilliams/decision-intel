@@ -9,13 +9,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
-import {
-  DEAL_TYPES,
-  DEAL_STAGES,
-  SECTORS,
-  CURRENCIES,
-  type DealSummary,
-} from '@/types/deals';
+import { DEAL_TYPES, DEAL_STAGES, SECTORS, CURRENCIES, type DealSummary } from '@/types/deals';
 
 interface DealFormModalProps {
   open: boolean;
@@ -142,7 +136,21 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
     } finally {
       setSaving(false);
     }
-  }, [name, dealType, stage, sector, ticketSize, currency, fundName, vintage, targetCompany, isEdit, deal, onOpenChange, onSuccess]);
+  }, [
+    name,
+    dealType,
+    stage,
+    sector,
+    ticketSize,
+    currency,
+    fundName,
+    vintage,
+    targetCompany,
+    isEdit,
+    deal,
+    onOpenChange,
+    onSuccess,
+  ]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -161,7 +169,7 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="e.g. Acme Corp Series B"
               style={inputStyle}
             />
@@ -171,18 +179,26 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
               <label style={labelStyle}>Deal Type *</label>
-              <select value={dealType} onChange={(e) => setDealType(e.target.value)} style={selectStyle}>
+              <select
+                value={dealType}
+                onChange={e => setDealType(e.target.value)}
+                style={selectStyle}
+              >
                 <option value="">Select type...</option>
-                {DEAL_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
+                {DEAL_TYPES.map(t => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
               <label style={labelStyle}>Stage</label>
-              <select value={stage} onChange={(e) => setStage(e.target.value)} style={selectStyle}>
-                {DEAL_STAGES.map((s) => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
+              <select value={stage} onChange={e => setStage(e.target.value)} style={selectStyle}>
+                {DEAL_STAGES.map(s => (
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -195,17 +211,19 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
               <input
                 type="text"
                 value={targetCompany}
-                onChange={(e) => setTargetCompany(e.target.value)}
+                onChange={e => setTargetCompany(e.target.value)}
                 placeholder="Company name"
                 style={inputStyle}
               />
             </div>
             <div>
               <label style={labelStyle}>Sector</label>
-              <select value={sector} onChange={(e) => setSector(e.target.value)} style={selectStyle}>
+              <select value={sector} onChange={e => setSector(e.target.value)} style={selectStyle}>
                 <option value="">Select sector...</option>
-                {SECTORS.map((s) => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
+                {SECTORS.map(s => (
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -218,7 +236,7 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
               <input
                 type="number"
                 value={ticketSize}
-                onChange={(e) => setTicketSize(e.target.value)}
+                onChange={e => setTicketSize(e.target.value)}
                 placeholder="e.g. 50000000"
                 min="0"
                 style={inputStyle}
@@ -226,9 +244,15 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
             </div>
             <div>
               <label style={labelStyle}>Currency</label>
-              <select value={currency} onChange={(e) => setCurrency(e.target.value)} style={selectStyle}>
-                {CURRENCIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
+              <select
+                value={currency}
+                onChange={e => setCurrency(e.target.value)}
+                style={selectStyle}
+              >
+                {CURRENCIES.map(c => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -241,7 +265,7 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
               <input
                 type="text"
                 value={fundName}
-                onChange={(e) => setFundName(e.target.value)}
+                onChange={e => setFundName(e.target.value)}
                 placeholder="e.g. Fund IV"
                 style={inputStyle}
               />
@@ -251,7 +275,7 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
               <input
                 type="number"
                 value={vintage}
-                onChange={(e) => setVintage(e.target.value)}
+                onChange={e => setVintage(e.target.value)}
                 placeholder="e.g. 2024"
                 min="1990"
                 max="2100"
@@ -262,7 +286,15 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
 
           {/* Error */}
           {error && (
-            <div style={{ fontSize: 12, color: '#ef4444', padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: 6 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: '#ef4444',
+                padding: '6px 10px',
+                background: 'rgba(239, 68, 68, 0.1)',
+                borderRadius: 6,
+              }}
+            >
               {error}
             </div>
           )}
@@ -280,7 +312,13 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
               onClick={handleSubmit}
               disabled={saving}
               className="btn btn-primary"
-              style={{ padding: '8px 20px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}
+              style={{
+                padding: '8px 20px',
+                fontSize: 13,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
             >
               {saving && <Loader2 size={14} className="animate-spin" />}
               {isEdit ? 'Save Changes' : 'Create Deal'}

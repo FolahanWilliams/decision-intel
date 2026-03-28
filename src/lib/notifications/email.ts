@@ -317,7 +317,9 @@ async function getUserEmail(userId: string): Promise<string | null> {
     const { data } = await supabase.auth.admin.getUserById(userId);
     return data?.user?.email ?? null;
   } catch (e) {
-    log.warn(`Could not fetch email for user ${userId}: ${e instanceof Error ? e.message : String(e)}`);
+    log.warn(
+      `Could not fetch email for user ${userId}: ${e instanceof Error ? e.message : String(e)}`
+    );
     return null;
   }
 }
@@ -344,7 +346,7 @@ export async function notifyOutcomeReminder(
 
   const itemsHtml = items
     .map(
-      (item) => `
+      item => `
         <tr>
           <td style="padding: 10px 14px; color: #e2e8f0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.06);">
             ${escapeHtml(item.filename)}

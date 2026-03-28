@@ -61,8 +61,13 @@ function KanbanCard({
         position: 'relative',
       }}
     >
-      <Link href={`/dashboard/deals/${deal.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
+      <Link
+        href={`/dashboard/deals/${deal.id}`}
+        style={{ textDecoration: 'none', color: 'inherit' }}
+      >
+        <div
+          style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}
+        >
           {deal.name}
         </div>
       </Link>
@@ -107,7 +112,10 @@ function KanbanCard({
 
       {/* Mobile fallback: "Move to" menu */}
       <button
-        onClick={(e) => { e.preventDefault(); setShowMenu(!showMenu); }}
+        onClick={e => {
+          e.preventDefault();
+          setShowMenu(!showMenu);
+        }}
         style={{
           position: 'absolute',
           top: 8,
@@ -140,10 +148,10 @@ function KanbanCard({
             backdropFilter: 'blur(12px)',
           }}
         >
-          {DEAL_STAGES.filter((s) => s.value !== deal.stage).map((stage) => (
+          {DEAL_STAGES.filter(s => s.value !== deal.stage).map(stage => (
             <button
               key={stage.value}
-              onClick={async (e) => {
+              onClick={async e => {
                 e.preventDefault();
                 setShowMenu(false);
                 await onStageChange(deal.id, stage.value);
@@ -160,8 +168,12 @@ function KanbanCard({
                 cursor: 'pointer',
                 borderRadius: 4,
               }}
-              onMouseEnter={(e) => { (e.target as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
-              onMouseLeave={(e) => { (e.target as HTMLElement).style.background = 'transparent'; }}
+              onMouseEnter={e => {
+                (e.target as HTMLElement).style.background = 'rgba(255,255,255,0.06)';
+              }}
+              onMouseLeave={e => {
+                (e.target as HTMLElement).style.background = 'transparent';
+              }}
             >
               Move to {stage.label}
             </button>
@@ -274,7 +286,7 @@ function KanbanColumn({
           overflowY: 'auto',
         }}
       >
-        {deals.map((deal) => (
+        {deals.map(deal => (
           <KanbanCard key={deal.id} deal={deal} onStageChange={onStageChange} />
         ))}
       </div>
@@ -288,20 +300,22 @@ export function DealKanban({ deals, onStageChange }: DealKanbanProps) {
   const [localDeals, setLocalDeals] = useState<DealSummary[]>(deals);
 
   // Sync when props change
-  if (deals !== localDeals && JSON.stringify(deals.map(d => d.id + d.stage)) !== JSON.stringify(localDeals.map(d => d.id + d.stage))) {
+  if (
+    deals !== localDeals &&
+    JSON.stringify(deals.map(d => d.id + d.stage)) !==
+      JSON.stringify(localDeals.map(d => d.id + d.stage))
+  ) {
     setLocalDeals(deals);
   }
 
   const handleDrop = useCallback(
     async (dealId: string, newStage: string) => {
-      const deal = localDeals.find((d) => d.id === dealId);
+      const deal = localDeals.find(d => d.id === dealId);
       if (!deal || deal.stage === newStage) return;
 
       // Optimistic update
       const previousDeals = [...localDeals];
-      setLocalDeals((prev) =>
-        prev.map((d) => (d.id === dealId ? { ...d, stage: newStage } : d))
-      );
+      setLocalDeals(prev => prev.map(d => (d.id === dealId ? { ...d, stage: newStage } : d)));
 
       const success = await onStageChange(dealId, newStage);
       if (!success) {
@@ -315,7 +329,7 @@ export function DealKanban({ deals, onStageChange }: DealKanbanProps) {
   // Group deals by stage
   const dealsByStage: Record<string, DealSummary[]> = {};
   for (const stage of DEAL_STAGES) {
-    dealsByStage[stage.value] = localDeals.filter((d) => d.stage === stage.value);
+    dealsByStage[stage.value] = localDeals.filter(d => d.stage === stage.value);
   }
 
   return (
@@ -328,7 +342,7 @@ export function DealKanban({ deals, onStageChange }: DealKanbanProps) {
         minHeight: 400,
       }}
     >
-      {DEAL_STAGES.map((stage) => (
+      {DEAL_STAGES.map(stage => (
         <KanbanColumn
           key={stage.value}
           stage={stage}

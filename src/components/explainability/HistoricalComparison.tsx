@@ -67,14 +67,24 @@ export function HistoricalComparison({
                   color: diffColor,
                 }}
               >
-                {diff >= 0 ? '+' : ''}{comp.format(diff)} vs org avg
+                {diff >= 0 ? '+' : ''}
+                {comp.format(diff)} vs org avg
               </span>
             </div>
 
             {/* This decision */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <span style={{ fontSize: '10px', color: 'var(--text-muted)', width: '60px' }}>This</span>
-              <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.04)', borderRadius: '3px' }}>
+              <span style={{ fontSize: '10px', color: 'var(--text-muted)', width: '60px' }}>
+                This
+              </span>
+              <div
+                style={{
+                  flex: 1,
+                  height: '6px',
+                  background: 'rgba(255,255,255,0.04)',
+                  borderRadius: '3px',
+                }}
+              >
                 <div
                   style={{
                     width: `${currentPct}%`,
@@ -84,15 +94,32 @@ export function HistoricalComparison({
                   }}
                 />
               </div>
-              <span style={{ fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", color: 'var(--text-primary)', width: '40px', textAlign: 'right' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: 'var(--text-primary)',
+                  width: '40px',
+                  textAlign: 'right',
+                }}
+              >
                 {comp.format(comp.current)}
               </span>
             </div>
 
             {/* Org baseline */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '10px', color: 'var(--text-muted)', width: '60px' }}>Org avg</span>
-              <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.04)', borderRadius: '3px' }}>
+              <span style={{ fontSize: '10px', color: 'var(--text-muted)', width: '60px' }}>
+                Org avg
+              </span>
+              <div
+                style={{
+                  flex: 1,
+                  height: '6px',
+                  background: 'rgba(255,255,255,0.04)',
+                  borderRadius: '3px',
+                }}
+              >
                 <div
                   style={{
                     width: `${baselinePct}%`,
@@ -103,7 +130,15 @@ export function HistoricalComparison({
                   }}
                 />
               </div>
-              <span style={{ fontSize: '11px', fontFamily: "'JetBrains Mono', monospace", color: 'var(--text-muted)', width: '40px', textAlign: 'right' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: 'var(--text-muted)',
+                  width: '40px',
+                  textAlign: 'right',
+                }}
+              >
                 {comp.format(comp.baseline)}
               </span>
             </div>

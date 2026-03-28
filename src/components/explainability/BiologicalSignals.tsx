@@ -9,7 +9,10 @@ interface Signal {
   delta: number;
 }
 
-const SIGNAL_INFO: Record<string, { title: string; icon: typeof AlertTriangle; color: string; description: string }> = {
+const SIGNAL_INFO: Record<
+  string,
+  { title: string; icon: typeof AlertTriangle; color: string; description: string }
+> = {
   winner_effect: {
     title: 'Winner Effect',
     icon: Activity,
@@ -68,7 +71,8 @@ export function BiologicalSignals({ signals }: { signals: Signal[] }) {
                   marginLeft: 'auto',
                 }}
               >
-                {signal.delta >= 0 ? '+' : ''}{signal.delta.toFixed(1)} pts
+                {signal.delta >= 0 ? '+' : ''}
+                {signal.delta.toFixed(1)} pts
               </span>
             </div>
 
@@ -78,7 +82,14 @@ export function BiologicalSignals({ signals }: { signals: Signal[] }) {
 
             {signal.indicators.length > 0 && (
               <div>
-                <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 500 }}>
+                <p
+                  style={{
+                    fontSize: '11px',
+                    color: 'var(--text-muted)',
+                    marginBottom: '4px',
+                    fontWeight: 500,
+                  }}
+                >
                   Matched indicators:
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>

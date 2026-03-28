@@ -29,13 +29,53 @@ interface ExplainabilityData {
     gradeLabel: string;
     color: string;
     components: {
-      biasLoad: { name: string; score: number; weight: number; weighted: number; grade: string; detail: string };
-      noiseLevel: { name: string; score: number; weight: number; weighted: number; grade: string; detail: string };
-      evidenceQuality: { name: string; score: number; weight: number; weighted: number; grade: string; detail: string };
-      processMaturity: { name: string; score: number; weight: number; weighted: number; grade: string; detail: string };
-      complianceRisk: { name: string; score: number; weight: number; weighted: number; grade: string; detail: string };
+      biasLoad: {
+        name: string;
+        score: number;
+        weight: number;
+        weighted: number;
+        grade: string;
+        detail: string;
+      };
+      noiseLevel: {
+        name: string;
+        score: number;
+        weight: number;
+        weighted: number;
+        grade: string;
+        detail: string;
+      };
+      evidenceQuality: {
+        name: string;
+        score: number;
+        weight: number;
+        weighted: number;
+        grade: string;
+        detail: string;
+      };
+      processMaturity: {
+        name: string;
+        score: number;
+        weight: number;
+        weighted: number;
+        grade: string;
+        detail: string;
+      };
+      complianceRisk: {
+        name: string;
+        score: number;
+        weight: number;
+        weighted: number;
+        grade: string;
+        detail: string;
+      };
     };
-    topImprovement: { component: string; currentScore: number; potentialGain: number; suggestion: string };
+    topImprovement: {
+      component: string;
+      currentScore: number;
+      potentialGain: number;
+      suggestion: string;
+    };
     system1Ratio: number | null;
   };
   compoundScoring: {
@@ -128,9 +168,19 @@ export function ExplainabilityDashboard({ analysisId }: { analysisId: string }) 
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0', gap: '12px' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '80px 0',
+          gap: '12px',
+        }}
+      >
         <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
-        <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Loading explainability data...</span>
+        <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+          Loading explainability data...
+        </span>
       </div>
     );
   }
@@ -181,7 +231,14 @@ export function ExplainabilityDashboard({ analysisId }: { analysisId: string }) 
               border: `1px solid ${data.dqi.color}40`,
             }}
           >
-            <span style={{ fontSize: '20px', fontWeight: 700, color: data.dqi.color, fontFamily: "'JetBrains Mono', monospace" }}>
+            <span
+              style={{
+                fontSize: '20px',
+                fontWeight: 700,
+                color: data.dqi.color,
+                fontFamily: "'JetBrains Mono', monospace",
+              }}
+            >
               {Math.round(data.overallScore)}
             </span>
             <span style={{ fontSize: '13px', fontWeight: 600, color: data.dqi.color }}>
@@ -190,7 +247,8 @@ export function ExplainabilityDashboard({ analysisId }: { analysisId: string }) 
           </div>
         </div>
         <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginTop: '6px' }}>
-          {data.dqi.gradeLabel} &middot; {data.biases.length} biases detected &middot; DQI {Math.round(data.dqi.score)}/100
+          {data.dqi.gradeLabel} &middot; {data.biases.length} biases detected &middot; DQI{' '}
+          {Math.round(data.dqi.score)}/100
         </p>
       </div>
 
@@ -198,21 +256,36 @@ export function ExplainabilityDashboard({ analysisId }: { analysisId: string }) 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
         {/* Attribution Waterfall — full width */}
         {hasCompoundAdjustments && (
-          <Section title="Attribution Waterfall" description="How each factor adjusted the final score">
+          <Section
+            title="Attribution Waterfall"
+            description="How each factor adjusted the final score"
+          >
             <AttributionWaterfall waterfall={data.waterfall} />
           </Section>
         )}
 
         {/* Two column grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))', gap: 'var(--spacing-lg)' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
+            gap: 'var(--spacing-lg)',
+          }}
+        >
           {/* DQI Components */}
           <Section title="Quality Dimensions" description="Five pillars of decision quality">
-            <DQIComponentBreakdown components={data.dqi.components} topImprovement={data.dqi.topImprovement} />
+            <DQIComponentBreakdown
+              components={data.dqi.components}
+              topImprovement={data.dqi.topImprovement}
+            />
           </Section>
 
           {/* Historical Comparison */}
           {data.orgBaseline.totalDecisions > 1 && (
-            <Section title="vs Organization Baseline" description={`Compared to ${data.orgBaseline.totalDecisions} org decisions`}>
+            <Section
+              title="vs Organization Baseline"
+              description={`Compared to ${data.orgBaseline.totalDecisions} org decisions`}
+            >
               <HistoricalComparison
                 currentScore={data.overallScore}
                 currentNoise={data.noiseScore}
@@ -225,21 +298,36 @@ export function ExplainabilityDashboard({ analysisId }: { analysisId: string }) 
 
         {/* Bias Interaction Map — full width */}
         {hasBiasInteractions && (
-          <Section title="Bias Interaction Map" description="How detected biases amplify or dampen each other">
+          <Section
+            title="Bias Interaction Map"
+            description="How detected biases amplify or dampen each other"
+          >
             <BiasInteractionMap interactions={data.biasInteractions} biases={data.biases} />
           </Section>
         )}
 
         {/* Context and Biological signals */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))', gap: 'var(--spacing-lg)' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
+            gap: 'var(--spacing-lg)',
+          }}
+        >
           {hasCompoundAdjustments && (
-            <Section title="Context Factor Impact" description="How decision context influenced the score">
+            <Section
+              title="Context Factor Impact"
+              description="How decision context influenced the score"
+            >
               <ContextFactorImpact adjustments={data.compoundScoring?.adjustments || []} />
             </Section>
           )}
 
           {hasBiologicalSignals && (
-            <Section title="Biological Signals" description="Physiological patterns detected in language">
+            <Section
+              title="Biological Signals"
+              description="Physiological patterns detected in language"
+            >
               <BiologicalSignals signals={data.biologicalSignals} />
             </Section>
           )}
@@ -247,14 +335,20 @@ export function ExplainabilityDashboard({ analysisId }: { analysisId: string }) 
 
         {/* Counterfactuals */}
         {hasCounterfactuals && (
-          <Section title="Counterfactual Scenarios" description="What if these biases were removed?">
+          <Section
+            title="Counterfactual Scenarios"
+            description="What if these biases were removed?"
+          >
             <CounterfactualScenarios counterfactuals={data.counterfactuals} />
           </Section>
         )}
 
         {/* Evidence Trail — full width */}
         {data.biases.length > 0 && (
-          <Section title="Evidence Trail" description="Linking each bias to source text and research">
+          <Section
+            title="Evidence Trail"
+            description="Linking each bias to source text and research"
+          >
             <EvidenceTrail biases={data.biases} rootCauses={data.rootCauses} />
           </Section>
         )}
@@ -283,8 +377,21 @@ function Section({
         WebkitBackdropFilter: 'blur(var(--liquid-blur)) saturate(140%)',
       }}
     >
-      <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>{title}</h2>
-      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: 'var(--spacing-md)' }}>{description}</p>
+      <h2
+        style={{
+          fontSize: '16px',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          marginBottom: '4px',
+        }}
+      >
+        {title}
+      </h2>
+      <p
+        style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: 'var(--spacing-md)' }}
+      >
+        {description}
+      </p>
       {children}
     </div>
   );
@@ -306,7 +413,13 @@ function DQIComponentBreakdown({
   ];
 
   const gradeColor = (grade: string) => {
-    const map: Record<string, string> = { A: '#22c55e', B: '#84cc16', C: '#eab308', D: '#f97316', F: '#ef4444' };
+    const map: Record<string, string> = {
+      A: '#22c55e',
+      B: '#84cc16',
+      C: '#eab308',
+      D: '#f97316',
+      F: '#ef4444',
+    };
     return map[grade] || '#888';
   };
 
@@ -315,10 +428,24 @@ function DQIComponentBreakdown({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {items.map(item => (
           <div key={item.name}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '4px',
+              }}
+            >
               <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{item.name}</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: gradeColor(item.grade), fontFamily: "'JetBrains Mono', monospace" }}>
+                <span
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: gradeColor(item.grade),
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
                   {Math.round(item.score)}
                 </span>
                 <span
@@ -335,7 +462,14 @@ function DQIComponentBreakdown({
                 </span>
               </div>
             </div>
-            <div style={{ height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+            <div
+              style={{
+                height: '6px',
+                background: 'rgba(255,255,255,0.06)',
+                borderRadius: '3px',
+                overflow: 'hidden',
+              }}
+            >
               <div
                 style={{
                   height: '100%',

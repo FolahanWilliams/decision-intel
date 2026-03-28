@@ -33,7 +33,14 @@ export function ContextFactorImpact({ adjustments }: { adjustments: Adjustment[]
 
         return (
           <div key={idx}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '4px',
+              }}
+            >
               <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                 {formatSource(adj.source)}
               </span>
@@ -45,7 +52,8 @@ export function ContextFactorImpact({ adjustments }: { adjustments: Adjustment[]
                   color: isPositive ? '#22c55e' : '#ef4444',
                 }}
               >
-                {isPositive ? '+' : ''}{adj.delta.toFixed(1)}
+                {isPositive ? '+' : ''}
+                {adj.delta.toFixed(1)}
               </span>
             </div>
 
@@ -121,7 +129,5 @@ export function ContextFactorImpact({ adjustments }: { adjustments: Adjustment[]
 }
 
 function formatSource(source: string): string {
-  return source
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return source.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }

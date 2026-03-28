@@ -12,7 +12,8 @@ function ExplainabilityContent() {
     return (
       <div style={{ padding: 'var(--spacing-xl)', textAlign: 'center' }}>
         <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>
-          No analysis selected. Navigate to a document and click &ldquo;Explain Score&rdquo; to view the explainability dashboard.
+          No analysis selected. Navigate to a document and click &ldquo;Explain Score&rdquo; to view
+          the explainability dashboard.
         </p>
       </div>
     );

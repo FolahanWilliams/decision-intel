@@ -25,7 +25,8 @@ export async function GET(request: Request) {
   const overallPercentiles = computePercentiles(undefined, windowMs);
 
   // 2. AI cost metrics from database
-  let aiCosts: Array<{ provider: string; operation: string; calls: number; totalCost: number }> = [];
+  let aiCosts: Array<{ provider: string; operation: string; calls: number; totalCost: number }> =
+    [];
   try {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000); // last 24h
     const usage = await prisma.apiUsage.groupBy({

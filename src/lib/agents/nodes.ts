@@ -1,6 +1,11 @@
 import { AuditState } from './types';
 import { parseJSON } from '../utils/json';
-import { AnalysisResult, BiasDetectionResult, NoiseBenchmark, CausalIntelligenceResult } from '../../types';
+import {
+  AnalysisResult,
+  BiasDetectionResult,
+  NoiseBenchmark,
+  CausalIntelligenceResult,
+} from '../../types';
 import {
   GoogleGenerativeAI,
   HarmCategory,
@@ -217,7 +222,12 @@ function isValidTicker(ticker: string): boolean {
 /** Strip control characters and cap length to prevent prompt injection via company names. */
 function sanitizeCompanyName(name: string | null | undefined): string | undefined {
   if (!name) return undefined;
-  return name.replace(/[\n\r\t\x00-\x1f]/g, ' ').trim().slice(0, 200) || undefined;
+  return (
+    name
+      .replace(/[\n\r\t\x00-\x1f]/g, ' ')
+      .trim()
+      .slice(0, 200) || undefined
+  );
 }
 
 // ============================================================
@@ -357,7 +367,9 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
     const investmentOverlay = buildInvestmentBiasOverlay(state.documentType, state.dealStage);
     if (investmentOverlay) {
       biasPrompt += `\n\n--- INVESTMENT COMMITTEE CONTEXT ---\n${investmentOverlay}`;
-      log.info(`Using investment-specific bias detection (docType=${state.documentType}, stage=${state.dealStage || 'unknown'})`);
+      log.info(
+        `Using investment-specific bias detection (docType=${state.documentType}, stage=${state.dealStage || 'unknown'})`
+      );
     }
 
     // Use Grounded Model for primary detection with retry logic
@@ -728,7 +740,10 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
     let fetchedData: Record<string, unknown> = {};
     if (dataRequests.length > 0) {
       const validRequests: DataRequest[] = dataRequests
-        .filter((r: { ticker?: unknown }) => r && r.ticker && typeof r.ticker === 'string' && isValidTicker(r.ticker))
+        .filter(
+          (r: { ticker?: unknown }) =>
+            r && r.ticker && typeof r.ticker === 'string' && isValidTicker(r.ticker)
+        )
         .map((r: { ticker: string; dataType: string; reason: string; claimToVerify: string }) => ({
           ticker: r.ticker.toUpperCase(),
           dataType: r.dataType,
@@ -1078,9 +1093,8 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
     // lookup if orgId is unavailable.
     let causalDriverBrief = '';
     try {
-      const { computeOrgCausalWeights, getCausalInsights, doCalculus } = await import(
-        '@/lib/learning/causal-learning'
-      );
+      const { computeOrgCausalWeights, getCausalInsights, doCalculus } =
+        await import('@/lib/learning/causal-learning');
       const effectiveOrgId = state.orgId || userId;
       const causalWeights = await computeOrgCausalWeights(effectiveOrgId);
 
@@ -1321,7 +1335,9 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
         causalWeights.map(w => [w.biasType.toLowerCase().replace(/\s+/g, '_'), w.dangerMultiplier])
       );
       causalWeightsForReport = causalWeights;
-      log.debug(`Causal AI active: ${causalWeights.length} bias-outcome edges loaded (org: ${effectiveOrgId || 'user-level'})`);
+      log.debug(
+        `Causal AI active: ${causalWeights.length} bias-outcome edges loaded (org: ${effectiveOrgId || 'user-level'})`
+      );
     }
   } catch {
     log.debug('Causal weights unavailable — using static severity only');

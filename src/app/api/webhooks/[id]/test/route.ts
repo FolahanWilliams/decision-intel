@@ -7,10 +7,7 @@ import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { createHmac } from 'crypto';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateApiRequest(request);
   if (auth.error) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -34,9 +31,7 @@ export async function POST(
     },
   });
 
-  const signature = createHmac('sha256', subscription.secret)
-    .update(testPayload)
-    .digest('hex');
+  const signature = createHmac('sha256', subscription.secret).update(testPayload).digest('hex');
 
   const start = performance.now();
   let statusCode: number | null = null;

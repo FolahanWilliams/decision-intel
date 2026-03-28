@@ -1127,7 +1127,7 @@ export default function Dashboard() {
                     <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
                       <select
                         value={selectedDocType}
-                        onChange={(e) => setSelectedDocType(e.target.value)}
+                        onChange={e => setSelectedDocType(e.target.value)}
                         style={{
                           padding: '6px 10px',
                           background: 'rgba(255, 255, 255, 0.06)',
@@ -1140,13 +1140,15 @@ export default function Dashboard() {
                         }}
                       >
                         <option value="">Document Type</option>
-                        {DOCUMENT_TYPES.map((t) => (
-                          <option key={t.value} value={t.value}>{t.label}</option>
+                        {DOCUMENT_TYPES.map(t => (
+                          <option key={t.value} value={t.value}>
+                            {t.label}
+                          </option>
                         ))}
                       </select>
                       <select
                         value={selectedDealId}
-                        onChange={(e) => setSelectedDealId(e.target.value)}
+                        onChange={e => setSelectedDealId(e.target.value)}
                         style={{
                           padding: '6px 10px',
                           background: 'rgba(255, 255, 255, 0.06)',
@@ -1159,15 +1161,21 @@ export default function Dashboard() {
                         }}
                       >
                         <option value="">Link to Deal</option>
-                        {dealsList.map((d) => (
-                          <option key={d.id} value={d.id}>{d.name}</option>
+                        {dealsList.map(d => (
+                          <option key={d.id} value={d.id}>
+                            {d.name}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     <div className="flex items-center gap-sm" style={{ marginTop: 12 }}>
                       <button
-                        onClick={() => { setPendingFile(null); setSelectedDocType(''); setSelectedDealId(''); }}
+                        onClick={() => {
+                          setPendingFile(null);
+                          setSelectedDocType('');
+                          setSelectedDealId('');
+                        }}
                         className="btn btn-ghost text-sm"
                       >
                         Cancel

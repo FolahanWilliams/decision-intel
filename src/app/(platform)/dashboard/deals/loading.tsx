@@ -1,7 +1,14 @@
 export default function DealsLoading() {
   return (
     <div className="container" style={{ maxWidth: 1200, padding: '24px 20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 20,
+        }}
+      >
         <div>
           <div
             style={{
@@ -35,7 +42,7 @@ export default function DealsLoading() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {[1, 2, 3, 4, 5].map((i) => (
+        {[1, 2, 3, 4, 5].map(i => (
           <div
             key={i}
             style={{

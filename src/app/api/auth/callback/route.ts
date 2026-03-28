@@ -18,18 +18,24 @@ export async function GET(request: Request) {
 
       // Detect first-time users for onboarding
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (user?.id) {
-          const settings = await prisma.userSettings.findUnique({
-            where: { userId: user.id },
-            select: { onboardingCompleted: true },
-          }).catch(() => null);
+          const settings = await prisma.userSettings
+            .findUnique({
+              where: { userId: user.id },
+              select: { onboardingCompleted: true },
+            })
+            .catch(() => null);
 
           if (!settings) {
             // First-time user — create settings and show welcome modal
-            await prisma.userSettings.create({
-              data: { userId: user.id },
-            }).catch(() => {}); // Ignore if already exists (race condition)
+            await prisma.userSettings
+              .create({
+                data: { userId: user.id },
+              })
+              .catch(() => {}); // Ignore if already exists (race condition)
             return NextResponse.redirect(`${origin}/dashboard?welcome=true`);
           }
 

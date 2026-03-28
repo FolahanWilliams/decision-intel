@@ -16,7 +16,9 @@ vi.mock('next/server', () => ({
     text: () => Promise<string>;
     constructor(input?: string | URL) {
       this.url =
-        typeof input === 'string' ? input : input?.toString() || 'http://localhost/api/stripe/webhook';
+        typeof input === 'string'
+          ? input
+          : input?.toString() || 'http://localhost/api/stripe/webhook';
       this.text = async () => mockRequestBody;
     }
   },
@@ -403,9 +405,7 @@ describe('POST /api/stripe/webhook', () => {
   // -----------------------------------------------------------------------
 
   it('returns 200 with { received: true } for unhandled event types', async () => {
-    mockConstructEvent.mockReturnValue(
-      makeStripeEvent('some.random.event', { id: 'obj_123' })
-    );
+    mockConstructEvent.mockReturnValue(makeStripeEvent('some.random.event', { id: 'obj_123' }));
 
     const res = await POST(createWebhookRequest());
 

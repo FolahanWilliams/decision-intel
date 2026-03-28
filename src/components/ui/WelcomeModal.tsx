@@ -22,7 +22,7 @@ const TOUR_STEPS = [
     icon: Sparkles,
     title: 'IC-Specific Bias Detection',
     description:
-      'Upload IC memos, CIMs, pitch decks, or term sheets. Our AI pipeline detects PE/VC-specific biases like anchoring to entry valuation, carry incentive distortion, and winner\'s curse.',
+      "Upload IC memos, CIMs, pitch decks, or term sheets. Our AI pipeline detects PE/VC-specific biases like anchoring to entry valuation, carry incentive distortion, and winner's curse.",
   },
   {
     icon: BarChart3,
@@ -53,8 +53,8 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
 
     // Verify with API
     fetch('/api/onboarding')
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         if (data.onboardingCompleted) {
           localStorage.setItem(STORAGE_KEY, 'true');
           onClose();
@@ -103,7 +103,12 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
   if (!open) return null;
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen: boolean) => { if (!isOpen) completeOnboarding(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen: boolean) => {
+        if (!isOpen) completeOnboarding();
+      }}
+    >
       <DialogContent className="sm:max-w-md" showCloseButton>
         {/* Step 0: Welcome */}
         {step === 0 && (
@@ -210,7 +215,14 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                       <Icon size={18} style={{ color: 'var(--text-secondary)' }} />
                     </div>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
+                      <div
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: 'var(--text-primary)',
+                          marginBottom: 2,
+                        }}
+                      >
                         {tourStep.title}
                       </div>
                       <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
@@ -237,9 +249,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
           <>
             <DialogHeader>
               <DialogTitle>Ready to go</DialogTitle>
-              <DialogDescription>
-                Choose how you&apos;d like to start:
-              </DialogDescription>
+              <DialogDescription>Choose how you&apos;d like to start:</DialogDescription>
             </DialogHeader>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, margin: '8px 0' }}>

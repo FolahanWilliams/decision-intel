@@ -34,18 +34,27 @@ const cardStyle: React.CSSProperties = {
 
 export function DealOutcomeDisplay({ outcome, currency = 'USD' }: DealOutcomeDisplayProps) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+        gap: 12,
+      }}
+    >
       {/* IRR */}
       {outcome.irr != null && (
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {outcome.irr >= 0
-              ? <TrendingUp size={14} style={{ color: getIrrColor(outcome.irr) }} />
-              : <TrendingDown size={14} style={{ color: getIrrColor(outcome.irr) }} />}
+            {outcome.irr >= 0 ? (
+              <TrendingUp size={14} style={{ color: getIrrColor(outcome.irr) }} />
+            ) : (
+              <TrendingDown size={14} style={{ color: getIrrColor(outcome.irr) }} />
+            )}
             <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>IRR</span>
           </div>
           <div style={{ fontSize: 22, fontWeight: 700, color: getIrrColor(outcome.irr) }}>
-            {outcome.irr > 0 ? '+' : ''}{outcome.irr.toFixed(1)}%
+            {outcome.irr > 0 ? '+' : ''}
+            {outcome.irr.toFixed(1)}%
           </div>
         </div>
       )}
@@ -66,7 +75,9 @@ export function DealOutcomeDisplay({ outcome, currency = 'USD' }: DealOutcomeDis
       {/* Exit Type */}
       {outcome.exitType && (
         <div style={cardStyle}>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>Exit Type</span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+            Exit Type
+          </span>
           <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
             {getExitTypeLabel(outcome.exitType)}
           </div>
@@ -76,9 +87,12 @@ export function DealOutcomeDisplay({ outcome, currency = 'USD' }: DealOutcomeDis
       {/* Exit Value */}
       {outcome.exitValue != null && (
         <div style={cardStyle}>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>Exit Value</span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+            Exit Value
+          </span>
           <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
-            {currency} {outcome.exitValue >= 1_000_000
+            {currency}{' '}
+            {outcome.exitValue >= 1_000_000
               ? `${(Number(outcome.exitValue) / 1_000_000).toFixed(1)}M`
               : Number(outcome.exitValue).toLocaleString()}
           </div>
@@ -90,7 +104,9 @@ export function DealOutcomeDisplay({ outcome, currency = 'USD' }: DealOutcomeDis
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Clock size={14} style={{ color: 'var(--text-muted)' }} />
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>Hold Period</span>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
+              Hold Period
+            </span>
           </div>
           <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
             {outcome.holdPeriod < 12
