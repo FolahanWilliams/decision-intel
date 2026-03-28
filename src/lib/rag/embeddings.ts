@@ -235,7 +235,9 @@ export async function storeAnalysisEmbeddingsBatch(items: EmbeddingInput[]): Pro
     // Filter out any failed embeddings (null or zero vectors)
     const successful = embeddingData.filter(
       data =>
-        data.embedding != null && data.embedding.length === 1536 && !data.embedding.every(v => v === 0)
+        data.embedding != null &&
+        data.embedding.length === 1536 &&
+        !data.embedding.every(v => v === 0)
     );
 
     const failed = embeddingData.length - successful.length;

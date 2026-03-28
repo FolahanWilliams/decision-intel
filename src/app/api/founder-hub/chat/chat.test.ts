@@ -5,7 +5,9 @@ import { NextRequest } from 'next/server';
 
 const { mockSendMessageStream, mockStartChat } = vi.hoisted(() => {
   const mockSendMessageStream = vi.fn();
-  const mockStartChat = vi.fn((_opts?: Record<string, unknown>) => ({ sendMessageStream: mockSendMessageStream }));
+  const mockStartChat = vi.fn((_opts?: Record<string, unknown>) => ({
+    sendMessageStream: mockSendMessageStream,
+  }));
   return { mockSendMessageStream, mockStartChat };
 });
 
@@ -169,7 +171,9 @@ describe('POST /api/founder-hub/chat', () => {
     await POST(makeRequest({ message: 'Test', history }, PASS));
     expect(mockStartChat).toHaveBeenCalled();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const chatArgs = (mockStartChat as any).mock.calls[0]?.[0] as { history: Array<{ role: string; parts?: Array<{ text: string }> }> } | undefined;
+    const chatArgs = (mockStartChat as any).mock.calls[0]?.[0] as
+      | { history: Array<{ role: string; parts?: Array<{ text: string }> }> }
+      | undefined;
     expect(chatArgs).toBeDefined();
     // At minimum, the 2 valid history entries should be present
     expect(chatArgs!.history.length).toBeGreaterThanOrEqual(4); // system pair + 2 valid
@@ -182,7 +186,9 @@ describe('POST /api/founder-hub/chat', () => {
     }));
     await POST(makeRequest({ message: 'Test', history }, PASS));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const chatArgs = (mockStartChat as any).mock.calls[0]?.[0] as { history: Array<unknown> } | undefined;
+    const chatArgs = (mockStartChat as any).mock.calls[0]?.[0] as
+      | { history: Array<unknown> }
+      | undefined;
     expect(chatArgs).toBeDefined();
     // System pair (2) + last 20 history entries
     expect(chatArgs!.history.length).toBe(22);

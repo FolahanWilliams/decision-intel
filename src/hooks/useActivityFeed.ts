@@ -54,7 +54,9 @@ export function useActivityFeed(options?: UseActivityFeedOptions) {
     abortRef.current = controller;
 
     try {
-      const res = await fetch(`${url}&cursor=${encodeURIComponent(nextCursor)}`, { signal: controller.signal });
+      const res = await fetch(`${url}&cursor=${encodeURIComponent(nextCursor)}`, {
+        signal: controller.signal,
+      });
       const result: ActivityFeedResponse = await res.json();
       setExtraActivities(prev => [...prev, ...result.activities]);
       setCursor(result.nextCursor);

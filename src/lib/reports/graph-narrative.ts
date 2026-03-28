@@ -26,7 +26,9 @@ function getGenAI(): GoogleGenerativeAI {
 export async function generateGraphNarrative(report: GraphNetworkReport): Promise<string> {
   try {
     const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview') });
+    const model = ai.getGenerativeModel({
+      model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),
+    });
 
     const prompt = `You are an executive advisor analyzing an organization's decision-making intelligence graph. Generate a concise, actionable 3-5 paragraph narrative summary for senior leadership. Use a professional, direct tone. No bullet points — flowing prose only.
 

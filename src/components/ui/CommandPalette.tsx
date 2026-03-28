@@ -236,7 +236,10 @@ export function CommandPalette() {
         icon: <Upload size={16} />,
         action: () => {
           navigate('/dashboard');
-          uploadTimeoutRef.current = setTimeout(() => document.getElementById('file-input')?.click(), 300);
+          uploadTimeoutRef.current = setTimeout(
+            () => document.getElementById('file-input')?.click(),
+            300
+          );
         },
         keywords: ['new', 'add', 'file'],
       },

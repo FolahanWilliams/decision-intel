@@ -36,14 +36,22 @@ export async function GET() {
         },
       });
 
-      result = sessions.map((s: { id: string; title: string; pinnedDocId: string | null; createdAt: Date; updatedAt: Date }) => ({
-        id: s.id,
-        title: s.title,
-        pinnedDocId: s.pinnedDocId,
-        createdAt: s.createdAt.toISOString(),
-        updatedAt: s.updatedAt.toISOString(),
-        messageCount: 0,
-      }));
+      result = sessions.map(
+        (s: {
+          id: string;
+          title: string;
+          pinnedDocId: string | null;
+          createdAt: Date;
+          updatedAt: Date;
+        }) => ({
+          id: s.id,
+          title: s.title,
+          pinnedDocId: s.pinnedDocId,
+          createdAt: s.createdAt.toISOString(),
+          updatedAt: s.updatedAt.toISOString(),
+          messageCount: 0,
+        })
+      );
     } catch (driftErr: unknown) {
       const code = (driftErr as { code?: string })?.code;
       if (code === 'P2021' || code === 'P2022') {
@@ -137,7 +145,13 @@ export async function POST(request: NextRequest) {
           } catch {
             // chatMessage table may not exist yet
           }
-          return (tx as { chatSession: { update: (args: unknown) => Promise<{ id: string; title: string; updatedAt: Date }> } }).chatSession.update({
+          return (
+            tx as {
+              chatSession: {
+                update: (args: unknown) => Promise<{ id: string; title: string; updatedAt: Date }>;
+              };
+            }
+          ).chatSession.update({
             where: { id },
             data: {
               title,

@@ -24,7 +24,7 @@ interface DocumentsResponse {
   documents: Document[];
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 function getScoreColor(score: number): string {
   if (score >= 80) return 'var(--success)';
@@ -61,17 +61,15 @@ function RecentAnalysesPicker() {
 
   // Flatten documents into a list of analyses with their document filename
   const analysisItems =
-    data?.documents?.flatMap((doc) =>
-      doc.analyses.map((analysis) => ({
+    data?.documents?.flatMap(doc =>
+      doc.analyses.map(analysis => ({
         ...analysis,
         filename: doc.filename,
       }))
     ) ?? [];
 
   // Sort by createdAt descending
-  analysisItems.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  analysisItems.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div style={{ padding: 'var(--spacing-xl)', maxWidth: '960px', margin: '0 auto' }}>
@@ -173,7 +171,7 @@ function RecentAnalysesPicker() {
 
       {!isLoading && !error && analysisItems.length > 0 && (
         <div className="grid grid-2 grid-3 gap-md">
-          {analysisItems.map((item) => (
+          {analysisItems.map(item => (
             <button
               key={item.id}
               onClick={() => handleSelect(item.id)}
@@ -190,19 +188,16 @@ function RecentAnalysesPicker() {
                 transition: 'border-color 0.15s ease, transform 0.15s ease',
                 width: '100%',
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 e.currentTarget.style.borderColor = 'var(--accent-primary)';
                 e.currentTarget.style.transform = 'translateY(-1px)';
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 e.currentTarget.style.borderColor = 'var(--glass-border)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <div
-                className="flex items-center"
-                style={{ gap: 'var(--spacing-sm)', minWidth: 0 }}
-              >
+              <div className="flex items-center" style={{ gap: 'var(--spacing-sm)', minWidth: 0 }}>
                 <FileText size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
                 <span
                   style={{
@@ -223,10 +218,7 @@ function RecentAnalysesPicker() {
                 style={{ gap: 'var(--spacing-md)', fontSize: '13px' }}
               >
                 {item.overallScore != null && (
-                  <span
-                    className="flex items-center"
-                    style={{ gap: '4px' }}
-                  >
+                  <span className="flex items-center" style={{ gap: '4px' }}>
                     <BarChart3 size={13} style={{ color: getScoreColor(item.overallScore) }} />
                     <span
                       style={{
@@ -260,9 +252,7 @@ function RecentAnalysesPicker() {
                     overflow: 'hidden',
                   }}
                 >
-                  {item.summary.length > 100
-                    ? `${item.summary.slice(0, 100)}...`
-                    : item.summary}
+                  {item.summary.length > 100 ? `${item.summary.slice(0, 100)}...` : item.summary}
                 </p>
               )}
             </button>

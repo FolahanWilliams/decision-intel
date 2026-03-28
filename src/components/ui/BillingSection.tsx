@@ -105,7 +105,11 @@ export function BillingSection() {
   const isPaid = data.plan !== 'free' && data.status !== 'none';
   const isUnlimited = data.usage.analysesLimit === -1;
   const usageColor =
-    data.usage.percentUsed > 85 ? 'var(--error)' : data.usage.percentUsed > 60 ? 'var(--warning)' : 'var(--success)';
+    data.usage.percentUsed > 85
+      ? 'var(--error)'
+      : data.usage.percentUsed > 60
+        ? 'var(--warning)'
+        : 'var(--success)';
 
   const handlePortal = async () => {
     setPortalLoading(true);

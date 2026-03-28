@@ -95,152 +95,155 @@ export default function SearchPage() {
 
   return (
     <ErrorBoundary sectionName="Semantic Search">
-    <div
-      className="container"
-      style={{
-        paddingTop: 'var(--spacing-2xl)',
-        paddingBottom: 'var(--spacing-2xl)',
-        maxWidth: 900,
-      }}
-    >
-      <header className="mb-xl">
-        <div className="flex items-center gap-md mb-sm">
-          <Search size={28} style={{ color: 'var(--text-secondary)' }} />
-          <h1>Semantic Search</h1>
-        </div>
-        <p className="text-muted">
-          Search across all your analysed documents using natural language. Results are ranked by
-          semantic similarity.
-        </p>
-      </header>
+      <div
+        className="container"
+        style={{
+          paddingTop: 'var(--spacing-2xl)',
+          paddingBottom: 'var(--spacing-2xl)',
+          maxWidth: 900,
+        }}
+      >
+        <header className="mb-xl">
+          <div className="flex items-center gap-md mb-sm">
+            <Search size={28} style={{ color: 'var(--text-secondary)' }} />
+            <h1>Semantic Search</h1>
+          </div>
+          <p className="text-muted">
+            Search across all your analysed documents using natural language. Results are ranked by
+            semantic similarity.
+          </p>
+        </header>
 
-      {/* Search input */}
-      <div className="card mb-xl">
-        <div className="card-body">
-          <div className="flex gap-sm">
-            <input
-              type="text"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') handleSearch();
-              }}
-              placeholder='e.g. "decisions with high confirmation bias" or "failed risk assessments"'
-              className="input flex-1"
-              style={{
-                padding: 'var(--spacing-md)',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-              }}
-            />
-            <button
-              onClick={handleSearch}
-              disabled={loading || !query.trim()}
-              className="btn btn-primary flex items-center gap-sm"
-            >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-              Search
-            </button>
+        {/* Search input */}
+        <div className="card mb-xl">
+          <div className="card-body">
+            <div className="flex gap-sm">
+              <input
+                type="text"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleSearch();
+                }}
+                placeholder='e.g. "decisions with high confirmation bias" or "failed risk assessments"'
+                className="input flex-1"
+                style={{
+                  padding: 'var(--spacing-md)',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                }}
+              />
+              <button
+                onClick={handleSearch}
+                disabled={loading || !query.trim()}
+                className="btn btn-primary flex items-center gap-sm"
+              >
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+                Search
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Results */}
-      {loading && (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
-          <span className="ml-2 text-muted">Searching documents...</span>
-        </div>
-      )}
+        {/* Results */}
+        {loading && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2
+              size={24}
+              className="animate-spin"
+              style={{ color: 'var(--text-secondary)' }}
+            />
+            <span className="ml-2 text-muted">Searching documents...</span>
+          </div>
+        )}
 
-      {!loading && searched && results.length === 0 && (
-        <EnhancedEmptyState type="search" />
-      )}
+        {!loading && searched && results.length === 0 && <EnhancedEmptyState type="search" />}
 
-      {!loading && results.length > 0 && (
-        <div className="flex flex-col gap-md">
-          <p className="text-sm text-muted">
-            {results.length} result{results.length !== 1 ? 's' : ''} found
-          </p>
-          {results.map((result, idx) => (
-            <Link
-              key={result.documentId}
-              href={`/documents/${result.documentId}`}
-              className="card animate-fade-in"
-              style={{
-                animationDelay: `${idx * 0.05}s`,
-                textDecoration: 'none',
-                color: 'inherit',
-                transition: 'border-color 0.15s',
-              }}
-            >
-              <div className="card-body">
-                <div className="flex items-start justify-between gap-md">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-sm mb-sm">
-                      <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
-                      <span style={{ fontWeight: 600, fontSize: '14px' }}>
-                        {highlightMatch(result.filename || result.documentId, query)}
-                      </span>
-                    </div>
-                    {result.biases.length > 0 && (
-                      <p
-                        className="text-sm text-muted"
-                        style={{ lineHeight: 1.5, marginBottom: '8px' }}
-                      >
-                        Biases: {highlightMatch(result.biases.join(', '), query)}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-md text-xs">
-                      <span
-                        className="flex items-center gap-xs"
-                        style={{ color: 'var(--accent-secondary)' }}
-                      >
-                        <TrendingUp size={12} />
-                        {Math.round(result.similarity * 100)}% match
-                      </span>
-                      {typeof result.score === 'number' && result.score > 0 && (
-                        <span className="badge badge-secondary">
-                          Score: {Math.round(result.score)}
+        {!loading && results.length > 0 && (
+          <div className="flex flex-col gap-md">
+            <p className="text-sm text-muted">
+              {results.length} result{results.length !== 1 ? 's' : ''} found
+            </p>
+            {results.map((result, idx) => (
+              <Link
+                key={result.documentId}
+                href={`/documents/${result.documentId}`}
+                className="card animate-fade-in"
+                style={{
+                  animationDelay: `${idx * 0.05}s`,
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  transition: 'border-color 0.15s',
+                }}
+              >
+                <div className="card-body">
+                  <div className="flex items-start justify-between gap-md">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-sm mb-sm">
+                        <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
+                        <span style={{ fontWeight: 600, fontSize: '14px' }}>
+                          {highlightMatch(result.filename || result.documentId, query)}
                         </span>
+                      </div>
+                      {result.biases.length > 0 && (
+                        <p
+                          className="text-sm text-muted"
+                          style={{ lineHeight: 1.5, marginBottom: '8px' }}
+                        >
+                          Biases: {highlightMatch(result.biases.join(', '), query)}
+                        </p>
                       )}
-                      {typeof result.graphEdgeCount === 'number' && result.graphEdgeCount > 0 && (
+                      <div className="flex items-center gap-md text-xs">
                         <span
                           className="flex items-center gap-xs"
-                          style={{ color: 'var(--accent-primary)' }}
+                          style={{ color: 'var(--accent-secondary)' }}
                         >
-                          <GitBranch size={12} />
-                          {result.graphEdgeCount} connection{result.graphEdgeCount !== 1 ? 's' : ''}
+                          <TrendingUp size={12} />
+                          {Math.round(result.similarity * 100)}% match
                         </span>
-                      )}
+                        {typeof result.score === 'number' && result.score > 0 && (
+                          <span className="badge badge-secondary">
+                            Score: {Math.round(result.score)}
+                          </span>
+                        )}
+                        {typeof result.graphEdgeCount === 'number' && result.graphEdgeCount > 0 && (
+                          <span
+                            className="flex items-center gap-xs"
+                            style={{ color: 'var(--accent-primary)' }}
+                          >
+                            <GitBranch size={12} />
+                            {result.graphEdgeCount} connection
+                            {result.graphEdgeCount !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    <ArrowRight
+                      size={16}
+                      style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: '4px' }}
+                    />
                   </div>
-                  <ArrowRight
-                    size={16}
-                    style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: '4px' }}
-                  />
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {/* Empty state before search */}
-      {!searched && (
-        <div className="card">
-          <div className="card-body flex flex-col items-center gap-md py-8">
-            <Search size={40} style={{ color: 'var(--text-muted)' }} />
-            <p className="text-muted text-center" style={{ maxWidth: 400 }}>
-              Enter a natural language query to find similar documents, decisions, and patterns
-              across your analysis history.
-            </p>
+              </Link>
+            ))}
           </div>
-        </div>
-      )}
-    </div>
+        )}
+
+        {/* Empty state before search */}
+        {!searched && (
+          <div className="card">
+            <div className="card-body flex flex-col items-center gap-md py-8">
+              <Search size={40} style={{ color: 'var(--text-muted)' }} />
+              <p className="text-muted text-center" style={{ maxWidth: 400 }}>
+                Enter a natural language query to find similar documents, decisions, and patterns
+                across your analysis history.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </ErrorBoundary>
   );
 }

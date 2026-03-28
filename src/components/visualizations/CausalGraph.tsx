@@ -372,8 +372,6 @@ export function CausalGraph({
         )}
 
         {viewMode === 'radial' && <RadialView data={graphData} dimensions={dimensions} />}
-
-
       </Card>
 
       {/* Insights Panel */}

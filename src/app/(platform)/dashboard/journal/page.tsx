@@ -190,357 +190,390 @@ export default function JournalPage() {
 
   return (
     <ErrorBoundary sectionName="Decision Journal">
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1
-            className="text-2xl font-bold flex items-center gap-2"
-            style={{ color: 'var(--text-primary)' }}
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1
+              className="text-2xl font-bold flex items-center gap-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              <BookOpen className="h-6 w-6" style={{ color: 'var(--warning)' }} />
+              Decision Journal
+            </h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+              Capture, review, and convert decisions from across your workflow.
+              {pagination && (
+                <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>
+                  {pagination.total} total entries
+                </span>
+              )}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowNewEntry(!showNewEntry)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            style={{
+              background: showNewEntry ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+            }}
           >
-            <BookOpen className="h-6 w-6" style={{ color: 'var(--warning)' }} />
-            Decision Journal
-          </h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-            Capture, review, and convert decisions from across your workflow.
-            {pagination && (
-              <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>
-                {pagination.total} total entries
-              </span>
-            )}
-          </p>
+            <Plus size={16} />
+            New Entry
+          </button>
         </div>
-        <button
-          onClick={() => setShowNewEntry(!showNewEntry)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          style={{
-            background: showNewEntry ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            color: 'var(--text-primary)',
-            cursor: 'pointer',
-          }}
-        >
-          <Plus size={16} />
-          New Entry
-        </button>
-      </div>
 
-      {/* New Entry Form */}
-      <AnimatePresence>
-        {showNewEntry && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            style={{ overflow: 'hidden', marginBottom: '24px' }}
-          >
-            <div
-              className="rounded-xl p-4"
+        {/* New Entry Form */}
+        <AnimatePresence>
+          {showNewEntry && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              style={{ overflow: 'hidden', marginBottom: '24px' }}
+            >
+              <div
+                className="rounded-xl p-4"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(251, 191, 36, 0.15)',
+                }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <Edit size={14} style={{ color: 'var(--warning)' }} />
+                  <span
+                    className="text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    Manual Journal Entry
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Entry title..."
+                  value={newEntryTitle}
+                  onChange={e => setNewEntryTitle(e.target.value)}
+                  className="w-full mb-2 px-3 py-2 rounded-lg text-sm"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    color: 'var(--text-primary)',
+                    outline: 'none',
+                  }}
+                />
+                <textarea
+                  placeholder="Describe the decision or context..."
+                  value={newEntryContent}
+                  onChange={e => setNewEntryContent(e.target.value)}
+                  rows={3}
+                  className="w-full mb-3 px-3 py-2 rounded-lg text-sm resize-none"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    color: 'var(--text-primary)',
+                    outline: 'none',
+                  }}
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setShowNewEntry(false)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium"
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleNewEntry}
+                    disabled={submitting || !newEntryTitle.trim() || !newEntryContent.trim()}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium"
+                    style={{
+                      background: 'rgba(251, 191, 36, 0.15)',
+                      border: '1px solid rgba(251, 191, 36, 0.3)',
+                      color: 'var(--warning)',
+                      cursor:
+                        submitting || !newEntryTitle.trim() || !newEntryContent.trim()
+                          ? 'not-allowed'
+                          : 'pointer',
+                      opacity:
+                        submitting || !newEntryTitle.trim() || !newEntryContent.trim() ? 0.5 : 1,
+                    }}
+                  >
+                    {submitting ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Send size={12} />
+                    )}
+                    {submitting ? 'Saving...' : 'Submit'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Source Filter Pills */}
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          {SOURCE_FILTERS.map(filter => (
+            <button
+              key={filter.key}
+              onClick={() => setSourceFilter(filter.key)}
+              className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(251, 191, 36, 0.15)',
+                background:
+                  sourceFilter === filter.key
+                    ? 'rgba(255, 255, 255, 0.12)'
+                    : 'rgba(255, 255, 255, 0.04)',
+                border:
+                  sourceFilter === filter.key
+                    ? '1px solid rgba(255, 255, 255, 0.2)'
+                    : '1px solid rgba(255, 255, 255, 0.06)',
+                color: sourceFilter === filter.key ? 'var(--text-primary)' : 'var(--text-muted)',
+                cursor: 'pointer',
               }}
             >
-              <div className="flex items-center gap-2 mb-3">
-                <Edit size={14} style={{ color: 'var(--warning)' }} />
-                <span
-                  className="text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  Manual Journal Entry
-                </span>
-              </div>
-              <input
-                type="text"
-                placeholder="Entry title..."
-                value={newEntryTitle}
-                onChange={e => setNewEntryTitle(e.target.value)}
-                className="w-full mb-2 px-3 py-2 rounded-lg text-sm"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  color: 'var(--text-primary)',
-                  outline: 'none',
-                }}
-              />
-              <textarea
-                placeholder="Describe the decision or context..."
-                value={newEntryContent}
-                onChange={e => setNewEntryContent(e.target.value)}
-                rows={3}
-                className="w-full mb-3 px-3 py-2 rounded-lg text-sm resize-none"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  color: 'var(--text-primary)',
-                  outline: 'none',
-                }}
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => setShowNewEntry(false)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium"
-                  style={{
-                    background: 'transparent',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    color: 'var(--text-muted)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleNewEntry}
-                  disabled={submitting || !newEntryTitle.trim() || !newEntryContent.trim()}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium"
-                  style={{
-                    background: 'rgba(251, 191, 36, 0.15)',
-                    border: '1px solid rgba(251, 191, 36, 0.3)',
-                    color: 'var(--warning)',
-                    cursor:
-                      submitting || !newEntryTitle.trim() || !newEntryContent.trim()
-                        ? 'not-allowed'
-                        : 'pointer',
-                    opacity:
-                      submitting || !newEntryTitle.trim() || !newEntryContent.trim() ? 0.5 : 1,
-                  }}
-                >
-                  {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
-                  {submitting ? 'Saving...' : 'Submit'}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Source Filter Pills */}
-      <div className="flex items-center gap-2 mb-4 flex-wrap">
-        {SOURCE_FILTERS.map(filter => (
-          <button
-            key={filter.key}
-            onClick={() => setSourceFilter(filter.key)}
-            className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
-            style={{
-              background:
-                sourceFilter === filter.key
-                  ? 'rgba(255, 255, 255, 0.12)'
-                  : 'rgba(255, 255, 255, 0.04)',
-              border:
-                sourceFilter === filter.key
-                  ? '1px solid rgba(255, 255, 255, 0.2)'
-                  : '1px solid rgba(255, 255, 255, 0.06)',
-              color: sourceFilter === filter.key ? 'var(--text-primary)' : 'var(--text-muted)',
-              cursor: 'pointer',
-            }}
-          >
-            {filter.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Status Tabs */}
-      <div
-        className="flex items-center gap-0 mb-6 rounded-lg overflow-hidden"
-        style={{ border: '1px solid rgba(255, 255, 255, 0.08)', width: 'fit-content' }}
-      >
-        {STATUS_TABS.map(tab => (
-          <button
-            key={tab.key}
-            onClick={() => setStatusFilter(tab.key)}
-            className="px-4 py-2 text-xs font-medium transition-colors"
-            style={{
-              background: statusFilter === tab.key ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-              color: statusFilter === tab.key ? 'var(--text-primary)' : 'var(--text-muted)',
-              borderRight: '1px solid rgba(255, 255, 255, 0.06)',
-              cursor: 'pointer',
-              border: 'none',
-              borderLeft: tab.key !== 'all' ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Error Banner */}
-      {error && (
-        <div style={{ padding: '12px 16px', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.3)', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--spacing-md)', fontSize: '13px', color: 'var(--error)' }} className="flex items-center gap-sm">
-          <AlertTriangle size={14} />
-          {error}
-          <button onClick={() => { setError(null); fetchEntries(); }} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', fontWeight: 600, fontSize: '12px' }}>
-            Retry
-          </button>
+              {filter.label}
+            </button>
+          ))}
         </div>
-      )}
 
-      {/* Timeline List */}
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
-          <span className="ml-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-            Loading journal entries...
-          </span>
+        {/* Status Tabs */}
+        <div
+          className="flex items-center gap-0 mb-6 rounded-lg overflow-hidden"
+          style={{ border: '1px solid rgba(255, 255, 255, 0.08)', width: 'fit-content' }}
+        >
+          {STATUS_TABS.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+              className="px-4 py-2 text-xs font-medium transition-colors"
+              style={{
+                background: statusFilter === tab.key ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                color: statusFilter === tab.key ? 'var(--text-primary)' : 'var(--text-muted)',
+                borderRight: '1px solid rgba(255, 255, 255, 0.06)',
+                cursor: 'pointer',
+                border: 'none',
+                borderLeft: tab.key !== 'all' ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-      ) : entries.length === 0 ? (
-        <EnhancedEmptyState
-          type="generic"
-          title="No journal entries found"
-          description="Create a manual entry or connect email/calendar/Slack integrations."
-        />
-      ) : (
-        <div className="relative">
-          {/* Timeline line */}
+
+        {/* Error Banner */}
+        {error && (
           <div
-            className="absolute left-[19px] top-0 bottom-0 w-px"
-            style={{ background: 'rgba(255, 255, 255, 0.06)' }}
+            style={{
+              padding: '12px 16px',
+              background: 'rgba(248, 113, 113, 0.1)',
+              border: '1px solid rgba(248, 113, 113, 0.3)',
+              borderRadius: 'var(--radius-sm)',
+              marginBottom: 'var(--spacing-md)',
+              fontSize: '13px',
+              color: 'var(--error)',
+            }}
+            className="flex items-center gap-sm"
+          >
+            <AlertTriangle size={14} />
+            {error}
+            <button
+              onClick={() => {
+                setError(null);
+                fetchEntries();
+              }}
+              style={{
+                marginLeft: 'auto',
+                background: 'none',
+                border: 'none',
+                color: 'var(--error)',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '12px',
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Timeline List */}
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
+            <span className="ml-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+              Loading journal entries...
+            </span>
+          </div>
+        ) : entries.length === 0 ? (
+          <EnhancedEmptyState
+            type="generic"
+            title="No journal entries found"
+            description="Create a manual entry or connect email/calendar/Slack integrations."
           />
+        ) : (
+          <div className="relative">
+            {/* Timeline line */}
+            <div
+              className="absolute left-[19px] top-0 bottom-0 w-px"
+              style={{ background: 'rgba(255, 255, 255, 0.06)' }}
+            />
 
-          <AnimatePresence>
-            {entries.map(entry => {
-              const Icon = SOURCE_ICONS[entry.source] || BookOpen;
-              const badgeStyle = STATUS_BADGE_STYLES[entry.status] || STATUS_BADGE_STYLES.pending;
-              const isConverting = converting === entry.id;
-              const isPending = entry.status === 'pending';
-              const statusLabel = entry.status === 'processed' ? 'converted' : entry.status;
+            <AnimatePresence>
+              {entries.map(entry => {
+                const Icon = SOURCE_ICONS[entry.source] || BookOpen;
+                const badgeStyle = STATUS_BADGE_STYLES[entry.status] || STATUS_BADGE_STYLES.pending;
+                const isConverting = converting === entry.id;
+                const isPending = entry.status === 'pending';
+                const statusLabel = entry.status === 'processed' ? 'converted' : entry.status;
 
-              return (
-                <motion.div
-                  key={entry.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  className="relative flex gap-4 pb-6"
-                >
-                  {/* Timeline dot */}
-                  <div
-                    className="relative z-10 flex-shrink-0 w-[38px] h-[38px] rounded-full flex items-center justify-center"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                    }}
+                return (
+                  <motion.div
+                    key={entry.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="relative flex gap-4 pb-6"
                   >
-                    <Icon size={16} style={{ color: 'var(--text-secondary)' }} />
-                  </div>
-
-                  {/* Entry card */}
-                  <div
-                    className="flex-1 rounded-xl p-4"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.06)',
-                    }}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className="text-sm font-semibold truncate"
-                            style={{ color: 'var(--text-primary)' }}
-                          >
-                            {entry.title}
-                          </span>
-                          {entry.extractedDecisions.length > 0 && (
-                            <span
-                              className="text-[10px] px-1.5 py-0.5 rounded"
-                              style={{
-                                background: 'rgba(99, 102, 241, 0.1)',
-                                color: 'var(--accent-primary)',
-                              }}
-                            >
-                              {entry.extractedDecisions.length} decision
-                              {entry.extractedDecisions.length !== 1 ? 's' : ''}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span
-                            className="text-[10px] px-2 py-0.5 rounded-full font-medium capitalize"
-                            style={{
-                              background: badgeStyle.bg,
-                              border: `1px solid ${badgeStyle.border}`,
-                              color: badgeStyle.color,
-                            }}
-                          >
-                            {statusLabel}
-                          </span>
-                          <span
-                            className="flex items-center gap-1 text-[10px]"
-                            style={{ color: 'var(--text-muted)' }}
-                          >
-                            <Clock size={10} />
-                            {formatDate(entry.createdAt)}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Convert button */}
-                      {isPending && (
-                        <button
-                          onClick={() => handleConvert(entry.id)}
-                          disabled={isConverting}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0 transition-colors"
-                          style={{
-                            background: 'rgba(34, 197, 94, 0.1)',
-                            border: '1px solid rgba(34, 197, 94, 0.2)',
-                            color: 'var(--success)',
-                            cursor: isConverting ? 'wait' : 'pointer',
-                          }}
-                        >
-                          {isConverting ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <ArrowRight size={12} />
-                          )}
-                          Convert
-                        </button>
-                      )}
-
-                      {entry.status === 'processed' && (
-                        <CheckCircle
-                          size={16}
-                          style={{ color: 'var(--success)', flexShrink: 0, marginTop: '2px' }}
-                        />
-                      )}
-
-                      {entry.status === 'dismissed' && (
-                        <XCircle
-                          size={16}
-                          style={{ color: 'var(--text-tertiary)', flexShrink: 0, marginTop: '2px' }}
-                        />
-                      )}
+                    {/* Timeline dot */}
+                    <div
+                      className="relative z-10 flex-shrink-0 w-[38px] h-[38px] rounded-full flex items-center justify-center"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                      }}
+                    >
+                      <Icon size={16} style={{ color: 'var(--text-secondary)' }} />
                     </div>
 
-                    {/* Extracted decisions preview */}
-                    {entry.extractedDecisions.length > 0 && (
-                      <div
-                        className="mt-3 pt-3 space-y-1"
-                        style={{ borderTop: '1px solid rgba(255, 255, 255, 0.04)' }}
-                      >
-                        {entry.extractedDecisions.slice(0, 3).map((decision, i) => (
-                          <p
-                            key={i}
-                            className="text-xs truncate"
-                            style={{ color: 'var(--text-secondary)' }}
+                    {/* Entry card */}
+                    <div
+                      className="flex-1 rounded-xl p-4"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span
+                              className="text-sm font-semibold truncate"
+                              style={{ color: 'var(--text-primary)' }}
+                            >
+                              {entry.title}
+                            </span>
+                            {entry.extractedDecisions.length > 0 && (
+                              <span
+                                className="text-[10px] px-1.5 py-0.5 rounded"
+                                style={{
+                                  background: 'rgba(99, 102, 241, 0.1)',
+                                  color: 'var(--accent-primary)',
+                                }}
+                              >
+                                {entry.extractedDecisions.length} decision
+                                {entry.extractedDecisions.length !== 1 ? 's' : ''}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span
+                              className="text-[10px] px-2 py-0.5 rounded-full font-medium capitalize"
+                              style={{
+                                background: badgeStyle.bg,
+                                border: `1px solid ${badgeStyle.border}`,
+                                color: badgeStyle.color,
+                              }}
+                            >
+                              {statusLabel}
+                            </span>
+                            <span
+                              className="flex items-center gap-1 text-[10px]"
+                              style={{ color: 'var(--text-muted)' }}
+                            >
+                              <Clock size={10} />
+                              {formatDate(entry.createdAt)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Convert button */}
+                        {isPending && (
+                          <button
+                            onClick={() => handleConvert(entry.id)}
+                            disabled={isConverting}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium flex-shrink-0 transition-colors"
+                            style={{
+                              background: 'rgba(34, 197, 94, 0.1)',
+                              border: '1px solid rgba(34, 197, 94, 0.2)',
+                              color: 'var(--success)',
+                              cursor: isConverting ? 'wait' : 'pointer',
+                            }}
                           >
-                            {decision}
-                          </p>
-                        ))}
-                        {entry.extractedDecisions.length > 3 && (
-                          <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                            +{entry.extractedDecisions.length - 3} more
-                          </p>
+                            {isConverting ? (
+                              <Loader2 size={12} className="animate-spin" />
+                            ) : (
+                              <ArrowRight size={12} />
+                            )}
+                            Convert
+                          </button>
+                        )}
+
+                        {entry.status === 'processed' && (
+                          <CheckCircle
+                            size={16}
+                            style={{ color: 'var(--success)', flexShrink: 0, marginTop: '2px' }}
+                          />
+                        )}
+
+                        {entry.status === 'dismissed' && (
+                          <XCircle
+                            size={16}
+                            style={{
+                              color: 'var(--text-tertiary)',
+                              flexShrink: 0,
+                              marginTop: '2px',
+                            }}
+                          />
                         )}
                       </div>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-      )}
-    </div>
+
+                      {/* Extracted decisions preview */}
+                      {entry.extractedDecisions.length > 0 && (
+                        <div
+                          className="mt-3 pt-3 space-y-1"
+                          style={{ borderTop: '1px solid rgba(255, 255, 255, 0.04)' }}
+                        >
+                          {entry.extractedDecisions.slice(0, 3).map((decision, i) => (
+                            <p
+                              key={i}
+                              className="text-xs truncate"
+                              style={{ color: 'var(--text-secondary)' }}
+                            >
+                              {decision}
+                            </p>
+                          ))}
+                          {entry.extractedDecisions.length > 3 && (
+                            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                              +{entry.extractedDecisions.length - 3} more
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
     </ErrorBoundary>
   );
 }

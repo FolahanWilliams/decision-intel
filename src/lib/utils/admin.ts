@@ -15,7 +15,9 @@ export async function verifyAdmin(): Promise<{ id: string; email: string } | nul
   if (adminEmails.length === 0) return null; // No admins configured
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user?.email) return null;
   if (!adminEmails.includes(user.email.trim().toLowerCase())) return null;

@@ -86,7 +86,8 @@ export async function GET() {
       cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd || false,
       trialEndsAt,
       hasStripeCustomer: !!subscription?.stripeCustomerId,
-      upgradeAvailable: !!process.env.STRIPE_SECRET_KEY && !!(PLANS.pro.priceId || PLANS.team.priceId),
+      upgradeAvailable:
+        !!process.env.STRIPE_SECRET_KEY && !!(PLANS.pro.priceId || PLANS.team.priceId),
       usage: {
         analysesUsed,
         analysesLimit,

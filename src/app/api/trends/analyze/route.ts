@@ -150,7 +150,11 @@ export async function POST() {
       provider: 'google',
       operation: 'market_analysis',
       tokens: prompt.length + responseText.length,
-      cost: estimateCost(getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'), prompt.length, responseText.length),
+      cost: estimateCost(
+        getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),
+        prompt.length,
+        responseText.length
+      ),
       metadata: { topics: activeTopics },
     });
 

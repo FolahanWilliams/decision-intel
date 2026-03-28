@@ -72,7 +72,10 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
   }
   if (loading) {
     return (
-      <div className="flex items-center gap-sm" style={{ padding: 'var(--spacing-md)', color: 'var(--text-muted)', fontSize: '13px' }}>
+      <div
+        className="flex items-center gap-sm"
+        style={{ padding: 'var(--spacing-md)', color: 'var(--text-muted)', fontSize: '13px' }}
+      >
         <Loader2 size={14} className="animate-spin" />
         Finding related decisions...
       </div>

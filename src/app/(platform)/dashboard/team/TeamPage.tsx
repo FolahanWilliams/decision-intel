@@ -156,7 +156,10 @@ export default function TeamPage() {
             {fetchError}
           </span>
           <button
-            onClick={() => { setLoading(true); fetchTeam(); }}
+            onClick={() => {
+              setLoading(true);
+              fetchTeam();
+            }}
             style={{
               padding: '6px 14px',
               fontSize: '13px',

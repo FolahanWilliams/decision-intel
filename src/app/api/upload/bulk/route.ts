@@ -229,8 +229,7 @@ async function processFilesAsync(
           throw new Error('PDF contains no extractable text (may be image-only)');
         }
       } else if (
-        file.type ===
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       ) {
         const result = await mammoth.extractRawText({ buffer: Buffer.from(buffer) });
         content = result.value;
@@ -238,8 +237,7 @@ async function processFilesAsync(
           throw new Error('DOCX contains no extractable text');
         }
       } else if (
-        file.type ===
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       ) {
         throw new Error('Excel spreadsheet support coming soon. Please export as CSV or text.');
       } else {

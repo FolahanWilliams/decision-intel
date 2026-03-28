@@ -81,38 +81,42 @@ export async function POST(req: NextRequest) {
     const { name, slug } = CreateOrgSchema.parse(body);
 
     // Atomically check uniqueness + create inside a single transaction
-    const org = await prisma.$transaction(async tx => {
-      const existing = await tx.teamMember.findFirst({
-        where: { userId: user.id, role: 'owner' },
+    const org = await prisma
+      .$transaction(async tx => {
+        const existing = await tx.teamMember.findFirst({
+          where: { userId: user.id, role: 'owner' },
+        });
+        if (existing) throw new Error('ALREADY_OWNS_ORG');
+
+        const slugExists = await tx.organization.findUnique({ where: { slug } });
+        if (slugExists) throw new Error('SLUG_TAKEN');
+
+        const newOrg = await tx.organization.create({
+          data: { name, slug },
+        });
+
+        await tx.teamMember.create({
+          data: {
+            orgId: newOrg.id,
+            userId: user.id,
+            email: user.email || '',
+            displayName:
+              (user.user_metadata as Record<string, string> | undefined)?.full_name ||
+              user.email?.split('@')[0] ||
+              'Owner',
+            role: 'owner',
+          },
+        });
+
+        return newOrg;
+      })
+      .catch((err: Error) => {
+        if (err.message === 'ALREADY_OWNS_ORG')
+          return { _conflict: 'You already own an organization' } as const;
+        if (err.message === 'SLUG_TAKEN')
+          return { _conflict: 'This team URL is already taken' } as const;
+        throw err;
       });
-      if (existing) throw new Error('ALREADY_OWNS_ORG');
-
-      const slugExists = await tx.organization.findUnique({ where: { slug } });
-      if (slugExists) throw new Error('SLUG_TAKEN');
-
-      const newOrg = await tx.organization.create({
-        data: { name, slug },
-      });
-
-      await tx.teamMember.create({
-        data: {
-          orgId: newOrg.id,
-          userId: user.id,
-          email: user.email || '',
-          displayName:
-            (user.user_metadata as Record<string, string> | undefined)?.full_name ||
-            user.email?.split('@')[0] ||
-            'Owner',
-          role: 'owner',
-        },
-      });
-
-      return newOrg;
-    }).catch((err: Error) => {
-      if (err.message === 'ALREADY_OWNS_ORG') return { _conflict: 'You already own an organization' } as const;
-      if (err.message === 'SLUG_TAKEN') return { _conflict: 'This team URL is already taken' } as const;
-      throw err;
-    });
 
     if ('_conflict' in org) {
       return NextResponse.json({ error: org._conflict }, { status: 409 });
