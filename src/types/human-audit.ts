@@ -216,6 +216,7 @@ export interface SlackWebhookPayload {
     text: string;
     ts: string;
     thread_ts?: string;
+    tab?: string; // "home" for app_home_opened events
   };
   challenge?: string;
   token?: string;
