@@ -48,10 +48,7 @@ export const ComplianceSchema = z
 export const SentimentSchema = z
   .object({
     score: z.number().min(0).max(100).default(0),
-    label: z
-      .enum(['Positive', 'Negative', 'Neutral', 'Mixed'])
-      .catch('Neutral')
-      .default('Neutral'),
+    label: z.enum(['Positive', 'Negative', 'Neutral', 'Mixed']).catch('Neutral').default('Neutral'),
   })
   .default({ score: 0, label: 'Neutral' });
 

@@ -198,356 +198,356 @@ export default function SubmitDecisionPage() {
 
   return (
     <ErrorBoundary sectionName="Submit Decision">
-    <div
-      className="container"
-      style={{
-        paddingTop: 'var(--spacing-2xl)',
-        paddingBottom: 'var(--spacing-2xl)',
-        maxWidth: 720,
-      }}
-    >
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Cognitive Audits', href: '/dashboard/decision-quality?tab=audits' },
-          { label: 'Submit Decision' },
-        ]}
-      />
+      <div
+        className="container"
+        style={{
+          paddingTop: 'var(--spacing-2xl)',
+          paddingBottom: 'var(--spacing-2xl)',
+          maxWidth: 720,
+        }}
+      >
+        <Breadcrumbs
+          items={[
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'Cognitive Audits', href: '/dashboard/decision-quality?tab=audits' },
+            { label: 'Submit Decision' },
+          ]}
+        />
 
-      <header className="mb-xl animate-fade-in">
-        <div className="flex items-center gap-md mb-sm">
-          <BrainCircuit size={28} style={{ color: 'var(--text-secondary)' }} />
-          <h1>Submit Decision for Audit</h1>
-        </div>
-        <p className="text-muted">
-          Paste a decision, upload a meeting recording, or submit a transcript for cognitive bias
-          analysis.
-        </p>
-      </header>
+        <header className="mb-xl animate-fade-in">
+          <div className="flex items-center gap-md mb-sm">
+            <BrainCircuit size={28} style={{ color: 'var(--text-secondary)' }} />
+            <h1>Submit Decision for Audit</h1>
+          </div>
+          <p className="text-muted">
+            Paste a decision, upload a meeting recording, or submit a transcript for cognitive bias
+            analysis.
+          </p>
+        </header>
 
-      {error && (
-        <div
-          className="flex items-center gap-sm mb-lg"
-          style={{
-            padding: 'var(--spacing-md)',
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid var(--error)',
-            fontSize: '14px',
-            color: 'var(--error)',
-          }}
-        >
-          <AlertCircle size={16} />
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
+        {error && (
           <div
-            className="card-body"
-            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}
+            className="flex items-center gap-sm mb-lg"
+            style={{
+              padding: 'var(--spacing-md)',
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid var(--error)',
+              fontSize: '14px',
+              color: 'var(--error)',
+            }}
           >
-            {/* Source */}
-            <div>
-              <label style={labelStyle}>Source</label>
-              <select value={source} onChange={e => setSource(e.target.value)} style={inputStyle}>
-                {SOURCES.map(s => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
 
-            {/* ─── Meeting Recording Mode ───────────────────────────── */}
-            {isRecordingMode && (
-              <>
-                {/* Meeting Title */}
-                <div>
-                  <label style={labelStyle}>
-                    Meeting Title <span style={{ color: 'var(--error)' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={meetingTitle}
-                    onChange={e => setMeetingTitle(e.target.value)}
-                    placeholder="e.g. Q1 2026 Business Outlook Review"
-                    style={inputStyle}
-                    required
-                  />
-                </div>
+        <form onSubmit={handleSubmit}>
+          <div className="card animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div
+              className="card-body"
+              style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}
+            >
+              {/* Source */}
+              <div>
+                <label style={labelStyle}>Source</label>
+                <select value={source} onChange={e => setSource(e.target.value)} style={inputStyle}>
+                  {SOURCES.map(s => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-                {/* Meeting Type */}
-                <div>
-                  <label style={labelStyle}>Meeting Type</label>
-                  <select
-                    value={meetingType}
-                    onChange={e => setMeetingType(e.target.value)}
-                    style={inputStyle}
-                  >
-                    {MEETING_TYPES.map(t => (
-                      <option key={t.value} value={t.value}>
-                        {t.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* ─── Meeting Recording Mode ───────────────────────────── */}
+              {isRecordingMode && (
+                <>
+                  {/* Meeting Title */}
+                  <div>
+                    <label style={labelStyle}>
+                      Meeting Title <span style={{ color: 'var(--error)' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={meetingTitle}
+                      onChange={e => setMeetingTitle(e.target.value)}
+                      placeholder="e.g. Q1 2026 Business Outlook Review"
+                      style={inputStyle}
+                      required
+                    />
+                  </div>
 
-                {/* File Drop Zone */}
-                <div>
-                  <label style={labelStyle}>
-                    Recording File <span style={{ color: 'var(--error)' }}>*</span>
-                  </label>
-
-                  {!meetingFile ? (
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      onDragOver={e => {
-                        e.preventDefault();
-                        setDragActive(true);
-                      }}
-                      onDragLeave={() => setDragActive(false)}
-                      onDrop={handleDrop}
-                      style={{
-                        border: `2px dashed ${dragActive ? 'var(--text-highlight)' : 'var(--border-color)'}`,
-                        borderRadius: '12px',
-                        padding: '40px 20px',
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        background: dragActive
-                          ? 'rgba(255, 255, 255, 0.06)'
-                          : 'var(--bg-secondary)',
-                        transition: 'all 0.2s ease',
-                      }}
+                  {/* Meeting Type */}
+                  <div>
+                    <label style={labelStyle}>Meeting Type</label>
+                    <select
+                      value={meetingType}
+                      onChange={e => setMeetingType(e.target.value)}
+                      style={inputStyle}
                     >
-                      <Upload
-                        size={36}
-                        style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}
-                      />
-                      <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '6px' }}>
-                        Drop recording here or click to browse
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                        Supports MP3, M4A, WAV, MP4, WebM, MOV (max 500MB)
-                      </div>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept={ACCEPTED_MEDIA_TYPES}
-                        onChange={e => {
-                          const f = e.target.files?.[0];
-                          if (f) setMeetingFile(f);
+                      {MEETING_TYPES.map(t => (
+                        <option key={t.value} value={t.value}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* File Drop Zone */}
+                  <div>
+                    <label style={labelStyle}>
+                      Recording File <span style={{ color: 'var(--error)' }}>*</span>
+                    </label>
+
+                    {!meetingFile ? (
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={e => {
+                          e.preventDefault();
+                          setDragActive(true);
                         }}
-                        style={{ display: 'none' }}
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '16px',
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '8px',
-                      }}
-                    >
-                      <FileAudio
-                        size={28}
-                        style={{ color: 'var(--text-secondary)', flexShrink: 0 }}
-                      />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            fontSize: '14px',
-                            fontWeight: 600,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {meetingFile.name}
+                        onDragLeave={() => setDragActive(false)}
+                        onDrop={handleDrop}
+                        style={{
+                          border: `2px dashed ${dragActive ? 'var(--text-highlight)' : 'var(--border-color)'}`,
+                          borderRadius: '12px',
+                          padding: '40px 20px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          background: dragActive
+                            ? 'rgba(255, 255, 255, 0.06)'
+                            : 'var(--bg-secondary)',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        <Upload
+                          size={36}
+                          style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}
+                        />
+                        <div style={{ fontSize: '15px', fontWeight: 600, marginBottom: '6px' }}>
+                          Drop recording here or click to browse
                         </div>
                         <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                          {formatFileSize(meetingFile.size)}
+                          Supports MP3, M4A, WAV, MP4, WebM, MOV (max 500MB)
                         </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMeetingFile(null);
-                          if (fileInputRef.current) fileInputRef.current.value = '';
-                        }}
-                        className="btn btn-ghost"
-                        style={{ padding: '4px' }}
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Upload progress */}
-                  {submitting && uploadProgress > 0 && (
-                    <div style={{ marginTop: '12px' }}>
-                      <div
-                        style={{
-                          height: '6px',
-                          background: 'var(--bg-tertiary)',
-                          borderRadius: '3px',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        <div
-                          style={{
-                            height: '100%',
-                            width: `${uploadProgress}%`,
-                            background: 'var(--text-highlight)',
-                            transition: 'width 0.3s ease',
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept={ACCEPTED_MEDIA_TYPES}
+                          onChange={e => {
+                            const f = e.target.files?.[0];
+                            if (f) setMeetingFile(f);
                           }}
+                          style={{ display: 'none' }}
                         />
                       </div>
+                    ) : (
                       <div
                         style={{
-                          fontSize: '11px',
-                          color: 'var(--text-muted)',
-                          marginTop: '4px',
-                          textAlign: 'right',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '16px',
+                          background: 'var(--bg-secondary)',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: '8px',
                         }}
                       >
-                        Uploading... {uploadProgress}%
+                        <FileAudio
+                          size={28}
+                          style={{ color: 'var(--text-secondary)', flexShrink: 0 }}
+                        />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              fontWeight: 600,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {meetingFile.name}
+                          </div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                            {formatFileSize(meetingFile.size)}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMeetingFile(null);
+                            if (fileInputRef.current) fileInputRef.current.value = '';
+                          }}
+                          className="btn btn-ghost"
+                          style={{ padding: '4px' }}
+                        >
+                          <X size={16} />
+                        </button>
                       </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
+                    )}
 
-            {/* ─── Text Mode Fields ────────────────────────────────── */}
-            {!isRecordingMode && (
-              <>
-                {/* Channel */}
+                    {/* Upload progress */}
+                    {submitting && uploadProgress > 0 && (
+                      <div style={{ marginTop: '12px' }}>
+                        <div
+                          style={{
+                            height: '6px',
+                            background: 'var(--bg-tertiary)',
+                            borderRadius: '3px',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <div
+                            style={{
+                              height: '100%',
+                              width: `${uploadProgress}%`,
+                              background: 'var(--text-highlight)',
+                              transition: 'width 0.3s ease',
+                            }}
+                          />
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '11px',
+                            color: 'var(--text-muted)',
+                            marginTop: '4px',
+                            textAlign: 'right',
+                          }}
+                        >
+                          Uploading... {uploadProgress}%
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* ─── Text Mode Fields ────────────────────────────────── */}
+              {!isRecordingMode && (
+                <>
+                  {/* Channel */}
+                  <div>
+                    <label style={labelStyle}>
+                      Channel / Context{' '}
+                      <span className="text-muted" style={{ fontWeight: 400 }}>
+                        (optional)
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      value={channel}
+                      onChange={e => setChannel(e.target.value)}
+                      placeholder="e.g. #incident-response, Board Meeting Q1"
+                      style={inputStyle}
+                    />
+                  </div>
+
+                  {/* Decision Type */}
+                  <div>
+                    <label style={labelStyle}>
+                      Decision Type{' '}
+                      <span className="text-muted" style={{ fontWeight: 400 }}>
+                        (optional)
+                      </span>
+                    </label>
+                    <select
+                      value={decisionType}
+                      onChange={e => setDecisionType(e.target.value)}
+                      style={inputStyle}
+                    >
+                      {DECISION_TYPES.map(t => (
+                        <option key={t.value} value={t.value}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* Participants (shared) */}
+              <div>
+                <label style={labelStyle}>
+                  Participants{' '}
+                  <span className="text-muted" style={{ fontWeight: 400 }}>
+                    (comma-separated, optional)
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  value={participants}
+                  onChange={e => setParticipants(e.target.value)}
+                  placeholder="e.g. Alice, Bob, Charlie"
+                  style={inputStyle}
+                />
+                {isRecordingMode && (
+                  <div className="text-xs text-muted mt-xs">
+                    <Mic size={10} style={{ display: 'inline', verticalAlign: 'middle' }} />{' '}
+                    Speakers will also be auto-detected from the audio
+                  </div>
+                )}
+              </div>
+
+              {/* Content (text mode only) */}
+              {!isRecordingMode && (
                 <div>
                   <label style={labelStyle}>
-                    Channel / Context{' '}
-                    <span className="text-muted" style={{ fontWeight: 400 }}>
-                      (optional)
-                    </span>
+                    Decision Content <span style={{ color: 'var(--error)' }}>*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={channel}
-                    onChange={e => setChannel(e.target.value)}
-                    placeholder="e.g. #incident-response, Board Meeting Q1"
-                    style={inputStyle}
+                  <textarea
+                    value={content}
+                    onChange={e => setContent(e.target.value)}
+                    placeholder="Paste the decision text, meeting transcript, or email thread here..."
+                    rows={12}
+                    style={{
+                      ...inputStyle,
+                      padding: '12px',
+                      lineHeight: 1.6,
+                      resize: 'vertical',
+                      fontFamily: 'inherit',
+                    }}
+                    required
                   />
-                </div>
-
-                {/* Decision Type */}
-                <div>
-                  <label style={labelStyle}>
-                    Decision Type{' '}
-                    <span className="text-muted" style={{ fontWeight: 400 }}>
-                      (optional)
-                    </span>
-                  </label>
-                  <select
-                    value={decisionType}
-                    onChange={e => setDecisionType(e.target.value)}
-                    style={inputStyle}
-                  >
-                    {DECISION_TYPES.map(t => (
-                      <option key={t.value} value={t.value}>
-                        {t.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </>
-            )}
-
-            {/* Participants (shared) */}
-            <div>
-              <label style={labelStyle}>
-                Participants{' '}
-                <span className="text-muted" style={{ fontWeight: 400 }}>
-                  (comma-separated, optional)
-                </span>
-              </label>
-              <input
-                type="text"
-                value={participants}
-                onChange={e => setParticipants(e.target.value)}
-                placeholder="e.g. Alice, Bob, Charlie"
-                style={inputStyle}
-              />
-              {isRecordingMode && (
-                <div className="text-xs text-muted mt-xs">
-                  <Mic size={10} style={{ display: 'inline', verticalAlign: 'middle' }} /> Speakers
-                  will also be auto-detected from the audio
+                  <div className="text-xs text-muted mt-xs">
+                    {content.length > 0
+                      ? `${content.length} characters`
+                      : 'Minimum 20 characters recommended for meaningful analysis'}
+                  </div>
                 </div>
               )}
             </div>
-
-            {/* Content (text mode only) */}
-            {!isRecordingMode && (
-              <div>
-                <label style={labelStyle}>
-                  Decision Content <span style={{ color: 'var(--error)' }}>*</span>
-                </label>
-                <textarea
-                  value={content}
-                  onChange={e => setContent(e.target.value)}
-                  placeholder="Paste the decision text, meeting transcript, or email thread here..."
-                  rows={12}
-                  style={{
-                    ...inputStyle,
-                    padding: '12px',
-                    lineHeight: 1.6,
-                    resize: 'vertical',
-                    fontFamily: 'inherit',
-                  }}
-                  required
-                />
-                <div className="text-xs text-muted mt-xs">
-                  {content.length > 0
-                    ? `${content.length} characters`
-                    : 'Minimum 20 characters recommended for meaningful analysis'}
-                </div>
-              </div>
-            )}
           </div>
-        </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-between mt-lg">
-          <Link href="/dashboard/decision-quality?tab=audits" className="btn btn-secondary">
-            <ArrowLeft size={16} /> Cancel
-          </Link>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={
-              submitting ||
-              (isRecordingMode ? !meetingFile || !meetingTitle.trim() : !content.trim())
-            }
-            style={{ minWidth: 180 }}
-          >
-            {submitting ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                {isRecordingMode ? 'Uploading...' : 'Submitting...'}
-              </>
-            ) : (
-              <>
-                {isRecordingMode ? <Upload size={16} /> : <Send size={16} />}
-                {isRecordingMode ? 'Upload & Analyze' : 'Submit for Audit'}
-              </>
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
+          {/* Actions */}
+          <div className="flex items-center justify-between mt-lg">
+            <Link href="/dashboard/decision-quality?tab=audits" className="btn btn-secondary">
+              <ArrowLeft size={16} /> Cancel
+            </Link>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={
+                submitting ||
+                (isRecordingMode ? !meetingFile || !meetingTitle.trim() : !content.trim())
+              }
+              style={{ minWidth: 180 }}
+            >
+              {submitting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  {isRecordingMode ? 'Uploading...' : 'Submitting...'}
+                </>
+              ) : (
+                <>
+                  {isRecordingMode ? <Upload size={16} /> : <Send size={16} />}
+                  {isRecordingMode ? 'Upload & Analyze' : 'Submit for Audit'}
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </ErrorBoundary>
   );
 }

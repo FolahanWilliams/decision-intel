@@ -1900,12 +1900,14 @@ export default function Dashboard() {
               ) : uploadedDocs.length === 0 ? (
                 <EnhancedEmptyState
                   type="documents"
-                  actions={[{
-                    label: 'Go to Upload',
-                    onClick: () => setActiveView('upload'),
-                    variant: 'primary',
-                    icon: <Upload className="w-4 h-4" />,
-                  }]}
+                  actions={[
+                    {
+                      label: 'Go to Upload',
+                      onClick: () => setActiveView('upload'),
+                      variant: 'primary',
+                      icon: <Upload className="w-4 h-4" />,
+                    },
+                  ]}
                 />
               ) : filteredDocs.length === 0 ? (
                 <div className="flex flex-col items-center gap-sm p-xl text-center">

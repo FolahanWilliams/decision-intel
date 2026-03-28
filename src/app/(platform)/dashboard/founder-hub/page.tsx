@@ -2085,7 +2085,14 @@ function LiveStats() {
     <div>
       {/* Hero Stats */}
       <div style={{ ...card, borderTop: '3px solid #22c55e' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 12,
+          }}
+        >
           <div style={sectionTitle}>
             <TrendingUp size={18} style={{ color: '#22c55e' }} /> Live Product Metrics
           </div>
@@ -3326,72 +3333,72 @@ export default function FounderHubPage() {
 
   return (
     <ErrorBoundary sectionName="Founder Hub">
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      {/* Header */}
-      <header style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-          <Rocket size={26} style={{ color: '#6366f1' }} />
-          <h1
-            style={{
-              fontSize: 24,
-              fontWeight: 800,
-              color: 'var(--text-primary, #fff)',
-              margin: 0,
-            }}
-          >
-            Founder Hub
-          </h1>
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* Header */}
+        <header style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+            <Rocket size={26} style={{ color: '#6366f1' }} />
+            <h1
+              style={{
+                fontSize: 24,
+                fontWeight: 800,
+                color: 'var(--text-primary, #fff)',
+                margin: 0,
+              }}
+            >
+              Founder Hub
+            </h1>
+          </div>
+          <p style={{ fontSize: 13, color: 'var(--text-muted, #71717a)', margin: 0 }}>
+            Your living knowledge board — product features, moat, pitch narrative, and tactical
+            playbook.
+          </p>
+        </header>
+
+        {/* Tab Navigation */}
+        <div
+          style={{
+            display: 'flex',
+            gap: 4,
+            marginBottom: 24,
+            overflowX: 'auto',
+            borderBottom: '1px solid var(--border-primary, #222)',
+            paddingBottom: 0,
+          }}
+        >
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '10px 16px',
+                fontSize: 13,
+                fontWeight: activeTab === tab.id ? 700 : 500,
+                color:
+                  activeTab === tab.id ? 'var(--text-primary, #fff)' : 'var(--text-muted, #71717a)',
+                background: 'none',
+                border: 'none',
+                borderBottom: activeTab === tab.id ? '2px solid #6366f1' : '2px solid transparent',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'color 0.15s, border-color 0.15s',
+              }}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
         </div>
-        <p style={{ fontSize: 13, color: 'var(--text-muted, #71717a)', margin: 0 }}>
-          Your living knowledge board — product features, moat, pitch narrative, and tactical
-          playbook.
-        </p>
-      </header>
 
-      {/* Tab Navigation */}
-      <div
-        style={{
-          display: 'flex',
-          gap: 4,
-          marginBottom: 24,
-          overflowX: 'auto',
-          borderBottom: '1px solid var(--border-primary, #222)',
-          paddingBottom: 0,
-        }}
-      >
-        {TABS.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '10px 16px',
-              fontSize: 13,
-              fontWeight: activeTab === tab.id ? 700 : 500,
-              color:
-                activeTab === tab.id ? 'var(--text-primary, #fff)' : 'var(--text-muted, #71717a)',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === tab.id ? '2px solid #6366f1' : '2px solid transparent',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'color 0.15s, border-color 0.15s',
-            }}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
+        {/* Tab Content */}
+        {TAB_CONTENT[activeTab]}
+
+        {/* AI Chat Widget */}
+        <FounderChatWidget />
       </div>
-
-      {/* Tab Content */}
-      {TAB_CONTENT[activeTab]}
-
-      {/* AI Chat Widget */}
-      <FounderChatWidget />
-    </div>
     </ErrorBoundary>
   );
 }

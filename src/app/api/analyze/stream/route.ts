@@ -300,7 +300,11 @@ export async function POST(request: NextRequest) {
           // Declared as let so it's accessible in the catch block
           streamAbsoluteTimeout = setTimeout(() => {
             log.error('Stream absolute timeout (235s) exceeded — closing');
-            sendUpdate({ type: 'error', message: 'Analysis timeout exceeded. Please try again with a shorter document.', progress: 0 });
+            sendUpdate({
+              type: 'error',
+              message: 'Analysis timeout exceeded. Please try again with a shorter document.',
+              progress: 0,
+            });
             controller.close();
           }, 235_000);
 
@@ -616,7 +620,11 @@ export async function POST(request: NextRequest) {
             provider: 'google',
             operation: 'analyze_document',
             tokens: doc.content.length, // Approximate token count from content length
-            cost: estimateCost(process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview', doc.content.length, 4000),
+            cost: estimateCost(
+              process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview',
+              doc.content.length,
+              4000
+            ),
             metadata: { documentId, filename: doc.filename },
           });
 

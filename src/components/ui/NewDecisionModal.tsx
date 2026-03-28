@@ -63,13 +63,22 @@ export function NewDecisionModal() {
     first?.focus();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { handleClose(); return; }
+      if (e.key === 'Escape') {
+        handleClose();
+        return;
+      }
       if (e.key !== 'Tab') return;
 
       if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        }
       } else {
-        if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
       }
     };
 

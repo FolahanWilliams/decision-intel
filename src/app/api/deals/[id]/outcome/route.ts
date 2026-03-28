@@ -70,7 +70,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // DealOutcome model may not exist yet (schema drift) — wrap in try/catch
     try {
       const outcome = await prisma.$transaction(async (tx: unknown) => {
-        const result = await (tx as Record<string, { upsert: (args: unknown) => Promise<unknown> }>).dealOutcome.upsert({
+        const result = await (
+          tx as Record<string, { upsert: (args: unknown) => Promise<unknown> }>
+        ).dealOutcome.upsert({
           where: { dealId },
           create: {
             dealId,

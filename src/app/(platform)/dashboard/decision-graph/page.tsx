@@ -244,7 +244,9 @@ export default function DecisionGraphPage() {
             }}
           >
             <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
-            <span className="text-sm text-zinc-400" style={{ flex: 1 }}>{orgError}</span>
+            <span className="text-sm text-zinc-400" style={{ flex: 1 }}>
+              {orgError}
+            </span>
             <button
               onClick={() => window.location.reload()}
               className="text-xs font-semibold px-3 py-1.5 rounded-lg"
@@ -289,7 +291,10 @@ export default function DecisionGraphPage() {
               {reportError || 'Failed to load report.'}
             </span>
             <button
-              onClick={() => { setReport(null); setReportError(null); }}
+              onClick={() => {
+                setReport(null);
+                setReportError(null);
+              }}
               className="text-xs font-semibold px-3 py-1.5 rounded-lg"
               style={{
                 color: '#ef4444',

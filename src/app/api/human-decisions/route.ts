@@ -37,18 +37,20 @@ const humanDecisionSchema = z.object({
   content: z.string().min(1).max(100_000),
   sourceRef: z.string().optional(),
   channel: z.string().optional(),
-  decisionType: z.enum([
-    'triage',
-    'escalation',
-    'approval',
-    'override',
-    'strategic',
-    'vendor_eval',
-    'capital_allocation',
-    'investment_thesis',
-    'portfolio_exit',
-    'm_and_a',
-  ]).optional(),
+  decisionType: z
+    .enum([
+      'triage',
+      'escalation',
+      'approval',
+      'override',
+      'strategic',
+      'vendor_eval',
+      'capital_allocation',
+      'investment_thesis',
+      'portfolio_exit',
+      'm_and_a',
+    ])
+    .optional(),
   participants: z.array(z.string()).optional(),
   linkedAnalysisId: z.string().optional(),
 });

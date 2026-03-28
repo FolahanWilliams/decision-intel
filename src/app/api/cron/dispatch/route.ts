@@ -36,11 +36,7 @@ interface JobResult {
   error?: string;
 }
 
-async function runJob(
-  baseUrl: string,
-  path: string,
-  cronSecret: string
-): Promise<JobResult> {
+async function runJob(baseUrl: string, path: string, cronSecret: string): Promise<JobResult> {
   const start = Date.now();
   try {
     const res = await fetch(`${baseUrl}${path}`, {
@@ -93,10 +89,7 @@ export async function GET() {
   ];
 
   // Jobs that run on Sundays (off-peak ML/calibration)
-  const sundayJobs = [
-    '/api/cron/learn-toxic-patterns',
-    '/api/cron/recalibrate',
-  ];
+  const sundayJobs = ['/api/cron/learn-toxic-patterns', '/api/cron/recalibrate'];
 
   // Jobs that run on Mondays (weekly communications)
   const mondayJobs = [
@@ -127,10 +120,13 @@ export async function GET() {
 
   const failed = results.filter(r => r.status === 'error');
 
-  return NextResponse.json({
-    dispatched: jobsToRun.length,
-    succeeded: results.filter(r => r.status === 'ok').length,
-    failed: failed.length,
-    results,
-  }, { status: failed.length === jobsToRun.length ? 500 : 200 });
+  return NextResponse.json(
+    {
+      dispatched: jobsToRun.length,
+      succeeded: results.filter(r => r.status === 'ok').length,
+      failed: failed.length,
+      results,
+    },
+    { status: failed.length === jobsToRun.length ? 500 : 200 }
+  );
 }

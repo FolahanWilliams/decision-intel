@@ -165,7 +165,9 @@ export async function GET(request: NextRequest) {
           where: { id: { in: linkedIds } },
           select: { id: true, content: true, status: true },
         });
-        linkedDecisionMap = new Map(decisions.map((d: { id: string; content: string; status: string }) => [d.id, d]));
+        linkedDecisionMap = new Map(
+          decisions.map((d: { id: string; content: string; status: string }) => [d.id, d])
+        );
       } catch {
         // Schema drift — HumanDecision table may not exist yet
       }
@@ -174,7 +176,9 @@ export async function GET(request: NextRequest) {
     // Attach linked decisions to entries
     const enrichedEntries = entries.map((e: { linkedDecisionId?: string | null }) => ({
       ...e,
-      linkedDecision: e.linkedDecisionId ? linkedDecisionMap.get(e.linkedDecisionId) ?? null : null,
+      linkedDecision: e.linkedDecisionId
+        ? (linkedDecisionMap.get(e.linkedDecisionId) ?? null)
+        : null,
     }));
 
     return NextResponse.json({

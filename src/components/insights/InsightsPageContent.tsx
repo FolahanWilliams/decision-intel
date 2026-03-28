@@ -1428,10 +1428,7 @@ export function InsightsPageContent() {
 
         {/* Market Analysis Results */}
         {marketAnalysisError && (
-          <div
-            className="card mb-md"
-            style={{ border: '1px solid rgba(248, 113, 113, 0.3)' }}
-          >
+          <div className="card mb-md" style={{ border: '1px solid rgba(248, 113, 113, 0.3)' }}>
             <div className="card-body flex items-center gap-sm" style={{ padding: '12px 16px' }}>
               <AlertTriangle size={14} style={{ color: '#f87171', flexShrink: 0 }} />
               <span style={{ fontSize: '12px', color: '#f87171' }}>{marketAnalysisError}</span>
@@ -1456,7 +1453,14 @@ export function InsightsPageContent() {
             </div>
             <div className="card-body" style={{ padding: '12px 16px' }}>
               {/* Summary */}
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '12px' }}>
+              <div
+                style={{
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                  marginBottom: '12px',
+                }}
+              >
                 {marketAnalysis.summary.split('\n').map((line, i) => (
                   <span key={i}>
                     {line}
@@ -1468,9 +1472,13 @@ export function InsightsPageContent() {
               {/* Impact Assessment Grid */}
               {marketAnalysis.impactAssessment.length > 0 && (
                 <div className="grid grid-3 gap-sm" style={{ marginBottom: '12px' }}>
-                  {marketAnalysis.impactAssessment.map((item) => {
+                  {marketAnalysis.impactAssessment.map(item => {
                     const statusColor =
-                      item.status === 'High' ? '#f87171' : item.status === 'Medium' ? '#fbbf24' : '#34d399';
+                      item.status === 'High'
+                        ? '#f87171'
+                        : item.status === 'Medium'
+                          ? '#fbbf24'
+                          : '#34d399';
                     return (
                       <div
                         key={item.category}
@@ -1481,8 +1489,17 @@ export function InsightsPageContent() {
                           border: `1px solid ${statusColor}20`,
                         }}
                       >
-                        <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                        <div
+                          className="flex items-center justify-between"
+                          style={{ marginBottom: '4px' }}
+                        >
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              color: 'var(--text-secondary)',
+                            }}
+                          >
                             {item.category}
                           </span>
                           <span
@@ -1498,7 +1515,14 @@ export function InsightsPageContent() {
                             {item.status}
                           </span>
                         </div>
-                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
+                        <p
+                          style={{
+                            fontSize: '11px',
+                            color: 'var(--text-muted)',
+                            lineHeight: 1.4,
+                            margin: 0,
+                          }}
+                        >
                           {item.details}
                         </p>
                       </div>

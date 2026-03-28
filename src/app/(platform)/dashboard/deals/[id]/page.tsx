@@ -121,185 +121,187 @@ export default function DealDetailPage() {
 
   return (
     <ErrorBoundary sectionName="Deal Detail">
-    <div className="container" style={{ maxWidth: 1000, padding: '24px 20px' }}>
-      {/* Back link */}
-      <Link
-        href="/dashboard/deals"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 4,
-          color: 'var(--text-muted)',
-          fontSize: 12,
-          textDecoration: 'none',
-          marginBottom: 16,
-        }}
-      >
-        <ArrowLeft size={14} /> Deal Pipeline
-      </Link>
-
-      {/* Header */}
-      <div
-        style={{
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: 12,
-          padding: '20px 24px',
-          marginBottom: 20,
-        }}
-      >
-        <div
+      <div className="container" style={{ maxWidth: 1000, padding: '24px 20px' }}>
+        {/* Back link */}
+        <Link
+          href="/dashboard/deals"
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: 12,
-          }}
-        >
-          <div>
-            <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
-              {deal.name}
-            </h1>
-            {deal.targetCompany && (
-              <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                {deal.targetCompany}
-              </div>
-            )}
-          </div>
-          <button
-            onClick={() => setShowEditForm(true)}
-            className="btn btn-ghost"
-            style={{
-              padding: '6px 12px',
-              fontSize: 12,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            <Edit2 size={13} /> Edit
-          </button>
-        </div>
-
-        {/* Badges row */}
-        <div
-          style={{
-            display: 'flex',
+            display: 'inline-flex',
             alignItems: 'center',
-            gap: 8,
-            flexWrap: 'wrap',
-            marginBottom: 14,
+            gap: 4,
+            color: 'var(--text-muted)',
+            fontSize: 12,
+            textDecoration: 'none',
+            marginBottom: 16,
           }}
         >
-          <span style={badgeStyle(typeColor)}>{getDealTypeLabel(deal.dealType)}</span>
-          <span style={badgeStyle(stageColor)}>{getStageLabel(deal.stage)}</span>
-          <span style={badgeStyle(statusColor)}>{deal.status}</span>
-          {deal.sector && (
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{deal.sector}</span>
-          )}
-        </div>
+          <ArrowLeft size={14} /> Deal Pipeline
+        </Link>
 
-        {/* Key metrics */}
+        {/* Header */}
         <div
           style={{
-            display: 'flex',
-            gap: 24,
-            flexWrap: 'wrap',
-            fontSize: 12,
-            color: 'var(--text-secondary)',
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: 12,
+            padding: '20px 24px',
+            marginBottom: 20,
           }}
         >
-          {deal.ticketSize && (
-            <div>
-              <span style={{ color: 'var(--text-muted)' }}>Ticket:</span>{' '}
-              <span style={{ fontWeight: 600 }}>
-                {formatTicketSize(deal.ticketSize, deal.currency)}
-              </span>
-            </div>
-          )}
-          {deal.fundName && (
-            <div>
-              <span style={{ color: 'var(--text-muted)' }}>Fund:</span>{' '}
-              <span style={{ fontWeight: 600 }}>{deal.fundName}</span>
-            </div>
-          )}
-          {deal.vintage && (
-            <div>
-              <span style={{ color: 'var(--text-muted)' }}>Vintage:</span>{' '}
-              <span style={{ fontWeight: 600 }}>{deal.vintage}</span>
-            </div>
-          )}
-          <div>
-            <span style={{ color: 'var(--text-muted)' }}>Documents:</span>{' '}
-            <span style={{ fontWeight: 600 }}>{deal.documents?.length || 0}</span>
-          </div>
-        </div>
-
-        {/* Stage advance */}
-        {nextStage && deal.status === 'active' && (
           <div
             style={{
-              marginTop: 14,
-              paddingTop: 14,
-              borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              marginBottom: 12,
             }}
           >
+            <div>
+              <h1
+                style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}
+              >
+                {deal.name}
+              </h1>
+              {deal.targetCompany && (
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+                  {deal.targetCompany}
+                </div>
+              )}
+            </div>
             <button
-              onClick={handleAdvanceStage}
-              disabled={advancingStage}
-              className="btn btn-primary"
+              onClick={() => setShowEditForm(true)}
+              className="btn btn-ghost"
               style={{
-                padding: '6px 16px',
+                padding: '6px 12px',
                 fontSize: 12,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
               }}
             >
-              Advance to {getStageLabel(nextStage)} <ChevronRight size={14} />
+              <Edit2 size={13} /> Edit
             </button>
           </div>
-        )}
-      </div>
 
-      {/* Tabs */}
-      <div
-        style={{
-          display: 'flex',
-          gap: 0,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          marginBottom: 20,
-        }}
-      >
-        <button
-          onClick={() => setActiveTab('documents')}
-          style={tabStyle(activeTab === 'documents')}
+          {/* Badges row */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              flexWrap: 'wrap',
+              marginBottom: 14,
+            }}
+          >
+            <span style={badgeStyle(typeColor)}>{getDealTypeLabel(deal.dealType)}</span>
+            <span style={badgeStyle(stageColor)}>{getStageLabel(deal.stage)}</span>
+            <span style={badgeStyle(statusColor)}>{deal.status}</span>
+            {deal.sector && (
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{deal.sector}</span>
+            )}
+          </div>
+
+          {/* Key metrics */}
+          <div
+            style={{
+              display: 'flex',
+              gap: 24,
+              flexWrap: 'wrap',
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+            }}
+          >
+            {deal.ticketSize && (
+              <div>
+                <span style={{ color: 'var(--text-muted)' }}>Ticket:</span>{' '}
+                <span style={{ fontWeight: 600 }}>
+                  {formatTicketSize(deal.ticketSize, deal.currency)}
+                </span>
+              </div>
+            )}
+            {deal.fundName && (
+              <div>
+                <span style={{ color: 'var(--text-muted)' }}>Fund:</span>{' '}
+                <span style={{ fontWeight: 600 }}>{deal.fundName}</span>
+              </div>
+            )}
+            {deal.vintage && (
+              <div>
+                <span style={{ color: 'var(--text-muted)' }}>Vintage:</span>{' '}
+                <span style={{ fontWeight: 600 }}>{deal.vintage}</span>
+              </div>
+            )}
+            <div>
+              <span style={{ color: 'var(--text-muted)' }}>Documents:</span>{' '}
+              <span style={{ fontWeight: 600 }}>{deal.documents?.length || 0}</span>
+            </div>
+          </div>
+
+          {/* Stage advance */}
+          {nextStage && deal.status === 'active' && (
+            <div
+              style={{
+                marginTop: 14,
+                paddingTop: 14,
+                borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+              }}
+            >
+              <button
+                onClick={handleAdvanceStage}
+                disabled={advancingStage}
+                className="btn btn-primary"
+                style={{
+                  padding: '6px 16px',
+                  fontSize: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                Advance to {getStageLabel(nextStage)} <ChevronRight size={14} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Tabs */}
+        <div
+          style={{
+            display: 'flex',
+            gap: 0,
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            marginBottom: 20,
+          }}
         >
-          Documents
-        </button>
-        <button onClick={() => setActiveTab('bias')} style={tabStyle(activeTab === 'bias')}>
-          Bias Summary
-        </button>
-        <button onClick={() => setActiveTab('outcome')} style={tabStyle(activeTab === 'outcome')}>
-          Outcome
-        </button>
+          <button
+            onClick={() => setActiveTab('documents')}
+            style={tabStyle(activeTab === 'documents')}
+          >
+            Documents
+          </button>
+          <button onClick={() => setActiveTab('bias')} style={tabStyle(activeTab === 'bias')}>
+            Bias Summary
+          </button>
+          <button onClick={() => setActiveTab('outcome')} style={tabStyle(activeTab === 'outcome')}>
+            Outcome
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'documents' && (
+          <DocumentsTab documents={deal.documents || []} dealId={deal.id} />
+        )}
+        {activeTab === 'bias' && <BiasSummaryTab documents={deal.documents || []} />}
+        {activeTab === 'outcome' && <OutcomeTab deal={deal} onUpdate={() => mutate()} />}
+
+        {/* Edit modal */}
+        <DealFormModal
+          open={showEditForm}
+          onOpenChange={setShowEditForm}
+          deal={deal as unknown as DealSummary}
+          onSuccess={() => mutate()}
+        />
       </div>
-
-      {/* Tab Content */}
-      {activeTab === 'documents' && (
-        <DocumentsTab documents={deal.documents || []} dealId={deal.id} />
-      )}
-      {activeTab === 'bias' && <BiasSummaryTab documents={deal.documents || []} />}
-      {activeTab === 'outcome' && <OutcomeTab deal={deal} onUpdate={() => mutate()} />}
-
-      {/* Edit modal */}
-      <DealFormModal
-        open={showEditForm}
-        onOpenChange={setShowEditForm}
-        deal={deal as unknown as DealSummary}
-        onSuccess={() => mutate()}
-      />
-    </div>
     </ErrorBoundary>
   );
 }

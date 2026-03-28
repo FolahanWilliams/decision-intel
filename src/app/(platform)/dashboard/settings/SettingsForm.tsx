@@ -233,8 +233,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
               <div className="flex items-start gap-sm rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
                 <AlertTriangle size={14} className="mt-0.5 shrink-0" />
                 <span>
-                  Email delivery is not configured. Toggling these settings will save your preferences,
-                  but no emails will be sent until the email provider is set up.
+                  Email delivery is not configured. Toggling these settings will save your
+                  preferences, but no emails will be sent until the email provider is set up.
                 </span>
               </div>
             )}

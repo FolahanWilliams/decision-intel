@@ -113,7 +113,12 @@ export async function POST(request: NextRequest) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object;
         const rawSub = isRecord(invoice) ? invoice.subscription : undefined;
-        const subId = typeof rawSub === 'string' ? rawSub : (isRecord(rawSub) && typeof rawSub.id === 'string' ? rawSub.id : undefined);
+        const subId =
+          typeof rawSub === 'string'
+            ? rawSub
+            : isRecord(rawSub) && typeof rawSub.id === 'string'
+              ? rawSub.id
+              : undefined;
         if (subId) {
           await prisma.subscription
             .update({

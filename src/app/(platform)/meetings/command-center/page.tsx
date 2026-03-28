@@ -152,7 +152,10 @@ function MiniGauge({ value, label, max = 1 }: { value: number; label: string; ma
           }}
         />
       </div>
-      <span style={{ fontSize: '0.75rem', fontWeight: 600, color }}>{(value * (max === 1 ? 100 : 1)).toFixed(0)}{max === 1 ? '%' : ''}</span>
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, color }}>
+        {(value * (max === 1 ? 100 : 1)).toFixed(0)}
+        {max === 1 ? '%' : ''}
+      </span>
     </div>
   );
 }
@@ -362,7 +365,12 @@ export default function MeetingCommandCenterPage() {
   const { data: teamData, isLoading: teamLoading } = useSWR<{
     snapshot: {
       totalMeetingsAnalyzed: number;
-      speakers: { name: string; meetingsAnalyzed: number; avgDominance: number; avgDissent: number }[];
+      speakers: {
+        name: string;
+        meetingsAnalyzed: number;
+        avgDominance: number;
+        avgDissent: number;
+      }[];
       dominantSpeakers: string[];
       dissenters: string[];
       cognitiveDiversityScore: number;
@@ -377,299 +385,305 @@ export default function MeetingCommandCenterPage() {
 
   return (
     <ErrorBoundary sectionName="Meeting Command Center">
-    <div
-      style={{
-        padding: 'var(--spacing-xl)',
-        maxWidth: 1200,
-        margin: '0 auto',
-      }}
-    >
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="flex items-center justify-between" style={{ marginBottom: 'var(--spacing-xl)' }}>
-        <div>
-          <div className="flex items-center gap-md" style={{ marginBottom: 'var(--spacing-sm)' }}>
-            <BarChart3 size={28} style={{ color: 'var(--accent-primary)' }} />
-            <h1 style={{ margin: 0, color: 'var(--text-primary)' }}>Meeting Command Center</h1>
-          </div>
-          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            {total > 0
-              ? `${total} meeting${total !== 1 ? 's' : ''} tracked`
-              : 'Real-time meeting intelligence and team dynamics'}
-          </p>
-        </div>
-        <Link
-          href="/dashboard/cognitive-audits/submit"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '8px 16px',
-            borderRadius: 'var(--radius-sm)',
-            background: 'var(--accent-primary)',
-            color: '#fff',
-            fontWeight: 600,
-            fontSize: '0.85rem',
-            textDecoration: 'none',
-            border: 'none',
-            cursor: 'pointer',
-          }}
+      <div
+        style={{
+          padding: 'var(--spacing-xl)',
+          maxWidth: 1200,
+          margin: '0 auto',
+        }}
+      >
+        {/* ── Header ─────────────────────────────────────────────────────────── */}
+        <header
+          className="flex items-center justify-between"
+          style={{ marginBottom: 'var(--spacing-xl)' }}
         >
-          <Upload size={15} /> Upload Recording
-        </Link>
-      </header>
-
-      {/* ── Team Health Overview ────────────────────────────────────────────── */}
-      <section style={{ marginBottom: 'var(--spacing-xl)' }}>
-        <h2
-          className="flex items-center gap-sm"
-          style={{
-            margin: 0,
-            marginBottom: 'var(--spacing-md)',
-            fontSize: '1.1rem',
-            color: 'var(--text-secondary)',
-            fontWeight: 600,
-          }}
-        >
-          <Activity size={18} /> Team Health Overview
-        </h2>
-
-        {teamLoading && !snapshot && (
-          <div
-            className="flex items-center gap-sm"
-            style={{ color: 'var(--text-muted)', padding: 'var(--spacing-md)' }}
-          >
-            <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Loading team
-            dynamics...
-          </div>
-        )}
-
-        {snapshot && (
-          <>
-            <div className="grid grid-4" style={{ gap: 'var(--spacing-md)' }}>
-              <StatCard
-                icon={<MessageSquare size={18} />}
-                label="Meetings Analyzed"
-                value={snapshot.totalMeetingsAnalyzed}
-              />
-              <StatCard
-                icon={<Brain size={18} />}
-                label="Cognitive Diversity"
-                value={`${(snapshot.cognitiveDiversityScore * 100).toFixed(0)}%`}
-                color={getScoreColor(snapshot.cognitiveDiversityScore)}
-                subtitle="Higher is better"
-              />
-              <StatCard
-                icon={<Shield size={18} />}
-                label="Dominant Speakers"
-                value={snapshot.dominantSpeakers.length}
-                subtitle={
-                  snapshot.dominantSpeakers.length > 0
-                    ? snapshot.dominantSpeakers.slice(0, 3).join(', ')
-                    : 'Well balanced'
-                }
-                color={snapshot.dominantSpeakers.length > 2 ? '#f59e0b' : undefined}
-              />
-              <StatCard
-                icon={<Users size={18} />}
-                label="Active Dissenters"
-                value={snapshot.dissenters.length}
-                subtitle={
-                  snapshot.dissenters.length > 0
-                    ? snapshot.dissenters.slice(0, 3).join(', ')
-                    : 'No frequent dissenters'
-                }
-              />
+          <div>
+            <div className="flex items-center gap-md" style={{ marginBottom: 'var(--spacing-sm)' }}>
+              <BarChart3 size={28} style={{ color: 'var(--accent-primary)' }} />
+              <h1 style={{ margin: 0, color: 'var(--text-primary)' }}>Meeting Command Center</h1>
             </div>
+            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+              {total > 0
+                ? `${total} meeting${total !== 1 ? 's' : ''} tracked`
+                : 'Real-time meeting intelligence and team dynamics'}
+            </p>
+          </div>
+          <Link
+            href="/dashboard/cognitive-audits/submit"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--accent-primary)',
+              color: '#fff',
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              textDecoration: 'none',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <Upload size={15} /> Upload Recording
+          </Link>
+        </header>
 
-            {/* Red flags */}
-            {snapshot.redFlags.length > 0 && (
-              <div
-                style={{
-                  marginTop: 'var(--spacing-md)',
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 'var(--spacing-sm)',
-                }}
-              >
-                {snapshot.redFlags.map((flag, i) => (
-                  <span
-                    key={i}
-                    className="flex items-center gap-sm"
-                    style={{
-                      padding: '4px 12px',
-                      borderRadius: '9999px',
-                      fontSize: '0.78rem',
-                      fontWeight: 600,
-                      color: '#ef4444',
-                      background: 'rgba(239,68,68,0.1)',
-                      border: '1px solid rgba(239,68,68,0.2)',
-                    }}
-                  >
-                    <AlertTriangle size={12} /> {flag}
-                  </span>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-
-        {!teamLoading && !snapshot && orgId && (
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-            No team dynamics data available yet. Analyze meetings to build team insights.
-          </p>
-        )}
-      </section>
-
-      {/* ── Recent Meetings ────────────────────────────────────────────────── */}
-      <section>
-        <div className="flex items-center justify-between" style={{ marginBottom: 'var(--spacing-md)' }}>
+        {/* ── Team Health Overview ────────────────────────────────────────────── */}
+        <section style={{ marginBottom: 'var(--spacing-xl)' }}>
           <h2
             className="flex items-center gap-sm"
             style={{
               margin: 0,
+              marginBottom: 'var(--spacing-md)',
               fontSize: '1.1rem',
               color: 'var(--text-secondary)',
               fontWeight: 600,
             }}
           >
-            <ListChecks size={18} /> Recent Meetings
+            <Activity size={18} /> Team Health Overview
           </h2>
-          <button
-            onClick={() => mutate()}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--glass-border)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '4px 10px',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              fontSize: '0.8rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}
-          >
-            Refresh
-          </button>
-        </div>
 
-        {/* Loading state */}
-        {isLoading && meetings.length === 0 && (
-          <div
-            className="flex items-center gap-sm"
-            style={{
-              justifyContent: 'center',
-              padding: 'var(--spacing-xl)',
-              color: 'var(--text-muted)',
-            }}
-          >
-            <Loader2 size={20} style={{ animation: 'spin 1s linear infinite' }} /> Loading
-            meetings...
-          </div>
-        )}
+          {teamLoading && !snapshot && (
+            <div
+              className="flex items-center gap-sm"
+              style={{ color: 'var(--text-muted)', padding: 'var(--spacing-md)' }}
+            >
+              <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Loading team
+              dynamics...
+            </div>
+          )}
 
-        {/* Error state */}
-        {error && (
-          <div
-            className="flex items-center gap-sm"
-            style={{
-              padding: 'var(--spacing-md)',
-              color: '#ef4444',
-              background: 'rgba(239,68,68,0.08)',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.85rem',
-            }}
-          >
-            <AlertTriangle size={16} /> Failed to load meetings. Please try again.
-          </div>
-        )}
+          {snapshot && (
+            <>
+              <div className="grid grid-4" style={{ gap: 'var(--spacing-md)' }}>
+                <StatCard
+                  icon={<MessageSquare size={18} />}
+                  label="Meetings Analyzed"
+                  value={snapshot.totalMeetingsAnalyzed}
+                />
+                <StatCard
+                  icon={<Brain size={18} />}
+                  label="Cognitive Diversity"
+                  value={`${(snapshot.cognitiveDiversityScore * 100).toFixed(0)}%`}
+                  color={getScoreColor(snapshot.cognitiveDiversityScore)}
+                  subtitle="Higher is better"
+                />
+                <StatCard
+                  icon={<Shield size={18} />}
+                  label="Dominant Speakers"
+                  value={snapshot.dominantSpeakers.length}
+                  subtitle={
+                    snapshot.dominantSpeakers.length > 0
+                      ? snapshot.dominantSpeakers.slice(0, 3).join(', ')
+                      : 'Well balanced'
+                  }
+                  color={snapshot.dominantSpeakers.length > 2 ? '#f59e0b' : undefined}
+                />
+                <StatCard
+                  icon={<Users size={18} />}
+                  label="Active Dissenters"
+                  value={snapshot.dissenters.length}
+                  subtitle={
+                    snapshot.dissenters.length > 0
+                      ? snapshot.dissenters.slice(0, 3).join(', ')
+                      : 'No frequent dissenters'
+                  }
+                />
+              </div>
 
-        {/* Empty state */}
-        {!isLoading && !error && meetings.length === 0 && (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: 'var(--spacing-xl) var(--spacing-md)',
-              background: 'var(--bg-secondary)',
-              border: '1px dashed var(--glass-border)',
-              borderRadius: 'var(--radius-md)',
-            }}
-          >
-            <MessageSquare
-              size={40}
-              style={{ color: 'var(--text-muted)', marginBottom: 'var(--spacing-sm)' }}
-            />
-            <p style={{ color: 'var(--text-secondary)', fontWeight: 600, marginBottom: 4 }}>
-              No meetings yet
+              {/* Red flags */}
+              {snapshot.redFlags.length > 0 && (
+                <div
+                  style={{
+                    marginTop: 'var(--spacing-md)',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 'var(--spacing-sm)',
+                  }}
+                >
+                  {snapshot.redFlags.map((flag, i) => (
+                    <span
+                      key={i}
+                      className="flex items-center gap-sm"
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: '9999px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: '#ef4444',
+                        background: 'rgba(239,68,68,0.1)',
+                        border: '1px solid rgba(239,68,68,0.2)',
+                      }}
+                    >
+                      <AlertTriangle size={12} /> {flag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {!teamLoading && !snapshot && orgId && (
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+              No team dynamics data available yet. Analyze meetings to build team insights.
             </p>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
-              Upload a meeting recording to get started with transcription, speaker analysis, and
-              cognitive auditing.
-            </p>
-          </div>
-        )}
+          )}
+        </section>
 
-        {/* Meeting cards */}
-        {meetings.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-            {meetings.map(meeting => (
-              <MeetingCard key={meeting.id} meeting={meeting} />
-            ))}
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
+        {/* ── Recent Meetings ────────────────────────────────────────────────── */}
+        <section>
           <div
             className="flex items-center justify-between"
-            style={{
-              marginTop: 'var(--spacing-md)',
-              padding: 'var(--spacing-sm) 0',
-            }}
+            style={{ marginBottom: 'var(--spacing-md)' }}
           >
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Page {page} of {totalPages}
-            </span>
-            <div className="flex items-center gap-sm">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                style={{
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '6px 10px',
-                  cursor: page <= 1 ? 'not-allowed' : 'pointer',
-                  opacity: page <= 1 ? 0.4 : 1,
-                  color: 'var(--text-secondary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                disabled={page >= totalPages}
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                style={{
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '6px 10px',
-                  cursor: page >= totalPages ? 'not-allowed' : 'pointer',
-                  opacity: page >= totalPages ? 0.4 : 1,
-                  color: 'var(--text-secondary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
+            <h2
+              className="flex items-center gap-sm"
+              style={{
+                margin: 0,
+                fontSize: '1.1rem',
+                color: 'var(--text-secondary)',
+                fontWeight: 600,
+              }}
+            >
+              <ListChecks size={18} /> Recent Meetings
+            </h2>
+            <button
+              onClick={() => mutate()}
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--glass-border)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '4px 10px',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              Refresh
+            </button>
           </div>
-        )}
-      </section>
-    </div>
+
+          {/* Loading state */}
+          {isLoading && meetings.length === 0 && (
+            <div
+              className="flex items-center gap-sm"
+              style={{
+                justifyContent: 'center',
+                padding: 'var(--spacing-xl)',
+                color: 'var(--text-muted)',
+              }}
+            >
+              <Loader2 size={20} style={{ animation: 'spin 1s linear infinite' }} /> Loading
+              meetings...
+            </div>
+          )}
+
+          {/* Error state */}
+          {error && (
+            <div
+              className="flex items-center gap-sm"
+              style={{
+                padding: 'var(--spacing-md)',
+                color: '#ef4444',
+                background: 'rgba(239,68,68,0.08)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.85rem',
+              }}
+            >
+              <AlertTriangle size={16} /> Failed to load meetings. Please try again.
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!isLoading && !error && meetings.length === 0 && (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: 'var(--spacing-xl) var(--spacing-md)',
+                background: 'var(--bg-secondary)',
+                border: '1px dashed var(--glass-border)',
+                borderRadius: 'var(--radius-md)',
+              }}
+            >
+              <MessageSquare
+                size={40}
+                style={{ color: 'var(--text-muted)', marginBottom: 'var(--spacing-sm)' }}
+              />
+              <p style={{ color: 'var(--text-secondary)', fontWeight: 600, marginBottom: 4 }}>
+                No meetings yet
+              </p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+                Upload a meeting recording to get started with transcription, speaker analysis, and
+                cognitive auditing.
+              </p>
+            </div>
+          )}
+
+          {/* Meeting cards */}
+          {meetings.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+              {meetings.map(meeting => (
+                <MeetingCard key={meeting.id} meeting={meeting} />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div
+              className="flex items-center justify-between"
+              style={{
+                marginTop: 'var(--spacing-md)',
+                padding: 'var(--spacing-sm) 0',
+              }}
+            >
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Page {page} of {totalPages}
+              </span>
+              <div className="flex items-center gap-sm">
+                <button
+                  disabled={page <= 1}
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--glass-border)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '6px 10px',
+                    cursor: page <= 1 ? 'not-allowed' : 'pointer',
+                    opacity: page <= 1 ? 0.4 : 1,
+                    color: 'var(--text-secondary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button
+                  disabled={page >= totalPages}
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--glass-border)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '6px 10px',
+                    cursor: page >= totalPages ? 'not-allowed' : 'pointer',
+                    opacity: page >= totalPages ? 0.4 : 1,
+                    color: 'var(--text-secondary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
     </ErrorBoundary>
   );
 }
