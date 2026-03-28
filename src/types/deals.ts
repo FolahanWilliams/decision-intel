@@ -22,6 +22,15 @@ export const DEAL_TYPES: SelectOption[] = [
   { value: 'recapitalization', label: 'Recapitalization' },
 ];
 
+export const DEAL_TYPE_COLORS: Record<string, string> = {
+  buyout: '#6366f1',
+  growth_equity: '#10b981',
+  venture: '#f59e0b',
+  secondary: '#8b5cf6',
+  add_on: '#3b82f6',
+  recapitalization: '#ec4899',
+};
+
 // ─── Deal Stages (ordered) ───────────────────────────────────────────────────
 
 export const DEAL_STAGES: SelectOption[] = [
@@ -33,6 +42,17 @@ export const DEAL_STAGES: SelectOption[] = [
   { value: 'exited', label: 'Exited' },
 ];
 
+// ─── Stage Colors ───────────────────────────────────────────────────────────
+
+export const STAGE_COLORS: Record<string, string> = {
+  screening: '#6366f1',
+  due_diligence: '#f59e0b',
+  ic_review: '#8b5cf6',
+  closing: '#3b82f6',
+  portfolio: '#10b981',
+  exited: '#6b7280',
+};
+
 // ─── Deal Statuses ───────────────────────────────────────────────────────────
 
 export const DEAL_STATUSES: SelectOption[] = [
@@ -42,6 +62,14 @@ export const DEAL_STATUSES: SelectOption[] = [
   { value: 'written_off', label: 'Written Off' },
   { value: 'exited', label: 'Exited' },
 ];
+
+export const STATUS_COLORS: Record<string, string> = {
+  active: '#10b981',
+  passed: '#6b7280',
+  invested: '#3b82f6',
+  written_off: '#ef4444',
+  exited: '#f59e0b',
+};
 
 // ─── Document Types ──────────────────────────────────────────────────────────
 
