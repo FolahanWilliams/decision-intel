@@ -19,6 +19,8 @@ import {
   CognitiveSchema,
   SimulationSchema,
   MemorySchema,
+  RecognitionCuesSchema,
+  NarrativePreMortemSchema,
 } from '@/lib/schemas/analysis';
 
 const log = createLogger('Analyzer');
@@ -222,6 +224,20 @@ export async function analyzeDocument(
                 : undefined
             ),
             intelligenceContext: toPrismaJson(result.intelligenceContext || undefined),
+            recognitionCues: toPrismaJson(
+              result.recognitionCues
+                ? RecognitionCuesSchema.safeParse(result.recognitionCues).success
+                  ? result.recognitionCues
+                  : undefined
+                : undefined
+            ),
+            narrativePreMortem: toPrismaJson(
+              result.narrativePreMortem
+                ? NarrativePreMortemSchema.safeParse(result.narrativePreMortem).success
+                  ? result.narrativePreMortem
+                  : undefined
+                : undefined
+            ),
           } satisfies Prisma.AnalysisUncheckedCreateInput,
         });
 

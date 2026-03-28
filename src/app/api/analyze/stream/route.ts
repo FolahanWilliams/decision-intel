@@ -24,6 +24,8 @@ import {
   CognitiveSchema,
   SimulationSchema,
   MemorySchema,
+  RecognitionCuesSchema,
+  NarrativePreMortemSchema,
 } from '@/lib/schemas/analysis';
 
 const log = createLogger('StreamRoute');
@@ -62,6 +64,10 @@ const NODE_LABELS: Record<string, { label: string; description: string }> = {
   simulationNode: {
     label: 'Boardroom Simulation',
     description: 'Running decision twin simulation with institutional memory…',
+  },
+  rpdRecognitionNode: {
+    label: 'Pattern Recognition',
+    description: 'Identifying recognition cues from historical deals using Klein RPD…',
   },
   riskScorer: { label: 'Risk Scoring', description: 'Calculating final decision quality score…' },
 };
@@ -504,6 +510,20 @@ export async function POST(request: NextRequest) {
                       : undefined
                   ),
                   metaVerdict: (report.metaVerdict as string) || null,
+                  recognitionCues: toPrismaJson(
+                    report.recognitionCues
+                      ? RecognitionCuesSchema.safeParse(report.recognitionCues).success
+                        ? report.recognitionCues
+                        : undefined
+                      : undefined
+                  ),
+                  narrativePreMortem: toPrismaJson(
+                    report.narrativePreMortem
+                      ? NarrativePreMortemSchema.safeParse(report.narrativePreMortem).success
+                        ? report.narrativePreMortem
+                        : undefined
+                      : undefined
+                  ),
                 } satisfies Prisma.AnalysisUncheckedCreateInput,
               });
 

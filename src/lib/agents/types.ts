@@ -8,6 +8,8 @@ import {
   SimulationResult,
   InstitutionalMemoryResult,
   ComplianceResult,
+  RecognitionCuesResult,
+  NarrativePreMortem,
 } from '@/types';
 import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
 
@@ -72,6 +74,10 @@ export interface AuditState {
   simulation?: SimulationResult;
   institutionalMemory?: InstitutionalMemoryResult;
   metaVerdict?: string;
+
+  // Klein RPD Framework
+  recognitionCues?: RecognitionCuesResult;
+  narrativePreMortem?: NarrativePreMortem;
 
   // Final Output
   finalReport?: AnalysisResult;

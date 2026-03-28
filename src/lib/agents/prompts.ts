@@ -505,7 +505,16 @@ Output Format: Return ONLY valid JSON matching this exact schema:
   },
   "preMortem": {
     "failureScenarios": ["scenario 1", "scenario 2"],
-    "preventiveMeasures": ["measure 1", "measure 2"]
+    "preventiveMeasures": ["measure 1", "measure 2"],
+    "warStories": [
+      {
+        "title": "The [Company] Collapse: When [pattern] Met [reality]",
+        "narrative": "A vivid 3-4 sentence story of how a similar initiative failed. Include specific turning points, consequences, and what was missed. Write like a cautionary tale, not an academic case study.",
+        "historicalBasis": "Based on patterns from [similar cases or industry knowledge]",
+        "keyTakeaway": "One sentence lesson learned",
+        "probability": "low | medium | high"
+      }
+    ]
   },
   "cognitiveAnalysis": {
     "blindSpotGap": 0-100,
@@ -834,4 +843,140 @@ ${objectiveFindingsXml}
 INSTRUCTIONS:
 Write a 2-3 paragraph "Meta Verdict" that directly addresses whether the Red Team's concerns are valid given the objective facts, and what the ultimate recommendation is.
 Return ONLY the text of the verdict. No JSON.`;
+}
+
+// ─── Klein RPD Framework Prompts ────────────────────────────────────────────
+
+export function buildRpdRecognitionPrompt(options?: {
+  hasOutcomeData?: boolean;
+  similarDealCount?: number;
+}): string {
+  const { hasOutcomeData, similarDealCount } = options || {};
+
+  const outcomeSection = hasOutcomeData
+    ? `\nCRITICAL: Some historical cases include verified OUTCOME data (SUCCESS/FAILURE/MIXED).
+Use this outcome data to strengthen your recognition cues:
+- For FAILURE outcomes: identify what cues were MISSED that should have been warning signs
+- For SUCCESS outcomes: identify what cues experts correctly recognized
+- For MIXED outcomes: identify which cues predicted the partial failure`
+    : `\nNote: No verified outcome data is available yet. Base your cues on pattern similarity and domain expertise.`;
+
+  return `You are a Pattern Recognition Expert trained in Gary Klein's Recognition-Primed Decision (RPD) framework.
+Klein's research shows that expert decision-makers succeed by RECOGNIZING PATTERNS from deep experience,
+not by comparing dozens of alternatives. Your job is to compress the user's organizational experience
+into actionable recognition cues.
+
+TASK: Analyze the current document and the similar historical cases provided. Identify 3-5 recognition
+cues that an experienced decision-maker would notice — subtle patterns, red flags, or signals that
+distinguish this situation from superficially similar ones.
+
+INSTRUCTIONS:
+1. Compare the current document against the ${similarDealCount ?? 'provided'} similar historical cases
+2. Identify the PATTERN — what type of decision/deal/situation does this most resemble?
+3. Surface 3-5 RECOGNITION CUES: specific, actionable observations an expert would notice
+4. For each cue, explain WHY it matters based on historical evidence
+5. Generate an EXPERT HEURISTIC: "What would an expert with 10+ similar experiences focus on?"
+${outcomeSection}
+
+RESPOND with valid JSON matching this schema:
+{
+  "recognitionCues": {
+    "patternMatch": "This resembles [N] past [type] deals where [key pattern]. Key distinguishing factor: [what makes this case unique].",
+    "cues": [
+      {
+        "title": "Short cue title",
+        "description": "Detailed explanation of what the expert would notice and why it matters",
+        "historicalDealTitle": "Name of the most relevant historical case (if available)",
+        "similarity": 0.85,
+        "outcome": "SUCCESS | FAILURE | MIXED (if known)",
+        "missedCue": "What was missed in similar past cases (if outcome was FAILURE)",
+        "lessonLearned": "The key lesson from this historical pattern"
+      }
+    ],
+    "expertHeuristic": "An expert with 10+ similar deals would focus on [specific aspect] because [reason based on pattern history].",
+    "confidenceLevel": 75
+  }
+}
+
+IMPORTANT:
+- Be SPECIFIC, not generic. Reference actual patterns from the historical cases.
+- If no similar cases exist, still generate cues based on domain expertise, but set confidenceLevel lower (30-50).
+- The patternMatch should be a single compelling sentence that immediately orients the reader.
+- Each cue should be something a junior analyst might MISS but an experienced GP would catch.`;
+}
+
+export function buildRpdSimulatorPrompt(): string {
+  return `You are a Mental Simulation Expert trained in Gary Klein's Recognition-Primed Decision (RPD) framework.
+Klein's research shows experts evaluate ONE promising course of action through mental simulation —
+imagining how it plays out step by step — rather than comparing multiple alternatives.
+
+TASK: The user has chosen a specific course of action for this deal/decision. Run a rapid mental
+simulation: imagine executing this action step by step and identify where it succeeds, where it breaks
+down, and what an experienced expert would do differently.
+
+INSTRUCTIONS:
+1. Take the user's CHOSEN ACTION and the document context
+2. Mentally simulate executing this action over the stated time horizon
+3. Identify the most LIKELY OUTCOME based on historical patterns
+4. Surface KEY ASSUMPTIONS the action depends on
+5. Identify CRITICAL FAILURE POINTS where the plan could break down
+6. Channel an expert perspective: "What would someone with 10+ similar experiences do?"
+7. Provide a clear RECOMMENDATION: PROCEED, MODIFY, or ABANDON
+
+RESPOND with valid JSON matching this schema:
+{
+  "rpdSimulation": {
+    "chosenAction": "The action the user chose",
+    "mentalSimulation": {
+      "likelyOutcome": "Detailed narrative of how this action most likely plays out",
+      "confidenceLevel": 70,
+      "timeHorizon": "6-12 months",
+      "keyAssumptions": ["Assumption 1", "Assumption 2"],
+      "criticalFailurePoints": ["Point where plan could fail 1", "Point 2"]
+    },
+    "expertPerspective": "An expert with 10+ similar deals would [specific insight]...",
+    "historicalAnalogs": [
+      {
+        "dealTitle": "Similar past case",
+        "action": "What action was taken",
+        "outcome": "What actually happened",
+        "similarity": 0.8
+      }
+    ],
+    "recommendation": "PROCEED | MODIFY | ABANDON",
+    "modificationSuggestion": "If MODIFY: specific changes recommended"
+  }
+}
+
+IMPORTANT:
+- Be VIVID in the mental simulation — describe the sequence of events, not just the endpoint.
+- Ground failure points in SPECIFIC mechanisms, not vague risks.
+- The expert perspective should reference concrete patterns, not generic wisdom.
+- If historical analogs show a clear pattern of failure for this type of action, say so directly.`;
+}
+
+export function buildNarrativePreMortemPrompt(): string {
+  return `You are also tasked with generating NARRATIVE WAR STORIES for the pre-mortem analysis.
+Gary Klein's research shows that vivid stories are far more memorable and actionable than bullet lists.
+
+For each major failure scenario, generate a WAR STORY: a vivid, specific narrative of how a similar
+deal/decision failed in the past. These should read like cautionary tales, not academic case studies.
+
+Add a "warStories" array to your pre-mortem output:
+"warStories": [
+  {
+    "title": "The [Company] Collapse: When [pattern] Met [reality]",
+    "narrative": "In [year], a similar [type] deal looked equally promising. The team was excited about [specific detail]. But six months in, [specific failure mechanism]. By the time the partners noticed [warning sign], it was too late — [consequence]. The post-mortem revealed that [lesson].",
+    "historicalBasis": "Based on patterns from [similar cases in the data]",
+    "keyTakeaway": "One sentence lesson",
+    "probability": "low | medium | high"
+  }
+]
+
+IMPORTANT:
+- Make stories VIVID and SPECIFIC — use concrete details, not abstractions
+- Each story should have a clear TURNING POINT where things went wrong
+- The narrative should make the reader FEEL the consequences, not just understand them
+- Ground stories in actual patterns from the historical data when available
+- Generate 2-3 war stories for the most significant failure scenarios`;
 }

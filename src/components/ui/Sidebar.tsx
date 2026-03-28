@@ -27,6 +27,7 @@ import {
   Lightbulb,
   Plug,
   Briefcase,
+  Target,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -425,6 +426,15 @@ export default function Sidebar() {
               pathname.startsWith('/dashboard/cognitive-audits') ||
               pathname === '/dashboard/nudges'
             }
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/calibration"
+            icon={<Target size={18} />}
+            label="Calibration"
+            description="Personal RPD calibration profile"
+            active={pathname.startsWith('/calibration')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />

@@ -65,6 +65,8 @@ model Analysis {
   biasWebImageUrl     String?
   preMortemImageUrl   String?
   preMortemRating     Int?
+  recognitionCues     Json?
+  narrativePreMortem  Json?
 
   // Version tracking and prompt reference
   version         Int             @default(1)

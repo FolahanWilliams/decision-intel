@@ -67,6 +67,8 @@ export interface AnalysisResult {
   bayesianPriors?: BayesianPriorsResult;
   causalIntelligence?: CausalIntelligenceResult;
   metaVerdict?: string;
+  recognitionCues?: RecognitionCuesResult;
+  narrativePreMortem?: NarrativePreMortem;
 }
 
 /** Causal AI Layer output — org-specific learned causal insights */
@@ -361,3 +363,69 @@ export const BIAS_CATEGORIES: Record<
     category: 'Judgment',
   },
 };
+
+// ─── Klein RPD Framework Types ──────────────────────────────────────────────
+
+export interface RecognitionCuesResult {
+  patternMatch: string;
+  cues: RecognitionCue[];
+  expertHeuristic: string;
+  confidenceLevel: number;
+}
+
+export interface RecognitionCue {
+  title: string;
+  description: string;
+  historicalDealId?: string;
+  historicalDealTitle?: string;
+  similarity: number;
+  outcome?: 'SUCCESS' | 'FAILURE' | 'MIXED';
+  missedCue?: string;
+  lessonLearned?: string;
+}
+
+export interface RpdSimulationResult {
+  chosenAction: string;
+  mentalSimulation: {
+    likelyOutcome: string;
+    confidenceLevel: number;
+    timeHorizon: string;
+    keyAssumptions: string[];
+    criticalFailurePoints: string[];
+  };
+  expertPerspective: string;
+  historicalAnalogs: Array<{
+    dealTitle: string;
+    action: string;
+    outcome: string;
+    similarity: number;
+  }>;
+  recommendation: 'PROCEED' | 'MODIFY' | 'ABANDON';
+  modificationSuggestion?: string;
+}
+
+export interface NarrativePreMortem {
+  failureScenarios: string[];
+  preventiveMeasures: string[];
+  warStories: Array<{
+    title: string;
+    narrative: string;
+    historicalBasis?: string;
+    keyTakeaway: string;
+    probability: 'low' | 'medium' | 'high';
+  }>;
+}
+
+export interface CalibrationProfile {
+  userId: string;
+  totalDecisions: number;
+  outcomeRate: { success: number; failure: number; mixed: number };
+  recurringBiases: Array<{
+    biasType: string;
+    frequency: number;
+    trend: 'increasing' | 'decreasing' | 'stable';
+  }>;
+  calibrationScore: number;
+  patternBlindSpots: string[];
+  strengthPatterns: string[];
+}
