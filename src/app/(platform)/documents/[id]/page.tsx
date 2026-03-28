@@ -45,6 +45,7 @@ import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { trackEvent } from '@/lib/analytics/track';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
 import {
   BiasInstance,
@@ -488,6 +489,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               },
             ]);
           } else if (update.type === 'complete') {
+            trackEvent('analysis_completed', { score: update.result?.overallScore });
             setStreamLogs(prev => [
               ...prev,
               { msg: '✓ Analysis complete. Results saved.', type: 'success', ts },

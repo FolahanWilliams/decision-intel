@@ -16,6 +16,7 @@ import { LiquidGlassEffect } from '@/components/ui/LiquidGlassEffect';
 import { LiquidGlassAdvanced } from '@/components/ui/LiquidGlassAdvanced';
 import { GlassRipple, GlassHover } from '@/components/ui/GlassMicroInteractions';
 import { cn } from '@/lib/utils';
+import { trackEvent } from '@/lib/analytics/track';
 import {
   Brain,
   AlertTriangle,
@@ -555,6 +556,8 @@ export default function LandingPage() {
     return `$${value}`;
   };
 
+  const roiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const heroRef = useRef(null);
   const problemRef = useRef(null);
   const solutionRef = useRef(null);
@@ -820,6 +823,7 @@ export default function LandingPage() {
                       href="/login"
                       className="btn btn-primary glow"
                       style={{ padding: '14px 32px', fontSize: '0.9rem' }}
+                      onClick={() => trackEvent('hero_cta_clicked', { target: 'start_free' })}
                     >
                       Start Free <ArrowRight className="w-4 h-4 ml-2 inline" />
                     </Link>
@@ -829,6 +833,7 @@ export default function LandingPage() {
                       href="/demo"
                       className="btn btn-secondary"
                       style={{ padding: '14px 32px', fontSize: '0.9rem' }}
+                      onClick={() => trackEvent('hero_cta_clicked', { target: 'see_demo' })}
                     >
                       See a Live Demo
                     </Link>
@@ -2838,7 +2843,11 @@ export default function LandingPage() {
                     max="50000"
                     step="100"
                     value={annualDecisions}
-                    onChange={e => setAnnualDecisions(Number(e.target.value))}
+                    onChange={e => {
+                      setAnnualDecisions(Number(e.target.value));
+                      if (roiTimerRef.current) clearTimeout(roiTimerRef.current);
+                      roiTimerRef.current = setTimeout(() => trackEvent('roi_calculator_used'), 1000);
+                    }}
                     aria-label="Annual Decisions"
                     className="w-full h-1 appearance-none cursor-pointer outline-none"
                     style={{
@@ -2880,7 +2889,11 @@ export default function LandingPage() {
                     max="100000"
                     step="1000"
                     value={avgDecisionValue}
-                    onChange={e => setAvgDecisionValue(Number(e.target.value))}
+                    onChange={e => {
+                      setAvgDecisionValue(Number(e.target.value));
+                      if (roiTimerRef.current) clearTimeout(roiTimerRef.current);
+                      roiTimerRef.current = setTimeout(() => trackEvent('roi_calculator_used'), 1000);
+                    }}
                     aria-label="Average Decision Value"
                     className="w-full h-1 appearance-none cursor-pointer outline-none"
                     style={{

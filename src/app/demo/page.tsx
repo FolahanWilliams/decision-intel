@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { DEMO_ANALYSES, type DemoAnalysis } from './data';
 import { DQIBadge } from '@/components/ui/DQIBadge';
+import { trackEvent } from '@/lib/analytics/track';
 
 type DemoTab =
   | 'overview'
@@ -89,8 +90,10 @@ export default function DemoPage() {
 
   // Run the streaming simulation
   const startSimulation = useCallback((idx: number) => {
+    trackEvent('demo_sample_selected', { sample: DEMO_ANALYSES[idx].shortName });
     setSelectedIdx(idx);
     setIsSimulating(true);
+    trackEvent('demo_simulation_started');
     setShowResults(false);
     setCurrentStage(0);
     setActiveTab('overview');
@@ -98,6 +101,7 @@ export default function DemoPage() {
     let stage = 0;
     const runNextStage = () => {
       if (stage >= PIPELINE_STAGES.length) {
+        trackEvent('demo_simulation_completed', { score: DEMO_ANALYSES[idx].overallScore });
         setIsSimulating(false);
         setShowResults(true);
         // Scroll to results after a brief delay
@@ -115,6 +119,7 @@ export default function DemoPage() {
 
   // Handle paste mode submission
   const handlePasteAnalyze = useCallback(() => {
+    trackEvent('demo_paste_analyzed');
     // For paste mode, randomly select a demo to show
     const idx = Math.floor(Math.random() * DEMO_ANALYSES.length);
     startSimulation(idx);

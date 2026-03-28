@@ -270,6 +270,8 @@ function ProductOverview() {
           <li><strong>Counterfactual Analysis API</strong> — &quot;What-if&quot; decision path computation with narrative explanations</li>
           <li><strong>Product Analytics</strong> — Internal event tracking across conversion funnel (<code>trackEvent()</code> fire-and-forget)</li>
           <li><strong>Prompt Versioning</strong> — SHA-256 deduplicated prompt tracking wired to every analysis</li>
+          <li><strong>Quick Bias Check</strong> — Dashboard modal for instant &lt;5s bias scan via paste, shared Gemini utility across extension + platform</li>
+          <li><strong>Demo Conversion Tracking</strong> — 10 funnel events wired: demo, login, hero CTA, ROI calculator, analysis completion, case study views</li>
         </ul>
       </div>
     </div>
@@ -2375,11 +2377,16 @@ function LiveStats() {
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
           {[
-            { event: 'demo_viewed', label: 'Demo Views' },
+            { event: 'hero_cta_clicked', label: 'Hero CTA Click' },
             { event: 'demo_sample_selected', label: 'Sample Selected' },
+            { event: 'demo_simulation_started', label: 'Sim Started' },
+            { event: 'demo_simulation_completed', label: 'Sim Completed' },
+            { event: 'demo_paste_analyzed', label: 'Paste Analyzed' },
             { event: 'roi_calculator_used', label: 'ROI Calculated' },
             { event: 'signup_started', label: 'Signup Started' },
-            { event: 'first_analysis_completed', label: 'First Analysis' },
+            { event: 'analysis_completed', label: 'Analysis Done' },
+            { event: 'quick_scan_completed', label: 'Quick Scan' },
+            { event: 'case_study_viewed', label: 'Case Study View' },
           ].map((item, i) => (
             <div
               key={i}
@@ -3296,10 +3303,10 @@ function FounderPlaybook() {
             'PE has different dominant patterns than healthcare. Vertical-specific baselines for new orgs.',
           ],
           [
-            'Quick Scan Mode',
+            'Quick Scan Mode (SHIPPED)',
             'Very High',
             '4h',
-            'Strebulaev "Fast Lane": 30-sec red flag scan before full 4-min analysis. Matches how VCs actually work (rapid filter → deep dive).',
+            'SHIPPED: Dashboard modal + platform API. Paste text → <5s Gemini bias scan. Shared utility with extension. Matches VC rapid-filter workflow.',
           ],
           [
             'Longitudinal Bias Tracking',
@@ -3320,10 +3327,10 @@ function FounderPlaybook() {
             'Visualize product analytics events, demo funnel conversion',
           ],
           [
-            'Demo Conversion Tracking',
+            'Demo Conversion Tracking (SHIPPED)',
             'High',
             '2h',
-            'Track demo_viewed → signup → first_analysis funnel',
+            'SHIPPED: 10 funnel events wired across demo, login, marketing, analysis, case study pages. Fire-and-forget trackEvent() with debounced ROI slider.',
           ],
           [
             'Extension Chrome Web Store',

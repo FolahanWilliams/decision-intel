@@ -74,6 +74,8 @@ const GraphHealthWidget = dynamic(
 );
 import { useDeals } from '@/hooks/useDeals';
 import { DOCUMENT_TYPES } from '@/types/deals';
+import { QuickScanModal } from '@/components/ui/QuickScanModal';
+import { Zap } from 'lucide-react';
 
 const ANALYSIS_STEPS: { name: string; icon: React.ReactNode }[] = [
   { name: 'Preparing document', icon: <FileText size={16} /> },
@@ -162,6 +164,7 @@ export default function Dashboard() {
 
   // Welcome modal for first-time users (triggered via ?welcome=true from auth callback)
   const [showWelcome, setShowWelcome] = useState(false);
+  const [quickScanOpen, setQuickScanOpen] = useState(false);
 
   // Handle Stripe checkout redirects (?upgraded=true or ?frameId=...) and welcome flow
   const { showToast } = useToast();
@@ -695,6 +698,29 @@ export default function Dashboard() {
           <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '2px' }}>
             Decision intelligence overview
           </p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            onClick={() => setQuickScanOpen(true)}
+            className="btn"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '7px 14px',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              background: 'rgba(168, 85, 247, 0.15)',
+              border: '1px solid rgba(168, 85, 247, 0.3)',
+              color: '#c084fc',
+              borderRadius: 'var(--radius-full)',
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            <Zap size={14} />
+            Quick Bias Check
+          </button>
         </div>
         <div
           style={{
@@ -2165,6 +2191,9 @@ export default function Dashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Quick Scan Modal */}
+      <QuickScanModal open={quickScanOpen} onClose={() => setQuickScanOpen(false)} />
     </div>
   );
 }
