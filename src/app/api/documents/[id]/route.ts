@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase/server';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { deleteVisualizations } from '@/lib/utils/visualization-storage';
+import { getDocumentContent } from '@/lib/utils/encryption';
 
 const log = createLogger('DocumentRoute');
 
@@ -33,6 +34,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           fileType: true,
           fileSize: true,
           content: true,
+          contentEncrypted: true,
+          contentIv: true,
+          contentTag: true,
           uploadedAt: true,
           status: true,
           analyses: {
@@ -100,7 +104,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
-    return NextResponse.json(document);
+    // Decrypt content transparently — never send encrypted fields to the client
+    const docAny = document as Record<string, unknown>;
+    const { contentEncrypted: _ce, contentIv: _ci, contentTag: _ct, ...docFields } = docAny;
+    const decryptedContent = getDocumentContent(document as Parameters<typeof getDocumentContent>[0]);
+    return NextResponse.json({ ...docFields, content: decryptedContent });
   } catch (error) {
     log.error('Error fetching document:', error);
     return NextResponse.json({ error: 'Failed to fetch document' }, { status: 500 });

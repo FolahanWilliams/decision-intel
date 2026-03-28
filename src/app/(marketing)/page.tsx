@@ -19,7 +19,6 @@ import { cn } from '@/lib/utils';
 import { trackEvent } from '@/lib/analytics/track';
 import {
   Brain,
-  AlertTriangle,
   Shield,
   Zap,
   Activity,
@@ -37,9 +36,9 @@ import {
   X,
   ChevronDown,
   Lock,
-  RefreshCw,
-  Fingerprint,
   Network,
+  Users,
+  Eye,
 } from 'lucide-react';
 
 // Scroll Progress
@@ -1035,7 +1034,7 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              Feel the Real Cost of Cognitive Bias
+              The Hidden Tax on Your Fund&apos;s Returns
             </h2>
             <p
               style={{
@@ -1045,13 +1044,13 @@ export default function LandingPage() {
                 lineHeight: 1.7,
               }}
             >
-              These aren&apos;t hypotheticals. They&apos;re happening in your organization right
-              now.
+              It&apos;s not just bias. It&apos;s noise — the invisible variance that no one
+              measures.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Card 1: The Anchoring Trap */}
+            {/* Card 1: The Noise Tax */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1064,7 +1063,7 @@ export default function LandingPage() {
                 padding: '28px',
               }}
             >
-              <Target className="w-6 h-6 mb-4" style={{ color: '#fbbf24' }} />
+              <Activity className="w-6 h-6 mb-4" style={{ color: '#ef4444' }} />
               <h3
                 style={{
                   fontSize: '1.15rem',
@@ -1073,7 +1072,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                The Anchoring Trap
+                The Noise Tax
               </h3>
               <p
                 style={{
@@ -1083,13 +1082,15 @@ export default function LandingPage() {
                   marginBottom: '16px',
                 }}
               >
-                Your M&amp;A team anchored on the seller&apos;s asking price instead of intrinsic
-                value.
+                When Kahneman studied insurance underwriters, executives expected 10% variance
+                between them. The actual number was 55%. The same pattern exists in your IC process
+                — when two partners review the same deal, their recommendations diverge by 40&ndash;60%.
+                Not because of different information. Because of uncontrolled noise.
               </p>
               <div
                 style={{
-                  background: 'rgba(251, 191, 36, 0.06)',
-                  border: '1px solid rgba(251, 191, 36, 0.12)',
+                  background: 'rgba(239, 68, 68, 0.06)',
+                  border: '1px solid rgba(239, 68, 68, 0.12)',
                   borderRadius: '10px',
                   padding: '14px',
                   marginBottom: '12px',
@@ -1103,19 +1104,18 @@ export default function LandingPage() {
                     marginBottom: '4px',
                   }}
                 >
-                  65% more likely to overpay
+                  55% variance where executives expected 10%
                 </p>
                 <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                  Malmendier &amp; Tate, 2008 — CEO overconfidence and M&amp;A
+                  Kahneman, Sibony, Sunstein — &ldquo;Noise&rdquo; (2021)
                 </p>
               </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                &ldquo;Microsoft paid $7.2B for Nokia — later written off entirely as a &lsquo;case
-                study in cognitive distortion.&rsquo;&rdquo;
+              <p style={{ fontSize: '0.85rem', color: '#22c55e', fontWeight: 600 }}>
+                Decision noise is measurable, quantifiable, and reducible.
               </p>
             </motion.div>
 
-            {/* Card 2: The Sunk Cost Spiral */}
+            {/* Card 2: The Bias Multiplier */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1128,7 +1128,7 @@ export default function LandingPage() {
                 padding: '28px',
               }}
             >
-              <RefreshCw className="w-6 h-6 mb-4" style={{ color: '#ef4444' }} />
+              <Brain className="w-6 h-6 mb-4" style={{ color: '#fbbf24' }} />
               <h3
                 style={{
                   fontSize: '1.15rem',
@@ -1137,7 +1137,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                The Sunk Cost Spiral
+                The Bias Multiplier
               </h3>
               <p
                 style={{
@@ -1147,134 +1147,10 @@ export default function LandingPage() {
                   marginBottom: '16px',
                 }}
               >
-                Your board kept funding a failing initiative because millions were already spent.
-              </p>
-              <div
-                style={{
-                  background: 'rgba(239, 68, 68, 0.06)',
-                  border: '1px solid rgba(239, 68, 68, 0.12)',
-                  borderRadius: '10px',
-                  padding: '14px',
-                  marginBottom: '12px',
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: '0.85rem',
-                    color: 'var(--text-primary)',
-                    fontWeight: 600,
-                    marginBottom: '4px',
-                  }}
-                >
-                  189% average cost overrun
-                </p>
-                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                  Standish Group CHAOS Report — IT project failure statistics
-                </p>
-              </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                &ldquo;German utility RWE lost &euro;10B — their CFO admitted they fell victim to
-                status quo and confirmation biases in combination.&rdquo;
-              </p>
-            </motion.div>
-
-            {/* Card 3: The Groupthink Effect */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: '28px',
-              }}
-            >
-              <AlertTriangle className="w-6 h-6 mb-4" style={{ color: '#ef4444' }} />
-              <h3
-                style={{
-                  fontSize: '1.15rem',
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  marginBottom: '12px',
-                }}
-              >
-                The Groupthink Tax
-              </h3>
-              <p
-                style={{
-                  fontSize: '0.9rem',
-                  color: 'var(--text-muted)',
-                  lineHeight: 1.7,
-                  marginBottom: '16px',
-                }}
-              >
-                Your strategy team agreed with the loudest voice in the room — not the best
-                analysis.
-              </p>
-              <div
-                style={{
-                  background: 'rgba(239, 68, 68, 0.06)',
-                  border: '1px solid rgba(239, 68, 68, 0.12)',
-                  borderRadius: '10px',
-                  padding: '14px',
-                  marginBottom: '12px',
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: '0.85rem',
-                    color: 'var(--text-primary)',
-                    fontWeight: 600,
-                    marginBottom: '4px',
-                  }}
-                >
-                  Only 28% of executives rate strategic decision quality in their company as
-                  &ldquo;generally good.&rdquo;
-                </p>
-                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                  McKinsey survey of 2,207 executives
-                </p>
-              </div>
-              <p style={{ fontSize: '0.85rem', color: '#22c55e', fontWeight: 600 }}>
-                Debiased decision processes improve ROI by 6.9 percentage points.
-              </p>
-            </motion.div>
-
-            {/* Card 4: The Overconfidence Tax */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: '28px',
-              }}
-            >
-              <TrendingUp className="w-6 h-6 mb-4" style={{ color: '#fbbf24' }} />
-              <h3
-                style={{
-                  fontSize: '1.15rem',
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  marginBottom: '12px',
-                }}
-              >
-                The Overconfidence Premium
-              </h3>
-              <p
-                style={{
-                  fontSize: '0.9rem',
-                  color: 'var(--text-muted)',
-                  lineHeight: 1.7,
-                  marginBottom: '16px',
-                }}
-              >
-                Your leadership team&apos;s revenue forecast was 30% too optimistic — again.
+                Noise is bad enough on its own. But cognitive biases make it directional —
+                anchoring, confirmation bias, and groupthink don&apos;t just add randomness. They
+                systematically push decisions in the wrong direction. The combination of noise + bias
+                is what turns a $50M deal into a $50M loss.
               </p>
               <div
                 style={{
@@ -1293,14 +1169,14 @@ export default function LandingPage() {
                     marginBottom: '4px',
                   }}
                 >
-                  &ldquo;The most robust finding in psychology&rdquo;
+                  Debiased decision processes improve ROI by 6.9 percentage points
                 </p>
                 <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                  Daniel Kahneman — Nobel Prize in Economics
+                  McKinsey survey of 2,207 executives
                 </p>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#22c55e', fontWeight: 600 }}>
-                Reference class forecasting reduces estimation errors by 70%.
+                Bias detection + noise measurement = the full picture.
               </p>
             </motion.div>
           </div>
@@ -1310,7 +1186,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.3 }}
             style={{
               textAlign: 'center',
               marginTop: '48px',
@@ -1323,13 +1199,13 @@ export default function LandingPage() {
               marginRight: 'auto',
             }}
           >
-            Decision Intel catches all of this. Automatically. In minutes, not months.
+            Decision Intel measures the noise. Detects the bias. Tracks the outcomes.
           </motion.p>
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.4 }}
             style={{ textAlign: 'center', marginTop: '16px' }}
           >
             <Link
@@ -1342,13 +1218,73 @@ export default function LandingPage() {
               }}
               className="hover:underline"
             >
-              Try Free &rarr;
+              Run Your Noise Audit &rarr;
             </Link>
           </motion.div>
         </div>
       </section>
 
       <SectionDivider variant="angle" color="rgba(163, 230, 53, 0.2)" />
+
+      {/* Noise Audit CTA */}
+      <section className="py-24 relative" style={{ background: 'var(--bg-primary)' }}>
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.04) 0%, transparent 60%)',
+          }}
+        />
+        <div className="relative z-10" style={containerStyle}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            style={{
+              maxWidth: '640px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              textAlign: 'center',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '16px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              How Much Noise Is Hiding in Your IC Process?
+            </h2>
+            <p
+              style={{
+                color: 'var(--text-muted)',
+                fontSize: '0.95rem',
+                lineHeight: 1.7,
+                marginBottom: '28px',
+              }}
+            >
+              Send us your last 3&ndash;5 IC memos. We&apos;ll measure the variance between
+              independent AI judges — the invisible tax on your returns that nobody quantifies. Most
+              funds are shocked by the result.
+            </p>
+            <GlassRipple>
+              <Link
+                href="/login"
+                className="btn btn-primary glow"
+                style={{ padding: '14px 32px', fontSize: '0.95rem' }}
+                onClick={() => trackEvent('noise_audit_cta_clicked')}
+              >
+                Run Your Free Noise Audit <ArrowRight className="w-4 h-4 ml-2 inline" />
+              </Link>
+            </GlassRipple>
+          </motion.div>
+        </div>
+      </section>
+
+      <SectionDivider variant="glow" color="rgba(255, 255, 255, 0.06)" />
 
       {/* How It Works Section */}
       <section
@@ -1537,6 +1473,103 @@ export default function LandingPage() {
       </section>
 
       <SectionDivider variant="glow" color="rgba(255, 255, 255, 0.06)" />
+
+      {/* Who Is This For? — Persona Section */}
+      <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
+        <div className="relative z-10" style={containerStyle}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-14 max-w-3xl mx-auto text-center"
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '12px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Who Is This For?
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
+              Decision Intel serves every layer of the investment decision stack.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[
+              {
+                icon: Target,
+                title: 'For Deal Partners',
+                description:
+                  'Run your own IC memos through the bias engine. Build your personal calibration curve. Track which biases cost you money over time.',
+                color: '#FFFFFF',
+              },
+              {
+                icon: Users,
+                title: 'For Investment Committees',
+                description:
+                  'Committee rooms with blind priors. Statistical Jury noise scoring. See exactly where your IC process leaks alpha.',
+                color: '#A3E635',
+              },
+              {
+                icon: Network,
+                title: 'For Fund Platforms',
+                description:
+                  'Multi-fund analytics. Cross-portfolio bias patterns. Compliance audit packs for LPs and regulators.',
+                color: '#22c55e',
+              },
+            ].map((persona, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.12 }}
+                style={{
+                  ...glassCardLight,
+                  padding: '32px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px',
+                }}
+              >
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '14px',
+                    background: `${persona.color}12`,
+                    border: `1px solid ${persona.color}30`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <persona.icon className="w-6 h-6" style={{ color: persona.color }} />
+                </div>
+                <h3
+                  style={{
+                    fontSize: '1.15rem',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  {persona.title}
+                </h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+                  {persona.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.06)" />
 
       {/* Case Study — What Decision Intel Would Have Caught */}
       <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
@@ -1814,7 +1847,7 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
-            {/* Large Feature: Cognitive Bias Engine */}
+            {/* Large Feature: Statistical Jury — Noise Measurement */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
@@ -1830,19 +1863,39 @@ export default function LandingPage() {
               <div style={{ padding: '32px', zIndex: 1 }}>
                 <div
                   style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '14px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
                     marginBottom: '24px',
-                    backdropFilter: 'blur(8px)',
                   }}
                 >
-                  <Brain className="w-6 h-6" style={{ color: '#FFFFFF' }} />
+                  <div
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '14px',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backdropFilter: 'blur(8px)',
+                    }}
+                  >
+                    <Activity className="w-6 h-6" style={{ color: '#FFFFFF' }} />
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      padding: '4px 12px',
+                      borderRadius: '9999px',
+                      background: 'rgba(34, 197, 94, 0.12)',
+                      color: '#22c55e',
+                    }}
+                  >
+                    Most Differentiated
+                  </span>
                 </div>
                 <h3
                   style={{
@@ -1852,7 +1905,7 @@ export default function LandingPage() {
                     color: 'var(--text-primary)',
                   }}
                 >
-                  Cognitive Bias Engine
+                  Statistical Jury — Noise Measurement
                 </h3>
                 <p
                   style={{
@@ -1862,9 +1915,10 @@ export default function LandingPage() {
                     lineHeight: 1.7,
                   }}
                 >
-                  Scans board papers, strategy proposals, risk assessments, and deal memos for 15+
-                  cognitive biases including anchoring, confirmation bias in due diligence, and
-                  groupthink in committee decisions.
+                  Three independent AI judges score every memo blind. We measure the variance between
+                  them to quantify how much &ldquo;noise&rdquo; — unwanted variability — exists in
+                  your IC process. Every AI tool claims to detect bias. Almost nobody measures
+                  decision noise with a triple-judge methodology.
                 </p>
               </div>
               <div style={{ padding: '0 32px', paddingBottom: 0, zIndex: 1 }}>
@@ -1893,7 +1947,7 @@ export default function LandingPage() {
                     }}
                   >
                     <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
-                      analysis_results.json
+                      noise_audit.json
                     </span>
                     <span
                       style={{
@@ -1901,26 +1955,30 @@ export default function LandingPage() {
                         fontWeight: 700,
                         padding: '2px 8px',
                         borderRadius: '9999px',
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        color: '#FFFFFF',
+                        background: 'rgba(34, 197, 94, 0.1)',
+                        color: '#22c55e',
                       }}
                     >
-                      Bias Detected
+                      Noise Audit
                     </span>
                   </div>
                   <div style={{ color: 'var(--text-muted)', lineHeight: 1.8 }}>
-                    <span style={{ color: '#FFFFFF' }}>&quot;biasType&quot;</span>:{' '}
-                    <span style={{ color: '#FFFFFF' }}>&quot;Confirmation Bias&quot;</span>,<br />
-                    <span style={{ color: '#FFFFFF' }}>&quot;severity&quot;</span>:{' '}
-                    <span style={{ color: '#FFFFFF' }}>&quot;HIGH&quot;</span>,<br />
-                    <span style={{ color: '#FFFFFF' }}>&quot;confidence&quot;</span>:{' '}
-                    <span style={{ color: '#22c55e' }}>0.94</span>
+                    <span style={{ color: '#FFFFFF' }}>Judge A</span>:{' '}
+                    <span style={{ color: '#22c55e' }}>72</span> &nbsp;
+                    <span style={{ color: '#FFFFFF' }}>Judge B</span>:{' '}
+                    <span style={{ color: '#fbbf24' }}>58</span> &nbsp;
+                    <span style={{ color: '#FFFFFF' }}>Judge C</span>:{' '}
+                    <span style={{ color: '#22c55e' }}>69</span>
+                    <br />
+                    <span style={{ color: '#FFFFFF' }}>&quot;variance&quot;</span>:{' '}
+                    <span style={{ color: '#ef4444' }}>14.2</span> &nbsp;
+                    <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>{'// high noise'}</span>
                   </div>
                 </div>
               </div>
             </motion.div>
 
-            {/* Statistical Jury */}
+            {/* Cognitive Bias Engine */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={featuresInView ? { opacity: 1, scale: 1 } : {}}
@@ -1944,7 +2002,7 @@ export default function LandingPage() {
                     border: '1px solid rgba(255, 255, 255, 0.15)',
                   }}
                 >
-                  <Activity className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                  <Brain className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                 </div>
                 <span
                   style={{
@@ -1956,7 +2014,7 @@ export default function LandingPage() {
                     color: '#FFFFFF',
                   }}
                 >
-                  Noise Audit
+                  15+ Bias Types
                 </span>
               </div>
               <h3
@@ -1967,11 +2025,11 @@ export default function LandingPage() {
                   color: 'var(--text-primary)',
                 }}
               >
-                Statistical Jury
+                Cognitive Bias Engine
               </h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.7 }}>
-                Three independent AI judges score the same memo blind. Measures variance to quantify
-                how much &ldquo;noise&rdquo; is in your IC process — the hidden tax on returns.
+                Scans IC memos, CIMs, and deal papers for anchoring, confirmation bias, groupthink,
+                and 12+ other cognitive biases with confidence scoring and severity classification.
               </p>
             </motion.div>
 
@@ -2232,116 +2290,12 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          {/* Moat Pillars */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-5 max-w-7xl mx-auto">
-            {[
-              {
-                icon: Fingerprint,
-                title: 'Autonomous Outcome Flywheel',
-                description:
-                  'Outcomes are detected automatically from follow-up documents, Slack messages, and web news — then confirmed with one click. Every outcome sharpens your bias detection and calibrates your Decision Twins.',
-                stat: 'Compounding data advantage',
-                color: '#FFFFFF',
-              },
-              {
-                icon: RefreshCw,
-                title: 'Auto-Recalibrating',
-                description:
-                  "Every outcome retrains bias weights, nudge thresholds, and Decision Twin accuracy for YOUR org. Not generic warnings — your organization's actual impact by bias type.",
-                stat: 'Learns from every decision',
-                color: '#A3E635',
-              },
-              {
-                icon: Network,
-                title: 'Decision Knowledge Graph',
-                description:
-                  'Every decision becomes a node. Every outcome, a validated edge. Your organization builds an irreplaceable map of how decisions cascade and where failure patterns hide.',
-                stat: 'Organizational decision memory',
-                color: '#60a5fa',
-              },
-              {
-                icon: Lock,
-                title: 'Pre-Decision Capture',
-                description:
-                  'Slack integration detects IC deliberation threads and delivers cognitive coaching nudges before the vote. Reply with your position to build your calibration curve — all without leaving Slack.',
-                stat: 'Always-on decision OS',
-                color: '#22c55e',
-              },
-              {
-                icon: Shield,
-                title: 'Regulator-Ready',
-                description:
-                  'Audit-grade decision logs with timestamped priors, outcomes, and calibration curves. Compliance mapping for SOX 302/404, SEC, FCA Consumer Duty, and EU AI Act frameworks.',
-                stat: 'Compliance audit packs',
-                color: '#FFFFFF',
-              },
-            ].map((pillar, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                animate={moatInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 0.2 + i * 0.1 }}
-                style={{
-                  ...glassCardLight,
-                  padding: '28px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '16px',
-                }}
-              >
-                <div
-                  style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
-                    background: `${pillar.color}12`,
-                    border: `1px solid ${pillar.color}30`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <pillar.icon className="w-5 h-5" style={{ color: pillar.color }} />
-                </div>
-                <div>
-                  <h3
-                    style={{
-                      fontSize: '1.05rem',
-                      fontWeight: 700,
-                      color: 'var(--text-primary)',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    {pillar.title}
-                  </h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>
-                    {pillar.description}
-                  </p>
-                </div>
-                <div
-                  style={{
-                    marginTop: 'auto',
-                    paddingTop: '12px',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: pillar.color,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  {pillar.stat}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
           {/* Competitor comparison callout */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={moatInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.6 }}
-            className="max-w-4xl mx-auto mt-16"
+            transition={{ delay: 0.2 }}
+            className="max-w-4xl mx-auto"
           >
             <div
               style={{
@@ -2389,359 +2343,6 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          {/* Competitive Comparison Table */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={moatInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.8 }}
-            className="max-w-5xl mx-auto mt-20"
-          >
-            <h3
-              style={{
-                fontSize: 'clamp(1.3rem, 2.2vw, 1.8rem)',
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                marginBottom: '24px',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Decision Intel vs. Traditional Consulting
-            </h3>
-
-            {/* Desktop Table */}
-            <div
-              className="hidden md:block"
-              style={{
-                borderRadius: '16px',
-                overflow: 'hidden',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-              }}
-            >
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ background: 'rgba(255, 255, 255, 0.06)' }}>
-                    <th
-                      style={{
-                        textAlign: 'left',
-                        padding: '14px 20px',
-                        fontSize: '0.8rem',
-                        fontWeight: 600,
-                        color: 'var(--text-muted)',
-                        letterSpacing: '0.05em',
-                        textTransform: 'uppercase',
-                        width: '22%',
-                      }}
-                    >
-                      Dimension
-                    </th>
-                    <th
-                      style={{
-                        textAlign: 'left',
-                        padding: '14px 20px',
-                        fontSize: '0.8rem',
-                        fontWeight: 600,
-                        color: 'var(--text-muted)',
-                        letterSpacing: '0.05em',
-                        textTransform: 'uppercase',
-                        width: '39%',
-                      }}
-                    >
-                      McKinsey/BCG
-                    </th>
-                    <th
-                      style={{
-                        textAlign: 'left',
-                        padding: '14px 20px',
-                        fontSize: '0.8rem',
-                        fontWeight: 600,
-                        color: 'var(--text-primary)',
-                        letterSpacing: '0.05em',
-                        textTransform: 'uppercase',
-                        width: '39%',
-                      }}
-                    >
-                      Decision Intel
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    {
-                      dimension: 'Annual cost',
-                      consulting: '$500K\u2013$2M per engagement',
-                      di: 'From $1,548/yr \u2014 0.3% of one engagement',
-                    },
-                    {
-                      dimension: 'Speed',
-                      consulting: '6\u201312 week engagements',
-                      di: 'Minutes per document',
-                    },
-                    {
-                      dimension: 'Auditor bias',
-                      consulting: 'Consultants have their own biases',
-                      di: 'AI doesn\u2019t have ego or politics',
-                    },
-                    {
-                      dimension: 'Continuity',
-                      consulting: 'Point-in-time snapshot',
-                      di: 'Continuous monitoring',
-                    },
-                    {
-                      dimension: 'Scale',
-                      consulting: 'One engagement at a time',
-                      di: 'Every decision, every team',
-                    },
-                    {
-                      dimension: 'Data flywheel',
-                      consulting: 'Report sits in a drawer',
-                      di: 'Outcomes improve accuracy over time',
-                    },
-                  ].map((row, i) => (
-                    <tr
-                      key={i}
-                      style={{
-                        background:
-                          i % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.04)',
-                      }}
-                    >
-                      <td
-                        style={{
-                          padding: '14px 20px',
-                          fontSize: '0.88rem',
-                          fontWeight: 600,
-                          color: 'var(--text-primary)',
-                          borderTop: '1px solid rgba(255, 255, 255, 0.04)',
-                        }}
-                      >
-                        {row.dimension}
-                      </td>
-                      <td
-                        style={{
-                          padding: '14px 20px',
-                          fontSize: '0.85rem',
-                          color: 'rgba(161, 161, 170, 0.8)',
-                          borderTop: '1px solid rgba(255, 255, 255, 0.04)',
-                        }}
-                      >
-                        {row.consulting}
-                      </td>
-                      <td
-                        style={{
-                          padding: '14px 20px',
-                          fontSize: '0.85rem',
-                          color: 'rgba(134, 239, 172, 0.9)',
-                          fontWeight: 500,
-                          borderTop: '1px solid rgba(255, 255, 255, 0.04)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                        }}
-                      >
-                        <CheckCircle2
-                          style={{
-                            width: '14px',
-                            height: '14px',
-                            flexShrink: 0,
-                            color: 'rgba(34, 197, 94, 0.7)',
-                          }}
-                        />
-                        {row.di}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Stacked Cards */}
-            <div
-              className="md:hidden"
-              style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
-            >
-              {[
-                {
-                  dimension: 'Annual cost',
-                  consulting: '$500K\u2013$2M per engagement',
-                  di: 'From $1,548/yr \u2014 0.3% of one engagement',
-                },
-                {
-                  dimension: 'Speed',
-                  consulting: '6\u201312 week engagements',
-                  di: 'Minutes per document',
-                },
-                {
-                  dimension: 'Auditor bias',
-                  consulting: 'Consultants have their own biases',
-                  di: 'AI doesn\u2019t have ego or politics',
-                },
-                {
-                  dimension: 'Continuity',
-                  consulting: 'Point-in-time snapshot',
-                  di: 'Continuous monitoring',
-                },
-                {
-                  dimension: 'Scale',
-                  consulting: 'One engagement at a time',
-                  di: 'Every decision, every team',
-                },
-                {
-                  dimension: 'Data flywheel',
-                  consulting: 'Report sits in a drawer',
-                  di: 'Outcomes improve accuracy over time',
-                },
-              ].map((row, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={moatInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ delay: 0.9 + i * 0.08 }}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '12px',
-                    padding: '16px',
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: '0.8rem',
-                      fontWeight: 700,
-                      color: 'var(--text-primary)',
-                      marginBottom: '10px',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    {row.dimension}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '0.82rem',
-                      color: 'rgba(161, 161, 170, 0.8)',
-                      marginBottom: '6px',
-                    }}
-                  >
-                    <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>Consulting:</span>{' '}
-                    {row.consulting}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '0.82rem',
-                      color: 'rgba(134, 239, 172, 0.9)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <CheckCircle2
-                      style={{
-                        width: '13px',
-                        height: '13px',
-                        flexShrink: 0,
-                        color: 'rgba(34, 197, 94, 0.7)',
-                      }}
-                    />
-                    <span>
-                      <span style={{ fontWeight: 600 }}>Decision Intel:</span> {row.di}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      <SectionDivider variant="wave" color="rgba(255, 255, 255, 0.06)" />
-
-      {/* Anti-SaaS Positioning Section */}
-      <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
-        <div className="relative z-10" style={containerStyle}>
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-14 max-w-3xl mx-auto text-center"
-          >
-            <h2
-              style={{
-                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
-                color: 'var(--text-primary)',
-                marginBottom: '12px',
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-              }}
-            >
-              AI Is Replacing Commodity SaaS. We&apos;re the Opposite.
-            </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
-              Most software tools are being commoditized by AI. Decision Intel is fundamentally
-              different — it doesn&apos;t get replaced by AI. It <em>is</em> the AI.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[
-              {
-                icon: Zap,
-                title: 'Most SaaS is being replaced by AI.',
-                body: 'Generic dashboards, form builders, and workflow tools are commoditized by LLMs that build them on demand. Decision Intel is fundamentally different — every improvement in foundation models makes our bias detection more accurate, not more replaceable.',
-              },
-              {
-                icon: TrendingUp,
-                title: 'Our moat grows with every decision you track.',
-                body: 'SaaS tools store your data but don\u2019t learn from it. Decision Intel builds a proprietary calibration dataset from your verified outcomes. After 6 months, your instance knows which biases cost YOUR organization the most. No competitor can replicate that.',
-              },
-              {
-                icon: Brain,
-                title: 'Cognitive bias detection requires AI. There is no manual alternative.',
-                body: 'You can\u2019t detect anchoring bias by reading more carefully. You can\u2019t measure decision noise with a spreadsheet. The 188 documented biases operate below conscious awareness — only systematic AI analysis surfaces them reliably.',
-              },
-            ].map((card, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '16px',
-                  padding: '28px 24px',
-                }}
-              >
-                <card.icon
-                  style={{
-                    width: '28px',
-                    height: '28px',
-                    color: 'rgba(34, 197, 94, 0.7)',
-                    marginBottom: '16px',
-                  }}
-                />
-                <h3
-                  style={{
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                    color: 'var(--text-primary)',
-                    marginBottom: '10px',
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {card.title}
-                </h3>
-                <p
-                  style={{
-                    fontSize: '0.85rem',
-                    color: 'var(--text-muted)',
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {card.body}
-                </p>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -2765,10 +2366,10 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              ROI Calculator
+              What Noise Costs Your Fund
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              Model the financial impact of unaudited strategic decisions.
+              Every deal your IC reviews carries hidden variance. Calculate what it costs.
             </p>
           </motion.div>
 
@@ -3048,14 +2649,14 @@ export default function LandingPage() {
                 >
                   {outcomeStats?.isRealData
                     ? 'Based on real platform outcome data.'
-                    : 'Estimates based on published research baselines (Kahneman et al., "Noise", 2021). Actual results will vary by organisation and decision type.'}
+                    : 'The average mid-market PE fund loses $23M per vintage year to bias-driven decisions. Estimates based on Kahneman et al., "Noise" (2021). Actual results vary by fund and decision type.'}
                 </p>
 
                 <div
                   style={{ paddingTop: '24px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}
                 >
                   <Link
-                    href="/login"
+                    href="/demo"
                     className="btn btn-primary w-full glow"
                     style={{
                       padding: '16px',
@@ -3070,7 +2671,7 @@ export default function LandingPage() {
                       fontWeight: 600,
                     }}
                   >
-                    Get Early Access
+                    See Your Fund&apos;s Noise Tax
                   </Link>
                 </div>
               </div>
@@ -3080,6 +2681,112 @@ export default function LandingPage() {
       </section>
 
       <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.06)" />
+
+      {/* Security & Trust Section */}
+      <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
+        <div className="relative z-10" style={containerStyle}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-14 max-w-3xl mx-auto text-center"
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '12px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Enterprise-Grade Security for Sensitive Deal Documents
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
+              Your IC memos contain material non-public information. We treat them accordingly.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {[
+              {
+                icon: Shield,
+                title: 'AES-256 Encryption at Rest',
+                description: 'Every document is encrypted using AES-256-GCM before it touches the database. Your content is never stored in plaintext.',
+              },
+              {
+                icon: Lock,
+                title: 'TLS 1.3 in Transit',
+                description: 'All data is encrypted in transit with TLS 1.3 and HSTS enforcement. No exceptions, no downgrades.',
+              },
+              {
+                icon: Eye,
+                title: 'Automatic PII Redaction',
+                description: 'Personally identifiable information is detected and redacted before analysis. Sensitive details never reach the AI pipeline.',
+              },
+              {
+                icon: Brain,
+                title: 'Your Data Never Trains Models',
+                description: 'Document content is never used to train or fine-tune any AI model. Your proprietary deal intelligence stays yours.',
+              },
+              {
+                icon: FileSearch,
+                title: 'GDPR Right-to-Erasure',
+                description: 'Full data deletion on request — documents, analyses, embeddings, and audit logs. Atomic transaction, no residual data.',
+              },
+              {
+                icon: CheckCircle2,
+                title: 'SOC 2 Certified Infrastructure',
+                description: 'Hosted on SOC 2 Type II certified infrastructure (Vercel + Supabase). Row-level access controls and audit logging.',
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                style={{
+                  ...glassCardLight,
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                }}
+              >
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '10px',
+                    background: 'rgba(34, 197, 94, 0.08)',
+                    border: '1px solid rgba(34, 197, 94, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <item.icon className="w-5 h-5" style={{ color: '#22c55e' }} />
+                </div>
+                <h3
+                  style={{
+                    fontSize: '1rem',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+                  {item.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <SectionDivider variant="glow" color="rgba(255, 255, 255, 0.06)" />
 
       {/* Pricing Section */}
       <section
@@ -3691,14 +3398,6 @@ export default function LandingPage() {
               {
                 q: 'How does outcome tracking work?',
                 a: 'The platform autonomously detects outcomes from three channels: follow-up documents (via semantic matching), Slack messages (outcome language detection), and web intelligence (public news search for named entities). Detected outcomes appear as draft notifications you confirm or dismiss with one click. You can also manually report outcomes at configurable intervals. If you have 5+ analyses awaiting outcomes, new analyses are gated until you close the loop. Every tracked outcome sharpens your bias severity weights, Decision Twin accuracy, and org-specific causal models.',
-              },
-              {
-                q: 'What is a Decision Twin?',
-                a: "Decision Twins are AI-simulated boardroom personas (e.g. Fiscal Conservative, Growth Advocate, Compliance Guard) that independently evaluate your proposal. Academic research on structured devil's advocacy and red-teaming (Schwenk, 1990; Schweiger et al., 1986) demonstrates that formalised dissent significantly improves decision quality by surfacing blind spots committees miss. The platform tracks which twin was most accurate over time.",
-              },
-              {
-                q: 'What compliance standards do you support?',
-                a: 'The platform provides compliance mapping tools for SOX Section 302/404, SEC disclosure requirements, FCA Consumer Duty, and EU AI Act frameworks. Exportable audit trails include full decision lineage, bias detection logs, and outcome verification to support your governance and reporting workflows. Note: Decision Intel assists with compliance preparation — it does not certify or guarantee regulatory compliance.',
               },
               {
                 q: 'How is this different from a generic AI bias scanner?',

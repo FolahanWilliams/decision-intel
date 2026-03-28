@@ -9,17 +9,20 @@ datasource db {
 }
 
 model Document {
-  id          String              @id @default(cuid())
-  userId      String
-  filename    String
-  fileType    String
-  fileSize    Int
-  content     String              @db.Text
-  uploadedAt  DateTime            @default(now())
-  status      String              @default("pending")
-  updatedAt   DateTime            @updatedAt
-  contentHash String?             @unique
-  orgId       String?
+  id               String              @id @default(cuid())
+  userId           String
+  filename         String
+  fileType         String
+  fileSize         Int
+  content          String              @db.Text
+  contentEncrypted String?             @db.Text
+  contentIv        String?
+  contentTag       String?
+  uploadedAt       DateTime            @default(now())
+  status           String              @default("pending")
+  updatedAt        DateTime            @updatedAt
+  contentHash      String?             @unique
+  orgId            String?
   documentType String?            // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | other
   dealId      String?
   deal        Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)

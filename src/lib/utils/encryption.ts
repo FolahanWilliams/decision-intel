@@ -1,11 +1,12 @@
 /**
  * AES-256-GCM Encryption Utility
  *
- * Used for encrypting sensitive credentials at rest (e.g. Slack bot tokens).
- * Each value gets a unique IV and auth tag for authenticated encryption.
+ * Used for encrypting sensitive data at rest:
+ * - Slack bot tokens (SLACK_TOKEN_ENCRYPTION_KEY)
+ * - Document content (DOCUMENT_ENCRYPTION_KEY)
  *
- * Requires SLACK_TOKEN_ENCRYPTION_KEY env var (64-char hex = 32 bytes).
- * Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+ * Each value gets a unique IV and auth tag for authenticated encryption.
+ * Generate keys with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
  */
 
 import crypto from 'crypto';
@@ -22,6 +23,17 @@ function getEncryptionKey(): Buffer {
   if (!keyHex || keyHex.length !== 64) {
     throw new Error(
       'SLACK_TOKEN_ENCRYPTION_KEY must be a 64-character hex string (32 bytes). ' +
+        "Generate with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
+    );
+  }
+  return Buffer.from(keyHex, 'hex');
+}
+
+function getDocumentEncryptionKey(): Buffer {
+  const keyHex = process.env.DOCUMENT_ENCRYPTION_KEY;
+  if (!keyHex || keyHex.length !== 64) {
+    throw new Error(
+      'DOCUMENT_ENCRYPTION_KEY must be a 64-character hex string (32 bytes). ' +
         "Generate with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
     );
   }
@@ -105,4 +117,81 @@ export function decryptToken(record: {
     log.error('Failed to decrypt token — possible key rotation or data corruption');
     throw new Error('Token decryption failed');
   }
+}
+
+// ── Document Content Encryption ─────────────────────────────
+
+/**
+ * Check if document encryption is available (key is configured).
+ */
+export function isDocumentEncryptionEnabled(): boolean {
+  const keyHex = process.env.DOCUMENT_ENCRYPTION_KEY;
+  return !!keyHex && keyHex.length === 64;
+}
+
+/**
+ * Encrypt document content using AES-256-GCM with the document encryption key.
+ * Returns the three fields for DB storage.
+ */
+export function encryptDocumentContent(content: string): {
+  contentEncrypted: string;
+  contentIv: string;
+  contentTag: string;
+} {
+  const key = getDocumentEncryptionKey();
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv(ALGORITHM, key, iv, { authTagLength: TAG_LENGTH });
+
+  let encrypted = cipher.update(content, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  const tag = cipher.getAuthTag();
+
+  return {
+    contentEncrypted: encrypted,
+    contentIv: iv.toString('hex'),
+    contentTag: tag.toString('hex'),
+  };
+}
+
+/**
+ * Decrypt document content from DB columns.
+ */
+export function decryptDocumentContent(record: {
+  contentEncrypted: string;
+  contentIv: string;
+  contentTag: string;
+}): string {
+  const key = getDocumentEncryptionKey();
+  const iv = Buffer.from(record.contentIv, 'hex');
+  const tag = Buffer.from(record.contentTag, 'hex');
+  const decipher = crypto.createDecipheriv(ALGORITHM, key, iv, { authTagLength: TAG_LENGTH });
+  decipher.setAuthTag(tag);
+
+  let decrypted = decipher.update(record.contentEncrypted, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
+/**
+ * Transparently get document content from either encrypted or plaintext fields.
+ * Handles backward compatibility: new docs use encrypted fields, old docs use plaintext.
+ */
+export function getDocumentContent(doc: {
+  content: string;
+  contentEncrypted?: string | null;
+  contentIv?: string | null;
+  contentTag?: string | null;
+}): string {
+  if (doc.contentEncrypted && doc.contentIv && doc.contentTag) {
+    try {
+      return decryptDocumentContent({
+        contentEncrypted: doc.contentEncrypted,
+        contentIv: doc.contentIv,
+        contentTag: doc.contentTag,
+      });
+    } catch {
+      log.error('Document decryption failed — falling back to plaintext content');
+    }
+  }
+  return doc.content;
 }

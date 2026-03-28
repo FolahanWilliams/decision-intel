@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { createHash } from 'crypto';
+import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -49,6 +50,9 @@ export async function POST() {
 
     const contentHash = createHash('sha256').update(content).digest('hex');
 
+    const encFields = isDocumentEncryptionEnabled()
+      ? encryptDocumentContent(content)
+      : {};
     const doc = await prisma.document.create({
       data: {
         userId: user.id,
@@ -56,6 +60,7 @@ export async function POST() {
         fileType: 'text/plain',
         fileSize: Buffer.byteLength(content, 'utf-8'),
         content,
+        ...encFields,
         contentHash,
         status: 'uploaded',
       },

@@ -13,6 +13,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
 import { trackApiUsage, estimateCost } from '@/lib/utils/cost-tracker';
 import { checkOutcomeGate, formatOutcomeReminder } from '@/lib/learning/outcome-gate';
+import { getDocumentContent } from '@/lib/utils/encryption';
 import {
   NoiseStatsSchema,
   FactCheckSchema,
@@ -127,6 +128,9 @@ export async function POST(request: NextRequest) {
     if (!doc) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
+
+    // Decrypt document content transparently (supports both encrypted and legacy plaintext)
+    const docContent = getDocumentContent(doc);
 
     // ── Outcome enforcement gate ──────────────────────────────────────
     // The behavioral data flywheel only works when users close the loop.
@@ -282,7 +286,7 @@ export async function POST(request: NextRequest) {
           const auditGraph = await getGraph();
           const eventStream = auditGraph.streamEvents(
             {
-              originalContent: doc.content,
+              originalContent: docContent,
               documentId,
               userId,
               orgId: doc.orgId || '',
@@ -643,10 +647,10 @@ export async function POST(request: NextRequest) {
             userId,
             provider: 'google',
             operation: 'analyze_document',
-            tokens: doc.content.length, // Approximate token count from content length
+            tokens: docContent.length, // Approximate token count from content length
             cost: estimateCost(
               process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview',
-              doc.content.length,
+              docContent.length,
               4000
             ),
             metadata: { documentId, filename: doc.filename },
@@ -800,7 +804,7 @@ export async function POST(request: NextRequest) {
                   error: errorMessage,
                   errorCode,
                   input: {
-                    content: doc.content.slice(0, 5000), // Truncate for storage
+                    content: docContent.slice(0, 5000), // Truncate for storage
                     filename: doc.filename,
                     options: { documentId, userId },
                   },
