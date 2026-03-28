@@ -141,10 +141,7 @@ export async function GET(request: NextRequest) {
     if (source) where.source = source;
     if (status) where.status = status;
 
-    let entries;
-    let total: number;
-
-    [entries, total] = await Promise.all([
+    const [entries, total] = await Promise.all([
       prisma.journalEntry.findMany({
         where,
         orderBy: { createdAt: 'desc' },

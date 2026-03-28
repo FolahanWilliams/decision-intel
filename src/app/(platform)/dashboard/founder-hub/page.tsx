@@ -2037,6 +2037,7 @@ function LiveStats() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetchStats fetches from external API and sets state on response
     fetchStats();
     const interval = setInterval(fetchStats, 60_000);
     return () => clearInterval(interval);
