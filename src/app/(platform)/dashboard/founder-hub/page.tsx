@@ -134,7 +134,7 @@ function ProductOverview() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: 'repeat(3, 1fr)',
           gap: 12,
           marginBottom: 16,
         }}
@@ -144,6 +144,8 @@ function ProductOverview() {
           { value: '15', label: 'AI Agent Pipeline', sub: 'Parallel execution' },
           { value: '113', label: 'Failure Cases', sub: '8 industries' },
           { value: '3', label: 'Outcome Channels', sub: 'Autonomous detection' },
+          { value: '2', label: 'AI Providers', sub: 'Gemini + Claude fallback' },
+          { value: '4', label: 'Touchpoints', sub: 'Web, Slack, Extension, API' },
         ].map((m, i) => (
           <div key={i} style={card}>
             <div style={stat}>{m.value}</div>
@@ -250,6 +252,25 @@ function ProductOverview() {
           systematic decision hygiene report{' '}
           <strong style={{ color: '#22c55e' }}>up to 60% reduction</strong> in decision variance.
         </p>
+      </div>
+
+      {/* Recently Shipped */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <Zap size={18} style={{ color: '#8b5cf6' }} /> Recently Shipped
+        </div>
+        <ul style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.8, paddingLeft: 16 }}>
+          <li><strong>Enhanced Public Demo</strong> — Streaming simulation UX with 3 sample docs, DQI badge, no login required at <code>/demo</code></li>
+          <li><strong>Data-Backed ROI Calculator</strong> — Live outcome stats replace hardcoded Kahneman baselines when ≥10 outcomes exist</li>
+          <li><strong>Case Study Export</strong> — One-click anonymized, branded shareable analyses with permanent links for LP reporting</li>
+          <li><strong>Browser Extension</strong> — Chrome extension with quick-score popup (&lt;5s) and full analysis sidepanel</li>
+          <li><strong>A/B Prompt Testing</strong> — Experiment CRUD with Thompson sampling auto-optimization dashboard at <code>/dashboard/experiments</code></li>
+          <li><strong>Multi-Model Fallback</strong> — Gemini → Claude failover routing (set <code>AI_FALLBACK_ENABLED=true</code>)</li>
+          <li><strong>Graph Health Widget</strong> — Real-time knowledge graph density, isolated nodes, anti-pattern tracking on dashboard</li>
+          <li><strong>Counterfactual Analysis API</strong> — &quot;What-if&quot; decision path computation with narrative explanations</li>
+          <li><strong>Product Analytics</strong> — Internal event tracking across conversion funnel (<code>trackEvent()</code> fire-and-forget)</li>
+          <li><strong>Prompt Versioning</strong> — SHA-256 deduplicated prompt tracking wired to every analysis</li>
+        </ul>
       </div>
     </div>
   );
@@ -474,6 +495,16 @@ SYNTHESIS (Sequential)
               label: 'RAG / Embeddings',
               value:
                 'Gemini embedding-001 (768-dim) → pgvector cosine similarity for semantic search and document matching',
+            },
+            {
+              label: 'Multi-Model Resilience',
+              value:
+                'Gemini → Claude automatic fallback when AI_FALLBACK_ENABLED=true. Model router at src/lib/ai/model-router.ts',
+            },
+            {
+              label: 'Prompt Versioning',
+              value:
+                'Every analysis records its promptVersionId via SHA-256 hash deduplication for drift tracking',
             },
             {
               label: 'Causal AI',
@@ -821,6 +852,38 @@ function IntegrationsAndFlywheel() {
             </div>
           ))}
         </div>
+        <ul style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.8, paddingLeft: 16, marginTop: 12 }}>
+          <li><strong>Setup Guide UI:</strong> Step-by-step wizard in Settings → Integrations with connection status indicators</li>
+          <li><strong>Token Expiry Detection:</strong> Automatic detection of revoked/expired tokens with markInstallationInactive()</li>
+          <li><strong>Error Recovery:</strong> Graceful handling of auth failures in nudge delivery with structured logging</li>
+        </ul>
+      </div>
+
+      {/* Browser Extension */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <Zap size={18} style={{ color: '#f59e0b' }} /> Browser Extension (Chrome)
+        </div>
+        <ul style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.8, paddingLeft: 16 }}>
+          <li><strong>Quick Score Popup:</strong> &lt;5 second bias-only scan from any webpage. Sends to <code>/api/extension/quick-score</code></li>
+          <li><strong>Full Analysis Sidepanel:</strong> Complete 15-agent pipeline from the browser. Calls <code>/api/extension/analyze</code></li>
+          <li><strong>Auth:</strong> API key + user ID via extension options. Rate limited: 30 req/hr (quick) / 10 req/hr (full)</li>
+          <li><strong>Content Script:</strong> Annotates page text with detected biases inline</li>
+          <li><strong>PDF Support:</strong> Extracts text from PDF tabs for analysis</li>
+        </ul>
+      </div>
+
+      {/* Product Analytics */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <BarChart3 size={18} style={{ color: '#06b6d4' }} /> Product Analytics
+        </div>
+        <ul style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.8, paddingLeft: 16 }}>
+          <li><strong>Client Library:</strong> <code>trackEvent(name, properties)</code> — fire-and-forget, no await needed</li>
+          <li><strong>API Endpoint:</strong> <code>POST /api/analytics/events</code> — stores in AnalyticsEvent table, auth optional</li>
+          <li><strong>Key Events:</strong> demo_viewed, demo_sample_selected, roi_calculator_used, case_study_shared, extension_installed, slack_connected, signup_started, first_analysis_completed</li>
+          <li><strong>Schema Drift Safe:</strong> Returns 200 silently if table doesn&apos;t exist</li>
+        </ul>
       </div>
 
       {/* Decision Knowledge Graph */}
@@ -1035,6 +1098,21 @@ function CompetitiveMoat() {
             'Very High',
             'Data network effect: more orgs = better calibration for all',
           ],
+          [
+            'Multi-Model Resilience',
+            'Medium',
+            'Gemini → Claude fallback. No single provider dependency. Easy to add more.',
+          ],
+          [
+            'A/B Prompt Testing',
+            'High',
+            'Thompson sampling + effectiveness data per variant. Proprietary optimization data.',
+          ],
+          [
+            'Case Study Export',
+            'Low',
+            'Simple feature but high conversion value. Social proof for sales.',
+          ],
         ].map(([cap, strength, why], i) => {
           const color =
             strength === 'Very High'
@@ -1213,7 +1291,7 @@ function CompetitiveMoat() {
               what: 'General-purpose LLM. Some firms ask it to "analyze for biases."',
               gap: 'Single model opinion (no noise measurement), no deterministic scoring, no outcome tracking, no org calibration, no PE-specific biases.',
               response:
-                '"That\'s one opinion from one model. We use 3 independent judges for noise measurement, a 20x20 bias interaction matrix for compound scoring, and an outcome flywheel that makes us smarter with every deal you close."',
+                '"That\'s one opinion from one model. We use 3 independent judges for noise measurement, a 20x20 bias interaction matrix for compound scoring, and an outcome flywheel that makes us smarter with every deal you close. Plus Chrome extension for real-time checking and Slack for meeting-time coaching."',
               color: '#a78bfa',
             },
           ].map((comp, i) => (
@@ -1706,6 +1784,40 @@ function MarketStrategy() {
           ))}
         </div>
       </div>
+
+      {/* GTM Assets (Recently Shipped) */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <Zap size={18} style={{ color: '#8b5cf6' }} /> GTM Assets Now Live
+        </div>
+        <ul
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary, #b4b4bc)',
+            lineHeight: 1.8,
+            paddingLeft: 16,
+          }}
+        >
+          <li>
+            <strong>Interactive Demo at /demo:</strong> Streaming simulation UX with 3 sample docs
+            (Nokia, Series B, Phoenix). No login required. Feels like the real product.
+          </li>
+          <li>
+            <strong>Data-Backed ROI Calculator:</strong> Landing page ROI section now pulls from{' '}
+            <code>/api/public/outcome-stats</code> — shows real outcome data when ≥10 exist,
+            Kahneman baselines otherwise.
+          </li>
+          <li>
+            <strong>Case Study Export:</strong> One-click &quot;Share as Case Study&quot; from any
+            analysis. Anonymized, branded, permanent links. Perfect for LP decks and sales
+            collateral.
+          </li>
+          <li>
+            <strong>Chrome Extension:</strong> Quick-score popup (&lt;5s) for real-time bias
+            checking from any webpage. Full analysis from sidepanel.
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }
@@ -1780,7 +1892,7 @@ function SalesToolkit() {
             {
               objection: '"How is this different from just asking ChatGPT?"',
               response:
-                "ChatGPT gives you one opinion from one model. We use 3 independent judges to measure noise, a 20x20 bias interaction matrix for compound scoring, 11 PE-specific biases that general models don't know to look for, and an outcome flywheel that makes us smarter with every deal you close. It's the difference between asking a friend and hiring a forensic auditor.",
+                "ChatGPT gives you one opinion from one model. We use 3 independent judges to measure noise, a 20x20 bias interaction matrix for compound scoring, 11 PE-specific biases that general models don't know to look for, and an outcome flywheel that makes us smarter with every deal you close. Plus Chrome extension for real-time checking and Slack for meeting-time coaching. It's the difference between asking a friend and hiring a forensic auditor.",
               tone: 'Technical credibility',
             },
             {
@@ -1812,6 +1924,12 @@ function SalesToolkit() {
               response:
                 'Small teams are actually more vulnerable to groupthink and authority bias — fewer voices means blind spots compound. Our Slack integration embeds cognitive coaching directly in your deal discussions, no workflow change required. Think of it as a silent partner who only speaks up when they spot a bias.',
               tone: 'Turn weakness into strength',
+            },
+            {
+              objection: '"Can I try it before committing?"',
+              response:
+                'Absolutely — visit /demo right now. Pick from 3 sample IC memos and watch the full 15-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own IC memos and we\'ll run a free pilot with full DQI scoring and bias reports.',
+              tone: 'Zero friction',
             },
           ].map((item, i) => (
             <div
@@ -1852,8 +1970,8 @@ function SalesToolkit() {
             step: 1,
             title: 'Setup (30 sec)',
             action:
-              'Open the dashboard. Have a sample IC memo ready — ideally one from a real deal that had a known outcome (good or bad).',
-            tip: 'If using their own memo, even better. If not, use the sample Acme Corp memo.',
+              'Open the dashboard. Have a sample IC memo ready — ideally one from a real deal that had a known outcome (good or bad). Alternative: open /demo for a no-login streaming simulation with 3 pre-loaded samples.',
+            tip: 'If using their own memo, even better. If not, the /demo page has Nokia, Series B, and Phoenix samples with full streaming UX.',
           },
           {
             step: 2,
@@ -1975,7 +2093,7 @@ function SalesToolkit() {
             {
               audience: 'VC Partner (30 sec)',
               pitch:
-                "We detect 31 cognitive biases in investment documents — 11 specific to PE/VC like anchoring to entry price and winner's curse. Our Boardroom Simulation creates virtual IC members who vote on your thesis. It usually surfaces the objection nobody in the room raised.",
+                "We detect 31 cognitive biases in investment documents — 11 specific to PE/VC like anchoring to entry price and winner's curse. Our Boardroom Simulation creates virtual IC members who vote on your thesis. Plus a Chrome extension for real-time bias checking and Slack integration for meeting-time coaching. It usually surfaces the objection nobody in the room raised.",
             },
             {
               audience: 'Investor (60 sec)',
@@ -2245,6 +2363,43 @@ function LiveStats() {
             </div>
           </div>
         )}
+
+      {/* Demo Funnel (from analytics) */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <TrendingUp size={16} style={{ color: '#8b5cf6' }} /> Demo &amp; Conversion Funnel
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
+          Track with <code>trackEvent()</code> from <code>src/lib/analytics/track.ts</code>.
+          Query via <code>GET /api/analytics/events?name=demo_viewed</code>.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
+          {[
+            { event: 'demo_viewed', label: 'Demo Views' },
+            { event: 'demo_sample_selected', label: 'Sample Selected' },
+            { event: 'roi_calculator_used', label: 'ROI Calculated' },
+            { event: 'signup_started', label: 'Signup Started' },
+            { event: 'first_analysis_completed', label: 'First Analysis' },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{
+                padding: 8,
+                borderRadius: 8,
+                background: 'var(--bg-tertiary, #0a0a0a)',
+                textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>
+                {item.label}
+              </div>
+              <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+                {item.event}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Usage note */}
       <div style={{ ...card, borderLeft: '3px solid #3b82f6' }}>
@@ -3105,13 +3260,13 @@ function FounderPlaybook() {
             'Cross-org benchmarking — "Your confirmation bias rate is 85th percentile." Data network effect.',
           ],
           [
-            'Counterfactual UI Slider',
+            'Counterfactual UI Slider (SHIPPED)',
             'High',
             '3h',
             'Interactive: "If we removed anchoring, success probability: 62% → 78%." Board presentation gold.',
           ],
           [
-            'Decision Graph Explorer (D3)',
+            'Decision Graph Explorer (D3) (SHIPPED)',
             'Very High',
             '6h',
             'Visual force-directed graph. Makes hidden patterns viscerally obvious.',
@@ -3157,6 +3312,24 @@ function FounderPlaybook() {
             'High',
             '3h',
             'Strebulaev "Jockey vs Horse": detect when IC memos are 80% team pedigree / 20% fundamentals. Flag imbalanced theses.',
+          ],
+          [
+            'Analytics Dashboard UI',
+            'High',
+            '4h',
+            'Visualize product analytics events, demo funnel conversion',
+          ],
+          [
+            'Demo Conversion Tracking',
+            'High',
+            '2h',
+            'Track demo_viewed → signup → first_analysis funnel',
+          ],
+          [
+            'Extension Chrome Web Store',
+            'Very High',
+            '6h',
+            'Publish extension for frictionless distribution',
           ],
         ].map(([feat, impact, effort, why], i) => {
           const impactColor =

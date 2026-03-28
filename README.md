@@ -407,6 +407,8 @@ Click the Decision Intel bot in the Slack sidebar to see a live dashboard:
 - Outcome reports via `/di outcome` feed the calibration engine
 - Prior submissions via `/di prior` populate Decision Rooms with blind independent assessments
 
+Configure Slack in **Settings → Integrations** with the step-by-step setup guide, connection status indicators, and available slash commands documentation.
+
 ### Public API (v1)
 
 RESTful API for programmatic access to the platform:
@@ -851,6 +853,8 @@ src/
 │   │   ├── quality-predictor.ts   # Meeting health & quality prediction
 │   │   ├── transcribe.ts          # Transcription processing
 │   │   └── process.ts             # Meeting data processing pipeline
+│   ├── ai/                        # Multi-model router and providers (Gemini, Claude)
+│   ├── analytics/                 # Product event tracking
 │   ├── integrations/              # External platform integrations
 │   │   └── slack/
 │   │       └── handler.ts         # Slack event routing & signature verification
@@ -1025,6 +1029,10 @@ GOOGLE_API_KEY="your-gemini-api-key"
 # External APIs (optional — enables enhanced fact-checking)
 FINNHUB_API_KEY="your-finnhub-key"
 
+# Multi-Model AI Fallback (optional)
+ANTHROPIC_API_KEY="your-anthropic-api-key"   # Required for Claude fallback (when AI_FALLBACK_ENABLED=true)
+AI_FALLBACK_ENABLED="true"                   # Set to 'true' to enable Gemini → Claude failover
+
 # Slack Integration (optional)
 SLACK_CLIENT_ID="your-slack-client-id"
 SLACK_CLIENT_SECRET="your-slack-client-secret"
@@ -1125,6 +1133,33 @@ Press `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux) to:
 ### Semantic Search
 
 Use `/dashboard/search` to find similar documents and analyses using vector similarity search powered by pgvector embeddings.
+
+### Browser Extension
+
+Install the Chrome extension from the `/extension/` directory for real-time bias checking:
+
+- **Quick Score** — Click the extension icon for a <5 second bias-only scan of the current page
+- **Full Analysis** — Open the side panel for a complete 15-agent pipeline analysis
+- **Inline Annotations** — Content script highlights detected biases directly on the page
+
+Load as an unpacked extension in Chrome Developer Mode. See `extension/README.md` for detailed setup.
+
+### A/B Prompt Testing
+
+Navigate to `/dashboard/experiments` to:
+
+- Create experiments with 2-10 prompt variants and custom traffic splits
+- Monitor per-variant effectiveness rates, impressions, and belief delta
+- Auto-optimize traffic allocation via Thompson sampling
+- Declare winners when statistical significance is reached
+
+### Case Study Export
+
+From any analysis, click "Share as Case Study" in the share modal to:
+
+- Generate a permanently shareable, anonymized analysis link
+- Brand with DQI badge, bias summary, coaching excerpts, and CTA
+- Use for LP reporting, sales collateral, and social proof
 
 ---
 
@@ -1263,6 +1298,16 @@ Or connect your GitHub repository to Vercel for automatic deployments on push.
 - [x] **PE/VC Investment Vertical** — Deal pipeline, document type classification, 11 PE-specific biases, deal-stage overlays, IC simulation with PE personas
 - [x] **Deal Pipeline & Outcome Tracking** — Full deal lifecycle (screening → exit) with IRR/MOIC outcome recording that feeds causal AI flywheel
 - [x] **Investment-Specific Compound Scoring** — Auto-escalated monetary stakes for deal-linked documents, deal-stage-aware risk weighting
+- [x] **Enhanced Public Demo** — Streaming simulation UX with 3 sample documents, DQI badge animation, no login required
+- [x] **Data-Backed ROI Calculator** — Live outcome statistics replace hardcoded research baselines when sufficient data exists
+- [x] **Case Study Export** — One-click anonymized, branded shareable analyses with permanent links
+- [x] **Browser Extension** — Chrome extension with quick-score popup (<5s) and full analysis sidepanel, dedicated API routes
+- [x] **A/B Prompt Testing** — Experiment CRUD, Thompson sampling auto-optimization, per-variant effectiveness dashboard
+- [x] **Multi-Model Fallback** — Gemini → Claude failover routing with unified response interface
+- [x] **Graph Health Monitoring** — Real-time knowledge graph density, isolated nodes, and anti-pattern tracking widget
+- [x] **Counterfactual Analysis API** — Alternative decision path computation with narrative explanations
+- [x] **Product Analytics** — Lightweight event tracking across conversion funnel with internal analytics API
+- [x] **Prompt Versioning** — SHA-256 deduplicated prompt tracking wired to analysis pipeline
 
 ### Planned
 
