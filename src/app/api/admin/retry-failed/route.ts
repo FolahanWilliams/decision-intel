@@ -27,9 +27,11 @@ export async function GET(_req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check admin status (implement proper role checking)
-    const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
-    const isAdmin = user.email && adminEmails.includes(user.email);
+    // Check admin status via ADMIN_EMAILS
+    const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e =>
+      e.trim().toLowerCase()
+    );
+    const isAdmin = user.email && adminEmails.includes(user.email.toLowerCase());
 
     if (!isAdmin) {
       log.warn(`Non-admin user ${user.id} attempted to access failed analyses`);
