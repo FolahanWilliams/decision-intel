@@ -14,6 +14,13 @@ interface DecisionRoom {
   participantCount: number;
   priorCount: number;
   createdAt: string;
+  decisionType?: string;
+  consensusScore?: number;
+  biasBriefing?: {
+    overallScore?: number;
+    biases?: Array<{ biasType: string; severity: string }>;
+    toxicCombinations?: Array<{ patternLabel: string }>;
+  };
 }
 
 // ─── Room List Card ─────────────────────────────────────────────────────────
@@ -28,6 +35,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
+  const [newDecisionType, setNewDecisionType] = useState('general');
   const [showCreate, setShowCreate] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,10 +68,12 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
           title: newTitle.trim(),
           documentId,
           analysisId,
+          decisionType: newDecisionType !== 'general' ? newDecisionType : undefined,
         }),
       });
       if (res.ok) {
         setNewTitle('');
+        setNewDecisionType('general');
         setShowCreate(false);
         fetchRooms();
       }
@@ -147,38 +157,61 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
             exit={{ height: 0, opacity: 0 }}
             style={{ overflow: 'hidden' }}
           >
-            <div style={{ padding: '12px 18px', display: 'flex', gap: '8px' }}>
-              <input
-                value={newTitle}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTitle(e.target.value)}
-                placeholder="Room title (e.g. Q4 Strategy Review)"
-                style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  fontSize: '13px',
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '8px',
-                  color: 'var(--text-primary)',
-                }}
-                onKeyDown={(e: React.KeyboardEvent) => e.key === 'Enter' && handleCreate()}
-              />
-              <button
-                onClick={handleCreate}
-                disabled={creating || !newTitle.trim()}
-                style={{
-                  padding: '8px 16px',
-                  background: newTitle.trim() ? '#a78bfa' : 'rgba(255,255,255,0.04)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  color: newTitle.trim() ? '#fff' : 'var(--text-muted)',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: creating ? 'wait' : 'pointer',
-                }}
-              >
-                {creating ? <Loader2 size={14} className="animate-spin" /> : 'Create'}
-              </button>
+            <div style={{ padding: '12px 18px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  value={newTitle}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTitle(e.target.value)}
+                  placeholder="Room title (e.g. Q4 Strategy Review)"
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    fontSize: '13px',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '8px',
+                    color: 'var(--text-primary)',
+                  }}
+                  onKeyDown={(e: React.KeyboardEvent) => e.key === 'Enter' && handleCreate()}
+                />
+                <select
+                  value={newDecisionType}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setNewDecisionType(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '8px',
+                    color: 'var(--text-secondary)',
+                    minWidth: '140px',
+                  }}
+                >
+                  <option value="general">General</option>
+                  <option value="investment_committee">Investment Committee</option>
+                  <option value="board_review">Board Review</option>
+                  <option value="deal_committee">Deal Committee</option>
+                  <option value="risk_committee">Risk Committee</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={handleCreate}
+                  disabled={creating || !newTitle.trim()}
+                  style={{
+                    padding: '8px 16px',
+                    background: newTitle.trim() ? '#a78bfa' : 'rgba(255,255,255,0.04)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: newTitle.trim() ? '#fff' : 'var(--text-muted)',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: creating ? 'wait' : 'pointer',
+                  }}
+                >
+                  {creating ? <Loader2 size={14} className="animate-spin" /> : 'Create'}
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
@@ -204,9 +237,25 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
               }}
             >
               <div>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  {room.title}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {room.title}
+                  </span>
+                  {room.decisionType && (
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        padding: '1px 6px',
+                        borderRadius: '4px',
+                        background: 'rgba(59, 130, 246, 0.1)',
+                        color: '#60a5fa',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {room.decisionType.replace(/_/g, ' ')}
+                    </span>
+                  )}
+                </div>
                 <div style={{ display: 'flex', gap: '12px', marginTop: '2px' }}>
                   <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                     <Users size={10} style={{ display: 'inline', marginRight: '3px' }} />
@@ -216,6 +265,16 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                     <Target size={10} style={{ display: 'inline', marginRight: '3px' }} />
                     {room.priorCount} priors submitted
                   </span>
+                  {room.biasBriefing && (
+                    <span style={{ fontSize: '11px', color: '#f59e0b' }}>
+                      {room.biasBriefing.biases?.length ?? 0} biases briefed
+                    </span>
+                  )}
+                  {room.consensusScore != null && (
+                    <span style={{ fontSize: '11px', color: room.consensusScore >= 60 ? '#22c55e' : '#f59e0b' }}>
+                      Consensus: {Math.round(room.consensusScore)}%
+                    </span>
+                  )}
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
