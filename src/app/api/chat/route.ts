@@ -8,12 +8,27 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { logAudit } from '@/lib/audit';
 import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
 
 const log = createLogger('ChatRoute');
 
 const MAX_MESSAGE_LENGTH = 10_000;
 const MAX_HISTORY_LENGTH = 20;
 const RAG_RESULT_LIMIT = 5;
+
+const ChatMessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string(),
+});
+
+const ChatRequestSchema = z.object({
+  message: z
+    .string()
+    .min(1, 'message is required')
+    .max(MAX_MESSAGE_LENGTH, `Message must be at most ${MAX_MESSAGE_LENGTH} characters`),
+  history: z.array(ChatMessageSchema).max(MAX_HISTORY_LENGTH).optional().default([]),
+  documentId: z.string().optional(),
+});
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -121,34 +136,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
-    const {
-      message,
-      history = [],
-      documentId,
-    } = body as { message: string; history?: ChatMessage[]; documentId?: string };
-
-    if (!message || typeof message !== 'string') {
-      return NextResponse.json({ error: 'message is required' }, { status: 400 });
+    const parsed = ChatRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      const firstError = parsed.error.issues[0]?.message || 'Invalid request';
+      return NextResponse.json({ error: firstError }, { status: 400 });
     }
-    if (message.length > MAX_MESSAGE_LENGTH) {
-      return NextResponse.json(
-        { error: `Message must be at most ${MAX_MESSAGE_LENGTH} characters` },
-        { status: 400 }
-      );
-    }
+    const { message, history = [], documentId } = parsed.data;
 
-    // Validate and truncate history
-    const safeHistory: ChatMessage[] = Array.isArray(history)
-      ? history
-          .filter(
-            (m): m is ChatMessage =>
-              typeof m === 'object' &&
-              m !== null &&
-              (m.role === 'user' || m.role === 'assistant') &&
-              typeof m.content === 'string'
-          )
-          .slice(-MAX_HISTORY_LENGTH)
-      : [];
+    // History already validated by Zod schema — take last N entries
+    const safeHistory: ChatMessage[] = history.slice(-MAX_HISTORY_LENGTH);
 
     // 1. RAG retrieval — search for relevant documents (or scope to pinned doc)
     let ragResults: Array<{

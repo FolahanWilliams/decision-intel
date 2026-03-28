@@ -3147,7 +3147,7 @@ function FounderPlaybook() {
 // ─── Main Page ──────────────────────────────────────────────────────────────
 
 // Password for founder-only access. Set via env var or hardcode for simplicity.
-const FOUNDER_PASS = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS || 'decisionintel2024';
+const FOUNDER_PASS = process.env.NEXT_PUBLIC_FOUNDER_HUB_PASS || '';
 
 export default function FounderHubPage() {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
@@ -3156,6 +3156,10 @@ export default function FounderHubPage() {
   const [passError, setPassError] = useState(false);
 
   const handleUnlock = useCallback(() => {
+    if (!FOUNDER_PASS) {
+      setPassError(true);
+      return;
+    }
     if (passInput === FOUNDER_PASS) {
       setUnlocked(true);
       setPassError(false);

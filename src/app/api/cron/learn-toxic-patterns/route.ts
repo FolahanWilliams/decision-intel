@@ -29,10 +29,14 @@ function safeCompare(a: string, b: string): boolean {
 }
 
 export async function GET(req: NextRequest) {
-  // Verify cron secret
-  const authHeader = req.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && (!authHeader || !safeCompare(authHeader, `Bearer ${cronSecret}`))) {
+  // Verify cron secret — required, not optional
+  const cronSecret = process.env.CRON_SECRET?.trim();
+  if (!cronSecret) {
+    log.error('CRON_SECRET not configured — rejecting request');
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
+  }
+  const authHeader = req.headers.get('authorization') ?? '';
+  if (!safeCompare(authHeader, `Bearer ${cronSecret}`)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

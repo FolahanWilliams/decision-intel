@@ -6,6 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { authenticateApiRequest } from '@/lib/utils/api-auth';
+import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { getRouteSummaries, computePercentiles, getTotalRecorded } from '@/lib/utils/api-metrics';
 
@@ -15,7 +16,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
-  // Verify admin access
+  // Verify admin access via ADMIN_EMAILS
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e => e.trim().toLowerCase());
+  if (!user?.email || !adminEmails.includes(user.email.toLowerCase())) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   const url = new URL(request.url);
   const windowMinutes = parseInt(url.searchParams.get('window') || '5', 10);
   const windowMs = Math.min(windowMinutes, 60) * 60_000;
