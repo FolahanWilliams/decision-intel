@@ -26,17 +26,17 @@ const log = createLogger('ROIAttribution');
 const BIAS_LOSS_RATES: Record<string, number> = {
   'Anchoring Bias': 0.15,
   'Confirmation Bias': 0.12,
-  'Overconfidence': 0.18,
+  Overconfidence: 0.18,
   'Overconfidence Bias': 0.18,
-  'Planning Fallacy': 0.10,
+  'Planning Fallacy': 0.1,
   'Sunk Cost Bias': 0.08,
   'Sunk Cost Fallacy': 0.08,
   'Narrative Bias': 0.14,
   'Availability Bias': 0.09,
   'Availability Heuristic': 0.09,
-  'Groupthink': 0.11,
+  Groupthink: 0.11,
   'Authority Bias': 0.07,
-  'Survivorship Bias': 0.10,
+  'Survivorship Bias': 0.1,
   'Commitment Escalation': 0.13,
   'Status Quo Bias': 0.06,
   'Loss Aversion': 0.08,
@@ -144,7 +144,7 @@ export async function computeROIAttribution(dealId: string): Promise<ROIAttribut
     }
 
     // Build breakdown
-    const breakdown: BiasAttribution[] = allBiases.map((bias) => {
+    const breakdown: BiasAttribution[] = allBiases.map(bias => {
       const confirmed = allConfirmed.has(bias.biasType);
       const lossRate = BIAS_LOSS_RATES[bias.biasType] ?? DEFAULT_LOSS_RATE;
       // Only confirmed biases contribute to value protected
@@ -157,11 +157,11 @@ export async function computeROIAttribution(dealId: string): Promise<ROIAttribut
       };
     });
 
-    const confirmedCount = breakdown.filter((b) => b.confirmed).length;
+    const confirmedCount = breakdown.filter(b => b.confirmed).length;
     const biasImpactRate = allBiases.length > 0 ? confirmedCount / allBiases.length : 0;
 
     // Correction factor: weighted average loss rate of confirmed biases
-    const confirmedBreakdown = breakdown.filter((b) => b.confirmed);
+    const confirmedBreakdown = breakdown.filter(b => b.confirmed);
     const correctionFactor =
       confirmedBreakdown.length > 0
         ? confirmedBreakdown.reduce((sum, b) => sum + b.lossRate, 0) / confirmedBreakdown.length

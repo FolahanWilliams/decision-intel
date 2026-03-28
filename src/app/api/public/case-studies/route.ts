@@ -114,9 +114,6 @@ export async function GET() {
     );
   } catch (err) {
     log.error('Failed to fetch case studies:', err);
-    return NextResponse.json(
-      { caseStudies: [], count: 0 },
-      { headers: CACHE_HEADERS }
-    );
+    return NextResponse.json({ caseStudies: [], count: 0 }, { headers: CACHE_HEADERS });
   }
 }

@@ -218,9 +218,7 @@ export async function POST(request: NextRequest) {
     // cuid as the storage filename, making the path deterministic for
     // later deletion: ${userId}/${document.id}${ext}
     // Falls back to plain create if contentHash column is missing (schema drift).
-    const encryptedFields = isDocumentEncryptionEnabled()
-      ? encryptDocumentContent(content)
-      : {};
+    const encryptedFields = isDocumentEncryptionEnabled() ? encryptDocumentContent(content) : {};
     let document;
     try {
       document = await prisma.document.create({

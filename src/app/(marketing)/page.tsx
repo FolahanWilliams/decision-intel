@@ -484,8 +484,8 @@ function CaseStudiesSection() {
 
   useEffect(() => {
     fetch('/api/public/case-studies')
-      .then((r) => r.json())
-      .then((d) => {
+      .then(r => r.json())
+      .then(d => {
         setCaseStudies(d.caseStudies || []);
         setLoaded(true);
       })
@@ -516,7 +516,11 @@ function CaseStudiesSection() {
   }
 
   return (
-    <section id="case-studies" className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
+    <section
+      id="case-studies"
+      className="py-28 relative"
+      style={{ background: 'var(--bg-primary)' }}
+    >
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -535,13 +539,13 @@ function CaseStudiesSection() {
             Real Results from Real Deals
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.7 }}>
-            Anonymized case studies from IC memos analyzed by the Decision Intel pipeline.
-            Every bias detection was later validated against actual deal outcomes.
+            Anonymized case studies from IC memos analyzed by the Decision Intel pipeline. Every
+            bias detection was later validated against actual deal outcomes.
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {caseStudies.map((study) => (
+          {caseStudies.map(study => (
             <motion.div
               key={study.token}
               initial={{ opacity: 0, y: 20 }}
@@ -1170,8 +1174,8 @@ export default function LandingPage() {
               >
                 When Kahneman studied insurance underwriters, executives expected 10% variance
                 between them. The actual number was 55%. The same pattern exists in your IC process
-                — when two partners review the same deal, their recommendations diverge by 40&ndash;60%.
-                Not because of different information. Because of uncontrolled noise.
+                — when two partners review the same deal, their recommendations diverge by
+                40&ndash;60%. Not because of different information. Because of uncontrolled noise.
               </p>
               <div
                 style={{
@@ -1235,8 +1239,8 @@ export default function LandingPage() {
               >
                 Noise is bad enough on its own. But cognitive biases make it directional —
                 anchoring, confirmation bias, and groupthink don&apos;t just add randomness. They
-                systematically push decisions in the wrong direction. The combination of noise + bias
-                is what turns a $50M deal into a $50M loss.
+                systematically push decisions in the wrong direction. The combination of noise +
+                bias is what turns a $50M deal into a $50M loss.
               </p>
               <div
                 style={{
@@ -2001,10 +2005,10 @@ export default function LandingPage() {
                     lineHeight: 1.7,
                   }}
                 >
-                  Three independent AI judges score every memo blind. We measure the variance between
-                  them to quantify how much &ldquo;noise&rdquo; — unwanted variability — exists in
-                  your IC process. Every AI tool claims to detect bias. Almost nobody measures
-                  decision noise with a triple-judge methodology.
+                  Three independent AI judges score every memo blind. We measure the variance
+                  between them to quantify how much &ldquo;noise&rdquo; — unwanted variability —
+                  exists in your IC process. Every AI tool claims to detect bias. Almost nobody
+                  measures decision noise with a triple-judge methodology.
                 </p>
               </div>
               <div style={{ padding: '0 32px', paddingBottom: 0, zIndex: 1 }}>
@@ -2058,7 +2062,9 @@ export default function LandingPage() {
                     <br />
                     <span style={{ color: '#FFFFFF' }}>&quot;variance&quot;</span>:{' '}
                     <span style={{ color: '#ef4444' }}>14.2</span> &nbsp;
-                    <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>{'// high noise'}</span>
+                    <span style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
+                      {'// high noise'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -2428,7 +2434,6 @@ export default function LandingPage() {
               </div>
             </div>
           </motion.div>
-
         </div>
       </section>
 
@@ -2803,32 +2808,38 @@ export default function LandingPage() {
               {
                 icon: Shield,
                 title: 'AES-256 Encryption at Rest',
-                description: 'Every document is encrypted using AES-256-GCM before it touches the database. Your content is never stored in plaintext.',
+                description:
+                  'Every document is encrypted using AES-256-GCM before it touches the database. Your content is never stored in plaintext.',
               },
               {
                 icon: Lock,
                 title: 'TLS 1.3 in Transit',
-                description: 'All data is encrypted in transit with TLS 1.3 and HSTS enforcement. No exceptions, no downgrades.',
+                description:
+                  'All data is encrypted in transit with TLS 1.3 and HSTS enforcement. No exceptions, no downgrades.',
               },
               {
                 icon: Eye,
                 title: 'Automatic PII Redaction',
-                description: 'Personally identifiable information is detected and redacted before analysis. Sensitive details never reach the AI pipeline.',
+                description:
+                  'Personally identifiable information is detected and redacted before analysis. Sensitive details never reach the AI pipeline.',
               },
               {
                 icon: Brain,
                 title: 'Your Data Never Trains Models',
-                description: 'Document content is never used to train or fine-tune any AI model. Your proprietary deal intelligence stays yours.',
+                description:
+                  'Document content is never used to train or fine-tune any AI model. Your proprietary deal intelligence stays yours.',
               },
               {
                 icon: FileSearch,
                 title: 'GDPR Right-to-Erasure',
-                description: 'Full data deletion on request — documents, analyses, embeddings, and audit logs. Atomic transaction, no residual data.',
+                description:
+                  'Full data deletion on request — documents, analyses, embeddings, and audit logs. Atomic transaction, no residual data.',
               },
               {
                 icon: CheckCircle2,
                 title: 'SOC 2 Certified Infrastructure',
-                description: 'Hosted on SOC 2 Type II certified infrastructure (Vercel + Supabase). Row-level access controls and audit logging.',
+                description:
+                  'Hosted on SOC 2 Type II certified infrastructure (Vercel + Supabase). Row-level access controls and audit logging.',
               },
             ].map((item, i) => (
               <motion.div
@@ -3433,8 +3444,8 @@ export default function LandingPage() {
             }}
           >
             All paid plans include a 14-day free trial. No credit card required to start. The
-            average mid-market PE fund loses $23M per vintage year to bias-driven decisions. Decision
-            Intel costs less than 0.1% of that.
+            average mid-market PE fund loses $23M per vintage year to bias-driven decisions.
+            Decision Intel costs less than 0.1% of that.
           </motion.p>
         </div>
       </section>
@@ -3468,8 +3479,8 @@ export default function LandingPage() {
                 marginBottom: '40px',
               }}
             >
-              For qualified PE/VC funds ($100M+ AUM). See the bias engine in action on your real deal
-              flow before committing.
+              For qualified PE/VC funds ($100M+ AUM). See the bias engine in action on your real
+              deal flow before committing.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-10">
@@ -3490,7 +3501,7 @@ export default function LandingPage() {
                   title: 'Calibration Report',
                   desc: 'At 30 days, receive a full calibration report: bias patterns, noise levels, and ROI projections.',
                 },
-              ].map((item) => (
+              ].map(item => (
                 <div
                   key={item.title}
                   className="rounded-xl border border-white/10 bg-white/[0.03] p-5"
@@ -3501,7 +3512,9 @@ export default function LandingPage() {
                   >
                     {item.title}
                   </h3>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                  <p
+                    style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6 }}
+                  >
                     {item.desc}
                   </p>
                 </div>

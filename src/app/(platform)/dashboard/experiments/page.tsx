@@ -533,97 +533,97 @@ export default function ExperimentsDashboard() {
 
   return (
     <ErrorBoundary sectionName="A/B Prompt Testing">
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">A/B Prompt Testing</h1>
-          <p className="text-zinc-500 text-sm mt-1">
-            Test nudge variants and auto-optimize with Thompson sampling
-          </p>
-        </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
-        >
-          New Experiment
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="text-center py-12 text-zinc-400">Loading experiments...</div>
-      ) : sorted.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-zinc-400 mb-4">No experiments yet</p>
+      <div className="max-w-4xl mx-auto py-8 px-4">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold">A/B Prompt Testing</h1>
+            <p className="text-zinc-500 text-sm mt-1">
+              Test nudge variants and auto-optimize with Thompson sampling
+            </p>
+          </div>
           <button
             onClick={() => setShowCreate(true)}
-            className="text-blue-600 hover:text-blue-700 text-sm"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
           >
-            Create your first experiment
+            New Experiment
           </button>
         </div>
-      ) : (
-        <div className="border rounded-xl overflow-hidden dark:border-zinc-700">
-          <table className="w-full">
-            <thead className="bg-zinc-50 dark:bg-zinc-800">
-              <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                  Name
-                </th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                  Type
-                </th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                  Status
-                </th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                  Variants
-                </th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                  Created
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y dark:divide-zinc-700">
-              {sorted.map(exp => (
-                <tr
-                  key={exp.id}
-                  onClick={() => setSelected(exp)}
-                  className="hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
-                >
-                  <td className="px-4 py-3 text-sm font-medium">{exp.name}</td>
-                  <td className="px-4 py-3 text-sm text-zinc-500">{exp.nudgeType}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        exp.status === 'active'
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                          : exp.status === 'paused'
-                            ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                            : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'
-                      }`}
-                    >
-                      {exp.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-zinc-500">
-                    {Array.isArray(exp.variants) ? exp.variants.length : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-zinc-400">
-                    {new Date(exp.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
 
-      <CreateExperimentModal
-        open={showCreate}
-        onClose={() => setShowCreate(false)}
-        onCreated={fetchExperiments}
-      />
-    </div>
+        {loading ? (
+          <div className="text-center py-12 text-zinc-400">Loading experiments...</div>
+        ) : sorted.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-zinc-400 mb-4">No experiments yet</p>
+            <button
+              onClick={() => setShowCreate(true)}
+              className="text-blue-600 hover:text-blue-700 text-sm"
+            >
+              Create your first experiment
+            </button>
+          </div>
+        ) : (
+          <div className="border rounded-xl overflow-hidden dark:border-zinc-700">
+            <table className="w-full">
+              <thead className="bg-zinc-50 dark:bg-zinc-800">
+                <tr>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                    Name
+                  </th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                    Type
+                  </th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                    Status
+                  </th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                    Variants
+                  </th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                    Created
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y dark:divide-zinc-700">
+                {sorted.map(exp => (
+                  <tr
+                    key={exp.id}
+                    onClick={() => setSelected(exp)}
+                    className="hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  >
+                    <td className="px-4 py-3 text-sm font-medium">{exp.name}</td>
+                    <td className="px-4 py-3 text-sm text-zinc-500">{exp.nudgeType}</td>
+                    <td className="px-4 py-3 text-sm">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          exp.status === 'active'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            : exp.status === 'paused'
+                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                              : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'
+                        }`}
+                      >
+                        {exp.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-500">
+                      {Array.isArray(exp.variants) ? exp.variants.length : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-400">
+                      {new Date(exp.createdAt).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <CreateExperimentModal
+          open={showCreate}
+          onClose={() => setShowCreate(false)}
+          onCreated={fetchExperiments}
+        />
+      </div>
     </ErrorBoundary>
   );
 }

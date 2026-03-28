@@ -125,7 +125,9 @@ export async function GET(request: NextRequest) {
       // DecisionOutcome table may not exist
     }
 
-    const documentContent = analysis.document ? getDocumentContent(analysis.document as Parameters<typeof getDocumentContent>[0]) : '';
+    const documentContent = analysis.document
+      ? getDocumentContent(analysis.document as Parameters<typeof getDocumentContent>[0])
+      : '';
     const wordCount = documentContent.split(/\s+/).filter(Boolean).length;
 
     const dqiInput: DQIInput = {

@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Interactive Demo — See Cognitive Bias Auditing in Action',
+  title: 'Watch Demo ��� Decision Intel Cognitive Bias Auditing',
   description:
-    'Explore a live cognitive bias audit of real-world decisions. See how Decision Intel detects biases, logical fallacies, and decision noise in case studies like the Microsoft-Nokia acquisition.',
+    'Watch a walkthrough of Decision Intel auditing real IC memos for cognitive bias, or try the interactive demo with real-world case studies. No login required.',
   openGraph: {
-    title: 'Decision Intel — Interactive Demo',
+    title: 'Decision Intel — Watch the Demo',
     description:
-      'Explore a live cognitive bias audit. See biases, logical fallacies, and decision noise detected in real-world case studies.',
+      'See cognitive bias auditing in action on real PE/VC deal documents. Interactive demo included.',
     url: '/demo',
   },
 };

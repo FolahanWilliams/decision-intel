@@ -67,69 +67,47 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Atomic upsert + deal status update in a single transaction
-    // DealOutcome model may not exist yet (schema drift) — wrap in try/catch
-    try {
-      const outcome = await prisma.$transaction(async (tx: unknown) => {
-        const result = await (
-          tx as Record<string, { upsert: (args: unknown) => Promise<unknown> }>
-        ).dealOutcome.upsert({
-          where: { dealId },
-          create: {
-            dealId,
-            irr: parsed.data.irr,
-            moic: parsed.data.moic,
-            exitType: parsed.data.exitType,
-            exitValue: parsed.data.exitValue,
-            holdPeriod: parsed.data.holdPeriod,
-            notes: parsed.data.notes,
-          },
-          update: {
-            irr: parsed.data.irr,
-            moic: parsed.data.moic,
-            exitType: parsed.data.exitType,
-            exitValue: parsed.data.exitValue,
-            holdPeriod: parsed.data.holdPeriod,
-            notes: parsed.data.notes,
-          },
-        });
-
-        // If exit data provided, update deal status atomically
-        if (parsed.data.exitType) {
-          await (tx as { deal: { update: (args: unknown) => Promise<unknown> } }).deal.update({
-            where: { id: dealId },
-            data: {
-              status: parsed.data.exitType === 'write_off' ? 'written_off' : 'exited',
-              exitDate: new Date(),
-            },
-          });
-        }
-
-        return result;
+    const outcome = await prisma.$transaction(async tx => {
+      const result = await tx.dealOutcome.upsert({
+        where: { dealId },
+        create: {
+          dealId,
+          irr: parsed.data.irr,
+          moic: parsed.data.moic,
+          exitType: parsed.data.exitType,
+          exitValue: parsed.data.exitValue,
+          holdPeriod: parsed.data.holdPeriod,
+          notes: parsed.data.notes,
+        },
+        update: {
+          irr: parsed.data.irr,
+          moic: parsed.data.moic,
+          exitType: parsed.data.exitType,
+          exitValue: parsed.data.exitValue,
+          holdPeriod: parsed.data.holdPeriod,
+          notes: parsed.data.notes,
+        },
       });
 
-      log.info(
-        `Deal outcome recorded: deal=${dealId}, IRR=${parsed.data.irr}, MOIC=${parsed.data.moic}`
-      );
-
-      return NextResponse.json(outcome, { status: 201 });
-    } catch (driftErr: unknown) {
-      const code = (driftErr as { code?: string })?.code;
-      if (code === 'P2021' || code === 'P2022') {
-        log.warn('DealOutcome model not available (schema drift), storing on deal directly');
-        // Fallback: update the deal record with exit info only
-        if (parsed.data.exitType) {
-          await prisma.deal.update({
-            where: { id: dealId },
-            data: {
-              status: parsed.data.exitType === 'write_off' ? 'written_off' : 'exited',
-              exitDate: new Date(),
-            },
-          });
-        }
-        return NextResponse.json({ dealId, ...parsed.data }, { status: 201 });
+      // If exit data provided, update deal status atomically
+      if (parsed.data.exitType) {
+        await tx.deal.update({
+          where: { id: dealId },
+          data: {
+            status: parsed.data.exitType === 'write_off' ? 'written_off' : 'exited',
+            exitDate: new Date(),
+          },
+        });
       }
-      throw driftErr;
-    }
+
+      return result;
+    });
+
+    log.info(
+      `Deal outcome recorded: deal=${dealId}, IRR=${parsed.data.irr}, MOIC=${parsed.data.moic}`
+    );
+
+    return NextResponse.json(outcome, { status: 201 });
   } catch (error) {
     log.error('Failed to create deal outcome:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

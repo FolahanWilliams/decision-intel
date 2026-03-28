@@ -267,9 +267,7 @@ async function processFilesAsync(
       }
 
       // Save document (with encryption if key is configured)
-      const encFields = isDocumentEncryptionEnabled()
-        ? encryptDocumentContent(content)
-        : {};
+      const encFields = isDocumentEncryptionEnabled() ? encryptDocumentContent(content) : {};
       const doc = await prisma.document.create({
         data: {
           userId,
