@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { testDatabaseConnection, getPoolStats, prisma } from '@/lib/prisma';
 import { getCacheStats } from '@/lib/utils/cache';
 import { createLogger } from '@/lib/utils/logger';
+import { getOptionalEnvVar } from '@/lib/env';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const log = createLogger('HealthRoute');
@@ -25,8 +26,9 @@ async function checkLLMHealth(): Promise<{ status: string; model?: string; error
       return { status: 'misconfigured', error: 'Missing API key' };
     }
 
+    const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: modelName });
 
     // Lightweight check - just verify model is accessible
     await model.generateContent({
@@ -35,7 +37,7 @@ async function checkLLMHealth(): Promise<{ status: string; model?: string; error
 
     const health = {
       status: 'healthy',
-      model: 'gemini-1.5-flash',
+      model: modelName,
     };
 
     healthCache.set('llm', { data: health, expires: Date.now() + CACHE_TTL });

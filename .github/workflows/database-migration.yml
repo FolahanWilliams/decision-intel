@@ -41,15 +41,14 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-        continue-on-error: true
 
       - name: Manual migration notice
-        if: steps.migrate.outcome == 'failure'
+        if: failure()
         run: |
           echo "⚠️ Automatic migration failed. This is likely due to network timeouts."
           echo "The application will still work - run migrations manually in Supabase SQL Editor if needed:"
           echo "https://supabase.com/dashboard/project/YOUR_PROJECT_ID/sql"
 
       - name: Notify success
-        if: steps.migrate.outcome == 'success'
+        if: success()
         run: echo "✅ Database migrations applied successfully"

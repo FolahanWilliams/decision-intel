@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import {
   Rocket,
   Brain,
@@ -3323,6 +3324,7 @@ export default function FounderHubPage() {
   };
 
   return (
+    <ErrorBoundary sectionName="Founder Hub">
     <div className="max-w-6xl mx-auto px-4 py-6">
       {/* Header */}
       <header style={{ marginBottom: 24 }}>
@@ -3389,6 +3391,7 @@ export default function FounderHubPage() {
       {/* AI Chat Widget */}
       <FounderChatWidget />
     </div>
+    </ErrorBoundary>
   );
 }
 

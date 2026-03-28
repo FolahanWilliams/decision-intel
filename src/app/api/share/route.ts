@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.issues[0].message }, { status: 400 });
+      return NextResponse.json({ error: 'Validation failed' }, { status: 400 });
     }
     log.error('Failed to create share link:', error);
     return NextResponse.json({ error: 'Failed to create share link' }, { status: 500 });

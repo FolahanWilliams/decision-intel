@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 import { GoogleGenerativeAI, type Tool } from '@google/generative-ai';
-import { getRequiredEnvVar } from '@/lib/env';
+import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { logAudit } from '@/lib/audit';
@@ -15,7 +15,7 @@ const log = createLogger('TrendsAnalyzeRoute');
 function getMarketAnalystModel() {
   const genAI = new GoogleGenerativeAI(getRequiredEnvVar('GOOGLE_API_KEY'));
   return genAI.getGenerativeModel({
-    model: 'gemini-3-flash-preview', // Fast, Supports Tools
+    model: getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'),
     tools: [{ googleSearch: {} } as Tool],
     generationConfig: {
       responseMimeType: 'application/json',
@@ -150,7 +150,7 @@ export async function POST() {
       provider: 'google',
       operation: 'market_analysis',
       tokens: prompt.length + responseText.length,
-      cost: estimateCost('gemini-2.0-flash', prompt.length, responseText.length),
+      cost: estimateCost(getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview'), prompt.length, responseText.length),
       metadata: { topics: activeTopics },
     });
 

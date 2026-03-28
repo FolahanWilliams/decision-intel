@@ -212,9 +212,12 @@ export function useCopilotStream(): UseCopilotStreamReturn {
     setIsStreaming(false);
     setActiveAgent(null);
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       // Fetch session turns
-      const res = await fetch(`/api/copilot/sessions/${id}`);
+      const res = await fetch(`/api/copilot/sessions/${id}`, { signal: controller.signal });
       if (!res.ok) throw new Error('Failed to load session');
       const data = await res.json();
 

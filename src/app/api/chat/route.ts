@@ -138,8 +138,7 @@ export async function POST(request: NextRequest) {
 
     const parsed = ChatRequestSchema.safeParse(body);
     if (!parsed.success) {
-      const firstError = parsed.error.issues[0]?.message || 'Invalid request';
-      return NextResponse.json({ error: firstError }, { status: 400 });
+      return NextResponse.json({ error: 'Validation failed' }, { status: 400 });
     }
     const { message, history = [], documentId } = parsed.data;
 

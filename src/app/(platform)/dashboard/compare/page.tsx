@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useDocuments } from '@/hooks/useDocuments';
 import { GitCompareArrows, Plus, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
@@ -90,6 +91,7 @@ export default function ComparePage() {
   };
 
   return (
+    <ErrorBoundary sectionName="Compare Analyses">
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Compare Analyses</h1>
@@ -361,5 +363,6 @@ export default function ComparePage() {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

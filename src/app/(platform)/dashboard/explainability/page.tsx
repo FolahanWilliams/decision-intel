@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense, useCallback } from 'react';
 import useSWR from 'swr';
 import { FileText, BarChart3, Calendar, Loader2, AlertTriangle } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ExplainabilityDashboard } from '@/components/explainability/ExplainabilityDashboard';
 
 interface Analysis {
@@ -285,14 +286,16 @@ function ExplainabilityContent() {
 
 export default function ExplainabilityPage() {
   return (
-    <Suspense
-      fallback={
-        <div style={{ padding: 'var(--spacing-xl)', textAlign: 'center' }}>
-          <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
-        </div>
-      }
-    >
-      <ExplainabilityContent />
-    </Suspense>
+    <ErrorBoundary sectionName="Explainability">
+      <Suspense
+        fallback={
+          <div style={{ padding: 'var(--spacing-xl)', textAlign: 'center' }}>
+            <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
+          </div>
+        }
+      >
+        <ExplainabilityContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BarChart3, Dna } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TabBar } from '@/components/ui/TabBar';
 import { InsightsPageContent } from '@/components/insights/InsightsPageContent';
@@ -44,8 +45,10 @@ function AnalyticsInner() {
 
 export default function AnalyticsPage() {
   return (
-    <Suspense fallback={null}>
-      <AnalyticsInner />
-    </Suspense>
+    <ErrorBoundary sectionName="Analytics">
+      <Suspense fallback={null}>
+        <AnalyticsInner />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

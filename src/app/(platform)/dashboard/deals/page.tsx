@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Plus, LayoutList, LayoutGrid, FileText, Filter, X, AlertTriangle } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useDeals } from '@/hooks/useDeals';
 import { useUrlFilters } from '@/hooks/useUrlFilters';
@@ -104,6 +105,7 @@ export default function DealsPage() {
   }
 
   return (
+    <ErrorBoundary sectionName="Deal Pipeline">
     <div className="container" style={{ maxWidth: 1200, padding: '24px 20px' }}>
       {/* Header */}
       <div
@@ -494,5 +496,6 @@ export default function DealsPage() {
       {/* Deal Form Modal */}
       <DealFormModal open={showForm} onOpenChange={setShowForm} onSuccess={() => mutate()} />
     </div>
+    </ErrorBoundary>
   );
 }

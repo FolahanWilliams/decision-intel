@@ -22,7 +22,7 @@ model Document {
   orgId       String?
   documentType String?            // ic_memo | cim | pitch_deck | term_sheet | due_diligence | lp_report | other
   dealId      String?
-  deal        Deal?               @relation(fields: [dealId], references: [id])
+  deal        Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)
   analyses    Analysis[]
   embeddings  DecisionEmbedding[]
   failedAnalyses FailedAnalysis[]
@@ -65,7 +65,8 @@ model Analysis {
 
   // Version tracking and prompt reference
   version         Int             @default(1)
-  promptVersionId String?         // FK to PromptVersion used for this analysis
+  promptVersionId String?
+  promptVersion   PromptVersion?  @relation(fields: [promptVersionId], references: [id], onDelete: SetNull)
 
   // Outcome tracking — mandatory flywheel
   outcomeStatus   String          @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
@@ -250,6 +251,7 @@ model TeamMember {
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@unique([orgId, userId])
+  @@unique([orgId, email])
   @@index([orgId])
   @@index([userId])
 }
@@ -266,6 +268,7 @@ model TeamInvite {
   expiresAt       DateTime
   organization    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
+  @@unique([orgId, email])
   @@index([orgId])
   @@index([email])
   @@index([token])
@@ -318,7 +321,7 @@ model Meeting {
   humanDecisionId       String?            @unique
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
-  humanDecision         HumanDecision?     @relation(fields: [humanDecisionId], references: [id])
+  humanDecision         HumanDecision?     @relation(fields: [humanDecisionId], references: [id], onDelete: SetNull)
   transcript            MeetingTranscript?
 
   @@index([userId])
@@ -359,6 +362,8 @@ model HumanDecision {
   cognitiveAudit   CognitiveAudit?
   meeting          Meeting?
   nudges           Nudge[]
+  decisionFrames   DecisionFrame[]  @relation("DecisionFrameLinkedDecision")
+  journalEntries   JournalEntry[]   @relation("JournalLinkedDecision")
 
   @@index([userId])
   @@index([orgId])
@@ -410,10 +415,14 @@ model Nudge {
   severity        String         @default("info")
   triggerReason   String
   wasHelpful      Boolean?
-  experimentId    String?        // FK to NudgeExperiment
+  experimentId    String?
+  experiment      NudgeExperiment? @relation(fields: [experimentId], references: [id], onDelete: SetNull)
   variantId       String?        // Which variant was served
-  decisionFrameId String?        // FK to DecisionFrame for pre→post decision linking
-  parentNudgeId   String?        // Self-ref for escalation chains
+  decisionFrameId String?
+  decisionFrame   DecisionFrame? @relation(fields: [decisionFrameId], references: [id], onDelete: SetNull)
+  parentNudgeId   String?
+  parentNudge     Nudge?         @relation("NudgeEscalation", fields: [parentNudgeId], references: [id], onDelete: SetNull)
+  childNudges     Nudge[]        @relation("NudgeEscalation")
   phase           String         @default("post_decision") // "pre_decision" | "post_decision"
   failureCount  Int       @default(0)
   lastAttemptAt DateTime?
@@ -426,6 +435,8 @@ model Nudge {
   @@index([targetUserId])
   @@index([createdAt])
   @@index([experimentId])
+  @@index([decisionFrameId])
+  @@index([parentNudgeId])
   @@index([channel, deliveredAt, nextRetryAt])
 }
 
@@ -440,6 +451,7 @@ model NudgeExperiment {
   endedAt       DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  nudges        Nudge[]
 
   @@index([nudgeType])
   @@index([status])
@@ -481,6 +493,7 @@ model DecisionOutcome {
   updatedAt          DateTime @updatedAt
 
   analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  decisionRooms DecisionRoom[]
 
   @@index([analysisId])
   @@index([userId])
@@ -590,6 +603,7 @@ model PromptVersion {
   content     String   @db.Text
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
+  analyses    Analysis[]
 
   @@unique([name, version])
   @@index([name, isActive])
@@ -721,18 +735,21 @@ model DecisionFrame {
   documentId        String?  @unique
   threadTs          String?  // Slack thread timestamp for pre-decision monitoring
   channelId         String?  // Slack channel ID for thread tracking
-  linkedDecisionId  String?  // FK to HumanDecision when deliberation becomes decision
+  linkedDecisionId  String?
+  linkedDecision    HumanDecision? @relation("DecisionFrameLinkedDecision", fields: [linkedDecisionId], references: [id], onDelete: SetNull)
   nudgeCount        Int      @default(0) // How many nudges delivered in this thread
   escalationLevel   String   @default("none") // "none" | "info" | "warning" | "critical"
   accumulatedBiases Json?    // Array of {bias, signal, detectedAt} across all thread messages
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  document Document? @relation(fields: [documentId], references: [id])
+  document Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  nudges   Nudge[]
 
   @@index([userId])
   @@index([orgId])
   @@index([channelId, threadTs])
+  @@index([linkedDecisionId])
 }
 
 // ─── Deep Vertical Integration — Compliance (Moat 5) ─────────────────────
@@ -750,7 +767,8 @@ model DecisionRoom {
   decisionType  String?         // "investment_committee" | "board_review" | "deal_committee" | "risk_committee" | "general"
   consensusScore Float?         // 0-100, computed from blind prior convergence on close
   dissenterWeight Json?         // { userId: predictionAccuracy } — learned from outcomes
-  outcomeId     String?         // FK to DecisionOutcome for post-committee outcome tracking
+  outcomeId     String?
+  outcome       DecisionOutcome? @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
   biasBriefing  Json?           // Auto-generated pre-meeting bias context from linked analysis
   closedAt      DateTime?
   createdAt     DateTime        @default(now())
@@ -762,6 +780,7 @@ model DecisionRoom {
   @@index([orgId])
   @@index([status])
   @@index([decisionType])
+  @@index([outcomeId])
 }
 
 model RoomParticipant {
@@ -807,7 +826,8 @@ model JournalEntry {
   scheduledAt   DateTime? // for calendar events
   processedAt   DateTime?
   status        String   @default("pending") // pending, processed, dismissed
-  linkedDecisionId String? // FK to HumanDecision if converted
+  linkedDecisionId String?
+  linkedDecision   HumanDecision? @relation("JournalLinkedDecision", fields: [linkedDecisionId], references: [id], onDelete: SetNull)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

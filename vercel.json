@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/cron/sync-intelligence",
+      "path": "/api/cron/dispatch",
       "schedule": "0 0 * * *"
     }
   ]

@@ -3,6 +3,7 @@
 import { useState, useCallback, type ReactNode } from 'react';
 import { Search, FileText, Loader2, ArrowRight, TrendingUp, GitBranch } from 'lucide-react';
 import Link from 'next/link';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 
@@ -93,6 +94,7 @@ export default function SearchPage() {
   }, [query, showToast]);
 
   return (
+    <ErrorBoundary sectionName="Semantic Search">
     <div
       className="container"
       style={{
@@ -239,5 +241,6 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   );
 }

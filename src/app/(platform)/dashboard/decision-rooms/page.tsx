@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { Users, Target, Plus, ChevronLeft, ChevronRight, AlertTriangle, Loader2 } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface Room {
   id: string;
@@ -71,6 +72,7 @@ export default function DecisionRoomsPage() {
   ];
 
   return (
+    <ErrorBoundary sectionName="Decision Rooms">
     <div style={{ padding: 'var(--spacing-xl)', maxWidth: 1200, margin: '0 auto' }}>
       {/* Header */}
       <div className="flex items-center justify-between" style={{ marginBottom: 'var(--spacing-xl)' }}>
@@ -338,5 +340,6 @@ export default function DecisionRoomsPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   );
 }

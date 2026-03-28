@@ -1,5 +1,6 @@
 'use client';
 
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { use, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import {
@@ -201,6 +202,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
   ];
 
   return (
+    <ErrorBoundary sectionName="Meeting Detail">
     <div
       className="container"
       style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
@@ -1161,6 +1163,7 @@ export default function MeetingDetailPage({ params }: { params: Promise<{ id: st
         </div>
       )}
     </div>
+    </ErrorBoundary>
   );
 }
 

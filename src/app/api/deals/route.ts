@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
@@ -48,6 +49,15 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
     if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limit: 20 deal creations per hour
+    const rateLimitResult = await checkRateLimit(user.id, '/api/deals', {
+      windowMs: 60 * 60 * 1000,
+      maxRequests: 20,
+    });
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     // Resolve org membership
