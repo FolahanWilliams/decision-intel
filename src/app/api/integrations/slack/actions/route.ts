@@ -86,9 +86,8 @@ export async function POST(req: NextRequest) {
 
           // Fire-and-forget: adjust graph edge weights from feedback
           try {
-            const { adjustEdgeWeightsFromNudgeFeedback } = await import(
-              '@/lib/graph/edge-learning'
-            );
+            const { adjustEdgeWeightsFromNudgeFeedback } =
+              await import('@/lib/graph/edge-learning');
             void adjustEdgeWeightsFromNudgeFeedback(nudgeId, wasHelpful).catch(err => {
               log.warn('Edge weight adjustment from nudge feedback failed:', err);
             });

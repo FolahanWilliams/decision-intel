@@ -522,10 +522,7 @@ async function checkCommitteePriorGap(
     const rooms = await prisma.decisionRoom.findMany({
       where: {
         status: 'open',
-        OR: [
-          { analysisId: sourceRef },
-          { documentId: sourceRef },
-        ],
+        OR: [{ analysisId: sourceRef }, { documentId: sourceRef }],
       },
       select: {
         id: true,

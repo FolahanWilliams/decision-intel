@@ -530,7 +530,7 @@ export function getEscalatedSeverity(
 ): 'info' | 'warning' | 'critical' | null {
   if (newBiases.length === 0) return null;
 
-  let targetSeverity: typeof SEVERITY_ORDER[number];
+  let targetSeverity: (typeof SEVERITY_ORDER)[number];
   if (newBiases.length >= 3) {
     targetSeverity = 'critical';
   } else if (newBiases.length >= 2) {
@@ -539,7 +539,7 @@ export function getEscalatedSeverity(
     targetSeverity = 'info';
   }
 
-  const currentIdx = SEVERITY_ORDER.indexOf(currentLevel as typeof SEVERITY_ORDER[number]);
+  const currentIdx = SEVERITY_ORDER.indexOf(currentLevel as (typeof SEVERITY_ORDER)[number]);
   const targetIdx = SEVERITY_ORDER.indexOf(targetSeverity);
 
   // Only escalate upward

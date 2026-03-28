@@ -15,7 +15,7 @@ const MUTATION_METHODS = ['POST', 'PUT', 'DELETE', 'PATCH'];
 
 // Endpoints that are exempt from CSRF checks
 const EXEMPT_PATHS = [
-  '/api/integrations/slack/events', // Slack sends its own signature
+  '/api/integrations/slack/', // Slack sends its own HMAC signature verification
   '/api/cron/', // Uses Bearer token authentication
   '/api/health', // Read-only health check
   '/api/stripe/webhook', // Stripe sends its own signature verification

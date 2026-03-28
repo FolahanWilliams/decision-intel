@@ -266,7 +266,8 @@ export async function GET(req: NextRequest) {
           const accuracy = leaderboardEntry
             ? Math.round((leaderboardEntry[1].correct / leaderboardEntry[1].predictions) * 100)
             : null;
-          const accuracyStr = accuracy !== null ? ` Selected as most accurate ${accuracy}% of the time.` : '';
+          const accuracyStr =
+            accuracy !== null ? ` Selected as most accurate ${accuracy}% of the time.` : '';
 
           let narrative: string;
           if (t.sampleSize < 3) {

@@ -84,7 +84,9 @@ export async function analyzeDocument(
   // Run analysis within a transaction for atomicity
   try {
     // Resolve deal context for PE/VC investment vertical
-    let dealContext: { documentType?: string; dealId?: string; dealType?: string; dealStage?: string } | undefined;
+    let dealContext:
+      | { documentType?: string; dealId?: string; dealType?: string; dealStage?: string }
+      | undefined;
     try {
       const docType = (document as Record<string, unknown>).documentType as string | undefined;
       const docDealId = (document as Record<string, unknown>).dealId as string | undefined;
@@ -105,9 +107,16 @@ export async function analyzeDocument(
       // Schema drift — documentType/dealId columns or Deal table may not exist yet
     }
 
-    const result = await runAnalysis(document.content, documentId, document.userId, update => {
-      if (onProgress) onProgress(update);
-    }, document.orgId ?? undefined, dealContext);
+    const result = await runAnalysis(
+      document.content,
+      documentId,
+      document.userId,
+      update => {
+        if (onProgress) onProgress(update);
+      },
+      document.orgId ?? undefined,
+      dealContext
+    );
 
     // Store analysis in database with Schema Drift Protection
     const foundBiases = result.biases.filter(b => b.found);
@@ -432,12 +441,16 @@ export async function analyzeDocument(
         select: { id: true },
       });
       if (savedForWebhook) {
-        emitWebhookEvent('analysis.completed', {
-          analysisId: savedForWebhook.id,
-          documentId,
-          score: result.overallScore,
-          biasCount: foundBiases.length,
-        }, document.orgId ?? document.userId);
+        emitWebhookEvent(
+          'analysis.completed',
+          {
+            analysisId: savedForWebhook.id,
+            documentId,
+            score: result.overallScore,
+            biasCount: foundBiases.length,
+          },
+          document.orgId ?? document.userId
+        );
       }
     } catch (webhookError) {
       log.warn(

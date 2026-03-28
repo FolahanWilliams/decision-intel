@@ -26,7 +26,7 @@ interface BriefingData {
 // ─── Pre-Meeting Checklist ──────────────────────────────────────────────────
 
 const PRE_MEETING_CHECKLIST = [
-  { id: 'dissent', label: 'Assign a formal dissenter / devil\'s advocate' },
+  { id: 'dissent', label: "Assign a formal dissenter / devil's advocate" },
   { id: 'premortem', label: 'Run a pre-mortem: "Assume this failed — why?"' },
   { id: 'baserate', label: 'Review base-rate data for this decision type' },
   { id: 'criteria', label: 'Confirm success/failure criteria before voting' },
@@ -89,7 +89,9 @@ export default function BiasBriefing({ analysisId, roomTitle }: BiasBriefingProp
 
   if (!data) return null;
 
-  const criticalBiases = data.biases.filter(b => b.severity === 'critical' || b.severity === 'high');
+  const criticalBiases = data.biases.filter(
+    b => b.severity === 'critical' || b.severity === 'high'
+  );
   const hasToxic = data.toxicCombinations.length > 0;
 
   return (
@@ -124,9 +126,8 @@ export default function BiasBriefing({ analysisId, roomTitle }: BiasBriefingProp
             style={{
               padding: '8px 16px',
               borderRadius: 8,
-              background: data.overallScore >= 60
-                ? 'rgba(34, 197, 94, 0.08)'
-                : 'rgba(239, 68, 68, 0.08)',
+              background:
+                data.overallScore >= 60 ? 'rgba(34, 197, 94, 0.08)' : 'rgba(239, 68, 68, 0.08)',
               border: `1px solid ${data.overallScore >= 60 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
             }}
           >

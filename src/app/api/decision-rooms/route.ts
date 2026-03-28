@@ -60,7 +60,11 @@ export async function POST(request: NextRequest) {
           },
         });
         if (analysis) {
-          let toxicCombinations: Array<{ patternLabel: string | null; toxicScore: number; biasTypes: string[] }> = [];
+          let toxicCombinations: Array<{
+            patternLabel: string | null;
+            toxicScore: number;
+            biasTypes: string[];
+          }> = [];
           try {
             const toxics = await prisma.toxicCombination.findMany({
               where: { analysisId },
@@ -86,8 +90,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const VALID_DECISION_TYPES = ['investment_committee', 'board_review', 'deal_committee', 'risk_committee', 'general'];
-    const validType = decisionType && VALID_DECISION_TYPES.includes(decisionType) ? decisionType : null;
+    const VALID_DECISION_TYPES = [
+      'investment_committee',
+      'board_review',
+      'deal_committee',
+      'risk_committee',
+      'general',
+    ];
+    const validType =
+      decisionType && VALID_DECISION_TYPES.includes(decisionType) ? decisionType : null;
 
     const room = await prisma.decisionRoom.create({
       data: {
@@ -106,7 +117,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    log.info(`Decision room created: ${room.id} (type: ${validType ?? 'general'}) by user ${user.id}`);
+    log.info(
+      `Decision room created: ${room.id} (type: ${validType ?? 'general'}) by user ${user.id}`
+    );
     return NextResponse.json(room, { status: 201 });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

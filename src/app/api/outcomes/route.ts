@@ -185,9 +185,8 @@ export async function POST(req: NextRequest) {
           const successes = allOutcomes.filter(
             o => o.outcome === 'success' || o.outcome === 'partial_success'
           ).length;
-          const accuracyRate = allOutcomes.length > 0
-            ? Math.round((successes / allOutcomes.length) * 100)
-            : 0;
+          const accuracyRate =
+            allOutcomes.length > 0 ? Math.round((successes / allOutcomes.length) * 100) : 0;
 
           await prisma.calibrationMilestone.create({
             data: {
@@ -199,10 +198,14 @@ export async function POST(req: NextRequest) {
             },
           });
 
-          const levelName = totalOutcomes >= 30 ? 'Platinum'
-            : totalOutcomes >= 15 ? 'Gold'
-            : totalOutcomes >= 5 ? 'Silver'
-            : 'Bronze';
+          const levelName =
+            totalOutcomes >= 30
+              ? 'Platinum'
+              : totalOutcomes >= 15
+                ? 'Gold'
+                : totalOutcomes >= 5
+                  ? 'Silver'
+                  : 'Bronze';
 
           milestone = { level: levelName, value: totalOutcomes, metricAfter: accuracyRate };
           log.info(`Calibration milestone reached: ${totalOutcomes} outcomes for user ${user.id}`);

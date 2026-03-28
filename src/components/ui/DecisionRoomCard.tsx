@@ -157,7 +157,9 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
             exit={{ height: 0, opacity: 0 }}
             style={{ overflow: 'hidden' }}
           >
-            <div style={{ padding: '12px 18px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div
+              style={{ padding: '12px 18px', display: 'flex', flexDirection: 'column', gap: '8px' }}
+            >
               <div style={{ display: 'flex', gap: '8px' }}>
                 <input
                   value={newTitle}
@@ -176,7 +178,9 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                 />
                 <select
                   value={newDecisionType}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setNewDecisionType(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setNewDecisionType(e.target.value)
+                  }
                   style={{
                     padding: '8px 12px',
                     fontSize: '12px',
@@ -271,7 +275,12 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                     </span>
                   )}
                   {room.consensusScore != null && (
-                    <span style={{ fontSize: '11px', color: room.consensusScore >= 60 ? '#22c55e' : '#f59e0b' }}>
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        color: room.consensusScore >= 60 ? '#22c55e' : '#f59e0b',
+                      }}
+                    >
                       Consensus: {Math.round(room.consensusScore)}%
                     </span>
                   )}

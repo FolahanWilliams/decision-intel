@@ -27,7 +27,8 @@ interface TwinReportData {
 // ─── Narrative Generator ────────────────────────────────────────────────────
 
 function generateNarrative(twin: TwinEffectivenessEntry, accuracy: number | null): string {
-  const accuracyStr = accuracy !== null ? ` — selected as most accurate ${accuracy}% of the time` : '';
+  const accuracyStr =
+    accuracy !== null ? ` — selected as most accurate ${accuracy}% of the time` : '';
   if (twin.sampleSize < 3) {
     return `${twin.twinName} has dissented ${twin.dissentCount} time(s). More outcomes needed for reliable insights.`;
   }
@@ -128,8 +129,7 @@ export default function TwinEffectivenessReport({
         }}
       >
         <p style={{ color: 'var(--text-secondary, #b4b4bc)', fontSize: 14 }}>
-          Report outcomes to unlock twin accuracy insights. Need at least 3 outcomes with twin
-          data.
+          Report outcomes to unlock twin accuracy insights. Need at least 3 outcomes with twin data.
         </p>
       </div>
     );
@@ -202,7 +202,13 @@ export default function TwinEffectivenessReport({
         Decision Twin Effectiveness
       </h3>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: 12,
+        }}
+      >
         {twins.map(t => {
           const effectiveColor = getEffectivenessColor(t.effectivenessRate);
           const leaderboard = accuracyMap.get(t.twinName);

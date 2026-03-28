@@ -112,10 +112,8 @@ export async function computeMultiTouchAttribution(
       const node = queue.shift()!;
 
       // Record this path
-      const avgStrength =
-        node.pathStrengths.reduce((s, v) => s + v, 0) / node.pathStrengths.length;
-      const rawScore =
-        node.pathStrengths.reduce((prod, s) => prod * s, 1) * (1 / node.depth);
+      const avgStrength = node.pathStrengths.reduce((s, v) => s + v, 0) / node.pathStrengths.length;
+      const rawScore = node.pathStrengths.reduce((prod, s) => prod * s, 1) * (1 / node.depth);
 
       results.push({
         sourceAnalysisId: node.analysisId,
