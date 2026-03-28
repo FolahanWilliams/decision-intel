@@ -167,6 +167,25 @@ export default function BiasLibraryPage() {
         </div>
       )}
 
+      {/* Empty state — no documents analysed yet */}
+      {!documents?.length && (
+        <div
+          style={{
+            textAlign: 'center',
+            padding: 'var(--spacing-xl) var(--spacing-lg)',
+            marginBottom: 'var(--spacing-lg)',
+            background: 'var(--bg-secondary)',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--glass-border)',
+          }}
+        >
+          <Brain size={28} style={{ color: 'var(--text-muted)', marginBottom: 'var(--spacing-sm)' }} />
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0 }}>
+            No biases detected yet. Upload and analyze documents to see which cognitive biases appear in your decision-making.
+          </p>
+        </div>
+      )}
+
       {/* Search and filter bar */}
       <div
         className="flex items-center gap-md"

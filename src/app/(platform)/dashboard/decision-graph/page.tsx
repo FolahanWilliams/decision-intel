@@ -15,6 +15,7 @@ import {
   TrendingDown,
   Minus,
   Download,
+  AlertTriangle,
 } from 'lucide-react';
 
 interface GraphReport {
@@ -65,16 +66,21 @@ export default function DecisionGraphPage() {
     null
   );
   const [reportLoading, setReportLoading] = useState(false);
+  const [orgError, setOrgError] = useState<string | null>(null);
+  const [reportError, setReportError] = useState<string | null>(null);
 
   // Fetch user's org
   useEffect(() => {
+    setOrgError(null);
     fetch('/api/team')
       .then(res => (res.ok ? res.json() : null))
       .then(data => {
         const id = data?.orgId || data?.organization?.id;
         if (id) setOrgId(id);
       })
-      .catch(() => {});
+      .catch(() => {
+        setOrgError('Failed to load organization data.');
+      });
   }, []);
 
   // Lazy-load report on tab switch
@@ -84,6 +90,7 @@ export default function DecisionGraphPage() {
 
     async function loadReport() {
       setReportLoading(true);
+      setReportError(null);
       try {
         const res = await fetch(
           `/api/decision-graph/report?orgId=${encodeURIComponent(orgId!)}&timeRange=${timeRange}&narrative=true`
@@ -91,9 +98,11 @@ export default function DecisionGraphPage() {
         if (res.ok && !cancelled) {
           const data = await res.json();
           setReport(data);
+        } else if (!cancelled) {
+          setReportError('Failed to load the network analysis report.');
         }
       } catch {
-        // non-critical
+        if (!cancelled) setReportError('Failed to load the network analysis report.');
       } finally {
         if (!cancelled) setReportLoading(false);
       }
@@ -222,7 +231,33 @@ export default function DecisionGraphPage() {
       </div>
 
       <ErrorBoundary>
-        {!orgId ? (
+        {orgError ? (
+          <div
+            className="card"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '14px 20px',
+              background: 'rgba(239, 68, 68, 0.08)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+            }}
+          >
+            <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
+            <span className="text-sm text-zinc-400" style={{ flex: 1 }}>{orgError}</span>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg"
+              style={{
+                color: '#ef4444',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+              }}
+            >
+              Try Again
+            </button>
+          </div>
+        ) : !orgId ? (
           <div className="card">
             <div className="card-body flex items-center justify-center h-64 text-zinc-500">
               <p>Join an organization to view the decision graph.</p>
@@ -237,11 +272,33 @@ export default function DecisionGraphPage() {
               Generating network analysis report...
             </div>
           </div>
-        ) : !report ? (
-          <div className="card">
-            <div className="card-body flex items-center justify-center h-64 text-zinc-500">
-              <p>Failed to load report. Try again.</p>
-            </div>
+        ) : reportError || !report ? (
+          <div
+            className="card"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '14px 20px',
+              background: 'rgba(239, 68, 68, 0.08)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+            }}
+          >
+            <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
+            <span className="text-sm text-zinc-400" style={{ flex: 1 }}>
+              {reportError || 'Failed to load report.'}
+            </span>
+            <button
+              onClick={() => { setReport(null); setReportError(null); }}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg"
+              style={{
+                color: '#ef4444',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+              }}
+            >
+              Try Again
+            </button>
           </div>
         ) : (
           <div className="space-y-4">

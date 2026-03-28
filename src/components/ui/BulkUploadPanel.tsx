@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Upload, X, FileText, Loader2, CheckCircle, AlertTriangle, FolderUp } from 'lucide-react';
 
 interface FileEntry {
@@ -45,6 +45,13 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear polling interval on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
 
   const validateFile = (file: File): string | null => {
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();

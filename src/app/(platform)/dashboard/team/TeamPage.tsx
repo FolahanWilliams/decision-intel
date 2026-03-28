@@ -84,20 +84,24 @@ export default function TeamPage() {
   const [org, setOrg] = useState<Organization | null>(null);
   const [myRole, setMyRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'members' | 'activity' | 'intelligence'>('members');
 
   const fetchTeam = useCallback(async () => {
+    setFetchError(null);
     try {
       const res = await fetch('/api/team');
       if (res.ok) {
         const data = await res.json();
         setOrg(data.organization);
         setMyRole(data.role);
+      } else if (res.status >= 500) {
+        setFetchError('Failed to load team data. Please try again.');
       }
     } catch {
-      // Silently fail - user just has no team
+      setFetchError('Failed to load team data. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -119,6 +123,53 @@ export default function TeamPage() {
       >
         <div className="flex items-center justify-center" style={{ minHeight: 300 }}>
           <Loader2 size={24} className="animate-spin" style={{ color: 'var(--text-secondary)' }} />
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (fetchError) {
+    return (
+      <div
+        className="container"
+        style={{
+          paddingTop: 'var(--spacing-2xl)',
+          paddingBottom: 'var(--spacing-2xl)',
+          maxWidth: 900,
+        }}
+      >
+        <Breadcrumbs items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Team' }]} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--spacing-md)',
+            padding: 'var(--spacing-md) var(--spacing-lg)',
+            background: 'rgba(239, 68, 68, 0.08)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
+          <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
+          <span style={{ color: 'var(--text-secondary)', fontSize: '14px', flex: 1 }}>
+            {fetchError}
+          </span>
+          <button
+            onClick={() => { setLoading(true); fetchTeam(); }}
+            style={{
+              padding: '6px 14px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#ef4444',
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+            }}
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );

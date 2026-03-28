@@ -15,6 +15,7 @@ import {
   FileText,
   Shield,
 } from 'lucide-react';
+import { useToast } from '@/components/ui/EnhancedToast';
 
 interface BillingData {
   plan: string;
@@ -77,6 +78,7 @@ export function BillingSection() {
   const [portalLoading, setPortalLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const { showToast } = useToast();
 
   if (isLoading) {
     return (
@@ -102,18 +104,22 @@ export function BillingSection() {
   const isPaid = data.plan !== 'free' && data.status !== 'none';
   const isUnlimited = data.usage.analysesLimit === -1;
   const usageColor =
-    data.usage.percentUsed > 85 ? '#f87171' : data.usage.percentUsed > 60 ? '#fbbf24' : '#34d399';
+    data.usage.percentUsed > 85 ? 'var(--error)' : data.usage.percentUsed > 60 ? 'var(--warning)' : 'var(--success)';
 
   const handlePortal = async () => {
     setPortalLoading(true);
     try {
       const res = await fetch('/api/billing/portal', { method: 'POST' });
+      if (!res.ok) {
+        showToast('Failed to open billing portal. Please try again.', 'error');
+        return;
+      }
       const json = await res.json();
       if (json.url) {
         window.location.href = json.url;
       }
     } catch {
-      // Silent fail
+      showToast('Failed to open billing portal. Please try again.', 'error');
     } finally {
       setPortalLoading(false);
     }
@@ -130,9 +136,11 @@ export function BillingSection() {
       if (res.ok) {
         setShowCancelConfirm(false);
         mutate();
+      } else {
+        showToast('Failed to update subscription. Please try again.', 'error');
       }
     } catch {
-      // Silent fail
+      showToast('Failed to update subscription. Please try again.', 'error');
     } finally {
       setCancelLoading(false);
     }
@@ -146,12 +154,16 @@ export function BillingSection() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan }),
       });
+      if (!res.ok) {
+        showToast('Failed to start checkout. Please try again.', 'error');
+        return;
+      }
       const json = await res.json();
       if (json.url) {
         window.location.href = json.url;
       }
     } catch {
-      // Silent fail
+      showToast('Failed to start checkout. Please try again.', 'error');
     } finally {
       setPortalLoading(false);
     }

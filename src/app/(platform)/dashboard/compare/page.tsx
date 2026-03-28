@@ -165,6 +165,18 @@ export default function ComparePage() {
           ) : null}
         </div>
 
+        {/* Empty state — nothing selected */}
+        {!loading && selectedIds.length === 0 && completeDocs.length > 0 && (
+          <div
+            className={cn('p-8 rounded-xl text-center', 'liquid-glass', 'border border-white/10')}
+          >
+            <GitCompareArrows size={32} className="mx-auto mb-3 text-gray-500" />
+            <p className="text-gray-400 text-sm">
+              Select two or more analyses above to compare them side by side.
+            </p>
+          </div>
+        )}
+
         {/* Comparison Results */}
         {loading && (
           <div className="text-center py-8 text-gray-400">Loading comparison data...</div>

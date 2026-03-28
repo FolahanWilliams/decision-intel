@@ -63,16 +63,16 @@ export default function Ticker() {
     >
       <div className="ticker-track" style={{ flex: 1 }}>
         <TickerItem label="Avg Quality" value={stats.avgScore} color="#FFFFFF" />
-        <TickerItem label="Avg Noise" value={stats.avgNoise} color="#fbbf24" />
-        <TickerItem label="Documents" value={stats.totalDocs} color="#38bdf8" />
+        <TickerItem label="Avg Noise" value={stats.avgNoise} color="var(--warning)" />
+        <TickerItem label="Documents" value={stats.totalDocs} color="var(--info)" />
         <TickerItem label="Analyzed" value={stats.analyzedDocs} color="#FFFFFF" />
-        <TickerItem label="Status" value="Operational" color="#34d399" />
+        <TickerItem label="Status" value="Operational" color="var(--success)" />
         {/* Duplicate for seamless marquee loop */}
         <TickerItem label="Avg Quality" value={stats.avgScore} color="#FFFFFF" />
-        <TickerItem label="Avg Noise" value={stats.avgNoise} color="#fbbf24" />
-        <TickerItem label="Documents" value={stats.totalDocs} color="#38bdf8" />
+        <TickerItem label="Avg Noise" value={stats.avgNoise} color="var(--warning)" />
+        <TickerItem label="Documents" value={stats.totalDocs} color="var(--info)" />
         <TickerItem label="Analyzed" value={stats.analyzedDocs} color="#FFFFFF" />
-        <TickerItem label="Status" value="Operational" color="#34d399" />
+        <TickerItem label="Status" value="Operational" color="var(--success)" />
       </div>
       <div style={{ flexShrink: 0, padding: '0 12px', zIndex: 10 }}>
         <NotificationBell />
