@@ -3337,6 +3337,13 @@ interface ChatMsg {
   content: string;
 }
 
+const STARTER_QUESTIONS = [
+  'Elevator pitch for a GP?',
+  'How do we beat DealCloud?',
+  'What did Strebulaev say?',
+  'Demo script for IC meeting',
+];
+
 function FounderChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -3344,13 +3351,9 @@ function FounderChatWidget() {
   const [streaming, setStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleSend = useCallback(async () => {
     if (!input.trim() || streaming) return;
@@ -3391,31 +3394,35 @@ function FounderChatWidget() {
       let assistantContent = '';
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-        const text = decoder.decode(value, { stream: true });
-        const lines = text.split('\n');
+          const text = decoder.decode(value, { stream: true });
+          const lines = text.split('\n');
 
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.type === 'chunk' && data.text) {
-              assistantContent += data.text;
-              setMessages(prev => {
-                const updated = [...prev];
-                updated[updated.length - 1] = { role: 'assistant', content: assistantContent };
-                return updated;
-              });
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.type === 'chunk' && data.text) {
+                assistantContent += data.text;
+                setMessages(prev => {
+                  const updated = [...prev];
+                  updated[updated.length - 1] = { role: 'assistant', content: assistantContent };
+                  return updated;
+                });
+              }
+            } catch {
+              // malformed SSE line
             }
-          } catch {
-            // skip malformed SSE lines
           }
         }
+      } finally {
+        reader.cancel();
       }
-    } catch (err) {
+    } catch {
       setMessages(prev => [
         ...prev,
         { role: 'assistant', content: 'Connection error. Please try again.' },
@@ -3535,17 +3542,10 @@ function FounderChatWidget() {
                 marginTop: 10,
               }}
             >
-              {[
-                'Elevator pitch for a GP?',
-                'How do we beat DealCloud?',
-                'What did Strebulaev say?',
-                'Demo script for IC meeting',
-              ].map(q => (
+              {STARTER_QUESTIONS.map(q => (
                 <button
                   key={q}
-                  onClick={() => {
-                    setInput(q);
-                  }}
+                  onClick={() => setInput(q)}
                   style={{
                     padding: '4px 10px',
                     fontSize: 11,
@@ -3608,7 +3608,6 @@ function FounderChatWidget() {
             color: 'var(--text-primary)',
             outline: 'none',
           }}
-          autoFocus
         />
         <button
           onClick={handleSend}

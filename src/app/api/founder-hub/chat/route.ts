@@ -14,16 +14,22 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
+import { timingSafeEqual } from 'crypto';
 
 const log = createLogger('FounderHubChat');
+const ENCODER = new TextEncoder();
 
-// ─── Gemini Setup ───────────────────────────────────────────────────────────
+// ─── Gemini Setup (cached at module scope) ──────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let cachedModel: any = null;
 
 function getModel() {
+  if (cachedModel) return cachedModel;
   const apiKey = getRequiredEnvVar('GOOGLE_API_KEY');
   const genAI = new GoogleGenerativeAI(apiKey);
   const modelName = getOptionalEnvVar('GEMINI_MODEL_NAME', 'gemini-3-flash-preview');
-  return genAI.getGenerativeModel({
+  const model = genAI.getGenerativeModel({
     model: modelName,
     safetySettings: [
       {
@@ -45,6 +51,8 @@ function getModel() {
     ],
     generationConfig: { maxOutputTokens: 4096 },
   });
+  cachedModel = model;
+  return model;
 }
 
 // ─── Founder Hub Knowledge Base ─────────────────────────────────────────────
@@ -127,7 +135,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Not configured' }, { status: 503 });
   }
   const headerPass = req.headers.get('x-founder-pass') || '';
-  if (headerPass !== founderPass) {
+  try {
+    const expected = Buffer.from(founderPass);
+    const provided = Buffer.from(headerPass);
+    if (expected.length !== provided.length || !timingSafeEqual(expected, provided)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -174,7 +188,6 @@ export async function POST(req: NextRequest) {
     });
 
     const result = await chat.sendMessageStream(message);
-    const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -182,14 +195,14 @@ export async function POST(req: NextRequest) {
           for await (const chunk of result.stream) {
             const text = chunk.text();
             if (text) {
-              controller.enqueue(encoder.encode(formatSSE({ type: 'chunk', text })));
+              controller.enqueue(ENCODER.encode(formatSSE({ type: 'chunk', text })));
             }
           }
-          controller.enqueue(encoder.encode(formatSSE({ type: 'done' })));
+          controller.enqueue(ENCODER.encode(formatSSE({ type: 'done' })));
         } catch (err) {
           log.error('Founder chat stream error:', err);
           controller.enqueue(
-            encoder.encode(
+            ENCODER.encode(
               formatSSE({ type: 'error', message: 'An error occurred generating the response.' })
             )
           );
