@@ -655,7 +655,10 @@ export default function LandingPage() {
             <a href="#roi" className="hover:text-white transition-colors duration-300">
               ROI
             </a>
-            <Link href="/demo" className="hover:text-white transition-colors duration-300 font-semibold">
+            <Link
+              href="/demo"
+              className="hover:text-white transition-colors duration-300 font-semibold"
+            >
               Try Demo
             </Link>
           </div>
@@ -783,8 +786,8 @@ export default function LandingPage() {
                     maxWidth: '540px',
                   }}
                 >
-                  Your LPs just don&apos;t know yet. Decision Intel finds them automatically — before
-                  they cost your fund $50M.
+                  Your LPs just don&apos;t know yet. Decision Intel finds them automatically —
+                  before they cost your fund $50M.
                 </motion.p>
 
                 <motion.div

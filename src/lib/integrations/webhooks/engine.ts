@@ -120,10 +120,12 @@ async function deliverWithRetry(
 
     if (success) {
       // Reset failure count and update lastSuccess
-      await prisma.webhookSubscription.update({
-        where: { id: subscriptionId },
-        data: { failCount: 0, lastSuccess: new Date(), lastError: null },
-      }).catch(() => {});
+      await prisma.webhookSubscription
+        .update({
+          where: { id: subscriptionId },
+          data: { failCount: 0, lastSuccess: new Date(), lastError: null },
+        })
+        .catch(() => {});
       return;
     }
 

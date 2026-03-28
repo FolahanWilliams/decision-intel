@@ -39,7 +39,12 @@ const selectStyle: React.CSSProperties = {
   paddingRight: 28,
 };
 
-export function DealOutcomeForm({ dealId, currency = 'USD', existingOutcome, onSuccess }: DealOutcomeFormProps) {
+export function DealOutcomeForm({
+  dealId,
+  currency = 'USD',
+  existingOutcome,
+  onSuccess,
+}: DealOutcomeFormProps) {
   const [irr, setIrr] = useState('');
   const [moic, setMoic] = useState('');
   const [exitType, setExitType] = useState('');
@@ -115,14 +120,25 @@ export function DealOutcomeForm({ dealId, currency = 'USD', existingOutcome, onS
             <input
               type="number"
               value={irr}
-              onChange={(e) => setIrr(e.target.value)}
+              onChange={e => setIrr(e.target.value)}
               placeholder="e.g. 25"
               step="0.1"
               min="-100"
               max="100"
               style={{ ...inputStyle, paddingRight: 28 }}
             />
-            <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 12 }}>%</span>
+            <span
+              style={{
+                position: 'absolute',
+                right: 10,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-muted)',
+                fontSize: 12,
+              }}
+            >
+              %
+            </span>
           </div>
         </div>
         <div>
@@ -131,13 +147,24 @@ export function DealOutcomeForm({ dealId, currency = 'USD', existingOutcome, onS
             <input
               type="number"
               value={moic}
-              onChange={(e) => setMoic(e.target.value)}
+              onChange={e => setMoic(e.target.value)}
               placeholder="e.g. 3.2"
               step="0.1"
               min="0"
               style={{ ...inputStyle, paddingRight: 20 }}
             />
-            <span style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 12 }}>x</span>
+            <span
+              style={{
+                position: 'absolute',
+                right: 10,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-muted)',
+                fontSize: 12,
+              }}
+            >
+              x
+            </span>
           </div>
         </div>
       </div>
@@ -146,10 +173,12 @@ export function DealOutcomeForm({ dealId, currency = 'USD', existingOutcome, onS
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
           <label style={labelStyle}>Exit Type</label>
-          <select value={exitType} onChange={(e) => setExitType(e.target.value)} style={selectStyle}>
+          <select value={exitType} onChange={e => setExitType(e.target.value)} style={selectStyle}>
             <option value="">Select exit type...</option>
-            {EXIT_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>{t.label}</option>
+            {EXIT_TYPES.map(t => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
             ))}
           </select>
         </div>
@@ -158,7 +187,7 @@ export function DealOutcomeForm({ dealId, currency = 'USD', existingOutcome, onS
           <input
             type="number"
             value={exitValue}
-            onChange={(e) => setExitValue(e.target.value)}
+            onChange={e => setExitValue(e.target.value)}
             placeholder="e.g. 150000000"
             min="0"
             style={inputStyle}
@@ -172,7 +201,7 @@ export function DealOutcomeForm({ dealId, currency = 'USD', existingOutcome, onS
         <input
           type="number"
           value={holdPeriod}
-          onChange={(e) => setHoldPeriod(e.target.value)}
+          onChange={e => setHoldPeriod(e.target.value)}
           placeholder="e.g. 48"
           min="0"
           max="180"
@@ -185,7 +214,7 @@ export function DealOutcomeForm({ dealId, currency = 'USD', existingOutcome, onS
         <label style={labelStyle}>Notes</label>
         <textarea
           value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          onChange={e => setNotes(e.target.value)}
           placeholder="Additional notes on deal outcome..."
           rows={3}
           style={{ ...inputStyle, resize: 'vertical' }}
@@ -194,12 +223,28 @@ export function DealOutcomeForm({ dealId, currency = 'USD', existingOutcome, onS
 
       {/* Error / Success */}
       {error && (
-        <div style={{ fontSize: 12, color: '#ef4444', padding: '6px 10px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: 6 }}>
+        <div
+          style={{
+            fontSize: 12,
+            color: '#ef4444',
+            padding: '6px 10px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            borderRadius: 6,
+          }}
+        >
           {error}
         </div>
       )}
       {success && (
-        <div style={{ fontSize: 12, color: '#10b981', padding: '6px 10px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: 6 }}>
+        <div
+          style={{
+            fontSize: 12,
+            color: '#10b981',
+            padding: '6px 10px',
+            background: 'rgba(16, 185, 129, 0.1)',
+            borderRadius: 6,
+          }}
+        >
           Outcome saved successfully
         </div>
       )}
@@ -210,7 +255,13 @@ export function DealOutcomeForm({ dealId, currency = 'USD', existingOutcome, onS
           onClick={handleSubmit}
           disabled={saving}
           className="btn btn-primary"
-          style={{ padding: '8px 20px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}
+          style={{
+            padding: '8px 20px',
+            fontSize: 13,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
         >
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {saving ? 'Saving...' : 'Save Outcome'}

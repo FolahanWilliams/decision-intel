@@ -11,10 +11,7 @@ import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { WEBHOOK_EVENTS } from '@/lib/integrations/webhooks/events';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateApiRequest(request);
   if (auth.error) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -35,10 +32,7 @@ export async function GET(
   return NextResponse.json({ subscription });
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateApiRequest(request);
   if (auth.error) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -72,7 +66,9 @@ export async function PATCH(
     if (!Array.isArray(body.events) || body.events.length === 0) {
       return NextResponse.json({ error: 'At least one event required' }, { status: 400 });
     }
-    const invalid = body.events.filter((e: string) => !(WEBHOOK_EVENTS as readonly string[]).includes(e));
+    const invalid = body.events.filter(
+      (e: string) => !(WEBHOOK_EVENTS as readonly string[]).includes(e)
+    );
     if (invalid.length > 0) {
       return NextResponse.json({ error: `Invalid events: ${invalid.join(', ')}` }, { status: 400 });
     }

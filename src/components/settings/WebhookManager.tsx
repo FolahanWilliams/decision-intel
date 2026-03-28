@@ -95,20 +95,28 @@ export function WebhookManager() {
       body: JSON.stringify({ active }),
     });
     if (res.ok) {
-      setSubscriptions(prev =>
-        prev.map(s => (s.id === id ? { ...s, active } : s))
-      );
+      setSubscriptions(prev => prev.map(s => (s.id === id ? { ...s, active } : s)));
     }
   };
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 'var(--spacing-md)',
+        }}
+      >
         <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>
           Webhook Subscriptions
         </h2>
         <button
-          onClick={() => { setShowCreate(true); setNewSecret(null); }}
+          onClick={() => {
+            setShowCreate(true);
+            setNewSecret(null);
+          }}
           className="btn btn-primary btn-sm flex items-center gap-sm"
         >
           <Plus size={14} /> New Webhook
@@ -142,12 +150,28 @@ export function WebhookManager() {
             Signing Secret (save this — it won&apos;t be shown again)
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <code style={{ fontSize: '11px', color: 'var(--text-primary)', background: 'rgba(0,0,0,0.3)', padding: '4px 8px', borderRadius: '4px', fontFamily: "'JetBrains Mono', monospace", wordBreak: 'break-all' }}>
+            <code
+              style={{
+                fontSize: '11px',
+                color: 'var(--text-primary)',
+                background: 'rgba(0,0,0,0.3)',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                fontFamily: "'JetBrains Mono', monospace",
+                wordBreak: 'break-all',
+              }}
+            >
               {newSecret}
             </code>
             <button
               onClick={() => navigator.clipboard.writeText(newSecret)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px' }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text-muted)',
+                padding: '4px',
+              }}
             >
               <Copy size={14} />
             </button>
@@ -160,7 +184,14 @@ export function WebhookManager() {
           <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
         </div>
       ) : subscriptions.length === 0 ? (
-        <p style={{ color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', padding: '40px' }}>
+        <p
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: '13px',
+            textAlign: 'center',
+            padding: '40px',
+          }}
+        >
           No webhook subscriptions yet. Create one to receive real-time event notifications.
         </p>
       ) : (
@@ -196,7 +227,17 @@ export function WebhookManager() {
                   }}
                 />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <p
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      color: 'var(--text-primary)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      fontFamily: "'JetBrains Mono', monospace",
+                    }}
+                  >
                     {sub.url}
                   </p>
                   <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -205,23 +246,50 @@ export function WebhookManager() {
                 </div>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <button
-                    onClick={e => { e.stopPropagation(); testWebhook(sub.id); }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      testWebhook(sub.id);
+                    }}
                     title="Send test event"
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px' }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--text-muted)',
+                      padding: '4px',
+                    }}
                   >
                     <PlayCircle size={14} />
                   </button>
                   <button
-                    onClick={e => { e.stopPropagation(); toggleActive(sub.id, !sub.active); }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      toggleActive(sub.id, !sub.active);
+                    }}
                     title={sub.active ? 'Disable' : 'Enable'}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: sub.active ? '#22c55e' : '#ef4444', padding: '4px' }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: sub.active ? '#22c55e' : '#ef4444',
+                      padding: '4px',
+                    }}
                   >
                     {sub.active ? <Check size={14} /> : <X size={14} />}
                   </button>
                   <button
-                    onClick={e => { e.stopPropagation(); deleteWebhook(sub.id); }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      deleteWebhook(sub.id);
+                    }}
                     title="Delete"
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px' }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--text-muted)',
+                      padding: '4px',
+                    }}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -236,11 +304,20 @@ export function WebhookManager() {
                       Last error: {sub.lastError} (failures: {sub.failCount})
                     </p>
                   )}
-                  <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '6px' }}>
+                  <p
+                    style={{
+                      fontSize: '11px',
+                      color: 'var(--text-muted)',
+                      fontWeight: 500,
+                      marginBottom: '6px',
+                    }}
+                  >
                     Recent Deliveries
                   </p>
                   {deliveries.length === 0 ? (
-                    <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>No deliveries yet</p>
+                    <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      No deliveries yet
+                    </p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       {deliveries.map(d => (
@@ -264,15 +341,18 @@ export function WebhookManager() {
                               background: d.success ? '#22c55e' : '#ef4444',
                             }}
                           />
-                          <span style={{ color: 'var(--text-secondary)', fontFamily: "'JetBrains Mono', monospace" }}>
+                          <span
+                            style={{
+                              color: 'var(--text-secondary)',
+                              fontFamily: "'JetBrains Mono', monospace",
+                            }}
+                          >
                             {d.event}
                           </span>
                           <span style={{ color: 'var(--text-muted)' }}>
                             {d.statusCode ?? '---'}
                           </span>
-                          <span style={{ color: 'var(--text-muted)' }}>
-                            {d.durationMs}ms
-                          </span>
+                          <span style={{ color: 'var(--text-muted)' }}>{d.durationMs}ms</span>
                           <span style={{ color: 'var(--text-muted)', marginLeft: 'auto' }}>
                             {new Date(d.createdAt).toLocaleTimeString()}
                           </span>
@@ -340,7 +420,14 @@ function CreateWebhookForm({
       }}
     >
       <div style={{ marginBottom: '12px' }}>
-        <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+        <label
+          style={{
+            fontSize: '12px',
+            color: 'var(--text-secondary)',
+            display: 'block',
+            marginBottom: '4px',
+          }}
+        >
           Endpoint URL
         </label>
         <input
@@ -363,7 +450,14 @@ function CreateWebhookForm({
       </div>
 
       <div style={{ marginBottom: '12px' }}>
-        <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
+        <label
+          style={{
+            fontSize: '12px',
+            color: 'var(--text-secondary)',
+            display: 'block',
+            marginBottom: '6px',
+          }}
+        >
           Events
         </label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
@@ -376,7 +470,9 @@ function CreateWebhookForm({
                 gap: '4px',
                 padding: '4px 10px',
                 borderRadius: 'var(--radius-sm)',
-                background: events.includes(event) ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255,255,255,0.04)',
+                background: events.includes(event)
+                  ? 'rgba(34, 197, 94, 0.1)'
+                  : 'rgba(255,255,255,0.04)',
                 border: `1px solid ${events.includes(event) ? 'rgba(34, 197, 94, 0.2)' : 'var(--liquid-border)'}`,
                 cursor: 'pointer',
                 fontSize: '11px',
@@ -401,9 +497,7 @@ function CreateWebhookForm({
         </div>
       </div>
 
-      {error && (
-        <p style={{ fontSize: '12px', color: '#ef4444', marginBottom: '8px' }}>{error}</p>
-      )}
+      {error && <p style={{ fontSize: '12px', color: '#ef4444', marginBottom: '8px' }}>{error}</p>}
 
       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
         <button type="button" onClick={onCancel} className="btn btn-secondary btn-sm">

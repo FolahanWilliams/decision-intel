@@ -268,7 +268,9 @@ export async function POST(request: NextRequest) {
                 dealType = deal.dealType;
                 dealStage = deal.stage;
               } else {
-                log.warn(`Deal ${dealId} referenced by document ${documentId} not found or access denied`);
+                log.warn(
+                  `Deal ${dealId} referenced by document ${documentId} not found or access denied`
+                );
                 dealId = '';
               }
             }

@@ -21,7 +21,15 @@ import {
 } from 'lucide-react';
 import { DEMO_ANALYSES, type DemoAnalysis } from './data';
 
-type DemoTab = 'overview' | 'biases' | 'logic' | 'swot' | 'noise' | 'compliance' | 'premortem' | 'boardroom';
+type DemoTab =
+  | 'overview'
+  | 'biases'
+  | 'logic'
+  | 'swot'
+  | 'noise'
+  | 'compliance'
+  | 'premortem'
+  | 'boardroom';
 
 const TABS: { id: DemoTab; label: string; icon: React.ReactNode }[] = [
   { id: 'overview', label: 'Overview', icon: <BarChart3 size={14} /> },
@@ -81,7 +89,7 @@ export default function DemoPage() {
 
   const handleTabKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      const currentIndex = TABS.findIndex((t) => t.id === activeTab);
+      const currentIndex = TABS.findIndex(t => t.id === activeTab);
       let nextIndex = currentIndex;
       if (e.key === 'ArrowRight') {
         nextIndex = (currentIndex + 1) % TABS.length;
@@ -99,12 +107,13 @@ export default function DemoPage() {
       const buttons = tabListRef.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
       buttons?.[nextIndex]?.focus();
     },
-    [activeTab],
+    [activeTab]
   );
 
   // Scroll active tab into view on mobile
   useEffect(() => {
-    const activeButton = tabListRef.current?.querySelector<HTMLButtonElement>('[aria-selected="true"]');
+    const activeButton =
+      tabListRef.current?.querySelector<HTMLButtonElement>('[aria-selected="true"]');
     activeButton?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   }, [activeTab]);
 
@@ -170,7 +179,12 @@ export default function DemoPage() {
                   className="text-[11px] px-2 py-0.5 rounded-md font-bold"
                   style={{
                     background: `${a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444'}15`,
-                    color: a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444',
+                    color:
+                      a.overallScore >= 70
+                        ? '#22c55e'
+                        : a.overallScore >= 40
+                          ? '#eab308'
+                          : '#ef4444',
                   }}
                 >
                   {a.overallScore}/100
@@ -182,7 +196,9 @@ export default function DemoPage() {
 
         {/* Document Title */}
         <div className="mb-6">
-          <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug">{analysis.documentName}</h1>
+          <h1 className="text-lg sm:text-xl font-bold mb-1.5 leading-snug">
+            {analysis.documentName}
+          </h1>
           <p className="text-slate-500 text-xs sm:text-[13px] m-0">
             Analyzed by Decision Intel &middot;{' '}
             {new Date(analysis.createdAt).toLocaleDateString('en-US', {
@@ -195,7 +211,12 @@ export default function DemoPage() {
 
         {/* Score Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-7">
-          <ScoreCard label="DECISION QUALITY" value={`${analysis.overallScore}`} sub="/100" color={scoreColor} />
+          <ScoreCard
+            label="DECISION QUALITY"
+            value={`${analysis.overallScore}`}
+            sub="/100"
+            color={scoreColor}
+          />
           <ScoreCard
             label="NOISE SCORE"
             value={`${analysis.noiseScore}`}
@@ -205,13 +226,13 @@ export default function DemoPage() {
           <ScoreCard
             label="BIASES DETECTED"
             value={`${analysis.biases.length}`}
-            sub={`${analysis.biases.filter((b) => b.severity === 'critical').length} critical`}
+            sub={`${analysis.biases.filter(b => b.severity === 'critical').length} critical`}
             color="#ef4444"
           />
           <ScoreCard
             label="BOARD VERDICT"
             value={analysis.simulation.overallVerdict}
-            sub={`${analysis.simulation.twins.filter((t) => t.vote === 'REJECT').length} of ${analysis.simulation.twins.length} reject`}
+            sub={`${analysis.simulation.twins.filter(t => t.vote === 'REJECT').length} of ${analysis.simulation.twins.length} reject`}
             color={analysis.simulation.overallVerdict === 'REJECT' ? '#ef4444' : '#eab308'}
             smallValue
           />
@@ -226,7 +247,7 @@ export default function DemoPage() {
           className="flex gap-1 mb-6 overflow-x-auto pb-0.5 border-b border-white/[0.06] -mx-4 px-4 sm:mx-0 sm:px-0"
           style={{ scrollbarWidth: 'none' }}
         >
-          {TABS.map((tab) => (
+          {TABS.map(tab => (
             <button
               key={tab.id}
               role="tab"
@@ -240,7 +261,10 @@ export default function DemoPage() {
                   ? 'font-semibold text-white border-b-2 border-b-white'
                   : 'font-normal text-slate-500 border-b-2 border-b-transparent'
               }`}
-              style={{ border: 'none', borderBottom: activeTab === tab.id ? '2px solid #fff' : '2px solid transparent' }}
+              style={{
+                border: 'none',
+                borderBottom: activeTab === tab.id ? '2px solid #fff' : '2px solid transparent',
+              }}
             >
               {tab.icon} {tab.label}
             </button>
@@ -264,9 +288,13 @@ export default function DemoPage() {
           <div className="mt-8 p-4 sm:p-5 bg-red-500/[0.06] border border-red-500/20 rounded-xl">
             <div className="flex items-center gap-2 mb-2.5">
               <TrendingUp size={16} className="text-red-500" />
-              <span className="text-[13px] font-bold text-red-500 tracking-wide">KNOWN OUTCOME</span>
+              <span className="text-[13px] font-bold text-red-500 tracking-wide">
+                KNOWN OUTCOME
+              </span>
             </div>
-            <p className="text-slate-200 text-sm m-0 mb-1.5 leading-relaxed">{analysis.outcome.what}</p>
+            <p className="text-slate-200 text-sm m-0 mb-1.5 leading-relaxed">
+              {analysis.outcome.what}
+            </p>
             <p className="text-slate-500 text-xs m-0">
               {analysis.outcome.when} &middot; {analysis.outcome.impact}
             </p>
@@ -279,8 +307,8 @@ export default function DemoPage() {
             This was a demo. Now try it on your own documents.
           </h3>
           <p className="text-slate-500 text-sm mb-6 max-w-[500px] mx-auto">
-            Upload any strategic document &mdash; board memo, M&amp;A rationale, investment thesis, market analysis
-            &mdash; and get a comprehensive cognitive bias audit in minutes.
+            Upload any strategic document &mdash; board memo, M&amp;A rationale, investment thesis,
+            market analysis &mdash; and get a comprehensive cognitive bias audit in minutes.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
@@ -305,8 +333,8 @@ export default function DemoPage() {
         </div>
 
         <p className="text-slate-700 text-[11px] text-center mt-8 leading-relaxed">
-          Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine to demonstrate product
-          capabilities. They are not financial or investment advice.
+          Demo analyses are generated by Decision Intel&apos;s cognitive bias detection engine to
+          demonstrate product capabilities. They are not financial or investment advice.
         </p>
       </div>
     </div>
@@ -331,7 +359,11 @@ function OverviewTab({ analysis }: { analysis: DemoAnalysis }) {
 
       {/* Quick stats grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <MiniCard label="Logical Fallacies" value={`${analysis.logicalFallacies.length} found`} color="#f97316" />
+        <MiniCard
+          label="Logical Fallacies"
+          value={`${analysis.logicalFallacies.length} found`}
+          color="#f97316"
+        />
         <MiniCard
           label="SWOT Balance"
           value={`${analysis.swot.weaknesses.length + analysis.swot.threats.length} risks vs ${analysis.swot.strengths.length + analysis.swot.opportunities.length} positives`}
@@ -344,10 +376,14 @@ function OverviewTab({ analysis }: { analysis: DemoAnalysis }) {
         />
         <MiniCard
           label="Compliance"
-          value={`${analysis.compliance.frameworks.filter((f) => f.status === 'non_compliant').length} non-compliant`}
+          value={`${analysis.compliance.frameworks.filter(f => f.status === 'non_compliant').length} non-compliant`}
           color="#ef4444"
         />
-        <MiniCard label="Pre-Mortem Risks" value={`${analysis.preMortem.scenarios.length} scenarios`} color="#eab308" />
+        <MiniCard
+          label="Pre-Mortem Risks"
+          value={`${analysis.preMortem.scenarios.length} scenarios`}
+          color="#eab308"
+        />
       </div>
     </>
   );
@@ -355,12 +391,20 @@ function OverviewTab({ analysis }: { analysis: DemoAnalysis }) {
 
 function BiasesTab({ analysis }: { analysis: DemoAnalysis }) {
   return (
-    <Section icon={<Brain size={16} />} title={`Cognitive Biases Detected (${analysis.biases.length})`}>
+    <Section
+      icon={<Brain size={16} />}
+      title={`Cognitive Biases Detected (${analysis.biases.length})`}
+    >
       <div className="flex flex-col gap-3">
         {analysis.biases.map((bias, idx) => (
-          <div key={idx} className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]">
+          <div
+            key={idx}
+            className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+          >
             <div className="flex flex-wrap items-center gap-2 mb-2.5">
-              <span className="font-bold text-sm text-white">{bias.biasType.replace(/_/g, ' ')}</span>
+              <span className="font-bold text-sm text-white">
+                {bias.biasType.replace(/_/g, ' ')}
+              </span>
               <SeverityBadge severity={bias.severity} />
               <span className="text-[11px] text-slate-500 sm:ml-auto">
                 {Math.round(bias.confidence * 100)}% confidence
@@ -372,7 +416,9 @@ function BiasesTab({ analysis }: { analysis: DemoAnalysis }) {
             >
               &ldquo;{bias.excerpt}&rdquo;
             </p>
-            <p className="text-slate-300 text-[13px] m-0 mb-2.5 leading-relaxed">{bias.explanation}</p>
+            <p className="text-slate-300 text-[13px] m-0 mb-2.5 leading-relaxed">
+              {bias.explanation}
+            </p>
             <p className="text-green-500/80 text-[13px] m-0 leading-relaxed">
               <strong>Recommendation:</strong> {bias.suggestion}
             </p>
@@ -385,14 +431,22 @@ function BiasesTab({ analysis }: { analysis: DemoAnalysis }) {
 
 function LogicTab({ analysis }: { analysis: DemoAnalysis }) {
   return (
-    <Section icon={<Scale size={16} />} title={`Logical Fallacies (${analysis.logicalFallacies.length})`}>
+    <Section
+      icon={<Scale size={16} />}
+      title={`Logical Fallacies (${analysis.logicalFallacies.length})`}
+    >
       <div className="flex flex-col gap-3">
         {analysis.logicalFallacies.map((f, idx) => (
-          <div key={idx} className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]">
+          <div
+            key={idx}
+            className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+          >
             <div className="flex flex-wrap items-center gap-2 mb-2.5">
               <span className="font-bold text-sm text-white">{f.name}</span>
               <SeverityBadge severity={f.severity} />
-              <span className="text-[11px] text-slate-500 sm:ml-auto">Logic Score: {f.score}/100</span>
+              <span className="text-[11px] text-slate-500 sm:ml-auto">
+                Logic Score: {f.score}/100
+              </span>
             </div>
             <p className="text-slate-400 text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3 border-l-2 border-white/10">
               &ldquo;{f.excerpt}&rdquo;
@@ -437,8 +491,9 @@ function NoiseTab({ analysis }: { analysis: DemoAnalysis }) {
     <>
       <Section icon={<Target size={16} />} title="Decision Noise Analysis">
         <p className="text-slate-400 text-[13px] mb-5 leading-relaxed">
-          Decision noise measures inconsistency in the document&apos;s reasoning. A high noise score means the same
-          facts could lead to wildly different conclusions depending on who reads it and when.
+          Decision noise measures inconsistency in the document&apos;s reasoning. A high noise score
+          means the same facts could lead to wildly different conclusions depending on who reads it
+          and when.
         </p>
         {/* Noise gauge */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 mb-6">
@@ -446,7 +501,12 @@ function NoiseTab({ analysis }: { analysis: DemoAnalysis }) {
             <div
               className="text-4xl sm:text-5xl font-extrabold leading-none"
               style={{
-                color: analysis.noiseScore <= 30 ? '#22c55e' : analysis.noiseScore <= 60 ? '#eab308' : '#ef4444',
+                color:
+                  analysis.noiseScore <= 30
+                    ? '#22c55e'
+                    : analysis.noiseScore <= 60
+                      ? '#eab308'
+                      : '#ef4444',
               }}
             >
               {analysis.noiseScore}
@@ -463,7 +523,9 @@ function NoiseTab({ analysis }: { analysis: DemoAnalysis }) {
             <div className="flex flex-col gap-2">
               {analysis.noiseBenchmarks.map((b, i) => (
                 <div key={i} className="flex items-center gap-2.5">
-                  <span className="text-[11px] sm:text-xs text-slate-400 w-20 sm:w-[120px] shrink-0">{b.label}</span>
+                  <span className="text-[11px] sm:text-xs text-slate-400 w-20 sm:w-[120px] shrink-0">
+                    {b.label}
+                  </span>
                   <div className="flex-1 h-1.5 rounded-sm bg-white/[0.06]">
                     <div
                       className="h-full rounded-sm transition-[width] duration-300"
@@ -480,7 +542,9 @@ function NoiseTab({ analysis }: { analysis: DemoAnalysis }) {
                       }}
                     />
                   </div>
-                  <span className="text-xs font-semibold text-slate-200 w-[30px] text-right">{b.value}</span>
+                  <span className="text-xs font-semibold text-slate-200 w-[30px] text-right">
+                    {b.value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -497,7 +561,10 @@ function ComplianceTab({ analysis }: { analysis: DemoAnalysis }) {
       <Section icon={<Gavel size={16} />} title="Compliance Assessment">
         <div className="flex flex-col gap-4">
           {analysis.compliance.frameworks.map((fw, idx) => (
-            <div key={idx} className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]">
+            <div
+              key={idx}
+              className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                 <span className="font-bold text-sm text-white">{fw.name}</span>
                 <div className="flex items-center gap-2.5">
@@ -527,7 +594,8 @@ function ComplianceTab({ analysis }: { analysis: DemoAnalysis }) {
         </div>
         <div className="mt-4 p-4 bg-red-500/[0.06] rounded-lg border border-red-500/15">
           <p className="text-slate-200 text-[13px] m-0 leading-relaxed">
-            <strong className="text-red-500">Overall Risk Assessment:</strong> {analysis.compliance.overallRisk}
+            <strong className="text-red-500">Overall Risk Assessment:</strong>{' '}
+            {analysis.compliance.overallRisk}
           </p>
         </div>
       </Section>
@@ -539,11 +607,15 @@ function PreMortemTab({ analysis }: { analysis: DemoAnalysis }) {
   return (
     <Section icon={<Skull size={16} />} title="Pre-Mortem Analysis">
       <p className="text-slate-400 text-[13px] mb-4 leading-relaxed">
-        Imagine it&apos;s 2 years from now and this decision has failed spectacularly. What went wrong?
+        Imagine it&apos;s 2 years from now and this decision has failed spectacularly. What went
+        wrong?
       </p>
       <div className="flex flex-col gap-3">
         {analysis.preMortem.scenarios.map((s, idx) => (
-          <div key={idx} className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]">
+          <div
+            key={idx}
+            className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+          >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2.5">
               <span className="font-bold text-sm text-white">{s.title}</span>
               <div className="flex gap-2">
@@ -554,7 +626,12 @@ function PreMortemTab({ analysis }: { analysis: DemoAnalysis }) {
                   className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase"
                   style={{
                     background: `${s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308'}15`,
-                    color: s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308',
+                    color:
+                      s.impact === 'catastrophic'
+                        ? '#ef4444'
+                        : s.impact === 'severe'
+                          ? '#f97316'
+                          : '#eab308',
                   }}
                 >
                   {s.impact}
@@ -575,7 +652,11 @@ function BoardroomTab({ analysis }: { analysis: DemoAnalysis }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {analysis.simulation.twins.map((twin, idx) => {
           const voteColor =
-            twin.vote === 'REJECT' ? '#ef4444' : twin.vote === 'CONDITIONAL APPROVE' ? '#eab308' : '#22c55e';
+            twin.vote === 'REJECT'
+              ? '#ef4444'
+              : twin.vote === 'CONDITIONAL APPROVE'
+                ? '#eab308'
+                : '#22c55e';
           return (
             <div key={idx} className="bg-[#0a0a0a] rounded-[10px] p-4 border border-white/[0.06]">
               <div className="flex justify-between items-center mb-2.5">

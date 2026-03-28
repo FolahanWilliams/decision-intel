@@ -6,22 +6,21 @@ import { z } from 'zod';
 
 const log = createLogger('DealOutcomeRoute');
 
-const OutcomeSchema = z.object({
-  irr: z.number().min(-1).max(100).optional(),
-  moic: z.number().min(0).max(1000).optional(),
-  exitType: z.enum(['ipo', 'trade_sale', 'secondary', 'write_off', 'partial_exit']).optional(),
-  exitValue: z.number().positive().optional(),
-  holdPeriod: z.number().int().positive().max(180).optional(), // months, max 15 years
-  notes: z.string().max(5000).optional(),
-}).refine(
-  (data) => Object.values(data).some(v => v !== undefined),
-  'At least one outcome field must be provided'
-);
+const OutcomeSchema = z
+  .object({
+    irr: z.number().min(-1).max(100).optional(),
+    moic: z.number().min(0).max(1000).optional(),
+    exitType: z.enum(['ipo', 'trade_sale', 'secondary', 'write_off', 'partial_exit']).optional(),
+    exitValue: z.number().positive().optional(),
+    holdPeriod: z.number().int().positive().max(180).optional(), // months, max 15 years
+    notes: z.string().max(5000).optional(),
+  })
+  .refine(
+    data => Object.values(data).some(v => v !== undefined),
+    'At least one outcome field must be provided'
+  );
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: dealId } = await params;
     const supabase = await createClient();
@@ -68,7 +67,7 @@ export async function POST(
     }
 
     // Atomic upsert + deal status update in a single transaction
-    const outcome = await prisma.$transaction(async (tx) => {
+    const outcome = await prisma.$transaction(async tx => {
       const result = await tx.dealOutcome.upsert({
         where: { dealId },
         create: {
@@ -104,7 +103,9 @@ export async function POST(
       return result;
     });
 
-    log.info(`Deal outcome recorded: deal=${dealId}, IRR=${parsed.data.irr}, MOIC=${parsed.data.moic}`);
+    log.info(
+      `Deal outcome recorded: deal=${dealId}, IRR=${parsed.data.irr}, MOIC=${parsed.data.moic}`
+    );
 
     return NextResponse.json(outcome, { status: 201 });
   } catch (error) {
@@ -113,10 +114,7 @@ export async function POST(
   }
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: dealId } = await params;
     const supabase = await createClient();

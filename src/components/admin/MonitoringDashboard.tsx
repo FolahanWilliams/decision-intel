@@ -15,7 +15,13 @@ interface MetricsData {
       p95: number;
       errorRate: number;
     }>;
-    overallPercentiles: { p50: number; p95: number; p99: number; count: number; avgMs: number } | null;
+    overallPercentiles: {
+      p50: number;
+      p95: number;
+      p99: number;
+      count: number;
+      avgMs: number;
+    } | null;
   };
   ai: {
     period: string;
@@ -69,7 +75,14 @@ export function MonitoringDashboard() {
   return (
     <div style={{ padding: 'var(--spacing-lg)', maxWidth: '1200px', margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-xl)' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 'var(--spacing-xl)',
+        }}
+      >
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)' }}>
             System Monitoring
@@ -105,17 +118,32 @@ export function MonitoringDashboard() {
       )}
 
       {/* Status cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: 'var(--spacing-md)',
+          marginBottom: 'var(--spacing-lg)',
+        }}
+      >
         <StatusCard
           icon={<Server size={16} />}
           label="System Status"
           value={health?.status || 'unknown'}
-          color={health?.status === 'healthy' ? '#22c55e' : health?.status === 'degraded' ? '#eab308' : '#ef4444'}
+          color={
+            health?.status === 'healthy'
+              ? '#22c55e'
+              : health?.status === 'degraded'
+                ? '#eab308'
+                : '#ef4444'
+          }
         />
         <StatusCard
           icon={<Activity size={16} />}
           label="API p95 Latency"
-          value={metrics?.api.overallPercentiles ? `${metrics.api.overallPercentiles.p95}ms` : 'N/A'}
+          value={
+            metrics?.api.overallPercentiles ? `${metrics.api.overallPercentiles.p95}ms` : 'N/A'
+          }
           color="var(--text-primary)"
         />
         <StatusCard
@@ -135,7 +163,13 @@ export function MonitoringDashboard() {
       {/* Service Health */}
       {health && (
         <Section title="Service Health" description={`Response time: ${health.responseTime}ms`}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '10px' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+              gap: '10px',
+            }}
+          >
             {Object.entries(health.services).map(([name, svc]) => (
               <div
                 key={name}
@@ -146,16 +180,30 @@ export function MonitoringDashboard() {
                   border: `1px solid ${svc.status === 'healthy' || svc.status === 'in_sync' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}
+                >
                   <div
                     style={{
                       width: 6,
                       height: 6,
                       borderRadius: '50%',
-                      background: svc.status === 'healthy' || svc.status === 'in_sync' ? '#22c55e' : svc.status === 'degraded' ? '#eab308' : '#ef4444',
+                      background:
+                        svc.status === 'healthy' || svc.status === 'in_sync'
+                          ? '#22c55e'
+                          : svc.status === 'degraded'
+                            ? '#eab308'
+                            : '#ef4444',
                     }}
                   />
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', textTransform: 'capitalize' }}>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                      textTransform: 'capitalize',
+                    }}
+                  >
                     {name.replace(/([A-Z])/g, ' $1').trim()}
                   </span>
                 </div>
@@ -168,34 +216,123 @@ export function MonitoringDashboard() {
 
       {/* API Route Performance */}
       {metrics && metrics.api.routeSummaries.length > 0 && (
-        <Section title="API Route Performance" description={`${metrics.api.totalRequestsRecorded} total requests tracked`}>
+        <Section
+          title="API Route Performance"
+          description={`${metrics.api.totalRequestsRecorded} total requests tracked`}
+        >
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--liquid-border)' }}>
-                  <th style={{ textAlign: 'left', padding: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>Route</th>
-                  <th style={{ textAlign: 'left', padding: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>Method</th>
-                  <th style={{ textAlign: 'right', padding: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>Requests</th>
-                  <th style={{ textAlign: 'right', padding: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>Avg (ms)</th>
-                  <th style={{ textAlign: 'right', padding: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>p95 (ms)</th>
-                  <th style={{ textAlign: 'right', padding: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>Error Rate</th>
+                  <th
+                    style={{
+                      textAlign: 'left',
+                      padding: '8px',
+                      color: 'var(--text-muted)',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Route
+                  </th>
+                  <th
+                    style={{
+                      textAlign: 'left',
+                      padding: '8px',
+                      color: 'var(--text-muted)',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Method
+                  </th>
+                  <th
+                    style={{
+                      textAlign: 'right',
+                      padding: '8px',
+                      color: 'var(--text-muted)',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Requests
+                  </th>
+                  <th
+                    style={{
+                      textAlign: 'right',
+                      padding: '8px',
+                      color: 'var(--text-muted)',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Avg (ms)
+                  </th>
+                  <th
+                    style={{
+                      textAlign: 'right',
+                      padding: '8px',
+                      color: 'var(--text-muted)',
+                      fontWeight: 500,
+                    }}
+                  >
+                    p95 (ms)
+                  </th>
+                  <th
+                    style={{
+                      textAlign: 'right',
+                      padding: '8px',
+                      color: 'var(--text-muted)',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Error Rate
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {metrics.api.routeSummaries.map((route, idx) => (
                   <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                    <td style={{ padding: '8px', fontFamily: "'JetBrains Mono', monospace", color: 'var(--text-primary)' }}>
+                    <td
+                      style={{
+                        padding: '8px',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        color: 'var(--text-primary)',
+                      }}
+                    >
                       {route.route}
                     </td>
-                    <td style={{ padding: '8px', color: 'var(--text-secondary)' }}>{route.method}</td>
-                    <td style={{ padding: '8px', textAlign: 'right', color: 'var(--text-secondary)' }}>{route.count}</td>
-                    <td style={{ padding: '8px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", color: route.avgMs > 1000 ? '#ef4444' : 'var(--text-primary)' }}>
+                    <td style={{ padding: '8px', color: 'var(--text-secondary)' }}>
+                      {route.method}
+                    </td>
+                    <td
+                      style={{ padding: '8px', textAlign: 'right', color: 'var(--text-secondary)' }}
+                    >
+                      {route.count}
+                    </td>
+                    <td
+                      style={{
+                        padding: '8px',
+                        textAlign: 'right',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        color: route.avgMs > 1000 ? '#ef4444' : 'var(--text-primary)',
+                      }}
+                    >
                       {route.avgMs}
                     </td>
-                    <td style={{ padding: '8px', textAlign: 'right', fontFamily: "'JetBrains Mono', monospace", color: route.p95 > 2000 ? '#ef4444' : 'var(--text-primary)' }}>
+                    <td
+                      style={{
+                        padding: '8px',
+                        textAlign: 'right',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        color: route.p95 > 2000 ? '#ef4444' : 'var(--text-primary)',
+                      }}
+                    >
                       {route.p95}
                     </td>
-                    <td style={{ padding: '8px', textAlign: 'right', color: route.errorRate > 0.1 ? '#ef4444' : '#22c55e' }}>
+                    <td
+                      style={{
+                        padding: '8px',
+                        textAlign: 'right',
+                        color: route.errorRate > 0.1 ? '#ef4444' : '#22c55e',
+                      }}
+                    >
                       {(route.errorRate * 100).toFixed(1)}%
                     </td>
                   </tr>
@@ -234,7 +371,14 @@ export function MonitoringDashboard() {
                   <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                     {cost.calls} calls
                   </span>
-                  <span style={{ fontSize: '12px', fontFamily: "'JetBrains Mono', monospace", fontWeight: 600, color: 'var(--text-primary)' }}>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                    }}
+                  >
                     ${cost.totalCost.toFixed(4)}
                   </span>
                 </div>
@@ -270,18 +414,41 @@ function StatusCard({
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
         <span style={{ color: 'var(--text-muted)' }}>{icon}</span>
-        <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <span
+          style={{
+            fontSize: '11px',
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+          }}
+        >
           {label}
         </span>
       </div>
-      <div style={{ fontSize: '20px', fontWeight: 700, color, fontFamily: "'JetBrains Mono', monospace", textTransform: 'capitalize' }}>
+      <div
+        style={{
+          fontSize: '20px',
+          fontWeight: 700,
+          color,
+          fontFamily: "'JetBrains Mono', monospace",
+          textTransform: 'capitalize',
+        }}
+      >
         {value}
       </div>
     </div>
   );
 }
 
-function Section({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
   return (
     <div
       style={{
@@ -293,8 +460,21 @@ function Section({ title, description, children }: { title: string; description:
         backdropFilter: 'blur(var(--liquid-blur)) saturate(140%)',
       }}
     >
-      <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>{title}</h2>
-      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: 'var(--spacing-md)' }}>{description}</p>
+      <h2
+        style={{
+          fontSize: '16px',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          marginBottom: '4px',
+        }}
+      >
+        {title}
+      </h2>
+      <p
+        style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: 'var(--spacing-md)' }}
+      >
+        {description}
+      </p>
       {children}
     </div>
   );

@@ -8,7 +8,8 @@ const STEPS = [
   {
     icon: Upload,
     title: 'Upload an IC Memo or CIM',
-    description: 'Start by uploading an investment committee memo, CIM, pitch deck, or due diligence report.',
+    description:
+      'Start by uploading an investment committee memo, CIM, pitch deck, or due diligence report.',
     action: 'Use the upload zone above',
     hasSampleAction: true,
   },
@@ -16,14 +17,15 @@ const STEPS = [
     icon: BarChart3,
     title: 'Review Deal-Specific Bias Analysis',
     description:
-      'Our AI detects investment-specific biases: anchoring to entry valuation, sunk cost on follow-ons, confirmation bias in thesis validation, and winner\'s curse in competitive auctions.',
+      "Our AI detects investment-specific biases: anchoring to entry valuation, sunk cost on follow-ons, confirmation bias in thesis validation, and winner's curse in competitive auctions.",
     action: 'Click on a document to view results',
     hasSampleAction: false,
   },
   {
     icon: Shield,
     title: 'Track IC Decision Quality',
-    description: 'Link deal outcomes (IRR, MOIC) to detected biases. Build your firm\'s institutional memory of what biases actually hurt returns.',
+    description:
+      "Link deal outcomes (IRR, MOIC) to detected biases. Build your firm's institutional memory of what biases actually hurt returns.",
     action: 'Explore deal pipeline and outcomes',
     hasSampleAction: false,
   },
@@ -51,8 +53,8 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
 
     // Then verify with API (fall back to showing guide if API fails)
     fetch('/api/onboarding')
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         if (data.onboardingCompleted) {
           localStorage.setItem(STORAGE_KEY, 'true');
         } else {

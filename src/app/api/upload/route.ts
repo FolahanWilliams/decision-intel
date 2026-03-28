@@ -62,7 +62,15 @@ export async function POST(request: NextRequest) {
     const dealId = formData.get('dealId') as string | null;
 
     // Validate documentType against known investment document types
-    const VALID_DOC_TYPES = ['ic_memo', 'cim', 'pitch_deck', 'term_sheet', 'due_diligence', 'lp_report', 'other'];
+    const VALID_DOC_TYPES = [
+      'ic_memo',
+      'cim',
+      'pitch_deck',
+      'term_sheet',
+      'due_diligence',
+      'lp_report',
+      'other',
+    ];
     if (documentType && !VALID_DOC_TYPES.includes(documentType)) {
       return NextResponse.json({ error: 'Invalid document type' }, { status: 400 });
     }

@@ -110,11 +110,7 @@ export function AttributionWaterfall({ waterfall }: { waterfall: WaterfallItem[]
                   fontSize: '12px',
                   fontFamily: "'JetBrains Mono', monospace",
                   fontWeight: 600,
-                  color: isEndpoint
-                    ? 'var(--text-primary)'
-                    : isPositive
-                      ? '#22c55e'
-                      : '#ef4444',
+                  color: isEndpoint ? 'var(--text-primary)' : isPositive ? '#22c55e' : '#ef4444',
                 }}
               >
                 {isEndpoint
@@ -130,7 +126,5 @@ export function AttributionWaterfall({ waterfall }: { waterfall: WaterfallItem[]
 }
 
 function formatLabel(label: string): string {
-  return label
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return label.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }

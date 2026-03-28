@@ -62,9 +62,7 @@ export function BiasInteractionMap({
                 alignItems: 'center',
                 gap: '12px',
                 padding: '10px 14px',
-                background: isAmplifying
-                  ? 'rgba(239, 68, 68, 0.04)'
-                  : 'rgba(34, 197, 94, 0.04)',
+                background: isAmplifying ? 'rgba(239, 68, 68, 0.04)' : 'rgba(34, 197, 94, 0.04)',
                 border: `1px solid ${isAmplifying ? 'rgba(239, 68, 68, 0.12)' : 'rgba(34, 197, 94, 0.12)'}`,
                 borderRadius: 'var(--radius-md)',
               }}
@@ -183,13 +181,13 @@ function LegendItem({ color, label, dot }: { color: string; label: string; dot?:
           background: color,
         }}
       />
-      <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{label}</span>
+      <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+        {label}
+      </span>
     </div>
   );
 }
 
 function formatBiasName(type: string): string {
-  return type
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }

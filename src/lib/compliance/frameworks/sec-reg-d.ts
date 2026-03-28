@@ -140,7 +140,7 @@ export const SEC_REG_D_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Investor verification processes selectively gather evidence confirming accredited status while overlooking contradictory indicators. Teams accept self-certification questionnaires at face value and interpret ambiguous financial documentation in the most favorable light to close the subscription.',
       example:
-        'An issuer reviews a prospective investor\'s bank statement showing a large account balance as proof of net worth, ignoring visible mortgage and credit card liabilities that, if properly counted, would bring the investor below the $1 million net worth threshold.',
+        "An issuer reviews a prospective investor's bank statement showing a large account balance as proof of net worth, ignoring visible mortgage and credit card liabilities that, if properly counted, would bring the investor below the $1 million net worth threshold.",
     },
     {
       biasType: 'confirmation_bias',
@@ -167,7 +167,7 @@ export const SEC_REG_D_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'sec_rd_rule_503',
       riskWeight: 0.6,
       mechanism:
-        'Management overestimates the organization\'s ability to meet Form D filing deadlines, assuming administrative processes will function smoothly without dedicated tracking. Overconfidence in operational capabilities leads to missed or late filings that jeopardize the exemption.',
+        "Management overestimates the organization's ability to meet Form D filing deadlines, assuming administrative processes will function smoothly without dedicated tracking. Overconfidence in operational capabilities leads to missed or late filings that jeopardize the exemption.",
       example:
         'A fund administrator assumes the 15-day Form D filing deadline will be handled as part of routine closing procedures, but the first sale date is ambiguously defined across multiple subscription documents, and the filing is submitted 30 days late.',
     },
@@ -211,7 +211,7 @@ export const SEC_REG_D_FRAMEWORK: RegulatoryFramework = {
       mechanism:
         'Deal teams developing offering memoranda reach premature consensus on disclosure adequacy without genuinely stress-testing whether the information provided to non-accredited investors meets the heightened Rule 502(b) requirements. Dissenting views on disclosure completeness are suppressed to maintain deal momentum.',
       example:
-        'A deal team unanimously approves a private placement memorandum for a complex real estate offering that includes non-accredited investors, despite one associate\'s unvoiced concern that the financial projections lack the audited financial statements required under Rule 502(b)(2).',
+        "A deal team unanimously approves a private placement memorandum for a complex real estate offering that includes non-accredited investors, despite one associate's unvoiced concern that the financial projections lack the audited financial statements required under Rule 502(b)(2).",
     },
     {
       biasType: 'groupthink',
@@ -249,7 +249,7 @@ export const SEC_REG_D_FRAMEWORK: RegulatoryFramework = {
       provisionId: 'sec_rd_rule_501',
       riskWeight: 0.7,
       mechanism:
-        'Positive impressions of an investor\'s professional credentials, educational background, or social status create a halo that leads compliance teams to assume financial accreditation without rigorous verification. Professional sophistication is conflated with meeting specific income or net worth thresholds.',
+        "Positive impressions of an investor's professional credentials, educational background, or social status create a halo that leads compliance teams to assume financial accreditation without rigorous verification. Professional sophistication is conflated with meeting specific income or net worth thresholds.",
       example:
         'A placement agent assumes a physician with a prestigious hospital affiliation is accredited based on professional status alone, without verifying income or net worth. The physician, early in their career with substantial medical school debt, does not actually meet the net worth threshold.',
     },

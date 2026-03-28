@@ -82,19 +82,22 @@ export async function GET(request: NextRequest) {
       // Persist learned causal edges and org causal model (Moat 1)
       if (orgId) {
         try {
-          const { learnCausalEdges, updateCausalModel, buildCausalDAG } = await import(
-            '@/lib/learning/causal-learning'
-          );
+          const { learnCausalEdges, updateCausalModel, buildCausalDAG } =
+            await import('@/lib/learning/causal-learning');
           const causalWeights = await learnCausalEdges(orgId);
 
           // Update the OrgCausalModel (aggregated weights + insights)
           await updateCausalModel(orgId).catch(err => {
-            log.debug(`OrgCausalModel update skipped for org ${orgId}: ${err instanceof Error ? err.message : String(err)}`);
+            log.debug(
+              `OrgCausalModel update skipped for org ${orgId}: ${err instanceof Error ? err.message : String(err)}`
+            );
           });
 
           // Rebuild causal DAG if sufficient data (20+ outcomes)
           await buildCausalDAG(orgId).catch(err => {
-            log.debug(`CausalDAG rebuild skipped for org ${orgId}: ${err instanceof Error ? err.message : String(err)}`);
+            log.debug(
+              `CausalDAG rebuild skipped for org ${orgId}: ${err instanceof Error ? err.message : String(err)}`
+            );
           });
           for (const w of causalWeights) {
             await prisma.causalEdge.upsert({

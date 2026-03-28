@@ -13,7 +13,8 @@ const INTEGRATIONS = [
   {
     id: 'slack',
     name: 'Slack',
-    description: 'Real-time decision capture, bias detection nudges, and outcome tracking via Slack channels.',
+    description:
+      'Real-time decision capture, bias detection nudges, and outcome tracking via Slack channels.',
     icon: MessageSquare,
     color: '#4A154B',
     category: 'Collaboration',
@@ -31,7 +32,8 @@ const INTEGRATIONS = [
   {
     id: 'webhooks',
     name: 'Outbound Webhooks',
-    description: 'Send real-time event notifications to your own endpoints with HMAC-signed payloads.',
+    description:
+      'Send real-time event notifications to your own endpoints with HMAC-signed payloads.',
     icon: Webhook,
     color: '#22c55e',
     category: 'Developer',
@@ -72,7 +74,7 @@ export function IntegrationMarketplace() {
 
   useEffect(() => {
     fetch('/api/integrations/slack/status')
-      .then(r => r.ok ? r.json() : null)
+      .then(r => (r.ok ? r.json() : null))
       .then(data => {
         if (data) setSlackStatus({ connected: data.connected, teamName: data.teamName });
       })
@@ -81,15 +83,36 @@ export function IntegrationMarketplace() {
 
   return (
     <div style={{ padding: 'var(--spacing-lg)', maxWidth: '1100px', margin: '0 auto' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
+      <h1
+        style={{
+          fontSize: '24px',
+          fontWeight: 700,
+          color: 'var(--text-primary)',
+          marginBottom: '6px',
+        }}
+      >
         Integrations
       </h1>
-      <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xl)' }}>
+      <p
+        style={{
+          fontSize: '14px',
+          color: 'var(--text-secondary)',
+          marginBottom: 'var(--spacing-xl)',
+        }}
+      >
         Connect Decision Intel with your existing tools and workflows
       </p>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', marginBottom: 'var(--spacing-lg)', borderBottom: '1px solid var(--liquid-border)', paddingBottom: '0' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '4px',
+          marginBottom: 'var(--spacing-lg)',
+          borderBottom: '1px solid var(--liquid-border)',
+          paddingBottom: '0',
+        }}
+      >
         {(['marketplace', 'webhooks'] as const).map(tab => (
           <button
             key={tab}
@@ -101,7 +124,8 @@ export function IntegrationMarketplace() {
               color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-muted)',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === tab ? '2px solid var(--text-primary)' : '2px solid transparent',
+              borderBottom:
+                activeTab === tab ? '2px solid var(--text-primary)' : '2px solid transparent',
               cursor: 'pointer',
               textTransform: 'capitalize',
               marginBottom: '-1px',
@@ -113,7 +137,13 @@ export function IntegrationMarketplace() {
       </div>
 
       {activeTab === 'marketplace' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gap: '16px',
+          }}
+        >
           {INTEGRATIONS.map(integration => {
             const Icon = integration.icon;
             const isSlackConnected = integration.id === 'slack' && slackStatus?.connected;
@@ -131,7 +161,14 @@ export function IntegrationMarketplace() {
                   opacity: isComingSoon ? 0.6 : 1,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '12px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                    marginBottom: '12px',
+                  }}
+                >
                   <div
                     style={{
                       width: 40,
@@ -148,27 +185,62 @@ export function IntegrationMarketplace() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      <h3
+                        style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}
+                      >
                         {integration.name}
                       </h3>
                       {isSlackConnected && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '10px', color: '#22c55e', background: 'rgba(34, 197, 94, 0.1)', padding: '2px 6px', borderRadius: 'var(--radius-sm)' }}>
+                        <span
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            fontSize: '10px',
+                            color: '#22c55e',
+                            background: 'rgba(34, 197, 94, 0.1)',
+                            padding: '2px 6px',
+                            borderRadius: 'var(--radius-sm)',
+                          }}
+                        >
                           <Check size={10} /> Connected
                         </span>
                       )}
                       {isComingSoon && (
-                        <span style={{ fontSize: '10px', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.06)', padding: '2px 6px', borderRadius: 'var(--radius-sm)' }}>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            color: 'var(--text-muted)',
+                            background: 'rgba(255,255,255,0.06)',
+                            padding: '2px 6px',
+                            borderRadius: 'var(--radius-sm)',
+                          }}
+                        >
                           Coming Soon
                         </span>
                       )}
                     </div>
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        color: 'var(--text-muted)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
                       {integration.category}
                     </span>
                   </div>
                 </div>
 
-                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>
+                <p
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.5,
+                    marginBottom: '16px',
+                  }}
+                >
                   {integration.description}
                 </p>
 
@@ -178,7 +250,12 @@ export function IntegrationMarketplace() {
                       <a
                         href="/api/integrations/slack/oauth"
                         className="btn btn-primary btn-sm"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          textDecoration: 'none',
+                        }}
                       >
                         Connect <ExternalLink size={12} />
                       </a>

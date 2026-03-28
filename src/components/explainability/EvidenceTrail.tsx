@@ -103,7 +103,13 @@ export function EvidenceTrail({
                 {bias.severity}
               </span>
               {bias.confidence != null && (
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: "'JetBrains Mono', monospace" }}>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    color: 'var(--text-muted)',
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
                   {Math.round(bias.confidence * 100)}%
                 </span>
               )}
@@ -123,13 +129,34 @@ export function EvidenceTrail({
                       borderRadius: '0 var(--radius-sm) var(--radius-sm) 0',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        marginBottom: '4px',
+                      }}
+                    >
                       <Quote size={12} style={{ color: 'var(--text-muted)' }} />
-                      <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          color: 'var(--text-muted)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
                         Source Text
                       </span>
                     </div>
-                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: 1.5 }}>
+                    <p
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--text-secondary)',
+                        fontStyle: 'italic',
+                        lineHeight: 1.5,
+                      }}
+                    >
                       &ldquo;{bias.excerpt}&rdquo;
                     </p>
                   </div>
@@ -138,10 +165,19 @@ export function EvidenceTrail({
                 {/* Explanation */}
                 {bias.explanation && (
                   <div style={{ marginBottom: '10px' }}>
-                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '2px' }}>
+                    <p
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                        fontWeight: 500,
+                        marginBottom: '2px',
+                      }}
+                    >
                       Explanation
                     </p>
-                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    <p
+                      style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}
+                    >
                       {bias.explanation}
                     </p>
                   </div>
@@ -150,7 +186,14 @@ export function EvidenceTrail({
                 {/* Suggestion */}
                 {bias.suggestion && (
                   <div style={{ marginBottom: '10px' }}>
-                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '2px' }}>
+                    <p
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--text-muted)',
+                        fontWeight: 500,
+                        marginBottom: '2px',
+                      }}
+                    >
                       Mitigation Suggestion
                     </p>
                     <p style={{ fontSize: '12px', color: '#22c55e', lineHeight: 1.5 }}>
@@ -169,7 +212,14 @@ export function EvidenceTrail({
                       borderRadius: 'var(--radius-sm)',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        marginBottom: '4px',
+                      }}
+                    >
                       <AlertTriangle size={12} style={{ color: '#f97316' }} />
                       <span style={{ fontSize: '11px', fontWeight: 600, color: '#f97316' }}>
                         Root Cause Attribution
@@ -204,7 +254,5 @@ export function EvidenceTrail({
 }
 
 function formatBiasName(type: string): string {
-  return type
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
