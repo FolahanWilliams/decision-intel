@@ -121,8 +121,8 @@ export function computeConsensusScore(priors: BlindPriorInput[]): ConsensusResul
   const rawScore = Math.max(0, Math.min(100, 100 - confPenalty - actionPenalty));
   const score = Math.round(rawScore);
 
-  // Identify dissenters: confidence > 1.5 stddev from mean
-  const dissenterThreshold = confStdDev * 1.5;
+  // Identify dissenters: confidence > 1 stddev from mean
+  const dissenterThreshold = confStdDev * 1.0;
   const dissenterIds = priors
     .filter(p => Math.abs(p.confidence - avgConfidence) > dissenterThreshold)
     .map(p => p.userId);

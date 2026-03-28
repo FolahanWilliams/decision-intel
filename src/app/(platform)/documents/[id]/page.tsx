@@ -226,7 +226,7 @@ function ConvictionBadge({ analysis }: { analysis: Analysis }) {
     return computeConviction({
       factCheckScore: factCheck?.score ?? null,
       verificationRate,
-      logicalScore: logicalAnalysis?.overallScore ?? null,
+      logicalScore: logicalAnalysis?.score ?? null,
       noiseStdDev: noiseStats?.stdDev ?? null,
       blindSpotGap: cognitiveAnalysis?.blindSpotGap ?? null,
     });
