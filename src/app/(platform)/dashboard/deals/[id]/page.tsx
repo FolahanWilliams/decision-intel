@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit2, ChevronRight, FileText, Upload, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Edit2, ChevronRight, FileText, Upload, AlertTriangle, Shield, TrendingUp } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useDeal } from '@/hooks/useDeals';
 import { DealFormModal } from '@/components/deals/DealFormModal';
@@ -501,6 +501,106 @@ function BiasSummaryTab({
 
 // ─── Outcome Tab ──────────────────────────────────────────────────────────────
 
+interface ROIData {
+  ticketSize: number;
+  totalBiasesDetected: number;
+  confirmedBiases: number;
+  biasImpactRate: number;
+  valueProtected: number;
+  breakdown: { biasType: string; confirmed: boolean; estimatedLoss: number }[];
+}
+
+function ValueProtectedCard({ dealId }: { dealId: string }) {
+  const [roi, setRoi] = useState<ROIData | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/deals/${dealId}/roi`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setRoi(d))
+      .catch(() => null);
+  }, [dealId]);
+
+  if (!roi || roi.valueProtected === 0) return null;
+
+  return (
+    <div
+      style={{
+        background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(59, 130, 246, 0.06))',
+        border: '1px solid rgba(34, 197, 94, 0.2)',
+        borderRadius: 10,
+        padding: '18px 22px',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <Shield className="w-4 h-4" style={{ color: '#22c55e' }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#22c55e' }}>Value Protected</span>
+      </div>
+
+      <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+        ${roi.valueProtected.toLocaleString()}
+      </div>
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
+        Estimated capital protected by bias detection on ${roi.ticketSize.toLocaleString()} ticket
+      </div>
+
+      <div style={{ display: 'flex', gap: 16, marginBottom: 12 }}>
+        <div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Biases Detected</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
+            {roi.totalBiasesDetected}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Confirmed</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: '#22c55e' }}>
+            {roi.confirmedBiases}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Impact Rate</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
+            {Math.round(roi.biasImpactRate * 100)}%
+          </div>
+        </div>
+      </div>
+
+      {roi.breakdown.filter((b) => b.confirmed).length > 0 && (
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>
+            Confirmed Bias Breakdown
+          </div>
+          {roi.breakdown
+            .filter((b) => b.confirmed)
+            .map((b, i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: 12,
+                  color: 'var(--text-secondary)',
+                  padding: '3px 0',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <TrendingUp className="w-3 h-3" style={{ color: '#22c55e' }} />
+                  {b.biasType}
+                </span>
+                <span style={{ fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>
+                  ${b.estimatedLoss.toLocaleString()}
+                </span>
+              </div>
+            ))}
+        </div>
+      )}
+
+      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 10, fontStyle: 'italic' }}>
+        Methodology: ticket size x research-based loss rate per confirmed bias type (Kahneman, Malmendier & Tate)
+      </div>
+    </div>
+  );
+}
+
 function OutcomeTab({
   deal,
   onUpdate,
@@ -510,6 +610,9 @@ function OutcomeTab({
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Value Protected Card */}
+      <ValueProtectedCard dealId={deal.id} />
+
       {/* Display existing outcome */}
       {deal.outcome && <DealOutcomeDisplay outcome={deal.outcome} currency={deal.currency} />}
 

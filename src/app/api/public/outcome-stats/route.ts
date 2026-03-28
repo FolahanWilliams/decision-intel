@@ -16,6 +16,9 @@ const MIN_OUTCOMES_FOR_REAL_DATA = 10;
 // Research-based defaults (Kahneman et al.)
 const DEFAULTS = {
   totalOutcomes: 0,
+  totalAnalyses: 0,
+  totalBiasesDetected: 0,
+  topBiasTypes: [] as { biasType: string; count: number }[],
   noiseReductionRate: 0.12, // 12% — Kahneman "Noise" baseline
   biasDetectionAccuracy: 0.74, // 74% — industry research average
   avgScoreImprovement: 8.5, // points on 100-scale
@@ -26,6 +29,23 @@ const DEFAULTS = {
 
 export async function GET() {
   try {
+    // Platform-wide counts (always returned regardless of outcome threshold)
+    const [totalAnalyses, totalBiasesDetected, topBiasTypesRaw] = await Promise.all([
+      prisma.analysis.count(),
+      prisma.biasInstance.count(),
+      prisma.biasInstance.groupBy({
+        by: ['biasType'],
+        _count: { biasType: true },
+        orderBy: { _count: { biasType: 'desc' } },
+        take: 5,
+      }),
+    ]);
+
+    const topBiasTypes = topBiasTypesRaw.map(b => ({
+      biasType: b.biasType,
+      count: b._count.biasType,
+    }));
+
     const outcomes = await prisma.decisionOutcome.findMany({
       select: {
         outcome: true,
@@ -42,9 +62,10 @@ export async function GET() {
     });
 
     if (outcomes.length < MIN_OUTCOMES_FOR_REAL_DATA) {
-      return NextResponse.json(DEFAULTS, {
-        headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
-      });
+      return NextResponse.json(
+        { ...DEFAULTS, totalAnalyses, totalBiasesDetected, topBiasTypes },
+        { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } }
+      );
     }
 
     // Compute real aggregates
@@ -104,6 +125,9 @@ export async function GET() {
     return NextResponse.json(
       {
         totalOutcomes: outcomes.length,
+        totalAnalyses,
+        totalBiasesDetected,
+        topBiasTypes,
         noiseReductionRate: Math.round(noiseReductionRate * 1000) / 1000,
         biasDetectionAccuracy: Math.round(biasDetectionAccuracy * 100) / 100,
         avgScoreImprovement: Math.round(avgScoreImprovement * 10) / 10,

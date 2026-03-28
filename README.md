@@ -15,6 +15,8 @@
 
 [![CI/CD](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml)
 
+> **[Book a Demo](https://www.decision-intel.com/demo)** | **[Start Free Trial](https://www.decision-intel.com/login)** | **[View Pricing](#pricing)** | **[Case Studies](https://www.decision-intel.com/#case-studies)**
+
 **[Live Demo](https://www.decision-intel.com/)** | **[Architecture](#architecture)** | **[Getting Started](#getting-started)** | **[Roadmap](#roadmap)**
 
 ---
@@ -56,6 +58,34 @@ The platform runs documents through a **15-agent analysis pipeline** with deal-s
 | **IC Members**         | Groupthink and authority bias silence genuine debate             | Blind IC voting, noise measurement across committee members, dissent tracking            |
 
 **ROI**: A single avoided bad deal saves **$50M-$500M** in capital. The platform pays for itself after one corrected thesis. Organizations using systematic decision hygiene report **up to 60% reduction in decision variance**.
+
+---
+
+## Pricing
+
+| Plan | Price | Best For |
+|:-----|:------|:---------|
+| **Noise Audit** | Free | Try the bias engine on 3 documents |
+| **Individual Partner** | $349/mo | Deal partners running IC memos through the gauntlet |
+| **Fund** | $1,999/mo | Full IC team with deal pipeline + Slack integration |
+| **Multi-Fund / Enterprise** | From $25K/yr | Multi-fund platforms with SSO + custom taxonomies |
+
+All paid plans include a 14-day free trial. No credit card required to start.
+
+**[View full pricing details](https://www.decision-intel.com/#pricing)**
+
+---
+
+## 30-Day Pilot Program
+
+For qualified PE/VC funds ($100M+ AUM), we offer a guided pilot:
+
+- **Guided onboarding** — we configure taxonomies, bias profiles, and noise benchmarks for your fund strategy
+- **50 IC memo analyses** — run your actual memos through the 15-agent pipeline
+- **Outcome tracking setup** — connect your deal pipeline so the system starts learning immediately
+- **Calibration report** — at 30 days, receive a full report: bias patterns, noise levels, and ROI projections
+
+**[Apply for a pilot](https://www.decision-intel.com/demo)**
 
 ---
 
@@ -1251,6 +1281,21 @@ vercel --prod
 ```
 
 Or connect your GitHub repository to Vercel for automatic deployments on push.
+
+---
+
+## Platform Traction
+
+Live metrics from the Decision Intel platform:
+
+| Metric | Value |
+|:-------|:------|
+| **Analyses Run** | Updated live — see [/api/public/outcome-stats](https://www.decision-intel.com/api/public/outcome-stats) |
+| **Biases Detected** | Across all IC memos, CIMs, and pitch decks processed |
+| **Outcomes Tracked** | Deal outcomes linked back to original bias detections |
+| **Detection Accuracy** | Percentage of flagged biases later confirmed by deal outcomes |
+
+These counters are displayed on the [landing page](https://www.decision-intel.com) and powered by the public outcome stats API.
 
 ---
 
