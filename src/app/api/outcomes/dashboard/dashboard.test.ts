@@ -43,11 +43,17 @@ vi.mock('@/utils/supabase/server', () => ({
 
 const mockFindFirst = vi.fn();
 const mockFindMany = vi.fn();
+const mockGroupBy = vi.fn();
+const mockAggregate = vi.fn();
 const mockQueryRaw = vi.fn();
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     teamMember: { findFirst: (...args: unknown[]) => mockFindFirst(...args) },
-    decisionOutcome: { findMany: (...args: unknown[]) => mockFindMany(...args) },
+    decisionOutcome: {
+      findMany: (...args: unknown[]) => mockFindMany(...args),
+      groupBy: (...args: unknown[]) => mockGroupBy(...args),
+      aggregate: (...args: unknown[]) => mockAggregate(...args),
+    },
     decisionPrior: { findMany: vi.fn().mockResolvedValue([]) },
     $queryRaw: (...args: unknown[]) => mockQueryRaw(...args),
   },
@@ -99,6 +105,8 @@ describe('GET /api/outcomes/dashboard', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } });
     mockFindFirst.mockResolvedValue({ orgId: 'org-1' });
     mockFindMany.mockResolvedValue([]);
+    mockGroupBy.mockResolvedValue([]);
+    mockAggregate.mockResolvedValue({ _avg: { impactScore: null } });
     mockQueryRaw.mockResolvedValue([]);
   });
 
@@ -132,6 +140,18 @@ describe('GET /api/outcomes/dashboard', () => {
   });
 
   it('computes KPIs correctly', async () => {
+    // groupBy returns per-outcome counts
+    mockGroupBy.mockImplementation(async (args: Record<string, unknown>) => {
+      const by = args.by as string[];
+      if (by.includes('mostAccurateTwin')) return []; // twin leaderboard call
+      return [
+        { outcome: 'success', _count: { id: 1 } },
+        { outcome: 'failure', _count: { id: 1 } },
+        { outcome: 'partial_success', _count: { id: 1 } },
+        { outcome: 'too_early', _count: { id: 1 } },
+      ];
+    });
+    mockAggregate.mockResolvedValue({ _avg: { impactScore: 56.6667 } });
     mockFindMany.mockResolvedValue([
       makeOutcome({
         outcome: 'success',
@@ -172,6 +192,15 @@ describe('GET /api/outcomes/dashboard', () => {
   });
 
   it('computes bias cost deltas correctly', async () => {
+    mockGroupBy.mockImplementation(async (args: Record<string, unknown>) => {
+      const by = args.by as string[];
+      if (by.includes('mostAccurateTwin')) return [];
+      return [
+        { outcome: 'success', _count: { id: 2 } },
+        { outcome: 'failure', _count: { id: 2 } },
+      ];
+    });
+    mockAggregate.mockResolvedValue({ _avg: { impactScore: null } });
     mockFindMany.mockResolvedValue([
       makeOutcome({ outcome: 'success', confirmedBiases: [] }),
       makeOutcome({ outcome: 'success', confirmedBiases: [] }),
@@ -193,6 +222,22 @@ describe('GET /api/outcomes/dashboard', () => {
   });
 
   it('builds persona leaderboard from twin data', async () => {
+    // The route uses groupBy for twin leaderboard
+    mockGroupBy.mockImplementation(async (args: Record<string, unknown>) => {
+      const by = args.by as string[];
+      if (by.includes('mostAccurateTwin')) {
+        return [
+          { mostAccurateTwin: 'Alice', outcome: 'success', _count: { id: 2 } },
+          { mostAccurateTwin: 'Bob', outcome: 'failure', _count: { id: 1 } },
+          { mostAccurateTwin: 'Bob', outcome: 'success', _count: { id: 1 } },
+        ];
+      }
+      return [
+        { outcome: 'success', _count: { id: 3 } },
+        { outcome: 'failure', _count: { id: 1 } },
+      ];
+    });
+    mockAggregate.mockResolvedValue({ _avg: { impactScore: null } });
     mockFindMany.mockResolvedValue([
       makeOutcome({ outcome: 'success', mostAccurateTwin: 'Alice' }),
       makeOutcome({ outcome: 'success', mostAccurateTwin: 'Alice' }),
@@ -233,7 +278,7 @@ describe('GET /api/outcomes/dashboard', () => {
   });
 
   it('returns schema drift fallback with correct shape', async () => {
-    mockFindMany.mockRejectedValue({ code: 'P2021' });
+    mockGroupBy.mockRejectedValue({ code: 'P2021' });
 
     const res = await GET(makeRequest());
     const body = await res.json();
