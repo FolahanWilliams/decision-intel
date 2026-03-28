@@ -19,6 +19,7 @@ import {
   Network,
   MessageSquare,
   Lock,
+  Crosshair,
 } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -32,6 +33,7 @@ type TabId =
   | 'market'
   | 'sales'
   | 'stats'
+  | 'frameworks'
   | 'playbook';
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
@@ -43,6 +45,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'market', label: 'Market Strategy', icon: <Target size={16} /> },
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} /> },
   { id: 'stats', label: 'Live Stats', icon: <TrendingUp size={16} /> },
+  { id: 'frameworks', label: 'Research & Frameworks', icon: <Crosshair size={16} /> },
   { id: 'playbook', label: 'Founder Playbook', icon: <BookOpen size={16} /> },
 ];
 
@@ -1075,6 +1078,27 @@ function CompetitiveMoat() {
         </p>
       </div>
 
+      {/* Academic Backing */}
+      <div style={{ ...card, borderLeft: '3px solid #8b5cf6' }}>
+        <div style={sectionTitle}>
+          <Brain size={18} style={{ color: '#8b5cf6' }} /> Academic Validation
+        </div>
+        <p
+          style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 0 }}
+        >
+          <strong style={{ color: '#8b5cf6' }}>Strebulaev (Stanford GSB, 2024):</strong> VC firms
+          pursuing consensus in investment decisions have <strong>lower IPO rates</strong>. Your
+          blind prior collection and consensus scoring are directly designed around this finding —
+          not a coincidence but an intentional implementation of what the research shows works. Cite
+          this when selling Committee Rooms:
+          <em>
+            {' '}
+            &quot;Stanford research shows consensus-seeking ICs underperform. Our blind prior system
+            is built to prevent exactly that.&quot;
+          </em>
+        </p>
+      </div>
+
       {/* Key Differentiators */}
       <div style={card}>
         <div style={sectionTitle}>
@@ -1690,6 +1714,52 @@ function MarketStrategy() {
 function SalesToolkit() {
   return (
     <div>
+      {/* Pitch Reframe — Strebulaev-Inspired */}
+      <div style={{ ...card, borderTop: '3px solid #22c55e', borderLeft: '3px solid #22c55e' }}>
+        <div style={sectionTitle}>
+          <Rocket size={18} style={{ color: '#22c55e' }} /> Critical Pitch Reframe
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+          <div
+            style={{
+              padding: 12,
+              borderRadius: 8,
+              background: 'rgba(239, 68, 68, 0.06)',
+              border: '1px solid rgba(239, 68, 68, 0.15)',
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#ef4444', marginBottom: 4 }}>
+              DEFENSIVE (old)
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              &quot;Avoid bad deals. Catch biases. Prevent mistakes.&quot;
+            </div>
+          </div>
+          <div
+            style={{
+              padding: 12,
+              borderRadius: 8,
+              background: 'rgba(34, 197, 94, 0.06)',
+              border: '1px solid rgba(34, 197, 94, 0.15)',
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#22c55e', marginBottom: 4 }}>
+              OFFENSIVE (new)
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              &quot;Swing with confidence. Make bolder bets because you&apos;ve stress-tested the
+              thesis. Decision Intel gives your IC permission to be ambitious.&quot;
+            </div>
+          </div>
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>
+          <strong style={{ color: 'var(--text-primary)' }}>Why this works:</strong> Strebulaev
+          (Stanford GSB) shows the best funds optimize for home runs, not strikeout avoidance. GPs
+          don&apos;t want a safety net — they want a decision quality amplifier. The defensive pitch
+          attracts compliance buyers. The offensive pitch attracts Managing Partners.
+        </p>
+      </div>
+
       {/* Objection Handler */}
       <div style={{ ...card, borderTop: '3px solid #f59e0b' }}>
         <div style={sectionTitle}>
@@ -2118,6 +2188,328 @@ function LiveStats() {
   );
 }
 
+// ─── Tab Content: Research & Frameworks ─────────────────────────────────────
+
+function ResearchFrameworks() {
+  return (
+    <div>
+      {/* Header */}
+      <div style={{ ...card, borderTop: '3px solid #8b5cf6' }}>
+        <div style={label}>RESEARCH-TO-ACTION LIBRARY</div>
+        <h2
+          style={{
+            fontSize: 20,
+            fontWeight: 800,
+            color: 'var(--text-primary, #fff)',
+            marginBottom: 6,
+            lineHeight: 1.3,
+          }}
+        >
+          The Venture Mindset — Ilya Strebulaev (Stanford GSB)
+        </h2>
+        <p
+          style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 0 }}
+        >
+          9 principles from 20 years of VC research at Stanford. Each principle mapped to Decision
+          Intel features and startup strategy. Source: <em>The Venture Mindset</em> (Strebulaev
+          &amp; Gornall, 2024). 50% of US IPOs over 50 years were VC-backed. 75% of large public
+          companies. When ICs make biased decisions, the ripple effects shape entire industries.
+        </p>
+      </div>
+
+      {/* 9 Principles */}
+      <div style={{ display: 'grid', gap: 12 }}>
+        {[
+          {
+            num: 1,
+            principle: "Home Runs Matter, Strikeouts Don't",
+            summary:
+              'Only 1 in 20 VC investments hits a home run, but a single winner returns 100x. Failure tolerance is structural, not emotional.',
+            product:
+              "Reframe your pitch from defensive to offensive. DQI doesn't just help avoid bad deals — it gives IC members permission to swing big because they've stress-tested the decision. \"Swing with confidence because you've already audited the thesis.\"",
+            startup:
+              'Go all-in on PE/VC. Don\'t build 6 features for 4 markets. Your "home run" is one flagship fund that becomes a case study. Accept that some features won\'t land.',
+            actions: [
+              'Rewrite landing page hero from "avoid mistakes" to "make better bets with confidence"',
+              'Focus pilot outreach on 5 target funds, not 50',
+            ],
+            color: '#22c55e',
+          },
+          {
+            num: 2,
+            principle: 'Agree to Disagree',
+            summary:
+              'VC firms pursuing consensus have LOWER IPO rates. The best firms let a single partner with conviction push a deal through. Microsoft M12 has an "anti-veto rule."',
+            product:
+              'Your Committee Decision Rooms with blind prior collection are a direct implementation of this principle. Cite Strebulaev in marketing: "Stanford research shows consensus-seeking committees underperform. Decision Intel\'s blind prior system is designed around this finding." Your consensus scoring quantifies when agreement is genuine vs. groupthink.',
+            startup:
+              "When building your advisory board, don't surround yourself with people who agree with you. Strebulaev's data: productive disagreement correlates with better outcomes.",
+            actions: [
+              'Add Strebulaev citation to Committee Rooms UI/marketing',
+              'Create a "Dissent Quality" metric in consensus scoring',
+              'Blog post: "Why Your IC\'s Consensus Is Killing Your Returns"',
+            ],
+            color: '#3b82f6',
+          },
+          {
+            num: 3,
+            principle: 'Get Outside Your Four Walls',
+            summary:
+              'VCs maintain 2-3x larger, more diverse LinkedIn networks than corporate executives. Insularity kills innovation.',
+            product:
+              'Your Slack integration puts Decision Intel inside the daily workflow where deals are discussed — not as a standalone app. This is the "inside the walls" play. The cross-department edge type in your knowledge graph detects organizational silos.',
+            startup:
+              "Be embedded in the PE/VC community. ILPA conferences, ACG events, LP/GP networking circles. Don't sell from the outside — be part of the ecosystem.",
+            actions: [
+              'Attend 2 PE/VC conferences per quarter',
+              'Launch a "Decision Quality" newsletter for PE professionals',
+              'Build a Slack community for IC members',
+            ],
+            color: '#f59e0b',
+          },
+          {
+            num: 4,
+            principle: 'The Jockey vs. The Horse',
+            summary:
+              'The most important VC investment factor is team quality, not business model. The "jockey" matters more than the "horse."',
+            product:
+              'You detect "Management Halo Effect" but could go deeper. Build a Jockey/Horse Balance Score — detect when an IC memo spends 80% on team pedigree and 20% on business fundamentals, or vice versa. Flag imbalanced memos.',
+            startup:
+              "Your codebase IS your jockey credibility: 113 annotated failure cases, 20x20 bias interaction matrix, causal inference. In technical DD, your depth signals you're the right founder for this problem.",
+            actions: [
+              'Add Jockey/Horse Balance Score to bias detection',
+              'Track ratio of team vs. fundamentals language in IC memos',
+              'Prepare "why me" narrative for investor conversations',
+            ],
+            color: '#ef4444',
+          },
+          {
+            num: 5,
+            principle: 'The Prepared Mind',
+            summary:
+              '"Chance favors only the prepared mind" (Pasteur). Jensen Huang spends 2-3 hours daily studying emerging tech. The best VCs recognize opportunities instantly because they\'ve studied deeply.',
+            product:
+              "Your Boardroom Simulation IS a \"prepared mind\" tool. You're giving IC members a pre-briefing on which biases historically damaged similar deals, what toxic combinations to watch for, and what diverse perspectives would flag. Lean into this framing: you're not auditing documents — you're preparing decision-makers.",
+            startup:
+              "Spend 30 min daily reading PE/VC industry news, academic papers on decision science, and competitor updates. Your Intelligence Hub's 14 RSS feeds should be your own morning briefing too.",
+            actions: [
+              'Rename "Pre-Meeting Bias Briefing" to "Prepared Mind Briefing" in marketing',
+              'Add a "Prepare for IC" CTA before committee meetings',
+              'Subscribe to 3 PE newsletters personally',
+            ],
+            color: '#8b5cf6',
+          },
+          {
+            num: 6,
+            principle: 'Fast Lane, Then Slow Lane',
+            summary:
+              'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
+            product:
+              'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 15-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
+            startup:
+              'Apply to your sales process too. Qualify leads fast — "Do you have an investment committee? Do you review IC memos?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
+            actions: [
+              'Build Quick Scan feature (top priority — Strebulaev-backed)',
+              'Add 2-question lead qualification before demos',
+              'Create a "Red Flag Preview" that runs before full analysis',
+            ],
+            color: '#22c55e',
+          },
+          {
+            num: 7,
+            principle: 'Double Down and Quit',
+            summary:
+              "VCs combat escalation of commitment through structural mechanisms: requiring multiple investors for follow-on rounds, bringing in arm's-length co-investors, requiring partner consensus specifically on follow-ons.",
+            product:
+              "BUILD THIS: Longitudinal Bias Tracking — don't just analyze individual IC memos, track how bias patterns change over the life of a deal. Does confirmation bias increase from initial investment to Series B follow-on? Is the follow-on memo less critical than the initial? This is a unique, hard-to-replicate feature.",
+            startup:
+              "Apply to your own features. Some features you shipped won't get traction. Be willing to kill them rather than doubling down. Measure feature usage monthly.",
+            actions: [
+              'Build deal-level longitudinal bias tracking',
+              'Compare bias severity across deal stages (screening vs IC vs follow-on)',
+              'Set up monthly feature usage analytics',
+            ],
+            color: '#3b82f6',
+          },
+          {
+            num: 8,
+            principle: 'Sharing the Pie (Incentive Alignment)',
+            summary:
+              'VCs invented vesting schedules in the 1970s. The principle is about aligning incentives across all contributors to prevent short-term behavior.',
+            product:
+              "Your \"Carry Incentive Distortion\" bias is a direct implementation. Go deeper: detect when an IC memo's enthusiasm correlates suspiciously with the deal's impact on a specific partner's carry economics. Track if advocacy intensity changes near fund deadlines.",
+            startup:
+              "When you hire your first team members, offer meaningful equity. Strebulaev's data shows aligned incentives outperform salary-heavy compensation in startups.",
+            actions: [
+              'Enhance carry incentive detection with fund timeline awareness',
+              'Detect deployment pressure signals ("need to put capital to work")',
+              'Design equity plan for first 3 hires',
+            ],
+            color: '#f59e0b',
+          },
+          {
+            num: 9,
+            principle: 'The Meta-Principle: VC-Backed Companies Shape the Economy',
+            summary:
+              '50% of US IPOs over 50 years were VC-backed. 75% of large public companies. VC-backed companies spend 92 cents of every R&D dollar. When ICs make biased decisions, the ripple effects go far beyond the fund.',
+            product:
+              'This is your highest-level pitch narrative: "Decision Intel doesn\'t just protect fund returns — it improves the quality of capital allocation across the innovation economy." When a biased IC kills a good deal, that startup might never get funded. When a biased IC backs a bad deal, capital that could have gone to a better company is wasted.',
+            startup:
+              'This framing elevates you from "SaaS tool vendor" to "mission-driven company improving how capital flows to innovation." Investors respond to mission, not just TAM.',
+            actions: [
+              'Add this framing to pitch deck\'s "Why This Matters" slide',
+              'Use in PR/press outreach — "improving how capital flows to innovation"',
+              'Blog post: "The Hidden Cost of IC Bias on the Innovation Economy"',
+            ],
+            color: '#ef4444',
+          },
+        ].map((p, i) => (
+          <div key={i} style={{ ...card, borderLeft: `4px solid ${p.color}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: '50%',
+                  background: p.color,
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 13,
+                  fontWeight: 800,
+                  flexShrink: 0,
+                }}
+              >
+                {p.num}
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary, #fff)' }}>
+                {p.principle}
+              </div>
+            </div>
+            <p
+              style={{
+                fontSize: 12,
+                color: 'var(--text-muted)',
+                marginBottom: 10,
+                lineHeight: 1.6,
+                fontStyle: 'italic',
+              }}
+            >
+              {p.summary}
+            </p>
+            <div
+              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}
+            >
+              <div
+                style={{
+                  padding: 10,
+                  borderRadius: 8,
+                  background: 'rgba(99, 102, 241, 0.06)',
+                  border: '1px solid rgba(99, 102, 241, 0.15)',
+                }}
+              >
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', marginBottom: 4 }}>
+                  FOR THE PRODUCT
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                  {p.product}
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: 10,
+                  borderRadius: 8,
+                  background: 'rgba(34, 197, 94, 0.06)',
+                  border: '1px solid rgba(34, 197, 94, 0.15)',
+                }}
+              >
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#22c55e', marginBottom: 4 }}>
+                  FOR THE STARTUP
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                  {p.startup}
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: p.color, marginBottom: 4 }}>
+                ACTION ITEMS
+              </div>
+              {p.actions.map((a, j) => (
+                <div
+                  key={j}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 6,
+                    fontSize: 12,
+                    color: 'var(--text-secondary)',
+                    marginBottom: 3,
+                  }}
+                >
+                  <ChevronRight size={12} style={{ color: p.color, flexShrink: 0, marginTop: 2 }} />
+                  <span>{a}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Key Takeaway */}
+      <div style={{ ...card, borderTop: '3px solid #6366f1', marginTop: 12 }}>
+        <div style={sectionTitle}>
+          <Zap size={18} style={{ color: '#6366f1' }} /> Most Actionable Takeaways
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {[
+            {
+              action: 'Reframe pitch from defensive to offensive',
+              detail:
+                '"Swing with confidence" not "avoid mistakes." The best funds don\'t want a safety net — they want a decision quality amplifier.',
+            },
+            {
+              action: 'Cite Strebulaev in marketing',
+              detail:
+                'Academic credibility from Stanford GSB for blind priors and committee rooms. "Stanford research shows consensus-seeking ICs underperform."',
+            },
+            {
+              action: 'Build Quick Scan mode',
+              detail:
+                'Fast lane/slow lane. 30-second red flag scan before 4-minute full analysis. Matches actual VC workflow and reduces friction.',
+            },
+            {
+              action: 'Build longitudinal bias tracking',
+              detail:
+                'Track bias drift across deal lifecycle. The follow-on memo should be MORE critical than the initial — is it? Nobody else will build this.',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{ padding: 12, borderRadius: 8, background: 'var(--bg-tertiary, #0a0a0a)' }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: 4,
+                }}
+              >
+                {item.action}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                {item.detail}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Tab Content: Founder Playbook ──────────────────────────────────────────
 
 function FounderPlaybook() {
@@ -2312,6 +2704,24 @@ function FounderPlaybook() {
             '4h',
             'PE has different dominant patterns than healthcare. Vertical-specific baselines for new orgs.',
           ],
+          [
+            'Quick Scan Mode',
+            'Very High',
+            '4h',
+            'Strebulaev "Fast Lane": 30-sec red flag scan before full 4-min analysis. Matches how VCs actually work (rapid filter → deep dive).',
+          ],
+          [
+            'Longitudinal Bias Tracking',
+            'Very High',
+            '6h',
+            'Strebulaev "Double Down & Quit": track bias drift across deal lifecycle. Does confirmation bias increase from screening to follow-on?',
+          ],
+          [
+            'Jockey/Horse Balance Score',
+            'High',
+            '3h',
+            'Strebulaev "Jockey vs Horse": detect when IC memos are 80% team pedigree / 20% fundamentals. Flag imbalanced theses.',
+          ],
         ].map(([feat, impact, effort, why], i) => {
           const impactColor =
             impact === 'Extreme' ? '#ef4444' : impact === 'Very High' ? '#22c55e' : '#3b82f6';
@@ -2477,6 +2887,7 @@ export default function FounderHubPage() {
     market: <MarketStrategy />,
     sales: <SalesToolkit />,
     stats: <LiveStats />,
+    frameworks: <ResearchFrameworks />,
     playbook: <FounderPlaybook />,
   };
 
