@@ -141,45 +141,54 @@ export async function GET(request: NextRequest) {
     if (source) where.source = source;
     if (status) where.status = status;
 
-    const [entries, total] = await Promise.all([
-      prisma.journalEntry.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
-      }),
-      prisma.journalEntry.count({ where }),
-    ]);
+    let entries;
+    let total: number;
 
-    // Enrich with linked decision data where available
-    const enrichedEntries = await Promise.all(
-      entries.map(async entry => {
-        if (!entry.linkedDecisionId) return entry;
-        try {
-          const linkedDecision = await prisma.humanDecision.findUnique({
-            where: { id: entry.linkedDecisionId },
-            select: {
-              id: true,
-              status: true,
-              decisionType: true,
-              createdAt: true,
-              cognitiveAudit: {
-                select: {
-                  decisionQualityScore: true,
-                  summary: true,
+    try {
+      [entries, total] = await Promise.all([
+        prisma.journalEntry.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: limit,
+          include: {
+            linkedDecision: {
+              select: {
+                id: true,
+                content: true,
+                status: true,
+                cognitiveAudit: {
+                  select: {
+                    decisionQualityScore: true,
+                    summary: true,
+                  },
                 },
               },
             },
-          });
-          return { ...entry, linkedDecision };
-        } catch {
-          return entry;
-        }
-      })
-    );
+          },
+        }),
+        prisma.journalEntry.count({ where }),
+      ]);
+    } catch (includeError) {
+      const includeMsg = includeError instanceof Error ? includeError.message : String(includeError);
+      if (includeMsg.includes('P2021') || includeMsg.includes('P2022')) {
+        // Schema drift — fall back to basic query without include
+        [entries, total] = await Promise.all([
+          prisma.journalEntry.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit,
+          }),
+          prisma.journalEntry.count({ where }),
+        ]);
+      } else {
+        throw includeError;
+      }
+    }
 
     return NextResponse.json({
-      entries: enrichedEntries,
+      entries,
       pagination: {
         page,
         limit,

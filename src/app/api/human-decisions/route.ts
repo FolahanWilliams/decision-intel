@@ -28,8 +28,30 @@ import {
   CognitiveAuditLogicalAnalysis,
   CognitiveAuditSwot,
 } from '@/lib/schemas/human-audit';
+import { z } from 'zod';
 import crypto from 'crypto';
 import type { HumanDecisionInput } from '@/types/human-audit';
+
+const humanDecisionSchema = z.object({
+  source: z.enum(['slack', 'meeting_transcript', 'email', 'jira', 'manual']),
+  content: z.string().min(1).max(100_000),
+  sourceRef: z.string().optional(),
+  channel: z.string().optional(),
+  decisionType: z.enum([
+    'triage',
+    'escalation',
+    'approval',
+    'override',
+    'strategic',
+    'vendor_eval',
+    'capital_allocation',
+    'investment_thesis',
+    'portfolio_exit',
+    'm_and_a',
+  ]).optional(),
+  participants: z.array(z.string()).optional(),
+  linkedAnalysisId: z.string().optional(),
+});
 
 const log = createLogger('HumanDecisionAPI');
 
@@ -60,37 +82,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let body: HumanDecisionInput;
+    let rawBody: unknown;
     try {
-      body = (await req.json()) as HumanDecisionInput;
+      rawBody = await req.json();
     } catch {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    // Validate required fields
-    if (!body.content || !body.source) {
+    const parsed = humanDecisionSchema.safeParse(rawBody);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Missing required fields: content, source' },
+        { error: 'Invalid request body', details: parsed.error.flatten() },
         { status: 400 }
       );
     }
-
-    // Validate content length to prevent unbounded storage
-    const MAX_CONTENT_LENGTH = 100_000;
-    if (typeof body.content !== 'string' || body.content.length > MAX_CONTENT_LENGTH) {
-      return NextResponse.json(
-        { error: `Content must be a string of at most ${MAX_CONTENT_LENGTH} characters` },
-        { status: 400 }
-      );
-    }
-
-    const validSources = ['slack', 'meeting_transcript', 'email', 'jira', 'manual'];
-    if (!validSources.includes(body.source)) {
-      return NextResponse.json(
-        { error: `Invalid source. Must be one of: ${validSources.join(', ')}` },
-        { status: 400 }
-      );
-    }
+    const body: HumanDecisionInput = parsed.data;
 
     // Deduplicate by content hash
     const contentHash = crypto.createHash('sha256').update(body.content).digest('hex');

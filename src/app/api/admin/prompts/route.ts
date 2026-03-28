@@ -6,7 +6,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import {
   registerPrompt,
@@ -15,27 +14,14 @@ import {
   initializePromptRegistry,
 } from '@/lib/prompts/registry';
 import { createLogger } from '@/lib/utils/logger';
+import { verifyAdmin, ADMIN_DENIED } from '@/lib/utils/admin';
 
 const log = createLogger('AdminPrompts');
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e =>
-      e.trim().toLowerCase()
-    );
-    if (!user.email || !adminEmails.includes(user.email.toLowerCase())) {
-      log.warn(`Non-admin user ${user.id} attempted to access prompt management`);
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const admin = await verifyAdmin();
+    if (!admin) return ADMIN_DENIED;
 
     const { searchParams } = new URL(req.url);
     const action = searchParams.get('action');
@@ -92,22 +78,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e =>
-      e.trim().toLowerCase()
-    );
-    if (!user.email || !adminEmails.includes(user.email.toLowerCase())) {
-      log.warn(`Non-admin user ${user.id} attempted to modify prompts`);
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const admin = await verifyAdmin();
+    if (!admin) return ADMIN_DENIED;
 
     const body = await req.json();
     const { name, content } = body;
@@ -122,7 +94,7 @@ export async function POST(req: NextRequest) {
     // Log audit trail
     await prisma.auditLog.create({
       data: {
-        userId: user.id,
+        userId: admin.id,
         action: 'prompt.update',
         resource: 'prompt',
         resourceId: result.id,
@@ -149,14 +121,8 @@ export async function POST(req: NextRequest) {
  */
 export async function PUT(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const admin = await verifyAdmin();
+    if (!admin) return ADMIN_DENIED;
 
     const body = await req.json();
     const { name, version } = body;
@@ -194,7 +160,7 @@ export async function PUT(req: NextRequest) {
     // Log audit trail
     await prisma.auditLog.create({
       data: {
-        userId: user.id,
+        userId: admin.id,
         action: 'prompt.rollback',
         resource: 'prompt',
         resourceId: targetPrompt.id,

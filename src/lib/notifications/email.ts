@@ -109,7 +109,10 @@ export async function notifyAnalysisComplete(
   analysisId: string
 ) {
   // Check user settings
-  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch(() => null);
+  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch((err: unknown) => {
+    log.warn('Failed to fetch user settings:', err instanceof Error ? err.message : String(err));
+    return null;
+  });
   if (settings && !settings.analysisAlerts) return; // User opted out
 
   const scoreColor = score >= 70 ? '#22c55e' : score >= 40 ? '#eab308' : '#ef4444';
@@ -164,7 +167,10 @@ export async function sendWeeklyDigest(
     nudgesReceived: number;
   }
 ) {
-  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch(() => null);
+  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch((err: unknown) => {
+    log.warn('Failed to fetch user settings:', err instanceof Error ? err.message : String(err));
+    return null;
+  });
   if (settings && !settings.weeklyDigest) return;
 
   const subject = `Your Weekly Decision Intel Digest`;
@@ -263,8 +269,9 @@ export async function notifyTeamInvite(
         status: success ? 'sent' : 'failed',
       },
     });
-  } catch {
-    // Schema drift
+  } catch (err) {
+    // Schema drift — NotificationLog table may not exist yet
+    log.warn('Failed to log invite notification:', err instanceof Error ? err.message : String(err));
   }
 }
 
@@ -278,7 +285,10 @@ export async function deliverEmailNudge(
   nudgeType: string,
   severity: string
 ) {
-  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch(() => null);
+  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch((err: unknown) => {
+    log.warn('Failed to fetch user settings:', err instanceof Error ? err.message : String(err));
+    return null;
+  });
   if (settings && !settings.emailNotifications) return;
 
   const severityColor =
@@ -336,7 +346,10 @@ export async function notifyOutcomeReminder(
   userId: string,
   items: Array<{ analysisId: string; filename: string }>
 ): Promise<void> {
-  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch(() => null);
+  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch((err: unknown) => {
+    log.warn('Failed to fetch user settings:', err instanceof Error ? err.message : String(err));
+    return null;
+  });
   if (settings && !settings.emailNotifications) return;
 
   const email = await getUserEmail(userId);

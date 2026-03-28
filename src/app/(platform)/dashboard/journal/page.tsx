@@ -14,6 +14,7 @@ import {
   XCircle,
   Clock,
   Send,
+  AlertTriangle,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
@@ -102,6 +103,7 @@ export default function JournalPage() {
   const [newEntryTitle, setNewEntryTitle] = useState('');
   const [newEntryContent, setNewEntryContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchEntries = useCallback(async () => {
     setLoading(true);
@@ -120,7 +122,7 @@ export default function JournalPage() {
         setPagination(data.pagination || null);
       }
     } catch {
-      // Silent fail
+      setError('Failed to load journal entries. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -142,7 +144,7 @@ export default function JournalPage() {
         setEntries(prev => prev.map(e => (e.id === entryId ? { ...e, status: 'processed' } : e)));
       }
     } catch {
-      // Silent fail
+      setError('Failed to load journal entries. Please try again.');
     } finally {
       setConverting(null);
     }
@@ -168,7 +170,7 @@ export default function JournalPage() {
         fetchEntries();
       }
     } catch {
-      // Silent fail
+      setError('Failed to load journal entries. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -358,6 +360,17 @@ export default function JournalPage() {
           </button>
         ))}
       </div>
+
+      {/* Error Banner */}
+      {error && (
+        <div style={{ padding: '12px 16px', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.3)', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--spacing-md)', fontSize: '13px', color: '#f87171' }} className="flex items-center gap-sm">
+          <AlertTriangle size={14} />
+          {error}
+          <button onClick={() => { setError(null); fetchEntries(); }} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontWeight: 600, fontSize: '12px' }}>
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* Timeline List */}
       {loading ? (

@@ -6,9 +6,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { verifyAdmin, ADMIN_DENIED } from '@/lib/utils/admin';
 
 const log = createLogger('RetryFailed');
 
@@ -17,26 +17,8 @@ const log = createLogger('RetryFailed');
  */
 export async function GET(_req: NextRequest) {
   try {
-    // Authenticate user
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check admin status via ADMIN_EMAILS
-    const adminEmails = (process.env.ADMIN_EMAILS?.split(',') || []).map(e =>
-      e.trim().toLowerCase()
-    );
-    const isAdmin = user.email && adminEmails.includes(user.email.toLowerCase());
-
-    if (!isAdmin) {
-      log.warn(`Non-admin user ${user.id} attempted to access failed analyses`);
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const admin = await verifyAdmin();
+    if (!admin) return ADMIN_DENIED;
 
     // Fetch failed analyses
     const failed = await prisma.failedAnalysis.findMany({
@@ -80,24 +62,8 @@ export async function GET(_req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    // Authenticate user
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check admin status
-    const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
-    const isAdmin = user.email && adminEmails.includes(user.email);
-
-    if (!isAdmin) {
-      log.warn(`Non-admin user ${user.id} attempted to retry failed analysis`);
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const admin = await verifyAdmin();
+    if (!admin) return ADMIN_DENIED;
 
     const body = await req.json();
     const { failedAnalysisId, retryAll } = body;

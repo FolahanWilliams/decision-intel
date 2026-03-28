@@ -5,33 +5,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
 import { errorTracker } from '@/lib/utils/error-tracker';
 import { createLogger } from '@/lib/utils/logger';
+import { verifyAdmin, ADMIN_DENIED } from '@/lib/utils/admin';
 
 const log = createLogger('AdminErrors');
 
 export async function GET(req: NextRequest) {
   try {
-    // Authenticate user
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin (you may want to implement proper role checking)
-    // For now, we'll check if the user email is in an admin list
-    const adminEmails = process.env.ADMIN_EMAILS?.split(',') || [];
-    const isAdmin = user.email && adminEmails.includes(user.email);
-
-    if (!isAdmin) {
-      log.warn(`Non-admin user ${user.id} attempted to access error logs`);
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const admin = await verifyAdmin();
+    if (!admin) return ADMIN_DENIED;
 
     // Get query parameters
     const { searchParams } = new URL(req.url);

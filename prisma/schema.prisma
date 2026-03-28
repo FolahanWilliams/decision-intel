@@ -487,6 +487,8 @@ model DecisionOutcome {
   @@index([orgId])
   @@index([outcome])
   @@index([reportedAt])
+  @@index([userId, reportedAt])
+  @@index([orgId, reportedAt])
 }
 
 model BoardroomPersona {
@@ -814,6 +816,7 @@ model JournalEntry {
   @@index([source])
   @@index([status])
   @@index([createdAt])
+  @@index([linkedDecisionId])
 }
 
 // ─── Public API Keys ──────────────────────────────────────────────────────

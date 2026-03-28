@@ -12,7 +12,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { validateContent } from '@/lib/utils/resilience';
 import { createHash } from 'crypto';
-import pdfParse from 'pdf-parse';
+import { PDFParse } from 'pdf-parse';
 import mammoth from 'mammoth';
 
 const log = createLogger('BulkUpload');
@@ -221,8 +221,10 @@ async function processFilesAsync(
       if (file.type === 'text/plain' || file.type === 'text/markdown') {
         content = new TextDecoder().decode(buffer);
       } else if (file.type === 'application/pdf') {
-        const pdfData = await pdfParse(Buffer.from(buffer));
-        content = pdfData.text;
+        const parser = new PDFParse({ data: new Uint8Array(buffer) });
+        const textResult = await parser.getText();
+        content = textResult.text;
+        await parser.destroy();
         if (!content.trim()) {
           throw new Error('PDF contains no extractable text (may be image-only)');
         }

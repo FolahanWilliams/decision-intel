@@ -6,6 +6,10 @@ import Stripe from 'stripe';
 
 const log = createLogger('StripeWebhook');
 
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return typeof val === 'object' && val !== null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
@@ -38,10 +42,9 @@ export async function POST(request: NextRequest) {
         if (userId && customerId && subscriptionId) {
           // Fetch subscription details for period end
           const sub = await getStripe().subscriptions.retrieve(subscriptionId);
-          const subData = sub as unknown as Record<string, unknown>;
           const periodEnd =
-            typeof subData.current_period_end === 'number'
-              ? new Date(subData.current_period_end * 1000)
+            isRecord(sub) && typeof sub.current_period_end === 'number'
+              ? new Date(sub.current_period_end * 1000)
               : null;
 
           await prisma.subscription.upsert({
@@ -69,10 +72,9 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.updated': {
         const sub = event.data.object as Stripe.Subscription;
         const subscriptionId = sub.id;
-        const subObj = sub as unknown as Record<string, unknown>;
         const updatedPeriodEnd =
-          typeof subObj.current_period_end === 'number'
-            ? new Date(subObj.current_period_end * 1000)
+          isRecord(sub) && typeof sub.current_period_end === 'number'
+            ? new Date(sub.current_period_end * 1000)
             : null;
 
         await prisma.subscription
@@ -109,9 +111,9 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as unknown as Record<string, unknown>;
-        const rawSub = invoice.subscription;
-        const subId = typeof rawSub === 'string' ? rawSub : (rawSub as { id?: string } | null)?.id;
+        const invoice = event.data.object;
+        const rawSub = isRecord(invoice) ? invoice.subscription : undefined;
+        const subId = typeof rawSub === 'string' ? rawSub : (isRecord(rawSub) && typeof rawSub.id === 'string' ? rawSub.id : undefined);
         if (subId) {
           await prisma.subscription
             .update({

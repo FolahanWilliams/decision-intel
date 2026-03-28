@@ -12,8 +12,13 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
       // If a redirect param was provided (e.g., from invite flow), use it
-      if (redirect && redirect.startsWith('/')) {
-        return NextResponse.redirect(`${origin}${redirect}`);
+      // Validate: must start with "/" but NOT "//" (prevents protocol-relative open redirects)
+      if (redirect && /^\/[^/]/.test(redirect)) {
+        // Additional safety: parse and reconstruct to strip any encoded tricks
+        const safeUrl = new URL(redirect, origin);
+        if (safeUrl.origin === origin) {
+          return NextResponse.redirect(safeUrl.toString());
+        }
       }
 
       // Detect first-time users for onboarding

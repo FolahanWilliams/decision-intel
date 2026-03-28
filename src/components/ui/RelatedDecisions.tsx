@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { GitBranch, ChevronDown, ChevronUp, Brain, ArrowRight, Link2 } from 'lucide-react';
+import { GitBranch, ChevronDown, ChevronUp, Brain, ArrowRight, Link2, Loader2 } from 'lucide-react';
 
 interface RelatedEdge {
   id: string;
@@ -70,7 +70,15 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
       <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '8px 0' }}>{error}</div>
     );
   }
-  if (loading || !data || data.edges.length === 0) return null;
+  if (loading) {
+    return (
+      <div className="flex items-center gap-sm" style={{ padding: 'var(--spacing-md)', color: 'var(--text-muted)', fontSize: '13px' }}>
+        <Loader2 size={14} className="animate-spin" />
+        Finding related decisions...
+      </div>
+    );
+  }
+  if (!data || data.edges.length === 0) return null;
 
   // Get connected nodes (exclude self)
   const connectedEdges = data.edges.filter(e => e.source === analysisId || e.target === analysisId);
