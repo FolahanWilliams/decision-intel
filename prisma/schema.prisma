@@ -412,6 +412,9 @@ model Nudge {
   wasHelpful      Boolean?
   experimentId    String?        // FK to NudgeExperiment
   variantId       String?        // Which variant was served
+  decisionFrameId String?        // FK to DecisionFrame for pre→post decision linking
+  parentNudgeId   String?        // Self-ref for escalation chains
+  phase           String         @default("post_decision") // "pre_decision" | "post_decision"
   failureCount  Int       @default(0)
   lastAttemptAt DateTime?
   nextRetryAt   DateTime?
@@ -714,6 +717,11 @@ model DecisionFrame {
   monetaryValue     Decimal?  // Estimated decision value
   currency          String?   @default("GBP") // ISO currency code
   documentId        String?  @unique
+  threadTs          String?  // Slack thread timestamp for pre-decision monitoring
+  channelId         String?  // Slack channel ID for thread tracking
+  linkedDecisionId  String?  // FK to HumanDecision when deliberation becomes decision
+  nudgeCount        Int      @default(0) // How many nudges delivered in this thread
+  escalationLevel   String   @default("none") // "none" | "info" | "warning" | "critical"
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -721,6 +729,7 @@ model DecisionFrame {
 
   @@index([userId])
   @@index([orgId])
+  @@index([channelId, threadTs])
 }
 
 // ─── Deep Vertical Integration — Compliance (Moat 5) ─────────────────────
@@ -735,6 +744,11 @@ model DecisionRoom {
   createdBy     String          // userId
   orgId         String?
   status        String          @default("open") // open, closed, archived
+  decisionType  String?         // "investment_committee" | "board_review" | "deal_committee" | "risk_committee" | "general"
+  consensusScore Float?         // 0-100, computed from blind prior convergence on close
+  dissenterWeight Json?         // { userId: predictionAccuracy } — learned from outcomes
+  outcomeId     String?         // FK to DecisionOutcome for post-committee outcome tracking
+  biasBriefing  Json?           // Auto-generated pre-meeting bias context from linked analysis
   closedAt      DateTime?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
@@ -744,6 +758,7 @@ model DecisionRoom {
   @@index([createdBy])
   @@index([orgId])
   @@index([status])
+  @@index([decisionType])
 }
 
 model RoomParticipant {
@@ -1191,5 +1206,40 @@ model IntegrationConnection {
 
   @@unique([orgId, provider])
   @@index([provider])
+}
+
+// ─── Multi-Touch Decision Attribution ────────────────────────────────────
+
+model DecisionAttribution {
+  id                String   @id @default(cuid())
+  outcomeAnalysisId String   // The analysis whose outcome triggered attribution
+  sourceAnalysisId  String   // A contributing analysis in the path
+  contributionPct   Float    // 0-100 — this source's share of influence
+  pathLength        Int      // Hops from source to outcome
+  pathEdgeTypes     String[] // Edge types traversed along the path
+  edgeStrengthAvg   Float    // Average edge strength along path
+  orgId             String?
+  computedAt        DateTime @default(now())
+
+  @@unique([outcomeAnalysisId, sourceAnalysisId])
+  @@index([outcomeAnalysisId])
+  @@index([sourceAnalysisId])
+  @@index([orgId])
+}
+
+// ─── Calibration Journey (Outcome Gate Gamification) ─────────────────────
+
+model CalibrationMilestone {
+  id              String   @id @default(cuid())
+  userId          String
+  orgId           String?
+  milestoneType   String   // "outcomes_reported" | "accuracy_improvement" | "calibration_level"
+  milestoneValue  Int      // e.g., 5, 10, 25 outcomes reported
+  metricBefore    Float?   // accuracy rate before this milestone
+  metricAfter     Float?   // accuracy rate after this milestone
+  unlockedAt      DateTime @default(now())
+
+  @@index([userId])
+  @@index([orgId])
 }
 

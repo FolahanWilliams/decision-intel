@@ -246,7 +246,47 @@ export async function GET(req: NextRequest) {
         .sort((a, b) => b.accuracy - a.accuracy);
 
       // ---------------------------------------------------------------
-      // 5. Pending outcome reminders
+      // 5. Twin Effectiveness (dissent accuracy + narrative)
+      // ---------------------------------------------------------------
+      let twinEffectiveness: Array<{
+        twinName: string;
+        dissentCount: number;
+        effectiveDissentCount: number;
+        effectivenessRate: number;
+        avgBeliefDelta: number;
+        sampleSize: number;
+        narrative: string;
+      }> = [];
+
+      try {
+        const { computeTwinEffectiveness } = await import('@/lib/learning/twin-effectiveness');
+        const rawTwins = await computeTwinEffectiveness(orgId, orgId ? undefined : user.id);
+        twinEffectiveness = rawTwins.map(t => {
+          const leaderboardEntry = Object.entries(twinMap).find(([name]) => name === t.twinName);
+          const accuracy = leaderboardEntry
+            ? Math.round((leaderboardEntry[1].correct / leaderboardEntry[1].predictions) * 100)
+            : null;
+          const accuracyStr = accuracy !== null ? ` Selected as most accurate ${accuracy}% of the time.` : '';
+
+          let narrative: string;
+          if (t.sampleSize < 3) {
+            narrative = `${t.twinName} has dissented ${t.dissentCount} time(s). More outcomes needed for reliable insights.`;
+          } else if (t.effectivenessRate >= 0.7) {
+            narrative = `${t.twinName} is your most reliable dissenter. When they objected, the decision later proved risky ${Math.round(t.effectivenessRate * 100)}% of the time.${accuracyStr}`;
+          } else if (t.effectivenessRate >= 0.4) {
+            narrative = `${t.twinName}: ${t.effectiveDissentCount} of ${t.dissentCount} dissents proved correct (${Math.round(t.effectivenessRate * 100)}%).${accuracyStr}`;
+          } else {
+            narrative = `${t.twinName} dissented ${t.dissentCount} times, but only ${t.effectiveDissentCount} proved correct. Their concerns may not align with real risk patterns.`;
+          }
+
+          return { ...t, narrative };
+        });
+      } catch (twinErr) {
+        log.debug('Twin effectiveness computation skipped:', twinErr);
+      }
+
+      // ---------------------------------------------------------------
+      // 6. Pending outcome reminders
       // ---------------------------------------------------------------
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -289,6 +329,7 @@ export async function GET(req: NextRequest) {
           calibration,
           biasCosts,
           personaLeaderboard,
+          twinEffectiveness,
           pendingOutcomes: pendingReminders.length,
           timeRange,
         },

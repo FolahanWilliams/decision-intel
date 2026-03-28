@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { title, documentId, analysisId, participantUserIds } = body;
+    const { title, documentId, analysisId, participantUserIds, decisionType } = body;
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
       return NextResponse.json({ error: 'Missing required field: title' }, { status: 400 });
@@ -47,12 +47,56 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Auto-generate bias briefing from linked analysis
+    let biasBriefing = null;
+    if (analysisId) {
+      try {
+        const analysis = await prisma.analysis.findUnique({
+          where: { id: analysisId },
+          select: {
+            overallScore: true,
+            noiseScore: true,
+            biases: { select: { biasType: true, severity: true }, take: 10 },
+          },
+        });
+        if (analysis) {
+          let toxicCombinations: Array<{ patternLabel: string; toxicScore: number; biasTypes: string[] }> = [];
+          try {
+            const toxics = await prisma.toxicCombination.findMany({
+              where: { analysisId },
+              select: { patternLabel: true, toxicScore: true, biasTypes: true },
+              orderBy: { toxicScore: 'desc' },
+              take: 3,
+            });
+            toxicCombinations = toxics;
+          } catch {
+            // ToxicCombination table may not exist
+          }
+
+          biasBriefing = {
+            overallScore: analysis.overallScore,
+            noiseScore: analysis.noiseScore,
+            biases: analysis.biases,
+            toxicCombinations,
+            generatedAt: new Date().toISOString(),
+          };
+        }
+      } catch (briefErr) {
+        log.debug('Bias briefing generation skipped:', briefErr);
+      }
+    }
+
+    const VALID_DECISION_TYPES = ['investment_committee', 'board_review', 'deal_committee', 'risk_committee', 'general'];
+    const validType = decisionType && VALID_DECISION_TYPES.includes(decisionType) ? decisionType : null;
+
     const room = await prisma.decisionRoom.create({
       data: {
         title: title.trim(),
         createdBy: user.id,
         documentId: documentId || null,
         analysisId: analysisId || null,
+        decisionType: validType,
+        biasBriefing: biasBriefing ?? undefined,
         participants: {
           create: participantCreates,
         },
@@ -62,7 +106,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    log.info(`Decision room created: ${room.id} by user ${user.id}`);
+    log.info(`Decision room created: ${room.id} (type: ${validType ?? 'general'}) by user ${user.id}`);
     return NextResponse.json(room, { status: 201 });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

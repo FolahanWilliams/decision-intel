@@ -19,6 +19,10 @@ import {
   verifySlackSignature,
   slackEventToDecisionInput,
   slackEventToPreDecisionInput,
+  isDecisionMessage,
+  detectMessageBiases,
+  generatePreDecisionNudge,
+  getEscalatedSeverity,
 } from '@/lib/integrations/slack/handler';
 import { prisma } from '@/lib/prisma';
 import { toPrismaStringArray, toPrismaJson } from '@/lib/utils/prisma-json';
@@ -66,6 +70,124 @@ export async function POST(req: NextRequest) {
       const decisionInput = slackEventToDecisionInput(payload);
 
       if (!decisionInput) {
+        // ── Thread Monitoring: check if this message is in a tracked DecisionFrame thread ──
+        const event = payload.event;
+        const threadChannel = event?.channel;
+        const threadTs = event?.thread_ts || event?.ts;
+
+        if (threadChannel && threadTs) {
+          try {
+            const existingFrame = await prisma.decisionFrame.findFirst({
+              where: { channelId: threadChannel, threadTs },
+              select: {
+                id: true,
+                escalationLevel: true,
+                nudgeCount: true,
+                linkedDecisionId: true,
+              },
+            });
+
+            if (existingFrame && !existingFrame.linkedDecisionId) {
+              const messageText = event?.text || '';
+
+              // Check if deliberation has escalated to a commitment
+              if (isDecisionMessage(messageText)) {
+                const teamId = payload.team_id;
+                let frameInstallation: { installedByUserId: string; orgId: string | null } | null = null;
+                if (teamId) {
+                  frameInstallation = await prisma.slackInstallation.findFirst({
+                    where: { teamId, status: 'active' },
+                    select: { installedByUserId: true, orgId: true },
+                  });
+                }
+                const frameUserId = frameInstallation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || 'system-slack';
+                const frameOrgId = frameInstallation?.orgId || teamId || null;
+
+                // Create HumanDecision from the commitment message
+                const contentHash = (await import('crypto')).createHash('sha256').update(messageText).digest('hex');
+                const existingDecision = await prisma.humanDecision.findUnique({
+                  where: { contentHash },
+                  select: { id: true },
+                });
+
+                if (!existingDecision) {
+                  const humanDecision = await prisma.humanDecision.create({
+                    data: {
+                      userId: frameUserId,
+                      orgId: frameOrgId,
+                      source: 'slack',
+                      sourceRef: `${threadChannel}:${event?.ts}`,
+                      channel: threadChannel,
+                      participants: toPrismaStringArray([event?.user || '']),
+                      content: messageText,
+                      contentHash,
+                      status: 'pending',
+                    },
+                  });
+
+                  // Link DecisionFrame → HumanDecision
+                  await prisma.decisionFrame.update({
+                    where: { id: existingFrame.id },
+                    data: { linkedDecisionId: humanDecision.id },
+                  });
+
+                  log.info(`Pre-decision thread resolved to decision ${humanDecision.id} in frame ${existingFrame.id}`);
+
+                  // Run audit in background
+                  const decisionInputForAudit = slackEventToDecisionInput(payload);
+                  if (decisionInputForAudit) {
+                    processSlackDecision(humanDecision.id, decisionInputForAudit, teamId).catch(err => {
+                      log.error(`Background audit for linked decision failed:`, err);
+                    });
+                  }
+                }
+              } else {
+                // Check for escalation: new biases detected in ongoing thread
+                const newBiases = detectMessageBiases(messageText);
+                const escalated = getEscalatedSeverity(
+                  existingFrame.escalationLevel,
+                  newBiases
+                );
+
+                if (escalated) {
+                  const nudge = generatePreDecisionNudge(messageText, newBiases);
+                  if (nudge) {
+                    const slackPayload = formatNudgeForSlack(
+                      {
+                        nudgeType: 'pre_decision_coaching',
+                        triggerReason: `Escalated: ${newBiases.map(b => b.bias).join(', ')}`,
+                        message: nudge.message,
+                        severity: escalated,
+                        channel: 'slack',
+                      },
+                      threadTs
+                    );
+                    slackPayload.channel = threadChannel;
+                    deliverSlackNudge(slackPayload, payload.team_id).catch(err => {
+                      log.error('Escalated nudge delivery failed:', err);
+                    });
+
+                    await prisma.decisionFrame.update({
+                      where: { id: existingFrame.id },
+                      data: {
+                        escalationLevel: escalated,
+                        nudgeCount: { increment: 1 },
+                      },
+                    });
+
+                    log.info(`Nudge escalated to ${escalated} in frame ${existingFrame.id}`);
+                  }
+                }
+              }
+            }
+          } catch (frameErr) {
+            const msg = frameErr instanceof Error ? frameErr.message : String(frameErr);
+            if (!msg.includes('P2021') && !msg.includes('P2022')) {
+              log.warn('Thread monitoring failed (non-critical):', msg);
+            }
+          }
+        }
+
         // Check for pre-decision deliberation messages and deliver coaching nudges
         const preDecision = slackEventToPreDecisionInput(payload);
         if (preDecision?.nudge) {
@@ -106,6 +228,7 @@ export async function POST(req: NextRequest) {
                 'system-slack';
               const frameOrgId = frameInstallation?.orgId || frameTeamId || null;
 
+              const [frameChannel, frameThreadTs] = (preDecision.input.sourceRef ?? '').split(':');
               await prisma.decisionFrame.create({
                 data: {
                   userId: frameUserId,
@@ -115,6 +238,10 @@ export async function POST(req: NextRequest) {
                   successCriteria: [],
                   failureCriteria: [],
                   stakeholders: preDecision.frame.stakeholders,
+                  channelId: frameChannel || null,
+                  threadTs: frameThreadTs || null,
+                  nudgeCount: 1,
+                  escalationLevel: preDecision.nudge?.severity ?? 'info',
                 },
               });
 

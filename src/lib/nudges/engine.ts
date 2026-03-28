@@ -72,6 +72,10 @@ export async function generateNudges(
   const graphNudge = await checkGraphPattern(context);
   if (graphNudge) nudges.push(graphNudge);
 
+  // 9. Committee Prior Gap — linked decision room has incomplete submissions
+  const committeeNudge = await checkCommitteePriorGap(context);
+  if (committeeNudge) nudges.push(committeeNudge);
+
   // Escalate critical nudges from Slack decisions to Slack delivery
   if (decision.source === 'slack' && decision.channel) {
     for (const nudge of nudges) {
@@ -498,5 +502,68 @@ export async function checkGraphNudgesForAnalysis(
     if (code === 'P2021' || code === 'P2022') return 0;
     log.warn('Graph nudge check for analysis failed (non-critical):', error);
     return 0;
+  }
+}
+
+// ─── 9. Committee Prior Gap ────────────────────────────────────────────────
+
+/**
+ * Detect when a decision is linked to a DecisionRoom where not all
+ * committee members have submitted their blind priors.
+ */
+async function checkCommitteePriorGap(
+  context: NudgeTriggerContext
+): Promise<NudgeDefinition | null> {
+  try {
+    // Find open rooms linked to this decision's analysis
+    const sourceRef = context.decision.sourceRef;
+    if (!sourceRef) return null;
+
+    const rooms = await prisma.decisionRoom.findMany({
+      where: {
+        status: 'open',
+        OR: [
+          { analysisId: sourceRef },
+          { documentId: sourceRef },
+        ],
+      },
+      select: {
+        id: true,
+        title: true,
+        _count: {
+          select: {
+            participants: true,
+            blindPriors: true,
+          },
+        },
+      },
+      take: 1,
+    });
+
+    if (rooms.length === 0) return null;
+
+    const room = rooms[0];
+    const total = room._count.participants;
+    const submitted = room._count.blindPriors;
+
+    if (total <= 0 || submitted >= total) return null;
+
+    const missing = total - submitted;
+    const submissionRate = submitted / total;
+
+    const severity: NudgeSeverity = submissionRate < 0.5 ? 'warning' : 'info';
+
+    return {
+      nudgeType: 'pre_decision_coaching',
+      triggerReason: `Committee room "${room.title}": ${missing} of ${total} members haven't submitted priors`,
+      message: `${missing} of ${total} committee members haven't submitted their blind priors yet for "${room.title}". Collect all perspectives before discussion to reduce groupthink.`,
+      severity,
+      channel: 'dashboard',
+    };
+  } catch (error) {
+    const code = (error as { code?: string })?.code;
+    if (code === 'P2021' || code === 'P2022') return null;
+    log.debug('Committee prior gap check skipped:', error);
+    return null;
   }
 }
