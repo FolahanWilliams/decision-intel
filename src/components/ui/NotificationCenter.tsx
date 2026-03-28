@@ -80,7 +80,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           return [...prev, ...deduped].sort((a, b) => b.createdAt - a.createdAt).slice(0, 50);
         });
       })
-      .catch(() => {});
+      .catch((err) => {
+        // Log fetch failures so they're not silently swallowed
+        console.warn('Failed to fetch notifications:', err instanceof Error ? err.message : err);
+      });
   }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
