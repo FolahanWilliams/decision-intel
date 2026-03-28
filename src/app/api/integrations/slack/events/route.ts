@@ -559,7 +559,7 @@ async function processSlackDecision(
       await prisma.humanDecision
         .update({ where: { id: decisionId }, data: { status: 'error' } })
         .catch(() => {});
-      return;
+      return null;
     }
 
     // Generate and persist nudges, deliver critical ones back to Slack
