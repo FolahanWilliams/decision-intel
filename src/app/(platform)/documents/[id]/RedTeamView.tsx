@@ -10,7 +10,7 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useToast } from '@/components/ui/ToastContext';
+import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('RedTeamView');

@@ -17,7 +17,7 @@ import {
 import Link from 'next/link';
 import { useChatStream, type ChatMessage } from '@/hooks/useChatStream';
 import { useDocuments } from '@/hooks/useDocuments';
-import { useToast } from '@/components/ui/ToastContext';
+import { useToast } from '@/components/ui/EnhancedToast';
 import { SuggestedQuestions } from '@/components/chat/SuggestedQuestions';
 import { SourceAttribution } from '@/components/chat/SourceAttribution';
 import { ChatEmptyState } from '@/components/chat/ChatEmptyState';

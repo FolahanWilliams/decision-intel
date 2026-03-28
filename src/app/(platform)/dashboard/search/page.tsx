@@ -3,7 +3,8 @@
 import { useState, useCallback, type ReactNode } from 'react';
 import { Search, FileText, Loader2, ArrowRight, TrendingUp, GitBranch } from 'lucide-react';
 import Link from 'next/link';
-import { useToast } from '@/components/ui/ToastContext';
+import { useToast } from '@/components/ui/EnhancedToast';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 
 /** Highlight parts of text that match any word in the query. */
 function highlightMatch(text: string, query: string): ReactNode {
@@ -153,12 +154,7 @@ export default function SearchPage() {
       )}
 
       {!loading && searched && results.length === 0 && (
-        <div className="card">
-          <div className="card-body flex flex-col items-center gap-md py-8">
-            <Search size={40} style={{ color: 'var(--text-muted)' }} />
-            <p className="text-muted">No matching documents found. Try a different query.</p>
-          </div>
-        </div>
+        <EnhancedEmptyState type="search" />
       )}
 
       {!loading && results.length > 0 && (

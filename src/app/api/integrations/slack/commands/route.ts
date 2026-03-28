@@ -174,7 +174,10 @@ async function handleAnalyzeCommand(params: { channelId: string; userId: string;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     if (msg.includes('P2021') || msg.includes('P2022')) {
-      return NextResponse.json({ response_type: 'ephemeral', text: 'Feature not yet available.' });
+      return NextResponse.json({
+        response_type: 'ephemeral',
+        text: 'The decision tracking database is being set up. An admin needs to run database migrations. Try again after setup is complete.',
+      });
     }
     log.error('Analyze command failed:', msg);
     return NextResponse.json({
@@ -261,7 +264,10 @@ async function handlePriorCommand(params: {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     if (msg.includes('P2021') || msg.includes('P2022')) {
-      return NextResponse.json({ response_type: 'ephemeral', text: 'Feature not yet available.' });
+      return NextResponse.json({
+        response_type: 'ephemeral',
+        text: 'The blind prior database is being set up. An admin needs to run database migrations. Try again after setup is complete.',
+      });
     }
     log.error('Prior command failed:', msg);
     return NextResponse.json({ response_type: 'ephemeral', text: 'Failed to record prior.' });

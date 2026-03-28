@@ -19,7 +19,7 @@ import {
 import { updateUserSettings, UserSettingsData } from '@/app/actions/settings';
 import { useTheme } from 'next-themes';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useToast } from '@/components/ui/ToastContext';
+import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 import type { SlackInstallationStatus } from '@/types/human-audit';
 import { PersonaManager } from './PersonaManager';

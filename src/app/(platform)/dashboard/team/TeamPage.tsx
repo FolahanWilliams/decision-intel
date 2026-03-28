@@ -21,7 +21,7 @@ import {
   Brain,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useToast } from '@/components/ui/ToastContext';
+import { useToast } from '@/components/ui/EnhancedToast';
 import dynamic from 'next/dynamic';
 
 const TeamIntelligenceTab = dynamic(() => import('@/components/ui/TeamIntelligenceTab'), {
