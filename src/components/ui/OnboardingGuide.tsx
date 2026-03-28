@@ -102,7 +102,7 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
     } finally {
       setLoadingSample(false);
     }
-  }, [router]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [router]);
 
   if (dismissed) return null;
 
