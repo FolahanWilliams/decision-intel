@@ -147,6 +147,26 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       updateData.status = status;
       if (status === 'closed') {
         updateData.closedAt = new Date();
+
+        // Compute consensus score from blind priors on room close
+        try {
+          const priors = await prisma.blindPrior.findMany({
+            where: { roomId: id },
+            select: { userId: true, defaultAction: true, confidence: true },
+          });
+
+          if (priors.length >= 2) {
+            const { computeConsensusScore } = await import('@/lib/learning/consensus-scoring');
+            const consensus = computeConsensusScore(priors);
+            updateData.consensusScore = consensus.score;
+
+            log.info(
+              `Room ${id} closed with consensus: ${consensus.convergenceLevel} (${consensus.score}/100), ${consensus.dissenterIds.length} dissenter(s)`
+            );
+          }
+        } catch (consensusErr) {
+          log.warn('Consensus scoring failed (non-critical):', consensusErr);
+        }
       }
     }
 

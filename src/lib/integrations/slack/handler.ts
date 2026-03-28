@@ -516,6 +516,40 @@ export function slackEventToPreDecisionInput(payload: SlackWebhookPayload): {
   return { input, biases, nudge, frame };
 }
 
+// ─── Escalation Severity ─────────────────────────────────────────────────
+
+const SEVERITY_ORDER = ['none', 'info', 'warning', 'critical'] as const;
+
+/**
+ * Determine if new biases warrant escalating the nudge severity.
+ * Returns the new severity level, or null if no escalation needed.
+ */
+export function getEscalatedSeverity(
+  currentLevel: string,
+  newBiases: { bias: string; signal: string }[]
+): 'info' | 'warning' | 'critical' | null {
+  if (newBiases.length === 0) return null;
+
+  let targetSeverity: typeof SEVERITY_ORDER[number];
+  if (newBiases.length >= 3) {
+    targetSeverity = 'critical';
+  } else if (newBiases.length >= 2) {
+    targetSeverity = 'warning';
+  } else {
+    targetSeverity = 'info';
+  }
+
+  const currentIdx = SEVERITY_ORDER.indexOf(currentLevel as typeof SEVERITY_ORDER[number]);
+  const targetIdx = SEVERITY_ORDER.indexOf(targetSeverity);
+
+  // Only escalate upward
+  if (targetIdx > currentIdx) {
+    return targetSeverity === 'none' ? null : targetSeverity;
+  }
+
+  return null;
+}
+
 // ─── Outcome Detection ────────────────────────────────────────────────────
 
 /**

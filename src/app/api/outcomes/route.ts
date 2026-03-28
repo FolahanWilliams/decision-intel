@@ -152,8 +152,71 @@ export async function POST(req: NextRequest) {
       log.warn('Outcome flywheel failed (non-critical):', flyErr);
     }
 
+    // Multi-touch attribution computation (fire-and-forget)
+    try {
+      const { computeMultiTouchAttribution } = await import('@/lib/graph/multi-touch-attribution');
+      void computeMultiTouchAttribution(analysisId, analysis.document.orgId ?? null).catch(err =>
+        log.warn('Attribution computation failed (non-critical):', err)
+      );
+    } catch {
+      // multi-touch-attribution module not available — skip
+    }
+
+    // Calibration milestone tracking (fire-and-forget)
+    let milestone: { level: string; value: number; metricAfter: number } | null = null;
+    try {
+      const totalOutcomes = await prisma.decisionOutcome.count({
+        where: { userId: user.id },
+      });
+      const MILESTONES = [5, 10, 15, 25, 50];
+      if (MILESTONES.includes(totalOutcomes)) {
+        const existing = await prisma.calibrationMilestone.findFirst({
+          where: {
+            userId: user.id,
+            milestoneType: 'outcomes_reported',
+            milestoneValue: totalOutcomes,
+          },
+        });
+        if (!existing) {
+          const allOutcomes = await prisma.decisionOutcome.findMany({
+            where: { userId: user.id },
+            select: { outcome: true },
+          });
+          const successes = allOutcomes.filter(
+            o => o.outcome === 'success' || o.outcome === 'partial_success'
+          ).length;
+          const accuracyRate = allOutcomes.length > 0
+            ? Math.round((successes / allOutcomes.length) * 100)
+            : 0;
+
+          await prisma.calibrationMilestone.create({
+            data: {
+              userId: user.id,
+              orgId: analysis.document.orgId,
+              milestoneType: 'outcomes_reported',
+              milestoneValue: totalOutcomes,
+              metricAfter: accuracyRate,
+            },
+          });
+
+          const levelName = totalOutcomes >= 30 ? 'Platinum'
+            : totalOutcomes >= 15 ? 'Gold'
+            : totalOutcomes >= 5 ? 'Silver'
+            : 'Bronze';
+
+          milestone = { level: levelName, value: totalOutcomes, metricAfter: accuracyRate };
+          log.info(`Calibration milestone reached: ${totalOutcomes} outcomes for user ${user.id}`);
+        }
+      }
+    } catch (msErr) {
+      const code = (msErr as { code?: string }).code;
+      if (code !== 'P2021' && code !== 'P2022') {
+        log.warn('Milestone tracking failed (non-critical):', msErr);
+      }
+    }
+
     log.info(`Outcome reported for analysis ${analysisId}: ${outcome}`);
-    return NextResponse.json({ ...result, contradictions });
+    return NextResponse.json({ ...result, contradictions, milestone });
   } catch (error: unknown) {
     const code = (error as { code?: string }).code;
     if (code === 'P2021' || code === 'P2022') {
