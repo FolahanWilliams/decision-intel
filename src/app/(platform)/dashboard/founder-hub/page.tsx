@@ -2188,9 +2188,137 @@ function LiveStats() {
   );
 }
 
+// ─── Research Card Component ────────────────────────────────────────────────
+
+function ResearchCard({
+  title,
+  source,
+  type,
+  color,
+  link,
+  insight,
+  product,
+  startup,
+  actions,
+}: {
+  title: string;
+  source: string;
+  type: string;
+  color: string;
+  link: string;
+  insight: string;
+  product: string;
+  startup: string;
+  actions: string[];
+}) {
+  return (
+    <div style={{ ...card, borderLeft: `3px solid ${color}`, marginTop: 10 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: 8,
+        }}
+      >
+        <div>
+          <div
+            style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}
+          >
+            {title}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+            {source} &middot; {type}
+          </div>
+        </div>
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: 11, color, textDecoration: 'underline', flexShrink: 0 }}
+        >
+          Listen/Read
+        </a>
+      </div>
+      <p
+        style={{
+          fontSize: 12,
+          color: 'var(--text-secondary)',
+          lineHeight: 1.6,
+          marginBottom: 10,
+          fontStyle: 'italic',
+        }}
+      >
+        {insight}
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+        <div
+          style={{
+            padding: 8,
+            borderRadius: 6,
+            background: 'rgba(99, 102, 241, 0.06)',
+            border: '1px solid rgba(99, 102, 241, 0.12)',
+          }}
+        >
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#6366f1', marginBottom: 3 }}>
+            FOR THE PRODUCT
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            {product}
+          </div>
+        </div>
+        <div
+          style={{
+            padding: 8,
+            borderRadius: 6,
+            background: 'rgba(34, 197, 94, 0.06)',
+            border: '1px solid rgba(34, 197, 94, 0.12)',
+          }}
+        >
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#22c55e', marginBottom: 3 }}>
+            FOR THE STARTUP
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            {startup}
+          </div>
+        </div>
+      </div>
+      <div style={{ fontSize: 10, fontWeight: 700, color, marginBottom: 3 }}>ACTIONS</div>
+      {actions.map((a, i) => (
+        <div
+          key={i}
+          style={{
+            display: 'flex',
+            gap: 5,
+            fontSize: 11,
+            color: 'var(--text-secondary)',
+            marginBottom: 2,
+          }}
+        >
+          <ChevronRight size={10} style={{ color, flexShrink: 0, marginTop: 2 }} />
+          <span>{a}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ─── Tab Content: Research & Frameworks ─────────────────────────────────────
 
 function ResearchFrameworks() {
+  const [section, setSection] = useState<
+    'all' | 'vc' | 'foundations' | 'category' | 'gtm' | 'strategy'
+  >('all');
+
+  const SECTIONS = [
+    { id: 'all' as const, label: 'All' },
+    { id: 'vc' as const, label: 'VC Decision Science' },
+    { id: 'foundations' as const, label: 'Decision Science' },
+    { id: 'category' as const, label: 'Category Creation' },
+    { id: 'gtm' as const, label: 'GTM & Sales' },
+    { id: 'strategy' as const, label: 'Founder Strategy' },
+  ];
+
   return (
     <div>
       {/* Header */}
@@ -2205,259 +2333,496 @@ function ResearchFrameworks() {
             lineHeight: 1.3,
           }}
         >
-          The Venture Mindset — Ilya Strebulaev (Stanford GSB)
+          Research, Frameworks &amp; Intellectual Foundations
         </h2>
         <p
           style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 0 }}
         >
-          9 principles from 20 years of VC research at Stanford. Each principle mapped to Decision
-          Intel features and startup strategy. Source: <em>The Venture Mindset</em> (Strebulaev
-          &amp; Gornall, 2024). 50% of US IPOs over 50 years were VC-backed. 75% of large public
-          companies. When ICs make biased decisions, the ripple effects shape entire industries.
+          Academic research, podcasts, and frameworks mapped to Decision Intel — both as product
+          validation and startup strategy. Every source linked to concrete action items.
         </p>
       </div>
 
-      {/* 9 Principles */}
-      <div style={{ display: 'grid', gap: 12 }}>
-        {[
-          {
-            num: 1,
-            principle: "Home Runs Matter, Strikeouts Don't",
-            summary:
-              'Only 1 in 20 VC investments hits a home run, but a single winner returns 100x. Failure tolerance is structural, not emotional.',
-            product:
-              "Reframe your pitch from defensive to offensive. DQI doesn't just help avoid bad deals — it gives IC members permission to swing big because they've stress-tested the decision. \"Swing with confidence because you've already audited the thesis.\"",
-            startup:
-              'Go all-in on PE/VC. Don\'t build 6 features for 4 markets. Your "home run" is one flagship fund that becomes a case study. Accept that some features won\'t land.',
-            actions: [
-              'Rewrite landing page hero from "avoid mistakes" to "make better bets with confidence"',
-              'Focus pilot outreach on 5 target funds, not 50',
-            ],
-            color: '#22c55e',
-          },
-          {
-            num: 2,
-            principle: 'Agree to Disagree',
-            summary:
-              'VC firms pursuing consensus have LOWER IPO rates. The best firms let a single partner with conviction push a deal through. Microsoft M12 has an "anti-veto rule."',
-            product:
-              'Your Committee Decision Rooms with blind prior collection are a direct implementation of this principle. Cite Strebulaev in marketing: "Stanford research shows consensus-seeking committees underperform. Decision Intel\'s blind prior system is designed around this finding." Your consensus scoring quantifies when agreement is genuine vs. groupthink.',
-            startup:
-              "When building your advisory board, don't surround yourself with people who agree with you. Strebulaev's data: productive disagreement correlates with better outcomes.",
-            actions: [
-              'Add Strebulaev citation to Committee Rooms UI/marketing',
-              'Create a "Dissent Quality" metric in consensus scoring',
-              'Blog post: "Why Your IC\'s Consensus Is Killing Your Returns"',
-            ],
-            color: '#3b82f6',
-          },
-          {
-            num: 3,
-            principle: 'Get Outside Your Four Walls',
-            summary:
-              'VCs maintain 2-3x larger, more diverse LinkedIn networks than corporate executives. Insularity kills innovation.',
-            product:
-              'Your Slack integration puts Decision Intel inside the daily workflow where deals are discussed — not as a standalone app. This is the "inside the walls" play. The cross-department edge type in your knowledge graph detects organizational silos.',
-            startup:
-              "Be embedded in the PE/VC community. ILPA conferences, ACG events, LP/GP networking circles. Don't sell from the outside — be part of the ecosystem.",
-            actions: [
-              'Attend 2 PE/VC conferences per quarter',
-              'Launch a "Decision Quality" newsletter for PE professionals',
-              'Build a Slack community for IC members',
-            ],
-            color: '#f59e0b',
-          },
-          {
-            num: 4,
-            principle: 'The Jockey vs. The Horse',
-            summary:
-              'The most important VC investment factor is team quality, not business model. The "jockey" matters more than the "horse."',
-            product:
-              'You detect "Management Halo Effect" but could go deeper. Build a Jockey/Horse Balance Score — detect when an IC memo spends 80% on team pedigree and 20% on business fundamentals, or vice versa. Flag imbalanced memos.',
-            startup:
-              "Your codebase IS your jockey credibility: 113 annotated failure cases, 20x20 bias interaction matrix, causal inference. In technical DD, your depth signals you're the right founder for this problem.",
-            actions: [
-              'Add Jockey/Horse Balance Score to bias detection',
-              'Track ratio of team vs. fundamentals language in IC memos',
-              'Prepare "why me" narrative for investor conversations',
-            ],
-            color: '#ef4444',
-          },
-          {
-            num: 5,
-            principle: 'The Prepared Mind',
-            summary:
-              '"Chance favors only the prepared mind" (Pasteur). Jensen Huang spends 2-3 hours daily studying emerging tech. The best VCs recognize opportunities instantly because they\'ve studied deeply.',
-            product:
-              "Your Boardroom Simulation IS a \"prepared mind\" tool. You're giving IC members a pre-briefing on which biases historically damaged similar deals, what toxic combinations to watch for, and what diverse perspectives would flag. Lean into this framing: you're not auditing documents — you're preparing decision-makers.",
-            startup:
-              "Spend 30 min daily reading PE/VC industry news, academic papers on decision science, and competitor updates. Your Intelligence Hub's 14 RSS feeds should be your own morning briefing too.",
-            actions: [
-              'Rename "Pre-Meeting Bias Briefing" to "Prepared Mind Briefing" in marketing',
-              'Add a "Prepare for IC" CTA before committee meetings',
-              'Subscribe to 3 PE newsletters personally',
-            ],
-            color: '#8b5cf6',
-          },
-          {
-            num: 6,
-            principle: 'Fast Lane, Then Slow Lane',
-            summary:
-              'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
-            product:
-              'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 15-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
-            startup:
-              'Apply to your sales process too. Qualify leads fast — "Do you have an investment committee? Do you review IC memos?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
-            actions: [
-              'Build Quick Scan feature (top priority — Strebulaev-backed)',
-              'Add 2-question lead qualification before demos',
-              'Create a "Red Flag Preview" that runs before full analysis',
-            ],
-            color: '#22c55e',
-          },
-          {
-            num: 7,
-            principle: 'Double Down and Quit',
-            summary:
-              "VCs combat escalation of commitment through structural mechanisms: requiring multiple investors for follow-on rounds, bringing in arm's-length co-investors, requiring partner consensus specifically on follow-ons.",
-            product:
-              "BUILD THIS: Longitudinal Bias Tracking — don't just analyze individual IC memos, track how bias patterns change over the life of a deal. Does confirmation bias increase from initial investment to Series B follow-on? Is the follow-on memo less critical than the initial? This is a unique, hard-to-replicate feature.",
-            startup:
-              "Apply to your own features. Some features you shipped won't get traction. Be willing to kill them rather than doubling down. Measure feature usage monthly.",
-            actions: [
-              'Build deal-level longitudinal bias tracking',
-              'Compare bias severity across deal stages (screening vs IC vs follow-on)',
-              'Set up monthly feature usage analytics',
-            ],
-            color: '#3b82f6',
-          },
-          {
-            num: 8,
-            principle: 'Sharing the Pie (Incentive Alignment)',
-            summary:
-              'VCs invented vesting schedules in the 1970s. The principle is about aligning incentives across all contributors to prevent short-term behavior.',
-            product:
-              "Your \"Carry Incentive Distortion\" bias is a direct implementation. Go deeper: detect when an IC memo's enthusiasm correlates suspiciously with the deal's impact on a specific partner's carry economics. Track if advocacy intensity changes near fund deadlines.",
-            startup:
-              "When you hire your first team members, offer meaningful equity. Strebulaev's data shows aligned incentives outperform salary-heavy compensation in startups.",
-            actions: [
-              'Enhance carry incentive detection with fund timeline awareness',
-              'Detect deployment pressure signals ("need to put capital to work")',
-              'Design equity plan for first 3 hires',
-            ],
-            color: '#f59e0b',
-          },
-          {
-            num: 9,
-            principle: 'The Meta-Principle: VC-Backed Companies Shape the Economy',
-            summary:
-              '50% of US IPOs over 50 years were VC-backed. 75% of large public companies. VC-backed companies spend 92 cents of every R&D dollar. When ICs make biased decisions, the ripple effects go far beyond the fund.',
-            product:
-              'This is your highest-level pitch narrative: "Decision Intel doesn\'t just protect fund returns — it improves the quality of capital allocation across the innovation economy." When a biased IC kills a good deal, that startup might never get funded. When a biased IC backs a bad deal, capital that could have gone to a better company is wasted.',
-            startup:
-              'This framing elevates you from "SaaS tool vendor" to "mission-driven company improving how capital flows to innovation." Investors respond to mission, not just TAM.',
-            actions: [
-              'Add this framing to pitch deck\'s "Why This Matters" slide',
-              'Use in PR/press outreach — "improving how capital flows to innovation"',
-              'Blog post: "The Hidden Cost of IC Bias on the Innovation Economy"',
-            ],
-            color: '#ef4444',
-          },
-        ].map((p, i) => (
-          <div key={i} style={{ ...card, borderLeft: `4px solid ${p.color}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-              <div
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  background: p.color,
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 13,
-                  fontWeight: 800,
-                  flexShrink: 0,
-                }}
-              >
-                {p.num}
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary, #fff)' }}>
-                {p.principle}
-              </div>
+      {/* Sub-section pills */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
+        {SECTIONS.map(s => (
+          <button
+            key={s.id}
+            onClick={() => setSection(s.id)}
+            style={{
+              padding: '5px 14px',
+              fontSize: 12,
+              fontWeight: section === s.id ? 700 : 500,
+              borderRadius: 20,
+              border: `1px solid ${section === s.id ? '#8b5cf6' : 'var(--border-primary, #333)'}`,
+              background: section === s.id ? 'rgba(139, 92, 246, 0.12)' : 'transparent',
+              color: section === s.id ? '#8b5cf6' : 'var(--text-muted, #71717a)',
+              cursor: 'pointer',
+            }}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── VC Decision Science ── */}
+      {(section === 'all' || section === 'vc') && (
+        <>
+          <div style={{ ...card, borderLeft: '3px solid #6366f1' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#6366f1', marginBottom: 12 }}>
+              VC Decision Science
             </div>
-            <p
-              style={{
-                fontSize: 12,
-                color: 'var(--text-muted)',
-                marginBottom: 10,
-                lineHeight: 1.6,
-                fontStyle: 'italic',
-              }}
-            >
-              {p.summary}
-            </p>
-            <div
-              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}
-            >
-              <div
-                style={{
-                  padding: 10,
-                  borderRadius: 8,
-                  background: 'rgba(99, 102, 241, 0.06)',
-                  border: '1px solid rgba(99, 102, 241, 0.15)',
-                }}
-              >
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', marginBottom: 4 }}>
-                  FOR THE PRODUCT
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                  {p.product}
-                </div>
-              </div>
-              <div
-                style={{
-                  padding: 10,
-                  borderRadius: 8,
-                  background: 'rgba(34, 197, 94, 0.06)',
-                  border: '1px solid rgba(34, 197, 94, 0.15)',
-                }}
-              >
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#22c55e', marginBottom: 4 }}>
-                  FOR THE STARTUP
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                  {p.startup}
-                </div>
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: p.color, marginBottom: 4 }}>
-                ACTION ITEMS
-              </div>
-              {p.actions.map((a, j) => (
-                <div
-                  key={j}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 6,
-                    fontSize: 12,
-                    color: 'var(--text-secondary)',
-                    marginBottom: 3,
-                  }}
-                >
-                  <ChevronRight size={12} style={{ color: p.color, flexShrink: 0, marginTop: 2 }} />
-                  <span>{a}</span>
+            <div style={{ display: 'grid', gap: 12 }}>
+              {[
+                {
+                  num: 1,
+                  principle: "Home Runs Matter, Strikeouts Don't",
+                  summary:
+                    'Only 1 in 20 VC investments hits a home run, but a single winner returns 100x. Failure tolerance is structural, not emotional.',
+                  product:
+                    "Reframe your pitch from defensive to offensive. DQI doesn't just help avoid bad deals — it gives IC members permission to swing big because they've stress-tested the decision. \"Swing with confidence because you've already audited the thesis.\"",
+                  startup:
+                    'Go all-in on PE/VC. Don\'t build 6 features for 4 markets. Your "home run" is one flagship fund that becomes a case study. Accept that some features won\'t land.',
+                  actions: [
+                    'Rewrite landing page hero from "avoid mistakes" to "make better bets with confidence"',
+                    'Focus pilot outreach on 5 target funds, not 50',
+                  ],
+                  color: '#22c55e',
+                },
+                {
+                  num: 2,
+                  principle: 'Agree to Disagree',
+                  summary:
+                    'VC firms pursuing consensus have LOWER IPO rates. The best firms let a single partner with conviction push a deal through. Microsoft M12 has an "anti-veto rule."',
+                  product:
+                    'Your Committee Decision Rooms with blind prior collection are a direct implementation of this principle. Cite Strebulaev in marketing: "Stanford research shows consensus-seeking committees underperform. Decision Intel\'s blind prior system is designed around this finding." Your consensus scoring quantifies when agreement is genuine vs. groupthink.',
+                  startup:
+                    "When building your advisory board, don't surround yourself with people who agree with you. Strebulaev's data: productive disagreement correlates with better outcomes.",
+                  actions: [
+                    'Add Strebulaev citation to Committee Rooms UI/marketing',
+                    'Create a "Dissent Quality" metric in consensus scoring',
+                    'Blog post: "Why Your IC\'s Consensus Is Killing Your Returns"',
+                  ],
+                  color: '#3b82f6',
+                },
+                {
+                  num: 3,
+                  principle: 'Get Outside Your Four Walls',
+                  summary:
+                    'VCs maintain 2-3x larger, more diverse LinkedIn networks than corporate executives. Insularity kills innovation.',
+                  product:
+                    'Your Slack integration puts Decision Intel inside the daily workflow where deals are discussed — not as a standalone app. This is the "inside the walls" play. The cross-department edge type in your knowledge graph detects organizational silos.',
+                  startup:
+                    "Be embedded in the PE/VC community. ILPA conferences, ACG events, LP/GP networking circles. Don't sell from the outside — be part of the ecosystem.",
+                  actions: [
+                    'Attend 2 PE/VC conferences per quarter',
+                    'Launch a "Decision Quality" newsletter for PE professionals',
+                    'Build a Slack community for IC members',
+                  ],
+                  color: '#f59e0b',
+                },
+                {
+                  num: 4,
+                  principle: 'The Jockey vs. The Horse',
+                  summary:
+                    'The most important VC investment factor is team quality, not business model. The "jockey" matters more than the "horse."',
+                  product:
+                    'You detect "Management Halo Effect" but could go deeper. Build a Jockey/Horse Balance Score — detect when an IC memo spends 80% on team pedigree and 20% on business fundamentals, or vice versa. Flag imbalanced memos.',
+                  startup:
+                    "Your codebase IS your jockey credibility: 113 annotated failure cases, 20x20 bias interaction matrix, causal inference. In technical DD, your depth signals you're the right founder for this problem.",
+                  actions: [
+                    'Add Jockey/Horse Balance Score to bias detection',
+                    'Track ratio of team vs. fundamentals language in IC memos',
+                    'Prepare "why me" narrative for investor conversations',
+                  ],
+                  color: '#ef4444',
+                },
+                {
+                  num: 5,
+                  principle: 'The Prepared Mind',
+                  summary:
+                    '"Chance favors only the prepared mind" (Pasteur). Jensen Huang spends 2-3 hours daily studying emerging tech. The best VCs recognize opportunities instantly because they\'ve studied deeply.',
+                  product:
+                    "Your Boardroom Simulation IS a \"prepared mind\" tool. You're giving IC members a pre-briefing on which biases historically damaged similar deals, what toxic combinations to watch for, and what diverse perspectives would flag. Lean into this framing: you're not auditing documents — you're preparing decision-makers.",
+                  startup:
+                    "Spend 30 min daily reading PE/VC industry news, academic papers on decision science, and competitor updates. Your Intelligence Hub's 14 RSS feeds should be your own morning briefing too.",
+                  actions: [
+                    'Rename "Pre-Meeting Bias Briefing" to "Prepared Mind Briefing" in marketing',
+                    'Add a "Prepare for IC" CTA before committee meetings',
+                    'Subscribe to 3 PE newsletters personally',
+                  ],
+                  color: '#8b5cf6',
+                },
+                {
+                  num: 6,
+                  principle: 'Fast Lane, Then Slow Lane',
+                  summary:
+                    'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
+                  product:
+                    'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 15-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
+                  startup:
+                    'Apply to your sales process too. Qualify leads fast — "Do you have an investment committee? Do you review IC memos?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
+                  actions: [
+                    'Build Quick Scan feature (top priority — Strebulaev-backed)',
+                    'Add 2-question lead qualification before demos',
+                    'Create a "Red Flag Preview" that runs before full analysis',
+                  ],
+                  color: '#22c55e',
+                },
+                {
+                  num: 7,
+                  principle: 'Double Down and Quit',
+                  summary:
+                    "VCs combat escalation of commitment through structural mechanisms: requiring multiple investors for follow-on rounds, bringing in arm's-length co-investors, requiring partner consensus specifically on follow-ons.",
+                  product:
+                    "BUILD THIS: Longitudinal Bias Tracking — don't just analyze individual IC memos, track how bias patterns change over the life of a deal. Does confirmation bias increase from initial investment to Series B follow-on? Is the follow-on memo less critical than the initial? This is a unique, hard-to-replicate feature.",
+                  startup:
+                    "Apply to your own features. Some features you shipped won't get traction. Be willing to kill them rather than doubling down. Measure feature usage monthly.",
+                  actions: [
+                    'Build deal-level longitudinal bias tracking',
+                    'Compare bias severity across deal stages (screening vs IC vs follow-on)',
+                    'Set up monthly feature usage analytics',
+                  ],
+                  color: '#3b82f6',
+                },
+                {
+                  num: 8,
+                  principle: 'Sharing the Pie (Incentive Alignment)',
+                  summary:
+                    'VCs invented vesting schedules in the 1970s. The principle is about aligning incentives across all contributors to prevent short-term behavior.',
+                  product:
+                    "Your \"Carry Incentive Distortion\" bias is a direct implementation. Go deeper: detect when an IC memo's enthusiasm correlates suspiciously with the deal's impact on a specific partner's carry economics. Track if advocacy intensity changes near fund deadlines.",
+                  startup:
+                    "When you hire your first team members, offer meaningful equity. Strebulaev's data shows aligned incentives outperform salary-heavy compensation in startups.",
+                  actions: [
+                    'Enhance carry incentive detection with fund timeline awareness',
+                    'Detect deployment pressure signals ("need to put capital to work")',
+                    'Design equity plan for first 3 hires',
+                  ],
+                  color: '#f59e0b',
+                },
+                {
+                  num: 9,
+                  principle: 'The Meta-Principle: VC-Backed Companies Shape the Economy',
+                  summary:
+                    '50% of US IPOs over 50 years were VC-backed. 75% of large public companies. VC-backed companies spend 92 cents of every R&D dollar. When ICs make biased decisions, the ripple effects go far beyond the fund.',
+                  product:
+                    'This is your highest-level pitch narrative: "Decision Intel doesn\'t just protect fund returns — it improves the quality of capital allocation across the innovation economy." When a biased IC kills a good deal, that startup might never get funded. When a biased IC backs a bad deal, capital that could have gone to a better company is wasted.',
+                  startup:
+                    'This framing elevates you from "SaaS tool vendor" to "mission-driven company improving how capital flows to innovation." Investors respond to mission, not just TAM.',
+                  actions: [
+                    'Add this framing to pitch deck\'s "Why This Matters" slide',
+                    'Use in PR/press outreach — "improving how capital flows to innovation"',
+                    'Blog post: "The Hidden Cost of IC Bias on the Innovation Economy"',
+                  ],
+                  color: '#ef4444',
+                },
+              ].map((p, i) => (
+                <div key={i} style={{ ...card, borderLeft: `4px solid ${p.color}` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <div
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: '50%',
+                        background: p.color,
+                        color: '#fff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 13,
+                        fontWeight: 800,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {p.num}
+                    </div>
+                    <div
+                      style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary, #fff)' }}
+                    >
+                      {p.principle}
+                    </div>
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: 'var(--text-muted)',
+                      marginBottom: 10,
+                      lineHeight: 1.6,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {p.summary}
+                  </p>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 10,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: 10,
+                        borderRadius: 8,
+                        background: 'rgba(99, 102, 241, 0.06)',
+                        border: '1px solid rgba(99, 102, 241, 0.15)',
+                      }}
+                    >
+                      <div
+                        style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', marginBottom: 4 }}
+                      >
+                        FOR THE PRODUCT
+                      </div>
+                      <div
+                        style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
+                      >
+                        {p.product}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        padding: 10,
+                        borderRadius: 8,
+                        background: 'rgba(34, 197, 94, 0.06)',
+                        border: '1px solid rgba(34, 197, 94, 0.15)',
+                      }}
+                    >
+                      <div
+                        style={{ fontSize: 11, fontWeight: 700, color: '#22c55e', marginBottom: 4 }}
+                      >
+                        FOR THE STARTUP
+                      </div>
+                      <div
+                        style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
+                      >
+                        {p.startup}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: p.color, marginBottom: 4 }}>
+                      ACTION ITEMS
+                    </div>
+                    {p.actions.map((a, j) => (
+                      <div
+                        key={j}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 6,
+                          fontSize: 12,
+                          color: 'var(--text-secondary)',
+                          marginBottom: 3,
+                        }}
+                      >
+                        <ChevronRight
+                          size={12}
+                          style={{ color: p.color, flexShrink: 0, marginTop: 2 }}
+                        />
+                        <span>{a}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        ))}
+          <ResearchCard
+            title="Daniel Kahneman: Beyond Cognitive Biases — Reducing Noise"
+            source="ClearerThinking Podcast"
+            type="Podcast"
+            color="#22c55e"
+            link="https://podcast.clearerthinking.org/episode/072/"
+            insight="Insurance underwriter study: executives expected 10% variability between judges. Actual: 55%. One underwriter prices at $9,500, another at $16,700 for the identical case. Noise is at least as damaging as bias, and organizations almost never measure it."
+            product="Your triple-judge noise scoring is a direct implementation of Kahneman's proposed methodology. Use the 10% vs 55% stat in every sales conversation — it's the 'holy shit' moment that makes PE partners realize they have no idea how much variability exists in their own IC."
+            startup="Offer a free 'noise audit' of a fund's last 5 IC memos as a top-of-funnel hook. Let them see the problem before pitching the solution."
+            actions={[
+              'Use 10% vs 55% stat in opening of every demo',
+              'Build free noise audit landing page',
+              'Create 1-pager: "How Much Noise Is In Your IC?"',
+            ]}
+          />
+        </>
+      )}
+
+      {/* ── Decision Science Foundations ── */}
+      {(section === 'all' || section === 'foundations') && (
+        <div style={{ ...card, borderLeft: '3px solid #f59e0b', marginTop: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b', marginBottom: 4 }}>
+            Decision Science Foundations
+          </div>
+          <ResearchCard
+            title='Olivier Sibony: "Decision Hygiene" Framework'
+            source="Behavioral Grooves Podcast + Euronews"
+            type="Podcast / Interview"
+            color="#f59e0b"
+            link="https://behavioralgrooves.com/episode/noise-with-olivier-sibony/"
+            insight="Kahneman's co-author on Noise, former McKinsey partner. Framework: checklists, premortems, structured independent assessments, and noise audits. Noise audits should be the starting point — orgs need to see how bad the problem is before buying a solution."
+            product="Your entire product IS decision hygiene. Sibony's framework validates every feature: structured analysis (bias detection), independent assessments (triple-judge), premortems (Pre-Mortem Architect agent), and noise audits (noise decomposition)."
+            startup="His 'noise audit first' approach suggests a powerful sales motion: offer a free noise audit of 5 IC memos as top-of-funnel. Let prospects SEE the problem before pitching the solution."
+            actions={[
+              'Build free noise audit landing page as lead gen',
+              'Quote Sibony in marketing: "decision hygiene"',
+              'Position DI as the decision hygiene platform',
+            ]}
+          />
+          <ResearchCard
+            title="Gary Klein: Naturalistic Decision Making"
+            source="The Decision-Making Studio (Ep. 234)"
+            type="Podcast"
+            color="#f59e0b"
+            link="https://podcasts.apple.com/us/podcast/ep-234-dr-gary-klein/id1054744455?i=1000677192489"
+            insight="Klein invented the premortem technique. He and Kahneman were 'collaborative adversaries' — Kahneman trusts systematic processes, Klein trusts expert intuition. The tension between them is the exact tension your product navigates."
+            product="DI sits at the intersection: structured AI analysis (Kahneman) augmenting expert human judgment (Klein), not replacing it. This is a nuanced positioning story for skeptical GPs who don't want a machine telling them what to do."
+            startup="When GPs push back with 'we trust our judgment,' don't argue. Say: 'We do too. Klein proved expert intuition is powerful. We just make sure it's not undermined by noise and bias you can't see.'"
+            actions={[
+              'Add Klein citation to premortem feature description',
+              'Use Kahneman-Klein framing in sales to skeptical GPs',
+              'Position DI as "augmentation" not "replacement"',
+            ]}
+          />
+          <ResearchCard
+            title="Annie Duke & Spencer Greenberg: Decision Education"
+            source="Decision Education Podcast (Sep 2025)"
+            type="Podcast"
+            color="#f59e0b"
+            link="https://www.annieduke.com/the-decision-education-podcast-with-guest-spencer-greenberg/"
+            insight="Knowing the name of a bias doesn't help you overcome it. Awareness alone is nearly useless. What works: precommitment contracts, structured decision processes, and Bayesian updating."
+            product="This validates your nudge system and decision architecture (blind priors, premortems) over simple bias reports. The real value isn't detecting biases — it's the structural interventions that make it harder to ACT on bias even when it's present. Diagnostic vs. treatment."
+            startup="Don't oversell bias detection in demos. Lead with the decision architecture features: 'We don't just tell you about your biases — we make it structurally harder to act on them.'"
+            actions={[
+              'Reframe marketing: "detection + intervention" not just "detection"',
+              'Emphasize nudge system and blind priors in demos',
+              'Blog: "Why Bias Awareness Doesn\'t Work (And What Does)"',
+            ]}
+          />
+          <ResearchCard
+            title='Philip Tetlock: "Hybrid Mind" — Human + AI Forecasting'
+            source="80,000 Hours Podcast (Oct 2025)"
+            type="Podcast"
+            color="#f59e0b"
+            link="https://80000hours.org/podcast/episodes/prof-tetlock-predicting-the-future/"
+            insight="Human-machine hybrids beat both pure AI and pure human judgment in forecasting tournaments. 40 years of data show process matters more than talent — superforecasters aren't smarter, they follow better processes."
+            product="DI IS a human-machine hybrid: AI detects biases and measures noise, humans make the final call. Tetlock gives you the language: 'Process beats talent. Our platform ensures your IC follows the process that produces better outcomes.'"
+            startup="'Process beats talent' in one sentence IS your entire value proposition. Use Tetlock's authority to back this claim."
+            actions={[
+              'Add Tetlock citation to product philosophy page',
+              'Use "process beats talent" in pitch decks',
+              'Reference Hybrid Mind tournament results in technical DD',
+            ]}
+          />
+        </div>
+      )}
+
+      {/* ── Category Creation ── */}
+      {(section === 'all' || section === 'category') && (
+        <div style={{ ...card, borderLeft: '3px solid #ef4444', marginTop: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#ef4444', marginBottom: 4 }}>
+            Category Creation
+          </div>
+          <ResearchCard
+            title='Christopher Lochhead: "How to Become a Category Pirate"'
+            source="Lenny's Podcast"
+            type="Podcast / Newsletter"
+            color="#ef4444"
+            link="https://www.lennysnewsletter.com/p/how-to-become-a-category-pirate-christopher"
+            insight="The company that creates a category captures 2/3 of the market value. Framework: 'Frame It, Name It, Claim It.' The 'better trap' — competing on being better within an existing category — is death."
+            product={
+              'You\'re not building a "better CRM" or a "better DD tool." You\'re creating the category of Investment Decision Quality. Your DQI should become the term PE uses like IRR and MOIC. When someone says "What\'s the DQI on this memo?" in an IC meeting, you\'ve won. Lochhead calls this "languaging" — weaponizing vocabulary.'
+            }
+            startup="Frame the problem (IC decisions are riddled with undetected bias and noise), name the solution (Decision Quality Index), claim the category (Decision Intel is the decision quality platform for capital allocators). This is your most important strategic task."
+            actions={[
+              'Make DQI the centerpiece term in all marketing',
+              'Write a "Category Point of View" document (Lochhead framework)',
+              'PR strategy: get DQI mentioned in PE trade publications',
+              'Blog series: "The Hidden Cost of Decision Noise in PE"',
+            ]}
+          />
+        </div>
+      )}
+
+      {/* ── GTM & Sales ── */}
+      {(section === 'all' || section === 'gtm') && (
+        <div style={{ ...card, borderLeft: '3px solid #3b82f6', marginTop: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#3b82f6', marginBottom: 4 }}>
+            GTM &amp; Sales
+          </div>
+          <ResearchCard
+            title="Ray Zhou (Affinity): From College Dropout to SaaS Leader"
+            source="Platform Builders Podcast"
+            type="Podcast"
+            color="#3b82f6"
+            link="https://www.heavybit.com/library/podcasts/platform-builders/ep-4-building-affinity-from-college-dropout-to-saas-leader-with-ray-zhou"
+            insight="Built Affinity into late-eight-figure revenue CRM for PE/VC. Three lessons: (1) hundreds of problem-first conversations before building features, (2) founder-led onboarding for every early customer, (3) focus on problems closest to core business — tangential solutions get replaced when AI improves."
+            product="Decision quality in capital allocation is about as core as it gets for a fund. That's your moat vs. the 'AI assistant' tools that summarize documents — those are tangential, yours is fundamental."
+            startup="Personally onboard every pilot customer. Conduct 50+ discovery calls focused on 'how does your IC actually work?' not 'let me show you features.' Zhou's outsider advantage (didn't know the industry) forced better questions — use yours the same way."
+            actions={[
+              'Target 50 discovery calls before next feature sprint',
+              'Personally onboard every pilot — no self-serve yet',
+              'Document every onboarding as a playbook for future hires',
+              'Ask: "Walk me through your last IC meeting" in every call',
+            ]}
+          />
+        </div>
+      )}
+
+      {/* ── Founder Strategy ── */}
+      {(section === 'all' || section === 'strategy') && (
+        <div style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: 16 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#a78bfa', marginBottom: 4 }}>
+            Founder Strategy
+          </div>
+          <ResearchCard
+            title="Peter Thiel: Zero to One — Contrarian Truths"
+            source="The Investors Podcast (MI383)"
+            type="Podcast Deep Dive"
+            color="#a78bfa"
+            link="https://www.theinvestorspodcast.com/millennial-investing/zero-to-one-lessons-from-peter-thiel-w-shawn-omalley/"
+            insight='Contrarian question: "What important truth do very few people agree with you on?" Monopoly framework: dominate a small niche, then expand in concentric circles. Sales and distribution matter as much as product.'
+            product={
+              'Your contrarian truth: "Investment committees think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: PE/VC IC decision quality. Your concentric expansion: PE/VC → M&A → FinServ → Enterprise.'
+            }
+            startup="The best 15-agent pipeline means nothing if you can't get it in front of Managing Partners. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
+            actions={[
+              'Write down your contrarian truth and use it in every pitch',
+              'Map your concentric expansion circles (already in Market Strategy tab)',
+              'Allocate 50% of time to distribution, not just product',
+              'Build referral incentive for pilot customers',
+            ]}
+          />
+        </div>
+      )}
+
+      {/* ── Connecting Thread ── */}
+      <div style={{ ...card, borderTop: '3px solid #8b5cf6', marginTop: 16 }}>
+        <div style={sectionTitle}>
+          <Crosshair size={18} style={{ color: '#8b5cf6' }} /> The Connecting Thread
+        </div>
+        <p
+          style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: 0 }}
+        >
+          Every one of these thinkers is telling you the same thing from a different angle: human
+          decision-making is{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>
+            systematically flawed in measurable ways
+          </strong>
+          , that{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>process beats intuition at scale</strong>
+          , that the organizations willing to{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>
+            audit their own judgment will outperform
+          </strong>{' '}
+          those that don&apos;t, and that the company who creates the{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>
+            language for this problem will own the market
+          </strong>
+          . You&apos;re building that company. DQI is that language.
+        </p>
       </div>
 
-      {/* Key Takeaway */}
+      {/* Key Takeaway (always visible) */}
       <div style={{ ...card, borderTop: '3px solid #6366f1', marginTop: 12 }}>
         <div style={sectionTitle}>
           <Zap size={18} style={{ color: '#6366f1' }} /> Most Actionable Takeaways
