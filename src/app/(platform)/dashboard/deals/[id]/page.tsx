@@ -308,7 +308,7 @@ export default function DealDetailPage() {
 
 function DocumentsTab({
   documents,
-  dealId,
+  dealId: _dealId,
 }: {
   documents: Array<{ id: string; filename: string; documentType: string | null; status: string }>;
   dealId: string;

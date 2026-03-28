@@ -52,7 +52,7 @@ export function CausalGraph({
   insights,
   totalOutcomes,
   orgId: _orgId,
-  timeRange,
+  timeRange: _timeRange,
   onBiasSelect,
 }: CausalGraphProps) {
   const svgRef = useRef<SVGSVGElement>(null);

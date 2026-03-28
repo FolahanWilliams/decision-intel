@@ -85,7 +85,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
     } finally {
       setCreating(false);
     }
-  }, [newTitle, documentId, analysisId, fetchRooms]);
+  }, [newTitle, newDecisionType, documentId, analysisId, fetchRooms]);
 
   if (error) {
     return (

@@ -615,7 +615,7 @@ export function DecisionKnowledgeGraph({
       .attr('pointer-events', 'none');
 
     // Apply search/path highlights
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, react-hooks/unsupported-syntax
     node.selectAll('circle, rect, polygon').each(function (this: any, d: any) {
       const n = d as GraphNode;
       const el = d3.select(this);

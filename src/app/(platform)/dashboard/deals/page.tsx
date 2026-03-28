@@ -59,6 +59,7 @@ export default function DealsPage() {
   const [view, setView] = useState<'list' | 'board'>('list');
   useEffect(() => {
     const saved = localStorage.getItem('deals-view') as 'list' | 'board' | null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading localStorage must use useEffect to avoid hydration mismatch
     if (saved) setView(saved);
   }, []);
 
