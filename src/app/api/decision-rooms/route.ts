@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
           },
         });
         if (analysis) {
-          let toxicCombinations: Array<{ patternLabel: string; toxicScore: number; biasTypes: string[] }> = [];
+          let toxicCombinations: Array<{ patternLabel: string | null; toxicScore: number; biasTypes: string[] }> = [];
           try {
             const toxics = await prisma.toxicCombination.findMany({
               where: { analysisId },
