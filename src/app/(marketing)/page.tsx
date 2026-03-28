@@ -17,6 +17,8 @@ import { LiquidGlassAdvanced } from '@/components/ui/LiquidGlassAdvanced';
 import { GlassRipple, GlassHover } from '@/components/ui/GlassMicroInteractions';
 import { cn } from '@/lib/utils';
 import { trackEvent } from '@/lib/analytics/track';
+import { TractionCounters } from '@/components/marketing/TractionCounters';
+import { CaseStudyCard, type CaseStudy } from '@/components/marketing/CaseStudyCard';
 import {
   Brain,
   Shield,
@@ -296,12 +298,12 @@ function MobileNav({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
               />
               <GlassRipple>
                 <Link
-                  href="/demo"
+                  href={process.env.NEXT_PUBLIC_DEMO_BOOKING_URL || '/demo'}
                   onClick={onClose}
                   className="btn btn-primary glow"
                   style={{ textAlign: 'center', padding: '14px', fontSize: '0.9rem' }}
                 >
-                  Request Demo
+                  Book a Demo
                 </Link>
               </GlassRipple>
               <Link
@@ -473,6 +475,85 @@ function FAQItem({
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+function CaseStudiesSection() {
+  const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/public/case-studies')
+      .then((r) => r.json())
+      .then((d) => {
+        setCaseStudies(d.caseStudies || []);
+        setLoaded(true);
+      })
+      .catch(() => setLoaded(true));
+  }, []);
+
+  if (loaded && caseStudies.length === 0) {
+    return (
+      <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          <h2
+            style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginBottom: '16px',
+            }}
+          >
+            Case Studies
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.7 }}>
+            We&apos;re onboarding our first pilot cohort. Anonymized case studies with real bias
+            detection results and outcome data will appear here as pilots complete.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section id="case-studies" className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-14 max-w-3xl mx-auto text-center"
+        >
+          <h2
+            style={{
+              fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              marginBottom: '16px',
+            }}
+          >
+            Real Results from Real Deals
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.7 }}>
+            Anonymized case studies from IC memos analyzed by the Decision Intel pipeline.
+            Every bias detection was later validated against actual deal outcomes.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {caseStudies.map((study) => (
+            <motion.div
+              key={study.token}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <CaseStudyCard study={study} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -682,11 +763,11 @@ export default function LandingPage() {
             </GlassHover>
             <GlassRipple>
               <Link
-                href="/demo"
+                href={process.env.NEXT_PUBLIC_DEMO_BOOKING_URL || '/demo'}
                 className="btn btn-primary hidden sm:inline-flex"
                 style={{ fontSize: '0.85rem' }}
               >
-                Request Demo
+                Book a Demo
               </Link>
             </GlassRipple>
             <button
@@ -806,22 +887,22 @@ export default function LandingPage() {
                 >
                   <GlassRipple>
                     <Link
-                      href="/demo"
+                      href={process.env.NEXT_PUBLIC_DEMO_BOOKING_URL || '/demo'}
                       className="btn btn-primary glow"
                       style={{ padding: '14px 32px', fontSize: '0.9rem' }}
-                      onClick={() => trackEvent('hero_cta_clicked', { target: 'request_demo' })}
+                      onClick={() => trackEvent('hero_cta_clicked', { target: 'book_demo' })}
                     >
-                      Request a Demo <ArrowRight className="w-4 h-4 ml-2 inline" />
+                      Book a Demo <ArrowRight className="w-4 h-4 ml-2 inline" />
                     </Link>
                   </GlassRipple>
                   <GlassHover>
                     <Link
-                      href="/demo"
+                      href="/login"
                       className="btn btn-secondary"
                       style={{ padding: '14px 32px', fontSize: '0.9rem' }}
-                      onClick={() => trackEvent('hero_cta_clicked', { target: 'see_demo' })}
+                      onClick={() => trackEvent('hero_cta_clicked', { target: 'try_free' })}
                     >
-                      See a Live Demo
+                      Try Free
                     </Link>
                   </GlassHover>
                 </motion.div>
@@ -1007,6 +1088,11 @@ export default function LandingPage() {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* Traction Counters */}
+      <section className="py-16 relative" style={{ background: 'var(--bg-primary)' }}>
+        <TractionCounters />
       </section>
 
       <SectionDivider variant="wave" color="rgba(239, 68, 68, 0.15)" />
@@ -2682,6 +2768,11 @@ export default function LandingPage() {
 
       <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.06)" />
 
+      {/* Case Studies Section */}
+      <CaseStudiesSection />
+
+      <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.06)" />
+
       {/* Security & Trust Section */}
       <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
         <div className="relative z-10" style={containerStyle}>
@@ -3350,6 +3441,87 @@ export default function LandingPage() {
 
       <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.06)" />
 
+      {/* Pilot Program Section */}
+      <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
+        <div className="relative z-10" style={containerStyle}>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto text-center"
+          >
+            <h2
+              style={{
+                fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                marginBottom: '16px',
+              }}
+            >
+              Start With a 30-Day Pilot
+            </h2>
+            <p
+              style={{
+                color: 'var(--text-secondary)',
+                fontSize: '1.1rem',
+                lineHeight: 1.7,
+                marginBottom: '40px',
+              }}
+            >
+              For qualified PE/VC funds ($100M+ AUM). See the bias engine in action on your real deal
+              flow before committing.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-10">
+              {[
+                {
+                  title: 'Guided Onboarding',
+                  desc: 'We configure taxonomies, bias profiles, and noise benchmarks for your fund strategy.',
+                },
+                {
+                  title: '50 IC Memo Analyses',
+                  desc: 'Run your actual memos through the 15-agent pipeline. See real DQI scores and bias detection.',
+                },
+                {
+                  title: 'Outcome Tracking Setup',
+                  desc: 'Connect your deal pipeline so the system starts learning from your outcomes immediately.',
+                },
+                {
+                  title: 'Calibration Report',
+                  desc: 'At 30 days, receive a full calibration report: bias patterns, noise levels, and ROI projections.',
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="rounded-xl border border-white/10 bg-white/[0.03] p-5"
+                >
+                  <h3
+                    className="font-semibold mb-2"
+                    style={{ color: 'var(--text-primary)', fontSize: '1rem' }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <Link
+              href={process.env.NEXT_PUBLIC_DEMO_BOOKING_URL || '/demo'}
+              className="btn btn-primary glow"
+              style={{ padding: '14px 32px', fontSize: '0.95rem' }}
+              onClick={() => trackEvent('pilot_cta_clicked')}
+            >
+              Apply for Pilot <ArrowRight className="w-4 h-4 ml-2 inline" />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.06)" />
+
       {/* FAQ Section */}
       <section
         id="faq"
@@ -3506,7 +3678,7 @@ export default function LandingPage() {
               }}
             >
               <Link
-                href="/demo"
+                href={process.env.NEXT_PUBLIC_DEMO_BOOKING_URL || '/demo'}
                 className="btn btn-primary glow"
                 style={{
                   padding: '16px 40px',
@@ -3514,15 +3686,15 @@ export default function LandingPage() {
                   fontWeight: 600,
                 }}
               >
-                Request a Demo <ArrowRight className="w-4 h-4 ml-2 inline" />
+                Book a Demo <ArrowRight className="w-4 h-4 ml-2 inline" />
               </Link>
-              <a
-                href="#solution"
+              <Link
+                href="/login"
                 className="btn btn-secondary"
                 style={{ padding: '16px 32px', fontSize: '0.95rem' }}
               >
-                Learn More
-              </a>
+                Try Free
+              </Link>
             </div>
             <div
               style={{

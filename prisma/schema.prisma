@@ -1000,6 +1000,7 @@ model Deal {
   status        String        @default("active") // active | passed | invested | written_off | exited
   exitDate      DateTime?
   documents     Document[]
+  outcome       DealOutcome?
 
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -1007,6 +1008,21 @@ model Deal {
   @@index([orgId, stage])
   @@index([orgId, status])
   @@index([orgId, dealType])
+}
+
+model DealOutcome {
+  id         String   @id @default(cuid())
+  dealId     String   @unique
+  irr        Float?
+  moic       Float?
+  exitType   String?                         // ipo | trade_sale | secondary | write_off | partial_exit
+  exitValue  Decimal?
+  holdPeriod Int?                            // months
+  notes      String?  @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  deal       Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
 }
 
 // ─── Chat Persistence ─────────────────────────────────────────────────────
