@@ -460,7 +460,7 @@ export async function generatePreDecisionNudge(
         orgBiasStats = new Map(
           history.biasStats.map(s => [
             s.biasType,
-            { confirmationRate: s.confirmationRate, failureCorrelation: s.failureCorrelation },
+            { confirmationRate: s.confirmationRate, failureCorrelation: s.avgFailureImpact },
           ])
         );
       }
@@ -747,7 +747,7 @@ export function formatAuditSummaryForSlack(
   return {
     channel: '',
     text: `Decision Audit: Score ${audit.decisionQualityScore}/100, ${audit.biasFindings.length} biases detected`,
-    blocks: blocks as SlackNudgePayload['blocks'],
+    blocks: blocks as unknown as SlackNudgePayload['blocks'],
     thread_ts: threadTs,
   };
 }
