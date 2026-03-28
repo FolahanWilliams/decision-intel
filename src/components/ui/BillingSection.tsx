@@ -35,6 +35,7 @@ interface BillingData {
     maxPages: number;
     biasTypes: number;
   };
+  upgradeAvailable?: boolean;
 }
 
 const fetcher = (url: string) =>

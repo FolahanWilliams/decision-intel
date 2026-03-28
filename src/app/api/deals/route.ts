@@ -142,7 +142,6 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
         include: {
-          outcome: true,
           _count: { select: { documents: true } },
         },
       }),
