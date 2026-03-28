@@ -1,40 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron/sync-intelligence",
+      "path": "/api/cron/dispatch",
       "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/cron/detect-outcomes",
-      "schedule": "0 10 * * *"
-    },
-    {
-      "path": "/api/cron/outcome-reminders",
-      "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/recalibrate",
-      "schedule": "0 3 * * 0"
-    },
-    {
-      "path": "/api/cron/learn-toxic-patterns",
-      "schedule": "0 2 * * 0"
-    },
-    {
-      "path": "/api/cron/retry-nudges",
-      "schedule": "*/30 * * * *"
-    },
-    {
-      "path": "/api/cron/team-profiles",
-      "schedule": "0 4 * * 1"
-    },
-    {
-      "path": "/api/cron/weekly-digest",
-      "schedule": "0 8 * * 1"
-    },
-    {
-      "path": "/api/cron/infer-graph-edges",
-      "schedule": "0 1 * * *"
     }
   ]
 }
