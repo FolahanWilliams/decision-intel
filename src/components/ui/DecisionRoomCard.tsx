@@ -197,7 +197,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                   <option value="general">General</option>
                   <option value="investment_committee">Investment Committee</option>
                   <option value="board_review">Board Review</option>
-                  <option value="deal_committee">Deal Committee</option>
+                  <option value="deal_committee">Transaction Committee</option>
                   <option value="risk_committee">Risk Committee</option>
                   <option value="executive_committee">Executive Committee</option>
                   <option value="strategy_review">Strategy Review</option>
