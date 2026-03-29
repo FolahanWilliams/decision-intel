@@ -270,7 +270,8 @@ function ProductOverview() {
           <li>
             <strong>Klein RPD Framework</strong> — Expert intuition amplification: pattern
             recognition cues from historical deals, narrative war-story pre-mortems, RPD mental
-            simulator, and personal calibration dashboard at <code>/calibration</code>
+            simulator, and personal calibration dashboard at{' '}
+            <code>/dashboard/decision-quality?tab=calibration</code>
           </li>
           <li>
             <strong>Enhanced Public Demo</strong> — Streaming simulation UX with 3 sample docs, DQI
@@ -290,7 +291,7 @@ function ProductOverview() {
           </li>
           <li>
             <strong>A/B Prompt Testing</strong> — Experiment CRUD with Thompson sampling
-            auto-optimization dashboard at <code>/dashboard/experiments</code>
+            auto-optimization dashboard at <code>/dashboard/decision-quality?tab=experiments</code>
           </li>
           <li>
             <strong>Multi-Model Fallback</strong> — Gemini → Claude failover routing (set{' '}
