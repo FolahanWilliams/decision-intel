@@ -5,6 +5,7 @@ export default {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    exclude: ['e2e/**', 'node_modules/**'],
     environment: 'node',
     setupFiles: ['./vitest.setup.ts'],
     coverage: {
