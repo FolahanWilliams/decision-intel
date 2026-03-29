@@ -407,6 +407,37 @@ export async function analyzeDocument(
       );
     }
 
+    // Fingerprint Predictive Warnings (non-blocking)
+    try {
+      if (document.orgId && document.documentType) {
+        const savedForFp = await prisma.analysis.findFirst({
+          where: { documentId },
+          orderBy: { createdAt: 'desc' },
+          select: { id: true },
+        });
+        if (savedForFp) {
+          const { generatePredictiveWarnings } = await import('@/lib/learning/fingerprint-engine');
+          const deal = document.dealId
+            ? await prisma.deal.findUnique({
+                where: { id: document.dealId },
+                select: { dealType: true },
+              })
+            : null;
+          await generatePredictiveWarnings(
+            savedForFp.id,
+            document.orgId,
+            document.documentType,
+            deal?.dealType ?? undefined
+          );
+        }
+      }
+    } catch (fpErr) {
+      log.debug(
+        'Fingerprint warnings unavailable:',
+        fpErr instanceof Error ? fpErr.message : String(fpErr)
+      );
+    }
+
     // Decision Graph edge inference (non-blocking)
     try {
       const savedForGraph = await prisma.analysis.findFirst({
