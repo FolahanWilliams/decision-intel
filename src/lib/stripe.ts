@@ -19,31 +19,32 @@ export function getStripe(): Stripe {
 
 export const PLANS = {
   free: {
-    name: 'Noise Audit',
-    description: 'One-time diagnostic — see the hidden variance in your IC memos',
+    name: 'Starter',
+    description: 'One-time diagnostic — see hidden bias and noise in your strategic documents',
     analysesPerMonth: 3,
     maxPages: 10,
     biasTypes: 5,
   },
   pro: {
-    name: 'Individual Partner',
-    description: 'For a single deal partner running IC memos through the bias engine',
+    name: 'Professional',
+    description:
+      'For individual decision-makers running strategic documents through the bias engine',
     priceId: process.env.STRIPE_PRO_PRICE_ID || '',
     analysesPerMonth: 50,
     maxPages: 100,
     biasTypes: 20,
   },
   team: {
-    name: 'Fund',
-    description: 'For investment committees and deal teams managing full fund portfolios',
+    name: 'Team',
+    description: 'For executive teams and decision committees managing project portfolios',
     priceId: process.env.STRIPE_TEAM_PRICE_ID || '',
     analysesPerMonth: 250,
     maxPages: 200,
     biasTypes: 20,
   },
   enterprise: {
-    name: 'Multi-Fund',
-    description: 'For PE/VC platforms managing multiple funds with dedicated IC workflows',
+    name: 'Enterprise',
+    description: 'For organizations managing multiple teams with dedicated decision workflows',
     analysesPerMonth: Infinity,
     maxPages: Infinity,
     biasTypes: 20,

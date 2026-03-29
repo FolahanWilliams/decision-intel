@@ -349,10 +349,11 @@ function DocumentsTab({
         <div
           style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}
         >
-          No documents linked to this deal
+          No documents linked to this project
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-          Upload IC memos, CIMs, or term sheets from the dashboard and link them to this deal.
+          Upload strategic documents, board memos, or assessments from the dashboard and link them
+          to this project.
         </div>
         <button
           onClick={() => router.push('/dashboard')}

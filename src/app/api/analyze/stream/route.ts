@@ -67,7 +67,7 @@ const NODE_LABELS: Record<string, { label: string; description: string }> = {
   },
   rpdRecognitionNode: {
     label: 'Pattern Recognition',
-    description: 'Identifying recognition cues from historical deals using Klein RPD…',
+    description: 'Identifying recognition cues from historical decisions using Klein RPD…',
   },
   riskScorer: { label: 'Risk Scoring', description: 'Calculating final decision quality score…' },
 };
@@ -260,7 +260,7 @@ export async function POST(request: NextRequest) {
             progress: 5,
           });
 
-          // Resolve deal context for PE/VC investment vertical
+          // Resolve project context for analysis
           let documentType = '';
           let dealId = '';
           let dealType = '';

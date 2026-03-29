@@ -1,5 +1,5 @@
 /**
- * ROI Attribution — computes "value protected" for a deal.
+ * ROI Attribution — computes "value protected" for a project/decision.
  *
  * Traverses: Deal → Documents → Analyses → (BiasInstances + DecisionOutcome)
  *

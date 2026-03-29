@@ -199,6 +199,9 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                   <option value="board_review">Board Review</option>
                   <option value="deal_committee">Deal Committee</option>
                   <option value="risk_committee">Risk Committee</option>
+                  <option value="executive_committee">Executive Committee</option>
+                  <option value="strategy_review">Strategy Review</option>
+                  <option value="ma_committee">M&A Committee</option>
                 </select>
               </div>
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
@@ -318,7 +321,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                     }}
                   >
                     {room.unanimityMessage ||
-                      'Unanimous agreement detected. Stanford research (Strebulaev, 2024) shows consensus-seeking ICs have lower IPO rates. Was genuine dissent suppressed?'}
+                      'Unanimous agreement detected. Stanford research (Strebulaev, 2024) shows consensus-seeking committees have lower success rates. Was genuine dissent suppressed?'}
                   </div>
                 )}
               </div>

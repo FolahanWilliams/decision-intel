@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
-    'How Decision Intel collects, uses, and protects your data. GDPR-compliant data processing for PE/VC investment analysis.',
+    'How Decision Intel collects, uses, and protects your data. GDPR-compliant data processing for high-stakes decision analysis.',
 };
 
 export default function PrivacyPolicyPage() {
