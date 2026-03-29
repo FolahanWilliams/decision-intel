@@ -34,9 +34,27 @@ Next.js 14 app (App Router) with Prisma ORM, Supabase Auth, LangGraph AI pipelin
 - **Dev server:** `npm run dev`
 - **Build:** `npm run build`
 - **Lint:** `npm run lint`
+- **Format check:** `npx prettier --check "src/**/*.{ts,tsx}" --ignore-path .gitignore`
+- **Format fix:** `npx prettier --write "src/**/*.{ts,tsx}" --ignore-path .gitignore`
 - **Tests:** `npm test` (Vitest)
 - **Prisma generate:** `npm run prisma:generate`
 - **Prisma migrate:** `npm run prisma:migrate`
+
+## Code Formatting
+
+**Always run Prettier on every file you create or modify before committing.** This is mandatory — CI checks formatting and will fail on unformatted code.
+
+```bash
+# After editing any .ts or .tsx file:
+npx prettier --write "path/to/file.ts"
+
+# Or format all changed files at once:
+npx prettier --write $(git diff --name-only --diff-filter=ACMR -- '*.ts' '*.tsx')
+```
+
+- Run `npx prettier --write` on every `.ts`/`.tsx` file you touch, **before every commit**.
+- If you create a new file, format it immediately after writing.
+- Never skip this step — unformatted code will be rejected by CI.
 
 ## Code Conventions
 

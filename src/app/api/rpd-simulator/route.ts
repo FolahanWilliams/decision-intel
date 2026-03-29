@@ -92,7 +92,10 @@ export async function POST(request: NextRequest) {
         })
         .join('\n\n');
     } catch (ragError) {
-      log.warn('RAG search failed for RPD simulator:', ragError instanceof Error ? ragError.message : String(ragError));
+      log.warn(
+        'RAG search failed for RPD simulator:',
+        ragError instanceof Error ? ragError.message : String(ragError)
+      );
     }
 
     // Build and execute the LLM call
@@ -102,16 +105,34 @@ export async function POST(request: NextRequest) {
 
     const model = genAI.getGenerativeModel({
       model: modelName,
-      tools: [{ googleSearch: {} } as Parameters<typeof genAI.getGenerativeModel>[0]['tools'] extends (infer T)[] ? T : never],
+      tools: [
+        { googleSearch: {} } as Parameters<
+          typeof genAI.getGenerativeModel
+        >[0]['tools'] extends (infer T)[]
+          ? T
+          : never,
+      ],
       generationConfig: {
         responseMimeType: 'application/json',
         maxOutputTokens: 8192,
       },
       safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
       ],
     });
 
