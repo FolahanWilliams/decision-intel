@@ -46,8 +46,8 @@ export async function checkAnalysisLimit(
       limit: limits.analysesPerMonth,
     };
   } catch {
-    // On error, allow (fail open for MVP)
-    log.debug('Analysis count check failed, allowing by default');
-    return { allowed: true, plan, used: 0, limit: limits.analysesPerMonth };
+    // On error, deny (fail closed to prevent limit bypass)
+    log.error('Analysis count check failed, denying by default');
+    return { allowed: false, plan, used: 0, limit: limits.analysesPerMonth };
   }
 }

@@ -266,6 +266,7 @@ export function useCopilotStream(): UseCopilotStreamReturn {
   useEffect(() => {
     if (!isStreaming) return;
     const timer = setTimeout(() => {
+      abortRef.current?.abort();
       setIsStreaming(false);
       setActiveAgent(null);
       setError('Response timed out. Please try again.');
