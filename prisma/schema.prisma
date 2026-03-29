@@ -36,6 +36,8 @@ model Document {
   @@index([updatedAt])
   @@index([contentHash])
   @@index([dealId])
+  @@index([userId, uploadedAt])
+  @@index([orgId, uploadedAt])
 }
 
 model Analysis {
@@ -89,6 +91,7 @@ model Analysis {
   fingerprintWarnings FingerprintWarning[]
 
   @@index([documentId])
+  @@index([createdAt])
 }
 
 model BiasInstance {
@@ -963,6 +966,7 @@ model DecisionEdge {
   @@index([targetType, targetId])
   @@index([edgeType])
   @@index([strength])
+  @@index([orgId, createdAt])
 }
 
 // ─── Autonomous Outcome Detection ────────────────────────────────────────

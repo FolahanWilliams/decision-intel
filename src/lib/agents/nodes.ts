@@ -30,7 +30,7 @@ import { searchSimilarDocuments, searchSimilarWithOutcomes } from '../rag/embedd
 import { prisma } from '../prisma';
 import { executeDataRequests, DataRequest } from '../tools/financial';
 import { getRequiredEnvVar, getOptionalEnvVar } from '../env';
-import { withRetry, smartTruncate, batchProcess } from '../utils/resilience';
+import { withRetry, smartTruncate, batchProcess, withCircuitBreaker } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
 import { createLogger } from '../utils/logger';
 import { assembleContext, formatContextForPrompt } from '../intelligence/contextBuilder';
@@ -187,6 +187,20 @@ function truncateText(text: string): string {
 }
 
 /**
+ * Wrapper that routes all Gemini LLM calls through the circuit breaker + retry.
+ * If Gemini has had 5+ consecutive failures, calls are rejected immediately
+ * for 60s instead of piling up timeouts.
+ */
+async function withGeminiResilience<T>(
+  fn: () => Promise<T>,
+  retries = 2,
+  baseDelay = 1000,
+  maxDelay = 10000
+): Promise<T> {
+  return withCircuitBreaker('gemini', () => withRetry(fn, retries, baseDelay, maxDelay));
+}
+
+/**
  * Extract verified search source URLs from Gemini grounding metadata.
  * Consolidates the duplicated metadata extraction pattern used by multiple nodes.
  */
@@ -255,8 +269,10 @@ export async function structurerNode(state: AuditState): Promise<Partial<AuditSt
   try {
     log.info('Running document structuring...');
 
-    const result = await withTimeout(
-      getModel().generateContent([STRUCTURER_PROMPT, `<input_text>\n${content}\n</input_text>`])
+    const result = await withGeminiResilience(() =>
+      withTimeout(
+        getModel().generateContent([STRUCTURER_PROMPT, `<input_text>\n${content}\n</input_text>`])
+      )
     );
 
     const responseText = result.response?.text ? result.response.text() : '';
@@ -293,12 +309,18 @@ export async function intelligenceNode(state: AuditState): Promise<Partial<Audit
     const content = truncateText(state.structuredContent || '');
 
     // Quick extraction: ask Gemini to identify topics, industry, and companies
-    const extractionResult = await withTimeout(
-      getModel().generateContent([
-        INTELLIGENCE_EXTRACTION_PROMPT,
-        `<input_text>\n${content.slice(0, 8000)}\n</input_text>`,
-      ]),
-      30000
+    const extractionResult = await withGeminiResilience(
+      () =>
+        withTimeout(
+          getModel().generateContent([
+            INTELLIGENCE_EXTRACTION_PROMPT,
+            `<input_text>\n${content.slice(0, 8000)}\n</input_text>`,
+          ]),
+          30000
+        ),
+      2,
+      1000,
+      5000
     );
 
     const extractionText = extractionResult.response?.text
@@ -404,8 +426,8 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
       );
     }
 
-    // Use Grounded Model for primary detection with retry logic
-    const result = await withRetry(
+    // Use Grounded Model for primary detection with circuit breaker + retry
+    const result = await withGeminiResilience(
       () =>
         withTimeout(
           getGroundedModel().generateContent([
@@ -447,7 +469,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
           }
 
           try {
-            const searchResult = await withRetry(
+            const searchResult = await withGeminiResilience(
               () =>
                 withTimeout(
                   getGroundedModel().generateContent([
@@ -527,14 +549,16 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
       log.info(`Using investment-specific noise evaluation (docType=${state.documentType})`);
     }
 
-    // Parallel Judges for Noise Scoring
+    // Parallel Judges for Noise Scoring (circuit breaker prevents pile-up if Gemini is down)
     const promises = [1, 2, 3].map(() =>
-      withTimeout(
-        getModel().generateContent([
-          noisePrompt,
-          `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
-          `\n(Random Seed: ${Math.random()})`,
-        ])
+      withGeminiResilience(() =>
+        withTimeout(
+          getModel().generateContent([
+            noisePrompt,
+            `Decision Text to Rate:\n<input_text>\n${content}\n</input_text>${contextSuffix}`,
+            `\n(Random Seed: ${Math.random()})`,
+          ])
+        )
       )
     );
 
@@ -585,10 +609,15 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
     let noiseBenchmarks = [];
     if (extractedBenchmarks.length > 0) {
       log.info(`Verifying ${extractedBenchmarks.length} benchmarks with Google Search...`);
-      const benchmarkResult = await getGroundedModel().generateContent([
-        buildNoiseBenchmarkPrompt(sanitizeForPrompt(extractedBenchmarks, 'internal_metrics')),
-        `Context: Global Market`,
-      ]);
+      const benchmarkResult = await withGeminiResilience(() =>
+        withTimeout(
+          getGroundedModel().generateContent([
+            buildNoiseBenchmarkPrompt(sanitizeForPrompt(extractedBenchmarks, 'internal_metrics')),
+            `Context: Global Market`,
+          ]),
+          30000
+        )
+      );
 
       const benchmarkText = benchmarkResult.response.text();
       noiseBenchmarks = parseJSON(benchmarkText) || [];
@@ -627,8 +656,10 @@ export async function gdprAnonymizerNode(state: AuditState): Promise<Partial<Aud
     log.info('Running GDPR Anonymization...');
 
     // Use the model to identify and redact PII
-    const result = await withTimeout(
-      getModel().generateContent([GDPR_ANONYMIZER_PROMPT, `Text to anonymize:\n${content}`])
+    const result = await withGeminiResilience(() =>
+      withTimeout(
+        getModel().generateContent([GDPR_ANONYMIZER_PROMPT, `Text to anonymize:\n${content}`])
+      )
     );
 
     const responseText = result.response?.text ? result.response.text() : '';
@@ -766,7 +797,7 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
     const additionalContext = `${internalKnowledgeContext}${verificationIntelPrompt}${crossDocVerifyPrompt}`;
 
     // Single grounded LLM call for both fact-check and compliance
-    const result = await withRetry(
+    const result = await withGeminiResilience(
       () =>
         withTimeout(
           getGroundedModel().generateContent([
@@ -816,15 +847,17 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
     let enrichedFactCheck;
     if (Object.keys(fetchedData).length > 0 && factCheckData?.verifications?.length > 0) {
       log.info('Refining fact-check with Finnhub financial data...');
-      const refinementResult = await withTimeout(
-        getGroundedModel().generateContent([
-          buildFactCheckRefinementPrompt(
-            sanitizeForPrompt(factCheckData.verifications, 'verifications'),
-            sanitizeForPrompt(fetchedData, 'financial_data')
-          ),
-          `Topic: ${sanitizeForPrompt(companyName, 'topic')}`,
-        ]),
-        45000
+      const refinementResult = await withGeminiResilience(() =>
+        withTimeout(
+          getGroundedModel().generateContent([
+            buildFactCheckRefinementPrompt(
+              sanitizeForPrompt(factCheckData.verifications, 'verifications'),
+              sanitizeForPrompt(fetchedData, 'financial_data')
+            ),
+            `Topic: ${sanitizeForPrompt(companyName, 'topic')}`,
+          ]),
+          45000
+        )
       );
 
       const refinedText = refinementResult.response?.text ? refinementResult.response.text() : '';
@@ -1010,7 +1043,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
 
     // Deep analysis (sentiment, logic, SWOT) does not need relaxed safety
     // settings — use standard safety to keep content moderation active.
-    const result = await withRetry(
+    const result = await withGeminiResilience(
       () =>
         withTimeout(
           getStandardSafetyGroundedModel().generateContent([
@@ -1272,13 +1305,19 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
       ? `\n\nCROSS-DOCUMENT CONTEXT (related deals from portfolio — use for historical simulation grounding):\n${sanitizeForPrompt(crossDocSimBlock, 'cross_doc_context')}`
       : '';
 
-    const result = await withTimeout(
-      getStandardSafetyGroundedModel().generateContent([
-        dynamicPrompt,
-        `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
-        `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}${causalDriverBrief}${crossDocSimPrompt}`,
-      ]),
-      90000
+    const result = await withGeminiResilience(
+      () =>
+        withTimeout(
+          getStandardSafetyGroundedModel().generateContent([
+            dynamicPrompt,
+            `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
+            `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}${causalDriverBrief}${crossDocSimPrompt}`,
+          ]),
+          90000
+        ),
+      2,
+      1000,
+      10000
     );
 
     const text = result.response?.text ? result.response.text() : '';
@@ -1366,13 +1405,19 @@ export async function rpdRecognitionNode(state: AuditState): Promise<Partial<Aud
       similarDealCount: similarDocs.length,
     });
 
-    const result = await withTimeout(
-      getStandardSafetyGroundedModel().generateContent([
-        prompt,
-        `Current Document Under Analysis:\n<input_text>\n${content}\n</input_text>`,
-        `Historical Cases Found (via Vector Search):\n${historicalContext || 'No similar historical cases found.'}${intelBlock}`,
-      ]),
-      90000
+    const result = await withGeminiResilience(
+      () =>
+        withTimeout(
+          getStandardSafetyGroundedModel().generateContent([
+            prompt,
+            `Current Document Under Analysis:\n<input_text>\n${content}\n</input_text>`,
+            `Historical Cases Found (via Vector Search):\n${historicalContext || 'No similar historical cases found.'}${intelBlock}`,
+          ]),
+          90000
+        ),
+      2,
+      1000,
+      10000
     );
 
     const text = result.response?.text ? result.response.text() : '';
@@ -1418,15 +1463,21 @@ export async function metaJudgeNode(state: AuditState): Promise<Partial<AuditSta
       };
     }
 
-    const result = await withTimeout(
-      getStandardSafetyGroundedModel().generateContent([
-        buildMetaJudgePrompt(
-          content,
-          sanitizeForPrompt(failureScenarios, 'failure_scenarios'),
-          sanitizeForPrompt({ factVerifications, biasFindings }, 'objective_findings')
+    const result = await withGeminiResilience(
+      () =>
+        withTimeout(
+          getStandardSafetyGroundedModel().generateContent([
+            buildMetaJudgePrompt(
+              content,
+              sanitizeForPrompt(failureScenarios, 'failure_scenarios'),
+              sanitizeForPrompt({ factVerifications, biasFindings }, 'objective_findings')
+            ),
+          ]),
+          60000
         ),
-      ]),
-      60000
+      2,
+      1000,
+      10000
     );
 
     const verdict = result.response?.text

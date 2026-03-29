@@ -627,6 +627,7 @@ export async function searchSimilarWithOutcomes(
             mostAccurateTwin: true,
             timeframe: true,
           },
+          take: 100,
         });
       } catch {
         // Schema drift — DecisionOutcome table may not exist yet

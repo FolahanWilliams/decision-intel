@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('TwinEffectiveness');
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -90,7 +93,7 @@ export default function TwinEffectivenessReport({
         });
       })
       .catch(err => {
-        console.warn('Failed to fetch twin effectiveness:', err);
+        log.warn('Failed to fetch twin effectiveness:', err);
         setError('Unable to load twin effectiveness data');
       })
       .finally(() => setLoading(false));
