@@ -168,26 +168,99 @@ src/
 
 ### 3.2 AI Pipeline — SOPHISTICATED
 
-- LangGraph-based multi-agent pipeline (`src/lib/agents/`).
-- Multi-provider support: Gemini (primary), Claude (fallback).
-- RAG with pgvector embeddings (1536 dimensions).
-- SSE streaming for real-time analysis results.
+LangGraph StateGraph with 11 specialized nodes in a super-node pattern:
 
-### 3.3 Database Schema — COMPREHENSIVE
+```
+gdprAnonymizer → structurer → intelligenceGatherer
+  ↓ (fan-out to 6 parallel nodes)
+  biasDetective | noiseJudge | verificationNode | deepAnalysisNode | simulationNode | rpdRecognitionNode
+  ↓ (fan-in)
+metaJudgeNode (debate orchestration) → riskScorer → END
+```
+
+**Strengths:**
+- Multi-model safety configuration (relaxed for bias detection, standard for simulation).
+- Lazy singleton model instances for efficient reuse.
+- Prompt injection mitigation — untrusted data wrapped in XML delimiters with entity escaping.
+- Google Search grounding for fact-checking with source extraction.
+- Investment vertical overlay (PE/VC-specific bias/noise models).
+- Retry with exponential backoff + jitter (`src/lib/utils/resilience.ts`).
+- Graceful GDPR fallback — if anonymization fails, routes to riskScorer (prevents PII leakage).
+
+**Issues:**
+
+| Severity | Issue                                    | Recommendation                      |
+| -------- | ---------------------------------------- | ----------------------------------- |
+| HIGH     | No circuit breaker for LLM failures — consistent node failure crashes pipeline | Add `withCircuitBreaker()` wrapper (code exists in resilience.ts but unused) |
+| MEDIUM   | No per-node timeout — all nodes share 90s timeout | Add configurable per-node timeouts |
+| MEDIUM   | No partial result propagation — any node failure fails entire analysis | Implement graceful degradation for non-critical nodes |
+| LOW      | AI fallback to Claude mentioned but not integrated into agent nodes | Wire up `AI_FALLBACK_ENABLED` → Claude provider |
+
+### 3.3 SSE Streaming — ROBUST
+
+- 15s heartbeat keepalive prevents proxy timeouts.
+- Event ID tracking + deduplication on client.
+- `Last-Event-ID` resumption from cached checkpoint.
+- `AbortController` cleanup on component unmount.
+- 4-minute client timeout with auto-retry (max 2).
+
+**Issues:**
+
+| Severity | Issue                                | Recommendation                    |
+| -------- | ------------------------------------ | --------------------------------- |
+| MEDIUM   | No backpressure handling — large documents may overwhelm stream | Implement stream.pause/resume based on buffer level |
+| LOW      | Checkpoint expiration can break resumption silently | Add logging when resume falls back to restart |
+
+### 3.4 RAG Implementation — WELL-IMPLEMENTED
+
+- Gemini `embedding-001` model, 1536 dimensions, batch size 100 with concurrency limit (3 parallel).
+- Graph-guided reranking: `60% semantic + 30% graph distance + 10% outcome boost`.
+- Fault-tolerant: non-critical embedding failures don't fail analysis.
+
+**Issues:**
+
+| Severity | Issue                                | Recommendation                    |
+| -------- | ------------------------------------ | --------------------------------- |
+| MEDIUM   | No embedding versioning — dimension changes break old vectors | Track model version per embedding |
+| MEDIUM   | Silent storage failures — RAG misses results with no error | Add retry + alerting for embedding storage |
+| LOW      | Similarity threshold hardcoded | Make configurable for precision vs. recall tuning |
+
+### 3.5 Database Schema — COMPREHENSIVE
 
 - 40+ Prisma models covering: documents, analysis, biases, teams, meetings, deals, experiments, nudges, causal models, decision graphs.
 - pgvector extension for embeddings with HNSW indexing.
-- 37 migrations spanning Feb 2 – Mar 29, 2026.
+- 38 migrations spanning Feb 2 – Mar 29, 2026.
+- AES-256-GCM encryption at rest for documents and Slack tokens.
 
 **Issues:**
 
 | Severity | Issue                             | Recommendation                    |
 | -------- | --------------------------------- | --------------------------------- |
 | MEDIUM   | Missing composite indexes on common query patterns | Add `@@index([userId, createdAt])`, `@@index([orgId, createdAt])` |
+| MEDIUM   | JSON denormalization in Analysis model (`noiseStats`, `factCheck`, `compliance`, etc.) | Extract into typed relational tables for query flexibility |
+| MEDIUM   | No soft delete — cascading deletes can lose DecisionRoom data | Add `deletedAt` timestamp with soft-delete queries |
 | MEDIUM   | Minimal transaction usage for multi-step writes | Use `$transaction` for deal + document creation flows |
-| LOW      | Proxy-based lazy Prisma client adds overhead to first call | Acceptable trade-off for build-time safety |
+| LOW      | CacheEntry has no automatic cleanup job | Add cron job to prune expired entries |
 
-### 3.4 Integrations — EXTENSIVE
+### 3.6 Scalability — CRITICAL gaps
+
+| Severity | Issue                                    | Location                      | Recommendation                    |
+| -------- | ---------------------------------------- | ----------------------------- | --------------------------------- |
+| CRITICAL | `buildDecisionGraph()` loads up to 200 analyses without pagination | `graph-builder.ts` | Cursor-based pagination |
+| HIGH     | RAG search returns all results, client-side filtering | `embeddings.ts` | Enforce `LIMIT` at DB level |
+| HIGH     | 2-hop graph traversal can fetch up to 2,550 edges | `graph-builder.ts` | Cache graph snapshots with TTL |
+| MEDIUM   | NotificationCenter fetches all notifications on mount, no pagination | `NotificationCenter.tsx` | Add offset/limit pagination |
+| MEDIUM   | No cost tracking for embedding generation | `embeddings.ts` | Add per-org quota + alerts |
+| MEDIUM   | Document decrypted per-node (11x per analysis) | `encryption.ts` | Cache decrypted content for pipeline duration |
+
+### 3.7 State Management — AD-HOC (acceptable at current scale)
+
+- 6 React Context providers (Theme, Density, ReducedMotion, Notification, Tooltip, Toast).
+- 18+ custom hooks for domain-specific data fetching.
+- No centralized state library (no Redux/Zustand).
+- Good for current scale; may need SWR deduplication or centralized cache at 100+ concurrent users.
+
+### 3.8 Integrations — EXTENSIVE
 
 - **Slack:** OAuth, events, commands, actions, HMAC verification, token encryption.
 - **Stripe:** Checkout, billing portal, webhook with signature verification.
@@ -251,30 +324,38 @@ src/
 
 ## 6. Top Recommendations (Priority Order)
 
-### Critical (do soon)
+### Critical (do now — scalability blockers)
 
-1. **Fix test infrastructure** — Resolve the 12 failing test files (module resolution for `next/server` and `react`). Add `deps.inline` for Next.js in `vitest.config.ts`.
-2. **Add rate limiting to remaining session-auth routes** — `/api/search` and similar high-frequency endpoints should have per-user rate limits.
+1. **Add pagination to `buildDecisionGraph()`** — Currently loads up to 200 analyses unbounded. Will timeout for orgs with 1000+ analyses. Use cursor-based pagination.
+2. **Fix test infrastructure** — Resolve the 12 failing test files (module resolution for `next/server` and `react`). Add `deps.inline` for Next.js in `vitest.config.ts`.
+3. **Add circuit breaker for LLM nodes** — If a node consistently fails, entire pipeline crashes. Wire up `withCircuitBreaker()` from `resilience.ts` to agent nodes.
 
-### High Priority
+### High Priority (next sprint)
 
-4. **Standardize API error responses** — Create a `createApiResponse()` utility that always returns `{ success, data?, error?, requestId? }`.
-5. **Add composite database indexes** — `@@index([userId, createdAt])` and `@@index([orgId, createdAt])` on Document, Analysis, and related models.
-6. **Increase test coverage** — Raise threshold from 5% to at least 30%. Add component tests for critical UI (NotificationCenter, dashboard, deal management).
-7. **Replace `console.warn/error` with logger** — All 31 instances in components should use `createClientLogger()`.
+4. **Enforce DB-level LIMIT on RAG search** — Currently returns all results with client-side filtering. Add `LIMIT` parameter in SQL.
+5. **Cache graph snapshots with TTL** — 2-hop traversal can fetch up to 2,550 edges per request.
+6. **Standardize API error responses** — Create a `createApiResponse()` utility that always returns `{ success, data?, error?, requestId? }`.
+7. **Add composite database indexes** — `@@index([userId, createdAt])` and `@@index([orgId, createdAt])` on Document, Analysis, and related models.
+8. **Increase test coverage** — Raise threshold from 5% to at least 30%. Add component tests for critical UI.
+9. **Add embedding failure alerting** — Silent storage failures mean RAG misses results with no error.
 
-### Medium Priority
+### Medium Priority (next 2 sprints)
 
-8. **Extract API route middleware** — Shared auth + validation + error handling wrapper to reduce duplication.
-9. **Tree-shake D3 imports** — Replace `import * as d3` with named imports.
-10. **Add request tracing** — Correlate all API logs with `x-request-id` header.
-11. **Add E2E tests** — Playwright for critical user flows (upload → analyze → view results).
+10. **Cache decrypted content for pipeline duration** — Document decrypted 11x per analysis (once per node).
+11. **Extract API route middleware** — Shared auth + validation + error handling wrapper to reduce duplication.
+12. **Add request tracing** — Correlate all API logs with `x-request-id` header.
+13. **Replace `console.warn/error` with logger** — All 31 instances in components should use `createClientLogger()`.
+14. **Add E2E tests** — Playwright for critical user flows (upload → analyze → view results).
+15. **Paginate NotificationCenter** — Currently fetches all notifications on mount.
+16. **Wire up AI fallback** — `AI_FALLBACK_ENABLED` and `ANTHROPIC_API_KEY` exist but aren't integrated into agent nodes.
 
 ### Low Priority
 
-12. **Add rate limiting to public routes** — `/api/public/case-studies`, `/api/public/outcome-stats`.
-13. **Migrate D3 visualizations** — Wrap in proper `useEffect` cleanup or migrate to Visx for React compatibility.
-14. **Add missing transaction boundaries** — Deal + document creation, outcome tracking flows.
+17. **Tree-shake D3 imports** — Replace `import * as d3` with named imports.
+18. **Migrate D3 visualizations** — Wrap in proper `useEffect` cleanup or migrate to Visx for React compatibility.
+19. **Add soft deletes** — Cascading deletes can lose DecisionRoom/BlindPrior data.
+20. **Add embedding versioning** — Track model version per embedding for compatibility across model changes.
+21. **Add per-org embedding cost tracking** — Prevent runaway API costs at scale.
 
 ---
 
@@ -287,5 +368,7 @@ src/
 - Structured logging with environment-aware levels.
 - Good separation of concerns (lib/ for business logic, components/ for UI, api/ for handlers).
 - Encryption at rest for sensitive data (documents, Slack tokens).
-- Multi-provider AI with fallback (Gemini → Claude).
+- Multi-provider AI pipeline with 11 specialized nodes, GDPR anonymization, and prompt injection mitigation.
 - Extensive compliance framework (SOX, GDPR, EU AI Act, FCA, Basel 3).
+- SSE streaming with heartbeat, event deduplication, and Last-Event-ID resumption.
+- Graph-guided RAG reranking (semantic + graph distance + outcome boost).
