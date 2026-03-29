@@ -4,8 +4,12 @@ import { timingSafeEqual } from 'crypto';
 const EXTENSION_API_KEY = process.env.EXTENSION_API_KEY?.trim();
 
 function safeCompare(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+  const maxLen = Math.max(a.length, b.length);
+  const bufA = Buffer.alloc(maxLen, 0);
+  const bufB = Buffer.alloc(maxLen, 0);
+  Buffer.from(a).copy(bufA);
+  Buffer.from(b).copy(bufB);
+  return timingSafeEqual(bufA, bufB);
 }
 
 export interface AuthResult {

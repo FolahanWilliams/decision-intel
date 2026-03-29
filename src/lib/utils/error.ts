@@ -28,8 +28,7 @@ export function getSafeErrorMessage(error: unknown): string {
     if (msg.includes('quota')) return 'AI service quota exceeded';
 
     // Storage errors (Supabase)
-    if (msg.includes('Storage'))
-      return `Storage error: ${msg.split(':').pop()?.trim() || 'upload failed'}`;
+    if (msg.includes('Storage')) return 'Storage error: upload failed';
     if (msg.includes('Bucket')) return 'Storage bucket not found or inaccessible';
     if (msg.includes('storage')) return 'File storage error';
 

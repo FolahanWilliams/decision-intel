@@ -91,14 +91,21 @@ async function cacheSet(key: string, value: string, ttlSeconds: number): Promise
  * Delete all expired cache entries. Called probabilistically on writes and
  * by the /api/cache/cleanup endpoint.
  */
+let pruneInFlight = false;
 export async function pruneExpiredEntries(): Promise<number> {
-  const result = await prisma.cacheEntry.deleteMany({
-    where: { expiresAt: { lte: new Date() } },
-  });
-  if (result.count > 0) {
-    log.debug(`Pruned ${result.count} expired cache entries`);
+  if (pruneInFlight) return 0;
+  pruneInFlight = true;
+  try {
+    const result = await prisma.cacheEntry.deleteMany({
+      where: { expiresAt: { lte: new Date() } },
+    });
+    if (result.count > 0) {
+      log.debug(`Pruned ${result.count} expired cache entries`);
+    }
+    return result.count;
+  } finally {
+    pruneInFlight = false;
   }
-  return result.count;
 }
 
 // ---------------------------------------------------------------------------
