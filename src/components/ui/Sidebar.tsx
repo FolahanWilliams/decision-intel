@@ -28,6 +28,9 @@ import {
   Plug,
   Briefcase,
   Target,
+  Vote,
+  Fingerprint,
+  FlaskConical,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -380,9 +383,7 @@ export default function Sidebar() {
             label="Analytics"
             description="Trends, insights & decision DNA"
             active={
-              pathname.startsWith('/dashboard/analytics') ||
-              pathname === '/dashboard/insights' ||
-              pathname === '/dashboard/decision-dna'
+              pathname.startsWith('/dashboard/analytics') || pathname === '/dashboard/insights'
             }
             collapsed={collapsed}
             onNavigate={closeMobile}
@@ -414,6 +415,15 @@ export default function Sidebar() {
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
+          <NavItem
+            href="/dashboard/fingerprint"
+            icon={<Fingerprint size={18} />}
+            label="Fingerprint"
+            description="Contextual cognitive profile"
+            active={pathname.startsWith('/dashboard/fingerprint')}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
 
           <SectionLabel collapsed={collapsed}>Decisions</SectionLabel>
           <NavItem
@@ -423,8 +433,7 @@ export default function Sidebar() {
             description="Audits & behavioral nudges"
             active={
               pathname.startsWith('/dashboard/decision-quality') ||
-              pathname.startsWith('/dashboard/cognitive-audits') ||
-              pathname === '/dashboard/nudges'
+              pathname.startsWith('/dashboard/cognitive-audits')
             }
             collapsed={collapsed}
             onNavigate={closeMobile}
@@ -444,6 +453,24 @@ export default function Sidebar() {
             label="Meetings"
             description="Meeting recordings & transcripts"
             active={pathname.startsWith('/dashboard/meetings')}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/decision-rooms"
+            icon={<Vote size={18} />}
+            label="Decision Rooms"
+            description="Collaborative decision spaces"
+            active={pathname.startsWith('/dashboard/decision-rooms')}
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/experiments"
+            icon={<FlaskConical size={18} />}
+            label="Experiments"
+            description="A/B test nudge effectiveness"
+            active={pathname.startsWith('/dashboard/experiments')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
