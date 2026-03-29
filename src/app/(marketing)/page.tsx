@@ -852,7 +852,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.03em',
                   }}
                 >
-                  Your last board memo had{' '}
+                  The Decision Performance OS{' '}
                   <span
                     className="block"
                     style={{
@@ -863,7 +863,7 @@ export default function LandingPage() {
                       paddingBottom: '4px',
                     }}
                   >
-                    3&ndash;5 cognitive biases in it.
+                    for High-Stakes Teams
                   </span>
                 </motion.h1>
 
@@ -879,8 +879,9 @@ export default function LandingPage() {
                     maxWidth: '540px',
                   }}
                 >
-                  Your stakeholders just don&apos;t know yet. Decision Intel finds them
-                  automatically — before they cost your organization millions.
+                  Eliminate satisficing bias and decision noise on every major call — M&amp;A,
+                  strategy, risk, hiring, and capital allocation. AI-powered auditing that catches
+                  what your team can&apos;t see.
                 </motion.p>
 
                 <motion.div
@@ -1173,9 +1174,10 @@ export default function LandingPage() {
                 }}
               >
                 When Kahneman studied insurance underwriters, executives expected 10% variance
-                between them. The actual number was 55%. The same pattern exists in your IC process
-                — when two executives review the same proposal, their recommendations diverge by
-                40&ndash;60%. Not because of different information. Because of uncontrolled noise.
+                between them. The actual number was 55%. The same pattern exists in your decision
+                process — when two executives review the same proposal, their recommendations
+                diverge by 40&ndash;60%. Not because of different information. Because of
+                uncontrolled noise.
               </p>
               <div
                 style={{
@@ -1346,7 +1348,7 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              How Much Noise Is Hiding in Your IC Process?
+              How Much Noise Is Hiding in Your Decision Process?
             </h2>
             <p
               style={{
@@ -1356,9 +1358,9 @@ export default function LandingPage() {
                 marginBottom: '28px',
               }}
             >
-              Send us your last 3&ndash;5 strategic memos. We&apos;ll measure the variance between
-              independent AI judges — the invisible tax on your returns that nobody quantifies. Most
-              funds are shocked by the result.
+              Send us your last 3&ndash;5 strategic documents. We&apos;ll measure the variance
+              between independent AI judges — the invisible tax on your outcomes that nobody
+              quantifies. Most teams are shocked by the result.
             </p>
             <GlassRipple>
               <Link
@@ -1420,7 +1422,7 @@ export default function LandingPage() {
                 icon: FileSearch,
                 title: 'Capture & Frame',
                 description:
-                  'Upload board papers, strategy proposals, risk assessments, or deal memos. Define success criteria and your prior beliefs before analysis begins.',
+                  'Upload board memos, strategy papers, risk assessments, or M&A proposals. Define success criteria and your prior beliefs before analysis begins.',
                 color: '#FFFFFF',
                 details: [
                   'Document intelligence',
@@ -2299,8 +2301,8 @@ export default function LandingPage() {
               The Decision Performance OS
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              Purpose-built for teams making high-stakes decisions — investment committees,
-              corporate boards, strategy teams, and compliance officers.
+              Purpose-built for teams making high-stakes decisions — M&amp;A, corporate strategy,
+              risk committees, executive boards, and capital allocation.
             </p>
           </motion.div>
 
@@ -2373,10 +2375,10 @@ export default function LandingPage() {
                     lineHeight: 1.7,
                   }}
                 >
-                  Three independent AI judges score every memo blind. We measure the variance
+                  Three independent AI judges score every document blind. We measure the variance
                   between them to quantify how much &ldquo;noise&rdquo; — unwanted variability —
-                  exists in your IC process. Every AI tool claims to detect bias. Almost nobody
-                  measures decision noise with a triple-judge methodology.
+                  exists in your decision process. Every AI tool claims to detect bias. Almost
+                  nobody measures decision noise with a triple-judge methodology.
                 </p>
               </div>
               <div style={{ padding: '0 32px', paddingBottom: 0, zIndex: 1 }}>
@@ -3430,7 +3432,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                One-time diagnostic — see the hidden variance in your strategic memos.
+                See how much hidden bias and noise lives in your strategic documents.
               </p>
               <Link
                 href="/login"
@@ -3448,7 +3450,7 @@ export default function LandingPage() {
                   transition: 'all 0.2s ease',
                 }}
               >
-                Run Your Noise Audit
+                Try Free
               </Link>
             </motion.div>
 
@@ -3943,7 +3945,7 @@ export default function LandingPage() {
           >
             {[
               {
-                q: 'How is investment data protected?',
+                q: 'How is sensitive data protected?',
                 a: 'All documents are encrypted at rest (AES-256) and in transit (TLS 1.3). We are hosted on SOC 2 Type II certified infrastructure (Vercel and Supabase), and PII is automatically detected and redacted before analysis. Your data is never used to train models and is deleted upon request.',
               },
               {

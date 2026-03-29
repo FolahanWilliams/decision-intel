@@ -53,3 +53,15 @@ dev.db-journal
 # Sentry Config File
 .env.sentry-build-plugin
 .cursor/
+
+# Build artifacts & archives
+*.zip
+*.log
+
+# Internal documentation (not for public)
+AGENTS.md
+GEMINI.md
+CLAUDE.md
+
+# Sample/test data
+sample_decision.txt
