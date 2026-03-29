@@ -6,7 +6,11 @@ import { formatDate } from '@/lib/utils/format-date';
 import { Brain, Lightbulb, ExternalLink, BarChart3, Eye, ChevronDown } from 'lucide-react';
 import { DocumentTextHighlighter } from '@/components/visualizations/DocumentTextHighlighter';
 import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline';
-import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
+import dynamic from 'next/dynamic';
+const BiasNetwork = dynamic(
+  () => import('@/components/visualizations/BiasNetwork').then(m => ({ default: m.BiasNetwork })),
+  { ssr: false }
+);
 import { RiskHeatMap } from '@/components/visualizations/RiskHeatMap';
 import { DecisionTimeline } from '@/components/visualizations/DecisionTimeline';
 import { DQIBadge } from '@/components/visualizations/DQIBadge';

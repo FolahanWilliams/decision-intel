@@ -48,7 +48,11 @@ import {
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 // Breadcrumbs handled by parent page
 import { BackToTop } from '@/components/ui/BackToTop';
-import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
+import dynamic from 'next/dynamic';
+const BiasNetwork = dynamic(
+  () => import('@/components/visualizations/BiasNetwork').then(m => ({ default: m.BiasNetwork })),
+  { ssr: false }
+);
 import { useGraphTrends } from '@/hooks/useGraphTrends';
 import { Network } from 'lucide-react';
 

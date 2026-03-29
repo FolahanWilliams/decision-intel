@@ -124,6 +124,7 @@ function AlertCard({
     >
       <button
         onClick={() => setExpanded(p => !p)}
+        aria-expanded={expanded}
         className="w-full text-left p-3 flex items-start gap-3"
       >
         {/* Severity dot */}

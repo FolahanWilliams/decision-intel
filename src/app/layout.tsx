@@ -48,6 +48,12 @@ import { ReducedMotionProvider } from '@/components/ReducedMotionProvider';
 import { DensityProvider } from '@/components/DensityProvider';
 import { WebVitalsReporter } from '@/components/monitoring/WebVitalsReporter';
 import { cn } from '@/lib/utils';
+import { assertEnvValid } from '@/lib/env';
+
+// Validate required environment variables at startup (skip during next build)
+if (process.env.NEXT_PHASE !== 'phase-production-build') {
+  assertEnvValid();
+}
 
 export default function RootLayout({
   children,

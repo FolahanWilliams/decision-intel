@@ -1,7 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DecisionKnowledgeGraph } from '@/components/visualizations/DecisionKnowledgeGraph';
+import dynamic from 'next/dynamic';
+const DecisionKnowledgeGraph = dynamic(
+  () =>
+    import('@/components/visualizations/DecisionKnowledgeGraph').then(m => ({
+      default: m.DecisionKnowledgeGraph,
+    })),
+  { ssr: false }
+);
 import { CausalDAG } from '@/components/visualizations/CausalDAG';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ErrorBoundary } from '@/components/ErrorBoundary';

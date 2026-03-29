@@ -59,7 +59,11 @@ import {
 } from '@/types';
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
-import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
+import dynamic from 'next/dynamic';
+const BiasNetwork = dynamic(
+  () => import('@/components/visualizations/BiasNetwork').then(m => ({ default: m.BiasNetwork })),
+  { ssr: false }
+);
 import { ShareModal } from '@/components/ui/ShareModal';
 import { Share2 } from 'lucide-react';
 

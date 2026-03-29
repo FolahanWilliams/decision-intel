@@ -66,9 +66,12 @@ import { useActivityFeed } from '@/hooks/useActivityFeed';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { SparklineChart } from '@/components/ui/SparklineChart';
 import { DashboardCharts } from '@/components/visualizations/DashboardCharts';
-import DecisionPerformance from '@/components/visualizations/DecisionPerformance';
 import { GraphStatsCard } from '@/components/ui/GraphStatsCard';
 import dynamic from 'next/dynamic';
+const DecisionPerformance = dynamic(
+  () => import('@/components/visualizations/DecisionPerformance'),
+  { ssr: false }
+);
 const GraphHealthWidget = dynamic(
   () =>
     import('@/components/visualizations/GraphHealthWidget').then(m => ({

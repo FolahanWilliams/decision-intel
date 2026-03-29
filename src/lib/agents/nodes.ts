@@ -559,7 +559,20 @@ export async function noiseJudgeNode(state: AuditState): Promise<Partial<AuditSt
     });
 
     // Calculate Stats
-    const validScores = scores.filter(s => typeof s === 'number' && isFinite(s));
+    const validScores = scores.filter(s => typeof s === 'number' && isFinite(s) && s > 0);
+
+    if (validScores.length < 2) {
+      log.warn(
+        `Noise scoring: only ${validScores.length}/3 judges returned valid scores — insufficient for reliable measurement`
+      );
+      const fallbackScore = validScores.length === 1 ? validScores[0] : 50;
+      return {
+        noiseScores: validScores,
+        noiseStats: { mean: Number(fallbackScore.toFixed(1)), stdDev: 0, variance: 0 },
+        noiseBenchmarks: [],
+      };
+    }
+
     const mean =
       validScores.length > 0 ? validScores.reduce((a, b) => a + b, 0) / validScores.length : 0;
     const variance =
