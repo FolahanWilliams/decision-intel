@@ -12,12 +12,10 @@ import {
   ChevronRight,
   Lightbulb,
   Terminal,
-  PlayCircle,
   Info,
   RefreshCw,
   Brain,
   Users,
-  Vote,
   Globe,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/EnhancedToast';
@@ -69,21 +67,17 @@ import { Share2 } from 'lucide-react';
 const OverviewTab = lazy(() =>
   import('./tabs/OverviewTab').then(m => ({ default: m.OverviewTab }))
 );
-const LogicTab = lazy(() => import('./tabs/LogicTab').then(m => ({ default: m.LogicTab })));
 const SwotTab = lazy(() => import('./tabs/SwotTab').then(m => ({ default: m.SwotTab })));
 const NoiseTab = lazy(() => import('./tabs/NoiseTab').then(m => ({ default: m.NoiseTab })));
-const RedTeamTab = lazy(() => import('./tabs/RedTeamTab').then(m => ({ default: m.RedTeamTab })));
-const BoardroomTab = lazy(() =>
-  import('./tabs/BoardroomTab').then(m => ({ default: m.BoardroomTab }))
-);
-const SimulatorTab = lazy(() =>
-  import('./tabs/SimulatorTab').then(m => ({ default: m.SimulatorTab }))
-);
 const IntelligenceTab = lazy(() =>
   import('./tabs/IntelligenceTab').then(m => ({ default: m.IntelligenceTab }))
 );
-const ReplayTab = lazy(() => import('./tabs/ReplayTab').then(m => ({ default: m.ReplayTab })));
-const RpdTab = lazy(() => import('./tabs/RpdTab').then(m => ({ default: m.RpdTab })));
+const EvidenceTab = lazy(() =>
+  import('./tabs/EvidenceTab').then(m => ({ default: m.EvidenceTab }))
+);
+const PerspectivesTab = lazy(() =>
+  import('./tabs/PerspectivesTab').then(m => ({ default: m.PerspectivesTab }))
+);
 
 interface VerificationSource {
   ticker?: string;
@@ -187,34 +181,26 @@ interface Document {
   analyses: Analysis[];
 }
 
-type TabId =
-  | 'overview'
-  | 'biases'
-  | 'factcheck'
-  | 'compliance'
-  | 'cognitive'
-  | 'logic'
-  | 'swot'
-  | 'noise'
-  | 'simulator'
-  | 'red-team'
-  | 'boardroom'
-  | 'intelligence'
-  | 'replay'
-  | 'rpd';
+type TabId = 'overview' | 'evidence' | 'swot' | 'noise' | 'perspectives' | 'intelligence';
 
 const VALID_TABS: TabId[] = [
   'overview',
-  'logic',
+  'evidence',
   'swot',
   'noise',
-  'rpd',
-  'red-team',
-  'boardroom',
-  'simulator',
+  'perspectives',
   'intelligence',
-  'replay',
 ];
+
+// Map old tab IDs to new ones for backward compatibility
+const TAB_ALIASES: Record<string, TabId> = {
+  replay: 'evidence',
+  logic: 'evidence',
+  'red-team': 'perspectives',
+  boardroom: 'perspectives',
+  simulator: 'perspectives',
+  rpd: 'overview',
+};
 
 // ─── Conviction Score Badge ─────────────────────────────────────────────────
 
@@ -308,8 +294,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const [toxicCombinations, setToxicCombinations] = useState<any[]>([]);
 
   // URL-based tab state (#7)
-  const tabFromUrl = searchParams.get('tab') as TabId | null;
-  const activeTab: TabId = tabFromUrl && VALID_TABS.includes(tabFromUrl) ? tabFromUrl : 'overview';
+  const tabFromUrl = searchParams.get('tab') ?? '';
+  const resolvedTab = TAB_ALIASES[tabFromUrl] ?? tabFromUrl;
+  const activeTab: TabId = VALID_TABS.includes(resolvedTab as TabId)
+    ? (resolvedTab as TabId)
+    : 'overview';
 
   const { showToast } = useToast();
 
@@ -711,33 +700,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         tabs: [{ id: 'overview', label: 'Overview', icon: Brain }],
       },
       {
-        label: 'Analysis',
+        label: 'Deep Analysis',
         tabs: [
-          { id: 'replay', label: 'Replay', icon: PlayCircle },
-          { id: 'logic', label: 'Logic', icon: CheckCircle },
+          { id: 'evidence', label: 'Evidence', icon: CheckCircle },
           { id: 'swot', label: 'SWOT', icon: Lightbulb },
           { id: 'noise', label: 'Noise', icon: Info },
         ],
       },
-      ...(analysis?.recognitionCues || analysis?.narrativePreMortem
-        ? [
-            {
-              label: 'Intuition',
-              tabs: [{ id: 'rpd' as const, label: 'Pattern Recognition', icon: Brain }],
-            },
-          ]
-        : []),
       {
         label: 'Scenarios',
-        tabs: [
-          ...(analysis?.cognitiveAnalysis
-            ? [{ id: 'red-team' as const, label: 'Red Team', icon: Users }]
-            : []),
-          ...(analysis?.simulation
-            ? [{ id: 'boardroom' as const, label: 'Boardroom', icon: Vote }]
-            : []),
-          { id: 'simulator' as const, label: 'Simulator', icon: PlayCircle },
-        ],
+        tabs: [{ id: 'perspectives', label: 'Perspectives', icon: Users }],
       },
       ...(analysis?.intelligenceContext
         ? [
@@ -1569,12 +1541,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     analysisCreatedAt={analysis?.createdAt}
                     analysisId={analysis?.id}
                     compoundAdjustments={analysis?.compliance?.compoundScoring?.adjustments}
+                    recognitionCues={analysis?.recognitionCues}
+                    narrativePreMortem={analysis?.narrativePreMortem}
                   />
                 </ErrorBoundary>
               )}
-              {activeTab === 'replay' && analysis && (
-                <ErrorBoundary sectionName="Decision Replay">
-                  <ReplayTab
+              {activeTab === 'evidence' && analysis && (
+                <ErrorBoundary sectionName="Evidence">
+                  <EvidenceTab
                     analysisData={{
                       overallScore: analysis.overallScore,
                       noiseScore: analysis.noiseScore,
@@ -1634,12 +1608,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                           }
                         : {}),
                     }}
+                    logicalAnalysis={analysis?.logicalAnalysis}
                   />
-                </ErrorBoundary>
-              )}
-              {activeTab === 'logic' && (
-                <ErrorBoundary sectionName="Logic Analysis">
-                  <LogicTab logicalAnalysis={analysis?.logicalAnalysis} />
                 </ErrorBoundary>
               )}
               {activeTab === 'swot' && (
@@ -1656,41 +1626,20 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   />
                 </ErrorBoundary>
               )}
-              {activeTab === 'red-team' && (
-                <ErrorBoundary sectionName="Red Team">
-                  <RedTeamTab
+              {activeTab === 'perspectives' && (
+                <ErrorBoundary sectionName="Perspectives">
+                  <PerspectivesTab
                     analysisId={analysis?.id}
                     cognitiveAnalysis={analysis?.cognitiveAnalysis}
                     preMortem={analysis?.preMortem}
-                  />
-                </ErrorBoundary>
-              )}
-              {activeTab === 'boardroom' && (
-                <ErrorBoundary sectionName="Boardroom Simulation">
-                  <BoardroomTab
                     simulation={analysis?.simulation}
                     hasOutcome={analysis?.outcomeStatus === 'outcome_logged'}
-                  />
-                </ErrorBoundary>
-              )}
-              {activeTab === 'simulator' && (
-                <ErrorBoundary sectionName="What-If Simulator">
-                  <SimulatorTab
                     documentContent={document.content}
                     documentId={document.id}
                     originalScore={analysis?.overallScore}
                     originalNoiseScore={analysis?.noiseScore}
                     originalBiasCount={biases.length}
                     originalBiasTypes={biases.map(b => b.biasType)}
-                  />
-                </ErrorBoundary>
-              )}
-              {activeTab === 'rpd' && (
-                <ErrorBoundary sectionName="Pattern Recognition">
-                  <RpdTab
-                    recognitionCues={analysis?.recognitionCues}
-                    narrativePreMortem={analysis?.narrativePreMortem}
-                    documentId={document.id}
                   />
                 </ErrorBoundary>
               )}
