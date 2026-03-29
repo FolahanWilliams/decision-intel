@@ -122,11 +122,11 @@ function ProductOverview() {
             lineHeight: 1.3,
           }}
         >
-          The Cognitive Bias Audit Engine for PE/VC Investment Committees
+          The Decision Performance OS for High-Stakes Teams
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.6 }}>
-          Quantify decision noise. Eliminate cognitive bias. Protect fund returns. AI-powered
-          cognitive auditing purpose-built for high-stakes capital allocation decisions.
+          Quantify decision noise. Eliminate cognitive bias. Protect organizational outcomes.
+          AI-powered cognitive auditing purpose-built for high-stakes decisions.
         </p>
       </div>
 

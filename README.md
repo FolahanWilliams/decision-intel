@@ -10,8 +10,8 @@
 
 # Decision Intelligence Platform
 
-> **The Cognitive Bias Audit Engine for PE/VC Investment Committees.**
-> Quantify decision noise. Eliminate cognitive bias. Protect fund returns.
+> **The Decision Performance OS for High-Stakes Teams.**
+> Quantify decision noise. Eliminate cognitive bias. Protect organizational outcomes.
 
 [![CI/CD](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml)
 
@@ -23,41 +23,41 @@
 
 ## The Problem
 
-PE/VC investment committees make $50M-$500M capital allocation decisions based on IC memos, CIMs, and pitch decks — documents riddled with cognitive biases that nobody systematically detects. Research by Daniel Kahneman (_Noise: A Flaw in Human Judgment_) reveals that **professionals evaluating identical information routinely reach wildly different conclusions** — a phenomenon called _decision noise_.
+Executive teams make high-stakes decisions — M&A, strategy pivots, risk assessments, major investments — based on board memos and strategic documents riddled with cognitive biases that nobody systematically detects. Research by Daniel Kahneman (_Noise: A Flaw in Human Judgment_) reveals that **professionals evaluating identical information routinely reach wildly different conclusions** — a phenomenon called _decision noise_.
 
 **The numbers are stark:**
 
-- A single bad deal costs a fund **1-3x the ticket size** in opportunity cost
-- IC members anchored to entry valuations hold losers 40% longer than optimal
-- Competitive auctions trigger winner's curse in **65% of cases** (Malmendier & Tate, 2008)
-- Confirmation bias in due diligence causes teams to **rubber-stamp rather than stress-test** investment theses
+- A single bad strategic decision costs organizations **millions to hundreds of millions** in value
+- Decision-makers anchored to initial assumptions hold failing positions 40% longer than optimal
+- Competitive dynamics trigger winner's curse in **65% of cases** (Malmendier & Tate, 2008)
+- Confirmation bias in due diligence causes teams to **rubber-stamp rather than stress-test** strategic rationale
 
-Most investment committees have no way to:
+Most executive teams have no way to:
 
-- **Detect** which biases are embedded in their IC memos and deal materials
-- **Measure** how much noise exists across their investment decisions
-- **Track** which biases actually correlated with poor IRR/MOIC outcomes
-- **Build** institutional memory that makes the committee sharper with every deal
+- **Detect** which biases are embedded in their strategic documents and decision materials
+- **Measure** how much noise exists across their decisions
+- **Track** which biases actually correlated with poor outcomes
+- **Build** institutional memory that makes the team sharper with every decision
 
 ## The Solution
 
-**Decision Intel** is an AI-powered cognitive auditing engine purpose-built for PE/VC investment committees. Upload an IC memo, CIM, pitch deck, or due diligence report and get a comprehensive bias audit in under 60 seconds — with **11 PE-specific biases** including anchoring to entry valuation, carry incentive distortion, and winner's curse.
+**Decision Intel** is an AI-powered decision performance platform for high-stakes executive teams. Upload a board memo, strategy paper, risk assessment, or any decision document and get a comprehensive bias audit in under 60 seconds — detecting **35+ cognitive biases** with industry-specific overlays for M&A, PE/VC, enterprise risk, and strategic planning.
 
-The platform runs documents through a **16-agent analysis pipeline** with deal-stage-specific overlays (screening, due diligence, IC review, closing, portfolio, post-exit) to detect bias, measure noise, simulate IC deliberations, and generate actionable intelligence that protects fund returns. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
+The platform runs documents through a **16-agent analysis pipeline** with context-specific overlays to detect bias, measure noise, simulate boardroom deliberations, and generate actionable intelligence that protects organizational outcomes. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
 
 ---
 
 ## Value Proposition
 
-| For                    | Pain Point                                                       | What We Deliver                                                                          |
-| :--------------------- | :--------------------------------------------------------------- | :--------------------------------------------------------------------------------------- |
-| **Managing Partners**  | No systematic way to measure IC decision quality                 | Deal-level DQI scoring (0-100), bias pattern tracking across fund vintage                |
-| **Deal Partners**      | IC memos anchored to entry thesis, not current fundamentals      | 11 PE-specific biases detected with exact excerpts and coaching suggestions              |
-| **Operating Partners** | Post-acquisition execution plans tainted by operational optimism | Boardroom simulation with PE personas (GP, LP Rep, Risk Committee, Sector Expert)        |
-| **LP Relations**       | Fund reports cherry-pick metrics and bury underperformers        | LP report analysis detecting survivorship bias, selective reporting, and framing effects |
-| **IC Members**         | Groupthink and authority bias silence genuine debate             | Blind IC voting, noise measurement across committee members, dissent tracking            |
+| For                         | Pain Point                                                        | What We Deliver                                                                           |
+| :-------------------------- | :---------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
+| **Executives / C-Suite**    | No systematic way to measure decision quality across the org      | Decision-level DQI scoring (0-100), bias pattern tracking across teams and projects       |
+| **M&A / Corp Dev Teams**    | Strategic memos anchored to initial assumptions, not fundamentals | 35+ cognitive biases detected with exact excerpts and coaching suggestions                |
+| **Strategy Teams**          | Strategic plans tainted by groupthink and overconfidence          | Boardroom simulation with custom personas, blind voting, and dissent tracking             |
+| **Risk / Compliance**       | Risk assessments cherry-pick data and bury uncomfortable truths   | Document analysis detecting survivorship bias, selective reporting, and framing effects   |
+| **Investment Committees**   | Authority bias and groupthink silence genuine debate              | Blind committee voting, noise measurement across members, decision calibration            |
 
-**ROI**: A single avoided bad deal saves **$50M-$500M** in capital. The platform pays for itself after one corrected thesis. Organizations using systematic decision hygiene report **up to 60% reduction in decision variance**.
+**ROI**: A single avoided bad decision saves organizations **millions in value**. The platform pays for itself after one corrected thesis. Organizations using systematic decision hygiene report **up to 60% reduction in decision variance**.
 
 ---
 
@@ -65,10 +65,10 @@ The platform runs documents through a **16-agent analysis pipeline** with deal-s
 
 | Plan | Price | Best For |
 |:-----|:------|:---------|
-| **Noise Audit** | Free | Try the bias engine on 3 documents |
-| **Individual Partner** | $349/mo | Deal partners running IC memos through the gauntlet |
-| **Fund** | $1,999/mo | Full IC team with deal pipeline + Slack integration |
-| **Multi-Fund / Enterprise** | From $25K/yr | Multi-fund platforms with SSO + custom taxonomies |
+| **Starter** | Free | Try the bias engine on 3 documents |
+| **Professional** | $349/mo | Analysts and decision-makers running strategic documents through the gauntlet |
+| **Team** | $999/mo | Executive teams with project pipeline + Slack integration |
+| **Enterprise** | Custom | Organizations with SSO + custom taxonomies + dedicated support |
 
 All paid plans include a 14-day free trial. No credit card required to start.
 
@@ -78,11 +78,11 @@ All paid plans include a 14-day free trial. No credit card required to start.
 
 ## 30-Day Pilot Program
 
-For qualified PE/VC funds ($100M+ AUM), we offer a guided pilot:
+For qualified enterprise teams, we offer a guided pilot:
 
-- **Guided onboarding** — we configure taxonomies, bias profiles, and noise benchmarks for your fund strategy
-- **50 IC memo analyses** — run your actual memos through the 16-agent pipeline
-- **Outcome tracking setup** — connect your deal pipeline so the system starts learning immediately
+- **Guided onboarding** — we configure taxonomies, bias profiles, and noise benchmarks for your team and decision types
+- **50 decision analyses** — run your actual documents through the 16-agent pipeline
+- **Outcome tracking setup** — connect your project pipeline so the system starts learning immediately
 - **Calibration report** — at 30 days, receive a full report: bias patterns, noise levels, and ROI projections
 
 **[Apply for a pilot](https://www.decision-intel.com/demo)**
@@ -248,13 +248,13 @@ These correlations feed directly into the compound scoring engine via `computeCo
 
 ### Boardroom Simulation (Decision Twin)
 
-A unique **decision simulation engine** that creates virtual boardroom personas and simulates how each would vote on the document's proposals. For PE/VC documents, auto-selects **5 IC-specific personas**: Managing Partner (GP/carry incentive), Operating Partner (execution feasibility), LP Advisory Rep (capital preservation), Sector Specialist (market dynamics), and Risk Committee Chair (tail risk analysis). Produces:
+A unique **decision simulation engine** that creates virtual boardroom personas and simulates how each would vote on the document's proposals. Auto-selects context-appropriate personas based on document type and industry, or uses your custom personas. For PE/VC documents, defaults to 5 investment-specific personas (Managing Partner, Operating Partner, LP Advisory Rep, Sector Specialist, Risk Committee Chair). Produces:
 
 - Individual persona votes (APPROVE / REJECT / ABSTAIN) with reasoning
 - Consensus analysis and coalition mapping
 - Dissent patterns and minority concerns
-- **Custom Personas** — Create fund-specific boardroom personas with configurable risk tolerance, focus areas, and values
-- **Causal Intelligence Integration** — Personas are briefed on which biases have historically damaged this org's deals
+- **Custom Personas** — Create team-specific boardroom personas with configurable risk tolerance, focus areas, and values
+- **Causal Intelligence Integration** — Personas are briefed on which biases have historically damaged this org's decisions
 - **Twin Effectiveness Report** — Tracks which personas' dissent actually correlated with poor outcomes. Shows per-twin dissent accuracy rate, belief delta, and auto-generated narratives (e.g., "The Operational Expert dissented 12 times. 9 of those decisions later failed — 75% accuracy. Trust their warnings.")
 
 ### Multi-Touch Decision Attribution
@@ -298,20 +298,18 @@ Organization-specific **Structural Causal Models (SCM)** that learn which biases
 - **Biological/Physiological Signal Detection** — Winner Effect (success-streak language amplifies overconfidence-family biases ×1.2) and Cortisol/Stress signals (crisis language amplifies System 1 biases ×1.18) detected via NLP pattern matching on document content
 - **System 1 vs System 2 Ratio Scoring** — DQI process maturity component penalizes heuristic-dominant decisions (>70% System 1 biases) and rewards deliberative processes
 
-### PE/VC Investment Vertical
+### Industry Verticals
 
-Purpose-built cognitive auditing for private equity and venture capital investment committees:
+#### Project Pipeline & Document Intelligence
 
-#### Deal Pipeline & Document Intelligence
+- **Project Model** — Full project lifecycle tracking: intake, analysis, review, approval, execution, monitoring, and closure (with PE/VC-specific stages available)
+- **Document Type Classification** — Board memos, strategy papers, risk assessments, vendor proposals, policy documents, and project charters each get context-aware bias detection. PE/VC documents (IC memos, CIMs, pitch decks, term sheets) receive specialized investment overlays
+- **Outcome Tracking** — Link project outcomes to detected biases. Feeds the causal learning flywheel to identify which biases correlate with poor results
+- **Project APIs** — Full CRUD for projects and outcomes with Zod validation and org-scoped access control
 
-- **Deal Model** — Full deal lifecycle tracking: screening, due diligence, IC review, closing, portfolio management, and post-exit retrospectives
-- **Document Type Classification** — IC memos, CIMs, pitch decks, term sheets, due diligence reports, and LP reports each get specialized bias detection overlays
-- **Deal Outcome Tracking** — Record IRR, MOIC, exit type, hold period, and exit value per deal. Feeds the causal learning flywheel to identify which biases correlate with poor returns
-- **Deal APIs** — Full CRUD for deals and deal outcomes with Zod validation and org-scoped access control
+#### PE/VC Investment Vertical (Conditional)
 
-#### 11 PE-Specific Cognitive Biases
-
-Beyond the standard 20 biases, the investment vertical detects:
+When PE/VC document types are detected, the platform activates 11 additional investment-specific biases beyond the standard 20:
 
 1. **Anchoring to Entry Price** — Decisions anchored to original thesis rather than current fundamentals
 2. **Confirmation Bias in Thesis Validation** — Selectively seeking evidence confirming the investment thesis
@@ -832,7 +830,7 @@ src/
 │   │   │   └── keys/              # API key management
 │   │   ├── activity-feed/         # Unified activity feed (multi-source)
 │   │   ├── chat/                  # RAG-powered chat with follow-up suggestions
-│   │   ├── deals/                 # Deal pipeline CRUD (PE/VC vertical)
+│   │   ├── deals/                 # Project pipeline CRUD
 │   │   │   └── [id]/outcome/     # Deal outcome recording (IRR/MOIC)
 │   │   ├── documents/             # CRUD operations
 │   │   ├── human-decisions/       # Cognitive audit ingestion (manual/email/Slack)
@@ -1308,7 +1306,7 @@ Live metrics from the Decision Intel platform:
 | Metric | Value |
 |:-------|:------|
 | **Analyses Run** | Updated live — see [/api/public/outcome-stats](https://www.decision-intel.com/api/public/outcome-stats) |
-| **Biases Detected** | Across all IC memos, CIMs, and pitch decks processed |
+| **Biases Detected** | Across all strategic documents processed |
 | **Outcomes Tracked** | Deal outcomes linked back to original bias detections |
 | **Detection Accuracy** | Percentage of flagged biases later confirmed by deal outcomes |
 
@@ -1357,7 +1355,7 @@ These counters are displayed on the [landing page](https://www.decision-intel.co
 - [x] **Deep Compliance (SOX/Basel III)** — Multi-framework compliance with remediation plans
 - [x] **Analysis Versioning** — Full snapshot history and prompt drift detection
 - [x] **Custom Boardroom Personas** — Organization-specific persona configuration
-- [x] **PE/VC Investment Vertical** — Deal pipeline, document type classification, 11 PE-specific biases, deal-stage overlays, IC simulation with PE personas
+- [x] **Industry Verticals** — Project pipeline, document type classification, industry-specific biases, stage overlays, boardroom simulation with customizable personas
 - [x] **Deal Pipeline & Outcome Tracking** — Full deal lifecycle (screening → exit) with IRR/MOIC outcome recording that feeds causal AI flywheel
 - [x] **Investment-Specific Compound Scoring** — Auto-escalated monetary stakes for deal-linked documents, deal-stage-aware risk weighting
 - [x] **Enhanced Public Demo** — Streaming simulation UX with 3 sample documents, DQI badge animation, no login required

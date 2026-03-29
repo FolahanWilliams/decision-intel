@@ -536,11 +536,11 @@ function CaseStudiesSection() {
               marginBottom: '16px',
             }}
           >
-            Real Results from Real Deals
+            Real Results from Real Decisions
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.7 }}>
-            Anonymized case studies from IC memos analyzed by the Decision Intel pipeline. Every
-            bias detection was later validated against actual deal outcomes.
+            Anonymized case studies from strategic documents analyzed by the Decision Intel
+            pipeline. Every bias detection was later validated against actual outcomes.
           </p>
         </motion.div>
 
@@ -836,7 +836,7 @@ export default function LandingPage() {
                       boxShadow: '0 0 8px rgba(34,197,94,0.5)',
                     }}
                   />
-                  <span>Built for PE/VC Investment Committees</span>
+                  <span>The Decision Performance OS</span>
                 </motion.div>
 
                 <motion.h1
@@ -852,7 +852,7 @@ export default function LandingPage() {
                     letterSpacing: '-0.03em',
                   }}
                 >
-                  Your last IC memo had{' '}
+                  Your last board memo had{' '}
                   <span
                     className="block"
                     style={{
@@ -879,8 +879,8 @@ export default function LandingPage() {
                     maxWidth: '540px',
                   }}
                 >
-                  Your LPs just don&apos;t know yet. Decision Intel finds them automatically —
-                  before they cost your fund $50M.
+                  Your stakeholders just don&apos;t know yet. Decision Intel finds them
+                  automatically — before they cost your organization millions.
                 </motion.p>
 
                 <motion.div
@@ -1124,7 +1124,7 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              The Hidden Tax on Your Fund&apos;s Returns
+              The Hidden Tax on Your Organization&apos;s Decisions
             </h2>
             <p
               style={{
@@ -1174,7 +1174,7 @@ export default function LandingPage() {
               >
                 When Kahneman studied insurance underwriters, executives expected 10% variance
                 between them. The actual number was 55%. The same pattern exists in your IC process
-                — when two partners review the same deal, their recommendations diverge by
+                — when two executives review the same proposal, their recommendations diverge by
                 40&ndash;60%. Not because of different information. Because of uncontrolled noise.
               </p>
               <div
@@ -1240,7 +1240,7 @@ export default function LandingPage() {
                 Noise is bad enough on its own. But cognitive biases make it directional —
                 anchoring, confirmation bias, and groupthink don&apos;t just add randomness. They
                 systematically push decisions in the wrong direction. The combination of noise +
-                bias is what turns a $50M deal into a $50M loss.
+                bias is what turns a strategic bet into a costly mistake.
               </p>
               <div
                 style={{
@@ -1356,7 +1356,7 @@ export default function LandingPage() {
                 marginBottom: '28px',
               }}
             >
-              Send us your last 3&ndash;5 IC memos. We&apos;ll measure the variance between
+              Send us your last 3&ndash;5 strategic memos. We&apos;ll measure the variance between
               independent AI judges — the invisible tax on your returns that nobody quantifies. Most
               funds are shocked by the result.
             </p>
@@ -1593,23 +1593,23 @@ export default function LandingPage() {
             {[
               {
                 icon: Target,
-                title: 'For Deal Partners',
+                title: 'For Decision-Makers',
                 description:
-                  'Run your own IC memos through the bias engine. Build your personal calibration curve. Track which biases cost you money over time.',
+                  'Run your strategic memos through the bias engine. Build your personal calibration curve. Track which biases cost you the most over time.',
                 color: '#FFFFFF',
               },
               {
                 icon: Users,
-                title: 'For Investment Committees',
+                title: 'For Executive Committees',
                 description:
-                  'Committee rooms with blind priors. Statistical Jury noise scoring. See exactly where your IC process leaks alpha.',
+                  'Decision rooms with blind priors. Statistical Jury noise scoring. See exactly where your committee process leaks quality.',
                 color: '#A3E635',
               },
               {
                 icon: Network,
-                title: 'For Fund Platforms',
+                title: 'For Organizations',
                 description:
-                  'Multi-fund analytics. Cross-portfolio bias patterns. Compliance audit packs for LPs and regulators.',
+                  'Multi-team analytics. Cross-project bias patterns. Compliance audit packs for boards and regulators.',
                 color: '#22c55e',
               },
             ].map((persona, i) => (
@@ -2488,8 +2488,9 @@ export default function LandingPage() {
                 Cognitive Bias Engine
               </h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.7 }}>
-                Scans IC memos, CIMs, and deal papers for anchoring, confirmation bias, groupthink,
-                and 12+ other cognitive biases with confidence scoring and severity classification.
+                Scans board memos, strategy papers, and decision documents for anchoring,
+                confirmation bias, groupthink, and 12+ other cognitive biases with confidence
+                scoring and severity classification.
               </p>
             </motion.div>
 
@@ -2825,10 +2826,10 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              What Noise Costs Your Fund
+              What Noise Costs Your Organization
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              Every deal your IC reviews carries hidden variance. Calculate what it costs.
+              Every major decision carries hidden variance. Calculate what it costs.
             </p>
           </motion.div>
 
@@ -3108,7 +3109,7 @@ export default function LandingPage() {
                 >
                   {outcomeStats?.isRealData
                     ? 'Based on real platform outcome data.'
-                    : 'The average mid-market PE fund loses $23M per vintage year to bias-driven decisions. Estimates based on Kahneman et al., "Noise" (2021). Actual results vary by fund and decision type.'}
+                    : 'Organizations lose millions per year to bias-driven decisions. Estimates based on Kahneman et al., "Noise" (2021). Actual results vary by organization and decision type.'}
                 </p>
 
                 <div
@@ -3130,7 +3131,7 @@ export default function LandingPage() {
                       fontWeight: 600,
                     }}
                   >
-                    See Your Fund&apos;s Noise Tax
+                    See Your Decision Noise Tax
                   </Link>
                 </div>
               </div>
@@ -3164,10 +3165,10 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              Enterprise-Grade Security for Sensitive Deal Documents
+              Enterprise-Grade Security for Sensitive Documents
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
-              Your IC memos contain material non-public information. We treat them accordingly.
+              Your strategic documents contain sensitive information. We treat them accordingly.
             </p>
           </motion.div>
 
@@ -3195,7 +3196,7 @@ export default function LandingPage() {
                 icon: Brain,
                 title: 'Your Data Never Trains Models',
                 description:
-                  'Document content is never used to train or fine-tune any AI model. Your proprietary deal intelligence stays yours.',
+                  'Document content is never used to train or fine-tune any AI model. Your proprietary intelligence stays yours.',
               },
               {
                 icon: FileSearch,
@@ -3379,7 +3380,7 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Noise Audit
+                Starter
               </h3>
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
@@ -3396,7 +3397,7 @@ export default function LandingPage() {
                   flex: 1,
                 }}
               >
-                {['3 deal analyses', '10 page max', '5 bias types', 'Docs support'].map(
+                {['3 decision analyses', '10 page max', '5 bias types', 'Docs support'].map(
                   (feature, i) => (
                     <div
                       key={i}
@@ -3429,7 +3430,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                One-time diagnostic — see the hidden variance in your IC memos.
+                One-time diagnostic — see the hidden variance in your strategic memos.
               </p>
               <Link
                 href="/login"
@@ -3481,7 +3482,7 @@ export default function LandingPage() {
                   letterSpacing: '0.02em',
                 }}
               >
-                Best for Deal Partners
+                Best for Decision-Makers
               </div>
               <h3
                 style={{
@@ -3491,7 +3492,7 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Individual Partner
+                Professional
               </h3>
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
@@ -3511,11 +3512,11 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  '50 deal analyses/month',
-                  '100 page IC memos & CIMs',
-                  'All PE/VC bias types',
-                  'Noise analysis + IC simulation',
-                  'Deal outcome tracking (IRR/MOIC)',
+                  '50 decision analyses/month',
+                  'All 35+ bias types',
+                  'Decision twins + boardroom simulation',
+                  'Noise analysis + knowledge graph',
+                  'Project outcome tracking',
                   'Priority email support',
                 ].map((feature, i) => (
                   <div
@@ -3548,7 +3549,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                For deal partners and analysts running IC memos through the bias gauntlet.
+                For analysts and leaders running strategic documents through the bias gauntlet.
               </p>
               <button
                 onClick={() => handleCheckout('pro')}
@@ -3613,11 +3614,11 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Fund
+                Team
               </h3>
               <div style={{ marginBottom: '4px' }}>
                 <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  {isAnnual ? '$1,599' : '$1,999'}
+                  {isAnnual ? '$799' : '$999'}
                 </span>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                   /month{isAnnual ? ', billed annually' : ''}
@@ -3638,12 +3639,12 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  '250 deal analyses/month',
-                  '200 page IC memos & CIMs',
-                  'All PE/VC bias types',
-                  'Deal pipeline + stage tracking',
-                  'Blind IC voting + team profiles',
+                  '250 decision analyses/month',
+                  'All 35+ bias types',
+                  'Project pipeline + stage tracking',
+                  'Team calibration + blind voting',
                   'Slack integration + API access',
+                  'Decision nudges + experiments',
                   'Dedicated support channel',
                 ].map((feature, i) => (
                   <div
@@ -3676,7 +3677,8 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                For PE/VC investment committees and deal teams managing full fund portfolios.
+                For executive teams and committees managing high-stakes decisions across the
+                organization.
               </p>
               <button
                 onClick={() => handleCheckout('team')}
@@ -3722,13 +3724,13 @@ export default function LandingPage() {
                   marginBottom: '4px',
                 }}
               >
-                Multi-Fund
+                Enterprise
               </h3>
               <div style={{ marginBottom: '20px' }}>
                 <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  Starting at $25K
+                  Custom
                 </span>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/year</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}> pricing</span>
               </div>
               <div
                 style={{
@@ -3740,11 +3742,11 @@ export default function LandingPage() {
                 }}
               >
                 {[
-                  'Unlimited deals + documents',
-                  'Multi-fund portfolio analytics',
+                  'Unlimited decisions + documents',
+                  'Multi-team analytics + reporting',
                   'SSO + audit log + full API',
                   'Dedicated CSM',
-                  'Custom bias taxonomies',
+                  'Custom bias taxonomies + personas',
                   'Private cloud deployment (coming soon)',
                 ].map((feature, i) => (
                   <div
@@ -3777,7 +3779,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                For PE/VC platforms managing multiple funds with dedicated IC workflows.
+                For organizations embedding decision quality into every major call.
               </p>
               <a
                 href="mailto:hello@decisionintel.ai"
@@ -3811,9 +3813,9 @@ export default function LandingPage() {
               marginTop: '24px',
             }}
           >
-            All paid plans include a 14-day free trial. No credit card required to start. The
-            average mid-market PE fund loses $23M per vintage year to bias-driven decisions.
-            Decision Intel costs less than 0.1% of that.
+            All paid plans include a 14-day free trial. No credit card required to start.
+            Organizations lose millions per year to bias-driven decisions. Decision Intel costs a
+            fraction of what one bad decision costs.
           </motion.p>
         </div>
       </section>
@@ -3847,23 +3849,23 @@ export default function LandingPage() {
                 marginBottom: '40px',
               }}
             >
-              For qualified PE/VC funds ($100M+ AUM). See the bias engine in action on your real
-              deal flow before committing.
+              For qualified enterprise teams. See the bias engine in action on your real strategic
+              documents before committing.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-10">
               {[
                 {
                   title: 'Guided Onboarding',
-                  desc: 'We configure taxonomies, bias profiles, and noise benchmarks for your fund strategy.',
+                  desc: 'We configure taxonomies, bias profiles, and noise benchmarks for your team and decision types.',
                 },
                 {
-                  title: '50 IC Memo Analyses',
-                  desc: 'Run your actual memos through the 15-agent pipeline. See real DQI scores and bias detection.',
+                  title: '50 Decision Analyses',
+                  desc: 'Run your actual documents through the 15-agent pipeline. See real DQI scores and bias detection.',
                 },
                 {
                   title: 'Outcome Tracking Setup',
-                  desc: 'Connect your deal pipeline so the system starts learning from your outcomes immediately.',
+                  desc: 'Connect your project pipeline so the system starts learning from your outcomes immediately.',
                 },
                 {
                   title: 'Calibration Report',
@@ -4011,7 +4013,7 @@ export default function LandingPage() {
               }}
             >
               <Target className="w-3.5 h-3.5" />
-              Built for PE/VC Investment Committees
+              Built for Teams That Make Decisions That Matter
             </div>
             <h2
               style={{
@@ -4046,8 +4048,8 @@ export default function LandingPage() {
                 marginRight: 'auto',
               }}
             >
-              Be among the first teams to audit decision quality with AI — from PE/VC funds and
-              corporate boards to strategy teams and compliance officers.
+              Be among the first teams to audit decision quality with AI — from executive committees
+              and M&amp;A teams to strategy groups and risk officers.
             </p>
             <div
               style={{

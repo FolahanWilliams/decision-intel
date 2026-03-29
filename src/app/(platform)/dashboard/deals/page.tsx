@@ -111,7 +111,7 @@ export default function DealsPage() {
   }
 
   return (
-    <ErrorBoundary sectionName="Deal Pipeline">
+    <ErrorBoundary sectionName="Project Pipeline">
       <div className="container" style={{ maxWidth: 1200, padding: '24px 20px' }}>
         {/* Header */}
         <div
@@ -124,10 +124,10 @@ export default function DealsPage() {
         >
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
-              Deal Pipeline
+              Project Pipeline
             </h1>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0' }}>
-              {total} deal{total !== 1 ? 's' : ''} tracked
+              {total} project{total !== 1 ? 's' : ''} tracked
             </p>
           </div>
           <button
@@ -141,7 +141,7 @@ export default function DealsPage() {
               fontSize: 13,
             }}
           >
-            <Plus size={14} /> New Deal
+            <Plus size={14} /> New Project
           </button>
         </div>
 
@@ -226,7 +226,7 @@ export default function DealsPage() {
             value={dealFilters.dealType || ''}
             onChange={e => updateFilter('dealType', e.target.value)}
             style={selectStyle}
-            aria-label="Filter by deal type"
+            aria-label="Filter by project type"
           >
             <option value="">All Types</option>
             {DEAL_TYPES.map(t => (
@@ -240,7 +240,7 @@ export default function DealsPage() {
             value={dealFilters.sector || ''}
             onChange={e => updateFilter('sector', e.target.value)}
             style={selectStyle}
-            aria-label="Sort deals by"
+            aria-label="Sort projects by"
           >
             <option value="">All Sectors</option>
             {SECTORS.map(s => (
@@ -331,7 +331,7 @@ export default function DealsPage() {
           >
             <AlertTriangle size={18} style={{ color: '#ef4444', flexShrink: 0 }} />
             <span style={{ color: 'var(--text-secondary)', fontSize: 13, flex: 1 }}>
-              Failed to load deals. Please try again.
+              Failed to load projects. Please try again.
             </span>
             <button
               onClick={() => mutate()}
@@ -369,10 +369,10 @@ export default function DealsPage() {
         ) : deals.length === 0 ? (
           <EnhancedEmptyState
             type="generic"
-            title="No deals yet"
-            description="Create your first deal to start tracking your pipeline."
+            title="No projects yet"
+            description="Create your first project to start tracking your pipeline."
             actions={[
-              { label: 'Create Deal', onClick: () => setShowForm(true), variant: 'primary' },
+              { label: 'Create Project', onClick: () => setShowForm(true), variant: 'primary' },
             ]}
           />
         ) : view === 'board' ? (

@@ -132,7 +132,7 @@ export function PersonaManager() {
       >
         <h3 className="flex items-center gap-sm">
           <Users size={18} />
-          Boardroom Personas
+          Decision Personas
         </h3>
         {!showNew && !editingId && personas.length < 10 && (
           <button
@@ -153,9 +153,9 @@ export function PersonaManager() {
           className="text-xs text-muted"
           style={{ marginBottom: 'var(--spacing-md)', lineHeight: 1.5 }}
         >
-          Custom personas replace the default AI-generated boardroom for your organization. Each
-          analysis will simulate these specific decision-makers voting on your proposals. If none
-          are defined, the AI generates domain-specific personas per document.
+          Custom personas replace the default AI-generated decision panel for your organization.
+          Each analysis will simulate these specific decision-makers voting on your proposals. If
+          none are defined, the AI generates domain-specific personas per document.
         </p>
 
         {loading ? (

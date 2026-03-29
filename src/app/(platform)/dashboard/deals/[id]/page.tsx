@@ -114,13 +114,13 @@ export default function DealDetailPage() {
       >
         <AlertTriangle size={40} style={{ color: '#ef4444', marginBottom: 12 }} />
         <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
-          Deal not found
+          Project not found
         </div>
         <Link
           href="/dashboard/deals"
           style={{ color: '#6366f1', fontSize: 13, marginTop: 8, display: 'inline-block' }}
         >
-          Back to Deal Pipeline
+          Back to Projects
         </Link>
       </div>
     );
@@ -132,7 +132,7 @@ export default function DealDetailPage() {
   const nextStage = getNextStage(deal.stage);
 
   return (
-    <ErrorBoundary sectionName="Deal Detail">
+    <ErrorBoundary sectionName="Project Detail">
       <div className="container" style={{ maxWidth: 1000, padding: '24px 20px' }}>
         {/* Back link */}
         <Link
@@ -147,7 +147,7 @@ export default function DealDetailPage() {
             marginBottom: 16,
           }}
         >
-          <ArrowLeft size={14} /> Deal Pipeline
+          <ArrowLeft size={14} /> Projects
         </Link>
 
         {/* Header */}
