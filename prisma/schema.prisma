@@ -1027,6 +1027,21 @@ model DealOutcome {
   deal       Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
 }
 
+model DecisionBriefRecord {
+  id        String   @id @default(cuid())
+  dealId    String
+  userId    String
+  orgId     String
+  brief     Json                              // Full validated brief JSON
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dealId])
+  @@index([userId])
+  @@unique([dealId, version])
+}
+
 // ─── Chat Persistence ─────────────────────────────────────────────────────
 
 model ChatSession {

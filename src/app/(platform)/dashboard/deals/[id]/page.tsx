@@ -19,6 +19,7 @@ import { useDeal } from '@/hooks/useDeals';
 import { DealFormModal } from '@/components/deals/DealFormModal';
 import { DealOutcomeForm } from '@/components/deals/DealOutcomeForm';
 import { DealOutcomeDisplay } from '@/components/deals/DealOutcomeDisplay';
+import { DecisionBriefTab } from '@/components/deals/DecisionBriefTab';
 import {
   STAGE_COLORS,
   DEAL_TYPE_COLORS,
@@ -58,7 +59,9 @@ export default function DealDetailPage() {
   const dealId = params.id as string;
 
   const { deal, isLoading, error, mutate } = useDeal(dealId);
-  const [activeTab, setActiveTab] = useState<'documents' | 'bias' | 'outcome'>('documents');
+  const [activeTab, setActiveTab] = useState<'documents' | 'bias' | 'outcome' | 'brief'>(
+    'documents'
+  );
   const [showEditForm, setShowEditForm] = useState(false);
   const [advancingStage, setAdvancingStage] = useState(false);
   const { showToast } = useToast();
@@ -294,6 +297,10 @@ export default function DealDetailPage() {
           <button onClick={() => setActiveTab('outcome')} style={tabStyle(activeTab === 'outcome')}>
             Outcome
           </button>
+          <button onClick={() => setActiveTab('brief')} style={tabStyle(activeTab === 'brief')}>
+            <FileText size={13} style={{ marginRight: 4, verticalAlign: -2 }} />
+            Decision Brief
+          </button>
         </div>
 
         {/* Tab Content */}
@@ -302,6 +309,7 @@ export default function DealDetailPage() {
         )}
         {activeTab === 'bias' && <BiasSummaryTab documents={deal.documents || []} />}
         {activeTab === 'outcome' && <OutcomeTab deal={deal} onUpdate={() => mutate()} />}
+        {activeTab === 'brief' && <DecisionBriefTab dealId={dealId} />}
 
         {/* Edit modal */}
         <DealFormModal

@@ -34,6 +34,10 @@ import { withRetry, smartTruncate, batchProcess } from '../utils/resilience';
 import { getCachedBiasInsight, cacheBiasInsight } from '../utils/cache';
 import { createLogger } from '../utils/logger';
 import { assembleContext, formatContextForPrompt } from '../intelligence/contextBuilder';
+import {
+  assembleCrossDocumentContext,
+  formatCrossDocContextForPrompt,
+} from '../rag/cross-document-context';
 import { normalizeBiasType } from '../utils/bias-normalize';
 import {
   isInvestmentDocument,
@@ -325,7 +329,23 @@ export async function intelligenceNode(state: AuditState): Promise<Partial<Audit
         `macro=${intelligenceContext.meta.sources.macroIndicators}`
     );
 
-    return { intelligenceContext };
+    // Assemble cross-document RAG context (non-blocking)
+    let crossDocContext;
+    try {
+      crossDocContext = await assembleCrossDocumentContext(
+        state.documentId,
+        content,
+        state.userId,
+        5
+      );
+      log.info(
+        `Cross-doc context: ${crossDocContext.sectionCount} sections, ${crossDocContext.documentCount} documents`
+      );
+    } catch (e) {
+      log.warn('Cross-doc context failed (non-fatal):', e instanceof Error ? e.message : String(e));
+    }
+
+    return { intelligenceContext, crossDocContext };
   } catch (e) {
     log.warn('Intelligence node failed (non-fatal):', e instanceof Error ? e.message : String(e));
     return {}; // Omit the key entirely so downstream nodes don't receive undefined
@@ -350,6 +370,14 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
       : '';
     const intelPrompt = intelContext
       ? `\n\nEXTERNAL INTELLIGENCE CONTEXT (use to validate claims and identify biases):\n${sanitizeForPrompt(intelContext, 'intelligence_context')}`
+      : '';
+
+    // Inject cross-document context if available
+    const crossDocBlock = state.crossDocContext
+      ? formatCrossDocContextForPrompt(state.crossDocContext)
+      : '';
+    const crossDocPrompt = crossDocBlock
+      ? `\n\nCROSS-DOCUMENT CONTEXT (similar documents in this user's portfolio — check for recurring bias patterns):\n${sanitizeForPrompt(crossDocBlock, 'cross_doc_context')}`
       : '';
 
     // Detect industry for enriched prompt (non-blocking)
@@ -383,7 +411,7 @@ export async function biasDetectiveNode(state: AuditState): Promise<Partial<Audi
           getGroundedModel().generateContent([
             biasPrompt,
             `Text to Analyze: \n<input_text>\n${content} \n </input_text>`,
-            `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.${intelPrompt}`,
+            `CRITICAL: If the document mentions modern events, public figures, or statistical claims, verify their accuracy using Google Search BEFORE flagging them as biased or unbiased.${intelPrompt}${crossDocPrompt}`,
           ])
         ),
       2, // 2 retries
@@ -713,8 +741,16 @@ export async function verificationNode(state: AuditState): Promise<Partial<Audit
       ? `\n\nRECENT RELEVANT NEWS (cross-reference claims against these):\n${sanitizeForPrompt(newsContext, 'recent_news')}`
       : '';
 
+    // Inject cross-document context for cross-referencing
+    const crossDocBlock = state.crossDocContext
+      ? formatCrossDocContextForPrompt(state.crossDocContext)
+      : '';
+    const crossDocVerifyPrompt = crossDocBlock
+      ? `\n\nCROSS-DOCUMENT CONTEXT (related documents — cross-reference claims):\n${sanitizeForPrompt(crossDocBlock, 'cross_doc_context')}`
+      : '';
+
     // Synthesize additional context
-    const additionalContext = `${internalKnowledgeContext}${verificationIntelPrompt}`;
+    const additionalContext = `${internalKnowledgeContext}${verificationIntelPrompt}${crossDocVerifyPrompt}`;
 
     // Single grounded LLM call for both fact-check and compliance
     const result = await withRetry(
@@ -951,6 +987,14 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
       ? `\n\nHISTORICAL CASE STUDIES (use as reference for SWOT, pre-mortem, and cognitive diversity):\n${sanitizeForPrompt(caseContext, 'case_studies')}`
       : '';
 
+    // Inject cross-document context for strategic analysis
+    const crossDocBlock = state.crossDocContext
+      ? formatCrossDocContextForPrompt(state.crossDocContext)
+      : '';
+    const crossDocDeepPrompt = crossDocBlock
+      ? `\n\nCROSS-DOCUMENT CONTEXT (related documents — use for comparative strategic analysis):\n${sanitizeForPrompt(crossDocBlock, 'cross_doc_context')}`
+      : '';
+
     // Deep analysis (sentiment, logic, SWOT) does not need relaxed safety
     // settings — use standard safety to keep content moderation active.
     const result = await withRetry(
@@ -958,7 +1002,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
         withTimeout(
           getStandardSafetyGroundedModel().generateContent([
             DEEP_ANALYSIS_SUPER_PROMPT,
-            `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}`,
+            `Text to analyze:\n<input_text>\n${content}\n</input_text>${deepIntelPrompt}${crossDocDeepPrompt}`,
           ]),
           90000 // 90 second timeout
         ),
@@ -1207,11 +1251,19 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
         ? `\n\nExternal Intelligence Brief:\n${sanitizeForPrompt(intelBrief, 'intelligence_brief')}`
         : '';
 
+    // Cross-document context for simulation
+    const crossDocSimBlock = state.crossDocContext
+      ? formatCrossDocContextForPrompt(state.crossDocContext)
+      : '';
+    const crossDocSimPrompt = crossDocSimBlock
+      ? `\n\nCROSS-DOCUMENT CONTEXT (related deals from portfolio — use for historical simulation grounding):\n${sanitizeForPrompt(crossDocSimBlock, 'cross_doc_context')}`
+      : '';
+
     const result = await withTimeout(
       getStandardSafetyGroundedModel().generateContent([
         dynamicPrompt,
         `Proposal to Vote On:\n<input_text>\n${content}\n</input_text>`,
-        `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}${causalDriverBrief}`,
+        `Similar Past Cases Found (via Vector Search):\n${sanitizeForPrompt(similarDocs, 'past_cases')}${intelBlock}${causalDriverBrief}${crossDocSimPrompt}`,
       ]),
       90000
     );

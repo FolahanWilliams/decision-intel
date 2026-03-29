@@ -12,6 +12,7 @@ import {
   NarrativePreMortem,
 } from '@/types';
 import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
+import { type CrossDocContext } from '@/lib/rag/cross-document-context';
 
 export interface AuditState {
   // Input
@@ -33,6 +34,9 @@ export interface AuditState {
 
   // Web Intelligence Context — assembled after structuring, consumed by analysis nodes
   intelligenceContext?: IntelligenceContext;
+
+  // Cross-Document RAG Context — related sections/docs from user's portfolio
+  crossDocContext?: CrossDocContext;
 
   // Agent Outputs
   biasAnalysis?: BiasDetectionResult[];
