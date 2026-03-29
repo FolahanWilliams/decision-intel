@@ -37,6 +37,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import useSWR from 'swr';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
 import type { OutcomeGateInfo } from '@/hooks/useAnalysisStream';
@@ -96,7 +97,15 @@ type DashboardView = 'upload' | 'browse';
 function getDetailedErrorMessage(err: unknown, uploadRes?: Response | null): string {
   if (uploadRes) {
     if (uploadRes.status === 429) {
-      return 'Rate limit exceeded. You can analyze up to 5 documents per hour. Please wait before trying again.';
+      const retryAfter = uploadRes.headers.get('Retry-After');
+      if (retryAfter) {
+        const seconds = parseInt(retryAfter, 10);
+        if (!isNaN(seconds) && seconds > 0) {
+          const minutes = Math.ceil(seconds / 60);
+          return `Upload limit reached (5 per hour). Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`;
+        }
+      }
+      return 'Upload limit reached. Please wait before trying again.';
     }
     if (uploadRes.status === 413) {
       return 'File is too large. Please upload a document under 5 MB.';
@@ -171,6 +180,16 @@ export default function Dashboard() {
 
   // Handle Stripe checkout redirects (?upgraded=true or ?frameId=...) and welcome flow
   const { showToast } = useToast();
+
+  // Plan usage for upload hint
+  const { data: billingData } = useSWR<{
+    usage: { analysesThisMonth: number };
+    limits: { analysesPerMonth: number };
+    planName: string;
+  }>('/api/billing', url => fetch(url).then(r => (r.ok ? r.json() : null)), {
+    revalidateOnFocus: false,
+    dedupingInterval: 60_000,
+  });
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('upgraded') === 'true') {
@@ -1342,6 +1361,12 @@ export default function Dashboard() {
                       {isDragOver ? 'Drop to upload' : 'Drop document here or click to browse'}
                     </p>
                     <p className="text-sm text-muted">PDF, TXT, MD, DOCX · Max 5 MB</p>
+                    {billingData && billingData.limits.analysesPerMonth > 0 && (
+                      <p className="text-xs text-muted" style={{ marginTop: '4px' }}>
+                        {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}
+                        analyses used this month ({billingData.planName})
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2159,6 +2184,12 @@ export default function Dashboard() {
             <div className="text-center">
               <p className="font-semibold text-lg">Drop your document here</p>
               <p className="text-sm text-muted mt-1">PDF, TXT, MD, DOCX · Max 5 MB</p>
+              {billingData && billingData.limits.analysesPerMonth > 0 && (
+                <p className="text-xs text-muted" style={{ marginTop: '4px' }}>
+                  {billingData.usage.analysesThisMonth}/{billingData.limits.analysesPerMonth}{' '}
+                  analyses used this month ({billingData.planName})
+                </p>
+              )}
             </div>
           </div>
         </div>

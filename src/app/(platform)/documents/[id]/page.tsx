@@ -1343,6 +1343,148 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {/* Toxic Combination Alert Banner */}
       {toxicCombinations.length > 0 && <ToxicAlertBanner combinations={toxicCombinations} />}
 
+      {/* Key Findings Summary Bar */}
+      {analysis && (
+        <div
+          className="grid grid-cols-2 md:grid-cols-4 gap-sm mb-lg"
+          style={{ marginTop: toxicCombinations.length > 0 ? 0 : 'var(--spacing-md)' }}
+        >
+          <div className="card" style={{ padding: '12px 16px' }}>
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Decision Quality
+            </div>
+            <div
+              style={{
+                fontSize: '24px',
+                fontWeight: 700,
+                fontFamily: "'JetBrains Mono', monospace",
+                color:
+                  analysis.overallScore >= 70
+                    ? '#34d399'
+                    : analysis.overallScore >= 40
+                      ? '#fbbf24'
+                      : '#f87171',
+              }}
+            >
+              {Math.round(analysis.overallScore)}
+              <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>
+                /100
+              </span>
+            </div>
+          </div>
+
+          <div className="card" style={{ padding: '12px 16px' }}>
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Biases Found
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <span
+                style={{
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color:
+                    biases.length === 0 ? '#34d399' : biases.length <= 3 ? '#fbbf24' : '#f87171',
+                }}
+              >
+                {biases.length}
+              </span>
+              {biases.length > 0 && (
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                  {biases.filter(b => b.severity === 'high' || b.severity === 'critical').length > 0
+                    ? `${biases.filter(b => b.severity === 'high' || b.severity === 'critical').length} high severity`
+                    : 'low-medium severity'}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="card" style={{ padding: '12px 16px' }}>
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Noise Score
+            </div>
+            <div
+              style={{
+                fontSize: '24px',
+                fontWeight: 700,
+                fontFamily: "'JetBrains Mono', monospace",
+                color:
+                  analysis.noiseScore <= 30
+                    ? '#34d399'
+                    : analysis.noiseScore <= 60
+                      ? '#fbbf24'
+                      : '#f87171',
+              }}
+            >
+              {Math.round(analysis.noiseScore)}
+              <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>
+                /100
+              </span>
+            </div>
+          </div>
+
+          <div className="card" style={{ padding: '12px 16px' }}>
+            <div
+              style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Risk Alerts
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <span
+                style={{
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color:
+                    toxicCombinations.length === 0
+                      ? '#34d399'
+                      : toxicCombinations.length <= 2
+                        ? '#fbbf24'
+                        : '#f87171',
+                }}
+              >
+                {toxicCombinations.length}
+              </span>
+              {toxicCombinations.length > 0 && (
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                  toxic combination{toxicCombinations.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tabs + Content */}
       <div className="grid" style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}>
         <div className="flex flex-col gap-lg">
