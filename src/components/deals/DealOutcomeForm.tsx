@@ -112,7 +112,7 @@ export function DealOutcomeForm({
         {existingOutcome ? 'Update Outcome' : 'Record Outcome'}
       </div>
 
-      {/* IRR + MOIC */}
+      {/* IRR + MOIC (investment metrics — optional) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
           <label style={labelStyle}>IRR (%)</label>
@@ -169,12 +169,12 @@ export function DealOutcomeForm({
         </div>
       </div>
 
-      {/* Exit Type + Exit Value */}
+      {/* Outcome Type + Value */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <label style={labelStyle}>Exit Type</label>
+          <label style={labelStyle}>Outcome Type</label>
           <select value={exitType} onChange={e => setExitType(e.target.value)} style={selectStyle}>
-            <option value="">Select exit type...</option>
+            <option value="">Select outcome type...</option>
             {EXIT_TYPES.map(t => (
               <option key={t.value} value={t.value}>
                 {t.label}
@@ -183,7 +183,7 @@ export function DealOutcomeForm({
           </select>
         </div>
         <div>
-          <label style={labelStyle}>Exit Value ({currency})</label>
+          <label style={labelStyle}>Outcome Value ({currency})</label>
           <input
             type="number"
             value={exitValue}
@@ -215,7 +215,7 @@ export function DealOutcomeForm({
         <textarea
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          placeholder="Additional notes on deal outcome..."
+          placeholder="Additional notes on project outcome..."
           rows={3}
           style={{ ...inputStyle, resize: 'vertical' }}
         />

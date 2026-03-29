@@ -1,7 +1,8 @@
 /**
- * Deal Pipeline — Shared Types & Constants
+ * Project Pipeline — Shared Types & Constants
  *
- * Used across deal pipeline pages, kanban board, forms, and outcome tracking.
+ * Used across project pipeline pages, kanban board, forms, and outcome tracking.
+ * (Database columns retain "deal" naming for backward compatibility.)
  */
 
 // ─── Value/Label Option Type ──────────────────────────────────────────────────
@@ -11,9 +12,17 @@ export interface SelectOption {
   label: string;
 }
 
-// ─── Deal Types ───────────────────────────────────────────────────────────────
+// ─── Project Types (DB column: dealType) ────────────────────────────────────
 
 export const DEAL_TYPES: SelectOption[] = [
+  // Enterprise / generic
+  { value: 'm_and_a', label: 'M&A / Acquisition' },
+  { value: 'strategic_initiative', label: 'Strategic Initiative' },
+  { value: 'risk_assessment', label: 'Risk Assessment' },
+  { value: 'vendor_evaluation', label: 'Vendor Evaluation' },
+  { value: 'product_launch', label: 'Product Launch' },
+  { value: 'restructuring', label: 'Restructuring' },
+  // PE/VC vertical
   { value: 'buyout', label: 'Buyout' },
   { value: 'growth_equity', label: 'Growth Equity' },
   { value: 'venture', label: 'Venture' },
@@ -23,6 +32,14 @@ export const DEAL_TYPES: SelectOption[] = [
 ];
 
 export const DEAL_TYPE_COLORS: Record<string, string> = {
+  // Enterprise
+  m_and_a: '#6366f1',
+  strategic_initiative: '#10b981',
+  risk_assessment: '#f59e0b',
+  vendor_evaluation: '#8b5cf6',
+  product_launch: '#3b82f6',
+  restructuring: '#ec4899',
+  // PE/VC
   buyout: '#6366f1',
   growth_equity: '#10b981',
   venture: '#f59e0b',
@@ -31,9 +48,18 @@ export const DEAL_TYPE_COLORS: Record<string, string> = {
   recapitalization: '#ec4899',
 };
 
-// ─── Deal Stages (ordered) ───────────────────────────────────────────────────
+// ─── Project Stages (DB column: stage) ──────────────────────────────────────
 
 export const DEAL_STAGES: SelectOption[] = [
+  // Generic workflow stages
+  { value: 'intake', label: 'Intake' },
+  { value: 'analysis', label: 'Analysis' },
+  { value: 'review', label: 'Review' },
+  { value: 'approval', label: 'Approval' },
+  { value: 'execution', label: 'Execution' },
+  { value: 'monitoring', label: 'Monitoring' },
+  { value: 'closed', label: 'Closed' },
+  // PE/VC stages
   { value: 'screening', label: 'Screening' },
   { value: 'due_diligence', label: 'Due Diligence' },
   { value: 'ic_review', label: 'IC Review' },
@@ -45,6 +71,15 @@ export const DEAL_STAGES: SelectOption[] = [
 // ─── Stage Colors ───────────────────────────────────────────────────────────
 
 export const STAGE_COLORS: Record<string, string> = {
+  // Generic
+  intake: '#6366f1',
+  analysis: '#f59e0b',
+  review: '#8b5cf6',
+  approval: '#3b82f6',
+  execution: '#10b981',
+  monitoring: '#14b8a6',
+  closed: '#6b7280',
+  // PE/VC
   screening: '#6366f1',
   due_diligence: '#f59e0b',
   ic_review: '#8b5cf6',
@@ -53,10 +88,15 @@ export const STAGE_COLORS: Record<string, string> = {
   exited: '#6b7280',
 };
 
-// ─── Deal Statuses ───────────────────────────────────────────────────────────
+// ─── Project Statuses (DB column: status) ───────────────────────────────────
 
 export const DEAL_STATUSES: SelectOption[] = [
   { value: 'active', label: 'Active' },
+  { value: 'on_hold', label: 'On Hold' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'rejected', label: 'Rejected' },
+  { value: 'completed', label: 'Completed' },
+  // PE/VC legacy
   { value: 'passed', label: 'Passed' },
   { value: 'invested', label: 'Invested' },
   { value: 'written_off', label: 'Written Off' },
@@ -65,6 +105,10 @@ export const DEAL_STATUSES: SelectOption[] = [
 
 export const STATUS_COLORS: Record<string, string> = {
   active: '#10b981',
+  on_hold: '#f59e0b',
+  approved: '#3b82f6',
+  rejected: '#ef4444',
+  completed: '#6b7280',
   passed: '#6b7280',
   invested: '#3b82f6',
   written_off: '#ef4444',
@@ -74,6 +118,15 @@ export const STATUS_COLORS: Record<string, string> = {
 // ─── Document Types ──────────────────────────────────────────────────────────
 
 export const DOCUMENT_TYPES: SelectOption[] = [
+  // Enterprise / generic
+  { value: 'board_memo', label: 'Board Memo' },
+  { value: 'strategy_paper', label: 'Strategy Paper' },
+  { value: 'risk_assessment', label: 'Risk Assessment' },
+  { value: 'vendor_proposal', label: 'Vendor Proposal' },
+  { value: 'policy_document', label: 'Policy Document' },
+  { value: 'project_charter', label: 'Project Charter' },
+  { value: 'budget_proposal', label: 'Budget Proposal' },
+  // PE/VC vertical
   { value: 'ic_memo', label: 'IC Memo' },
   { value: 'cim', label: 'CIM' },
   { value: 'pitch_deck', label: 'Pitch Deck' },
@@ -83,9 +136,16 @@ export const DOCUMENT_TYPES: SelectOption[] = [
   { value: 'other', label: 'Other' },
 ];
 
-// ─── Exit Types ──────────────────────────────────────────────────────────────
+// ─── Outcome Types (DB column: exitType) ────────────────────────────────────
 
 export const EXIT_TYPES: SelectOption[] = [
+  // Generic outcomes
+  { value: 'successful', label: 'Successful' },
+  { value: 'partial_success', label: 'Partial Success' },
+  { value: 'failed', label: 'Failed' },
+  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'ongoing', label: 'Ongoing' },
+  // PE/VC exit types
   { value: 'ipo', label: 'IPO' },
   { value: 'trade_sale', label: 'Trade Sale' },
   { value: 'secondary', label: 'Secondary' },
@@ -111,6 +171,23 @@ export const CURRENCIES: SelectOption[] = [
   { value: 'EUR', label: 'EUR' },
   { value: 'GBP', label: 'GBP' },
 ];
+
+// ─── PE/VC Project Type Detection ───────────────────────────────────────────
+
+const PE_VC_TYPES = new Set([
+  'buyout',
+  'growth_equity',
+  'venture',
+  'secondary',
+  'add_on',
+  'recapitalization',
+]);
+
+/** Returns true if the project type belongs to the PE/VC vertical */
+export function isPeVcProjectType(dealType?: string | null): boolean {
+  if (!dealType) return false;
+  return PE_VC_TYPES.has(dealType);
+}
 
 // ─── TypeScript Interfaces ───────────────────────────────────────────────────
 
@@ -165,6 +242,13 @@ export interface DealFilters {
   sector?: string;
 }
 
+// ─── Aliases for new "Project" terminology ──────────────────────────────────
+
+export type ProjectSummary = DealSummary;
+export type ProjectDetail = DealDetail;
+export type ProjectOutcome = DealOutcome;
+export type ProjectFilters = DealFilters;
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 export function getStageLabel(stage: string): string {
@@ -174,6 +258,9 @@ export function getStageLabel(stage: string): string {
 export function getDealTypeLabel(dealType: string): string {
   return DEAL_TYPES.find(t => t.value === dealType)?.label || dealType;
 }
+
+/** Alias for getDealTypeLabel — uses "Project" terminology */
+export const getProjectTypeLabel = getDealTypeLabel;
 
 export function getDocTypeLabel(docType: string): string {
   return DOCUMENT_TYPES.find(d => d.value === docType)?.label || docType;

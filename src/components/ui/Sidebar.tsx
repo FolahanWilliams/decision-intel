@@ -339,8 +339,8 @@ export default function Sidebar() {
           <NavItem
             href="/dashboard/deals"
             icon={<Briefcase size={18} />}
-            label="Deal Pipeline"
-            description="Track deals from screening to exit"
+            label="Projects"
+            description="Track projects from intake to completion"
             active={pathname.startsWith('/dashboard/deals')}
             collapsed={collapsed}
             onNavigate={closeMobile}

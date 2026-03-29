@@ -52,7 +52,7 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
 
   const [name, setName] = useState('');
   const [dealType, setDealType] = useState('');
-  const [stage, setStage] = useState('screening');
+  const [stage, setStage] = useState('intake');
   const [sector, setSector] = useState('');
   const [ticketSize, setTicketSize] = useState('');
   const [currency, setCurrency] = useState('USD');
@@ -90,11 +90,11 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
 
   const handleSubmit = useCallback(async () => {
     if (!name.trim()) {
-      setError('Deal name is required');
+      setError('Project name is required');
       return;
     }
     if (!dealType) {
-      setError('Deal type is required');
+      setError('Project type is required');
       return;
     }
 
@@ -126,7 +126,7 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || `Failed to ${isEdit ? 'update' : 'create'} deal`);
+        throw new Error(data.error || `Failed to ${isEdit ? 'update' : 'create'} project`);
       }
 
       onOpenChange(false);
@@ -156,29 +156,29 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg" showCloseButton>
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Deal' : 'New Deal'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Edit Project' : 'New Project'}</DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Update deal details.' : 'Add a new deal to your pipeline.'}
+            {isEdit ? 'Update project details.' : 'Add a new project to your pipeline.'}
           </DialogDescription>
         </DialogHeader>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 4 }}>
           {/* Name */}
           <div>
-            <label style={labelStyle}>Deal Name *</label>
+            <label style={labelStyle}>Project Name *</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder="e.g. Acme Corp Series B"
+              placeholder="e.g. Acme Corp Acquisition"
               style={inputStyle}
             />
           </div>
 
-          {/* Deal Type + Stage row */}
+          {/* Project Type + Stage row */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={labelStyle}>Deal Type *</label>
+              <label style={labelStyle}>Project Type *</label>
               <select
                 value={dealType}
                 onChange={e => setDealType(e.target.value)}
@@ -204,10 +204,10 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
             </div>
           </div>
 
-          {/* Target Company + Sector */}
+          {/* Subject / Target + Sector */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={labelStyle}>Target Company</label>
+              <label style={labelStyle}>Subject / Target</label>
               <input
                 type="text"
                 value={targetCompany}
@@ -229,10 +229,10 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
             </div>
           </div>
 
-          {/* Ticket Size + Currency */}
+          {/* Value / Budget + Currency */}
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
             <div>
-              <label style={labelStyle}>Ticket Size</label>
+              <label style={labelStyle}>Value / Budget</label>
               <input
                 type="number"
                 value={ticketSize}
@@ -258,20 +258,20 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
             </div>
           </div>
 
-          {/* Fund Name + Vintage */}
+          {/* Team / Division + Year */}
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
             <div>
-              <label style={labelStyle}>Fund Name</label>
+              <label style={labelStyle}>Team / Division</label>
               <input
                 type="text"
                 value={fundName}
                 onChange={e => setFundName(e.target.value)}
-                placeholder="e.g. Fund IV"
+                placeholder="e.g. Corporate Strategy"
                 style={inputStyle}
               />
             </div>
             <div>
-              <label style={labelStyle}>Vintage</label>
+              <label style={labelStyle}>Year</label>
               <input
                 type="number"
                 value={vintage}
