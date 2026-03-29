@@ -20,7 +20,7 @@
 | CI/CD Workflows     | 5             |
 | Dependencies        | 65+           |
 
-**Overall Assessment:** A well-architected, production-grade AI-powered decision intelligence platform. Strong TypeScript strictness (`strict: true`), good auth patterns, CSRF protection, and structured logging. Key areas for improvement: test coverage, a few unprotected API routes, inconsistent error response formats, and missing composite database indexes.
+**Overall Assessment:** A well-architected, production-grade AI-powered decision intelligence platform with excellent security posture (8.5/10). Strong TypeScript strictness (`strict: true`), multi-layer auth, CSRF protection, AES-256-GCM encryption, timing-safe secret comparison, and structured logging. Key areas for improvement: test coverage (5% threshold, 12 failing test files), inconsistent error response formats, and missing composite database indexes.
 
 ---
 
@@ -54,29 +54,35 @@
 - API routes validate request bodies before processing.
 - File upload endpoints enforce content length limits (e.g., `MAX_CONTENT_LENGTH = 100_000` in extension routes).
 
-### 1.4 XSS — LOW RISK
+### 1.4 XSS — SECURE
 
 - Only 2 uses of `dangerouslySetInnerHTML`:
   1. `src/app/(marketing)/layout.tsx:63` — JSON-LD structured data (safe, no user input).
-  2. `src/app/(platform)/dashboard/meetings/[id]/page.tsx:614` — Search highlighting. **Verify** that `highlightedText` is properly sanitized before rendering.
+  2. `src/app/(platform)/dashboard/meetings/[id]/page.tsx:614` — Search highlighting with proper `escapeHtml()` function (`meetings/[id]/page.tsx:1189-1205`) that replaces `&`, `<`, `>`, `"` before rendering.
 
-### 1.5 SQL Injection — LOW RISK
+### 1.5 SQL Injection — SECURE
 
 - Prisma ORM used exclusively for queries — parameterized by default.
 - Raw SQL in `src/lib/rag/embeddings.ts` uses Prisma's tagged template literals (`$executeRaw`), which are parameterized.
-- No string interpolation in SQL queries found.
+- `$queryRawUnsafe` usage in RAG embeddings is properly guarded with `assertSafeId()` (UUID validation), `assertSafeEmbeddingVector()` (format validation), and `Math.floor`'d limits. Used only due to PgBouncer limitations.
+- Timing-safe comparisons (`crypto.timingSafeEqual`) used for secret/token validation.
 
-### 1.6 Secrets Management — GOOD
+### 1.6 Secrets Management — EXCELLENT
 
 - No hardcoded secrets found in source code.
-- `.env.example` documents all required variables.
-- Document content encrypted with AES-256-GCM (encryption key from env).
+- `.env.example` documents all required variables with no real-looking example values.
+- Document content encrypted with AES-256-GCM (encryption key validated for 64-char hex format, proper 96-bit IV and 128-bit auth tags).
 - Slack tokens encrypted at rest (`SLACK_TOKEN_ENCRYPTION_KEY`).
+- API keys generated with `randomBytes(16)`, only SHA-256 hash stored in DB, raw key shown once at creation.
+- `getRequiredEnvVar()`/`getOptionalEnvVar()` helpers validate and trim all env vars.
 
-### 1.7 Rate Limiting — PARTIAL
+### 1.7 Rate Limiting — GOOD
 
-- Rate limiting applied to: API key routes, extension endpoints, deals endpoint.
-- **Gap:** Many internal API routes (e.g., `/api/analyze`, `/api/upload`, `/api/search`) lack per-user rate limiting. The analyze endpoint only has rate limiting via `checkRateLimit` in some code paths.
+- DB-based rate limiting with atomic upserts (no TOCTOU race conditions).
+- Per-route configuration: uploads (5/hr), user deletion (2/hr), deal creation (20/hr), extension analysis (10/hr).
+- Per-API-key rate limits with `Retry-After` headers.
+- Configurable fail modes: `open` (availability-first) vs `closed` (security-first).
+- **Gap:** Some internal session-authenticated routes (e.g., `/api/search`) rely on auth alone without explicit per-user rate limits.
 
 ### 1.8 Security Headers — GOOD
 
@@ -248,8 +254,7 @@ src/
 ### Critical (do soon)
 
 1. **Fix test infrastructure** — Resolve the 12 failing test files (module resolution for `next/server` and `react`). Add `deps.inline` for Next.js in `vitest.config.ts`.
-2. **Add rate limiting to core routes** — `/api/analyze`, `/api/upload`, `/api/search` need per-user rate limits to prevent abuse.
-3. **Sanitize `highlightedText` in meetings page** — The `dangerouslySetInnerHTML` at `meetings/[id]/page.tsx:614` should use DOMPurify or equivalent.
+2. **Add rate limiting to remaining session-auth routes** — `/api/search` and similar high-frequency endpoints should have per-user rate limits.
 
 ### High Priority
 
