@@ -1280,7 +1280,8 @@ export async function rpdRecognitionNode(state: AuditState): Promise<Partial<Aud
         const outcomeStr = doc.outcome
           ? `\n  Outcome: ${doc.outcome.result}${doc.outcome.lessonsLearned ? ` — ${doc.outcome.lessonsLearned}` : ''}`
           : '';
-        const biasStr = doc.biases.length > 0 ? `\n  Biases detected: ${doc.biases.join(', ')}` : '';
+        const biasStr =
+          doc.biases.length > 0 ? `\n  Biases detected: ${doc.biases.join(', ')}` : '';
         return `Case ${i + 1}: "${doc.filename}" (similarity: ${(doc.similarity * 100).toFixed(0)}%)${biasStr}${outcomeStr}\n  Content excerpt: ${doc.content.slice(0, 500)}`;
       })
       .join('\n\n');

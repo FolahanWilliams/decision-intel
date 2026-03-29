@@ -723,9 +723,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         ? [
             {
               label: 'Intuition',
-              tabs: [
-                { id: 'rpd' as const, label: 'Pattern Recognition', icon: Brain },
-              ],
+              tabs: [{ id: 'rpd' as const, label: 'Pattern Recognition', icon: Brain }],
             },
           ]
         : []),

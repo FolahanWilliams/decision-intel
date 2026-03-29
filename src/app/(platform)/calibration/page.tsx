@@ -71,10 +71,7 @@ export default function CalibrationPage() {
     return (
       <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
         <Breadcrumbs
-          items={[
-            { label: 'Dashboard', href: '/dashboard' },
-            { label: 'Calibration' },
-          ]}
+          items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Calibration' }]}
         />
         <div className="card mt-6">
           <div className="card-body text-center p-12">
@@ -109,10 +106,7 @@ export default function CalibrationPage() {
       style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
     >
       <Breadcrumbs
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Personal Calibration' },
-        ]}
+        items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Personal Calibration' }]}
       />
 
       <header style={{ marginBottom: 'var(--spacing-xl)' }}>
@@ -266,7 +260,8 @@ export default function CalibrationPage() {
             <div className="card-body">
               {totalOutcomes === 0 ? (
                 <p className="text-sm text-muted text-center py-4">
-                  No outcomes reported yet. Report decision outcomes to build your calibration curve.
+                  No outcomes reported yet. Report decision outcomes to build your calibration
+                  curve.
                 </p>
               ) : (
                 <div className="space-y-4">

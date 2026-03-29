@@ -25,7 +25,12 @@ interface RpdTabProps {
 
 type RpdView = 'overview' | 'cues' | 'stories' | 'simulator';
 
-const VIEWS: { id: RpdView; label: string; icon: typeof Brain; needs: 'cues' | 'stories' | 'either' | 'always' }[] = [
+const VIEWS: {
+  id: RpdView;
+  label: string;
+  icon: typeof Brain;
+  needs: 'cues' | 'stories' | 'either' | 'always';
+}[] = [
   { id: 'overview', label: 'Overview', icon: Brain, needs: 'either' },
   { id: 'cues', label: 'Recognition Cues', icon: Eye, needs: 'cues' },
   { id: 'stories', label: 'War Stories', icon: BookOpen, needs: 'stories' },
@@ -79,7 +84,8 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
         <div className="card">
           <div className="card-body">
             <div className="text-center p-8 text-muted">
-              No pattern recognition data available. This analysis may not have enough historical data for RPD analysis.
+              No pattern recognition data available. This analysis may not have enough historical
+              data for RPD analysis.
             </div>
           </div>
         </div>
@@ -92,9 +98,17 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
   const confidenceLevel = recognitionCues?.confidenceLevel ?? 0;
 
   const confidenceColor =
-    confidenceLevel >= 70 ? 'text-emerald-400' : confidenceLevel >= 40 ? 'text-amber-400' : 'text-zinc-400';
+    confidenceLevel >= 70
+      ? 'text-emerald-400'
+      : confidenceLevel >= 40
+        ? 'text-amber-400'
+        : 'text-zinc-400';
   const confidenceLabel =
-    confidenceLevel >= 70 ? 'High Confidence' : confidenceLevel >= 40 ? 'Moderate' : 'Low Confidence';
+    confidenceLevel >= 70
+      ? 'High Confidence'
+      : confidenceLevel >= 40
+        ? 'Moderate'
+        : 'Low Confidence';
 
   const availableViews = VIEWS.filter(v => {
     if (v.needs === 'cues') return !!recognitionCues;
@@ -162,7 +176,9 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
                     <Target size={16} className={confidenceColor} />
                   </div>
                   <div className="card-body">
-                    <div className={`text-2xl font-bold ${confidenceColor}`}>{confidenceLevel}/100</div>
+                    <div className={`text-2xl font-bold ${confidenceColor}`}>
+                      {confidenceLevel}/100
+                    </div>
                     <p className="text-xs text-muted">{confidenceLabel}</p>
                     <div className="mt-2 h-2 bg-muted/20 overflow-hidden">
                       <div
@@ -233,7 +249,10 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
                 </div>
                 <div className="card-body space-y-3">
                   {cues.slice(0, 3).map((cue, i) => (
-                    <div key={i} className="flex items-start gap-3 p-3 border border-border bg-card/50">
+                    <div
+                      key={i}
+                      className="flex items-start gap-3 p-3 border border-border bg-card/50"
+                    >
                       <div className="flex-shrink-0 mt-0.5">
                         <OutcomeIcon outcome={cue.outcome} />
                       </div>
@@ -353,7 +372,8 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
                 Cautionary War Stories
               </h4>
               <p className="text-xs text-muted mt-1">
-                Vivid narratives of how similar decisions went wrong &mdash; Klein&apos;s research shows stories are more memorable and actionable than bullet lists
+                Vivid narratives of how similar decisions went wrong &mdash; Klein&apos;s research
+                shows stories are more memorable and actionable than bullet lists
               </p>
             </div>
             <div className="card-body space-y-4">
@@ -366,7 +386,10 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
                       : 'bg-zinc-500/10 text-zinc-400';
 
                 return (
-                  <div key={i} className="p-4 border border-border border-l-4 border-l-orange-500/50">
+                  <div
+                    key={i}
+                    className="p-4 border border-border border-l-4 border-l-orange-500/50"
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="text-sm font-semibold text-foreground">{story.title}</h5>
                       <span className={`text-[10px] px-1.5 py-0.5 font-medium ${probColor}`}>
@@ -407,8 +430,9 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
                   RPD Mental Simulator
                 </h4>
                 <p className="text-xs text-muted mt-1">
-                  Klein&apos;s RPD: Pick one promising course of action and mentally simulate how it plays out.
-                  No need to compare dozens of alternatives &mdash; experts evaluate one option deeply.
+                  Klein&apos;s RPD: Pick one promising course of action and mentally simulate how it
+                  plays out. No need to compare dozens of alternatives &mdash; experts evaluate one
+                  option deeply.
                 </p>
               </div>
               <div className="card-body">
@@ -575,33 +599,34 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
                 )}
 
                 {/* Historical Analogs */}
-                {simulationResult.historicalAnalogs && simulationResult.historicalAnalogs.length > 0 && (
-                  <div className="card">
-                    <div className="card-header">
-                      <h4 className="text-sm font-semibold">Historical Analogs</h4>
-                    </div>
-                    <div className="card-body space-y-2">
-                      {simulationResult.historicalAnalogs.map((analog, i) => (
-                        <div key={i} className="p-3 border border-border">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-semibold text-foreground">
-                              {analog.dealTitle}
-                            </span>
-                            <span className="text-[10px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 font-mono">
-                              {Math.round(analog.similarity * 100)}% match
-                            </span>
+                {simulationResult.historicalAnalogs &&
+                  simulationResult.historicalAnalogs.length > 0 && (
+                    <div className="card">
+                      <div className="card-header">
+                        <h4 className="text-sm font-semibold">Historical Analogs</h4>
+                      </div>
+                      <div className="card-body space-y-2">
+                        {simulationResult.historicalAnalogs.map((analog, i) => (
+                          <div key={i} className="p-3 border border-border">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs font-semibold text-foreground">
+                                {analog.dealTitle}
+                              </span>
+                              <span className="text-[10px] px-1.5 py-0.5 bg-blue-500/10 text-blue-400 font-mono">
+                                {Math.round(analog.similarity * 100)}% match
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-muted">
+                              <span className="font-medium">Action:</span> {analog.action}
+                            </p>
+                            <p className="text-[11px] text-muted">
+                              <span className="font-medium">Outcome:</span> {analog.outcome}
+                            </p>
                           </div>
-                          <p className="text-[11px] text-muted">
-                            <span className="font-medium">Action:</span> {analog.action}
-                          </p>
-                          <p className="text-[11px] text-muted">
-                            <span className="font-medium">Outcome:</span> {analog.outcome}
-                          </p>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </>
             )}
           </div>
