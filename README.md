@@ -43,7 +43,7 @@ Most investment committees have no way to:
 
 **Decision Intel** is an AI-powered cognitive auditing engine purpose-built for PE/VC investment committees. Upload an IC memo, CIM, pitch deck, or due diligence report and get a comprehensive bias audit in under 60 seconds — with **11 PE-specific biases** including anchoring to entry valuation, carry incentive distortion, and winner's curse.
 
-The platform runs documents through a **15-agent analysis pipeline** with deal-stage-specific overlays (screening, due diligence, IC review, closing, portfolio, post-exit) to detect bias, measure noise, simulate IC deliberations, and generate actionable intelligence that protects fund returns.
+The platform runs documents through a **16-agent analysis pipeline** with deal-stage-specific overlays (screening, due diligence, IC review, closing, portfolio, post-exit) to detect bias, measure noise, simulate IC deliberations, and generate actionable intelligence that protects fund returns. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
 
 ---
 
@@ -81,7 +81,7 @@ All paid plans include a 14-day free trial. No credit card required to start.
 For qualified PE/VC funds ($100M+ AUM), we offer a guided pilot:
 
 - **Guided onboarding** — we configure taxonomies, bias profiles, and noise benchmarks for your fund strategy
-- **50 IC memo analyses** — run your actual memos through the 15-agent pipeline
+- **50 IC memo analyses** — run your actual memos through the 16-agent pipeline
 - **Outcome tracking setup** — connect your deal pipeline so the system starts learning immediately
 - **Calibration report** — at 30 days, receive a full report: bias patterns, noise levels, and ROI projections
 
@@ -146,6 +146,16 @@ Generates failure scenarios _before_ decisions are made:
 - Top failure modes with probability estimates
 - Preventive measures for each scenario
 - Cascading risk identification
+
+#### Klein RPD Framework (Expert Intuition Amplification)
+
+Complements Kahneman-style debiasing with Gary Klein's Recognition-Primed Decision framework — amplifying expert intuition rather than just suppressing bias:
+
+- **Recognition Cues** — Surfaces 3-5 historical deal pattern matches from the knowledge graph with similarity scores and outcome data
+- **Expert Heuristics** — AI-generated insights on what an experienced decision-maker with 10+ similar exits would notice
+- **Narrative Pre-Mortems** — Vivid "war story" failure scenarios based on historical analogs (supplements bullet-list pre-mortems)
+- **RPD Mental Simulator** — Single-option mental simulation where users pick one action and AI simulates outcomes using historical data
+- **Personal Calibration Dashboard** — Per-user dashboard at `/calibration` showing decision patterns, recurring biases, calibration score, blind spots, and strength patterns
 
 #### Advanced Analysis Suite
 
@@ -402,7 +412,7 @@ Each message in a deliberation thread is analyzed for new biases, and only novel
 When a tracked deliberation thread resolves to a commitment ("let's approve it", "we've decided"), the platform:
 
 1. Creates a `HumanDecision` record linked to the pre-decision context
-2. Runs a full cognitive audit via the 15-agent pipeline
+2. Runs a full cognitive audit via the 16-agent pipeline
 3. Posts a rich Block Kit summary card to the Slack thread with:
    - Decision Quality Score (color-coded gauge)
    - Noise Score and bias count
@@ -478,7 +488,7 @@ Real-time intelligence enrichment from external sources:
 
 ### Decision Replay & Counterfactual Analysis
 
-Step through your analysis like a debugger steps through code. The **Replay** tab decomposes the 15-agent pipeline into a visual timeline, showing exactly how each stage influenced the final score:
+Step through your analysis like a debugger steps through code. The **Replay** tab decomposes the 16-agent pipeline into a visual timeline, showing exactly how each stage influenced the final score:
 
 - **Score Waterfall** — Horizontal bar chart showing score progression from 100 → final through each analysis stage
 - **Step-by-Step Replay** — Expandable cards for each pipeline stage: Document Intelligence → Bias Detection → Noise Analysis → Fact Check → Deep Analysis → Boardroom → Final Score
@@ -645,7 +655,7 @@ A parallel analysis product that audits spoken and written decisions from multip
 │  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌─────────┐ │
 │  │Dashboard │  │Documents │  │Intelligence│  │Second    │  │Settings │ │
 │  │  Upload  │  │ Detail   │  │    Hub     │  │ Brain    │  │  Auth   │ │
-│  │  Feed    │  │ 9 Tabs   │  │Bias Library│  │  Chat    │  │  GDPR   │ │
+│  │  Feed    │  │ 10 Tabs   │  │Bias Library│  │  Chat    │  │  GDPR   │ │
 │  └────┬─────┘  └────┬─────┘  └─────┬──────┘  └────┬─────┘  └────┬────┘ │
 │  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────┐               │
 │  │  Team    │  │ Meeting  │  │ Cognitive  │  │ Shared   │               │
@@ -679,6 +689,7 @@ A parallel analysis product that audits spoken and written decisions from multip
 │  │  [Bias Detective]     [Noise Judge x3]    [Fact Checker]         │   │
 │  │  [Pre-Mortem]         [Compliance]        [Sentiment]            │   │
 │  │  [Intelligence]       [Deep Analysis]     [Verification]         │   │
+│  │  [RPD Recognition]                                               │   │
 │  └──────────────────────────────┬───────────────────────────────────┘   │
 │                                 │                                       │
 │  ┌─────────────────── SYNTHESIS ────────────────────────────────────┐   │
@@ -742,13 +753,13 @@ Document Upload
              │            │            │            │             │              │
               ┌───────────┼────────────┼────────────┼─────────────┼──────────────┘
               ▼            ▼            ▼            ▼             ▼
-        ┌──────────┐ ┌──────────┐ ┌──────────┐
-        │  Deep    │ │Intel-    │ │Verifi-   │
-        │ Analysis │ │ligence   │ │cation    │
-        │(SWOT/Red)│ │(News/Res)│ │(Extended)│
-        └────┬─────┘ └────┬─────┘ └────┬─────┘
-             │            │            │
-             └────────────┼────────────┘
+        ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+        │  Deep    │ │Intel-    │ │Verifi-   │ │   RPD    │
+        │ Analysis │ │ligence   │ │cation    │ │Recognitn │
+        │(SWOT/Red)│ │(News/Res)│ │(Extended)│ │(Klein)   │
+        └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘
+             │            │            │            │
+             └────────────┼────────────┴────────────┘
                           ▼
                    ┌─────────────┐
                    │    Risk     │
@@ -787,8 +798,9 @@ src/
 │   │       ├── audit-log/         # Compliance audit trail
 │   │       ├── search/            # Semantic search
 │   │       └── settings/          # User preferences
+│   │   └── calibration/           # Personal calibration dashboard (Klein RPD)
 │   │   └── documents/
-│   │       └── [id]/              # Document detail (9 analysis tabs)
+│   │       └── [id]/              # Document detail (10 analysis tabs)
 │   │           └── tabs/
 │   │               ├── OverviewTab     # Document content & biases
 │   │               ├── ReplayTab       # Decision Replay & counterfactual analysis
@@ -798,6 +810,7 @@ src/
 │   │               ├── RedTeamTab      # Counter-arguments & blind spots
 │   │               ├── BoardroomTab    # Decision Twin simulation
 │   │               ├── SimulatorTab    # What-If scenario testing
+│   │               ├── RpdTab          # Klein RPD recognition cues & mental simulation
 │   │               └── IntelligenceTab # Relevant news & research
 │   │   └── shared/
 │   │       └── [token]/           # Password-protected shareable analysis links
@@ -809,6 +822,9 @@ src/
 │   │   ├── analyze/
 │   │   │   ├── stream/            # SSE streaming analysis
 │   │   │   └── simulate/          # Boardroom simulation
+│   │   ├── rpd-simulator/         # Klein RPD mental simulation
+│   │   ├── calibration/
+│   │   │   └── profile/           # Personal calibration profile
 │   │   ├── v1/                    # Public API (API key auth)
 │   │   │   ├── analyze/           # Programmatic document analysis
 │   │   │   ├── documents/         # Document listing
@@ -996,7 +1012,7 @@ src/
 | :---------------------- | :---------------------------- | :--------------------------------------------------------------- |
 | **Framework**           | Next.js 16 (App Router)       | Full-stack React with server components & route handlers         |
 | **Language**            | TypeScript 5.9 (strict mode)  | Type safety across the entire codebase                           |
-| **AI Engine**           | Google Gemini (via LangChain) | LLM powering all 15 agent nodes                                  |
+| **AI Engine**           | Google Gemini (via LangChain) | LLM powering all 16 agent nodes                                  |
 | **Orchestration**       | LangGraph 1.1                 | Multi-agent directed graph with parallel execution               |
 | **Causal AI**           | Custom SCM Engine             | Structural Causal Models for counterfactual reasoning            |
 | **Database**            | Supabase PostgreSQL           | Primary data store with PgBouncer connection pooling             |
@@ -1104,7 +1120,7 @@ Visit `http://localhost:3000/api/health` to confirm database connectivity and sy
 1. **Sign up** at `/sign-up` and log in
 2. **Upload** a document (PDF, DOCX, or TXT — up to 5MB) from the dashboard
 3. **Watch** real-time analysis progress via SSE streaming
-4. **Explore** results across 9 analysis tabs:
+4. **Explore** results across 10 analysis tabs:
    - **Overview** — Executive summary with overall score
    - **Replay** — Step-by-step pipeline walkthrough with counterfactual "What-If" testing
    - **Logic** — Logical fallacies and reasoning quality
@@ -1113,6 +1129,7 @@ Visit `http://localhost:3000/api/health` to confirm database connectivity and sy
    - **Red Team** — Counter-arguments and blind spots
    - **Boardroom** — Simulated decision votes from virtual personas
    - **Simulator** — Scenario planning interface
+   - **Intuition** — Klein RPD pattern recognition cues, narrative war stories, and mental simulator
    - **Intelligence** — Relevant news, research papers, and case studies
 5. **Share & Export** — Click the Share & Export button to download as PDF, CSV, Markdown, or JSON, or quick-share via clipboard or email
 
@@ -1169,7 +1186,7 @@ Use `/dashboard/search` to find similar documents and analyses using vector simi
 Install the Chrome extension from the `/extension/` directory for real-time bias checking:
 
 - **Quick Score** — Click the extension icon for a <5 second bias-only scan of the current page
-- **Full Analysis** — Open the side panel for a complete 15-agent pipeline analysis
+- **Full Analysis** — Open the side panel for a complete 16-agent pipeline analysis
 - **Inline Annotations** — Content script highlights detected biases directly on the page
 
 Load as an unpacked extension in Chrome Developer Mode. See `extension/README.md` for detailed setup.
@@ -1303,7 +1320,7 @@ These counters are displayed on the [landing page](https://www.decision-intel.co
 
 ### Shipped
 
-- [x] 15-agent cognitive bias detection pipeline
+- [x] 16-agent cognitive bias detection pipeline
 - [x] Decision noise measurement (Statistical Jury)
 - [x] Financial fact-checking (Finnhub + Google Search Grounding)
 - [x] GDPR PII anonymization (pre-analysis)
@@ -1353,6 +1370,7 @@ These counters are displayed on the [landing page](https://www.decision-intel.co
 - [x] **Counterfactual Analysis API** — Alternative decision path computation with narrative explanations
 - [x] **Product Analytics** — Lightweight event tracking across conversion funnel with internal analytics API
 - [x] **Prompt Versioning** — SHA-256 deduplicated prompt tracking wired to analysis pipeline
+- [x] **Klein RPD Framework** — Expert intuition amplification with recognition cues from historical deals, narrative war-story pre-mortems, RPD mental simulator, and personal calibration dashboard
 
 ### Planned
 

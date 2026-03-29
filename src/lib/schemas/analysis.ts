@@ -144,3 +144,22 @@ export const BayesianPriorsSchema = z
       .default([]),
   })
   .optional();
+
+// ─── Klein RPD Framework Schemas ────────────────────────────────────────────
+
+export const RecognitionCuesSchema = z
+  .object({
+    patternMatch: z.string().default(''),
+    cues: z.array(z.record(z.string(), z.unknown())).default([]),
+    expertHeuristic: z.string().default(''),
+    confidenceLevel: z.number().min(0).max(100).default(0),
+  })
+  .optional();
+
+export const NarrativePreMortemSchema = z
+  .object({
+    failureScenarios: z.array(z.string()).default([]),
+    preventiveMeasures: z.array(z.string()).default([]),
+    warStories: z.array(z.record(z.string(), z.unknown())).default([]),
+  })
+  .optional();

@@ -62,7 +62,7 @@ You are the Decision Intel Founder's strategic AI advisor. You have deep knowled
 
 === PRODUCT OVERVIEW ===
 Decision Intel is an AI-powered cognitive bias auditing engine for PE/VC investment committees. Upload an IC memo, CIM, pitch deck, or DD report → get a comprehensive bias audit in under 60 seconds.
-- 15-agent LangGraph pipeline (parallel fan-out: bias detective, noise judge x3, fact checker, pre-mortem, compliance, deep analysis, verification, sentiment → meta judge → risk scorer → boardroom simulation)
+- 16-agent LangGraph pipeline (parallel fan-out: bias detective, noise judge x3, fact checker, pre-mortem, compliance, deep analysis, verification, sentiment, rpd recognition → meta judge → risk scorer → boardroom simulation)
 - 20 standard cognitive biases + 11 PE-specific biases (anchoring to entry price, thesis confirmation, sunk cost holds, survivorship, herd behavior, disposition effect, projection overconfidence, narrative fallacy, winner's curse, management halo, carry incentive distortion)
 - Decision Quality Index (DQI): 0-100 composite score (FICO for decisions). Components: Bias Load 30%, Noise Level 20%, Evidence Quality 20%, Process Maturity 15%, Compliance Risk 15%
 - Conviction Score: 0-100 measuring thesis support INDEPENDENT of bias. Components: Evidence Strength 35%, Argument Coherence 30%, Judge Agreement 20%, Perspective Diversity 15%
@@ -106,7 +106,7 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Kahneman: Insurance underwriter study — expected 10% variability, actual 55%. Noise is at least as damaging as bias. Your triple-judge noise scoring is a direct implementation.
 - Strebulaev (Stanford GSB): 9 VC principles. Key: consensus-seeking ICs have LOWER IPO rates → validates your blind prior system. "Home runs matter" → reframe pitch from defensive to offensive.
 - Sibony: "Decision hygiene" framework. Offer free noise audit as sales hook.
-- Klein: Invented premortem. Position DI at intersection of structured analysis (Kahneman) + expert intuition (Klein).
+- Klein: Invented premortem. RPD framework NOW SHIPPED: recognition cues from historical deals (RAG pattern matching), narrative war-story pre-mortems, RPD mental simulator (/api/rpd-simulator), personal calibration dashboard (/calibration). DI sits at intersection of structured analysis (Kahneman) + expert intuition amplification (Klein).
 - Duke: Knowing bias names doesn't help. Precommitment and decision architecture does → validates nudge system.
 - Tetlock: Human-machine hybrids beat both pure AI and pure human → validates DI architecture.
 - Lochhead: Category creation. "Frame It, Name It, Claim It." DQI should become the term PE uses like IRR/MOIC.
@@ -117,6 +117,7 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Decision Knowledge Graph: 8 edge types, 5 node types, 5 anti-patterns, multi-touch attribution, edge learning from outcomes
 - Committee Decision Rooms: blind prior collection, consensus scoring (0-100), unanimity warning (Strebulaev), dissent quality score, bias briefing
 - Calibration Gamification: Bronze→Silver→Gold→Platinum, milestone tracking, "each outcome makes AI smarter"
+- Personal Calibration Dashboard: /calibration — per-user decision patterns, recurring biases with trends, calibration score, blind spots, strength patterns
 
 === FOUNDER NOTES ===
 - Deepest moat is time-to-data, not features. Frame first 6 months as calibration investment.
@@ -138,6 +139,7 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Prompt Versioning: SHA-256 deduplicated prompt tracking wired to every analysis via promptVersionId.
 - Quick Bias Check: Dashboard modal for instant <5s bias scan via paste. Shared Gemini utility between extension and platform at /api/analyze/quick-score.
 - Demo Conversion Tracking: 10 funnel events wired across demo, login, marketing, analysis, and case study pages via trackEvent() fire-and-forget.
+- Klein RPD Framework: Expert intuition amplification with 4 components — recognition cues (historical pattern matching via RAG), narrative pre-mortems (war stories), RPD mental simulator (/api/rpd-simulator), personal calibration dashboard (/calibration). Runs as 16th agent in pipeline. Dual framework: Kahneman debiasing + Klein intuition amplification.
 `.trim();
 
 // ─── Route Handler ──────────────────────────────────────────────────────────

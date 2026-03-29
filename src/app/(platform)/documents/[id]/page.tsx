@@ -56,6 +56,8 @@ import {
   InstitutionalMemoryResult,
   ComplianceResult,
   IntelligenceContextSummary,
+  RecognitionCuesResult,
+  NarrativePreMortem,
 } from '@/types';
 import { RegulatoryHorizonWidget } from './RegulatoryHorizonWidget';
 import { InstitutionalMemoryWidget } from './InstitutionalMemoryWidget';
@@ -81,6 +83,7 @@ const IntelligenceTab = lazy(() =>
   import('./tabs/IntelligenceTab').then(m => ({ default: m.IntelligenceTab }))
 );
 const ReplayTab = lazy(() => import('./tabs/ReplayTab').then(m => ({ default: m.ReplayTab })));
+const RpdTab = lazy(() => import('./tabs/RpdTab').then(m => ({ default: m.RpdTab })));
 
 interface VerificationSource {
   ticker?: string;
@@ -169,6 +172,8 @@ interface Analysis {
   intelligenceContext?: IntelligenceContextSummary;
   metaVerdict?: string;
   outcomeStatus?: string;
+  recognitionCues?: RecognitionCuesResult;
+  narrativePreMortem?: NarrativePreMortem;
 }
 
 interface Document {
@@ -195,13 +200,15 @@ type TabId =
   | 'red-team'
   | 'boardroom'
   | 'intelligence'
-  | 'replay';
+  | 'replay'
+  | 'rpd';
 
 const VALID_TABS: TabId[] = [
   'overview',
   'logic',
   'swot',
   'noise',
+  'rpd',
   'red-team',
   'boardroom',
   'simulator',
@@ -712,6 +719,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           { id: 'noise', label: 'Noise', icon: Info },
         ],
       },
+      ...(analysis?.recognitionCues || analysis?.narrativePreMortem
+        ? [
+            {
+              label: 'Intuition',
+              tabs: [
+                { id: 'rpd' as const, label: 'Pattern Recognition', icon: Brain },
+              ],
+            },
+          ]
+        : []),
       {
         label: 'Scenarios',
         tabs: [
@@ -1525,6 +1542,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     originalNoiseScore={analysis?.noiseScore}
                     originalBiasCount={biases.length}
                     originalBiasTypes={biases.map(b => b.biasType)}
+                  />
+                </ErrorBoundary>
+              )}
+              {activeTab === 'rpd' && (
+                <ErrorBoundary sectionName="Pattern Recognition">
+                  <RpdTab
+                    recognitionCues={analysis?.recognitionCues}
+                    narrativePreMortem={analysis?.narrativePreMortem}
+                    documentId={document.id}
                   />
                 </ErrorBoundary>
               )}

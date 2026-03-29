@@ -141,7 +141,7 @@ function ProductOverview() {
       >
         {[
           { value: '20', label: 'Standard Biases', sub: '+ 11 PE-specific' },
-          { value: '15', label: 'AI Agent Pipeline', sub: 'Parallel execution' },
+          { value: '16', label: 'AI Agent Pipeline', sub: 'Parallel execution' },
           { value: '113', label: 'Failure Cases', sub: '8 industries' },
           { value: '3', label: 'Outcome Channels', sub: 'Autonomous detection' },
           { value: '2', label: 'AI Providers', sub: 'Gemini + Claude fallback' },
@@ -268,6 +268,11 @@ function ProductOverview() {
           }}
         >
           <li>
+            <strong>Klein RPD Framework</strong> — Expert intuition amplification: pattern
+            recognition cues from historical deals, narrative war-story pre-mortems, RPD mental
+            simulator, and personal calibration dashboard at <code>/calibration</code>
+          </li>
+          <li>
             <strong>Enhanced Public Demo</strong> — Streaming simulation UX with 3 sample docs, DQI
             badge, no login required at <code>/demo</code>
           </li>
@@ -329,7 +334,7 @@ function CorePipeline() {
       {/* Pipeline Diagram */}
       <div style={card}>
         <div style={sectionTitle}>
-          <Zap size={18} style={{ color: '#f59e0b' }} /> 15-Agent Analysis Pipeline
+          <Zap size={18} style={{ color: '#f59e0b' }} /> 16-Agent Analysis Pipeline
         </div>
         <pre
           style={{
@@ -353,7 +358,8 @@ ANALYSIS (Parallel Fan-Out)
   ├── [Compliance Mapper]   ── FCA, SOX, Basel III, EU AI Act
   ├── [Deep Analysis]       ── Logical fallacies, SWOT, blind spots
   ├── [Verification Agent]  ── Cross-reference claims vs real-time data
-  └── [Sentiment Analyzer]  ── Emotional tone scoring
+  ├── [Sentiment Analyzer]  ── Emotional tone scoring
+  └── [RPD Recognition]     ── Klein pattern matching + expert heuristics
 
 SYNTHESIS (Sequential)
   [Meta Judge] ──> [Risk Scorer] ──> [Boardroom Simulation] ──> END`}
@@ -524,7 +530,7 @@ SYNTHESIS (Sequential)
             {
               label: 'AI Pipeline',
               value:
-                '15 agents in LangGraph DAG — preprocessing (sequential) → analysis (parallel fan-out) → synthesis (sequential)',
+                '16 agents in LangGraph DAG — preprocessing (sequential) → analysis (parallel fan-out) → synthesis (sequential)',
             },
             {
               label: 'Scoring Layer',
@@ -939,7 +945,7 @@ function IntegrationsAndFlywheel() {
             to <code>/api/extension/quick-score</code>
           </li>
           <li>
-            <strong>Full Analysis Sidepanel:</strong> Complete 15-agent pipeline from the browser.
+            <strong>Full Analysis Sidepanel:</strong> Complete 16-agent pipeline from the browser.
             Calls <code>/api/extension/analyze</code>
           </li>
           <li>
@@ -1320,7 +1326,7 @@ function CompetitiveMoat() {
             <ul
               style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, paddingLeft: 14 }}
             >
-              <li>15-agent pipeline with deterministic compound scoring on top</li>
+              <li>16-agent pipeline with deterministic compound scoring on top</li>
               <li>Every outcome makes the platform smarter (causal learning)</li>
               <li>Statistical jury with 3 independent judges</li>
               <li>Per-org calibration profiles learned from outcomes</li>
@@ -1384,7 +1390,7 @@ function CompetitiveMoat() {
               what: 'AI assistant for PE firms — automates CIM summarization, deal screening, data room analysis.',
               gap: "Summarizes and structures data but doesn't detect cognitive biases, measure noise, or track decision outcomes.",
               response:
-                '"Blueflame reads the documents faster. We read the decision-maker\'s blind spots. Our 15-agent pipeline detects 20 biases they can\'t see."',
+                '"Blueflame reads the documents faster. We read the decision-maker\'s blind spots. Our 16-agent pipeline detects 20 biases they can\'t see."',
               color: '#ef4444',
             },
             {
@@ -1482,7 +1488,7 @@ function MarketStrategy() {
         >
           &quot;Decision Intel is a cognitive bias auditing engine for PE/VC investment committees.
           We sit between deal sourcing and capital deployment — the one place in the fund workflow
-          where nobody is providing decision quality tools. Our 15-agent AI pipeline analyzes IC
+          where nobody is providing decision quality tools. Our 16-agent AI pipeline analyzes IC
           memos, CIMs, and due diligence reports to detect the specific biases that destroy fund
           returns: anchoring to entry price, confirmation bias in thesis validation, sunk cost in
           portfolio holds, and overconfidence in projections. We produce a proprietary Decision
@@ -2029,7 +2035,7 @@ function SalesToolkit() {
             {
               objection: '"Can I try it before committing?"',
               response:
-                "Absolutely — visit /demo right now. Pick from 3 sample IC memos and watch the full 15-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own IC memos and we'll run a free pilot with full DQI scoring and bias reports.",
+                "Absolutely — visit /demo right now. Pick from 3 sample IC memos and watch the full 16-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own IC memos and we'll run a free pilot with full DQI scoring and bias reports.",
               tone: 'Zero friction',
             },
           ].map((item, i) => (
@@ -2078,7 +2084,7 @@ function SalesToolkit() {
             step: 2,
             title: 'Upload & Analyze (60 sec)',
             action:
-              'Drag the IC memo onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 15 agents are doing: "Right now, 3 independent AI judges are scoring this document for noise, while our bias detective is scanning for 31 cognitive biases..."',
+              'Drag the IC memo onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 16 agents are doing: "Right now, 3 independent AI judges are scoring this document for noise, while our bias detective is scanning for 31 cognitive biases..."',
             tip: 'The streaming progress bar is your friend — it creates anticipation.',
           },
           {
@@ -2199,12 +2205,12 @@ function SalesToolkit() {
             {
               audience: 'Investor (60 sec)',
               pitch:
-                "Decision Intel is the cognitive bias auditing engine for PE/VC investment committees. We sit between deal sourcing and capital deployment — the one place in the fund workflow where nobody provides decision quality tools. 15-agent AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. PE/VC software market is $607B going to $995B by 2035 — we're creating a new category in it.",
+                "Decision Intel is the cognitive bias auditing engine for PE/VC investment committees. We sit between deal sourcing and capital deployment — the one place in the fund workflow where nobody provides decision quality tools. 16-agent AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. PE/VC software market is $607B going to $995B by 2035 — we're creating a new category in it.",
             },
             {
               audience: 'Technical Audience (30 sec)',
               pitch:
-                'LangGraph-based 15-agent pipeline with deterministic compound scoring on top of LLM output. 20x20 bias interaction matrix, Bayesian prior integration, Granger-causal temporal inference for our decision knowledge graph. Not a wrapper — we built the scoring math.',
+                'LangGraph-based 16-agent pipeline with deterministic compound scoring on top of LLM output. 20x20 bias interaction matrix, Bayesian prior integration, Granger-causal temporal inference for our decision knowledge graph. Not a wrapper — we built the scoring math.',
             },
           ].map((item, i) => (
             <div
@@ -2793,7 +2799,7 @@ function ResearchFrameworks() {
                   summary:
                     'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
                   product:
-                    'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 15-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
+                    'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 16-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
                   startup:
                     'Apply to your sales process too. Qualify leads fast — "Do you have an investment committee? Do you review IC memos?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
                   actions: [
@@ -3009,12 +3015,12 @@ function ResearchFrameworks() {
             color="#f59e0b"
             link="https://podcasts.apple.com/us/podcast/ep-234-dr-gary-klein/id1054744455?i=1000677192489"
             insight="Klein invented the premortem technique. He and Kahneman were 'collaborative adversaries' — Kahneman trusts systematic processes, Klein trusts expert intuition. The tension between them is the exact tension your product navigates."
-            product="DI sits at the intersection: structured AI analysis (Kahneman) augmenting expert human judgment (Klein), not replacing it. This is a nuanced positioning story for skeptical GPs who don't want a machine telling them what to do."
-            startup="When GPs push back with 'we trust our judgment,' don't argue. Say: 'We do too. Klein proved expert intuition is powerful. We just make sure it's not undermined by noise and bias you can't see.'"
+            product="Klein RPD framework NOW SHIPPED: recognition cues from historical deals, narrative war-story pre-mortems, RPD mental simulator, and personal calibration dashboard. DI sits at the intersection: structured AI analysis (Kahneman) augmenting expert human judgment (Klein), not replacing it. Dual-framework positioning is live — skeptical GPs can see their intuition amplified, not overridden."
+            startup="When GPs push back with 'we trust our judgment,' don't argue. Say: 'We do too. Klein proved expert intuition is powerful. Our RPD framework surfaces the pattern recognition cues an expert with 10+ similar exits would notice. We amplify your intuition while making sure it's not undermined by noise and bias you can't see.'"
             actions={[
-              'Add Klein citation to premortem feature description',
-              'Use Kahneman-Klein framing in sales to skeptical GPs',
-              'Position DI as "augmentation" not "replacement"',
+              '✅ Klein RPD framework shipped: recognition cues, narrative pre-mortems, RPD simulator, calibration dashboard',
+              'Use Kahneman-Klein dual framework in sales: "We suppress bias AND amplify intuition"',
+              'Demo the RPD tab as second wow moment after Boardroom Simulation',
             ]}
           />
           <ResearchCard
@@ -3118,7 +3124,7 @@ function ResearchFrameworks() {
             product={
               'Your contrarian truth: "Investment committees think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: PE/VC IC decision quality. Your concentric expansion: PE/VC → M&A → FinServ → Enterprise.'
             }
-            startup="The best 15-agent pipeline means nothing if you can't get it in front of Managing Partners. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
+            startup="The best 16-agent pipeline means nothing if you can't get it in front of Managing Partners. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
             actions={[
               'Write down your contrarian truth and use it in every pitch',
               'Map your concentric expansion circles (already in Market Strategy tab)',

@@ -64,6 +64,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               biasWebImageUrl: true,
               preMortemImageUrl: true,
               metaVerdict: true,
+              recognitionCues: true,
+              narrativePreMortem: true,
             },
           },
         },

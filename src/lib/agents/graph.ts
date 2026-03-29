@@ -10,6 +10,7 @@ import {
   simulationNode,
   intelligenceNode,
   metaJudgeNode,
+  rpdRecognitionNode,
 } from './nodes';
 import {
   AnalysisResult,
@@ -21,6 +22,8 @@ import {
   SimulationResult,
   InstitutionalMemoryResult,
   ComplianceResult,
+  RecognitionCuesResult,
+  NarrativePreMortem,
 } from '@/types';
 import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
 
@@ -150,6 +153,14 @@ const GraphState = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => null,
   }),
+  recognitionCues: Annotation<RecognitionCuesResult | null>({
+    reducer: (x, y) => y ?? x,
+    default: () => null,
+  }),
+  narrativePreMortem: Annotation<NarrativePreMortem | null>({
+    reducer: (x, y) => y ?? x,
+    default: () => null,
+  }),
 });
 
 // Routing function: only allow content into the analysis pipeline when
@@ -173,6 +184,7 @@ const workflow = new StateGraph(GraphState)
   .addNode('verificationNode', verificationNode) // factChecker + complianceMapper
   .addNode('deepAnalysisNode', deepAnalysisNode) // linguistic + strategic + cognitiveDiversity
   .addNode('simulationNode', simulationNode) // decisionTwin + memoryRecall
+  .addNode('rpdRecognitionNode', rpdRecognitionNode) // Klein RPD pattern recognition
   .addNode('metaJudgeNode', metaJudgeNode) // debate orchestration
   .addNode('riskScorer', riskScorerNode)
 
@@ -188,19 +200,21 @@ const workflow = new StateGraph(GraphState)
   // structurer → intelligence gathering (extracts topics + assembles context)
   .addEdge('structurer', 'intelligenceGatherer')
 
-  // Fan-out: intelligenceGatherer → 5 parallel super-nodes (all receive context via state)
+  // Fan-out: intelligenceGatherer → 6 parallel super-nodes (all receive context via state)
   .addEdge('intelligenceGatherer', 'biasDetective')
   .addEdge('intelligenceGatherer', 'noiseJudge')
   .addEdge('intelligenceGatherer', 'verificationNode')
   .addEdge('intelligenceGatherer', 'deepAnalysisNode')
   .addEdge('intelligenceGatherer', 'simulationNode')
+  .addEdge('intelligenceGatherer', 'rpdRecognitionNode')
 
-  // Fan-in: 5 super-nodes → metaJudgeNode
+  // Fan-in: 6 super-nodes → metaJudgeNode
   .addEdge('biasDetective', 'metaJudgeNode')
   .addEdge('noiseJudge', 'metaJudgeNode')
   .addEdge('verificationNode', 'metaJudgeNode')
   .addEdge('deepAnalysisNode', 'metaJudgeNode')
   .addEdge('simulationNode', 'metaJudgeNode')
+  .addEdge('rpdRecognitionNode', 'metaJudgeNode')
 
   // Meta Judge -> Final Risk Scorer
   .addEdge('metaJudgeNode', 'riskScorer')

@@ -5,6 +5,7 @@ import {
   BiasDetectionResult,
   NoiseBenchmark,
   CausalIntelligenceResult,
+  RecognitionCuesResult,
 } from '../../types';
 import {
   GoogleGenerativeAI,
@@ -23,6 +24,7 @@ import {
   buildNoiseBenchmarkPrompt,
   buildFactCheckRefinementPrompt,
   buildMetaJudgePrompt,
+  buildRpdRecognitionPrompt,
 } from './prompts';
 import { searchSimilarDocuments, searchSimilarWithOutcomes } from '../rag/embeddings';
 import { prisma } from '../prisma';
@@ -988,12 +990,24 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
       `Deep analysis complete. Sentiment: ${data?.sentiment?.label || 'N/A'}, Logic score: ${data?.logicalAnalysis?.score ?? 'N/A'}, BlindSpotGap: ${cognitiveData?.blindSpotGap ?? 'N/A'}`
     );
 
+    // Extract narrative pre-mortem (Klein RPD war stories) from the preMortem output
+    const preMortemData = data?.preMortem;
+    const narrativePreMortem =
+      preMortemData?.warStories && preMortemData.warStories.length > 0
+        ? {
+            failureScenarios: preMortemData.failureScenarios || [],
+            preventiveMeasures: preMortemData.preventiveMeasures || [],
+            warStories: preMortemData.warStories,
+          }
+        : undefined;
+
     return {
       sentimentAnalysis: data?.sentiment ?? { score: 0, label: 'Neutral' },
       logicalAnalysis: data?.logicalAnalysis ?? { score: 100, fallacies: [] },
       swotAnalysis: data?.swot,
-      preMortem: data?.preMortem,
+      preMortem: preMortemData,
       cognitiveAnalysis: cognitiveData,
+      narrativePreMortem,
     };
   } catch (e) {
     log.error('Deep Analysis Node failed:', e instanceof Error ? e.message : String(e));
@@ -1003,6 +1017,7 @@ export async function deepAnalysisNode(state: AuditState): Promise<Partial<Audit
       swotAnalysis: undefined,
       preMortem: undefined,
       cognitiveAnalysis: undefined,
+      narrativePreMortem: undefined,
     };
   }
 }
@@ -1218,6 +1233,100 @@ export async function simulationNode(state: AuditState): Promise<Partial<AuditSt
       simulation: undefined,
       institutionalMemory: undefined,
     };
+  }
+}
+
+// ============================================================
+// RPD RECOGNITION NODE (Klein Pattern Recognition)
+// ============================================================
+
+export async function rpdRecognitionNode(state: AuditState): Promise<Partial<AuditState>> {
+  // SECURITY: Defense-in-depth — abort if anonymization didn't succeed.
+  if (state.anonymizationStatus !== 'success') {
+    log.warn('rpdRecognitionNode: anonymization not confirmed — skipping to protect PII');
+    return { recognitionCues: undefined };
+  }
+
+  const content = truncateText(state.structuredContent || '');
+
+  try {
+    log.info('Running Klein RPD pattern recognition analysis...');
+
+    const userId = state.userId || 'system';
+
+    // Step 1: RAG vector search WITH outcome data for pattern matching
+    let similarDocs: Awaited<ReturnType<typeof searchSimilarWithOutcomes>> = [];
+    let hasOutcomeData = false;
+
+    try {
+      const docsWithOutcomes = await searchSimilarWithOutcomes(content, userId, 7);
+      similarDocs = docsWithOutcomes;
+      hasOutcomeData = docsWithOutcomes.some(d => d.outcome != null);
+
+      log.info(
+        `RPD: Found ${docsWithOutcomes.length} similar historical cases, ` +
+          `${docsWithOutcomes.filter(d => d.outcome).length} with verified outcomes`
+      );
+    } catch (ragError) {
+      log.warn(
+        'RPD: RAG search failed, proceeding without historical cases:',
+        ragError instanceof Error ? ragError.message : String(ragError)
+      );
+    }
+
+    // Step 2: Build context from similar cases
+    const historicalContext = similarDocs
+      .map((doc, i) => {
+        const outcomeStr = doc.outcome
+          ? `\n  Outcome: ${doc.outcome.result}${doc.outcome.lessonsLearned ? ` — ${doc.outcome.lessonsLearned}` : ''}`
+          : '';
+        const biasStr = doc.biases.length > 0 ? `\n  Biases detected: ${doc.biases.join(', ')}` : '';
+        return `Case ${i + 1}: "${doc.filename}" (similarity: ${(doc.similarity * 100).toFixed(0)}%)${biasStr}${outcomeStr}\n  Content excerpt: ${doc.content.slice(0, 500)}`;
+      })
+      .join('\n\n');
+
+    // Step 3: Build intelligence context if available
+    const intelBrief = state.intelligenceContext
+      ? formatContextForPrompt(state.intelligenceContext)
+      : '';
+    const intelBlock =
+      intelBrief && intelBrief !== 'No external intelligence context available.'
+        ? `\n\nExternal Intelligence Brief:\n${intelBrief.slice(0, 2000)}`
+        : '';
+
+    // Step 4: Generate recognition cues via LLM
+    const prompt = buildRpdRecognitionPrompt({
+      hasOutcomeData,
+      similarDealCount: similarDocs.length,
+    });
+
+    const result = await withTimeout(
+      getStandardSafetyGroundedModel().generateContent([
+        prompt,
+        `Current Document Under Analysis:\n<input_text>\n${content}\n</input_text>`,
+        `Historical Cases Found (via Vector Search):\n${historicalContext || 'No similar historical cases found.'}${intelBlock}`,
+      ]),
+      90000
+    );
+
+    const text = result.response?.text ? result.response.text() : '';
+    const data = parseJSON(text);
+
+    const recognitionCues = data?.recognitionCues as RecognitionCuesResult | undefined;
+
+    if (recognitionCues) {
+      log.info(
+        `RPD: Pattern recognition complete. ${recognitionCues.cues?.length || 0} cues identified, ` +
+          `confidence: ${recognitionCues.confidenceLevel ?? 'N/A'}`
+      );
+    } else {
+      log.warn('RPD: No recognition cues returned from LLM');
+    }
+
+    return { recognitionCues };
+  } catch (e) {
+    log.error('RPD Recognition Node failed:', e instanceof Error ? e.message : String(e));
+    return { recognitionCues: undefined };
   }
 }
 
@@ -1637,6 +1746,8 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
           (b.biasType || '').toLowerCase().replace(/\s+/g, '_')
         )
       ),
+      recognitionCues: state.recognitionCues ?? undefined,
+      narrativePreMortem: state.narrativePreMortem ?? undefined,
     } satisfies AnalysisResult,
   };
 }
