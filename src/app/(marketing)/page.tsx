@@ -1896,6 +1896,374 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Additional Case Studies */}
+      <section className="pb-28 relative" style={{ background: 'var(--bg-primary)' }}>
+        <div className="relative z-10" style={containerStyle}>
+          <div className="max-w-4xl mx-auto">
+            <h3
+              style={{
+                fontSize: '0.7rem',
+                color: 'rgba(255, 255, 255, 0.4)',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textAlign: 'center',
+                marginBottom: '32px',
+              }}
+            >
+              MORE RETROSPECTIVE ANALYSES ON PUBLIC DECISIONS
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* Case Study 2: WeWork IPO */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  padding: '28px 24px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    flexWrap: 'wrap',
+                    gap: '16px',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontSize: '0.7rem',
+                        color: 'rgba(249, 115, 22, 0.8)',
+                        fontWeight: 700,
+                        letterSpacing: '0.08em',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      CASE STUDY
+                    </div>
+                    <h3
+                      style={{
+                        fontSize: '1.15rem',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      WeWork IPO: The $39B Valuation Collapse
+                    </h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+                      SoftBank&apos;s Vision Fund valued WeWork at $47B in early 2019. By September,
+                      the failed IPO exposed governance failures and the valuation cratered to $8B.
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                    <div
+                      style={{
+                        fontSize: '2.4rem',
+                        fontWeight: 800,
+                        color: '#f97316',
+                        lineHeight: 1,
+                      }}
+                    >
+                      29
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>/ 100</div>
+                    <div
+                      style={{
+                        fontSize: '0.68rem',
+                        color: '#f97316',
+                        fontWeight: 600,
+                        marginTop: '2px',
+                      }}
+                    >
+                      Decision Quality
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                    gap: '10px',
+                  }}
+                >
+                  {[
+                    {
+                      label: 'Halo Effect',
+                      sev: 'critical',
+                      detail: 'Founder charisma over fundamentals',
+                    },
+                    {
+                      label: 'Anchoring Bias',
+                      sev: 'critical',
+                      detail: 'Prior $47B round as anchor',
+                    },
+                    {
+                      label: 'Herding Behavior',
+                      sev: 'high',
+                      detail: 'Follow-on investors mimicked SoftBank',
+                    },
+                    {
+                      label: 'Overconfidence',
+                      sev: 'high',
+                      detail: '"Community-adjusted EBITDA" accepted',
+                    },
+                    {
+                      label: 'Narrative Fallacy',
+                      sev: 'high',
+                      detail: '"Next Amazon" story vs. unit economics',
+                    },
+                    {
+                      label: 'Authority Bias',
+                      sev: 'medium',
+                      detail: 'SoftBank brand suppressed dissent',
+                    },
+                  ].map((bias, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#fff' }}>
+                          {bias.label}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '0.6rem',
+                            padding: '1px 6px',
+                            borderRadius: '8px',
+                            fontWeight: 700,
+                            textTransform: 'uppercase' as const,
+                            background:
+                              bias.sev === 'critical'
+                                ? 'rgba(239, 68, 68, 0.1)'
+                                : bias.sev === 'high'
+                                  ? 'rgba(249, 115, 22, 0.1)'
+                                  : 'rgba(234, 179, 8, 0.1)',
+                            color:
+                              bias.sev === 'critical'
+                                ? '#ef4444'
+                                : bias.sev === 'high'
+                                  ? '#f97316'
+                                  : '#eab308',
+                          }}
+                        >
+                          {bias.sev}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        {bias.detail}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p
+                  style={{
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.3)',
+                    margin: '16px 0 0 0',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  Analysis based on publicly available S-1 filing, investor presentations, and press
+                  coverage.
+                </p>
+              </motion.div>
+
+              {/* Case Study 3: Quibi */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  padding: '28px 24px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    flexWrap: 'wrap',
+                    gap: '16px',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontSize: '0.7rem',
+                        color: 'rgba(239, 68, 68, 0.8)',
+                        fontWeight: 700,
+                        letterSpacing: '0.08em',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      CASE STUDY
+                    </div>
+                    <h3
+                      style={{
+                        fontSize: '1.15rem',
+                        fontWeight: 700,
+                        color: 'var(--text-primary)',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      Quibi: The $1.75B Streaming Bet That Lasted 6 Months
+                    </h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+                      Investors including JPMorgan, Goldman Sachs, and major studios poured $1.75B
+                      into Quibi. It shut down 6 months after launch with fewer than 500K paying
+                      subscribers.
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                    <div
+                      style={{
+                        fontSize: '2.4rem',
+                        fontWeight: 800,
+                        color: '#ef4444',
+                        lineHeight: 1,
+                      }}
+                    >
+                      31
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>/ 100</div>
+                    <div
+                      style={{
+                        fontSize: '0.68rem',
+                        color: '#ef4444',
+                        fontWeight: 600,
+                        marginTop: '2px',
+                      }}
+                    >
+                      Decision Quality
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                    gap: '10px',
+                  }}
+                >
+                  {[
+                    {
+                      label: 'Authority Bias',
+                      sev: 'critical',
+                      detail: 'Katzenberg + Whitman credentials = no pushback',
+                    },
+                    {
+                      label: 'Survivorship Bias',
+                      sev: 'critical',
+                      detail: '"Mobile-first worked for TikTok"',
+                    },
+                    {
+                      label: 'Confirmation Bias',
+                      sev: 'high',
+                      detail: 'Only positive focus group data cited',
+                    },
+                    {
+                      label: 'Planning Fallacy',
+                      sev: 'high',
+                      detail: '7M subscribers in Y1 projection',
+                    },
+                    {
+                      label: 'Sunk Cost Fallacy',
+                      sev: 'medium',
+                      detail: '$1B+ content spend pre-launch',
+                    },
+                    { label: 'Groupthink', sev: 'medium', detail: 'Zero dissent in $1.75B raise' },
+                  ].map((bias, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#fff' }}>
+                          {bias.label}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '0.6rem',
+                            padding: '1px 6px',
+                            borderRadius: '8px',
+                            fontWeight: 700,
+                            textTransform: 'uppercase' as const,
+                            background:
+                              bias.sev === 'critical'
+                                ? 'rgba(239, 68, 68, 0.1)'
+                                : bias.sev === 'high'
+                                  ? 'rgba(249, 115, 22, 0.1)'
+                                  : 'rgba(234, 179, 8, 0.1)',
+                            color:
+                              bias.sev === 'critical'
+                                ? '#ef4444'
+                                : bias.sev === 'high'
+                                  ? '#f97316'
+                                  : '#eab308',
+                          }}
+                        >
+                          {bias.sev}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        {bias.detail}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p
+                  style={{
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.3)',
+                    margin: '16px 0 0 0',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  Analysis based on publicly available investor materials, press coverage, and
+                  post-mortem reporting.
+                </p>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <SectionDivider variant="glow" color="rgba(255, 255, 255, 0.06)" />
 
       {/* Features - Bento Grid */}
@@ -3829,7 +4197,7 @@ export default function LandingPage() {
                   { label: 'Live Demo', href: '/demo' },
                   { label: 'Pricing', href: '#pricing' },
                   { label: 'FAQ', href: '#faq' },
-                  { label: 'Contact', href: 'mailto:hello@decisionintel.ai' },
+                  { label: 'Contact', href: 'mailto:folahanwilliams@gmail.com' },
                 ].map((link, i) => (
                   <a
                     key={i}
@@ -3858,10 +4226,10 @@ export default function LandingPage() {
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {[
-                  { label: 'Privacy Policy', href: '#' },
-                  { label: 'Terms of Service', href: '#' },
-                  { label: 'Cookie Policy', href: '#' },
-                  { label: 'GDPR', href: '#' },
+                  { label: 'Privacy Policy', href: '/privacy' },
+                  { label: 'Terms of Service', href: '/terms' },
+                  { label: 'Cookie Policy', href: '/privacy#cookies' },
+                  { label: 'GDPR', href: '/privacy#gdpr' },
                 ].map((link, i) => (
                   <a
                     key={i}
@@ -3900,7 +4268,7 @@ export default function LandingPage() {
                   href: 'https://linkedin.com/company/decision-intel',
                   label: 'LinkedIn',
                 },
-                { icon: Mail, href: 'mailto:hello@decisionintel.ai', label: 'Email' },
+                { icon: Mail, href: 'mailto:folahanwilliams@gmail.com', label: 'Email' },
               ].map((social, i) => (
                 <a
                   key={i}
