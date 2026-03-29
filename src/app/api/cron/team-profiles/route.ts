@@ -214,6 +214,64 @@ export async function GET(req: NextRequest) {
 
         processed++;
         log.info(`Upserted TeamCognitiveProfile for org ${orgId} (${totalDecisions} decisions)`);
+
+        // Quarterly aggregation — upsert a profile for the current quarter
+        try {
+          const currentQ = Math.ceil((now.getMonth() + 1) / 3);
+          const quarterStart = new Date(now.getFullYear(), (currentQ - 1) * 3, 1);
+          const quarterEnd = new Date(now.getFullYear(), currentQ * 3, 0, 23, 59, 59, 999);
+
+          const quarterAnalyses = await prisma.analysis.findMany({
+            where: {
+              document: { orgId },
+              createdAt: { gte: quarterStart, lte: quarterEnd },
+            },
+            select: { overallScore: true, noiseScore: true },
+          });
+
+          if (quarterAnalyses.length >= 1) {
+            const qAvgQuality =
+              quarterAnalyses.reduce((s, a) => s + a.overallScore, 0) / quarterAnalyses.length;
+            const qAvgNoise =
+              quarterAnalyses.reduce((s, a) => s + a.noiseScore, 0) / quarterAnalyses.length;
+
+            await prisma.teamCognitiveProfile.upsert({
+              where: {
+                orgId_periodStart_periodEnd: {
+                  orgId,
+                  periodStart: quarterStart,
+                  periodEnd: quarterEnd,
+                },
+              },
+              update: {
+                avgDecisionQuality: Math.round(qAvgQuality * 100) / 100,
+                avgNoiseScore: Math.round(qAvgNoise * 100) / 100,
+                totalDecisions: quarterAnalyses.length,
+                topBiases: toPrismaJson(topBiases) as Prisma.InputJsonValue,
+                nudgeEffectiveness: toPrismaJson(nudgeEffectiveness),
+              },
+              create: {
+                orgId,
+                periodStart: quarterStart,
+                periodEnd: quarterEnd,
+                avgDecisionQuality: Math.round(qAvgQuality * 100) / 100,
+                avgNoiseScore: Math.round(qAvgNoise * 100) / 100,
+                totalDecisions: quarterAnalyses.length,
+                topBiases: toPrismaJson(topBiases) as Prisma.InputJsonValue,
+                nudgeEffectiveness: toPrismaJson(nudgeEffectiveness),
+              },
+            });
+
+            log.info(
+              `Upserted quarterly TeamCognitiveProfile for org ${orgId} (Q${currentQ}, ${quarterAnalyses.length} decisions)`
+            );
+          }
+        } catch (quarterErr) {
+          log.warn(
+            `Failed quarterly aggregation for org ${orgId}:`,
+            quarterErr instanceof Error ? quarterErr.message : String(quarterErr)
+          );
+        }
       } catch (err) {
         log.error(`Failed to compute profile for org ${orgId}:`, err);
         failed++;

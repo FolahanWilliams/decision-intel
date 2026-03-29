@@ -86,6 +86,7 @@ model Analysis {
 
   toxicCombinations ToxicCombination[]
   draftOutcomes     DraftOutcome[]
+  fingerprintWarnings FingerprintWarning[]
 
   @@index([documentId])
 }
@@ -1040,6 +1041,45 @@ model DecisionBriefRecord {
   @@index([dealId])
   @@index([userId])
   @@unique([dealId, version])
+}
+
+// ─── Decision Fingerprint ─────────────────────────────────────────────────
+
+model ContextualBiasPattern {
+  id              String   @id @default(cuid())
+  orgId           String
+  biasType        String
+  documentType    String?                         // ic_memo | cim | pitch_deck | etc.
+  dealType        String?                         // buyout | growth_equity | venture | etc.
+  quarter         String                          // "2026-Q1" format
+  occurrenceCount Int
+  avgSeverity     Float
+  totalAnalyses   Int                             // denominator for prevalence
+  prevalenceRate  Float                           // occurrenceCount / totalAnalyses
+  trend           String?                         // "increasing" | "decreasing" | "stable"
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([orgId, biasType, documentType, dealType, quarter])
+  @@index([orgId])
+  @@index([orgId, quarter])
+}
+
+model FingerprintWarning {
+  id             String   @id @default(cuid())
+  orgId          String
+  analysisId     String
+  warningType    String                           // "contextual_pattern" | "seasonal" | "deal_type"
+  message        String   @db.Text
+  severity       String                           // "info" | "warning" | "critical"
+  matchedPattern Json                             // the pattern(s) that triggered it
+  acknowledged   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  analysis       Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([analysisId])
 }
 
 // ─── Chat Persistence ─────────────────────────────────────────────────────
