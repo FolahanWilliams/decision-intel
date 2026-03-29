@@ -96,6 +96,7 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
     <div className="card">
       <button
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
         className="card-header w-full flex items-center justify-between hover:bg-white/5 transition-colors"
       >
         <h3 className="flex items-center gap-2 text-sm font-semibold">

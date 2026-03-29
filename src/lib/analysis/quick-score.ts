@@ -149,7 +149,9 @@ export async function runQuickScore(
   }
 
   const score = Math.max(0, Math.min(100, Math.round(parsed.score)));
-  const grade = typeof parsed.grade === 'string' ? parsed.grade.toUpperCase() : scoreToGrade(score);
+  const VALID_GRADES = new Set(['A', 'B', 'C', 'D', 'F']);
+  const rawGrade = typeof parsed.grade === 'string' ? parsed.grade.toUpperCase().trim() : '';
+  const grade = VALID_GRADES.has(rawGrade) ? rawGrade : scoreToGrade(score);
   const biases = Array.isArray(parsed.biases)
     ? parsed.biases.slice(0, 5).map((b: Record<string, unknown>) => ({
         type: String(b.type || 'Unknown Bias'),

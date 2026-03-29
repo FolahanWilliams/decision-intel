@@ -685,8 +685,8 @@ export async function runAnalysis(
     // Fallback to non-streaming invoke if streaming fails
     sendStep('Processing document', 'running', 50);
 
-    // Fallback timeout: aligned with maxDuration (300s) minus overhead
-    const FALLBACK_TIMEOUT_MS = 240000; // 240 seconds
+    // Fallback timeout: 250s — leaves 50s margin before Vercel 300s maxDuration
+    const FALLBACK_TIMEOUT_MS = 250000; // 250 seconds
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(
         () => reject(new Error(`Analysis timed out after ${FALLBACK_TIMEOUT_MS / 1000} seconds`)),

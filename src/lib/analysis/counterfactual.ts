@@ -108,8 +108,17 @@ export async function computeCounterfactuals(
     }> = [];
 
     try {
-      const where: Record<string, unknown> = {};
-      if (orgId) where.orgId = orgId;
+      if (!orgId) {
+        log.warn(
+          'computeCounterfactuals called without orgId — returning empty to avoid full table scan'
+        );
+        return { ...emptyResult, biasCount: biasTypes.length };
+      }
+
+      const where: Record<string, unknown> = {
+        orgId,
+        analysisId: { not: analysisId },
+      };
 
       outcomes = await prisma.decisionOutcome.findMany({
         where,
