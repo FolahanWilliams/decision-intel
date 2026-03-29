@@ -120,8 +120,9 @@ describe('RelatedDecisions logic', () => {
     });
 
     it('handles team fetch returning orgId in organization.id', async () => {
-      const teamData = { organization: { id: 'org-alt-789' } };
-      const orgId = teamData?.orgId || teamData?.organization?.id;
+      const teamData: Record<string, unknown> = { organization: { id: 'org-alt-789' } };
+      const orgId =
+        (teamData?.orgId as string) || (teamData?.organization as Record<string, string>)?.id;
       expect(orgId).toBe('org-alt-789');
     });
 
@@ -134,8 +135,10 @@ describe('RelatedDecisions logic', () => {
     });
 
     it('returns null when no orgId found', () => {
-      const teamData = { name: 'Test Team' }; // no orgId field
-      const orgId = teamData?.orgId || teamData?.organization?.id;
+      const teamData: Record<string, unknown> = { name: 'Test Team' }; // no orgId field
+      const orgId =
+        (teamData?.orgId as string) ||
+        (teamData?.organization as Record<string, string> | undefined)?.id;
       expect(orgId).toBeUndefined();
     });
   });

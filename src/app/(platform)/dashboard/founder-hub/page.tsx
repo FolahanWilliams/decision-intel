@@ -140,7 +140,7 @@ function ProductOverview() {
         }}
       >
         {[
-          { value: '20', label: 'Standard Biases', sub: '+ 11 PE-specific' },
+          { value: '20', label: 'Standard Biases', sub: '+ 11 investment-specific' },
           { value: '16', label: 'AI Agent Pipeline', sub: 'Parallel execution' },
           { value: '113', label: 'Failure Cases', sub: '8 industries' },
           { value: '3', label: 'Outcome Channels', sub: 'Autonomous detection' },
@@ -171,20 +171,24 @@ function ProductOverview() {
           }}
         >
           <li>
-            PE/VC ICs make $50M-$500M decisions on documents riddled with cognitive biases nobody
-            detects
+            Executive teams make high-stakes decisions on documents riddled with cognitive biases
+            nobody detects
           </li>
-          <li>A single bad deal costs 1-3x ticket size in opportunity cost</li>
-          <li>IC members anchored to entry valuations hold losers 40% longer than optimal</li>
+          <li>A single bad strategic decision costs organizations millions in value destruction</li>
           <li>
-            Competitive auctions trigger winner&apos;s curse in 65% of cases (Malmendier &amp; Tate,
-            2008)
-          </li>
-          <li>
-            Confirmation bias in DD causes teams to rubber-stamp rather than stress-test theses
+            Decision-makers anchored to initial assumptions hold failing initiatives 40% longer than
+            optimal
           </li>
           <li>
-            No committee has a way to track which biases actually correlated with poor IRR/MOIC
+            Competitive pressure and time constraints trigger overconfidence and groupthink in 65%
+            of major decisions (Malmendier &amp; Tate, 2008)
+          </li>
+          <li>
+            Confirmation bias in due diligence causes teams to rubber-stamp rather than stress-test
+            strategies
+          </li>
+          <li>
+            No organization has a way to track which biases actually correlated with poor outcomes
           </li>
         </ul>
       </div>
@@ -208,29 +212,29 @@ function ProductOverview() {
         </div>
         {[
           [
-            'Managing Partners',
-            'No systematic IC quality measurement',
-            'Deal-level DQI scoring (0-100), bias tracking across vintage',
+            'Strategy Leaders',
+            'No systematic decision quality measurement',
+            'Document-level DQI scoring (0-100), bias tracking across projects',
           ],
           [
-            'Deal Partners',
-            'IC memos anchored to entry thesis',
-            '11 PE biases detected with exact excerpts + coaching',
+            'M&A / Decision Owners',
+            'Memos anchored to initial assumptions',
+            '31 cognitive biases detected with exact excerpts + coaching',
           ],
           [
-            'Operating Partners',
+            'Risk & Compliance',
             'Operational optimism in execution plans',
-            'Boardroom simulation with PE personas (GP, LP, Risk, Sector)',
+            'Boardroom simulation with custom personas (Risk, Ops, Finance, Domain)',
           ],
           [
-            'LP Relations',
-            'Fund reports cherry-pick metrics',
-            'LP report analysis: survivorship bias, selective reporting, framing',
+            'Board / Stakeholders',
+            'Reports cherry-pick metrics and frame selectively',
+            'Document analysis: survivorship bias, selective reporting, framing',
           ],
           [
-            'IC Members',
+            'Executive Committees',
             'Groupthink silences genuine debate',
-            'Blind IC voting, noise measurement, dissent tracking',
+            'Blind voting, noise measurement, dissent tracking',
           ],
         ].map(([persona, pain, deliver], i) => (
           <div key={i} style={{ ...tableRow, color: 'var(--text-secondary, #b4b4bc)' }}>
@@ -247,10 +251,11 @@ function ProductOverview() {
           <TrendingUp size={18} style={{ color: '#22c55e' }} /> ROI Story
         </div>
         <p style={{ fontSize: 14, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.7 }}>
-          A single avoided bad deal saves <strong style={{ color: '#22c55e' }}>$50M-$500M</strong>{' '}
-          in capital. The platform pays for itself after one corrected thesis. Organizations using
-          systematic decision hygiene report{' '}
-          <strong style={{ color: '#22c55e' }}>up to 60% reduction</strong> in decision variance.
+          A single avoided bad decision saves organizations{' '}
+          <strong style={{ color: '#22c55e' }}>millions to billions</strong> in value. The platform
+          pays for itself after one corrected thesis. Organizations using systematic decision
+          hygiene report <strong style={{ color: '#22c55e' }}>up to 60% reduction</strong> in
+          decision variance.
         </p>
       </div>
 
@@ -269,7 +274,7 @@ function ProductOverview() {
         >
           <li>
             <strong>Klein RPD Framework</strong> — Expert intuition amplification: pattern
-            recognition cues from historical deals, narrative war-story pre-mortems, RPD mental
+            recognition cues from historical decisions, narrative war-story pre-mortems, RPD mental
             simulator, and personal calibration dashboard at{' '}
             <code>/dashboard/decision-quality?tab=calibration</code>
           </li>
@@ -283,7 +288,7 @@ function ProductOverview() {
           </li>
           <li>
             <strong>Case Study Export</strong> — One-click anonymized, branded shareable analyses
-            with permanent links for LP reporting
+            with permanent links for stakeholder reporting
           </li>
           <li>
             <strong>Browser Extension</strong> — Chrome extension with quick-score popup (&lt;5s)
@@ -352,7 +357,7 @@ function CorePipeline() {
   [GDPR Anonymizer] ──> [Data Structurer] ──> [Intelligence Gatherer]
 
 ANALYSIS (Parallel Fan-Out)
-  ├── [Bias Detective]      ── 20 cognitive biases + 11 PE-specific
+  ├── [Bias Detective]      ── 20 cognitive biases + 11 investment-specific
   ├── [Noise Judge x3]      ── Statistical jury (3 independent models)
   ├── [Fact Checker]        ── Finnhub + Google Search grounding
   ├── [Pre-Mortem]          ── Failure scenarios + preventive measures
@@ -405,7 +410,7 @@ SYNTHESIS (Sequential)
             </div>
           </div>
           <div>
-            <div style={label}>PE-SPECIFIC BIASES (11)</div>
+            <div style={label}>INVESTMENT-SPECIFIC BIASES (11)</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
               {[
                 'Entry Price Anchor',
@@ -1372,10 +1377,10 @@ function CompetitiveMoat() {
             },
             {
               name: 'DealCloud (Intapp)',
-              what: 'Deal management and pipeline CRM for PE/VC. Tracks deal flow, pipeline stages, fund reporting.',
+              what: 'Deal management and pipeline CRM for PE/VC and enterprise. Tracks deal flow, pipeline stages, reporting.',
               gap: 'No cognitive analysis of IC materials. Tracks the deal, not the quality of the decision-making about the deal.',
               response:
-                '"DealCloud tracks your pipeline. We audit the decisions your pipeline produces. Upload the IC memo from DealCloud — we score it in 60 seconds."',
+                '"DealCloud tracks your pipeline. We audit the decisions your pipeline produces. Upload the strategic document from DealCloud — we score it in 60 seconds."',
               color: '#6366f1',
             },
             {
@@ -1397,9 +1402,9 @@ function CompetitiveMoat() {
             {
               name: 'ChatGPT / Claude (direct)',
               what: 'General-purpose LLM. Some firms ask it to "analyze for biases."',
-              gap: 'Single model opinion (no noise measurement), no deterministic scoring, no outcome tracking, no org calibration, no PE-specific biases.',
+              gap: 'Single model opinion (no noise measurement), no deterministic scoring, no outcome tracking, no org calibration, no domain-specific biases.',
               response:
-                '"That\'s one opinion from one model. We use 3 independent judges for noise measurement, a 20x20 bias interaction matrix for compound scoring, and an outcome flywheel that makes us smarter with every deal you close. Plus Chrome extension for real-time checking and Slack for meeting-time coaching."',
+                '"That\'s one opinion from one model. We use 3 independent judges for noise measurement, a 20x20 bias interaction matrix for compound scoring, and an outcome flywheel that makes us smarter with every decision you make. Plus Chrome extension for real-time checking and Slack for meeting-time coaching."',
               color: '#a78bfa',
             },
           ].map((comp, i) => (
@@ -1450,7 +1455,7 @@ function MarketStrategy() {
     <div>
       {/* Verdict */}
       <div style={{ ...card, borderTop: '3px solid #22c55e' }}>
-        <div style={label}>BEACHHEAD MARKET VERDICT</div>
+        <div style={label}>PRIMARY MARKET</div>
         <h2
           style={{
             fontSize: 22,
@@ -1460,12 +1465,13 @@ function MarketStrategy() {
             lineHeight: 1.3,
           }}
         >
-          PE/VC Investment Committees
+          Enterprise Decision Teams
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-          Your product is already built for this market. The competitive white space is real. The
-          buyer is accessible. The community dynamics favor rapid word-of-mouth. Everything else
-          requires either rebuilding the product, longer sales cycles, or both.
+          Any team making high-stakes, document-driven decisions — M&amp;A, corporate strategy, risk
+          assessment, vendor selection, product launches. The competitive white space is real. The
+          buyer is accessible. PE/VC investment committees are a proven first vertical with
+          quantifiable ROI.
         </p>
       </div>
 
@@ -1487,14 +1493,13 @@ function MarketStrategy() {
             borderRadius: '0 8px 8px 0',
           }}
         >
-          &quot;Decision Intel is a cognitive bias auditing engine for PE/VC investment committees.
-          We sit between deal sourcing and capital deployment — the one place in the fund workflow
-          where nobody is providing decision quality tools. Our 16-agent AI pipeline analyzes IC
-          memos, CIMs, and due diligence reports to detect the specific biases that destroy fund
-          returns: anchoring to entry price, confirmation bias in thesis validation, sunk cost in
-          portfolio holds, and overconfidence in projections. We produce a proprietary Decision
-          Quality Index — think FICO score for investment decisions — and our outcome tracking
-          flywheel means the platform gets smarter with every deal a fund closes.&quot;
+          &quot;Decision Intel is a cognitive bias auditing engine for high-stakes executive teams.
+          We analyze strategic documents — board memos, M&amp;A proposals, risk assessments, vendor
+          evaluations — to detect the specific biases that destroy organizational value: anchoring
+          to initial assumptions, confirmation bias in due diligence, sunk cost in failing
+          initiatives, and groupthink in committee decisions. We produce a proprietary Decision
+          Quality Index — think FICO score for strategic decisions — and our outcome tracking
+          flywheel means the platform gets smarter with every decision an organization makes.&quot;
         </blockquote>
       </div>
 
@@ -1574,29 +1579,36 @@ function MarketStrategy() {
           </div>
           {[
             [
+              'Enterprise M&A / Strategy',
+              '$10M-10B/decision',
+              '1-3 mo',
+              'Built for it',
+              'CSO / Corp Dev VP',
+              'PRIMARY',
+            ],
+            [
               'PE/VC ICs',
               '$50-500M/deal',
               '1-2 mo',
-              'Built for it',
+              'Proven vertical',
               'MP / Head of IC',
-              'BEACHHEAD',
+              'PROVEN',
             ],
-            ['Corporate M&A', '$1-10B/deal', '6-12 mo', 'Needs retool', 'Corp Dev VP', 'Year 2-3'],
-            ['Hedge Funds', '$10M-1B/pos', '3-6 mo', 'Weak (1 PM)', 'PM / CIO', 'Year 3+'],
-            ['Insurance', 'Varies', '12+ mo', 'Wrong problem', 'CUO', 'No'],
-            ['Gov/Defense', '$100M-10B', '18-36 mo', 'FedRAMP req', 'Procurement', 'Year 4+'],
-            ['Corp Boards', 'Varies', '6-12 mo', 'Too diffuse', 'Board Secretary', 'Year 4+'],
+            ['Risk & Compliance', '$10M-1B', '2-4 mo', 'Strong fit', 'CRO / GRC Lead', 'Year 1-2'],
+            ['Hedge Funds', '$10M-1B/pos', '3-6 mo', 'Moderate', 'PM / CIO', 'Year 2+'],
+            ['Gov/Defense', '$100M-10B', '18-36 mo', 'FedRAMP req', 'Procurement', 'Year 3+'],
+            ['Corp Boards', 'Varies', '6-12 mo', 'Expanding', 'Board Secretary', 'Year 3+'],
           ].map(([market, value, cycle, fit, buyer, verdict], i) => {
-            const isBeachhead = verdict === 'BEACHHEAD';
-            const verdictColor = isBeachhead ? '#22c55e' : verdict === 'No' ? '#ef4444' : '#f59e0b';
+            const isPrimary = verdict === 'PRIMARY' || verdict === 'PROVEN';
+            const verdictColor = isPrimary ? '#22c55e' : verdict === 'No' ? '#ef4444' : '#f59e0b';
             return [
               <div
                 key={`m${i}`}
                 style={{
                   padding: '8px 0',
                   borderBottom: '1px solid var(--border-primary, #222)',
-                  fontWeight: isBeachhead ? 700 : 400,
-                  color: isBeachhead ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  fontWeight: isPrimary ? 700 : 400,
+                  color: isPrimary ? 'var(--text-primary)' : 'var(--text-secondary)',
                 }}
               >
                 {market}
@@ -1655,33 +1667,33 @@ function MarketStrategy() {
       {/* Why PE/VC Wins */}
       <div style={card}>
         <div style={sectionTitle}>
-          <CheckCircle size={18} style={{ color: '#22c55e' }} /> Why PE/VC Wins as Beachhead
+          <CheckCircle size={18} style={{ color: '#22c55e' }} /> Why This Market Wins
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {[
             {
               title: 'Product Already Built',
-              desc: '11 PE-specific biases, IC memo analysis, deal pipeline tracking, IRR/MOIC outcome logging, committee rooms with blind prior collection. Zero retooling needed.',
+              desc: '31 cognitive biases, strategic document analysis, project pipeline tracking, outcome logging, committee rooms with blind prior collection. Works across M&A, strategy, risk, and investment decisions.',
             },
             {
               title: 'Genuine White Space',
-              desc: 'Competitors (Affinity, DealCloud, Grata, Blueflame AI) focus on deal sourcing and CRM. Nobody is doing cognitive bias auditing of the actual decision-making process.',
+              desc: 'Nobody is doing cognitive bias auditing of enterprise decision-making processes. Competitors focus on CRM, pipeline management, or generic AI. We own the decision quality category.',
             },
             {
               title: 'Accessible Buyer',
-              desc: 'PE firms are 5-50 people. The Managing Partner or Head of IC can greenlight a purchase in a single meeting. No procurement department, no 12-month sales cycle.',
+              desc: 'Strategy teams, M&A groups, and risk committees have decision authority. A VP of Strategy or Head of M&A can greenlight a pilot. PE/VC firms (5-50 people) are the fastest-closing segment.',
             },
             {
-              title: 'Community FOMO',
-              desc: 'PE/VC is tight-knit. One flagship fund using Decision Intel creates real fear of missing out among peers. Word-of-mouth is the primary distribution channel.',
+              title: 'Cross-Industry Pull',
+              desc: 'Cognitive bias is universal. Every industry making high-stakes decisions — finance, healthcare, technology, government — has the same problem. One product, many verticals.',
             },
             {
               title: 'Quantifiable ROI',
-              desc: 'A single avoided bad deal saves $50M-$500M. On a $50-100K annual contract, that is a 500-1000x ROI. The easiest sales conversation possible.',
+              desc: 'A single avoided bad decision saves millions. On a Starter-to-Team subscription, that is 100-1000x ROI. The easiest sales conversation possible.',
             },
             {
               title: 'Academic Backing',
-              desc: "Kahneman's Noise, Malmendier & Tate on winner's curse (65% of auctions), behavioral bias costs 2x management fees in performance drag. The research is on your side.",
+              desc: "Kahneman's Noise, Malmendier & Tate on decision errors, behavioral bias costs organizations billions annually in value destruction. The research is on your side.",
             },
           ].map((item, i) => (
             <div
@@ -1709,34 +1721,34 @@ function MarketStrategy() {
       {/* Why Other Markets Don't Work (Yet) */}
       <div style={card}>
         <div style={sectionTitle}>
-          <AlertTriangle size={18} style={{ color: '#f59e0b' }} /> Why Not the Others (Yet)
+          <Rocket size={18} style={{ color: '#f59e0b' }} /> Expansion Markets
         </div>
         <div style={{ display: 'grid', gap: 8 }}>
           {[
             {
-              market: 'Corporate M&A',
+              market: 'PE/VC Investment Committees',
               reason:
-                'Highest per-deal value destruction ($8.8B HP-Autonomy, $10B+ Bayer-Monsanto). But buyers are Fortune 500 corp dev teams or advisory firms — 6-12+ month sales cycles, significant product retooling needed. This is your Year 2-3 expansion, not your beachhead.',
+                'Proven first vertical with quantifiable ROI ($50M-$500M per avoided bad deal). Product includes 11 investment-specific biases, IC memo analysis, IRR/MOIC outcome tracking. Tight-knit community drives word-of-mouth. Fastest sales cycle (1-2 months).',
             },
             {
               market: 'Hedge Funds',
               reason:
-                "High decision volume and alpha erosion is well-documented ($4.3B lost on Ackman-Valeant from disposition effect alone). But funds build proprietary tools, are secretive about process, and often have a single PM deciding — your committee workflow doesn't map.",
+                'High decision volume and alpha erosion is well-documented ($4.3B lost on Ackman-Valeant from disposition effect alone). Single-PM funds need adapted workflow, but multi-manager funds map well to our committee features.',
             },
             {
-              market: 'Insurance Underwriting',
+              market: 'Insurance & Risk',
               reason:
-                'The "bias" conversation has shifted to algorithmic/ML bias (NY DFS Circular 2024-7). This is fundamentally a different product — fairness-in-AI, not cognitive bias in human decisions.',
+                'Large premium-at-risk decisions with documented bias patterns. Regulatory pressure (NY DFS, Solvency II) creates compliance pull. Longer sales cycle but high contract values.',
             },
             {
               market: 'Government/Defense',
               reason:
-                "Jaw-dropping waste ($850B DoD budget, failed audit 7 consecutive years, F-35 cost 3x). But FedRAMP = 12-18 months, procurement = 18-36 months. You'd burn through seed before closing one contract.",
+                'Massive decision spend ($850B DoD budget alone). FedRAMP certification needed (12-18 months). High-value contracts justify the compliance investment. Year 3+ expansion target.',
             },
             {
               market: 'Corporate Boards',
               reason:
-                '85% of leaders report "decision distress." But who\'s the buyer? What document are you analyzing? Too diffuse. The IC memo workflow doesn\'t translate to quarterly board meetings.',
+                '85% of leaders report "decision distress." Board memo analysis, strategy paper auditing, and governance workflows are natural extensions of the current product. Growing demand for decision quality governance.',
             },
           ].map((item, i) => (
             <div
@@ -1770,8 +1782,10 @@ function MarketStrategy() {
           <div
             style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}
           >
-            $50-100K
-            <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-muted)' }}>/year</span>
+            $0-999
+            <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-muted)' }}>
+              /month
+            </span>
           </div>
           <ul
             style={{
@@ -1781,13 +1795,13 @@ function MarketStrategy() {
               paddingLeft: 14,
             }}
           >
-            <li>Mid-market PE fund: $500M fund size</li>
-            <li>Avoid 1 bad deal per vintage = $50-500M saved</li>
+            <li>Starter: Free (3 analyses) → Professional: $349/mo → Team: $999/mo</li>
+            <li>Avoid 1 bad decision per year = millions saved</li>
             <li>
-              ROI: <strong style={{ color: '#22c55e' }}>500-1000x</strong> the subscription cost
+              ROI: <strong style={{ color: '#22c55e' }}>100-1000x</strong> the subscription cost
             </li>
-            <li>Comparable to DealCloud/Affinity pricing tier</li>
-            <li>Land at $50K, expand to $100K+ with team seats</li>
+            <li>Enterprise: Custom pricing for SSO, unlimited, dedicated support</li>
+            <li>Land with Professional, expand to Team seats + Enterprise</li>
           </ul>
         </div>
         <div style={card}>
@@ -1811,11 +1825,11 @@ function MarketStrategy() {
               paddingLeft: 14,
             }}
           >
-            <li>PE/VC software market: $607B → $995B by 2035</li>
-            <li>1,500+ active VC firms globally</li>
-            <li>Thousands of PE funds across mid-market and mega-cap</li>
             <li>Decision intelligence market: $12.2B → $46.4B by 2030</li>
-            <li>Concentrated enough to be addressable at seed stage</li>
+            <li>Enterprise GRC software: $50B+ and growing at 14% CAGR</li>
+            <li>PE/VC software vertical: $607B → $995B by 2035</li>
+            <li>Fortune 500 + mid-market = 10,000+ addressable organizations</li>
+            <li>Cross-industry applicability expands TAM beyond any single vertical</li>
           </ul>
         </div>
       </div>
@@ -1828,36 +1842,36 @@ function MarketStrategy() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
           {[
             {
-              year: 'Year 1-2',
-              market: 'PE/VC Investment Committees',
+              year: 'Year 1',
+              market: 'Enterprise Decision Teams',
               color: '#22c55e',
               status: 'NOW',
               details:
-                'Beachhead. Product built. IC memos, deal pipeline, committee rooms. Land 10-20 flagship funds.',
+                'M&A, corporate strategy, risk assessment, vendor evaluation. Board memos, strategy papers, project pipeline. PE/VC as proven first vertical.',
             },
             {
-              year: 'Year 2-3',
-              market: 'M&A Advisory & Corp Dev',
+              year: 'Year 2',
+              market: 'Financial Services Vertical',
               color: '#3b82f6',
               status: 'NEXT',
               details:
-                'Adjacent. Highest per-deal value destruction. Retool IC memo workflow for deal evaluation memos.',
+                'Deeper PE/VC penetration, hedge funds, credit committees. Investment-specific biases and IRR/MOIC tracking as differentiators.',
             },
             {
-              year: 'Year 3-4',
-              market: 'Broader Financial Services',
+              year: 'Year 3',
+              market: 'Government & Insurance',
               color: '#f59e0b',
               status: 'PLANNED',
               details:
-                'Hedge funds, credit committees, insurance. Product adaptations for single-PM and underwriting workflows.',
+                'FedRAMP certification unlocks government. Regulatory compliance pull in insurance. High contract values justify longer sales cycles.',
             },
             {
               year: 'Year 4+',
-              market: 'Enterprise Decision Quality',
+              market: 'Horizontal Platform',
               color: '#a78bfa',
               status: 'VISION',
               details:
-                'Any org making high-stakes, document-driven decisions. Compliance, risk, boards, procurement.',
+                'Decision quality as infrastructure. API-first platform for any organization. Industry-specific bias modules as add-ons.',
             },
           ].map((item, i) => (
             <div
@@ -1917,7 +1931,7 @@ function MarketStrategy() {
           </li>
           <li>
             <strong>Case Study Export:</strong> One-click &quot;Share as Case Study&quot; from any
-            analysis. Anonymized, branded, permanent links. Perfect for LP decks and sales
+            analysis. Anonymized, branded, permanent links. Perfect for stakeholder decks and sales
             collateral.
           </li>
           <li>
@@ -1968,16 +1982,17 @@ function SalesToolkit() {
               OFFENSIVE (new)
             </div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              &quot;Swing with confidence. Make bolder bets because you&apos;ve stress-tested the
-              thesis. Decision Intel gives your IC permission to be ambitious.&quot;
+              &quot;Swing with confidence. Make bolder strategic bets because you&apos;ve
+              stress-tested the decision. Decision Intel gives your team permission to be
+              ambitious.&quot;
             </div>
           </div>
         </div>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>
           <strong style={{ color: 'var(--text-primary)' }}>Why this works:</strong> Strebulaev
-          (Stanford GSB) shows the best funds optimize for home runs, not strikeout avoidance. GPs
-          don&apos;t want a safety net — they want a decision quality amplifier. The defensive pitch
-          attracts compliance buyers. The offensive pitch attracts Managing Partners.
+          (Stanford GSB) shows the best decision-makers optimize for bold moves, not risk avoidance.
+          Leaders don&apos;t want a safety net — they want a decision quality amplifier. The
+          defensive pitch attracts compliance buyers. The offensive pitch attracts strategy leaders.
         </p>
       </div>
 
@@ -1987,24 +2002,24 @@ function SalesToolkit() {
           <Shield size={18} style={{ color: '#f59e0b' }} /> Objection Handler
         </div>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
-          The exact objections PE/VC buyers will raise and your prepared responses.
+          The exact objections enterprise buyers will raise and your prepared responses.
         </p>
         <div style={{ display: 'grid', gap: 10 }}>
           {[
             {
-              objection: '"We already have a good IC process."',
+              objection: '"We already have a good decision process."',
               response:
-                "Great — upload your last 3 IC memos and let's see what the DQI scores look like. Most funds score 45-65 on their first run. The question isn't whether your process is good — it's whether there are blind spots nobody is catching.",
+                "Great — upload your last 3 strategic documents and let's see what the DQI scores look like. Most organizations score 45-65 on their first run. The question isn't whether your process is good — it's whether there are blind spots nobody is catching.",
               tone: 'Curious, not confrontational',
             },
             {
               objection: '"How is this different from just asking ChatGPT?"',
               response:
-                "ChatGPT gives you one opinion from one model. We use 3 independent judges to measure noise, a 20x20 bias interaction matrix for compound scoring, 11 PE-specific biases that general models don't know to look for, and an outcome flywheel that makes us smarter with every deal you close. Plus Chrome extension for real-time checking and Slack for meeting-time coaching. It's the difference between asking a friend and hiring a forensic auditor.",
+                "ChatGPT gives you one opinion from one model. We use 3 independent judges to measure noise, a 20x20 bias interaction matrix for compound scoring, 31 domain-specific biases that general models don't know to look for, and an outcome flywheel that makes us smarter with every decision you make. Plus Chrome extension for real-time checking and Slack for meeting-time coaching. It's the difference between asking a friend and hiring a forensic auditor.",
               tone: 'Technical credibility',
             },
             {
-              objection: '"Our deal team would never share IC memos with an external tool."',
+              objection: '"Our team would never share strategic documents with an external tool."',
               response:
                 'We GDPR-anonymize every document before it touches AI — names, companies, and numbers are tokenized. The PII never leaves the anonymization layer. Plus, you self-host your data on your own Supabase instance. We can do an on-prem demo if that helps.',
               tone: 'Address security directly',
@@ -2012,31 +2027,31 @@ function SalesToolkit() {
             {
               objection: '"We don\'t have budget for another software tool."',
               response:
-                "A single avoided bad deal saves $50-500M. Even if we prevent one thesis error per vintage year, that's a 500-1000x ROI on a $50K subscription. What's the cost of NOT catching the next anchoring bias in your IC memo?",
+                "A single avoided bad decision saves millions. Even if we prevent one strategic error per year, that's a 100-1000x ROI on the subscription. What's the cost of NOT catching the next anchoring bias in your board memo?",
               tone: 'ROI framing',
             },
             {
               objection: '"We tried AI tools before and they weren\'t useful."',
               response:
-                "Were they general-purpose AI or purpose-built for investment decisions? We have 11 PE-specific biases like anchoring to entry price, carry incentive distortion, and winner's curse that no general tool detects. Plus, our outcome tracking means we calibrate to YOUR fund's actual decision patterns — not generic advice.",
+                "Were they general-purpose AI or purpose-built for high-stakes decisions? We have 31 cognitive biases including domain-specific ones like anchoring to initial estimates, sunk cost in failing initiatives, and groupthink in committee decisions that no general tool detects. Plus, our outcome tracking means we calibrate to YOUR organization's actual decision patterns — not generic advice.",
               tone: 'Specificity wins',
             },
             {
               objection: '"How long until we see value?"',
               response:
-                "Upload your first IC memo — you'll have a full bias audit with DQI score in under 60 seconds. The Boardroom Simulation alone usually surfaces something nobody in the room raised. First-day value, not first-quarter value.",
+                "Upload your first strategic document — you'll have a full bias audit with DQI score in under 60 seconds. The Boardroom Simulation alone usually surfaces something nobody in the room raised. First-day value, not first-quarter value.",
               tone: 'Immediate gratification',
             },
             {
               objection: '"We\'re a small team, we don\'t need this."',
               response:
-                'Small teams are actually more vulnerable to groupthink and authority bias — fewer voices means blind spots compound. Our Slack integration embeds cognitive coaching directly in your deal discussions, no workflow change required. Think of it as a silent partner who only speaks up when they spot a bias.',
+                'Small teams are actually more vulnerable to groupthink and authority bias — fewer voices means blind spots compound. Our Slack integration embeds cognitive coaching directly in your strategic discussions, no workflow change required. Think of it as a silent partner who only speaks up when they spot a bias.',
               tone: 'Turn weakness into strength',
             },
             {
               objection: '"Can I try it before committing?"',
               response:
-                "Absolutely — visit /demo right now. Pick from 3 sample IC memos and watch the full 16-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own IC memos and we'll run a free pilot with full DQI scoring and bias reports.",
+                "Absolutely — visit /demo right now. Pick from 3 sample documents and watch the full 16-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own strategic documents and we'll run a free pilot with full DQI scoring and bias reports.",
               tone: 'Zero friction',
             },
           ].map((item, i) => (
@@ -2078,21 +2093,21 @@ function SalesToolkit() {
             step: 1,
             title: 'Setup (30 sec)',
             action:
-              'Open the dashboard. Have a sample IC memo ready — ideally one from a real deal that had a known outcome (good or bad). Alternative: open /demo for a no-login streaming simulation with 3 pre-loaded samples.',
-            tip: 'If using their own memo, even better. If not, the /demo page has Nokia, Series B, and Phoenix samples with full streaming UX.',
+              'Open the dashboard. Have a sample strategic document ready — ideally one from a real decision that had a known outcome (good or bad). Alternative: open /demo for a no-login streaming simulation with 3 pre-loaded samples.',
+            tip: 'If using their own document, even better. If not, the /demo page has Nokia, Series B, and Phoenix samples with full streaming UX.',
           },
           {
             step: 2,
             title: 'Upload & Analyze (60 sec)',
             action:
-              'Drag the IC memo onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 16 agents are doing: "Right now, 3 independent AI judges are scoring this document for noise, while our bias detective is scanning for 31 cognitive biases..."',
+              'Drag the document onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 16 agents are doing: "Right now, 3 independent AI judges are scoring this document for noise, while our bias detective is scanning for 31 cognitive biases..."',
             tip: 'The streaming progress bar is your friend — it creates anticipation.',
           },
           {
             step: 3,
             title: 'DQI Score Reveal (60 sec)',
             action:
-              'When the score appears, pause for dramatic effect. "Your IC memo scored 47/100 — that\'s a D grade. Let me show you why."',
+              'When the score appears, pause for dramatic effect. "Your document scored 47/100 — that\'s a D grade. Let me show you why."',
             tip: 'Most memos score 40-65. If it scores high (80+), pivot to: "This is unusually clean — let me show you what we DID find."',
           },
           {
@@ -2106,8 +2121,8 @@ function SalesToolkit() {
             step: 5,
             title: 'Boardroom Simulation (2 min) — THE WOW MOMENT',
             action:
-              'Switch to the Boardroom tab. Show the 5 IC personas voting. "Your Risk Committee Chair voted REJECT because of concentration risk. Your Operating Partner flagged execution timeline as unrealistic. Did anyone in your real IC raise these points?"',
-            tip: 'This is usually where the prospect goes quiet and starts thinking about their last deal. Let the silence land.',
+              'Switch to the Boardroom tab. Show the 5 decision personas voting. "Your Risk Officer voted REJECT because of concentration risk. Your Operations Lead flagged execution timeline as unrealistic. Did anyone on your real team raise these points?"',
+            tip: 'This is usually where the prospect goes quiet and starts thinking about their last major decision. Let the silence land.',
           },
           {
             step: 6,
@@ -2127,7 +2142,7 @@ function SalesToolkit() {
             step: 8,
             title: 'Close (60 sec)',
             action:
-              '"Imagine if every IC memo went through this before the vote. How many of your last 10 deals would have scored differently?" Offer: free pilot — 3 IC memos analyzed, no commitment.',
+              '"Imagine if every strategic document went through this before the decision. How many of your last 10 major decisions would have scored differently?" Offer: free pilot — 3 documents analyzed, no commitment.',
             tip: "Don't oversell. The product sells itself after the demo. Just get the pilot started.",
           },
         ].map((item, i) => (
@@ -2194,19 +2209,19 @@ function SalesToolkit() {
         <div style={{ display: 'grid', gap: 8 }}>
           {[
             {
-              audience: 'PE Managing Partner (30 sec)',
+              audience: 'Chief Strategy Officer (30 sec)',
               pitch:
-                "We're building a cognitive bias auditing engine for IC memos. Upload a memo, get a Decision Quality Score in 60 seconds — think FICO for investment decisions. Our outcome flywheel means we learn which biases actually cost your fund money, so the platform gets sharper with every deal.",
+                "We're building a cognitive bias auditing engine for strategic decisions. Upload a board memo, get a Decision Quality Score in 60 seconds — think FICO for organizational decisions. Our outcome flywheel means we learn which biases actually cost your organization money, so the platform gets sharper with every decision.",
             },
             {
-              audience: 'VC Partner (30 sec)',
+              audience: 'M&A / Corp Dev Lead (30 sec)',
               pitch:
-                "We detect 31 cognitive biases in investment documents — 11 specific to PE/VC like anchoring to entry price and winner's curse. Our Boardroom Simulation creates virtual IC members who vote on your thesis. Plus a Chrome extension for real-time bias checking and Slack integration for meeting-time coaching. It usually surfaces the objection nobody in the room raised.",
+                'We detect 31 cognitive biases in strategic documents — including anchoring to initial estimates, sunk cost in failing deals, and groupthink in committee decisions. Our Boardroom Simulation creates virtual decision-makers who vote on your thesis. Plus a Chrome extension for real-time bias checking and Slack integration for meeting-time coaching. It usually surfaces the objection nobody in the room raised.',
             },
             {
-              audience: 'Investor (60 sec)',
+              audience: 'Board / Executive Sponsor (60 sec)',
               pitch:
-                "Decision Intel is the cognitive bias auditing engine for PE/VC investment committees. We sit between deal sourcing and capital deployment — the one place in the fund workflow where nobody provides decision quality tools. 16-agent AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. PE/VC software market is $607B going to $995B by 2035 — we're creating a new category in it.",
+                "Decision Intel is the cognitive bias auditing engine for high-stakes executive teams. We sit between analysis and commitment — the one place in the decision workflow where nobody provides quality tools. 16-agent AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. Decision intelligence market is $12.2B going to $46.4B by 2030 — we're creating a new category.",
             },
             {
               audience: 'Technical Audience (30 sec)',
@@ -2723,10 +2738,10 @@ function ResearchFrameworks() {
                   product:
                     "Reframe your pitch from defensive to offensive. DQI doesn't just help avoid bad deals — it gives IC members permission to swing big because they've stress-tested the decision. \"Swing with confidence because you've already audited the thesis.\"",
                   startup:
-                    'Go all-in on PE/VC. Don\'t build 6 features for 4 markets. Your "home run" is one flagship fund that becomes a case study. Accept that some features won\'t land.',
+                    'Go all-in on enterprise decision teams. Don\'t build 6 features for 4 markets. Your "home run" is one flagship customer that becomes a case study. Accept that some features won\'t land.',
                   actions: [
-                    'Rewrite landing page hero from "avoid mistakes" to "make better bets with confidence"',
-                    'Focus pilot outreach on 5 target funds, not 50',
+                    'Rewrite landing page hero from "avoid mistakes" to "make better decisions with confidence"',
+                    'Focus pilot outreach on 5 target organizations, not 50',
                   ],
                   color: '#22c55e',
                 },
@@ -2754,11 +2769,11 @@ function ResearchFrameworks() {
                   product:
                     'Your Slack integration puts Decision Intel inside the daily workflow where deals are discussed — not as a standalone app. This is the "inside the walls" play. The cross-department edge type in your knowledge graph detects organizational silos.',
                   startup:
-                    "Be embedded in the PE/VC community. ILPA conferences, ACG events, LP/GP networking circles. Don't sell from the outside — be part of the ecosystem.",
+                    "Be embedded in your target communities. Strategy conferences, M&A events, risk management circles. Don't sell from the outside — be part of the ecosystem.",
                   actions: [
-                    'Attend 2 PE/VC conferences per quarter',
-                    'Launch a "Decision Quality" newsletter for PE professionals',
-                    'Build a Slack community for IC members',
+                    'Attend 2 industry conferences per quarter',
+                    'Launch a "Decision Quality" newsletter for enterprise leaders',
+                    'Build a Slack community for decision-makers',
                   ],
                   color: '#f59e0b',
                 },
@@ -2786,11 +2801,11 @@ function ResearchFrameworks() {
                   product:
                     "Your Boardroom Simulation IS a \"prepared mind\" tool. You're giving IC members a pre-briefing on which biases historically damaged similar deals, what toxic combinations to watch for, and what diverse perspectives would flag. Lean into this framing: you're not auditing documents — you're preparing decision-makers.",
                   startup:
-                    "Spend 30 min daily reading PE/VC industry news, academic papers on decision science, and competitor updates. Your Intelligence Hub's 14 RSS feeds should be your own morning briefing too.",
+                    "Spend 30 min daily reading industry news, academic papers on decision science, and competitor updates. Your Intelligence Hub's 14 RSS feeds should be your own morning briefing too.",
                   actions: [
                     'Rename "Pre-Meeting Bias Briefing" to "Prepared Mind Briefing" in marketing',
-                    'Add a "Prepare for IC" CTA before committee meetings',
-                    'Subscribe to 3 PE newsletters personally',
+                    'Add a "Prepare for Meeting" CTA before committee meetings',
+                    'Subscribe to 3 industry newsletters personally',
                   ],
                   color: '#8b5cf6',
                 },
@@ -2802,7 +2817,7 @@ function ResearchFrameworks() {
                   product:
                     'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 16-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
                   startup:
-                    'Apply to your sales process too. Qualify leads fast — "Do you have an investment committee? Do you review IC memos?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
+                    'Apply to your sales process too. Qualify leads fast — "Do you have a decision committee? Do you review strategic documents before major decisions?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
                   actions: [
                     'Build Quick Scan feature (top priority — Strebulaev-backed)',
                     'Add 2-question lead qualification before demos',
@@ -2848,7 +2863,7 @@ function ResearchFrameworks() {
                   summary:
                     '50% of US IPOs over 50 years were VC-backed. 75% of large public companies. VC-backed companies spend 92 cents of every R&D dollar. When ICs make biased decisions, the ripple effects go far beyond the fund.',
                   product:
-                    'This is your highest-level pitch narrative: "Decision Intel doesn\'t just protect fund returns — it improves the quality of capital allocation across the innovation economy." When a biased IC kills a good deal, that startup might never get funded. When a biased IC backs a bad deal, capital that could have gone to a better company is wasted.',
+                    'This is your highest-level pitch narrative: "Decision Intel doesn\'t just protect organizational outcomes — it improves the quality of decision-making across the economy." When a biased committee kills a good initiative, innovation is lost. When a biased team backs a bad strategy, resources that could have gone to better opportunities are wasted.',
                   startup:
                     'This framing elevates you from "SaaS tool vendor" to "mission-driven company improving how capital flows to innovation." Investors respond to mission, not just TAM.',
                   actions: [
@@ -2977,12 +2992,12 @@ function ResearchFrameworks() {
             color="#22c55e"
             link="https://podcast.clearerthinking.org/episode/072/"
             insight="Insurance underwriter study: executives expected 10% variability between judges. Actual: 55%. One underwriter prices at $9,500, another at $16,700 for the identical case. Noise is at least as damaging as bias, and organizations almost never measure it."
-            product="Your triple-judge noise scoring is a direct implementation of Kahneman's proposed methodology. Use the 10% vs 55% stat in every sales conversation — it's the 'holy shit' moment that makes PE partners realize they have no idea how much variability exists in their own IC."
-            startup="Offer a free 'noise audit' of a fund's last 5 IC memos as a top-of-funnel hook. Let them see the problem before pitching the solution."
+            product="Your triple-judge noise scoring is a direct implementation of Kahneman's proposed methodology. Use the 10% vs 55% stat in every sales conversation — it's the 'holy shit' moment that makes executives realize they have no idea how much variability exists in their own decision processes."
+            startup="Offer a free 'noise audit' of a team's last 5 strategic documents as a top-of-funnel hook. Let them see the problem before pitching the solution."
             actions={[
               'Use 10% vs 55% stat in opening of every demo',
               'Build free noise audit landing page',
-              'Create 1-pager: "How Much Noise Is In Your IC?"',
+              'Create 1-pager: "How Much Noise Is In Your Decisions?"',
             ]}
           />
         </>
@@ -3002,7 +3017,7 @@ function ResearchFrameworks() {
             link="https://behavioralgrooves.com/episode/noise-with-olivier-sibony/"
             insight="Kahneman's co-author on Noise, former McKinsey partner. Framework: checklists, premortems, structured independent assessments, and noise audits. Noise audits should be the starting point — orgs need to see how bad the problem is before buying a solution."
             product="Your entire product IS decision hygiene. Sibony's framework validates every feature: structured analysis (bias detection), independent assessments (triple-judge), premortems (Pre-Mortem Architect agent), and noise audits (noise decomposition)."
-            startup="His 'noise audit first' approach suggests a powerful sales motion: offer a free noise audit of 5 IC memos as top-of-funnel. Let prospects SEE the problem before pitching the solution."
+            startup="His 'noise audit first' approach suggests a powerful sales motion: offer a free noise audit of 5 strategic documents as top-of-funnel. Let prospects SEE the problem before pitching the solution."
             actions={[
               'Build free noise audit landing page as lead gen',
               'Quote Sibony in marketing: "decision hygiene"',
@@ -3016,8 +3031,8 @@ function ResearchFrameworks() {
             color="#f59e0b"
             link="https://podcasts.apple.com/us/podcast/ep-234-dr-gary-klein/id1054744455?i=1000677192489"
             insight="Klein invented the premortem technique. He and Kahneman were 'collaborative adversaries' — Kahneman trusts systematic processes, Klein trusts expert intuition. The tension between them is the exact tension your product navigates."
-            product="Klein RPD framework NOW SHIPPED: recognition cues from historical deals, narrative war-story pre-mortems, RPD mental simulator, and personal calibration dashboard. DI sits at the intersection: structured AI analysis (Kahneman) augmenting expert human judgment (Klein), not replacing it. Dual-framework positioning is live — skeptical GPs can see their intuition amplified, not overridden."
-            startup="When GPs push back with 'we trust our judgment,' don't argue. Say: 'We do too. Klein proved expert intuition is powerful. Our RPD framework surfaces the pattern recognition cues an expert with 10+ similar exits would notice. We amplify your intuition while making sure it's not undermined by noise and bias you can't see.'"
+            product="Klein RPD framework NOW SHIPPED: recognition cues from historical decisions, narrative war-story pre-mortems, RPD mental simulator, and personal calibration dashboard. DI sits at the intersection: structured AI analysis (Kahneman) augmenting expert human judgment (Klein), not replacing it. Dual-framework positioning is live — skeptical leaders can see their intuition amplified, not overridden."
+            startup="When leaders push back with 'we trust our judgment,' don't argue. Say: 'We do too. Klein proved expert intuition is powerful. Our RPD framework surfaces the pattern recognition cues an expert with 10+ similar decisions would notice. We amplify your intuition while making sure it's not undermined by noise and bias you can't see.'"
             actions={[
               '✅ Klein RPD framework shipped: recognition cues, narrative pre-mortems, RPD simulator, calibration dashboard',
               'Use Kahneman-Klein dual framework in sales: "We suppress bias AND amplify intuition"',
@@ -3046,7 +3061,7 @@ function ResearchFrameworks() {
             color="#f59e0b"
             link="https://80000hours.org/podcast/episodes/prof-tetlock-predicting-the-future/"
             insight="Human-machine hybrids beat both pure AI and pure human judgment in forecasting tournaments. 40 years of data show process matters more than talent — superforecasters aren't smarter, they follow better processes."
-            product="DI IS a human-machine hybrid: AI detects biases and measures noise, humans make the final call. Tetlock gives you the language: 'Process beats talent. Our platform ensures your IC follows the process that produces better outcomes.'"
+            product="DI IS a human-machine hybrid: AI detects biases and measures noise, humans make the final call. Tetlock gives you the language: 'Process beats talent. Our platform ensures your team follows the process that produces better outcomes.'"
             startup="'Process beats talent' in one sentence IS your entire value proposition. Use Tetlock's authority to back this claim."
             actions={[
               'Add Tetlock citation to product philosophy page',
@@ -3097,13 +3112,13 @@ function ResearchFrameworks() {
             color="#3b82f6"
             link="https://www.heavybit.com/library/podcasts/platform-builders/ep-4-building-affinity-from-college-dropout-to-saas-leader-with-ray-zhou"
             insight="Built Affinity into late-eight-figure revenue CRM for PE/VC. Three lessons: (1) hundreds of problem-first conversations before building features, (2) founder-led onboarding for every early customer, (3) focus on problems closest to core business — tangential solutions get replaced when AI improves."
-            product="Decision quality in capital allocation is about as core as it gets for a fund. That's your moat vs. the 'AI assistant' tools that summarize documents — those are tangential, yours is fundamental."
-            startup="Personally onboard every pilot customer. Conduct 50+ discovery calls focused on 'how does your IC actually work?' not 'let me show you features.' Zhou's outsider advantage (didn't know the industry) forced better questions — use yours the same way."
+            product="Decision quality is about as core as it gets for any organization. That's your moat vs. the 'AI assistant' tools that summarize documents — those are tangential, yours is fundamental."
+            startup="Personally onboard every pilot customer. Conduct 50+ discovery calls focused on 'how does your team actually make major decisions?' not 'let me show you features.' Zhou's outsider advantage (didn't know the industry) forced better questions — use yours the same way."
             actions={[
               'Target 50 discovery calls before next feature sprint',
               'Personally onboard every pilot — no self-serve yet',
               'Document every onboarding as a playbook for future hires',
-              'Ask: "Walk me through your last IC meeting" in every call',
+              'Ask: "Walk me through your last major decision" in every call',
             ]}
           />
         </div>
@@ -3123,9 +3138,9 @@ function ResearchFrameworks() {
             link="https://www.theinvestorspodcast.com/millennial-investing/zero-to-one-lessons-from-peter-thiel-w-shawn-omalley/"
             insight='Contrarian question: "What important truth do very few people agree with you on?" Monopoly framework: dominate a small niche, then expand in concentric circles. Sales and distribution matter as much as product.'
             product={
-              'Your contrarian truth: "Investment committees think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: PE/VC IC decision quality. Your concentric expansion: PE/VC → M&A → FinServ → Enterprise.'
+              'Your contrarian truth: "Executive teams think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: enterprise decision quality. Your concentric expansion: Enterprise M&A/Strategy → PE/VC → FinServ → Horizontal.'
             }
-            startup="The best 16-agent pipeline means nothing if you can't get it in front of Managing Partners. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
+            startup="The best 16-agent pipeline means nothing if you can't get it in front of decision-makers. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
             actions={[
               'Write down your contrarian truth and use it in every pitch',
               'Map your concentric expansion circles (already in Market Strategy tab)',
@@ -3173,22 +3188,22 @@ function ResearchFrameworks() {
             {
               action: 'Reframe pitch from defensive to offensive',
               detail:
-                '"Swing with confidence" not "avoid mistakes." The best funds don\'t want a safety net — they want a decision quality amplifier.',
+                '"Swing with confidence" not "avoid mistakes." The best teams don\'t want a safety net — they want a decision quality amplifier.',
             },
             {
               action: 'Cite Strebulaev in marketing',
               detail:
-                'Academic credibility from Stanford GSB for blind priors and committee rooms. "Stanford research shows consensus-seeking ICs underperform."',
+                'Academic credibility from Stanford GSB for blind priors and committee rooms. "Stanford research shows consensus-seeking committees underperform."',
             },
             {
               action: 'Build Quick Scan mode',
               detail:
-                'Fast lane/slow lane. 30-second red flag scan before 4-minute full analysis. Matches actual VC workflow and reduces friction.',
+                'Fast lane/slow lane. 30-second red flag scan before 4-minute full analysis. Matches actual decision workflow and reduces friction.',
             },
             {
               action: 'Build longitudinal bias tracking',
               detail:
-                'Track bias drift across deal lifecycle. The follow-on memo should be MORE critical than the initial — is it? Nobody else will build this.',
+                'Track bias drift across project lifecycle. The follow-on assessment should be MORE critical than the initial — is it? Nobody else will build this.',
             },
           ].map((item, i) => (
             <div
@@ -3229,33 +3244,33 @@ function FounderPlaybook() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {[
             {
-              persona: 'Managing Partners',
-              hook: '"How do you measure IC decision quality today?"',
+              persona: 'Strategy Leaders',
+              hook: '"How do you measure decision quality today?"',
               pitch:
-                'Show DQI scoring across their last 10 deals. Highlight the deals with low scores that later underperformed.',
-              close: 'Free pilot: upload 3 recent IC memos and see the scores.',
+                'Show DQI scoring across their last 10 major decisions. Highlight the ones with low scores that later underperformed.',
+              close: 'Free pilot: upload 3 recent strategic documents and see the scores.',
             },
             {
-              persona: 'Deal Partners',
-              hook: '"When was the last time someone challenged the entry valuation thesis?"',
+              persona: 'M&A / Decision Owners',
+              hook: '"When was the last time someone challenged the core thesis?"',
               pitch:
-                'Demo the Boardroom Simulation on their own IC memo. The "Operating Partner" persona usually surfaces something nobody raised.',
+                'Demo the Boardroom Simulation on their own document. The "Risk Officer" persona usually surfaces something nobody raised.',
               close: 'Let them see their own blind spots in real-time.',
             },
             {
               persona: 'Risk / Compliance',
-              hook: '"How do you document decision rationale for LP reporting?"',
+              hook: '"How do you document decision rationale for stakeholder reporting?"',
               pitch:
-                'Show the compliance mapping + audit trail. FCA Consumer Duty is a real pain point for UK-regulated funds.',
+                'Show the compliance mapping + audit trail. Regulatory requirements are a real pain point for regulated organizations.',
               close:
                 'Compliance is the "vitamin" that gets you in the door; the bias detection is the "painkiller" that keeps them.',
             },
             {
-              persona: 'LP Relations',
-              hook: '"Do your fund reports pass the survivorship bias test?"',
+              persona: 'Board / Stakeholders',
+              hook: '"Do your reports pass the survivorship bias test?"',
               pitch:
-                'Upload a sample LP report — the platform will flag selective reporting, framing effects, and cherry-picked metrics.',
-              close: 'Position as LP transparency tool, not just IC tool.',
+                'Upload a sample board report — the platform will flag selective reporting, framing effects, and cherry-picked metrics.',
+              close: 'Position as decision transparency tool for the entire organization.',
             },
           ].map((item, i) => (
             <div
@@ -3699,10 +3714,10 @@ interface ChatMsg {
 }
 
 const STARTER_QUESTIONS = [
-  'Elevator pitch for a GP?',
-  'How do we beat DealCloud?',
+  'Elevator pitch for a CSO?',
+  'How do we beat competitors?',
   'What did Strebulaev say?',
-  'Demo script for IC meeting',
+  'Demo script for exec meeting',
 ];
 
 function FounderChatWidget() {
