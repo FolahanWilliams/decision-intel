@@ -508,7 +508,7 @@ SYNTHESIS (Sequential)
               paddingLeft: 14,
             }}
           >
-            <li>5 PE-specific IC personas auto-selected</li>
+            <li>5 role-specific personas auto-selected</li>
             <li>Individual votes: APPROVE / REJECT / REVISE</li>
             <li>Dissent patterns and minority concerns</li>
             <li>Custom personas with configurable risk tolerance</li>
@@ -1377,7 +1377,7 @@ function CompetitiveMoat() {
             },
             {
               name: 'DealCloud (Intapp)',
-              what: 'Deal management and pipeline CRM for PE/VC and enterprise. Tracks deal flow, pipeline stages, reporting.',
+              what: 'Deal management and pipeline CRM for enterprise and PE/VC. Tracks deal flow, pipeline stages, reporting.',
               gap: 'No cognitive analysis of IC materials. Tracks the deal, not the quality of the decision-making about the deal.',
               response:
                 '"DealCloud tracks your pipeline. We audit the decisions your pipeline produces. Upload the strategic document from DealCloud — we score it in 60 seconds."',
@@ -3086,14 +3086,14 @@ function ResearchFrameworks() {
             link="https://www.lennysnewsletter.com/p/how-to-become-a-category-pirate-christopher"
             insight="The company that creates a category captures 2/3 of the market value. Framework: 'Frame It, Name It, Claim It.' The 'better trap' — competing on being better within an existing category — is death."
             product={
-              'You\'re not building a "better CRM" or a "better DD tool." You\'re creating the category of Investment Decision Quality. Your DQI should become the term PE uses like IRR and MOIC. When someone says "What\'s the DQI on this memo?" in an IC meeting, you\'ve won. Lochhead calls this "languaging" — weaponizing vocabulary.'
+              'You\'re not building a "better CRM" or a "better DD tool." You\'re creating the category of Investment Decision Quality. Your DQI should become the term PE uses like IRR and MOIC. When someone says "What\'s the DQI on this memo?" in a strategy meeting or IC, you\'ve won. Lochhead calls this "languaging" — weaponizing vocabulary.'
             }
-            startup="Frame the problem (IC decisions are riddled with undetected bias and noise), name the solution (Decision Quality Index), claim the category (Decision Intel is the decision quality platform for capital allocators). This is your most important strategic task."
+            startup="Frame the problem (Strategic decisions are riddled with undetected bias and noise), name the solution (Decision Quality Index), claim the category (Decision Intel is the decision quality platform for capital allocators). This is your most important strategic task."
             actions={[
               'Make DQI the centerpiece term in all marketing',
               'Write a "Category Point of View" document (Lochhead framework)',
               'PR strategy: get DQI mentioned in PE trade publications',
-              'Blog series: "The Hidden Cost of Decision Noise in PE"',
+              'Blog series: "The Hidden Cost of Decision Noise in Enterprise Decisions"',
             ]}
           />
         </div>

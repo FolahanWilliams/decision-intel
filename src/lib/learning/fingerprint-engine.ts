@@ -2,7 +2,7 @@
  * Decision Fingerprint Engine — Contextual Cognitive Profile
  *
  * Detects contextual bias patterns: "Your team over-indexes on anchoring bias
- * in IC memo reviews during Q4." Provides predictive warnings when current
+ * in strategic document reviews during Q4." Provides predictive warnings when current
  * analysis conditions match historically bad patterns, and a longitudinal
  * fingerprint view spanning 8+ quarters.
  */

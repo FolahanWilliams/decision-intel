@@ -88,7 +88,7 @@ export async function analyzeDocument(
 
   // Run analysis within a transaction for atomicity
   try {
-    // Resolve deal context for PE/VC investment vertical
+    // Resolve project context for analysis
     let dealContext:
       | { documentType?: string; dealId?: string; dealType?: string; dealStage?: string }
       | undefined;

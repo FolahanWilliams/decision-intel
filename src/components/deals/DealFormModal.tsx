@@ -321,7 +321,7 @@ export function DealFormModal({ open, onOpenChange, deal, onSuccess }: DealFormM
               }}
             >
               {saving && <Loader2 size={14} className="animate-spin" />}
-              {isEdit ? 'Save Changes' : 'Create Deal'}
+              {isEdit ? 'Save Changes' : 'Create Project'}
             </button>
           </div>
         </div>

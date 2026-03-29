@@ -95,6 +95,9 @@ export async function POST(request: NextRequest) {
       'board_review',
       'deal_committee',
       'risk_committee',
+      'executive_committee',
+      'strategy_review',
+      'ma_committee',
       'general',
     ];
     const validType =

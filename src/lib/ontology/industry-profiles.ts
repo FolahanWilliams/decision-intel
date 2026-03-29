@@ -28,7 +28,7 @@ export interface IndustryProfile {
 export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
   financial_services: {
     industry: 'financial_services',
-    displayName: 'Financial Services (Banking, PE/VC, Insurance)',
+    displayName: 'Financial Services (Banking, Investment Management, Insurance)',
     additionalBiases: [
       {
         id: 'disposition_effect',
@@ -53,7 +53,7 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
         detectionPrompt:
           'Look for justifications based on what other firms, funds, or analysts are doing rather than independent thesis. Watch for "everyone is in this trade" or "the market consensus is" as primary reasoning.',
         exampleScenario:
-          'An investment committee approves a deal primarily because three competitor firms have already invested, without conducting independent due diligence on the target.',
+          'A financial services committee approves a transaction primarily because three competitor firms have already invested, without conducting independent due diligence.',
         riskMultiplier: 1.3,
       },
       {
@@ -105,7 +105,7 @@ export const INDUSTRY_PROFILES: Record<string, IndustryProfile> = {
         detectionPrompt:
           'Look for competitive bidding situations where the winning bid significantly exceeds intrinsic value estimates. Watch for "we had to increase our bid to win" or justification of premium multiples in a competitive process.',
         exampleScenario:
-          'A PE firm wins an auction by bidding 14x EBITDA when their initial model showed 10x as fair value, rationalizing the premium with "synergies" that never materialize.',
+          'A firm wins a competitive auction by bidding 14x EBITDA when their initial model showed 10x as fair value, rationalizing the premium with "synergies" that never materialize.',
         riskMultiplier: 1.4,
       },
     ],

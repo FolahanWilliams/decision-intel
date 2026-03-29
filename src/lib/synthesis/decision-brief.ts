@@ -68,7 +68,7 @@ function getSynthesisModel() {
 // Prompt
 // ---------------------------------------------------------------------------
 
-const DECISION_BRIEF_PROMPT = `You are a senior investment committee analyst synthesizing multiple document analyses into a comprehensive Decision Brief for a deal.
+const DECISION_BRIEF_PROMPT = `You are a senior decision analyst synthesizing multiple document analyses into a comprehensive Decision Brief.
 
 Given the analyses below, produce a single JSON object with this structure:
 {

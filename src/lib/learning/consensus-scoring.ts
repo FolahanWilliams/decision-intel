@@ -167,7 +167,7 @@ export function computeConsensusScore(priors: BlindPriorInput[]): ConsensusResul
   // Unanimity warning: Strebulaev (Stanford GSB, 2024) shows consensus-seeking ICs underperform
   const unanimityWarning = actionGroupCount <= 1 && priors.length >= 2;
   const unanimityMessage = unanimityWarning
-    ? `Unanimous agreement detected across all ${priors.length} committee members. Stanford research (Strebulaev, 2024) shows consensus-seeking investment committees have lower IPO rates. Consider: was genuine dissent suppressed, or is this a rare case of true alignment?`
+    ? `Unanimous agreement detected across all ${priors.length} committee members. Stanford research (Strebulaev, 2024) shows consensus-seeking committees have lower success rates. Consider: was genuine dissent suppressed, or is this a rare case of true alignment?`
     : null;
 
   log.debug(
