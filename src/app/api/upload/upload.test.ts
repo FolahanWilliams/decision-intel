@@ -41,6 +41,11 @@ vi.mock('@/lib/utils/rate-limit', () => ({
   checkRateLimit: (...args: unknown[]) => mockCheckRateLimit(...args),
 }));
 
+const mockCheckAnalysisLimit = vi.fn();
+vi.mock('@/lib/utils/plan-limits', () => ({
+  checkAnalysisLimit: (...args: unknown[]) => mockCheckAnalysisLimit(...args),
+}));
+
 const mockParseFile = vi.fn();
 vi.mock('@/lib/utils/file-parser', () => ({
   parseFile: (...args: unknown[]) => mockParseFile(...args),
@@ -101,6 +106,12 @@ beforeEach(() => {
     limit: 5,
     remaining: 4,
     reset: Date.now(),
+  });
+  mockCheckAnalysisLimit.mockResolvedValue({
+    allowed: true,
+    plan: 'free',
+    used: 0,
+    limit: 10,
   });
   mockDocFindFirst.mockResolvedValue(null); // no cache hit
   mockSupabaseUpload.mockResolvedValue({ error: null });
