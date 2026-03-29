@@ -312,6 +312,20 @@ export async function analyzeDocument(
       );
     }
 
+    // Store section-level embeddings for cross-document RAG (non-blocking)
+    try {
+      const { chunkIntoSections, storeSectionEmbeddings } =
+        await import('@/lib/rag/section-embeddings');
+      const plainContent = getDocumentContent(document);
+      const sections = chunkIntoSections(plainContent, document.filename);
+      await storeSectionEmbeddings(documentId, sections);
+    } catch (sectionError) {
+      log.warn(
+        'Failed to store section embeddings (non-critical): ' +
+          (sectionError instanceof Error ? sectionError.message : String(sectionError))
+      );
+    }
+
     // Toxic Combination Detection (non-blocking, fire-and-forget)
     try {
       const savedAnalysis = await prisma.analysis.findFirst({

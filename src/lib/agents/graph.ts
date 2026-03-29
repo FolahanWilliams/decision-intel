@@ -26,6 +26,7 @@ import {
   NarrativePreMortem,
 } from '@/types';
 import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
+import { type CrossDocContext } from '@/lib/rag/cross-document-context';
 
 // Define the State using Annotation.Root
 const GraphState = Annotation.Root({
@@ -146,6 +147,10 @@ const GraphState = Annotation.Root({
     default: () => null,
   }),
   intelligenceContext: Annotation<IntelligenceContext | undefined>({
+    reducer: (x, y) => y ?? x,
+    default: () => undefined,
+  }),
+  crossDocContext: Annotation<CrossDocContext | undefined>({
     reducer: (x, y) => y ?? x,
     default: () => undefined,
   }),
