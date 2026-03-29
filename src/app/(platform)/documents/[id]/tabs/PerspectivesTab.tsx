@@ -18,7 +18,18 @@ interface PerspectivesTabProps {
     imageUrl?: string | null;
   };
   // Boardroom props
-  simulation?: any;
+  simulation?: {
+    overallVerdict: 'APPROVED' | 'REJECTED' | 'MIXED';
+    twins: Array<{
+      name: string;
+      role: string;
+      vote: 'APPROVE' | 'REJECT' | 'REVISE';
+      confidence: number;
+      rationale: string;
+      keyRiskIdentified?: string;
+      feedback?: string;
+    }>;
+  };
   orgId?: string;
   hasOutcome?: boolean;
   // Simulator props
