@@ -405,15 +405,15 @@ pre {
   font-variant-numeric: tabular-nums;
 }
 
-/* Layout */
+/* Layout — fluid container that adapts to screen size */
 .container {
   width: 100% !important;
-  max-width: 1400px !important;
+  max-width: clamp(640px, 90%, 1600px) !important;
   margin-left: auto !important;
   margin-right: auto !important;
   margin-inline: auto !important;
-  padding-left: 2rem !important;
-  padding-right: 2rem !important;
+  padding-left: clamp(1rem, 2vw, 3rem) !important;
+  padding-right: clamp(1rem, 2vw, 3rem) !important;
   box-sizing: border-box !important;
 }
 
@@ -1688,12 +1688,32 @@ tr:hover td {
    Responsive Grids
    ═══════════════════════════════════════════ */
 @layer base {
+  /* Ultra-wide: expand grids to use available space */
+  @media (min-width: 1800px) {
+    .grid-3 { grid-template-columns: repeat(4, 1fr); }
+    .grid-4 { grid-template-columns: repeat(5, 1fr); }
+    .grid-5 { grid-template-columns: repeat(6, 1fr); }
+  }
+
+  @media (min-width: 1400px) and (max-width: 1799px) {
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-5 { grid-template-columns: repeat(5, 1fr); }
+  }
+
+  /* Tablet/small laptop: reduce columns */
   @media (max-width: 1024px) {
     .grid-4 { grid-template-columns: repeat(2, 1fr); }
     .grid-5 { grid-template-columns: repeat(3, 1fr); }
     .grid-3 { grid-template-columns: repeat(2, 1fr); }
   }
 
+  @media (max-width: 768px) {
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* Mobile: single column */
   @media (max-width: 640px) {
     .grid-4 { grid-template-columns: 1fr; }
     .grid-5 { grid-template-columns: repeat(2, 1fr); }
