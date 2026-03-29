@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('BiasBriefing');
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -59,7 +62,7 @@ export default function BiasBriefing({ analysisId, roomTitle }: BiasBriefingProp
           });
         }
       })
-      .catch(err => console.warn('Failed to fetch bias briefing:', err))
+      .catch(err => log.warn('Failed to fetch bias briefing:', err))
       .finally(() => setLoading(false));
   }, [analysisId]);
 

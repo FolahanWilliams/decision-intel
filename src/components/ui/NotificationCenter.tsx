@@ -10,7 +10,10 @@ import {
   ReactNode,
 } from 'react';
 import { Bell, FileText, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { createClientLogger } from '@/lib/utils/logger';
 import Link from 'next/link';
+
+const log = createClientLogger('NotificationCenter');
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,7 +85,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       })
       .catch(err => {
         // Log fetch failures so they're not silently swallowed
-        console.warn('Failed to fetch notifications:', err instanceof Error ? err.message : err);
+        log.warn('Failed to fetch notifications:', err instanceof Error ? err.message : err);
       });
   }, []);
 

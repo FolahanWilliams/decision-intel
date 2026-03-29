@@ -18,9 +18,12 @@ import {
   Code,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { createClientLogger } from '@/lib/utils/logger';
 import { Button } from '@/components/ui/button';
 import { useDensity } from '@/components/DensityProvider';
 import html2canvas from 'html2canvas';
+
+const log = createClientLogger('ChartWrapper');
 
 interface ChartToolbarAction {
   id: string;
@@ -116,7 +119,7 @@ export function InteractiveChartWrapper({
           a.download = `${title || 'chart'}-${Date.now()}.png`;
           a.click();
         } catch (error) {
-          console.error('Failed to export chart:', error);
+          log.error('Failed to export chart:', error);
         }
       } else if (format === 'svg' && chartRef.current) {
         try {
@@ -135,11 +138,11 @@ export function InteractiveChartWrapper({
             onExport?.(format);
           }
         } catch (error) {
-          console.error('Failed to export SVG:', error);
+          log.error('Failed to export SVG:', error);
         }
       } else {
         if (!onExport) {
-          console.warn(
+          log.warn(
             `No export handler provided for format: ${format}. Pass an onExport callback to handle ${format} exports.`
           );
         }

@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation';
 import { ChevronRight, Home, FileText, Brain, BarChart3, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('Breadcrumbs');
 
 interface BreadcrumbItem {
   label: string;
@@ -99,7 +102,7 @@ export function EnhancedBreadcrumbs() {
 
         setDynamicTitles(prev => ({ ...prev, [loadingKey]: title }));
       } catch (error) {
-        console.error('Failed to fetch dynamic title:', error);
+        log.error('Failed to fetch dynamic title:', error);
       } finally {
         setLoading(prev => {
           const next = new Set(prev);

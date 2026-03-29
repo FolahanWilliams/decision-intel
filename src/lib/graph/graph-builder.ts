@@ -427,6 +427,8 @@ export async function buildDecisionGraph(params: {
             impactScore: true,
             reportedAt: true,
           },
+          orderBy: { reportedAt: 'desc' },
+          take: safeLimit,
         })
       : [];
 

@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('CalibrationScorecard');
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -73,7 +76,7 @@ export default function CalibrationScorecard({
           });
         }
       })
-      .catch(err => console.warn('Failed to fetch calibration stats:', err))
+      .catch(err => log.warn('Failed to fetch calibration stats:', err))
       .finally(() => setLoading(false));
   }, [orgId, timeRange]);
 
