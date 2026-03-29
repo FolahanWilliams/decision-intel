@@ -158,6 +158,7 @@ export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>(
     'all'
   );
+  const [showCharts, setShowCharts] = useState(false);
   const [showTrend, setShowTrend] = useState(false);
   const [showComparative, setShowComparative] = useState(false);
   const [docsPage, setDocsPage] = useState(1);
@@ -998,19 +999,42 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
-          <ErrorBoundary sectionName="Dashboard Charts">
-            <DashboardCharts
-              riskDistribution={{
-                highRisk: riskSummary.high,
-                mediumRisk: riskSummary.medium,
-                lowRisk: riskSummary.low,
-              }}
-              scoreTrend={scoreTrendData}
-              topBiases={topBiases}
-              totalAnalyzed={riskSummary.total}
-              avgScore={riskSummary.avg}
-            />
-          </ErrorBoundary>
+          <div className="card mb-xl">
+            <button
+              onClick={() => setShowCharts(prev => !prev)}
+              className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+              aria-expanded={showCharts}
+            >
+              <h3 className="flex items-center gap-2 text-base">
+                <BarChart3 size={18} style={{ color: 'var(--text-secondary)' }} />
+                Portfolio Overview
+                <span className="text-xs text-muted font-normal">
+                  ({riskSummary.total} analyzed)
+                </span>
+              </h3>
+              <ChevronRight
+                size={18}
+                className={`text-muted transition-transform ${showCharts ? 'rotate-90' : ''}`}
+              />
+            </button>
+            {showCharts && (
+              <div className="card-body pt-0">
+                <ErrorBoundary sectionName="Dashboard Charts">
+                  <DashboardCharts
+                    riskDistribution={{
+                      highRisk: riskSummary.high,
+                      mediumRisk: riskSummary.medium,
+                      lowRisk: riskSummary.low,
+                    }}
+                    scoreTrend={scoreTrendData}
+                    topBiases={topBiases}
+                    totalAnalyzed={riskSummary.total}
+                    avgScore={riskSummary.avg}
+                  />
+                </ErrorBoundary>
+              </div>
+            )}
+          </div>
         </motion.div>
       )}
 

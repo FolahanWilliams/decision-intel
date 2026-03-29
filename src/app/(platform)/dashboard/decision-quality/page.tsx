@@ -2,22 +2,29 @@
 
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { BrainCircuit, Bell } from 'lucide-react';
+import { BrainCircuit, Bell, Target, FlaskConical } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TabBar } from '@/components/ui/TabBar';
 import { AuditsPageContent } from '@/components/audits/AuditsPageContent';
 import { NudgesPageContent } from '@/components/nudges/NudgesPageContent';
+import { CalibrationContent } from '@/components/calibration/CalibrationContent';
+import { ExperimentsContent } from '@/components/experiments/ExperimentsContent';
 
 const TABS = [
   { key: 'audits', label: 'Audits', icon: <BrainCircuit size={15} /> },
   { key: 'nudges', label: 'Nudges', icon: <Bell size={15} /> },
+  { key: 'calibration', label: 'Calibration', icon: <Target size={15} /> },
+  { key: 'experiments', label: 'Experiments', icon: <FlaskConical size={15} /> },
 ];
+
+const VALID_TABS = new Set(['audits', 'nudges', 'calibration', 'experiments']);
 
 function DecisionQualityInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const tab = searchParams.get('tab') === 'nudges' ? 'nudges' : 'audits';
+  const rawTab = searchParams.get('tab') ?? 'audits';
+  const tab = VALID_TABS.has(rawTab) ? rawTab : 'audits';
 
   return (
     <div>
@@ -30,7 +37,9 @@ function DecisionQualityInner() {
             <BrainCircuit size={28} style={{ color: 'var(--accent-primary)' }} />
             <h1>Decision Quality</h1>
           </div>
-          <p className="text-muted">Audit human decision quality and track behavioral nudges</p>
+          <p className="text-muted">
+            Audits, nudges, personal calibration, and A/B prompt experiments
+          </p>
         </header>
         <TabBar
           tabs={TABS}
@@ -41,7 +50,10 @@ function DecisionQualityInner() {
         />
       </div>
       <div style={{ marginTop: 'var(--spacing-md)' }}>
-        {tab === 'audits' ? <AuditsPageContent /> : <NudgesPageContent />}
+        {tab === 'audits' && <AuditsPageContent />}
+        {tab === 'nudges' && <NudgesPageContent />}
+        {tab === 'calibration' && <CalibrationContent />}
+        {tab === 'experiments' && <ExperimentsContent />}
       </div>
     </div>
   );

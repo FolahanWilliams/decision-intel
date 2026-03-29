@@ -10,7 +10,6 @@ import {
   BarChart3,
   Menu,
   X,
-  ClipboardList,
   Search,
   ChevronLeft,
   LogOut as LogOutIcon,
@@ -24,13 +23,8 @@ import {
   Plus,
   ChevronRight as ChevronR,
   PenLine,
-  Lightbulb,
   Plug,
   Briefcase,
-  Target,
-  Vote,
-  Fingerprint,
-  FlaskConical,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -42,7 +36,7 @@ export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     Reference: true,
-    System: true,
+    'Team & Settings': true,
   });
 
   // Persist collapsed sections to localStorage
@@ -333,7 +327,7 @@ export default function Sidebar() {
             {!collapsed && <span>New Decision</span>}
           </button>
 
-          <SectionLabel collapsed={collapsed}>Platform</SectionLabel>
+          <SectionLabel collapsed={collapsed}>Core</SectionLabel>
           <NavItem
             href="/dashboard"
             icon={<LayoutDashboard size={18} />}
@@ -381,9 +375,12 @@ export default function Sidebar() {
             href="/dashboard/analytics"
             icon={<BarChart3 size={18} />}
             label="Analytics"
-            description="Trends, insights & decision DNA"
+            description="Trends, DNA, explainability & fingerprint"
             active={
-              pathname.startsWith('/dashboard/analytics') || pathname === '/dashboard/insights'
+              pathname.startsWith('/dashboard/analytics') ||
+              pathname === '/dashboard/insights' ||
+              pathname.startsWith('/dashboard/explainability') ||
+              pathname.startsWith('/dashboard/fingerprint')
             }
             collapsed={collapsed}
             onNavigate={closeMobile}
@@ -397,80 +394,40 @@ export default function Sidebar() {
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
-          <NavItem
-            href="/dashboard/search"
-            icon={<Search size={18} />}
-            label="Search"
-            description="Semantic search across documents"
-            active={pathname === '/dashboard/search'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/explainability"
-            icon={<Lightbulb size={18} />}
-            label="Explainability"
-            description="Understand why scores are what they are"
-            active={pathname.startsWith('/dashboard/explainability')}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/fingerprint"
-            icon={<Fingerprint size={18} />}
-            label="Fingerprint"
-            description="Contextual cognitive profile"
-            active={pathname.startsWith('/dashboard/fingerprint')}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
 
           <SectionLabel collapsed={collapsed}>Decisions</SectionLabel>
           <NavItem
             href="/dashboard/decision-quality"
             icon={<BrainCircuit size={18} />}
             label="Decision Quality"
-            description="Audits & behavioral nudges"
+            description="Audits, nudges, calibration & experiments"
             active={
               pathname.startsWith('/dashboard/decision-quality') ||
-              pathname.startsWith('/dashboard/cognitive-audits')
+              pathname.startsWith('/dashboard/cognitive-audits') ||
+              pathname.startsWith('/calibration') ||
+              pathname.startsWith('/dashboard/experiments')
             }
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/calibration"
-            icon={<Target size={18} />}
-            label="Calibration"
-            description="Personal RPD calibration profile"
-            active={pathname.startsWith('/calibration')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
           <NavItem
             href="/dashboard/meetings"
             icon={<Video size={18} />}
-            label="Meetings"
-            description="Meeting recordings & transcripts"
-            active={pathname.startsWith('/dashboard/meetings')}
+            label="Meetings & Rooms"
+            description="Recordings, transcripts & decision rooms"
+            active={
+              pathname.startsWith('/dashboard/meetings') ||
+              pathname.startsWith('/dashboard/decision-rooms')
+            }
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
           <NavItem
-            href="/dashboard/decision-rooms"
-            icon={<Vote size={18} />}
-            label="Decision Rooms"
-            description="Collaborative decision spaces"
-            active={pathname.startsWith('/dashboard/decision-rooms')}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/experiments"
-            icon={<FlaskConical size={18} />}
-            label="Experiments"
-            description="A/B test nudge effectiveness"
-            active={pathname.startsWith('/dashboard/experiments')}
+            href="/dashboard/journal"
+            icon={<PenLine size={18} />}
+            label="Decision Journal"
+            description="Record and reflect on decisions"
+            active={pathname === '/dashboard/journal'}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
@@ -499,39 +456,20 @@ export default function Sidebar() {
               collapsed={collapsed}
               onNavigate={closeMobile}
             />
-            <NavItem
-              href="/dashboard/journal"
-              icon={<PenLine size={18} />}
-              label="Journal"
-              description="Decision journal entries"
-              active={pathname === '/dashboard/journal'}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
           </CollapsibleSection>
 
-          <SectionLabel collapsed={collapsed}>Collaboration</SectionLabel>
-          <NavItem
-            href="/dashboard/team"
-            icon={<Users size={18} />}
-            label="Team"
-            description="Manage your team and invites"
-            active={pathname === '/dashboard/team'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-
           <CollapsibleSection
-            label="System"
+            label="Team & Settings"
             collapsed={collapsed}
-            isOpen={!collapsedSections.System}
-            onToggle={() => toggleSection('System')}
+            isOpen={!collapsedSections['Team & Settings']}
+            onToggle={() => toggleSection('Team & Settings')}
           >
             <NavItem
-              href="/dashboard/audit-log"
-              icon={<ClipboardList size={18} />}
-              label="Audit Log"
-              active={pathname === '/dashboard/audit-log'}
+              href="/dashboard/team"
+              icon={<Users size={18} />}
+              label="Team"
+              description="Manage your team and invites"
+              active={pathname === '/dashboard/team'}
               collapsed={collapsed}
               onNavigate={closeMobile}
             />
@@ -547,7 +485,7 @@ export default function Sidebar() {
               href="/dashboard/settings"
               icon={<Settings size={18} />}
               label="Settings"
-              active={pathname === '/dashboard/settings'}
+              active={pathname === '/dashboard/settings' || pathname === '/dashboard/audit-log'}
               collapsed={collapsed}
               onNavigate={closeMobile}
             />

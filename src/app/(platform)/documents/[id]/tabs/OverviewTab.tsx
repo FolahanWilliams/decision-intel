@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BiasInstance } from '@/types';
+import { BiasInstance, RecognitionCuesResult, NarrativePreMortem } from '@/types';
 import { formatDate } from '@/lib/utils/format-date';
-import { Brain, Lightbulb, ExternalLink, BarChart3 } from 'lucide-react';
+import { Brain, Lightbulb, ExternalLink, BarChart3, Eye, ChevronDown } from 'lucide-react';
 import { DocumentTextHighlighter } from '@/components/visualizations/DocumentTextHighlighter';
 import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline';
 import { BiasNetwork } from '@/components/visualizations/BiasNetwork';
@@ -52,6 +52,8 @@ interface OverviewTabProps {
   analysisCreatedAt?: string;
   analysisId?: string;
   compoundAdjustments?: Array<{ source: string; delta: number; description: string }>;
+  recognitionCues?: RecognitionCuesResult;
+  narrativePreMortem?: NarrativePreMortem;
 }
 
 const SEVERITY_BADGE_STYLES: Record<string, string> = {
@@ -75,7 +77,11 @@ export function OverviewTab({
   analysisCreatedAt,
   analysisId,
   compoundAdjustments,
+  recognitionCues,
+  narrativePreMortem,
 }: OverviewTabProps) {
+  const [showRpd, setShowRpd] = useState(false);
+  const hasRpd = !!(recognitionCues || narrativePreMortem);
   // Fetch historical bias frequencies for sparklines
   const [biasFrequencies, setBiasFrequencies] = useState<Record<string, BiasFrequencyData> | null>(
     null
@@ -324,6 +330,98 @@ export function OverviewTab({
           )}
         </div>
       </div>
+
+      {/* Pattern Recognition (RPD) — collapsible, conditional */}
+      {hasRpd && (
+        <div className="card mt-lg">
+          <button
+            onClick={() => setShowRpd(prev => !prev)}
+            className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
+            aria-expanded={showRpd}
+          >
+            <h3 className="flex items-center gap-2 text-base">
+              <Eye size={18} style={{ color: 'var(--accent-primary)' }} />
+              Pattern Recognition (RPD)
+            </h3>
+            <ChevronDown
+              size={16}
+              className={`text-muted transition-transform ${showRpd ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {showRpd && (
+            <div className="card-body">
+              {recognitionCues && (
+                <div style={{ marginBottom: 'var(--spacing-lg)' }}>
+                  <h4 className="text-sm font-semibold mb-md">Recognition Cues</h4>
+                  <p className="text-xs text-muted mb-sm">
+                    Pattern: {recognitionCues.patternMatch} (confidence:{' '}
+                    {Math.round(recognitionCues.confidenceLevel * 100)}%)
+                  </p>
+                  {recognitionCues.cues && recognitionCues.cues.length > 0 ? (
+                    <div className="space-y-2">
+                      {recognitionCues.cues.map((cue, i) => (
+                        <div
+                          key={i}
+                          className="p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg"
+                        >
+                          <div className="text-sm font-medium text-blue-300">{cue.title}</div>
+                          <p className="text-xs text-muted mt-1">{cue.description}</p>
+                          {cue.outcome && (
+                            <span
+                              className={`text-xs mt-1 inline-block ${cue.outcome === 'SUCCESS' ? 'text-emerald-400' : cue.outcome === 'FAILURE' ? 'text-red-400' : 'text-amber-400'}`}
+                            >
+                              Historical outcome: {cue.outcome}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted">
+                      No strong recognition cues detected in this document.
+                    </p>
+                  )}
+                  {recognitionCues.expertHeuristic && (
+                    <p className="text-xs text-muted mt-sm italic">
+                      Expert heuristic: {recognitionCues.expertHeuristic}
+                    </p>
+                  )}
+                </div>
+              )}
+              {narrativePreMortem && (
+                <div>
+                  <h4 className="text-sm font-semibold mb-md">Narrative Pre-Mortem</h4>
+                  {narrativePreMortem.warStories && narrativePreMortem.warStories.length > 0 ? (
+                    <div className="space-y-2">
+                      {narrativePreMortem.warStories.map((story, i) => (
+                        <div
+                          key={i}
+                          className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg"
+                        >
+                          <div className="text-sm font-medium text-amber-300">{story.title}</div>
+                          <p className="text-xs text-muted mt-1">{story.narrative}</p>
+                          <div className="flex items-center gap-md mt-1">
+                            <span className="text-xs text-muted">
+                              Probability: {story.probability}
+                            </span>
+                            {story.keyTakeaway && (
+                              <span className="text-xs text-emerald-400">
+                                Takeaway: {story.keyTakeaway}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted">No pre-mortem scenarios generated.</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
