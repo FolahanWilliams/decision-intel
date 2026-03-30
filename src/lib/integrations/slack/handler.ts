@@ -892,6 +892,8 @@ export async function publishAppHome(slackUserId: string, teamId?: string): Prom
   }
 
   // Fetch data for App Home
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
+
   const blocks: Array<Record<string, unknown>> = [
     {
       type: 'header',
@@ -970,27 +972,85 @@ export async function publishAppHome(slackUserId: string, teamId?: string): Prom
     });
 
     if (recentDecisions.length === 0) {
-      blocks.push({
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: '_No decisions captured yet. Start discussing decisions in channels where the bot is invited._',
+      // Getting-started guide for new workspaces
+      blocks.push(
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: ':wave: *Welcome to Decision Intel!*\nI help your team make better decisions by detecting cognitive biases in real-time.',
+          },
         },
-      });
+        { type: 'divider' },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: '*Get started in 3 steps:*\n\n:one: *Invite me to a channel* — Add me to channels where decisions happen (e.g. #strategy, #deal-review)\n\n:two: *Discuss a decision naturally* — When I detect a committed decision ("let\'s approve...", "we\'re going with..."), I\'ll audit it for biases\n\n:three: *Review your analysis* — Get a bias score, top risks, and actionable suggestions right in the thread',
+          },
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: ':zap: *Try it now:* Type `/di score We should go with the cheaper vendor since we already invested heavily in evaluating them` in any channel to see bias detection in action.',
+          },
+        },
+        {
+          type: 'actions',
+          elements: [
+            {
+              type: 'button',
+              text: { type: 'plain_text', text: 'Open Dashboard' },
+              url: `${appUrl}/dashboard`,
+              style: 'primary',
+            },
+            {
+              type: 'button',
+              text: { type: 'plain_text', text: 'View Bias Library' },
+              url: `${appUrl}/dashboard/bias-library`,
+            },
+          ],
+        }
+      );
     } else {
       for (const d of recentDecisions) {
         const score = d.cognitiveAudit?.decisionQualityScore;
         const scoreStr = score != null ? `${score}/100` : 'Pending';
+        const scoreEmoji = score != null ? (score >= 70 ? ':large_green_circle:' : score >= 40 ? ':large_yellow_circle:' : ':red_circle:') : ':white_circle:';
         const title = d.content.slice(0, 60) + (d.content.length > 60 ? '...' : '');
         const type = d.decisionType ? ` · ${d.decisionType.replace(/_/g, ' ')}` : '';
         blocks.push({
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `*${scoreStr}* — ${title}${type}`,
+            text: `${scoreEmoji} *${scoreStr}* — ${title}${type}`,
+          },
+          accessory: {
+            type: 'button',
+            text: { type: 'plain_text', text: 'View' },
+            url: `${appUrl}/dashboard/decision-quality`,
+            action_id: `view_decision_${d.id}`,
           },
         });
       }
+
+      // "View All" button after decisions list
+      blocks.push({
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'View All Decisions' },
+            url: `${appUrl}/dashboard/decision-quality`,
+          },
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'Report Outcome' },
+            url: `${appUrl}/dashboard/outcome-flywheel`,
+          },
+        ],
+      });
     }
   } catch {
     blocks.push({
@@ -1025,7 +1085,6 @@ export async function publishAppHome(slackUserId: string, teamId?: string): Prom
   }
 
   // Open Dashboard button
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
   blocks.push(
     { type: 'divider' },
     {

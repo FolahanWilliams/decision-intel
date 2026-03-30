@@ -69,11 +69,37 @@ export async function POST(req: NextRequest) {
 
     // Handle event callbacks
     if (payload.type === 'event_callback') {
-      // App Home tab opened
+      // App Home tab opened — always process (not channel-specific)
       if (payload.event?.type === 'app_home_opened' && payload.event?.tab === 'home') {
         void publishAppHome(payload.event.user, payload.team_id).catch(err => {
           log.warn('App Home publish failed:', err);
         });
+        return NextResponse.json({ ok: true });
+      }
+
+      // ── Channel gating: skip processing if channel is not monitored ──
+      const eventChannel = payload.event?.channel;
+      const teamId = payload.team_id;
+      let installationConfig: { monitoredChannels: string[]; nudgeFrequency: string } | null = null;
+
+      if (teamId) {
+        try {
+          installationConfig = await prisma.slackInstallation.findFirst({
+            where: { teamId, status: 'active' },
+            select: { monitoredChannels: true, nudgeFrequency: true },
+          });
+        } catch {
+          // Schema drift — columns may not exist yet; treat as "monitor all"
+        }
+      }
+
+      // If monitoredChannels is configured (non-empty) and this channel isn't in the list, skip
+      if (
+        installationConfig?.monitoredChannels &&
+        installationConfig.monitoredChannels.length > 0 &&
+        eventChannel &&
+        !installationConfig.monitoredChannels.includes(eventChannel)
+      ) {
         return NextResponse.json({ ok: true });
       }
 
@@ -157,7 +183,7 @@ export async function POST(req: NextRequest) {
                   // Run audit in background, then post summary card to thread
                   const decisionInputForAudit = slackEventToDecisionInput(payload);
                   if (decisionInputForAudit) {
-                    processSlackDecision(humanDecision.id, decisionInputForAudit, teamId)
+                    processSlackDecision(humanDecision.id, decisionInputForAudit, teamId, installationConfig?.nudgeFrequency)
                       .then(auditResult => {
                         if (auditResult) {
                           const summaryCard = formatAuditSummaryForSlack(
@@ -203,20 +229,27 @@ export async function POST(req: NextRequest) {
 
                   if (nudge) {
                     const severity = escalated || nudge.severity;
-                    const slackPayload = formatNudgeForSlack(
-                      {
-                        nudgeType: 'pre_decision_coaching',
-                        triggerReason: `New biases: ${newBiases.map(b => b.bias).join(', ')}`,
-                        message: nudge.message,
-                        severity,
-                        channel: 'slack',
-                      },
-                      threadTs
-                    );
-                    slackPayload.channel = threadChannel;
-                    deliverSlackNudge(slackPayload, payload.team_id).catch(err => {
-                      log.error('Thread nudge delivery failed:', err);
-                    });
+                    // Gate by nudgeFrequency config
+                    const freq = installationConfig?.nudgeFrequency || 'normal';
+                    const shouldDeliver =
+                      freq === 'normal' || (freq === 'quiet' && severity === 'critical');
+
+                    if (shouldDeliver) {
+                      const slackPayload = formatNudgeForSlack(
+                        {
+                          nudgeType: 'pre_decision_coaching',
+                          triggerReason: `New biases: ${newBiases.map(b => b.bias).join(', ')}`,
+                          message: nudge.message,
+                          severity,
+                          channel: 'slack',
+                        },
+                        threadTs
+                      );
+                      slackPayload.channel = threadChannel;
+                      deliverSlackNudge(slackPayload, payload.team_id).catch(err => {
+                        log.error('Thread nudge delivery failed:', err);
+                      });
+                    }
                   }
 
                   // Accumulate biases on the frame
@@ -428,7 +461,6 @@ export async function POST(req: NextRequest) {
       }
 
       // Look up workspace installation for multi-tenant support
-      const teamId = payload.team_id;
       let installation: { installedByUserId: string; orgId: string | null } | null = null;
 
       if (teamId) {
@@ -477,7 +509,7 @@ export async function POST(req: NextRequest) {
       });
 
       // Run audit in background (don't block Slack's 3-second timeout)
-      processSlackDecision(humanDecision.id, decisionInput, teamId).catch(err => {
+      processSlackDecision(humanDecision.id, decisionInput, teamId, installationConfig?.nudgeFrequency).catch(err => {
         log.error(`Background Slack audit failed for ${humanDecision.id}:`, err);
       });
 
@@ -495,7 +527,8 @@ export async function POST(req: NextRequest) {
 async function processSlackDecision(
   decisionId: string,
   input: Parameters<typeof analyzeHumanDecision>[0],
-  teamId?: string
+  teamId?: string,
+  nudgeFrequency?: string
 ): Promise<{
   decisionQualityScore: number;
   noiseScore: number;
@@ -585,10 +618,18 @@ async function processSlackDecision(
           return null;
         });
 
-      // Deliver critical/warning nudges back to the Slack thread
+      // Deliver nudges back to the Slack thread (gated by nudgeFrequency config)
+      const nudgeFreq = nudgeFrequency || 'normal';
+      const shouldDeliverNudge =
+        nudgeFreq === 'normal'
+          ? nudge.severity === 'critical' || nudge.severity === 'warning'
+          : nudgeFreq === 'quiet'
+            ? nudge.severity === 'critical'
+            : false; // 'off' = never deliver
+
       if (
         nudgeRecord &&
-        (nudge.severity === 'critical' || nudge.severity === 'warning') &&
+        shouldDeliverNudge &&
         sourceRef
       ) {
         const [channel, threadTs] = sourceRef.split(':');

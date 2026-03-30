@@ -379,9 +379,14 @@ async function handleBriefCommand(params: { userId: string; teamId: string }) {
         elements: [
           {
             type: 'button',
-            text: { type: 'plain_text', text: 'Open Dashboard' },
-            url: `${appUrl}/dashboard`,
+            text: { type: 'plain_text', text: 'Open Analytics' },
+            url: `${appUrl}/dashboard/analytics`,
             style: 'primary',
+          },
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'Decision Graph' },
+            url: `${appUrl}/dashboard/decision-graph`,
           },
           {
             type: 'button',
@@ -474,9 +479,37 @@ async function handleAnalyzeCommand(params: { channelId: string; userId: string;
       // Post audit card to channel
       void deliverSlackNudge(summaryCard, params.teamId).catch(() => {});
 
+      const analyzeActions: Array<Record<string, unknown>> = [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'View Full Analysis' },
+          url: `${appUrl}/dashboard/decision-quality`,
+          style: 'primary',
+        },
+      ];
+      if (copilotUrl) {
+        analyzeActions.push({
+          type: 'button',
+          text: { type: 'plain_text', text: 'Continue in Copilot' },
+          url: copilotUrl,
+        });
+      }
+
       return NextResponse.json({
         response_type: 'ephemeral',
-        text: `Audit results posted for the most recent decision (score: ${audit.decisionQualityScore}/100).`,
+        blocks: [
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: `:white_check_mark: Audit results posted for the most recent decision (score: *${audit.decisionQualityScore}/100*).`,
+            },
+          },
+          {
+            type: 'actions',
+            elements: analyzeActions,
+          },
+        ],
       });
     }
 
@@ -811,24 +844,31 @@ async function handleStatusCommand(params: { userId: string; teamId: string }) {
       );
     }
 
+    const statusActions: Array<Record<string, unknown>> = [
+      {
+        type: 'button',
+        text: { type: 'plain_text', text: 'Open Dashboard' },
+        url: `${appUrl}/dashboard`,
+        style: 'primary',
+      },
+      {
+        type: 'button',
+        text: { type: 'plain_text', text: 'Decision Quality' },
+        url: `${appUrl}/dashboard/decision-quality`,
+      },
+    ];
+
+    if (pendingCount > 0) {
+      statusActions.push({
+        type: 'button',
+        text: { type: 'plain_text', text: `Record Outcome (${pendingCount} pending)` },
+        url: `${appUrl}/dashboard/outcome-flywheel`,
+      });
+    }
+
     blocks.push(
       { type: 'divider' },
-      {
-        type: 'actions',
-        elements: [
-          {
-            type: 'button',
-            text: { type: 'plain_text', text: 'Open Dashboard' },
-            url: `${appUrl}/dashboard`,
-            style: 'primary',
-          },
-          {
-            type: 'button',
-            text: { type: 'plain_text', text: 'Decision Quality' },
-            url: `${appUrl}/dashboard/decision-quality`,
-          },
-        ],
-      }
+      { type: 'actions', elements: statusActions }
     );
 
     return NextResponse.json({
