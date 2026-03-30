@@ -465,6 +465,7 @@ export function CommandPalette() {
 
     const flat = result.flatMap(g => g.items);
     return { groups: result, flatItems: flat };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, recentDocItems, navCommands, actionCommands]);
 
   // Clamp selectedIndex

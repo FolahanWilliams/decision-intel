@@ -151,7 +151,7 @@ export async function GET() {
 
     // Flywheel health: what % of decisions have closed the outcome loop
     let totalDecisions = 0;
-    let outcomesLogged = outcomes.length;
+    const outcomesLogged = outcomes.length;
     try {
       totalDecisions = await prisma.analysis.count({
         where: orgId
