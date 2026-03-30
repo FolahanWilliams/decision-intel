@@ -47,7 +47,7 @@ const NODE_LABELS: Record<string, { label: string; description: string }> = {
   },
   biasDetective: {
     label: 'Bias Detection',
-    description: 'Analyzing for 15 cognitive biases with research verification…',
+    description: 'Analyzing for 20 cognitive biases with research verification…',
   },
   noiseJudge: {
     label: 'Noise Analysis',

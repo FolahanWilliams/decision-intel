@@ -295,6 +295,8 @@ model SlackInstallation {
   botTokenTag       String
   botUserId         String?
   scopes            String[]
+  monitoredChannels String[]  @default([])
+  nudgeFrequency    String    @default("normal")
   status            String    @default("active")
   revokedAt         DateTime?
   createdAt         DateTime  @default(now())

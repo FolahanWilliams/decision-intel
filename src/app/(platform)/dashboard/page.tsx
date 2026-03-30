@@ -537,7 +537,7 @@ export default function Dashboard() {
       );
 
       setUploadPhase('analyzing');
-      setUploadProgress(0);
+      // Don't reset progress to 0 — the analysis stream will drive progress from here
 
       // If the server returned a cached result, skip streaming and
       // directly revalidate the SWR cache so the existing document
@@ -748,6 +748,8 @@ export default function Dashboard() {
             Quick Bias Check
           </button>
         </div>
+        {/* Only show view switcher when user has documents */}
+        {uploadedDocs.length > 0 && (
         <div
           style={{
             display: 'flex',
@@ -800,6 +802,7 @@ export default function Dashboard() {
             Browse &amp; Analyze
           </button>
         </div>
+        )}
       </div>
 
       {/* Hero KPI Cards */}
@@ -1147,6 +1150,9 @@ export default function Dashboard() {
         />
       )}
 
+      {/* Onboarding Guide — persists across view switches */}
+      <OnboardingGuide documentCount={totalDocs ?? 0} />
+
       {/* Decision Triage — top decisions needing attention */}
       <DecisionTriageWidget />
 
@@ -1165,88 +1171,104 @@ export default function Dashboard() {
       {/* ═══════ UPLOAD & MONITOR VIEW ═══════ */}
       {activeView === 'upload' && (
         <>
-          {/* Onboarding Guide for new users */}
-          <OnboardingGuide documentCount={totalDocs ?? 0} />
 
-          {/* Upload Confirmation Modal */}
-          <AnimatePresence>
-            {pendingFile && !uploading && (
-              <motion.div
-                className="card mb-xl"
-                style={{ borderColor: 'rgba(255, 255, 255, 0.15)' }}
-                initial={{ opacity: 0, y: -10, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.98 }}
-                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <div className="card-header" style={{ background: 'rgba(255, 255, 255, 0.06)' }}>
-                  <h3 className="flex items-center gap-sm text-sm">
-                    <FileText size={16} style={{ color: 'var(--text-highlight)' }} />
-                    Ready to Analyze
-                  </h3>
-                </div>
-                <div className="card-body">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-md">
-                      <div
-                        style={{
-                          width: 48,
-                          height: 48,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          background: 'var(--bg-tertiary)',
-                          border: '1px solid var(--border-color)',
-                        }}
-                      >
-                        <FileText size={24} className="text-accent-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{pendingFile.name}</p>
-                        <p className="text-xs text-muted">
-                          {(pendingFile.size / 1024).toFixed(1)} KB ·{' '}
-                          {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
-                        </p>
-                      </div>
+          {/* Upload Confirmation Dialog */}
+          <Dialog
+            open={!!pendingFile && !uploading}
+            onOpenChange={(isOpen: boolean) => {
+              if (!isOpen) {
+                setPendingFile(null);
+                setSelectedDocType('');
+                setSelectedDealId('');
+              }
+            }}
+          >
+            <DialogContent className="sm:max-w-md" showCloseButton>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-base">
+                  <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
+                  Ready to Analyze
+                </DialogTitle>
+                <DialogDescription>
+                  Review file details and optionally tag before analysis.
+                </DialogDescription>
+              </DialogHeader>
+
+              {pendingFile && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {/* File preview */}
+                  <div className="flex items-center gap-md" style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: 8, border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'var(--bg-tertiary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 8,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <FileText size={22} className="text-accent-primary" />
                     </div>
-                    {/* Document type + Deal selectors */}
-                    <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
+                    <div style={{ minWidth: 0 }}>
+                      <p className="font-medium text-sm" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pendingFile.name}</p>
+                      <p className="text-xs text-muted">
+                        {(pendingFile.size / 1024).toFixed(1)} KB ·{' '}
+                        {pendingFile.type || pendingFile.name.split('.').pop()?.toUpperCase()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Document type + Deal selectors — stacked for clarity */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div>
+                      <label className="text-xs text-muted font-medium" style={{ display: 'block', marginBottom: 4 }}>
+                        Document Type <span className="text-muted">(optional)</span>
+                      </label>
                       <select
                         value={selectedDocType}
                         onChange={e => setSelectedDocType(e.target.value)}
                         style={{
-                          padding: '6px 10px',
+                          width: '100%',
+                          padding: '8px 10px',
                           background: 'rgba(255, 255, 255, 0.06)',
                           border: '1px solid rgba(255, 255, 255, 0.12)',
-                          borderRadius: 6,
+                          borderRadius: 8,
                           color: 'var(--text-primary)',
-                          fontSize: 12,
+                          fontSize: 13,
                           outline: 'none',
-                          minWidth: 130,
                         }}
                       >
-                        <option value="">Document Type</option>
+                        <option value="">Select type...</option>
                         {DOCUMENT_TYPES.map(t => (
                           <option key={t.value} value={t.value}>
                             {t.label}
                           </option>
                         ))}
                       </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted font-medium" style={{ display: 'block', marginBottom: 4 }}>
+                        Link to Deal <span className="text-muted">(optional)</span>
+                      </label>
                       <select
                         value={selectedDealId}
                         onChange={e => setSelectedDealId(e.target.value)}
                         style={{
-                          padding: '6px 10px',
+                          width: '100%',
+                          padding: '8px 10px',
                           background: 'rgba(255, 255, 255, 0.06)',
                           border: '1px solid rgba(255, 255, 255, 0.12)',
-                          borderRadius: 6,
+                          borderRadius: 8,
                           color: 'var(--text-primary)',
-                          fontSize: 12,
+                          fontSize: 13,
                           outline: 'none',
-                          minWidth: 140,
                         }}
                       >
-                        <option value="">Link to Deal</option>
+                        <option value="">Select deal...</option>
                         {dealsList.map(d => (
                           <option key={d.id} value={d.id}>
                             {d.name}
@@ -1254,31 +1276,32 @@ export default function Dashboard() {
                         ))}
                       </select>
                     </div>
-
-                    <div className="flex items-center gap-sm" style={{ marginTop: 12 }}>
-                      <button
-                        onClick={() => {
-                          setPendingFile(null);
-                          setSelectedDocType('');
-                          setSelectedDealId('');
-                        }}
-                        className="btn btn-ghost text-sm"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={confirmUpload}
-                        className="btn btn-primary flex items-center gap-sm"
-                      >
-                        <Brain size={16} />
-                        Start Analysis
-                      </button>
-                    </div>
                   </div>
+
+                  {/* Actions */}
+                  <DialogFooter>
+                    <button
+                      onClick={() => {
+                        setPendingFile(null);
+                        setSelectedDocType('');
+                        setSelectedDealId('');
+                      }}
+                      className="btn btn-ghost text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={confirmUpload}
+                      className="btn btn-primary flex items-center gap-sm"
+                    >
+                      <Brain size={16} />
+                      Start Analysis
+                    </button>
+                  </DialogFooter>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              )}
+            </DialogContent>
+          </Dialog>
 
           {/* Decision Frame Context Banner */}
           {activeFrameStatement && (
@@ -1522,9 +1545,15 @@ export default function Dashboard() {
                         cancelAnalysis();
                         setUploading(false);
                       }}
-                      className="text-xs text-muted hover:text-error transition-colors"
+                      className="btn btn-ghost text-xs flex items-center gap-xs"
+                      style={{
+                        color: 'var(--text-muted)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        padding: '6px 12px',
+                      }}
                     >
-                      Cancel analysis
+                      <X size={12} />
+                      Cancel Analysis
                     </button>
                   </div>
                 </div>

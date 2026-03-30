@@ -150,7 +150,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     actions: [
       {
         label: 'Invite Team Member',
-        onClick: () => console.log('Open invite modal'),
+        href: '/dashboard/team',
         variant: 'primary',
         icon: <Plus className="w-4 h-4" />,
       },

@@ -4,7 +4,7 @@
 To build the definitive decision performance platform for high-stakes executive teams — detecting the cognitive biases and decision noise that destroy organizational outcomes before commitments are made.
 
 ## Core Value Proposition
-*   **Comprehensive Bias Detection**: Identifies 35+ cognitive biases across strategic documents — including anchoring, confirmation bias, groupthink, sunk cost fallacy, and overconfidence — with industry-specific overlays for PE/VC, M&A, and enterprise risk.
+*   **Comprehensive Bias Detection**: Identifies 20 cognitive biases across strategic documents — including anchoring, confirmation bias, groupthink, sunk cost fallacy, and overconfidence — with industry-specific overlays for PE/VC, M&A, and enterprise risk.
 *   **Project Pipeline Intelligence**: Full project lifecycle tracking from intake through completion, with stage-specific bias overlays for board memos, strategy papers, risk assessments, and decision documents.
 *   **Noise Audit**: Uses multi-agent variance (3-Judge System) to measure decision inconsistency across valuation, timing, framing, and comparable selection dimensions.
 *   **Outcome Flywheel**: Links project outcomes to detected biases — building institutional memory of what biases actually hurt performance at your organization.

@@ -1444,7 +1444,7 @@ export default function LandingPage() {
                 icon: Brain,
                 title: 'AI Cognitive Audit',
                 description:
-                  'Multi-agent pipeline detects 15+ biases, runs a statistical jury for noise scoring, and simulates a boardroom of Decision Twins to stress-test your thesis.',
+                  'Multi-agent pipeline detects 20 biases, runs a statistical jury for noise scoring, and simulates a boardroom of Decision Twins to stress-test your thesis.',
                 color: '#6366F1',
                 details: [
                   'Bias detection engine',
@@ -2485,7 +2485,7 @@ export default function LandingPage() {
                     color: '#FFFFFF',
                   }}
                 >
-                  15+ Bias Types
+                  20 Bias Types
                 </span>
               </div>
               <h3
@@ -2531,7 +2531,7 @@ export default function LandingPage() {
                 Streaming
               </h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                15-agent pipeline streams results as each stage completes. Quick scan in under 5
+                11-agent pipeline streams results as each stage completes. Quick scan in under 5
                 seconds.
               </p>
             </motion.div>
@@ -3524,7 +3524,7 @@ export default function LandingPage() {
               >
                 {[
                   '50 decision analyses/month',
-                  'All 35+ bias types',
+                  'All 20 bias types',
                   'Decision twins + boardroom simulation',
                   'Noise analysis + knowledge graph',
                   'Project outcome tracking',
@@ -3651,7 +3651,7 @@ export default function LandingPage() {
               >
                 {[
                   '250 decision analyses/month',
-                  'All 35+ bias types',
+                  'All 20 bias types',
                   'Project pipeline + stage tracking',
                   'Team calibration + blind voting',
                   'Slack integration + API access',
@@ -3872,7 +3872,7 @@ export default function LandingPage() {
                 },
                 {
                   title: '50 Decision Analyses',
-                  desc: 'Run your actual documents through the 15-agent pipeline. See real DQI scores and bias detection.',
+                  desc: 'Run your actual documents through the 11-agent pipeline. See real DQI scores and bias detection.',
                 },
                 {
                   title: 'Outcome Tracking Setup',

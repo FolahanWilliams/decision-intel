@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import useSWR from 'swr';
 import {
   MessageSquare,
   Webhook,
@@ -12,6 +13,13 @@ import {
   Terminal,
   Loader2,
   Unplug,
+  Hash,
+  BellRing,
+  Activity,
+  Check,
+  ChevronRight,
+  Brain,
+  Save,
 } from 'lucide-react';
 import { WebhookManager } from './WebhookManager';
 import type { SlackInstallationStatus } from '@/types/human-audit';
@@ -84,6 +92,304 @@ const SLASH_COMMANDS = [
   { command: '/di status', description: 'Calibration level, trends, and pending outcomes' },
   { command: '/di help', description: 'Show all available commands' },
 ];
+
+const swrFetcher = (url: string) => fetch(url).then(r => r.ok ? r.json() : null);
+
+interface SlackChannel {
+  id: string;
+  name: string;
+  isPrivate: boolean;
+  numMembers: number;
+  isMember: boolean;
+}
+
+function SlackChannelConfig() {
+  const { data: channels } = useSWR<{ channels: SlackChannel[] }>(
+    '/api/integrations/slack/channels',
+    swrFetcher,
+    { revalidateOnFocus: false, dedupingInterval: 60_000 }
+  );
+  const { data: config, mutate: mutateConfig } = useSWR<{
+    monitoredChannels: string[];
+    nudgeFrequency: string;
+  }>('/api/integrations/slack/config', swrFetcher, { revalidateOnFocus: false });
+
+  const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
+  const [nudgeFrequency, setNudgeFrequency] = useState('normal');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  // Sync state when config loads
+  useEffect(() => {
+    if (config) {
+      setSelectedChannels(config.monitoredChannels || []);
+      setNudgeFrequency(config.nudgeFrequency || 'normal');
+    }
+  }, [config]);
+
+  const toggleChannel = (channelId: string) => {
+    setSelectedChannels(prev =>
+      prev.includes(channelId) ? prev.filter(c => c !== channelId) : [...prev, channelId]
+    );
+    setSaved(false);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaved(false);
+    try {
+      const res = await fetch('/api/integrations/slack/config', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ monitoredChannels: selectedChannels, nudgeFrequency }),
+      });
+      if (res.ok) {
+        setSaved(true);
+        mutateConfig();
+        setTimeout(() => setSaved(false), 3000);
+      }
+    } catch { /* ignore */ } finally {
+      setSaving(false);
+    }
+  };
+
+  const channelList = channels?.channels || [];
+  const hasChanges =
+    config &&
+    (JSON.stringify(selectedChannels.sort()) !== JSON.stringify((config.monitoredChannels || []).sort()) ||
+      nudgeFrequency !== (config.nudgeFrequency || 'normal'));
+
+  return (
+    <div style={{ borderTop: '1px solid var(--liquid-border)', paddingTop: '18px', marginTop: '4px' }}>
+      {/* Channel Selector */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+        <Hash size={14} style={{ color: 'var(--text-muted)' }} />
+        <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          Monitored Channels
+        </h4>
+      </div>
+      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '10px', lineHeight: 1.5 }}>
+        Select which channels the bot monitors for decisions. Leave empty to monitor all channels.
+      </p>
+
+      {channelList.length > 0 ? (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px', maxHeight: 140, overflowY: 'auto' }}>
+          {channelList.map(ch => {
+            const isSelected = selectedChannels.includes(ch.id);
+            return (
+              <button
+                key={ch.id}
+                onClick={() => toggleChannel(ch.id)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '4px 10px',
+                  fontSize: '12px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: isSelected ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
+                  background: isSelected ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                  color: isSelected ? '#a78bfa' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {isSelected && <Check size={10} />}
+                <span>{ch.isPrivate ? '🔒' : '#'}</span>
+                {ch.name}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px', fontStyle: 'italic' }}>
+          Loading channels...
+        </div>
+      )}
+
+      {/* Nudge Frequency */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+        <BellRing size={14} style={{ color: 'var(--text-muted)' }} />
+        <h4 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          Nudge Frequency
+        </h4>
+      </div>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+        {[
+          { value: 'normal', label: 'Normal', desc: 'All warning + critical nudges' },
+          { value: 'quiet', label: 'Quiet', desc: 'Critical biases only' },
+          { value: 'off', label: 'Off', desc: 'No nudges (still detects decisions)' },
+        ].map(opt => (
+          <button
+            key={opt.value}
+            onClick={() => { setNudgeFrequency(opt.value); setSaved(false); }}
+            style={{
+              flex: 1,
+              padding: '8px 12px',
+              fontSize: '12px',
+              borderRadius: 'var(--radius-md)',
+              border: nudgeFrequency === opt.value ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
+              background: nudgeFrequency === opt.value ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+              color: nudgeFrequency === opt.value ? '#a78bfa' : 'var(--text-secondary)',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: 'all 0.15s',
+            }}
+          >
+            <div style={{ fontWeight: 600, marginBottom: 2 }}>{opt.label}</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{opt.desc}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Save Button */}
+      {hasChanges && (
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 16px',
+            fontSize: '12px',
+            fontWeight: 600,
+            color: '#fff',
+            background: '#6366f1',
+            border: 'none',
+            borderRadius: 'var(--radius-md)',
+            cursor: saving ? 'wait' : 'pointer',
+            opacity: saving ? 0.7 : 1,
+            marginBottom: '4px',
+          }}
+        >
+          {saving ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={12} />}
+          {saving ? 'Saving...' : 'Save Configuration'}
+        </button>
+      )}
+      {saved && (
+        <span style={{ fontSize: '11px', color: '#22c55e', marginLeft: '8px' }}>
+          ✓ Saved
+        </span>
+      )}
+    </div>
+  );
+}
+
+interface SlackActivityData {
+  recentDecisions: Array<{ id: string; content: string; type: string | null; score: number | null; createdAt: string }>;
+  recentNudges: Array<{ id: string; biasType: string; severity: string; wasHelpful: boolean | null; createdAt: string }>;
+  summary: { decisionsThisWeek: number; nudgesThisWeek: number; outcomesThisWeek: number; nudgeHelpfulRate: number | null };
+}
+
+function SlackActivityFeed() {
+  const { data } = useSWR<SlackActivityData>(
+    '/api/integrations/slack/activity',
+    swrFetcher,
+    { revalidateOnFocus: false, dedupingInterval: 60_000 }
+  );
+  const [expanded, setExpanded] = useState(false);
+
+  if (!data) return null;
+
+  const { summary } = data;
+  const hasActivity = summary.decisionsThisWeek > 0 || summary.nudgesThisWeek > 0;
+
+  return (
+    <div style={{ borderTop: '1px solid var(--liquid-border)', paddingTop: '18px', marginTop: '4px' }}>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          marginBottom: expanded ? '12px' : '0',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: 'var(--text-primary)',
+          padding: 0,
+          width: '100%',
+        }}
+      >
+        <Activity size={14} style={{ color: 'var(--text-muted)' }} />
+        <h4 style={{ fontSize: '13px', fontWeight: 600, flex: 1, textAlign: 'left' }}>
+          Bot Activity
+        </h4>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
+          <span>{summary.decisionsThisWeek} decisions</span>
+          <span>{summary.nudgesThisWeek} nudges</span>
+          <span>{summary.outcomesThisWeek} outcomes</span>
+          <span style={{ fontSize: '10px' }}>this week</span>
+          <ChevronRight size={14} style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s' }} />
+        </div>
+      </button>
+
+      {expanded && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Summary stats */}
+          {summary.nudgeHelpfulRate !== null && (
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', padding: '8px 10px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: 'var(--radius-sm)' }}>
+              Nudge helpfulness rate: <strong style={{ color: '#22c55e' }}>{summary.nudgeHelpfulRate}%</strong>
+            </div>
+          )}
+
+          {/* Recent decisions */}
+          {data.recentDecisions.length > 0 && (
+            <div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                Recent Decisions
+              </div>
+              {data.recentDecisions.map(d => (
+                <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', borderRadius: 'var(--radius-sm)', background: 'rgba(255, 255, 255, 0.02)', marginBottom: '4px' }}>
+                  <Brain size={12} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {d.content}
+                  </span>
+                  {d.score !== null && (
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: d.score >= 70 ? '#22c55e' : d.score >= 40 ? '#eab308' : '#ef4444',
+                    }}>
+                      {d.score}/100
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Recent nudges */}
+          {data.recentNudges.length > 0 && (
+            <div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                Recent Nudges
+              </div>
+              {data.recentNudges.map(n => (
+                <div key={n.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', borderRadius: 'var(--radius-sm)', background: 'rgba(255, 255, 255, 0.02)', marginBottom: '4px' }}>
+                  <BellRing size={12} style={{ color: n.severity === 'critical' ? '#ef4444' : '#eab308', flexShrink: 0 }} />
+                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)', flex: 1 }}>
+                    {n.biasType.replace(/_/g, ' ')}
+                  </span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                    {new Date(n.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!hasActivity && (
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontStyle: 'italic', padding: '8px 0' }}>
+              No bot activity this week. Start discussing decisions in monitored Slack channels.
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function SlackDetailSection({
   slackStatus,
@@ -414,6 +720,12 @@ function SlackDetailSection({
             </a>
           </div>
         )}
+
+        {/* Channel Configuration (only when connected) */}
+        {isConnected && !isTokenExpired && <SlackChannelConfig />}
+
+        {/* Bot Activity Feed (only when connected) */}
+        {isConnected && !isTokenExpired && <SlackActivityFeed />}
 
         {/* Slash commands documentation */}
         <div
