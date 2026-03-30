@@ -443,6 +443,119 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       "If a high-stakes decision took less than an hour, you probably didn't think hard enough.",
     difficulty: 'moderate',
   },
+  halo_effect: {
+    realWorldExample: {
+      title: 'Enron and the "Smartest Guys in the Room"',
+      description:
+        "Enron's early success in energy trading created a halo that blinded analysts, rating agencies, and investors to massive accounting fraud. The company's prestige and charismatic leadership made stakeholders assume competence across all operations, even as internal controls collapsed.",
+      company: 'Enron',
+      year: '1985–2001',
+    },
+    debiasingTechniques: [
+      'Evaluate each dimension of a decision independently — score financial, operational, and strategic merits separately before combining.',
+      'Use blind evaluation where possible: strip names, brands, and reputations from materials before assessment.',
+      'Ask "Would I still rate this highly if the brand/person/track record were unknown?"',
+    ],
+    relatedBiases: [
+      { key: 'authority_bias', reason: 'Prestige creates a halo that mimics authority' },
+      {
+        key: 'confirmation_bias',
+        reason: 'A positive halo makes you seek confirming evidence',
+      },
+    ],
+    academicReference:
+      'Thorndike, E.L. (1920). "A constant error in psychological ratings." Journal of Applied Psychology, 4(1), 25–29.',
+    quickTip:
+      'If you can\'t name a specific weakness in the option you favor, you\'re probably under a halo.',
+    difficulty: 'moderate',
+  },
+  gamblers_fallacy: {
+    realWorldExample: {
+      title: 'Monte Carlo Casino, 1913',
+      description:
+        'At the Monte Carlo Casino, the roulette ball landed on black 26 times in a row. Gamblers lost millions betting on red, convinced that a "correction" was due — but each spin was independent. The same fallacy appears in investment committees after a string of successful deals: "We\'re due for a miss."',
+      company: 'Monte Carlo Casino',
+      year: '1913',
+    },
+    debiasingTechniques: [
+      'Explicitly state the base rate for each outcome before evaluating a sequence of events.',
+      'Ask "Is there a causal mechanism linking past outcomes to this decision, or am I pattern-matching on randomness?"',
+      'Use pre-commitment: decide your criteria before seeing the outcome sequence.',
+    ],
+    relatedBiases: [
+      {
+        key: 'recency_bias',
+        reason: 'Recent streaks amplify the fallacy',
+      },
+      {
+        key: 'overconfidence_bias',
+        reason: 'Believing you can predict random outcomes',
+      },
+    ],
+    academicReference:
+      'Tversky, A. & Kahneman, D. (1971). "Belief in the law of small numbers." Psychological Bulletin, 76(2), 105–110.',
+    quickTip:
+      'Past outcomes only predict future ones when there is a genuine causal link — not just a pattern.',
+    difficulty: 'moderate',
+  },
+  zeigarnik_effect: {
+    realWorldExample: {
+      title: 'Yahoo\'s Incomplete Acquisitions',
+      description:
+        'Yahoo famously passed on acquiring Google (2002) and Facebook (2006). In subsequent acquisition decisions, the unfinished business of those missed deals heavily influenced strategy — leading to the overpriced $1.1B acquisition of Tumblr, partly driven by the psychological weight of previous "ones that got away."',
+      company: 'Yahoo',
+      year: '2002–2013',
+    },
+    debiasingTechniques: [
+      'Explicitly list all "open loops" (unresolved past decisions) before starting a new evaluation — then consciously set them aside.',
+      'Use a decision journal: closing out past decisions in writing reduces their psychological pull.',
+      'Ask "Am I evaluating this opportunity on its own merits, or trying to close an old chapter?"',
+    ],
+    relatedBiases: [
+      {
+        key: 'sunk_cost_fallacy',
+        reason: 'Unfinished tasks create psychological investment similar to sunk costs',
+      },
+      {
+        key: 'loss_aversion',
+        reason: 'Incomplete tasks feel like losses, driving irrational action',
+      },
+    ],
+    academicReference:
+      'Zeigarnik, B. (1927). "On finished and unfinished tasks." Psychologische Forschung, 9, 1–85.',
+    quickTip:
+      'If a past missed opportunity keeps coming up in your current deliberation, name it and set it aside.',
+    difficulty: 'hard',
+  },
+  paradox_of_choice: {
+    realWorldExample: {
+      title: 'Jam Study and Enterprise Software Selection',
+      description:
+        'Sheena Iyengar\'s famous study showed customers were 10x more likely to purchase when offered 6 jam varieties vs. 24. The same effect plagues enterprise procurement: when evaluating too many vendor options, committees often default to the incumbent or delay decisions indefinitely.',
+      company: 'Columbia University / Enterprise Procurement',
+      year: '2000',
+    },
+    debiasingTechniques: [
+      'Limit initial screening to 3–5 options maximum using pre-agreed criteria before deep evaluation.',
+      'Use "satisficing" deliberately: define your minimum acceptable criteria upfront and choose the first option that meets them.',
+      'Implement a two-stage process: broad screening with hard cutoffs, then deep comparison of the shortlist only.',
+    ],
+    relatedBiases: [
+      {
+        key: 'status_quo_bias',
+        reason: 'Too many choices leads to defaulting to the current option',
+      },
+      {
+        key: 'cognitive_misering',
+        reason: 'Choice overload triggers low-effort decision shortcuts',
+      },
+    ],
+    academicReference:
+      'Iyengar, S.S. & Lepper, M.R. (2000). "When choice is demotivating." Journal of Personality and Social Psychology, 79(6), 995–1006.',
+    quickTip:
+      'If your team has been evaluating options for weeks without converging, you probably have too many options.',
+    difficulty: 'easy',
+  },
 };
 
 /** Get education content for a bias, with safe fallback for unrecognized keys. */

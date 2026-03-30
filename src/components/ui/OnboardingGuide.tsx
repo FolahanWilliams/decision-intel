@@ -17,7 +17,7 @@ const STEPS = [
     icon: BarChart3,
     title: 'Review Your Bias Analysis',
     description:
-      'Our AI detects cognitive biases: anchoring, confirmation bias, sunk cost fallacy, groupthink, and 30+ more — with severity scores, excerpts, and actionable suggestions.',
+      'Our AI detects cognitive biases: anchoring, confirmation bias, sunk cost fallacy, groupthink, and 16 more — with severity scores, excerpts, and actionable suggestions.',
     action: 'Click on a document to view results',
     hasSampleAction: false,
   },

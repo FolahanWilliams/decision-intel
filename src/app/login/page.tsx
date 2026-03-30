@@ -171,7 +171,7 @@ function LoginContent() {
                 icon: Brain,
                 title: 'Bias Detection',
                 description:
-                  'Identify 15+ cognitive biases including confirmation, anchoring, and groupthink',
+                  'Identify 20 cognitive biases including confirmation, anchoring, and groupthink',
                 color: '#f59e0b',
               },
               {

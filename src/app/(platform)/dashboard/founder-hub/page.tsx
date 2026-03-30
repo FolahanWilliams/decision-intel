@@ -219,7 +219,7 @@ function ProductOverview() {
           [
             'M&A / Decision Owners',
             'Memos anchored to initial assumptions',
-            '31 cognitive biases detected with exact excerpts + coaching',
+            '20 cognitive biases detected with exact excerpts + coaching',
           ],
           [
             'Risk & Compliance',
@@ -342,7 +342,7 @@ function CorePipeline() {
       {/* Pipeline Diagram */}
       <div style={card}>
         <div style={sectionTitle}>
-          <Zap size={18} style={{ color: '#f59e0b' }} /> 16-Agent Analysis Pipeline
+          <Zap size={18} style={{ color: '#f59e0b' }} /> 11-Agent Analysis Pipeline
         </div>
         <pre
           style={{
@@ -360,17 +360,14 @@ function CorePipeline() {
 
 ANALYSIS (Parallel Fan-Out)
   ├── [Bias Detective]      ── 20 cognitive biases + 11 investment-specific
-  ├── [Noise Judge x3]      ── Statistical jury (3 independent models)
-  ├── [Fact Checker]        ── Finnhub + Google Search grounding
-  ├── [Pre-Mortem]          ── Failure scenarios + preventive measures
-  ├── [Compliance Mapper]   ── FCA, SOX, Basel III, EU AI Act
-  ├── [Deep Analysis]       ── Logical fallacies, SWOT, blind spots
-  ├── [Verification Agent]  ── Cross-reference claims vs real-time data
-  ├── [Sentiment Analyzer]  ── Emotional tone scoring
+  ├── [Noise Judge]         ── Statistical noise & variance scoring
+  ├── [Verification]        ── Fact checking + compliance mapping
+  ├── [Deep Analysis]       ── Linguistic, strategic & cognitive diversity
+  ├── [Simulation]          ── Decision twin simulation + memory recall
   └── [RPD Recognition]     ── Klein pattern matching + expert heuristics
 
 SYNTHESIS (Sequential)
-  [Meta Judge] ──> [Risk Scorer] ──> [Boardroom Simulation] ──> END`}
+  [Meta Judge] ──> [Risk Scorer] ──> END`}
         </pre>
       </div>
 
@@ -538,7 +535,7 @@ SYNTHESIS (Sequential)
             {
               label: 'AI Pipeline',
               value:
-                '16 agents in LangGraph DAG — preprocessing (sequential) → analysis (parallel fan-out) → synthesis (sequential)',
+                '11 agents in LangGraph DAG — preprocessing (sequential) → analysis (parallel fan-out) → synthesis (sequential)',
             },
             {
               label: 'Scoring Layer',
@@ -953,7 +950,7 @@ function IntegrationsAndFlywheel() {
             to <code>/api/extension/quick-score</code>
           </li>
           <li>
-            <strong>Full Analysis Sidepanel:</strong> Complete 16-agent pipeline from the browser.
+            <strong>Full Analysis Sidepanel:</strong> Complete 11-agent pipeline from the browser.
             Calls <code>/api/extension/analyze</code>
           </li>
           <li>
@@ -1334,7 +1331,7 @@ function StrategyAndPositioning() {
             <ul
               style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, paddingLeft: 14 }}
             >
-              <li>16-agent pipeline with deterministic compound scoring on top</li>
+              <li>11-agent pipeline with deterministic compound scoring on top</li>
               <li>Every outcome makes the platform smarter (causal learning)</li>
               <li>Statistical jury with 3 independent judges</li>
               <li>Per-org calibration profiles learned from outcomes</li>
@@ -1398,7 +1395,7 @@ function StrategyAndPositioning() {
               what: 'AI assistant for PE firms — automates CIM summarization, deal screening, data room analysis.',
               gap: "Summarizes and structures data but doesn't detect cognitive biases, measure noise, or track decision outcomes.",
               response:
-                '"Blueflame reads the documents faster. We read the decision-maker\'s blind spots. Our 16-agent pipeline detects 20 biases they can\'t see."',
+                '"Blueflame reads the documents faster. We read the decision-maker\'s blind spots. Our 11-agent pipeline detects 20 biases they can\'t see."',
               color: '#ef4444',
             },
             {
@@ -1667,7 +1664,7 @@ function StrategyAndPositioning() {
           {[
             {
               title: 'Product Already Built',
-              desc: '31 cognitive biases, strategic document analysis, project pipeline tracking, outcome logging, committee rooms with blind prior collection. Works across M&A, strategy, risk, and investment decisions.',
+              desc: '20 cognitive biases, strategic document analysis, project pipeline tracking, outcome logging, committee rooms with blind prior collection. Works across M&A, strategy, risk, and investment decisions.',
             },
             {
               title: 'Genuine White Space',
@@ -2027,7 +2024,7 @@ function SalesToolkit() {
             {
               objection: '"We tried AI tools before and they weren\'t useful."',
               response:
-                "Were they general-purpose AI or purpose-built for high-stakes decisions? We have 31 cognitive biases including domain-specific ones like anchoring to initial estimates, sunk cost in failing initiatives, and groupthink in committee decisions that no general tool detects. Plus, our outcome tracking means we calibrate to YOUR organization's actual decision patterns — not generic advice.",
+                "Were they general-purpose AI or purpose-built for high-stakes decisions? We have 20 cognitive biases including domain-specific ones like anchoring to initial estimates, sunk cost in failing initiatives, and groupthink in committee decisions that no general tool detects. Plus, our outcome tracking means we calibrate to YOUR organization's actual decision patterns — not generic advice.",
               tone: 'Specificity wins',
             },
             {
@@ -2045,7 +2042,7 @@ function SalesToolkit() {
             {
               objection: '"Can I try it before committing?"',
               response:
-                "Absolutely — visit /demo right now. Pick from 3 sample documents and watch the full 16-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own strategic documents and we'll run a free pilot with full DQI scoring and bias reports.",
+                "Absolutely — visit /demo right now. Pick from 3 sample documents and watch the full 11-agent pipeline run in real time with streaming progress. No login, no commitment. Or send us 3 of your own strategic documents and we'll run a free pilot with full DQI scoring and bias reports.",
               tone: 'Zero friction',
             },
           ].map((item, i) => (
@@ -2094,7 +2091,7 @@ function SalesToolkit() {
             step: 2,
             title: 'Upload & Analyze (60 sec)',
             action:
-              'Drag the document onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 16 agents are doing: "Right now, 3 independent AI judges are scoring this document for noise, while our bias detective is scanning for 31 cognitive biases..."',
+              'Drag the document onto the upload zone. Click "Analyze." While the SSE stream runs, narrate what the 11 agents are doing: "Right now, our noise judge is scoring this document for variance, while our bias detective is scanning for 20 cognitive biases..."',
             tip: 'The streaming progress bar is your friend — it creates anticipation.',
           },
           {
@@ -2210,17 +2207,17 @@ function SalesToolkit() {
             {
               audience: 'M&A / Corp Dev Lead (30 sec)',
               pitch:
-                'We detect 31 cognitive biases in strategic documents — including anchoring to initial estimates, sunk cost in failing deals, and groupthink in committee decisions. Our Boardroom Simulation creates virtual decision-makers who vote on your thesis. Plus a Chrome extension for real-time bias checking and Slack integration for meeting-time coaching. It usually surfaces the objection nobody in the room raised.',
+                'We detect 20 cognitive biases in strategic documents — including anchoring to initial estimates, sunk cost in failing deals, and groupthink in committee decisions. Our Boardroom Simulation creates virtual decision-makers who vote on your thesis. Plus a Chrome extension for real-time bias checking and Slack integration for meeting-time coaching. It usually surfaces the objection nobody in the room raised.',
             },
             {
               audience: 'Board / Executive Sponsor (60 sec)',
               pitch:
-                "Decision Intel is the cognitive bias auditing engine for high-stakes executive teams. We sit between analysis and commitment — the one place in the decision workflow where nobody provides quality tools. 16-agent AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. Decision intelligence market is $12.2B going to $46.4B by 2030 — we're creating a new category.",
+                "Decision Intel is the cognitive bias auditing engine for high-stakes executive teams. We sit between analysis and commitment — the one place in the decision workflow where nobody provides quality tools. 11-agent AI pipeline, proprietary Decision Quality Index, and an outcome tracking flywheel. Decision intelligence market is $12.2B going to $46.4B by 2030 — we're creating a new category.",
             },
             {
               audience: 'Technical Audience (30 sec)',
               pitch:
-                'LangGraph-based 16-agent pipeline with deterministic compound scoring on top of LLM output. 20x20 bias interaction matrix, Bayesian prior integration, Granger-causal temporal inference for our decision knowledge graph. Not a wrapper — we built the scoring math.',
+                'LangGraph-based 11-agent pipeline with deterministic compound scoring on top of LLM output. 20x20 bias interaction matrix, Bayesian prior integration, Granger-causal temporal inference for our decision knowledge graph. Not a wrapper — we built the scoring math.',
             },
           ].map((item, i) => (
             <div
@@ -3144,7 +3141,7 @@ function PlaybookAndResearch() {
                     summary:
                       'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
                     product:
-                      'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 16-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
+                      'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 11-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
                     startup:
                       'Apply to your sales process too. Qualify leads fast — "Do you have a decision committee? Do you review strategic documents before major decisions?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
                     actions: [
@@ -3562,7 +3559,7 @@ function PlaybookAndResearch() {
                 product={
                   'Your contrarian truth: "Executive teams think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: enterprise decision quality. Your concentric expansion: Enterprise M&A/Strategy → PE/VC → FinServ → Horizontal.'
                 }
-                startup="The best 16-agent pipeline means nothing if you can't get it in front of decision-makers. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
+                startup="The best 11-agent pipeline means nothing if you can't get it in front of decision-makers. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
                 actions={[
                   'Write down your contrarian truth and use it in every pitch',
                   'Map your concentric expansion circles (already in Market Strategy tab)',

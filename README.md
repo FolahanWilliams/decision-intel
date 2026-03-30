@@ -41,9 +41,9 @@ Most executive teams have no way to:
 
 ## The Solution
 
-**Decision Intel** is an AI-powered decision performance platform for high-stakes executive teams. Upload a board memo, strategy paper, risk assessment, or any decision document and get a comprehensive bias audit in under 60 seconds — detecting **35+ cognitive biases** with industry-specific overlays for M&A, PE/VC, enterprise risk, and strategic planning.
+**Decision Intel** is an AI-powered decision performance platform for high-stakes executive teams. Upload a board memo, strategy paper, risk assessment, or any decision document and get a comprehensive bias audit in under 60 seconds — detecting **20 cognitive biases** with industry-specific overlays for M&A, PE/VC, enterprise risk, and strategic planning.
 
-The platform runs documents through a **16-agent analysis pipeline** with context-specific overlays to detect bias, measure noise, simulate boardroom deliberations, and generate actionable intelligence that protects organizational outcomes. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
+The platform runs documents through a **11-agent analysis pipeline** with context-specific overlays to detect bias, measure noise, simulate boardroom deliberations, and generate actionable intelligence that protects organizational outcomes. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
 
 ---
 
@@ -52,7 +52,7 @@ The platform runs documents through a **16-agent analysis pipeline** with contex
 | For                         | Pain Point                                                        | What We Deliver                                                                           |
 | :-------------------------- | :---------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
 | **Executives / C-Suite**    | No systematic way to measure decision quality across the org      | Decision-level DQI scoring (0-100), bias pattern tracking across teams and projects       |
-| **M&A / Corp Dev Teams**    | Strategic memos anchored to initial assumptions, not fundamentals | 35+ cognitive biases detected with exact excerpts and coaching suggestions                |
+| **M&A / Corp Dev Teams**    | Strategic memos anchored to initial assumptions, not fundamentals | 20 cognitive biases detected with exact excerpts and coaching suggestions                |
 | **Strategy Teams**          | Strategic plans tainted by groupthink and overconfidence          | Boardroom simulation with custom personas, blind voting, and dissent tracking             |
 | **Risk / Compliance**       | Risk assessments cherry-pick data and bury uncomfortable truths   | Document analysis detecting survivorship bias, selective reporting, and framing effects   |
 | **Investment Committees**   | Authority bias and groupthink silence genuine debate              | Blind committee voting, noise measurement across members, decision calibration            |
@@ -81,7 +81,7 @@ All paid plans include a 14-day free trial. No credit card required to start.
 For qualified enterprise teams, we offer a guided pilot:
 
 - **Guided onboarding** — we configure taxonomies, bias profiles, and noise benchmarks for your team and decision types
-- **50 decision analyses** — run your actual documents through the 16-agent pipeline
+- **50 decision analyses** — run your actual documents through the 11-agent pipeline
 - **Outcome tracking setup** — connect your project pipeline so the system starts learning immediately
 - **Calibration report** — at 30 days, receive a full report: bias patterns, noise levels, and ROI projections
 
@@ -410,7 +410,7 @@ Each message in a deliberation thread is analyzed for new biases, and only novel
 When a tracked deliberation thread resolves to a commitment ("let's approve it", "we've decided"), the platform:
 
 1. Creates a `HumanDecision` record linked to the pre-decision context
-2. Runs a full cognitive audit via the 16-agent pipeline
+2. Runs a full cognitive audit via the 11-agent pipeline
 3. Posts a rich Block Kit summary card to the Slack thread with:
    - Decision Quality Score (color-coded gauge)
    - Noise Score and bias count
@@ -486,7 +486,7 @@ Real-time intelligence enrichment from external sources:
 
 ### Decision Replay & Counterfactual Analysis
 
-Step through your analysis like a debugger steps through code. The **Replay** tab decomposes the 16-agent pipeline into a visual timeline, showing exactly how each stage influenced the final score:
+Step through your analysis like a debugger steps through code. The **Replay** tab decomposes the 11-agent pipeline into a visual timeline, showing exactly how each stage influenced the final score:
 
 - **Score Waterfall** — Horizontal bar chart showing score progression from 100 → final through each analysis stage
 - **Step-by-Step Replay** — Expandable cards for each pipeline stage: Document Intelligence → Bias Detection → Noise Analysis → Fact Check → Deep Analysis → Boardroom → Final Score
@@ -680,18 +680,16 @@ A parallel analysis product that audits spoken and written decisions from multip
 │                    LangGraph Multi-Agent Pipeline                        │
 │                                                                         │
 │  ┌─────────────────── PREPROCESSING (Sequential) ───────────────────┐   │
-│  │  [GDPR Anonymizer] ──→ [Data Structurer]                        │   │
+│  │  [GDPR Anonymizer] ──→ [Data Structurer] ──→ [Intelligence]     │   │
 │  └──────────────────────────────┬───────────────────────────────────┘   │
 │                                 │                                       │
-│  ┌─────────────────── ANALYSIS (Parallel) ──────────────────────────┐   │
-│  │  [Bias Detective]     [Noise Judge x3]    [Fact Checker]         │   │
-│  │  [Pre-Mortem]         [Compliance]        [Sentiment]            │   │
-│  │  [Intelligence]       [Deep Analysis]     [Verification]         │   │
-│  │  [RPD Recognition]                                               │   │
+│  ┌─────────────────── ANALYSIS (Parallel Fan-Out) ──────────────────┐   │
+│  │  [Bias Detective]     [Noise Judge]       [Verification]         │   │
+│  │  [Deep Analysis]      [Simulation]        [RPD Recognition]      │   │
 │  └──────────────────────────────┬───────────────────────────────────┘   │
 │                                 │                                       │
-│  ┌─────────────────── SYNTHESIS ────────────────────────────────────┐   │
-│  │  [Risk Scorer] ──→ [Boardroom Simulation]                       │   │
+│  ┌─────────────────── SYNTHESIS (Sequential) ───────────────────────┐   │
+│  │  [Meta Judge] ──→ [Risk Scorer]                                  │   │
 │  └──────────────────────────────┬───────────────────────────────────┘   │
 └──────────────────────────────────┬──────────────────────────────────────┘
                                    │
@@ -1010,7 +1008,7 @@ src/
 | :---------------------- | :---------------------------- | :--------------------------------------------------------------- |
 | **Framework**           | Next.js 16 (App Router)       | Full-stack React with server components & route handlers         |
 | **Language**            | TypeScript 5.9 (strict mode)  | Type safety across the entire codebase                           |
-| **AI Engine**           | Google Gemini (via LangChain) | LLM powering all 16 agent nodes                                  |
+| **AI Engine**           | Google Gemini (via LangChain) | LLM powering all 11 agent nodes                                  |
 | **Orchestration**       | LangGraph 1.1                 | Multi-agent directed graph with parallel execution               |
 | **Causal AI**           | Custom SCM Engine             | Structural Causal Models for counterfactual reasoning            |
 | **Database**            | Supabase PostgreSQL           | Primary data store with PgBouncer connection pooling             |
@@ -1184,7 +1182,7 @@ Use `/dashboard/search` to find similar documents and analyses using vector simi
 Install the Chrome extension from the `/extension/` directory for real-time bias checking:
 
 - **Quick Score** — Click the extension icon for a <5 second bias-only scan of the current page
-- **Full Analysis** — Open the side panel for a complete 16-agent pipeline analysis
+- **Full Analysis** — Open the side panel for a complete 11-agent pipeline analysis
 - **Inline Annotations** — Content script highlights detected biases directly on the page
 
 Load as an unpacked extension in Chrome Developer Mode. See `extension/README.md` for detailed setup.
@@ -1318,7 +1316,7 @@ These counters are displayed on the [landing page](https://www.decision-intel.co
 
 ### Shipped
 
-- [x] 16-agent cognitive bias detection pipeline
+- [x] 11-agent cognitive bias detection pipeline
 - [x] Decision noise measurement (Statistical Jury)
 - [x] Financial fact-checking (Finnhub + Google Search Grounding)
 - [x] GDPR PII anonymization (pre-analysis)

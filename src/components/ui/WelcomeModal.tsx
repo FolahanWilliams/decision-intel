@@ -22,7 +22,7 @@ const TOUR_STEPS = [
     icon: Sparkles,
     title: 'AI-Powered Bias Detection',
     description:
-      'Upload board memos, strategy papers, risk assessments, or any decision document. Our AI pipeline detects 35+ cognitive biases including anchoring, confirmation bias, and groupthink.',
+      'Upload board memos, strategy papers, risk assessments, or any decision document. Our AI pipeline detects 20 cognitive biases including anchoring, confirmation bias, and groupthink.',
   },
   {
     icon: BarChart3,
