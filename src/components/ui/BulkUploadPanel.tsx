@@ -25,8 +25,23 @@ const ACCEPTED_TYPES = [
   'text/plain',
   'text/markdown',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/csv',
+  'application/csv',
+  'text/html',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 ];
-const ACCEPTED_EXTENSIONS = ['.pdf', '.txt', '.md', '.docx'];
+const ACCEPTED_EXTENSIONS = [
+  '.pdf',
+  '.txt',
+  '.md',
+  '.docx',
+  '.xlsx',
+  '.csv',
+  '.html',
+  '.htm',
+  '.pptx',
+];
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -240,7 +255,7 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
               type="file"
               hidden
               multiple
-              accept=".pdf,.txt,.md,.docx"
+              accept=".pdf,.txt,.md,.docx,.xlsx,.csv,.html,.htm,.pptx"
               onChange={e => {
                 if (e.target.files) addFiles(e.target.files);
                 e.target.value = '';
@@ -251,7 +266,7 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
               Drop files here or click to browse
             </p>
             <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-              PDF, TXT, MD, DOCX · Max 10 MB each
+              PDF, DOCX, XLSX, CSV, PPTX, HTML, TXT, MD · Max 10 MB each
             </p>
           </div>
         )}

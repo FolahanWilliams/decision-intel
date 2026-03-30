@@ -92,12 +92,28 @@ export async function POST(request: NextRequest) {
       'text/plain',
       'text/markdown',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/csv',
+      'application/csv',
+      'text/html',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     ];
 
-    const isTextFile = file.name.endsWith('.txt') || file.name.endsWith('.md');
-    if (!allowedTypes.includes(file.type) && !isTextFile) {
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+    const allowedExtensions = [
+      '.pdf',
+      '.txt',
+      '.md',
+      '.docx',
+      '.xlsx',
+      '.csv',
+      '.html',
+      '.htm',
+      '.pptx',
+    ];
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(ext)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Supported: PDF, TXT, MD, DOCX' },
+        { error: 'Invalid file type. Supported: PDF, TXT, MD, DOCX, XLSX, CSV, HTML, PPTX' },
         { status: 400 }
       );
     }
@@ -277,8 +293,8 @@ export async function POST(request: NextRequest) {
     const { getServiceSupabase } = await import('@/lib/supabase');
     const supabase = getServiceSupabase();
 
-    const ext = path.extname(file.name);
-    const storagePath = `${userId}/${document.id}${ext}`;
+    const fileExt = path.extname(file.name);
+    const storagePath = `${userId}/${document.id}${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
       .from(process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf')
