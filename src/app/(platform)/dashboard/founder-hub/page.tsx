@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
 import {
   Rocket,
   Brain,
@@ -10,6 +11,7 @@ import {
   Shield,
   BookOpen,
   ChevronRight,
+  ChevronDown,
   Target,
   Users,
   FileText,
@@ -21,6 +23,8 @@ import {
   MessageSquare,
   Lock,
   Crosshair,
+  Search,
+  X,
 } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -30,11 +34,9 @@ type TabId =
   | 'pipeline'
   | 'scoring'
   | 'integrations'
-  | 'moat'
-  | 'market'
+  | 'strategy'
   | 'sales'
   | 'stats'
-  | 'frameworks'
   | 'playbook';
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
@@ -42,12 +44,10 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'pipeline', label: 'Analysis Pipeline', icon: <Brain size={16} /> },
   { id: 'scoring', label: 'Scoring Engine', icon: <BarChart3 size={16} /> },
   { id: 'integrations', label: 'Integrations & Flywheel', icon: <Plug size={16} /> },
-  { id: 'moat', label: 'Moat & Competitors', icon: <Shield size={16} /> },
-  { id: 'market', label: 'Market Strategy', icon: <Target size={16} /> },
+  { id: 'strategy', label: 'Strategy & Positioning', icon: <Shield size={16} /> },
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} /> },
   { id: 'stats', label: 'Live Stats', icon: <TrendingUp size={16} /> },
-  { id: 'frameworks', label: 'Research & Frameworks', icon: <Crosshair size={16} /> },
-  { id: 'playbook', label: 'Founder Playbook', icon: <BookOpen size={16} /> },
+  { id: 'playbook', label: 'Playbook & Research', icon: <BookOpen size={16} /> },
 ];
 
 // ─── Shared Styles ──────────────────────────────────────────────────────────
@@ -273,18 +273,37 @@ function ProductOverview() {
           }}
         >
           <li>
+            <strong>Slack → Copilot Auto-Trigger</strong> — Auto-creates CopilotSession seeded with
+            decision context after every Slack audit. &quot;Continue in Copilot&quot; button in
+            Slack messages for seamless handoff.
+          </li>
+          <li>
+            <strong>Intelligence Brief on Empty States</strong> — Contextual org intelligence
+            (top dangerous biases, maturity grade, decision stats) replaces generic empty states
+            across 4 dashboard pages.
+          </li>
+          <li>
+            <strong>Enhanced Slack Commands</strong> — 7 slash commands with rich Block Kit:{' '}
+            <code>/di help</code> (categorized), <code>/di score</code> (instant bias check),{' '}
+            <code>/di brief</code> (org intelligence), <code>/di status</code> (quality trends),{' '}
+            <code>/di analyze</code> (with Copilot link).
+          </li>
+          <li>
+            <strong>Bias Heat Map Enhancement</strong> — Density gutter minimap, confidence-based
+            opacity, hover tooltips with excerpts, keyboard navigation (←→ cycle, H toggle).
+          </li>
+          <li>
+            <strong>Enterprise Language Pivot</strong> — Decision types renamed from PE/VC-specific
+            to enterprise-neutral (resource allocation, strategic proposal, initiative closure).
+          </li>
+          <li>
             <strong>Klein RPD Framework</strong> — Expert intuition amplification: pattern
-            recognition cues from historical decisions, narrative war-story pre-mortems, RPD mental
-            simulator, and personal calibration dashboard at{' '}
-            <code>/dashboard/decision-quality?tab=calibration</code>
+            recognition cues, narrative pre-mortems, RPD mental simulator, personal calibration
+            dashboard.
           </li>
           <li>
             <strong>Enhanced Public Demo</strong> — Streaming simulation UX with 3 sample docs, DQI
             badge, no login required at <code>/demo</code>
-          </li>
-          <li>
-            <strong>Data-Backed ROI Calculator</strong> — Live outcome stats replace hardcoded
-            Kahneman baselines when ≥10 outcomes exist
           </li>
           <li>
             <strong>Case Study Export</strong> — One-click anonymized, branded shareable analyses
@@ -296,35 +315,18 @@ function ProductOverview() {
           </li>
           <li>
             <strong>A/B Prompt Testing</strong> — Experiment CRUD with Thompson sampling
-            auto-optimization dashboard at <code>/dashboard/decision-quality?tab=experiments</code>
+            auto-optimization
           </li>
           <li>
-            <strong>Multi-Model Fallback</strong> — Gemini → Claude failover routing (set{' '}
-            <code>AI_FALLBACK_ENABLED=true</code>)
-          </li>
-          <li>
-            <strong>Graph Health Widget</strong> — Real-time knowledge graph density, isolated
-            nodes, anti-pattern tracking on dashboard
-          </li>
-          <li>
-            <strong>Counterfactual Analysis API</strong> — &quot;What-if&quot; decision path
-            computation with narrative explanations
-          </li>
-          <li>
-            <strong>Product Analytics</strong> — Internal event tracking across conversion funnel (
-            <code>trackEvent()</code> fire-and-forget)
-          </li>
-          <li>
-            <strong>Prompt Versioning</strong> — SHA-256 deduplicated prompt tracking wired to every
-            analysis
+            <strong>Multi-Model Fallback</strong> — Gemini → Claude failover routing
           </li>
           <li>
             <strong>Quick Bias Check</strong> — Dashboard modal for instant &lt;5s bias scan via
             paste, shared Gemini utility across extension + platform
           </li>
           <li>
-            <strong>Demo Conversion Tracking</strong> — 10 funnel events wired: demo, login, hero
-            CTA, ROI calculator, analysis completion, case study views
+            <strong>Counterfactual Analysis API</strong> — &quot;What-if&quot; decision path
+            computation with narrative explanations
           </li>
         </ul>
       </div>
@@ -1143,7 +1145,7 @@ function IntegrationsAndFlywheel() {
   );
 }
 
-function CompetitiveMoat() {
+function StrategyAndPositioning() {
   return (
     <div>
       {/* Moat Table */}
@@ -1444,17 +1446,9 @@ function CompetitiveMoat() {
           ))}
         </div>
       </div>
-    </div>
-  );
-}
 
-// ─── Tab Content: Market Strategy ───────────────────────────────────────────
-
-function MarketStrategy() {
-  return (
-    <div>
-      {/* Verdict */}
-      <div style={{ ...card, borderTop: '3px solid #22c55e' }}>
+      {/* ── Market Strategy Section ── */}
+      <div style={{ ...card, borderTop: '3px solid #22c55e', marginTop: 24 }}>
         <div style={label}>PRIMARY MARKET</div>
         <h2
           style={{
@@ -1944,7 +1938,7 @@ function MarketStrategy() {
   );
 }
 
-// ─── Tab Content: Sales Toolkit (Objection Handler + Demo Script) ───────────
+// ─── Tab Content: Sales Toolkit (Objection Handler + Demo Script) ────────────
 
 function SalesToolkit() {
   return (
@@ -2659,12 +2653,30 @@ function ResearchCard({
   );
 }
 
-// ─── Tab Content: Research & Frameworks ─────────────────────────────────────
+// ─── Tab Content: Playbook & Research (merged) ─────────────────────────────
 
-function ResearchFrameworks() {
+function PlaybookAndResearch() {
   const [section, setSection] = useState<
     'all' | 'vc' | 'foundations' | 'category' | 'gtm' | 'strategy'
   >('all');
+  const [expandedResearch, setExpandedResearch] = useState<Set<string>>(new Set());
+
+  const toggleResearchSection = useCallback((id: string) => {
+    setExpandedResearch(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const expandAll = useCallback(() => {
+    setExpandedResearch(new Set(['vc', 'foundations', 'category', 'gtm', 'strategy']));
+  }, []);
+
+  const collapseAll = useCallback(() => {
+    setExpandedResearch(new Set());
+  }, []);
 
   const SECTIONS = [
     { id: 'all' as const, label: 'All' },
@@ -2677,8 +2689,269 @@ function ResearchFrameworks() {
 
   return (
     <div>
-      {/* Header */}
-      <div style={{ ...card, borderTop: '3px solid #8b5cf6' }}>
+      {/* Sales Positioning */}
+      <div style={{ ...card, borderTop: '3px solid #f59e0b' }}>
+        <div style={sectionTitle}>
+          <Target size={18} style={{ color: '#f59e0b' }} /> Sales Positioning
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {[
+            {
+              persona: 'Strategy Leaders',
+              hook: '"How do you measure decision quality today?"',
+              pitch:
+                'Show DQI scoring across their last 10 major decisions. Highlight the ones with low scores that later underperformed.',
+              close: 'Free pilot: upload 3 recent strategic documents and see the scores.',
+            },
+            {
+              persona: 'M&A / Decision Owners',
+              hook: '"When was the last time someone challenged the core thesis?"',
+              pitch:
+                'Demo the Boardroom Simulation on their own document. The "Risk Officer" persona usually surfaces something nobody raised.',
+              close: 'Let them see their own blind spots in real-time.',
+            },
+            {
+              persona: 'Risk / Compliance',
+              hook: '"How do you document decision rationale for stakeholder reporting?"',
+              pitch:
+                'Show the compliance mapping + audit trail. Regulatory requirements are a real pain point for regulated organizations.',
+              close:
+                'Compliance is the "vitamin" that gets you in the door; the bias detection is the "painkiller" that keeps them.',
+            },
+            {
+              persona: 'Board / Stakeholders',
+              hook: '"Do your reports pass the survivorship bias test?"',
+              pitch:
+                'Upload a sample board report — the platform will flag selective reporting, framing effects, and cherry-picked metrics.',
+              close: 'Position as decision transparency tool for the entire organization.',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{ padding: 14, borderRadius: 8, background: 'var(--bg-tertiary, #0a0a0a)' }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: 6,
+                }}
+              >
+                {item.persona}
+              </div>
+              <div style={{ fontSize: 12, color: '#f59e0b', fontStyle: 'italic', marginBottom: 6 }}>
+                {item.hook}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
+                {item.pitch}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                <strong>Close:</strong> {item.close}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Key Talking Points */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <MessageSquare size={18} style={{ color: '#3b82f6' }} /> Key Talking Points
+        </div>
+        <div style={{ display: 'grid', gap: 8 }}>
+          {[
+            {
+              point: 'ROI is immediate',
+              detail:
+                'A single avoided bad deal saves $50M-$500M. The platform pays for itself after one corrected thesis.',
+            },
+            {
+              point: 'Not a replacement — an augmentation',
+              detail:
+                "We don't tell you what to decide. We show you what you might be missing. Like a spell-checker for cognitive biases.",
+            },
+            {
+              point: 'Gets smarter with you',
+              detail:
+                'After 50 decisions, we know which biases actually cost YOUR org money. No competitor can replicate 18 months of your calibration data.',
+            },
+            {
+              point: 'Sell to the committee, not the individual',
+              detail:
+                'Slack integration + cognitive audit of team decisions is the B2B killer feature. Individual bias detection is nice-to-have; team decision auditing is must-have.',
+            },
+            {
+              point: 'The Toxic Combinations are viral',
+              detail:
+                '"The Echo Chamber", "The Sunk Ship" — memorable, tweetable. Consider publishing a "Taxonomy of Bad Decisions" for thought leadership.',
+            },
+            {
+              point: 'Counterfactual is the ROI story',
+              detail:
+                '"If you\'d removed anchoring from your last 20 decisions, success rate would have been 14% higher — that\'s $2.3M in avoided losses."',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{
+                padding: 10,
+                borderRadius: 8,
+                background: 'var(--bg-tertiary, #0a0a0a)',
+                display: 'flex',
+                gap: 10,
+              }}
+            >
+              <ChevronRight size={14} style={{ color: '#3b82f6', flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {item.point}
+                </span>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 6 }}>
+                  — {item.detail}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Prioritized Backlog */}
+      <div style={card}>
+        <div style={sectionTitle}>
+          <Rocket size={18} style={{ color: '#6366f1' }} /> Prioritized Backlog
+        </div>
+        <div
+          style={{
+            ...tableRow,
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            gridTemplateColumns: '2fr 1fr 1fr 3fr',
+            borderBottom: '2px solid var(--border-primary, #222)',
+          }}
+        >
+          <div>Feature</div>
+          <div>Impact</div>
+          <div>Effort</div>
+          <div>Why</div>
+        </div>
+        {[
+          [
+            'Bias Genome Leaderboard',
+            'Extreme',
+            '5h',
+            'Cross-org benchmarking — "Your confirmation bias rate is 85th percentile." Data network effect.',
+          ],
+          [
+            'Longitudinal Bias Tracking',
+            'Very High',
+            '6h',
+            'Track bias drift across project lifecycle. Does confirmation bias increase from screening to follow-on?',
+          ],
+          [
+            'Knowledge Graph Explorer (D3)',
+            'Very High',
+            '6h',
+            'Visual force-directed graph. Makes hidden patterns viscerally obvious.',
+          ],
+          [
+            'Regulatory Compliance Dashboard',
+            'High',
+            '4h',
+            'Compliance mapper exists but no UI. For regulated industries, this alone justifies subscription.',
+          ],
+          [
+            'Decision Confidence Tracker',
+            'High',
+            '3h',
+            'Bayesian belief-update visualization. "Your confidence shifted 72% → 41%." Killer differentiator.',
+          ],
+          [
+            'Org Calibration Dashboard',
+            'Very High',
+            '4h',
+            'Show how platform learned YOUR patterns. Makes switching cost tangible and visible.',
+          ],
+          [
+            'Industry Vertical Bias Profiles',
+            'High',
+            '4h',
+            'PE has different dominant patterns than healthcare. Vertical-specific baselines for new orgs.',
+          ],
+          [
+            'Jockey/Horse Balance Score',
+            'High',
+            '3h',
+            'Detect when IC memos are 80% team pedigree / 20% fundamentals. Flag imbalanced theses.',
+          ],
+          [
+            'Analytics Dashboard UI',
+            'High',
+            '4h',
+            'Visualize product analytics events, demo funnel conversion',
+          ],
+          [
+            'Extension Chrome Web Store',
+            'Very High',
+            '6h',
+            'Publish extension for frictionless distribution',
+          ],
+        ].map(([feat, impact, effort, why], i) => {
+          const impactColor =
+            impact === 'Extreme' ? '#ef4444' : impact === 'Very High' ? '#22c55e' : '#3b82f6';
+          return (
+            <div
+              key={i}
+              style={{
+                ...tableRow,
+                color: 'var(--text-secondary)',
+                gridTemplateColumns: '2fr 1fr 1fr 3fr',
+              }}
+            >
+              <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{feat}</div>
+              <div>
+                <span style={badge(impactColor)}>{impact}</span>
+              </div>
+              <div style={{ color: 'var(--text-muted)' }}>{effort}</div>
+              <div>{why}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Founder Notes */}
+      <div style={{ ...card, borderLeft: '3px solid #a78bfa' }}>
+        <div style={sectionTitle}>
+          <BookOpen size={18} style={{ color: '#a78bfa' }} /> Founder Notes
+        </div>
+        <ul
+          style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 2, paddingLeft: 16 }}
+        >
+          <li>
+            <strong>Your deepest moat is time-to-data, not features.</strong> Frame the first 6
+            months as a calibration investment.
+          </li>
+          <li>
+            <strong>The Outcome Gate is controversial AND valuable.</strong> Show calibration
+            improvement to make feedback feel rewarding, not punitive.
+          </li>
+          <li>
+            <strong>Consider a &quot;Decision Score&quot; that&apos;s external-facing</strong> —
+            like a credit score for organizational decision quality. Creates a new category.
+          </li>
+          <li>
+            <strong>Sell the Bias Genome to investors.</strong> &quot;World&apos;s first dataset of
+            which cognitive biases predict failure, by industry and decision type.&quot;
+          </li>
+          <li>
+            <strong>The counterfactual engine is underexposed.</strong> Get it into the UI and the
+            sales deck — it&apos;s the ROI story that closes enterprise deals.
+          </li>
+        </ul>
+      </div>
+
+      {/* ── Research Section ── */}
+      <div style={{ ...card, borderTop: '3px solid #8b5cf6', marginTop: 24 }}>
         <div style={label}>RESEARCH-TO-ACTION LIBRARY</div>
         <h2
           style={{
@@ -2699,8 +2972,8 @@ function ResearchFrameworks() {
         </p>
       </div>
 
-      {/* Sub-section pills */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
+      {/* Sub-section pills + expand/collapse */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         {SECTIONS.map(s => (
           <button
             key={s.id}
@@ -2719,15 +2992,61 @@ function ResearchFrameworks() {
             {s.label}
           </button>
         ))}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+          <button
+            onClick={expandAll}
+            style={{
+              padding: '4px 10px',
+              fontSize: 11,
+              borderRadius: 6,
+              border: '1px solid var(--border-primary, #333)',
+              background: 'transparent',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+            }}
+          >
+            Expand All
+          </button>
+          <button
+            onClick={collapseAll}
+            style={{
+              padding: '4px 10px',
+              fontSize: 11,
+              borderRadius: 6,
+              border: '1px solid var(--border-primary, #333)',
+              background: 'transparent',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+            }}
+          >
+            Collapse All
+          </button>
+        </div>
       </div>
 
       {/* ── VC Decision Science ── */}
       {(section === 'all' || section === 'vc') && (
         <>
-          <div style={{ ...card, borderLeft: '3px solid #6366f1' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#6366f1', marginBottom: 12 }}>
-              VC Decision Science
+          <div
+            style={{ ...card, borderLeft: '3px solid #6366f1', cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('vc')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#6366f1' }}>
+                VC Decision Science
+              </div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#6366f1',
+                  transform: expandedResearch.has('vc') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
             </div>
+          </div>
+          {expandedResearch.has('vc') && (
+          <div style={{ ...card, borderLeft: '3px solid #6366f1', marginTop: -8, borderTop: 'none' }}>
             <div style={{ display: 'grid', gap: 12 }}>
               {[
                 {
@@ -2984,7 +3303,6 @@ function ResearchFrameworks() {
                 </div>
               ))}
             </div>
-          </div>
           <ResearchCard
             title="Daniel Kahneman: Beyond Cognitive Biases — Reducing Noise"
             source="ClearerThinking Podcast"
@@ -3000,15 +3318,34 @@ function ResearchFrameworks() {
               'Create 1-pager: "How Much Noise Is In Your Decisions?"',
             ]}
           />
+          </div>
+          )}
         </>
       )}
 
       {/* ── Decision Science Foundations ── */}
       {(section === 'all' || section === 'foundations') && (
-        <div style={{ ...card, borderLeft: '3px solid #f59e0b', marginTop: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b', marginBottom: 4 }}>
-            Decision Science Foundations
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #f59e0b', marginTop: 16, cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('foundations')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b' }}>
+                Decision Science Foundations
+              </div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#f59e0b',
+                  transform: expandedResearch.has('foundations') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
           </div>
+          {expandedResearch.has('foundations') && (
+        <div style={{ ...card, borderLeft: '3px solid #f59e0b', marginTop: -8 }}>
           <ResearchCard
             title='Olivier Sibony: "Decision Hygiene" Framework'
             source="Behavioral Grooves Podcast + Euronews"
@@ -3070,14 +3407,33 @@ function ResearchFrameworks() {
             ]}
           />
         </div>
+          )}
+        </>
       )}
 
       {/* ── Category Creation ── */}
       {(section === 'all' || section === 'category') && (
-        <div style={{ ...card, borderLeft: '3px solid #ef4444', marginTop: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#ef4444', marginBottom: 4 }}>
-            Category Creation
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #ef4444', marginTop: 16, cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('category')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#ef4444' }}>
+                Category Creation
+              </div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#ef4444',
+                  transform: expandedResearch.has('category') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
           </div>
+          {expandedResearch.has('category') && (
+        <div style={{ ...card, borderLeft: '3px solid #ef4444', marginTop: -8 }}>
           <ResearchCard
             title='Christopher Lochhead: "How to Become a Category Pirate"'
             source="Lenny's Podcast"
@@ -3097,14 +3453,33 @@ function ResearchFrameworks() {
             ]}
           />
         </div>
+          )}
+        </>
       )}
 
       {/* ── GTM & Sales ── */}
       {(section === 'all' || section === 'gtm') && (
-        <div style={{ ...card, borderLeft: '3px solid #3b82f6', marginTop: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#3b82f6', marginBottom: 4 }}>
-            GTM &amp; Sales
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #3b82f6', marginTop: 16, cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('gtm')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#3b82f6' }}>
+                GTM &amp; Sales
+              </div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#3b82f6',
+                  transform: expandedResearch.has('gtm') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
           </div>
+          {expandedResearch.has('gtm') && (
+        <div style={{ ...card, borderLeft: '3px solid #3b82f6', marginTop: -8 }}>
           <ResearchCard
             title="Ray Zhou (Affinity): From College Dropout to SaaS Leader"
             source="Platform Builders Podcast"
@@ -3122,14 +3497,33 @@ function ResearchFrameworks() {
             ]}
           />
         </div>
+          )}
+        </>
       )}
 
       {/* ── Founder Strategy ── */}
       {(section === 'all' || section === 'strategy') && (
-        <div style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#a78bfa', marginBottom: 4 }}>
-            Founder Strategy
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: 16, cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('strategy')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#a78bfa' }}>
+                Founder Strategy
+              </div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#a78bfa',
+                  transform: expandedResearch.has('strategy') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
           </div>
+          {expandedResearch.has('strategy') && (
+        <div style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: -8 }}>
           <ResearchCard
             title="Peter Thiel: Zero to One — Contrarian Truths"
             source="The Investors Podcast (MI383)"
@@ -3149,6 +3543,8 @@ function ResearchFrameworks() {
             ]}
           />
         </div>
+          )}
+        </>
       )}
 
       {/* ── Connecting Thread ── */}
@@ -3231,289 +3627,51 @@ function ResearchFrameworks() {
   );
 }
 
-// ─── Tab Content: Founder Playbook ──────────────────────────────────────────
+// ─── Search Results ────────────────────────────────────────────────────────
 
-function FounderPlaybook() {
+function SearchResults({ query, tabContent }: { query: string; tabContent: Record<TabId, React.ReactNode> }) {
+  const q = query.toLowerCase().trim();
+  if (!q) return null;
+
+  // Render all tab contents and let the browser render them; we overlay a search notice
   return (
     <div>
-      {/* Sales Positioning */}
-      <div style={{ ...card, borderTop: '3px solid #f59e0b' }}>
-        <div style={sectionTitle}>
-          <Target size={18} style={{ color: '#f59e0b' }} /> Sales Positioning
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {[
-            {
-              persona: 'Strategy Leaders',
-              hook: '"How do you measure decision quality today?"',
-              pitch:
-                'Show DQI scoring across their last 10 major decisions. Highlight the ones with low scores that later underperformed.',
-              close: 'Free pilot: upload 3 recent strategic documents and see the scores.',
-            },
-            {
-              persona: 'M&A / Decision Owners',
-              hook: '"When was the last time someone challenged the core thesis?"',
-              pitch:
-                'Demo the Boardroom Simulation on their own document. The "Risk Officer" persona usually surfaces something nobody raised.',
-              close: 'Let them see their own blind spots in real-time.',
-            },
-            {
-              persona: 'Risk / Compliance',
-              hook: '"How do you document decision rationale for stakeholder reporting?"',
-              pitch:
-                'Show the compliance mapping + audit trail. Regulatory requirements are a real pain point for regulated organizations.',
-              close:
-                'Compliance is the "vitamin" that gets you in the door; the bias detection is the "painkiller" that keeps them.',
-            },
-            {
-              persona: 'Board / Stakeholders',
-              hook: '"Do your reports pass the survivorship bias test?"',
-              pitch:
-                'Upload a sample board report — the platform will flag selective reporting, framing effects, and cherry-picked metrics.',
-              close: 'Position as decision transparency tool for the entire organization.',
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              style={{ padding: 14, borderRadius: 8, background: 'var(--bg-tertiary, #0a0a0a)' }}
-            >
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  marginBottom: 6,
-                }}
-              >
-                {item.persona}
-              </div>
-              <div style={{ fontSize: 12, color: '#f59e0b', fontStyle: 'italic', marginBottom: 6 }}>
-                {item.hook}
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
-                {item.pitch}
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                <strong>Close:</strong> {item.close}
-              </div>
-            </div>
-          ))}
-        </div>
+      <div
+        style={{
+          ...card,
+          borderLeft: '3px solid #6366f1',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          marginBottom: 16,
+        }}
+      >
+        <Search size={14} style={{ color: '#6366f1', flexShrink: 0 }} />
+        <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+          Showing all tabs filtered by &quot;<strong style={{ color: '#6366f1' }}>{query}</strong>&quot;
+          — use <kbd style={{ padding: '1px 5px', borderRadius: 4, border: '1px solid var(--border-primary, #333)', fontSize: 11 }}>Ctrl+F</kbd> to jump to matches
+        </span>
       </div>
-
-      {/* Key Talking Points */}
-      <div style={card}>
-        <div style={sectionTitle}>
-          <MessageSquare size={18} style={{ color: '#3b82f6' }} /> Key Talking Points
+      {TABS.map(tab => (
+        <div key={tab.id} style={{ marginBottom: 24 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 8,
+              padding: '8px 0',
+              borderBottom: '1px solid var(--border-primary, #222)',
+            }}
+          >
+            {tab.icon}
+            <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
+              {tab.label}
+            </span>
+          </div>
+          {tabContent[tab.id]}
         </div>
-        <div style={{ display: 'grid', gap: 8 }}>
-          {[
-            {
-              point: 'ROI is immediate',
-              detail:
-                'A single avoided bad deal saves $50M-$500M. The platform pays for itself after one corrected thesis.',
-            },
-            {
-              point: 'Not a replacement — an augmentation',
-              detail:
-                "We don't tell you what to decide. We show you what you might be missing. Like a spell-checker for cognitive biases.",
-            },
-            {
-              point: 'Gets smarter with you',
-              detail:
-                'After 50 decisions, we know which biases actually cost YOUR org money. No competitor can replicate 18 months of your calibration data.',
-            },
-            {
-              point: 'Sell to the committee, not the individual',
-              detail:
-                'Slack integration + cognitive audit of team decisions is the B2B killer feature. Individual bias detection is nice-to-have; team decision auditing is must-have.',
-            },
-            {
-              point: 'The Toxic Combinations are viral',
-              detail:
-                '"The Echo Chamber", "The Sunk Ship" — memorable, tweetable. Consider publishing a "Taxonomy of Bad Decisions" for thought leadership.',
-            },
-            {
-              point: 'Counterfactual is the ROI story',
-              detail:
-                '"If you\'d removed anchoring from your last 20 decisions, success rate would have been 14% higher — that\'s $2.3M in avoided losses."',
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              style={{
-                padding: 10,
-                borderRadius: 8,
-                background: 'var(--bg-tertiary, #0a0a0a)',
-                display: 'flex',
-                gap: 10,
-              }}
-            >
-              <ChevronRight size={14} style={{ color: '#3b82f6', flexShrink: 0, marginTop: 2 }} />
-              <div>
-                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-                  {item.point}
-                </span>
-                <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 6 }}>
-                  — {item.detail}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* What to Build Next */}
-      <div style={card}>
-        <div style={sectionTitle}>
-          <Rocket size={18} style={{ color: '#6366f1' }} /> Prioritized Backlog
-        </div>
-        <div
-          style={{
-            ...tableRow,
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            gridTemplateColumns: '2fr 1fr 1fr 3fr',
-            borderBottom: '2px solid var(--border-primary, #222)',
-          }}
-        >
-          <div>Feature</div>
-          <div>Impact</div>
-          <div>Effort</div>
-          <div>Why</div>
-        </div>
-        {[
-          [
-            'Bias Genome Leaderboard',
-            'Extreme',
-            '5h',
-            'Cross-org benchmarking — "Your confirmation bias rate is 85th percentile." Data network effect.',
-          ],
-          [
-            'Counterfactual UI Slider (SHIPPED)',
-            'High',
-            '3h',
-            'Interactive: "If we removed anchoring, success probability: 62% → 78%." Board presentation gold.',
-          ],
-          [
-            'Decision Graph Explorer (D3) (SHIPPED)',
-            'Very High',
-            '6h',
-            'Visual force-directed graph. Makes hidden patterns viscerally obvious.',
-          ],
-          [
-            'Regulatory Compliance Dashboard',
-            'High',
-            '4h',
-            'Compliance mapper exists but no UI. For regulated industries, this alone justifies subscription.',
-          ],
-          [
-            'Decision Confidence Tracker',
-            'High',
-            '3h',
-            'Bayesian belief-update visualization. "Your confidence shifted 72% → 41%." Killer differentiator.',
-          ],
-          [
-            'Org Calibration Dashboard',
-            'Very High',
-            '4h',
-            'Show how platform learned YOUR patterns. Makes switching cost tangible and visible.',
-          ],
-          [
-            'Industry Vertical Bias Profiles',
-            'High',
-            '4h',
-            'PE has different dominant patterns than healthcare. Vertical-specific baselines for new orgs.',
-          ],
-          [
-            'Quick Scan Mode (SHIPPED)',
-            'Very High',
-            '4h',
-            'SHIPPED: Dashboard modal + platform API. Paste text → <5s Gemini bias scan. Shared utility with extension. Matches VC rapid-filter workflow.',
-          ],
-          [
-            'Longitudinal Bias Tracking',
-            'Very High',
-            '6h',
-            'Strebulaev "Double Down & Quit": track bias drift across deal lifecycle. Does confirmation bias increase from screening to follow-on?',
-          ],
-          [
-            'Jockey/Horse Balance Score',
-            'High',
-            '3h',
-            'Strebulaev "Jockey vs Horse": detect when IC memos are 80% team pedigree / 20% fundamentals. Flag imbalanced theses.',
-          ],
-          [
-            'Analytics Dashboard UI',
-            'High',
-            '4h',
-            'Visualize product analytics events, demo funnel conversion',
-          ],
-          [
-            'Demo Conversion Tracking (SHIPPED)',
-            'High',
-            '2h',
-            'SHIPPED: 10 funnel events wired across demo, login, marketing, analysis, case study pages. Fire-and-forget trackEvent() with debounced ROI slider.',
-          ],
-          [
-            'Extension Chrome Web Store',
-            'Very High',
-            '6h',
-            'Publish extension for frictionless distribution',
-          ],
-        ].map(([feat, impact, effort, why], i) => {
-          const impactColor =
-            impact === 'Extreme' ? '#ef4444' : impact === 'Very High' ? '#22c55e' : '#3b82f6';
-          return (
-            <div
-              key={i}
-              style={{
-                ...tableRow,
-                color: 'var(--text-secondary)',
-                gridTemplateColumns: '2fr 1fr 1fr 3fr',
-              }}
-            >
-              <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{feat}</div>
-              <div>
-                <span style={badge(impactColor)}>{impact}</span>
-              </div>
-              <div style={{ color: 'var(--text-muted)' }}>{effort}</div>
-              <div>{why}</div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Founder Tips */}
-      <div style={{ ...card, borderLeft: '3px solid #a78bfa' }}>
-        <div style={sectionTitle}>
-          <BookOpen size={18} style={{ color: '#a78bfa' }} /> Founder Notes
-        </div>
-        <ul
-          style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 2, paddingLeft: 16 }}
-        >
-          <li>
-            <strong>Your deepest moat is time-to-data, not features.</strong> Frame the first 6
-            months as a calibration investment.
-          </li>
-          <li>
-            <strong>The Outcome Gate is controversial AND valuable.</strong> Show calibration
-            improvement to make feedback feel rewarding, not punitive.
-          </li>
-          <li>
-            <strong>Consider a &quot;Decision Score&quot; that&apos;s external-facing</strong> —
-            like a credit score for organizational decision quality. Creates a new category.
-          </li>
-          <li>
-            <strong>Sell the Bias Genome to investors.</strong> &quot;World&apos;s first dataset of
-            which cognitive biases predict failure, by industry and decision type.&quot;
-          </li>
-          <li>
-            <strong>The counterfactual engine is underexposed.</strong> Get it into the UI and the
-            sales deck — it&apos;s the ROI story that closes enterprise deals.
-          </li>
-        </ul>
-      </div>
+      ))}
     </div>
   );
 }
@@ -3528,6 +3686,8 @@ export default function FounderHubPage() {
   const [unlocked, setUnlocked] = useState(false);
   const [passInput, setPassInput] = useState('');
   const [passError, setPassError] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const handleUnlock = useCallback(() => {
     if (!FOUNDER_PASS) {
@@ -3541,6 +3701,19 @@ export default function FounderHubPage() {
       setPassError(true);
     }
   }, [passInput]);
+
+  // Keyboard shortcut: Cmd/Ctrl+K to focus search
+  useEffect(() => {
+    if (!unlocked) return;
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [unlocked]);
 
   // Password gate
   if (!unlocked) {
@@ -3626,58 +3799,108 @@ export default function FounderHubPage() {
     pipeline: <CorePipeline />,
     scoring: <ScoringEngine />,
     integrations: <IntegrationsAndFlywheel />,
-    moat: <CompetitiveMoat />,
-    market: <MarketStrategy />,
+    strategy: <StrategyAndPositioning />,
     sales: <SalesToolkit />,
     stats: <LiveStats />,
-    frameworks: <ResearchFrameworks />,
-    playbook: <FounderPlaybook />,
+    playbook: <PlaybookAndResearch />,
   };
+
+  // TAB_CONTENT is rendered below after password gate
 
   return (
     <ErrorBoundary sectionName="Founder Hub">
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Header */}
-        <header style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-            <Rocket size={26} style={{ color: '#6366f1' }} />
-            <h1
-              style={{
-                fontSize: 24,
-                fontWeight: 800,
-                color: 'var(--text-primary, #fff)',
-                margin: 0,
-              }}
-            >
-              Founder Hub
-            </h1>
+        {/* Header + Search */}
+        <header style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Rocket size={26} style={{ color: '#6366f1' }} />
+              <h1
+                style={{
+                  fontSize: 24,
+                  fontWeight: 800,
+                  color: 'var(--text-primary, #fff)',
+                  margin: 0,
+                }}
+              >
+                Founder Hub
+              </h1>
+            </div>
+            {/* Global Search */}
+            <div style={{ position: 'relative', width: 260 }}>
+              <Search
+                size={14}
+                style={{
+                  position: 'absolute',
+                  left: 10,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-muted, #71717a)',
+                }}
+              />
+              <input
+                ref={searchRef}
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search content... (⌘K)"
+                style={{
+                  width: '100%',
+                  padding: '8px 32px 8px 30px',
+                  fontSize: 12,
+                  borderRadius: 8,
+                  border: '1px solid var(--border-primary, #333)',
+                  background: 'var(--bg-secondary, #111)',
+                  color: 'var(--text-primary, #fff)',
+                  outline: 'none',
+                }}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: 8,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: 2,
+                  }}
+                >
+                  <X size={12} />
+                </button>
+              )}
+            </div>
           </div>
           <p style={{ fontSize: 13, color: 'var(--text-muted, #71717a)', margin: 0 }}>
-            Your living knowledge board — product features, moat, pitch narrative, and tactical
-            playbook.
+            Your living knowledge board — product features, strategy, sales playbook, and research.
           </p>
         </header>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation — responsive scrollable strip */}
         <div
           style={{
             display: 'flex',
-            gap: 4,
+            gap: 2,
             marginBottom: 24,
             overflowX: 'auto',
             borderBottom: '1px solid var(--border-primary, #222)',
             paddingBottom: 0,
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
           }}
         >
           {TABS.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => { setActiveTab(tab.id); setSearchQuery(''); }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                padding: '10px 16px',
+                padding: '10px 14px',
                 fontSize: 13,
                 fontWeight: activeTab === tab.id ? 700 : 500,
                 color:
@@ -3688,6 +3911,7 @@ export default function FounderHubPage() {
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 transition: 'color 0.15s, border-color 0.15s',
+                flexShrink: 0,
               }}
             >
               {tab.icon}
@@ -3697,311 +3921,15 @@ export default function FounderHubPage() {
         </div>
 
         {/* Tab Content */}
-        {TAB_CONTENT[activeTab]}
+        {searchQuery ? (
+          <SearchResults query={searchQuery} tabContent={TAB_CONTENT} />
+        ) : (
+          TAB_CONTENT[activeTab]
+        )}
 
         {/* AI Chat Widget */}
-        <FounderChatWidget />
+        <FounderChatWidget founderPass={FOUNDER_PASS} />
       </div>
     </ErrorBoundary>
-  );
-}
-
-// ─── Founder Chat Widget ────────────────────────────────────────────────────
-
-interface ChatMsg {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-const STARTER_QUESTIONS = [
-  'Elevator pitch for a CSO?',
-  'How do we beat competitors?',
-  'What did Strebulaev say?',
-  'Demo script for exec meeting',
-];
-
-function FounderChatWidget() {
-  const [open, setOpen] = useState(false);
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<ChatMsg[]>([]);
-  const [streaming, setStreaming] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const handleSend = useCallback(async () => {
-    if (!input.trim() || streaming) return;
-    const userMsg = input.trim();
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
-    setStreaming(true);
-
-    try {
-      const res = await fetch('/api/founder-hub/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-founder-pass': FOUNDER_PASS,
-        },
-        body: JSON.stringify({
-          message: userMsg,
-          history: messages.slice(-10),
-        }),
-      });
-
-      if (!res.ok) {
-        setMessages(prev => [
-          ...prev,
-          { role: 'assistant', content: 'Error: ' + (res.statusText || 'Failed to connect') },
-        ]);
-        setStreaming(false);
-        return;
-      }
-
-      const reader = res.body?.getReader();
-      if (!reader) {
-        setStreaming(false);
-        return;
-      }
-
-      const decoder = new TextDecoder();
-      let assistantContent = '';
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const text = decoder.decode(value, { stream: true });
-          const lines = text.split('\n');
-
-          for (const line of lines) {
-            if (!line.startsWith('data: ')) continue;
-            try {
-              const data = JSON.parse(line.slice(6));
-              if (data.type === 'chunk' && data.text) {
-                assistantContent += data.text;
-                setMessages(prev => {
-                  const updated = [...prev];
-                  updated[updated.length - 1] = { role: 'assistant', content: assistantContent };
-                  return updated;
-                });
-              }
-            } catch {
-              // malformed SSE line
-            }
-          }
-        }
-      } finally {
-        reader.cancel();
-      }
-    } catch {
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', content: 'Connection error. Please try again.' },
-      ]);
-    } finally {
-      setStreaming(false);
-    }
-  }, [input, messages, streaming]);
-
-  if (!open) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          width: 52,
-          height: 52,
-          borderRadius: '50%',
-          background: '#6366f1',
-          color: '#fff',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
-          zIndex: 50,
-          fontSize: 22,
-        }}
-        title="Ask the Founder AI"
-      >
-        <MessageSquare size={22} />
-      </button>
-    );
-  }
-
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: 24,
-        right: 24,
-        width: 400,
-        height: 520,
-        borderRadius: 16,
-        background: 'var(--bg-secondary, #111)',
-        border: '1px solid var(--border-primary, #333)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
-        zIndex: 50,
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: '12px 16px',
-          borderBottom: '1px solid var(--border-primary, #333)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: 'rgba(99, 102, 241, 0.08)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Brain size={16} style={{ color: '#6366f1' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-            Founder AI
-          </span>
-        </div>
-        <button
-          onClick={() => setOpen(false)}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            cursor: 'pointer',
-            padding: 4,
-          }}
-        >
-          &times;
-        </button>
-      </div>
-
-      {/* Messages */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '12px 14px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-        }}
-      >
-        {messages.length === 0 && (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '30px 10px',
-              color: 'var(--text-muted)',
-              fontSize: 12,
-              lineHeight: 1.6,
-            }}
-          >
-            Ask me about your product, competitors, sales strategy, market positioning, or research
-            frameworks.
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 4,
-                justifyContent: 'center',
-                marginTop: 10,
-              }}
-            >
-              {STARTER_QUESTIONS.map(q => (
-                <button
-                  key={q}
-                  onClick={() => setInput(q)}
-                  style={{
-                    padding: '4px 10px',
-                    fontSize: 11,
-                    borderRadius: 12,
-                    border: '1px solid var(--border-primary, #333)',
-                    background: 'transparent',
-                    color: '#6366f1',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '85%',
-              padding: '8px 12px',
-              borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-              background: msg.role === 'user' ? '#6366f1' : 'var(--bg-tertiary, #1a1a1a)',
-              color: msg.role === 'user' ? '#fff' : 'var(--text-secondary)',
-              fontSize: 12,
-              lineHeight: 1.6,
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {msg.content || (streaming && i === messages.length - 1 ? '...' : '')}
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <div
-        style={{
-          padding: '10px 12px',
-          borderTop: '1px solid var(--border-primary, #333)',
-          display: 'flex',
-          gap: 8,
-        }}
-      >
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-          placeholder="Ask the Founder AI..."
-          disabled={streaming}
-          style={{
-            flex: 1,
-            padding: '8px 12px',
-            fontSize: 12,
-            borderRadius: 8,
-            border: '1px solid var(--border-primary, #333)',
-            background: 'var(--bg-tertiary, #0a0a0a)',
-            color: 'var(--text-primary)',
-            outline: 'none',
-          }}
-        />
-        <button
-          onClick={handleSend}
-          disabled={streaming || !input.trim()}
-          style={{
-            padding: '8px 14px',
-            fontSize: 12,
-            fontWeight: 600,
-            borderRadius: 8,
-            border: 'none',
-            background: input.trim() && !streaming ? '#6366f1' : 'var(--bg-tertiary, #1a1a1a)',
-            color: input.trim() && !streaming ? '#fff' : 'var(--text-muted)',
-            cursor: streaming ? 'wait' : 'pointer',
-          }}
-        >
-          {streaming ? '...' : 'Send'}
-        </button>
-      </div>
-    </div>
   );
 }

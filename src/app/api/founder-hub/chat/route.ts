@@ -120,11 +120,13 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Thiel: Contrarian truth: "Executive teams think decisions are rational but they're riddled with measurable noise and bias nobody audits."
 
 === INTEGRATIONS ===
-- Slack: Decision detection, pre-decision coaching with org-calibrated nudges, thread bias accumulation, audit summary card on commitment, /di commands (analyze, prior, outcome, status), App Home dashboard
+- Slack: Decision detection, pre-decision coaching with org-calibrated nudges, thread bias accumulation, audit summary card on commitment. 7 slash commands: /di help (Block Kit categorized), /di analyze (full audit + Copilot link), /di score (instant bias check), /di brief (org intelligence), /di status (quality trends + calibration), /di prior, /di outcome. App Home dashboard. Auto-creates CopilotSession after every Slack audit with "Continue in Copilot" button for seamless handoff.
 - Decision Knowledge Graph: 8 edge types, 5 node types, 5 anti-patterns, multi-touch attribution, edge learning from outcomes
 - Committee Decision Rooms: blind prior collection, consensus scoring (0-100), unanimity warning (Strebulaev), dissent quality score, bias briefing
 - Calibration Gamification: Bronze→Silver→Gold→Platinum, milestone tracking, "each outcome makes AI smarter"
 - Personal Calibration Dashboard: /calibration — per-user decision patterns, recurring biases with trends, calibration score, blind spots, strength patterns
+- Copilot AI Assistant: CopilotSession + CopilotTurn models for persistent AI coaching. Auto-seeded from Slack audits. Accessible from /dashboard/ai-assistant.
+- Intelligence Brief: Contextual org intelligence on empty dashboard states — shows top dangerous biases, maturity grade, decision stats, and page-specific tips.
 
 === FOUNDER NOTES ===
 - Deepest moat is time-to-data, not features. Frame first 6 months as calibration investment.
@@ -135,17 +137,21 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Consider a "Decision Score" that's external-facing — like a credit score for organizational decision quality.
 
 === RECENTLY SHIPPED FEATURES (March 2026) ===
+- Slack → Copilot Auto-Trigger: Auto-creates CopilotSession seeded with decision context after every Slack audit. "Continue in Copilot" button in Slack messages.
+- Intelligence Brief on Empty States: Contextual org intelligence (top dangerous biases, maturity grade, decision stats) replaces generic empty states across 4 dashboard pages.
+- Enhanced Slack Commands: 7 slash commands with rich Block Kit — /di help (categorized), /di score (instant bias check), /di brief (org intelligence), /di status (quality trends), /di analyze (with Copilot link), /di prior, /di outcome.
+- Bias Heat Map Enhancement: Density gutter minimap, confidence-based opacity, hover tooltips with excerpts, keyboard navigation (←→ cycle biases, H toggle heat map).
+- Enterprise Language Pivot: Decision types renamed from PE/VC-specific to enterprise-neutral (resource_allocation, strategic_proposal, initiative_closure).
+- Klein RPD Framework: Expert intuition amplification — recognition cues, narrative pre-mortems, RPD mental simulator, personal calibration dashboard. Dual framework: Kahneman debiasing + Klein intuition amplification.
 - Enhanced Public Demo: Streaming simulation UX with 3 sample docs at /demo, no login required. DQI badge animation.
-- Data-Backed ROI Calculator: Live outcome stats from /api/public/outcome-stats replace Kahneman defaults when ≥10 outcomes exist.
 - Case Study Export: One-click anonymized shareable analyses with permanent links. Available via Share modal.
 - Browser Extension: Chrome extension with quick-score popup (<5s) and full analysis sidepanel.
 - A/B Prompt Testing: Experiment dashboard with Thompson sampling auto-optimization.
 - Multi-Model Fallback: Gemini → Claude failover routing. Set AI_FALLBACK_ENABLED=true.
-- Graph Health Widget: Real-time knowledge graph density, isolated nodes, anti-pattern tracking on main dashboard.
+- Quick Bias Check: Dashboard modal for instant <5s bias scan via paste. Shared Gemini utility across extension + platform.
 - Counterfactual Analysis API: "What-if" decision path computation with narrative explanations.
 - Enterprise Project Types: M&A, Strategic Initiative, Risk Assessment, Vendor Evaluation, Product Launch, Restructuring — alongside existing PE/VC types.
-- Enterprise Case Studies: 9 case studies across PE/VC and enterprise decisions with confirmed outcomes.
-- Klein RPD Framework: Expert intuition amplification — recognition cues, narrative pre-mortems, RPD mental simulator, personal calibration dashboard. Dual framework: Kahneman debiasing + Klein intuition amplification.
+- Founder Hub Streamlining: Consolidated from 10 tabs to 8 (merged Moat+Market→Strategy, merged Research+Playbook→Playbook). Collapsible research sections, global search (⌘K), deduped content, responsive tab strip.
 `.trim();
 
 // ─── Route Handler ──────────────────────────────────────────────────────────
