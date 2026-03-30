@@ -1670,7 +1670,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <SectionDivider variant="angle" color="rgba(255, 255, 255, 0.06)" />
+      <SectionDivider variant="angle" color="rgba(0, 210, 255, 0.06)" />
 
       {/* Case Study — What Decision Intel Would Have Caught */}
       <section className="py-28 relative" style={{ background: 'var(--bg-primary)' }}>
@@ -2288,7 +2288,7 @@ export default function LandingPage() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(circle at center, rgba(255, 255, 255, 0.02) 0%, transparent 70%)',
+              'radial-gradient(circle at center, rgba(0, 210, 255, 0.02) 0%, transparent 70%)',
           }}
         />
         <div className="relative z-10" style={containerStyle}>
@@ -2296,7 +2296,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 50 }}
             animate={featuresInView ? { opacity: 1, y: 0 } : {}}
             className="mb-16 max-w-6xl mx-auto"
-            style={{ borderLeft: '3px solid #FFFFFF', paddingLeft: '24px' }}
+            style={{ borderLeft: '3px solid #00D2FF', paddingLeft: '24px' }}
           >
             <h2
               style={{
@@ -2343,8 +2343,8 @@ export default function LandingPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '14px',
-                      background: 'rgba(255, 255, 255, 0.06)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      background: 'rgba(0, 210, 255, 0.08)',
+                      border: '1px solid rgba(0, 210, 255, 0.15)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2469,8 +2469,8 @@ export default function LandingPage() {
                   style={{
                     padding: '10px',
                     borderRadius: '12px',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    background: 'rgba(0, 210, 255, 0.08)',
+                    border: '1px solid rgba(0, 210, 255, 0.15)',
                   }}
                 >
                   <Brain className="w-5 h-5" style={{ color: '#00D2FF' }} />
@@ -2582,7 +2582,7 @@ export default function LandingPage() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.03) 0%, transparent 60%)',
+              'radial-gradient(circle at 70% 30%, rgba(0, 210, 255, 0.03) 0%, transparent 60%)',
           }}
         />
         <div className="relative z-10" style={containerStyle}>
@@ -2590,7 +2590,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 50 }}
             animate={moatInView ? { opacity: 1, y: 0 } : {}}
             className="mb-16 max-w-6xl mx-auto"
-            style={{ borderLeft: '3px solid #FFFFFF', paddingLeft: '24px' }}
+            style={{ borderLeft: '3px solid #00D2FF', paddingLeft: '24px' }}
           >
             <h2
               style={{
@@ -2662,7 +2662,7 @@ export default function LandingPage() {
                     label: 'Analyze',
                     description:
                       'AI detects cognitive biases and quantifies decision noise across your decision-making teams',
-                    color: '#FFFFFF',
+                    color: '#00D2FF',
                   },
                   {
                     step: '2',
@@ -2676,7 +2676,7 @@ export default function LandingPage() {
                     label: 'Learn',
                     description:
                       'Outcomes detected automatically from documents, Slack, and web intelligence. Over time, you see exactly which biases cost your organization money — your data, not generic warnings',
-                    color: '#A3E635',
+                    color: '#6366F1',
                   },
                   {
                     step: '4',
@@ -2776,7 +2776,7 @@ export default function LandingPage() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px',
-                borderLeft: '3px solid rgba(255, 255, 255, 0.2)',
+                borderLeft: '3px solid rgba(0, 210, 255, 0.2)',
               }}
             >
               <div
@@ -2826,7 +2826,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 50 }}
             animate={roiInView ? { opacity: 1, y: 0 } : {}}
             className="mb-16 max-w-6xl mx-auto"
-            style={{ borderLeft: '3px solid #FFFFFF', paddingLeft: '24px' }}
+            style={{ borderLeft: '3px solid #00D2FF', paddingLeft: '24px' }}
           >
             <h2
               style={{
@@ -2914,7 +2914,7 @@ export default function LandingPage() {
                     aria-label="Annual Decisions"
                     className="w-full h-1 appearance-none cursor-pointer outline-none"
                     style={{
-                      accentColor: '#FFFFFF',
+                      accentColor: '#00D2FF',
                       background: 'rgba(255, 255, 255, 0.1)',
                       borderRadius: '4px',
                     }}
@@ -2963,7 +2963,7 @@ export default function LandingPage() {
                     aria-label="Average Decision Value"
                     className="w-full h-1 appearance-none cursor-pointer outline-none"
                     style={{
-                      accentColor: '#FFFFFF',
+                      accentColor: '#00D2FF',
                       background: 'rgba(255, 255, 255, 0.1)',
                       borderRadius: '4px',
                     }}
@@ -3007,9 +3007,9 @@ export default function LandingPage() {
               style={{
                 ...glassCard,
                 padding: '32px',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
+                border: '1px solid rgba(0, 210, 255, 0.12)',
                 boxShadow:
-                  '0 12px 48px rgba(0, 0, 0, 0.38), 0 0 40px rgba(255, 255, 255, 0.04), 0 1px 0 rgba(255,255,255,0.07) inset',
+                  '0 12px 48px rgba(0, 0, 0, 0.38), 0 0 40px rgba(0, 210, 255, 0.04), 0 1px 0 rgba(255,255,255,0.07) inset',
               }}
             >
               <div
@@ -3049,8 +3049,8 @@ export default function LandingPage() {
                       width: '8px',
                       height: '8px',
                       borderRadius: '50%',
-                      background: '#FFFFFF',
-                      boxShadow: '0 0 8px rgba(255, 255, 255, 0.3)',
+                      background: '#00D2FF',
+                      boxShadow: '0 0 8px rgba(0, 210, 255, 0.3)',
                     }}
                   />
                   <span
@@ -3281,7 +3281,7 @@ export default function LandingPage() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.02) 0%, transparent 60%)',
+              'radial-gradient(circle at 50% 40%, rgba(0, 210, 255, 0.02) 0%, transparent 60%)',
           }}
         />
         <div className="relative z-10" style={containerStyle}>
@@ -3324,7 +3324,7 @@ export default function LandingPage() {
                   padding: '8px 20px',
                   borderRadius: '9999px',
                   border: 'none',
-                  background: !isAnnual ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+                  background: !isAnnual ? 'rgba(0, 210, 255, 0.12)' : 'transparent',
                   color: !isAnnual ? 'var(--text-primary)' : 'var(--text-muted)',
                   fontSize: '0.84rem',
                   fontWeight: 600,
@@ -3340,7 +3340,7 @@ export default function LandingPage() {
                   padding: '8px 20px',
                   borderRadius: '9999px',
                   border: 'none',
-                  background: isAnnual ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+                  background: isAnnual ? 'rgba(0, 210, 255, 0.12)' : 'transparent',
                   color: isAnnual ? 'var(--text-primary)' : 'var(--text-muted)',
                   fontSize: '0.84rem',
                   fontWeight: 600,
@@ -3470,7 +3470,7 @@ export default function LandingPage() {
               transition={{ delay: 0.2 }}
               style={{
                 background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                border: '1px solid rgba(0, 210, 255, 0.3)',
                 borderRadius: '16px',
                 padding: '28px 24px',
                 display: 'flex',
@@ -3928,7 +3928,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 50 }}
             animate={faqInView ? { opacity: 1, y: 0 } : {}}
             className="mb-16 max-w-3xl mx-auto"
-            style={{ borderLeft: '3px solid #FFFFFF', paddingLeft: '24px' }}
+            style={{ borderLeft: '3px solid #00D2FF', paddingLeft: '24px' }}
           >
             <h2
               style={{
@@ -3994,7 +3994,7 @@ export default function LandingPage() {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(ellipse at center, rgba(255, 255, 255, 0.03) 0%, transparent 60%)',
+              'radial-gradient(ellipse at center, rgba(0, 210, 255, 0.03) 0%, transparent 60%)',
           }}
         />
         <div className="relative z-10" style={containerStyle}>
@@ -4016,9 +4016,9 @@ export default function LandingPage() {
                 padding: '6px 14px',
                 marginBottom: '24px',
                 borderRadius: '9999px',
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                color: '#FFFFFF',
+                background: 'rgba(0, 210, 255, 0.08)',
+                border: '1px solid rgba(0, 210, 255, 0.2)',
+                color: '#00D2FF',
                 fontSize: '0.8rem',
                 fontWeight: 600,
               }}
@@ -4040,7 +4040,7 @@ export default function LandingPage() {
               <br />
               <span
                 style={{
-                  background: 'linear-gradient(135deg, #FFFFFF, #d4d4d8)',
+                  background: 'linear-gradient(135deg, #00D2FF, #38BDF8, #6366F1)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                 }}
@@ -4123,7 +4123,8 @@ export default function LandingPage() {
         className="py-16 relative z-10"
         style={{
           background: 'var(--bg-primary)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          borderTop: '1px solid transparent',
+          borderImage: 'linear-gradient(90deg, transparent, rgba(0,210,255,0.2), transparent) 1',
         }}
       >
         <div style={containerStyle}>
