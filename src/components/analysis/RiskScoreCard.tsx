@@ -29,9 +29,7 @@ function formatCurrency(value: number, currency: string): string {
 }
 
 function formatBiasName(biasType: string): string {
-  return biasType
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function getRiskColor(score: number): string {
@@ -42,11 +40,16 @@ function getRiskColor(score: number): string {
 
 function getSeverityColor(severity: string): string {
   switch (severity) {
-    case 'critical': return '#f87171';
-    case 'high': return '#fb923c';
-    case 'medium': return '#FBBF24';
-    case 'low': return '#34d399';
-    default: return 'var(--text-muted)';
+    case 'critical':
+      return '#f87171';
+    case 'high':
+      return '#fb923c';
+    case 'medium':
+      return '#FBBF24';
+    case 'low':
+      return '#34d399';
+    default:
+      return 'var(--text-muted)';
   }
 }
 
@@ -80,15 +83,14 @@ export function RiskScoreCard({ analysisId }: RiskScoreCardProps) {
     }
 
     fetchRiskScore();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [analysisId]);
 
   if (loading) {
     return (
-      <div
-        className="card"
-        style={{ border: '1px solid rgba(255, 255, 255, 0.06)' }}
-      >
+      <div className="card" style={{ border: '1px solid rgba(255, 255, 255, 0.06)' }}>
         <div
           className="card-body flex items-center justify-center gap-sm"
           style={{ padding: 'var(--spacing-lg)', color: 'var(--text-muted)', fontSize: '13px' }}
@@ -109,10 +111,7 @@ export function RiskScoreCard({ analysisId }: RiskScoreCardProps) {
   const dashOffset = circumference - (data.riskScore / 100) * circumference;
 
   return (
-    <div
-      className="card"
-      style={{ border: `1px solid ${riskColor}20` }}
-    >
+    <div className="card" style={{ border: `1px solid ${riskColor}20` }}>
       <div
         className="card-header flex items-center gap-sm"
         style={{ borderBottom: `1px solid ${riskColor}15` }}
@@ -160,13 +159,7 @@ export function RiskScoreCard({ analysisId }: RiskScoreCardProps) {
               >
                 {data.riskScore}
               </text>
-              <text
-                x="44"
-                y="54"
-                textAnchor="middle"
-                fill="var(--text-muted)"
-                fontSize="9"
-              >
+              <text x="44" y="54" textAnchor="middle" fill="var(--text-muted)" fontSize="9">
                 RISK
               </text>
             </svg>
@@ -177,7 +170,10 @@ export function RiskScoreCard({ analysisId }: RiskScoreCardProps) {
             {/* Potential loss headline */}
             {data.potentialLoss != null && data.potentialLoss > 0 ? (
               <div style={{ marginBottom: 'var(--spacing-sm)' }}>
-                <div className="flex items-center gap-xs" style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: 2 }}>
+                <div
+                  className="flex items-center gap-xs"
+                  style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: 2 }}
+                >
                   <TrendingDown size={12} />
                   Estimated Value at Risk
                 </div>
@@ -186,7 +182,13 @@ export function RiskScoreCard({ analysisId }: RiskScoreCardProps) {
                 </div>
               </div>
             ) : (
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: 'var(--spacing-sm)' }}>
+              <div
+                style={{
+                  fontSize: '13px',
+                  color: 'var(--text-muted)',
+                  marginBottom: 'var(--spacing-sm)',
+                }}
+              >
                 Set a monetary value on the decision frame to see estimated loss
               </div>
             )}
@@ -208,7 +210,15 @@ export function RiskScoreCard({ analysisId }: RiskScoreCardProps) {
             {/* Top risks */}
             {data.topRisks.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                <div
+                  style={{
+                    fontSize: '11px',
+                    color: 'var(--text-muted)',
+                    fontWeight: 600,
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                  }}
+                >
                   Top Risk Contributors
                 </div>
                 {data.topRisks.slice(0, 3).map((risk, i) => (

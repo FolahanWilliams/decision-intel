@@ -2,7 +2,16 @@
 
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { BiasInstance } from '@/types';
-import { AlertTriangle, ChevronRight, Eye, EyeOff, Search, Maximize2, Minimize2, BarChart3 } from 'lucide-react';
+import {
+  AlertTriangle,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Search,
+  Maximize2,
+  Minimize2,
+  BarChart3,
+} from 'lucide-react';
 import { getBiasDisplayName } from '@/lib/utils/bias-normalize';
 import { getBiasColor, resetBiasColors, type BiasColorSet } from '@/lib/utils/bias-colors';
 
@@ -256,15 +265,12 @@ export function DocumentTextHighlighter({
   }, []);
 
   // Click on heat map bin to scroll to that region of the document
-  const handleHeatMapClick = useCallback(
-    (binIndex: number, binCount: number) => {
-      if (!textRef.current) return;
-      const scrollFraction = binIndex / binCount;
-      const scrollTarget = textRef.current.scrollHeight * scrollFraction;
-      textRef.current.scrollTo({ top: scrollTarget, behavior: 'smooth' });
-    },
-    []
-  );
+  const handleHeatMapClick = useCallback((binIndex: number, binCount: number) => {
+    if (!textRef.current) return;
+    const scrollFraction = binIndex / binCount;
+    const scrollTarget = textRef.current.scrollHeight * scrollFraction;
+    textRef.current.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+  }, []);
 
   // Keyboard: Escape to deselect, D to toggle detective mode, H for heat map, arrows for cycling
   useEffect(() => {
@@ -286,12 +292,17 @@ export function DocumentTextHighlighter({
           if (prev === null) return filteredBiasIndices[0];
           const currentPos = filteredBiasIndices.indexOf(prev);
           if (currentPos === -1) return filteredBiasIndices[0];
-          const next = e.key === 'ArrowRight'
-            ? filteredBiasIndices[(currentPos + 1) % filteredBiasIndices.length]
-            : filteredBiasIndices[(currentPos - 1 + filteredBiasIndices.length) % filteredBiasIndices.length];
+          const next =
+            e.key === 'ArrowRight'
+              ? filteredBiasIndices[(currentPos + 1) % filteredBiasIndices.length]
+              : filteredBiasIndices[
+                  (currentPos - 1 + filteredBiasIndices.length) % filteredBiasIndices.length
+                ];
           // Scroll both panels to the new bias
           setTimeout(() => {
-            highlightRefs.current.get(next)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlightRefs.current
+              .get(next)
+              ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             sidebarRefs.current.get(next)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }, 0);
           return next;
@@ -441,9 +452,15 @@ export function DocumentTextHighlighter({
             {heatMapData.map(bin => {
               const hasData = bin.biasCount > 0;
               const opacity = hasData
-                ? bin.biasCount >= 3 ? 1 : bin.biasCount >= 2 ? 0.6 : 0.3
+                ? bin.biasCount >= 3
+                  ? 1
+                  : bin.biasCount >= 2
+                    ? 0.6
+                    : 0.3
                 : 0;
-              const color = hasData ? (SEVERITY_HEX[bin.maxSeverity] ?? SEVERITY_HEX.low) : 'transparent';
+              const color = hasData
+                ? (SEVERITY_HEX[bin.maxSeverity] ?? SEVERITY_HEX.low)
+                : 'transparent';
               return (
                 <div
                   key={bin.index}
@@ -747,7 +764,8 @@ export function DocumentTextHighlighter({
                 className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded"
                 style={{
                   backgroundColor: `${SEVERITY_HEX[biases[hoveredBiasIdx].severity.toLowerCase()] ?? SEVERITY_HEX.low}30`,
-                  color: SEVERITY_HEX[biases[hoveredBiasIdx].severity.toLowerCase()] ?? SEVERITY_HEX.low,
+                  color:
+                    SEVERITY_HEX[biases[hoveredBiasIdx].severity.toLowerCase()] ?? SEVERITY_HEX.low,
                 }}
               >
                 {biases[hoveredBiasIdx].severity}
@@ -768,8 +786,8 @@ export function DocumentTextHighlighter({
       )}
 
       <div className="p-2 text-center text-[10px] text-muted border-t border-border bg-secondary/20">
-        Click highlighted text or sidebar items to link them &bull; Esc deselect &bull;
-        D detective &bull; H heat map &bull; ←→ cycle biases
+        Click highlighted text or sidebar items to link them &bull; Esc deselect &bull; D detective
+        &bull; H heat map &bull; ←→ cycle biases
       </div>
     </div>
   );

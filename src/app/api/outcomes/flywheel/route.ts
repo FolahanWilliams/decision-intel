@@ -154,18 +154,14 @@ export async function GET() {
     const outcomesLogged = outcomes.length;
     try {
       totalDecisions = await prisma.analysis.count({
-        where: orgId
-          ? { document: { orgId } }
-          : { document: { userId: user.id } },
+        where: orgId ? { document: { orgId } } : { document: { userId: user.id } },
       });
     } catch {
       totalDecisions = outcomesLogged;
     }
 
     const loopClosureRate =
-      totalDecisions > 0
-        ? Number(((outcomesLogged / totalDecisions) * 100).toFixed(1))
-        : 0;
+      totalDecisions > 0 ? Number(((outcomesLogged / totalDecisions) * 100).toFixed(1)) : 0;
 
     return NextResponse.json({
       successDecisions,

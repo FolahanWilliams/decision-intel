@@ -647,10 +647,22 @@ async function handleStatusCommand(params: { userId: string; teamId: string }) {
       totalOutcomes >= 30
         ? { label: 'Platinum', emoji: ':gem:', next: '' }
         : totalOutcomes >= 15
-          ? { label: 'Gold', emoji: ':1st_place_medal:', next: `${30 - totalOutcomes} more for Platinum` }
+          ? {
+              label: 'Gold',
+              emoji: ':1st_place_medal:',
+              next: `${30 - totalOutcomes} more for Platinum`,
+            }
           : totalOutcomes >= 5
-            ? { label: 'Silver', emoji: ':2nd_place_medal:', next: `${15 - totalOutcomes} more for Gold` }
-            : { label: 'Bronze', emoji: ':3rd_place_medal:', next: `${5 - totalOutcomes} more for Silver` };
+            ? {
+                label: 'Silver',
+                emoji: ':2nd_place_medal:',
+                next: `${15 - totalOutcomes} more for Gold`,
+              }
+            : {
+                label: 'Bronze',
+                emoji: ':3rd_place_medal:',
+                next: `${5 - totalOutcomes} more for Silver`,
+              };
 
     // Recent decision scores
     const recentFields: Array<{ type: string; text: string }> = [];
@@ -738,7 +750,8 @@ async function handleStatusCommand(params: { userId: string; teamId: string }) {
             .reduce((sum, d) => sum + (d.cognitiveAudit?.decisionQualityScore ?? 0), 0) /
           Math.min(5, allScores.length - 5);
         const diff = recentAvg - previousAvg;
-        const trendEmoji = diff > 2 ? ':arrow_up:' : diff < -2 ? ':arrow_down:' : ':left_right_arrow:';
+        const trendEmoji =
+          diff > 2 ? ':arrow_up:' : diff < -2 ? ':arrow_down:' : ':left_right_arrow:';
         const trendLabel = diff > 2 ? 'Improving' : diff < -2 ? 'Declining' : 'Stable';
         trendText = `\n*Quality Trend:* ${trendEmoji} ${trendLabel} (${diff > 0 ? '+' : ''}${Math.round(diff)} pts)`;
       }

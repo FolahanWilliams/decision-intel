@@ -278,9 +278,9 @@ function ProductOverview() {
             Slack messages for seamless handoff.
           </li>
           <li>
-            <strong>Intelligence Brief on Empty States</strong> — Contextual org intelligence
-            (top dangerous biases, maturity grade, decision stats) replaces generic empty states
-            across 4 dashboard pages.
+            <strong>Intelligence Brief on Empty States</strong> — Contextual org intelligence (top
+            dangerous biases, maturity grade, decision stats) replaces generic empty states across 4
+            dashboard pages.
           </li>
           <li>
             <strong>Enhanced Slack Commands</strong> — 7 slash commands with rich Block Kit:{' '}
@@ -2973,7 +2973,15 @@ function PlaybookAndResearch() {
       </div>
 
       {/* Sub-section pills + expand/collapse */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 6,
+          marginBottom: 16,
+          flexWrap: 'wrap',
+          alignItems: 'center',
+        }}
+      >
         {SECTIONS.map(s => (
           <button
             key={s.id}
@@ -3046,279 +3054,299 @@ function PlaybookAndResearch() {
             </div>
           </div>
           {expandedResearch.has('vc') && (
-          <div style={{ ...card, borderLeft: '3px solid #6366f1', marginTop: -8, borderTop: 'none' }}>
-            <div style={{ display: 'grid', gap: 12 }}>
-              {[
-                {
-                  num: 1,
-                  principle: "Home Runs Matter, Strikeouts Don't",
-                  summary:
-                    'Only 1 in 20 VC investments hits a home run, but a single winner returns 100x. Failure tolerance is structural, not emotional.',
-                  product:
-                    "Reframe your pitch from defensive to offensive. DQI doesn't just help avoid bad deals — it gives IC members permission to swing big because they've stress-tested the decision. \"Swing with confidence because you've already audited the thesis.\"",
-                  startup:
-                    'Go all-in on enterprise decision teams. Don\'t build 6 features for 4 markets. Your "home run" is one flagship customer that becomes a case study. Accept that some features won\'t land.',
-                  actions: [
-                    'Rewrite landing page hero from "avoid mistakes" to "make better decisions with confidence"',
-                    'Focus pilot outreach on 5 target organizations, not 50',
-                  ],
-                  color: '#22c55e',
-                },
-                {
-                  num: 2,
-                  principle: 'Agree to Disagree',
-                  summary:
-                    'VC firms pursuing consensus have LOWER IPO rates. The best firms let a single partner with conviction push a deal through. Microsoft M12 has an "anti-veto rule."',
-                  product:
-                    'Your Committee Decision Rooms with blind prior collection are a direct implementation of this principle. Cite Strebulaev in marketing: "Stanford research shows consensus-seeking committees underperform. Decision Intel\'s blind prior system is designed around this finding." Your consensus scoring quantifies when agreement is genuine vs. groupthink.',
-                  startup:
-                    "When building your advisory board, don't surround yourself with people who agree with you. Strebulaev's data: productive disagreement correlates with better outcomes.",
-                  actions: [
-                    'Add Strebulaev citation to Committee Rooms UI/marketing',
-                    'Create a "Dissent Quality" metric in consensus scoring',
-                    'Blog post: "Why Your IC\'s Consensus Is Killing Your Returns"',
-                  ],
-                  color: '#3b82f6',
-                },
-                {
-                  num: 3,
-                  principle: 'Get Outside Your Four Walls',
-                  summary:
-                    'VCs maintain 2-3x larger, more diverse LinkedIn networks than corporate executives. Insularity kills innovation.',
-                  product:
-                    'Your Slack integration puts Decision Intel inside the daily workflow where deals are discussed — not as a standalone app. This is the "inside the walls" play. The cross-department edge type in your knowledge graph detects organizational silos.',
-                  startup:
-                    "Be embedded in your target communities. Strategy conferences, M&A events, risk management circles. Don't sell from the outside — be part of the ecosystem.",
-                  actions: [
-                    'Attend 2 industry conferences per quarter',
-                    'Launch a "Decision Quality" newsletter for enterprise leaders',
-                    'Build a Slack community for decision-makers',
-                  ],
-                  color: '#f59e0b',
-                },
-                {
-                  num: 4,
-                  principle: 'The Jockey vs. The Horse',
-                  summary:
-                    'The most important VC investment factor is team quality, not business model. The "jockey" matters more than the "horse."',
-                  product:
-                    'You detect "Management Halo Effect" but could go deeper. Build a Jockey/Horse Balance Score — detect when an IC memo spends 80% on team pedigree and 20% on business fundamentals, or vice versa. Flag imbalanced memos.',
-                  startup:
-                    "Your codebase IS your jockey credibility: 113 annotated failure cases, 20x20 bias interaction matrix, causal inference. In technical DD, your depth signals you're the right founder for this problem.",
-                  actions: [
-                    'Add Jockey/Horse Balance Score to bias detection',
-                    'Track ratio of team vs. fundamentals language in IC memos',
-                    'Prepare "why me" narrative for investor conversations',
-                  ],
-                  color: '#ef4444',
-                },
-                {
-                  num: 5,
-                  principle: 'The Prepared Mind',
-                  summary:
-                    '"Chance favors only the prepared mind" (Pasteur). Jensen Huang spends 2-3 hours daily studying emerging tech. The best VCs recognize opportunities instantly because they\'ve studied deeply.',
-                  product:
-                    "Your Boardroom Simulation IS a \"prepared mind\" tool. You're giving IC members a pre-briefing on which biases historically damaged similar deals, what toxic combinations to watch for, and what diverse perspectives would flag. Lean into this framing: you're not auditing documents — you're preparing decision-makers.",
-                  startup:
-                    "Spend 30 min daily reading industry news, academic papers on decision science, and competitor updates. Your Intelligence Hub's 14 RSS feeds should be your own morning briefing too.",
-                  actions: [
-                    'Rename "Pre-Meeting Bias Briefing" to "Prepared Mind Briefing" in marketing',
-                    'Add a "Prepare for Meeting" CTA before committee meetings',
-                    'Subscribe to 3 industry newsletters personally',
-                  ],
-                  color: '#8b5cf6',
-                },
-                {
-                  num: 6,
-                  principle: 'Fast Lane, Then Slow Lane',
-                  summary:
-                    'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
-                  product:
-                    'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 16-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
-                  startup:
-                    'Apply to your sales process too. Qualify leads fast — "Do you have a decision committee? Do you review strategic documents before major decisions?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
-                  actions: [
-                    'Build Quick Scan feature (top priority — Strebulaev-backed)',
-                    'Add 2-question lead qualification before demos',
-                    'Create a "Red Flag Preview" that runs before full analysis',
-                  ],
-                  color: '#22c55e',
-                },
-                {
-                  num: 7,
-                  principle: 'Double Down and Quit',
-                  summary:
-                    "VCs combat escalation of commitment through structural mechanisms: requiring multiple investors for follow-on rounds, bringing in arm's-length co-investors, requiring partner consensus specifically on follow-ons.",
-                  product:
-                    "BUILD THIS: Longitudinal Bias Tracking — don't just analyze individual IC memos, track how bias patterns change over the life of a deal. Does confirmation bias increase from initial investment to Series B follow-on? Is the follow-on memo less critical than the initial? This is a unique, hard-to-replicate feature.",
-                  startup:
-                    "Apply to your own features. Some features you shipped won't get traction. Be willing to kill them rather than doubling down. Measure feature usage monthly.",
-                  actions: [
-                    'Build deal-level longitudinal bias tracking',
-                    'Compare bias severity across deal stages (screening vs IC vs follow-on)',
-                    'Set up monthly feature usage analytics',
-                  ],
-                  color: '#3b82f6',
-                },
-                {
-                  num: 8,
-                  principle: 'Sharing the Pie (Incentive Alignment)',
-                  summary:
-                    'VCs invented vesting schedules in the 1970s. The principle is about aligning incentives across all contributors to prevent short-term behavior.',
-                  product:
-                    "Your \"Carry Incentive Distortion\" bias is a direct implementation. Go deeper: detect when an IC memo's enthusiasm correlates suspiciously with the deal's impact on a specific partner's carry economics. Track if advocacy intensity changes near fund deadlines.",
-                  startup:
-                    "When you hire your first team members, offer meaningful equity. Strebulaev's data shows aligned incentives outperform salary-heavy compensation in startups.",
-                  actions: [
-                    'Enhance carry incentive detection with fund timeline awareness',
-                    'Detect deployment pressure signals ("need to put capital to work")',
-                    'Design equity plan for first 3 hires',
-                  ],
-                  color: '#f59e0b',
-                },
-                {
-                  num: 9,
-                  principle: 'The Meta-Principle: VC-Backed Companies Shape the Economy',
-                  summary:
-                    '50% of US IPOs over 50 years were VC-backed. 75% of large public companies. VC-backed companies spend 92 cents of every R&D dollar. When ICs make biased decisions, the ripple effects go far beyond the fund.',
-                  product:
-                    'This is your highest-level pitch narrative: "Decision Intel doesn\'t just protect organizational outcomes — it improves the quality of decision-making across the economy." When a biased committee kills a good initiative, innovation is lost. When a biased team backs a bad strategy, resources that could have gone to better opportunities are wasted.',
-                  startup:
-                    'This framing elevates you from "SaaS tool vendor" to "mission-driven company improving how capital flows to innovation." Investors respond to mission, not just TAM.',
-                  actions: [
-                    'Add this framing to pitch deck\'s "Why This Matters" slide',
-                    'Use in PR/press outreach — "improving how capital flows to innovation"',
-                    'Blog post: "The Hidden Cost of IC Bias on the Innovation Economy"',
-                  ],
-                  color: '#ef4444',
-                },
-              ].map((p, i) => (
-                <div key={i} style={{ ...card, borderLeft: `4px solid ${p.color}` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <div
+              style={{ ...card, borderLeft: '3px solid #6366f1', marginTop: -8, borderTop: 'none' }}
+            >
+              <div style={{ display: 'grid', gap: 12 }}>
+                {[
+                  {
+                    num: 1,
+                    principle: "Home Runs Matter, Strikeouts Don't",
+                    summary:
+                      'Only 1 in 20 VC investments hits a home run, but a single winner returns 100x. Failure tolerance is structural, not emotional.',
+                    product:
+                      "Reframe your pitch from defensive to offensive. DQI doesn't just help avoid bad deals — it gives IC members permission to swing big because they've stress-tested the decision. \"Swing with confidence because you've already audited the thesis.\"",
+                    startup:
+                      'Go all-in on enterprise decision teams. Don\'t build 6 features for 4 markets. Your "home run" is one flagship customer that becomes a case study. Accept that some features won\'t land.',
+                    actions: [
+                      'Rewrite landing page hero from "avoid mistakes" to "make better decisions with confidence"',
+                      'Focus pilot outreach on 5 target organizations, not 50',
+                    ],
+                    color: '#22c55e',
+                  },
+                  {
+                    num: 2,
+                    principle: 'Agree to Disagree',
+                    summary:
+                      'VC firms pursuing consensus have LOWER IPO rates. The best firms let a single partner with conviction push a deal through. Microsoft M12 has an "anti-veto rule."',
+                    product:
+                      'Your Committee Decision Rooms with blind prior collection are a direct implementation of this principle. Cite Strebulaev in marketing: "Stanford research shows consensus-seeking committees underperform. Decision Intel\'s blind prior system is designed around this finding." Your consensus scoring quantifies when agreement is genuine vs. groupthink.',
+                    startup:
+                      "When building your advisory board, don't surround yourself with people who agree with you. Strebulaev's data: productive disagreement correlates with better outcomes.",
+                    actions: [
+                      'Add Strebulaev citation to Committee Rooms UI/marketing',
+                      'Create a "Dissent Quality" metric in consensus scoring',
+                      'Blog post: "Why Your IC\'s Consensus Is Killing Your Returns"',
+                    ],
+                    color: '#3b82f6',
+                  },
+                  {
+                    num: 3,
+                    principle: 'Get Outside Your Four Walls',
+                    summary:
+                      'VCs maintain 2-3x larger, more diverse LinkedIn networks than corporate executives. Insularity kills innovation.',
+                    product:
+                      'Your Slack integration puts Decision Intel inside the daily workflow where deals are discussed — not as a standalone app. This is the "inside the walls" play. The cross-department edge type in your knowledge graph detects organizational silos.',
+                    startup:
+                      "Be embedded in your target communities. Strategy conferences, M&A events, risk management circles. Don't sell from the outside — be part of the ecosystem.",
+                    actions: [
+                      'Attend 2 industry conferences per quarter',
+                      'Launch a "Decision Quality" newsletter for enterprise leaders',
+                      'Build a Slack community for decision-makers',
+                    ],
+                    color: '#f59e0b',
+                  },
+                  {
+                    num: 4,
+                    principle: 'The Jockey vs. The Horse',
+                    summary:
+                      'The most important VC investment factor is team quality, not business model. The "jockey" matters more than the "horse."',
+                    product:
+                      'You detect "Management Halo Effect" but could go deeper. Build a Jockey/Horse Balance Score — detect when an IC memo spends 80% on team pedigree and 20% on business fundamentals, or vice versa. Flag imbalanced memos.',
+                    startup:
+                      "Your codebase IS your jockey credibility: 113 annotated failure cases, 20x20 bias interaction matrix, causal inference. In technical DD, your depth signals you're the right founder for this problem.",
+                    actions: [
+                      'Add Jockey/Horse Balance Score to bias detection',
+                      'Track ratio of team vs. fundamentals language in IC memos',
+                      'Prepare "why me" narrative for investor conversations',
+                    ],
+                    color: '#ef4444',
+                  },
+                  {
+                    num: 5,
+                    principle: 'The Prepared Mind',
+                    summary:
+                      '"Chance favors only the prepared mind" (Pasteur). Jensen Huang spends 2-3 hours daily studying emerging tech. The best VCs recognize opportunities instantly because they\'ve studied deeply.',
+                    product:
+                      "Your Boardroom Simulation IS a \"prepared mind\" tool. You're giving IC members a pre-briefing on which biases historically damaged similar deals, what toxic combinations to watch for, and what diverse perspectives would flag. Lean into this framing: you're not auditing documents — you're preparing decision-makers.",
+                    startup:
+                      "Spend 30 min daily reading industry news, academic papers on decision science, and competitor updates. Your Intelligence Hub's 14 RSS feeds should be your own morning briefing too.",
+                    actions: [
+                      'Rename "Pre-Meeting Bias Briefing" to "Prepared Mind Briefing" in marketing',
+                      'Add a "Prepare for Meeting" CTA before committee meetings',
+                      'Subscribe to 3 industry newsletters personally',
+                    ],
+                    color: '#8b5cf6',
+                  },
+                  {
+                    num: 6,
+                    principle: 'Fast Lane, Then Slow Lane',
+                    summary:
+                      'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
+                    product:
+                      'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 16-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
+                    startup:
+                      'Apply to your sales process too. Qualify leads fast — "Do you have a decision committee? Do you review strategic documents before major decisions?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
+                    actions: [
+                      'Build Quick Scan feature (top priority — Strebulaev-backed)',
+                      'Add 2-question lead qualification before demos',
+                      'Create a "Red Flag Preview" that runs before full analysis',
+                    ],
+                    color: '#22c55e',
+                  },
+                  {
+                    num: 7,
+                    principle: 'Double Down and Quit',
+                    summary:
+                      "VCs combat escalation of commitment through structural mechanisms: requiring multiple investors for follow-on rounds, bringing in arm's-length co-investors, requiring partner consensus specifically on follow-ons.",
+                    product:
+                      "BUILD THIS: Longitudinal Bias Tracking — don't just analyze individual IC memos, track how bias patterns change over the life of a deal. Does confirmation bias increase from initial investment to Series B follow-on? Is the follow-on memo less critical than the initial? This is a unique, hard-to-replicate feature.",
+                    startup:
+                      "Apply to your own features. Some features you shipped won't get traction. Be willing to kill them rather than doubling down. Measure feature usage monthly.",
+                    actions: [
+                      'Build deal-level longitudinal bias tracking',
+                      'Compare bias severity across deal stages (screening vs IC vs follow-on)',
+                      'Set up monthly feature usage analytics',
+                    ],
+                    color: '#3b82f6',
+                  },
+                  {
+                    num: 8,
+                    principle: 'Sharing the Pie (Incentive Alignment)',
+                    summary:
+                      'VCs invented vesting schedules in the 1970s. The principle is about aligning incentives across all contributors to prevent short-term behavior.',
+                    product:
+                      "Your \"Carry Incentive Distortion\" bias is a direct implementation. Go deeper: detect when an IC memo's enthusiasm correlates suspiciously with the deal's impact on a specific partner's carry economics. Track if advocacy intensity changes near fund deadlines.",
+                    startup:
+                      "When you hire your first team members, offer meaningful equity. Strebulaev's data shows aligned incentives outperform salary-heavy compensation in startups.",
+                    actions: [
+                      'Enhance carry incentive detection with fund timeline awareness',
+                      'Detect deployment pressure signals ("need to put capital to work")',
+                      'Design equity plan for first 3 hires',
+                    ],
+                    color: '#f59e0b',
+                  },
+                  {
+                    num: 9,
+                    principle: 'The Meta-Principle: VC-Backed Companies Shape the Economy',
+                    summary:
+                      '50% of US IPOs over 50 years were VC-backed. 75% of large public companies. VC-backed companies spend 92 cents of every R&D dollar. When ICs make biased decisions, the ripple effects go far beyond the fund.',
+                    product:
+                      'This is your highest-level pitch narrative: "Decision Intel doesn\'t just protect organizational outcomes — it improves the quality of decision-making across the economy." When a biased committee kills a good initiative, innovation is lost. When a biased team backs a bad strategy, resources that could have gone to better opportunities are wasted.',
+                    startup:
+                      'This framing elevates you from "SaaS tool vendor" to "mission-driven company improving how capital flows to innovation." Investors respond to mission, not just TAM.',
+                    actions: [
+                      'Add this framing to pitch deck\'s "Why This Matters" slide',
+                      'Use in PR/press outreach — "improving how capital flows to innovation"',
+                      'Blog post: "The Hidden Cost of IC Bias on the Innovation Economy"',
+                    ],
+                    color: '#ef4444',
+                  },
+                ].map((p, i) => (
+                  <div key={i} style={{ ...card, borderLeft: `4px solid ${p.color}` }}>
                     <div
-                      style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: '50%',
-                        background: p.color,
-                        color: '#fff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 13,
-                        fontWeight: 800,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {p.num}
-                    </div>
-                    <div
-                      style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary, #fff)' }}
-                    >
-                      {p.principle}
-                    </div>
-                  </div>
-                  <p
-                    style={{
-                      fontSize: 12,
-                      color: 'var(--text-muted)',
-                      marginBottom: 10,
-                      lineHeight: 1.6,
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    {p.summary}
-                  </p>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
-                      gap: 10,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: 10,
-                        borderRadius: 8,
-                        background: 'rgba(99, 102, 241, 0.06)',
-                        border: '1px solid rgba(99, 102, 241, 0.15)',
-                      }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}
                     >
                       <div
-                        style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', marginBottom: 4 }}
-                      >
-                        FOR THE PRODUCT
-                      </div>
-                      <div
-                        style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
-                      >
-                        {p.product}
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        padding: 10,
-                        borderRadius: 8,
-                        background: 'rgba(34, 197, 94, 0.06)',
-                        border: '1px solid rgba(34, 197, 94, 0.15)',
-                      }}
-                    >
-                      <div
-                        style={{ fontSize: 11, fontWeight: 700, color: '#22c55e', marginBottom: 4 }}
-                      >
-                        FOR THE STARTUP
-                      </div>
-                      <div
-                        style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
-                      >
-                        {p.startup}
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: p.color, marginBottom: 4 }}>
-                      ACTION ITEMS
-                    </div>
-                    {p.actions.map((a, j) => (
-                      <div
-                        key={j}
                         style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: '50%',
+                          background: p.color,
+                          color: '#fff',
                           display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: 6,
-                          fontSize: 12,
-                          color: 'var(--text-secondary)',
-                          marginBottom: 3,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 13,
+                          fontWeight: 800,
+                          flexShrink: 0,
                         }}
                       >
-                        <ChevronRight
-                          size={12}
-                          style={{ color: p.color, flexShrink: 0, marginTop: 2 }}
-                        />
-                        <span>{a}</span>
+                        {p.num}
                       </div>
-                    ))}
+                      <div
+                        style={{
+                          fontSize: 15,
+                          fontWeight: 700,
+                          color: 'var(--text-primary, #fff)',
+                        }}
+                      >
+                        {p.principle}
+                      </div>
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: 'var(--text-muted)',
+                        marginBottom: 10,
+                        lineHeight: 1.6,
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      {p.summary}
+                    </p>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: 10,
+                        marginBottom: 10,
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: 10,
+                          borderRadius: 8,
+                          background: 'rgba(99, 102, 241, 0.06)',
+                          border: '1px solid rgba(99, 102, 241, 0.15)',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: '#6366f1',
+                            marginBottom: 4,
+                          }}
+                        >
+                          FOR THE PRODUCT
+                        </div>
+                        <div
+                          style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
+                        >
+                          {p.product}
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          padding: 10,
+                          borderRadius: 8,
+                          background: 'rgba(34, 197, 94, 0.06)',
+                          border: '1px solid rgba(34, 197, 94, 0.15)',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: '#22c55e',
+                            marginBottom: 4,
+                          }}
+                        >
+                          FOR THE STARTUP
+                        </div>
+                        <div
+                          style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
+                        >
+                          {p.startup}
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div
+                        style={{ fontSize: 11, fontWeight: 700, color: p.color, marginBottom: 4 }}
+                      >
+                        ACTION ITEMS
+                      </div>
+                      {p.actions.map((a, j) => (
+                        <div
+                          key={j}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: 6,
+                            fontSize: 12,
+                            color: 'var(--text-secondary)',
+                            marginBottom: 3,
+                          }}
+                        >
+                          <ChevronRight
+                            size={12}
+                            style={{ color: p.color, flexShrink: 0, marginTop: 2 }}
+                          />
+                          <span>{a}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <ResearchCard
+                title="Daniel Kahneman: Beyond Cognitive Biases — Reducing Noise"
+                source="ClearerThinking Podcast"
+                type="Podcast"
+                color="#22c55e"
+                link="https://podcast.clearerthinking.org/episode/072/"
+                insight="Insurance underwriter study: executives expected 10% variability between judges. Actual: 55%. One underwriter prices at $9,500, another at $16,700 for the identical case. Noise is at least as damaging as bias, and organizations almost never measure it."
+                product="Your triple-judge noise scoring is a direct implementation of Kahneman's proposed methodology. Use the 10% vs 55% stat in every sales conversation — it's the 'holy shit' moment that makes executives realize they have no idea how much variability exists in their own decision processes."
+                startup="Offer a free 'noise audit' of a team's last 5 strategic documents as a top-of-funnel hook. Let them see the problem before pitching the solution."
+                actions={[
+                  'Use 10% vs 55% stat in opening of every demo',
+                  'Build free noise audit landing page',
+                  'Create 1-pager: "How Much Noise Is In Your Decisions?"',
+                ]}
+              />
             </div>
-          <ResearchCard
-            title="Daniel Kahneman: Beyond Cognitive Biases — Reducing Noise"
-            source="ClearerThinking Podcast"
-            type="Podcast"
-            color="#22c55e"
-            link="https://podcast.clearerthinking.org/episode/072/"
-            insight="Insurance underwriter study: executives expected 10% variability between judges. Actual: 55%. One underwriter prices at $9,500, another at $16,700 for the identical case. Noise is at least as damaging as bias, and organizations almost never measure it."
-            product="Your triple-judge noise scoring is a direct implementation of Kahneman's proposed methodology. Use the 10% vs 55% stat in every sales conversation — it's the 'holy shit' moment that makes executives realize they have no idea how much variability exists in their own decision processes."
-            startup="Offer a free 'noise audit' of a team's last 5 strategic documents as a top-of-funnel hook. Let them see the problem before pitching the solution."
-            actions={[
-              'Use 10% vs 55% stat in opening of every demo',
-              'Build free noise audit landing page',
-              'Create 1-pager: "How Much Noise Is In Your Decisions?"',
-            ]}
-          />
-          </div>
           )}
         </>
       )}
@@ -3338,75 +3366,77 @@ function PlaybookAndResearch() {
                 size={16}
                 style={{
                   color: '#f59e0b',
-                  transform: expandedResearch.has('foundations') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transform: expandedResearch.has('foundations')
+                    ? 'rotate(180deg)'
+                    : 'rotate(0deg)',
                   transition: 'transform 0.2s',
                 }}
               />
             </div>
           </div>
           {expandedResearch.has('foundations') && (
-        <div style={{ ...card, borderLeft: '3px solid #f59e0b', marginTop: -8 }}>
-          <ResearchCard
-            title='Olivier Sibony: "Decision Hygiene" Framework'
-            source="Behavioral Grooves Podcast + Euronews"
-            type="Podcast / Interview"
-            color="#f59e0b"
-            link="https://behavioralgrooves.com/episode/noise-with-olivier-sibony/"
-            insight="Kahneman's co-author on Noise, former McKinsey partner. Framework: checklists, premortems, structured independent assessments, and noise audits. Noise audits should be the starting point — orgs need to see how bad the problem is before buying a solution."
-            product="Your entire product IS decision hygiene. Sibony's framework validates every feature: structured analysis (bias detection), independent assessments (triple-judge), premortems (Pre-Mortem Architect agent), and noise audits (noise decomposition)."
-            startup="His 'noise audit first' approach suggests a powerful sales motion: offer a free noise audit of 5 strategic documents as top-of-funnel. Let prospects SEE the problem before pitching the solution."
-            actions={[
-              'Build free noise audit landing page as lead gen',
-              'Quote Sibony in marketing: "decision hygiene"',
-              'Position DI as the decision hygiene platform',
-            ]}
-          />
-          <ResearchCard
-            title="Gary Klein: Naturalistic Decision Making"
-            source="The Decision-Making Studio (Ep. 234)"
-            type="Podcast"
-            color="#f59e0b"
-            link="https://podcasts.apple.com/us/podcast/ep-234-dr-gary-klein/id1054744455?i=1000677192489"
-            insight="Klein invented the premortem technique. He and Kahneman were 'collaborative adversaries' — Kahneman trusts systematic processes, Klein trusts expert intuition. The tension between them is the exact tension your product navigates."
-            product="Klein RPD framework NOW SHIPPED: recognition cues from historical decisions, narrative war-story pre-mortems, RPD mental simulator, and personal calibration dashboard. DI sits at the intersection: structured AI analysis (Kahneman) augmenting expert human judgment (Klein), not replacing it. Dual-framework positioning is live — skeptical leaders can see their intuition amplified, not overridden."
-            startup="When leaders push back with 'we trust our judgment,' don't argue. Say: 'We do too. Klein proved expert intuition is powerful. Our RPD framework surfaces the pattern recognition cues an expert with 10+ similar decisions would notice. We amplify your intuition while making sure it's not undermined by noise and bias you can't see.'"
-            actions={[
-              '✅ Klein RPD framework shipped: recognition cues, narrative pre-mortems, RPD simulator, calibration dashboard',
-              'Use Kahneman-Klein dual framework in sales: "We suppress bias AND amplify intuition"',
-              'Demo the RPD tab as second wow moment after Boardroom Simulation',
-            ]}
-          />
-          <ResearchCard
-            title="Annie Duke & Spencer Greenberg: Decision Education"
-            source="Decision Education Podcast (Sep 2025)"
-            type="Podcast"
-            color="#f59e0b"
-            link="https://www.annieduke.com/the-decision-education-podcast-with-guest-spencer-greenberg/"
-            insight="Knowing the name of a bias doesn't help you overcome it. Awareness alone is nearly useless. What works: precommitment contracts, structured decision processes, and Bayesian updating."
-            product="This validates your nudge system and decision architecture (blind priors, premortems) over simple bias reports. The real value isn't detecting biases — it's the structural interventions that make it harder to ACT on bias even when it's present. Diagnostic vs. treatment."
-            startup="Don't oversell bias detection in demos. Lead with the decision architecture features: 'We don't just tell you about your biases — we make it structurally harder to act on them.'"
-            actions={[
-              'Reframe marketing: "detection + intervention" not just "detection"',
-              'Emphasize nudge system and blind priors in demos',
-              'Blog: "Why Bias Awareness Doesn\'t Work (And What Does)"',
-            ]}
-          />
-          <ResearchCard
-            title='Philip Tetlock: "Hybrid Mind" — Human + AI Forecasting'
-            source="80,000 Hours Podcast (Oct 2025)"
-            type="Podcast"
-            color="#f59e0b"
-            link="https://80000hours.org/podcast/episodes/prof-tetlock-predicting-the-future/"
-            insight="Human-machine hybrids beat both pure AI and pure human judgment in forecasting tournaments. 40 years of data show process matters more than talent — superforecasters aren't smarter, they follow better processes."
-            product="DI IS a human-machine hybrid: AI detects biases and measures noise, humans make the final call. Tetlock gives you the language: 'Process beats talent. Our platform ensures your team follows the process that produces better outcomes.'"
-            startup="'Process beats talent' in one sentence IS your entire value proposition. Use Tetlock's authority to back this claim."
-            actions={[
-              'Add Tetlock citation to product philosophy page',
-              'Use "process beats talent" in pitch decks',
-              'Reference Hybrid Mind tournament results in technical DD',
-            ]}
-          />
-        </div>
+            <div style={{ ...card, borderLeft: '3px solid #f59e0b', marginTop: -8 }}>
+              <ResearchCard
+                title='Olivier Sibony: "Decision Hygiene" Framework'
+                source="Behavioral Grooves Podcast + Euronews"
+                type="Podcast / Interview"
+                color="#f59e0b"
+                link="https://behavioralgrooves.com/episode/noise-with-olivier-sibony/"
+                insight="Kahneman's co-author on Noise, former McKinsey partner. Framework: checklists, premortems, structured independent assessments, and noise audits. Noise audits should be the starting point — orgs need to see how bad the problem is before buying a solution."
+                product="Your entire product IS decision hygiene. Sibony's framework validates every feature: structured analysis (bias detection), independent assessments (triple-judge), premortems (Pre-Mortem Architect agent), and noise audits (noise decomposition)."
+                startup="His 'noise audit first' approach suggests a powerful sales motion: offer a free noise audit of 5 strategic documents as top-of-funnel. Let prospects SEE the problem before pitching the solution."
+                actions={[
+                  'Build free noise audit landing page as lead gen',
+                  'Quote Sibony in marketing: "decision hygiene"',
+                  'Position DI as the decision hygiene platform',
+                ]}
+              />
+              <ResearchCard
+                title="Gary Klein: Naturalistic Decision Making"
+                source="The Decision-Making Studio (Ep. 234)"
+                type="Podcast"
+                color="#f59e0b"
+                link="https://podcasts.apple.com/us/podcast/ep-234-dr-gary-klein/id1054744455?i=1000677192489"
+                insight="Klein invented the premortem technique. He and Kahneman were 'collaborative adversaries' — Kahneman trusts systematic processes, Klein trusts expert intuition. The tension between them is the exact tension your product navigates."
+                product="Klein RPD framework NOW SHIPPED: recognition cues from historical decisions, narrative war-story pre-mortems, RPD mental simulator, and personal calibration dashboard. DI sits at the intersection: structured AI analysis (Kahneman) augmenting expert human judgment (Klein), not replacing it. Dual-framework positioning is live — skeptical leaders can see their intuition amplified, not overridden."
+                startup="When leaders push back with 'we trust our judgment,' don't argue. Say: 'We do too. Klein proved expert intuition is powerful. Our RPD framework surfaces the pattern recognition cues an expert with 10+ similar decisions would notice. We amplify your intuition while making sure it's not undermined by noise and bias you can't see.'"
+                actions={[
+                  '✅ Klein RPD framework shipped: recognition cues, narrative pre-mortems, RPD simulator, calibration dashboard',
+                  'Use Kahneman-Klein dual framework in sales: "We suppress bias AND amplify intuition"',
+                  'Demo the RPD tab as second wow moment after Boardroom Simulation',
+                ]}
+              />
+              <ResearchCard
+                title="Annie Duke & Spencer Greenberg: Decision Education"
+                source="Decision Education Podcast (Sep 2025)"
+                type="Podcast"
+                color="#f59e0b"
+                link="https://www.annieduke.com/the-decision-education-podcast-with-guest-spencer-greenberg/"
+                insight="Knowing the name of a bias doesn't help you overcome it. Awareness alone is nearly useless. What works: precommitment contracts, structured decision processes, and Bayesian updating."
+                product="This validates your nudge system and decision architecture (blind priors, premortems) over simple bias reports. The real value isn't detecting biases — it's the structural interventions that make it harder to ACT on bias even when it's present. Diagnostic vs. treatment."
+                startup="Don't oversell bias detection in demos. Lead with the decision architecture features: 'We don't just tell you about your biases — we make it structurally harder to act on them.'"
+                actions={[
+                  'Reframe marketing: "detection + intervention" not just "detection"',
+                  'Emphasize nudge system and blind priors in demos',
+                  'Blog: "Why Bias Awareness Doesn\'t Work (And What Does)"',
+                ]}
+              />
+              <ResearchCard
+                title='Philip Tetlock: "Hybrid Mind" — Human + AI Forecasting'
+                source="80,000 Hours Podcast (Oct 2025)"
+                type="Podcast"
+                color="#f59e0b"
+                link="https://80000hours.org/podcast/episodes/prof-tetlock-predicting-the-future/"
+                insight="Human-machine hybrids beat both pure AI and pure human judgment in forecasting tournaments. 40 years of data show process matters more than talent — superforecasters aren't smarter, they follow better processes."
+                product="DI IS a human-machine hybrid: AI detects biases and measures noise, humans make the final call. Tetlock gives you the language: 'Process beats talent. Our platform ensures your team follows the process that produces better outcomes.'"
+                startup="'Process beats talent' in one sentence IS your entire value proposition. Use Tetlock's authority to back this claim."
+                actions={[
+                  'Add Tetlock citation to product philosophy page',
+                  'Use "process beats talent" in pitch decks',
+                  'Reference Hybrid Mind tournament results in technical DD',
+                ]}
+              />
+            </div>
           )}
         </>
       )}
@@ -3433,26 +3463,26 @@ function PlaybookAndResearch() {
             </div>
           </div>
           {expandedResearch.has('category') && (
-        <div style={{ ...card, borderLeft: '3px solid #ef4444', marginTop: -8 }}>
-          <ResearchCard
-            title='Christopher Lochhead: "How to Become a Category Pirate"'
-            source="Lenny's Podcast"
-            type="Podcast / Newsletter"
-            color="#ef4444"
-            link="https://www.lennysnewsletter.com/p/how-to-become-a-category-pirate-christopher"
-            insight="The company that creates a category captures 2/3 of the market value. Framework: 'Frame It, Name It, Claim It.' The 'better trap' — competing on being better within an existing category — is death."
-            product={
-              'You\'re not building a "better CRM" or a "better DD tool." You\'re creating the category of Investment Decision Quality. Your DQI should become the term PE uses like IRR and MOIC. When someone says "What\'s the DQI on this memo?" in a strategy meeting or IC, you\'ve won. Lochhead calls this "languaging" — weaponizing vocabulary.'
-            }
-            startup="Frame the problem (Strategic decisions are riddled with undetected bias and noise), name the solution (Decision Quality Index), claim the category (Decision Intel is the decision quality platform for capital allocators). This is your most important strategic task."
-            actions={[
-              'Make DQI the centerpiece term in all marketing',
-              'Write a "Category Point of View" document (Lochhead framework)',
-              'PR strategy: get DQI mentioned in PE trade publications',
-              'Blog series: "The Hidden Cost of Decision Noise in Enterprise Decisions"',
-            ]}
-          />
-        </div>
+            <div style={{ ...card, borderLeft: '3px solid #ef4444', marginTop: -8 }}>
+              <ResearchCard
+                title='Christopher Lochhead: "How to Become a Category Pirate"'
+                source="Lenny's Podcast"
+                type="Podcast / Newsletter"
+                color="#ef4444"
+                link="https://www.lennysnewsletter.com/p/how-to-become-a-category-pirate-christopher"
+                insight="The company that creates a category captures 2/3 of the market value. Framework: 'Frame It, Name It, Claim It.' The 'better trap' — competing on being better within an existing category — is death."
+                product={
+                  'You\'re not building a "better CRM" or a "better DD tool." You\'re creating the category of Investment Decision Quality. Your DQI should become the term PE uses like IRR and MOIC. When someone says "What\'s the DQI on this memo?" in a strategy meeting or IC, you\'ve won. Lochhead calls this "languaging" — weaponizing vocabulary.'
+                }
+                startup="Frame the problem (Strategic decisions are riddled with undetected bias and noise), name the solution (Decision Quality Index), claim the category (Decision Intel is the decision quality platform for capital allocators). This is your most important strategic task."
+                actions={[
+                  'Make DQI the centerpiece term in all marketing',
+                  'Write a "Category Point of View" document (Lochhead framework)',
+                  'PR strategy: get DQI mentioned in PE trade publications',
+                  'Blog series: "The Hidden Cost of Decision Noise in Enterprise Decisions"',
+                ]}
+              />
+            </div>
           )}
         </>
       )}
@@ -3465,9 +3495,7 @@ function PlaybookAndResearch() {
             onClick={() => toggleResearchSection('gtm')}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#3b82f6' }}>
-                GTM &amp; Sales
-              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#3b82f6' }}>GTM &amp; Sales</div>
               <ChevronDown
                 size={16}
                 style={{
@@ -3479,24 +3507,24 @@ function PlaybookAndResearch() {
             </div>
           </div>
           {expandedResearch.has('gtm') && (
-        <div style={{ ...card, borderLeft: '3px solid #3b82f6', marginTop: -8 }}>
-          <ResearchCard
-            title="Ray Zhou (Affinity): From College Dropout to SaaS Leader"
-            source="Platform Builders Podcast"
-            type="Podcast"
-            color="#3b82f6"
-            link="https://www.heavybit.com/library/podcasts/platform-builders/ep-4-building-affinity-from-college-dropout-to-saas-leader-with-ray-zhou"
-            insight="Built Affinity into late-eight-figure revenue CRM for PE/VC. Three lessons: (1) hundreds of problem-first conversations before building features, (2) founder-led onboarding for every early customer, (3) focus on problems closest to core business — tangential solutions get replaced when AI improves."
-            product="Decision quality is about as core as it gets for any organization. That's your moat vs. the 'AI assistant' tools that summarize documents — those are tangential, yours is fundamental."
-            startup="Personally onboard every pilot customer. Conduct 50+ discovery calls focused on 'how does your team actually make major decisions?' not 'let me show you features.' Zhou's outsider advantage (didn't know the industry) forced better questions — use yours the same way."
-            actions={[
-              'Target 50 discovery calls before next feature sprint',
-              'Personally onboard every pilot — no self-serve yet',
-              'Document every onboarding as a playbook for future hires',
-              'Ask: "Walk me through your last major decision" in every call',
-            ]}
-          />
-        </div>
+            <div style={{ ...card, borderLeft: '3px solid #3b82f6', marginTop: -8 }}>
+              <ResearchCard
+                title="Ray Zhou (Affinity): From College Dropout to SaaS Leader"
+                source="Platform Builders Podcast"
+                type="Podcast"
+                color="#3b82f6"
+                link="https://www.heavybit.com/library/podcasts/platform-builders/ep-4-building-affinity-from-college-dropout-to-saas-leader-with-ray-zhou"
+                insight="Built Affinity into late-eight-figure revenue CRM for PE/VC. Three lessons: (1) hundreds of problem-first conversations before building features, (2) founder-led onboarding for every early customer, (3) focus on problems closest to core business — tangential solutions get replaced when AI improves."
+                product="Decision quality is about as core as it gets for any organization. That's your moat vs. the 'AI assistant' tools that summarize documents — those are tangential, yours is fundamental."
+                startup="Personally onboard every pilot customer. Conduct 50+ discovery calls focused on 'how does your team actually make major decisions?' not 'let me show you features.' Zhou's outsider advantage (didn't know the industry) forced better questions — use yours the same way."
+                actions={[
+                  'Target 50 discovery calls before next feature sprint',
+                  'Personally onboard every pilot — no self-serve yet',
+                  'Document every onboarding as a playbook for future hires',
+                  'Ask: "Walk me through your last major decision" in every call',
+                ]}
+              />
+            </div>
           )}
         </>
       )}
@@ -3523,26 +3551,26 @@ function PlaybookAndResearch() {
             </div>
           </div>
           {expandedResearch.has('strategy') && (
-        <div style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: -8 }}>
-          <ResearchCard
-            title="Peter Thiel: Zero to One — Contrarian Truths"
-            source="The Investors Podcast (MI383)"
-            type="Podcast Deep Dive"
-            color="#a78bfa"
-            link="https://www.theinvestorspodcast.com/millennial-investing/zero-to-one-lessons-from-peter-thiel-w-shawn-omalley/"
-            insight='Contrarian question: "What important truth do very few people agree with you on?" Monopoly framework: dominate a small niche, then expand in concentric circles. Sales and distribution matter as much as product.'
-            product={
-              'Your contrarian truth: "Executive teams think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: enterprise decision quality. Your concentric expansion: Enterprise M&A/Strategy → PE/VC → FinServ → Horizontal.'
-            }
-            startup="The best 16-agent pipeline means nothing if you can't get it in front of decision-makers. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
-            actions={[
-              'Write down your contrarian truth and use it in every pitch',
-              'Map your concentric expansion circles (already in Market Strategy tab)',
-              'Allocate 50% of time to distribution, not just product',
-              'Build referral incentive for pilot customers',
-            ]}
-          />
-        </div>
+            <div style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: -8 }}>
+              <ResearchCard
+                title="Peter Thiel: Zero to One — Contrarian Truths"
+                source="The Investors Podcast (MI383)"
+                type="Podcast Deep Dive"
+                color="#a78bfa"
+                link="https://www.theinvestorspodcast.com/millennial-investing/zero-to-one-lessons-from-peter-thiel-w-shawn-omalley/"
+                insight='Contrarian question: "What important truth do very few people agree with you on?" Monopoly framework: dominate a small niche, then expand in concentric circles. Sales and distribution matter as much as product.'
+                product={
+                  'Your contrarian truth: "Executive teams think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: enterprise decision quality. Your concentric expansion: Enterprise M&A/Strategy → PE/VC → FinServ → Horizontal.'
+                }
+                startup="The best 16-agent pipeline means nothing if you can't get it in front of decision-makers. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
+                actions={[
+                  'Write down your contrarian truth and use it in every pitch',
+                  'Map your concentric expansion circles (already in Market Strategy tab)',
+                  'Allocate 50% of time to distribution, not just product',
+                  'Build referral incentive for pilot customers',
+                ]}
+              />
+            </div>
           )}
         </>
       )}
@@ -3629,7 +3657,13 @@ function PlaybookAndResearch() {
 
 // ─── Search Results ────────────────────────────────────────────────────────
 
-function SearchResults({ query, tabContent }: { query: string; tabContent: Record<TabId, React.ReactNode> }) {
+function SearchResults({
+  query,
+  tabContent,
+}: {
+  query: string;
+  tabContent: Record<TabId, React.ReactNode>;
+}) {
   const q = query.toLowerCase().trim();
   if (!q) return null;
 
@@ -3648,8 +3682,19 @@ function SearchResults({ query, tabContent }: { query: string; tabContent: Recor
       >
         <Search size={14} style={{ color: '#6366f1', flexShrink: 0 }} />
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-          Showing all tabs filtered by &quot;<strong style={{ color: '#6366f1' }}>{query}</strong>&quot;
-          — use <kbd style={{ padding: '1px 5px', borderRadius: 4, border: '1px solid var(--border-primary, #333)', fontSize: 11 }}>Ctrl+F</kbd> to jump to matches
+          Showing all tabs filtered by &quot;<strong style={{ color: '#6366f1' }}>{query}</strong>
+          &quot; — use{' '}
+          <kbd
+            style={{
+              padding: '1px 5px',
+              borderRadius: 4,
+              border: '1px solid var(--border-primary, #333)',
+              fontSize: 11,
+            }}
+          >
+            Ctrl+F
+          </kbd>{' '}
+          to jump to matches
         </span>
       </div>
       {TABS.map(tab => (
@@ -3812,7 +3857,14 @@ export default function FounderHubPage() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Header + Search */}
         <header style={{ marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 6,
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <Rocket size={26} style={{ color: '#6366f1' }} />
               <h1
@@ -3895,7 +3947,10 @@ export default function FounderHubPage() {
           {TABS.map(tab => (
             <button
               key={tab.id}
-              onClick={() => { setActiveTab(tab.id); setSearchQuery(''); }}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setSearchQuery('');
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',

@@ -36,9 +36,7 @@ const CONTEXT_ICONS: Record<BriefContext, React.ReactNode> = {
 };
 
 function formatBiasName(raw: string): string {
-  return raw
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+  return raw.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function getContextualTip(context: BriefContext, data: IntelligenceData): string {
@@ -51,7 +49,7 @@ function getContextualTip(context: BriefContext, data: IntelligenceData): string
       if (biasName && dangerX) {
         return `Focus your next analysis on ${biasName} — it correlates with ${dangerX}x higher failure rate in your organization.`;
       }
-      return 'Upload documents to start building your organization\'s decision intelligence profile.';
+      return "Upload documents to start building your organization's decision intelligence profile.";
 
     case 'deals':
       if (biasName && dangerX) {
@@ -77,7 +75,7 @@ function getContextualTip(context: BriefContext, data: IntelligenceData): string
         }
         return `Your team is at ${maturity.grade} level (${maturity.score}/100). Keep tracking outcomes to maintain calibration accuracy.`;
       }
-      return 'Track decision outcomes to build your team\'s calibration profile and measure improvement over time.';
+      return "Track decision outcomes to build your team's calibration profile and measure improvement over time.";
     }
   }
 }
@@ -140,8 +138,8 @@ export function IntelligenceBrief({ context }: IntelligenceBriefProps) {
       <div className="flex flex-wrap gap-4 text-xs text-muted">
         {profile && profile.totalDecisions > 0 && (
           <div>
-            <span className="font-bold text-foreground">{profile.totalDecisions}</span>{' '}
-            decisions tracked
+            <span className="font-bold text-foreground">{profile.totalDecisions}</span> decisions
+            tracked
           </div>
         )}
         {profile && profile.avgDecisionQuality > 0 && (
