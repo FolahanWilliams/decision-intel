@@ -764,6 +764,25 @@ export async function POST(request: NextRequest) {
           // Send final complete
           sendUpdate({ type: 'complete', progress: 100, result: result.finalReport });
 
+          // Emit webhook event (non-blocking, fire-and-forget)
+          try {
+            const { emitWebhookEvent } = await import('@/lib/integrations/webhooks/engine');
+            if (createdAnalysisId) {
+              emitWebhookEvent(
+                'analysis.completed',
+                {
+                  analysisId: createdAnalysisId,
+                  documentId,
+                  score: report.overallScore ?? 0,
+                  biasCount: detectedBiases.length,
+                },
+                doc.orgId || userId!
+              );
+            }
+          } catch {
+            // Non-critical — webhook table may not exist
+          }
+
           // Clean up checkpoint cache on completion
           const cacheKey = `stream:${documentId}:${userId}`;
           await prisma.cacheEntry.delete({ where: { key: cacheKey } }).catch(() => {}); // Ignore errors

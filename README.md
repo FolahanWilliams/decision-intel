@@ -1370,15 +1370,17 @@ These counters are displayed on the [landing page](https://www.decision-intel.co
 - [x] **Prompt Versioning** — SHA-256 deduplicated prompt tracking wired to analysis pipeline
 - [x] **Klein RPD Framework** — Expert intuition amplification with recognition cues from historical deals, narrative war-story pre-mortems, RPD mental simulator, and personal calibration dashboard
 
+- [x] **Decision Playbooks** — 6 built-in templates (M&A, Board Review, Risk, Investment, Product Launch, Hiring) with custom playbook creation, bias focus areas, compliance frameworks, and persona configurations
+- [x] **Webhook Notifications** — HMAC-signed outbound webhooks on analysis completion, outcome reporting, toxic combinations, and decision room updates with retry, auto-disable, and delivery logs
+- [x] **Excel Upload Support** — Full .xlsx spreadsheet parsing via ExcelJS for multi-sheet document analysis
+
 ### Planned
 
 - [ ] **Custom Bias Taxonomies** — Let organizations define domain-specific bias categories
 - [ ] **Enterprise SSO** — SAML/OIDC integration for large organizations
 - [ ] **Multi-language Support** — Document analysis in non-English languages
-- [ ] **Decision Playbooks** — Templated analysis configurations for common decision types
 - [ ] **Microsoft Teams Integration** — Decision detection and nudge delivery in Teams
 - [ ] **Email Integration** — Automated decision detection from email threads
-- [ ] **Webhook Notifications** — Configurable webhooks on analysis completion
 
 ---
 
