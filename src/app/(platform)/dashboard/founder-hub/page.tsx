@@ -122,11 +122,11 @@ function ProductOverview() {
             lineHeight: 1.3,
           }}
         >
-          The Decision Performance OS for High-Stakes Teams
+          The Decision Performance OS for M&amp;A &amp; Investment Teams
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.6 }}>
-          Quantify decision noise. Eliminate cognitive bias. Protect organizational outcomes.
-          AI-powered cognitive auditing purpose-built for high-stakes decisions.
+          Audit every deal thesis for cognitive bias and decision noise. Protect investment outcomes.
+          AI-powered cognitive auditing purpose-built for M&amp;A and PE/VC teams.
         </p>
       </div>
 

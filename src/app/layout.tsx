@@ -10,12 +10,13 @@ export const metadata: Metadata = {
     template: '%s | Decision Intel',
   },
   description:
-    'AI-powered decision intelligence platform that audits organizational decisions for cognitive bias and noise, turning unstructured documents into actionable insights.',
+    'AI-powered decision performance platform that audits M&A deal theses and IC memos for cognitive bias and decision noise, protecting investment outcomes.',
   keywords: [
     'decision intelligence',
     'cognitive bias',
-    'noise reduction',
-    'AI analysis',
+    'M&A due diligence',
+    'investment committee',
+    'PE bias detection',
     'decision auditing',
   ],
   openGraph: {
@@ -23,14 +24,14 @@ export const metadata: Metadata = {
     siteName: 'Decision Intel',
     title: 'Decision Intel | Cognitive Bias Auditing Platform',
     description:
-      'AI-powered decision intelligence platform that audits organizational decisions for cognitive bias and noise.',
+      'AI-powered decision performance platform for M&A and investment teams. Audit deal theses for cognitive bias and noise.',
     url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Decision Intel | Cognitive Bias Auditing Platform',
     description:
-      'AI-powered decision intelligence platform that audits organizational decisions for cognitive bias and noise.',
+      'AI-powered decision performance platform for M&A and investment teams. Audit deal theses for cognitive bias and noise.',
   },
   robots: { index: true, follow: true },
   icons: {

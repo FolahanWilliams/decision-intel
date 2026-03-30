@@ -509,8 +509,8 @@ function CaseStudiesSection() {
             Case Studies
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.7 }}>
-            We&apos;re onboarding our first pilot cohort. Anonymized case studies with real bias
-            detection results and outcome data will appear here as pilots complete.
+            We&apos;re onboarding our first M&amp;A pilot cohort. Anonymized deal case studies with
+            real bias detection results and outcome data will appear here as pilots complete.
           </p>
         </div>
       </section>
@@ -541,8 +541,8 @@ function CaseStudiesSection() {
             Real Results from Real Decisions
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.7 }}>
-            Anonymized case studies from strategic documents analyzed by the Decision Intel
-            pipeline. Every bias detection was later validated against actual outcomes.
+            Retrospective analyses of landmark M&amp;A and investment failures, run through the
+            Decision Intel pipeline. Every bias detection was validated against actual outcomes.
           </p>
         </motion.div>
 
@@ -871,7 +871,7 @@ export default function LandingPage() {
                       paddingBottom: '4px',
                     }}
                   >
-                    for High-Stakes Teams
+                    for M&amp;A &amp; Investment Teams
                   </span>
                 </motion.h1>
 
@@ -887,9 +887,9 @@ export default function LandingPage() {
                     maxWidth: '540px',
                   }}
                 >
-                  Eliminate satisficing bias and decision noise on every major call — M&amp;A,
-                  strategy, risk, hiring, and capital allocation. AI-powered auditing that catches
-                  what your team can&apos;t see.
+                  Every deal thesis has hidden biases. We audit IC memos, diligence reports, and
+                  strategic documents for 20+ cognitive biases and decision noise — before your
+                  committee votes.
                 </motion.p>
 
                 <motion.div
@@ -1134,7 +1134,7 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              The Hidden Tax on Your Organization&apos;s Decisions
+              The Hidden Tax on Every Deal Decision
             </h2>
             <p
               style={{
@@ -1420,7 +1420,7 @@ export default function LandingPage() {
               How It Works
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
-              From strategic document to verified outcome in three steps.
+              From deal memo to verified outcome in three steps.
             </p>
           </motion.div>
 
@@ -1431,7 +1431,7 @@ export default function LandingPage() {
                 icon: FileSearch,
                 title: 'Capture & Frame',
                 description:
-                  'Upload board memos, strategy papers, risk assessments, or M&A proposals. Define success criteria and your prior beliefs before analysis begins.',
+                  'Upload IC memos, deal theses, diligence reports, or CIMs. Define success criteria and your prior beliefs before the committee reviews.',
                 color: '#00D2FF',
                 details: [
                   'Document intelligence',
@@ -1444,7 +1444,7 @@ export default function LandingPage() {
                 icon: Brain,
                 title: 'AI Cognitive Audit',
                 description:
-                  'Multi-agent pipeline detects 20 biases, runs a statistical jury for noise scoring, and simulates a boardroom of Decision Twins to stress-test your thesis.',
+                  '11-agent pipeline detects 20+ biases (with 11 additional investment-specific overlays), runs a statistical jury for noise scoring, and simulates a boardroom of Decision Twins to stress-test your deal thesis.',
                 color: '#6366F1',
                 details: [
                   'Bias detection engine',
@@ -1604,23 +1604,23 @@ export default function LandingPage() {
             {[
               {
                 icon: Target,
-                title: 'For Decision-Makers',
+                title: 'For M&A / Corp Dev',
                 description:
-                  'Run your strategic memos through the bias engine. Build your personal calibration curve. Track which biases cost you the most over time.',
+                  'Run deal theses and diligence memos through the bias engine. Detect anchoring, overconfidence, and winner\'s curse before the board votes.',
                 color: '#FFFFFF',
               },
               {
                 icon: Users,
-                title: 'For Executive Committees',
+                title: 'For Investment Committees',
                 description:
-                  'Decision rooms with blind priors. Statistical Jury noise scoring. See exactly where your committee process leaks quality.',
+                  'Blind prior collection. Statistical Jury noise scoring. See exactly where your IC process leaks quality — from screening to post-exit.',
                 color: '#A3E635',
               },
               {
                 icon: Network,
-                title: 'For Organizations',
+                title: 'For PE / VC Funds',
                 description:
-                  'Multi-team analytics. Cross-project bias patterns. Compliance audit packs for boards and regulators.',
+                  'Portfolio-wide bias analytics. Deal-stage overlays. 11 investment-specific biases detected beyond the core 20.',
                 color: '#22c55e',
               },
             ].map((persona, i) => (
@@ -1702,7 +1702,7 @@ export default function LandingPage() {
                 marginBottom: '40px',
               }}
             >
-              We ran our engine on one of the most infamous strategic decisions in tech history.
+              We ran our engine on one of the most infamous acquisition decisions in tech history.
             </p>
 
             {/* Case Study Card */}
@@ -2310,8 +2310,8 @@ export default function LandingPage() {
               The Decision Performance OS
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              Purpose-built for teams making high-stakes decisions — M&amp;A, corporate strategy,
-              risk committees, executive boards, and capital allocation.
+              Purpose-built for M&amp;A teams, PE/VC investment committees, and corporate development
+              — where a single biased decision costs millions.
             </p>
           </motion.div>
 
@@ -3093,7 +3093,7 @@ export default function LandingPage() {
                         fontWeight: 600,
                       }}
                     >
-                      Recoverable Value (60%)
+                      Projected Recoverable Value
                     </div>
                     <div
                       style={{
@@ -3299,11 +3299,11 @@ export default function LandingPage() {
                 letterSpacing: '-0.02em',
               }}
             >
-              What Would You Pay to Avoid Your Next $10M Mistake?
+              What Would You Pay to Avoid Your Next Bad Deal?
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7 }}>
-              A single consulting engagement costs $500K–$2M. Decision Intel runs continuously for
-              less than the cost of one junior analyst.
+              A single due diligence engagement costs $500K–$2M. Decision Intel audits every deal
+              thesis continuously for less than the cost of one junior analyst.
             </p>
           </motion.div>
 
@@ -3493,7 +3493,7 @@ export default function LandingPage() {
                   letterSpacing: '0.02em',
                 }}
               >
-                Best for Decision-Makers
+                Best for Deal Teams
               </div>
               <h3
                 style={{
@@ -3790,7 +3790,7 @@ export default function LandingPage() {
                   marginBottom: '12px',
                 }}
               >
-                For organizations embedding decision quality into every major call.
+                For PE funds and M&amp;A teams embedding decision quality into every deal.
               </p>
               <a
                 href="mailto:hello@decisionintel.ai"
@@ -3860,15 +3860,15 @@ export default function LandingPage() {
                 marginBottom: '40px',
               }}
             >
-              For qualified enterprise teams. See the bias engine in action on your real strategic
-              documents before committing.
+              For M&amp;A teams and investment committees. See the bias engine in action on your
+              real deal documents before committing.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-10">
               {[
                 {
                   title: 'Guided Onboarding',
-                  desc: 'We configure taxonomies, bias profiles, and noise benchmarks for your team and decision types.',
+                  desc: 'We configure deal-specific taxonomies, investment bias profiles, and noise benchmarks for your committee.',
                 },
                 {
                   title: '50 Decision Analyses',
@@ -3876,7 +3876,7 @@ export default function LandingPage() {
                 },
                 {
                   title: 'Outcome Tracking Setup',
-                  desc: 'Connect your project pipeline so the system starts learning from your outcomes immediately.',
+                  desc: 'Connect your deal pipeline so the system starts learning from your investment outcomes immediately.',
                 },
                 {
                   title: 'Calibration Report',
@@ -4156,8 +4156,8 @@ export default function LandingPage() {
                   maxWidth: '240px',
                 }}
               >
-                The Decision Performance OS for high-stakes teams. Track, score, and improve
-                critical decisions with measurable ROI.
+                The Decision Performance OS for M&amp;A and investment teams. Audit every deal
+                thesis for cognitive bias and decision noise.
               </p>
             </div>
 
