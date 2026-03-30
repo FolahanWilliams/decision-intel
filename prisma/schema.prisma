@@ -1269,6 +1269,34 @@ model DecisionAttribution {
   @@index([orgId])
 }
 
+// ─── Decision Playbooks ─────────────────────────────────────────────────
+
+model DecisionPlaybook {
+  id                   String   @id @default(cuid())
+  orgId                String?
+  userId               String
+  name                 String
+  description          String   @db.Text
+  category             String   // m_and_a | board_review | risk_assessment | strategic_planning | investment_committee | custom
+  industry             String?  // Links to INDUSTRY_PROFILES key
+  documentType         String?  // Recommended document type
+  complianceFrameworks String[] // e.g. ["fca_consumer_duty", "gdpr_art22"]
+  biasFocus            String[] // Specific bias IDs to emphasize
+  personaConfig        Json?    // Pre-configured persona settings
+  templateData         Json?    // Additional analysis options
+  isBuiltIn            Boolean  @default(false)
+  isPublic             Boolean  @default(false)
+  usageCount           Int      @default(0)
+  lastUsedAt           DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([orgId])
+  @@index([userId])
+  @@index([category])
+  @@index([isBuiltIn])
+}
+
 // ─── Calibration Journey (Outcome Gate Gamification) ─────────────────────
 
 model CalibrationMilestone {

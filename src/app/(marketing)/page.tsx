@@ -3749,7 +3749,7 @@ export default function LandingPage() {
                   'SSO + audit log + full API',
                   'Dedicated CSM',
                   'Custom bias taxonomies + personas',
-                  'Private cloud deployment (coming soon)',
+                  'Private cloud deployment available',
                 ].map((feature, i) => (
                   <div
                     key={i}

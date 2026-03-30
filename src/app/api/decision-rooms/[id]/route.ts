@@ -217,6 +217,22 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     log.info(`Decision room ${id} updated by user ${user.id}`);
+
+    // Emit webhook event (non-blocking, fire-and-forget)
+    try {
+      const { emitWebhookEvent } = await import('@/lib/integrations/webhooks/engine');
+      emitWebhookEvent(
+        'decision_room.updated',
+        {
+          roomId: id,
+          status: updatedRoom?.status ?? 'unknown',
+        },
+        user.id
+      );
+    } catch {
+      // Non-critical — webhook table may not exist
+    }
+
     return NextResponse.json(updatedRoom);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

@@ -144,6 +144,23 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Emit webhook event (non-blocking, fire-and-forget)
+    try {
+      const { emitWebhookEvent } = await import('@/lib/integrations/webhooks/engine');
+      emitWebhookEvent(
+        'outcome.reported',
+        {
+          outcomeId: decisionOutcome.id,
+          analysisId,
+          outcome,
+          confidence: impactScore ?? null,
+        },
+        orgId || user.id
+      );
+    } catch {
+      // Non-critical — webhook table may not exist
+    }
+
     // Auto-trigger recalibration if sufficient outcomes exist (behavioral data flywheel)
     try {
       const outcomeCount = await prisma.decisionOutcome.count({

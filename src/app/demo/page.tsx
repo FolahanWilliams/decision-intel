@@ -646,8 +646,8 @@ function DemoVideoSection() {
             <Play size={28} className="text-white/40 ml-1" />
           </div>
           <p className="text-slate-500 text-sm max-w-[400px]">
-            Demo video coming soon. Try the interactive demo below to see the bias detection engine
-            in action.
+            Try the interactive demo below — upload a sample document and watch the 16-agent bias
+            detection pipeline in real time.
           </p>
         </div>
       )}

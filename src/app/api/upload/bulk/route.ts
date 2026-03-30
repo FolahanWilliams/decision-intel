@@ -240,7 +240,23 @@ async function processFilesAsync(
       } else if (
         file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       ) {
-        throw new Error('Excel spreadsheet support coming soon. Please export as CSV or text.');
+        const ExcelJS = await import('exceljs');
+        const workbook = new ExcelJS.default.Workbook();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await workbook.xlsx.load(Buffer.from(buffer) as any);
+        const lines: string[] = [];
+        workbook.eachSheet(sheet => {
+          lines.push(`## ${sheet.name}`);
+          sheet.eachRow(row => {
+            const cells = Array.isArray(row.values) ? row.values.slice(1) : [];
+            lines.push(cells.map(v => (v != null ? String(v) : '')).join('\t'));
+          });
+          lines.push('');
+        });
+        content = lines.join('\n').trim();
+        if (!content) {
+          throw new Error('Excel spreadsheet contains no extractable data');
+        }
       } else {
         throw new Error(`Unsupported file type: ${file.type}`);
       }

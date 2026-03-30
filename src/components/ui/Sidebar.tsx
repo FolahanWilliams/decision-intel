@@ -25,6 +25,7 @@ import {
   PenLine,
   Plug,
   Briefcase,
+  BookTemplate,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -353,6 +354,16 @@ export default function Sidebar() {
               (pathname === '/' || pathname.startsWith('/documents')) &&
               !pathname.includes('trends')
             }
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+
+          <NavItem
+            href="/dashboard/playbooks"
+            icon={<BookTemplate size={18} />}
+            label="Playbooks"
+            description="Pre-configured analysis templates"
+            active={pathname.startsWith('/dashboard/playbooks')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
