@@ -852,3 +852,206 @@ export async function getAccuracyImprovement(orgId: string): Promise<AccuracyImp
     throw error;
   }
 }
+
+// ─── Risk-Adjusted Decision Score (M3) ──────────────────────────────────────
+
+export interface RiskAdjustedResult {
+  riskScore: number; // 0-100, higher = more risk
+  potentialLoss: number | null; // monetary value at risk
+  currency: string;
+  topRisks: Array<{
+    biasType: string;
+    severity: string;
+    failureRate: number;
+    estimatedCost: number | null;
+  }>;
+  baselineComparison: string; // e.g. "2.3x higher risk than org average"
+}
+
+/**
+ * Calculate a risk-adjusted decision score for an analysis.
+ *
+ * Combines detected biases, their historical failure rates, and optional
+ * monetary stakes from DecisionFrame to produce:
+ * - A risk score (0-100)
+ * - Estimated potential loss ($)
+ * - Top risk contributors ranked by danger
+ * - Comparison to org baseline
+ */
+export async function calculateRiskAdjustedScore(
+  analysisId: string,
+  orgId?: string | null
+): Promise<RiskAdjustedResult> {
+  const emptyResult: RiskAdjustedResult = {
+    riskScore: 0,
+    potentialLoss: null,
+    currency: 'GBP',
+    topRisks: [],
+    baselineComparison: 'Not enough data for comparison',
+  };
+
+  try {
+    // 1. Fetch biases for this analysis
+    const biases = await prisma.biasInstance.findMany({
+      where: { analysisId },
+      select: { biasType: true, severity: true, confidence: true },
+    });
+
+    if (biases.length === 0) return emptyResult;
+
+    // 2. Get org-level bias history for failure rates
+    let biasHistory: OrgBiasHistory | null = null;
+    if (orgId) {
+      biasHistory = await getOrgBiasHistory(orgId);
+    }
+
+    // 3. Get ToxicPattern failure rates as fallback
+    const toxicPatterns = await prisma.toxicPattern
+      .findMany({
+        where: orgId ? { OR: [{ orgId }, { orgId: null }] } : { orgId: null },
+        select: { biasTypes: true, failureRate: true },
+      })
+      .catch(() => [] as Array<{ biasTypes: string[]; failureRate: number }>);
+
+    // Build failure rate lookup from toxic patterns
+    const patternFailureRates: Record<string, number> = {};
+    for (const pattern of toxicPatterns) {
+      for (const bias of pattern.biasTypes) {
+        const existing = patternFailureRates[bias] ?? 0;
+        patternFailureRates[bias] = Math.max(existing, pattern.failureRate);
+      }
+    }
+
+    // 4. Get monetary value from DecisionFrame
+    let monetaryValue: number | null = null;
+    let currency = 'GBP';
+    try {
+      const analysis = await prisma.analysis.findUnique({
+        where: { id: analysisId },
+        select: { documentId: true },
+      });
+      if (analysis?.documentId) {
+        const frame = await prisma.decisionFrame.findUnique({
+          where: { documentId: analysis.documentId },
+          select: { monetaryValue: true, currency: true },
+        });
+        if (frame?.monetaryValue) {
+          monetaryValue = Number(frame.monetaryValue);
+          currency = frame.currency ?? 'GBP';
+        }
+      }
+    } catch {
+      // Schema drift — DecisionFrame may not exist
+    }
+
+    // 5. Score each bias
+    const severityWeights: Record<string, number> = {
+      critical: 1.0,
+      high: 0.7,
+      medium: 0.4,
+      low: 0.15,
+    };
+
+    const risks: RiskAdjustedResult['topRisks'] = [];
+    let totalRiskWeight = 0;
+
+    for (const bias of biases) {
+      // Get failure rate: prefer org-specific, fall back to toxic patterns, default 0.3
+      const orgStats = biasHistory?.biasStats.find(s => s.biasType === bias.biasType);
+      const failureRate =
+        orgStats && orgStats.totalRated >= 3
+          ? 1 - (orgStats.confirmed > 0 ? orgStats.avgFailureImpact / 100 : 0.5)
+          : patternFailureRates[bias.biasType] ?? 0.3;
+
+      const sevWeight = severityWeights[bias.severity] ?? 0.4;
+      const confidence = bias.confidence ?? 0.5;
+      const biasRisk = sevWeight * failureRate * confidence;
+      totalRiskWeight += biasRisk;
+
+      let estimatedCost: number | null = null;
+      if (monetaryValue) {
+        estimatedCost = Math.round(failureRate * sevWeight * monetaryValue);
+      }
+
+      risks.push({
+        biasType: bias.biasType,
+        severity: bias.severity,
+        failureRate: Number(failureRate.toFixed(3)),
+        estimatedCost,
+      });
+    }
+
+    // Normalize risk score to 0-100
+    // Max possible for single bias is 1.0 (severity) × 1.0 (failure) × 1.0 (confidence)
+    // With multiple biases, use diminishing returns formula
+    const rawScore = 1 - Math.pow(1 - Math.min(totalRiskWeight, 1), 1 / Math.max(biases.length, 1));
+    const riskScore = Math.min(100, Math.round(rawScore * 100 + biases.length * 3));
+
+    // Calculate potential loss
+    let potentialLoss: number | null = null;
+    if (monetaryValue) {
+      potentialLoss = Math.round(risks.reduce((sum, r) => sum + (r.estimatedCost ?? 0), 0));
+    }
+
+    // Sort risks by estimated cost or failure rate
+    risks.sort((a, b) => {
+      if (a.estimatedCost != null && b.estimatedCost != null) return b.estimatedCost - a.estimatedCost;
+      return b.failureRate - a.failureRate;
+    });
+
+    // 6. Baseline comparison
+    let baselineComparison = 'Not enough data for comparison';
+    if (orgId && biasHistory && biasHistory.totalOutcomes >= 5) {
+      // Compute average risk across recent org analyses
+      try {
+        const recentAnalyses = await prisma.analysis.findMany({
+          where: {
+            document: orgId ? { orgId } : undefined,
+            createdAt: { gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) },
+          },
+          select: { id: true },
+          take: 50,
+          orderBy: { createdAt: 'desc' },
+        });
+
+        if (recentAnalyses.length > 1) {
+          const allBiasCounts = await prisma.biasInstance.groupBy({
+            by: ['analysisId'],
+            where: { analysisId: { in: recentAnalyses.map(a => a.id) } },
+            _count: true,
+          });
+
+          const avgBiasCount =
+            allBiasCounts.reduce((sum, g) => sum + g._count, 0) / Math.max(allBiasCounts.length, 1);
+          const ratio = biases.length / Math.max(avgBiasCount, 1);
+
+          if (ratio > 1.5) {
+            baselineComparison = `${ratio.toFixed(1)}x more biases than your org average`;
+          } else if (ratio < 0.7) {
+            baselineComparison = `${(1 / ratio).toFixed(1)}x fewer biases than your org average`;
+          } else {
+            baselineComparison = 'Bias count is within normal range for your org';
+          }
+        }
+      } catch {
+        // Ignore baseline comparison errors
+      }
+    }
+
+    return {
+      riskScore,
+      potentialLoss,
+      currency,
+      topRisks: risks.slice(0, 5),
+      baselineComparison,
+    };
+  } catch (error) {
+    const code = (error as { code?: string }).code;
+    if (code === 'P2021' || code === 'P2022') {
+      log.debug('Schema drift in calculateRiskAdjustedScore');
+      return emptyResult;
+    }
+    log.error('Failed to calculate risk-adjusted score:', error);
+    throw error;
+  }
+}

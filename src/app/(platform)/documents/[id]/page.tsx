@@ -40,6 +40,7 @@ import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinationCard';
 import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
+import { RiskScoreCard } from '@/components/analysis/RiskScoreCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -1032,6 +1033,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {document && (
         <div className="mb-lg">
           <DecisionRoomList documentId={document.id} analysisId={analysis?.id} />
+        </div>
+      )}
+
+      {/* Risk-Adjusted Decision Score */}
+      {analysis && (
+        <div className="mb-lg">
+          <RiskScoreCard analysisId={analysis.id} />
         </div>
       )}
 
