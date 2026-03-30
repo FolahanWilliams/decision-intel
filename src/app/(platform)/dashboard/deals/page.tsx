@@ -371,6 +371,8 @@ export default function DealsPage() {
             type="generic"
             title="No projects yet"
             description="Create your first project to start tracking your pipeline."
+            showBrief
+            briefContext="deals"
             actions={[
               { label: 'Create Project', onClick: () => setShowForm(true), variant: 'primary' },
             ]}

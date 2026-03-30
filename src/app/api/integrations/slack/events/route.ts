@@ -608,6 +608,84 @@ async function processSlackDecision(
       }
     }
 
+    // ─── I1: Auto-create CopilotSession seeded with decision context ──────
+    let copilotSessionId: string | null = null;
+    try {
+      const installation = teamId
+        ? await prisma.slackInstallation.findFirst({
+            where: { teamId, status: 'active' },
+            select: { installedByUserId: true, orgId: true },
+          })
+        : null;
+
+      const sessionUserId = installation?.installedByUserId || undefined;
+
+      if (sessionUserId) {
+        const orgMember = await prisma.teamMember.findFirst({
+          where: { userId: sessionUserId },
+          select: { orgId: true },
+        });
+
+        const session = await prisma.copilotSession.create({
+          data: {
+            userId: sessionUserId,
+            orgId: orgMember?.orgId,
+            decisionPrompt: input.content.slice(0, 500),
+            title: `Slack Decision: ${input.content.slice(0, 80)}`,
+            metadata: {
+              source: 'slack_auto',
+              humanDecisionId: decisionId,
+              decisionType: input.decisionType,
+              channel: input.channel,
+              dqiScore: auditResult.decisionQualityScore,
+            },
+          },
+        });
+        copilotSessionId = session.id;
+
+        // Seed with initial agent turn summarizing the audit
+        const biasCount = Array.isArray(auditResult.biasFindings)
+          ? auditResult.biasFindings.length
+          : 0;
+        await prisma.copilotTurn.create({
+          data: {
+            sessionId: session.id,
+            role: 'agent',
+            agentType: 'bias_detector',
+            content: `I detected a decision in your Slack channel and ran a cognitive audit.\n\n**Decision Score:** ${auditResult.decisionQualityScore}/100\n**Noise Score:** ${auditResult.noiseScore}/100\n**Summary:** ${auditResult.summary}\n\nI found ${biasCount} potential biases. Would you like me to explore any of these in detail, or help you think through this decision?`,
+          },
+        });
+
+        log.info(`CopilotSession ${session.id} auto-created for Slack decision ${decisionId}`);
+      }
+    } catch (copilotErr) {
+      log.warn('CopilotSession auto-creation failed:', copilotErr);
+    }
+
+    // Deliver audit summary with copilot link to Slack thread
+    if (sourceRef) {
+      const [summaryChannel, summaryThreadTs] = sourceRef.split(':');
+      if (summaryChannel) {
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.decisionintel.ai';
+        const copilotUrl = copilotSessionId
+          ? `${appUrl}/dashboard/ai-assistant?mode=copilot&session=${copilotSessionId}`
+          : undefined;
+
+        const summaryPayload = formatAuditSummaryForSlack(
+          {
+            decisionQualityScore: auditResult.decisionQualityScore,
+            noiseScore: auditResult.noiseScore,
+            biasFindings: Array.isArray(auditResult.biasFindings) ? auditResult.biasFindings : [],
+            summary: auditResult.summary,
+            copilotUrl,
+          },
+          summaryThreadTs
+        );
+        summaryPayload.channel = summaryChannel;
+        await deliverSlackNudge(summaryPayload, teamId);
+      }
+    }
+
     log.info(`Slack decision ${decisionId} audited: score=${auditResult.decisionQualityScore}`);
     return {
       decisionQualityScore: auditResult.decisionQualityScore,

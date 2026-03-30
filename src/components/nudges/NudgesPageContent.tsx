@@ -15,6 +15,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
 import { createClientLogger } from '@/lib/utils/logger';
 import {
   SOURCE_LABELS,
@@ -203,6 +204,7 @@ export function NudgesPageContent() {
                     ? 'All nudges have been acknowledged!'
                     : 'No nudges generated yet. Submit human decisions to receive behavioral nudges.'}
                 </p>
+                {!filterUnacknowledged && <IntelligenceBrief context="nudges" />}
               </div>
             ) : (
               nudges.map((nudge: NudgeSummary, idx: number) => {

@@ -754,6 +754,7 @@ export function formatAuditSummaryForSlack(
     biasFindings: Array<{ biasType: string; severity: string }>;
     summary: string;
     analysisUrl?: string;
+    copilotUrl?: string;
   },
   threadTs?: string
 ): SlackNudgePayload {
@@ -815,18 +816,27 @@ export function formatAuditSummaryForSlack(
     { type: 'divider' }
   );
 
+  const actionButtons: Array<Record<string, unknown>> = [];
+
   if (audit.analysisUrl) {
-    blocks.push({
-      type: 'actions',
-      elements: [
-        {
-          type: 'button',
-          text: { type: 'plain_text', text: 'View Full Analysis' },
-          url: audit.analysisUrl,
-          style: 'primary',
-        },
-      ],
+    actionButtons.push({
+      type: 'button',
+      text: { type: 'plain_text', text: 'View Full Analysis' },
+      url: audit.analysisUrl,
+      style: 'primary',
     });
+  }
+
+  if (audit.copilotUrl) {
+    actionButtons.push({
+      type: 'button',
+      text: { type: 'plain_text', text: 'Continue in Copilot' },
+      url: audit.copilotUrl,
+    });
+  }
+
+  if (actionButtons.length > 0) {
+    blocks.push({ type: 'actions', elements: actionButtons });
   }
 
   blocks.push({

@@ -21,6 +21,7 @@ import {
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useDensity } from '@/components/DensityProvider';
+import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
 
 export type EmptyStateType =
   | 'documents'
@@ -261,6 +262,10 @@ interface EnhancedEmptyStateProps {
   actions?: EmptyStateConfig['actions'];
   suggestions?: string[];
   className?: string;
+  /** Show an intelligence brief based on org data */
+  showBrief?: boolean;
+  /** Context for the intelligence brief */
+  briefContext?: 'documents' | 'deals' | 'nudges' | 'effectiveness';
 }
 
 export function EnhancedEmptyState({
@@ -271,6 +276,8 @@ export function EnhancedEmptyState({
   actions,
   suggestions,
   className,
+  showBrief,
+  briefContext,
 }: EnhancedEmptyStateProps) {
   const config = emptyStateConfigs[type];
   const { density } = useDensity();
@@ -358,6 +365,18 @@ export function EnhancedEmptyState({
               </motion.li>
             ))}
           </ul>
+        </motion.div>
+      )}
+
+      {/* Intelligence Brief */}
+      {showBrief && briefContext && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="w-full max-w-md mb-6"
+        >
+          <IntelligenceBrief context={briefContext} />
         </motion.div>
       )}
 

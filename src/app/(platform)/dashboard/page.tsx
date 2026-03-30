@@ -1991,6 +1991,8 @@ export default function Dashboard() {
               ) : uploadedDocs.length === 0 ? (
                 <EnhancedEmptyState
                   type="documents"
+                  showBrief
+                  briefContext="documents"
                   actions={[
                     {
                       label: 'Go to Upload',
