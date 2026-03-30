@@ -290,6 +290,11 @@ export function OverviewTab({
                         <span className={`text-xs capitalize ${badgeStyle} px-1.5 py-0.5`}>
                           {bias.severity}
                         </span>
+                        {bias.confidence != null && (
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                            {Math.round(bias.confidence * 100)}% confidence
+                          </span>
+                        )}
                       </div>
                       {/* Sparkline: historical frequency for this bias type */}
                       <BiasSparklineWithData
