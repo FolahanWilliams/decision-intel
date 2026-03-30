@@ -9,6 +9,8 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
 import { createLogger } from '@/lib/utils/logger';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
+import { logAudit } from '@/lib/audit';
+import { isFileTypeSupported, FILE_TYPE_LABELS } from '@/lib/constants/file-types';
 
 const log = createLogger('UploadRoute');
 
@@ -87,33 +89,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = [
-      'application/pdf',
-      'text/plain',
-      'text/markdown',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'text/csv',
-      'application/csv',
-      'text/html',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    ];
-
-    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-    const allowedExtensions = [
-      '.pdf',
-      '.txt',
-      '.md',
-      '.docx',
-      '.xlsx',
-      '.csv',
-      '.html',
-      '.htm',
-      '.pptx',
-    ];
-    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(ext)) {
+    if (!isFileTypeSupported(file.type, file.name)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Supported: PDF, TXT, MD, DOCX, XLSX, CSV, HTML, PPTX' },
+        { error: `Invalid file type. Supported: ${FILE_TYPE_LABELS}` },
         { status: 400 }
       );
     }
@@ -321,6 +299,20 @@ export async function POST(request: NextRequest) {
         })
         .catch(err => log.warn('Failed to link DecisionFrame:', err));
     }
+
+    // Audit log (fire-and-forget)
+    logAudit({
+      action: 'UPLOAD_DOCUMENT',
+      resource: 'Document',
+      resourceId: document.id,
+      details: {
+        filename: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        documentType: documentType || undefined,
+        dealId: dealId || undefined,
+      },
+    });
 
     return NextResponse.json({
       id: document.id,

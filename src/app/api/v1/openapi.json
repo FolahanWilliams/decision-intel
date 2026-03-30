@@ -1,0 +1,596 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Decision Intelligence API",
+    "description": "Public API for the Decision Intelligence platform. Analyze documents for cognitive biases, track decision quality, and access aggregated insights.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Decision Intelligence Support"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "API v1"
+    }
+  ],
+  "security": [
+    {
+      "apiKey": []
+    }
+  ],
+  "paths": {
+    "/analyze": {
+      "post": {
+        "operationId": "analyzeDocument",
+        "summary": "Analyze a document",
+        "description": "Submit a document for cognitive bias analysis. Provide either an existing documentId or raw content. Results include bias detection, overall quality score, and recommendations.",
+        "tags": ["Analysis"],
+        "security": [{ "apiKey": [] }],
+        "parameters": [
+          {
+            "name": "x-request-id",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Unique request identifier for idempotency and tracing"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "documentId": {
+                    "type": "string",
+                    "description": "ID of an existing document to analyze. Mutually exclusive with content."
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Raw text content to analyze. Mutually exclusive with documentId."
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Title for the document (used as filename when creating from content)"
+                  }
+                }
+              },
+              "examples": {
+                "byDocumentId": {
+                  "summary": "Analyze existing document",
+                  "value": { "documentId": "clx1abc123" }
+                },
+                "byContent": {
+                  "summary": "Analyze raw content",
+                  "value": {
+                    "content": "We recommend acquiring TargetCo at a $500M valuation based on projected 10x revenue growth...",
+                    "title": "Acquisition Memo - TargetCo"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Analysis completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid request (missing content/documentId, invalid JSON)" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "description": "Document not found" },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "500": { "description": "Analysis failed" }
+        }
+      }
+    },
+    "/documents": {
+      "get": {
+        "operationId": "listDocuments",
+        "summary": "List or retrieve documents",
+        "description": "List all documents with pagination, or retrieve a specific document by ID. Includes latest analysis results when available.",
+        "tags": ["Documents"],
+        "security": [{ "apiKey": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Specific document ID to retrieve. If omitted, returns paginated list."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1, "minimum": 1 },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "minimum": 1, "maximum": 100 },
+            "description": "Results per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Documents retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    { "$ref": "#/components/schemas/DocumentDetail" },
+                    { "$ref": "#/components/schemas/DocumentList" }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "description": "Document not found" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/dqi": {
+      "get": {
+        "operationId": "getDecisionQualityIndex",
+        "summary": "Get Decision Quality Index",
+        "description": "Compute and return the Decision Quality Index (DQI) for a specific analysis. Includes letter grade, component scores, recommendations, and an embeddable SVG badge.",
+        "tags": ["Quality"],
+        "security": [{ "apiKey": [] }],
+        "parameters": [
+          {
+            "name": "analysisId",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Analysis ID to compute DQI for"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["full", "badge"] },
+            "description": "Response format. 'badge' returns only the embeddable badge."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "DQI computed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DQIResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing analysisId parameter" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "description": "Analysis not found" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/insights": {
+      "get": {
+        "operationId": "getInsights",
+        "summary": "Get aggregated insights",
+        "description": "Retrieve aggregated decision intelligence insights including bias statistics, quality trends, noise trends, and outcome tracking.",
+        "tags": ["Insights"],
+        "security": [{ "apiKey": [] }],
+        "parameters": [
+          {
+            "name": "timeRange",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["7d", "30d", "90d", "1y"],
+              "default": "90d"
+            },
+            "description": "Time range for aggregation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Insights retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsightsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/keys": {
+      "post": {
+        "operationId": "createApiKey",
+        "summary": "Create an API key",
+        "description": "Generate a new API key with specified scopes. The raw key is returned only once — save it immediately.",
+        "tags": ["API Keys"],
+        "security": [{ "session": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "scopes"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "Human-readable name for the key"
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["analyze", "documents", "outcomes", "insights"]
+                    },
+                    "minItems": 1,
+                    "description": "Permission scopes for the key"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "API key created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyCreated"
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid request" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "409": { "description": "Maximum 10 API keys per user" }
+        }
+      },
+      "get": {
+        "operationId": "listApiKeys",
+        "summary": "List API keys",
+        "description": "List all API keys for the authenticated user. Key values are redacted to prefix only.",
+        "tags": ["API Keys"],
+        "security": [{ "session": [] }],
+        "responses": {
+          "200": {
+            "description": "API keys retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyList"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      },
+      "delete": {
+        "operationId": "revokeApiKey",
+        "summary": "Revoke an API key",
+        "description": "Permanently revoke an API key. This action cannot be undone.",
+        "tags": ["API Keys"],
+        "security": [{ "session": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "API key ID to revoke"
+          }
+        ],
+        "responses": {
+          "200": { "description": "API key revoked" },
+          "400": { "description": "Missing id parameter" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "description": "API key not found" },
+          "409": { "description": "Key already revoked" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "API key authentication. Keys start with `di_live_`. Create keys via the Settings page or POST /api/v1/keys."
+      },
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sb-access-token",
+        "description": "Supabase session cookie (browser authentication)"
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Missing or invalid authentication",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "Unauthorized" }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Insufficient permissions (missing required scope)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string", "example": "Missing required scope: insights" }
+              }
+            }
+          }
+        }
+      },
+      "RateLimited": {
+        "description": "Rate limit exceeded",
+        "headers": {
+          "Retry-After": {
+            "schema": { "type": "integer" },
+            "description": "Seconds to wait before retrying"
+          },
+          "X-RateLimit-Limit": {
+            "schema": { "type": "integer" },
+            "description": "Maximum requests per hour"
+          },
+          "X-RateLimit-Remaining": {
+            "schema": { "type": "integer" },
+            "description": "Remaining requests in current window"
+          },
+          "X-RateLimit-Reset": {
+            "schema": { "type": "integer" },
+            "description": "Unix timestamp when the rate limit resets"
+          }
+        }
+      }
+    },
+    "schemas": {
+      "AnalysisResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "data": {
+            "type": "object",
+            "properties": {
+              "analysisId": { "type": "string" },
+              "overallScore": { "type": "number", "minimum": 0, "maximum": 100 },
+              "biases": { "type": "array", "items": { "type": "object" } },
+              "recommendations": { "type": "array", "items": { "type": "object" } },
+              "cached": { "type": "boolean", "description": "True if result was returned from cache" }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "requestId": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" },
+              "apiVersion": { "type": "string", "example": "v1" }
+            }
+          }
+        }
+      },
+      "DocumentDetail": {
+        "type": "object",
+        "properties": {
+          "document": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "filename": { "type": "string" },
+              "fileType": { "type": "string" },
+              "fileSize": { "type": "integer" },
+              "status": { "type": "string" },
+              "uploadedAt": { "type": "string", "format": "date-time" },
+              "analysis": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "id": { "type": "string" },
+                  "overallScore": { "type": "number" },
+                  "noiseScore": { "type": "number" },
+                  "biases": { "type": "array", "items": { "type": "object" } },
+                  "createdAt": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DocumentList": {
+        "type": "object",
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "filename": { "type": "string" },
+                "fileType": { "type": "string" },
+                "fileSize": { "type": "integer" },
+                "status": { "type": "string" },
+                "uploadedAt": { "type": "string", "format": "date-time" },
+                "latestAnalysis": {
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "id": { "type": "string" },
+                    "overallScore": { "type": "number" },
+                    "noiseScore": { "type": "number" },
+                    "createdAt": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "page": { "type": "integer" },
+              "limit": { "type": "integer" },
+              "total": { "type": "integer" },
+              "totalPages": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "DQIResponse": {
+        "type": "object",
+        "properties": {
+          "analysisId": { "type": "string" },
+          "dqi": {
+            "type": "object",
+            "properties": {
+              "score": { "type": "number", "minimum": 0, "maximum": 100 },
+              "letterGrade": { "type": "string", "enum": ["A", "B", "C", "D", "F"] },
+              "components": {
+                "type": "object",
+                "properties": {
+                  "biasManagement": { "type": "number" },
+                  "factualAccuracy": { "type": "number" },
+                  "processQuality": { "type": "number" },
+                  "compliance": { "type": "number" },
+                  "resultingInsights": { "type": "number" }
+                }
+              },
+              "recommendations": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "badge": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string" },
+              "svg": { "type": "string" }
+            }
+          }
+        }
+      },
+      "InsightsResponse": {
+        "type": "object",
+        "properties": {
+          "timeRange": { "type": "string" },
+          "biasStats": {
+            "type": "object",
+            "properties": {
+              "topBiases": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "biasType": { "type": "string" },
+                    "count": { "type": "integer" },
+                    "avgSeverity": { "type": "string", "enum": ["low", "medium", "high", "critical"] }
+                  }
+                }
+              },
+              "totalBiasesDetected": { "type": "integer" }
+            }
+          },
+          "qualityTrends": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "month": { "type": "string", "example": "2026-03" },
+                "avgScore": { "type": "number" },
+                "count": { "type": "integer" }
+              }
+            }
+          },
+          "noiseTrends": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "month": { "type": "string" },
+                "avgNoise": { "type": "number" },
+                "count": { "type": "integer" }
+              }
+            }
+          },
+          "outcomeStats": {
+            "type": "object",
+            "properties": {
+              "totalOutcomes": { "type": "integer" },
+              "successRate": { "type": "number" },
+              "failureRate": { "type": "number" },
+              "biasAccuracy": { "type": "number" }
+            }
+          }
+        }
+      },
+      "ApiKeyCreated": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "keyPrefix": { "type": "string", "example": "di_live_a1b2c3d4" },
+          "rawKey": { "type": "string", "description": "Full API key. Shown only once — save it immediately." },
+          "scopes": { "type": "array", "items": { "type": "string" } },
+          "rateLimit": { "type": "integer", "example": 100 },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ApiKeyList": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "keyPrefix": { "type": "string" },
+                "scopes": { "type": "array", "items": { "type": "string" } },
+                "rateLimit": { "type": "integer" },
+                "lastUsedAt": { "type": "string", "format": "date-time", "nullable": true },
+                "expiresAt": { "type": "string", "format": "date-time", "nullable": true },
+                "revokedAt": { "type": "string", "format": "date-time", "nullable": true },
+                "createdAt": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

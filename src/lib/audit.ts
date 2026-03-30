@@ -25,7 +25,10 @@ export type AuditAction =
   | 'UPLOAD_MEETING'
   | 'MEETING_TRANSCRIBED'
   // Decision Copilot
-  | 'COPILOT_MESSAGE';
+  | 'COPILOT_MESSAGE'
+  // Document Uploads
+  | 'UPLOAD_DOCUMENT'
+  | 'BULK_UPLOAD';
 
 export interface AuditLogParams {
   action: AuditAction;

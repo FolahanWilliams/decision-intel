@@ -14,36 +14,15 @@ import { validateContent } from '@/lib/utils/resilience';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
 import { createHash } from 'crypto';
 import { parseFile } from '@/lib/utils/file-parser';
+import { logAudit } from '@/lib/audit';
+import { isFileTypeSupported } from '@/lib/constants/file-types';
 
 const log = createLogger('BulkUpload');
 
 const MAX_FILES_PER_BATCH = 10;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
 
-// Supported file types
-const SUPPORTED_TYPES = [
-  'text/plain',
-  'text/markdown',
-  'application/pdf',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'text/csv',
-  'application/csv',
-  'text/html',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-];
-
-const SUPPORTED_EXTENSIONS = [
-  '.pdf',
-  '.txt',
-  '.md',
-  '.docx',
-  '.xlsx',
-  '.csv',
-  '.html',
-  '.htm',
-  '.pptx',
-];
+// File type constants imported from @/lib/constants/file-types
 
 /**
  * GET /api/upload/bulk?batchId=xxx - Check batch upload status
@@ -191,6 +170,17 @@ export async function POST(req: NextRequest) {
     // Process files asynchronously
     processFilesAsync(files, user.id, batch.id, membership?.orgId || null);
 
+    // Audit log (fire-and-forget)
+    logAudit({
+      action: 'BULK_UPLOAD',
+      resource: 'BatchUpload',
+      resourceId: batch.id,
+      details: {
+        totalFiles: files.length,
+        filenames: files.map(f => f.name),
+      },
+    });
+
     return NextResponse.json(
       {
         batchId: batch.id,
@@ -226,8 +216,7 @@ async function processFilesAsync(
         throw new Error(`File too large (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`);
       }
 
-      const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-      if (!SUPPORTED_TYPES.includes(file.type) && !SUPPORTED_EXTENSIONS.includes(ext)) {
+      if (!isFileTypeSupported(file.type, file.name)) {
         throw new Error(`Unsupported file type: ${file.type}`);
       }
 
