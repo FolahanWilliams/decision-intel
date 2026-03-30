@@ -3,11 +3,11 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Decision Intel | The Decision Performance OS',
   description:
-    'The decision performance platform for enterprise teams. Detect cognitive bias, reduce decision noise, and improve outcomes across M&A, strategy, risk, and investment decisions.',
+    'The decision performance platform for M&A and investment teams. Detect cognitive bias, reduce decision noise, and protect deal outcomes with AI-powered auditing.',
   openGraph: {
     title: 'Decision Intel | The Decision Performance OS',
     description:
-      'The decision performance platform for enterprise teams. Detect cognitive bias, reduce decision noise, and improve outcomes.',
+      'The decision performance platform for M&A and investment teams. Audit deal theses for cognitive bias and noise.',
     url: '/',
     siteName: 'Decision Intel',
     type: 'website',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Decision Intel | The Decision Performance OS',
     description:
-      'The decision performance platform for enterprise teams. Detect cognitive bias, reduce decision noise, and improve outcomes.',
+      'The decision performance platform for M&A and investment teams. Audit deal theses for cognitive bias and noise.',
   },
   keywords: [
     'decision intelligence platform',

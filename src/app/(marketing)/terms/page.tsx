@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
-    'Terms and conditions for using the Decision Intel platform. AI-powered decision intelligence for high-stakes executive teams.',
+    'Terms and conditions for using the Decision Intel platform. AI-powered decision intelligence for M&A and investment teams.',
 };
 
 export default function TermsOfServicePage() {

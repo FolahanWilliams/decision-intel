@@ -10,8 +10,8 @@
 
 # Decision Intelligence Platform
 
-> **The Decision Performance OS for High-Stakes Teams.**
-> Quantify decision noise. Eliminate cognitive bias. Protect organizational outcomes.
+> **The Decision Performance OS for M&A & Investment Teams.**
+> Audit every deal thesis for cognitive bias and decision noise. Protect investment outcomes.
 
 [![CI/CD](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/FolahanWilliams/decision-intel/actions/workflows/ci-cd.yml)
 
@@ -23,27 +23,27 @@
 
 ## The Problem
 
-Executive teams make high-stakes decisions — M&A, strategy pivots, risk assessments, major investments — based on board memos and strategic documents riddled with cognitive biases that nobody systematically detects. Research by Daniel Kahneman (_Noise: A Flaw in Human Judgment_) reveals that **professionals evaluating identical information routinely reach wildly different conclusions** — a phenomenon called _decision noise_.
+M&A teams, PE/VC investment committees, and corporate development groups make deal decisions — acquisitions, divestments, investment theses, post-merger integration plans — based on IC memos and diligence documents riddled with cognitive biases that nobody systematically detects. Research by Daniel Kahneman (_Noise: A Flaw in Human Judgment_) reveals that **professionals evaluating identical information routinely reach wildly different conclusions** — a phenomenon called _decision noise_.
 
 **The numbers are stark:**
 
-- A single bad strategic decision costs organizations **millions to hundreds of millions** in value
+- 70–90% of M&A transactions fail to create expected value (Harvard Business Review)
 - Decision-makers anchored to initial assumptions hold failing positions 40% longer than optimal
 - Competitive dynamics trigger winner's curse in **65% of cases** (Malmendier & Tate, 2008)
-- Confirmation bias in due diligence causes teams to **rubber-stamp rather than stress-test** strategic rationale
+- Confirmation bias in due diligence causes teams to **rubber-stamp rather than stress-test** deal rationale
 
-Most executive teams have no way to:
+Most deal teams have no way to:
 
-- **Detect** which biases are embedded in their strategic documents and decision materials
-- **Measure** how much noise exists across their decisions
-- **Track** which biases actually correlated with poor outcomes
-- **Build** institutional memory that makes the team sharper with every decision
+- **Detect** which biases are embedded in their IC memos and diligence materials
+- **Measure** how much noise exists across their investment committee
+- **Track** which biases actually correlated with poor deal outcomes
+- **Build** institutional memory that makes the committee sharper with every deal
 
 ## The Solution
 
-**Decision Intel** is an AI-powered decision performance platform for high-stakes executive teams. Upload a board memo, strategy paper, risk assessment, or any decision document and get a comprehensive bias audit in under 60 seconds — detecting **20 cognitive biases** with industry-specific overlays for M&A, PE/VC, enterprise risk, and strategic planning.
+**Decision Intel** is an AI-powered decision performance platform for M&A teams, PE/VC investment committees, and corporate development groups. Upload an IC memo, deal thesis, diligence report, CIM, or any deal document and get a comprehensive bias audit in under 60 seconds — detecting **20+ cognitive biases** with 11 additional investment-specific overlays for PE/VC, M&A, and deal diligence.
 
-The platform runs documents through a **11-agent analysis pipeline** with context-specific overlays to detect bias, measure noise, simulate boardroom deliberations, and generate actionable intelligence that protects organizational outcomes. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
+The platform runs documents through an **11-agent analysis pipeline** with deal-stage-specific overlays (screening → due diligence → IC review → closing → portfolio → post-exit) to detect bias, measure noise, simulate boardroom deliberations, and generate actionable intelligence that protects investment outcomes. The engine combines **Kahneman-style debiasing** (noise measurement, bias detection, compound scoring) with **Klein's Recognition-Primed Decision framework** (pattern recognition cues, expert heuristics, narrative pre-mortems, mental simulation) — suppressing bias while amplifying expert intuition.
 
 ---
 
@@ -51,13 +51,13 @@ The platform runs documents through a **11-agent analysis pipeline** with contex
 
 | For                         | Pain Point                                                        | What We Deliver                                                                           |
 | :-------------------------- | :---------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| **Executives / C-Suite**    | No systematic way to measure decision quality across the org      | Decision-level DQI scoring (0-100), bias pattern tracking across teams and projects       |
-| **M&A / Corp Dev Teams**    | Strategic memos anchored to initial assumptions, not fundamentals | 20 cognitive biases detected with exact excerpts and coaching suggestions                |
-| **Strategy Teams**          | Strategic plans tainted by groupthink and overconfidence          | Boardroom simulation with custom personas, blind voting, and dissent tracking             |
-| **Risk / Compliance**       | Risk assessments cherry-pick data and bury uncomfortable truths   | Document analysis detecting survivorship bias, selective reporting, and framing effects   |
-| **Investment Committees**   | Authority bias and groupthink silence genuine debate              | Blind committee voting, noise measurement across members, decision calibration            |
+| **M&A / Corp Dev Teams**    | Deal theses anchored to initial assumptions, not fundamentals     | 20+ cognitive biases detected with exact excerpts and coaching suggestions                |
+| **PE Investment Committees**| Authority bias and groupthink silence genuine debate at IC        | Blind committee voting, noise measurement across members, decision calibration            |
+| **VC Deal Teams**           | Confirmation bias in thesis validation, narrative fallacy         | 11 investment-specific bias overlays, deal-stage analysis from screening to post-exit     |
+| **Post-Merger Integration** | Integration plans tainted by sunk cost and overconfidence         | Boardroom simulation with custom personas, blind voting, and dissent tracking             |
+| **Portfolio Management**    | Disposition effect and sunk cost drive hold/exit decisions        | Outcome tracking, org-specific causal learning, portfolio-wide bias analytics             |
 
-**ROI**: A single avoided bad decision saves organizations **millions in value**. The platform pays for itself after one corrected thesis. Organizations using systematic decision hygiene report **up to 60% reduction in decision variance**.
+**ROI**: A single avoided bad deal saves funds **millions in value**. The platform pays for itself after one corrected thesis. Research shows systematic decision hygiene reduces decision variance significantly (Kahneman, _Noise_, 2021).
 
 ---
 
@@ -65,10 +65,10 @@ The platform runs documents through a **11-agent analysis pipeline** with contex
 
 | Plan | Price | Best For |
 |:-----|:------|:---------|
-| **Starter** | Free | Try the bias engine on 3 documents |
-| **Professional** | $349/mo | Analysts and decision-makers running strategic documents through the gauntlet |
-| **Team** | $999/mo | Executive teams with project pipeline + Slack integration |
-| **Enterprise** | Custom | Organizations with SSO + custom taxonomies + dedicated support |
+| **Starter** | Free | Try the bias engine on 3 deal documents |
+| **Professional** | $349/mo | Deal teams and analysts running IC memos and diligence reports through the gauntlet |
+| **Team** | $999/mo | Investment committees with deal pipeline + Slack integration |
+| **Enterprise** | Custom | PE funds and M&A teams with SSO + custom taxonomies + dedicated support |
 
 All paid plans include a 14-day free trial. No credit card required to start.
 
@@ -78,11 +78,11 @@ All paid plans include a 14-day free trial. No credit card required to start.
 
 ## 30-Day Pilot Program
 
-For qualified enterprise teams, we offer a guided pilot:
+For M&A teams and investment committees, we offer a guided pilot:
 
-- **Guided onboarding** — we configure taxonomies, bias profiles, and noise benchmarks for your team and decision types
-- **50 decision analyses** — run your actual documents through the 11-agent pipeline
-- **Outcome tracking setup** — connect your project pipeline so the system starts learning immediately
+- **Guided onboarding** — we configure deal-specific taxonomies, investment bias profiles, and noise benchmarks for your committee
+- **50 deal analyses** — run your actual IC memos and diligence reports through the 11-agent pipeline
+- **Outcome tracking setup** — connect your deal pipeline so the system starts learning from investment outcomes immediately
 - **Calibration report** — at 30 days, receive a full report: bias patterns, noise levels, and ROI projections
 
 **[Apply for a pilot](https://www.decision-intel.com/demo)**
@@ -269,7 +269,7 @@ When an outcome is reported, the platform traces backward through the decision k
 
 ### Committee Decision Rooms
 
-Purpose-built for investment committees, board reviews, deal committees, and risk committees:
+Purpose-built for PE/VC investment committees, M&A deal committees, and board reviews:
 
 - **Decision Room Types** — `investment_committee`, `board_review`, `deal_committee`, `risk_committee`, `general`
 - **Blind Prior Collection** — Committee members submit independent assessments before group discussion begins (prevents anchoring and groupthink)

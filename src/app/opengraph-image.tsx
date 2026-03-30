@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'Decision Intel — The Decision Performance OS for High-Stakes Teams';
+export const alt = 'Decision Intel — The Decision Performance OS for M&A & Investment Teams';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -88,7 +88,7 @@ export default function OGImage() {
           lineHeight: 1.4,
         }}
       >
-        AI-Powered Cognitive Bias Auditing for High-Stakes Executive Teams
+        AI-Powered Cognitive Bias Auditing for M&amp;A &amp; Investment Teams
       </div>
 
       {/* Bottom accent line */}
