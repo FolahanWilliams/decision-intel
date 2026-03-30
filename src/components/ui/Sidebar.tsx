@@ -37,6 +37,8 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+    Intelligence: true,
+    Decisions: true,
     Reference: true,
     'Team & Settings': true,
   });
@@ -369,7 +371,12 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
 
-          <SectionLabel collapsed={collapsed}>Intelligence</SectionLabel>
+          <CollapsibleSection
+            label="Intelligence"
+            collapsed={collapsed}
+            isOpen={!collapsedSections.Intelligence}
+            onToggle={() => toggleSection('Intelligence')}
+          >
           <NavItem
             href="/dashboard/ai-assistant"
             icon={<Sparkles size={18} />}
@@ -416,7 +423,14 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
 
-          <SectionLabel collapsed={collapsed}>Decisions</SectionLabel>
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            label="Decisions"
+            collapsed={collapsed}
+            isOpen={!collapsedSections.Decisions}
+            onToggle={() => toggleSection('Decisions')}
+          >
           <NavItem
             href="/dashboard/decision-quality"
             icon={<BrainCircuit size={18} />}
@@ -452,6 +466,8 @@ export default function Sidebar() {
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
+
+          </CollapsibleSection>
 
           <CollapsibleSection
             label="Reference"

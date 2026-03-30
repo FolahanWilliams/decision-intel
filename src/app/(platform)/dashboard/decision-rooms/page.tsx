@@ -1,5 +1,9 @@
-import { redirect } from 'next/navigation';
+import { DecisionRoomsContent } from '@/components/decision-rooms/DecisionRoomsContent';
 
-export default function DecisionRoomsRedirect() {
-  redirect('/dashboard/meetings?tab=rooms');
+export const metadata = {
+  title: 'Decision Rooms',
+};
+
+export default function DecisionRoomsPage() {
+  return <DecisionRoomsContent />;
 }
