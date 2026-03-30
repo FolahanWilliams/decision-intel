@@ -186,7 +186,7 @@ export function CommandPalette() {
       {
         id: 'outcome-flywheel',
         label: 'Outcome Attribution Flywheel',
-        description: 'See which decisions paid off and which didn\'t',
+        description: "See which decisions paid off and which didn't",
         icon: <TrendingUp size={16} />,
         action: () => navigate('/dashboard/outcome-flywheel'),
         keywords: ['outcome', 'flywheel', 'attribution', 'roi', 'impact'],

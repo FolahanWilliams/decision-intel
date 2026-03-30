@@ -300,6 +300,13 @@ export async function deliverEmailNudge(
     });
   if (settings && !settings.emailNotifications) return;
 
+  // Respect notification severity threshold
+  if (settings?.notificationSeverity) {
+    const pref = settings.notificationSeverity;
+    if (pref === 'critical' && severity !== 'critical') return;
+    if (pref === 'high_critical' && severity !== 'critical' && severity !== 'warning') return;
+  }
+
   const severityColor =
     severity === 'critical' ? '#ef4444' : severity === 'warning' ? '#eab308' : '#6366f1';
 

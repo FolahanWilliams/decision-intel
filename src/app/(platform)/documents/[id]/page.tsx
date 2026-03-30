@@ -43,6 +43,8 @@ import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { RiskScoreCard } from '@/components/analysis/RiskScoreCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
+import { ActionableNudges } from '@/components/analysis/ActionableNudges';
+import { NoiseTaxCard } from '@/components/analysis/NoiseTaxCard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { trackEvent } from '@/lib/analytics/track';
 import { PageSkeleton, CardSkeleton } from '@/components/ui/LoadingSkeleton';
@@ -297,6 +299,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   // Toxic combinations state
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [toxicCombinations, setToxicCombinations] = useState<any[]>([]);
+
+  // Focused/Full view toggle
+  const [viewMode, setViewMode] = useState<'focused' | 'full'>('focused');
 
   // URL-based tab state (#7)
   const tabFromUrl = searchParams.get('tab') ?? '';
@@ -867,885 +872,1042 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         </ErrorBoundary>
       )}
 
-      {/* Bias Network Map */}
-      {analysis && biases.length > 0 && (
-        <div className="mb-xl">
-          <ErrorBoundary sectionName="Bias Network">
-            <div className="card">
-              <div
-                className="card-header"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-              >
-                <h3
+      {/* View Mode Toggle */}
+      {analysis && (
+        <div
+          className="flex items-center justify-between mb-lg"
+          style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: 12 }}
+        >
+          <div className="flex items-center gap-sm">
+            <button
+              onClick={() => setViewMode('focused')}
+              className="text-sm font-medium px-3 py-1"
+              style={{
+                borderRadius: 6,
+                background: viewMode === 'focused' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                color: viewMode === 'focused' ? '#6366f1' : 'var(--text-muted)',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Focused
+            </button>
+            <button
+              onClick={() => setViewMode('full')}
+              className="text-sm font-medium px-3 py-1"
+              style={{
+                borderRadius: 6,
+                background: viewMode === 'full' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                color: viewMode === 'full' ? '#6366f1' : 'var(--text-muted)',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Full Analysis
+            </button>
+          </div>
+          {viewMode === 'focused' && (
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              Showing key findings only
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Focused View: Actionable Nudges + Recommendation */}
+      {analysis && viewMode === 'focused' && (
+        <div className="mb-xl" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <ActionableNudges biases={biases} />
+
+          {/* Recommendation Card */}
+          <div
+            className="card animate-fade-in"
+            style={{
+              borderLeft: `3px solid ${
+                analysis.overallScore > 80
+                  ? '#34d399'
+                  : analysis.overallScore > 60
+                    ? '#eab308'
+                    : '#ef4444'
+              }`,
+            }}
+          >
+            <div className="card-body" style={{ padding: '16px 20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span
                   style={{
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color:
+                      analysis.overallScore > 80
+                        ? '#34d399'
+                        : analysis.overallScore > 60
+                          ? '#eab308'
+                          : '#ef4444',
                   }}
                 >
-                  <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
-                  Bias Network Map
-                </h3>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  Interactive &middot; Click nodes to explore
+                  {analysis.simulation?.overallVerdict ||
+                    (analysis.overallScore > 80
+                      ? 'PROCEED'
+                      : analysis.overallScore > 60
+                        ? 'PROCEED WITH CAUTION'
+                        : 'REVIEW REQUIRED')}
                 </span>
               </div>
-              <div className="card-body">
-                <BiasNetwork
-                  biases={biases.map(b => ({
-                    ...b,
-                    category: 'cognitive',
-                  }))}
-                  onBiasClick={biasType => {
-                    const bias = biases.find(b => b.biasType === biasType);
-                    if (bias) setSelectedBias(bias);
+              <p
+                style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}
+              >
+                {analysis.summary}
+              </p>
+            </div>
+          </div>
+
+          {/* Deep Dive CTA */}
+          <button
+            onClick={() => setViewMode('full')}
+            className="btn btn-ghost flex items-center gap-sm"
+            style={{ alignSelf: 'center', fontSize: 13 }}
+          >
+            View Full Analysis →
+          </button>
+        </div>
+      )}
+
+      {/* === Full Analysis View === */}
+      {viewMode === 'full' && (
+        <>
+          {/* Bias Network Map */}
+          {analysis && biases.length > 0 && (
+            <div className="mb-xl">
+              <ErrorBoundary sectionName="Bias Network">
+                <div className="card">
+                  <div
+                    className="card-header"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <h3
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      <Brain size={16} style={{ color: 'var(--accent-primary)' }} />
+                      Bias Network Map
+                    </h3>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      Interactive &middot; Click nodes to explore
+                    </span>
+                  </div>
+                  <div className="card-body">
+                    <BiasNetwork
+                      biases={biases.map(b => ({
+                        ...b,
+                        category: 'cognitive',
+                      }))}
+                      onBiasClick={biasType => {
+                        const bias = biases.find(b => b.biasType === biasType);
+                        if (bias) setSelectedBias(bias);
+                      }}
+                    />
+                  </div>
+                </div>
+              </ErrorBoundary>
+            </div>
+          )}
+
+          {/* Decision Prior — capture or display */}
+          {analysis && !priorLoading && (
+            <div className="mb-lg">
+              {prior ? (
+                <PostAnalysisPrior
+                  analysisId={analysis.id}
+                  prior={prior}
+                  onUpdated={beliefDelta => {
+                    setPrior(prev =>
+                      prev ? { ...prev, beliefDelta, postAnalysisAction: 'updated' } : prev
+                    );
                   }}
                 />
-              </div>
-            </div>
-          </ErrorBoundary>
-        </div>
-      )}
-
-      {/* Decision Prior — capture or display */}
-      {analysis && !priorLoading && (
-        <div className="mb-lg">
-          {prior ? (
-            <PostAnalysisPrior
-              analysisId={analysis.id}
-              prior={prior}
-              onUpdated={beliefDelta => {
-                setPrior(prev =>
-                  prev ? { ...prev, beliefDelta, postAnalysisAction: 'updated' } : prev
-                );
-              }}
-            />
-          ) : (
-            <DecisionPriorCapture
-              analysisId={analysis.id}
-              onPriorSaved={savedPrior => {
-                setPrior({
-                  analysisId: analysis.id,
-                  defaultAction: savedPrior.defaultAction,
-                  confidence: savedPrior.confidence,
-                });
-              }}
-            />
-          )}
-        </div>
-      )}
-
-      {/* Outcome Timeframe Picker — set when to review */}
-      {analysis && (
-        <div className="mb-lg">
-          <OutcomeTimeframePicker
-            analysisId={analysis.id}
-            currentDueAt={(analysis as unknown as { outcomeDueAt?: string }).outcomeDueAt}
-          />
-        </div>
-      )}
-
-      {/* Auto-Detected Outcome (Draft) */}
-      {analysis && (
-        <div className="mb-lg">
-          <DraftOutcomeCard analysisId={analysis.id} />
-        </div>
-      )}
-
-      {/* Decision Outcome Tracker */}
-      {analysis && (
-        <div className="mb-lg">
-          <OutcomeReporter
-            analysisId={analysis.id}
-            analysisDate={analysis.createdAt}
-            biases={biases}
-            twins={analysis.simulation?.twins}
-          />
-        </div>
-      )}
-
-      {/* Learning Flywheel — what the org learned from this decision */}
-      {analysis && (
-        <div className="mb-lg">
-          <LearningImpactCard analysisId={analysis.id} />
-        </div>
-      )}
-
-      {/* Counterfactual Analysis */}
-      {analysis && (
-        <div className="mb-lg">
-          <CounterfactualPanel analysisId={analysis.id} />
-        </div>
-      )}
-
-      {/* What-If Intervention Panel — causal do-calculus */}
-      {analysis && biases.length > 0 && (
-        <div className="mb-lg">
-          <InterventionPanel analysisId={analysis.id} biases={biases} />
-        </div>
-      )}
-
-      {/* MetaVerdict — adversarial analysis */}
-      {analysis?.metaVerdict && (
-        <ErrorBoundary sectionName="MetaVerdict">
-          <MetaVerdictPanel verdict={analysis.metaVerdict} />
-        </ErrorBoundary>
-      )}
-
-      {/* Toxic Combinations — compound risk detection */}
-      {toxicCombinations.length > 0 && (
-        <div className="mb-lg">
-          <ToxicCombinationCard
-            combinations={toxicCombinations}
-            onAcknowledge={async id => {
-              const res = await fetch('/api/toxic-combinations', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, status: 'acknowledged' }),
-              });
-              if (res.ok) {
-                setToxicCombinations(prev =>
-                  prev.map(c => (c.id === id ? { ...c, status: 'acknowledged' } : c))
-                );
-              }
-            }}
-            onMitigate={async (id, notes) => {
-              const res = await fetch('/api/toxic-combinations', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, status: 'mitigated', mitigationNotes: notes }),
-              });
-              if (res.ok) {
-                setToxicCombinations(prev =>
-                  prev.map(c =>
-                    c.id === id ? { ...c, status: 'mitigated', mitigationNotes: notes } : c
-                  )
-                );
-              }
-            }}
-          />
-        </div>
-      )}
-
-      {/* Decision Room — collaborative blind priors */}
-      {document && (
-        <div className="mb-lg">
-          <DecisionRoomList documentId={document.id} analysisId={analysis?.id} />
-        </div>
-      )}
-
-      {/* Risk-Adjusted Decision Score */}
-      {analysis && (
-        <div className="mb-lg">
-          <RiskScoreCard analysisId={analysis.id} />
-        </div>
-      )}
-
-      {/* Related Decisions — knowledge graph connections */}
-      {analysis && (
-        <div className="mb-lg">
-          <RelatedDecisions analysisId={analysis.id} />
-        </div>
-      )}
-
-      {/* Graph-Powered Recommendations */}
-      {analysis && (
-        <div className="mb-lg">
-          <RecommendationsPanel analysisId={analysis.id} />
-        </div>
-      )}
-
-      {/* Re-scan Button */}
-      <div className="flex justify-end gap-md mb-lg">
-        <button
-          onClick={runLiveScan}
-          disabled={isScanning}
-          className="btn btn-primary flex items-center gap-sm"
-        >
-          {isScanning ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
-          Run Live Audit
-        </button>
-      </div>
-
-      {/* Summary & Live Stream */}
-      <div className="grid grid-3 mb-xl">
-        <div className="col-span-2">
-          {analysis?.summary ? (
-            <div className="card h-full animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <div className="card-header">
-                <h3>Executive Summary</h3>
-              </div>
-              <div className="card-body">
-                <p style={{ fontSize: '1rem', lineHeight: 1.6 }}>{analysis.summary}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="card h-full flex items-center justify-center p-xl">
-              <p className="text-muted">Initiate LIVE SCAN to generate audit summary.</p>
-            </div>
-          )}
-        </div>
-
-        {/* Scan Terminal */}
-        <div
-          className="card animate-fade-in"
-          style={{ animationDelay: '0.4s', background: 'var(--bg-card)' }}
-        >
-          <div className="card-header" style={{ background: 'var(--bg-secondary)' }}>
-            <h3 className="flex items-center gap-sm text-xs">
-              <Terminal size={14} /> Live Scan Feed
-            </h3>
-          </div>
-          <div
-            className="card-body"
-            style={{
-              padding: 'var(--spacing-md)',
-              fontSize: '10px',
-              height: '200px',
-              overflowY: 'auto',
-              fontFamily: 'monospace',
-            }}
-          >
-            {isScanning && (
-              <div className="mb-md">
-                <div className="progress-bar" style={{ marginBottom: '4px' }}>
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${scanProgress}%` }}
-                    role="progressbar"
-                    aria-valuenow={scanProgress}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                  />
-                </div>
-                <div className="text-muted">Progress: {scanProgress}%</div>
-              </div>
-            )}
-            {streamLogs.map((log, i) => (
-              <div
-                key={i}
-                style={{
-                  marginBottom: '4px',
-                  color:
-                    log.type === 'bias'
-                      ? 'var(--error)'
-                      : log.type === 'success'
-                        ? 'var(--success)'
-                        : 'var(--text-secondary)',
-                }}
-              >
-                <span style={{ color: 'var(--text-muted)' }}>[{log.ts}]</span> {log.msg}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Financial Fact Check */}
-      {analysis?.factCheck && (
-        <ErrorBoundary sectionName="Financial Fact Check">
-          <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            <div className="card-header flex items-center justify-between">
-              <h3 className="flex items-center gap-sm">
-                <CheckCircle size={18} style={{ color: 'var(--accent-primary)' }} />
-                Financial Fact Check
-                {(analysis.factCheck.primaryCompany || analysis.factCheck.primaryTopic) && (
-                  <span
-                    className="badge badge-secondary"
-                    style={{ marginLeft: '8px', fontSize: '10px' }}
-                  >
-                    {analysis.factCheck.primaryCompany
-                      ? `${analysis.factCheck.primaryCompany.name} (${analysis.factCheck.primaryCompany.ticker})`
-                      : analysis.factCheck.primaryTopic}
-                  </span>
-                )}
-              </h3>
-              {analysis.factCheck.dataFetchedAt && (
-                <span className="text-xs text-muted">
-                  Data fetched: {formatDate(analysis.factCheck.dataFetchedAt, true)}
-                </span>
-              )}
-            </div>
-            {analysis.factCheck.searchSources && analysis.factCheck.searchSources.length > 0 && (
-              <div
-                style={{
-                  padding: '12px 16px',
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  borderBottom: '1px solid var(--border-color)',
-                }}
-              >
-                <div
-                  className="flex items-center gap-sm"
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    marginBottom: '8px',
-                    color: 'var(--accent-primary)',
-                  }}
-                >
-                  <FileText size={12} />
-                  Verified with Google Search Grounding
-                </div>
-                <div className="flex flex-wrap gap-sm">
-                  {analysis.factCheck.searchSources.map((source, i) => {
-                    try {
-                      return (
-                        <a
-                          key={i}
-                          href={source}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="badge hover:opacity-80 transition-opacity"
-                          style={{
-                            textDecoration: 'none',
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid var(--border-color)',
-                            color: 'var(--text-primary)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            maxWidth: '100%',
-                          }}
-                        >
-                          <span style={{ opacity: 0.7 }}>Source {i + 1}:</span>
-                          <span style={{ fontWeight: 500 }}>{new URL(source).hostname}</span>
-                        </a>
-                      );
-                    } catch {
-                      return null;
-                    }
-                  })}
-                </div>
-              </div>
-            )}
-            <div className="card-body" style={{ padding: 0 }}>
-              {analysis.factCheck.verifications && analysis.factCheck.verifications.length > 0 ? (
-                analysis.factCheck.verifications.map((v, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      padding: '16px',
-                      borderBottom:
-                        idx < (analysis.factCheck?.verifications?.length || 0) - 1
-                          ? '1px solid var(--border-color)'
-                          : 'none',
-                    }}
-                  >
-                    <div className="flex items-start gap-md">
-                      <div style={{ marginTop: '2px' }}>
-                        {v.verdict?.toUpperCase() === 'VERIFIED' ? (
-                          <CheckCircle
-                            size={16}
-                            style={{ color: 'var(--success)' }}
-                            aria-label="Verified"
-                          />
-                        ) : v.verdict?.toUpperCase() === 'CONTRADICTED' ? (
-                          <AlertTriangle
-                            size={16}
-                            style={{ color: 'var(--error)' }}
-                            aria-label="Contradicted"
-                          />
-                        ) : (
-                          <Info
-                            size={16}
-                            style={{ color: 'var(--warning)' }}
-                            aria-label="Unverifiable"
-                          />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p
-                          style={{
-                            fontSize: '13px',
-                            fontWeight: 500,
-                            marginBottom: '4px',
-                            color: 'var(--text-primary)',
-                          }}
-                        >
-                          &quot;{v.claim}&quot;
-                        </p>
-                        <div
-                          style={{
-                            fontSize: '10px',
-                            fontWeight: 700,
-                            marginBottom: '6px',
-                            color:
-                              v.verdict?.toUpperCase() === 'VERIFIED'
-                                ? 'var(--success)'
-                                : v.verdict?.toUpperCase() === 'CONTRADICTED'
-                                  ? 'var(--error)'
-                                  : 'var(--warning)',
-                          }}
-                        >
-                          {v.verdict?.toUpperCase()}
-                        </div>
-                        <p
-                          style={{
-                            fontSize: '12px',
-                            color: 'var(--text-secondary)',
-                            lineHeight: 1.5,
-                            marginBottom: '8px',
-                          }}
-                        >
-                          {v.explanation}
-                        </p>
-                        {v.sourceUrl && (
-                          <a
-                            href={v.sourceUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-xs text-[10px]"
-                            style={{ color: 'var(--accent-primary)' }}
-                          >
-                            <FileText size={10} />
-                            Evidence Source:{' '}
-                            {(() => {
-                              try {
-                                return new URL(v.sourceUrl).hostname;
-                              } catch {
-                                return 'External Source';
-                              }
-                            })()}
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
               ) : (
-                <div className="p-xl text-center text-muted">
-                  <p>No specific financial claims were isolated for verification.</p>
+                <DecisionPriorCapture
+                  analysisId={analysis.id}
+                  onPriorSaved={savedPrior => {
+                    setPrior({
+                      analysisId: analysis.id,
+                      defaultAction: savedPrior.defaultAction,
+                      confidence: savedPrior.confidence,
+                    });
+                  }}
+                />
+              )}
+            </div>
+          )}
+
+          {/* Outcome Timeframe Picker — set when to review */}
+          {analysis && (
+            <div className="mb-lg">
+              <OutcomeTimeframePicker
+                analysisId={analysis.id}
+                currentDueAt={(analysis as unknown as { outcomeDueAt?: string }).outcomeDueAt}
+              />
+            </div>
+          )}
+
+          {/* Auto-Detected Outcome (Draft) */}
+          {analysis && (
+            <div className="mb-lg">
+              <DraftOutcomeCard analysisId={analysis.id} />
+            </div>
+          )}
+
+          {/* Decision Outcome Tracker */}
+          {analysis && (
+            <div className="mb-lg">
+              <OutcomeReporter
+                analysisId={analysis.id}
+                analysisDate={analysis.createdAt}
+                biases={biases}
+                twins={analysis.simulation?.twins}
+              />
+            </div>
+          )}
+
+          {/* Learning Flywheel — what the org learned from this decision */}
+          {analysis && (
+            <div className="mb-lg">
+              <LearningImpactCard analysisId={analysis.id} />
+            </div>
+          )}
+
+          {/* Counterfactual Analysis */}
+          {analysis && (
+            <div className="mb-lg">
+              <CounterfactualPanel analysisId={analysis.id} />
+            </div>
+          )}
+
+          {/* What-If Intervention Panel — causal do-calculus */}
+          {analysis && biases.length > 0 && (
+            <div className="mb-lg">
+              <InterventionPanel analysisId={analysis.id} biases={biases} />
+            </div>
+          )}
+
+          {/* MetaVerdict — adversarial analysis */}
+          {analysis?.metaVerdict && (
+            <ErrorBoundary sectionName="MetaVerdict">
+              <MetaVerdictPanel verdict={analysis.metaVerdict} />
+            </ErrorBoundary>
+          )}
+
+          {/* Toxic Combinations — compound risk detection */}
+          {toxicCombinations.length > 0 && (
+            <div className="mb-lg">
+              <ToxicCombinationCard
+                combinations={toxicCombinations}
+                onAcknowledge={async id => {
+                  const res = await fetch('/api/toxic-combinations', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, status: 'acknowledged' }),
+                  });
+                  if (res.ok) {
+                    setToxicCombinations(prev =>
+                      prev.map(c => (c.id === id ? { ...c, status: 'acknowledged' } : c))
+                    );
+                  }
+                }}
+                onMitigate={async (id, notes) => {
+                  const res = await fetch('/api/toxic-combinations', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, status: 'mitigated', mitigationNotes: notes }),
+                  });
+                  if (res.ok) {
+                    setToxicCombinations(prev =>
+                      prev.map(c =>
+                        c.id === id ? { ...c, status: 'mitigated', mitigationNotes: notes } : c
+                      )
+                    );
+                  }
+                }}
+              />
+            </div>
+          )}
+
+          {/* Decision Room — collaborative blind priors */}
+          {document && (
+            <div className="mb-lg">
+              <DecisionRoomList documentId={document.id} analysisId={analysis?.id} />
+            </div>
+          )}
+
+          {/* Risk-Adjusted Decision Score */}
+          {analysis && (
+            <div className="mb-lg">
+              <RiskScoreCard analysisId={analysis.id} />
+            </div>
+          )}
+
+          {/* Related Decisions — knowledge graph connections */}
+          {analysis && (
+            <div className="mb-lg">
+              <RelatedDecisions analysisId={analysis.id} />
+            </div>
+          )}
+
+          {/* Graph-Powered Recommendations */}
+          {analysis && (
+            <div className="mb-lg">
+              <RecommendationsPanel analysisId={analysis.id} />
+            </div>
+          )}
+
+          {/* Re-scan Button */}
+          <div className="flex justify-end gap-md mb-lg">
+            <button
+              onClick={runLiveScan}
+              disabled={isScanning}
+              className="btn btn-primary flex items-center gap-sm"
+            >
+              {isScanning ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <RefreshCw size={16} />
+              )}
+              Run Live Audit
+            </button>
+          </div>
+
+          {/* Summary & Live Stream */}
+          <div className="grid grid-3 mb-xl">
+            <div className="col-span-2">
+              {analysis?.summary ? (
+                <div className="card h-full animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                  <div className="card-header">
+                    <h3>Executive Summary</h3>
+                  </div>
+                  <div className="card-body">
+                    <p style={{ fontSize: '1rem', lineHeight: 1.6 }}>{analysis.summary}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="card h-full flex items-center justify-center p-xl">
+                  <p className="text-muted">Initiate LIVE SCAN to generate audit summary.</p>
                 </div>
               )}
             </div>
-          </div>
-        </ErrorBoundary>
-      )}
 
-      {/* Toxic Combination Alert Banner */}
-      {toxicCombinations.length > 0 && <ToxicAlertBanner combinations={toxicCombinations} />}
-
-      {/* Key Findings Summary Bar */}
-      {analysis && (
-        <div
-          className="grid grid-cols-2 md:grid-cols-4 gap-sm mb-lg"
-          style={{ marginTop: toxicCombinations.length > 0 ? 0 : 'var(--spacing-md)' }}
-        >
-          <div className="card" style={{ padding: '12px 16px' }}>
+            {/* Scan Terminal */}
             <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
+              className="card animate-fade-in"
+              style={{ animationDelay: '0.4s', background: 'var(--bg-card)' }}
             >
-              Decision Quality
-            </div>
-            <div
-              style={{
-                fontSize: '24px',
-                fontWeight: 700,
-                fontFamily: "'JetBrains Mono', monospace",
-                color:
-                  analysis.overallScore >= 70
-                    ? '#34d399'
-                    : analysis.overallScore >= 40
-                      ? '#fbbf24'
-                      : '#f87171',
-              }}
-            >
-              {Math.round(analysis.overallScore)}
-              <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>
-                /100
-              </span>
-            </div>
-          </div>
-
-          <div className="card" style={{ padding: '12px 16px' }}>
-            <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
-            >
-              Biases Found
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-              <span
+              <div className="card-header" style={{ background: 'var(--bg-secondary)' }}>
+                <h3 className="flex items-center gap-sm text-xs">
+                  <Terminal size={14} /> Live Scan Feed
+                </h3>
+              </div>
+              <div
+                className="card-body"
                 style={{
-                  fontSize: '24px',
-                  fontWeight: 700,
-                  fontFamily: "'JetBrains Mono', monospace",
-                  color:
-                    biases.length === 0 ? '#34d399' : biases.length <= 3 ? '#fbbf24' : '#f87171',
+                  padding: 'var(--spacing-md)',
+                  fontSize: '10px',
+                  height: '200px',
+                  overflowY: 'auto',
+                  fontFamily: 'monospace',
                 }}
               >
-                {biases.length}
-              </span>
-              {biases.length > 0 && (
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  {biases.filter(b => b.severity === 'high' || b.severity === 'critical').length > 0
-                    ? `${biases.filter(b => b.severity === 'high' || b.severity === 'critical').length} high severity`
-                    : 'low-medium severity'}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="card" style={{ padding: '12px 16px' }}>
-            <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
-            >
-              Noise Score
-            </div>
-            <div
-              style={{
-                fontSize: '24px',
-                fontWeight: 700,
-                fontFamily: "'JetBrains Mono', monospace",
-                color:
-                  analysis.noiseScore <= 30
-                    ? '#34d399'
-                    : analysis.noiseScore <= 60
-                      ? '#fbbf24'
-                      : '#f87171',
-              }}
-            >
-              {Math.round(analysis.noiseScore)}
-              <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>
-                /100
-              </span>
-            </div>
-          </div>
-
-          <div className="card" style={{ padding: '12px 16px' }}>
-            <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
-            >
-              Risk Alerts
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-              <span
-                style={{
-                  fontSize: '24px',
-                  fontWeight: 700,
-                  fontFamily: "'JetBrains Mono', monospace",
-                  color:
-                    toxicCombinations.length === 0
-                      ? '#34d399'
-                      : toxicCombinations.length <= 2
-                        ? '#fbbf24'
-                        : '#f87171',
-                }}
-              >
-                {toxicCombinations.length}
-              </span>
-              {toxicCombinations.length > 0 && (
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  toxic combination{toxicCombinations.length !== 1 ? 's' : ''}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tabs + Content */}
-      <div className="grid" style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}>
-        <div className="flex flex-col gap-lg">
-          {/* Tab Bar with group labels */}
-          <div
-            className="flex flex-wrap items-end gap-0 mb-lg"
-            role="tablist"
-            aria-label="Analysis tabs"
-            style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
-          >
-            {TAB_GROUPS.map((group, gi) => (
-              <div key={group.label} className="flex items-end">
-                {gi > 0 && (
-                  <div
-                    style={{
-                      width: 1,
-                      height: 24,
-                      background: 'var(--border-color)',
-                      margin: '0 4px',
-                      alignSelf: 'center',
-                    }}
-                  />
+                {isScanning && (
+                  <div className="mb-md">
+                    <div className="progress-bar" style={{ marginBottom: '4px' }}>
+                      <div
+                        className="progress-bar-fill"
+                        style={{ width: `${scanProgress}%` }}
+                        role="progressbar"
+                        aria-valuenow={scanProgress}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                      />
+                    </div>
+                    <div className="text-muted">Progress: {scanProgress}%</div>
+                  </div>
                 )}
-                <div className="flex flex-col">
-                  {group.label !== 'Overview' && (
-                    <span
-                      style={{
-                        fontSize: '9px',
-                        fontWeight: 600,
-                        color: 'var(--text-muted)',
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        padding: '0 16px 2px',
-                        userSelect: 'none',
-                      }}
-                    >
-                      {group.label}
+                {streamLogs.map((log, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      marginBottom: '4px',
+                      color:
+                        log.type === 'bias'
+                          ? 'var(--error)'
+                          : log.type === 'success'
+                            ? 'var(--success)'
+                            : 'var(--text-secondary)',
+                    }}
+                  >
+                    <span style={{ color: 'var(--text-muted)' }}>[{log.ts}]</span> {log.msg}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Financial Fact Check */}
+          {analysis?.factCheck && (
+            <ErrorBoundary sectionName="Financial Fact Check">
+              <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                <div className="card-header flex items-center justify-between">
+                  <h3 className="flex items-center gap-sm">
+                    <CheckCircle size={18} style={{ color: 'var(--accent-primary)' }} />
+                    Financial Fact Check
+                    {(analysis.factCheck.primaryCompany || analysis.factCheck.primaryTopic) && (
+                      <span
+                        className="badge badge-secondary"
+                        style={{ marginLeft: '8px', fontSize: '10px' }}
+                      >
+                        {analysis.factCheck.primaryCompany
+                          ? `${analysis.factCheck.primaryCompany.name} (${analysis.factCheck.primaryCompany.ticker})`
+                          : analysis.factCheck.primaryTopic}
+                      </span>
+                    )}
+                  </h3>
+                  {analysis.factCheck.dataFetchedAt && (
+                    <span className="text-xs text-muted">
+                      Data fetched: {formatDate(analysis.factCheck.dataFetchedAt, true)}
                     </span>
                   )}
-                  <div className="flex">
-                    {group.tabs.map(tab => (
-                      <button
-                        key={tab.id}
-                        role="tab"
-                        aria-selected={activeTab === tab.id}
-                        aria-controls={`tabpanel-${tab.id}`}
-                        onClick={() => handleTabChange(tab.id)}
-                        className="flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors -mb-px"
-                        style={
-                          activeTab === tab.id
-                            ? {
-                                background: 'rgba(255, 255, 255, 0.06)',
-                                color: '#FFFFFF',
-                                borderBottom: '2px solid #FFFFFF',
-                              }
-                            : {
-                                color: 'var(--text-muted)',
-                                background: 'transparent',
-                                borderBottom: '2px solid transparent',
-                              }
-                        }
-                      >
-                        <tab.icon size={14} />
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Tab Panels (lazy loaded, each wrapped in ErrorBoundary) */}
-          <div role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={activeTab}>
-            <Suspense fallback={<CardSkeleton lines={5} />}>
-              {activeTab === 'overview' && (
-                <ErrorBoundary sectionName="Overview">
-                  <OverviewTab
-                    documentContent={document.content}
-                    biases={biases}
-                    uploadedAt={document.uploadedAt}
-                    analysisCreatedAt={analysis?.createdAt}
-                    analysisId={analysis?.id}
-                    compoundAdjustments={analysis?.compliance?.compoundScoring?.adjustments}
-                    recognitionCues={analysis?.recognitionCues}
-                    narrativePreMortem={analysis?.narrativePreMortem}
-                  />
-                </ErrorBoundary>
-              )}
-              {activeTab === 'evidence' && analysis && (
-                <ErrorBoundary sectionName="Evidence">
-                  <EvidenceTab
-                    analysisData={{
-                      overallScore: analysis.overallScore,
-                      noiseScore: analysis.noiseScore,
-                      summary: analysis.summary,
-                      biases: biases.map(b => ({
-                        biasType: b.biasType,
-                        found: true,
-                        severity: b.severity as 'low' | 'medium' | 'high' | 'critical',
-                        excerpt: b.excerpt,
-                        explanation: b.explanation,
-                        suggestion: b.suggestion,
-                      })),
-                      ...(analysis.noiseStats
-                        ? {
-                            noiseStats: analysis.noiseStats as {
-                              mean: number;
-                              stdDev: number;
-                              variance: number;
-                            },
-                          }
-                        : {}),
-                      ...(analysis.factCheck
-                        ? {
-                            factCheck: analysis.factCheck as {
-                              score: number;
-                              flags: string[];
-                              verifications?: Array<{
-                                claim: string;
-                                verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE';
-                                explanation: string;
-                              }>;
-                            },
-                          }
-                        : {}),
-                      ...(analysis.compliance
-                        ? { compliance: analysis.compliance as import('@/types').ComplianceResult }
-                        : {}),
-                      ...(analysis.logicalAnalysis
-                        ? {
-                            logicalAnalysis:
-                              analysis.logicalAnalysis as import('@/types').LogicalAnalysisResult,
-                          }
-                        : {}),
-                      ...(analysis.swotAnalysis
-                        ? {
-                            swotAnalysis:
-                              analysis.swotAnalysis as import('@/types').SwotAnalysisResult,
-                          }
-                        : {}),
-                      ...(analysis.simulation
-                        ? { simulation: analysis.simulation as import('@/types').SimulationResult }
-                        : {}),
-                      ...(analysis.cognitiveAnalysis
-                        ? {
-                            cognitiveAnalysis:
-                              analysis.cognitiveAnalysis as import('@/types').CognitiveAnalysisResult,
-                          }
-                        : {}),
-                    }}
-                    logicalAnalysis={analysis?.logicalAnalysis}
-                  />
-                </ErrorBoundary>
-              )}
-              {activeTab === 'swot' && (
-                <ErrorBoundary sectionName="SWOT Analysis">
-                  <SwotTab swotAnalysis={analysis?.swotAnalysis} />
-                </ErrorBoundary>
-              )}
-              {activeTab === 'noise' && analysis && (
-                <ErrorBoundary sectionName="Noise Analysis">
-                  <NoiseTab
-                    noiseScore={analysis.noiseScore}
-                    noiseStats={analysis.noiseStats}
-                    noiseBenchmarks={analysis.noiseBenchmarks}
-                  />
-                </ErrorBoundary>
-              )}
-              {activeTab === 'perspectives' && (
-                <ErrorBoundary sectionName="Perspectives">
-                  <PerspectivesTab
-                    analysisId={analysis?.id}
-                    cognitiveAnalysis={analysis?.cognitiveAnalysis}
-                    preMortem={analysis?.preMortem}
-                    simulation={analysis?.simulation}
-                    hasOutcome={analysis?.outcomeStatus === 'outcome_logged'}
-                    documentContent={document.content}
-                    documentId={document.id}
-                    originalScore={analysis?.overallScore}
-                    originalNoiseScore={analysis?.noiseScore}
-                    originalBiasCount={biases.length}
-                    originalBiasTypes={biases.map(b => b.biasType)}
-                  />
-                </ErrorBoundary>
-              )}
-              {activeTab === 'intelligence' && (
-                <ErrorBoundary sectionName="Intelligence Context">
-                  <IntelligenceTab intelligenceContext={analysis?.intelligenceContext} />
-                </ErrorBoundary>
-              )}
-            </Suspense>
-          </div>
-        </div>
-
-        {/* Right Column: Bias Sidebar */}
-        <ErrorBoundary sectionName="Bias Sidebar">
-          <div className="flex flex-col gap-lg">
-            <div className="card">
-              <div className="card-body p-md flex justify-around">
-                <div className="text-center">
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
-                    Decision Quality
-                  </div>
-                  <div style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>
-                    {analysis ? Math.round(analysis.overallScore) : '--'}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
-                    Noise Score
-                  </div>
-                  <div style={{ color: 'var(--accent-secondary)', fontWeight: 700 }}>
-                    {analysis ? Math.round(analysis.noiseScore) : '--'}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="card" style={{ alignSelf: 'start', width: '100%' }}>
-              <div className="card-header">
-                <h3>Detected Biases</h3>
-              </div>
-              <div
-                style={{ maxHeight: '60vh', overflowY: 'auto' }}
-                role="list"
-                aria-label="Detected biases"
-              >
-                {biases.length > 0 ? (
-                  biases.map((bias, idx) => (
+                {analysis.factCheck.searchSources &&
+                  analysis.factCheck.searchSources.length > 0 && (
                     <div
-                      key={bias.id}
-                      role="listitem"
-                      tabIndex={0}
-                      onClick={() => setSelectedBias(bias)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          setSelectedBias(bias);
-                        }
-                      }}
                       style={{
-                        padding: 'var(--spacing-md)',
-                        borderBottom:
-                          idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
-                        cursor: 'pointer',
-                        background:
-                          selectedBias?.id === bias.id
-                            ? 'rgba(255, 255, 255, 0.06)'
-                            : 'transparent',
-                        borderLeft:
-                          selectedBias?.id === bias.id
-                            ? '3px solid var(--accent-primary)'
-                            : '3px solid transparent',
+                        padding: '12px 16px',
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        borderBottom: '1px solid var(--border-color)',
                       }}
                     >
-                      <div className="flex items-center justify-between">
-                        <span style={{ fontWeight: 500, fontSize: '13px' }}>{bias.biasType}</span>
-                        <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
-                      </div>
-                      <span
-                        className={`badge badge-${bias.severity}`}
-                        style={{ marginTop: 'var(--spacing-xs)', fontSize: '9px' }}
+                      <div
+                        className="flex items-center gap-sm"
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          marginBottom: '8px',
+                          color: 'var(--accent-primary)',
+                        }}
                       >
-                        {bias.severity}
-                        <span className="sr-only"> severity</span>
-                      </span>
+                        <FileText size={12} />
+                        Verified with Google Search Grounding
+                      </div>
+                      <div className="flex flex-wrap gap-sm">
+                        {analysis.factCheck.searchSources.map((source, i) => {
+                          try {
+                            return (
+                              <a
+                                key={i}
+                                href={source}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="badge hover:opacity-80 transition-opacity"
+                                style={{
+                                  textDecoration: 'none',
+                                  background: 'rgba(255, 255, 255, 0.05)',
+                                  border: '1px solid var(--border-color)',
+                                  color: 'var(--text-primary)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  maxWidth: '100%',
+                                }}
+                              >
+                                <span style={{ opacity: 0.7 }}>Source {i + 1}:</span>
+                                <span style={{ fontWeight: 500 }}>{new URL(source).hostname}</span>
+                              </a>
+                            );
+                          } catch {
+                            return null;
+                          }
+                        })}
+                      </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="p-xl text-center text-muted text-xs">No data available</div>
-                )}
+                  )}
+                <div className="card-body" style={{ padding: 0 }}>
+                  {analysis.factCheck.verifications &&
+                  analysis.factCheck.verifications.length > 0 ? (
+                    analysis.factCheck.verifications.map((v, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '16px',
+                          borderBottom:
+                            idx < (analysis.factCheck?.verifications?.length || 0) - 1
+                              ? '1px solid var(--border-color)'
+                              : 'none',
+                        }}
+                      >
+                        <div className="flex items-start gap-md">
+                          <div style={{ marginTop: '2px' }}>
+                            {v.verdict?.toUpperCase() === 'VERIFIED' ? (
+                              <CheckCircle
+                                size={16}
+                                style={{ color: 'var(--success)' }}
+                                aria-label="Verified"
+                              />
+                            ) : v.verdict?.toUpperCase() === 'CONTRADICTED' ? (
+                              <AlertTriangle
+                                size={16}
+                                style={{ color: 'var(--error)' }}
+                                aria-label="Contradicted"
+                              />
+                            ) : (
+                              <Info
+                                size={16}
+                                style={{ color: 'var(--warning)' }}
+                                aria-label="Unverifiable"
+                              />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p
+                              style={{
+                                fontSize: '13px',
+                                fontWeight: 500,
+                                marginBottom: '4px',
+                                color: 'var(--text-primary)',
+                              }}
+                            >
+                              &quot;{v.claim}&quot;
+                            </p>
+                            <div
+                              style={{
+                                fontSize: '10px',
+                                fontWeight: 700,
+                                marginBottom: '6px',
+                                color:
+                                  v.verdict?.toUpperCase() === 'VERIFIED'
+                                    ? 'var(--success)'
+                                    : v.verdict?.toUpperCase() === 'CONTRADICTED'
+                                      ? 'var(--error)'
+                                      : 'var(--warning)',
+                              }}
+                            >
+                              {v.verdict?.toUpperCase()}
+                            </div>
+                            <p
+                              style={{
+                                fontSize: '12px',
+                                color: 'var(--text-secondary)',
+                                lineHeight: 1.5,
+                                marginBottom: '8px',
+                              }}
+                            >
+                              {v.explanation}
+                            </p>
+                            {v.sourceUrl && (
+                              <a
+                                href={v.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-xs text-[10px]"
+                                style={{ color: 'var(--accent-primary)' }}
+                              >
+                                <FileText size={10} />
+                                Evidence Source:{' '}
+                                {(() => {
+                                  try {
+                                    return new URL(v.sourceUrl).hostname;
+                                  } catch {
+                                    return 'External Source';
+                                  }
+                                })()}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-xl text-center text-muted">
+                      <p>No specific financial claims were isolated for verification.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </ErrorBoundary>
+          )}
+
+          {/* Toxic Combination Alert Banner */}
+          {toxicCombinations.length > 0 && <ToxicAlertBanner combinations={toxicCombinations} />}
+
+          {/* Key Findings Summary Bar */}
+          {analysis && (
+            <div
+              className="grid grid-cols-2 md:grid-cols-4 gap-sm mb-lg"
+              style={{ marginTop: toxicCombinations.length > 0 ? 0 : 'var(--spacing-md)' }}
+            >
+              <div className="card" style={{ padding: '12px 16px' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  Decision Quality
+                </div>
+                <div
+                  style={{
+                    fontSize: '24px',
+                    fontWeight: 700,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color:
+                      analysis.overallScore >= 70
+                        ? '#34d399'
+                        : analysis.overallScore >= 40
+                          ? '#fbbf24'
+                          : '#f87171',
+                  }}
+                >
+                  {Math.round(analysis.overallScore)}
+                  <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>
+                    /100
+                  </span>
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: '12px 16px' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  Biases Found
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                  <span
+                    style={{
+                      fontSize: '24px',
+                      fontWeight: 700,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      color:
+                        biases.length === 0
+                          ? '#34d399'
+                          : biases.length <= 3
+                            ? '#fbbf24'
+                            : '#f87171',
+                    }}
+                  >
+                    {biases.length}
+                  </span>
+                  {biases.length > 0 && (
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      {biases.filter(b => b.severity === 'high' || b.severity === 'critical')
+                        .length > 0
+                        ? `${biases.filter(b => b.severity === 'high' || b.severity === 'critical').length} high severity`
+                        : 'low-medium severity'}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: '12px 16px' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  Noise Score
+                </div>
+                <div
+                  style={{
+                    fontSize: '24px',
+                    fontWeight: 700,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color:
+                      analysis.noiseScore <= 30
+                        ? '#34d399'
+                        : analysis.noiseScore <= 60
+                          ? '#fbbf24'
+                          : '#f87171',
+                  }}
+                >
+                  {Math.round(analysis.noiseScore)}
+                  <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>
+                    /100
+                  </span>
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: '12px 16px' }}>
+                <div
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  Risk Alerts
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                  <span
+                    style={{
+                      fontSize: '24px',
+                      fontWeight: 700,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      color:
+                        toxicCombinations.length === 0
+                          ? '#34d399'
+                          : toxicCombinations.length <= 2
+                            ? '#fbbf24'
+                            : '#f87171',
+                    }}
+                  >
+                    {toxicCombinations.length}
+                  </span>
+                  {toxicCombinations.length > 0 && (
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      toxic combination{toxicCombinations.length !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
+          )}
+
+          {/* Tabs + Content */}
+          <div
+            className="grid"
+            style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}
+          >
+            <div className="flex flex-col gap-lg">
+              {/* Tab Bar with group labels */}
+              <div
+                className="flex flex-wrap items-end gap-0 mb-lg"
+                role="tablist"
+                aria-label="Analysis tabs"
+                style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
+              >
+                {TAB_GROUPS.map((group, gi) => (
+                  <div key={group.label} className="flex items-end">
+                    {gi > 0 && (
+                      <div
+                        style={{
+                          width: 1,
+                          height: 24,
+                          background: 'var(--border-color)',
+                          margin: '0 4px',
+                          alignSelf: 'center',
+                        }}
+                      />
+                    )}
+                    <div className="flex flex-col">
+                      {group.label !== 'Overview' && (
+                        <span
+                          style={{
+                            fontSize: '9px',
+                            fontWeight: 600,
+                            color: 'var(--text-muted)',
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                            padding: '0 16px 2px',
+                            userSelect: 'none',
+                          }}
+                        >
+                          {group.label}
+                        </span>
+                      )}
+                      <div className="flex">
+                        {group.tabs.map(tab => (
+                          <button
+                            key={tab.id}
+                            role="tab"
+                            aria-selected={activeTab === tab.id}
+                            aria-controls={`tabpanel-${tab.id}`}
+                            onClick={() => handleTabChange(tab.id)}
+                            className="flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors -mb-px"
+                            style={
+                              activeTab === tab.id
+                                ? {
+                                    background: 'rgba(255, 255, 255, 0.06)',
+                                    color: '#FFFFFF',
+                                    borderBottom: '2px solid #FFFFFF',
+                                  }
+                                : {
+                                    color: 'var(--text-muted)',
+                                    background: 'transparent',
+                                    borderBottom: '2px solid transparent',
+                                  }
+                            }
+                          >
+                            <tab.icon size={14} />
+                            {tab.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Tab Panels (lazy loaded, each wrapped in ErrorBoundary) */}
+              <div role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={activeTab}>
+                <Suspense fallback={<CardSkeleton lines={5} />}>
+                  {activeTab === 'overview' && (
+                    <ErrorBoundary sectionName="Overview">
+                      <OverviewTab
+                        documentContent={document.content}
+                        biases={biases}
+                        uploadedAt={document.uploadedAt}
+                        analysisCreatedAt={analysis?.createdAt}
+                        analysisId={analysis?.id}
+                        compoundAdjustments={analysis?.compliance?.compoundScoring?.adjustments}
+                        recognitionCues={analysis?.recognitionCues}
+                        narrativePreMortem={analysis?.narrativePreMortem}
+                      />
+                    </ErrorBoundary>
+                  )}
+                  {activeTab === 'evidence' && analysis && (
+                    <ErrorBoundary sectionName="Evidence">
+                      <EvidenceTab
+                        analysisData={{
+                          overallScore: analysis.overallScore,
+                          noiseScore: analysis.noiseScore,
+                          summary: analysis.summary,
+                          biases: biases.map(b => ({
+                            biasType: b.biasType,
+                            found: true,
+                            severity: b.severity as 'low' | 'medium' | 'high' | 'critical',
+                            excerpt: b.excerpt,
+                            explanation: b.explanation,
+                            suggestion: b.suggestion,
+                          })),
+                          ...(analysis.noiseStats
+                            ? {
+                                noiseStats: analysis.noiseStats as {
+                                  mean: number;
+                                  stdDev: number;
+                                  variance: number;
+                                },
+                              }
+                            : {}),
+                          ...(analysis.factCheck
+                            ? {
+                                factCheck: analysis.factCheck as {
+                                  score: number;
+                                  flags: string[];
+                                  verifications?: Array<{
+                                    claim: string;
+                                    verdict: 'VERIFIED' | 'CONTRADICTED' | 'UNVERIFIABLE';
+                                    explanation: string;
+                                  }>;
+                                },
+                              }
+                            : {}),
+                          ...(analysis.compliance
+                            ? {
+                                compliance:
+                                  analysis.compliance as import('@/types').ComplianceResult,
+                              }
+                            : {}),
+                          ...(analysis.logicalAnalysis
+                            ? {
+                                logicalAnalysis:
+                                  analysis.logicalAnalysis as import('@/types').LogicalAnalysisResult,
+                              }
+                            : {}),
+                          ...(analysis.swotAnalysis
+                            ? {
+                                swotAnalysis:
+                                  analysis.swotAnalysis as import('@/types').SwotAnalysisResult,
+                              }
+                            : {}),
+                          ...(analysis.simulation
+                            ? {
+                                simulation:
+                                  analysis.simulation as import('@/types').SimulationResult,
+                              }
+                            : {}),
+                          ...(analysis.cognitiveAnalysis
+                            ? {
+                                cognitiveAnalysis:
+                                  analysis.cognitiveAnalysis as import('@/types').CognitiveAnalysisResult,
+                              }
+                            : {}),
+                        }}
+                        logicalAnalysis={analysis?.logicalAnalysis}
+                      />
+                    </ErrorBoundary>
+                  )}
+                  {activeTab === 'swot' && (
+                    <ErrorBoundary sectionName="SWOT Analysis">
+                      <SwotTab swotAnalysis={analysis?.swotAnalysis} />
+                    </ErrorBoundary>
+                  )}
+                  {activeTab === 'noise' && analysis && (
+                    <ErrorBoundary sectionName="Noise Analysis">
+                      <NoiseTab
+                        noiseScore={analysis.noiseScore}
+                        noiseStats={analysis.noiseStats}
+                        noiseBenchmarks={analysis.noiseBenchmarks}
+                      />
+                    </ErrorBoundary>
+                  )}
+                  {activeTab === 'perspectives' && (
+                    <ErrorBoundary sectionName="Perspectives">
+                      <PerspectivesTab
+                        analysisId={analysis?.id}
+                        cognitiveAnalysis={analysis?.cognitiveAnalysis}
+                        preMortem={analysis?.preMortem}
+                        simulation={analysis?.simulation}
+                        hasOutcome={analysis?.outcomeStatus === 'outcome_logged'}
+                        documentContent={document.content}
+                        documentId={document.id}
+                        originalScore={analysis?.overallScore}
+                        originalNoiseScore={analysis?.noiseScore}
+                        originalBiasCount={biases.length}
+                        originalBiasTypes={biases.map(b => b.biasType)}
+                      />
+                    </ErrorBoundary>
+                  )}
+                  {activeTab === 'intelligence' && (
+                    <ErrorBoundary sectionName="Intelligence Context">
+                      <IntelligenceTab intelligenceContext={analysis?.intelligenceContext} />
+                    </ErrorBoundary>
+                  )}
+                </Suspense>
+              </div>
+            </div>
+
+            {/* Right Column: Bias Sidebar */}
+            <ErrorBoundary sectionName="Bias Sidebar">
+              <div className="flex flex-col gap-lg">
+                <div className="card">
+                  <div className="card-body p-md flex justify-around">
+                    <div className="text-center">
+                      <div
+                        style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}
+                      >
+                        Decision Quality
+                      </div>
+                      <div style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>
+                        {analysis ? Math.round(analysis.overallScore) : '--'}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div
+                        style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}
+                      >
+                        Noise Score
+                      </div>
+                      <div style={{ color: 'var(--accent-secondary)', fontWeight: 700 }}>
+                        {analysis ? Math.round(analysis.noiseScore) : '--'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="card" style={{ alignSelf: 'start', width: '100%' }}>
+                  <div className="card-header">
+                    <h3>Detected Biases</h3>
+                  </div>
+                  <div
+                    style={{ maxHeight: '60vh', overflowY: 'auto' }}
+                    role="list"
+                    aria-label="Detected biases"
+                  >
+                    {biases.length > 0 ? (
+                      biases.map((bias, idx) => (
+                        <div
+                          key={bias.id}
+                          role="listitem"
+                          tabIndex={0}
+                          onClick={() => setSelectedBias(bias)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              setSelectedBias(bias);
+                            }
+                          }}
+                          style={{
+                            padding: 'var(--spacing-md)',
+                            borderBottom:
+                              idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
+                            cursor: 'pointer',
+                            background:
+                              selectedBias?.id === bias.id
+                                ? 'rgba(255, 255, 255, 0.06)'
+                                : 'transparent',
+                            borderLeft:
+                              selectedBias?.id === bias.id
+                                ? '3px solid var(--accent-primary)'
+                                : '3px solid transparent',
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span style={{ fontWeight: 500, fontSize: '13px' }}>
+                              {bias.biasType}
+                            </span>
+                            <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
+                          </div>
+                          <div
+                            className="flex items-center gap-xs"
+                            style={{ marginTop: 'var(--spacing-xs)' }}
+                          >
+                            <span
+                              className={`badge badge-${bias.severity}`}
+                              style={{ fontSize: '9px' }}
+                            >
+                              {bias.severity}
+                              <span className="sr-only"> severity</span>
+                            </span>
+                            {bias.confidence != null && (
+                              <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                                {Math.round(bias.confidence * 100)}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-xl text-center text-muted text-xs">No data available</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Noise Tax ROI Projection */}
+                {analysis && (
+                  <NoiseTaxCard
+                    overallScore={analysis.overallScore}
+                    noiseScore={analysis.noiseScore}
+                    biasCount={biases.length}
+                  />
+                )}
+              </div>
+            </ErrorBoundary>
           </div>
-        </ErrorBoundary>
-      </div>
+        </>
+      )}
 
       {/* Bias Detail Modal (accessible) */}
       {selectedBias && (

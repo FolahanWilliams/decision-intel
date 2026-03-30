@@ -15,11 +15,25 @@ export default async function SettingsPage() {
     analysisAlerts: true,
     weeklyDigest: false,
     darkMode: true,
+    notificationSeverity: 'all' as const,
   };
+
+  const initialSettings = settings
+    ? {
+        emailNotifications: settings.emailNotifications,
+        analysisAlerts: settings.analysisAlerts,
+        weeklyDigest: settings.weeklyDigest,
+        darkMode: settings.darkMode,
+        notificationSeverity: (settings.notificationSeverity || 'all') as
+          | 'all'
+          | 'high_critical'
+          | 'critical',
+      }
+    : defaultSettings;
 
   return (
     <ErrorBoundary sectionName="Settings">
-      <SettingsForm initialSettings={settings || defaultSettings} userEmail={user?.email} />
+      <SettingsForm initialSettings={initialSettings} userEmail={user?.email} />
     </ErrorBoundary>
   );
 }

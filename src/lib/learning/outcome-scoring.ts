@@ -961,7 +961,7 @@ export async function calculateRiskAdjustedScore(
       const failureRate =
         orgStats && orgStats.totalRated >= 3
           ? 1 - (orgStats.confirmed > 0 ? orgStats.avgFailureImpact / 100 : 0.5)
-          : patternFailureRates[bias.biasType] ?? 0.3;
+          : (patternFailureRates[bias.biasType] ?? 0.3);
 
       const sevWeight = severityWeights[bias.severity] ?? 0.4;
       const confidence = bias.confidence ?? 0.5;
@@ -995,7 +995,8 @@ export async function calculateRiskAdjustedScore(
 
     // Sort risks by estimated cost or failure rate
     risks.sort((a, b) => {
-      if (a.estimatedCost != null && b.estimatedCost != null) return b.estimatedCost - a.estimatedCost;
+      if (a.estimatedCost != null && b.estimatedCost != null)
+        return b.estimatedCost - a.estimatedCost;
       return b.failureRate - a.failureRate;
     });
 

@@ -13,22 +13,16 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { validateContent } from '@/lib/utils/resilience';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
 import { createHash } from 'crypto';
-import { PDFParse } from 'pdf-parse';
-import mammoth from 'mammoth';
+import { parseFile } from '@/lib/utils/file-parser';
+import { logAudit } from '@/lib/audit';
+import { isFileTypeSupported } from '@/lib/constants/file-types';
 
 const log = createLogger('BulkUpload');
 
 const MAX_FILES_PER_BATCH = 10;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
 
-// Supported file types
-const SUPPORTED_TYPES = [
-  'text/plain',
-  'text/markdown',
-  'application/pdf',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-];
+// File type constants imported from @/lib/constants/file-types
 
 /**
  * GET /api/upload/bulk?batchId=xxx - Check batch upload status
@@ -176,6 +170,17 @@ export async function POST(req: NextRequest) {
     // Process files asynchronously
     processFilesAsync(files, user.id, batch.id, membership?.orgId || null);
 
+    // Audit log (fire-and-forget)
+    logAudit({
+      action: 'BULK_UPLOAD',
+      resource: 'BatchUpload',
+      resourceId: batch.id,
+      details: {
+        totalFiles: files.length,
+        filenames: files.map(f => f.name),
+      },
+    });
+
     return NextResponse.json(
       {
         batchId: batch.id,
@@ -211,55 +216,13 @@ async function processFilesAsync(
         throw new Error(`File too large (max ${MAX_FILE_SIZE / 1024 / 1024}MB)`);
       }
 
-      if (!SUPPORTED_TYPES.includes(file.type)) {
+      if (!isFileTypeSupported(file.type, file.name)) {
         throw new Error(`Unsupported file type: ${file.type}`);
       }
 
-      // Read file content
+      // Read file content and parse using centralized file parser
       const buffer = await file.arrayBuffer();
-      let content = '';
-
-      if (file.type === 'text/plain' || file.type === 'text/markdown') {
-        content = new TextDecoder().decode(buffer);
-      } else if (file.type === 'application/pdf') {
-        const parser = new PDFParse({ data: new Uint8Array(buffer) });
-        const textResult = await parser.getText();
-        content = textResult.text;
-        await parser.destroy();
-        if (!content.trim()) {
-          throw new Error('PDF contains no extractable text (may be image-only)');
-        }
-      } else if (
-        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      ) {
-        const result = await mammoth.extractRawText({ buffer: Buffer.from(buffer) });
-        content = result.value;
-        if (!content.trim()) {
-          throw new Error('DOCX contains no extractable text');
-        }
-      } else if (
-        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      ) {
-        const ExcelJS = await import('exceljs');
-        const workbook = new ExcelJS.default.Workbook();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await workbook.xlsx.load(Buffer.from(buffer) as any);
-        const lines: string[] = [];
-        workbook.eachSheet(sheet => {
-          lines.push(`## ${sheet.name}`);
-          sheet.eachRow(row => {
-            const cells = Array.isArray(row.values) ? row.values.slice(1) : [];
-            lines.push(cells.map(v => (v != null ? String(v) : '')).join('\t'));
-          });
-          lines.push('');
-        });
-        content = lines.join('\n').trim();
-        if (!content) {
-          throw new Error('Excel spreadsheet contains no extractable data');
-        }
-      } else {
-        throw new Error(`Unsupported file type: ${file.type}`);
-      }
+      const content = await parseFile(Buffer.from(buffer), file.type, file.name);
 
       // Validate content
       const validation = validateContent(content);

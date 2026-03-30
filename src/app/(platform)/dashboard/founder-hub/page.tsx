@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
 import {
   Rocket,
   Brain,
@@ -10,6 +11,7 @@ import {
   Shield,
   BookOpen,
   ChevronRight,
+  ChevronDown,
   Target,
   Users,
   FileText,
@@ -21,6 +23,8 @@ import {
   MessageSquare,
   Lock,
   Crosshair,
+  Search,
+  X,
 } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -30,11 +34,9 @@ type TabId =
   | 'pipeline'
   | 'scoring'
   | 'integrations'
-  | 'moat'
-  | 'market'
+  | 'strategy'
   | 'sales'
   | 'stats'
-  | 'frameworks'
   | 'playbook';
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
@@ -42,12 +44,10 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'pipeline', label: 'Analysis Pipeline', icon: <Brain size={16} /> },
   { id: 'scoring', label: 'Scoring Engine', icon: <BarChart3 size={16} /> },
   { id: 'integrations', label: 'Integrations & Flywheel', icon: <Plug size={16} /> },
-  { id: 'moat', label: 'Moat & Competitors', icon: <Shield size={16} /> },
-  { id: 'market', label: 'Market Strategy', icon: <Target size={16} /> },
+  { id: 'strategy', label: 'Strategy & Positioning', icon: <Shield size={16} /> },
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} /> },
   { id: 'stats', label: 'Live Stats', icon: <TrendingUp size={16} /> },
-  { id: 'frameworks', label: 'Research & Frameworks', icon: <Crosshair size={16} /> },
-  { id: 'playbook', label: 'Founder Playbook', icon: <BookOpen size={16} /> },
+  { id: 'playbook', label: 'Playbook & Research', icon: <BookOpen size={16} /> },
 ];
 
 // ─── Shared Styles ──────────────────────────────────────────────────────────
@@ -273,18 +273,37 @@ function ProductOverview() {
           }}
         >
           <li>
+            <strong>Slack → Copilot Auto-Trigger</strong> — Auto-creates CopilotSession seeded with
+            decision context after every Slack audit. &quot;Continue in Copilot&quot; button in
+            Slack messages for seamless handoff.
+          </li>
+          <li>
+            <strong>Intelligence Brief on Empty States</strong> — Contextual org intelligence (top
+            dangerous biases, maturity grade, decision stats) replaces generic empty states across 4
+            dashboard pages.
+          </li>
+          <li>
+            <strong>Enhanced Slack Commands</strong> — 7 slash commands with rich Block Kit:{' '}
+            <code>/di help</code> (categorized), <code>/di score</code> (instant bias check),{' '}
+            <code>/di brief</code> (org intelligence), <code>/di status</code> (quality trends),{' '}
+            <code>/di analyze</code> (with Copilot link).
+          </li>
+          <li>
+            <strong>Bias Heat Map Enhancement</strong> — Density gutter minimap, confidence-based
+            opacity, hover tooltips with excerpts, keyboard navigation (←→ cycle, H toggle).
+          </li>
+          <li>
+            <strong>Enterprise Language Pivot</strong> — Decision types renamed from PE/VC-specific
+            to enterprise-neutral (resource allocation, strategic proposal, initiative closure).
+          </li>
+          <li>
             <strong>Klein RPD Framework</strong> — Expert intuition amplification: pattern
-            recognition cues from historical decisions, narrative war-story pre-mortems, RPD mental
-            simulator, and personal calibration dashboard at{' '}
-            <code>/dashboard/decision-quality?tab=calibration</code>
+            recognition cues, narrative pre-mortems, RPD mental simulator, personal calibration
+            dashboard.
           </li>
           <li>
             <strong>Enhanced Public Demo</strong> — Streaming simulation UX with 3 sample docs, DQI
             badge, no login required at <code>/demo</code>
-          </li>
-          <li>
-            <strong>Data-Backed ROI Calculator</strong> — Live outcome stats replace hardcoded
-            Kahneman baselines when ≥10 outcomes exist
           </li>
           <li>
             <strong>Case Study Export</strong> — One-click anonymized, branded shareable analyses
@@ -296,35 +315,18 @@ function ProductOverview() {
           </li>
           <li>
             <strong>A/B Prompt Testing</strong> — Experiment CRUD with Thompson sampling
-            auto-optimization dashboard at <code>/dashboard/decision-quality?tab=experiments</code>
+            auto-optimization
           </li>
           <li>
-            <strong>Multi-Model Fallback</strong> — Gemini → Claude failover routing (set{' '}
-            <code>AI_FALLBACK_ENABLED=true</code>)
-          </li>
-          <li>
-            <strong>Graph Health Widget</strong> — Real-time knowledge graph density, isolated
-            nodes, anti-pattern tracking on dashboard
-          </li>
-          <li>
-            <strong>Counterfactual Analysis API</strong> — &quot;What-if&quot; decision path
-            computation with narrative explanations
-          </li>
-          <li>
-            <strong>Product Analytics</strong> — Internal event tracking across conversion funnel (
-            <code>trackEvent()</code> fire-and-forget)
-          </li>
-          <li>
-            <strong>Prompt Versioning</strong> — SHA-256 deduplicated prompt tracking wired to every
-            analysis
+            <strong>Multi-Model Fallback</strong> — Gemini → Claude failover routing
           </li>
           <li>
             <strong>Quick Bias Check</strong> — Dashboard modal for instant &lt;5s bias scan via
             paste, shared Gemini utility across extension + platform
           </li>
           <li>
-            <strong>Demo Conversion Tracking</strong> — 10 funnel events wired: demo, login, hero
-            CTA, ROI calculator, analysis completion, case study views
+            <strong>Counterfactual Analysis API</strong> — &quot;What-if&quot; decision path
+            computation with narrative explanations
           </li>
         </ul>
       </div>
@@ -1143,7 +1145,7 @@ function IntegrationsAndFlywheel() {
   );
 }
 
-function CompetitiveMoat() {
+function StrategyAndPositioning() {
   return (
     <div>
       {/* Moat Table */}
@@ -1444,17 +1446,9 @@ function CompetitiveMoat() {
           ))}
         </div>
       </div>
-    </div>
-  );
-}
 
-// ─── Tab Content: Market Strategy ───────────────────────────────────────────
-
-function MarketStrategy() {
-  return (
-    <div>
-      {/* Verdict */}
-      <div style={{ ...card, borderTop: '3px solid #22c55e' }}>
+      {/* ── Market Strategy Section ── */}
+      <div style={{ ...card, borderTop: '3px solid #22c55e', marginTop: 24 }}>
         <div style={label}>PRIMARY MARKET</div>
         <h2
           style={{
@@ -1944,7 +1938,7 @@ function MarketStrategy() {
   );
 }
 
-// ─── Tab Content: Sales Toolkit (Objection Handler + Demo Script) ───────────
+// ─── Tab Content: Sales Toolkit (Objection Handler + Demo Script) ────────────
 
 function SalesToolkit() {
   return (
@@ -2659,12 +2653,30 @@ function ResearchCard({
   );
 }
 
-// ─── Tab Content: Research & Frameworks ─────────────────────────────────────
+// ─── Tab Content: Playbook & Research (merged) ─────────────────────────────
 
-function ResearchFrameworks() {
+function PlaybookAndResearch() {
   const [section, setSection] = useState<
     'all' | 'vc' | 'foundations' | 'category' | 'gtm' | 'strategy'
   >('all');
+  const [expandedResearch, setExpandedResearch] = useState<Set<string>>(new Set());
+
+  const toggleResearchSection = useCallback((id: string) => {
+    setExpandedResearch(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const expandAll = useCallback(() => {
+    setExpandedResearch(new Set(['vc', 'foundations', 'category', 'gtm', 'strategy']));
+  }, []);
+
+  const collapseAll = useCallback(() => {
+    setExpandedResearch(new Set());
+  }, []);
 
   const SECTIONS = [
     { id: 'all' as const, label: 'All' },
@@ -2675,565 +2687,6 @@ function ResearchFrameworks() {
     { id: 'strategy' as const, label: 'Founder Strategy' },
   ];
 
-  return (
-    <div>
-      {/* Header */}
-      <div style={{ ...card, borderTop: '3px solid #8b5cf6' }}>
-        <div style={label}>RESEARCH-TO-ACTION LIBRARY</div>
-        <h2
-          style={{
-            fontSize: 20,
-            fontWeight: 800,
-            color: 'var(--text-primary, #fff)',
-            marginBottom: 6,
-            lineHeight: 1.3,
-          }}
-        >
-          Research, Frameworks &amp; Intellectual Foundations
-        </h2>
-        <p
-          style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 0 }}
-        >
-          Academic research, podcasts, and frameworks mapped to Decision Intel — both as product
-          validation and startup strategy. Every source linked to concrete action items.
-        </p>
-      </div>
-
-      {/* Sub-section pills */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
-        {SECTIONS.map(s => (
-          <button
-            key={s.id}
-            onClick={() => setSection(s.id)}
-            style={{
-              padding: '5px 14px',
-              fontSize: 12,
-              fontWeight: section === s.id ? 700 : 500,
-              borderRadius: 20,
-              border: `1px solid ${section === s.id ? '#8b5cf6' : 'var(--border-primary, #333)'}`,
-              background: section === s.id ? 'rgba(139, 92, 246, 0.12)' : 'transparent',
-              color: section === s.id ? '#8b5cf6' : 'var(--text-muted, #71717a)',
-              cursor: 'pointer',
-            }}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── VC Decision Science ── */}
-      {(section === 'all' || section === 'vc') && (
-        <>
-          <div style={{ ...card, borderLeft: '3px solid #6366f1' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#6366f1', marginBottom: 12 }}>
-              VC Decision Science
-            </div>
-            <div style={{ display: 'grid', gap: 12 }}>
-              {[
-                {
-                  num: 1,
-                  principle: "Home Runs Matter, Strikeouts Don't",
-                  summary:
-                    'Only 1 in 20 VC investments hits a home run, but a single winner returns 100x. Failure tolerance is structural, not emotional.',
-                  product:
-                    "Reframe your pitch from defensive to offensive. DQI doesn't just help avoid bad deals — it gives IC members permission to swing big because they've stress-tested the decision. \"Swing with confidence because you've already audited the thesis.\"",
-                  startup:
-                    'Go all-in on enterprise decision teams. Don\'t build 6 features for 4 markets. Your "home run" is one flagship customer that becomes a case study. Accept that some features won\'t land.',
-                  actions: [
-                    'Rewrite landing page hero from "avoid mistakes" to "make better decisions with confidence"',
-                    'Focus pilot outreach on 5 target organizations, not 50',
-                  ],
-                  color: '#22c55e',
-                },
-                {
-                  num: 2,
-                  principle: 'Agree to Disagree',
-                  summary:
-                    'VC firms pursuing consensus have LOWER IPO rates. The best firms let a single partner with conviction push a deal through. Microsoft M12 has an "anti-veto rule."',
-                  product:
-                    'Your Committee Decision Rooms with blind prior collection are a direct implementation of this principle. Cite Strebulaev in marketing: "Stanford research shows consensus-seeking committees underperform. Decision Intel\'s blind prior system is designed around this finding." Your consensus scoring quantifies when agreement is genuine vs. groupthink.',
-                  startup:
-                    "When building your advisory board, don't surround yourself with people who agree with you. Strebulaev's data: productive disagreement correlates with better outcomes.",
-                  actions: [
-                    'Add Strebulaev citation to Committee Rooms UI/marketing',
-                    'Create a "Dissent Quality" metric in consensus scoring',
-                    'Blog post: "Why Your IC\'s Consensus Is Killing Your Returns"',
-                  ],
-                  color: '#3b82f6',
-                },
-                {
-                  num: 3,
-                  principle: 'Get Outside Your Four Walls',
-                  summary:
-                    'VCs maintain 2-3x larger, more diverse LinkedIn networks than corporate executives. Insularity kills innovation.',
-                  product:
-                    'Your Slack integration puts Decision Intel inside the daily workflow where deals are discussed — not as a standalone app. This is the "inside the walls" play. The cross-department edge type in your knowledge graph detects organizational silos.',
-                  startup:
-                    "Be embedded in your target communities. Strategy conferences, M&A events, risk management circles. Don't sell from the outside — be part of the ecosystem.",
-                  actions: [
-                    'Attend 2 industry conferences per quarter',
-                    'Launch a "Decision Quality" newsletter for enterprise leaders',
-                    'Build a Slack community for decision-makers',
-                  ],
-                  color: '#f59e0b',
-                },
-                {
-                  num: 4,
-                  principle: 'The Jockey vs. The Horse',
-                  summary:
-                    'The most important VC investment factor is team quality, not business model. The "jockey" matters more than the "horse."',
-                  product:
-                    'You detect "Management Halo Effect" but could go deeper. Build a Jockey/Horse Balance Score — detect when an IC memo spends 80% on team pedigree and 20% on business fundamentals, or vice versa. Flag imbalanced memos.',
-                  startup:
-                    "Your codebase IS your jockey credibility: 113 annotated failure cases, 20x20 bias interaction matrix, causal inference. In technical DD, your depth signals you're the right founder for this problem.",
-                  actions: [
-                    'Add Jockey/Horse Balance Score to bias detection',
-                    'Track ratio of team vs. fundamentals language in IC memos',
-                    'Prepare "why me" narrative for investor conversations',
-                  ],
-                  color: '#ef4444',
-                },
-                {
-                  num: 5,
-                  principle: 'The Prepared Mind',
-                  summary:
-                    '"Chance favors only the prepared mind" (Pasteur). Jensen Huang spends 2-3 hours daily studying emerging tech. The best VCs recognize opportunities instantly because they\'ve studied deeply.',
-                  product:
-                    "Your Boardroom Simulation IS a \"prepared mind\" tool. You're giving IC members a pre-briefing on which biases historically damaged similar deals, what toxic combinations to watch for, and what diverse perspectives would flag. Lean into this framing: you're not auditing documents — you're preparing decision-makers.",
-                  startup:
-                    "Spend 30 min daily reading industry news, academic papers on decision science, and competitor updates. Your Intelligence Hub's 14 RSS feeds should be your own morning briefing too.",
-                  actions: [
-                    'Rename "Pre-Meeting Bias Briefing" to "Prepared Mind Briefing" in marketing',
-                    'Add a "Prepare for Meeting" CTA before committee meetings',
-                    'Subscribe to 3 industry newsletters personally',
-                  ],
-                  color: '#8b5cf6',
-                },
-                {
-                  num: 6,
-                  principle: 'Fast Lane, Then Slow Lane',
-                  summary:
-                    'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
-                  product:
-                    'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 16-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
-                  startup:
-                    'Apply to your sales process too. Qualify leads fast — "Do you have a decision committee? Do you review strategic documents before major decisions?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
-                  actions: [
-                    'Build Quick Scan feature (top priority — Strebulaev-backed)',
-                    'Add 2-question lead qualification before demos',
-                    'Create a "Red Flag Preview" that runs before full analysis',
-                  ],
-                  color: '#22c55e',
-                },
-                {
-                  num: 7,
-                  principle: 'Double Down and Quit',
-                  summary:
-                    "VCs combat escalation of commitment through structural mechanisms: requiring multiple investors for follow-on rounds, bringing in arm's-length co-investors, requiring partner consensus specifically on follow-ons.",
-                  product:
-                    "BUILD THIS: Longitudinal Bias Tracking — don't just analyze individual IC memos, track how bias patterns change over the life of a deal. Does confirmation bias increase from initial investment to Series B follow-on? Is the follow-on memo less critical than the initial? This is a unique, hard-to-replicate feature.",
-                  startup:
-                    "Apply to your own features. Some features you shipped won't get traction. Be willing to kill them rather than doubling down. Measure feature usage monthly.",
-                  actions: [
-                    'Build deal-level longitudinal bias tracking',
-                    'Compare bias severity across deal stages (screening vs IC vs follow-on)',
-                    'Set up monthly feature usage analytics',
-                  ],
-                  color: '#3b82f6',
-                },
-                {
-                  num: 8,
-                  principle: 'Sharing the Pie (Incentive Alignment)',
-                  summary:
-                    'VCs invented vesting schedules in the 1970s. The principle is about aligning incentives across all contributors to prevent short-term behavior.',
-                  product:
-                    "Your \"Carry Incentive Distortion\" bias is a direct implementation. Go deeper: detect when an IC memo's enthusiasm correlates suspiciously with the deal's impact on a specific partner's carry economics. Track if advocacy intensity changes near fund deadlines.",
-                  startup:
-                    "When you hire your first team members, offer meaningful equity. Strebulaev's data shows aligned incentives outperform salary-heavy compensation in startups.",
-                  actions: [
-                    'Enhance carry incentive detection with fund timeline awareness',
-                    'Detect deployment pressure signals ("need to put capital to work")',
-                    'Design equity plan for first 3 hires',
-                  ],
-                  color: '#f59e0b',
-                },
-                {
-                  num: 9,
-                  principle: 'The Meta-Principle: VC-Backed Companies Shape the Economy',
-                  summary:
-                    '50% of US IPOs over 50 years were VC-backed. 75% of large public companies. VC-backed companies spend 92 cents of every R&D dollar. When ICs make biased decisions, the ripple effects go far beyond the fund.',
-                  product:
-                    'This is your highest-level pitch narrative: "Decision Intel doesn\'t just protect organizational outcomes — it improves the quality of decision-making across the economy." When a biased committee kills a good initiative, innovation is lost. When a biased team backs a bad strategy, resources that could have gone to better opportunities are wasted.',
-                  startup:
-                    'This framing elevates you from "SaaS tool vendor" to "mission-driven company improving how capital flows to innovation." Investors respond to mission, not just TAM.',
-                  actions: [
-                    'Add this framing to pitch deck\'s "Why This Matters" slide',
-                    'Use in PR/press outreach — "improving how capital flows to innovation"',
-                    'Blog post: "The Hidden Cost of IC Bias on the Innovation Economy"',
-                  ],
-                  color: '#ef4444',
-                },
-              ].map((p, i) => (
-                <div key={i} style={{ ...card, borderLeft: `4px solid ${p.color}` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                    <div
-                      style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: '50%',
-                        background: p.color,
-                        color: '#fff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 13,
-                        fontWeight: 800,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {p.num}
-                    </div>
-                    <div
-                      style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary, #fff)' }}
-                    >
-                      {p.principle}
-                    </div>
-                  </div>
-                  <p
-                    style={{
-                      fontSize: 12,
-                      color: 'var(--text-muted)',
-                      marginBottom: 10,
-                      lineHeight: 1.6,
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    {p.summary}
-                  </p>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
-                      gap: 10,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: 10,
-                        borderRadius: 8,
-                        background: 'rgba(99, 102, 241, 0.06)',
-                        border: '1px solid rgba(99, 102, 241, 0.15)',
-                      }}
-                    >
-                      <div
-                        style={{ fontSize: 11, fontWeight: 700, color: '#6366f1', marginBottom: 4 }}
-                      >
-                        FOR THE PRODUCT
-                      </div>
-                      <div
-                        style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
-                      >
-                        {p.product}
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        padding: 10,
-                        borderRadius: 8,
-                        background: 'rgba(34, 197, 94, 0.06)',
-                        border: '1px solid rgba(34, 197, 94, 0.15)',
-                      }}
-                    >
-                      <div
-                        style={{ fontSize: 11, fontWeight: 700, color: '#22c55e', marginBottom: 4 }}
-                      >
-                        FOR THE STARTUP
-                      </div>
-                      <div
-                        style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
-                      >
-                        {p.startup}
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: p.color, marginBottom: 4 }}>
-                      ACTION ITEMS
-                    </div>
-                    {p.actions.map((a, j) => (
-                      <div
-                        key={j}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: 6,
-                          fontSize: 12,
-                          color: 'var(--text-secondary)',
-                          marginBottom: 3,
-                        }}
-                      >
-                        <ChevronRight
-                          size={12}
-                          style={{ color: p.color, flexShrink: 0, marginTop: 2 }}
-                        />
-                        <span>{a}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <ResearchCard
-            title="Daniel Kahneman: Beyond Cognitive Biases — Reducing Noise"
-            source="ClearerThinking Podcast"
-            type="Podcast"
-            color="#22c55e"
-            link="https://podcast.clearerthinking.org/episode/072/"
-            insight="Insurance underwriter study: executives expected 10% variability between judges. Actual: 55%. One underwriter prices at $9,500, another at $16,700 for the identical case. Noise is at least as damaging as bias, and organizations almost never measure it."
-            product="Your triple-judge noise scoring is a direct implementation of Kahneman's proposed methodology. Use the 10% vs 55% stat in every sales conversation — it's the 'holy shit' moment that makes executives realize they have no idea how much variability exists in their own decision processes."
-            startup="Offer a free 'noise audit' of a team's last 5 strategic documents as a top-of-funnel hook. Let them see the problem before pitching the solution."
-            actions={[
-              'Use 10% vs 55% stat in opening of every demo',
-              'Build free noise audit landing page',
-              'Create 1-pager: "How Much Noise Is In Your Decisions?"',
-            ]}
-          />
-        </>
-      )}
-
-      {/* ── Decision Science Foundations ── */}
-      {(section === 'all' || section === 'foundations') && (
-        <div style={{ ...card, borderLeft: '3px solid #f59e0b', marginTop: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b', marginBottom: 4 }}>
-            Decision Science Foundations
-          </div>
-          <ResearchCard
-            title='Olivier Sibony: "Decision Hygiene" Framework'
-            source="Behavioral Grooves Podcast + Euronews"
-            type="Podcast / Interview"
-            color="#f59e0b"
-            link="https://behavioralgrooves.com/episode/noise-with-olivier-sibony/"
-            insight="Kahneman's co-author on Noise, former McKinsey partner. Framework: checklists, premortems, structured independent assessments, and noise audits. Noise audits should be the starting point — orgs need to see how bad the problem is before buying a solution."
-            product="Your entire product IS decision hygiene. Sibony's framework validates every feature: structured analysis (bias detection), independent assessments (triple-judge), premortems (Pre-Mortem Architect agent), and noise audits (noise decomposition)."
-            startup="His 'noise audit first' approach suggests a powerful sales motion: offer a free noise audit of 5 strategic documents as top-of-funnel. Let prospects SEE the problem before pitching the solution."
-            actions={[
-              'Build free noise audit landing page as lead gen',
-              'Quote Sibony in marketing: "decision hygiene"',
-              'Position DI as the decision hygiene platform',
-            ]}
-          />
-          <ResearchCard
-            title="Gary Klein: Naturalistic Decision Making"
-            source="The Decision-Making Studio (Ep. 234)"
-            type="Podcast"
-            color="#f59e0b"
-            link="https://podcasts.apple.com/us/podcast/ep-234-dr-gary-klein/id1054744455?i=1000677192489"
-            insight="Klein invented the premortem technique. He and Kahneman were 'collaborative adversaries' — Kahneman trusts systematic processes, Klein trusts expert intuition. The tension between them is the exact tension your product navigates."
-            product="Klein RPD framework NOW SHIPPED: recognition cues from historical decisions, narrative war-story pre-mortems, RPD mental simulator, and personal calibration dashboard. DI sits at the intersection: structured AI analysis (Kahneman) augmenting expert human judgment (Klein), not replacing it. Dual-framework positioning is live — skeptical leaders can see their intuition amplified, not overridden."
-            startup="When leaders push back with 'we trust our judgment,' don't argue. Say: 'We do too. Klein proved expert intuition is powerful. Our RPD framework surfaces the pattern recognition cues an expert with 10+ similar decisions would notice. We amplify your intuition while making sure it's not undermined by noise and bias you can't see.'"
-            actions={[
-              '✅ Klein RPD framework shipped: recognition cues, narrative pre-mortems, RPD simulator, calibration dashboard',
-              'Use Kahneman-Klein dual framework in sales: "We suppress bias AND amplify intuition"',
-              'Demo the RPD tab as second wow moment after Boardroom Simulation',
-            ]}
-          />
-          <ResearchCard
-            title="Annie Duke & Spencer Greenberg: Decision Education"
-            source="Decision Education Podcast (Sep 2025)"
-            type="Podcast"
-            color="#f59e0b"
-            link="https://www.annieduke.com/the-decision-education-podcast-with-guest-spencer-greenberg/"
-            insight="Knowing the name of a bias doesn't help you overcome it. Awareness alone is nearly useless. What works: precommitment contracts, structured decision processes, and Bayesian updating."
-            product="This validates your nudge system and decision architecture (blind priors, premortems) over simple bias reports. The real value isn't detecting biases — it's the structural interventions that make it harder to ACT on bias even when it's present. Diagnostic vs. treatment."
-            startup="Don't oversell bias detection in demos. Lead with the decision architecture features: 'We don't just tell you about your biases — we make it structurally harder to act on them.'"
-            actions={[
-              'Reframe marketing: "detection + intervention" not just "detection"',
-              'Emphasize nudge system and blind priors in demos',
-              'Blog: "Why Bias Awareness Doesn\'t Work (And What Does)"',
-            ]}
-          />
-          <ResearchCard
-            title='Philip Tetlock: "Hybrid Mind" — Human + AI Forecasting'
-            source="80,000 Hours Podcast (Oct 2025)"
-            type="Podcast"
-            color="#f59e0b"
-            link="https://80000hours.org/podcast/episodes/prof-tetlock-predicting-the-future/"
-            insight="Human-machine hybrids beat both pure AI and pure human judgment in forecasting tournaments. 40 years of data show process matters more than talent — superforecasters aren't smarter, they follow better processes."
-            product="DI IS a human-machine hybrid: AI detects biases and measures noise, humans make the final call. Tetlock gives you the language: 'Process beats talent. Our platform ensures your team follows the process that produces better outcomes.'"
-            startup="'Process beats talent' in one sentence IS your entire value proposition. Use Tetlock's authority to back this claim."
-            actions={[
-              'Add Tetlock citation to product philosophy page',
-              'Use "process beats talent" in pitch decks',
-              'Reference Hybrid Mind tournament results in technical DD',
-            ]}
-          />
-        </div>
-      )}
-
-      {/* ── Category Creation ── */}
-      {(section === 'all' || section === 'category') && (
-        <div style={{ ...card, borderLeft: '3px solid #ef4444', marginTop: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#ef4444', marginBottom: 4 }}>
-            Category Creation
-          </div>
-          <ResearchCard
-            title='Christopher Lochhead: "How to Become a Category Pirate"'
-            source="Lenny's Podcast"
-            type="Podcast / Newsletter"
-            color="#ef4444"
-            link="https://www.lennysnewsletter.com/p/how-to-become-a-category-pirate-christopher"
-            insight="The company that creates a category captures 2/3 of the market value. Framework: 'Frame It, Name It, Claim It.' The 'better trap' — competing on being better within an existing category — is death."
-            product={
-              'You\'re not building a "better CRM" or a "better DD tool." You\'re creating the category of Investment Decision Quality. Your DQI should become the term PE uses like IRR and MOIC. When someone says "What\'s the DQI on this memo?" in a strategy meeting or IC, you\'ve won. Lochhead calls this "languaging" — weaponizing vocabulary.'
-            }
-            startup="Frame the problem (Strategic decisions are riddled with undetected bias and noise), name the solution (Decision Quality Index), claim the category (Decision Intel is the decision quality platform for capital allocators). This is your most important strategic task."
-            actions={[
-              'Make DQI the centerpiece term in all marketing',
-              'Write a "Category Point of View" document (Lochhead framework)',
-              'PR strategy: get DQI mentioned in PE trade publications',
-              'Blog series: "The Hidden Cost of Decision Noise in Enterprise Decisions"',
-            ]}
-          />
-        </div>
-      )}
-
-      {/* ── GTM & Sales ── */}
-      {(section === 'all' || section === 'gtm') && (
-        <div style={{ ...card, borderLeft: '3px solid #3b82f6', marginTop: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#3b82f6', marginBottom: 4 }}>
-            GTM &amp; Sales
-          </div>
-          <ResearchCard
-            title="Ray Zhou (Affinity): From College Dropout to SaaS Leader"
-            source="Platform Builders Podcast"
-            type="Podcast"
-            color="#3b82f6"
-            link="https://www.heavybit.com/library/podcasts/platform-builders/ep-4-building-affinity-from-college-dropout-to-saas-leader-with-ray-zhou"
-            insight="Built Affinity into late-eight-figure revenue CRM for PE/VC. Three lessons: (1) hundreds of problem-first conversations before building features, (2) founder-led onboarding for every early customer, (3) focus on problems closest to core business — tangential solutions get replaced when AI improves."
-            product="Decision quality is about as core as it gets for any organization. That's your moat vs. the 'AI assistant' tools that summarize documents — those are tangential, yours is fundamental."
-            startup="Personally onboard every pilot customer. Conduct 50+ discovery calls focused on 'how does your team actually make major decisions?' not 'let me show you features.' Zhou's outsider advantage (didn't know the industry) forced better questions — use yours the same way."
-            actions={[
-              'Target 50 discovery calls before next feature sprint',
-              'Personally onboard every pilot — no self-serve yet',
-              'Document every onboarding as a playbook for future hires',
-              'Ask: "Walk me through your last major decision" in every call',
-            ]}
-          />
-        </div>
-      )}
-
-      {/* ── Founder Strategy ── */}
-      {(section === 'all' || section === 'strategy') && (
-        <div style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#a78bfa', marginBottom: 4 }}>
-            Founder Strategy
-          </div>
-          <ResearchCard
-            title="Peter Thiel: Zero to One — Contrarian Truths"
-            source="The Investors Podcast (MI383)"
-            type="Podcast Deep Dive"
-            color="#a78bfa"
-            link="https://www.theinvestorspodcast.com/millennial-investing/zero-to-one-lessons-from-peter-thiel-w-shawn-omalley/"
-            insight='Contrarian question: "What important truth do very few people agree with you on?" Monopoly framework: dominate a small niche, then expand in concentric circles. Sales and distribution matter as much as product.'
-            product={
-              'Your contrarian truth: "Executive teams think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: enterprise decision quality. Your concentric expansion: Enterprise M&A/Strategy → PE/VC → FinServ → Horizontal.'
-            }
-            startup="The best 16-agent pipeline means nothing if you can't get it in front of decision-makers. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
-            actions={[
-              'Write down your contrarian truth and use it in every pitch',
-              'Map your concentric expansion circles (already in Market Strategy tab)',
-              'Allocate 50% of time to distribution, not just product',
-              'Build referral incentive for pilot customers',
-            ]}
-          />
-        </div>
-      )}
-
-      {/* ── Connecting Thread ── */}
-      <div style={{ ...card, borderTop: '3px solid #8b5cf6', marginTop: 16 }}>
-        <div style={sectionTitle}>
-          <Crosshair size={18} style={{ color: '#8b5cf6' }} /> The Connecting Thread
-        </div>
-        <p
-          style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: 0 }}
-        >
-          Every one of these thinkers is telling you the same thing from a different angle: human
-          decision-making is{' '}
-          <strong style={{ color: 'var(--text-primary)' }}>
-            systematically flawed in measurable ways
-          </strong>
-          , that{' '}
-          <strong style={{ color: 'var(--text-primary)' }}>process beats intuition at scale</strong>
-          , that the organizations willing to{' '}
-          <strong style={{ color: 'var(--text-primary)' }}>
-            audit their own judgment will outperform
-          </strong>{' '}
-          those that don&apos;t, and that the company who creates the{' '}
-          <strong style={{ color: 'var(--text-primary)' }}>
-            language for this problem will own the market
-          </strong>
-          . You&apos;re building that company. DQI is that language.
-        </p>
-      </div>
-
-      {/* Key Takeaway (always visible) */}
-      <div style={{ ...card, borderTop: '3px solid #6366f1', marginTop: 12 }}>
-        <div style={sectionTitle}>
-          <Zap size={18} style={{ color: '#6366f1' }} /> Most Actionable Takeaways
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {[
-            {
-              action: 'Reframe pitch from defensive to offensive',
-              detail:
-                '"Swing with confidence" not "avoid mistakes." The best teams don\'t want a safety net — they want a decision quality amplifier.',
-            },
-            {
-              action: 'Cite Strebulaev in marketing',
-              detail:
-                'Academic credibility from Stanford GSB for blind priors and committee rooms. "Stanford research shows consensus-seeking committees underperform."',
-            },
-            {
-              action: 'Build Quick Scan mode',
-              detail:
-                'Fast lane/slow lane. 30-second red flag scan before 4-minute full analysis. Matches actual decision workflow and reduces friction.',
-            },
-            {
-              action: 'Build longitudinal bias tracking',
-              detail:
-                'Track bias drift across project lifecycle. The follow-on assessment should be MORE critical than the initial — is it? Nobody else will build this.',
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              style={{ padding: 12, borderRadius: 8, background: 'var(--bg-tertiary, #0a0a0a)' }}
-            >
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  marginBottom: 4,
-                }}
-              >
-                {item.action}
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                {item.detail}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Tab Content: Founder Playbook ──────────────────────────────────────────
-
-function FounderPlaybook() {
   return (
     <div>
       {/* Sales Positioning */}
@@ -3363,7 +2816,7 @@ function FounderPlaybook() {
         </div>
       </div>
 
-      {/* What to Build Next */}
+      {/* Prioritized Backlog */}
       <div style={card}>
         <div style={sectionTitle}>
           <Rocket size={18} style={{ color: '#6366f1' }} /> Prioritized Backlog
@@ -3390,13 +2843,13 @@ function FounderPlaybook() {
             'Cross-org benchmarking — "Your confirmation bias rate is 85th percentile." Data network effect.',
           ],
           [
-            'Counterfactual UI Slider (SHIPPED)',
-            'High',
-            '3h',
-            'Interactive: "If we removed anchoring, success probability: 62% → 78%." Board presentation gold.',
+            'Longitudinal Bias Tracking',
+            'Very High',
+            '6h',
+            'Track bias drift across project lifecycle. Does confirmation bias increase from screening to follow-on?',
           ],
           [
-            'Decision Graph Explorer (D3) (SHIPPED)',
+            'Knowledge Graph Explorer (D3)',
             'Very High',
             '6h',
             'Visual force-directed graph. Makes hidden patterns viscerally obvious.',
@@ -3426,34 +2879,16 @@ function FounderPlaybook() {
             'PE has different dominant patterns than healthcare. Vertical-specific baselines for new orgs.',
           ],
           [
-            'Quick Scan Mode (SHIPPED)',
-            'Very High',
-            '4h',
-            'SHIPPED: Dashboard modal + platform API. Paste text → <5s Gemini bias scan. Shared utility with extension. Matches VC rapid-filter workflow.',
-          ],
-          [
-            'Longitudinal Bias Tracking',
-            'Very High',
-            '6h',
-            'Strebulaev "Double Down & Quit": track bias drift across deal lifecycle. Does confirmation bias increase from screening to follow-on?',
-          ],
-          [
             'Jockey/Horse Balance Score',
             'High',
             '3h',
-            'Strebulaev "Jockey vs Horse": detect when IC memos are 80% team pedigree / 20% fundamentals. Flag imbalanced theses.',
+            'Detect when IC memos are 80% team pedigree / 20% fundamentals. Flag imbalanced theses.',
           ],
           [
             'Analytics Dashboard UI',
             'High',
             '4h',
             'Visualize product analytics events, demo funnel conversion',
-          ],
-          [
-            'Demo Conversion Tracking (SHIPPED)',
-            'High',
-            '2h',
-            'SHIPPED: 10 funnel events wired across demo, login, marketing, analysis, case study pages. Fire-and-forget trackEvent() with debounced ROI slider.',
           ],
           [
             'Extension Chrome Web Store',
@@ -3484,7 +2919,7 @@ function FounderPlaybook() {
         })}
       </div>
 
-      {/* Founder Tips */}
+      {/* Founder Notes */}
       <div style={{ ...card, borderLeft: '3px solid #a78bfa' }}>
         <div style={sectionTitle}>
           <BookOpen size={18} style={{ color: '#a78bfa' }} /> Founder Notes
@@ -3514,6 +2949,774 @@ function FounderPlaybook() {
           </li>
         </ul>
       </div>
+
+      {/* ── Research Section ── */}
+      <div style={{ ...card, borderTop: '3px solid #8b5cf6', marginTop: 24 }}>
+        <div style={label}>RESEARCH-TO-ACTION LIBRARY</div>
+        <h2
+          style={{
+            fontSize: 20,
+            fontWeight: 800,
+            color: 'var(--text-primary, #fff)',
+            marginBottom: 6,
+            lineHeight: 1.3,
+          }}
+        >
+          Research, Frameworks &amp; Intellectual Foundations
+        </h2>
+        <p
+          style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 0 }}
+        >
+          Academic research, podcasts, and frameworks mapped to Decision Intel — both as product
+          validation and startup strategy. Every source linked to concrete action items.
+        </p>
+      </div>
+
+      {/* Sub-section pills + expand/collapse */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 6,
+          marginBottom: 16,
+          flexWrap: 'wrap',
+          alignItems: 'center',
+        }}
+      >
+        {SECTIONS.map(s => (
+          <button
+            key={s.id}
+            onClick={() => setSection(s.id)}
+            style={{
+              padding: '5px 14px',
+              fontSize: 12,
+              fontWeight: section === s.id ? 700 : 500,
+              borderRadius: 20,
+              border: `1px solid ${section === s.id ? '#8b5cf6' : 'var(--border-primary, #333)'}`,
+              background: section === s.id ? 'rgba(139, 92, 246, 0.12)' : 'transparent',
+              color: section === s.id ? '#8b5cf6' : 'var(--text-muted, #71717a)',
+              cursor: 'pointer',
+            }}
+          >
+            {s.label}
+          </button>
+        ))}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+          <button
+            onClick={expandAll}
+            style={{
+              padding: '4px 10px',
+              fontSize: 11,
+              borderRadius: 6,
+              border: '1px solid var(--border-primary, #333)',
+              background: 'transparent',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+            }}
+          >
+            Expand All
+          </button>
+          <button
+            onClick={collapseAll}
+            style={{
+              padding: '4px 10px',
+              fontSize: 11,
+              borderRadius: 6,
+              border: '1px solid var(--border-primary, #333)',
+              background: 'transparent',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+            }}
+          >
+            Collapse All
+          </button>
+        </div>
+      </div>
+
+      {/* ── VC Decision Science ── */}
+      {(section === 'all' || section === 'vc') && (
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #6366f1', cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('vc')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#6366f1' }}>
+                VC Decision Science
+              </div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#6366f1',
+                  transform: expandedResearch.has('vc') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
+          </div>
+          {expandedResearch.has('vc') && (
+            <div
+              style={{ ...card, borderLeft: '3px solid #6366f1', marginTop: -8, borderTop: 'none' }}
+            >
+              <div style={{ display: 'grid', gap: 12 }}>
+                {[
+                  {
+                    num: 1,
+                    principle: "Home Runs Matter, Strikeouts Don't",
+                    summary:
+                      'Only 1 in 20 VC investments hits a home run, but a single winner returns 100x. Failure tolerance is structural, not emotional.',
+                    product:
+                      "Reframe your pitch from defensive to offensive. DQI doesn't just help avoid bad deals — it gives IC members permission to swing big because they've stress-tested the decision. \"Swing with confidence because you've already audited the thesis.\"",
+                    startup:
+                      'Go all-in on enterprise decision teams. Don\'t build 6 features for 4 markets. Your "home run" is one flagship customer that becomes a case study. Accept that some features won\'t land.',
+                    actions: [
+                      'Rewrite landing page hero from "avoid mistakes" to "make better decisions with confidence"',
+                      'Focus pilot outreach on 5 target organizations, not 50',
+                    ],
+                    color: '#22c55e',
+                  },
+                  {
+                    num: 2,
+                    principle: 'Agree to Disagree',
+                    summary:
+                      'VC firms pursuing consensus have LOWER IPO rates. The best firms let a single partner with conviction push a deal through. Microsoft M12 has an "anti-veto rule."',
+                    product:
+                      'Your Committee Decision Rooms with blind prior collection are a direct implementation of this principle. Cite Strebulaev in marketing: "Stanford research shows consensus-seeking committees underperform. Decision Intel\'s blind prior system is designed around this finding." Your consensus scoring quantifies when agreement is genuine vs. groupthink.',
+                    startup:
+                      "When building your advisory board, don't surround yourself with people who agree with you. Strebulaev's data: productive disagreement correlates with better outcomes.",
+                    actions: [
+                      'Add Strebulaev citation to Committee Rooms UI/marketing',
+                      'Create a "Dissent Quality" metric in consensus scoring',
+                      'Blog post: "Why Your IC\'s Consensus Is Killing Your Returns"',
+                    ],
+                    color: '#3b82f6',
+                  },
+                  {
+                    num: 3,
+                    principle: 'Get Outside Your Four Walls',
+                    summary:
+                      'VCs maintain 2-3x larger, more diverse LinkedIn networks than corporate executives. Insularity kills innovation.',
+                    product:
+                      'Your Slack integration puts Decision Intel inside the daily workflow where deals are discussed — not as a standalone app. This is the "inside the walls" play. The cross-department edge type in your knowledge graph detects organizational silos.',
+                    startup:
+                      "Be embedded in your target communities. Strategy conferences, M&A events, risk management circles. Don't sell from the outside — be part of the ecosystem.",
+                    actions: [
+                      'Attend 2 industry conferences per quarter',
+                      'Launch a "Decision Quality" newsletter for enterprise leaders',
+                      'Build a Slack community for decision-makers',
+                    ],
+                    color: '#f59e0b',
+                  },
+                  {
+                    num: 4,
+                    principle: 'The Jockey vs. The Horse',
+                    summary:
+                      'The most important VC investment factor is team quality, not business model. The "jockey" matters more than the "horse."',
+                    product:
+                      'You detect "Management Halo Effect" but could go deeper. Build a Jockey/Horse Balance Score — detect when an IC memo spends 80% on team pedigree and 20% on business fundamentals, or vice versa. Flag imbalanced memos.',
+                    startup:
+                      "Your codebase IS your jockey credibility: 113 annotated failure cases, 20x20 bias interaction matrix, causal inference. In technical DD, your depth signals you're the right founder for this problem.",
+                    actions: [
+                      'Add Jockey/Horse Balance Score to bias detection',
+                      'Track ratio of team vs. fundamentals language in IC memos',
+                      'Prepare "why me" narrative for investor conversations',
+                    ],
+                    color: '#ef4444',
+                  },
+                  {
+                    num: 5,
+                    principle: 'The Prepared Mind',
+                    summary:
+                      '"Chance favors only the prepared mind" (Pasteur). Jensen Huang spends 2-3 hours daily studying emerging tech. The best VCs recognize opportunities instantly because they\'ve studied deeply.',
+                    product:
+                      "Your Boardroom Simulation IS a \"prepared mind\" tool. You're giving IC members a pre-briefing on which biases historically damaged similar deals, what toxic combinations to watch for, and what diverse perspectives would flag. Lean into this framing: you're not auditing documents — you're preparing decision-makers.",
+                    startup:
+                      "Spend 30 min daily reading industry news, academic papers on decision science, and competitor updates. Your Intelligence Hub's 14 RSS feeds should be your own morning briefing too.",
+                    actions: [
+                      'Rename "Pre-Meeting Bias Briefing" to "Prepared Mind Briefing" in marketing',
+                      'Add a "Prepare for Meeting" CTA before committee meetings',
+                      'Subscribe to 3 industry newsletters personally',
+                    ],
+                    color: '#8b5cf6',
+                  },
+                  {
+                    num: 6,
+                    principle: 'Fast Lane, Then Slow Lane',
+                    summary:
+                      'VCs use rapid filtering first ("why NOT invest?" to eliminate red flags), then switch to deep 120-hour due diligence for serious prospects.',
+                    product:
+                      'BUILD THIS: Quick Scan mode — a fast, lightweight bias check (30 seconds) that flags top 2-3 red flags before committing to the full 16-agent pipeline (4 minutes). Mirrors how VCs actually work. Reduces adoption friction dramatically.',
+                    startup:
+                      'Apply to your sales process too. Qualify leads fast — "Do you have a decision committee? Do you review strategic documents before major decisions?" If no to either, move on. Don\'t spend 2 hours demoing to someone who doesn\'t have the workflow.',
+                    actions: [
+                      'Build Quick Scan feature (top priority — Strebulaev-backed)',
+                      'Add 2-question lead qualification before demos',
+                      'Create a "Red Flag Preview" that runs before full analysis',
+                    ],
+                    color: '#22c55e',
+                  },
+                  {
+                    num: 7,
+                    principle: 'Double Down and Quit',
+                    summary:
+                      "VCs combat escalation of commitment through structural mechanisms: requiring multiple investors for follow-on rounds, bringing in arm's-length co-investors, requiring partner consensus specifically on follow-ons.",
+                    product:
+                      "BUILD THIS: Longitudinal Bias Tracking — don't just analyze individual IC memos, track how bias patterns change over the life of a deal. Does confirmation bias increase from initial investment to Series B follow-on? Is the follow-on memo less critical than the initial? This is a unique, hard-to-replicate feature.",
+                    startup:
+                      "Apply to your own features. Some features you shipped won't get traction. Be willing to kill them rather than doubling down. Measure feature usage monthly.",
+                    actions: [
+                      'Build deal-level longitudinal bias tracking',
+                      'Compare bias severity across deal stages (screening vs IC vs follow-on)',
+                      'Set up monthly feature usage analytics',
+                    ],
+                    color: '#3b82f6',
+                  },
+                  {
+                    num: 8,
+                    principle: 'Sharing the Pie (Incentive Alignment)',
+                    summary:
+                      'VCs invented vesting schedules in the 1970s. The principle is about aligning incentives across all contributors to prevent short-term behavior.',
+                    product:
+                      "Your \"Carry Incentive Distortion\" bias is a direct implementation. Go deeper: detect when an IC memo's enthusiasm correlates suspiciously with the deal's impact on a specific partner's carry economics. Track if advocacy intensity changes near fund deadlines.",
+                    startup:
+                      "When you hire your first team members, offer meaningful equity. Strebulaev's data shows aligned incentives outperform salary-heavy compensation in startups.",
+                    actions: [
+                      'Enhance carry incentive detection with fund timeline awareness',
+                      'Detect deployment pressure signals ("need to put capital to work")',
+                      'Design equity plan for first 3 hires',
+                    ],
+                    color: '#f59e0b',
+                  },
+                  {
+                    num: 9,
+                    principle: 'The Meta-Principle: VC-Backed Companies Shape the Economy',
+                    summary:
+                      '50% of US IPOs over 50 years were VC-backed. 75% of large public companies. VC-backed companies spend 92 cents of every R&D dollar. When ICs make biased decisions, the ripple effects go far beyond the fund.',
+                    product:
+                      'This is your highest-level pitch narrative: "Decision Intel doesn\'t just protect organizational outcomes — it improves the quality of decision-making across the economy." When a biased committee kills a good initiative, innovation is lost. When a biased team backs a bad strategy, resources that could have gone to better opportunities are wasted.',
+                    startup:
+                      'This framing elevates you from "SaaS tool vendor" to "mission-driven company improving how capital flows to innovation." Investors respond to mission, not just TAM.',
+                    actions: [
+                      'Add this framing to pitch deck\'s "Why This Matters" slide',
+                      'Use in PR/press outreach — "improving how capital flows to innovation"',
+                      'Blog post: "The Hidden Cost of IC Bias on the Innovation Economy"',
+                    ],
+                    color: '#ef4444',
+                  },
+                ].map((p, i) => (
+                  <div key={i} style={{ ...card, borderLeft: `4px solid ${p.color}` }}>
+                    <div
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}
+                    >
+                      <div
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: '50%',
+                          background: p.color,
+                          color: '#fff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 13,
+                          fontWeight: 800,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {p.num}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 15,
+                          fontWeight: 700,
+                          color: 'var(--text-primary, #fff)',
+                        }}
+                      >
+                        {p.principle}
+                      </div>
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: 'var(--text-muted)',
+                        marginBottom: 10,
+                        lineHeight: 1.6,
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      {p.summary}
+                    </p>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: 10,
+                        marginBottom: 10,
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: 10,
+                          borderRadius: 8,
+                          background: 'rgba(99, 102, 241, 0.06)',
+                          border: '1px solid rgba(99, 102, 241, 0.15)',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: '#6366f1',
+                            marginBottom: 4,
+                          }}
+                        >
+                          FOR THE PRODUCT
+                        </div>
+                        <div
+                          style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
+                        >
+                          {p.product}
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          padding: 10,
+                          borderRadius: 8,
+                          background: 'rgba(34, 197, 94, 0.06)',
+                          border: '1px solid rgba(34, 197, 94, 0.15)',
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: '#22c55e',
+                            marginBottom: 4,
+                          }}
+                        >
+                          FOR THE STARTUP
+                        </div>
+                        <div
+                          style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}
+                        >
+                          {p.startup}
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div
+                        style={{ fontSize: 11, fontWeight: 700, color: p.color, marginBottom: 4 }}
+                      >
+                        ACTION ITEMS
+                      </div>
+                      {p.actions.map((a, j) => (
+                        <div
+                          key={j}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: 6,
+                            fontSize: 12,
+                            color: 'var(--text-secondary)',
+                            marginBottom: 3,
+                          }}
+                        >
+                          <ChevronRight
+                            size={12}
+                            style={{ color: p.color, flexShrink: 0, marginTop: 2 }}
+                          />
+                          <span>{a}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <ResearchCard
+                title="Daniel Kahneman: Beyond Cognitive Biases — Reducing Noise"
+                source="ClearerThinking Podcast"
+                type="Podcast"
+                color="#22c55e"
+                link="https://podcast.clearerthinking.org/episode/072/"
+                insight="Insurance underwriter study: executives expected 10% variability between judges. Actual: 55%. One underwriter prices at $9,500, another at $16,700 for the identical case. Noise is at least as damaging as bias, and organizations almost never measure it."
+                product="Your triple-judge noise scoring is a direct implementation of Kahneman's proposed methodology. Use the 10% vs 55% stat in every sales conversation — it's the 'holy shit' moment that makes executives realize they have no idea how much variability exists in their own decision processes."
+                startup="Offer a free 'noise audit' of a team's last 5 strategic documents as a top-of-funnel hook. Let them see the problem before pitching the solution."
+                actions={[
+                  'Use 10% vs 55% stat in opening of every demo',
+                  'Build free noise audit landing page',
+                  'Create 1-pager: "How Much Noise Is In Your Decisions?"',
+                ]}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── Decision Science Foundations ── */}
+      {(section === 'all' || section === 'foundations') && (
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #f59e0b', marginTop: 16, cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('foundations')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b' }}>
+                Decision Science Foundations
+              </div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#f59e0b',
+                  transform: expandedResearch.has('foundations')
+                    ? 'rotate(180deg)'
+                    : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
+          </div>
+          {expandedResearch.has('foundations') && (
+            <div style={{ ...card, borderLeft: '3px solid #f59e0b', marginTop: -8 }}>
+              <ResearchCard
+                title='Olivier Sibony: "Decision Hygiene" Framework'
+                source="Behavioral Grooves Podcast + Euronews"
+                type="Podcast / Interview"
+                color="#f59e0b"
+                link="https://behavioralgrooves.com/episode/noise-with-olivier-sibony/"
+                insight="Kahneman's co-author on Noise, former McKinsey partner. Framework: checklists, premortems, structured independent assessments, and noise audits. Noise audits should be the starting point — orgs need to see how bad the problem is before buying a solution."
+                product="Your entire product IS decision hygiene. Sibony's framework validates every feature: structured analysis (bias detection), independent assessments (triple-judge), premortems (Pre-Mortem Architect agent), and noise audits (noise decomposition)."
+                startup="His 'noise audit first' approach suggests a powerful sales motion: offer a free noise audit of 5 strategic documents as top-of-funnel. Let prospects SEE the problem before pitching the solution."
+                actions={[
+                  'Build free noise audit landing page as lead gen',
+                  'Quote Sibony in marketing: "decision hygiene"',
+                  'Position DI as the decision hygiene platform',
+                ]}
+              />
+              <ResearchCard
+                title="Gary Klein: Naturalistic Decision Making"
+                source="The Decision-Making Studio (Ep. 234)"
+                type="Podcast"
+                color="#f59e0b"
+                link="https://podcasts.apple.com/us/podcast/ep-234-dr-gary-klein/id1054744455?i=1000677192489"
+                insight="Klein invented the premortem technique. He and Kahneman were 'collaborative adversaries' — Kahneman trusts systematic processes, Klein trusts expert intuition. The tension between them is the exact tension your product navigates."
+                product="Klein RPD framework NOW SHIPPED: recognition cues from historical decisions, narrative war-story pre-mortems, RPD mental simulator, and personal calibration dashboard. DI sits at the intersection: structured AI analysis (Kahneman) augmenting expert human judgment (Klein), not replacing it. Dual-framework positioning is live — skeptical leaders can see their intuition amplified, not overridden."
+                startup="When leaders push back with 'we trust our judgment,' don't argue. Say: 'We do too. Klein proved expert intuition is powerful. Our RPD framework surfaces the pattern recognition cues an expert with 10+ similar decisions would notice. We amplify your intuition while making sure it's not undermined by noise and bias you can't see.'"
+                actions={[
+                  '✅ Klein RPD framework shipped: recognition cues, narrative pre-mortems, RPD simulator, calibration dashboard',
+                  'Use Kahneman-Klein dual framework in sales: "We suppress bias AND amplify intuition"',
+                  'Demo the RPD tab as second wow moment after Boardroom Simulation',
+                ]}
+              />
+              <ResearchCard
+                title="Annie Duke & Spencer Greenberg: Decision Education"
+                source="Decision Education Podcast (Sep 2025)"
+                type="Podcast"
+                color="#f59e0b"
+                link="https://www.annieduke.com/the-decision-education-podcast-with-guest-spencer-greenberg/"
+                insight="Knowing the name of a bias doesn't help you overcome it. Awareness alone is nearly useless. What works: precommitment contracts, structured decision processes, and Bayesian updating."
+                product="This validates your nudge system and decision architecture (blind priors, premortems) over simple bias reports. The real value isn't detecting biases — it's the structural interventions that make it harder to ACT on bias even when it's present. Diagnostic vs. treatment."
+                startup="Don't oversell bias detection in demos. Lead with the decision architecture features: 'We don't just tell you about your biases — we make it structurally harder to act on them.'"
+                actions={[
+                  'Reframe marketing: "detection + intervention" not just "detection"',
+                  'Emphasize nudge system and blind priors in demos',
+                  'Blog: "Why Bias Awareness Doesn\'t Work (And What Does)"',
+                ]}
+              />
+              <ResearchCard
+                title='Philip Tetlock: "Hybrid Mind" — Human + AI Forecasting'
+                source="80,000 Hours Podcast (Oct 2025)"
+                type="Podcast"
+                color="#f59e0b"
+                link="https://80000hours.org/podcast/episodes/prof-tetlock-predicting-the-future/"
+                insight="Human-machine hybrids beat both pure AI and pure human judgment in forecasting tournaments. 40 years of data show process matters more than talent — superforecasters aren't smarter, they follow better processes."
+                product="DI IS a human-machine hybrid: AI detects biases and measures noise, humans make the final call. Tetlock gives you the language: 'Process beats talent. Our platform ensures your team follows the process that produces better outcomes.'"
+                startup="'Process beats talent' in one sentence IS your entire value proposition. Use Tetlock's authority to back this claim."
+                actions={[
+                  'Add Tetlock citation to product philosophy page',
+                  'Use "process beats talent" in pitch decks',
+                  'Reference Hybrid Mind tournament results in technical DD',
+                ]}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── Category Creation ── */}
+      {(section === 'all' || section === 'category') && (
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #ef4444', marginTop: 16, cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('category')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#ef4444' }}>
+                Category Creation
+              </div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#ef4444',
+                  transform: expandedResearch.has('category') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
+          </div>
+          {expandedResearch.has('category') && (
+            <div style={{ ...card, borderLeft: '3px solid #ef4444', marginTop: -8 }}>
+              <ResearchCard
+                title='Christopher Lochhead: "How to Become a Category Pirate"'
+                source="Lenny's Podcast"
+                type="Podcast / Newsletter"
+                color="#ef4444"
+                link="https://www.lennysnewsletter.com/p/how-to-become-a-category-pirate-christopher"
+                insight="The company that creates a category captures 2/3 of the market value. Framework: 'Frame It, Name It, Claim It.' The 'better trap' — competing on being better within an existing category — is death."
+                product={
+                  'You\'re not building a "better CRM" or a "better DD tool." You\'re creating the category of Investment Decision Quality. Your DQI should become the term PE uses like IRR and MOIC. When someone says "What\'s the DQI on this memo?" in a strategy meeting or IC, you\'ve won. Lochhead calls this "languaging" — weaponizing vocabulary.'
+                }
+                startup="Frame the problem (Strategic decisions are riddled with undetected bias and noise), name the solution (Decision Quality Index), claim the category (Decision Intel is the decision quality platform for capital allocators). This is your most important strategic task."
+                actions={[
+                  'Make DQI the centerpiece term in all marketing',
+                  'Write a "Category Point of View" document (Lochhead framework)',
+                  'PR strategy: get DQI mentioned in PE trade publications',
+                  'Blog series: "The Hidden Cost of Decision Noise in Enterprise Decisions"',
+                ]}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── GTM & Sales ── */}
+      {(section === 'all' || section === 'gtm') && (
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #3b82f6', marginTop: 16, cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('gtm')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#3b82f6' }}>GTM &amp; Sales</div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#3b82f6',
+                  transform: expandedResearch.has('gtm') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
+          </div>
+          {expandedResearch.has('gtm') && (
+            <div style={{ ...card, borderLeft: '3px solid #3b82f6', marginTop: -8 }}>
+              <ResearchCard
+                title="Ray Zhou (Affinity): From College Dropout to SaaS Leader"
+                source="Platform Builders Podcast"
+                type="Podcast"
+                color="#3b82f6"
+                link="https://www.heavybit.com/library/podcasts/platform-builders/ep-4-building-affinity-from-college-dropout-to-saas-leader-with-ray-zhou"
+                insight="Built Affinity into late-eight-figure revenue CRM for PE/VC. Three lessons: (1) hundreds of problem-first conversations before building features, (2) founder-led onboarding for every early customer, (3) focus on problems closest to core business — tangential solutions get replaced when AI improves."
+                product="Decision quality is about as core as it gets for any organization. That's your moat vs. the 'AI assistant' tools that summarize documents — those are tangential, yours is fundamental."
+                startup="Personally onboard every pilot customer. Conduct 50+ discovery calls focused on 'how does your team actually make major decisions?' not 'let me show you features.' Zhou's outsider advantage (didn't know the industry) forced better questions — use yours the same way."
+                actions={[
+                  'Target 50 discovery calls before next feature sprint',
+                  'Personally onboard every pilot — no self-serve yet',
+                  'Document every onboarding as a playbook for future hires',
+                  'Ask: "Walk me through your last major decision" in every call',
+                ]}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── Founder Strategy ── */}
+      {(section === 'all' || section === 'strategy') && (
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: 16, cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('strategy')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#a78bfa' }}>
+                Founder Strategy
+              </div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#a78bfa',
+                  transform: expandedResearch.has('strategy') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
+          </div>
+          {expandedResearch.has('strategy') && (
+            <div style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: -8 }}>
+              <ResearchCard
+                title="Peter Thiel: Zero to One — Contrarian Truths"
+                source="The Investors Podcast (MI383)"
+                type="Podcast Deep Dive"
+                color="#a78bfa"
+                link="https://www.theinvestorspodcast.com/millennial-investing/zero-to-one-lessons-from-peter-thiel-w-shawn-omalley/"
+                insight='Contrarian question: "What important truth do very few people agree with you on?" Monopoly framework: dominate a small niche, then expand in concentric circles. Sales and distribution matter as much as product.'
+                product={
+                  'Your contrarian truth: "Executive teams think their decisions are rational, but they\'re riddled with measurable cognitive noise and bias that nobody audits." Your monopoly niche: enterprise decision quality. Your concentric expansion: Enterprise M&A/Strategy → PE/VC → FinServ → Horizontal.'
+                }
+                startup="The best 16-agent pipeline means nothing if you can't get it in front of decision-makers. Distribution strategy matters as much as the product. Conferences, Slack communities, thought leadership content, and referral loops from pilot customers are your channels."
+                actions={[
+                  'Write down your contrarian truth and use it in every pitch',
+                  'Map your concentric expansion circles (already in Market Strategy tab)',
+                  'Allocate 50% of time to distribution, not just product',
+                  'Build referral incentive for pilot customers',
+                ]}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── Connecting Thread ── */}
+      <div style={{ ...card, borderTop: '3px solid #8b5cf6', marginTop: 16 }}>
+        <div style={sectionTitle}>
+          <Crosshair size={18} style={{ color: '#8b5cf6' }} /> The Connecting Thread
+        </div>
+        <p
+          style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: 0 }}
+        >
+          Every one of these thinkers is telling you the same thing from a different angle: human
+          decision-making is{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>
+            systematically flawed in measurable ways
+          </strong>
+          , that{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>process beats intuition at scale</strong>
+          , that the organizations willing to{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>
+            audit their own judgment will outperform
+          </strong>{' '}
+          those that don&apos;t, and that the company who creates the{' '}
+          <strong style={{ color: 'var(--text-primary)' }}>
+            language for this problem will own the market
+          </strong>
+          . You&apos;re building that company. DQI is that language.
+        </p>
+      </div>
+
+      {/* Key Takeaway (always visible) */}
+      <div style={{ ...card, borderTop: '3px solid #6366f1', marginTop: 12 }}>
+        <div style={sectionTitle}>
+          <Zap size={18} style={{ color: '#6366f1' }} /> Most Actionable Takeaways
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {[
+            {
+              action: 'Reframe pitch from defensive to offensive',
+              detail:
+                '"Swing with confidence" not "avoid mistakes." The best teams don\'t want a safety net — they want a decision quality amplifier.',
+            },
+            {
+              action: 'Cite Strebulaev in marketing',
+              detail:
+                'Academic credibility from Stanford GSB for blind priors and committee rooms. "Stanford research shows consensus-seeking committees underperform."',
+            },
+            {
+              action: 'Build Quick Scan mode',
+              detail:
+                'Fast lane/slow lane. 30-second red flag scan before 4-minute full analysis. Matches actual decision workflow and reduces friction.',
+            },
+            {
+              action: 'Build longitudinal bias tracking',
+              detail:
+                'Track bias drift across project lifecycle. The follow-on assessment should be MORE critical than the initial — is it? Nobody else will build this.',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{ padding: 12, borderRadius: 8, background: 'var(--bg-tertiary, #0a0a0a)' }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  marginBottom: 4,
+                }}
+              >
+                {item.action}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                {item.detail}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Search Results ────────────────────────────────────────────────────────
+
+function SearchResults({
+  query,
+  tabContent,
+}: {
+  query: string;
+  tabContent: Record<TabId, React.ReactNode>;
+}) {
+  const q = query.toLowerCase().trim();
+  if (!q) return null;
+
+  // Render all tab contents and let the browser render them; we overlay a search notice
+  return (
+    <div>
+      <div
+        style={{
+          ...card,
+          borderLeft: '3px solid #6366f1',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          marginBottom: 16,
+        }}
+      >
+        <Search size={14} style={{ color: '#6366f1', flexShrink: 0 }} />
+        <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+          Showing all tabs filtered by &quot;<strong style={{ color: '#6366f1' }}>{query}</strong>
+          &quot; — use{' '}
+          <kbd
+            style={{
+              padding: '1px 5px',
+              borderRadius: 4,
+              border: '1px solid var(--border-primary, #333)',
+              fontSize: 11,
+            }}
+          >
+            Ctrl+F
+          </kbd>{' '}
+          to jump to matches
+        </span>
+      </div>
+      {TABS.map(tab => (
+        <div key={tab.id} style={{ marginBottom: 24 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 8,
+              padding: '8px 0',
+              borderBottom: '1px solid var(--border-primary, #222)',
+            }}
+          >
+            {tab.icon}
+            <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>
+              {tab.label}
+            </span>
+          </div>
+          {tabContent[tab.id]}
+        </div>
+      ))}
     </div>
   );
 }
@@ -3528,6 +3731,8 @@ export default function FounderHubPage() {
   const [unlocked, setUnlocked] = useState(false);
   const [passInput, setPassInput] = useState('');
   const [passError, setPassError] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const handleUnlock = useCallback(() => {
     if (!FOUNDER_PASS) {
@@ -3541,6 +3746,19 @@ export default function FounderHubPage() {
       setPassError(true);
     }
   }, [passInput]);
+
+  // Keyboard shortcut: Cmd/Ctrl+K to focus search
+  useEffect(() => {
+    if (!unlocked) return;
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [unlocked]);
 
   // Password gate
   if (!unlocked) {
@@ -3626,58 +3844,118 @@ export default function FounderHubPage() {
     pipeline: <CorePipeline />,
     scoring: <ScoringEngine />,
     integrations: <IntegrationsAndFlywheel />,
-    moat: <CompetitiveMoat />,
-    market: <MarketStrategy />,
+    strategy: <StrategyAndPositioning />,
     sales: <SalesToolkit />,
     stats: <LiveStats />,
-    frameworks: <ResearchFrameworks />,
-    playbook: <FounderPlaybook />,
+    playbook: <PlaybookAndResearch />,
   };
+
+  // TAB_CONTENT is rendered below after password gate
 
   return (
     <ErrorBoundary sectionName="Founder Hub">
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Header */}
-        <header style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-            <Rocket size={26} style={{ color: '#6366f1' }} />
-            <h1
-              style={{
-                fontSize: 24,
-                fontWeight: 800,
-                color: 'var(--text-primary, #fff)',
-                margin: 0,
-              }}
-            >
-              Founder Hub
-            </h1>
+        {/* Header + Search */}
+        <header style={{ marginBottom: 20 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 6,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Rocket size={26} style={{ color: '#6366f1' }} />
+              <h1
+                style={{
+                  fontSize: 24,
+                  fontWeight: 800,
+                  color: 'var(--text-primary, #fff)',
+                  margin: 0,
+                }}
+              >
+                Founder Hub
+              </h1>
+            </div>
+            {/* Global Search */}
+            <div style={{ position: 'relative', width: 260 }}>
+              <Search
+                size={14}
+                style={{
+                  position: 'absolute',
+                  left: 10,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-muted, #71717a)',
+                }}
+              />
+              <input
+                ref={searchRef}
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search content... (⌘K)"
+                style={{
+                  width: '100%',
+                  padding: '8px 32px 8px 30px',
+                  fontSize: 12,
+                  borderRadius: 8,
+                  border: '1px solid var(--border-primary, #333)',
+                  background: 'var(--bg-secondary, #111)',
+                  color: 'var(--text-primary, #fff)',
+                  outline: 'none',
+                }}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: 8,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: 2,
+                  }}
+                >
+                  <X size={12} />
+                </button>
+              )}
+            </div>
           </div>
           <p style={{ fontSize: 13, color: 'var(--text-muted, #71717a)', margin: 0 }}>
-            Your living knowledge board — product features, moat, pitch narrative, and tactical
-            playbook.
+            Your living knowledge board — product features, strategy, sales playbook, and research.
           </p>
         </header>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation — responsive scrollable strip */}
         <div
           style={{
             display: 'flex',
-            gap: 4,
+            gap: 2,
             marginBottom: 24,
             overflowX: 'auto',
             borderBottom: '1px solid var(--border-primary, #222)',
             paddingBottom: 0,
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
           }}
         >
           {TABS.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setSearchQuery('');
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                padding: '10px 16px',
+                padding: '10px 14px',
                 fontSize: 13,
                 fontWeight: activeTab === tab.id ? 700 : 500,
                 color:
@@ -3688,6 +3966,7 @@ export default function FounderHubPage() {
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 transition: 'color 0.15s, border-color 0.15s',
+                flexShrink: 0,
               }}
             >
               {tab.icon}
@@ -3697,311 +3976,15 @@ export default function FounderHubPage() {
         </div>
 
         {/* Tab Content */}
-        {TAB_CONTENT[activeTab]}
+        {searchQuery ? (
+          <SearchResults query={searchQuery} tabContent={TAB_CONTENT} />
+        ) : (
+          TAB_CONTENT[activeTab]
+        )}
 
         {/* AI Chat Widget */}
-        <FounderChatWidget />
+        <FounderChatWidget founderPass={FOUNDER_PASS} />
       </div>
     </ErrorBoundary>
-  );
-}
-
-// ─── Founder Chat Widget ────────────────────────────────────────────────────
-
-interface ChatMsg {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-const STARTER_QUESTIONS = [
-  'Elevator pitch for a CSO?',
-  'How do we beat competitors?',
-  'What did Strebulaev say?',
-  'Demo script for exec meeting',
-];
-
-function FounderChatWidget() {
-  const [open, setOpen] = useState(false);
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<ChatMsg[]>([]);
-  const [streaming, setStreaming] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const handleSend = useCallback(async () => {
-    if (!input.trim() || streaming) return;
-    const userMsg = input.trim();
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
-    setStreaming(true);
-
-    try {
-      const res = await fetch('/api/founder-hub/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-founder-pass': FOUNDER_PASS,
-        },
-        body: JSON.stringify({
-          message: userMsg,
-          history: messages.slice(-10),
-        }),
-      });
-
-      if (!res.ok) {
-        setMessages(prev => [
-          ...prev,
-          { role: 'assistant', content: 'Error: ' + (res.statusText || 'Failed to connect') },
-        ]);
-        setStreaming(false);
-        return;
-      }
-
-      const reader = res.body?.getReader();
-      if (!reader) {
-        setStreaming(false);
-        return;
-      }
-
-      const decoder = new TextDecoder();
-      let assistantContent = '';
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const text = decoder.decode(value, { stream: true });
-          const lines = text.split('\n');
-
-          for (const line of lines) {
-            if (!line.startsWith('data: ')) continue;
-            try {
-              const data = JSON.parse(line.slice(6));
-              if (data.type === 'chunk' && data.text) {
-                assistantContent += data.text;
-                setMessages(prev => {
-                  const updated = [...prev];
-                  updated[updated.length - 1] = { role: 'assistant', content: assistantContent };
-                  return updated;
-                });
-              }
-            } catch {
-              // malformed SSE line
-            }
-          }
-        }
-      } finally {
-        reader.cancel();
-      }
-    } catch {
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', content: 'Connection error. Please try again.' },
-      ]);
-    } finally {
-      setStreaming(false);
-    }
-  }, [input, messages, streaming]);
-
-  if (!open) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          width: 52,
-          height: 52,
-          borderRadius: '50%',
-          background: '#6366f1',
-          color: '#fff',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
-          zIndex: 50,
-          fontSize: 22,
-        }}
-        title="Ask the Founder AI"
-      >
-        <MessageSquare size={22} />
-      </button>
-    );
-  }
-
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: 24,
-        right: 24,
-        width: 400,
-        height: 520,
-        borderRadius: 16,
-        background: 'var(--bg-secondary, #111)',
-        border: '1px solid var(--border-primary, #333)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
-        zIndex: 50,
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: '12px 16px',
-          borderBottom: '1px solid var(--border-primary, #333)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: 'rgba(99, 102, 241, 0.08)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Brain size={16} style={{ color: '#6366f1' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-            Founder AI
-          </span>
-        </div>
-        <button
-          onClick={() => setOpen(false)}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            cursor: 'pointer',
-            padding: 4,
-          }}
-        >
-          &times;
-        </button>
-      </div>
-
-      {/* Messages */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '12px 14px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 10,
-        }}
-      >
-        {messages.length === 0 && (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '30px 10px',
-              color: 'var(--text-muted)',
-              fontSize: 12,
-              lineHeight: 1.6,
-            }}
-          >
-            Ask me about your product, competitors, sales strategy, market positioning, or research
-            frameworks.
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 4,
-                justifyContent: 'center',
-                marginTop: 10,
-              }}
-            >
-              {STARTER_QUESTIONS.map(q => (
-                <button
-                  key={q}
-                  onClick={() => setInput(q)}
-                  style={{
-                    padding: '4px 10px',
-                    fontSize: 11,
-                    borderRadius: 12,
-                    border: '1px solid var(--border-primary, #333)',
-                    background: 'transparent',
-                    color: '#6366f1',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '85%',
-              padding: '8px 12px',
-              borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-              background: msg.role === 'user' ? '#6366f1' : 'var(--bg-tertiary, #1a1a1a)',
-              color: msg.role === 'user' ? '#fff' : 'var(--text-secondary)',
-              fontSize: 12,
-              lineHeight: 1.6,
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {msg.content || (streaming && i === messages.length - 1 ? '...' : '')}
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <div
-        style={{
-          padding: '10px 12px',
-          borderTop: '1px solid var(--border-primary, #333)',
-          display: 'flex',
-          gap: 8,
-        }}
-      >
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-          placeholder="Ask the Founder AI..."
-          disabled={streaming}
-          style={{
-            flex: 1,
-            padding: '8px 12px',
-            fontSize: 12,
-            borderRadius: 8,
-            border: '1px solid var(--border-primary, #333)',
-            background: 'var(--bg-tertiary, #0a0a0a)',
-            color: 'var(--text-primary)',
-            outline: 'none',
-          }}
-        />
-        <button
-          onClick={handleSend}
-          disabled={streaming || !input.trim()}
-          style={{
-            padding: '8px 14px',
-            fontSize: 12,
-            fontWeight: 600,
-            borderRadius: 8,
-            border: 'none',
-            background: input.trim() && !streaming ? '#6366f1' : 'var(--bg-tertiary, #1a1a1a)',
-            color: input.trim() && !streaming ? '#fff' : 'var(--text-muted)',
-            cursor: streaming ? 'wait' : 'pointer',
-          }}
-        >
-          {streaming ? '...' : 'Send'}
-        </button>
-      </div>
-    </div>
   );
 }

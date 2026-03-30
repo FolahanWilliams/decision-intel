@@ -122,7 +122,7 @@ export async function GET(request: Request) {
       }>;
     }
 
-    const transformedDocs = (documents as DocRow[]).map((doc) => {
+    const transformedDocs = (documents as DocRow[]).map(doc => {
       const latestAnalysis = doc.analyses[0];
       return {
         id: doc.id,

@@ -10,6 +10,7 @@ export interface UserSettingsData {
   analysisAlerts: boolean;
   weeklyDigest: boolean;
   darkMode: boolean;
+  notificationSeverity: 'all' | 'high_critical' | 'critical';
 }
 
 const UserSettingsSchema = z.object({
@@ -17,6 +18,7 @@ const UserSettingsSchema = z.object({
   analysisAlerts: z.boolean(),
   weeklyDigest: z.boolean(),
   darkMode: z.boolean(),
+  notificationSeverity: z.enum(['all', 'high_critical', 'critical']),
 });
 
 export async function getUserSettings() {

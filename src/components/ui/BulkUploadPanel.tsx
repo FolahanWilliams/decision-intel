@@ -2,6 +2,11 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Upload, X, FileText, Loader2, CheckCircle, AlertTriangle, FolderUp } from 'lucide-react';
+import {
+  SUPPORTED_MIME_TYPES,
+  SUPPORTED_EXTENSIONS,
+  FILE_TYPE_LABELS,
+} from '@/lib/constants/file-types';
 
 interface FileEntry {
   file: File;
@@ -20,13 +25,8 @@ interface BatchStatus {
 
 const MAX_FILES = 10;
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
-const ACCEPTED_TYPES = [
-  'application/pdf',
-  'text/plain',
-  'text/markdown',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-];
-const ACCEPTED_EXTENSIONS = ['.pdf', '.txt', '.md', '.docx'];
+const ACCEPTED_TYPES = SUPPORTED_MIME_TYPES as readonly string[];
+const ACCEPTED_EXTENSIONS = SUPPORTED_EXTENSIONS as readonly string[];
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -204,6 +204,8 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
       <div className="card-body">
         {error && (
           <div
+            role="alert"
+            aria-live="assertive"
             className="flex items-center gap-sm"
             style={{
               padding: '8px 12px',
@@ -214,7 +216,7 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
               marginBottom: 'var(--spacing-sm)',
             }}
           >
-            <AlertTriangle size={14} />
+            <AlertTriangle size={14} aria-hidden="true" />
             {error}
           </div>
         )}
@@ -222,9 +224,18 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
         {/* Drop zone (only when not uploading) */}
         {!uploading && !batch && (
           <div
+            role="button"
+            tabIndex={0}
+            aria-label={`Drop files here or click to browse. Accepted: ${FILE_TYPE_LABELS}. Maximum 10 MB each.`}
             onDragOver={e => e.preventDefault()}
             onDrop={handleDrop}
             onClick={() => inputRef.current?.click()}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                inputRef.current?.click();
+              }
+            }}
             style={{
               padding: 'var(--spacing-lg)',
               border: '2px dashed rgba(255, 255, 255, 0.1)',
@@ -240,18 +251,23 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
               type="file"
               hidden
               multiple
-              accept=".pdf,.txt,.md,.docx"
+              aria-label="Select files to upload"
+              accept=".pdf,.txt,.md,.docx,.xlsx,.csv,.html,.htm,.pptx"
               onChange={e => {
                 if (e.target.files) addFiles(e.target.files);
                 e.target.value = '';
               }}
             />
-            <Upload size={20} style={{ margin: '0 auto 8px', color: 'var(--text-muted)' }} />
+            <Upload
+              size={20}
+              aria-hidden="true"
+              style={{ margin: '0 auto 8px', color: 'var(--text-muted)' }}
+            />
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
               Drop files here or click to browse
             </p>
             <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-              PDF, TXT, MD, DOCX · Max 10 MB each
+              {FILE_TYPE_LABELS} · Max 10 MB each
             </p>
           </div>
         )}
@@ -291,6 +307,7 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
                 {!uploading && (
                   <button
                     onClick={() => removeFile(idx)}
+                    aria-label={`Remove ${entry.file.name}`}
                     style={{
                       background: 'transparent',
                       border: 'none',
@@ -299,7 +316,7 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
                       color: 'var(--text-muted)',
                     }}
                   >
-                    <X size={12} />
+                    <X size={12} aria-hidden="true" />
                   </button>
                 )}
               </div>
@@ -358,6 +375,11 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
 
             {/* Progress bar */}
             <div
+              role="progressbar"
+              aria-valuenow={progress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Upload progress: ${progress}% complete`}
               style={{
                 height: '6px',
                 background: 'rgba(255, 255, 255, 0.06)',
@@ -383,7 +405,7 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
 
             {/* Errors */}
             {batch.errors.length > 0 && (
-              <div style={{ marginTop: 'var(--spacing-sm)' }}>
+              <div role="alert" aria-live="polite" style={{ marginTop: 'var(--spacing-sm)' }}>
                 {batch.errors.map((err, i) => (
                   <div
                     key={i}

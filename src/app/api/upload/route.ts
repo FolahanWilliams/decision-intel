@@ -9,6 +9,8 @@ import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { checkAnalysisLimit } from '@/lib/utils/plan-limits';
 import { createLogger } from '@/lib/utils/logger';
 import { encryptDocumentContent, isDocumentEncryptionEnabled } from '@/lib/utils/encryption';
+import { logAudit } from '@/lib/audit';
+import { isFileTypeSupported, FILE_TYPE_LABELS } from '@/lib/constants/file-types';
 
 const log = createLogger('UploadRoute');
 
@@ -87,17 +89,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = [
-      'application/pdf',
-      'text/plain',
-      'text/markdown',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    ];
-
-    const isTextFile = file.name.endsWith('.txt') || file.name.endsWith('.md');
-    if (!allowedTypes.includes(file.type) && !isTextFile) {
+    if (!isFileTypeSupported(file.type, file.name)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Supported: PDF, TXT, MD, DOCX' },
+        { error: `Invalid file type. Supported: ${FILE_TYPE_LABELS}` },
         { status: 400 }
       );
     }
@@ -277,8 +271,8 @@ export async function POST(request: NextRequest) {
     const { getServiceSupabase } = await import('@/lib/supabase');
     const supabase = getServiceSupabase();
 
-    const ext = path.extname(file.name);
-    const storagePath = `${userId}/${document.id}${ext}`;
+    const fileExt = path.extname(file.name);
+    const storagePath = `${userId}/${document.id}${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
       .from(process.env.SUPABASE_DOCUMENT_BUCKET || 'pdf')
@@ -305,6 +299,20 @@ export async function POST(request: NextRequest) {
         })
         .catch(err => log.warn('Failed to link DecisionFrame:', err));
     }
+
+    // Audit log (fire-and-forget)
+    logAudit({
+      action: 'UPLOAD_DOCUMENT',
+      resource: 'Document',
+      resourceId: document.id,
+      details: {
+        filename: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        documentType: documentType || undefined,
+        dealId: dealId || undefined,
+      },
+    });
 
     return NextResponse.json({
       id: document.id,

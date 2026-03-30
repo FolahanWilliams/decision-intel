@@ -133,7 +133,9 @@ export async function getCachedAnalysis(
       return JSON.parse(raw);
     } catch {
       log.warn('Corrupted cache entry for analysis: ' + contentHash.substring(0, 8));
-      prisma.cacheEntry.delete({ where: { key: `${CACHE_KEYS.ANALYSIS}${contentHash}` } }).catch(() => null);
+      prisma.cacheEntry
+        .delete({ where: { key: `${CACHE_KEYS.ANALYSIS}${contentHash}` } })
+        .catch(() => null);
       return null;
     }
   }
@@ -162,7 +164,9 @@ export async function getCachedEmbedding(textHash: string): Promise<number[] | n
       return JSON.parse(raw) as number[];
     } catch {
       log.warn('Corrupted cache entry for embedding: ' + textHash.substring(0, 8));
-      prisma.cacheEntry.delete({ where: { key: `${CACHE_KEYS.EMBEDDING}${textHash}` } }).catch(() => null);
+      prisma.cacheEntry
+        .delete({ where: { key: `${CACHE_KEYS.EMBEDDING}${textHash}` } })
+        .catch(() => null);
       return null;
     }
   }

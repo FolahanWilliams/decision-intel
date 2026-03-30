@@ -6,10 +6,7 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('RiskScoreAPI');
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {

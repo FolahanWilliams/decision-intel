@@ -92,12 +92,22 @@ export function classifyDecisionType(text: string): HumanDecisionInput['decision
   if (/\b(overrid|dismiss|ignore|false.?positive)\b/.test(lower)) return 'override';
   if (/\b(vendor|supplier|tool|platform|evaluate)\b/.test(lower)) return 'vendor_eval';
   if (/\b(strategy|roadmap|initiative|budget|plan)\b/.test(lower)) return 'strategic';
-  if (/\b(resource.?alloc|allocate.?resources|budget.?size|commit.?resources|allocate.?budget|deploy.?capital)\b/.test(lower))
+  if (
+    /\b(resource.?alloc|allocate.?resources|budget.?size|commit.?resources|allocate.?budget|deploy.?capital)\b/.test(
+      lower
+    )
+  )
     return 'resource_allocation';
-  if (/\b(business.?case|proposal.?review|strategic.?memo|project.?proposal|strategic.?plan)\b/.test(lower))
+  if (
+    /\b(business.?case|proposal.?review|strategic.?memo|project.?proposal|strategic.?plan)\b/.test(
+      lower
+    )
+  )
     return 'strategic_proposal';
-  if (/\b(wind.?down|discontinue|sunset|close.?out|decommission|realiz|liquidat)\b/.test(lower)) return 'initiative_closure';
-  if (/\b(m&a|merger|acqui|takeover|partnership|joint.?venture|strategic.?alliance)\b/.test(lower)) return 'm_and_a';
+  if (/\b(wind.?down|discontinue|sunset|close.?out|decommission|realiz|liquidat)\b/.test(lower))
+    return 'initiative_closure';
+  if (/\b(m&a|merger|acqui|takeover|partnership|joint.?venture|strategic.?alliance)\b/.test(lower))
+    return 'm_and_a';
 
   return undefined;
 }

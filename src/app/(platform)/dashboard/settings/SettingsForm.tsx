@@ -38,6 +38,9 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
   const [emailNotifications, setEmailNotifications] = useState(initialSettings.emailNotifications);
   const [analysisAlerts, setAnalysisAlerts] = useState(initialSettings.analysisAlerts);
   const [weeklyDigest, setWeeklyDigest] = useState(initialSettings.weeklyDigest);
+  const [notificationSeverity, setNotificationSeverity] = useState(
+    initialSettings.notificationSeverity
+  );
   const [emailConfigured, setEmailConfigured] = useState(true); // assume configured until proven otherwise
 
   // Display preferences
@@ -158,6 +161,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           analysisAlerts,
           weeklyDigest,
           darkMode,
+          notificationSeverity,
         });
         setSaved(true);
         showToast('Settings saved successfully', 'success');
@@ -259,6 +263,37 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
               onChange={setWeeklyDigest}
               disabled={isPending}
             />
+
+            {/* Notification Severity Threshold */}
+            <div className="flex items-center justify-between">
+              <div>
+                <div style={{ fontWeight: 500, marginBottom: '2px' }}>Severity Threshold</div>
+                <div className="text-xs text-muted">
+                  Only receive notifications at or above this severity level
+                </div>
+              </div>
+              <select
+                value={notificationSeverity}
+                onChange={e =>
+                  setNotificationSeverity(e.target.value as 'all' | 'high_critical' | 'critical')
+                }
+                disabled={isPending}
+                style={{
+                  padding: '6px 12px',
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '4px',
+                  color: 'var(--text-primary)',
+                  fontSize: '13px',
+                  cursor: isPending ? 'not-allowed' : 'pointer',
+                  opacity: isPending ? 0.5 : 1,
+                }}
+              >
+                <option value="all">All notifications</option>
+                <option value="high_critical">High &amp; Critical only</option>
+                <option value="critical">Critical only</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
