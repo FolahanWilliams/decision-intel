@@ -45,9 +45,9 @@ const humanDecisionSchema = z.object({
       'override',
       'strategic',
       'vendor_eval',
-      'capital_allocation',
-      'investment_thesis',
-      'portfolio_exit',
+      'resource_allocation',
+      'strategic_proposal',
+      'initiative_closure',
       'm_and_a',
     ])
     .optional(),

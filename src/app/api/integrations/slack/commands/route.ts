@@ -374,7 +374,7 @@ async function handleOutcomeCommand(params: {
   if (!outcome || !VALID.includes(outcome)) {
     return NextResponse.json({
       response_type: 'ephemeral',
-      text: 'Usage: `/di outcome <success|partial_success|failure|too_early> [notes]`\n\nExample: `/di outcome success Deal closed at 15% above target`',
+      text: 'Usage: `/di outcome <success|partial_success|failure|too_early> [notes]`\n\nExample: `/di outcome success Project completed ahead of schedule`',
     });
   }
 
