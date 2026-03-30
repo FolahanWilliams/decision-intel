@@ -74,18 +74,26 @@ function ToastItem({ toast, onRemove, index }: ToastItemProps) {
   useEffect(() => {
     if (toast.persistent || !toast.duration) return;
 
+    let removed = false;
+
     const interval = setInterval(() => {
       setProgress(prev => {
         const next = prev - 100 / (toast.duration! / 100);
         if (next <= 0) {
-          onRemove();
+          if (!removed) {
+            removed = true;
+            queueMicrotask(onRemove);
+          }
           return 0;
         }
         return next;
       });
     }, 100);
 
-    return () => clearInterval(interval);
+    return () => {
+      removed = true;
+      clearInterval(interval);
+    };
   }, [toast, onRemove]);
 
   return (

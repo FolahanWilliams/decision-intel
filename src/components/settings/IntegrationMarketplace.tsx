@@ -76,11 +76,13 @@ const INTEGRATIONS = [
 ];
 
 const SLASH_COMMANDS = [
-  { command: '/di analyze', description: 'Analyze a decision in the current channel' },
-  { command: '/di prior', description: 'Submit a decision prior' },
-  { command: '/outcome', description: 'Report a decision outcome' },
-  { command: '/di status', description: 'Check integration status' },
-  { command: '/di help', description: 'Show available commands' },
+  { command: '/di analyze', description: 'Audit the most recent decision in this channel' },
+  { command: '/di score <text>', description: 'Quick inline bias check on any text' },
+  { command: '/di brief', description: 'Org intelligence briefing — top risks and maturity' },
+  { command: '/di prior', description: 'Submit a blind prior for the active decision room' },
+  { command: '/di outcome', description: 'Report a decision outcome (success/failure)' },
+  { command: '/di status', description: 'Calibration level, trends, and pending outcomes' },
+  { command: '/di help', description: 'Show all available commands' },
 ];
 
 function SlackDetailSection({

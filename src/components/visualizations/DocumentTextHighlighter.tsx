@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { BiasInstance } from '@/types';
-import { AlertTriangle, ChevronRight, Eye, EyeOff, Search } from 'lucide-react';
+import { AlertTriangle, ChevronRight, Eye, EyeOff, Search, Maximize2, Minimize2, BarChart3 } from 'lucide-react';
 import { getBiasDisplayName } from '@/lib/utils/bias-normalize';
 import { getBiasColor, resetBiasColors, type BiasColorSet } from '@/lib/utils/bias-colors';
 
@@ -45,8 +45,29 @@ const SEVERITY_COLORS: Record<
   },
 };
 
+const SEVERITY_HEX: Record<string, string> = {
+  critical: '#ef4444',
+  high: '#f97316',
+  medium: '#eab308',
+  low: '#3b82f6',
+};
+
+const SEVERITY_RANK: Record<string, number> = {
+  critical: 4,
+  high: 3,
+  medium: 2,
+  low: 1,
+};
+
 function getSeverityColor(severity: string) {
   return SEVERITY_COLORS[severity.toLowerCase()] ?? SEVERITY_COLORS.low;
+}
+
+function getConfidenceOpacity(confidence: number | null | undefined): number {
+  if (confidence == null) return 1;
+  if (confidence >= 0.8) return 1;
+  if (confidence >= 0.5) return 0.7;
+  return 0.4;
 }
 
 interface TextSegment {
@@ -99,6 +120,49 @@ function buildSegments(content: string, biases: BiasInstance[]): TextSegment[] {
   return segments;
 }
 
+interface HeatMapBin {
+  index: number;
+  biasCount: number;
+  maxSeverity: string;
+  biasIndices: number[];
+}
+
+/**
+ * Builds heat map data by dividing document into bins and counting bias density per bin.
+ */
+function buildHeatMapData(
+  content: string,
+  biases: BiasInstance[],
+  binCount: number = 50
+): HeatMapBin[] {
+  const totalLen = content.length;
+  if (totalLen === 0) return [];
+
+  const binSize = Math.max(1, Math.ceil(totalLen / binCount));
+  const lowerContent = content.toLowerCase();
+  const bins: HeatMapBin[] = Array.from({ length: binCount }, (_, i) => ({
+    index: i,
+    biasCount: 0,
+    maxSeverity: '',
+    biasIndices: [],
+  }));
+
+  biases.forEach((bias, idx) => {
+    if (!bias.excerpt) return;
+    const pos = lowerContent.indexOf(bias.excerpt.toLowerCase());
+    if (pos === -1) return;
+    const binIdx = Math.min(Math.floor(pos / binSize), binCount - 1);
+    bins[binIdx].biasCount++;
+    bins[binIdx].biasIndices.push(idx);
+    const sev = bias.severity.toLowerCase();
+    if ((SEVERITY_RANK[sev] ?? 0) > (SEVERITY_RANK[bins[binIdx].maxSeverity] ?? 0)) {
+      bins[binIdx].maxSeverity = sev;
+    }
+  });
+
+  return bins;
+}
+
 export function DocumentTextHighlighter({
   content,
   biases,
@@ -110,9 +174,14 @@ export function DocumentTextHighlighter({
   const [showHighlights, setShowHighlights] = useState(true);
   const [detectiveMode, setDetectiveMode] = useState(defaultDetectiveMode);
   const [biasTypeFilter, setBiasTypeFilter] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [showHeatMap, setShowHeatMap] = useState(true);
+  const [hoveredBiasIdx, setHoveredBiasIdx] = useState<number | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const textRef = useRef<HTMLDivElement>(null);
   const sidebarRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
   const highlightRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Assign colors to each unique bias type for detective mode
   const biasTypeColors = useMemo(() => {
@@ -128,6 +197,8 @@ export function DocumentTextHighlighter({
   const uniqueBiasTypes = useMemo(() => Array.from(new Set(biases.map(b => b.biasType))), [biases]);
 
   const segments = useMemo(() => buildSegments(content, biases), [content, biases]);
+
+  const heatMapData = useMemo(() => buildHeatMapData(content, biases), [content, biases]);
 
   const filteredBiasIndices = useMemo(() => {
     return biases
@@ -170,20 +241,66 @@ export function DocumentTextHighlighter({
     [biases, onBiasSelect]
   );
 
-  // Keyboard: Escape to deselect, D to toggle detective mode
+  const handleHighlightHover = useCallback(
+    (biasIndex: number, e: React.MouseEvent) => {
+      if (selectedBiasIdx !== null) return; // no tooltip when a bias is selected
+      const rect = (e.target as HTMLElement).getBoundingClientRect();
+      setTooltipPos({ x: rect.left + rect.width / 2, y: rect.top - 8 });
+      setHoveredBiasIdx(biasIndex);
+    },
+    [selectedBiasIdx]
+  );
+
+  const handleHighlightLeave = useCallback(() => {
+    setHoveredBiasIdx(null);
+  }, []);
+
+  // Click on heat map bin to scroll to that region of the document
+  const handleHeatMapClick = useCallback(
+    (binIndex: number, binCount: number) => {
+      if (!textRef.current) return;
+      const scrollFraction = binIndex / binCount;
+      const scrollTarget = textRef.current.scrollHeight * scrollFraction;
+      textRef.current.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+    },
+    []
+  );
+
+  // Keyboard: Escape to deselect, D to toggle detective mode, H for heat map, arrows for cycling
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+        return;
+
       if (e.key === 'Escape') setSelectedBiasIdx(null);
       if (e.key === 'd' || e.key === 'D') {
-        const target = e.target as HTMLElement;
-        if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
-          return;
         setDetectiveMode(prev => !prev);
+      }
+      if (e.key === 'h' || e.key === 'H') {
+        setShowHeatMap(prev => !prev);
+      }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        if (filteredBiasIndices.length === 0) return;
+        setSelectedBiasIdx(prev => {
+          if (prev === null) return filteredBiasIndices[0];
+          const currentPos = filteredBiasIndices.indexOf(prev);
+          if (currentPos === -1) return filteredBiasIndices[0];
+          const next = e.key === 'ArrowRight'
+            ? filteredBiasIndices[(currentPos + 1) % filteredBiasIndices.length]
+            : filteredBiasIndices[(currentPos - 1 + filteredBiasIndices.length) % filteredBiasIndices.length];
+          // Scroll both panels to the new bias
+          setTimeout(() => {
+            highlightRefs.current.get(next)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            sidebarRefs.current.get(next)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 0);
+          return next;
+        });
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
+  }, [filteredBiasIndices]);
 
   if (!content || !biases.length) return null;
 
@@ -196,8 +313,10 @@ export function DocumentTextHighlighter({
     {} as Record<string, number>
   );
 
+  const panelMaxHeight = expanded ? 'calc(100vh - 200px)' : '700px';
+
   return (
-    <div className="card h-full flex flex-col">
+    <div className="card h-full flex flex-col" ref={containerRef}>
       <div className="card-header pb-2">
         <div className="flex justify-between items-center flex-wrap gap-2">
           <h3 className="text-lg font-bold flex items-center gap-2">
@@ -254,6 +373,20 @@ export function DocumentTextHighlighter({
                 })}
               </>
             )}
+            {/* Heat map gutter toggle */}
+            <button
+              onClick={() => setShowHeatMap(p => !p)}
+              className={`p-1 transition-colors rounded ${
+                showHeatMap
+                  ? 'text-emerald-400 bg-emerald-500/15'
+                  : 'text-muted hover:text-foreground'
+              }`}
+              title={showHeatMap ? 'Hide heat map (H)' : 'Show heat map (H)'}
+              aria-label={showHeatMap ? 'Hide heat map' : 'Show heat map'}
+              aria-pressed={showHeatMap}
+            >
+              <BarChart3 size={14} />
+            </button>
             {/* Detective mode toggle */}
             <button
               onClick={() => {
@@ -281,6 +414,15 @@ export function DocumentTextHighlighter({
             >
               {showHighlights ? <Eye size={14} /> : <EyeOff size={14} />}
             </button>
+            {/* Expand/collapse toggle */}
+            <button
+              onClick={() => setExpanded(p => !p)}
+              className="p-1 text-muted hover:text-foreground transition-colors"
+              title={expanded ? 'Collapse view' : 'Expand view'}
+              aria-label={expanded ? 'Collapse view' : 'Expand view'}
+            >
+              {expanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+            </button>
           </div>
         </div>
       </div>
@@ -289,11 +431,46 @@ export function DocumentTextHighlighter({
         className="card-body flex-1 flex flex-col md:flex-row gap-0 overflow-hidden"
         style={{ minHeight: '300px' }}
       >
+        {/* Heat map density gutter */}
+        {showHeatMap && (
+          <div
+            className="hidden md:flex flex-col flex-shrink-0 border-r border-border"
+            style={{ width: '20px', maxHeight: panelMaxHeight, overflow: 'hidden' }}
+            aria-label="Bias density heat map"
+          >
+            {heatMapData.map(bin => {
+              const hasData = bin.biasCount > 0;
+              const opacity = hasData
+                ? bin.biasCount >= 3 ? 1 : bin.biasCount >= 2 ? 0.6 : 0.3
+                : 0;
+              const color = hasData ? (SEVERITY_HEX[bin.maxSeverity] ?? SEVERITY_HEX.low) : 'transparent';
+              return (
+                <div
+                  key={bin.index}
+                  className="cursor-pointer transition-opacity"
+                  style={{
+                    flex: 1,
+                    minHeight: '2px',
+                    backgroundColor: color,
+                    opacity,
+                  }}
+                  onClick={() => handleHeatMapClick(bin.index, heatMapData.length)}
+                  title={
+                    hasData
+                      ? `${bin.biasCount} bias${bin.biasCount > 1 ? 'es' : ''} (${bin.maxSeverity})`
+                      : undefined
+                  }
+                />
+              );
+            })}
+          </div>
+        )}
+
         {/* Document text panel */}
         <div
           ref={textRef}
           className="flex-1 overflow-y-auto p-4 text-sm leading-relaxed whitespace-pre-wrap font-serif bg-muted/20 md:border-r border-b md:border-b-0 border-border"
-          style={{ maxHeight: '500px' }}
+          style={{ maxHeight: panelMaxHeight }}
           onClick={() => setSelectedBiasIdx(null)}
         >
           {segments.map((seg, i) => {
@@ -310,6 +487,7 @@ export function DocumentTextHighlighter({
 
             const bias = biases[seg.biasIndex];
             const isSelected = selectedBiasIdx === seg.biasIndex;
+            const confidenceOpacity = getConfidenceOpacity(bias.confidence);
 
             if (detectiveMode) {
               // Detective mode: color by bias type with inline labels
@@ -334,6 +512,7 @@ export function DocumentTextHighlighter({
                       ? {
                           backgroundColor: typeColor?.bg,
                           textDecorationColor: typeColor?.underline,
+                          opacity: confidenceOpacity,
                           ...(isSelected
                             ? {
                                 outline: `2px solid ${typeColor?.border}`,
@@ -347,6 +526,8 @@ export function DocumentTextHighlighter({
                     e.stopPropagation();
                     handleHighlightClick(seg.biasIndex!);
                   }}
+                  onMouseEnter={e => handleHighlightHover(seg.biasIndex!, e)}
+                  onMouseLeave={handleHighlightLeave}
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
@@ -395,10 +576,13 @@ export function DocumentTextHighlighter({
                       }`
                     : ''
                 }`}
+                style={isVisible ? { opacity: confidenceOpacity } : undefined}
                 onClick={e => {
                   e.stopPropagation();
                   handleHighlightClick(seg.biasIndex!);
                 }}
+                onMouseEnter={e => handleHighlightHover(seg.biasIndex!, e)}
+                onMouseLeave={handleHighlightLeave}
                 onKeyDown={e => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -416,7 +600,7 @@ export function DocumentTextHighlighter({
         {/* Bias sidebar */}
         <div
           className="w-full md:w-64 lg:w-72 overflow-y-auto flex-shrink-0 bg-secondary/30"
-          style={{ maxHeight: '500px' }}
+          style={{ maxHeight: panelMaxHeight }}
         >
           <div className="p-2 text-[10px] text-muted border-b border-border uppercase tracking-wider font-semibold">
             {filteredBiasIndices.length} bias{filteredBiasIndices.length !== 1 ? 'es' : ''} detected
@@ -454,10 +638,17 @@ export function DocumentTextHighlighter({
                     >
                       {getBiasDisplayName(bias.biasType)}
                     </span>
-                    <ChevronRight
-                      size={12}
-                      className={`text-muted transition-transform ${isSelected ? 'rotate-90' : 'group-hover:translate-x-0.5'}`}
-                    />
+                    <div className="flex items-center gap-1">
+                      {bias.confidence != null && (
+                        <span className="text-[9px] text-muted">
+                          {Math.round(bias.confidence * 100)}%
+                        </span>
+                      )}
+                      <ChevronRight
+                        size={12}
+                        className={`text-muted transition-transform ${isSelected ? 'rotate-90' : 'group-hover:translate-x-0.5'}`}
+                      />
+                    </div>
                   </div>
                   <p className="text-[11px] text-muted italic line-clamp-2">
                     &quot;{bias.excerpt}&quot;
@@ -498,10 +689,17 @@ export function DocumentTextHighlighter({
                   >
                     {bias.severity}
                   </span>
-                  <ChevronRight
-                    size={12}
-                    className={`text-muted transition-transform ${isSelected ? 'rotate-90' : 'group-hover:translate-x-0.5'}`}
-                  />
+                  <div className="flex items-center gap-1">
+                    {bias.confidence != null && (
+                      <span className="text-[9px] text-muted">
+                        {Math.round(bias.confidence * 100)}%
+                      </span>
+                    )}
+                    <ChevronRight
+                      size={12}
+                      className={`text-muted transition-transform ${isSelected ? 'rotate-90' : 'group-hover:translate-x-0.5'}`}
+                    />
+                  </div>
                 </div>
                 <p className="text-xs font-semibold text-foreground mb-1">{bias.biasType}</p>
                 <p className="text-[11px] text-muted italic line-clamp-2">
@@ -524,9 +722,54 @@ export function DocumentTextHighlighter({
         </div>
       </div>
 
+      {/* Hover tooltip */}
+      {hoveredBiasIdx !== null && (
+        <div
+          className="fixed z-50 pointer-events-none"
+          style={{
+            left: tooltipPos.x,
+            top: tooltipPos.y,
+            transform: 'translate(-50%, -100%)',
+          }}
+        >
+          <div
+            className="rounded-lg shadow-lg border border-border px-3 py-2"
+            style={{
+              backgroundColor: 'var(--bg-secondary, #1a1a2e)',
+              maxWidth: '280px',
+            }}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs font-bold text-foreground">
+                {getBiasDisplayName(biases[hoveredBiasIdx].biasType)}
+              </span>
+              <span
+                className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded"
+                style={{
+                  backgroundColor: `${SEVERITY_HEX[biases[hoveredBiasIdx].severity.toLowerCase()] ?? SEVERITY_HEX.low}30`,
+                  color: SEVERITY_HEX[biases[hoveredBiasIdx].severity.toLowerCase()] ?? SEVERITY_HEX.low,
+                }}
+              >
+                {biases[hoveredBiasIdx].severity}
+              </span>
+              {biases[hoveredBiasIdx].confidence != null && (
+                <span className="text-[9px] text-muted">
+                  {Math.round(biases[hoveredBiasIdx].confidence! * 100)}% confidence
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-muted line-clamp-2">
+              {biases[hoveredBiasIdx].explanation.length > 80
+                ? biases[hoveredBiasIdx].explanation.slice(0, 80) + '…'
+                : biases[hoveredBiasIdx].explanation}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="p-2 text-center text-[10px] text-muted border-t border-border bg-secondary/20">
-        Click highlighted text or sidebar items to link them &bull; Press Esc to deselect &bull;
-        Press D for {detectiveMode ? 'normal mode' : 'detective mode'}
+        Click highlighted text or sidebar items to link them &bull; Esc deselect &bull;
+        D detective &bull; H heat map &bull; ←→ cycle biases
       </div>
     </div>
   );

@@ -43,6 +43,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0); // 0 = welcome, 1 = tour, 2 = get started
   const [loadingSample, setLoadingSample] = useState(false);
+  const [sampleError, setSampleError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check localStorage first for instant decision (avoid flicker)
@@ -81,15 +82,22 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
 
   const handleTrySample = useCallback(async () => {
     setLoadingSample(true);
+    setSampleError(null);
     try {
       const res = await fetch('/api/onboarding/sample', { method: 'POST' });
-      const data = await res.json();
-      if (data.documentId) {
-        completeOnboarding();
-        router.push(`/documents/${data.documentId}`);
+      if (!res.ok) {
+        setSampleError('Failed to create sample document. Please try uploading your own.');
+        return;
       }
+      const data = await res.json();
+      if (!data.documentId) {
+        setSampleError('Sample created but no document returned. Please try uploading your own.');
+        return;
+      }
+      completeOnboarding();
+      router.push(`/documents/${data.documentId}`);
     } catch {
-      // Fall through — user can still dismiss and upload manually
+      setSampleError('Network error. Please try again or upload your own document.');
     } finally {
       setLoadingSample(false);
     }
@@ -251,6 +259,21 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
               <DialogTitle>Ready to go</DialogTitle>
               <DialogDescription>Choose how you&apos;d like to start:</DialogDescription>
             </DialogHeader>
+
+            {sampleError && (
+              <div
+                style={{
+                  padding: '8px 12px',
+                  background: 'rgba(248, 113, 113, 0.08)',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  color: '#f87171',
+                  margin: '0 0 4px',
+                }}
+              >
+                {sampleError}
+              </div>
+            )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, margin: '8px 0' }}>
               <button

@@ -128,8 +128,14 @@ export async function getCachedAnalysis(
 ): Promise<Record<string, unknown> | null> {
   const raw = await cacheGet(`${CACHE_KEYS.ANALYSIS}${contentHash}`);
   if (raw) {
-    log.debug('Cache hit for analysis: ' + contentHash.substring(0, 8));
-    return JSON.parse(raw);
+    try {
+      log.debug('Cache hit for analysis: ' + contentHash.substring(0, 8));
+      return JSON.parse(raw);
+    } catch {
+      log.warn('Corrupted cache entry for analysis: ' + contentHash.substring(0, 8));
+      prisma.cacheEntry.delete({ where: { key: `${CACHE_KEYS.ANALYSIS}${contentHash}` } }).catch(() => null);
+      return null;
+    }
   }
   return null;
 }
@@ -151,7 +157,16 @@ export async function cacheAnalysis(
  */
 export async function getCachedEmbedding(textHash: string): Promise<number[] | null> {
   const raw = await cacheGet(`${CACHE_KEYS.EMBEDDING}${textHash}`);
-  return raw ? (JSON.parse(raw) as number[]) : null;
+  if (raw) {
+    try {
+      return JSON.parse(raw) as number[];
+    } catch {
+      log.warn('Corrupted cache entry for embedding: ' + textHash.substring(0, 8));
+      prisma.cacheEntry.delete({ where: { key: `${CACHE_KEYS.EMBEDDING}${textHash}` } }).catch(() => null);
+      return null;
+    }
+  }
+  return null;
 }
 
 /**
@@ -186,8 +201,18 @@ export async function getCachedFinancialData(
   ticker: string,
   dataType: string
 ): Promise<unknown | null> {
-  const raw = await cacheGet(`${CACHE_KEYS.FINANCIAL_DATA}${ticker}:${dataType}`);
-  return raw ? JSON.parse(raw) : null;
+  const key = `${CACHE_KEYS.FINANCIAL_DATA}${ticker}:${dataType}`;
+  const raw = await cacheGet(key);
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      log.warn(`Corrupted cache entry for financial data: ${ticker}:${dataType}`);
+      prisma.cacheEntry.delete({ where: { key } }).catch(() => null);
+      return null;
+    }
+  }
+  return null;
 }
 
 /**

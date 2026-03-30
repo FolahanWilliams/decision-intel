@@ -26,6 +26,7 @@ import {
   Plug,
   Briefcase,
   BookTemplate,
+  TrendingUp,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -393,6 +394,15 @@ export default function Sidebar() {
               pathname.startsWith('/dashboard/explainability') ||
               pathname.startsWith('/dashboard/fingerprint')
             }
+            collapsed={collapsed}
+            onNavigate={closeMobile}
+          />
+          <NavItem
+            href="/dashboard/outcome-flywheel"
+            icon={<TrendingUp size={18} />}
+            label="Outcome Flywheel"
+            description="Track which decisions paid off"
+            active={pathname.startsWith('/dashboard/outcome-flywheel')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />

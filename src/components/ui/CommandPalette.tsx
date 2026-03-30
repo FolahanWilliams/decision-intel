@@ -66,6 +66,15 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
   error: <AlertTriangle size={12} style={{ color: 'var(--error)' }} />,
 };
 
+const DECISION_PREFIXES = ['should', 'how do', 'what if', 'is it worth', 'can we', 'will', 'would'];
+
+function isDecisionQuestion(query: string): boolean {
+  const lower = query.toLowerCase().trim();
+  if (lower.length < 10) return false;
+  if (lower.endsWith('?')) return true;
+  return DECISION_PREFIXES.some(p => lower.startsWith(p));
+}
+
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -173,6 +182,14 @@ export function CommandPalette() {
         icon: <MessageSquare size={16} />,
         action: () => navigate('/dashboard/ai-assistant?mode=chat'),
         keywords: ['ask', 'question', 'rag', 'ai', 'chat'],
+      },
+      {
+        id: 'outcome-flywheel',
+        label: 'Outcome Attribution Flywheel',
+        description: 'See which decisions paid off and which didn\'t',
+        icon: <TrendingUp size={16} />,
+        action: () => navigate('/dashboard/outcome-flywheel'),
+        keywords: ['outcome', 'flywheel', 'attribution', 'roi', 'impact'],
       },
       {
         id: 'bias-library',
@@ -397,6 +414,30 @@ export function CommandPalette() {
     };
 
     const result: CommandGroup[] = [];
+
+    // Decision question detection — inject "Ask Copilot" at top
+    if (searchMode === 'all' && isDecisionQuestion(rawQuery)) {
+      const truncated = rawQuery.length > 50 ? rawQuery.slice(0, 50) + '...' : rawQuery;
+      result.push({
+        id: 'copilot-quick',
+        label: 'Decision Copilot',
+        items: [
+          {
+            id: 'ask-copilot',
+            label: `Ask Copilot: "${truncated}"`,
+            description: 'Start a new decision session with AI agents',
+            icon: <Zap size={16} style={{ color: '#00D2FF' }} />,
+            action: () => {
+              setOpen(false);
+              router.push(
+                `/dashboard/ai-assistant?mode=copilot&prompt=${encodeURIComponent(rawQuery)}`
+              );
+            },
+            keywords: [],
+          },
+        ],
+      });
+    }
 
     // Recent Documents group
     if (searchMode === 'all' || searchMode === 'documents') {

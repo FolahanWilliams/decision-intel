@@ -3,12 +3,21 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Decision Intel | The Decision Performance OS',
   description:
-    'Audit strategic documents for cognitive bias, decision noise, and blind spots. Purpose-built for executive teams making high-stakes decisions — M&A, strategy, risk, and investment committees.',
+    'The decision performance platform for enterprise teams. Detect cognitive bias, reduce decision noise, and improve outcomes across M&A, strategy, risk, and investment decisions.',
   openGraph: {
     title: 'Decision Intel | The Decision Performance OS',
     description:
-      'Audit strategic documents for cognitive bias and decision noise. Built for high-stakes executive teams.',
+      'The decision performance platform for enterprise teams. Detect cognitive bias, reduce decision noise, and improve outcomes.',
     url: '/',
+    siteName: 'Decision Intel',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Decision Intel | The Decision Performance OS',
+    description:
+      'The decision performance platform for enterprise teams. Detect cognitive bias, reduce decision noise, and improve outcomes.',
   },
   keywords: [
     'decision intelligence platform',
@@ -19,6 +28,12 @@ export const metadata: Metadata = {
     'board memo analysis',
     'enterprise risk decisions',
     'decision noise reduction',
+    'decision performance',
+    'enterprise decision platform',
+    'investment committee analysis',
+    'decision playbooks',
+    'AI bias detection',
+    'strategic risk assessment',
   ],
 };
 
@@ -28,8 +43,17 @@ const jsonLd = {
   name: 'Decision Intel',
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
+  url: process.env.NEXT_PUBLIC_APP_URL || 'https://decisionintel.io',
   description:
-    'AI-powered platform that audits high-stakes decisions for cognitive bias and noise. Built for executive teams, M&A committees, and strategic decision-makers.',
+    'AI-powered decision performance platform that detects cognitive bias and noise in high-stakes enterprise decisions. Built for executive teams, M&A committees, and strategic decision-makers.',
+  featureList: [
+    'Multi-persona bias analysis',
+    'Decision playbooks',
+    'Compliance framework mapping',
+    'Real-time collaboration',
+    'Outcome tracking',
+    'Bulk document analysis',
+  ],
   offers: [
     {
       '@type': 'Offer',

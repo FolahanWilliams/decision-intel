@@ -205,7 +205,7 @@ export function isInvestmentDocument(documentType?: string): boolean {
 
 /** Check if a decision type is investment-related (legacy support) */
 export function isInvestmentDecision(decisionType?: string): boolean {
-  return ['capital_allocation', 'investment_thesis', 'portfolio_exit', 'm_and_a'].includes(
+  return ['resource_allocation', 'strategic_proposal', 'initiative_closure', 'm_and_a'].includes(
     decisionType ?? ''
   );
 }

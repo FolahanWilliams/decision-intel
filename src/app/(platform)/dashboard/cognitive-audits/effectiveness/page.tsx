@@ -15,6 +15,7 @@ import {
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { SOURCE_LABELS, formatDateShort } from '@/lib/constants/human-audit';
+import { IntelligenceBrief } from '@/components/ui/IntelligenceBrief';
 
 const fetcher = (url: string) =>
   fetch(url).then(res => {
@@ -422,9 +423,10 @@ export default function EffectivenessPage() {
               </div>
               <div className="card-body">
                 {Object.keys(data.sourceDistribution).length === 0 ? (
-                  <p className="text-muted text-center" style={{ padding: 'var(--spacing-md)' }}>
-                    No data yet.
-                  </p>
+                  <div style={{ padding: 'var(--spacing-md)' }}>
+                    <p className="text-muted text-center">No data yet.</p>
+                    <IntelligenceBrief context="effectiveness" />
+                  </div>
                 ) : (
                   <div
                     style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}

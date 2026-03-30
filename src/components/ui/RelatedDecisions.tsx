@@ -49,20 +49,46 @@ export function RelatedDecisions({ analysisId }: RelatedDecisionsProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Discover orgId then fetch graph
-    fetch('/api/team')
-      .then(res => (res.ok ? res.json() : null))
-      .then(teamData => {
+    let cancelled = false;
+
+    async function fetchRelated() {
+      try {
+        const teamRes = await fetch('/api/team');
+        if (cancelled) return;
+        if (!teamRes.ok) {
+          setLoading(false);
+          return;
+        }
+        const teamData = await teamRes.json();
         const orgId = teamData?.orgId || teamData?.organization?.id;
-        if (!orgId) return null;
-        return fetch(`/api/decision-graph?orgId=${orgId}&highlightNode=${analysisId}&depth=1`);
-      })
-      .then(res => (res && res.ok ? res.json() : null))
-      .then(d => {
-        if (d) setData({ nodes: d.nodes, edges: d.edges });
-      })
-      .catch(() => setError('Failed to load related decisions'))
-      .finally(() => setLoading(false));
+        if (!orgId || cancelled) {
+          setLoading(false);
+          return;
+        }
+
+        const graphRes = await fetch(
+          `/api/decision-graph?orgId=${orgId}&highlightNode=${analysisId}&depth=1`
+        );
+        if (cancelled) return;
+        if (!graphRes.ok) {
+          setLoading(false);
+          return;
+        }
+        const d = await graphRes.json();
+        if (!cancelled) {
+          setData({ nodes: d.nodes, edges: d.edges });
+        }
+      } catch {
+        if (!cancelled) setError('Failed to load related decisions');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchRelated();
+    return () => {
+      cancelled = true;
+    };
   }, [analysisId]);
 
   if (error) {

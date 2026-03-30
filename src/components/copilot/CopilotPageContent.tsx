@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Plus,
   Sparkles,
@@ -72,6 +73,21 @@ export function CopilotPageContent() {
       fetchSessions();
     }
   }, [sessionId, fetchSessions]);
+
+  // Auto-start session from Command Palette prompt param
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialPrompt = searchParams.get('prompt');
+  const promptHandledRef = useRef(false);
+
+  useEffect(() => {
+    if (initialPrompt && !sessionId && !promptHandledRef.current) {
+      promptHandledRef.current = true;
+      startNewSession(initialPrompt);
+      sendMessage(initialPrompt);
+      router.replace('/dashboard/ai-assistant?mode=copilot');
+    }
+  }, [initialPrompt, sessionId, startNewSession, sendMessage, router]);
 
   const handleNewDecision = () => {
     setShowPromptInput(true);

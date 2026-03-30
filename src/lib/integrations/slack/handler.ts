@@ -92,12 +92,12 @@ export function classifyDecisionType(text: string): HumanDecisionInput['decision
   if (/\b(overrid|dismiss|ignore|false.?positive)\b/.test(lower)) return 'override';
   if (/\b(vendor|supplier|tool|platform|evaluate)\b/.test(lower)) return 'vendor_eval';
   if (/\b(strategy|roadmap|initiative|budget|plan)\b/.test(lower)) return 'strategic';
-  if (/\b(capital.?alloc|deploy.?capital|fund.?size|commit.?capital)\b/.test(lower))
-    return 'capital_allocation';
-  if (/\b(investment.?thesis|thesis.?review|investment.?memo)\b/.test(lower))
-    return 'investment_thesis';
-  if (/\b(exit|divest|portfolio.?sale|realiz|liquidat)\b/.test(lower)) return 'portfolio_exit';
-  if (/\b(m&a|merger|acqui|takeover|buyout|lbo|bolt.?on)\b/.test(lower)) return 'm_and_a';
+  if (/\b(resource.?alloc|allocate.?resources|budget.?size|commit.?resources|allocate.?budget|deploy.?capital)\b/.test(lower))
+    return 'resource_allocation';
+  if (/\b(business.?case|proposal.?review|strategic.?memo|project.?proposal|strategic.?plan)\b/.test(lower))
+    return 'strategic_proposal';
+  if (/\b(wind.?down|discontinue|sunset|close.?out|decommission|realiz|liquidat)\b/.test(lower)) return 'initiative_closure';
+  if (/\b(m&a|merger|acqui|takeover|partnership|joint.?venture|strategic.?alliance)\b/.test(lower)) return 'm_and_a';
 
   return undefined;
 }
@@ -754,6 +754,7 @@ export function formatAuditSummaryForSlack(
     biasFindings: Array<{ biasType: string; severity: string }>;
     summary: string;
     analysisUrl?: string;
+    copilotUrl?: string;
   },
   threadTs?: string
 ): SlackNudgePayload {
@@ -815,18 +816,27 @@ export function formatAuditSummaryForSlack(
     { type: 'divider' }
   );
 
+  const actionButtons: Array<Record<string, unknown>> = [];
+
   if (audit.analysisUrl) {
-    blocks.push({
-      type: 'actions',
-      elements: [
-        {
-          type: 'button',
-          text: { type: 'plain_text', text: 'View Full Analysis' },
-          url: audit.analysisUrl,
-          style: 'primary',
-        },
-      ],
+    actionButtons.push({
+      type: 'button',
+      text: { type: 'plain_text', text: 'View Full Analysis' },
+      url: audit.analysisUrl,
+      style: 'primary',
     });
+  }
+
+  if (audit.copilotUrl) {
+    actionButtons.push({
+      type: 'button',
+      text: { type: 'plain_text', text: 'Continue in Copilot' },
+      url: audit.copilotUrl,
+    });
+  }
+
+  if (actionButtons.length > 0) {
+    blocks.push({ type: 'actions', elements: actionButtons });
   }
 
   blocks.push({
