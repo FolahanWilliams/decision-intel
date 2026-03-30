@@ -108,9 +108,22 @@ export async function GET(request: Request) {
     }
 
     // Transform to include score from latest analysis
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- shape varies with schema drift
-    const transformedDocs = documents.map((doc: any) => {
-      const latestAnalysis = Array.isArray(doc.analyses) ? doc.analyses[0] : undefined;
+    interface DocRow {
+      id: string;
+      filename: string;
+      status: string;
+      fileSize: number | null;
+      uploadedAt: Date;
+      analyses: Array<{
+        overallScore: number | null;
+        noiseScore?: number | null;
+        biases?: Array<{ severity: string; biasType: string }>;
+        factCheck?: unknown;
+      }>;
+    }
+
+    const transformedDocs = (documents as DocRow[]).map((doc) => {
+      const latestAnalysis = doc.analyses[0];
       return {
         id: doc.id,
         filename: doc.filename,

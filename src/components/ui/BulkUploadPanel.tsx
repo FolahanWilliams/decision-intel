@@ -149,7 +149,10 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
             });
 
             if (b.status === 'completed' || b.status === 'failed') {
-              if (pollRef.current) clearInterval(pollRef.current);
+              if (pollRef.current) {
+                clearInterval(pollRef.current);
+                pollRef.current = null;
+              }
               setUploading(false);
               onComplete?.();
             }
@@ -159,6 +162,9 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
         }
       };
 
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+      }
       pollRef.current = setInterval(pollStatus, 3000);
       // Also poll immediately
       pollStatus();
