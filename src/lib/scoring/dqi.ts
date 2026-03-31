@@ -20,6 +20,7 @@
 import { createLogger } from '@/lib/utils/logger';
 import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
 import type { CaseStudy } from '@/lib/data/case-studies';
+import { computeCorrelationMultiplier } from '@/lib/data/case-correlations';
 
 const logger = createLogger('DQI');
 
@@ -154,6 +155,30 @@ const GRADE_THRESHOLDS: Array<{
 ];
 
 const METHODOLOGY_VERSION = '2.0.0';
+
+/** Biases associated with fast, heuristic (System 1) processing */
+const SYSTEM1_BIASES = new Set([
+  'anchoring_bias', 'anchoring',
+  'availability_heuristic', 'availability',
+  'recency_bias', 'recency',
+  'framing_effect', 'framing',
+  'loss_aversion',
+  'halo_effect',
+  'bandwagon_effect',
+  'status_quo_bias',
+]);
+
+/**
+ * Classify detected biases as System 1 (heuristic) vs System 2 (deliberative)
+ * and return the ratio of System 1 biases (0-1).
+ */
+function computeSystem1Ratio(biases: DQIInput['biases']): number | null {
+  if (biases.length === 0) return null;
+  const s1 = biases.filter(b =>
+    SYSTEM1_BIASES.has(b.type.toLowerCase().replace(/[\s-]+/g, '_'))
+  ).length;
+  return Number((s1 / biases.length).toFixed(2));
+}
 
 // ---------------------------------------------------------------------------
 // Component scoring functions
@@ -357,18 +382,30 @@ function scoreComplianceRisk(compliance: DQIInput['compliance']): DQIComponent {
 }
 
 function scoreHistoricalAlignment(
-  alignment: DQIInput['historicalAlignment']
+  alignment: DQIInput['historicalAlignment'],
+  biases?: DQIInput['biases']
 ): DQIComponent {
-  // Default to neutral score when no historical data is available
+  // When no alignment data is provided, auto-compute from biases
   if (!alignment) {
-    return {
-      name: 'Historical Alignment',
-      score: 60,
-      weight: WEIGHTS.historicalAlignment,
-      weighted: Math.round(60 * WEIGHTS.historicalAlignment * 10) / 10,
-      grade: getComponentGrade(60),
-      detail: 'No historical correlation data available.',
-    };
+    if (biases && biases.length > 0) {
+      const biasTypes = biases.map(b => b.type);
+      const result = computeCorrelationMultiplier(biasTypes, {});
+      alignment = {
+        matchedFailurePatterns: result.matchedPairs.length,
+        matchedSuccessPatterns: result.matchedSuccessPatterns.length,
+        correlationMultiplier: result.multiplier,
+        beneficialDamping: result.beneficialDamping,
+      };
+    } else {
+      return {
+        name: 'Historical Alignment',
+        score: 60,
+        weight: WEIGHTS.historicalAlignment,
+        weighted: Math.round(60 * WEIGHTS.historicalAlignment * 10) / 10,
+        grade: getComponentGrade(60),
+        detail: 'No historical correlation data available.',
+      };
+    }
   }
 
   let score = 70; // Neutral starting point
@@ -611,13 +648,18 @@ export function getHistoricalComparisons(dqiScore: number): Array<{
  * and actionable improvement recommendations.
  */
 export function computeDQI(input: DQIInput): DQIResult {
+  // Auto-compute System 1 ratio if not provided
+  if (input.process.system1Ratio === undefined) {
+    input.process.system1Ratio = computeSystem1Ratio(input.biases) ?? undefined;
+  }
+
   // Compute each component
   const biasLoad = scoreBiasLoad(input.biases);
   const noiseLevel = scoreNoiseLevel(input.noiseStats);
   const evidenceQuality = scoreEvidenceQuality(input.factCheck);
   const processMaturity = scoreProcessMaturity(input.process);
   const complianceRisk = scoreComplianceRisk(input.compliance);
-  const historicalAlignment = scoreHistoricalAlignment(input.historicalAlignment);
+  const historicalAlignment = scoreHistoricalAlignment(input.historicalAlignment, input.biases);
 
   const components = {
     biasLoad,
