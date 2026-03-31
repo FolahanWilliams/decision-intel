@@ -13,7 +13,7 @@ vi.mock('@/lib/utils/logger', () => ({
   createLogger: () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() }),
 }));
 
-import { computeDQI, computeSyntheticDQI, computeHistoricalPercentile, WEIGHTS, GRADE_THRESHOLDS, SYSTEM1_BIASES, METHODOLOGY_VERSION } from './dqi';
+import { computeDQI, computeSyntheticDQI, computeHistoricalPercentile, WEIGHTS, GRADE_THRESHOLDS, SYSTEM1_BIASES } from './dqi';
 import type { DQIInput } from './dqi';
 import { ALL_CASES } from '@/lib/data/case-studies';
 

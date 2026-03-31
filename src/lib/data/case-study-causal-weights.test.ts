@@ -12,7 +12,6 @@ import type {
   CausalWeight,
   CausalInsight,
   CausalGraphNode,
-  CausalGraphEdge,
 } from './case-study-causal-weights';
 
 vi.mock('@/lib/utils/logger', () => ({
