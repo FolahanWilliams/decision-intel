@@ -1,20 +1,21 @@
 /**
- * Decision Quality Index (DQI)
+ * Decision Quality Index (DQI) — v2.0.0
  *
  * A brandable, public-facing score — the "Lighthouse Score" for decisions.
  * Like FICO for credit or Lighthouse for web performance, the DQI provides
  * a single 0-100 number with a clear, published methodology.
  *
- * Scoring Components (5 dimensions):
+ * Scoring Components (6 dimensions):
  * ─────────────────────────────────────────────
- *  Bias Load         30%   Weighted count of detected biases
- *  Noise Level       20%   Kahneman noise measurement
- *  Evidence Quality  20%   Fact-check verification rate
- *  Process Maturity  15%   Dissent, priors, outcome tracking
- *  Compliance Risk   15%   Regulatory alignment score
+ *  Bias Load              28%   Weighted count of detected biases
+ *  Noise Level            18%   Kahneman noise measurement
+ *  Evidence Quality       18%   Fact-check verification rate
+ *  Process Maturity       13%   Dissent, priors, outcome tracking, System 1 ratio
+ *  Compliance Risk        13%   Regulatory alignment score
+ *  Historical Alignment   10%   Correlation with 146-case study database
  * ─────────────────────────────────────────────
  *
- * Grades: A (85-100), B (70-84), C (55-69), D (40-54), F (0-39)
+ * Grades: A (80-100), B (65-79), C (50-64), D (35-49), F (0-34)
  */
 
 import { createLogger } from '@/lib/utils/logger';

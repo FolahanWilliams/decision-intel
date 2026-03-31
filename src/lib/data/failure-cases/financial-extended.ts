@@ -112,6 +112,28 @@ export const FINANCIAL_EXTENDED_CASES: FailureCase[] = [
       'Bandwagon effect in crypto communities creates echo chambers that silence legitimate technical criticism',
       'Unsustainable yields (20% on Anchor) are a red flag for hidden risk subsidization',
     ],
+    preDecisionEvidence: {
+      document:
+        "2021 public statement by Do Kwon: '95% of [stablecoins] are going to die, but there's also a chance UST dies too' — paired with Anchor Protocol offering 20% 'stable' yield",
+      source: 'Do Kwon, CEO of Terraform Labs',
+      date: '2021',
+      documentType: 'press_release',
+      detectableRedFlags: [
+        'Algorithmic stablecoin mechanism untested at scale',
+        '20% Anchor yield funded by reserves not sustainable revenue',
+        'Founder publicly acknowledging death spiral risk while marketing stability',
+        '$10B+ TVL with circular collateral dependency',
+      ],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'bandwagon_effect',
+        'groupthink',
+        'optimism_bias',
+        'authority_bias',
+      ],
+      hypotheticalAnalysis:
+        "A decision intelligence tool would have flagged the fundamental contradiction between marketing UST as 'stable' while the founder publicly acknowledged its potential death. The 20% Anchor yield with no sustainable revenue source would have triggered Ponzi-scheme pattern matching and overconfidence bias warnings.",
+    },
     source:
       'SEC Complaint against Terraform Labs and Do Kwon (2023); Chainalysis Crypto Crime Report 2023',
     sourceType: 'sec_filing',

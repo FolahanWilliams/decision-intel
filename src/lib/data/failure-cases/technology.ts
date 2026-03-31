@@ -36,6 +36,21 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Status quo bias is most dangerous when current profits are high, as it creates an illusion that the existing model is permanent.',
       'Companies must be willing to cannibalize their own products before competitors do it for them.',
     ],
+    preDecisionEvidence: {
+      document: 'Future of Digital Imaging: Market Research Report',
+      source: 'Kodak Research Labs',
+      date: '1981-09-01',
+      documentType: 'internal_memo',
+      detectableRedFlags: [
+        'Internal research directly contradicted corporate strategy by predicting digital photography would overtake film by 2010',
+        '30-year timeline to digital dominance created false comfort and deferred urgency for strategic pivoting',
+        'A working digital camera prototype had already been built internally in 1975, proving technical feasibility',
+        'Declining film margins were being ignored in favor of absolute revenue figures that masked underlying erosion',
+      ],
+      flaggableBiases: ['status_quo_bias', 'confirmation_bias', 'loss_aversion', 'sunk_cost_fallacy'],
+      hypotheticalAnalysis:
+        "A decision intelligence system would have flagged the internal contradiction between Kodak's own 1981 research predicting digital dominance and the company's continued $5B+ annual film investment. The 30-year timeline created false comfort — the bias detector would have identified status quo bias and loss aversion in leadership's refusal to cannibalize profitable film revenue.",
+    },
     source:
       'Chunka Mui, "How Kodak Failed" (Forbes, 2012); Kodak Chapter 11 filing, SDNY Case No. 12-10202',
     sourceType: 'case_study',
@@ -75,6 +90,21 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'A culture of fear where middle management hides bad news from senior leadership creates a fatal information asymmetry.',
       'Platform transitions require decisive action; incremental improvements to legacy systems cannot close a generational gap.',
     ],
+    preDecisionEvidence: {
+      document: 'Smartphone OS Strategy Review',
+      source: 'Nokia Strategy Division',
+      date: '2007-06-15',
+      documentType: 'strategy_document',
+      detectableRedFlags: [
+        'Symbian market share was declining quarter-over-quarter despite being presented as the dominant platform',
+        'Touch-based interfaces were dismissed as a "niche" use case despite the iPhone launch creating an entirely new product category',
+        'Developer ecosystem for Symbian was shrinking as third-party developers migrated to emerging platforms',
+        "Apple's iPhone launch in January 2007 was creating a new smartphone category that invalidated Nokia's feature-phone assumptions",
+      ],
+      flaggableBiases: ['status_quo_bias', 'overconfidence_bias', 'groupthink', 'confirmation_bias'],
+      hypotheticalAnalysis:
+        "Decision intelligence would have flagged the contradiction between declining Symbian developer engagement metrics and the board's decision to double down on the platform. The anchoring to existing 40% market share masked the velocity of change — a noise analysis would have shown unprecedented inter-analyst disagreement about smartphone OS futures.",
+    },
     source:
       'Timo O. Vuori and Quy N. Huy, "Distributed Attention and Shared Emotions in the Innovation Process," Administrative Science Quarterly (2016)',
     sourceType: 'academic_paper',
@@ -347,6 +377,21 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       "Confirmation bias led leadership to interpret forced signups as organic growth, masking the platform's fundamental engagement problem.",
       'Overconfidence in engineering capability ignores the network effects that protect established social platforms.',
     ],
+    preDecisionEvidence: {
+      document: 'Emerald Sea Project Memo: Google+ Integration Strategy',
+      source: 'Vic Gundotra, VP of Engineering',
+      date: '2011-01-15',
+      documentType: 'strategy_document',
+      detectableRedFlags: [
+        'Forced integration across all Google products was mandated top-down without any user demand signals or market research justification',
+        "Internal employee surveys showed widespread skepticism about the platform's ability to compete with Facebook",
+        "Facebook's network effects and switching costs were systematically underestimated in the project rationale",
+        'No organic growth mechanism was identified — the strategy relied entirely on coerced adoption through product bundling',
+      ],
+      flaggableBiases: ['confirmation_bias', 'overconfidence_bias', 'bandwagon_effect', 'planning_fallacy'],
+      hypotheticalAnalysis:
+        "A decision intelligence tool would have detected overconfidence bias in the top-down mandate and confirmation bias in the lack of internal dissent channels. The absence of any user-demand signal in the project memo — combined with the forced integration strategy — would have triggered high-confidence warnings about the 'build it and they will come' assumption being driven by planning fallacy rather than evidence.",
+    },
     source:
       'Ars Technica post-mortem analysis (2019); Google official blog announcement of Google+ shutdown (2018)',
     sourceType: 'post_mortem',

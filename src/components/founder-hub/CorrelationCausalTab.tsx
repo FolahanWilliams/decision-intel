@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Network, AlertTriangle, Target, BarChart3, Shield, CheckCircle, Zap, TrendingUp } from 'lucide-react';
 import { computeCrossCaseCorrelations, getTopDangerousBiasPairs, getTopSeverityPredictors, getIndustryProfile } from '@/lib/data/case-correlations';
 // Types used implicitly via the computed correlation data
@@ -16,14 +16,12 @@ import { card, sectionTitle, label, stat, badge, formatBias, formatIndustry } fr
 // ---------------------------------------------------------------------------
 
 export function CorrelationCausalTab() {
-  const correlations = computeCrossCaseCorrelations();
-  const topPairs = getTopDangerousBiasPairs(15);
-  const topPredictors = getTopSeverityPredictors(10);
-  const seedWeights = computeSeedWeights();
-  // causalWeights available for downstream use
-  computeStaticCausalWeights();
-  const causalGraph = getStaticCausalGraph();
-  const causalInsights = getStaticCausalInsights();
+  const correlations = useMemo(() => computeCrossCaseCorrelations(), []);
+  const topPairs = useMemo(() => getTopDangerousBiasPairs(15), []);
+  const topPredictors = useMemo(() => getTopSeverityPredictors(10), []);
+  const seedWeights = useMemo(() => computeSeedWeights(), []);
+  const causalGraph = useMemo(() => { computeStaticCausalWeights(); return getStaticCausalGraph(); }, []);
+  const causalInsights = useMemo(() => getStaticCausalInsights(), []);
 
   const [selectedIndustry, setSelectedIndustry] = useState<string>(
     correlations.industryProfiles[0]?.industry ?? '',
@@ -33,9 +31,10 @@ export function CorrelationCausalTab() {
 
   // Helpers ------------------------------------------------------------------
 
-  const maxAmplification = topPairs.length > 0
-    ? Math.max(...topPairs.map(p => p.amplificationRatio))
-    : 1;
+  const maxAmplification = useMemo(
+    () => topPairs.length > 0 ? Math.max(...topPairs.map(p => p.amplificationRatio)) : 1,
+    [topPairs],
+  );
 
   function barColor(ratio: number): string {
     if (ratio >= 1.8) return '#dc2626';
@@ -43,9 +42,12 @@ export function CorrelationCausalTab() {
     return '#f59e0b';
   }
 
-  const sortedDivergence = [...correlations.biasOutcomeDivergence]
-    .sort((a, b) => (b.failureRate - b.successRate) - (a.failureRate - a.successRate))
-    .slice(0, 12);
+  const sortedDivergence = useMemo(
+    () => [...correlations.biasOutcomeDivergence]
+      .sort((a, b) => (b.failureRate - b.successRate) - (a.failureRate - a.successRate))
+      .slice(0, 12),
+    [correlations],
+  );
 
   // Active / inactive button styles
   const btnActive = (color: string): React.CSSProperties => ({
