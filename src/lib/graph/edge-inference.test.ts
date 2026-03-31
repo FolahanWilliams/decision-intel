@@ -36,6 +36,11 @@ vi.mock('@/lib/utils/logger', () => ({
   }),
 }));
 
+// Mock case study matcher (historical parallel edges)
+vi.mock('@/lib/research/caseStudyMatcher', () => ({
+  matchCaseStudiesSync: vi.fn().mockReturnValue([]),
+}));
+
 import { inferEdgesForAnalysis, inferTemporalEdges, addManualEdge } from './edge-inference';
 import { prisma } from '@/lib/prisma';
 import { searchSimilarWithOutcomes } from '@/lib/rag/embeddings';
