@@ -38,6 +38,7 @@ export function OutcomeGateBanner({
 
   return (
     <motion.div
+      role="alert"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
@@ -103,10 +104,12 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
   const [submitting, setSubmitting] = useState(false);
   const [outcome, setOutcome] = useState<string>('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleQuickSubmit = useCallback(async () => {
     if (!selectedAnalysis || !outcome) return;
     setSubmitting(true);
+    setSubmitError(null);
     try {
       const res = await fetch('/api/outcomes', {
         method: 'POST',
@@ -119,9 +122,11 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
       if (res.ok) {
         setSubmitted(true);
         onOutcomeSubmitted?.();
+      } else {
+        setSubmitError('Failed to submit outcome. Please try again.');
       }
     } catch {
-      // Silent fail — user can navigate to the full page
+      setSubmitError('Failed to submit outcome. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -136,6 +141,9 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Outcome reporting required"
       style={{
         position: 'fixed',
         inset: 0,
@@ -258,6 +266,22 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
             </motion.div>
           ) : (
             <>
+              {submitError && (
+                <div
+                  role="alert"
+                  style={{
+                    marginBottom: '12px',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    fontSize: '12px',
+                    color: '#f87171',
+                  }}
+                >
+                  {submitError}
+                </div>
+              )}
               <p
                 style={{
                   fontSize: '13px',

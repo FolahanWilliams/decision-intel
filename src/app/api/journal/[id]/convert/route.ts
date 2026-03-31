@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 import { analyzeHumanDecision } from '@/lib/human-audit/analyzer';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { logAudit } from '@/lib/audit';
@@ -149,11 +150,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       { status: 201 }
     );
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       log.debug('Table not available (schema drift)');
       return NextResponse.json({ error: 'Feature not available (schema drift)' }, { status: 503 });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Failed to convert journal entry:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -228,13 +229,9 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
         });
       });
     } catch (dbError: unknown) {
-      const prismaError = dbError as { code?: string; message?: string };
-      if (
-        prismaError.code === 'P2021' ||
-        prismaError.code === 'P2022' ||
-        prismaError.message?.includes('does not exist')
-      ) {
+      if (isSchemaDrift(dbError)) {
         schemaDrift = true;
+        const prismaError = dbError as { code?: string };
         log.warn('Schema drift in cognitive audit persistence: ' + prismaError.code);
       } else {
         throw dbError;

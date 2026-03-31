@@ -7,15 +7,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
-import { getSafeErrorMessage } from '@/lib/utils/error';
+import { getSafeErrorMessage, isSchemaDrift } from '@/lib/utils/error';
 import { logAudit } from '@/lib/audit';
 
 const log = createLogger('NudgesAPI');
-
-function isSchemaDrift(err: unknown): boolean {
-  const e = err as { code?: string; message?: string };
-  return e.code === 'P2021' || e.code === 'P2022' || !!e.message?.includes('does not exist');
-}
 
 export async function GET(req: NextRequest) {
   try {

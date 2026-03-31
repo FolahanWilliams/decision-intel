@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, ArrowLeft, RotateCcw } from 'lucide-react';
+import { AlertTriangle, RotateCcw, FileText } from 'lucide-react';
 import * as Sentry from '@sentry/nextjs';
 
-export default function PlatformError({
+export default function DashboardError({
   error,
   reset,
 }: {
@@ -17,7 +17,7 @@ export default function PlatformError({
   }, [error]);
 
   return (
-    <div className="flex flex-1 items-center justify-center min-h-[60vh]">
+    <div className="flex flex-1 items-center justify-center min-h-[50vh]">
       <div className="flex flex-col items-center gap-6 text-center px-6 max-w-lg">
         <div
           className="flex items-center justify-center w-16 h-16"
@@ -31,23 +31,13 @@ export default function PlatformError({
         </div>
 
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-          Something went wrong
+          Dashboard Error
         </h1>
 
-        {error.message && (
-          <p
-            className="text-sm px-4 py-3 w-full font-mono"
-            style={{
-              color: 'var(--text-muted)',
-              background: 'var(--bg-card)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-color)',
-              wordBreak: 'break-word',
-            }}
-          >
-            {error.message}
-          </p>
-        )}
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          The dashboard encountered an issue loading. This is usually temporary &mdash; try
+          refreshing the page.
+        </p>
 
         {error.digest && (
           <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
@@ -67,7 +57,7 @@ export default function PlatformError({
             }}
           >
             <RotateCcw size={16} />
-            Try again
+            Reload Dashboard
           </button>
 
           <Link
@@ -80,8 +70,8 @@ export default function PlatformError({
               border: '1px solid var(--border-color)',
             }}
           >
-            <ArrowLeft size={16} />
-            Dashboard
+            <FileText size={16} />
+            View Documents
           </Link>
         </div>
       </div>

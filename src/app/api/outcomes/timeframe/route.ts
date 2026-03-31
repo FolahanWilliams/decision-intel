@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 
 const log = createLogger('OutcomeTimeframeRoute');
 
@@ -77,13 +78,13 @@ export async function POST(request: NextRequest) {
       outcomeDueAt: dueDate.toISOString(),
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       log.debug('outcomeStatus/outcomeDueAt columns not available (schema drift)');
       return NextResponse.json({
         _message: 'Schema drift — timeframe saved will take effect after migration',
       });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Failed to set outcome timeframe:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

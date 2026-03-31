@@ -1,3 +1,12 @@
+/**
+ * Detects Prisma schema drift errors (P2021: table missing, P2022: column missing).
+ * Use this to gracefully degrade when the database schema is behind the code.
+ */
+export function isSchemaDrift(err: unknown): boolean {
+  const e = err as { code?: string; message?: string };
+  return e.code === 'P2021' || e.code === 'P2022' || !!e.message?.includes('does not exist');
+}
+
 export function getSafeErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     // Allow-list safe error messages that don't contain PII

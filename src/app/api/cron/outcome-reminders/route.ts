@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 import { timingSafeEqual } from 'crypto';
 
 const log = createLogger('OutcomeReminderCron');
@@ -72,8 +73,7 @@ export async function GET(request: NextRequest) {
         take: 100, // Process in batches
       });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes('P2021') || msg.includes('P2022')) {
+      if (isSchemaDrift(err)) {
         log.warn('Schema drift: outcomeStatus column not yet migrated');
         return NextResponse.json({
           processed: 0,

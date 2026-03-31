@@ -36,11 +36,12 @@ export async function GET(request: Request) {
 
           if (!settings) {
             // First-time user — create settings and show welcome modal
-            await prisma.userSettings
-              .create({
-                data: { userId: user.id },
-              })
-              .catch(() => {}); // Ignore if already exists (race condition)
+            // Use upsert to safely handle concurrent login requests
+            await prisma.userSettings.upsert({
+              where: { userId: user.id },
+              create: { userId: user.id },
+              update: {},
+            });
             return NextResponse.redirect(`${origin}/dashboard?welcome=true`);
           }
 

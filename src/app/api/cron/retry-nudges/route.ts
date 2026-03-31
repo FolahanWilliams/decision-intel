@@ -65,13 +65,17 @@ export async function GET(request: NextRequest) {
     for (const nudge of pendingNudges) {
       try {
         // Build Slack payload from nudge data
-        const payload = formatNudgeForSlack({
-          nudgeType: nudge.nudgeType as import('@/types/human-audit').NudgeType,
-          triggerReason: nudge.triggerReason,
-          message: nudge.message,
-          severity: (nudge.severity as 'info' | 'warning' | 'critical') || 'info',
-          channel: 'slack',
-        });
+        const payload = formatNudgeForSlack(
+          {
+            nudgeType: nudge.nudgeType as import('@/types/human-audit').NudgeType,
+            triggerReason: nudge.triggerReason,
+            message: nudge.message,
+            severity: (nudge.severity as 'info' | 'warning' | 'critical') || 'info',
+            channel: 'slack',
+          },
+          undefined,
+          nudge.id
+        );
 
         // Look up Slack channel from org installation or env fallback
         let teamId: string | undefined;

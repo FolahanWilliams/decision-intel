@@ -15,6 +15,8 @@ const log = createLogger('WebhookEngine');
 
 const MAX_FAILURES = 10;
 const RETRY_DELAYS = [1000, 5000, 30000]; // 1s, 5s, 30s
+const MAX_DELIVERIES_PER_HOUR = 200; // Per-subscription hourly cap
+const MAX_PAYLOAD_SIZE = 1_048_576; // 1MB
 
 /**
  * Emit an event to all matching webhook subscriptions for an org.
@@ -65,6 +67,29 @@ async function deliverWithRetry(
     timestamp: new Date().toISOString(),
     data,
   });
+
+  // Enforce payload size limit
+  if (payload.length > MAX_PAYLOAD_SIZE) {
+    log.warn(`Webhook payload too large (${payload.length} bytes) for ${subscriptionId}, skipping`);
+    return;
+  }
+
+  // Per-subscription hourly delivery rate limit
+  try {
+    const oneHourAgo = new Date(Date.now() - 3600_000);
+    const recentCount = await prisma.webhookDelivery.count({
+      where: {
+        subscriptionId,
+        createdAt: { gte: oneHourAgo },
+      },
+    });
+    if (recentCount >= MAX_DELIVERIES_PER_HOUR) {
+      log.warn(`Webhook ${subscriptionId} exceeded ${MAX_DELIVERIES_PER_HOUR} deliveries/hour, throttling`);
+      return;
+    }
+  } catch {
+    // Non-critical — deliver anyway if count check fails
+  }
 
   const signature = createHmac('sha256', secret).update(payload).digest('hex');
 

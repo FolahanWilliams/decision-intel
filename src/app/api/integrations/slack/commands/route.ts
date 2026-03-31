@@ -20,8 +20,27 @@ import {
   detectMessageBiases,
 } from '@/lib/integrations/slack/handler';
 import { prisma } from '@/lib/prisma';
+import { isSchemaDrift } from '@/lib/utils/error';
 
 const log = createLogger('SlackCommands');
+
+// ─── Per-User Rate Limiting (instance-local, best-effort for serverless) ────
+
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 10; // 10 commands per minute per user
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(userId);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  entry.count++;
+  return entry.count <= RATE_LIMIT_MAX;
+}
 
 const BIAS_LABELS: Record<string, string> = {
   anchoring: 'Anchoring',
@@ -30,6 +49,14 @@ const BIAS_LABELS: Record<string, string> = {
   groupthink: 'Groupthink',
   availability_bias: 'Availability Bias',
   overconfidence: 'Overconfidence',
+  bandwagon: 'Bandwagon Effect',
+  authority_bias: 'Authority Bias',
+  recency_bias: 'Recency Bias',
+  survivorship_bias: 'Survivorship Bias',
+  status_quo: 'Status Quo Bias',
+  framing_effect: 'Framing Effect',
+  planning_fallacy: 'Planning Fallacy',
+  hindsight_bias: 'Hindsight Bias',
 };
 
 export async function POST(req: NextRequest) {
@@ -55,6 +82,14 @@ export async function POST(req: NextRequest) {
     const userId = params.get('user_id') || '';
     const teamId = params.get('team_id') || '';
 
+    // Rate limit check (best-effort, instance-local)
+    if (!checkRateLimit(userId)) {
+      return NextResponse.json({
+        response_type: 'ephemeral',
+        text: 'You\'re sending commands too quickly. Please wait a moment and try again.',
+      });
+    }
+
     // Legacy /outcome command
     if (command === '/outcome') {
       return handleOutcomeCommand({ text, channelId, userId, teamId });
@@ -79,6 +114,8 @@ export async function POST(req: NextRequest) {
           return handleOutcomeCommand({ text: args, channelId, userId, teamId });
         case 'status':
           return handleStatusCommand({ userId, teamId });
+        case 'channel-stats':
+          return handleChannelStatsCommand({ channelId, teamId });
         case 'help':
         default:
           return handleHelpCommand();
@@ -169,6 +206,10 @@ function handleHelpCommand() {
             type: 'mrkdwn',
             text: '`/di brief`\nOrg intelligence briefing — top risks, decision quality, maturity',
           },
+          {
+            type: 'mrkdwn',
+            text: '`/di channel-stats`\nDecision stats for this channel — count, avg score, top biases',
+          },
         ],
       },
       { type: 'divider' },
@@ -213,7 +254,7 @@ function handleScoreCommand(params: { text: string; channelId: string }) {
           elements: [
             {
               type: 'mrkdwn',
-              text: `_Checked for: anchoring, confirmation bias, sunk cost, groupthink, availability bias, overconfidence_`,
+              text: `_Checked for 14 cognitive biases including anchoring, confirmation, sunk cost, groupthink, overconfidence, planning fallacy, and more_`,
             },
           ],
         },
@@ -256,7 +297,7 @@ function handleScoreCommand(params: { text: string; channelId: string }) {
         elements: [
           {
             type: 'mrkdwn',
-            text: '_Quick check covers 6 common biases. Upload to the dashboard for a full 30+ bias analysis with severity scoring._',
+            text: '_Quick check covers 14 common biases. Upload to the dashboard for a full 30+ bias analysis with severity scoring._',
           },
         ],
       },
@@ -541,13 +582,13 @@ async function handleAnalyzeCommand(params: { channelId: string; userId: string;
       text: `Most recent decision status: ${recentDecision.status}`,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       return NextResponse.json({
         response_type: 'ephemeral',
         text: 'The decision tracking database is being set up. An admin needs to run database migrations. Try again after setup is complete.',
       });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Analyze command failed:', msg);
     return NextResponse.json({
       response_type: 'ephemeral',
@@ -631,13 +672,13 @@ async function handlePriorCommand(params: {
       text: `Prior noted: *${action}* at *${confidence}%* confidence. Create a Decision Room on the web app for blind prior collection.`,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       return NextResponse.json({
         response_type: 'ephemeral',
         text: 'The blind prior database is being set up. An admin needs to run database migrations. Try again after setup is complete.',
       });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Prior command failed:', msg);
     return NextResponse.json({ response_type: 'ephemeral', text: 'Failed to record prior.' });
   }
@@ -956,14 +997,163 @@ async function handleOutcomeCommand(params: {
       text: `:white_check_mark: Outcome recorded: *${outcome.replace(/_/g, ' ')}*${notes ? ` — ${notes}` : ''}. Your calibration data has been updated.`,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       return NextResponse.json({
         response_type: 'ephemeral',
         text: 'Outcome tracking is being set up. Please try again later.',
       });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Outcome command failed:', msg);
     return NextResponse.json({ response_type: 'ephemeral', text: 'Failed to record outcome.' });
+  }
+}
+
+// ─── /di channel-stats ───────────────────────────────────────────────────
+
+async function handleChannelStatsCommand(params: { channelId: string; teamId: string }) {
+  try {
+    // Verify active installation (validates the request context)
+    await prisma.slackInstallation.findFirst({
+      where: { teamId: params.teamId, status: 'active' },
+      select: { orgId: true },
+    });
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.decisionintel.ai';
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    // Fetch channel decisions
+    const decisions = await prisma.humanDecision.findMany({
+      where: {
+        source: 'slack',
+        channel: params.channelId,
+        createdAt: { gte: thirtyDaysAgo },
+      },
+      select: {
+        createdAt: true,
+        cognitiveAudit: {
+          select: { decisionQualityScore: true, biasFindings: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (decisions.length === 0) {
+      return NextResponse.json({
+        response_type: 'ephemeral',
+        text: 'No decisions tracked in this channel in the last 30 days. The bot detects decisions automatically from messages — try discussing a decision in this channel.',
+      });
+    }
+
+    // Calculate stats
+    const scores = decisions
+      .map(d => d.cognitiveAudit?.decisionQualityScore)
+      .filter((s): s is number => s != null);
+    const avgScore = scores.length > 0
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+      : 0;
+    const bestScore = scores.length > 0 ? Math.max(...scores) : 0;
+    const worstScore = scores.length > 0 ? Math.min(...scores) : 0;
+
+    // Score trend (first half vs second half)
+    let trendText = '';
+    if (scores.length >= 4) {
+      const mid = Math.floor(scores.length / 2);
+      const olderAvg = scores.slice(mid).reduce((a, b) => a + b, 0) / (scores.length - mid);
+      const newerAvg = scores.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
+      const diff = newerAvg - olderAvg;
+      const trendEmoji = diff > 2 ? ':arrow_up:' : diff < -2 ? ':arrow_down:' : ':left_right_arrow:';
+      const trendLabel = diff > 2 ? 'Improving' : diff < -2 ? 'Declining' : 'Stable';
+      trendText = `${trendEmoji} ${trendLabel} (${diff > 0 ? '+' : ''}${Math.round(diff)} pts)`;
+    }
+
+    // Top biases across all decisions in channel
+    const biasCounts = new Map<string, number>();
+    for (const d of decisions) {
+      const findings = (d.cognitiveAudit?.biasFindings as Array<{ biasType: string }>) ?? [];
+      for (const f of findings) {
+        if (f.biasType) {
+          biasCounts.set(f.biasType, (biasCounts.get(f.biasType) || 0) + 1);
+        }
+      }
+    }
+    const topBiases = [...biasCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+
+    const biasText = topBiases.length > 0
+      ? topBiases
+          .map(([type, count]) => {
+            const label = BIAS_LABELS[type] || type.replace(/_/g, ' ');
+            return `:warning: ${label} (${count}x)`;
+          })
+          .join('\n')
+      : '_Not enough data_';
+
+    const scoreEmoji = avgScore >= 70 ? ':large_green_circle:' : avgScore >= 40 ? ':large_yellow_circle:' : ':red_circle:';
+
+    const blocks: Array<Record<string, unknown>> = [
+      {
+        type: 'header',
+        text: { type: 'plain_text', text: 'Channel Decision Stats (30 days)', emoji: true },
+      },
+      {
+        type: 'section',
+        fields: [
+          { type: 'mrkdwn', text: `*Decisions Tracked*\n${decisions.length}` },
+          { type: 'mrkdwn', text: `*Avg DQI Score*\n${scoreEmoji} ${avgScore}/100` },
+          { type: 'mrkdwn', text: `*Best / Worst*\n${bestScore} / ${worstScore}` },
+        ],
+      },
+    ];
+
+    if (trendText) {
+      blocks.push({
+        type: 'section',
+        text: { type: 'mrkdwn', text: `*Quality Trend*\n${trendText}` },
+      });
+    }
+
+    blocks.push(
+      { type: 'divider' },
+      {
+        type: 'section',
+        text: { type: 'mrkdwn', text: `*Most Common Biases*\n${biasText}` },
+      },
+      { type: 'divider' },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'Open Analytics' },
+            url: `${appUrl}/dashboard/analytics`,
+            style: 'primary',
+          },
+          {
+            type: 'button',
+            text: { type: 'plain_text', text: 'Decision Graph' },
+            url: `${appUrl}/dashboard/decision-graph`,
+          },
+        ],
+      }
+    );
+
+    return NextResponse.json({
+      response_type: 'ephemeral',
+      blocks,
+    });
+  } catch (error) {
+    if (isSchemaDrift(error)) {
+      return NextResponse.json({
+        response_type: 'ephemeral',
+        text: 'Channel stats require database setup. Please run migrations first.',
+      });
+    }
+    log.error('Channel stats command failed:', error);
+    return NextResponse.json({
+      response_type: 'ephemeral',
+      text: 'Failed to fetch channel stats.',
+    });
   }
 }

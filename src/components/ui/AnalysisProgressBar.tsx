@@ -132,6 +132,9 @@ export function AnalysisProgressFloat() {
 
   return (
     <div
+      role="status"
+      aria-live="polite"
+      aria-label={`Analysis ${activeAnalysis.status}: ${activeAnalysis.currentStep}`}
       style={{
         position: 'fixed',
         bottom: '24px',

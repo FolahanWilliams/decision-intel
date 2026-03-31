@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 
 const log = createLogger('DecisionFramesRoute');
 
@@ -80,11 +81,11 @@ export async function POST(request: NextRequest) {
     log.info(`Decision frame created: ${frame.id} by user ${user.id}`);
     return NextResponse.json({ id: frame.id });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       log.debug('DecisionFrame table not available (schema drift)');
       return NextResponse.json({ id: 'schema-drift-noop' });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Failed to create decision frame:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -120,10 +121,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(frame);
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       return NextResponse.json({ error: 'Feature not yet available' }, { status: 501 });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Failed to fetch decision frame:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

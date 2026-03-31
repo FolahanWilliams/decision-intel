@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 
 const log = createLogger('DecisionRoomDetailRoute');
 
@@ -83,10 +84,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       return NextResponse.json({ error: 'Feature not available (schema drift)' }, { status: 503 });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Failed to get decision room:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

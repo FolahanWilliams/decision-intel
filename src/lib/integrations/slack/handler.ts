@@ -136,54 +136,63 @@ export function slackEventToDecisionInput(payload: SlackWebhookPayload): HumanDe
  * Format a nudge as a Slack message with Block Kit formatting.
  * Nudges are designed to feel like coaching, not surveillance.
  */
-export function formatNudgeForSlack(nudge: NudgeDefinition, threadTs?: string): SlackNudgePayload {
+export function formatNudgeForSlack(
+  nudge: NudgeDefinition,
+  threadTs?: string,
+  nudgeId?: string
+): SlackNudgePayload {
   const severityEmoji = {
     info: ':bulb:',
     warning: ':warning:',
     critical: ':rotating_light:',
   }[nudge.severity];
 
-  const blocks = [
+  const blocks: Array<Record<string, unknown>> = [
     {
-      type: 'section' as const,
+      type: 'section',
       text: {
-        type: 'mrkdwn' as const,
+        type: 'mrkdwn',
         text: `${severityEmoji} *Decision Intelligence Insight*\n${nudge.message}`,
       },
     },
-    { type: 'divider' as const },
+    { type: 'divider' },
     {
-      type: 'context' as const,
+      type: 'context',
       elements: [
         {
-          type: 'mrkdwn' as const,
+          type: 'mrkdwn',
           text: `_Powered by Decision Intel cognitive audit engine_ | <https://docs.decisionintel.ai/nudges|Learn more about nudges>`,
-        },
-      ],
-    },
-    {
-      type: 'actions' as const,
-      elements: [
-        {
-          type: 'button',
-          text: { type: 'plain_text', text: 'Helpful' },
-          action_id: 'nudge_helpful',
-          value: 'true',
-        },
-        {
-          type: 'button',
-          text: { type: 'plain_text', text: 'Not relevant' },
-          action_id: 'nudge_not_helpful',
-          value: 'false',
         },
       ],
     },
   ];
 
+  // Only include feedback buttons when nudgeId is available so the
+  // actions handler can look up the correct Nudge record.
+  if (nudgeId) {
+    blocks.push({
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Helpful' },
+          action_id: 'nudge_helpful',
+          value: nudgeId,
+        },
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Not relevant' },
+          action_id: 'nudge_not_helpful',
+          value: nudgeId,
+        },
+      ],
+    });
+  }
+
   return {
     channel: '', // Set by caller based on decision context
     text: `${severityEmoji} ${nudge.message}`, // Fallback text
-    blocks,
+    blocks: blocks as unknown as SlackNudgePayload['blocks'],
     thread_ts: threadTs,
   };
 }
@@ -391,16 +400,18 @@ const BIAS_PATTERNS: { bias: string; patterns: RegExp[] }[] = [
       /\bstarting\s+point\b/i,
       /\bfirst\s+(price|number|quote|estimate|figure)\b/i,
       /\boriginal(ly)?\s+(price|cost|estimate|quote)\b/i,
+      /\bbased\s+on\s+(the|their)\s+(initial|original|first)\b/i,
     ],
   },
   {
     bias: 'confirmation_bias',
     patterns: [
-      /\bconfirms?\s+what\s+I\s+thought\b/i,
+      /\bconfirms?\s+what\s+(I|we)\s+thought\b/i,
       /\bas\s+expected\b/i,
-      /\bjust\s+as\s+I\s+predicted\b/i,
+      /\bjust\s+as\s+(I|we)\s+predicted\b/i,
       /\bknew\s+it\b/i,
       /\btold\s+you\s+so\b/i,
+      /\ball\s+(the\s+)?(data|evidence|research)\s+(supports?|confirms?|validates?)\b/i,
     ],
   },
   {
@@ -446,6 +457,80 @@ const BIAS_PATTERNS: { bias: string; patterns: RegExp[] }[] = [
       /\bsure\s+thing\b/i,
       /\bcannot?\s+lose\b/i,
       /\bcan'?t\s+go\s+wrong\b/i,
+    ],
+  },
+  // ─── 8 additional bias types for broader coverage ───
+  {
+    bias: 'bandwagon',
+    patterns: [
+      /\beveryone\s+is\s+doing\b/i,
+      /\bindustry\s+standard\b/i,
+      /\bbest\s+practice\b/i,
+      /\bmarket\s+(consensus|trend)\b/i,
+      /\bcompetitors?\s+(are|all)\s+(doing|using|adopting)\b/i,
+    ],
+  },
+  {
+    bias: 'authority_bias',
+    patterns: [
+      /\bthe\s+(CEO|CTO|CFO|board|director|VP|president)\s+(said|thinks|believes|wants)\b/i,
+      /\bexperts?\s+agree\b/i,
+      /\bboard\s+approved\b/i,
+      /\baccording\s+to\s+(the\s+)?(experts?|authorities?|leadership)\b/i,
+    ],
+  },
+  {
+    bias: 'recency_bias',
+    patterns: [
+      /\b(latest|most\s+recent)\s+(data|numbers|results|quarter)\b/i,
+      /\brecent\s+trends?\s+(show|suggest|indicate)\b/i,
+      /\bjust\s+(last|this)\s+(week|month|quarter)\b/i,
+    ],
+  },
+  {
+    bias: 'survivorship_bias',
+    patterns: [
+      /\bsuccessful\s+companies\s+(do|all|have)\b/i,
+      /\btop\s+performers?\s+(all|do|have)\b/i,
+      /\bwinners?\s+(all|do|have)\b/i,
+      /\bjust\s+like\s+\w+\s+(did|does)\b/i,
+    ],
+  },
+  {
+    bias: 'status_quo',
+    patterns: [
+      /\bwe'?ve\s+always\s+(done|used)\b/i,
+      /\bif\s+it\s+ain'?t\s+broke\b/i,
+      /\bwhy\s+(change|fix)\s+(what|something)\b/i,
+      /\bdon'?t\s+rock\s+the\s+boat\b/i,
+    ],
+  },
+  {
+    bias: 'framing_effect',
+    patterns: [
+      /\bonly\s+\d+\s*%/i,
+      /\bas\s+much\s+as\s+\d+/i,
+      /\ba\s+mere\s+\$?\d/i,
+      /\b(small|tiny|minimal)\s+(investment|cost|risk|price)\b/i,
+    ],
+  },
+  {
+    bias: 'planning_fallacy',
+    patterns: [
+      /\bshould\s+only\s+take\b/i,
+      /\beasily\s+(achievable|doable|done)\b/i,
+      /\bno\s+problem\b/i,
+      /\bwe'?ll\s+(easily|quickly|definitely)\b/i,
+      /\bwon'?t\s+take\s+long\b/i,
+    ],
+  },
+  {
+    bias: 'hindsight_bias',
+    patterns: [
+      /\bI\s+knew\s+it\b/i,
+      /\bobvious\s+in\s+retrospect\b/i,
+      /\bshould\s+have\s+(seen|known)\b/i,
+      /\bcould\s+have\s+predicted\b/i,
     ],
   },
 ];
@@ -510,6 +595,46 @@ const PRE_DECISION_NUDGE_TEMPLATES: Record<
       'Overconfidence language detected. Consider: what would need to be true for this to fail?',
     severity: 'warning',
   },
+  bandwagon: {
+    message:
+      'Bandwagon signal — is this the right approach for YOUR context, or just the popular one?',
+    severity: 'info',
+  },
+  authority_bias: {
+    message:
+      'Authority bias detected — has this claim been independently validated beyond the authority cited?',
+    severity: 'info',
+  },
+  recency_bias: {
+    message:
+      'Recency bias signal — are recent events being overweighted vs long-term patterns?',
+    severity: 'info',
+  },
+  survivorship_bias: {
+    message:
+      'Survivorship bias — what about organizations that tried this same approach and failed?',
+    severity: 'warning',
+  },
+  status_quo: {
+    message:
+      'Status quo bias detected — is staying the course truly optimal, or just comfortable?',
+    severity: 'info',
+  },
+  framing_effect: {
+    message:
+      'Framing effect detected — how would this look if framed differently (loss vs gain, absolute vs percentage)?',
+    severity: 'info',
+  },
+  planning_fallacy: {
+    message:
+      'Planning fallacy signal — check base rates for similar projects before committing to timelines.',
+    severity: 'warning',
+  },
+  hindsight_bias: {
+    message:
+      'Hindsight bias — was this really predictable in advance, or does it just feel that way now?',
+    severity: 'info',
+  },
 };
 
 /** Action prompt per bias type for org-calibrated messages */
@@ -520,6 +645,14 @@ const BIAS_ACTION_PROMPTS: Record<string, string> = {
   groupthink: 'Assign a formal dissenter before voting.',
   availability_bias: 'Check base-rate data — recent events may be overweighted.',
   overconfidence: 'What would need to be true for this to fail?',
+  bandwagon: 'Evaluate on first principles — is this optimal for your context, or just popular?',
+  authority_bias: 'Independently validate the claim regardless of who said it.',
+  recency_bias: 'Zoom out to a longer time horizon. How does this look over 3-5 years?',
+  survivorship_bias: 'Seek out failure case studies, not just success stories.',
+  status_quo: 'Evaluate the status quo with the same rigor as any new proposal.',
+  framing_effect: 'Reframe the same data differently — as a loss, or as an absolute number.',
+  planning_fallacy: 'Use reference class forecasting: how long did similar projects actually take?',
+  hindsight_bias: 'Review what information was actually available at decision time.',
 };
 
 /**
@@ -532,6 +665,14 @@ const BIAS_LABELS: Record<string, string> = {
   groupthink: 'Groupthink',
   availability_bias: 'Availability bias',
   overconfidence: 'Overconfidence',
+  bandwagon: 'Bandwagon effect',
+  authority_bias: 'Authority bias',
+  recency_bias: 'Recency bias',
+  survivorship_bias: 'Survivorship bias',
+  status_quo: 'Status quo bias',
+  framing_effect: 'Framing effect',
+  planning_fallacy: 'Planning fallacy',
+  hindsight_bias: 'Hindsight bias',
 };
 
 /**
