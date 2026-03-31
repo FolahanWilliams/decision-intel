@@ -29,12 +29,12 @@ vi.mock('@/utils/supabase/server', () => ({
 }));
 
 const mockFindUnique = vi.fn();
-const mockCreate = vi.fn();
+const mockUpsert = vi.fn();
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     userSettings: {
       findUnique: (...args: unknown[]) => mockFindUnique(...args),
-      create: (...args: unknown[]) => mockCreate(...args),
+      upsert: (...args: unknown[]) => mockUpsert(...args),
     },
   },
 }));
@@ -70,7 +70,7 @@ describe('GET /api/auth/callback', () => {
     mockExchangeCode.mockResolvedValue({ error: null });
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } });
     mockFindUnique.mockResolvedValue(null);
-    mockCreate.mockResolvedValue({});
+    mockUpsert.mockResolvedValue({});
 
     const req = new Request('http://localhost/api/auth/callback?code=test-code');
     const res = await GET(req);
@@ -81,13 +81,15 @@ describe('GET /api/auth/callback', () => {
     mockExchangeCode.mockResolvedValue({ error: null });
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } } });
     mockFindUnique.mockResolvedValue(null);
-    mockCreate.mockResolvedValue({});
+    mockUpsert.mockResolvedValue({});
 
     const req = new Request('http://localhost/api/auth/callback?code=test-code');
     await GET(req);
 
-    expect(mockCreate).toHaveBeenCalledWith({
-      data: { userId: 'user-1' },
+    expect(mockUpsert).toHaveBeenCalledWith({
+      where: { userId: 'user-1' },
+      create: { userId: 'user-1' },
+      update: {},
     });
   });
 

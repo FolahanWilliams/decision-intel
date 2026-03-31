@@ -177,7 +177,9 @@ describe('GET /api/decision-priors', () => {
   });
 
   it('handles schema drift (P2021 error)', async () => {
-    mockFindUnique.mockRejectedValue(new Error('P2021: table not found'));
+    const err = new Error('The table does not exist in the current database');
+    (err as unknown as Record<string, string>).code = 'P2021';
+    mockFindUnique.mockRejectedValue(err);
 
     const res = await GET(makeGetRequest({ analysisId: 'analysis-1' }));
     const body = await res.json();
