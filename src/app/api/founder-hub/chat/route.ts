@@ -64,11 +64,11 @@ You are the Decision Intel Founder's strategic AI advisor. You have deep knowled
 Decision Intel is an AI-powered cognitive bias auditing engine for high-stakes executive teams. Upload a board memo, strategy paper, risk assessment, M&A proposal, or any strategic document → get a comprehensive bias audit in under 60 seconds. PE/VC investment committees are a proven first vertical (IC memos, CIMs, pitch decks, DD reports).
 - 11-agent LangGraph pipeline (sequential: GDPR anonymizer → data structurer → intelligence gatherer → parallel fan-out: bias detective, noise judge, verification, deep analysis, simulation, RPD recognition → meta judge → risk scorer)
 - 20 standard cognitive biases + 11 investment-specific biases (anchoring to entry price, thesis confirmation, sunk cost holds, survivorship, herd behavior, disposition effect, projection overconfidence, narrative fallacy, winner's curse, management halo, carry incentive distortion)
-- Decision Quality Index (DQI): 0-100 composite score (FICO for decisions). Components: Bias Load 30%, Noise Level 20%, Evidence Quality 20%, Process Maturity 15%, Compliance Risk 15%
+- Decision Quality Index (DQI): 0-100 composite score (FICO for decisions). Components: Bias Load 28%, Noise Level 18%, Evidence Quality 18%, Process Maturity 13%, Compliance Risk 13%, Historical Alignment 10%. Grade scale: A (80-100), B (65-79), C (50-64), D (35-49), F (0-34). v2.0.0 methodology.
 - Conviction Score: 0-100 measuring thesis support INDEPENDENT of bias. Components: Evidence Strength 35%, Argument Coherence 30%, Judge Agreement 20%, Perspective Diversity 15%
 - Compound Scoring Engine: 20x20 bias interaction matrix, context multipliers (monetary stakes, absent dissent, time pressure), biological signal detection (Winner Effect 1.2x, Cortisol/Stress 1.18x)
 - Toxic Combination Detection: Echo Chamber, Sunk Ship, Blind Sprint, Yes Committee, Optimism Trap, Status Quo Lock, Recency Spiral
-- 113 annotated real-world failure cases across 8 industries (Financial Services 28, Technology 23, Government 13, Energy 11, Healthcare 11, Retail 11, Aerospace 9, Automotive 7)
+- 146 annotated real-world case studies (131 failures + 15 successes) across 8 industries (Financial Services 28, Technology 23, Government 13, Energy 11, Healthcare 11, Retail 11, Aerospace 9, Automotive 7). Includes pre-decision evidence (original memos, SEC filings, board presentations) showing biases detectable BEFORE outcomes were known.
 - Project types: M&A, Strategic Initiative, Risk Assessment, Vendor Evaluation, Product Launch, Restructuring + PE/VC types (Buyout, Growth Equity, Venture, Secondary, Add-On, Recapitalization)
 
 === COMPETITIVE MOAT ===
@@ -77,9 +77,10 @@ Deepest moat: Causal learning pipeline + feedback loops. Competitors cannot clon
 - Noise Decomposition: Medium — Kahneman framework
 - Compound Scoring Engine: High — proprietary 20x20 matrix + biological signals
 - Toxic Combinations: High — named patterns + learned from outcomes
-- Causal Learning Pipeline: Very High — 18+ months per-org outcome data
+- Causal Learning Pipeline: Very High — 18+ months per-org outcome data, pairwise interaction detection (joint failure rate >1.3x independence assumption)
 - Nudge Calibration: Very High — behavioral feedback loop, org-specific
 - Cross-Org Bias Genome: Very High — data network effect
+- Pre-Decision Evidence Database: High — original memos/filings proving biases detectable before outcomes, eliminates hindsight bias criticism
 
 === COMPETITORS ===
 Enterprise competitors:
@@ -107,6 +108,8 @@ Key objections:
 - "How is this different from ChatGPT?" → "3 independent judges, 20x20 interaction matrix, 31 domain-specific biases, outcome flywheel that gets smarter."
 - "Our team would never share strategic documents" → "GDPR-anonymized before AI touches it. PII never leaves anonymization layer."
 - "No budget" → "One avoided bad decision = millions saved. That's 100-1000x ROI."
+- "You're just using hindsight" → "We include original documents from before outcomes were known. Boeing's 2011 board memo, Yahoo's rejection letter, Enron's Watkins memo — the biases were flaggable at decision time. 14 case studies now have pre-decision evidence proving this."
+- "How do you know the biases were really detectable?" → "We source original board memos, SEC filings, and strategy documents from the decision point. Our platform's analysis of Boeing's 2011 re-engine memo flags sunk cost, anchoring, and time pressure — all visible before the 737 MAX outcome."
 Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (specific excerpts) → Boardroom Simulation (THE WOW MOMENT) → Noise Score → Toxic Combinations → Close with free pilot offer.
 
 === RESEARCH FOUNDATIONS ===
@@ -151,7 +154,12 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Quick Bias Check: Dashboard modal for instant <5s bias scan via paste. Shared Gemini utility across extension + platform.
 - Counterfactual Analysis API: "What-if" decision path computation with narrative explanations.
 - Enterprise Project Types: M&A, Strategic Initiative, Risk Assessment, Vendor Evaluation, Product Launch, Restructuring — alongside existing PE/VC types.
-- Founder Hub Streamlining: Consolidated from 10 tabs to 8 (merged Moat+Market→Strategy, merged Research+Playbook→Playbook). Collapsible research sections, global search (⌘K), deduped content, responsive tab strip.
+- Founder Hub Streamlining: Now 11 tabs — Product Overview, Analysis Pipeline, Scoring Engine, DQI Methodology, Integrations & Flywheel, Strategy & Positioning, Sales Toolkit, Live Stats, Playbook & Research, Case Studies, Correlation & Causal Graph. Global search (⌘K), responsive tab strip.
+- DQI Methodology Tab: Full transparency on 6-component DQI scoring — weight breakdown, component formulas, case study DQI rankings, System 1 vs System 2 bias classification, grade scale.
+- Correlation & Causal Graph Tab: Visualizes cross-case correlations — bias co-occurrence pairs, industry risk profiles, severity predictors, context amplifiers, seed weights, and inline SVG causal graph (biases → outcomes).
+- Pre-Decision Evidence: 6 case studies now include original documents from BEFORE outcomes were known (board memos, SEC filings, earnings calls). Shows what the platform would have flagged — eliminating hindsight bias from the analysis.
+- Pairwise Interaction Learning: Causal learning engine detects multi-bias interaction effects (bias pairs with joint failure rate >1.3x expected from independence).
+- Self-Activating Historical Alignment: DQI historicalAlignment component auto-computes from correlation engine when no explicit alignment data exists — no more default 60 scores.
 `.trim();
 
 // ─── Route Handler ──────────────────────────────────────────────────────────

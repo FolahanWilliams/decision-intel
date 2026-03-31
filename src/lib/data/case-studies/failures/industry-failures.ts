@@ -48,6 +48,29 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     source:
       'House Committee on Transportation and Infrastructure, "The Design, Development & Certification of the Boeing 737 MAX" (September 2020); NTSB accident reports (Lion Air 610, Ethiopian Airlines 302); DOJ deferred prosecution agreement (January 2021)',
     sourceType: 'ntsb_report',
+    preDecisionEvidence: {
+      document:
+        'Boeing\'s 2011 board presentation on the 737 MAX program (reconstructed from House Committee report): Boeing evaluated two options — a clean-sheet narrow-body design (est. $15-20B, 7-10 year timeline) vs. re-engining the existing 737 airframe with new LEAP engines (est. $3B, 3-5 year timeline). The board approved the re-engine approach in August 2011, citing: "Airbus is already taking orders for the A320neo. We cannot afford to cede the narrow-body market for a decade." Internal engineering memo (2012): "The larger LEAP engines change the aircraft\'s handling characteristics, particularly at high angles of attack. We recommend augmentation through a new flight control law." The MCAS system was designed as a "minor flight control modification" — framing that enabled Boeing to classify it as not requiring new type certification.',
+      source: 'House Committee on Transportation and Infrastructure report (2020), Chapter 4; Boeing internal emails and memos cited in DOJ deferred prosecution agreement; FAA ODA audit findings',
+      date: '2011-08-01',
+      documentType: 'board_memo',
+      detectableRedFlags: [
+        'Choosing 3-5 year timeline over 7-10 year timeline primarily due to competitive pressure — time pressure overriding engineering completeness',
+        'Framing a flight control system change as "minor modification" to avoid regulatory scrutiny — classic framing effect',
+        'Engineering team\'s recommendation for augmentation acknowledged the handling change but was not paired with redundancy requirements',
+        'Unanimous board consensus with no documented dissent — 20 participants yet no one flagged the safety tradeoff explicitly',
+        '"No new type rating" as a selling point — anchoring customer value proposition to pilot training avoidance rather than safety',
+      ],
+      flaggableBiases: [
+        'planning_fallacy',
+        'confirmation_bias',
+        'framing_effect',
+        'groupthink',
+        'anchoring_bias',
+      ],
+      hypotheticalAnalysis:
+        'DI Platform would flag: CRITICAL "Blind Sprint" toxic combination — time pressure + groupthink + planning fallacy. The decision to re-engine rather than design new is defensible, but the DOWNSTREAM framing of MCAS as "minor" is where catastrophic risk accumulates. Red flag: classifying a system that can override pilot control authority as a "minor modification" is the framing effect at its most dangerous. Second red flag: zero documented dissent among 20 participants on a safety-critical aerospace decision — in any healthy engineering culture, this unanimity itself is a warning sign. The platform would generate an IMMEDIATE ESCALATION: "This decision involves safety-of-flight systems where failure modes include loss of life. The combination of time pressure, framing effects, and unanimous consensus requires independent safety review outside the program management chain." Recommendation: Require dual-sensor redundancy as a non-negotiable design constraint before program approval.',
+    },
   },
   {
     id: 'cs-fail-ind-002',

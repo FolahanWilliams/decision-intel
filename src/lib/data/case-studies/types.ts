@@ -84,6 +84,33 @@ export interface CaseStudy {
 
   /** Key quotes from primary sources (optional) */
   keyQuotes?: Array<{ text: string; source: string; date?: string }>;
+
+  /** Pre-decision evidence: the actual document/memo from BEFORE outcome was known.
+   *  This eliminates hindsight bias — shows what the decision looked like at decision time,
+   *  and what a Decision Intelligence platform would have flagged. */
+  preDecisionEvidence?: {
+    /** The memo, statement, or document excerpt from before the decision outcome */
+    document: string;
+    /** Source attribution for the pre-decision document */
+    source: string;
+    /** Date of the pre-decision document (ISO format or descriptive) */
+    date: string;
+    /** Type of pre-decision artifact */
+    documentType:
+      | 'board_memo'
+      | 'press_release'
+      | 'earnings_call'
+      | 'internal_memo'
+      | 'sec_filing'
+      | 'public_statement'
+      | 'strategy_document';
+    /** Red flags that were detectable AT DECISION TIME (without hindsight) */
+    detectableRedFlags: string[];
+    /** Biases that the platform would have flagged at decision time */
+    flaggableBiases: string[];
+    /** What the platform's analysis would have surfaced */
+    hypotheticalAnalysis: string;
+  };
 }
 
 /** Failure-only subset for backward compatibility with legacy data files */

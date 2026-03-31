@@ -3,6 +3,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
+import { DqiMethodologyTab } from '@/components/founder-hub/DqiMethodologyTab';
+import { CorrelationCausalTab } from '@/components/founder-hub/CorrelationCausalTab';
 import {
   Rocket,
   Brain,
@@ -43,23 +45,27 @@ type TabId =
   | 'overview'
   | 'pipeline'
   | 'scoring'
+  | 'dqi_methodology'
   | 'integrations'
   | 'strategy'
   | 'sales'
   | 'stats'
   | 'playbook'
-  | 'case_studies';
+  | 'case_studies'
+  | 'correlation_causal';
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} /> },
   { id: 'pipeline', label: 'Analysis Pipeline', icon: <Brain size={16} /> },
   { id: 'scoring', label: 'Scoring Engine', icon: <BarChart3 size={16} /> },
+  { id: 'dqi_methodology', label: 'DQI Methodology', icon: <Target size={16} /> },
   { id: 'integrations', label: 'Integrations & Flywheel', icon: <Plug size={16} /> },
   { id: 'strategy', label: 'Strategy & Positioning', icon: <Shield size={16} /> },
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} /> },
   { id: 'stats', label: 'Live Stats', icon: <TrendingUp size={16} /> },
   { id: 'playbook', label: 'Playbook & Research', icon: <BookOpen size={16} /> },
   { id: 'case_studies', label: 'Case Studies', icon: <Library size={16} /> },
+  { id: 'correlation_causal', label: 'Correlation & Causal Graph', icon: <Network size={16} /> },
 ];
 
 // ─── Shared Styles ──────────────────────────────────────────────────────────
@@ -154,7 +160,7 @@ function ProductOverview() {
         {[
           { value: '20', label: 'Standard Biases', sub: '+ 11 investment-specific' },
           { value: '16', label: 'AI Agent Pipeline', sub: 'Parallel execution' },
-          { value: '113', label: 'Failure Cases', sub: '8 industries' },
+          { value: '146', label: 'Case Studies', sub: 'failures + successes' },
           { value: '3', label: 'Outcome Channels', sub: 'Autonomous detection' },
           { value: '2', label: 'AI Providers', sub: 'Gemini + Claude fallback' },
           { value: '4', label: 'Touchpoints', sub: 'Web, Slack, Extension, API' },
@@ -764,7 +770,7 @@ function ScoringEngine() {
           >
             <li>Context amplifiers: monetary stakes, absent dissent, time pressure</li>
             <li>Org-calibrated: thresholds adjust from your outcome data</li>
-            <li>Historical failure rates from 113-case database</li>
+            <li>Historical failure &amp; success rates from 146-case database</li>
           </ul>
         </div>
         <div style={card}>
@@ -824,8 +830,8 @@ function ScoringEngine() {
               desc: 'Org-specific learned weights amplifying severity from historical impact',
             },
             {
-              title: '113 Failure Cases',
-              desc: '8 industries: Financial Services (28), Technology (23), Government (13), Energy (11)',
+              title: '146 Case Studies',
+              desc: '131 failures + 15 successes across 8 industries, with pre-decision evidence',
             },
             {
               title: 'Bio Signals',
@@ -4085,6 +4091,64 @@ function CaseStudiesTab() {
                       {c.source}
                     </p>
                   </div>
+
+                  {/* Pre-Decision Evidence */}
+                  {c.preDecisionEvidence && (
+                    <div
+                      style={{
+                        marginTop: 16,
+                        padding: 16,
+                        borderRadius: 8,
+                        background: 'var(--bg-tertiary, #0a0a0a)',
+                        border: '1px solid #6366f140',
+                      }}
+                    >
+                      <p style={{ ...label, color: '#6366f1', marginBottom: 10 }}>
+                        Pre-Decision Evidence — What the Platform Would Have Caught
+                      </p>
+                      <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 8px' }}>
+                        {c.preDecisionEvidence.documentType.replace(/_/g, ' ').toUpperCase()} — {c.preDecisionEvidence.date} — {c.preDecisionEvidence.source}
+                      </p>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: 'var(--text-secondary, #a1a1aa)',
+                          lineHeight: 1.7,
+                          marginBottom: 12,
+                          padding: '10px 14px',
+                          borderLeft: '3px solid #6366f140',
+                          background: 'var(--bg-secondary, #111)',
+                          borderRadius: 4,
+                          fontStyle: 'italic',
+                        }}
+                      >
+                        {c.preDecisionEvidence.document.length > 600
+                          ? c.preDecisionEvidence.document.slice(0, 600) + '...'
+                          : c.preDecisionEvidence.document}
+                      </div>
+
+                      <p style={{ ...label, color: '#ef4444', marginBottom: 6 }}>Detectable Red Flags at Decision Time</p>
+                      <ul style={{ margin: '0 0 12px', paddingLeft: 18 }}>
+                        {c.preDecisionEvidence.detectableRedFlags.map((flag, i) => (
+                          <li key={i} style={{ fontSize: 12, color: '#ef4444', lineHeight: 1.7 }}>
+                            <span style={{ color: 'var(--text-secondary)' }}>{flag}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <p style={{ ...label, color: '#f59e0b', marginBottom: 6 }}>Biases Flaggable Before Outcome</p>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 12 }}>
+                        {c.preDecisionEvidence.flaggableBiases.map(b => (
+                          <span key={b} style={badge('#f59e0b')}>{formatBias(b)}</span>
+                        ))}
+                      </div>
+
+                      <p style={{ ...label, color: '#22c55e', marginBottom: 6 }}>Hypothetical DI Platform Analysis</p>
+                      <p style={{ fontSize: 12, color: 'var(--text-secondary, #a1a1aa)', lineHeight: 1.7, margin: 0 }}>
+                        {c.preDecisionEvidence.hypotheticalAnalysis}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -4291,12 +4355,14 @@ export default function FounderHubPage() {
     overview: <ProductOverview />,
     pipeline: <CorePipeline />,
     scoring: <ScoringEngine />,
+    dqi_methodology: <ErrorBoundary sectionName="DQI Methodology"><DqiMethodologyTab /></ErrorBoundary>,
     integrations: <IntegrationsAndFlywheel />,
     strategy: <StrategyAndPositioning />,
     sales: <SalesToolkit />,
     stats: <LiveStats />,
     playbook: <PlaybookAndResearch />,
     case_studies: <CaseStudiesTab />,
+    correlation_causal: <ErrorBoundary sectionName="Correlation & Causal"><CorrelationCausalTab /></ErrorBoundary>,
   };
 
   // TAB_CONTENT is rendered below after password gate

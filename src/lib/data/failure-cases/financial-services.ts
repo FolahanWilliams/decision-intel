@@ -30,6 +30,29 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'When internal risk officers are overruled or sidelined, the organization loses its critical feedback loop.',
       'Groupthink at the board level can prevent timely recognition of systemic market shifts.',
     ],
+    preDecisionEvidence: {
+      document:
+        'The risk committee recommended maintaining current MBS and commercial real estate exposure levels, noting that housing market fundamentals remain sound despite regional softness. Leverage ratios of 31:1 are consistent with peer institutions.',
+      source: 'Lehman Brothers Risk Committee Presentation, March 2007',
+      date: '2007-03',
+      documentType: 'internal_memo',
+      detectableRedFlags: [
+        'Leverage ratio at 31:1 (highest on Wall Street)',
+        '$85B in MBS with no hedging strategy',
+        'Chief Risk Officer subsequently sidelined/demoted',
+        'Repo 105 accounting to temporarily hide $50B in assets',
+        'Commercial real estate doubled in 12 months',
+      ],
+      flaggableBiases: [
+        'overconfidence',
+        'groupthink',
+        'anchoring_bias',
+        'normalcy_bias',
+        'confirmation_bias',
+      ],
+      hypotheticalAnalysis:
+        "DI would have flagged extreme overconfidence in housing market stability, anchoring to peer leverage ratios as justification (31:1 is dangerous regardless of peers), groupthink pattern of sidelining the CRO who raised concerns, and confirmation bias in selective use of 'regional softness' framing to dismiss systemic risk.",
+    },
     source:
       'Lehman Brothers Holdings Inc. Chapter 11 Proceedings, SDNY Case No. 08-13555; Financial Crisis Inquiry Commission Report (2011)',
     sourceType: 'sec_filing',

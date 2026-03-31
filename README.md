@@ -166,21 +166,22 @@ Complements Kahneman-style debiasing with Gary Klein's Recognition-Primed Decisi
 
 ### Proprietary Scoring & Intelligence Engine
 
-The platform's core differentiator: a deterministic, mathematically rigorous scoring layer that runs **after** LLM analysis. Competitors can call the same LLMs — they cannot replicate the scoring math, the ontology, or the 113-case statistical database.
+The platform's core differentiator: a deterministic, mathematically rigorous scoring layer that runs **after** LLM analysis. Competitors can call the same LLMs — they cannot replicate the scoring math, the ontology, or the 146-case statistical database.
 
 #### Decision Quality Index (DQI)
 
-A branded **0-100 composite score** (like FICO for decisions) with letter grades (A-F) computed from 5 weighted dimensions:
+A branded **0-100 composite score** (like FICO for decisions) with letter grades (A-F) computed from 6 weighted dimensions (v2.0.0):
 
-| Component            | Weight | Measures                                                 |
-| :------------------- | :----- | :------------------------------------------------------- |
-| **Bias Load**        | 30%    | Severity-weighted bias count vs. document complexity     |
-| **Noise Level**      | 20%    | Inter-judge variance from triple-judge noise measurement |
-| **Evidence Quality** | 20%    | Fact-check verification rate and source reliability      |
-| **Process Maturity** | 15%    | Prior submitted, outcomes tracked, dissent present       |
-| **Compliance Risk**  | 15%    | Regulatory framework violation score                     |
+| Component                | Weight | Measures                                                              |
+| :----------------------- | :----- | :-------------------------------------------------------------------- |
+| **Bias Load**            | 28%    | Severity-weighted bias count vs. document complexity                  |
+| **Noise Level**          | 18%    | Inter-judge variance from triple-judge noise measurement              |
+| **Evidence Quality**     | 18%    | Fact-check verification rate and source reliability                   |
+| **Process Maturity**     | 13%    | Prior submitted, outcomes tracked, dissent present, System 1 ratio    |
+| **Compliance Risk**      | 13%    | Regulatory framework violation score                                  |
+| **Historical Alignment** | 10%    | Correlation with 146-case database failure/success patterns           |
 
-Grades: **A** (85-100), **B** (70-84), **C** (55-69), **D** (40-54), **F** (0-39). Surfaced as an SVG badge on every analysis with component breakdown and top improvement recommendation.
+Grades: **A** (80-100), **B** (65-79), **C** (50-64), **D** (35-49), **F** (0-34). Surfaced as an SVG badge on every analysis with component breakdown and top improvement recommendation.
 
 #### Compound Scoring Engine
 
@@ -189,7 +190,7 @@ Deterministic post-LLM scoring that transforms raw bias detections into calibrat
 - **20x20 Interaction Matrix** — 400 empirically-grounded pairwise interaction weights between all cognitive biases (e.g., confirmation_bias + groupthink = 1.35x amplification)
 - **Context Multipliers** — Monetary stakes (1.0-1.6x), absent dissent (+0.25), time pressure (+0.15), group size effects
 - **Detectability Weighting** — Hard-to-detect biases (low detectability in the ontology) get 3-8% severity boost when found at high confidence — finding them is more meaningful
-- **Historical Correlation** — Cross-references detected bias combinations against the 113-case failure database to compute empirical amplification ratios
+- **Historical Correlation** — Cross-references detected bias combinations against the 146-case study database to compute empirical amplification ratios
 - **Confidence Decay** — Sigmoid temporal decay (documents older than 6 months get progressively reduced confidence)
 - **Org Calibration** — Per-organization learned weights that adjust severity based on historical outcomes
 
@@ -223,7 +224,7 @@ A proprietary **directed graph** encoding empirically-grounded relationships bet
 
 #### Cross-Case Correlation Engine
 
-**113 annotated real-world decision failures** sourced from SEC filings, NTSB reports, GAO audits, FDA actions, FCA enforcement, and academic case studies — spanning 8 industries:
+**146 annotated real-world case studies** (131 failures + 15 successes) sourced from SEC filings, NTSB reports, GAO audits, FDA actions, FCA enforcement, board memos, and academic case studies — spanning 8 industries. Includes pre-decision evidence (original documents from before outcomes were known) showing what the platform would have flagged:
 
 | Industry           | Cases | Avg Impact | Catastrophic Rate |
 | :----------------- | :---- | :--------- | :---------------- |
@@ -244,7 +245,7 @@ The engine computes:
 - **Severity Predictors** — Factors most predictive of catastrophic outcomes, ranked by statistical lift
 - **Context Amplifiers** — Which conditions worsen failure severity (very_high_stakes = 1.12x lift)
 
-These correlations feed directly into the compound scoring engine via `computeCorrelationMultiplier()`, giving every analysis the benefit of 113 documented failures.
+These correlations feed directly into the compound scoring engine via `computeCorrelationMultiplier()`, giving every analysis the benefit of 146 documented case studies (failures and successes).
 
 ### Boardroom Simulation (Decision Twin)
 
@@ -480,7 +481,7 @@ Real-time intelligence enrichment from external sources:
 
 - **News & Signals** — 14 RSS feeds across psychology, business, regulatory, industry, and academic sources (HBR, McKinsey, MIT Sloan, SEC EDGAR, FCA, Reuters, BBC Business, SSRN, and more)
 - **Research Papers** — Semantic Scholar integration for academic research matching
-- **Case Studies** — 113 annotated historical decision failures across 8 industries (Lehman Brothers, Boeing 737 MAX, Fukushima, VW Dieselgate, etc.) matched by bias type, toxic pattern, and industry
+- **Case Studies** — 146 annotated case studies (131 failures + 15 successes) across 8 industries (Lehman Brothers, Boeing 737 MAX, Fukushima, VW Dieselgate, Apple iPhone, Netflix Streaming, etc.) matched by bias type, toxic pattern, and industry — with pre-decision evidence
 - **Macro Context** — FRED economic indicators for market backdrop
 - **Intelligence Hub** — Dedicated dashboard page with filterable news grid, research counts, and freshness monitoring
 

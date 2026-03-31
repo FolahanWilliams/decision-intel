@@ -29,6 +29,15 @@ export interface FailureCase {
     participantCount: number;
   };
   lessonsLearned: string[];
+  preDecisionEvidence?: {
+    document: string;
+    source: string;
+    date: string;
+    documentType: 'board_memo' | 'press_release' | 'earnings_call' | 'internal_memo' | 'sec_filing' | 'public_statement' | 'strategy_document';
+    detectableRedFlags: string[];
+    flaggableBiases: string[];
+    hypotheticalAnalysis: string;
+  };
   source: string;
   sourceType:
     | 'sec_filing'
