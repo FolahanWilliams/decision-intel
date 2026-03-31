@@ -4355,14 +4355,14 @@ export default function FounderHubPage() {
     overview: <ProductOverview />,
     pipeline: <CorePipeline />,
     scoring: <ScoringEngine />,
-    dqi_methodology: <DqiMethodologyTab />,
+    dqi_methodology: <ErrorBoundary sectionName="DQI Methodology"><DqiMethodologyTab /></ErrorBoundary>,
     integrations: <IntegrationsAndFlywheel />,
     strategy: <StrategyAndPositioning />,
     sales: <SalesToolkit />,
     stats: <LiveStats />,
     playbook: <PlaybookAndResearch />,
     case_studies: <CaseStudiesTab />,
-    correlation_causal: <CorrelationCausalTab />,
+    correlation_causal: <ErrorBoundary sectionName="Correlation & Causal"><CorrelationCausalTab /></ErrorBoundary>,
   };
 
   // TAB_CONTENT is rendered below after password gate
