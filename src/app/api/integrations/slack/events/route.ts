@@ -631,7 +631,7 @@ async function processSlackDecision(
       ) {
         const [channel, threadTs] = sourceRef.split(':');
         if (channel) {
-          const slackPayload = formatNudgeForSlack(nudge, threadTs);
+          const slackPayload = formatNudgeForSlack(nudge, threadTs, nudgeRecord.id);
           slackPayload.channel = channel;
           const delivered = await deliverSlackNudge(slackPayload, teamId);
           if (delivered) {

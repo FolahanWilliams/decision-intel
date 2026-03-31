@@ -27,6 +27,7 @@ import {
 import { DEMO_ANALYSES, type DemoAnalysis } from './data';
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { trackEvent } from '@/lib/analytics/track';
+import { scanForBiases, type ScanResult } from '@/lib/analysis/client-bias-scanner';
 
 type DemoTab =
   | 'overview'
@@ -36,11 +37,13 @@ type DemoTab =
   | 'noise'
   | 'compliance'
   | 'premortem'
-  | 'boardroom';
+  | 'boardroom'
+  | 'intelligence';
 
 const TABS: { id: DemoTab; label: string; icon: React.ReactNode }[] = [
   { id: 'overview', label: 'Overview', icon: <BarChart3 size={14} /> },
   { id: 'biases', label: 'Biases', icon: <Brain size={14} /> },
+  { id: 'intelligence', label: 'Intelligence', icon: <FileText size={14} /> },
   { id: 'logic', label: 'Logic', icon: <Scale size={14} /> },
   { id: 'swot', label: 'SWOT', icon: <Lightbulb size={14} /> },
   { id: 'noise', label: 'Noise', icon: <Target size={14} /> },
@@ -85,6 +88,8 @@ export default function DemoPage() {
   const [currentStage, setCurrentStage] = useState(-1);
   const [showResults, setShowResults] = useState(false);
   const [pasteMode, setPasteMode] = useState(false);
+  const [pasteText, setPasteText] = useState('');
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const tabListRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -119,14 +124,14 @@ export default function DemoPage() {
     runNextStage();
   }, []);
 
-  // Handle paste mode submission
+  // Handle paste mode submission — runs real client-side bias scanning
   const handlePasteAnalyze = useCallback(() => {
-    trackEvent('demo_paste_analyzed');
-    // For paste mode, randomly select a demo to show
-    const idx = Math.floor(Math.random() * DEMO_ANALYSES.length);
-    startSimulation(idx);
-    setPasteMode(false);
-  }, [startSimulation]);
+    if (!pasteText.trim() || pasteText.trim().length < 15) return;
+    trackEvent('demo_paste_analyzed', { textLength: pasteText.length });
+    const result = scanForBiases(pasteText);
+    setScanResult(result);
+    trackEvent('demo_paste_results', { biasCount: result.biasCount, riskLevel: result.riskLevel });
+  }, [pasteText]);
 
   const scoreColor = analysis
     ? analysis.overallScore >= 70
@@ -225,8 +230,8 @@ export default function DemoPage() {
 
       {/* Content */}
       <div className="max-w-[960px] mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-20">
-        {/* Video Demo Section — always visible when not in simulation/results */}
-        {!isSimulating && !showResults && (
+        {/* Video Demo Section — always visible when not in simulation/results/scan */}
+        {!isSimulating && !showResults && !scanResult && (
           <>
             <DemoVideoSection />
 
@@ -242,7 +247,7 @@ export default function DemoPage() {
         )}
 
         {/* Interactive Demo Section */}
-        {!isSimulating && !showResults && (
+        {!isSimulating && !showResults && !scanResult && (
           <div className="mb-10">
             <div className="text-center mb-8">
               <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-tight">
@@ -314,26 +319,34 @@ export default function DemoPage() {
                 {pasteMode ? 'Hide text input' : 'Or paste your own text for a preview'}
               </button>
             </div>
-            {pasteMode && (
+            {pasteMode && !scanResult && (
               <div className="mt-4">
                 <textarea
+                  value={pasteText}
+                  onChange={e => setPasteText(e.target.value)}
                   className="w-full h-32 bg-[#0a0a0a] border border-white/[0.12] rounded-xl p-4 text-sm text-slate-300 resize-none focus:outline-none focus:border-white/30 placeholder:text-slate-600"
                   placeholder="Paste a decision memo, investment thesis, or strategic rationale..."
                 />
                 <div className="flex justify-between items-center mt-3">
                   <span className="text-[11px] text-slate-600">
-                    Demo mode: results are illustrative, not generated from your text
+                    Real-time bias scan — results generated from your text
                   </span>
                   <button
                     onClick={handlePasteAnalyze}
-                    className="px-4 py-2 rounded-lg bg-white text-black text-xs font-semibold cursor-pointer border-none"
+                    disabled={pasteText.trim().length < 15}
+                    className="px-4 py-2 rounded-lg bg-white text-black text-xs font-semibold cursor-pointer border-none disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    Analyze <ArrowRight size={12} className="inline ml-1" />
+                    Scan for Biases <ArrowRight size={12} className="inline ml-1" />
                   </button>
                 </div>
               </div>
             )}
           </div>
+        )}
+
+        {/* Quick Scan Results (paste mode) */}
+        {scanResult && !isSimulating && !showResults && (
+          <QuickScanResults result={scanResult} onBack={() => { setScanResult(null); setPasteText(''); }} />
         )}
 
         {/* Streaming Simulation */}
@@ -534,6 +547,7 @@ export default function DemoPage() {
             <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
               {activeTab === 'overview' && <OverviewTab analysis={analysis} />}
               {activeTab === 'biases' && <BiasesTab analysis={analysis} />}
+              {activeTab === 'intelligence' && <IntelligenceTab analysis={analysis} />}
               {activeTab === 'logic' && <LogicTab analysis={analysis} />}
               {activeTab === 'swot' && <SwotTab analysis={analysis} />}
               {activeTab === 'noise' && <NoiseTab analysis={analysis} />}
@@ -768,6 +782,96 @@ function BiasesTab({ analysis }: { analysis: DemoAnalysis }) {
         ))}
       </div>
     </Section>
+  );
+}
+
+function IntelligenceTab({ analysis }: { analysis: DemoAnalysis }) {
+  const { intelligence } = analysis;
+  return (
+    <>
+      {/* Pattern Match */}
+      <Section icon={<Brain size={16} />} title="Pattern Recognition">
+        <div className="bg-indigo-500/[0.06] border border-indigo-500/20 rounded-lg p-4 mb-4">
+          <p className="text-slate-200 text-sm m-0 leading-relaxed">
+            {intelligence.patternMatch}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {intelligence.recognitionCues.map((cue, idx) => (
+            <div
+              key={idx}
+              className="bg-[#0a0a0a] rounded-[10px] p-4 border border-white/[0.06] flex-1 min-w-[250px]"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-[13px] text-white">{cue.title}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-400 font-bold">
+                  {Math.round(cue.similarity * 100)}% match
+                </span>
+              </div>
+              <p className="text-slate-400 text-xs m-0 leading-relaxed">{cue.description}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* Institutional Memory */}
+      <Section
+        icon={<FileText size={16} />}
+        title={`Institutional Memory (${intelligence.similarCases.length} similar cases)`}
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="text-[11px] text-slate-500">Recall Score</div>
+          <div className="flex-1 h-1.5 rounded-full bg-white/[0.06]">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${intelligence.recallScore}%`,
+                background:
+                  intelligence.recallScore >= 70
+                    ? '#22c55e'
+                    : intelligence.recallScore >= 40
+                      ? '#eab308'
+                      : '#ef4444',
+              }}
+            />
+          </div>
+          <div className="text-sm font-bold text-white">{intelligence.recallScore}/100</div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {intelligence.similarCases.map((c, idx) => {
+            const outcomeColor =
+              c.outcome === 'SUCCESS'
+                ? '#22c55e'
+                : c.outcome === 'FAILURE'
+                  ? '#ef4444'
+                  : '#eab308';
+            return (
+              <div
+                key={idx}
+                className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+              >
+                <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                  <span className="font-bold text-sm text-white">{c.title}</span>
+                  <span
+                    className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold"
+                    style={{ background: `${outcomeColor}15`, color: outcomeColor }}
+                  >
+                    {c.outcome}
+                  </span>
+                  <span className="text-[11px] text-slate-500 sm:ml-auto">
+                    {Math.round(c.similarity * 100)}% similar
+                  </span>
+                </div>
+                <p className="text-slate-300 text-[13px] m-0 leading-relaxed">
+                  <strong className="text-slate-200">Key Lesson:</strong> {c.lesson}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+    </>
   );
 }
 
@@ -1137,6 +1241,192 @@ function SwotQuadrant({ title, items, color }: { title: string; items: string[];
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+// ─── Quick Scan Results (Paste Mode) ──────────────────────────────────
+
+const riskColors: Record<string, string> = {
+  critical: '#ef4444',
+  high: '#f97316',
+  medium: '#eab308',
+  low: '#22c55e',
+  clear: '#22c55e',
+};
+
+function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () => void }) {
+  const router = useRouter();
+  const [loadingSample, setLoadingSample] = useState(false);
+
+  const handleTryNow = async () => {
+    setLoadingSample(true);
+    try {
+      const res = await fetch('/api/onboarding/sample', { method: 'POST' });
+      const data = await res.json();
+      if (data.documentId) {
+        router.push(`/documents/${data.documentId}`);
+        return;
+      }
+    } catch {
+      // Fall through to login
+    }
+    router.push('/login');
+    setLoadingSample(false);
+  };
+
+  return (
+    <div className="mb-10">
+      {/* Back button */}
+      <button
+        onClick={onBack}
+        className="text-xs text-slate-500 hover:text-white transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mb-6"
+      >
+        <ArrowRight size={12} className="rotate-180" />
+        Scan different text
+      </button>
+
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold mb-4"
+          style={{
+            background: `${riskColors[result.riskLevel]}15`,
+            color: riskColors[result.riskLevel],
+          }}
+        >
+          <Brain size={16} />
+          {result.biasCount === 0
+            ? 'No Biases Detected'
+            : `${result.biasCount} Bias${result.biasCount > 1 ? 'es' : ''} Detected`}
+        </div>
+        <p className="text-slate-400 text-sm max-w-[600px] mx-auto">{result.summary}</p>
+      </div>
+
+      {/* Score Cards */}
+      {result.biasCount > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-7">
+          <div className="bg-[#111111] border border-white/[0.08] rounded-xl py-3 px-3 text-center">
+            <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">BIASES FOUND</div>
+            <div className="text-2xl font-extrabold" style={{ color: riskColors[result.riskLevel] }}>
+              {result.biasCount}
+            </div>
+            <div className="text-[11px] text-slate-500 mt-1">of 14 checked</div>
+          </div>
+          <div className="bg-[#111111] border border-white/[0.08] rounded-xl py-3 px-3 text-center">
+            <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">RISK LEVEL</div>
+            <div className="text-lg font-extrabold uppercase" style={{ color: riskColors[result.riskLevel] }}>
+              {result.riskLevel}
+            </div>
+            <div className="text-[11px] text-slate-500 mt-1">
+              {result.biases.filter(b => b.severity === 'critical' || b.severity === 'high').length} high/critical
+            </div>
+          </div>
+          <div className="bg-[#111111] border border-white/[0.08] rounded-xl py-3 px-3 text-center col-span-2 sm:col-span-1">
+            <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">SCAN TYPE</div>
+            <div className="text-lg font-extrabold text-slate-300">Quick</div>
+            <div className="text-[11px] text-slate-500 mt-1">
+              {result.isPreDecision ? 'Pre-decision detected' : '14-bias pattern scan'}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detected Biases */}
+      {result.biases.length > 0 && (
+        <div className="bg-[#111111] border border-white/[0.08] rounded-xl p-4 sm:p-6 mb-4">
+          <h3 className="text-[15px] font-bold mb-4 flex items-center gap-2 text-white">
+            <Brain size={16} /> Detected Biases
+          </h3>
+          <div className="flex flex-col gap-3">
+            {result.biases.map((bias, idx) => (
+              <div
+                key={idx}
+                className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+              >
+                <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                  <span className="font-bold text-sm text-white">{bias.label}</span>
+                  <SeverityBadge severity={bias.severity} />
+                </div>
+                <p
+                  className="text-slate-400 text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3"
+                  style={{ borderLeft: `2px solid ${sevColor(bias.severity)}30` }}
+                >
+                  &ldquo;...{bias.signal}...&rdquo;
+                </p>
+                <p className="text-slate-300 text-[13px] m-0 mb-2.5 leading-relaxed">
+                  {bias.explanation}
+                </p>
+                <p className="text-green-500/80 text-[13px] m-0 leading-relaxed">
+                  <strong>Recommendation:</strong> {bias.suggestion}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* No biases state */}
+      {result.biases.length === 0 && (
+        <div className="bg-[#111111] border border-green-500/20 rounded-xl p-6 sm:p-8 mb-4 text-center">
+          <CheckCircle2 size={32} className="text-green-500 mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-white mb-2">Looking Good</h3>
+          <p className="text-slate-400 text-sm max-w-[500px] mx-auto">
+            No common cognitive biases detected in this text. The full analysis also checks for
+            logical fallacies, decision noise, regulatory compliance, fact verification, and runs a
+            boardroom simulation with AI decision twins.
+          </p>
+        </div>
+      )}
+
+      {/* Upsell CTA */}
+      <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.08] text-center">
+        <h3 className="text-lg font-bold text-white mb-2">
+          This quick scan checks 14 common biases.
+        </h3>
+        <p className="text-slate-500 text-sm mb-2 max-w-[550px] mx-auto">
+          The full Decision Intel analysis goes much deeper:
+        </p>
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
+          {[
+            '30+ cognitive biases',
+            'Decision noise scoring',
+            'Logical fallacy detection',
+            'Regulatory compliance',
+            'Fact verification',
+            'SWOT analysis',
+            'Pre-mortem scenarios',
+            'Boardroom simulation',
+            'Institutional memory',
+          ].map(feature => (
+            <span
+              key={feature}
+              className="text-[11px] px-2.5 py-1 rounded-full bg-white/[0.05] text-slate-400 border border-white/[0.08]"
+            >
+              {feature}
+            </span>
+          ))}
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            onClick={handleTryNow}
+            disabled={loadingSample}
+            className="px-7 py-3 rounded-[10px] bg-white text-black font-bold text-sm border-none cursor-pointer disabled:cursor-wait"
+          >
+            {loadingSample ? 'Loading...' : 'Try Full Analysis'}{' '}
+            <ArrowRight size={14} className="inline align-middle ml-1" />
+          </button>
+          <Link
+            href="/login"
+            className="px-7 py-3 rounded-[10px] bg-transparent border border-white/20 text-white font-semibold text-sm no-underline text-center"
+          >
+            Sign Up Free
+          </Link>
+        </div>
+        <p className="text-slate-600 text-[11px] mt-4">
+          No credit card required &middot; 3 free analyses &middot; 14-day trial on paid plans
+        </p>
+      </div>
     </div>
   );
 }

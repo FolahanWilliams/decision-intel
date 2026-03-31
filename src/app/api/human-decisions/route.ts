@@ -425,7 +425,7 @@ async function runCognitiveAudit(decisionId: string, input: HumanDecisionInput, 
         if (nudge.channel === 'slack' && input.channel) {
           const sourceRef = input.sourceRef; // e.g. "C12345:1234567890.123456"
           const threadTs = sourceRef?.includes(':') ? sourceRef.split(':')[1] : undefined;
-          const payload = formatNudgeForSlack(nudge, threadTs);
+          const payload = formatNudgeForSlack(nudge, threadTs, persisted.id);
           payload.channel = input.channel;
 
           deliverSlackNudge(payload)
