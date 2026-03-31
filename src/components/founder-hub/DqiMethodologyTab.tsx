@@ -207,7 +207,7 @@ export function DqiMethodologyTab() {
             marginBottom: 16,
           }}
         >
-          <div style={badge('#6366f1')}>33+ Case Studies</div>
+          <div style={badge('#6366f1')}>146 Case Studies</div>
           <span style={{ color: 'var(--text-muted, #71717a)', fontSize: 18 }}>→</span>
           <div
             style={{
@@ -250,7 +250,7 @@ export function DqiMethodologyTab() {
         >
           <p style={{ margin: 0 }}>
             When your document is analyzed, the detected biases are compared against our database of
-            33+ real-world failure and success case studies.
+            146 real-world failure and success case studies.
           </p>
           <p style={{ margin: 0 }}>
             If your bias pattern matches known failure patterns (like overconfidence + anchoring in

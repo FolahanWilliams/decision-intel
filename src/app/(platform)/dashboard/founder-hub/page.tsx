@@ -160,7 +160,7 @@ function ProductOverview() {
         {[
           { value: '20', label: 'Standard Biases', sub: '+ 11 investment-specific' },
           { value: '16', label: 'AI Agent Pipeline', sub: 'Parallel execution' },
-          { value: '113', label: 'Failure Cases', sub: '8 industries' },
+          { value: '146', label: 'Case Studies', sub: 'failures + successes' },
           { value: '3', label: 'Outcome Channels', sub: 'Autonomous detection' },
           { value: '2', label: 'AI Providers', sub: 'Gemini + Claude fallback' },
           { value: '4', label: 'Touchpoints', sub: 'Web, Slack, Extension, API' },
@@ -770,7 +770,7 @@ function ScoringEngine() {
           >
             <li>Context amplifiers: monetary stakes, absent dissent, time pressure</li>
             <li>Org-calibrated: thresholds adjust from your outcome data</li>
-            <li>Historical failure rates from 113-case database</li>
+            <li>Historical failure &amp; success rates from 146-case database</li>
           </ul>
         </div>
         <div style={card}>
@@ -830,8 +830,8 @@ function ScoringEngine() {
               desc: 'Org-specific learned weights amplifying severity from historical impact',
             },
             {
-              title: '113 Failure Cases',
-              desc: '8 industries: Financial Services (28), Technology (23), Government (13), Energy (11)',
+              title: '146 Case Studies',
+              desc: '131 failures + 15 successes across 8 industries, with pre-decision evidence',
             },
             {
               title: 'Bio Signals',
