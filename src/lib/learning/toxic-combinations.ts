@@ -520,7 +520,6 @@ async function gatherContextFactors(
     const analysisCount = await prisma.analysis.count({
       where: {
         documentId: (analysis as { documentId?: string }).documentId,
-        status: 'completed',
       },
     });
     iterativeProcess = analysisCount > 1;

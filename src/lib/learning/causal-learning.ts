@@ -150,6 +150,59 @@ export async function computeOrgCausalWeights(
       });
     }
 
+    // --- Pairwise interaction detection ---
+    const biasTypesList = Array.from(biasStats.keys());
+    const outcomeBiasSets = outcomesList
+      .filter(o => o.analysis?.biases && typeof o.analysis.biases === 'object')
+      .map(o => ({
+        biasTypes: new Set(Object.keys(o.analysis!.biases as object)),
+        outcome: o.outcome,
+      }));
+
+    for (let i = 0; i < biasTypesList.length; i++) {
+      for (let j = i + 1; j < biasTypesList.length; j++) {
+        const biasA = biasTypesList[i];
+        const biasB = biasTypesList[j];
+
+        let jointTotal = 0;
+        let jointFailures = 0;
+        let jointSuccesses = 0;
+        for (const entry of outcomeBiasSets) {
+          if (entry.biasTypes.has(biasA) && entry.biasTypes.has(biasB)) {
+            jointTotal++;
+            if (entry.outcome === 'failure') jointFailures++;
+            else if (entry.outcome === 'success') jointSuccesses++;
+          }
+        }
+
+        if (jointTotal < 5) continue;
+
+        const jointFailureRate = jointFailures / jointTotal;
+        const statsA = biasStats.get(biasA)!;
+        const statsB = biasStats.get(biasB)!;
+        const totalA = statsA.failures + statsA.successes + statsA.partials;
+        const totalB = statsB.failures + statsB.successes + statsB.partials;
+        if (totalA === 0 || totalB === 0) continue;
+        const expectedRate = (statsA.failures / totalA) * (statsB.failures / totalB);
+
+        if (expectedRate === 0) continue;
+        const interactionStrength = jointFailureRate / expectedRate;
+
+        if (interactionStrength > 1.3) {
+          weights.push({
+            biasType: [biasA, biasB].sort().join('+'),
+            outcomeCorrelation: Number(
+              (jointFailureRate - baseFailureRate).toFixed(3)
+            ),
+            failureCount: jointFailures,
+            successCount: jointSuccesses,
+            dangerMultiplier: Number(interactionStrength.toFixed(2)),
+            sampleSize: jointTotal,
+          });
+        }
+      }
+    }
+
     weights.sort((a, b) => b.dangerMultiplier - a.dangerMultiplier);
     return weights;
   } catch (error) {
@@ -427,10 +480,67 @@ export async function learnCausalEdges(orgId: string): Promise<CausalWeight[]> {
       });
     }
 
+    // --- Pairwise interaction detection ---
+    // Discover bias pairs that are synergistically more dangerous than
+    // expected from individual rates (super-additive risk).
+    const biasTypesList = Array.from(biasOutcomes.keys());
+    const outcomeBiasSets = outcomes.map(o => ({
+      biasTypes: new Set(
+        o.analysis.biases.map((b: { biasType: string }) => b.biasType)
+      ),
+      outcome: o.outcome,
+    }));
+
+    for (let i = 0; i < biasTypesList.length; i++) {
+      for (let j = i + 1; j < biasTypesList.length; j++) {
+        const biasA = biasTypesList[i];
+        const biasB = biasTypesList[j];
+
+        let jointTotal = 0;
+        let jointFailures = 0;
+        let jointSuccesses = 0;
+        for (const entry of outcomeBiasSets) {
+          if (entry.biasTypes.has(biasA) && entry.biasTypes.has(biasB)) {
+            jointTotal++;
+            if (entry.outcome === 'failure') jointFailures++;
+            else if (entry.outcome === 'success') jointSuccesses++;
+          }
+        }
+
+        if (jointTotal < 5) continue;
+
+        const jointFailureRate = jointFailures / jointTotal;
+        const statsA = biasOutcomes.get(biasA)!;
+        const statsB = biasOutcomes.get(biasB)!;
+        const totalA = statsA.failures + statsA.successes + statsA.partials;
+        const totalB = statsB.failures + statsB.successes + statsB.partials;
+        const rateA = statsA.failures / totalA;
+        const rateB = statsB.failures / totalB;
+        const expectedRate = rateA * rateB;
+
+        if (expectedRate === 0) continue;
+        const interactionStrength = jointFailureRate / expectedRate;
+
+        // Only record pairs that are >=30% more dangerous than independence predicts
+        if (interactionStrength > 1.3) {
+          weights.push({
+            biasType: [biasA, biasB].sort().join('+'),
+            outcomeCorrelation: Number(
+              (jointFailureRate - baseFailureRate).toFixed(3)
+            ),
+            failureCount: jointFailures,
+            successCount: jointSuccesses,
+            dangerMultiplier: Number(interactionStrength.toFixed(2)),
+            sampleSize: jointTotal,
+          });
+        }
+      }
+    }
+
     weights.sort((a, b) => b.dangerMultiplier - a.dangerMultiplier);
 
     log.info(
-      `Causal edges learned for org ${orgId}: ${weights.length} bias types from ${outcomes.length} outcomes`
+      `Causal edges learned for org ${orgId}: ${weights.length} bias types (incl. pairs) from ${outcomes.length} outcomes`
     );
 
     return weights;
