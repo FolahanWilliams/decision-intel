@@ -125,7 +125,7 @@ export interface DQIComponent {
 // Constants
 // ---------------------------------------------------------------------------
 
-const WEIGHTS = {
+export const WEIGHTS = {
   biasLoad: 0.28,
   noiseLevel: 0.18,
   evidenceQuality: 0.18,
@@ -141,7 +141,7 @@ const BIAS_SEVERITY_COST: Record<string, number> = {
   low: 2,
 };
 
-const GRADE_THRESHOLDS: Array<{
+export const GRADE_THRESHOLDS: Array<{
   min: number;
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
   label: string;
@@ -154,10 +154,10 @@ const GRADE_THRESHOLDS: Array<{
   { min: 0, grade: 'F', label: 'Critical Decision Risk', color: '#ef4444' },
 ];
 
-const METHODOLOGY_VERSION = '2.0.0';
+export const METHODOLOGY_VERSION = '2.0.0';
 
 /** Biases associated with fast, heuristic (System 1) processing */
-const SYSTEM1_BIASES = new Set([
+export const SYSTEM1_BIASES = new Set([
   'anchoring_bias', 'anchoring',
   'availability_heuristic', 'availability',
   'recency_bias', 'recency',
@@ -540,7 +540,7 @@ function findTopImprovement(components: DQIResult['components']): DQIResult['top
  * Compute a synthetic DQI score for a historical case study.
  * Maps the case's characteristics to approximate DQI dimensions.
  */
-function computeSyntheticDQI(c: CaseStudy): number {
+export function computeSyntheticDQI(c: CaseStudy): number {
   // Bias Load (30%): more biases and higher impact → lower score
   const biasPenalty = c.biasesPresent.length * 8;
   const biasScore = Math.max(0, Math.min(100, 100 - Math.sqrt(biasPenalty) * 6));
@@ -589,7 +589,7 @@ function getCaseBenchmarks(): Array<{ company: string; dqi: number; outcome: str
  * Compute the percentile ranking of a DQI score against historical case studies.
  * Returns 0-100 where 100 = better than all historical cases.
  */
-function computeHistoricalPercentile(dqiScore: number): number {
+export function computeHistoricalPercentile(dqiScore: number): number {
   const benchmarks = getCaseBenchmarks();
   const belowCount = benchmarks.filter(b => b.dqi < dqiScore).length;
   return Math.round((belowCount / benchmarks.length) * 100);

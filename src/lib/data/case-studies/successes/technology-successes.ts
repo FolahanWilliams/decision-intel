@@ -51,6 +51,27 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     source:
       'Walter Isaacson, "Steve Jobs" (2011); Apple Inc. 10-K filings (2007-2012); Yukari Iwatani Kane, "Haunted Empire" (2014)',
     sourceType: 'biography',
+    preDecisionEvidence: {
+      document:
+        'Steve Jobs, Macworld keynote (January 9, 2007): "Today Apple is going to reinvent the phone... An iPod, a phone, an internet communicator — these are not three separate devices. This is one device." Internal Apple board presentation (2006, described in Isaacson biography): Jobs argued "the phone is going to eat the iPod. The question is whether it\'s going to be our phone or someone else\'s." The iPod generated $9.15 billion in FY2006 — roughly 40% of Apple\'s $19.3 billion total revenue. iPod team members privately expressed concern that the iPhone would "kill our baby."',
+      source: 'Macworld 2007 keynote transcript; Isaacson "Steve Jobs" (2011) Ch. 36; Apple 10-K FY2006',
+      date: '2007-01-09',
+      documentType: 'public_statement',
+      detectableRedFlags: [
+        'Cannibalizing a product line worth 40% of total revenue — extreme concentration risk',
+        'No proven track record in telecommunications or carrier relationships',
+        'iPod team expressing internal dissent that was overridden rather than addressed through process',
+        'CEO conviction-driven decision without formal quantitative cannibalization modeling',
+      ],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'loss_aversion',
+        'sunk_cost_fallacy',
+        'anchoring_bias',
+      ],
+      hypotheticalAnalysis:
+        'DI Platform would flag: HIGH-RISK loss aversion pattern — 40% revenue concentration at risk. But critically, it would ALSO detect the "Controlled Burn" beneficial pattern: leadership explicitly acknowledging the cannibalization risk and framing it as strategic necessity ("if we don\'t, someone else will"). The platform would note: biases ARE present (overconfidence, anchoring to iPod success) but mitigation factors are active — iterative prototyping, existential framing, and CEO willing to destroy own cash cow. Recommendation: Proceed, but establish quantitative cannibalization tracking milestones. Ensure iPod team has a role in iPhone development to prevent organizational resistance. The key distinction from a failure case: the biases were RECOGNIZED and MANAGED, not ignored.',
+    },
   },
   {
     id: 'cs-success-tech-002',
@@ -102,6 +123,27 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     source:
       'Reed Hastings and Erin Meyer, "No Rules Rules" (2020); Netflix 10-K filings (2007-2013); Gina Keating, "Netflixed" (2012)',
     sourceType: 'annual_report',
+    preDecisionEvidence: {
+      document:
+        'Netflix 2007 Annual Letter to Shareholders (January 2008): "We named our company Netflix, not DVD-by-mail, because we believed the future of movie delivery was over the internet... We started streaming in January 2007 at no extra charge to our DVD subscribers. We expect streaming to be a small part of the value for some years to come." The letter explicitly warned investors that streaming investment would compress margins: "We are investing heavily in streaming, which will reduce our operating margins in the near term." Q4 2007 earnings call: Hastings stated "The DVD business is still growing, but the future is clearly streaming."',
+      source: 'Netflix 2007 Annual Letter to Shareholders; Netflix Q4 2007 Earnings Call Transcript; Netflix 10-K FY2007',
+      date: '2008-01-25',
+      documentType: 'public_statement',
+      detectableRedFlags: [
+        'Investing in streaming before broadband penetration supported mass adoption — only 55% of US homes had broadband in 2007',
+        'Margin compression acknowledged upfront — short-term earnings would decline',
+        'DVD business still growing — classic innovator\'s dilemma of investing away from current strength',
+        'No proven streaming content licensing model existed yet — infrastructure bet on unbuilt ecosystem',
+      ],
+      flaggableBiases: [
+        'status_quo_bias',
+        'loss_aversion',
+        'planning_fallacy',
+        'anchoring_bias',
+      ],
+      hypotheticalAnalysis:
+        'DI Platform would flag: "Patient Bet" + "Controlled Burn" beneficial patterns detected. Key distinction: this decision acknowledges risk transparently (CEO publicly warning about margin compression) rather than hiding it. Status quo bias is present in the organization (DVD still growing) but leadership is ACTIVELY managing it by studying Blockbuster\'s failure. Planning fallacy risk: streaming profitability timeline likely underestimated — platform would recommend maintaining DVD cash flow bridge for 3-5 years longer than management projects. Verdict: biases present but mitigation factors are strong. Iterative rollout (streaming free for existing subscribers) de-risks the bet. Recommendation: Proceed with caution on timeline — ensure DVD business is not prematurely cannibalized before streaming economics are proven.',
+    },
   },
   {
     id: 'cs-success-tech-003',
