@@ -38,10 +38,13 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
-async function sendEmail(payload: EmailPayload): Promise<boolean> {
+/** Sentinel return value distinguishing "not configured" from "send failure". */
+type SendResult = 'sent' | 'dry_run' | 'failed';
+
+async function sendEmail(payload: EmailPayload): Promise<SendResult> {
   if (!RESEND_API_KEY) {
     log.warn(`[DRY RUN] Email not sent (RESEND_API_KEY not configured): "${payload.subject}" to ${payload.to}`);
-    return false;
+    return 'dry_run';
   }
 
   try {
@@ -63,13 +66,13 @@ async function sendEmail(payload: EmailPayload): Promise<boolean> {
     if (!res.ok) {
       const err = await res.text();
       log.error(`Resend API error: ${res.status} ${err}`);
-      return false;
+      return 'failed';
     }
 
-    return true;
+    return 'sent';
   } catch (error) {
     log.error('Email send failed:', error);
-    return false;
+    return 'failed';
   }
 }
 
@@ -78,7 +81,7 @@ async function logNotification(
   channel: string,
   type: string,
   subject: string,
-  success: boolean,
+  result: SendResult,
   error?: string
 ) {
   try {
@@ -88,8 +91,8 @@ async function logNotification(
         channel,
         type,
         subject,
-        status: success ? 'sent' : 'failed',
-        error,
+        status: result === 'sent' ? 'sent' : result === 'dry_run' ? 'skipped' : 'failed',
+        error: result === 'dry_run' ? 'RESEND_API_KEY not configured' : error,
       },
     });
   } catch {
@@ -152,8 +155,8 @@ export async function notifyAnalysisComplete(
     </div>
   `;
 
-  const success = await sendEmail({ to: email, subject, html });
-  await logNotification(userId, 'email', 'analysis_complete', subject, success);
+  const result = await sendEmail({ to: email, subject, html });
+  await logNotification(userId, 'email', 'analysis_complete', subject, result);
 }
 
 /**
@@ -223,8 +226,8 @@ export async function sendWeeklyDigest(
     </div>
   `;
 
-  const success = await sendEmail({ to: email, subject, html });
-  await logNotification(userId, 'email', 'weekly_digest', subject, success);
+  const result = await sendEmail({ to: email, subject, html });
+  await logNotification(userId, 'email', 'weekly_digest', subject, result);
 }
 
 /**
@@ -261,7 +264,7 @@ export async function notifyTeamInvite(
     </div>
   `;
 
-  const success = await sendEmail({ to: inviteeEmail, subject, html });
+  const result = await sendEmail({ to: inviteeEmail, subject, html });
   // Log under a system user since invitee may not have an account yet
   try {
     await prisma.notificationLog.create({
@@ -270,7 +273,8 @@ export async function notifyTeamInvite(
         channel: 'email',
         type: 'invite',
         subject,
-        status: success ? 'sent' : 'failed',
+        status: result === 'sent' ? 'sent' : result === 'dry_run' ? 'skipped' : 'failed',
+        error: result === 'dry_run' ? 'RESEND_API_KEY not configured' : undefined,
       },
     });
   } catch (err) {
@@ -328,8 +332,8 @@ export async function deliverEmailNudge(
     </div>
   `;
 
-  const success = await sendEmail({ to: email, subject, html });
-  await logNotification(userId, 'email', 'nudge', subject, success);
+  const result = await sendEmail({ to: email, subject, html });
+  await logNotification(userId, 'email', 'nudge', subject, result);
 }
 
 /**
@@ -423,6 +427,6 @@ export async function notifyOutcomeReminder(
     </div>
   `;
 
-  const success = await sendEmail({ to: email, subject, html });
-  await logNotification(userId, 'email', 'outcome_reminder', subject, success);
+  const result = await sendEmail({ to: email, subject, html });
+  await logNotification(userId, 'email', 'outcome_reminder', subject, result);
 }

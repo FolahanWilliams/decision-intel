@@ -20,6 +20,7 @@ import {
   detectMessageBiases,
 } from '@/lib/integrations/slack/handler';
 import { prisma } from '@/lib/prisma';
+import { isSchemaDrift } from '@/lib/utils/error';
 
 const log = createLogger('SlackCommands');
 
@@ -541,13 +542,13 @@ async function handleAnalyzeCommand(params: { channelId: string; userId: string;
       text: `Most recent decision status: ${recentDecision.status}`,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       return NextResponse.json({
         response_type: 'ephemeral',
         text: 'The decision tracking database is being set up. An admin needs to run database migrations. Try again after setup is complete.',
       });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Analyze command failed:', msg);
     return NextResponse.json({
       response_type: 'ephemeral',
@@ -631,13 +632,13 @@ async function handlePriorCommand(params: {
       text: `Prior noted: *${action}* at *${confidence}%* confidence. Create a Decision Room on the web app for blind prior collection.`,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       return NextResponse.json({
         response_type: 'ephemeral',
         text: 'The blind prior database is being set up. An admin needs to run database migrations. Try again after setup is complete.',
       });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Prior command failed:', msg);
     return NextResponse.json({ response_type: 'ephemeral', text: 'Failed to record prior.' });
   }
@@ -956,13 +957,13 @@ async function handleOutcomeCommand(params: {
       text: `:white_check_mark: Outcome recorded: *${outcome.replace(/_/g, ' ')}*${notes ? ` — ${notes}` : ''}. Your calibration data has been updated.`,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       return NextResponse.json({
         response_type: 'ephemeral',
         text: 'Outcome tracking is being set up. Please try again later.',
       });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Outcome command failed:', msg);
     return NextResponse.json({ response_type: 'ephemeral', text: 'Failed to record outcome.' });
   }

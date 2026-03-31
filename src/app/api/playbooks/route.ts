@@ -9,6 +9,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 import { BUILT_IN_PLAYBOOKS, PLAYBOOK_CATEGORIES } from '@/lib/playbooks/templates';
 import { Prisma } from '@prisma/client';
 
@@ -40,8 +41,7 @@ export async function GET(request: NextRequest) {
         orderBy: [{ usageCount: 'desc' }, { createdAt: 'desc' }],
       });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes('P2021') || msg.includes('P2022')) {
+      if (isSchemaDrift(err)) {
         log.debug('DecisionPlaybook table not yet migrated — returning built-in only');
       } else {
         throw err;
@@ -148,8 +148,7 @@ export async function POST(request: NextRequest) {
     log.info(`Created playbook "${name}" for user ${user.id}`);
     return NextResponse.json({ playbook }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       return NextResponse.json(
         { error: 'Playbooks feature requires a database migration. Run: npx prisma db push' },
         { status: 503 }

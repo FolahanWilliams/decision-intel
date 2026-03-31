@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 
 const log = createLogger('DecisionRoomPriorsRoute');
 
@@ -94,11 +95,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     log.info(`Blind prior submitted for room ${roomId} by user ${user.id}`);
     return NextResponse.json({ id: prior.id }, { status: 201 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    if (msg.includes('P2021') || msg.includes('P2022')) {
+    if (isSchemaDrift(error)) {
       log.debug('BlindPrior table not available (schema drift)');
       return NextResponse.json({ id: 'schema-drift-noop' });
     }
+    const msg = error instanceof Error ? error.message : String(error);
     log.error('Failed to submit blind prior:', msg);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

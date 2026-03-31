@@ -15,6 +15,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 import {
   verifySlackSignature,
   slackEventToDecisionInput,
@@ -277,8 +278,8 @@ export async function POST(req: NextRequest) {
               }
             }
           } catch (frameErr) {
-            const msg = frameErr instanceof Error ? frameErr.message : String(frameErr);
-            if (!msg.includes('P2021') && !msg.includes('P2022')) {
+            if (!isSchemaDrift(frameErr)) {
+              const msg = frameErr instanceof Error ? frameErr.message : String(frameErr);
               log.warn('Thread monitoring failed (non-critical):', msg);
             }
           }
@@ -379,8 +380,8 @@ export async function POST(req: NextRequest) {
 
               log.info(`DecisionFrame auto-created from Slack pre-decision in channel ${channel}`);
             } catch (frameErr) {
-              const msg = frameErr instanceof Error ? frameErr.message : String(frameErr);
-              if (!msg.includes('P2021') && !msg.includes('P2022')) {
+              if (!isSchemaDrift(frameErr)) {
+                const msg = frameErr instanceof Error ? frameErr.message : String(frameErr);
                 log.error('DecisionFrame auto-creation failed:', msg);
               }
             }
@@ -437,8 +438,8 @@ export async function POST(req: NextRequest) {
               }
             }
           } catch (priorErr) {
-            const msg = priorErr instanceof Error ? priorErr.message : String(priorErr);
-            if (!msg.includes('P2021') && !msg.includes('P2022')) {
+            if (!isSchemaDrift(priorErr)) {
+              const msg = priorErr instanceof Error ? priorErr.message : String(priorErr);
               log.warn('DecisionPrior capture from Slack failed (non-critical):', msg);
             }
           }
@@ -575,13 +576,9 @@ async function processSlackDecision(
         });
       });
     } catch (dbError: unknown) {
-      const prismaError = dbError as { code?: string; message?: string };
-      if (
-        prismaError.code === 'P2021' ||
-        prismaError.code === 'P2022' ||
-        prismaError.message?.includes('does not exist')
-      ) {
+      if (isSchemaDrift(dbError)) {
         schemaDrift = true;
+        const prismaError = dbError as { code?: string };
         log.warn('Schema drift in Slack audit persistence: ' + prismaError.code);
       } else {
         throw dbError;

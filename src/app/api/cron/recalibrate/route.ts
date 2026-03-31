@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 import { runFullRecalibration } from '@/lib/learning/feedback-loop';
 import { timingSafeEqual } from 'crypto';
 
@@ -127,10 +128,10 @@ export async function GET(request: NextRequest) {
             log.info(`Persisted ${causalWeights.length} causal edges for org ${orgId}`);
           }
         } catch (causalError) {
-          const msg = causalError instanceof Error ? causalError.message : String(causalError);
-          if (msg.includes('P2021') || msg.includes('P2022')) {
+          if (isSchemaDrift(causalError)) {
             log.debug('CausalEdge table not available (schema drift)');
           } else {
+            const msg = causalError instanceof Error ? causalError.message : String(causalError);
             log.warn(`Causal edge persistence failed for org ${orgId}:`, msg);
           }
         }
@@ -165,10 +166,10 @@ export async function GET(request: NextRequest) {
           twinRecalibratedCount++;
         }
       } catch (twinErr) {
-        const msg = twinErr instanceof Error ? twinErr.message : String(twinErr);
-        if (msg.includes('P2021') || msg.includes('P2022')) {
+        if (isSchemaDrift(twinErr)) {
           log.debug('Twin effectiveness tables not available (schema drift)');
         } else {
+          const msg = twinErr instanceof Error ? twinErr.message : String(twinErr);
           log.warn(`Twin effectiveness recalibration failed for org ${orgId}:`, msg);
         }
       }
