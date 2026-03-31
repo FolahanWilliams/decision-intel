@@ -14,6 +14,7 @@
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
+import { matchCaseStudiesSync } from '@/lib/research/caseStudyMatcher';
 
 const log = createLogger('EdgeInference');
 
@@ -27,7 +28,8 @@ export type EdgeType =
   | 'escalated_from'
   | 'reversed'
   | 'depends_on'
-  | 'cross_department';
+  | 'cross_department'
+  | 'historical_parallel';
 
 interface EdgeCandidate {
   sourceType: string;
@@ -99,6 +101,10 @@ export async function inferEdgesForAnalysis(
     // 6. Cross-department edges (same org, different user, shared biases + similar topic)
     const crossDeptEdges = await findCrossDepartmentEdges(analysis, orgId);
     candidates.push(...crossDeptEdges);
+
+    // 7. Historical parallel edges (link to case study database)
+    const historicalEdges = findHistoricalParallelEdges(analysis);
+    candidates.push(...historicalEdges);
 
     // Persist edges (upsert to avoid duplicates)
     let created = 0;
@@ -711,4 +717,39 @@ export async function addManualEdge(params: {
     select: { id: true },
   });
   return edge;
+}
+
+// ─── Historical Parallel Edge Inference ─────────────────────────────────────
+
+/**
+ * Find historical parallel edges by matching detected biases against
+ * the real-world case study database.
+ */
+function findHistoricalParallelEdges(
+  analysis: { id: string; biases: Array<{ biasType: string; severity: string }>; document: { id: string } | null }
+): EdgeCandidate[] {
+  const biasTypes = analysis.biases.map(b => b.biasType);
+  if (biasTypes.length === 0) return [];
+
+  const industry = undefined; // Could be enhanced with document industry detection
+  const matches = matchCaseStudiesSync(biasTypes, industry, 3);
+
+  return matches.map(match => ({
+    sourceType: 'analysis',
+    sourceId: analysis.id,
+    targetType: 'case_study',
+    targetId: `case_${match.company.toLowerCase().replace(/\s+/g, '_')}_${match.year || 0}`,
+    edgeType: 'historical_parallel' as EdgeType,
+    strength: Math.min(1.0, match.matchScore / 10),
+    confidence: Math.min(1.0, match.matchedBiases.length / biasTypes.length),
+    description: `Shares ${match.matchedBiases.length} bias pattern(s) with ${match.company}'s ${match.title} (${match.outcomeDirection})`,
+    metadata: {
+      company: match.company,
+      year: match.year,
+      outcome: match.outcome,
+      outcomeDirection: match.outcomeDirection,
+      matchedBiases: match.matchedBiases,
+      estimatedImpact: match.estimatedImpact,
+    },
+  }));
 }

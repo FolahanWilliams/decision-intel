@@ -18,6 +18,8 @@
  */
 
 import { createLogger } from '@/lib/utils/logger';
+import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
+import type { CaseStudy } from '@/lib/data/case-studies';
 
 const logger = createLogger('DQI');
 
@@ -63,6 +65,17 @@ export interface DQIInput {
   };
   /** Optional: compound score from scoring engine */
   compoundScore?: number;
+  /** Optional: historical correlation data for the 6th DQI component */
+  historicalAlignment?: {
+    /** Number of matched failure patterns */
+    matchedFailurePatterns: number;
+    /** Number of matched success patterns */
+    matchedSuccessPatterns: number;
+    /** Correlation multiplier from case-correlations engine */
+    correlationMultiplier: number;
+    /** Beneficial damping factor (1.0 = no damping) */
+    beneficialDamping: number;
+  };
 }
 
 export interface DQIResult {
@@ -81,6 +94,7 @@ export interface DQIResult {
     evidenceQuality: DQIComponent;
     processMaturity: DQIComponent;
     complianceRisk: DQIComponent;
+    historicalAlignment: DQIComponent;
   };
   /** Percentile ranking (if benchmark data available) */
   percentile: number | null;
@@ -111,11 +125,12 @@ export interface DQIComponent {
 // ---------------------------------------------------------------------------
 
 const WEIGHTS = {
-  biasLoad: 0.3,
-  noiseLevel: 0.2,
-  evidenceQuality: 0.2,
-  processMaturity: 0.15,
-  complianceRisk: 0.15,
+  biasLoad: 0.28,
+  noiseLevel: 0.18,
+  evidenceQuality: 0.18,
+  processMaturity: 0.13,
+  complianceRisk: 0.13,
+  historicalAlignment: 0.10,
 };
 
 const BIAS_SEVERITY_COST: Record<string, number> = {
@@ -138,7 +153,7 @@ const GRADE_THRESHOLDS: Array<{
   { min: 0, grade: 'F', label: 'Critical Decision Risk', color: '#ef4444' },
 ];
 
-const METHODOLOGY_VERSION = '1.0.0';
+const METHODOLOGY_VERSION = '2.0.0';
 
 // ---------------------------------------------------------------------------
 // Component scoring functions
@@ -341,6 +356,69 @@ function scoreComplianceRisk(compliance: DQIInput['compliance']): DQIComponent {
   };
 }
 
+function scoreHistoricalAlignment(
+  alignment: DQIInput['historicalAlignment']
+): DQIComponent {
+  // Default to neutral score when no historical data is available
+  if (!alignment) {
+    return {
+      name: 'Historical Alignment',
+      score: 60,
+      weight: WEIGHTS.historicalAlignment,
+      weighted: Math.round(60 * WEIGHTS.historicalAlignment * 10) / 10,
+      grade: getComponentGrade(60),
+      detail: 'No historical correlation data available.',
+    };
+  }
+
+  let score = 70; // Neutral starting point
+
+  // Failure pattern penalty: more matched failure patterns = lower score
+  if (alignment.matchedFailurePatterns > 0) {
+    score -= alignment.matchedFailurePatterns * 8;
+  }
+
+  // Correlation multiplier penalty: higher multiplier = higher compound risk
+  if (alignment.correlationMultiplier > 1.0) {
+    score -= (alignment.correlationMultiplier - 1.0) * 30;
+  }
+
+  // Success pattern bonus: matched beneficial patterns boost score
+  if (alignment.matchedSuccessPatterns > 0) {
+    score += alignment.matchedSuccessPatterns * 10;
+  }
+
+  // Beneficial damping bonus: active mitigation recognized
+  if (alignment.beneficialDamping < 1.0) {
+    score += (1.0 - alignment.beneficialDamping) * 20;
+  }
+
+  score = Math.max(0, Math.min(100, score));
+
+  let detail: string;
+  if (alignment.matchedFailurePatterns === 0 && alignment.matchedSuccessPatterns === 0) {
+    detail = 'No strong historical pattern matches found.';
+  } else {
+    const parts: string[] = [];
+    if (alignment.matchedFailurePatterns > 0) {
+      parts.push(`${alignment.matchedFailurePatterns} failure pattern(s) detected`);
+    }
+    if (alignment.matchedSuccessPatterns > 0) {
+      parts.push(`${alignment.matchedSuccessPatterns} success pattern(s) matched`);
+    }
+    detail = parts.join(', ') + '.';
+  }
+
+  return {
+    name: 'Historical Alignment',
+    score: Math.round(score),
+    weight: WEIGHTS.historicalAlignment,
+    weighted: Math.round(score * WEIGHTS.historicalAlignment * 10) / 10,
+    grade: getComponentGrade(score),
+    detail,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -389,6 +467,13 @@ function findTopImprovement(components: DQIResult['components']): DQIResult['top
       suggestion:
         'Address regulatory violations and ensure decision documentation meets compliance requirements.',
     },
+    {
+      component: 'Historical Alignment',
+      score: components.historicalAlignment.score,
+      weight: components.historicalAlignment.weight,
+      suggestion:
+        'Your decision pattern matches historical failures. Review case study parallels, encourage dissent, bring in external advisors, and iterate before committing.',
+    },
   ];
 
   // Find the component with the most potential weighted improvement
@@ -411,6 +496,111 @@ function findTopImprovement(components: DQIResult['components']): DQIResult['top
 }
 
 // ---------------------------------------------------------------------------
+// Historical Benchmarking — Percentile from Case Study Database
+// ---------------------------------------------------------------------------
+
+/**
+ * Compute a synthetic DQI score for a historical case study.
+ * Maps the case's characteristics to approximate DQI dimensions.
+ */
+function computeSyntheticDQI(c: CaseStudy): number {
+  // Bias Load (30%): more biases and higher impact → lower score
+  const biasPenalty = c.biasesPresent.length * 8;
+  const biasScore = Math.max(0, Math.min(100, 100 - Math.sqrt(biasPenalty) * 6));
+
+  // Process Maturity (15%): infer from context factors
+  let processScore = 40;
+  if (c.contextFactors.dissentEncouraged) processScore += 20;
+  if (c.contextFactors.externalAdvisors) processScore += 15;
+  if (c.contextFactors.iterativeProcess) processScore += 15;
+  if (!c.contextFactors.dissentAbsent) processScore += 10;
+  processScore = Math.min(100, processScore);
+
+  // Evidence/Noise (20% each): estimate from outcome
+  // Success cases imply better evidence/less noise; failures imply worse
+  const evidenceScore = isSuccessOutcome(c.outcome) ? 70 : isFailureOutcome(c.outcome) ? 35 : 50;
+  const noiseScore = c.contextFactors.unanimousConsensus ? 30 : 60;
+
+  // Compliance (15%): neutral estimate
+  const complianceScore = 60;
+
+  // Weighted total (same weights as DQI)
+  const syntheticDQI =
+    biasScore * 0.3 +
+    noiseScore * 0.2 +
+    evidenceScore * 0.2 +
+    processScore * 0.15 +
+    complianceScore * 0.15;
+
+  return Math.round(Math.max(0, Math.min(100, syntheticDQI)));
+}
+
+/** Cache synthetic DQI scores (computed once) */
+let _cachedBenchmarks: Array<{ company: string; dqi: number; outcome: string }> | null = null;
+
+function getCaseBenchmarks(): Array<{ company: string; dqi: number; outcome: string }> {
+  if (_cachedBenchmarks) return _cachedBenchmarks;
+  _cachedBenchmarks = ALL_CASES.map(c => ({
+    company: c.company,
+    dqi: computeSyntheticDQI(c),
+    outcome: c.outcome,
+  })).sort((a, b) => a.dqi - b.dqi);
+  return _cachedBenchmarks;
+}
+
+/**
+ * Compute the percentile ranking of a DQI score against historical case studies.
+ * Returns 0-100 where 100 = better than all historical cases.
+ */
+function computeHistoricalPercentile(dqiScore: number): number {
+  const benchmarks = getCaseBenchmarks();
+  const belowCount = benchmarks.filter(b => b.dqi < dqiScore).length;
+  return Math.round((belowCount / benchmarks.length) * 100);
+}
+
+/**
+ * Find the closest historical case study comparisons for narrative context.
+ */
+export function getHistoricalComparisons(dqiScore: number): Array<{
+  company: string;
+  dqi: number;
+  outcome: string;
+  relation: 'below' | 'comparable' | 'above';
+}> {
+  const benchmarks = getCaseBenchmarks();
+  const comparisons: Array<{
+    company: string;
+    dqi: number;
+    outcome: string;
+    relation: 'below' | 'comparable' | 'above';
+  }> = [];
+
+  // Find closest failure case below
+  const failureBelow = benchmarks
+    .filter(b => b.dqi < dqiScore && b.outcome.includes('failure'))
+    .pop();
+  if (failureBelow) {
+    comparisons.push({ ...failureBelow, relation: 'above' });
+  }
+
+  // Find closest success case above
+  const successAbove = benchmarks
+    .find(b => b.dqi > dqiScore && (b.outcome.includes('success')));
+  if (successAbove) {
+    comparisons.push({ ...successAbove, relation: 'below' });
+  }
+
+  // Find comparable case (within 5 points)
+  const comparable = benchmarks
+    .find(b => Math.abs(b.dqi - dqiScore) <= 5 && b.company !== failureBelow?.company && b.company !== successAbove?.company);
+  if (comparable) {
+    comparisons.push({ ...comparable, relation: 'comparable' });
+  }
+
+  return comparisons;
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -427,6 +617,7 @@ export function computeDQI(input: DQIInput): DQIResult {
   const evidenceQuality = scoreEvidenceQuality(input.factCheck);
   const processMaturity = scoreProcessMaturity(input.process);
   const complianceRisk = scoreComplianceRisk(input.compliance);
+  const historicalAlignment = scoreHistoricalAlignment(input.historicalAlignment);
 
   const components = {
     biasLoad,
@@ -434,6 +625,7 @@ export function computeDQI(input: DQIInput): DQIResult {
     evidenceQuality,
     processMaturity,
     complianceRisk,
+    historicalAlignment,
   };
 
   // Compute weighted total
@@ -442,7 +634,8 @@ export function computeDQI(input: DQIInput): DQIResult {
     noiseLevel.weighted +
     evidenceQuality.weighted +
     processMaturity.weighted +
-    complianceRisk.weighted;
+    complianceRisk.weighted +
+    historicalAlignment.weighted;
 
   // If compound score is available, blend it in (10% influence)
   let finalScore = rawScore;
@@ -466,7 +659,7 @@ export function computeDQI(input: DQIInput): DQIResult {
     gradeLabel: gradeInfo.label,
     color: gradeInfo.color,
     components,
-    percentile: null, // requires benchmark database
+    percentile: computeHistoricalPercentile(finalScore),
     topImprovement,
     system1Ratio: input.process.system1Ratio ?? null,
     methodologyVersion: METHODOLOGY_VERSION,
@@ -481,6 +674,7 @@ export function computeDQI(input: DQIInput): DQIResult {
       evidenceQuality: evidenceQuality.score,
       processMaturity: processMaturity.score,
       complianceRisk: complianceRisk.score,
+      historicalAlignment: historicalAlignment.score,
     },
   });
 

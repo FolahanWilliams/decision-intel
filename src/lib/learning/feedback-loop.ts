@@ -14,6 +14,7 @@ import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { DEFAULT_BIAS_SEVERITY_WEIGHTS, DEFAULT_COUNTERFACTUAL_WEIGHTS } from './constants';
+import { updateCausalModel } from './causal-learning';
 
 // Re-export constants so existing imports keep working
 export { DEFAULT_BIAS_SEVERITY_WEIGHTS, DEFAULT_COUNTERFACTUAL_WEIGHTS };
@@ -576,6 +577,7 @@ export async function runFullRecalibration(orgId?: string | null): Promise<{
   biasSeverity: { updated: boolean; sampleSize: number };
   nudgeThresholds: { updated: boolean; sampleSize: number };
   twinWeights: { updated: boolean; sampleSize: number };
+  causalModel: { updated: boolean };
 }> {
   log.info(`Starting full recalibration for ${orgId || 'global'}...`);
 
@@ -585,11 +587,24 @@ export async function runFullRecalibration(orgId?: string | null): Promise<{
     recalibrateTwinWeights(orgId),
   ]);
 
+  // Update org-specific causal model (bias→outcome weights)
+  let causalModelUpdated = false;
+  if (orgId) {
+    try {
+      const result = await updateCausalModel(orgId);
+      causalModelUpdated = result != null;
+      log.info(`Causal model ${causalModelUpdated ? 'updated' : 'skipped (insufficient data)'} for ${orgId}`);
+    } catch (error) {
+      log.error(`Causal model update failed for ${orgId}:`, error);
+    }
+  }
+
   log.info(
     `Recalibration complete: biases=${biasSeverity.updated}(n=${biasSeverity.sampleSize}), ` +
       `nudges=${nudgeThresholds.updated}(n=${nudgeThresholds.sampleSize}), ` +
-      `twins=${twinWeights.updated}(n=${twinWeights.sampleSize})`
+      `twins=${twinWeights.updated}(n=${twinWeights.sampleSize}), ` +
+      `causal=${causalModelUpdated}`
   );
 
-  return { biasSeverity, nudgeThresholds, twinWeights };
+  return { biasSeverity, nudgeThresholds, twinWeights, causalModel: { updated: causalModelUpdated } };
 }
