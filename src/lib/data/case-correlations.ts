@@ -13,7 +13,15 @@
  * engine are the defensible IP layer.
  */
 
-import { FAILURE_CASES, type FailureCase } from './failure-cases';
+import { FAILURE_CASES as LEGACY_FAILURE_CASES, type FailureCase } from './failure-cases';
+import {
+  ALL_CASES,
+  FAILURE_CASES as UNIFIED_FAILURE_CASES,
+  SUCCESS_CASES,
+  type CaseStudy,
+  isFailureOutcome,
+  isSuccessOutcome,
+} from './case-studies';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -93,8 +101,33 @@ export interface ContextAmplifier {
   amplifiedBiases: Array<{ bias: string; frequency: number; avgImpact: number }>;
 }
 
+export interface BiasOutcomeDivergence {
+  bias: string;
+  /** Fraction of cases with this bias that had failure outcomes */
+  failureRate: number;
+  /** Fraction of cases with this bias that had success outcomes */
+  successRate: number;
+  /** How often this bias was actively managed in success cases */
+  mitigationFrequency: number;
+  /** Context conditions that separated success from failure */
+  criticalMitigators: string[];
+  failureSample: number;
+  successSample: number;
+}
+
+export interface SuccessPatternCorrelation {
+  pattern: string;
+  frequency: number;
+  avgPositiveImpact: number;
+  requiredConditions: string[];
+  associatedBiasesManaged: string[];
+  sampleSize: number;
+}
+
 export interface CrossCaseCorrelations {
   totalCases: number;
+  totalFailureCases: number;
+  totalSuccessCases: number;
   /** Top bias pairs ranked by amplification ratio */
   biasCooccurrences: BiasCooccurrenceEntry[];
   /** Risk profile per industry */
@@ -105,6 +138,10 @@ export interface CrossCaseCorrelations {
   severityPredictors: SeverityPredictor[];
   /** How context factors amplify failure severity */
   contextAmplifiers: ContextAmplifier[];
+  /** Per-bias divergence between failure and success outcomes */
+  biasOutcomeDivergence: BiasOutcomeDivergence[];
+  /** Beneficial patterns from success cases */
+  successPatterns: SuccessPatternCorrelation[];
 }
 
 // ---------------------------------------------------------------------------
@@ -483,6 +520,93 @@ function computeContextAmplifiers(cases: FailureCase[]): ContextAmplifier[] {
 }
 
 // ---------------------------------------------------------------------------
+// Success/Failure Divergence Analysis
+// ---------------------------------------------------------------------------
+
+function computeBiasOutcomeDivergence(allCases: CaseStudy[]): BiasOutcomeDivergence[] {
+  const allBiases = [...new Set(allCases.flatMap(c => c.biasesPresent))];
+  const results: BiasOutcomeDivergence[] = [];
+
+  for (const bias of allBiases) {
+    const casesWithBias = allCases.filter(c => c.biasesPresent.includes(bias));
+    if (casesWithBias.length < 2) continue;
+
+    const failures = casesWithBias.filter(c => isFailureOutcome(c.outcome));
+    const successes = casesWithBias.filter(c => isSuccessOutcome(c.outcome));
+
+    // How often was this bias managed in success cases?
+    const managedInSuccesses = successes.filter(c => c.biasesManaged.includes(bias));
+    const mitigationFrequency = successes.length > 0
+      ? managedInSuccesses.length / successes.length
+      : 0;
+
+    // What mitigation factors appeared most in successes vs failures?
+    const successMitigators = new Map<string, number>();
+    for (const c of successes) {
+      for (const factor of c.mitigationFactors) {
+        successMitigators.set(factor, (successMitigators.get(factor) ?? 0) + 1);
+      }
+    }
+    const criticalMitigators = [...successMitigators.entries()]
+      .filter(([, count]) => count >= 2)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 3)
+      .map(([factor]) => factor);
+
+    results.push({
+      bias,
+      failureRate: Math.round((failures.length / casesWithBias.length) * 100) / 100,
+      successRate: Math.round((successes.length / casesWithBias.length) * 100) / 100,
+      mitigationFrequency: Math.round(mitigationFrequency * 100) / 100,
+      criticalMitigators,
+      failureSample: failures.length,
+      successSample: successes.length,
+    });
+  }
+
+  // Sort by divergence (biases with highest failure:success ratio)
+  return results.sort((a, b) => b.failureRate - a.failureRate);
+}
+
+function computeSuccessPatterns(successCases: CaseStudy[]): SuccessPatternCorrelation[] {
+  const patternMap = new Map<string, CaseStudy[]>();
+
+  for (const c of successCases) {
+    for (const pattern of c.beneficialPatterns) {
+      if (!patternMap.has(pattern)) patternMap.set(pattern, []);
+      patternMap.get(pattern)!.push(c);
+    }
+  }
+
+  return [...patternMap.entries()]
+    .map(([pattern, cases]) => {
+      const avgImpact = cases.reduce((s, c) => s + c.impactScore, 0) / cases.length;
+
+      // Find required conditions (context factors common across cases)
+      const conditions: string[] = [];
+      const dissentRate = cases.filter(c => c.contextFactors.dissentEncouraged).length / cases.length;
+      const advisorRate = cases.filter(c => c.contextFactors.externalAdvisors).length / cases.length;
+      const iterativeRate = cases.filter(c => c.contextFactors.iterativeProcess).length / cases.length;
+      if (dissentRate > 0.5) conditions.push('dissent_encouraged');
+      if (advisorRate > 0.5) conditions.push('external_advisors');
+      if (iterativeRate > 0.5) conditions.push('iterative_process');
+
+      // Find biases managed across these cases
+      const managedBiases = [...new Set(cases.flatMap(c => c.biasesManaged))];
+
+      return {
+        pattern,
+        frequency: cases.length,
+        avgPositiveImpact: Math.round(avgImpact * 10) / 10,
+        requiredConditions: conditions,
+        associatedBiasesManaged: managedBiases,
+        sampleSize: cases.length,
+      };
+    })
+    .sort((a, b) => b.avgPositiveImpact - a.avgPositiveImpact);
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -495,14 +619,22 @@ let _cached: CrossCaseCorrelations | null = null;
 export function computeCrossCaseCorrelations(): CrossCaseCorrelations {
   if (_cached) return _cached;
 
-  const cases = FAILURE_CASES;
+  // Legacy failure cases for existing correlation functions
+  const cases = LEGACY_FAILURE_CASES;
+
   _cached = {
-    totalCases: cases.length,
+    totalCases: ALL_CASES.length,
+    totalFailureCases: UNIFIED_FAILURE_CASES.length,
+    totalSuccessCases: SUCCESS_CASES.length,
+    // Existing failure-based correlations (use legacy type for compatibility)
     biasCooccurrences: computeBiasCooccurrences(cases),
     industryProfiles: computeIndustryProfiles(cases),
     temporalPatterns: computeTemporalPatterns(cases),
     severityPredictors: computeSeverityPredictors(cases),
     contextAmplifiers: computeContextAmplifiers(cases),
+    // New success/failure divergence analysis (uses unified type)
+    biasOutcomeDivergence: computeBiasOutcomeDivergence(ALL_CASES),
+    successPatterns: computeSuccessPatterns(SUCCESS_CASES),
   };
 
   return _cached;
@@ -543,11 +675,16 @@ export function computeCorrelationMultiplier(
     timePressure?: boolean;
     unanimousConsensus?: boolean;
     participantCount?: number;
+    dissentEncouraged?: boolean;
+    externalAdvisors?: boolean;
+    iterativeProcess?: boolean;
   }
 ): {
   multiplier: number;
   matchedPairs: BiasCooccurrenceEntry[];
   matchedPredictors: SeverityPredictor[];
+  beneficialDamping: number;
+  matchedSuccessPatterns: SuccessPatternCorrelation[];
 } {
   const correlations = computeCrossCaseCorrelations();
 
@@ -585,10 +722,7 @@ export function computeCorrelationMultiplier(
     }
   }
 
-  // Compute composite multiplier
-  // Base: 1.0 (no adjustment)
-  // Each matched pair with amplification > 1.0 adds (amplification - 1) * 0.1
-  // Each matched context predictor with lift > 1.0 adds (lift - 1) * 0.05
+  // Compute risk amplification from failure correlations
   let multiplier = 1.0;
   for (const pair of matchedPairs) {
     if (pair.amplificationRatio > 1.0) {
@@ -601,8 +735,55 @@ export function computeCorrelationMultiplier(
     }
   }
 
-  // Cap at 2.0 (100% amplification max)
-  multiplier = Math.min(2.0, Math.round(multiplier * 100) / 100);
+  // Compute beneficial damping from success pattern matches
+  // When the context includes mitigation factors seen in success cases,
+  // reduce the risk multiplier
+  let beneficialDamping = 1.0;
+  const matchedSuccessPatterns: SuccessPatternCorrelation[] = [];
 
-  return { multiplier, matchedPairs, matchedPredictors };
+  for (const sp of correlations.successPatterns) {
+    // Check if detected biases overlap with biases managed in this success pattern
+    const biasOverlap = sp.associatedBiasesManaged.filter(b =>
+      detectedBiases.some(d => d.toLowerCase().replace(/\s+/g, '_') === b || d === b)
+    );
+    if (biasOverlap.length === 0) continue;
+
+    // Check if context conditions match
+    let contextMatch = 0;
+    let contextTotal = sp.requiredConditions.length;
+    for (const cond of sp.requiredConditions) {
+      if (cond === 'dissent_encouraged' && context.dissentEncouraged) contextMatch++;
+      if (cond === 'external_advisors' && context.externalAdvisors) contextMatch++;
+      if (cond === 'iterative_process' && context.iterativeProcess) contextMatch++;
+    }
+
+    // Require at least one context condition match and one bias overlap
+    if (contextTotal > 0 && contextMatch > 0) {
+      matchedSuccessPatterns.push(sp);
+      const matchStrength = (contextMatch / contextTotal) * (biasOverlap.length / sp.associatedBiasesManaged.length);
+      beneficialDamping -= matchStrength * 0.15;
+    }
+  }
+
+  // Also check bias outcome divergence: if a bias appears more in successes
+  // with mitigation, reduce its risk contribution
+  for (const divergence of correlations.biasOutcomeDivergence) {
+    if (!detectedBiases.includes(divergence.bias)) continue;
+    if (divergence.mitigationFrequency > 0.5) {
+      // This bias is frequently managed in successes — check if mitigation context is present
+      const hasMitigationContext =
+        context.dissentEncouraged || context.externalAdvisors || context.iterativeProcess;
+      if (hasMitigationContext) {
+        beneficialDamping -= divergence.mitigationFrequency * 0.05;
+      }
+    }
+  }
+
+  beneficialDamping = Math.max(0.7, beneficialDamping);
+
+  // Apply damping and cap
+  multiplier = multiplier * beneficialDamping;
+  multiplier = Math.max(0.7, Math.min(2.0, Math.round(multiplier * 100) / 100));
+
+  return { multiplier, matchedPairs, matchedPredictors, beneficialDamping, matchedSuccessPatterns };
 }
