@@ -750,7 +750,7 @@ export function computeCorrelationMultiplier(
 
     // Check if context conditions match
     let contextMatch = 0;
-    let contextTotal = sp.requiredConditions.length;
+    const contextTotal = sp.requiredConditions.length;
     for (const cond of sp.requiredConditions) {
       if (cond === 'dissent_encouraged' && context.dissentEncouraged) contextMatch++;
       if (cond === 'external_advisors' && context.externalAdvisors) contextMatch++;
