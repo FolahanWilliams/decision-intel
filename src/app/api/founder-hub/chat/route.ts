@@ -108,6 +108,8 @@ Key objections:
 - "How is this different from ChatGPT?" → "3 independent judges, 20x20 interaction matrix, 31 domain-specific biases, outcome flywheel that gets smarter."
 - "Our team would never share strategic documents" → "GDPR-anonymized before AI touches it. PII never leaves anonymization layer."
 - "No budget" → "One avoided bad decision = millions saved. That's 100-1000x ROI."
+- "You're just using hindsight" → "We include original documents from before outcomes were known. Boeing's 2011 board memo, Yahoo's rejection letter, Enron's Watkins memo — the biases were flaggable at decision time. 14 case studies now have pre-decision evidence proving this."
+- "How do you know the biases were really detectable?" → "We source original board memos, SEC filings, and strategy documents from the decision point. Our platform's analysis of Boeing's 2011 re-engine memo flags sunk cost, anchoring, and time pressure — all visible before the 737 MAX outcome."
 Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (specific excerpts) → Boardroom Simulation (THE WOW MOMENT) → Noise Score → Toxic Combinations → Close with free pilot offer.
 
 === RESEARCH FOUNDATIONS ===

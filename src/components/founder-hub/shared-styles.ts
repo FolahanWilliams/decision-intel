@@ -1,4 +1,5 @@
 import type React from 'react';
+import type { CaseOutcome } from '@/lib/data/case-studies/types';
 
 // ─── Shared Styles for Founder Hub Tabs ──────────────────────────────────────
 
@@ -70,3 +71,23 @@ export function formatIndustry(s: string) {
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 }
+
+// ─── Outcome Maps ──────────────────────────────────────────────────────────
+
+export const OUTCOME_COLORS: Record<CaseOutcome, string> = {
+  catastrophic_failure: '#ef4444',
+  failure: '#f97316',
+  partial_failure: '#eab308',
+  partial_success: '#84cc16',
+  success: '#22c55e',
+  exceptional_success: '#06b6d4',
+};
+
+export const OUTCOME_LABELS: Record<CaseOutcome, string> = {
+  catastrophic_failure: 'Catastrophic Failure',
+  failure: 'Failure',
+  partial_failure: 'Partial Failure',
+  partial_success: 'Partial Success',
+  success: 'Success',
+  exceptional_success: 'Exceptional Success',
+};

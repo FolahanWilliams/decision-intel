@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { BarChart3, Target, Brain, ChevronRight, ChevronDown, AlertTriangle, TrendingUp } from 'lucide-react';
 import { WEIGHTS, GRADE_THRESHOLDS, SYSTEM1_BIASES, METHODOLOGY_VERSION, computeSyntheticDQI, computeHistoricalPercentile } from '@/lib/scoring/dqi';
 import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
-import { card, sectionTitle, label, badge, formatBias } from './shared-styles';
+import { card, sectionTitle, label, badge, OUTCOME_COLORS, OUTCOME_LABELS } from './shared-styles';
+import type { CaseOutcome } from '@/lib/data/case-studies/types';
 
 // ---------------------------------------------------------------------------
 // Component weight colors
@@ -70,8 +71,8 @@ export function DqiMethodologyTab() {
   })).sort((a, b) => b.dqi - a.dqi);
 
   const filteredCases = caseRankings.filter(c => {
-    if (outcomeFilter === 'success') return isSuccessOutcome(c.outcome as any);
-    if (outcomeFilter === 'failure') return isFailureOutcome(c.outcome as any);
+    if (outcomeFilter === 'success') return isSuccessOutcome(c.outcome as CaseOutcome);
+    if (outcomeFilter === 'failure') return isFailureOutcome(c.outcome as CaseOutcome);
     return true;
   });
 
@@ -144,16 +145,20 @@ export function DqiMethodologyTab() {
             const isExpanded = expandedComponent === key;
             return (
               <div key={key}>
-                <div
+                <button
+                  type="button"
+                  aria-expanded={isExpanded}
                   onClick={() => setExpandedComponent(isExpanded ? null : key)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
+                    width: '100%',
                     padding: '10px 12px',
                     borderRadius: 8,
                     cursor: 'pointer',
                     background: isExpanded ? 'var(--border-primary, #222)' : 'transparent',
+                    border: 'none',
                     transition: 'background 0.15s ease',
                   }}
                 >
@@ -170,7 +175,7 @@ export function DqiMethodologyTab() {
                   <span style={badge(COMPONENT_COLORS[key])}>
                     {Math.round(weight * 100)}%
                   </span>
-                </div>
+                </button>
                 {isExpanded && (
                   <div
                     style={{
@@ -317,7 +322,7 @@ export function DqiMethodologyTab() {
         {filteredCases.map((c, i) => {
           const scoreColor = gradeColorForScore(c.dqi);
           const percentile = computeHistoricalPercentile(c.dqi);
-          const outcomeColor = isSuccessOutcome(c.outcome as any) ? '#22c55e' : '#ef4444';
+          const outcomeColor = OUTCOME_COLORS[c.outcome as CaseOutcome] ?? '#71717a';
           return (
             <div
               key={`${c.company}-${i}`}
@@ -349,7 +354,7 @@ export function DqiMethodologyTab() {
                 {c.dqi}
               </span>
               <span style={badge(outcomeColor)}>
-                {formatBias(c.outcome)}
+                {OUTCOME_LABELS[c.outcome as CaseOutcome] ?? c.outcome}
               </span>
               <span style={{ color: 'var(--text-muted, #71717a)', fontSize: 12 }}>
                 {percentile}th

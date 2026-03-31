@@ -29,7 +29,7 @@ export function CorrelationCausalTab() {
     correlations.industryProfiles[0]?.industry ?? '',
   );
 
-  const industryProfile = getIndustryProfile(selectedIndustry);
+  const industryProfile = selectedIndustry ? getIndustryProfile(selectedIndustry) : undefined;
 
   // Helpers ------------------------------------------------------------------
 

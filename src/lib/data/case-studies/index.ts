@@ -39,6 +39,7 @@ function adaptLegacyCase(legacy: LegacyFailureCase): CaseStudy {
       externalAdvisors: false,
       iterativeProcess: false,
     },
+    ...(legacy.preDecisionEvidence ? { preDecisionEvidence: legacy.preDecisionEvidence } : {}),
   };
 }
 

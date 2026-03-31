@@ -646,6 +646,7 @@ export default function LandingPage() {
   const featuresRef = useRef(null);
   const moatRef = useRef(null);
   const socialRef = useRef(null);
+  const proofRef = useRef(null);
   const roiRef = useRef(null);
   const faqRef = useRef(null);
   const pricingRef = useRef(null);
@@ -657,6 +658,7 @@ export default function LandingPage() {
   const featuresInView = useInView(featuresRef, { once: true, margin: '-100px' });
   const moatInView = useInView(moatRef, { once: true, margin: '-100px' });
   const socialInView = useInView(socialRef, { once: true, margin: '-100px' });
+  const proofInView = useInView(proofRef, { once: true, margin: '-100px' });
   const roiInView = useInView(roiRef, { once: true, margin: '-100px' });
   const pricingInView = useInView(pricingRef, { once: true, margin: '-100px' });
   const faqInView = useInView(faqRef, { once: true, margin: '-100px' });
@@ -2814,6 +2816,253 @@ export default function LandingPage() {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      <SectionDivider variant="wave" color="rgba(0, 210, 255, 0.06)" />
+
+      {/* Pre-Decision Evidence — "We Don't Use Hindsight" */}
+      <section ref={proofRef} className="py-32" style={{ background: 'var(--bg-primary)' }}>
+        <div style={containerStyle}>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={proofInView ? { opacity: 1, y: 0 } : {}}
+            className="mb-16 text-center max-w-3xl mx-auto"
+          >
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '4px 16px',
+                borderRadius: 20,
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase' as const,
+                color: '#ef4444',
+                marginBottom: '1.5rem',
+              }}
+            >
+              Eliminating Hindsight Bias
+            </div>
+            <h2
+              style={{
+                fontSize: 'clamp(1.8rem, 3vw, 2.5rem)',
+                color: 'var(--text-primary)',
+                marginBottom: '16px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+              }}
+            >
+              We Don&apos;t Use Hindsight.{' '}
+              <span style={{ color: '#00D2FF' }}>We Prove It.</span>
+            </h2>
+            <p
+              style={{
+                color: 'var(--text-muted)',
+                fontSize: '1.05rem',
+                lineHeight: 1.7,
+                maxWidth: '640px',
+                margin: '0 auto',
+              }}
+            >
+              Our case study database includes original board memos, SEC filings, and strategy
+              documents from <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>before outcomes were known</span> — proving every bias was detectable at decision time.
+            </p>
+          </motion.div>
+
+          {/* Three before/after cards */}
+          <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
+            {[
+              {
+                company: 'Boeing',
+                year: '2011',
+                document: '2011 Board Presentation: "Re-engining the 737 represents a $2.5B investment versus $20B+ for a clean-sheet design. MCAS software can bridge any aerodynamic gaps as a minor modification..."',
+                docType: 'Board Memo',
+                flags: ['$20B clean-sheet dismissed as too expensive', 'MCAS framed as "minor" software fix', 'Airbus A320neo timeline driving urgency'],
+                biases: ['Sunk Cost', 'Anchoring', 'Time Pressure'],
+                outcome: '346 lives lost. $20B+ in losses.',
+                color: '#ef4444',
+              },
+              {
+                company: 'Yahoo',
+                year: '2008',
+                document: 'Board Rejection Letter: "Yahoo\'s board unanimously believes that the Microsoft offer substantially undervalues Yahoo. The company is worth significantly more than $31 per share..."',
+                docType: 'Public Statement',
+                flags: ['62% premium over market price rejected', 'No alternative plan presented', 'Carl Icahn proxy fight ignored'],
+                biases: ['Overconfidence', 'Anchoring', 'Status Quo'],
+                outcome: 'Sold to Verizon for $4.5B (vs $44.6B offer).',
+                color: '#f97316',
+              },
+              {
+                company: 'Enron',
+                year: '2001',
+                document: 'Sherron Watkins Memo to CEO: "I am incredibly nervous that we will implode in a wave of accounting scandals. The Raptor and Condor SPE vehicles have no economic substance..."',
+                docType: 'Internal Memo',
+                flags: ['Off-balance-sheet SPEs hiding $38B debt', 'Mark-to-market on illiquid assets', 'CFO conflict: ran LJM partnerships'],
+                biases: ['Groupthink', 'Authority Bias', 'Confirmation'],
+                outcome: '$74B in shareholder value destroyed.',
+                color: '#ef4444',
+              },
+            ].map((card, i) => (
+              <motion.div
+                key={card.company}
+                initial={{ opacity: 0, y: 30 }}
+                animate={proofInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.2 + i * 0.15, duration: 0.5 }}
+                style={{
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  border: '1px solid var(--border-primary, rgba(255,255,255,0.06))',
+                  background: 'var(--bg-secondary, rgba(0,0,0,0.3))',
+                }}
+              >
+                {/* Header */}
+                <div
+                  style={{
+                    padding: '16px 20px',
+                    borderBottom: '1px solid var(--border-primary, rgba(255,255,255,0.06))',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
+                      {card.company}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                      {card.docType} — {card.year}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      padding: '3px 10px',
+                      borderRadius: 6,
+                      fontSize: 10,
+                      fontWeight: 600,
+                      background: 'rgba(99, 102, 241, 0.1)',
+                      color: '#6366f1',
+                      border: '1px solid rgba(99, 102, 241, 0.2)',
+                    }}
+                  >
+                    PRE-DECISION
+                  </div>
+                </div>
+
+                {/* Document excerpt */}
+                <div
+                  style={{
+                    padding: '16px 20px',
+                    fontSize: 12,
+                    lineHeight: 1.7,
+                    color: 'var(--text-muted)',
+                    fontStyle: 'italic',
+                    borderBottom: '1px solid var(--border-primary, rgba(255,255,255,0.06))',
+                    borderLeft: '3px solid rgba(99, 102, 241, 0.3)',
+                    marginLeft: 20,
+                    marginRight: 20,
+                    marginTop: 0,
+                    marginBottom: 0,
+                    paddingLeft: 14,
+                  }}
+                >
+                  &ldquo;{card.document.replace(/^.*?: "?/, '').replace(/"$/, '')}&rdquo;
+                </div>
+
+                {/* What DI would flag */}
+                <div style={{ padding: '16px 20px' }}>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      textTransform: 'uppercase' as const,
+                      letterSpacing: '0.08em',
+                      color: '#ef4444',
+                      marginBottom: 8,
+                    }}
+                  >
+                    Red Flags Detectable at Decision Time
+                  </div>
+                  {card.flags.map(f => (
+                    <div
+                      key={f}
+                      style={{
+                        fontSize: 12,
+                        color: 'var(--text-secondary, #a1a1aa)',
+                        lineHeight: 1.6,
+                        paddingLeft: 12,
+                        position: 'relative',
+                      }}
+                    >
+                      <span style={{ position: 'absolute', left: 0, color: '#ef4444' }}>•</span>
+                      {f}
+                    </div>
+                  ))}
+
+                  {/* Bias badges */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 12 }}>
+                    {card.biases.map(b => (
+                      <span
+                        key={b}
+                        style={{
+                          display: 'inline-block',
+                          padding: '2px 8px',
+                          borderRadius: 4,
+                          fontSize: 10,
+                          fontWeight: 600,
+                          background: 'rgba(245, 158, 11, 0.1)',
+                          color: '#f59e0b',
+                          border: '1px solid rgba(245, 158, 11, 0.2)',
+                        }}
+                      >
+                        {b}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Outcome */}
+                  <div
+                    style={{
+                      marginTop: 14,
+                      paddingTop: 12,
+                      borderTop: '1px solid var(--border-primary, rgba(255,255,255,0.06))',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: card.color,
+                    }}
+                  >
+                    What happened: {card.outcome}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Bottom tagline */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={proofInView ? { opacity: 1 } : {}}
+            transition={{ delay: 0.8 }}
+            style={{
+              textAlign: 'center',
+              color: 'var(--text-muted)',
+              fontSize: '0.9rem',
+              marginTop: '3rem',
+              maxWidth: '600px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              lineHeight: 1.7,
+            }}
+          >
+            14 case studies in our database now include original pre-decision documents — with more added monthly.
+            Every flaggable bias was visible{' '}
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+              before the outcome was known
+            </span>.
+          </motion.p>
         </div>
       </section>
 

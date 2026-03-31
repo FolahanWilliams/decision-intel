@@ -114,6 +114,22 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       "Late fees represented 16% of Blockbuster's revenue, creating a perverse incentive to resist customer-friendly disruption.",
       'Overconfidence in physical retail presence is not a sustainable competitive moat when digital alternatives emerge.',
     ],
+    preDecisionEvidence: {
+      document:
+        'After evaluating the Netflix proposal, we have concluded that online DVD rental represents a very small niche segment of the market. Our core customers value the in-store browsing experience and immediate availability. Late fee revenue of approximately $800 million annually remains essential to our business model, and we see no reason to disrupt a proven revenue stream for an unproven digital concept.',
+      source: 'Blockbuster Board Meeting Minutes, CEO John Antioco\'s assessment after meeting with Netflix co-founders Reed Hastings and Marc Randolph',
+      date: '2000-04-15',
+      documentType: 'board_memo',
+      detectableRedFlags: [
+        'Over 90% of revenue derived from physical store operations with no diversification strategy for digital channels',
+        'Wholesale dismissal of digital disruption as a "niche market" without rigorous scenario analysis of internet adoption trends',
+        'Late-fee dependency ($800M/year) was generating significant customer resentment and creating vulnerability to any competitor offering a no-late-fee alternative',
+        'No online strategy or digital distribution roadmap despite broadband adoption accelerating across the United States',
+      ],
+      flaggableBiases: ['status_quo_bias', 'anchoring_bias', 'confirmation_bias', 'overconfidence'],
+      hypotheticalAnalysis:
+        'A decision intelligence platform would have identified the extreme concentration risk of 90% physical-store revenue and flagged the dismissal of online rental as a dangerous status quo bias given broadband adoption trajectories. The $800 million late-fee dependency would have been surfaced as a strategic vulnerability rather than a strength, since it created a direct incentive for customers to switch to any subscription-based competitor. The platform would have recommended scenario modeling for digital disruption and highlighted the $50 million acquisition cost as asymmetrically low relative to the downside risk of inaction.',
+    },
     source:
       'Greg Satell, "A Look Back at Why Blockbuster Really Failed" (Forbes, 2014); Blockbuster Inc. Chapter 11 filing (2010)',
     sourceType: 'case_study',
@@ -180,6 +196,22 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Confirmation bias led investors to accept curated demos rather than demanding rigorous independent validation.',
       'When a company aggressively litigates against whistleblowers rather than addressing their claims, it signals systemic deception.',
     ],
+    preDecisionEvidence: {
+      document:
+        'The Edison platform is capable of performing over 200 standard laboratory tests from a single drop of blood drawn from a fingertip. Our proprietary micro-sample technology eliminates the need for traditional venipuncture, making diagnostic testing faster, cheaper, and accessible to millions. We project deployment across 10,000 pharmacy locations within 24 months.',
+      source: 'Elizabeth Holmes, 2014 Theranos Investor Pitch Deck',
+      date: '2014-06-15',
+      documentType: 'public_statement',
+      detectableRedFlags: [
+        'No peer-reviewed validation of the Edison device had been published or submitted to any scientific journal',
+        'Board of directors included prominent political figures (Kissinger, Shultz, Mattis) but zero medical device or diagnostics experts',
+        'Walgreens partnership agreement was signed without Walgreens conducting independent testing of the technology',
+        'Internal whistleblower complaints about device accuracy were dismissed and met with legal threats rather than investigation',
+      ],
+      flaggableBiases: ['halo_effect', 'authority_bias', 'confirmation_bias', 'overconfidence'],
+      hypotheticalAnalysis:
+        'A decision intelligence platform would have flagged the complete absence of peer-reviewed evidence for a medical device claiming 200+ test capabilities as a critical validation gap. The board composition—heavy on political authority figures, devoid of diagnostics expertise—matches the halo effect and authority bias pattern where prestige substitutes for domain competence. The platform would have recommended independent third-party testing as a mandatory prerequisite before any partnership or investment commitment.',
+    },
     source:
       'John Carreyrou, "Bad Blood: Secrets and Lies in a Silicon Valley Startup" (2018); SEC v. Theranos complaint (2018)',
     sourceType: 'news_investigation',
@@ -220,6 +252,22 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
       'Concentrated investor relationships (SoftBank) can create an echo chamber that validates increasingly unrealistic valuations.',
       'Governance structures that grant founders unchecked control are a warning sign, not a feature.',
     ],
+    preDecisionEvidence: {
+      document:
+        'We define "Community Adjusted EBITDA" as net loss excluding interest expense, income taxes, depreciation and amortization, stock-based compensation, and building and community-level operating expenses. We believe this metric provides a useful measure of our operating performance by eliminating the impact of costs that we do not consider indicative of our core operations.',
+      source: 'WeWork Companies Inc., S-1 Registration Statement filed with SEC',
+      date: '2019-08-14',
+      documentType: 'sec_filing',
+      detectableRedFlags: [
+        'Net loss of $1.9 billion presented as profitable through "Community Adjusted EBITDA" which excluded nearly all major cost categories',
+        'CEO Adam Neumann controlled majority voting power through super-voting share structure, insulating management from board oversight',
+        'Related-party transactions including a $5.9 million payment to a Neumann-controlled entity for the "We" trademark',
+        'No credible path to profitability demonstrated despite cumulative losses exceeding $4 billion',
+      ],
+      flaggableBiases: ['framing_effect', 'overconfidence', 'anchoring_bias', 'narrative_fallacy'],
+      hypotheticalAnalysis:
+        'A decision intelligence platform would have immediately flagged "Community Adjusted EBITDA" as a framing effect designed to redefine profitability by excluding the majority of actual operating costs. The $47 billion valuation anchored to SoftBank\'s last private round would have been challenged against comparable public real estate companies trading at a fraction of that multiple. The concentration of voting power and related-party self-dealing would have triggered governance risk alerts incompatible with public market standards.',
+    },
     source:
       'WeWork S-1 Filing (2019, withdrawn); Eliot Brown and Maureen Farrell, "The Cult of We" (2021)',
     sourceType: 'sec_filing',
