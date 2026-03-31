@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Network, GitBranch, Boxes, Activity, Shield } from 'lucide-react';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('GraphStatsCard');
 
 interface GraphStats {
   totalNodes: number;
@@ -50,11 +53,11 @@ export function GraphStatsCard() {
             const riskData = await riskRes.json();
             setRiskState(riskData);
           }
-        } catch {
-          /* non-critical */
+        } catch (err) {
+          log.warn('Failed to fetch risk state:', err);
         }
-      } catch {
-        // Non-critical — silently fail
+      } catch (err) {
+        log.warn('Failed to fetch graph stats:', err);
       } finally {
         if (!cancelled) setLoading(false);
       }

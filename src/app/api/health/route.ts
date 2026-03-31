@@ -7,9 +7,11 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const log = createLogger('HealthRoute');
 
-// Cache for expensive health checks
+// Short-lived cache for expensive health checks (LLM ping).
+// On serverless this only helps within a single warm instance, which is fine —
+// it prevents burst-cost when multiple health probes hit the same instance.
 const healthCache = new Map<string, { data: unknown; expires: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 30_000; // 30 seconds
 
 /**
  * Check LLM API availability

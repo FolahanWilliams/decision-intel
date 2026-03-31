@@ -40,7 +40,7 @@ function escapeHtml(str: string): string {
 
 async function sendEmail(payload: EmailPayload): Promise<boolean> {
   if (!RESEND_API_KEY) {
-    log.warn(`[DRY RUN] Email not sent (RESEND_API_KEY not configured): ${payload.subject}`);
+    log.warn(`[DRY RUN] Email not sent (RESEND_API_KEY not configured): "${payload.subject}" to ${payload.to}`);
     return false;
   }
 

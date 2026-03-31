@@ -8,10 +8,13 @@ export async function register() {
     const { assertEnvValid } = await import('./lib/env');
     try {
       assertEnvValid();
-      console.log('[Instrumentation] ✓ Environment variables validated');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Instrumentation] Environment variables validated');
+      }
     } catch (err) {
+      // Always log env validation failures regardless of environment
       console.error(
-        '[Instrumentation] ✗ Environment validation failed:',
+        '[Instrumentation] Environment validation failed:',
         err instanceof Error ? err.message : err
       );
       // Don't crash the server — just warn loudly

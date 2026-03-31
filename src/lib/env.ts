@@ -55,6 +55,26 @@ export function validateEnv(): EnvValidationResult {
     }
   }
 
+  // Security warnings for production deployments
+  if (process.env.NODE_ENV === 'production') {
+    if (!process.env.DOCUMENT_ENCRYPTION_KEY) {
+      warnings.push(
+        'DOCUMENT_ENCRYPTION_KEY is not set — uploaded documents will be stored unencrypted. ' +
+          'Set this to a 32-byte hex key to enable AES-256-GCM encryption at rest.'
+      );
+    }
+    if (!process.env.RESEND_API_KEY) {
+      warnings.push(
+        'RESEND_API_KEY is not set — email notifications (invites, digests, outcome reminders) will be silently skipped.'
+      );
+    }
+    if (!process.env.CRON_SECRET) {
+      warnings.push(
+        'CRON_SECRET is not set — scheduled jobs (outcome detection, nudges, digests) will fail with 401.'
+      );
+    }
+  }
+
   return {
     valid: missing.length === 0,
     missing,

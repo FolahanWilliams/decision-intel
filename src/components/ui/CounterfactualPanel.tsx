@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { GitBranch, Loader2, TrendingUp, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { createClientLogger } from '@/lib/utils/logger';
+
+const log = createClientLogger('CounterfactualPanel');
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -55,8 +58,8 @@ export function CounterfactualPanel({ analysisId }: CounterfactualPanelProps) {
           const result = await res.json();
           if (!cancelled) setData(result);
         }
-      } catch {
-        // Silent fail — panel is supplementary
+      } catch (err) {
+        log.warn('Failed to fetch counterfactual data:', err);
       } finally {
         if (!cancelled) setLoading(false);
       }

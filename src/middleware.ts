@@ -9,7 +9,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // Continue with session update
-  return await updateSession(request);
+  const response = await updateSession(request);
+
+  // Propagate or generate a request ID for end-to-end tracing
+  const requestId = request.headers.get('x-request-id') || crypto.randomUUID();
+  response.headers.set('x-request-id', requestId);
+
+  return response;
 }
 
 export const config = {
