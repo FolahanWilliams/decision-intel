@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { BarChart3, Target, Brain, ChevronRight, ChevronDown, AlertTriangle, TrendingUp } from 'lucide-react';
 import { WEIGHTS, GRADE_THRESHOLDS, SYSTEM1_BIASES, METHODOLOGY_VERSION, computeSyntheticDQI, computeHistoricalPercentile } from '@/lib/scoring/dqi';
 import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
-import { card, sectionTitle, label, badge, OUTCOME_COLORS, OUTCOME_LABELS } from './shared-styles';
+import { card, sectionTitle, label, badge, formatBias, OUTCOME_COLORS, OUTCOME_LABELS } from './shared-styles';
 import type { CaseOutcome } from '@/lib/data/case-studies/types';
 
 // ---------------------------------------------------------------------------
