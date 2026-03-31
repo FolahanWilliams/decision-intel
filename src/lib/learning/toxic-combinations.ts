@@ -16,6 +16,12 @@ import { Prisma } from '@prisma/client';
 import { createLogger } from '@/lib/utils/logger';
 import { DEFAULT_BIAS_SEVERITY_WEIGHTS } from './constants';
 import { computeSeedWeights, getSeedInteractionWeights } from '@/lib/data/seed-weights';
+import {
+  detectBeneficialPatterns,
+  getBeneficialDampingFactor,
+  type BeneficialPatternResult,
+  type BeneficialContext,
+} from './beneficial-patterns';
 
 const log = createLogger('ToxicCombinations');
 
@@ -45,6 +51,8 @@ export interface DetectionResult {
   combinations: ToxicComboResult[];
   threshold: number;
   flaggedCount: number;
+  beneficialPatterns: BeneficialPatternResult[];
+  beneficialDampingApplied: number;
 }
 
 // ─── Named Toxic Patterns (Built-In) ───────────────────────────────────────
@@ -168,7 +176,7 @@ export async function detectToxicCombinations(
     });
 
     if (!analysis || analysis.biases.length < 2) {
-      return { analysisId, combinations: [], threshold: 50, flaggedCount: 0 };
+      return { analysisId, combinations: [], threshold: 50, flaggedCount: 0, beneficialPatterns: [], beneficialDampingApplied: 1.0 };
     }
 
     const biasTypes = analysis.biases.map(b => b.biasType.toLowerCase());
@@ -337,6 +345,24 @@ export async function detectToxicCombinations(
     // Get adaptive threshold
     const threshold = await getOrgToxicThreshold(orgId);
 
+    // Detect beneficial patterns from success case database
+    const biasTypeStrings = biasTypes;
+    const beneficialContext: Partial<BeneficialContext> = {
+      dissentEncouraged: !context.dissentAbsent,
+      externalAdvisors: false, // not currently captured in context
+      iterativeProcess: false, // not currently captured in context
+    };
+    const beneficialResults = detectBeneficialPatterns(biasTypeStrings, beneficialContext);
+    const dampingFactor = getBeneficialDampingFactor(beneficialResults);
+
+    // Apply beneficial damping to toxic scores
+    if (dampingFactor < 1.0) {
+      for (const combo of combinations) {
+        combo.toxicScore = Math.round(combo.toxicScore * dampingFactor);
+      }
+      combinations.sort((a, b) => b.toxicScore - a.toxicScore);
+    }
+
     // Persist flagged combinations
     const flagged = combinations.filter(c => c.toxicScore >= threshold);
     if (flagged.length > 0) {
@@ -348,10 +374,12 @@ export async function detectToxicCombinations(
       combinations: flagged,
       threshold,
       flaggedCount: flagged.length,
+      beneficialPatterns: beneficialResults,
+      beneficialDampingApplied: dampingFactor,
     };
   } catch (error) {
     log.error('Failed to detect toxic combinations:', error);
-    return { analysisId, combinations: [], threshold: 50, flaggedCount: 0 };
+    return { analysisId, combinations: [], threshold: 50, flaggedCount: 0, beneficialPatterns: [], beneficialDampingApplied: 1.0 };
   }
 }
 

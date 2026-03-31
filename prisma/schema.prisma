@@ -204,20 +204,31 @@ model ResearchCache {
 }
 
 model CaseStudy {
-  id        String                 @id @default(cuid())
-  title     String
-  industry  String?
-  outcome   String
-  createdAt DateTime               @default(now())
-  biasTypes String[]
-  company   String
-  embedding Unsupported("vector")?
-  lessons   String
-  summary   String
-  year      Int?
+  id                   String                 @id @default(cuid())
+  title                String
+  industry             String?
+  outcome              String
+  createdAt            DateTime               @default(now())
+  biasTypes            String[]
+  company              String
+  embedding            Unsupported("vector")?
+  lessons              String
+  summary              String
+  year                 Int?
+  impactDirection      String?
+  impactScore          Int?
+  estimatedImpact      String?
+  biasesManaged        String[]
+  mitigationFactors    String[]
+  beneficialPatterns   String[]
+  survivorshipBiasRisk String?
+  source               String?
+  sourceType           String?
+  decisionContext      String?
 
   @@index([biasTypes])
   @@index([industry])
+  @@index([outcome])
 }
 
 model IntelligenceSync {
