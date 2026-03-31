@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { BarChart3, Target, Brain, ChevronRight, ChevronDown, AlertTriangle, TrendingUp } from 'lucide-react';
 import { WEIGHTS, GRADE_THRESHOLDS, SYSTEM1_BIASES, METHODOLOGY_VERSION, computeSyntheticDQI, computeHistoricalPercentile } from '@/lib/scoring/dqi';
 import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
@@ -63,12 +63,12 @@ export function DqiMethodologyTab() {
   const [outcomeFilter, setOutcomeFilter] = useState<'all' | 'success' | 'failure'>('all');
 
   // Pre-compute case study benchmarks
-  const caseRankings = ALL_CASES.map(c => ({
+  const caseRankings = useMemo(() => ALL_CASES.map(c => ({
     company: c.company,
     dqi: computeSyntheticDQI(c),
     outcome: c.outcome,
     year: c.year,
-  })).sort((a, b) => b.dqi - a.dqi);
+  })).sort((a, b) => b.dqi - a.dqi), []);
 
   const filteredCases = caseRankings.filter(c => {
     if (outcomeFilter === 'success') return isSuccessOutcome(c.outcome as CaseOutcome);

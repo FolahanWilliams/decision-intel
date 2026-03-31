@@ -76,6 +76,22 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
     ],
     source: 'Tim Arango, "How the AOL-Time Warner Merger Went So Wrong," NYT (2010); SEC filings',
     sourceType: 'case_study',
+    preDecisionEvidence: {
+      document:
+        "January 2000 merger announcement press release declaring 'historic merger' to create world's first fully integrated media and communications company",
+      source: 'AOL and Time Warner Corporate Communications',
+      date: 'January 10, 2000',
+      documentType: 'press_release',
+      detectableRedFlags: [
+        "Merger premised on AOL's inflated dot-com valuation",
+        'No integration plan for fundamentally different corporate cultures',
+        'Dial-up subscriber growth already plateauing',
+        'Combined debt exceeding $17B',
+      ],
+      flaggableBiases: ['overconfidence_bias', 'framing_effect', 'recency_bias'],
+      hypotheticalAnalysis:
+        "Decision intelligence would have flagged the extreme valuation asymmetry — AOL's $164B market cap was built on dial-up subscriptions already showing growth deceleration. The press release's emphasis on 'synergies' without concrete integration metrics would have triggered overconfidence and anchoring bias warnings.",
+    },
   },
   {
     id: 'tech-ext-003',
@@ -115,6 +131,22 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
     ],
     source: 'Samsung Galaxy Note 7 Investigation Report (2017); U.S. CPSC recall notices',
     sourceType: 'post_mortem',
+    preDecisionEvidence: {
+      document:
+        '2016 internal battery testing timeline showing compressed QA schedule to beat iPhone 7 launch',
+      source: 'Samsung Mobile Division Product Management',
+      date: 'March 2016',
+      documentType: 'risk_assessment',
+      detectableRedFlags: [
+        'Testing timeline compressed by 3 weeks vs standard protocol',
+        'Dual-supplier battery strategy without unified testing criteria',
+        "Thermal runaway incidents in early prototypes attributed to 'isolated cases'",
+        'Competitive pressure overriding safety margins',
+      ],
+      flaggableBiases: ['optimism_bias', 'planning_fallacy', 'groupthink'],
+      hypotheticalAnalysis:
+        "A decision intelligence system would have flagged the compressed testing timeline as a classic speed-safety tradeoff driven by competitive anchoring to Apple's launch date. The dismissal of early thermal incidents as 'isolated' would have triggered optimism bias and normalcy bias warnings.",
+    },
   },
   {
     id: 'tech-ext-004',
@@ -231,6 +263,22 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
     source:
       'Austin Carr, "The Real Story Behind Jeff Bezos\'s Fire Phone Debacle" (Fast Company, 2014)',
     sourceType: 'news_investigation',
+    preDecisionEvidence: {
+      document:
+        "2014 internal product review document showing 3D 'Dynamic Perspective' as primary differentiator over price or ecosystem",
+      source: 'Amazon Lab126 Product Team',
+      date: 'February 2014',
+      documentType: 'strategy_document',
+      detectableRedFlags: [
+        'Primary differentiator was a gimmick feature no users requested',
+        'Price point ($199 with contract) matched iPhone without matching ecosystem',
+        'No exclusive content or services strategy',
+        'Internal usability testing showed confusion with 3D features',
+      ],
+      flaggableBiases: ['confirmation_bias', 'authority_bias', 'overconfidence_bias'],
+      hypotheticalAnalysis:
+        "Decision intelligence would have detected confirmation bias in the product team's fixation on Dynamic Perspective despite negative usability signals. The absence of any price disruption strategy — Amazon's core competency — would have flagged a fundamental strategic misalignment.",
+    },
   },
   {
     id: 'tech-ext-007',
@@ -308,6 +356,22 @@ export const TECHNOLOGY_EXTENDED_CASES: FailureCase[] = [
     source:
       'Jacquie McNish and Sean Silcoff, "Losing the Signal: The Untold Story Behind the Extraordinary Rise and Spectacular Fall of BlackBerry" (2015)',
     sourceType: 'case_study',
+    preDecisionEvidence: {
+      document:
+        "2007 co-CEO Jim Balsillie public dismissal of iPhone threat: 'It's OK, we'll be fine'",
+      source: 'Jim Balsillie, co-CEO of Research In Motion',
+      date: 'February 2007',
+      documentType: 'press_release',
+      detectableRedFlags: [
+        'Public dismissal of category-defining competitor',
+        'Overreliance on enterprise security moat',
+        'Physical keyboard treated as permanent advantage',
+        'Consumer market trends ignored',
+      ],
+      flaggableBiases: ['overconfidence_bias', 'anchoring_bias', 'status_quo_bias'],
+      hypotheticalAnalysis:
+        "A decision intelligence tool would have flagged extreme overconfidence in co-CEO's public dismissal of iPhone. The anchoring to enterprise security and physical keyboards ignored consumer-led adoption patterns that historically disrupted enterprise markets within 3-5 years.",
+    },
   },
   {
     id: 'tech-ext-009',

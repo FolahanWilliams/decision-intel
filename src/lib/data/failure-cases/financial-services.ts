@@ -198,6 +198,29 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'The presence of Nobel laureates and star talent does not immunize an organization against overconfidence.',
       'Extreme leverage transforms manageable losses into systemic crises.',
     ],
+    preDecisionEvidence: {
+      document:
+        "1997 annual investor letter describing 'negligible' portfolio risk based on Value-at-Risk models",
+      source: 'Long-Term Capital Management Partners (John Meriwether)',
+      date: '1997',
+      documentType: 'financial_report',
+      detectableRedFlags: [
+        'VaR models assuming normal distributions in fat-tailed markets',
+        'Leverage exceeding 25:1 on notional $1.25T',
+        'Correlation assumptions based on 5-year lookback missing regime changes',
+        'Nobel laureate credentials creating authority bias in risk oversight',
+      ],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'anchoring_bias',
+        'cognitive_misering',
+        'groupthink',
+        'confirmation_bias',
+        'gamblers_fallacy',
+      ],
+      hypotheticalAnalysis:
+        "A decision intelligence system would have flagged the fundamental model risk — VaR calculations assuming normal distributions while the fund's own leverage amplified tail-risk exposure. The 'negligible risk' characterization in the investor letter, contradicted by 25:1 leverage ratios, would have triggered overconfidence and authority bias warnings.",
+    },
     source:
       'Roger Lowenstein, "When Genius Failed" (2000); President\'s Working Group on Financial Markets Report (1999)',
     sourceType: 'academic_paper',
@@ -270,6 +293,28 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Anchoring to AAA credit ratings on structured products masked the true default correlation risk.',
       "Counterparty risk concentration can transform a single firm's failure into a systemic crisis.",
     ],
+    preDecisionEvidence: {
+      document:
+        '2005 Financial Products division strategy memo on CDS portfolio expansion targeting $500B notional value',
+      source: 'AIG Financial Products Division (Joseph Cassano)',
+      date: '2005',
+      documentType: 'strategy_document',
+      detectableRedFlags: [
+        'CDS portfolio concentration in mortgage-backed securities',
+        'Risk models assuming housing prices could not decline nationally',
+        'No stress testing for correlated defaults',
+        'Leverage ratios exceeding 100:1 on some positions',
+      ],
+      flaggableBiases: [
+        'overconfidence_bias',
+        'anchoring_bias',
+        'confirmation_bias',
+        'cognitive_misering',
+        'groupthink',
+      ],
+      hypotheticalAnalysis:
+        "Decision intelligence would have flagged the extreme concentration risk and the foundational assumption that national housing prices could not decline simultaneously — an assumption contradicted by historical data from Japan (1990s) and regional US markets. The absence of correlated-default stress testing would have triggered immediate model risk warnings.",
+    },
     source:
       'Financial Crisis Inquiry Commission Report (2011); Congressional Oversight Panel, "The AIG Rescue" (2010)',
     sourceType: 'sec_filing',
@@ -309,6 +354,28 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'Shooting the messenger (attacking journalists and short sellers) is a red flag for confirmation bias in governance.',
       'Third-party audits are insufficient safeguards when auditors face conflicts of interest and fail to verify basic claims.',
     ],
+    preDecisionEvidence: {
+      document:
+        '2019 annual investor presentation claiming €1.9B held in trustee accounts in the Philippines',
+      source: 'Wirecard AG Investor Relations (Markus Braun, CEO)',
+      date: '2019',
+      documentType: 'investor_deck',
+      detectableRedFlags: [
+        'Third-party trustee arrangement obscuring direct verification',
+        'Revenue growth outpacing industry by 3x without clear explanation',
+        'Short-seller reports from 2015-2019 raising fraud allegations',
+        'Auditor reliance on trustee confirmations without independent verification',
+      ],
+      flaggableBiases: [
+        'confirmation_bias',
+        'authority_bias',
+        'groupthink',
+        'selective_perception',
+        'halo_effect',
+      ],
+      hypotheticalAnalysis:
+        "Decision intelligence would have flagged the unusual trustee account structure as a verification gap — the inability to independently confirm €1.9B in assets through standard audit procedures was a critical red flag. The pattern of attacking short-sellers rather than providing transparent rebuttals would have triggered authority bias and confirmation bias warnings.",
+    },
     source:
       'German Parliamentary Inquiry into Wirecard (2021); FT investigative series by Dan McCrum (2015-2020)',
     sourceType: 'news_investigation',
@@ -485,6 +552,22 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
       'When employees who report problems are fired rather than heard, the organization eliminates its own early warning system.',
       'Authority bias toward a storied corporate culture ("the Wells Fargo way") prevented leaders from acknowledging systemic fraud.',
     ],
+    preDecisionEvidence: {
+      document:
+        "2010 internal 'Going for Gr-Eight' cross-selling strategy memo setting 8-products-per-customer target",
+      source: 'Wells Fargo Community Banking Division (Carrie Tolstedt)',
+      date: '2010',
+      documentType: 'internal_memo',
+      detectableRedFlags: [
+        '8-product target was arbitrary with no customer-demand basis',
+        'Aggressive sales quotas creating perverse incentives',
+        'Whistleblower complaints already surfacing about fake accounts',
+        'Branch-level metrics showing statistically improbable account opening rates',
+      ],
+      flaggableBiases: ['groupthink', 'authority_bias', 'bandwagon_effect'],
+      hypotheticalAnalysis:
+        "Decision intelligence would have flagged the disconnect between the arbitrary '8 products' target and actual customer financial needs. The escalating whistleblower reports combined with statistically anomalous account-opening metrics would have triggered fraud-risk and incentive-misalignment warnings at high confidence.",
+    },
     source:
       'Wells Fargo Board Independent Directors Report (2017); CFPB Consent Order No. 2016-CFPB-0015',
     sourceType: 'case_study',
