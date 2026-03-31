@@ -11,8 +11,10 @@ import type { FailureCase as LegacyFailureCase } from '../failure-cases';
 import { TECHNOLOGY_FAILURE_CASES } from './failures/technology-failures';
 import { FINANCIAL_FAILURE_CASES } from './failures/financial-failures';
 import { INDUSTRY_FAILURE_CASES } from './failures/industry-failures';
+import { GOVERNMENT_FAILURE_CASES } from './failures/government-failures';
 import { TECHNOLOGY_SUCCESS_CASES } from './successes/technology-successes';
 import { INDUSTRY_SUCCESS_CASES } from './successes/industry-successes';
+import { GOVERNMENT_SUCCESS_CASES } from './successes/government-successes';
 
 export type { CaseStudy, CaseOutcome, Industry, SourceType } from './types';
 export { isFailureOutcome, isSuccessOutcome } from './types';
@@ -50,11 +52,13 @@ const NEW_FAILURE_CASES: CaseStudy[] = [
   ...TECHNOLOGY_FAILURE_CASES,
   ...FINANCIAL_FAILURE_CASES,
   ...INDUSTRY_FAILURE_CASES,
+  ...GOVERNMENT_FAILURE_CASES,
 ];
 
 const NEW_SUCCESS_CASES: CaseStudy[] = [
   ...TECHNOLOGY_SUCCESS_CASES,
   ...INDUSTRY_SUCCESS_CASES,
+  ...GOVERNMENT_SUCCESS_CASES,
 ];
 
 // ---------------------------------------------------------------------------

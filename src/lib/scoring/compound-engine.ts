@@ -33,6 +33,12 @@ export interface DocumentContext {
   wordCount: number;
   /** Optional raw document content for biological/physiological signal detection */
   rawContent?: string;
+  /** Whether dissent was actively encouraged in the process */
+  dissentEncouraged?: boolean;
+  /** Whether external advisors were involved */
+  externalAdvisors?: boolean;
+  /** Whether an iterative decision process was used */
+  iterativeProcess?: boolean;
 }
 
 export interface CompoundScore {
@@ -517,14 +523,26 @@ export function computeCompoundScore(
       dissentAbsent: !context.dissentPresent,
       timePressure: context.timelineWeeks !== null && context.timelineWeeks < 4,
       participantCount: context.participantCount,
+      dissentEncouraged: context.dissentEncouraged,
+      externalAdvisors: context.externalAdvisors,
+      iterativeProcess: context.iterativeProcess,
     }
   );
 
   if (correlationResult.multiplier > 1.0) {
     adjustments.push({
       source: 'historical_correlation',
-      description: `${correlationResult.matchedPairs.length} bias pair(s) historically amplify severity (×${correlationResult.multiplier})`,
+      description: `${correlationResult.matchedPairs.length} bias pair(s) historically amplify severity (×${correlationResult.multiplier.toFixed(2)})`,
       delta: -(correlationResult.multiplier - 1.0) * 5,
+    });
+  }
+
+  // 6b. Beneficial pattern damping from success case correlations
+  if (correlationResult.beneficialDamping < 1.0) {
+    adjustments.push({
+      source: 'beneficial_pattern',
+      description: `${correlationResult.matchedSuccessPatterns.length} success pattern(s) detected — bias risk reduced (×${correlationResult.beneficialDamping.toFixed(2)})`,
+      delta: (1.0 - correlationResult.beneficialDamping) * 5,
     });
   }
 

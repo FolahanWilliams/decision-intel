@@ -81,6 +81,9 @@ export interface CaseStudy {
   lessonsLearned: string[];
   source: string;
   sourceType: SourceType;
+
+  /** Key quotes from primary sources (optional) */
+  keyQuotes?: Array<{ text: string; source: string; date?: string }>;
 }
 
 /** Failure-only subset for backward compatibility with legacy data files */

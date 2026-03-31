@@ -34,6 +34,12 @@ export interface ContextFactors {
   unanimousConsensus: boolean;
   participantCount: number;
   confidenceSpread: number | null; // from BlindPrior (narrow = anchoring risk)
+  /** Whether the process actively encouraged dissent (from decision room data) */
+  dissentEncouraged: boolean;
+  /** Whether external advisors were involved */
+  externalAdvisors: boolean;
+  /** Whether an iterative decision process was used */
+  iterativeProcess: boolean;
 }
 
 export interface ToxicComboResult {
@@ -348,9 +354,9 @@ export async function detectToxicCombinations(
     // Detect beneficial patterns from success case database
     const biasTypeStrings = biasTypes;
     const beneficialContext: Partial<BeneficialContext> = {
-      dissentEncouraged: !context.dissentAbsent,
-      externalAdvisors: false, // not currently captured in context
-      iterativeProcess: false, // not currently captured in context
+      dissentEncouraged: context.dissentEncouraged,
+      externalAdvisors: context.externalAdvisors,
+      iterativeProcess: context.iterativeProcess,
     };
     const beneficialResults = detectBeneficialPatterns(biasTypeStrings, beneficialContext);
     const dampingFactor = getBeneficialDampingFactor(beneficialResults);
@@ -387,6 +393,7 @@ export async function detectToxicCombinations(
 
 interface AnalysisWithRelations {
   id: string;
+  documentId?: string;
   overallScore: number;
   outcomeDueAt: Date | null;
   document: {
@@ -468,6 +475,59 @@ async function gatherContextFactors(
     analysis.outcomeDueAt != null &&
     analysis.outcomeDueAt.getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000;
 
+  // Beneficial context: dissent encouraged, external advisors, iterative process
+  let dissentEncouraged = false;
+  let externalAdvisors = false;
+  let iterativeProcess = false;
+
+  try {
+    // Dissent encouraged: dissent was present AND decision completed (not suppressed)
+    const rooms = await prisma.decisionRoom.findMany({
+      where: { analysisId },
+      include: { blindPriors: true },
+    });
+    if (rooms.length > 0) {
+      const room = rooms[0];
+      const priors = room.blindPriors;
+      if (priors.length >= 3) {
+        const uniqueActions = new Set(priors.map(p => p.defaultAction.toLowerCase().trim()));
+        // Dissent encouraged = multiple viewpoints AND room completed
+        dissentEncouraged = uniqueActions.size > 1 && room.status === 'completed';
+      }
+    }
+  } catch {
+    // Decision room data unavailable
+  }
+
+  try {
+    // External advisors: check stakeholders for external roles
+    const stakeholders = frame?.stakeholders ?? [];
+    const externalIndicators = ['external', 'advisor', 'consultant', 'board', 'independent'];
+    externalAdvisors = stakeholders.some(s =>
+      externalIndicators.some(ind => s.toLowerCase().includes(ind))
+    );
+
+    // Also check if multiple distinct stakeholders participated (>6 suggests broad input)
+    if (!externalAdvisors && stakeholders.length > 6) {
+      externalAdvisors = true;
+    }
+  } catch {
+    // External advisor data unavailable
+  }
+
+  try {
+    // Iterative process: multiple analysis versions exist for the same document
+    const analysisCount = await prisma.analysis.count({
+      where: {
+        documentId: (analysis as { documentId?: string }).documentId,
+        status: 'completed',
+      },
+    });
+    iterativeProcess = analysisCount > 1;
+  } catch {
+    // Iteration data unavailable
+  }
+
   return {
     monetaryStakes,
     dissentAbsent,
@@ -475,6 +535,9 @@ async function gatherContextFactors(
     unanimousConsensus,
     participantCount,
     confidenceSpread,
+    dissentEncouraged,
+    externalAdvisors,
+    iterativeProcess,
   };
 }
 
@@ -642,7 +705,7 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
       outcomes.filter(o => o.outcome === 'success').length / outcomes.length;
 
     for (const outcome of outcomes) {
-      const biasTypes = [...new Set(outcome.analysis.biases.map(b => b.biasType.toLowerCase()))];
+      const biasTypes: string[] = [...new Set(outcome.analysis.biases.map((b: { biasType: string }) => b.biasType.toLowerCase()))] as string[];
       if (biasTypes.length < 2) continue;
 
       const pairs = generatePairs(biasTypes);
@@ -666,15 +729,46 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
       }
     }
 
-    // Filter for significant patterns and upsert
+    // Also build triple combination stats (B4: multi-bias interaction discovery)
+    const tripleStats = new Map<
+      string,
+      { failures: number; successes: number; impactDeltas: number[] }
+    >();
+
+    for (const outcome of outcomes) {
+      const tripleBiasTypes: string[] = [...new Set(outcome.analysis.biases.map((b: { biasType: string }) => b.biasType.toLowerCase()))] as string[];
+      if (tripleBiasTypes.length < 3) continue;
+
+      const triples = generateTriples(tripleBiasTypes);
+      const isFailure = outcome.outcome === 'failure';
+      const isSuccess = outcome.outcome === 'success';
+
+      for (const triple of triples) {
+        const key = triple.sort().join('+');
+        const stats = tripleStats.get(key) ?? { failures: 0, successes: 0, impactDeltas: [] };
+        if (isFailure) {
+          stats.failures++;
+          if (outcome.impactScore != null) stats.impactDeltas.push(outcome.impactScore);
+        } else if (isSuccess) {
+          stats.successes++;
+        }
+        tripleStats.set(key, stats);
+      }
+    }
+
+    // Filter for significant patterns and upsert (pairs + triples)
     let patternsCreated = 0;
 
-    for (const [key, stats] of pairStats.entries()) {
+    // Helper to upsert a pattern
+    const upsertPattern = async (key: string, stats: { failures: number; successes: number; impactDeltas: number[] }, combinationSize: number) => {
       const total = stats.failures + stats.successes;
-      if (total < 5) continue; // Statistical significance threshold
+      if (total < (combinationSize === 3 ? 3 : 5)) return; // Lower threshold for triples
 
       const failureRate = stats.failures / total;
-      if (failureRate <= baselineSuccessRate) continue; // Only patterns worse than baseline
+      const falsePositiveRate = stats.successes / total;
+
+      // Skip patterns that don't perform worse than baseline
+      if (failureRate <= baselineSuccessRate) return;
 
       const avgImpactDelta =
         stats.impactDeltas.length > 0
@@ -690,37 +784,55 @@ export async function learnToxicPatterns(orgId: string): Promise<number> {
           biasTypes.every(bt => np.biasTypes.includes(bt))
       );
 
+      // B3: Apply false positive damping — if >30% of flagged patterns
+      // ended up succeeding, reduce the pattern's effective score
+      let adjustedFailureRate = failureRate;
+      if (falsePositiveRate > 0.3) {
+        adjustedFailureRate *= 1.0 - (falsePositiveRate - 0.3) * 0.5;
+      }
+
       try {
         await prisma.toxicPattern.upsert({
           where: {
-            id: `${orgId}-${key}`, // deterministic ID for upsert
+            id: `${orgId}-${key}`,
           },
           create: {
             id: `${orgId}-${key}`,
             orgId,
             biasTypes,
-            contextPattern: {},
-            failureRate: Number(failureRate.toFixed(3)),
+            contextPattern: { combinationSize, falsePositiveRate: Number(falsePositiveRate.toFixed(3)) },
+            failureRate: Number(adjustedFailureRate.toFixed(3)),
             avgImpactDelta: Number(avgImpactDelta.toFixed(1)),
             sampleSize: total,
             label: namedMatch?.label ?? null,
             description:
               namedMatch?.description ??
-              `Bias combination ${key} has a ${(failureRate * 100).toFixed(0)}% failure rate in your organization.`,
+              `Bias combination ${key} has a ${(adjustedFailureRate * 100).toFixed(0)}% failure rate in your organization${falsePositiveRate > 0.3 ? ` (adjusted for ${(falsePositiveRate * 100).toFixed(0)}% false positive rate)` : ''}.`,
           },
           update: {
-            failureRate: Number(failureRate.toFixed(3)),
+            failureRate: Number(adjustedFailureRate.toFixed(3)),
             avgImpactDelta: Number(avgImpactDelta.toFixed(1)),
             sampleSize: total,
+            contextPattern: { combinationSize, falsePositiveRate: Number(falsePositiveRate.toFixed(3)) },
           },
         });
         patternsCreated++;
       } catch (upsertError) {
         log.warn(`Failed to upsert pattern ${key}:`, upsertError);
       }
+    };
+
+    // Process pair patterns
+    for (const [key, stats] of pairStats.entries()) {
+      await upsertPattern(key, stats, 2);
     }
 
-    log.info(`Learned ${patternsCreated} toxic patterns for org ${orgId}`);
+    // Process triple patterns (B4)
+    for (const [key, stats] of tripleStats.entries()) {
+      await upsertPattern(key, stats, 3);
+    }
+
+    log.info(`Learned ${patternsCreated} toxic patterns (pairs + triples) for org ${orgId}`);
     return patternsCreated;
   } catch (error) {
     log.error('Failed to learn toxic patterns:', error);
@@ -765,4 +877,17 @@ function generatePairs(items: string[]): string[][] {
     }
   }
   return pairs;
+}
+
+/** Generate all unique triples from an array */
+function generateTriples(items: string[]): string[][] {
+  const triples: string[][] = [];
+  for (let i = 0; i < items.length; i++) {
+    for (let j = i + 1; j < items.length; j++) {
+      for (let k = j + 1; k < items.length; k++) {
+        triples.push([items[i], items[j], items[k]]);
+      }
+    }
+  }
+  return triples;
 }
