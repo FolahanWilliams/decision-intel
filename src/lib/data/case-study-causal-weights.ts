@@ -7,8 +7,75 @@
  */
 
 import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
-import type { CausalWeight, CausalInsight } from '@/lib/learning/causal-learning';
-import { getCausalInsights } from '@/lib/learning/causal-learning';
+
+// ─── Types (inlined to avoid importing from causal-learning.ts which pulls in Prisma) ──
+
+export interface CausalWeight {
+  biasType: string;
+  outcomeCorrelation: number;
+  failureCount: number;
+  successCount: number;
+  dangerMultiplier: number;
+  sampleSize: number;
+}
+
+export interface CausalInsight {
+  type: 'danger' | 'safe' | 'noise' | 'twin';
+  message: string;
+  confidence: number;
+  biasType?: string;
+  dataPoints: number;
+}
+
+function formatBiasName(biasType: string): string {
+  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function getCausalInsights(weights: CausalWeight[], totalOutcomes: number): CausalInsight[] {
+  if (weights.length === 0 || totalOutcomes === 0) {
+    return [{ type: 'noise', message: 'Not enough data to generate causal insights.', confidence: 0, dataPoints: 0 }];
+  }
+  const insights: CausalInsight[] = [];
+  const dangerous = weights.filter(w => w.dangerMultiplier >= 1.5 && w.sampleSize >= 5);
+  for (const w of dangerous.slice(0, 3)) {
+    insights.push({
+      type: 'danger',
+      message: `${formatBiasName(w.biasType)} is associated with poor outcomes ${w.dangerMultiplier}x more than baseline (${w.failureCount} failures in ${w.sampleSize} decisions).`,
+      confidence: Math.min(0.95, w.sampleSize / 20),
+      biasType: w.biasType,
+      dataPoints: w.sampleSize,
+    });
+  }
+  const safe = weights.filter(w => w.dangerMultiplier <= 0.9 && w.sampleSize >= 5);
+  for (const w of safe.slice(0, 2)) {
+    insights.push({
+      type: 'safe',
+      message: `${formatBiasName(w.biasType)} detections are mostly benign — only ${w.failureCount} failures out of ${w.sampleSize} decisions.`,
+      confidence: Math.min(0.9, w.sampleSize / 15),
+      biasType: w.biasType,
+      dataPoints: w.sampleSize,
+    });
+  }
+  const noisy = weights.filter(w => w.sampleSize < 5);
+  for (const w of noisy) {
+    insights.push({
+      type: 'noise',
+      message: `${formatBiasName(w.biasType)} has insufficient outcome data (${w.sampleSize} records).`,
+      confidence: w.sampleSize / 10,
+      biasType: w.biasType,
+      dataPoints: w.sampleSize,
+    });
+  }
+  if (totalOutcomes >= 50 && dangerous.length > 0) {
+    insights.push({
+      type: 'twin',
+      message: `Based on ${totalOutcomes} outcomes, ${formatBiasName(dangerous[0].biasType)} is the strongest failure predictor.`,
+      confidence: Math.min(0.9, totalOutcomes / 200),
+      dataPoints: totalOutcomes,
+    });
+  }
+  return insights;
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
