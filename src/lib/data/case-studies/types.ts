@@ -103,7 +103,10 @@ export interface CaseStudy {
       | 'internal_memo'
       | 'sec_filing'
       | 'public_statement'
-      | 'strategy_document';
+      | 'strategy_document'
+      | 'risk_assessment'
+      | 'financial_report'
+      | 'investor_deck';
     /** Red flags that were detectable AT DECISION TIME (without hindsight) */
     detectableRedFlags: string[];
     /** Biases that the platform would have flagged at decision time */
