@@ -142,7 +142,7 @@ export default function LandingPage() {
                 textDecoration: 'none',
               }}
             >
-              Book a Demo
+              Try the Demo
             </Link>
           </div>
 
@@ -186,7 +186,7 @@ export default function LandingPage() {
                 marginTop: 4,
               }}
             >
-              Book a Demo
+              Try the Demo
             </Link>
           </div>
         )}
@@ -216,18 +216,22 @@ export default function LandingPage() {
                 marginBottom: 20,
               }}
             >
-              The Decision Performance OS
+              The Decision
+              <br />
+              Performance OS
               <br />
               <span style={{ color: C.green }}>for M&A</span>
             </h1>
-            <p style={{ fontSize: 18, color: C.slate600, lineHeight: 1.7, marginBottom: 32, maxWidth: 480 }}>
-              Every deal is a data problem. Our platform brings clarity and confidence
-              to cognitive bias and decision-making.
+            <p style={{ fontSize: 18, color: C.slate600, lineHeight: 1.7, marginBottom: 32, maxWidth: 500 }}>
+              M&A teams, corporate development groups, and investment committees
+              make high-stakes decisions on incomplete information. Our platform
+              audits the cognitive biases hiding in every deal memo — so you can
+              swing with confidence.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link
                 href="/demo"
-                onClick={() => trackEvent('hero_book_demo_clicked')}
+                onClick={() => trackEvent('hero_try_demo_clicked')}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -241,7 +245,7 @@ export default function LandingPage() {
                   textDecoration: 'none',
                 }}
               >
-                Book a Demo <ArrowRight size={16} />
+                Try the Demo <ArrowRight size={16} />
               </Link>
               <Link
                 href="/login"
@@ -263,18 +267,110 @@ export default function LandingPage() {
               </Link>
             </div>
           </div>
+          {/* 4-Panel Process Visualization */}
           <div
             style={{
-              background: C.slate100,
-              borderRadius: 16,
-              aspectRatio: '4/3',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: `1px solid ${C.slate200}`,
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 12,
             }}
           >
-            <span style={{ color: C.slate400, fontSize: 14 }}>Product Screenshot</span>
+            {[
+              {
+                step: '01',
+                label: 'Analyze',
+                desc: 'Upload deal memos & IC notes',
+                icon: '◎',
+                color: '#3B82F6',
+                bg: '#EFF6FF',
+                borderColor: '#BFDBFE',
+              },
+              {
+                step: '02',
+                label: 'Graph',
+                desc: 'Map decision relationships',
+                icon: '⬡',
+                color: '#8B5CF6',
+                bg: '#F5F3FF',
+                borderColor: '#DDD6FE',
+              },
+              {
+                step: '03',
+                label: 'Learn',
+                desc: 'Track outcomes & calibrate',
+                icon: '△',
+                color: '#F59E0B',
+                bg: '#FFFBEB',
+                borderColor: '#FDE68A',
+              },
+              {
+                step: '04',
+                label: 'Act',
+                desc: 'Mitigate bias & decide better',
+                icon: '→',
+                color: C.green,
+                bg: C.greenLight,
+                borderColor: '#BBF7D0',
+              },
+            ].map((panel, i) => (
+              <motion.div
+                key={panel.label}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
+                style={{
+                  background: panel.bg,
+                  border: `1px solid ${panel.borderColor}`,
+                  borderRadius: 14,
+                  padding: '24px 20px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Large faded step number */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: -8,
+                    right: 8,
+                    fontSize: 64,
+                    fontWeight: 800,
+                    color: panel.borderColor,
+                    lineHeight: 1,
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                  }}
+                >
+                  {panel.step}
+                </div>
+                {/* Icon */}
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    background: C.white,
+                    border: `1px solid ${panel.borderColor}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 18,
+                    color: panel.color,
+                    marginBottom: 12,
+                    fontWeight: 700,
+                  }}
+                >
+                  {panel.icon}
+                </div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: C.slate900, marginBottom: 4, position: 'relative', zIndex: 1 }}>
+                  {panel.label}
+                </div>
+                <div style={{ fontSize: 13, color: C.slate600, position: 'relative', zIndex: 1 }}>
+                  {panel.desc}
+                </div>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </section>
