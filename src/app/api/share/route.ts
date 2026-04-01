@@ -106,7 +106,10 @@ export async function GET(req: NextRequest) {
   }
 
   const token = searchParams.get('token');
-  const password = searchParams.get('password');
+  // Accept password from header to avoid exposing it in query params,
+  // server logs, browser history, and referrer headers.
+  // Falls back to query param for backward compatibility.
+  const password = req.headers.get('x-share-password') || searchParams.get('password');
 
   if (!token) {
     return NextResponse.json({ error: 'Missing token' }, { status: 400 });

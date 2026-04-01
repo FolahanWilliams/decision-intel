@@ -1,22 +1,9 @@
 import { NextResponse } from 'next/server';
-import { timingSafeEqual } from 'crypto';
 import { pruneExpiredEntries, getCacheStats } from '@/lib/utils/cache';
 import { createLogger } from '@/lib/utils/logger';
+import { safeCompare } from '@/lib/utils/safe-compare';
 
 const log = createLogger('CacheCleanup');
-
-/** Constant-time string comparison to prevent timing attacks.
- *  Pads the shorter buffer to avoid leaking length information. */
-function safeCompare(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  const maxLen = Math.max(bufA.length, bufB.length);
-  const paddedA = Buffer.alloc(maxLen);
-  const paddedB = Buffer.alloc(maxLen);
-  bufA.copy(paddedA);
-  bufB.copy(paddedB);
-  return bufA.length === bufB.length && timingSafeEqual(paddedA, paddedB);
-}
 
 /**
  * POST /api/cache/cleanup

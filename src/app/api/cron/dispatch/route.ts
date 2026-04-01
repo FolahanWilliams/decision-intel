@@ -14,20 +14,11 @@
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { createLogger } from '@/lib/utils/logger';
+import { safeCompare } from '@/lib/utils/safe-compare';
 
 const log = createLogger('CronDispatch');
 
 export const maxDuration = 300; // 5 minutes for all sub-jobs
-
-// Timing-safe comparison
-function safeCompare(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return result === 0;
-}
 
 interface JobResult {
   job: string;

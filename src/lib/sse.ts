@@ -97,8 +97,6 @@ export class SSEReader {
           this.lastEventId = eventId;
         } else if (line.startsWith('data:')) {
           eventData = line.slice(5).trim();
-        } else if (line.startsWith('data: ')) {
-          eventData = line.slice(6);
         }
       }
 

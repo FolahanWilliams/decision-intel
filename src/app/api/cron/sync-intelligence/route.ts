@@ -4,26 +4,13 @@ import { cleanExpiredResearch } from '@/lib/research/scholarSearch';
 import { prisma } from '@/lib/prisma';
 import { toPrismaJson } from '@/lib/utils/prisma-json';
 import { createLogger } from '@/lib/utils/logger';
-import { timingSafeEqual } from 'crypto';
+import { safeCompare } from '@/lib/utils/safe-compare';
 
 const log = createLogger('IntelligenceCron');
 
 export const maxDuration = 300; // 5 minutes for full sync
 
 const CRON_SECRET = process.env.CRON_SECRET?.trim();
-
-/** Constant-time comparison to prevent timing attacks on the cron secret.
- *  Pads the shorter buffer to avoid leaking length information. */
-function safeCompare(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  const maxLen = Math.max(bufA.length, bufB.length);
-  const paddedA = Buffer.alloc(maxLen);
-  const paddedB = Buffer.alloc(maxLen);
-  bufA.copy(paddedA);
-  bufB.copy(paddedB);
-  return bufA.length === bufB.length && timingSafeEqual(paddedA, paddedB);
-}
 
 /**
  * GET /api/cron/sync-intelligence — Scheduled intelligence sync.

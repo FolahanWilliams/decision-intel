@@ -15,7 +15,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/utils/logger';
-import { timingSafeEqual } from 'crypto';
+import { safeCompare } from '@/lib/utils/safe-compare';
 import { detectOutcomesFromWeb } from '@/lib/learning/outcome-inference';
 
 const log = createLogger('DetectOutcomesCron');
@@ -24,17 +24,6 @@ export const maxDuration = 120; // 2 minutes
 
 const CRON_SECRET = process.env.CRON_SECRET?.trim();
 const MAX_WEB_SEARCHES = 10;
-
-function safeCompare(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  const maxLen = Math.max(bufA.length, bufB.length);
-  const paddedA = Buffer.alloc(maxLen);
-  const paddedB = Buffer.alloc(maxLen);
-  bufA.copy(paddedA);
-  bufB.copy(paddedB);
-  return bufA.length === bufB.length && timingSafeEqual(paddedA, paddedB);
-}
 
 export async function GET(request: NextRequest) {
   const start = Date.now();

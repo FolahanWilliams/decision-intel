@@ -251,9 +251,11 @@ export default function SharedAnalysisPage() {
     try {
       const url = new URL('/api/share', window.location.origin);
       url.searchParams.set('token', token);
-      if (pwd) url.searchParams.set('password', pwd);
 
-      const res = await fetch(url.toString());
+      const headers: Record<string, string> = {};
+      if (pwd) headers['x-share-password'] = pwd;
+
+      const res = await fetch(url.toString(), { headers });
       const data = await res.json();
 
       if (res.status === 401 && data.requiresPassword) {

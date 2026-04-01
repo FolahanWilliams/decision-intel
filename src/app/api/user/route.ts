@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 import { getStripe } from '@/lib/stripe';
+import { isSchemaDrift } from '@/lib/utils/error';
 
 const log = createLogger('UserRoute');
 
@@ -85,33 +86,51 @@ export async function DELETE() {
     // Delete all user data atomically.
     // Order matters: dependent tables first (FK constraints), then parents.
     // Document → Analysis cascade handles BiasInstance, DecisionEmbedding, AnalysisVersion.
+    //
+    // Schema-drift guard: some tables may not exist yet if migrations are pending.
+    // We only swallow P2021/P2022 errors — all other errors propagate and abort
+    // the transaction so data integrity is preserved.
+    const schemaDriftSafe = async (fn: () => Promise<unknown>) => {
+      try {
+        await fn();
+      } catch (err) {
+        if (isSchemaDrift(err)) {
+          log.warn('Schema drift during user deletion (skipping table): ' + (err as Error).message);
+          return;
+        }
+        throw err;
+      }
+    };
+
     await prisma.$transaction(async tx => {
       // Outcome & learning data
-      await tx.decisionOutcome.deleteMany({ where: { userId } }).catch(() => {});
-      await tx.decisionPrior.deleteMany({ where: { userId } }).catch(() => {});
-      await tx.decisionFrame.deleteMany({ where: { userId } }).catch(() => {});
+      await schemaDriftSafe(() => tx.decisionOutcome.deleteMany({ where: { userId } }));
+      await schemaDriftSafe(() => tx.decisionPrior.deleteMany({ where: { userId } }));
+      await schemaDriftSafe(() => tx.decisionFrame.deleteMany({ where: { userId } }));
 
       // Product B: Nudges → CognitiveAudits → HumanDecisions (FK order)
       // Nudges can be linked via humanDecision OR targetUserId
-      await tx.nudge
-        .deleteMany({
+      await schemaDriftSafe(() =>
+        tx.nudge.deleteMany({
           where: { OR: [{ humanDecision: { userId } }, { targetUserId: userId }] },
         })
-        .catch(() => {});
-      await tx.cognitiveAudit.deleteMany({ where: { humanDecision: { userId } } }).catch(() => {});
+      );
+      await schemaDriftSafe(() =>
+        tx.cognitiveAudit.deleteMany({ where: { humanDecision: { userId } } })
+      );
       await tx.humanDecision.deleteMany({ where: { userId } });
 
       // Share links + access logs (access cascades from shareLink)
-      await tx.shareLink.deleteMany({ where: { userId } }).catch(() => {});
+      await schemaDriftSafe(() => tx.shareLink.deleteMany({ where: { userId } }));
 
       // Notifications
-      await tx.notificationLog.deleteMany({ where: { userId } }).catch(() => {});
+      await schemaDriftSafe(() => tx.notificationLog.deleteMany({ where: { userId } }));
 
       // Subscription
-      await tx.subscription.deleteMany({ where: { userId } }).catch(() => {});
+      await schemaDriftSafe(() => tx.subscription.deleteMany({ where: { userId } }));
 
       // Team membership (remove from team, don't delete the org)
-      await tx.teamMember.deleteMany({ where: { userId } }).catch(() => {});
+      await schemaDriftSafe(() => tx.teamMember.deleteMany({ where: { userId } }));
 
       // Product A: Documents cascade to Analyses, BiasInstances, Embeddings
       await tx.auditLog.deleteMany({ where: { userId } });
