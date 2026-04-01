@@ -347,7 +347,7 @@ export function AnalysisProgressFloat() {
           nodeStates={nodeStates}
           progress={activeAnalysis.progress}
           biasCount={activeAnalysis.biasCount}
-          noiseScore={activeAnalysis.noiseScore}
+          noiseScore={activeAnalysis.noiseScore ?? undefined}
         />
       ) : (
         <>
