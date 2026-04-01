@@ -72,6 +72,17 @@ The platform runs documents through an **11-agent analysis pipeline** with deal-
 
 All paid plans include a 14-day free trial. No credit card required to start.
 
+### Per-Deal Audit Pricing
+
+One-time deal audit purchases scale with investment size — no subscription required:
+
+| Tier | Deal Size | Price | Includes |
+|:-----|:----------|:------|:---------|
+| **Emerging** | < $10M | $499 | Unlimited analyses for all documents linked to the deal |
+| **Growth** | $10M–$50M | $1,499 | Unlimited analyses for all documents linked to the deal |
+| **Core** | $50M–$200M | $2,999 | Unlimited analyses for all documents linked to the deal |
+| **Flagship** | $200M+ | $4,999 | Unlimited analyses for all documents linked to the deal |
+
 **[View full pricing details](https://www.decision-intel.com/#pricing)**
 
 ---
@@ -207,10 +218,15 @@ When users submit a **Decision Prior** (pre-analysis belief and confidence), the
 
 Inspired by **Wiz's cloud security graph** — detects when multiple individually-benign biases co-occur with contextual risk factors to create compound decision risk. Surfaces only the **top ~5% of risky decisions**, eliminating alert fatigue:
 
-- **7 Named Patterns**: Echo Chamber, Sunk Ship, Blind Sprint, Yes Committee, Optimism Trap, Status Quo Lock, Recency Spiral
-- **Context Amplifiers**: Monetary stakes, absent dissent, time pressure, unanimous consensus, small group size
-- **Historical Failure Rates**: Each pattern linked to real-world failure cases with documented outcomes
-- **Org Calibration**: Pattern thresholds and severity weights adjust from your organization's actual decision outcomes
+- **10 Named Patterns**: Echo Chamber, Sunk Ship, Blind Sprint, Yes Committee, Optimism Trap, Status Quo Lock, Recency Spiral, Golden Child, Doubling Down, Deadline Panic
+- **Context Amplifiers**: Monetary stakes (up to 2x), absent dissent (1.3x), time pressure (1.25x), unanimous consensus (1.2x), small group size (1.15x), narrow confidence spread (1.1x) — capped at 3x total
+- **Historical Failure Rates**: Each pattern linked to real-world failure cases with documented outcomes; false-positive damping reduces rates when >30% of flagged patterns succeeded
+- **Org Calibration**: Pattern thresholds and severity weights adjust from your organization's actual decision outcomes via CausalEdge weights
+- **Mitigation Playbooks**: Auto-generated, research-backed debiasing steps for each named pattern (e.g., Echo Chamber → appoint devil's advocate, collect blind priors, present bear case first, run pre-mortem). Context-aware augmentation adds steps for very-high-stakes, small-group, or unanimous-consensus situations
+- **Dollar Impact Estimation**: When linked to a deal with ticket size, estimates financial risk: `estimatedRisk = ticketSize × historicalFailRate` (e.g., "Estimated risk: $22.5M based on 45% failure rate on $50M deal")
+- **Toxic Score Trends**: Per-org daily trend data showing whether compound risk is improving or worsening over time
+- **Org Benchmarking**: Compare your organization's toxic pattern frequency against anonymized global benchmarks from all opted-in organizations
+- **Beneficial Pattern Damping**: Detects when the decision process includes protective factors (dissent encouraged, external advisors, iterative validation) and reduces toxic scores accordingly (0.7x–1.0x dampener)
 - **Actionable Workflow**: Acknowledge, investigate, or mitigate detected patterns with audit trail
 
 #### Bias Interaction Ontology
@@ -1328,6 +1344,11 @@ These counters are displayed on the [landing page](https://www.decision-intel.co
 - [x] Semantic search (pgvector embeddings)
 - [x] 14 interactive visualization components
 - [x] SSE real-time streaming analysis
+- [x] **Live Pipeline Graph** — Expandable floating visualization of the 11-node LangGraph pipeline during analysis. Nodes light up in real-time (pending → running → complete) with glass-morphism styling, animated edge connections, and live bias/noise badges. Respects reduced-motion preferences.
+- [x] **Per-Deal Audit Pricing** — One-time Stripe payments scaled to deal ticket size ($499–$4,999). Grants unlimited analyses for all documents linked to the deal, bypassing subscription limits. Integrated with deal pipeline UI.
+- [x] **Toxic Combination Mitigation Playbooks** — Auto-generated, research-backed debiasing steps for all 10 named patterns. Context-aware augmentation, academic citations, and expandable step-by-step guidance.
+- [x] **Dollar Impact Estimation** — Connects toxic combinations to deal ticket sizes to estimate financial risk exposure.
+- [x] **Toxic Score Trends & Org Benchmarking** — Per-org trend sparklines showing compound risk trajectory over time, plus anonymized cross-org pattern benchmarking.
 - [x] Full audit trail
 - [x] **Decision Replay & Counterfactual Analysis** — Step-by-step pipeline replay with "What-If" scenario testing
 - [x] **Bias Education Library** — 16 biases with real-world case studies, debiasing techniques, and academic references

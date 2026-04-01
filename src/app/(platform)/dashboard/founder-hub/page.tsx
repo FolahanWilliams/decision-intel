@@ -753,6 +753,9 @@ function ScoringEngine() {
               'Optimism Trap',
               'Status Quo Lock',
               'Recency Spiral',
+              'Golden Child',
+              'Doubling Down',
+              'Deadline Panic',
             ].map(p => (
               <span key={p} style={badge('#ef4444')}>
                 {p}
@@ -768,9 +771,14 @@ function ScoringEngine() {
               marginTop: 8,
             }}
           >
-            <li>Context amplifiers: monetary stakes, absent dissent, time pressure</li>
-            <li>Org-calibrated: thresholds adjust from your outcome data</li>
-            <li>Historical failure &amp; success rates from 146-case database</li>
+            <li>10 named patterns (Echo Chamber, Sunk Ship, Blind Sprint, Yes Committee, Optimism Trap, Status Quo Lock, Recency Spiral, Golden Child, Doubling Down, Deadline Panic)</li>
+            <li>Context amplifiers: monetary stakes (2x), absent dissent (1.3x), time pressure (1.25x), unanimous consensus (1.2x)</li>
+            <li>Org-calibrated: thresholds adjust from your outcome data via CausalEdge weights</li>
+            <li>Historical failure &amp; success rates from 146-case database with false-positive damping</li>
+            <li><strong>NEW: Mitigation Playbooks</strong> — auto-generated, research-backed debiasing steps per pattern</li>
+            <li><strong>NEW: Dollar Impact</strong> — estimated financial risk from deal ticket size × failure rate</li>
+            <li><strong>NEW: Trend Sparklines</strong> — per-org toxic score trajectory over time</li>
+            <li><strong>NEW: Org Benchmarks</strong> — compare your patterns to anonymized global averages</li>
           </ul>
         </div>
         <div style={card}>
@@ -1196,7 +1204,7 @@ function StrategyAndPositioning() {
           [
             'Toxic Combination Patterns',
             'High',
-            '7 named patterns + learned patterns from outcomes',
+            '10 named patterns + learned patterns + mitigation playbooks + dollar impact estimation',
           ],
           [
             'Causal Learning Pipeline',
@@ -2144,8 +2152,8 @@ function SalesToolkit() {
             step: 7,
             title: 'Toxic Combinations (60 sec)',
             action:
-              'If detected, show the toxic combination card. "\'The Echo Chamber\' — confirmation bias plus groupthink in a high-stakes context. This pattern appears in 73% of our historical failure cases."',
-            tip: 'The named patterns are memorable and shareable. Prospects will mention them to colleagues.',
+              'If detected, show the toxic combination card with the auto-generated mitigation playbook. "\'The Echo Chamber\' — confirmation bias plus groupthink in a high-stakes context. This pattern appears in 73% of our historical failure cases. Estimated risk: $22.5M on this deal. Here\'s your 4-step debiasing playbook with research citations."',
+            tip: 'The named patterns are memorable and shareable. The dollar impact makes it visceral. The mitigation playbook makes it actionable. Prospects will mention these to colleagues.',
           },
           {
             step: 8,
