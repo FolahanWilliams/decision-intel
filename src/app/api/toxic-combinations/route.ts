@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   const orgId = searchParams.get('orgId');
   const status = searchParams.get('status') || 'active';
   const analysisId = searchParams.get('analysisId');
-  const limit = parseInt(searchParams.get('limit') || '50', 10);
+  const limit = Math.max(1, Math.min(parseInt(searchParams.get('limit') || '50', 10) || 50, 100));
 
   try {
     const combinations = await prisma.toxicCombination.findMany({
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
         status,
       },
       orderBy: { toxicScore: 'desc' },
-      take: Math.min(limit, 100),
+      take: limit,
       include: {
         analysis: {
           select: {
