@@ -18,11 +18,8 @@ import {
   Users,
   Shield,
   Zap,
-  Mail,
   Target,
   Network,
-  Lock,
-  Eye,
 } from 'lucide-react';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
