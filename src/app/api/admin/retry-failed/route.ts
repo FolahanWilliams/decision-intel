@@ -65,17 +65,22 @@ export async function POST(req: NextRequest) {
     const admin = await verifyAdmin();
     if (!admin) return ADMIN_DENIED;
 
-    const body = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
+    }
     const { failedAnalysisId, retryAll } = body;
 
     if (retryAll) {
-      // Retry all eligible failed analyses
-      const eligibleFailed = await prisma.failedAnalysis.findMany({
-        where: {
-          resolvedAt: null,
-          retryCount: { lt: prisma.failedAnalysis.fields.maxRetries },
-        },
+      // Retry all eligible failed analyses.
+      // Filter in application code: each record has its own maxRetries value,
+      // so we fetch unresolved records and filter by retryCount < maxRetries.
+      const allFailed = await prisma.failedAnalysis.findMany({
+        where: { resolvedAt: null },
       });
+      const eligibleFailed = allFailed.filter(f => f.retryCount < f.maxRetries);
 
       log.info(`Retrying ${eligibleFailed.length} failed analyses`);
 

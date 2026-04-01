@@ -14,7 +14,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
 import { getRequiredEnvVar, getOptionalEnvVar } from '@/lib/env';
 import { formatSSE } from '@/lib/sse';
 import { createLogger } from '@/lib/utils/logger';
-import { timingSafeEqual } from 'crypto';
+import { safeCompare } from '@/lib/utils/safe-compare';
 
 const log = createLogger('FounderHubChat');
 const ENCODER = new TextEncoder();
@@ -171,13 +171,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Not configured' }, { status: 503 });
   }
   const headerPass = req.headers.get('x-founder-pass') || '';
-  try {
-    const expected = Buffer.from(founderPass);
-    const provided = Buffer.from(headerPass);
-    if (expected.length !== provided.length || !timingSafeEqual(expected, provided)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-  } catch {
+  if (!safeCompare(headerPass, founderPass)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
