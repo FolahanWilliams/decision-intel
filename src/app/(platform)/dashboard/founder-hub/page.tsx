@@ -31,7 +31,6 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   HelpCircle,
-  DollarSign,
   Lightbulb,
 } from 'lucide-react';
 import {

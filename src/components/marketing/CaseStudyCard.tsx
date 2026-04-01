@@ -22,13 +22,13 @@ export interface CaseStudy {
 function OutcomeIcon({ status }: { status: string }) {
   switch (status) {
     case 'success':
-      return <CheckCircle className="w-4 h-4 text-green-400" />;
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
     case 'failure':
-      return <XCircle className="w-4 h-4 text-red-400" />;
+      return <XCircle className="w-4 h-4 text-red-500" />;
     case 'partial_success':
-      return <CheckCircle className="w-4 h-4 text-yellow-400" />;
+      return <CheckCircle className="w-4 h-4 text-yellow-500" />;
     default:
-      return <Clock className="w-4 h-4 text-zinc-400" />;
+      return <Clock className="w-4 h-4" style={{ color: '#94A3B8' }} />;
   }
 }
 
@@ -47,38 +47,50 @@ function outcomeLabel(status: string): string {
 
 export function CaseStudyCard({ study }: { study: CaseStudy }) {
   return (
-    <div className="relative rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-900/80 to-zinc-800/60 backdrop-blur-lg p-6 flex flex-col gap-4 hover:border-white/20 transition-colors">
+    <div
+      className="relative rounded-2xl p-6 flex flex-col gap-4 transition-shadow hover:shadow-md"
+      style={{
+        backgroundColor: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
+      }}
+    >
       {/* Header: Label + DQI */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
-          <span className="text-xs font-medium text-blue-400 uppercase tracking-wider">
+          <span
+            className="text-xs font-medium uppercase tracking-wider"
+            style={{ color: '#16A34A' }}
+          >
             Case Study
           </span>
-          <h3 className="text-lg font-semibold text-white mt-1">{study.label}</h3>
+          <h3 className="text-lg font-semibold mt-1" style={{ color: '#0F172A' }}>
+            {study.label}
+          </h3>
         </div>
         <DQIBadge score={study.dqiScore} size="sm" showGrade />
       </div>
 
       {/* Bias Summary */}
       <div className="flex items-center gap-3 text-sm">
-        <span className="text-zinc-400">{study.totalBiases} biases detected</span>
+        <span style={{ color: '#475569' }}>{study.totalBiases} biases detected</span>
         <div className="flex items-center gap-1.5">
           {study.severityCounts.high > 0 && (
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-red-500" />
-              <span className="text-red-400">{study.severityCounts.high}</span>
+              <span className="text-red-600">{study.severityCounts.high}</span>
             </span>
           )}
           {study.severityCounts.medium > 0 && (
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-yellow-500" />
-              <span className="text-yellow-400">{study.severityCounts.medium}</span>
+              <span className="text-yellow-600">{study.severityCounts.medium}</span>
             </span>
           )}
           {study.severityCounts.low > 0 && (
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-green-400">{study.severityCounts.low}</span>
+              <span className="text-green-600">{study.severityCounts.low}</span>
             </span>
           )}
         </div>
@@ -89,7 +101,12 @@ export function CaseStudyCard({ study }: { study: CaseStudy }) {
         {study.topBiasTypes.map(b => (
           <span
             key={b.type}
-            className="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-zinc-300"
+            className="text-xs px-2 py-0.5 rounded-full"
+            style={{
+              backgroundColor: '#F1F5F9',
+              border: '1px solid #E2E8F0',
+              color: '#475569',
+            }}
           >
             {b.type}
           </span>
@@ -98,11 +115,14 @@ export function CaseStudyCard({ study }: { study: CaseStudy }) {
 
       {/* Outcome */}
       {study.outcome && (
-        <div className="flex items-center gap-2 text-sm border-t border-white/5 pt-3">
+        <div
+          className="flex items-center gap-2 text-sm pt-3"
+          style={{ borderTop: '1px solid #E2E8F0' }}
+        >
           <OutcomeIcon status={study.outcome.status} />
-          <span className="text-zinc-300">{outcomeLabel(study.outcome.status)}</span>
+          <span style={{ color: '#475569' }}>{outcomeLabel(study.outcome.status)}</span>
           {study.outcome.confirmedBiasCount > 0 && (
-            <span className="text-zinc-500 ml-auto">
+            <span className="ml-auto" style={{ color: '#94A3B8' }}>
               {study.outcome.confirmedBiasCount}/{study.totalBiases} confirmed
             </span>
           )}
@@ -112,9 +132,12 @@ export function CaseStudyCard({ study }: { study: CaseStudy }) {
       {/* CTA */}
       <a
         href={`/shared/${study.token}?case=true`}
-        className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors mt-auto"
+        className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors mt-auto"
+        style={{ color: '#16A34A' }}
+        onMouseEnter={e => (e.currentTarget.style.color = '#15803D')}
+        onMouseLeave={e => (e.currentTarget.style.color = '#16A34A')}
       >
-        View Full Analysis <ExternalLink className="w-3.5 h-3.5" />
+        See the Full Analysis <span aria-hidden="true">&rarr;</span>
       </a>
     </div>
   );

@@ -29,12 +29,22 @@ function AnimatedCounter({ value, suffix = '', label, icon }: CounterProps) {
 
   return (
     <div ref={ref} className="flex flex-col items-center gap-2 px-4 py-3">
-      <div className="text-blue-400/80">{icon}</div>
-      <div className="flex items-baseline gap-1">
-        <motion.span className="text-3xl font-bold text-white tabular-nums">{rounded}</motion.span>
-        {suffix && <span className="text-lg text-zinc-400">{suffix}</span>}
+      <div
+        className="flex items-center justify-center w-10 h-10 rounded-full"
+        style={{ backgroundColor: '#E0F2F1' }}
+      >
+        <span style={{ color: '#0D9488' }}>{icon}</span>
       </div>
-      <span className="text-sm text-zinc-500 text-center">{label}</span>
+      <div className="flex items-baseline gap-1">
+        <motion.span
+          className="text-3xl font-bold tabular-nums"
+          style={{ color: '#0F172A' }}
+        >
+          {rounded}
+        </motion.span>
+        {suffix && <span className="text-lg" style={{ color: '#64748B' }}>{suffix}</span>}
+      </div>
+      <span className="text-sm text-center" style={{ color: '#475569' }}>{label}</span>
     </div>
   );
 }
@@ -61,7 +71,10 @@ export function TractionCounters() {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-lg p-4">
+      <div
+        className="grid grid-cols-2 md:grid-cols-4 gap-2 rounded-2xl p-4"
+        style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
+      >
         <AnimatedCounter
           value={data.totalAnalyses}
           label="Analyses Run"
@@ -84,7 +97,7 @@ export function TractionCounters() {
           icon={<TrendingUp className="w-5 h-5" />}
         />
       </div>
-      <p className="text-xs text-zinc-600 text-center mt-2">
+      <p className="text-xs text-center mt-2" style={{ color: '#94A3B8' }}>
         {data.isRealData
           ? 'Live platform data'
           : 'Research baseline — updated as platform data grows'}
