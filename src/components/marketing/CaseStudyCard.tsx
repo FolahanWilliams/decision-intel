@@ -1,7 +1,7 @@
 'use client';
 
 import { DQIBadge } from '@/components/ui/DQIBadge';
-import { CheckCircle, XCircle, Clock, ExternalLink } from 'lucide-react';
+import { CheckCircle, XCircle, Clock } from 'lucide-react';
 
 export interface CaseStudy {
   token: string;
