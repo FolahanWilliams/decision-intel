@@ -7,6 +7,8 @@ interface ToxicCombo {
   patternLabel: string | null;
   biasTypes: string[];
   toxicScore: number;
+  estimatedRiskAmount?: number;
+  dealTicketSize?: number;
 }
 
 interface ToxicAlertBannerProps {
@@ -50,6 +52,11 @@ export function ToxicAlertBanner({ combinations, onViewDetails }: ToxicAlertBann
           }}
         >
           Compound Risk: {top.patternLabel || 'Unnamed Pattern'} ({Math.round(top.toxicScore)}/100)
+          {top.estimatedRiskAmount != null && (
+            <span style={{ marginLeft: '8px', color: '#f87171', fontWeight: 700 }}>
+              — ${(top.estimatedRiskAmount / 1_000_000).toFixed(1)}M at risk
+            </span>
+          )}
         </div>
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           {top.biasTypes.map(bt => (

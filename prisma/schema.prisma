@@ -1327,3 +1327,21 @@ model CalibrationMilestone {
   @@index([orgId])
 }
 
+model DealAuditPurchase {
+  id              String   @id @default(cuid())
+  userId          String
+  orgId           String?
+  dealId          String
+  stripePaymentId String   @unique
+  tier            String   // "small" | "mid" | "large" | "mega"
+  amount          Int      // cents
+  currency        String   @default("USD")
+  ticketSize      Decimal  // deal's ticket size at time of purchase
+  status          String   @default("active") // active | refunded
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([dealId])
+  @@index([orgId])
+}
+

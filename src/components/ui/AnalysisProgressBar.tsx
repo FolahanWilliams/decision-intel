@@ -9,8 +9,9 @@ import {
   useEffect,
   ReactNode,
 } from 'react';
-import { Loader2, CheckCircle, X, FileText } from 'lucide-react';
+import { Loader2, CheckCircle, X, FileText, ChevronUp, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
+import { LivePipelineGraph, PIPELINE_NODE_LABELS } from './LivePipelineGraph';
 
 // ---------------------------------------------------------------------------
 // Types & Context
@@ -22,6 +23,9 @@ interface ActiveAnalysis {
   progress: number;
   currentStep: string;
   status: 'analyzing' | 'complete' | 'error';
+  nodeStates: Record<string, 'pending' | 'running' | 'complete'>;
+  biasCount: number;
+  noiseScore: number | null;
 }
 
 interface AnalysisProgressContextType {
@@ -31,6 +35,9 @@ interface AnalysisProgressContextType {
   completeTracking: (documentId: string) => void;
   errorTracking: () => void;
   dismiss: () => void;
+  updateNodeState: (label: string, status: 'pending' | 'running' | 'complete') => void;
+  updateBiasCount: (count: number) => void;
+  updateNoiseScore: (score: number) => void;
 }
 
 const AnalysisProgressContext = createContext<AnalysisProgressContextType | undefined>(undefined);
@@ -51,12 +58,19 @@ export function AnalysisProgressProvider({ children }: { children: ReactNode }) 
       clearTimeout(dismissTimerRef.current);
       dismissTimerRef.current = null;
     }
+    const initialNodeStates: Record<string, 'pending' | 'running' | 'complete'> = {};
+    for (const label of PIPELINE_NODE_LABELS) {
+      initialNodeStates[label] = 'pending';
+    }
     setActiveAnalysis({
       documentId,
       filename,
       progress: 0,
       currentStep: 'Preparing document',
       status: 'analyzing',
+      nodeStates: initialNodeStates,
+      biasCount: 0,
+      noiseScore: null,
     });
   }, []);
 
@@ -91,6 +105,20 @@ export function AnalysisProgressProvider({ children }: { children: ReactNode }) 
     setActiveAnalysis(null);
   }, []);
 
+  const updateNodeState = useCallback((label: string, status: 'pending' | 'running' | 'complete') => {
+    setActiveAnalysis(prev =>
+      prev ? { ...prev, nodeStates: { ...prev.nodeStates, [label]: status } } : prev
+    );
+  }, []);
+
+  const updateBiasCount = useCallback((count: number) => {
+    setActiveAnalysis(prev => (prev ? { ...prev, biasCount: count } : prev));
+  }, []);
+
+  const updateNoiseScore = useCallback((score: number) => {
+    setActiveAnalysis(prev => (prev ? { ...prev, noiseScore: score } : prev));
+  }, []);
+
   return (
     <AnalysisProgressContext.Provider
       value={{
@@ -100,6 +128,9 @@ export function AnalysisProgressProvider({ children }: { children: ReactNode }) 
         completeTracking,
         errorTracking,
         dismiss,
+        updateNodeState,
+        updateBiasCount,
+        updateNoiseScore,
       }}
     >
       {children}
@@ -117,18 +148,112 @@ export function useAnalysisProgress() {
 // Floating progress bar UI
 // ---------------------------------------------------------------------------
 
+function usePipelineExpanded(): [boolean, (v: boolean) => void] {
+  const [expanded, setExpandedState] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem('di-pipeline-expanded') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const setExpanded = useCallback((value: boolean) => {
+    setExpandedState(value);
+    try {
+      localStorage.setItem('di-pipeline-expanded', String(value));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  return [expanded, setExpanded];
+}
+
+/**
+ * Derives node states from the currentStep by tracking step history internally.
+ * When currentStep changes, the previous step becomes 'complete' and the new one 'running'.
+ */
+function useDerivedNodeStates(activeAnalysis: ActiveAnalysis | null) {
+  const prevStepRef = useRef<string | null>(null);
+  const { updateNodeState } = useAnalysisProgress();
+
+  useEffect(() => {
+    if (!activeAnalysis || activeAnalysis.status !== 'analyzing') {
+      prevStepRef.current = null;
+      return;
+    }
+
+    const currentStep = activeAnalysis.currentStep;
+    if (currentStep === prevStepRef.current) return;
+
+    // Mark previous step as complete
+    if (prevStepRef.current) {
+      // Find the matching pipeline label for the previous step
+      const prevLabel = findPipelineLabel(prevStepRef.current);
+      if (prevLabel) {
+        updateNodeState(prevLabel, 'complete');
+      }
+    }
+
+    // Mark current step as running
+    const currentLabel = findPipelineLabel(currentStep);
+    if (currentLabel) {
+      updateNodeState(currentLabel, 'running');
+    }
+
+    prevStepRef.current = currentStep;
+  }, [activeAnalysis?.currentStep, activeAnalysis?.status, updateNodeState]);
+}
+
+/** Map SSE step names to pipeline node labels */
+const STEP_TO_LABEL: Record<string, string> = {
+  'Privacy Shield': 'Privacy Shield',
+  'Document Intelligence': 'Document Intelligence',
+  'Bias Detection': 'Bias Detection',
+  'Noise Analysis': 'Noise Analysis',
+  'Fact & Compliance Check': 'Fact & Compliance Check',
+  'Deep Analysis': 'Deep Analysis',
+  'Boardroom Simulation': 'Boardroom Simulation',
+  'Pattern Recognition': 'Pattern Recognition',
+  'Meta Judge': 'Meta Judge',
+  'Risk Scoring': 'Risk Scoring',
+};
+
+function findPipelineLabel(stepName: string): string | null {
+  // Direct match
+  if (STEP_TO_LABEL[stepName]) return STEP_TO_LABEL[stepName];
+  // Fuzzy: check if any label is contained in the step name
+  for (const label of PIPELINE_NODE_LABELS) {
+    if (stepName.toLowerCase().includes(label.toLowerCase())) return label;
+  }
+  return null;
+}
+
 export function AnalysisProgressFloat() {
   const { activeAnalysis, dismiss } = useAnalysisProgress();
+  const [expanded, setExpanded] = usePipelineExpanded();
+
+  // Derive node states from step progression
+  useDerivedNodeStates(activeAnalysis);
 
   if (!activeAnalysis) return null;
 
   const isComplete = activeAnalysis.status === 'complete';
   const isError = activeAnalysis.status === 'error';
+  const isAnalyzing = activeAnalysis.status === 'analyzing';
   const barColor = isComplete
     ? 'var(--success)'
     : isError
       ? 'var(--error)'
       : 'var(--accent-primary)';
+
+  const panelWidth = 'min(640px, 90vw)';
+
+  // When complete, mark all nodes complete
+  const nodeStates = isComplete
+    ? Object.fromEntries(PIPELINE_NODE_LABELS.map(l => [l, 'complete' as const]))
+    : (activeAnalysis.nodeStates || {});
 
   return (
     <div
@@ -141,15 +266,22 @@ export function AnalysisProgressFloat() {
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 45,
-        background: 'var(--bg-secondary)',
+        width: expanded && isAnalyzing ? panelWidth : undefined,
+        minWidth: expanded && isAnalyzing ? undefined : '360px',
+        maxWidth: expanded && isAnalyzing ? undefined : '480px',
+        background: 'rgba(5, 5, 5, 0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
         border: '1px solid var(--border-color)',
+        borderRadius: 12,
         padding: '12px 16px',
-        minWidth: '360px',
-        maxWidth: '480px',
+        overflow: 'hidden',
+        transition: 'height 0.35s ease, width 0.35s ease, max-width 0.35s ease',
       }}
     >
-      <div className="flex items-center justify-between" style={{ marginBottom: '8px' }}>
-        <div className="flex items-center gap-sm" style={{ fontSize: '13px' }}>
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: expanded && isAnalyzing ? 12 : 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
           {isComplete ? (
             <CheckCircle size={14} style={{ color: 'var(--success)' }} />
           ) : isError ? (
@@ -174,53 +306,89 @@ export function AnalysisProgressFloat() {
             )}
           </span>
         </div>
-        <button
-          onClick={dismiss}
-          aria-label="Dismiss"
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            cursor: 'pointer',
-            display: 'flex',
-            padding: '2px',
-          }}
-        >
-          <X size={14} />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {/* Expand/collapse toggle – only show during analysis */}
+          {isAnalyzing && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              aria-label={expanded ? 'Collapse pipeline view' : 'Expand pipeline view'}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                display: 'flex',
+                padding: '2px',
+              }}
+            >
+              {expanded ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+            </button>
+          )}
+          <button
+            onClick={dismiss}
+            aria-label="Dismiss"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              padding: '2px',
+            }}
+          >
+            <X size={14} />
+          </button>
+        </div>
       </div>
 
-      {/* Progress bar */}
-      <div
-        role="progressbar"
-        aria-valuenow={Math.round(activeAnalysis.progress)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={activeAnalysis.currentStep}
-        style={{
-          height: '3px',
-          background: 'var(--bg-tertiary)',
-          marginBottom: '6px',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            height: '100%',
-            width: `${activeAnalysis.progress}%`,
-            background: barColor,
-            transition: 'width 0.4s ease',
-          }}
+      {/* Expanded pipeline graph */}
+      {expanded && isAnalyzing ? (
+        <LivePipelineGraph
+          nodeStates={nodeStates}
+          progress={activeAnalysis.progress}
+          biasCount={activeAnalysis.biasCount}
+          noiseScore={activeAnalysis.noiseScore}
         />
-      </div>
+      ) : (
+        <>
+          {/* Progress bar */}
+          <div
+            role="progressbar"
+            aria-valuenow={Math.round(activeAnalysis.progress)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={activeAnalysis.currentStep}
+            style={{
+              height: '3px',
+              background: 'var(--bg-tertiary)',
+              marginBottom: '6px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${activeAnalysis.progress}%`,
+                background: barColor,
+                transition: 'width 0.4s ease',
+              }}
+            />
+          </div>
 
-      <div
-        className="flex items-center justify-between"
-        style={{ fontSize: '11px', color: 'var(--text-muted)' }}
-      >
-        <span>{activeAnalysis.currentStep}</span>
-        <span>{Math.round(activeAnalysis.progress)}%</span>
-      </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: 11,
+              color: 'var(--text-muted)',
+            }}
+          >
+            <span>{activeAnalysis.currentStep}</span>
+            <span>{Math.round(activeAnalysis.progress)}%</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }

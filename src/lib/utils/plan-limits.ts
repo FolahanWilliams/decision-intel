@@ -22,8 +22,23 @@ export async function getUserPlan(userId: string): Promise<PlanType> {
 }
 
 export async function checkAnalysisLimit(
-  userId: string
+  userId: string,
+  dealId?: string | null
 ): Promise<{ allowed: boolean; plan: PlanType; used: number; limit: number }> {
+  // If a deal audit has been purchased, bypass subscription limits for that deal
+  if (dealId) {
+    try {
+      const dealAudit = await prisma.dealAuditPurchase.findFirst({
+        where: { dealId, status: 'active' },
+      });
+      if (dealAudit) {
+        return { allowed: true, plan: 'enterprise' as PlanType, used: 0, limit: -1 };
+      }
+    } catch {
+      // Schema drift — DealAuditPurchase table may not exist
+    }
+  }
+
   const plan = await getUserPlan(userId);
   const limits = PLANS[plan];
 

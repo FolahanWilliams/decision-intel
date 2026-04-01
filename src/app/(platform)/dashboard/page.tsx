@@ -262,7 +262,7 @@ export default function Dashboard() {
   const [deleting, setDeleting] = useState(false);
 
   const { addNotification } = useNotifications();
-  const { startTracking, updateProgress, completeTracking, errorTracking } = useAnalysisProgress();
+  const { startTracking, updateProgress, completeTracking, errorTracking, updateBiasCount, updateNoiseScore } = useAnalysisProgress();
   const [showActivityFeed, setShowActivityFeed] = useState(false);
   const {
     activities,
@@ -288,6 +288,9 @@ export default function Dashboard() {
   const [showOutcomeGateModal, setShowOutcomeGateModal] = useState(false);
   const [outcomeGateInfo, setOutcomeGateInfo] = useState<OutcomeGateInfo | null>(null);
 
+  // Bias count accumulator for pipeline graph badges
+  const biasCountRef = useRef(0);
+
   // SSE: streaming analysis with typed events, auto-retry, AbortController cleanup
   const {
     startAnalysis,
@@ -298,6 +301,14 @@ export default function Dashboard() {
     outcomeGate,
   } = useAnalysisStream({
     stepNames: ANALYSIS_STEPS.map(s => s.name),
+    onBiasDetected: () => {
+      // Increment bias count in the progress context (called per bias event)
+      biasCountRef.current += 1;
+      updateBiasCount(biasCountRef.current);
+    },
+    onNoiseUpdate: (score) => {
+      updateNoiseScore(score);
+    },
     onOutcomeReminder: (count, ids) => {
       setOutcomeReminder({ pendingCount: count, analysisIds: ids });
     },
@@ -568,6 +579,7 @@ export default function Dashboard() {
       );
 
       // Stream analysis via the hook (auto-retry, typed events, AbortController cleanup)
+      biasCountRef.current = 0;
       startTracking(uploadData.id, uploadData.filename);
       const finalResult = await startAnalysis(uploadData.id);
 
@@ -642,6 +654,7 @@ export default function Dashboard() {
       );
 
       const retryDoc = uploadedDocs.find(d => d.id === docId);
+      biasCountRef.current = 0;
       startTracking(docId, retryDoc?.filename || 'Document');
       const finalResult = await startAnalysis(docId);
 

@@ -52,3 +52,16 @@ export const PLANS = {
 } as const;
 
 export type PlanType = keyof typeof PLANS;
+
+export const DEAL_AUDIT_TIERS = [
+  { id: 'small',  label: 'Emerging',   maxTicket: 10_000_000,   price: 499,   priceId: process.env.STRIPE_DEAL_SMALL_PRICE_ID || '' },
+  { id: 'mid',    label: 'Growth',     maxTicket: 50_000_000,   price: 1499,  priceId: process.env.STRIPE_DEAL_MID_PRICE_ID || '' },
+  { id: 'large',  label: 'Core',       maxTicket: 200_000_000,  price: 2999,  priceId: process.env.STRIPE_DEAL_LARGE_PRICE_ID || '' },
+  { id: 'mega',   label: 'Flagship',   maxTicket: Infinity,     price: 4999,  priceId: process.env.STRIPE_DEAL_MEGA_PRICE_ID || '' },
+] as const;
+
+export type DealAuditTierId = typeof DEAL_AUDIT_TIERS[number]['id'];
+
+export function getDealAuditTier(ticketSize: number): typeof DEAL_AUDIT_TIERS[number] {
+  return DEAL_AUDIT_TIERS.find(t => ticketSize <= t.maxTicket) || DEAL_AUDIT_TIERS[DEAL_AUDIT_TIERS.length - 1];
+}
