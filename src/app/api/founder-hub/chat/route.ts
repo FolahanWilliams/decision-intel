@@ -67,7 +67,7 @@ Decision Intel is an AI-powered cognitive bias auditing engine for high-stakes e
 - Decision Quality Index (DQI): 0-100 composite score (FICO for decisions). Components: Bias Load 28%, Noise Level 18%, Evidence Quality 18%, Process Maturity 13%, Compliance Risk 13%, Historical Alignment 10%. Grade scale: A (80-100), B (65-79), C (50-64), D (35-49), F (0-34). v2.0.0 methodology.
 - Conviction Score: 0-100 measuring thesis support INDEPENDENT of bias. Components: Evidence Strength 35%, Argument Coherence 30%, Judge Agreement 20%, Perspective Diversity 15%
 - Compound Scoring Engine: 20x20 bias interaction matrix, context multipliers (monetary stakes, absent dissent, time pressure), biological signal detection (Winner Effect 1.2x, Cortisol/Stress 1.18x)
-- Toxic Combination Detection: Echo Chamber, Sunk Ship, Blind Sprint, Yes Committee, Optimism Trap, Status Quo Lock, Recency Spiral
+- Toxic Combination Detection: 10 named patterns (Echo Chamber, Sunk Ship, Blind Sprint, Yes Committee, Optimism Trap, Status Quo Lock, Recency Spiral, Golden Child, Doubling Down, Deadline Panic). Each pattern encodes specific bias pairs/triples + contextual trigger conditions. Context amplifiers: monetary stakes (2x), absent dissent (1.3x), time pressure (1.25x), unanimous consensus (1.2x), small group (1.15x), narrow confidence (1.1x) — capped at 3x. Org-calibrated via CausalEdge weights. Auto-generated mitigation playbooks with research citations. Dollar impact estimation: ticketSize × historicalFailRate. Trend sparklines. Org benchmarking vs anonymized global averages. Beneficial pattern damping (0.7x–1.0x). False-positive damping when >30% of flagged patterns succeeded.
 - 146 annotated real-world case studies (131 failures + 15 successes) across 8 industries (Financial Services 28, Technology 23, Government 13, Energy 11, Healthcare 11, Retail 11, Aerospace 9, Automotive 7). Includes pre-decision evidence (original memos, SEC filings, board presentations) showing biases detectable BEFORE outcomes were known.
 - Project types: M&A, Strategic Initiative, Risk Assessment, Vendor Evaluation, Product Launch, Restructuring + PE/VC types (Buyout, Growth Equity, Venture, Secondary, Add-On, Recapitalization)
 
@@ -76,8 +76,16 @@ Deepest moat: Causal learning pipeline + feedback loops. Competitors cannot clon
 - Bias Detection (LLM): Low moat — copyable
 - Noise Decomposition: Medium — Kahneman framework
 - Compound Scoring Engine: High — proprietary 20x20 matrix + biological signals
-- Toxic Combinations: High — named patterns + learned from outcomes
+- Toxic Combinations: High — 10 named patterns + org-calibrated learned patterns + mitigation playbooks + dollar impact estimation + false-positive damping + beneficial pattern detection. Key insight: individual bias detection is a feature; calibrated compound risk scoring with playbooks and dollar quantification is a product category.
 - Causal Learning Pipeline: Very High — 18+ months per-org outcome data, pairwise interaction detection (joint failure rate >1.3x independence assumption)
+
+=== TOXIC COMBINATIONS NARRATIVE (USE IN CONVERSATIONS) ===
+The toxic combination feature is the most differentiable story. Three layers of moat:
+1. INTERACTION MATH: Individual bias detection is like checking blood pressure. Toxic combinations detect when multiple biases COMBINE with contextual factors (time pressure, absent dissent, high stakes) to create compound risk 8x worse than any single factor. 10 patterns each encode specific trigger conditions — not just bias pairs but three-variable interactions.
+2. ORG-SPECIFIC CALIBRATION: CausalEdge weights mean the same bias pair might be dangerous at Firm A but benign at Firm B. The system learns this from outcome data. A competitor needs 18+ months of customer behavior data, outcome enforcement infrastructure, and causal inference math to replicate.
+3. FALSE-POSITIVE DAMPING: The system tracks when patterns are flagged but decisions SUCCEED, reducing effective failure rates over time. This is the anti-alert-fatigue mechanism. Combined with beneficial pattern damping (dissent encouraged, external advisors, iterative process), the system learns not just what's dangerous but what protective factors make dangerous patterns survivable.
+Pitch reframe: "Detection is a feature. Calibrated compound risk scoring with mitigation playbooks and dollar quantification is a product category. That's the difference between a thermometer and a cardiologist."
+Investor one-liner: "We're building the Wiz of decision intelligence — compound risk scoring for cognitive biases, not cloud vulnerabilities."
 - Nudge Calibration: Very High — behavioral feedback loop, org-specific
 - Cross-Org Bias Genome: Very High — data network effect
 - Pre-Decision Evidence Database: High — original memos/filings proving biases detectable before outcomes, eliminates hindsight bias criticism
@@ -97,7 +105,7 @@ General AI:
 === MARKET STRATEGY ===
 Primary market: Enterprise Decision Teams — any team making high-stakes, document-driven decisions (M&A, corporate strategy, risk assessment, vendor selection, product launches).
 Proven vertical: PE/VC Investment Committees — quantifiable ROI ($50-500M per avoided bad deal), tight-knit community, fastest sales cycle.
-Pricing: Starter (Free, 3 analyses) → Professional ($349/mo) → Team ($999/mo) → Enterprise (Custom).
+Pricing: Starter (Free, 3 analyses) → Professional ($349/mo) → Team ($999/mo) → Enterprise (Custom). ALSO: Per-Deal Audit pricing ($499-$4,999 one-time, scaled by deal ticket size). Grants unlimited analyses for all documents linked to that deal. Price lever: per-deal is 10-100x more profitable than per-seat because a PE firm making a $200M investment happily pays $5K for a decision audit.
 Market: Decision intelligence $12.2B → $46.4B by 2030. Enterprise GRC $50B+. PE/VC software $607B → $995B by 2035.
 Expansion: Year 1 Enterprise M&A/Strategy/Risk → Year 2 Financial Services (PE/VC, Hedge Funds) → Year 3 Government/Insurance → Year 4+ Horizontal platform.
 
@@ -139,7 +147,17 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Counterfactual engine is underexposed. Get it into UI and sales deck — it's the ROI story.
 - Consider a "Decision Score" that's external-facing — like a credit score for organizational decision quality.
 
-=== RECENTLY SHIPPED FEATURES (March 2026) ===
+=== RECENTLY SHIPPED FEATURES (April 2026) ===
+- Live Pipeline Graph: Expandable floating visualization of the 11-node LangGraph pipeline during analysis. Nodes light up in real-time (pending → running → complete) with glass-morphism styling, animated edges, and live bias/noise badges. Respects reduced-motion.
+- Per-Deal Audit Pricing: One-time Stripe payments scaled to deal ticket size ($499/<$10M, $1499/<$50M, $2999/<$200M, $4999/$200M+). Grants unlimited analyses for deal-linked documents, bypassing subscription limits. DealAuditPurchase model + DealAuditCTA component.
+- Toxic Mitigation Playbooks: Auto-generated research-backed debiasing steps for all 10 named patterns. Context-aware augmentation (very-high-stakes, small-group, unanimous-consensus add extra steps). Each step has owner, timing, priority, and academic citations.
+- Dollar Impact Estimation: Connects toxic combos to deal ticketSize to estimate financial risk (ticketSize × historicalFailRate). Shows in ToxicCombinationCard and ToxicAlertBanner.
+- Toxic Score Trends API: Daily avg toxic scores for sparkline visualization (/api/toxic-combinations/trends).
+- Org Benchmarking API: Compare org toxic patterns to anonymized global averages (/api/toxic-combinations/benchmarks).
+- Toxic Pattern Tooltips: Interactive ? icons on each named pattern in Founder Hub showing bias composition, trigger conditions, danger explanation, and research citations.
+- Founder Pitch Script: Toxic Combinations pitch narrative with timed script sections, demo moments, and investor one-liner.
+
+=== PREVIOUSLY SHIPPED (March 2026) ===
 - Slack → Copilot Auto-Trigger: Auto-creates CopilotSession seeded with decision context after every Slack audit. "Continue in Copilot" button in Slack messages.
 - Intelligence Brief on Empty States: Contextual org intelligence (top dangerous biases, maturity grade, decision stats) replaces generic empty states across 4 dashboard pages.
 - Enhanced Slack Commands: 7 slash commands with rich Block Kit — /di help (categorized), /di score (instant bias check), /di brief (org intelligence), /di status (quality trends), /di analyze (with Copilot link), /di prior, /di outcome.

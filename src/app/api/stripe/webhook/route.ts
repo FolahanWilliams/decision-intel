@@ -66,6 +66,32 @@ export async function POST(request: NextRequest) {
 
           log.info(`Subscription created: ${plan} for user ${userId}`);
         }
+
+        // Handle one-time deal audit payment
+        if (session.mode === 'payment' && session.metadata?.type === 'deal_audit') {
+          const { userId: auditUserId, dealId, tier, ticketSize, orgId } = session.metadata;
+          if (auditUserId && dealId && tier) {
+            try {
+              await prisma.dealAuditPurchase.create({
+                data: {
+                  userId: auditUserId,
+                  orgId: orgId || null,
+                  dealId,
+                  stripePaymentId: session.id,
+                  tier,
+                  amount: session.amount_total || 0,
+                  currency: (session.currency || 'usd').toUpperCase(),
+                  ticketSize: parseFloat(ticketSize || '0'),
+                  status: 'active',
+                },
+              });
+              log.info(`Deal audit purchased: ${tier} for deal ${dealId} by user ${auditUserId}`);
+            } catch (err) {
+              log.error('Failed to create DealAuditPurchase:', err);
+            }
+          }
+          break;
+        }
         break;
       }
 

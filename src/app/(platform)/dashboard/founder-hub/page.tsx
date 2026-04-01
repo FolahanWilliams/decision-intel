@@ -30,6 +30,9 @@ import {
   Library,
   ArrowUpRight,
   ArrowDownRight,
+  HelpCircle,
+  DollarSign,
+  Lightbulb,
 } from 'lucide-react';
 import {
   ALL_CASES,
@@ -745,18 +748,8 @@ function ScoringEngine() {
             Wiz-inspired: surfaces only top ~5% of risky decisions, eliminating alert fatigue.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-            {[
-              'Echo Chamber',
-              'Sunk Ship',
-              'Blind Sprint',
-              'Yes Committee',
-              'Optimism Trap',
-              'Status Quo Lock',
-              'Recency Spiral',
-            ].map(p => (
-              <span key={p} style={badge('#ef4444')}>
-                {p}
-              </span>
+            {TOXIC_PATTERN_DATA.map(p => (
+              <ToxicPatternBadge key={p.label} pattern={p} />
             ))}
           </div>
           <ul
@@ -768,9 +761,14 @@ function ScoringEngine() {
               marginTop: 8,
             }}
           >
-            <li>Context amplifiers: monetary stakes, absent dissent, time pressure</li>
-            <li>Org-calibrated: thresholds adjust from your outcome data</li>
-            <li>Historical failure &amp; success rates from 146-case database</li>
+            <li>10 named patterns (Echo Chamber, Sunk Ship, Blind Sprint, Yes Committee, Optimism Trap, Status Quo Lock, Recency Spiral, Golden Child, Doubling Down, Deadline Panic)</li>
+            <li>Context amplifiers: monetary stakes (2x), absent dissent (1.3x), time pressure (1.25x), unanimous consensus (1.2x)</li>
+            <li>Org-calibrated: thresholds adjust from your outcome data via CausalEdge weights</li>
+            <li>Historical failure &amp; success rates from 146-case database with false-positive damping</li>
+            <li><strong>NEW: Mitigation Playbooks</strong> — auto-generated, research-backed debiasing steps per pattern</li>
+            <li><strong>NEW: Dollar Impact</strong> — estimated financial risk from deal ticket size × failure rate</li>
+            <li><strong>NEW: Trend Sparklines</strong> — per-org toxic score trajectory over time</li>
+            <li><strong>NEW: Org Benchmarks</strong> — compare your patterns to anonymized global averages</li>
           </ul>
         </div>
         <div style={card}>
@@ -1196,7 +1194,7 @@ function StrategyAndPositioning() {
           [
             'Toxic Combination Patterns',
             'High',
-            '7 named patterns + learned patterns from outcomes',
+            '10 named patterns + learned patterns + mitigation playbooks + dollar impact estimation',
           ],
           [
             'Causal Learning Pipeline',
@@ -1286,6 +1284,12 @@ function StrategyAndPositioning() {
           the data itself.
         </p>
       </div>
+
+      {/* ── Toxic Combination Deep-Dive (Moat Narrative) ── */}
+      <ToxicCombinationMoatNarrative />
+
+      {/* ── Founder Pitch Script ── */}
+      <FounderPitchScript />
 
       {/* Academic Backing */}
       <div style={{ ...card, borderLeft: '3px solid #8b5cf6' }}>
@@ -1955,6 +1959,306 @@ function StrategyAndPositioning() {
 
 // ─── Tab Content: Sales Toolkit (Objection Handler + Demo Script) ────────────
 
+// ─── Toxic Pattern Knowledge Base ──────────────────────────────────────────
+
+const TOXIC_PATTERN_DATA = [
+  {
+    label: 'Echo Chamber',
+    biases: ['Groupthink', 'Confirmation Bias'],
+    trigger: 'No dissenting voices present',
+    why: 'Creates a self-reinforcing belief loop. The group only hears what it already believes, and challenging evidence is dismissed as noise. The absence of dissent is mistaken for agreement.',
+    score: 85,
+    research: 'Janis (1972) — Groupthink in policy fiascoes; Kahneman & Tversky (1974) — Anchoring',
+  },
+  {
+    label: 'Sunk Ship',
+    biases: ['Sunk Cost Fallacy', 'Anchoring Bias'],
+    trigger: 'High monetary stakes (>$100K)',
+    why: 'Prior investment anchors the team to their original thesis. The more you\'ve spent, the harder it is to walk away — even when new evidence says you should. The anchor makes "double down" feel safer than "cut losses."',
+    score: 80,
+    research: 'Arkes & Blumer (1985) — Sunk Cost; Thaler (1980) — Mental Accounting',
+  },
+  {
+    label: 'Blind Sprint',
+    biases: ['Availability Heuristic', 'Overconfidence Bias'],
+    trigger: 'Time pressure present',
+    why: 'Under time pressure, the brain shortcuts to easily recalled information (what\'s vivid, not what\'s representative). Overconfidence makes the team feel certain about a decision they haven\'t properly stress-tested.',
+    score: 75,
+    research: 'Tversky & Kahneman (1973) — Availability; Lichtenstein et al. (1982) — Overconfidence',
+  },
+  {
+    label: 'Yes Committee',
+    biases: ['Groupthink', 'Authority Bias'],
+    trigger: 'Unanimous consensus reached',
+    why: 'The most senior person speaks first and sets the anchor. Authority bias makes juniors defer. Unanimity is mistaken for quality — but Strebulaev\'s Stanford research shows consensus-seeking ICs have LOWER IPO rates.',
+    score: 82,
+    research: 'Milgram (1963) — Authority Obedience; Strebulaev (Stanford GSB, 2024) — VC consensus',
+  },
+  {
+    label: 'Optimism Trap',
+    biases: ['Overconfidence Bias', 'Confirmation Bias'],
+    trigger: 'High monetary stakes (>$100K)',
+    why: 'Decision-makers selectively gather supporting evidence while being overly confident in a high-stakes bet. They ask "why should we invest?" instead of "why might this fail?" The higher the stakes, the stronger the confirmation pull.',
+    score: 78,
+    research: 'Kahneman & Lovallo (1993) — Planning Fallacy; Tetlock (2005) — Forecasting',
+  },
+  {
+    label: 'Status Quo Lock',
+    biases: ['Status Quo Bias', 'Anchoring Bias'],
+    trigger: 'No dissenting voices present',
+    why: 'Inaction feels safe because it\'s the default. Anchoring to "how we\'ve always done it" combined with nobody pushing for change creates invisible paralysis. The cost of NOT acting is never calculated.',
+    score: 70,
+    research: 'Samuelson & Zeckhauser (1988) — Status Quo Bias; Thaler & Sunstein (2008) — Nudge',
+  },
+  {
+    label: 'Recency Spiral',
+    biases: ['Recency Bias', 'Availability Heuristic'],
+    trigger: 'Time pressure present',
+    why: 'Last quarter\'s results dominate the discussion. The most recent data point is the most emotionally salient, drowning out 5-year trends. Under time pressure, there\'s no space to pull up the long view.',
+    score: 72,
+    research: 'Tversky & Kahneman (1973) — Availability; Taleb (2007) — Narrative Fallacy',
+  },
+  {
+    label: 'Golden Child',
+    biases: ['Halo Effect', 'Confirmation Bias', 'Authority Bias'],
+    trigger: 'Always active (no context required)',
+    why: 'A prestigious brand, charismatic founder, or elite pedigree creates an aura that blinds the team to red flags. Three biases compound: the halo makes everything look good, confirmation bias filters for supporting evidence, and authority bias prevents questioning.',
+    score: 82,
+    research: 'Thorndike (1920) — Halo Effect; Nisbett & Wilson (1977) — Attribution Errors',
+  },
+  {
+    label: 'Doubling Down',
+    biases: ['Gambler\'s Fallacy', 'Overconfidence Bias', 'Sunk Cost Fallacy'],
+    trigger: 'High monetary stakes (>$100K)',
+    why: 'Three biases create an escalation spiral: the belief that losses must reverse (gambler\'s), confidence that this time will be different (overconfidence), and inability to walk away from prior investment (sunk cost). This is how $10M write-offs become $100M write-offs.',
+    score: 85,
+    research: 'Staw (1976) — Escalation of Commitment; Brockner (1992) — Entrapment',
+  },
+  {
+    label: 'Deadline Panic',
+    biases: ['Zeigarnik Effect', 'Planning Fallacy'],
+    trigger: 'Time pressure present',
+    why: 'Incomplete-task anxiety (Zeigarnik) creates psychological pressure to close, fast. Combined with planning fallacy (underestimating complexity), the team compresses timelines and makes rushed commitments to achieve the feeling of "done."',
+    score: 78,
+    research: 'Zeigarnik (1927) — Task Completion; Buehler et al. (1994) — Planning Fallacy',
+  },
+];
+
+function ToxicPatternBadge({ pattern }: { pattern: typeof TOXIC_PATTERN_DATA[number] }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  return (
+    <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+      <span style={badge('#ef4444')}>{pattern.label}</span>
+      <button
+        onClick={() => setShowTooltip(!showTooltip)}
+        onBlur={() => setTimeout(() => setShowTooltip(false), 200)}
+        aria-label={`Learn about ${pattern.label} pattern`}
+        style={{
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          padding: 0,
+          marginLeft: -4,
+          display: 'inline-flex',
+          alignItems: 'center',
+        }}
+      >
+        <HelpCircle size={12} style={{ color: 'var(--text-muted)', opacity: 0.6 }} />
+      </button>
+      {showTooltip && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '100%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            marginBottom: 8,
+            width: 320,
+            padding: 14,
+            background: 'var(--bg-primary, #0a0a0a)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: 10,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+            zIndex: 50,
+            fontSize: 12,
+            lineHeight: 1.6,
+          }}
+        >
+          <div style={{ fontWeight: 700, color: '#fca5a5', marginBottom: 6, fontSize: 13 }}>
+            {pattern.label}
+            <span style={{ fontWeight: 400, color: 'var(--text-muted)', marginLeft: 8, fontSize: 11 }}>
+              Base score: {pattern.score}/100
+            </span>
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Biases: </span>
+            <span style={{ color: 'var(--text-secondary)' }}>{pattern.biases.join(' + ')}</span>
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Trigger: </span>
+            <span style={{ color: 'var(--text-secondary)' }}>{pattern.trigger}</span>
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Why it&apos;s dangerous: </span>
+            <span style={{ color: 'var(--text-secondary)' }}>{pattern.why}</span>
+          </div>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 6, marginTop: 4 }}>
+            <span style={{ color: '#64748b', fontStyle: 'italic', fontSize: 10 }}>{pattern.research}</span>
+          </div>
+        </div>
+      )}
+    </span>
+  );
+}
+
+// ─── Toxic Combination Moat Narrative ──────────────────────────────────────
+
+function ToxicCombinationMoatNarrative() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div style={{ ...card, borderLeft: '3px solid #ef4444' }}>
+      <div
+        style={{ ...sectionTitle, cursor: 'pointer' }}
+        onClick={() => setExpanded(!expanded)}
+      >
+        <AlertTriangle size={18} style={{ color: '#ef4444' }} /> Why Toxic Combinations Is Your Most Differentiable Feature
+        <span style={{ marginLeft: 'auto', color: 'var(--text-muted)' }}>
+          {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        </span>
+      </div>
+
+      {expanded && (
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, marginTop: 12 }}>
+          <p style={{ marginBottom: 16 }}>
+            <strong style={{ color: 'var(--text-primary)' }}>Every AI product in decision intelligence can detect individual biases.</strong>{' '}
+            That&apos;s table stakes. Feed a document into Claude or GPT, ask &quot;what cognitive biases are present?&quot; and you get a list. That&apos;s a weekend project. What you&apos;ve built is fundamentally different in three ways that compound on each other:
+          </p>
+
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ ...badge('#3b82f6'), fontSize: 11 }}>1</span>
+              <strong style={{ color: '#60a5fa', fontSize: 14 }}>The Interaction Math, Not the Detection</strong>
+            </div>
+            <p style={{ marginLeft: 28, marginBottom: 0 }}>
+              Individual bias detection is like checking blood pressure. Toxic combination detection is like understanding that{' '}
+              <strong style={{ color: 'var(--text-primary)' }}>high blood pressure + high cholesterol + smoking together create cardiac risk 8x worse than any single factor</strong>.
+              The nonlinear compounding is where the actual danger lives. Your 10 named patterns encode specific{' '}
+              <em>contextual trigger conditions</em>. &quot;The Echo Chamber&quot; isn&apos;t just groupthink + confirmation bias — it&apos;s those biases{' '}
+              <strong style={{ color: '#fca5a5' }}>when dissent is absent</strong>. That third variable turns moderate concern into critical alert.
+            </p>
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ ...badge('#22c55e'), fontSize: 11 }}>2</span>
+              <strong style={{ color: '#4ade80', fontSize: 14 }}>The Org-Specific Calibration Loop (The Real Moat)</strong>
+            </div>
+            <p style={{ marginLeft: 28, marginBottom: 0 }}>
+              Your CausalEdge weights mean the <strong style={{ color: 'var(--text-primary)' }}>same bias pair might be dangerous at Firm A but benign at Firm B</strong>, and your system knows the difference.
+              A PE firm with strong dissent culture might show Echo Chamber patterns but still make great decisions — their process compensates. Your system learns this from outcomes and dials down the alert.
+              A competitor would need to: (1) convince customers to report outcomes, (2) wait 18+ months for data, (3) build causal inference, (4) calibrate per-org thresholds. That&apos;s not a sprint — it&apos;s a multi-year flywheel with cold-start problems at every stage.
+            </p>
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ ...badge('#f59e0b'), fontSize: 11 }}>3</span>
+              <strong style={{ color: '#fbbf24', fontSize: 14 }}>False-Positive Damping (The Quiet Killer Feature)</strong>
+            </div>
+            <p style={{ marginLeft: 28, marginBottom: 0 }}>
+              Your system tracks when a pattern was flagged but the decision <strong style={{ color: 'var(--text-primary)' }}>succeeded anyway</strong> — and uses that to reduce the pattern&apos;s effective failure rate.
+              Alert fatigue kills every monitoring product. You&apos;ve built anti-alert-fatigue into the scoring math.
+              Combined with beneficial pattern damping (dissent encouraged → lower scores, external advisors → lower scores), your system learns not just{' '}
+              <em>what&apos;s dangerous</em> but <em>what protective factors make dangerous patterns survivable</em>.
+            </p>
+          </div>
+
+          <div style={{ padding: '12px 16px', background: 'rgba(99, 102, 241, 0.08)', borderRadius: 8, border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+            <div style={{ fontWeight: 700, color: '#a5b4fc', marginBottom: 6, fontSize: 13 }}>
+              <Lightbulb size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />
+              The Bottom Line
+            </div>
+            <p style={{ margin: 0, fontStyle: 'italic', color: 'var(--text-primary)' }}>
+              Detection is a feature. Calibrated compound risk scoring with mitigation playbooks and dollar quantification is a product category. The pitch isn&apos;t &quot;we detect bias.&quot; The pitch is: &quot;We know which specific combination of biases, in your specific organizational context, with your specific deal dynamics, has historically led to the worst outcomes — and we have a research-backed playbook to prevent it, with a dollar figure attached.&quot; That&apos;s the difference between a thermometer and a cardiologist.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Founder Pitch Script ─────────────────────────────────────────────────
+
+function FounderPitchScript() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div style={{ ...card, borderLeft: '3px solid #00d2ff' }}>
+      <div
+        style={{ ...sectionTitle, cursor: 'pointer' }}
+        onClick={() => setExpanded(!expanded)}
+      >
+        <MessageSquare size={18} style={{ color: '#00d2ff' }} /> Pitch Script: The Toxic Combinations Story
+        <span style={{ marginLeft: 'auto', color: 'var(--text-muted)' }}>
+          {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        </span>
+      </div>
+
+      {expanded && (
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, marginTop: 12 }}>
+          {[
+            {
+              label: 'OPEN (10s)',
+              script: '"Every AI tool can flag individual biases. That\'s table stakes now. But here\'s what nobody else does—"',
+              note: 'Pause. Let them lean in.',
+            },
+            {
+              label: 'THE ANALOGY (15s)',
+              script: '"Detecting a single bias is like checking blood pressure. Useful, but not the full picture. We detect when multiple biases COMBINE with situational factors — time pressure, absent dissent, high stakes — to create compound risk that\'s 8x worse than any single factor. It\'s the difference between a blood pressure reading and a cardiac risk assessment."',
+              note: 'The medical analogy is sticky. People remember it.',
+            },
+            {
+              label: 'THE DEMO MOMENT (20s)',
+              script: '"[Show toxic combination card] See this? \'The Echo Chamber\' — confirmation bias plus groupthink, triggered by the fact that nobody in this memo disagreed. This pattern has a 45% historical failure rate. On your $50M deal, that\'s $22.5M at risk. And here\'s the 4-step mitigation playbook with the academic research behind each step."',
+              note: 'The dollar figure makes it visceral. The playbook makes it actionable. The research makes it credible.',
+            },
+            {
+              label: 'THE MOAT (15s)',
+              script: '"And here\'s what makes this impossible to replicate: our system learns which patterns are actually dangerous for YOUR specific organization. Firm A might be immune to Echo Chambers because they have strong dissent culture. Firm B might be devastated by them. We know the difference — because we track outcomes. Every decision you run through the platform makes the next detection more accurate."',
+              note: 'Emphasize "YOUR specific organization" — personalization is the moat.',
+            },
+            {
+              label: 'THE CLOSE (10s)',
+              script: '"Your competitors are using ChatGPT to get a list of biases. You\'d be using a system that knows which specific combinations, in your specific context, with your specific deal dynamics, have historically led to the worst outcomes — with a dollar figure and a playbook attached."',
+              note: '"Thermometer vs. cardiologist." Drop this line if they need one phrase to remember.',
+            },
+          ].map((step, i) => (
+            <div key={i} style={{ marginBottom: 16, paddingLeft: 12, borderLeft: '2px solid rgba(0, 210, 255, 0.2)' }}>
+              <div style={{ fontWeight: 700, color: '#00d2ff', fontSize: 11, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                {step.label}
+              </div>
+              <div style={{ color: 'var(--text-primary)', fontStyle: 'italic', marginBottom: 4 }}>
+                {step.script}
+              </div>
+              <div style={{ fontSize: 11, color: '#f59e0b' }}>
+                💡 {step.note}
+              </div>
+            </div>
+          ))}
+
+          <div style={{ padding: '12px 16px', background: 'rgba(0, 210, 255, 0.06)', borderRadius: 8, border: '1px solid rgba(0, 210, 255, 0.15)', marginTop: 8 }}>
+            <strong style={{ color: '#00d2ff', fontSize: 12 }}>ONE-LINER FOR INVESTORS:</strong>
+            <p style={{ margin: '6px 0 0', color: 'var(--text-primary)', fontWeight: 600, fontSize: 14 }}>
+              &quot;We&apos;re building the Wiz of decision intelligence — compound risk scoring for cognitive biases, not cloud vulnerabilities. Same insight: individual findings are noise, combinations are signal.&quot;
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SalesToolkit() {
   return (
     <div>
@@ -2144,8 +2448,8 @@ function SalesToolkit() {
             step: 7,
             title: 'Toxic Combinations (60 sec)',
             action:
-              'If detected, show the toxic combination card. "\'The Echo Chamber\' — confirmation bias plus groupthink in a high-stakes context. This pattern appears in 73% of our historical failure cases."',
-            tip: 'The named patterns are memorable and shareable. Prospects will mention them to colleagues.',
+              'If detected, show the toxic combination card with the auto-generated mitigation playbook. "\'The Echo Chamber\' — confirmation bias plus groupthink in a high-stakes context. This pattern appears in 73% of our historical failure cases. Estimated risk: $22.5M on this deal. Here\'s your 4-step debiasing playbook with research citations."',
+            tip: 'The named patterns are memorable and shareable. The dollar impact makes it visceral. The mitigation playbook makes it actionable. Prospects will mention these to colleagues.',
           },
           {
             step: 8,

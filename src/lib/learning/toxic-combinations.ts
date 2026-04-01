@@ -50,6 +50,12 @@ export interface ToxicComboResult {
   patternDescription: string | null;
   historicalFailRate: number | null;
   sampleSize: number;
+  /** Auto-generated mitigation steps for this combination */
+  mitigationPlaybook?: import('./toxic-mitigation').MitigationPlaybook;
+  /** Estimated financial risk = ticketSize * historicalFailRate (if deal linked) */
+  estimatedRiskAmount?: number;
+  /** The deal's ticket size at time of detection */
+  dealTicketSize?: number;
 }
 
 export interface DetectionResult {
@@ -373,6 +379,35 @@ export async function detectToxicCombinations(
     const flagged = combinations.filter(c => c.toxicScore >= threshold);
     if (flagged.length > 0) {
       await persistToxicCombinations(analysisId, orgId, flagged);
+    }
+
+    // Enrich flagged combinations with mitigation playbooks
+    const { generateMitigationPlaybook } = await import('./toxic-mitigation');
+    for (const combo of flagged) {
+      combo.mitigationPlaybook = generateMitigationPlaybook(
+        combo.patternLabel,
+        combo.biasTypes,
+        combo.contextFactors
+      );
+    }
+
+    // Enrich with dollar impact estimation if deal is linked
+    try {
+      const dealLink = await prisma.document.findUnique({
+        where: { id: analysis.documentId },
+        select: { dealId: true, deal: { select: { ticketSize: true } } },
+      });
+      if (dealLink?.deal?.ticketSize) {
+        const ticketSize = Number(dealLink.deal.ticketSize);
+        for (const combo of flagged) {
+          combo.dealTicketSize = ticketSize;
+          if (combo.historicalFailRate != null && combo.historicalFailRate > 0) {
+            combo.estimatedRiskAmount = Math.round(ticketSize * combo.historicalFailRate);
+          }
+        }
+      }
+    } catch {
+      // Schema drift — deal table may not exist yet
     }
 
     return {

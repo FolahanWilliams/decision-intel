@@ -25,6 +25,21 @@ interface ContextFactors {
   confidenceSpread: number | null;
 }
 
+interface MitigationStep {
+  title: string;
+  description: string;
+  owner: string;
+  timing: string;
+  priority: string;
+}
+
+interface MitigationPlaybook {
+  patternLabel: string;
+  summary: string;
+  steps: MitigationStep[];
+  researchBasis: string;
+}
+
 interface ToxicCombination {
   id: string;
   biasTypes: string[];
@@ -35,6 +50,9 @@ interface ToxicCombination {
   sampleSize: number;
   status: string;
   mitigationNotes: string | null;
+  mitigationPlaybook?: MitigationPlaybook;
+  estimatedRiskAmount?: number;
+  dealTicketSize?: number;
 }
 
 interface ToxicCombinationCardProps {
@@ -216,6 +234,66 @@ export function ToxicCombinationCard({
                         </span>
                       )}
                     </span>
+                  </div>
+                )}
+
+                {/* Dollar Impact Estimation */}
+                {combo.estimatedRiskAmount != null && combo.dealTicketSize != null && (
+                  <div className="flex items-center gap-2 text-sm bg-red-950/30 rounded p-2 border border-red-500/20">
+                    <DollarSign className="h-4 w-4 text-red-400 flex-shrink-0" />
+                    <span className="text-zinc-300">
+                      Estimated risk:{' '}
+                      <strong className="text-red-400">
+                        ${(combo.estimatedRiskAmount / 1_000_000).toFixed(1)}M
+                      </strong>
+                      <span className="text-zinc-500 ml-1">
+                        ({Math.round((combo.historicalFailRate ?? 0) * 100)}% failure rate on $
+                        {(combo.dealTicketSize / 1_000_000).toFixed(0)}M deal)
+                      </span>
+                    </span>
+                  </div>
+                )}
+
+                {/* Mitigation Playbook */}
+                {combo.mitigationPlaybook && (
+                  <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <ShieldAlert className="h-4 w-4 text-cyan-400" />
+                      <span className="text-sm font-semibold text-cyan-300">Mitigation Playbook</span>
+                    </div>
+                    <p className="text-xs text-zinc-400 mb-3">{combo.mitigationPlaybook.summary}</p>
+                    <div className="space-y-2">
+                      {combo.mitigationPlaybook.steps.map((step, idx) => (
+                        <div
+                          key={idx}
+                          className="flex gap-3 text-xs"
+                        >
+                          <span
+                            className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                              step.priority === 'critical'
+                                ? 'bg-red-500/30 text-red-300'
+                                : step.priority === 'high'
+                                ? 'bg-orange-500/20 text-orange-300'
+                                : 'bg-blue-500/20 text-blue-300'
+                            }`}
+                          >
+                            {idx + 1}
+                          </span>
+                          <div className="flex-1">
+                            <div className="font-medium text-zinc-200">{step.title}</div>
+                            <div className="text-zinc-500 mt-0.5">{step.description}</div>
+                            <div className="flex gap-2 mt-1 text-[10px]">
+                              <span className="text-zinc-600">{step.owner.replace('_', ' ')}</span>
+                              <span className="text-zinc-700">·</span>
+                              <span className="text-zinc-600">{step.timing.replace(/_/g, ' ')}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-3 pt-2 border-t border-white/5 text-[10px] text-zinc-600 italic">
+                      {combo.mitigationPlaybook.researchBasis}
+                    </div>
                   </div>
                 )}
 
