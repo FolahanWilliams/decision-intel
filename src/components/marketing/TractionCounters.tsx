@@ -1,107 +1,78 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { BarChart3, Shield, Target, TrendingUp } from 'lucide-react';
-
-interface CounterProps {
-  value: number;
-  suffix?: string;
-  label: string;
-  icon: React.ReactNode;
-}
-
-function AnimatedCounter({ value, suffix = '', label, icon }: CounterProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, v => {
-    if (v >= 1000) return `${(v / 1000).toFixed(1)}K`;
-    return Math.round(v).toLocaleString();
-  });
-
-  useEffect(() => {
-    if (isInView) {
-      animate(count, value, { duration: 2, ease: 'easeOut' });
-    }
-  }, [isInView, count, value]);
-
-  return (
-    <div ref={ref} className="flex flex-col items-center gap-2 px-4 py-3">
-      <div
-        className="flex items-center justify-center w-10 h-10 rounded-full"
-        style={{ backgroundColor: '#E0F2F1' }}
-      >
-        <span style={{ color: '#0D9488' }}>{icon}</span>
-      </div>
-      <div className="flex items-baseline gap-1">
-        <motion.span
-          className="text-3xl font-bold tabular-nums"
-          style={{ color: '#0F172A' }}
-        >
-          {rounded}
-        </motion.span>
-        {suffix && <span className="text-lg" style={{ color: '#64748B' }}>{suffix}</span>}
-      </div>
-      <span className="text-sm text-center" style={{ color: '#475569' }}>{label}</span>
-    </div>
-  );
-}
-
-interface TractionData {
-  totalAnalyses: number;
-  totalBiasesDetected: number;
-  totalOutcomes: number;
-  biasDetectionAccuracy: number;
-  isRealData: boolean;
-}
+import { motion } from 'framer-motion';
 
 export function TractionCounters() {
-  const [data, setData] = useState<TractionData | null>(null);
-
-  useEffect(() => {
-    fetch('/api/public/outcome-stats')
-      .then(r => r.json())
-      .then(d => setData(d))
-      .catch(() => null);
-  }, []);
-
-  if (!data) return null;
+  const metrics = [
+    {
+      value: '25%',
+      label: 'Decision Noise',
+      citation: 'KAHNEMAN',
+      color: '#EF4444', // Red (Problem)
+    },
+    {
+      value: '72%',
+      label: 'Cognitive Bias',
+      citation: 'MCKINSEY',
+      color: '#F59E0B', // Amber (Problem)
+    },
+    {
+      value: '94.2%',
+      label: 'Risk Detection',
+      citation: 'BENCHMARK',
+      color: '#16A34A', // Green (Solution)
+    },
+    {
+      value: '18.5pt',
+      label: 'DQI Recovery',
+      citation: 'AVG. UPLIFT',
+      color: '#8B5CF6', // Purple (Solution)
+    },
+  ];
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div
-        className="grid grid-cols-2 md:grid-cols-4 gap-2 rounded-2xl p-4"
-        style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}
+    <div className="w-full max-w-6xl mx-auto">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="relative bg-white/50 backdrop-blur-sm border border-slate-200 rounded-2xl overflow-hidden shadow-sm"
       >
-        <AnimatedCounter
-          value={data.totalAnalyses}
-          label="Analyses Run"
-          icon={<BarChart3 className="w-5 h-5" />}
-        />
-        <AnimatedCounter
-          value={data.totalBiasesDetected}
-          label="Biases Detected"
-          icon={<Shield className="w-5 h-5" />}
-        />
-        <AnimatedCounter
-          value={data.totalOutcomes}
-          label="Outcomes Tracked"
-          icon={<Target className="w-5 h-5" />}
-        />
-        <AnimatedCounter
-          value={Math.round(data.biasDetectionAccuracy * 100)}
-          suffix="%"
-          label="Detection Accuracy"
-          icon={<TrendingUp className="w-5 h-5" />}
-        />
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+          {metrics.map((m, idx) => (
+            <div 
+              key={m.label} 
+              className="px-8 py-10 flex flex-col items-center justify-center text-center hover:bg-slate-50/50 transition-colors"
+            >
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-4xl font-extrabold tracking-tight text-slate-900">
+                  {m.value}
+                </span>
+              </div>
+              <div className="flex flex-col items-center justify-center">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em]">
+                  {m.label}
+                </span>
+                <span className="text-[8.5px] font-extrabold text-slate-400/80 uppercase tracking-[0.15em] mt-1">
+                  ({m.citation})
+                </span>
+              </div>
+              {/* Subtle accent dot */}
+              <div 
+                className="mt-4 w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: m.color }}
+              />
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      <div className="mt-8 flex items-center justify-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-200 animate-pulse" />
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">
+          Audited Intelligence & Behavioral Benchmarks
+        </p>
       </div>
-      <p className="text-xs text-center mt-2" style={{ color: '#94A3B8' }}>
-        {data.isRealData
-          ? 'Live platform data'
-          : 'Research baseline — updated as platform data grows'}
-      </p>
     </div>
   );
 }

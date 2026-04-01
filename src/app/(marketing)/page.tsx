@@ -17,10 +17,11 @@ import {
   BarChart3,
   Users,
   Shield,
-  Zap,
   Target,
   Network,
 } from 'lucide-react';
+
+import { TractionCounters } from '@/components/marketing/TractionCounters';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -267,154 +268,54 @@ export default function LandingPage() {
               </Link>
             </div>
           </div>
-          {/* 4-Panel Process Visualization */}
-          <div
+          {/* Institutional Audit Report Preview */}
+          <motion.div
+            initial={{ opacity: 0, x: 20, scale: 0.98 }}
+            whileInView={{ opacity: 1, x: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 12,
+              position: 'relative',
+              borderRadius: 20,
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px -15px rgba(0,0,0,0.15)',
+              border: `1px solid ${C.slate200}`,
+              background: C.white,
             }}
           >
-            {[
-              {
-                step: '01',
-                label: 'Analyze',
-                desc: 'Upload deal memos & IC notes',
-                icon: '◎',
-                color: '#3B82F6',
-                bg: '#EFF6FF',
-                borderColor: '#BFDBFE',
-              },
-              {
-                step: '02',
-                label: 'Graph',
-                desc: 'Map decision relationships',
-                icon: '⬡',
-                color: '#8B5CF6',
-                bg: '#F5F3FF',
-                borderColor: '#DDD6FE',
-              },
-              {
-                step: '03',
-                label: 'Learn',
-                desc: 'Track outcomes & calibrate',
-                icon: '△',
-                color: '#F59E0B',
-                bg: '#FFFBEB',
-                borderColor: '#FDE68A',
-              },
-              {
-                step: '04',
-                label: 'Act',
-                desc: 'Mitigate bias & decide better',
-                icon: '→',
-                color: C.green,
-                bg: C.greenLight,
-                borderColor: '#BBF7D0',
-              },
-            ].map((panel, i) => (
-              <motion.div
-                key={panel.label}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
-                style={{
-                  background: panel.bg,
-                  border: `1px solid ${panel.borderColor}`,
-                  borderRadius: 14,
-                  padding: '24px 20px',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
-              >
-                {/* Large faded step number */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: -8,
-                    right: 8,
-                    fontSize: 64,
-                    fontWeight: 800,
-                    color: panel.borderColor,
-                    lineHeight: 1,
-                    pointerEvents: 'none',
-                    userSelect: 'none',
-                  }}
-                >
-                  {panel.step}
-                </div>
-                {/* Icon */}
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    background: C.white,
-                    border: `1px solid ${panel.borderColor}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 18,
-                    color: panel.color,
-                    marginBottom: 12,
-                    fontWeight: 700,
-                  }}
-                >
-                  {panel.icon}
-                </div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: C.slate900, marginBottom: 4, position: 'relative', zIndex: 1 }}>
-                  {panel.label}
-                </div>
-                <div style={{ fontSize: 13, color: C.slate600, position: 'relative', zIndex: 1 }}>
-                  {panel.desc}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%)',
+                zIndex: 10,
+                pointerEvents: 'none',
+              }}
+            />
+            <img 
+              src="/marketing/audit-preview.png" 
+              alt="Decision Audit Report Preview"
+              style={{
+                width: '100%',
+                height: 'auto',
+                display: 'block',
+                borderRadius: 16,
+              }}
+            />
+          </motion.div>
         </motion.div>
       </section>
 
       {/* ── Stats Bar ───────────────────────────────────────────────── */}
-      <section style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}`, borderBottom: `1px solid ${C.slate200}` }}>
-        <div
-          style={{
-            maxWidth: 1200,
-            margin: '0 auto',
-            padding: '48px 24px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 32,
-            textAlign: 'center',
-          }}
-          className="stats-grid"
-        >
-          {[
-            { icon: BarChart3, value: '$36B+', label: 'Market to 2026' },
-            { icon: TrendingUp, value: '28%', label: 'Improvement' },
-            { icon: Zap, value: '4.5x', label: 'Faster Insights' },
-          ].map(({ icon: Icon, value, label }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 12,
-                  background: C.tealBg,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Icon size={22} style={{ color: C.teal }} />
-              </div>
-              <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: 32, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>{value}</div>
-                <div style={{ fontSize: 13, color: C.slate600, marginTop: 2 }}>{label}</div>
-              </div>
-            </div>
-          ))}
+      {/* ── Stats Bar ───────────────────────────────────────────────── */}
+      <section style={{ 
+        background: C.slate50, 
+        borderTop: `1px solid ${C.slate200}`, 
+        borderBottom: `1px solid ${C.slate200}`,
+        padding: '80px 24px',
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <TractionCounters />
         </div>
       </section>
 
@@ -485,22 +386,6 @@ export default function LandingPage() {
                 }}
                 onClick={() => setExpandedCard(isOpen ? null : i)}
               >
-                {/* Background Number */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: -10,
-                    right: 12,
-                    fontSize: 120,
-                    fontWeight: 800,
-                    color: C.slate100,
-                    lineHeight: 1,
-                    pointerEvents: 'none',
-                    userSelect: 'none',
-                  }}
-                >
-                  {card.num}
-                </div>
 
                 {/* Icon */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20, position: 'relative', zIndex: 1 }}>
@@ -577,77 +462,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Case Studies ────────────────────────────────────────────── */}
-      <section id="case-studies" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: C.green, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
-              Case Studies
-            </p>
-            <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 48 }}>
-              Proven Impact with Data Visualization
-            </h2>
-          </motion.div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }} className="cards-grid">
-            {[
-              {
-                title: 'Microsoft-Nokia',
-                desc: 'Decision quality scores revealing the cognitive biases that led to a $7.6B write-down, with market share projections the team overlooked.',
-                score: 38,
-              },
-              {
-                title: 'WeWork',
-                desc: 'Analysis of the governance failures and overconfidence biases that drove a $47B valuation collapse before the failed IPO.',
-                score: 24,
-              },
-            ].map((cs, i) => (
-              <motion.div
-                key={cs.title}
-                {...fadeIn}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                style={{
-                  background: C.white,
-                  border: `1px solid ${C.slate200}`,
-                  borderRadius: 16,
-                  padding: 28,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                }}
-              >
-                <h3 style={{ fontSize: 22, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>
-                  {cs.title}
-                </h3>
-                <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6, marginBottom: 20 }}>
-                  {cs.desc}
-                </p>
-                <div
-                  style={{
-                    background: C.slate100,
-                    borderRadius: 12,
-                    height: 200,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 16,
-                    border: `1px solid ${C.slate200}`,
-                  }}
-                >
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 32, fontWeight: 800, color: cs.score < 40 ? '#EF4444' : C.slate900 }}>{cs.score}</div>
-                    <div style={{ fontSize: 12, color: C.slate400 }}>DQI Score</div>
-                  </div>
-                </div>
-                <Link
-                  href="/demo"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, color: C.green, textDecoration: 'none' }}
-                >
-                  See the Full Analysis <ArrowRight size={14} />
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── Features ────────────────────────────────────────────────── */}
       <section id="features" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
