@@ -97,16 +97,16 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
   return (
     <div
       style={{
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        border: '1px solid var(--bg-elevated)',
         borderRadius: '12px',
         overflow: 'hidden',
-        background: 'rgba(255, 255, 255, 0.02)',
+        background: 'var(--bg-card)',
       }}
     >
       <div
         style={{
           padding: '14px 18px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          borderBottom: '1px solid var(--bg-card-hover)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -172,8 +172,8 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                     flex: 1,
                     padding: '8px 12px',
                     fontSize: '13px',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--bg-elevated)',
                     borderRadius: '8px',
                     color: 'var(--text-primary)',
                   }}
@@ -187,8 +187,8 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                   style={{
                     padding: '8px 12px',
                     fontSize: '12px',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--bg-elevated)',
                     borderRadius: '8px',
                     color: 'var(--text-secondary)',
                     minWidth: '140px',
@@ -210,7 +210,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                   disabled={creating || !newTitle.trim()}
                   style={{
                     padding: '8px 16px',
-                    background: newTitle.trim() ? '#a78bfa' : 'rgba(255,255,255,0.04)',
+                    background: newTitle.trim() ? '#a78bfa' : 'var(--bg-card-hover)',
                     border: 'none',
                     borderRadius: '8px',
                     color: newTitle.trim() ? '#fff' : 'var(--text-muted)',
@@ -240,7 +240,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
               key={room.id}
               style={{
                 padding: '12px 18px',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                borderBottom: '1px solid var(--bg-card-hover)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -456,8 +456,8 @@ export function BlindPriorForm({ roomId, onSubmitted }: BlindPriorFormProps) {
             width: '100%',
             padding: '10px 12px',
             fontSize: '13px',
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--bg-elevated)',
             borderRadius: '8px',
             color: 'var(--text-primary)',
             resize: 'vertical',
@@ -497,8 +497,8 @@ export function BlindPriorForm({ roomId, onSubmitted }: BlindPriorFormProps) {
           width: '100%',
           padding: '8px 12px',
           fontSize: '12px',
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--bg-elevated)',
           borderRadius: '8px',
           color: 'var(--text-primary)',
           resize: 'vertical',
@@ -512,7 +512,7 @@ export function BlindPriorForm({ roomId, onSubmitted }: BlindPriorFormProps) {
         disabled={saving || !action.trim()}
         style={{
           padding: '9px 20px',
-          background: action.trim() ? '#a78bfa' : 'rgba(255,255,255,0.04)',
+          background: action.trim() ? '#a78bfa' : 'var(--bg-card-hover)',
           border: 'none',
           borderRadius: '8px',
           color: action.trim() ? '#fff' : 'var(--text-muted)',

@@ -515,15 +515,15 @@ export function EnhancedDashboardCharts({
                   <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
               <XAxis
                 dataKey="date"
-                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.6)' }}
-                stroke="rgba(255,255,255,0.2)"
+                tick={{ fontSize: 10, fill: 'var(--text-secondary)' }}
+                stroke="var(--border-hover)"
               />
               <YAxis
-                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.6)' }}
-                stroke="rgba(255,255,255,0.2)"
+                tick={{ fontSize: 10, fill: 'var(--text-secondary)' }}
+                stroke="var(--border-hover)"
                 domain={[0, 100]}
               />
               <Tooltip content={<CustomTooltip />} />
@@ -562,8 +562,8 @@ export function EnhancedDashboardCharts({
                 <Brush
                   dataKey="date"
                   height={30}
-                  stroke="rgba(255,255,255,0.2)"
-                  fill="rgba(255,255,255,0.05)"
+                  stroke="var(--border-hover)"
+                  fill="var(--bg-card-hover)"
                   onChange={handleTimeRangeSelect}
                 />
               )}
@@ -691,18 +691,18 @@ export function EnhancedDashboardCharts({
             // Compact bar chart view
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={filteredBiases}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.6)' }}
-                  stroke="rgba(255,255,255,0.2)"
+                  tick={{ fontSize: 10, fill: 'var(--text-secondary)' }}
+                  stroke="var(--border-hover)"
                   angle={-45}
                   textAnchor="end"
                   height={60}
                 />
                 <YAxis
-                  tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.6)' }}
-                  stroke="rgba(255,255,255,0.2)"
+                  tick={{ fontSize: 10, fill: 'var(--text-secondary)' }}
+                  stroke="var(--border-hover)"
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar
@@ -736,14 +736,14 @@ export function EnhancedDashboardCharts({
               <h3 className="text-sm font-semibold mb-4">Bias Categories</h3>
               <ResponsiveContainer width="100%" height={250}>
                 <RadarChart data={radarData}>
-                  <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                  <PolarGrid stroke="var(--border-color)" />
                   <PolarAngleAxis
                     dataKey="category"
-                    tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.6)' }}
+                    tick={{ fontSize: 10, fill: 'var(--text-secondary)' }}
                   />
                   <PolarRadiusAxis
                     domain={[0, 100]}
-                    tick={{ fontSize: 8, fill: 'rgba(255,255,255,0.4)' }}
+                    tick={{ fontSize: 8, fill: 'var(--text-muted)' }}
                   />
                   <Radar
                     name="Current"

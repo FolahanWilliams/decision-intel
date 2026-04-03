@@ -214,8 +214,8 @@ export default function JournalPage() {
             onClick={() => setShowNewEntry(!showNewEntry)}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             style={{
-              background: showNewEntry ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              background: showNewEntry ? 'rgba(251, 191, 36, 0.15)' : 'var(--bg-card-hover)',
+              border: '1px solid var(--border-color)',
               color: 'var(--text-primary)',
               cursor: 'pointer',
             }}
@@ -237,7 +237,7 @@ export default function JournalPage() {
               <div
                 className="rounded-xl p-4"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
+                  background: 'var(--bg-card)',
                   border: '1px solid rgba(251, 191, 36, 0.15)',
                 }}
               >
@@ -257,8 +257,8 @@ export default function JournalPage() {
                   onChange={e => setNewEntryTitle(e.target.value)}
                   className="w-full mb-2 px-3 py-2 rounded-lg text-sm"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    background: 'var(--bg-card-hover)',
+                    border: '1px solid var(--bg-elevated)',
                     color: 'var(--text-primary)',
                     outline: 'none',
                   }}
@@ -270,8 +270,8 @@ export default function JournalPage() {
                   rows={3}
                   className="w-full mb-3 px-3 py-2 rounded-lg text-sm resize-none"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    background: 'var(--bg-card-hover)',
+                    border: '1px solid var(--bg-elevated)',
                     color: 'var(--text-primary)',
                     outline: 'none',
                   }}
@@ -282,7 +282,7 @@ export default function JournalPage() {
                     className="px-3 py-1.5 rounded-lg text-xs font-medium"
                     style={{
                       background: 'transparent',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      border: '1px solid var(--bg-elevated)',
                       color: 'var(--text-muted)',
                       cursor: 'pointer',
                     }}
@@ -328,12 +328,12 @@ export default function JournalPage() {
               style={{
                 background:
                   sourceFilter === filter.key
-                    ? 'rgba(255, 255, 255, 0.12)'
+                    ? 'var(--border-color)'
                     : 'rgba(255, 255, 255, 0.04)',
                 border:
                   sourceFilter === filter.key
-                    ? '1px solid rgba(255, 255, 255, 0.2)'
-                    : '1px solid rgba(255, 255, 255, 0.06)',
+                    ? '1px solid var(--border-hover)'
+                    : '1px solid var(--bg-card-hover)',
                 color: sourceFilter === filter.key ? 'var(--text-primary)' : 'var(--text-muted)',
                 cursor: 'pointer',
               }}
@@ -346,7 +346,7 @@ export default function JournalPage() {
         {/* Status Tabs */}
         <div
           className="flex items-center gap-0 mb-6 rounded-lg overflow-hidden"
-          style={{ border: '1px solid rgba(255, 255, 255, 0.08)', width: 'fit-content' }}
+          style={{ border: '1px solid var(--bg-elevated)', width: 'fit-content' }}
         >
           {STATUS_TABS.map(tab => (
             <button
@@ -354,12 +354,12 @@ export default function JournalPage() {
               onClick={() => setStatusFilter(tab.key)}
               className="px-4 py-2 text-xs font-medium transition-colors"
               style={{
-                background: statusFilter === tab.key ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                background: statusFilter === tab.key ? 'var(--bg-active)' : 'transparent',
                 color: statusFilter === tab.key ? 'var(--text-primary)' : 'var(--text-muted)',
-                borderRight: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRight: '1px solid var(--bg-card-hover)',
                 cursor: 'pointer',
                 border: 'none',
-                borderLeft: tab.key !== 'all' ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
+                borderLeft: tab.key !== 'all' ? '1px solid var(--bg-card-hover)' : 'none',
               }}
             >
               {tab.label}
@@ -422,7 +422,7 @@ export default function JournalPage() {
             {/* Timeline line */}
             <div
               className="absolute left-[19px] top-0 bottom-0 w-px"
-              style={{ background: 'rgba(255, 255, 255, 0.06)' }}
+              style={{ background: 'var(--bg-card-hover)' }}
             />
 
             <AnimatePresence>
@@ -445,7 +445,7 @@ export default function JournalPage() {
                     <div
                       className="relative z-10 flex-shrink-0 w-[38px] h-[38px] rounded-full flex items-center justify-center"
                       style={{
-                        background: 'rgba(255, 255, 255, 0.05)',
+                        background: 'var(--bg-card-hover)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
                       }}
                     >
@@ -456,8 +456,8 @@ export default function JournalPage() {
                     <div
                       className="flex-1 rounded-xl p-4"
                       style={{
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--bg-card-hover)',
                       }}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -548,7 +548,7 @@ export default function JournalPage() {
                       {entry.extractedDecisions.length > 0 && (
                         <div
                           className="mt-3 pt-3 space-y-1"
-                          style={{ borderTop: '1px solid rgba(255, 255, 255, 0.04)' }}
+                          style={{ borderTop: '1px solid var(--bg-card-hover)' }}
                         >
                           {entry.extractedDecisions.slice(0, 3).map((decision, i) => (
                             <p

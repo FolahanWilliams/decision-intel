@@ -186,10 +186,10 @@ export function TrendOverlay({ data }: TrendOverlayProps) {
       <div className="w-full h-[220px] relative z-10">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 5, right: 10, bottom: 5, left: -20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--bg-card-hover)" vertical={false} />
             <XAxis
               dataKey="formattedDate"
-              stroke="rgba(255,255,255,0.3)"
+              stroke="var(--text-muted)"
               fontSize={11}
               fontFamily="JetBrains Mono, monospace"
               tickLine={false}
@@ -198,7 +198,7 @@ export function TrendOverlay({ data }: TrendOverlayProps) {
             />
             <YAxis
               domain={[0, 100]}
-              stroke="rgba(255,255,255,0.3)"
+              stroke="var(--text-muted)"
               fontSize={11}
               fontFamily="JetBrains Mono, monospace"
               tickLine={false}
@@ -208,7 +208,7 @@ export function TrendOverlay({ data }: TrendOverlayProps) {
             <Tooltip
               contentStyle={{
                 backgroundColor: 'rgba(5, 5, 5, 0.95)',
-                borderColor: 'rgba(255, 255, 255, 0.15)',
+                borderColor: 'var(--border-color)',
                 borderRadius: '12px',
                 backdropFilter: 'blur(16px)',
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
@@ -218,8 +218,8 @@ export function TrendOverlay({ data }: TrendOverlayProps) {
                 fontWeight: 600,
                 fontFamily: 'JetBrains Mono, monospace',
               }}
-              labelStyle={{ color: 'rgba(255,255,255,0.5)', marginBottom: '8px', fontSize: '12px' }}
-              cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '4 4' }}
+              labelStyle={{ color: 'var(--text-secondary)', marginBottom: '8px', fontSize: '12px' }}
+              cursor={{ stroke: 'var(--border-color)', strokeWidth: 1, strokeDasharray: '4 4' }}
             />
             <Line
               type="monotone"

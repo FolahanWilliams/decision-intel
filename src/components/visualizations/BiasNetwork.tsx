@@ -1133,7 +1133,7 @@ function ClusterView({
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ width: 10, height: 10, borderRadius: '50%', background: color }} />
                 <span style={{ fontSize: '13px', fontWeight: 700, color }}>{meta.label}</span>
-                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                   {meta.description}
                 </span>
               </div>

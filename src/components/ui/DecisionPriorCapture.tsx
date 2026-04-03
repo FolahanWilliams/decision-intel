@@ -116,17 +116,17 @@ export function DecisionPriorCapture({
   return (
     <div
       style={{
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        border: '1px solid var(--bg-elevated)',
         borderRadius: '12px',
         overflow: 'hidden',
-        background: 'rgba(255, 255, 255, 0.02)',
+        background: 'var(--bg-card)',
       }}
     >
       {/* Header */}
       <div
         style={{
           padding: compact ? '12px 16px' : '14px 18px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          borderBottom: '1px solid var(--bg-card-hover)',
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
@@ -183,8 +183,8 @@ export function DecisionPriorCapture({
               width: '100%',
               padding: '10px 12px',
               fontSize: '13px',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--bg-elevated)',
               borderRadius: '8px',
               color: 'var(--text-primary)',
               resize: 'vertical',
@@ -284,8 +284,8 @@ export function DecisionPriorCapture({
               width: '100%',
               padding: '10px 12px',
               fontSize: '13px',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--bg-elevated)',
               borderRadius: '8px',
               color: 'var(--text-primary)',
               resize: 'vertical',
@@ -303,7 +303,7 @@ export function DecisionPriorCapture({
             disabled={saving || !defaultAction.trim()}
             style={{
               padding: '9px 20px',
-              background: defaultAction.trim() ? 'var(--accent-primary)' : 'rgba(255,255,255,0.04)',
+              background: defaultAction.trim() ? 'var(--accent-primary)' : 'var(--bg-card-hover)',
               border: 'none',
               borderRadius: '8px',
               color: defaultAction.trim() ? '#fff' : 'var(--text-muted)',
@@ -441,9 +441,9 @@ export function PostAnalysisPrior({ analysisId, prior, onUpdated }: PostAnalysis
           <div
             style={{
               padding: '12px 14px',
-              background: 'rgba(255, 255, 255, 0.03)',
+              background: 'var(--bg-card)',
               borderRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
+              border: '1px solid var(--bg-card-hover)',
             }}
           >
             <div
@@ -499,8 +499,8 @@ export function PostAnalysisPrior({ analysisId, prior, onUpdated }: PostAnalysis
                 width: '100%',
                 padding: '10px 12px',
                 fontSize: '13px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--bg-elevated)',
                 borderRadius: '8px',
                 color: 'var(--text-primary)',
                 resize: 'vertical',
@@ -519,7 +519,7 @@ export function PostAnalysisPrior({ analysisId, prior, onUpdated }: PostAnalysis
               disabled={saving || !postAction.trim()}
               style={{
                 padding: '9px 20px',
-                background: postAction.trim() ? 'var(--accent-primary)' : 'rgba(255,255,255,0.04)',
+                background: postAction.trim() ? 'var(--accent-primary)' : 'var(--bg-card-hover)',
                 border: 'none',
                 borderRadius: '8px',
                 color: postAction.trim() ? '#fff' : 'var(--text-muted)',

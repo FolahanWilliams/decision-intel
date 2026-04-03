@@ -78,7 +78,7 @@ const glassCard: React.CSSProperties = {
 
 const tooltipStyle: React.CSSProperties = {
   background: 'rgba(0, 0, 0, 0.75)',
-  border: '1px solid rgba(255,255,255,0.18)',
+  border: '1px solid var(--border-hover)',
   borderRadius: '12px',
   backdropFilter: 'blur(24px) saturate(180%)',
   boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.08) inset',
@@ -87,7 +87,7 @@ const tooltipStyle: React.CSSProperties = {
 };
 
 const CHART_COLORS = {
-  white: '#FFFFFF',
+  white: 'var(--text-primary)',
   zinc200: '#d4d4d8',
   zinc400: '#a1a1aa',
   zinc500: '#71717a',
@@ -442,14 +442,14 @@ export default function DecisionPerformance() {
             href="/outcomes/report"
             style={{
               color: CHART_COLORS.white,
-              background: 'rgba(255,255,255,0.08)',
+              background: 'var(--bg-elevated)',
               borderRadius: 10,
               padding: '6px 16px',
               fontSize: 13,
               fontWeight: 600,
               textDecoration: 'none',
               whiteSpace: 'nowrap',
-              border: '1px solid rgba(255,255,255,0.12)',
+              border: '1px solid var(--border-color)',
               transition: 'background 0.2s',
             }}
           >
@@ -537,7 +537,7 @@ export default function DecisionPerformance() {
         </div>
         <ResponsiveContainer width="100%" height={320}>
           <ComposedChart data={calibrationData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--bg-card-hover)" />
             <XAxis
               dataKey="bucket"
               tick={{ fill: CHART_COLORS.zinc400, fontSize: 12 }}
@@ -693,7 +693,7 @@ export default function DecisionPerformance() {
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(255,255,255,0.06)"
+                    stroke="var(--bg-card-hover)"
                     horizontal={false}
                   />
                   <XAxis
@@ -789,7 +789,7 @@ export default function DecisionPerformance() {
                   gridTemplateColumns: '32px 1fr 80px 80px',
                   gap: 'var(--spacing-sm)',
                   padding: '8px 12px',
-                  borderBottom: '1px solid rgba(255,255,255,0.08)',
+                  borderBottom: '1px solid var(--bg-elevated)',
                   fontSize: 11,
                   color: 'var(--text-muted)',
                   fontWeight: 600,
@@ -816,9 +816,9 @@ export default function DecisionPerformance() {
                       gridTemplateColumns: '32px 1fr 80px 80px',
                       gap: 'var(--spacing-sm)',
                       padding: '10px 12px',
-                      borderBottom: '1px solid rgba(255,255,255,0.04)',
+                      borderBottom: '1px solid var(--bg-card-hover)',
                       alignItems: 'center',
-                      background: isTop ? 'rgba(255,255,255,0.03)' : 'transparent',
+                      background: isTop ? 'var(--bg-card)' : 'transparent',
                     }}
                   >
                     <span
@@ -936,7 +936,7 @@ export default function DecisionPerformance() {
                 key={stat.label}
                 style={{
                   flex: '1 1 140px',
-                  background: 'rgba(255,255,255,0.04)',
+                  background: 'var(--bg-card-hover)',
                   borderRadius: 12,
                   padding: 'var(--spacing-md)',
                   textAlign: 'center',
@@ -979,7 +979,7 @@ export default function DecisionPerformance() {
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(255,255,255,0.06)"
+                    stroke="var(--bg-card-hover)"
                     horizontal={false}
                   />
                   <XAxis
@@ -1026,7 +1026,7 @@ export default function DecisionPerformance() {
             style={{
               marginTop: 'var(--spacing-md)',
               padding: 'var(--spacing-sm) var(--spacing-md)',
-              background: 'rgba(255,255,255,0.03)',
+              background: 'var(--bg-card)',
               borderRadius: 10,
               fontSize: 13,
               color: 'var(--text-muted)',

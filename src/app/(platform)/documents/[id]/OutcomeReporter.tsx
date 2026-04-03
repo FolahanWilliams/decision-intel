@@ -178,7 +178,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
         borderRadius: '12px',
         overflow: 'hidden',
         background: existing
-          ? `linear-gradient(135deg, ${outcomeOption?.color || 'rgba(255,255,255,0.06)'}08, transparent)`
+          ? `linear-gradient(135deg, ${outcomeOption?.color || 'var(--bg-card-hover)'}08, transparent)`
           : 'var(--bg-secondary)',
       }}
     >
@@ -261,8 +261,8 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                     onClick={() => setOutcome(opt.value)}
                     style={{
                       padding: '10px 8px',
-                      background: isSelected ? `${opt.color}15` : 'rgba(255,255,255,0.03)',
-                      border: `1px solid ${isSelected ? opt.color + '50' : 'rgba(255,255,255,0.08)'}`,
+                      background: isSelected ? `${opt.color}15` : 'var(--bg-card)',
+                      border: `1px solid ${isSelected ? opt.color + '50' : 'var(--bg-elevated)'}`,
                       borderRadius: '8px',
                       cursor: 'pointer',
                       display: 'flex',
@@ -317,10 +317,10 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                         padding: '4px 12px',
                         fontSize: '11px',
                         background:
-                          timeframe === tf.value ? 'rgba(255,255,255,0.06)' : 'transparent',
-                        border: `1px solid ${timeframe === tf.value ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)'}`,
+                          timeframe === tf.value ? 'var(--bg-card-hover)' : 'transparent',
+                        border: `1px solid ${timeframe === tf.value ? 'var(--border-hover)' : 'var(--bg-elevated)'}`,
                         borderRadius: '14px',
-                        color: timeframe === tf.value ? '#FFFFFF' : 'var(--text-muted)',
+                        color: timeframe === tf.value ? 'var(--text-primary)' : 'var(--text-muted)',
                         cursor: 'pointer',
                         fontWeight: timeframe === tf.value ? 600 : 400,
                       }}
@@ -392,7 +392,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                               padding: '2px 8px',
                               fontSize: '10px',
                               background: isConfirmed ? 'rgba(239,68,68,0.15)' : 'transparent',
-                              border: `1px solid ${isConfirmed ? 'rgba(239,68,68,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                              border: `1px solid ${isConfirmed ? 'rgba(239,68,68,0.4)' : 'var(--bg-elevated)'}`,
                               borderRadius: '10px',
                               color: isConfirmed ? '#f87171' : 'var(--text-muted)',
                               cursor: 'pointer',
@@ -406,7 +406,7 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                               padding: '2px 8px',
                               fontSize: '10px',
                               background: isFalse ? 'rgba(34,197,94,0.15)' : 'transparent',
-                              border: `1px solid ${isFalse ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                              border: `1px solid ${isFalse ? 'rgba(34,197,94,0.4)' : 'var(--bg-elevated)'}`,
                               borderRadius: '10px',
                               color: isFalse ? '#4ade80' : 'var(--text-muted)',
                               cursor: 'pointer',
@@ -449,11 +449,11 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                           fontSize: '11px',
                           background:
                             mostAccurateTwin === twin.name
-                              ? 'rgba(255,255,255,0.06)'
+                              ? 'var(--bg-card-hover)'
                               : 'transparent',
-                          border: `1px solid ${mostAccurateTwin === twin.name ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)'}`,
+                          border: `1px solid ${mostAccurateTwin === twin.name ? 'var(--border-hover)' : 'var(--bg-elevated)'}`,
                           borderRadius: '14px',
-                          color: mostAccurateTwin === twin.name ? '#FFFFFF' : 'var(--text-muted)',
+                          color: mostAccurateTwin === twin.name ? 'var(--text-primary)' : 'var(--text-muted)',
                           cursor: 'pointer',
                           fontWeight: mostAccurateTwin === twin.name ? 600 : 400,
                         }}
@@ -490,8 +490,8 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                       width: '100%',
                       padding: '8px 10px',
                       fontSize: '12px',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--bg-elevated)',
                       borderRadius: '8px',
                       color: 'var(--text-primary)',
                       resize: 'vertical',
@@ -521,8 +521,8 @@ export function OutcomeReporter({ analysisId, analysisDate, biases, twins }: Out
                       width: '100%',
                       padding: '8px 10px',
                       fontSize: '12px',
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--bg-elevated)',
                       borderRadius: '8px',
                       color: 'var(--text-primary)',
                       resize: 'vertical',
