@@ -143,13 +143,13 @@ export async function notifyAnalysisComplete(
         </div>
 
         <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/documents/${analysisId}"
-           style="display: inline-block; padding: 10px 20px; background: #6366f1; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">
+           style="display: inline-block; padding: 10px 20px; background: #16A34A; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">
           View Full Analysis
         </a>
 
         <p style="color: #64748b; font-size: 12px; margin-top: 24px;">
           You received this because you have analysis alerts enabled in your
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard/settings" style="color: #6366f1;">settings</a>.
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard/settings" style="color: #16A34A;">settings</a>.
         </p>
       </div>
     </div>
@@ -195,7 +195,7 @@ export async function sendWeeklyDigest(
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
           <div style="background: #1a1a2e; padding: 14px; border-radius: 8px;">
             <div style="font-size: 12px; color: #94a3b8;">Documents Analyzed</div>
-            <div style="font-size: 24px; font-weight: 700; color: #6366f1;">${stats.documentsAnalyzed}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #16A34A;">${stats.documentsAnalyzed}</div>
           </div>
           <div style="background: #1a1a2e; padding: 14px; border-radius: 8px;">
             <div style="font-size: 12px; color: #94a3b8;">Avg Score</div>
@@ -214,13 +214,13 @@ export async function sendWeeklyDigest(
         </div>
 
         <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard"
-           style="display: inline-block; padding: 10px 20px; background: #6366f1; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">
+           style="display: inline-block; padding: 10px 20px; background: #16A34A; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">
           Go to Dashboard
         </a>
 
         <p style="color: #64748b; font-size: 12px; margin-top: 24px;">
           You received this because you have weekly digest enabled in your
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard/settings" style="color: #6366f1;">settings</a>.
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard/settings" style="color: #16A34A;">settings</a>.
         </p>
       </div>
     </div>
@@ -253,7 +253,7 @@ export async function notifyTeamInvite(
         </p>
 
         <a href="${acceptUrl}"
-           style="display: inline-block; padding: 12px 24px; background: #6366f1; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px;">
+           style="display: inline-block; padding: 12px 24px; background: #16A34A; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px;">
           Accept Invitation
         </a>
 
@@ -312,7 +312,7 @@ export async function deliverEmailNudge(
   }
 
   const severityColor =
-    severity === 'critical' ? '#ef4444' : severity === 'warning' ? '#eab308' : '#6366f1';
+    severity === 'critical' ? '#ef4444' : severity === 'warning' ? '#eab308' : '#16A34A';
 
   const subject = `Decision Nudge: ${nudgeType.replace(/_/g, ' ')}`;
   const html = `
@@ -325,7 +325,7 @@ export async function deliverEmailNudge(
         <p style="color: #e2e8f0; line-height: 1.6; margin: 0 0 20px;">${escapeHtml(nudgeMessage)}</p>
 
         <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard/nudges"
-           style="display: inline-block; padding: 10px 20px; background: #6366f1; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">
+           style="display: inline-block; padding: 10px 20px; background: #16A34A; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">
           View All Nudges
         </a>
       </div>
@@ -393,7 +393,7 @@ export async function notifyOutcomeReminder(
           </td>
           <td style="padding: 10px 14px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.06);">
             <a href="${appUrl}/documents/${item.analysisId}"
-               style="color: #6366f1; font-size: 13px; font-weight: 500; text-decoration: none;">
+               style="color: #16A34A; font-size: 13px; font-weight: 500; text-decoration: none;">
               Report Outcome
             </a>
           </td>
@@ -415,13 +415,13 @@ export async function notifyOutcomeReminder(
         </table>
 
         <a href="${appUrl}/dashboard"
-           style="display: inline-block; padding: 10px 20px; background: #6366f1; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">
+           style="display: inline-block; padding: 10px 20px; background: #16A34A; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 500;">
           Go to Dashboard
         </a>
 
         <p style="color: #64748b; font-size: 12px; margin-top: 24px;">
           You received this because you have email notifications enabled in your
-          <a href="${appUrl}/dashboard/settings" style="color: #6366f1;">settings</a>.
+          <a href="${appUrl}/dashboard/settings" style="color: #16A34A;">settings</a>.
         </p>
       </div>
     </div>
