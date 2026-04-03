@@ -50,6 +50,7 @@ export async function POST() {
       message:
         'This is a test nudge from Decision Intel. If you can see this message, your Slack integration is working correctly. Cognitive bias detection and real-time coaching are active for this workspace.',
       severity: 'info',
+      channel: 'slack',
     });
 
     const success = await deliverSlackNudge(payload, installation.teamId);
