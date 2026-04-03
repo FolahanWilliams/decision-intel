@@ -145,7 +145,7 @@ model UserSettings {
   updatedAt           DateTime @updatedAt
   analysisAlerts      Boolean  @default(true)
   createdAt           DateTime @default(now())
-  darkMode            Boolean  @default(true)
+  darkMode            Boolean  @default(false)
   emailNotifications  Boolean  @default(true)
   weeklyDigest        Boolean  @default(false)
   notificationSeverity String  @default("all")

@@ -14,7 +14,7 @@ export default async function SettingsPage() {
     emailNotifications: true,
     analysisAlerts: true,
     weeklyDigest: false,
-    darkMode: true,
+    darkMode: false,
     notificationSeverity: 'all' as const,
   };
 
