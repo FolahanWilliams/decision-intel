@@ -396,7 +396,7 @@ export function BulkUploadPanel({ onComplete }: BulkUploadPanelProps) {
                       ? '#f87171'
                       : batch.status === 'completed'
                         ? '#34d399'
-                        : '#6366f1',
+                        : '#16A34A',
                   borderRadius: '3px',
                   transition: 'width 0.3s ease',
                 }}

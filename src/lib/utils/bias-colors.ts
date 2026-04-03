@@ -14,11 +14,11 @@ const BIAS_COLOR_PALETTE = [
   { bg: 'rgba(34,197,94,0.18)', text: '#4ade80', border: '#22c55e', underline: '#22c55e' }, // green
   { bg: 'rgba(20,184,166,0.18)', text: '#2dd4bf', border: '#14b8a6', underline: '#14b8a6' }, // teal
   { bg: 'rgba(6,182,212,0.18)', text: '#22d3ee', border: '#06b6d4', underline: '#06b6d4' }, // cyan
-  { bg: 'rgba(99,102,241,0.18)', text: '#818cf8', border: '#6366f1', underline: '#6366f1' }, // indigo
+  { bg: 'rgba(22,163,74,0.18)', text: '#4ade80', border: '#16A34A', underline: '#16A34A' }, // green-accent
   { bg: 'rgba(244,63,94,0.18)', text: '#fb7185', border: '#f43f5e', underline: '#f43f5e' }, // rose
   { bg: 'rgba(132,204,22,0.18)', text: '#a3e635', border: '#84cc16', underline: '#84cc16' }, // lime
   { bg: 'rgba(217,119,6,0.18)', text: '#fbbf24', border: '#d97706', underline: '#d97706' }, // amber
-  { bg: 'rgba(139,92,246,0.18)', text: '#a78bfa', border: '#8b5cf6', underline: '#8b5cf6' }, // violet
+  { bg: 'rgba(22,163,74,0.14)', text: '#86efac', border: '#22c55e', underline: '#22c55e' }, // green-light
   { bg: 'rgba(16,185,129,0.18)', text: '#34d399', border: '#10b981', underline: '#10b981' }, // emerald
   { bg: 'rgba(251,146,60,0.18)', text: '#fdba74', border: '#fb923c', underline: '#fb923c' }, // light orange
   { bg: 'rgba(56,189,248,0.18)', text: '#7dd3fc', border: '#38bdf8', underline: '#38bdf8' }, // sky

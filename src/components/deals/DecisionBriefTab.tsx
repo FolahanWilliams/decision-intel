@@ -113,8 +113,8 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
             marginBottom: 16,
           }}
         >
-          <RefreshCw size={14} style={{ color: '#6366f1', animation: 'spin 1s linear infinite' }} />
-          <span style={{ fontSize: 13, color: '#6366f1', fontWeight: 500 }}>
+          <RefreshCw size={14} style={{ color: '#16A34A', animation: 'spin 1s linear infinite' }} />
+          <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 500 }}>
             Generating Decision Brief...
           </span>
         </div>

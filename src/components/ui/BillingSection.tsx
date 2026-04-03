@@ -46,7 +46,7 @@ const fetcher = (url: string) =>
 
 const PLAN_COLORS: Record<string, string> = {
   free: '#A1A1AA',
-  pro: '#6366f1',
+  pro: '#16A34A',
   team: '#8b5cf6',
   enterprise: '#f59e0b',
 };

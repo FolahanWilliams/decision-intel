@@ -254,7 +254,7 @@ function SeverityDonut({ counts }: { counts: Record<string, number> }) {
           y={size / 2}
           textAnchor="middle"
           dominantBaseline="central"
-          fill="white"
+          fill="var(--text-primary)"
           fontSize="18"
           fontWeight="800"
           style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}
@@ -280,7 +280,7 @@ function SeverityDonut({ counts }: { counts: Record<string, number> }) {
               <span
                 style={{
                   fontSize: '11px',
-                  color: 'rgba(255,255,255,0.7)',
+                  color: 'var(--text-secondary)',
                   textTransform: 'capitalize',
                 }}
               >
@@ -487,22 +487,22 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   fontWeight: isActive ? 700 : 500,
                   background: isActive
                     ? sev === 'all'
-                      ? 'rgba(255,255,255,0.06)'
+                      ? 'var(--bg-card-hover)'
                       : SEVERITY_BG[sev]
                     : 'transparent',
                   border: `1px solid ${
                     isActive
                       ? sev === 'all'
-                        ? 'rgba(255,255,255,0.15)'
+                        ? 'var(--border-color)'
                         : SEVERITY_COLORS[sev] + '60'
-                      : 'rgba(255,255,255,0.08)'
+                      : 'var(--bg-elevated)'
                   }`,
                   borderRadius: '20px',
                   color: isActive
                     ? sev === 'all'
-                      ? '#FFFFFF'
+                      ? 'var(--text-primary)'
                       : SEVERITY_COLORS[sev]
-                    : 'rgba(255,255,255,0.5)',
+                    : 'var(--text-secondary)',
                   cursor: 'pointer',
                   textTransform: 'capitalize',
                   transition: prefersReducedMotion ? 'none' : 'all 0.15s',
@@ -518,8 +518,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
         <div
           style={{
             display: 'flex',
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'var(--bg-card-hover)',
+            border: '1px solid var(--bg-elevated)',
             borderRadius: '20px',
             overflow: 'hidden',
           }}
@@ -532,8 +532,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                 padding: '3px 12px',
                 fontSize: '11px',
                 fontWeight: viewMode === mode ? 700 : 400,
-                background: viewMode === mode ? 'rgba(255,255,255,0.06)' : 'transparent',
-                color: viewMode === mode ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
+                background: viewMode === mode ? 'var(--bg-card-hover)' : 'transparent',
+                color: viewMode === mode ? 'var(--text-primary)' : 'var(--text-secondary)',
                 border: 'none',
                 cursor: 'pointer',
                 textTransform: 'capitalize',
@@ -558,7 +558,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
               aspectRatio: `${svgWidth} / ${svgHeight}`,
               maxHeight: compact ? '420px' : '520px',
               background:
-                'radial-gradient(ellipse at center, rgba(255,255,255,0.02) 0%, transparent 70%)',
+                'radial-gradient(ellipse at center, var(--bg-card) 0%, transparent 70%)',
               borderRadius: '8px',
             }}
           >
@@ -570,8 +570,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
               </filter>
               {/* Connection gradient */}
               <linearGradient id="connGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
-                <stop offset="100%" stopColor="rgba(255,255,255,0.2)" />
+                <stop offset="0%" stopColor="var(--text-secondary)" />
+                <stop offset="100%" stopColor="var(--border-hover)" />
               </linearGradient>
             </defs>
 
@@ -583,7 +583,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   cx={(i + 1) * (svgWidth / 13)}
                   cy={(j + 1) * (svgHeight / 13)}
                   r={0.5}
-                  fill="rgba(255,255,255,0.04)"
+                  fill="var(--border-color)"
                 />
               ))
             )}
@@ -721,7 +721,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                     y={node.y}
                     dy="0.35em"
                     textAnchor="middle"
-                    fill="rgba(255,255,255,0.95)"
+                    fill="var(--text-primary)"
                     fontSize={isActive ? '15' : '13'}
                     fontWeight="700"
                     pointerEvents="none"
@@ -735,7 +735,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                     x={node.x}
                     y={node.y + nodeRadius + 16}
                     textAnchor="middle"
-                    fill={isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.55)'}
+                    fill={isActive ? 'var(--text-primary)' : 'var(--text-secondary)'}
                     fontSize={isActive ? '11' : '9.5'}
                     fontWeight={isActive ? '700' : '500'}
                     pointerEvents="none"
@@ -778,7 +778,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                     background: SEVERITY_COLORS[activeHover.severity],
                   }}
                 />
-                <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>
                   {activeHover.name}
                 </span>
                 <span
@@ -795,11 +795,11 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   {activeHover.severity}
                 </span>
               </div>
-              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>
+              <div style={{ fontSize: '11px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
                 {BIAS_DEFINITIONS[activeHover.name] ||
                   'A cognitive bias detected in the decision path.'}
               </div>
-              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', marginTop: '6px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '6px' }}>
                 {
                   connections.filter(c => c.from === activeHover.id || c.to === activeHover.id)
                     .length
@@ -818,8 +818,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                 left: '50%',
                 transform: 'translateX(-50%)',
                 fontSize: '10px',
-                color: 'rgba(255,255,255,0.3)',
-                background: 'rgba(0,0,0,0.5)',
+                color: 'var(--text-muted)',
+                background: 'var(--bg-elevated)',
                 padding: '3px 12px',
                 borderRadius: '10px',
                 pointerEvents: 'none',
@@ -869,7 +869,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                   background: SEVERITY_COLORS[selectedNode.severity],
                 }}
               />
-              <span style={{ fontSize: '14px', fontWeight: 700, color: '#fff' }}>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
                 {selectedNode.name}
               </span>
               <span
@@ -889,10 +889,10 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             <button
               onClick={() => setSelectedNodeId(null)}
               style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: 'var(--bg-card-hover)',
+                border: '1px solid var(--bg-active)',
                 borderRadius: '6px',
-                color: 'rgba(255,255,255,0.5)',
+                color: 'var(--text-secondary)',
                 fontSize: '11px',
                 padding: '2px 8px',
                 cursor: 'pointer',
@@ -905,7 +905,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
           <p
             style={{
               fontSize: '12px',
-              color: 'rgba(255,255,255,0.6)',
+              color: 'var(--text-secondary)',
               lineHeight: 1.5,
               margin: '0 0 8px 0',
             }}
@@ -919,7 +919,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             <div
               style={{
                 fontSize: '11px',
-                color: 'rgba(255,255,255,0.5)',
+                color: 'var(--text-secondary)',
                 borderLeft: `2px solid ${SEVERITY_COLORS[selectedNode.severity]}40`,
                 paddingLeft: '10px',
                 marginBottom: '8px',
@@ -941,7 +941,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
                 <span
                   style={{
                     fontSize: '10px',
-                    color: 'rgba(255,255,255,0.4)',
+                    color: 'var(--text-muted)',
                     fontWeight: 600,
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
@@ -993,8 +993,8 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             justifyContent: 'space-between',
             marginTop: '12px',
             padding: '10px 16px',
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--bg-card-hover)',
             borderRadius: '10px',
           }}
         >
@@ -1005,7 +1005,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             <span
               style={{
                 fontSize: '10px',
-                color: 'rgba(255,255,255,0.35)',
+                color: 'var(--text-muted)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
               }}
@@ -1029,7 +1029,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             justifyContent: 'center',
             marginTop: '8px',
             paddingTop: '8px',
-            borderTop: '1px solid rgba(255,255,255,0.06)',
+            borderTop: '1px solid var(--bg-card-hover)',
           }}
         >
           {(['low', 'medium', 'high', 'critical'] as const).map(sev => (
@@ -1046,7 +1046,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
               <span
                 style={{
                   fontSize: '10px',
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'var(--text-secondary)',
                   textTransform: 'capitalize',
                 }}
               >
@@ -1162,7 +1162,7 @@ function ClusterView({
                     background: 'rgba(0,0,0,0.3)',
                     border: `1px solid ${color}30`,
                     borderRadius: '16px',
-                    color: 'rgba(255,255,255,0.8)',
+                    color: 'var(--text-primary)',
                     cursor: onBiasClick ? 'pointer' : 'default',
                     transition: prefersReducedMotion ? 'none' : 'all 0.15s',
                   }}

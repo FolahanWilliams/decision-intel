@@ -161,7 +161,7 @@ function FlywheelInner() {
 
       <header style={{ marginBottom: 'var(--spacing-xl)' }}>
         <div className="flex items-center gap-md" style={{ marginBottom: 'var(--spacing-xs)' }}>
-          <TrendingUp size={28} style={{ color: '#00D2FF' }} />
+          <TrendingUp size={28} style={{ color: 'var(--accent-primary)' }} />
           <h1 style={{ fontSize: '24px', fontWeight: 700 }}>Outcome Attribution Flywheel</h1>
         </div>
         <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
@@ -264,7 +264,7 @@ function FlywheelInner() {
                 cy="48"
                 r="40"
                 fill="none"
-                stroke="#00D2FF"
+                stroke="var(--accent-primary)"
                 strokeWidth="6"
                 strokeLinecap="round"
                 strokeDasharray={healthCircumference}
@@ -272,7 +272,7 @@ function FlywheelInner() {
                 transform="rotate(-90 48 48)"
                 style={{ transition: 'stroke-dashoffset 0.5s ease' }}
               />
-              <text x="48" y="44" textAnchor="middle" fill="#00D2FF" fontSize="18" fontWeight="700">
+              <text x="48" y="44" textAnchor="middle" fill="var(--accent-primary)" fontSize="18" fontWeight="700">
                 {Math.round(flywheelHealth.loopClosureRate)}%
               </text>
               <text x="48" y="58" textAnchor="middle" fill="var(--text-muted)" fontSize="8">

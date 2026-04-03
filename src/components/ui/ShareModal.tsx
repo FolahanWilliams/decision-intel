@@ -348,8 +348,8 @@ export function ShareModal({
                     disabled={creatingCaseStudy}
                     className="h-auto w-full justify-start gap-3 p-3 text-left"
                     style={{
-                      background: caseStudyUrl ? 'rgba(99, 102, 241, 0.08)' : undefined,
-                      borderColor: caseStudyUrl ? 'rgba(99, 102, 241, 0.25)' : undefined,
+                      background: caseStudyUrl ? 'rgba(22, 163, 74, 0.08)' : undefined,
+                      borderColor: caseStudyUrl ? 'rgba(22, 163, 74, 0.25)' : undefined,
                     }}
                   >
                     {creatingCaseStudy ? (
@@ -361,7 +361,7 @@ export function ShareModal({
                     ) : caseStudyCopied ? (
                       <Check size={18} className="shrink-0" style={{ color: 'var(--success)' }} />
                     ) : (
-                      <BookOpen size={18} className="shrink-0" style={{ color: '#6366f1' }} />
+                      <BookOpen size={18} className="shrink-0" style={{ color: '#16A34A' }} />
                     )}
                     <div>
                       <div style={{ fontWeight: 500, fontSize: '13px' }}>

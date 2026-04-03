@@ -131,7 +131,7 @@ function ProductOverview() {
   return (
     <div>
       {/* Hero */}
-      <div style={{ ...card, borderTop: '3px solid #6366f1' }}>
+      <div style={{ ...card, borderTop: '3px solid #16A34A' }}>
         <div style={label}>POSITIONING</div>
         <h2
           style={{
@@ -517,7 +517,7 @@ SYNTHESIS (Sequential)
         </div>
         <div style={card}>
           <div style={sectionTitle}>
-            <Users size={16} style={{ color: '#a78bfa' }} /> Boardroom Simulation
+            <Users size={16} style={{ color: '#16A34A' }} /> Boardroom Simulation
           </div>
           <ul
             style={{
@@ -538,9 +538,9 @@ SYNTHESIS (Sequential)
       </div>
 
       {/* Technical Architecture Quick Reference */}
-      <div style={{ ...card, borderTop: '3px solid #a78bfa' }}>
+      <div style={{ ...card, borderTop: '3px solid #16A34A' }}>
         <div style={sectionTitle}>
-          <Zap size={18} style={{ color: '#a78bfa' }} /> Technical Architecture — Talking Points
+          <Zap size={18} style={{ color: '#16A34A' }} /> Technical Architecture — Talking Points
         </div>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
           Condensed reference for technical conversations (CTOs, technical DD, co-founder
@@ -617,7 +617,7 @@ SYNTHESIS (Sequential)
                 fontSize: 12,
               }}
             >
-              <div style={{ fontWeight: 700, color: '#a78bfa', marginBottom: 2 }}>{item.label}</div>
+              <div style={{ fontWeight: 700, color: '#16A34A', marginBottom: 2 }}>{item.label}</div>
               <div style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>{item.value}</div>
             </div>
           ))}
@@ -633,9 +633,9 @@ function ScoringEngine() {
   return (
     <div>
       {/* DQI */}
-      <div style={{ ...card, borderTop: '3px solid #6366f1' }}>
+      <div style={{ ...card, borderTop: '3px solid #16A34A' }}>
         <div style={sectionTitle}>
-          <BarChart3 size={18} style={{ color: '#6366f1' }} /> Decision Quality Index (DQI)
+          <BarChart3 size={18} style={{ color: '#16A34A' }} /> Decision Quality Index (DQI)
         </div>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
           Branded 0-100 composite score (like FICO for decisions) with A-F letter grades.
@@ -670,7 +670,7 @@ function ScoringEngine() {
           >
             <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{comp}</div>
             <div>
-              <span style={badge('#6366f1')}>{weight}</span>
+              <span style={badge('#16A34A')}>{weight}</span>
             </div>
             <div>{measures}</div>
           </div>
@@ -1100,7 +1100,7 @@ function IntegrationsAndFlywheel() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div style={card}>
           <div style={sectionTitle}>
-            <Users size={16} style={{ color: '#a78bfa' }} /> Committee Decision Rooms
+            <Users size={16} style={{ color: '#16A34A' }} /> Committee Decision Rooms
           </div>
           <ul
             style={{
@@ -1269,9 +1269,9 @@ function StrategyAndPositioning() {
       </div>
 
       {/* Core Thesis */}
-      <div style={{ ...card, borderLeft: '3px solid #6366f1' }}>
+      <div style={{ ...card, borderLeft: '3px solid #16A34A' }}>
         <div style={sectionTitle}>
-          <Rocket size={18} style={{ color: '#6366f1' }} /> The Deepest Moat
+          <Rocket size={18} style={{ color: '#16A34A' }} /> The Deepest Moat
         </div>
         <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
           <strong style={{ color: 'var(--text-primary)' }}>
@@ -1401,7 +1401,7 @@ function StrategyAndPositioning() {
               gap: 'No cognitive analysis of IC materials. Tracks the deal, not the quality of the decision-making about the deal.',
               response:
                 '"DealCloud tracks your pipeline. We audit the decisions your pipeline produces. Upload the strategic document from DealCloud — we score it in 60 seconds."',
-              color: '#6366f1',
+              color: '#16A34A',
             },
             {
               name: 'Grata',
@@ -1425,7 +1425,7 @@ function StrategyAndPositioning() {
               gap: 'Single model opinion (no noise measurement), no deterministic scoring, no outcome tracking, no org calibration, no domain-specific biases.',
               response:
                 '"That\'s one opinion from one model. We use 3 independent judges for noise measurement, a 20x20 bias interaction matrix for compound scoring, and an outcome flywheel that makes us smarter with every decision you make. Plus Chrome extension for real-time checking and Slack for meeting-time coaching."',
-              color: '#a78bfa',
+              color: '#16A34A',
             },
           ].map((comp, i) => (
             <div
@@ -1488,20 +1488,20 @@ function StrategyAndPositioning() {
       </div>
 
       {/* Sharpened Value Prop */}
-      <div style={{ ...card, borderLeft: '3px solid #6366f1' }}>
+      <div style={{ ...card, borderLeft: '3px solid #16A34A' }}>
         <div style={sectionTitle}>
-          <Rocket size={18} style={{ color: '#6366f1' }} /> Investor-Ready Positioning
+          <Rocket size={18} style={{ color: '#16A34A' }} /> Investor-Ready Positioning
         </div>
         <blockquote
           style={{
             margin: 0,
             padding: '12px 16px',
-            borderLeft: '3px solid #6366f1',
+            borderLeft: '3px solid #16A34A',
             fontSize: 14,
             color: 'var(--text-secondary)',
             lineHeight: 1.7,
             fontStyle: 'italic',
-            background: 'rgba(99, 102, 241, 0.04)',
+            background: 'rgba(22, 163, 74, 0.04)',
             borderRadius: '0 8px 8px 0',
           }}
         >
@@ -1849,7 +1849,7 @@ function StrategyAndPositioning() {
       {/* Expansion Roadmap */}
       <div style={card}>
         <div style={sectionTitle}>
-          <Rocket size={18} style={{ color: '#6366f1' }} /> Expansion Roadmap
+          <Rocket size={18} style={{ color: '#16A34A' }} /> Expansion Roadmap
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 12 }}>
           {[
@@ -1880,7 +1880,7 @@ function StrategyAndPositioning() {
             {
               year: 'Year 4+',
               market: 'Horizontal Platform',
-              color: '#a78bfa',
+              color: '#16A34A',
               status: 'VISION',
               details:
                 'Decision quality as infrastructure. API-first platform for any organization. Industry-specific bias modules as add-ons.',
@@ -2173,7 +2173,7 @@ function ToxicCombinationMoatNarrative() {
             </p>
           </div>
 
-          <div style={{ padding: '12px 16px', background: 'rgba(99, 102, 241, 0.08)', borderRadius: 8, border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+          <div style={{ padding: '12px 16px', background: 'rgba(22, 163, 74, 0.08)', borderRadius: 8, border: '1px solid rgba(22, 163, 74, 0.2)' }}>
             <div style={{ fontWeight: 700, color: '#a5b4fc', marginBottom: 6, fontSize: 13 }}>
               <Lightbulb size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />
               The Bottom Line
@@ -2395,7 +2395,7 @@ function SalesToolkit() {
       {/* Demo Script */}
       <div style={card}>
         <div style={sectionTitle}>
-          <Rocket size={18} style={{ color: '#6366f1' }} /> Demo Script — Step by Step
+          <Rocket size={18} style={{ color: '#16A34A' }} /> Demo Script — Step by Step
         </div>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
           Follow this sequence for maximum impact. Total demo time: 8-12 minutes.
@@ -2472,7 +2472,7 @@ function SalesToolkit() {
                 width: 32,
                 height: 32,
                 borderRadius: '50%',
-                background: '#6366f1',
+                background: '#16A34A',
                 color: '#fff',
                 display: 'flex',
                 alignItems: 'center',
@@ -2505,7 +2505,7 @@ function SalesToolkit() {
               >
                 {item.action}
               </div>
-              <div style={{ fontSize: 11, color: '#6366f1', fontStyle: 'italic' }}>
+              <div style={{ fontSize: 11, color: '#16A34A', fontStyle: 'italic' }}>
                 Tip: {item.tip}
               </div>
             </div>
@@ -2684,7 +2684,7 @@ function LiveStats() {
               label: 'Avg Decision Score',
               color: '#f59e0b',
             },
-            { value: kpis?.decisionsTracked ?? '—', label: 'Outcomes Tracked', color: '#a78bfa' },
+            { value: kpis?.decisionsTracked ?? '—', label: 'Outcomes Tracked', color: '#16A34A' },
           ].map((m, i) => (
             <div key={i} style={card}>
               <div style={{ ...stat, color: m.color }}>{String(m.value)}</div>
@@ -2698,7 +2698,7 @@ function LiveStats() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div style={card}>
           <div style={sectionTitle}>
-            <Target size={16} style={{ color: '#6366f1' }} /> Calibration Metrics
+            <Target size={16} style={{ color: '#16A34A' }} /> Calibration Metrics
           </div>
           <div style={{ display: 'grid', gap: 8 }}>
             {[
@@ -2765,7 +2765,7 @@ function LiveStats() {
         ((d as Record<string, unknown>).twinEffectiveness as unknown[]).length > 0 && (
           <div style={card}>
             <div style={sectionTitle}>
-              <Users size={16} style={{ color: '#a78bfa' }} /> Twin Effectiveness (Live)
+              <Users size={16} style={{ color: '#16A34A' }} /> Twin Effectiveness (Live)
             </div>
             <div
               style={{
@@ -2924,11 +2924,11 @@ function ResearchCard({
           style={{
             padding: 8,
             borderRadius: 6,
-            background: 'rgba(99, 102, 241, 0.06)',
-            border: '1px solid rgba(99, 102, 241, 0.12)',
+            background: 'rgba(22, 163, 74, 0.06)',
+            border: '1px solid rgba(22, 163, 74, 0.12)',
           }}
         >
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#6366f1', marginBottom: 3 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#16A34A', marginBottom: 3 }}>
             FOR THE PRODUCT
           </div>
           <div style={{ fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -3137,7 +3137,7 @@ function PlaybookAndResearch() {
       {/* Prioritized Backlog */}
       <div style={card}>
         <div style={sectionTitle}>
-          <Rocket size={18} style={{ color: '#6366f1' }} /> Prioritized Backlog
+          <Rocket size={18} style={{ color: '#16A34A' }} /> Prioritized Backlog
         </div>
         <div
           style={{
@@ -3238,9 +3238,9 @@ function PlaybookAndResearch() {
       </div>
 
       {/* Founder Notes */}
-      <div style={{ ...card, borderLeft: '3px solid #a78bfa' }}>
+      <div style={{ ...card, borderLeft: '3px solid #16A34A' }}>
         <div style={sectionTitle}>
-          <BookOpen size={18} style={{ color: '#a78bfa' }} /> Founder Notes
+          <BookOpen size={18} style={{ color: '#16A34A' }} /> Founder Notes
         </div>
         <ul
           style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 2, paddingLeft: 16 }}
@@ -3354,17 +3354,17 @@ function PlaybookAndResearch() {
       {(section === 'all' || section === 'vc') && (
         <>
           <div
-            style={{ ...card, borderLeft: '3px solid #6366f1', cursor: 'pointer' }}
+            style={{ ...card, borderLeft: '3px solid #16A34A', cursor: 'pointer' }}
             onClick={() => toggleResearchSection('vc')}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#6366f1' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#16A34A' }}>
                 VC Decision Science
               </div>
               <ChevronDown
                 size={16}
                 style={{
-                  color: '#6366f1',
+                  color: '#16A34A',
                   transform: expandedResearch.has('vc') ? 'rotate(180deg)' : 'rotate(0deg)',
                   transition: 'transform 0.2s',
                 }}
@@ -3373,7 +3373,7 @@ function PlaybookAndResearch() {
           </div>
           {expandedResearch.has('vc') && (
             <div
-              style={{ ...card, borderLeft: '3px solid #6366f1', marginTop: -8, borderTop: 'none' }}
+              style={{ ...card, borderLeft: '3px solid #16A34A', marginTop: -8, borderTop: 'none' }}
             >
               <div style={{ display: 'grid', gap: 12 }}>
                 {[
@@ -3575,15 +3575,15 @@ function PlaybookAndResearch() {
                         style={{
                           padding: 10,
                           borderRadius: 8,
-                          background: 'rgba(99, 102, 241, 0.06)',
-                          border: '1px solid rgba(99, 102, 241, 0.15)',
+                          background: 'rgba(22, 163, 74, 0.06)',
+                          border: '1px solid rgba(22, 163, 74, 0.15)',
                         }}
                       >
                         <div
                           style={{
                             fontSize: 11,
                             fontWeight: 700,
-                            color: '#6366f1',
+                            color: '#16A34A',
                             marginBottom: 4,
                           }}
                         >
@@ -3851,17 +3851,17 @@ function PlaybookAndResearch() {
       {(section === 'all' || section === 'strategy') && (
         <>
           <div
-            style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: 16, cursor: 'pointer' }}
+            style={{ ...card, borderLeft: '3px solid #16A34A', marginTop: 16, cursor: 'pointer' }}
             onClick={() => toggleResearchSection('strategy')}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#a78bfa' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#16A34A' }}>
                 Founder Strategy
               </div>
               <ChevronDown
                 size={16}
                 style={{
-                  color: '#a78bfa',
+                  color: '#16A34A',
                   transform: expandedResearch.has('strategy') ? 'rotate(180deg)' : 'rotate(0deg)',
                   transition: 'transform 0.2s',
                 }}
@@ -3869,12 +3869,12 @@ function PlaybookAndResearch() {
             </div>
           </div>
           {expandedResearch.has('strategy') && (
-            <div style={{ ...card, borderLeft: '3px solid #a78bfa', marginTop: -8 }}>
+            <div style={{ ...card, borderLeft: '3px solid #16A34A', marginTop: -8 }}>
               <ResearchCard
                 title="Peter Thiel: Zero to One — Contrarian Truths"
                 source="The Investors Podcast (MI383)"
                 type="Podcast Deep Dive"
-                color="#a78bfa"
+                color="#16A34A"
                 link="https://www.theinvestorspodcast.com/millennial-investing/zero-to-one-lessons-from-peter-thiel-w-shawn-omalley/"
                 insight='Contrarian question: "What important truth do very few people agree with you on?" Monopoly framework: dominate a small niche, then expand in concentric circles. Sales and distribution matter as much as product.'
                 product={
@@ -3921,9 +3921,9 @@ function PlaybookAndResearch() {
       </div>
 
       {/* Key Takeaway (always visible) */}
-      <div style={{ ...card, borderTop: '3px solid #6366f1', marginTop: 12 }}>
+      <div style={{ ...card, borderTop: '3px solid #16A34A', marginTop: 12 }}>
         <div style={sectionTitle}>
-          <Zap size={18} style={{ color: '#6366f1' }} /> Most Actionable Takeaways
+          <Zap size={18} style={{ color: '#16A34A' }} /> Most Actionable Takeaways
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {[
@@ -4035,8 +4035,8 @@ function CaseStudiesTab() {
         fontSize: 12,
         fontWeight: filter === value ? 700 : 500,
         color: filter === value ? '#fff' : 'var(--text-muted, #71717a)',
-        background: filter === value ? '#6366f120' : 'transparent',
-        border: filter === value ? '1px solid #6366f1' : '1px solid var(--border-primary, #333)',
+        background: filter === value ? '#16A34A20' : 'transparent',
+        border: filter === value ? '1px solid #16A34A' : '1px solid var(--border-primary, #333)',
         borderRadius: 6,
         cursor: 'pointer',
         transition: 'all 0.15s',
@@ -4049,9 +4049,9 @@ function CaseStudiesTab() {
   return (
     <div>
       {/* Header */}
-      <div style={{ ...card, borderLeft: '3px solid #6366f1' }}>
+      <div style={{ ...card, borderLeft: '3px solid #16A34A' }}>
         <h2 style={sectionTitle}>
-          <Library size={20} style={{ color: '#6366f1' }} />
+          <Library size={20} style={{ color: '#16A34A' }} />
           Real-World Case Studies Database
         </h2>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6 }}>
@@ -4064,7 +4064,7 @@ function CaseStudiesTab() {
       {/* Stats Row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 16 }}>
         {[
-          { label: 'Total Cases', value: stats.totalCases, color: '#6366f1' },
+          { label: 'Total Cases', value: stats.totalCases, color: '#16A34A' },
           { label: 'Failure Cases', value: stats.failureCount, color: '#ef4444' },
           { label: 'Success Cases', value: stats.successCount, color: '#22c55e' },
           { label: 'Industries', value: Object.keys(stats.byIndustry).length, color: '#f59e0b' },
@@ -4250,7 +4250,7 @@ function CaseStudiesTab() {
                       <span
                         key={b}
                         style={{
-                          ...badge(c.biasesManaged.includes(b) ? '#22c55e' : '#6366f1'),
+                          ...badge(c.biasesManaged.includes(b) ? '#22c55e' : '#16A34A'),
                           fontSize: 10,
                         }}
                       >
@@ -4403,10 +4403,10 @@ function CaseStudiesTab() {
                         padding: 16,
                         borderRadius: 8,
                         background: 'var(--bg-tertiary, #0a0a0a)',
-                        border: '1px solid #6366f140',
+                        border: '1px solid #16A34A40',
                       }}
                     >
-                      <p style={{ ...label, color: '#6366f1', marginBottom: 10 }}>
+                      <p style={{ ...label, color: '#16A34A', marginBottom: 10 }}>
                         Pre-Decision Evidence — What the Platform Would Have Caught
                       </p>
                       <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 8px' }}>
@@ -4419,7 +4419,7 @@ function CaseStudiesTab() {
                           lineHeight: 1.7,
                           marginBottom: 12,
                           padding: '10px 14px',
-                          borderLeft: '3px solid #6366f140',
+                          borderLeft: '3px solid #16A34A40',
                           background: 'var(--bg-secondary, #111)',
                           borderRadius: 4,
                           fontStyle: 'italic',
@@ -4488,16 +4488,16 @@ function SearchResults({
       <div
         style={{
           ...card,
-          borderLeft: '3px solid #6366f1',
+          borderLeft: '3px solid #16A34A',
           display: 'flex',
           alignItems: 'center',
           gap: 8,
           marginBottom: 16,
         }}
       >
-        <Search size={14} style={{ color: '#6366f1', flexShrink: 0 }} />
+        <Search size={14} style={{ color: '#16A34A', flexShrink: 0 }} />
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-          Showing all tabs filtered by &quot;<strong style={{ color: '#6366f1' }}>{query}</strong>
+          Showing all tabs filtered by &quot;<strong style={{ color: '#16A34A' }}>{query}</strong>
           &quot; — use{' '}
           <kbd
             style={{
@@ -4639,7 +4639,7 @@ export default function FounderHubPage() {
               fontWeight: 600,
               borderRadius: 8,
               border: 'none',
-              background: '#6366f1',
+              background: '#16A34A',
               color: '#fff',
               cursor: 'pointer',
             }}
@@ -4684,7 +4684,7 @@ export default function FounderHubPage() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Rocket size={26} style={{ color: '#6366f1' }} />
+              <Rocket size={26} style={{ color: '#16A34A' }} />
               <h1
                 style={{
                   fontSize: 24,
@@ -4780,7 +4780,7 @@ export default function FounderHubPage() {
                   activeTab === tab.id ? 'var(--text-primary, #fff)' : 'var(--text-muted, #71717a)',
                 background: 'none',
                 border: 'none',
-                borderBottom: activeTab === tab.id ? '2px solid #6366f1' : '2px solid transparent',
+                borderBottom: activeTab === tab.id ? '2px solid #16A34A' : '2px solid transparent',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 transition: 'color 0.15s, border-color 0.15s',

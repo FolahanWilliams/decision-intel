@@ -116,14 +116,14 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
           width: 52,
           height: 52,
           borderRadius: '50%',
-          background: '#6366f1',
+          background: '#16A34A',
           color: '#fff',
           border: 'none',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
+          boxShadow: '0 4px 12px rgba(22, 163, 74, 0.4)',
           zIndex: 50,
           fontSize: 22,
         }}
@@ -160,11 +160,11 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'rgba(99, 102, 241, 0.08)',
+          background: 'rgba(22, 163, 74, 0.08)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Brain size={16} style={{ color: '#6366f1' }} />
+          <Brain size={16} style={{ color: '#16A34A' }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
             Founder AI
           </span>
@@ -225,7 +225,7 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
                     borderRadius: 12,
                     border: '1px solid var(--border-primary, #333)',
                     background: 'transparent',
-                    color: '#6366f1',
+                    color: '#16A34A',
                     cursor: 'pointer',
                   }}
                 >
@@ -243,7 +243,7 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
               maxWidth: '85%',
               padding: '8px 12px',
               borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-              background: msg.role === 'user' ? '#6366f1' : 'var(--bg-tertiary, #1a1a1a)',
+              background: msg.role === 'user' ? '#16A34A' : 'var(--bg-tertiary, #1a1a1a)',
               color: msg.role === 'user' ? '#fff' : 'var(--text-secondary)',
               fontSize: 12,
               lineHeight: 1.6,
@@ -291,7 +291,7 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
             fontWeight: 600,
             borderRadius: 8,
             border: 'none',
-            background: input.trim() && !streaming ? '#6366f1' : 'var(--bg-tertiary, #1a1a1a)',
+            background: input.trim() && !streaming ? '#16A34A' : 'var(--bg-tertiary, #1a1a1a)',
             color: input.trim() && !streaming ? '#fff' : 'var(--text-muted)',
             cursor: streaming ? 'wait' : 'pointer',
           }}
