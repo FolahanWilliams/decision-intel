@@ -25,3 +25,4 @@ CREATE INDEX "GoogleDriveInstallation_status_idx" ON "GoogleDriveInstallation"("
 -- Add source tracking to Document
 ALTER TABLE "Document" ADD COLUMN "source" TEXT;
 ALTER TABLE "Document" ADD COLUMN "sourceRef" TEXT;
+CREATE INDEX "Document_source_sourceRef_idx" ON "Document"("source", "sourceRef");
