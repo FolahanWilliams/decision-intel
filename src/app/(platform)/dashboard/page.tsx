@@ -768,8 +768,8 @@ export default function Dashboard() {
             display: 'flex',
             alignItems: 'center',
             gap: '2px',
-            background: 'rgba(255, 255, 255, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            background: 'var(--bg-card-hover)',
+            border: '1px solid var(--border-color)',
             borderRadius: 'var(--radius-full)',
             padding: '3px',
           }}
@@ -787,7 +787,7 @@ export default function Dashboard() {
               alignItems: 'center',
               gap: '6px',
               transition: 'all 0.15s',
-              background: activeView === 'upload' ? 'rgba(255, 255, 255, 0.10)' : 'transparent',
+              background: activeView === 'upload' ? 'var(--bg-active)' : 'transparent',
               color: activeView === 'upload' ? 'var(--text-highlight)' : 'var(--text-muted)',
             }}
           >
@@ -807,7 +807,7 @@ export default function Dashboard() {
               alignItems: 'center',
               gap: '6px',
               transition: 'all 0.15s',
-              background: activeView === 'browse' ? 'rgba(255, 255, 255, 0.10)' : 'transparent',
+              background: activeView === 'browse' ? 'var(--bg-active)' : 'transparent',
               color: activeView === 'browse' ? 'var(--text-highlight)' : 'var(--text-muted)',
             }}
           >
@@ -827,8 +827,8 @@ export default function Dashboard() {
               onClick={() => setShowKpiSettings(!showKpiSettings)}
               className="btn btn-ghost p-sm flex items-center gap-xs text-xs"
               style={{
-                background: showKpiSettings ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: showKpiSettings ? 'var(--bg-card-hover)' : 'transparent',
+                border: '1px solid var(--border-color)',
               }}
             >
               <Settings size={14} />
@@ -896,18 +896,18 @@ export default function Dashboard() {
                 value: totalDocs,
                 numericValue: totalDocs,
                 icon: <FileText size={18} />,
-                iconBg: 'rgba(255, 255, 255, 0.06)',
-                iconColor: 'rgba(255, 255, 255, 0.5)',
-                sparkColor: 'rgba(255, 255, 255, 0.4)',
+                iconBg: 'var(--bg-card-hover)',
+                iconColor: 'var(--text-secondary)',
+                sparkColor: 'var(--text-muted)',
               },
               {
                 label: 'Analyzed',
                 value: uploadedDocs.filter(d => d.status === 'complete').length,
                 numericValue: uploadedDocs.filter(d => d.status === 'complete').length,
                 icon: <CheckCircle size={18} />,
-                iconBg: 'rgba(255, 255, 255, 0.06)',
-                iconColor: 'rgba(255, 255, 255, 0.5)',
-                sparkColor: 'rgba(255, 255, 255, 0.4)',
+                iconBg: 'var(--bg-card-hover)',
+                iconColor: 'var(--text-secondary)',
+                sparkColor: 'var(--text-muted)',
               },
               {
                 label: 'Avg Quality',
@@ -915,9 +915,9 @@ export default function Dashboard() {
                 numericValue: riskSummary.avg,
                 suffix: '%',
                 icon: <TrendingUp size={18} />,
-                iconBg: 'rgba(255, 255, 255, 0.06)',
-                iconColor: 'rgba(255, 255, 255, 0.5)',
-                sparkColor: 'rgba(255, 255, 255, 0.4)',
+                iconBg: 'var(--bg-card-hover)',
+                iconColor: 'var(--text-secondary)',
+                sparkColor: 'var(--text-muted)',
                 showSparkline: true,
               },
               {
@@ -925,9 +925,9 @@ export default function Dashboard() {
                 value: -1, // Sentinel: replaced by custom component
                 numericValue: -1,
                 icon: <Brain size={18} />,
-                iconBg: 'rgba(255, 255, 255, 0.06)',
-                iconColor: 'rgba(255, 255, 255, 0.5)',
-                sparkColor: 'rgba(255, 255, 255, 0.4)',
+                iconBg: 'var(--bg-card-hover)',
+                iconColor: 'var(--text-secondary)',
+                sparkColor: 'var(--text-muted)',
                 isCustom: true,
               },
             ]
@@ -1210,7 +1210,7 @@ export default function Dashboard() {
               {pendingFile && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {/* File preview */}
-                  <div className="flex items-center gap-md" style={{ padding: '12px', background: 'rgba(255, 255, 255, 0.04)', borderRadius: 8, border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <div className="flex items-center gap-md" style={{ padding: '12px', background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--border-color)' }}>
                     <div
                       style={{
                         width: 44,
@@ -1406,9 +1406,9 @@ export default function Dashboard() {
                       justifyContent: 'center',
                       borderRadius: 'var(--radius-lg)',
                       background: isDragOver
-                        ? 'rgba(255, 255, 255, 0.12)'
-                        : 'rgba(255, 255, 255, 0.06)',
-                      border: `1px solid ${isDragOver ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.1)'}`,
+                        ? 'var(--bg-active-hover)'
+                        : 'var(--bg-card-hover)',
+                      border: `1px solid ${isDragOver ? 'var(--border-hover)' : 'var(--border-color)'}`,
                       transition: 'all 0.2s ease',
                       transform: isDragOver ? 'scale(1.1)' : 'scale(1)',
                     }}
@@ -2244,11 +2244,11 @@ export default function Dashboard() {
               alignItems: 'center',
               gap: 'var(--spacing-lg)',
               padding: 'var(--spacing-2xl)',
-              border: '2px dashed rgba(255, 255, 255, 0.35)',
+              border: '2px dashed var(--border-hover)',
               borderRadius: 'var(--radius-xl)',
-              background: 'rgba(255, 255, 255, 0.08)',
+              background: 'var(--bg-card-hover)',
               backdropFilter: 'blur(24px) saturate(160%)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.08) inset',
+              boxShadow: 'var(--shadow-lg)',
             }}
           >
             <CloudUpload size={48} style={{ color: 'var(--accent-primary)' }} />

@@ -6,17 +6,12 @@ import {
 } from '@/components/ui/AnalysisProgressBar';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { NewDecisionModal } from '@/components/ui/NewDecisionModal';
-import { LiquidGlassEffect } from '@/components/ui/LiquidGlassEffect';
-import { LiquidGlassAdvanced } from '@/components/ui/LiquidGlassAdvanced';
-
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
   return (
     <AnalysisProgressProvider>
       <a href="#main-content" className="skip-nav">
         Skip to main content
       </a>
-      <LiquidGlassEffect />
-      <LiquidGlassAdvanced />
       <Ticker />
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         <Sidebar />
@@ -26,7 +21,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           style={{
             flex: 1,
             overflowY: 'auto',
-            background: 'transparent',
+            background: 'var(--bg-primary)',
             color: 'var(--text-primary)',
             transition: 'color 0.3s',
           }}

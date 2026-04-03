@@ -19,7 +19,7 @@
   --radius-3xl: 24px;
   --radius-full: 9999px;
 
-  --color-accent-primary: #00D2FF;
+  --color-accent-primary: #16A34A;
   --color-accent-secondary: #34d399;
   --color-success: #22c55e;
   --color-warning: #FBBF24;
@@ -37,30 +37,34 @@
   --bg-card: rgba(255, 255, 255, 0.03);
   --bg-card-hover: rgba(255, 255, 255, 0.06);
   --bg-elevated: rgba(255, 255, 255, 0.05);
+  --bg-active: rgba(255, 255, 255, 0.10);
+  --bg-active-hover: rgba(255, 255, 255, 0.12);
+  --overlay-backdrop: rgba(0, 0, 0, 0.5);
+  --overlay-heavy: rgba(0, 0, 0, 0.8);
 
   --text-primary: #F0F4F8;
   --text-secondary: #94A3B8;
   --text-muted: #71717a;
-  --text-highlight: #00D2FF;
+  --text-highlight: #16A34A;
 
-  --accent-primary: #00D2FF;
+  --accent-primary: #16A34A;
   --accent-secondary: #34d399;
   --accent-tertiary: #60a5fa;
 
-  /* Gradient stops — cyan to indigo */
-  --gradient-start: #00D2FF;
-  --gradient-mid: #0EA5E9;
-  --gradient-end: #6366F1;
+  /* Gradient stops — green to emerald */
+  --gradient-start: #16A34A;
+  --gradient-mid: #15803D;
+  --gradient-end: #166534;
 
   /* Accent effects */
-  --accent-glow: 0 0 20px rgba(0, 210, 255, 0.3), 0 0 60px rgba(0, 210, 255, 0.1);
-  --accent-gradient: linear-gradient(135deg, #00D2FF, #0EA5E9, #6366F1);
-  --accent-gradient-subtle: linear-gradient(135deg, rgba(0,210,255,0.15), rgba(99,102,241,0.08));
+  --accent-glow: 0 0 20px rgba(22, 163, 74, 0.3), 0 0 60px rgba(22, 163, 74, 0.1);
+  --accent-gradient: linear-gradient(135deg, #16A34A, #15803D, #166534);
+  --accent-gradient-subtle: linear-gradient(135deg, rgba(22,163,74,0.15), rgba(22,101,52,0.08));
 
-  /* Borders — crisp visible glass edges */
-  --border-color: rgba(0, 210, 255, 0.12);
-  --border-active: rgba(0, 210, 255, 0.5);
-  --border-hover: rgba(0, 210, 255, 0.25);
+  /* Borders — crisp visible edges */
+  --border-color: rgba(22, 163, 74, 0.12);
+  --border-active: rgba(22, 163, 74, 0.5);
+  --border-hover: rgba(22, 163, 74, 0.25);
 
   /* Severity — vivid, saturated */
   --success: #34d399;
@@ -172,25 +176,29 @@
   --bg-primary: #ffffff;
   --bg-secondary: #f9fafb;
   --bg-tertiary: #f3f4f6;
-  --bg-card: rgba(0, 0, 0, 0.02);
-  --bg-card-hover: rgba(0, 0, 0, 0.04);
-  --bg-elevated: rgba(255, 255, 255, 0.95);
+  --bg-card: rgba(0, 0, 0, 0.01);
+  --bg-card-hover: rgba(0, 0, 0, 0.03);
+  --bg-elevated: #FFFFFF;
+  --bg-active: rgba(0, 0, 0, 0.06);
+  --bg-active-hover: rgba(0, 0, 0, 0.08);
+  --overlay-backdrop: rgba(0, 0, 0, 0.3);
+  --overlay-heavy: rgba(0, 0, 0, 0.6);
 
   /* Text — dark on light */
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
-  --text-highlight: #000000;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --text-highlight: #16A34A;
 
-  /* Brand — Dark accent for light mode */
-  --accent-primary: #111827;
-  --accent-secondary: #374151;
-  --accent-tertiary: #6b7280;
+  /* Brand — Green accent for light mode */
+  --accent-primary: #16A34A;
+  --accent-secondary: #15803D;
+  --accent-tertiary: #166534;
 
-  /* Gradient stops — dark to gray */
-  --gradient-start: #111827;
-  --gradient-mid: #374151;
-  --gradient-end: #6b7280;
+  /* Gradient stops — green */
+  --gradient-start: #16A34A;
+  --gradient-mid: #15803D;
+  --gradient-end: #166534;
 
   /* Borders — subtle gray */
   --border-color: rgba(0, 0, 0, 0.12);

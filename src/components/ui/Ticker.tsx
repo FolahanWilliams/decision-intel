@@ -47,10 +47,10 @@ export default function Ticker() {
       role="marquee"
       aria-label="System metrics"
       style={{
-        background: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(40px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.18)',
+        background: 'var(--bg-elevated)',
+        backdropFilter: 'blur(20px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+        borderBottom: '1px solid var(--border-color)',
         height: '44px',
         display: 'flex',
         alignItems: 'center',
@@ -58,20 +58,20 @@ export default function Ticker() {
         whiteSpace: 'nowrap',
         fontSize: '13px',
         fontFamily: 'Inter, sans-serif',
-        boxShadow: '0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 4px 16px rgba(0, 0, 0, 0.4)',
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
       <div className="ticker-track" style={{ flex: 1 }}>
-        <TickerItem label="Avg Quality" value={stats.avgScore} color="#FFFFFF" />
+        <TickerItem label="Avg Quality" value={stats.avgScore} color="var(--text-primary)" />
         <TickerItem label="Avg Noise" value={stats.avgNoise} color="var(--warning)" />
         <TickerItem label="Documents" value={stats.totalDocs} color="var(--info)" />
-        <TickerItem label="Analyzed" value={stats.analyzedDocs} color="#FFFFFF" />
+        <TickerItem label="Analyzed" value={stats.analyzedDocs} color="var(--text-primary)" />
         <TickerItem label="Status" value="Operational" color="var(--success)" />
         {/* Duplicate for seamless marquee loop */}
-        <TickerItem label="Avg Quality" value={stats.avgScore} color="#FFFFFF" />
+        <TickerItem label="Avg Quality" value={stats.avgScore} color="var(--text-primary)" />
         <TickerItem label="Avg Noise" value={stats.avgNoise} color="var(--warning)" />
         <TickerItem label="Documents" value={stats.totalDocs} color="var(--info)" />
-        <TickerItem label="Analyzed" value={stats.analyzedDocs} color="#FFFFFF" />
+        <TickerItem label="Analyzed" value={stats.analyzedDocs} color="var(--text-primary)" />
         <TickerItem label="Status" value="Operational" color="var(--success)" />
       </div>
       <div style={{ flexShrink: 0, padding: '0 12px', zIndex: 10 }}>
