@@ -306,15 +306,21 @@ export function InsightsPageContent() {
     }
   };
 
-  // Fetch orgId for graph trends
+  // Fetch orgId for graph trends — try team endpoint, fall back to member lookup
   useEffect(() => {
     fetch('/api/team')
       .then(res => (res.ok ? res.json() : null))
       .then(data => {
-        const id = data?.orgId || data?.organization?.id;
-        if (id) setGraphOrgId(id);
+        const id = data?.orgId || data?.organization?.id || data?.id;
+        if (id) {
+          setGraphOrgId(id);
+        } else {
+          console.warn('[Insights] Could not resolve orgId — graph trends unavailable');
+        }
       })
-      .catch(() => {});
+      .catch(() => {
+        console.warn('[Insights] Failed to fetch orgId for graph trends');
+      });
   }, []);
 
   useEffect(() => {

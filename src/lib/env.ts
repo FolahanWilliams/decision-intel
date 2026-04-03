@@ -58,20 +58,30 @@ export function validateEnv(): EnvValidationResult {
   // Security warnings for production deployments
   if (process.env.NODE_ENV === 'production') {
     if (!process.env.DOCUMENT_ENCRYPTION_KEY) {
-      warnings.push(
+      const msg =
         'DOCUMENT_ENCRYPTION_KEY is not set — uploaded documents will be stored unencrypted. ' +
-          'Set this to a 32-byte hex key to enable AES-256-GCM encryption at rest.'
-      );
+        'Set this to a 32-byte hex key to enable AES-256-GCM encryption at rest.';
+      warnings.push(msg);
+      console.error(`[ENV] CRITICAL: ${msg}`);
+    }
+    if (!process.env.SLACK_TOKEN_ENCRYPTION_KEY && process.env.SLACK_CLIENT_ID) {
+      const msg =
+        'SLACK_TOKEN_ENCRYPTION_KEY is not set but Slack integration is configured. ' +
+        'Slack token operations will crash at runtime.';
+      warnings.push(msg);
+      console.error(`[ENV] CRITICAL: ${msg}`);
     }
     if (!process.env.RESEND_API_KEY) {
-      warnings.push(
-        'RESEND_API_KEY is not set — email notifications (invites, digests, outcome reminders) will be silently skipped.'
-      );
+      const msg =
+        'RESEND_API_KEY is not set — email notifications (invites, digests, outcome reminders) will be silently skipped.';
+      warnings.push(msg);
+      console.warn(`[ENV] WARNING: ${msg}`);
     }
     if (!process.env.CRON_SECRET) {
-      warnings.push(
-        'CRON_SECRET is not set — scheduled jobs (outcome detection, nudges, digests) will fail with 401.'
-      );
+      const msg =
+        'CRON_SECRET is not set — scheduled jobs (outcome detection, nudges, digests) will fail with 401.';
+      warnings.push(msg);
+      console.warn(`[ENV] WARNING: ${msg}`);
     }
   }
 

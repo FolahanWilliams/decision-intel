@@ -138,6 +138,20 @@ export async function GET(request: NextRequest) {
     const page = Math.max(parseInt(searchParams.get('page') || '1', 10) || 1, 1);
     const skip = (page - 1) * limit;
 
+    const VALID_STATUSES = ['active', 'passed', 'invested', 'written_off', 'exited'];
+    const VALID_STAGES = ['screening', 'dd', 'ic', 'closing', 'monitoring', 'exited'];
+    const VALID_DEAL_TYPES = ['direct', 'co_invest', 'secondary', 'fund'];
+
+    if (status && !VALID_STATUSES.includes(status)) {
+      return NextResponse.json({ error: `Invalid status. Valid values: ${VALID_STATUSES.join(', ')}` }, { status: 400 });
+    }
+    if (stage && !VALID_STAGES.includes(stage)) {
+      return NextResponse.json({ error: `Invalid stage. Valid values: ${VALID_STAGES.join(', ')}` }, { status: 400 });
+    }
+    if (dealType && !VALID_DEAL_TYPES.includes(dealType)) {
+      return NextResponse.json({ error: `Invalid dealType. Valid values: ${VALID_DEAL_TYPES.join(', ')}` }, { status: 400 });
+    }
+
     const where: Record<string, unknown> = {
       orgId: orgId || user.id,
     };
