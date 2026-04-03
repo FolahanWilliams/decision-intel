@@ -151,6 +151,7 @@ model UserSettings {
   notificationSeverity String  @default("all")
   onboardingCompleted  Boolean  @default(false)
   onboardingStep       Int      @default(0)
+  emailForwardToken    String?  @unique
 
   @@index([userId])
 }
