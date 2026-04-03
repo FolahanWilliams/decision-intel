@@ -187,9 +187,9 @@ function SlackChannelConfig() {
                   padding: '4px 10px',
                   fontSize: '12px',
                   borderRadius: 'var(--radius-sm)',
-                  border: isSelected ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
-                  background: isSelected ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-                  color: isSelected ? '#a78bfa' : 'var(--text-secondary)',
+                  border: isSelected ? '1px solid rgba(22, 163, 74, 0.4)' : '1px solid var(--border-color)',
+                  background: isSelected ? 'rgba(22, 163, 74, 0.15)' : 'var(--bg-card)',
+                  color: isSelected ? 'var(--accent-primary)' : 'var(--text-secondary)',
                   cursor: 'pointer',
                   transition: 'all 0.15s',
                 }}
@@ -228,9 +228,9 @@ function SlackChannelConfig() {
               padding: '8px 12px',
               fontSize: '12px',
               borderRadius: 'var(--radius-md)',
-              border: nudgeFrequency === opt.value ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
-              background: nudgeFrequency === opt.value ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-              color: nudgeFrequency === opt.value ? '#a78bfa' : 'var(--text-secondary)',
+              border: nudgeFrequency === opt.value ? '1px solid rgba(22, 163, 74, 0.4)' : '1px solid var(--border-color)',
+              background: nudgeFrequency === opt.value ? 'rgba(22, 163, 74, 0.15)' : 'var(--bg-card)',
+              color: nudgeFrequency === opt.value ? 'var(--accent-primary)' : 'var(--text-secondary)',
               cursor: 'pointer',
               textAlign: 'left',
               transition: 'all 0.15s',
@@ -255,7 +255,7 @@ function SlackChannelConfig() {
             fontSize: '12px',
             fontWeight: 600,
             color: '#fff',
-            background: '#6366f1',
+            background: 'var(--accent-primary)',
             border: 'none',
             borderRadius: 'var(--radius-md)',
             cursor: saving ? 'wait' : 'pointer',
@@ -329,7 +329,7 @@ function SlackActivityFeed() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {/* Summary stats */}
           {summary.nudgeHelpfulRate !== null && (
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', padding: '8px 10px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', padding: '8px 10px', background: 'var(--bg-card)', borderRadius: 'var(--radius-sm)' }}>
               Nudge helpfulness rate: <strong style={{ color: '#22c55e' }}>{summary.nudgeHelpfulRate}%</strong>
             </div>
           )}
@@ -341,7 +341,7 @@ function SlackActivityFeed() {
                 Recent Decisions
               </div>
               {data.recentDecisions.map(d => (
-                <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', borderRadius: 'var(--radius-sm)', background: 'rgba(255, 255, 255, 0.02)', marginBottom: '4px' }}>
+                <div key={d.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-card)', marginBottom: '4px' }}>
                   <Brain size={12} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
                   <span style={{ fontSize: '12px', color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {d.content}
@@ -367,7 +367,7 @@ function SlackActivityFeed() {
                 Recent Nudges
               </div>
               {data.recentNudges.map(n => (
-                <div key={n.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', borderRadius: 'var(--radius-sm)', background: 'rgba(255, 255, 255, 0.02)', marginBottom: '4px' }}>
+                <div key={n.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-card)', marginBottom: '4px' }}>
                   <BellRing size={12} style={{ color: n.severity === 'critical' ? '#ef4444' : '#eab308', flexShrink: 0 }} />
                   <span style={{ fontSize: '12px', color: 'var(--text-secondary)', flex: 1 }}>
                     {n.biasType.replace(/_/g, ' ')}
@@ -406,6 +406,7 @@ function SlackDetailSection({
 }) {
   const isConnected = slackStatus?.connected === true;
   const isTokenExpired = slackStatus?.status === 'token_expired';
+  const [testNudgeLoading, setTestNudgeLoading] = useState(false);
 
   return (
     <>
@@ -472,7 +473,7 @@ function SlackDetailSection({
                         ? 'rgba(34, 197, 94, 0.1)'
                         : isTokenExpired
                           ? 'rgba(245, 158, 11, 0.1)'
-                          : 'rgba(255, 255, 255, 0.06)',
+                          : 'var(--bg-card-hover)',
                     padding: '2px 8px',
                     borderRadius: 'var(--radius-sm)',
                   }}
@@ -570,9 +571,9 @@ function SlackDetailSection({
               <div
                 style={{
                   padding: '12px',
-                  background: 'rgba(255, 255, 255, 0.03)',
+                  background: 'var(--bg-card)',
                   borderRadius: 'var(--radius-md)',
-                  border: '1px solid rgba(255, 255, 255, 0.04)',
+                  border: '1px solid var(--border-color)',
                 }}
               >
                 <div
@@ -593,9 +594,9 @@ function SlackDetailSection({
               <div
                 style={{
                   padding: '12px',
-                  background: 'rgba(255, 255, 255, 0.03)',
+                  background: 'var(--bg-card)',
                   borderRadius: 'var(--radius-md)',
-                  border: '1px solid rgba(255, 255, 255, 0.04)',
+                  border: '1px solid var(--border-color)',
                 }}
               >
                 <div
@@ -643,7 +644,7 @@ function SlackDetailSection({
                         fontSize: '10px',
                         padding: '2px 6px',
                         borderRadius: 'var(--radius-sm)',
-                        background: 'rgba(255, 255, 255, 0.06)',
+                        background: 'var(--bg-card-hover)',
                         color: 'var(--text-secondary)',
                         fontFamily: 'monospace',
                       }}
@@ -680,6 +681,41 @@ function SlackDetailSection({
                 <Unplug size={12} />
               )}
               {disconnecting ? 'Disconnecting...' : 'Disconnect Workspace'}
+            </button>
+            <button
+              onClick={async () => {
+                setTestNudgeLoading(true);
+                try {
+                  const res = await fetch('/api/integrations/slack/test-nudge', { method: 'POST' });
+                  if (res.ok) {
+                    // Show success feedback
+                  }
+                } catch {
+                  // Silently handle error
+                } finally {
+                  setTestNudgeLoading(false);
+                }
+              }}
+              disabled={testNudgeLoading}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                fontSize: 12,
+                fontWeight: 600,
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-secondary)',
+                cursor: testNudgeLoading ? 'not-allowed' : 'pointer',
+                opacity: testNudgeLoading ? 0.6 : 1,
+              }}
+            >
+              {testNudgeLoading && (
+                <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />
+              )}
+              {testNudgeLoading ? 'Sending...' : 'Send Test Nudge'}
             </button>
           </div>
         )}
@@ -764,7 +800,7 @@ function SlackDetailSection({
                   gap: '12px',
                   padding: '6px 10px',
                   borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--bg-card)',
                 }}
               >
                 <code
@@ -772,7 +808,7 @@ function SlackDetailSection({
                     fontSize: '12px',
                     fontFamily: 'monospace',
                     fontWeight: 600,
-                    color: '#a78bfa',
+                    color: 'var(--accent-primary)',
                     whiteSpace: 'nowrap',
                     minWidth: '110px',
                   }}

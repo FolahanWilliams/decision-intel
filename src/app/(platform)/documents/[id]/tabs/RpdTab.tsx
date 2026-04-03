@@ -99,10 +99,10 @@ export function RpdTab({ recognitionCues, narrativePreMortem, documentId }: RpdT
 
   const confidenceColor =
     confidenceLevel >= 70
-      ? 'text-emerald-400'
+      ? 'text-emerald-600 dark:text-emerald-400'
       : confidenceLevel >= 40
-        ? 'text-amber-400'
-        : 'text-zinc-400';
+        ? 'text-amber-600 dark:text-amber-400'
+        : 'text-zinc-600 dark:text-zinc-400';
   const confidenceLabel =
     confidenceLevel >= 70
       ? 'High Confidence'

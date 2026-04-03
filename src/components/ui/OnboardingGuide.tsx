@@ -109,11 +109,11 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
   return (
     <div
       className="card mb-xl animate-fade-in"
-      style={{ borderColor: 'rgba(255, 255, 255, 0.12)', borderWidth: '1px' }}
+      style={{ borderColor: 'var(--border-color)', borderWidth: '1px' }}
       role="region"
       aria-label="Getting started guide"
     >
-      <div className="card-header" style={{ background: 'rgba(255, 255, 255, 0.03)' }}>
+      <div className="card-header" style={{ background: 'var(--bg-card)' }}>
         <h3
           style={{
             color: 'var(--text-secondary)',
@@ -154,10 +154,10 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
                 alignItems: 'center',
                 gap: '8px',
                 padding: 'var(--spacing-md)',
-                background: index === currentStep ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
+                background: index === currentStep ? 'var(--bg-card-hover)' : 'transparent',
                 border:
                   index === currentStep
-                    ? '1px solid rgba(255, 255, 255, 0.2)'
+                    ? '1px solid var(--border-color)'
                     : '1px solid var(--border-color)',
                 cursor: 'pointer',
                 color: 'inherit',
@@ -173,7 +173,7 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
                   alignItems: 'center',
                   justifyContent: 'center',
                   background: isStepCompleted(index)
-                    ? '#22c55e'
+                    ? 'var(--accent-primary)'
                     : index <= currentStep
                       ? '#FFFFFF'
                       : 'var(--bg-tertiary)',
