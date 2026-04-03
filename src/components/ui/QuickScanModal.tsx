@@ -146,7 +146,7 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
                 minHeight: 180,
                 padding: 12,
                 borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
+                border: '1px solid var(--border-color)',
                 background: 'rgba(0, 0, 0, 0.2)',
                 color: 'var(--text-primary)',
                 fontSize: '0.875rem',
@@ -252,8 +252,8 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
                       style={{
                         padding: '10px 14px',
                         borderRadius: 'var(--radius-md)',
-                        background: 'rgba(255, 255, 255, 0.04)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: 'var(--bg-card-hover)',
+                        border: '1px solid var(--bg-elevated)',
                       }}
                     >
                       <div

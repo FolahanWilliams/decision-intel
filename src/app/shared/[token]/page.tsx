@@ -68,25 +68,25 @@ const LOCKED_SECTIONS: Array<{
     key: 'swotAnalysis',
     title: 'Strategic SWOT',
     description: 'Strengths, weaknesses, opportunities, and threats identified',
-    icon: <Target size={14} style={{ color: '#6366f1' }} />,
+    icon: <Target size={14} style={{ color: '#16A34A' }} />,
   },
   {
     key: 'factCheck',
     title: 'Fact Verification',
     description: 'Claims verified against real-time data sources',
-    icon: <Search size={14} style={{ color: '#6366f1' }} />,
+    icon: <Search size={14} style={{ color: '#16A34A' }} />,
   },
   {
     key: 'preMortem',
     title: 'Pre-Mortem Scenarios',
     description: 'Failure scenarios simulated before they happen',
-    icon: <Activity size={14} style={{ color: '#6366f1' }} />,
+    icon: <Activity size={14} style={{ color: '#16A34A' }} />,
   },
   {
     key: 'sentiment',
     title: 'Sentiment Analysis',
     description: 'Emotional tone and objectivity assessment',
-    icon: <Heart size={14} style={{ color: '#6366f1' }} />,
+    icon: <Heart size={14} style={{ color: '#16A34A' }} />,
   },
 ];
 
@@ -313,7 +313,7 @@ export default function SharedAnalysisPage() {
         }}
       >
         <div style={{ maxWidth: 400, width: '90%', textAlign: 'center' }}>
-          <Lock size={40} style={{ color: '#6366f1', marginBottom: 16 }} />
+          <Lock size={40} style={{ color: '#16A34A', marginBottom: 16 }} />
           <h2 style={{ marginBottom: 8 }}>Password Protected</h2>
           <p style={{ color: '#94a3b8', marginBottom: 24 }}>
             This shared analysis requires a password to view.
@@ -346,7 +346,7 @@ export default function SharedAnalysisPage() {
               style={{
                 width: '100%',
                 padding: '12px',
-                background: '#6366f1',
+                background: '#16A34A',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 8,
@@ -377,7 +377,7 @@ export default function SharedAnalysisPage() {
           justifyContent: 'center',
         }}
       >
-        <Loader2 size={32} className="animate-spin" style={{ color: '#6366f1' }} />
+        <Loader2 size={32} className="animate-spin" style={{ color: '#16A34A' }} />
       </div>
     );
   }
@@ -413,7 +413,7 @@ export default function SharedAnalysisPage() {
       {isCaseStudy && (
         <div
           style={{
-            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%)',
+            background: 'linear-gradient(135deg, #16A34A 0%, #16A34A 50%, #16A34A 100%)',
             padding: '14px 24px',
             textAlign: 'center',
           }}
@@ -438,10 +438,10 @@ export default function SharedAnalysisPage() {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Shield size={18} style={{ color: '#6366f1' }} />
+            <Shield size={18} style={{ color: '#16A34A' }} />
             <span style={{ fontSize: 14, fontWeight: 600 }}>
               <span style={{ color: '#fff' }}>Decision</span>
-              <span style={{ color: '#6366f1', marginLeft: 4 }}>Intel</span>
+              <span style={{ color: '#16A34A', marginLeft: 4 }}>Intel</span>
             </span>
             <span style={{ fontSize: 11, color: '#64748b', marginLeft: 8 }}>
               {isCaseStudy ? 'Case Study' : 'Shared Analysis'}
@@ -530,7 +530,7 @@ export default function SharedAnalysisPage() {
               gap: 8,
             }}
           >
-            <BarChart3 size={16} style={{ color: '#6366f1' }} /> Executive Summary
+            <BarChart3 size={16} style={{ color: '#16A34A' }} /> Executive Summary
           </h3>
           <p style={{ color: '#cbd5e1', lineHeight: 1.7, margin: 0, fontSize: 14 }}>
             {analysis.summary}
@@ -617,7 +617,7 @@ export default function SharedAnalysisPage() {
                     <p style={{ color: '#cbd5e1', fontSize: 13, margin: '0 0 6px' }}>
                       {bias.explanation}
                     </p>
-                    <p style={{ color: '#6366f1', fontSize: 13, margin: 0 }}>{bias.suggestion}</p>
+                    <p style={{ color: '#16A34A', fontSize: 13, margin: 0 }}>{bias.suggestion}</p>
                   </div>
                 );
               })}
@@ -674,7 +674,7 @@ export default function SharedAnalysisPage() {
             marginTop: 48,
             padding: '32px 24px',
             background: isCaseStudy
-              ? 'linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, #1a1a2e 40%, rgba(26, 26, 46, 0) 100%)'
+              ? 'linear-gradient(180deg, rgba(22, 163, 74, 0.08) 0%, #1a1a2e 40%, rgba(26, 26, 46, 0) 100%)'
               : 'linear-gradient(180deg, #1a1a2e 0%, rgba(26, 26, 46, 0) 100%)',
             borderRadius: 16,
             border: '1px solid #2d2d44',
@@ -690,18 +690,18 @@ export default function SharedAnalysisPage() {
               marginBottom: 12,
             }}
           >
-            <Shield size={20} style={{ color: '#6366f1' }} />
+            <Shield size={20} style={{ color: '#16A34A' }} />
             <span style={{ fontSize: 16, fontWeight: 700 }}>
               {isCaseStudy ? (
                 <>
                   <span style={{ color: '#94a3b8' }}>Powered by </span>
                   <span style={{ color: '#fff' }}>Decision</span>
-                  <span style={{ color: '#6366f1', marginLeft: 4 }}>Intel</span>
+                  <span style={{ color: '#16A34A', marginLeft: 4 }}>Intel</span>
                 </>
               ) : (
                 <>
                   <span style={{ color: '#fff' }}>Decision</span>
-                  <span style={{ color: '#6366f1', marginLeft: 4 }}>Intel</span>
+                  <span style={{ color: '#16A34A', marginLeft: 4 }}>Intel</span>
                 </>
               )}
             </span>
@@ -725,7 +725,7 @@ export default function SharedAnalysisPage() {
               alignItems: 'center',
               gap: 8,
               padding: '12px 28px',
-              background: '#6366f1',
+              background: '#16A34A',
               color: '#fff',
               border: 'none',
               borderRadius: 10,

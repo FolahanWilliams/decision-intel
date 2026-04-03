@@ -318,9 +318,9 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                         padding: '10px 14px',
                         background:
                           selectedAnalysis === id
-                            ? 'rgba(255, 255, 255, 0.06)'
-                            : 'rgba(255, 255, 255, 0.02)',
-                        border: `1px solid ${selectedAnalysis === id ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.06)'}`,
+                            ? 'var(--bg-card-hover)'
+                            : 'var(--bg-card)',
+                        border: `1px solid ${selectedAnalysis === id ? 'var(--border-hover)' : 'var(--bg-card-hover)'}`,
                         borderRadius: '8px',
                         cursor: 'pointer',
                         display: 'flex',
@@ -385,8 +385,8 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                             onClick={() => setOutcome(opt.value)}
                             style={{
                               padding: '10px 8px',
-                              background: isSelected ? `${opt.color}15` : 'rgba(255,255,255,0.03)',
-                              border: `1px solid ${isSelected ? opt.color + '50' : 'rgba(255,255,255,0.08)'}`,
+                              background: isSelected ? `${opt.color}15` : 'var(--bg-card)',
+                              border: `1px solid ${isSelected ? opt.color + '50' : 'var(--bg-elevated)'}`,
                               borderRadius: '8px',
                               cursor: 'pointer',
                               display: 'flex',
@@ -452,7 +452,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
                 style={{
                   marginTop: '16px',
                   paddingTop: '16px',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderTop: '1px solid var(--bg-card-hover)',
                   textAlign: 'center',
                 }}
               >

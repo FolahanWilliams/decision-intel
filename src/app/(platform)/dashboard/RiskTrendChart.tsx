@@ -37,7 +37,7 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
               <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--bg-elevated)" />
           <XAxis
             dataKey="date"
             axisLine={false}
@@ -54,13 +54,13 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
           <Tooltip
             contentStyle={{
               background: 'rgba(0, 0, 0, 0.75)',
-              border: '1px solid rgba(255,255,255,0.18)',
+              border: '1px solid var(--border-hover)',
               borderRadius: '12px',
               backdropFilter: 'blur(24px) saturate(180%)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.08) inset',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 var(--bg-elevated) inset',
               padding: '8px 12px',
             }}
-            itemStyle={{ color: '#FFFFFF', fontWeight: 600, fontSize: '13px' }}
+            itemStyle={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '13px' }}
             labelStyle={{ color: '#a1a1aa', fontSize: '11px', marginBottom: '4px' }}
           />
           <Area

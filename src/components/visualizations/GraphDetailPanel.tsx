@@ -66,7 +66,7 @@ const NODE_TYPE_COLORS: Record<string, string> = {
   human_decision: '#a855f7',
   person: '#14b8a6',
   bias_pattern: '#f59e0b',
-  outcome: '#6366f1',
+  outcome: '#16A34A',
 };
 
 function getScoreColor(score: number): string {

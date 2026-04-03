@@ -46,13 +46,13 @@ const PERSONA_CONFIG: Record<string, PersonaConfig> = {
   },
   'Aggressive Growth': {
     icon: <TrendingUp size={20} />,
-    color: '#a78bfa',
+    color: '#16A34A',
     bgGradient:
-      'linear-gradient(135deg, rgba(167, 139, 250, 0.06) 0%, rgba(167, 139, 250, 0.02) 100%)',
-    borderColor: 'rgba(167, 139, 250, 0.25)',
+      'linear-gradient(135deg, rgba(22, 163, 74, 0.06) 0%, rgba(22, 163, 74, 0.02) 100%)',
+    borderColor: 'rgba(22, 163, 74, 0.25)',
     description: 'Prioritizes market capture and competitive advantage',
     avatarInitials: 'AG',
-    avatarGradient: 'linear-gradient(135deg, #a78bfa, #7c3aed)',
+    avatarGradient: 'linear-gradient(135deg, #16A34A, #7c3aed)',
   },
   'Compliance Guard': {
     icon: <Shield size={20} />,

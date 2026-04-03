@@ -495,7 +495,7 @@ export default function DecisionPerformance() {
           value={formatPercent(kpis.biasDetectionAccuracy)}
           subtext="confirmed / (confirmed + false positives)"
           index={3}
-          accentColor="#a78bfa"
+          accentColor="#16A34A"
         />
       </div>
 
@@ -758,7 +758,7 @@ export default function DecisionPerformance() {
               marginBottom: 'var(--spacing-md)',
             }}
           >
-            <Users size={18} style={{ color: '#a78bfa' }} />
+            <Users size={18} style={{ color: '#16A34A' }} />
             <span
               style={{
                 color: 'var(--text-primary)',
@@ -900,7 +900,7 @@ export default function DecisionPerformance() {
               marginBottom: 'var(--spacing-md)',
             }}
           >
-            <Brain size={18} style={{ color: '#a78bfa' }} />
+            <Brain size={18} style={{ color: '#16A34A' }} />
             <span
               style={{
                 color: 'var(--text-primary)',
@@ -1009,7 +1009,7 @@ export default function DecisionPerformance() {
                       const intensity = Math.min(1, (entry.avgDelta || 0) / 80);
                       const fill =
                         intensity > 0.5
-                          ? '#a78bfa'
+                          ? '#16A34A'
                           : intensity > 0.2
                             ? CHART_COLORS.zinc200
                             : CHART_COLORS.zinc400;
@@ -1030,7 +1030,7 @@ export default function DecisionPerformance() {
               borderRadius: 10,
               fontSize: 13,
               color: 'var(--text-muted)',
-              borderLeft: '3px solid #a78bfa',
+              borderLeft: '3px solid #16A34A',
             }}
           >
             {data.priorIntelligence.avgBeliefDelta > 30

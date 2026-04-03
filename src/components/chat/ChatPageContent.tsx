@@ -372,7 +372,7 @@ export function ChatPageContent() {
                   style={{
                     width: '100%',
                     padding: '10px 12px',
-                    background: 'rgba(255, 255, 255, 0.06)',
+                    background: 'var(--bg-card-hover)',
                     border: 'none',
                     borderBottom: '1px solid var(--border-color)',
                     color: 'var(--text-highlight)',
@@ -404,7 +404,7 @@ export function ChatPageContent() {
                       padding: '8px 12px',
                       borderBottom: '1px solid var(--border-color)',
                       background:
-                        s.id === activeSessionId ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
+                        s.id === activeSessionId ? 'var(--bg-card-hover)' : 'transparent',
                     }}
                   >
                     <button
@@ -463,8 +463,8 @@ export function ChatPageContent() {
               onClick={() => setShowPicker(!showPicker)}
               className="btn flex items-center gap-xs"
               style={{
-                background: pinnedDocId ? 'rgba(255, 255, 255, 0.06)' : 'var(--bg-tertiary)',
-                border: `1px solid ${pinnedDocId ? 'rgba(255, 255, 255, 0.15)' : 'var(--border-color)'}`,
+                background: pinnedDocId ? 'var(--bg-card-hover)' : 'var(--bg-tertiary)',
+                border: `1px solid ${pinnedDocId ? 'var(--border-color)' : 'var(--border-color)'}`,
                 color: pinnedDocId ? 'var(--text-highlight)' : 'var(--text-muted)',
                 fontSize: '12px',
                 padding: '6px 12px',
@@ -529,7 +529,7 @@ export function ChatPageContent() {
                       width: '100%',
                       padding: '10px 12px',
                       background:
-                        d.id === pinnedDocId ? 'rgba(255, 255, 255, 0.06)' : 'transparent',
+                        d.id === pinnedDocId ? 'var(--bg-card-hover)' : 'transparent',
                       border: 'none',
                       borderBottom: '1px solid var(--border-color)',
                       color: 'var(--text-primary)',
@@ -584,7 +584,7 @@ export function ChatPageContent() {
           className="flex items-center gap-sm"
           style={{
             padding: '8px var(--spacing-md)',
-            background: 'rgba(255, 255, 255, 0.06)',
+            background: 'var(--bg-card-hover)',
             borderBottom: '1px solid var(--border-color)',
             fontSize: '12px',
             flexShrink: 0,
@@ -772,8 +772,8 @@ function MessageBubble({
         style={{
           maxWidth: '85%',
           padding: 'var(--spacing-sm) var(--spacing-md)',
-          background: isUser ? 'rgba(255, 255, 255, 0.1)' : 'var(--bg-secondary)',
-          color: isUser ? '#fff' : 'var(--text-primary)',
+          background: isUser ? 'var(--bg-elevated)' : 'var(--bg-secondary)',
+          color: isUser ? 'var(--text-primary)' : 'var(--text-primary)',
           borderRadius: '2px',
           fontSize: '14px',
           lineHeight: 1.6,

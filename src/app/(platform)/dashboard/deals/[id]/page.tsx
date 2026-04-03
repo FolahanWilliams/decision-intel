@@ -46,10 +46,10 @@ const tabStyle = (active: boolean): React.CSSProperties => ({
   padding: '8px 16px',
   fontSize: 13,
   fontWeight: active ? 600 : 400,
-  color: active ? '#6366f1' : 'var(--text-muted)',
-  background: active ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
+  color: active ? '#16A34A' : 'var(--text-muted)',
+  background: active ? 'rgba(22, 163, 74, 0.1)' : 'transparent',
   border: 'none',
-  borderBottom: active ? '2px solid #6366f1' : '2px solid transparent',
+  borderBottom: active ? '2px solid #16A34A' : '2px solid transparent',
   cursor: 'pointer',
   transition: 'all 0.15s',
 });
@@ -118,7 +118,7 @@ export default function DealDetailPage() {
         </div>
         <Link
           href="/dashboard/deals"
-          style={{ color: '#6366f1', fontSize: 13, marginTop: 8, display: 'inline-block' }}
+          style={{ color: '#16A34A', fontSize: 13, marginTop: 8, display: 'inline-block' }}
         >
           Back to Projects
         </Link>
@@ -410,8 +410,8 @@ function DocumentsTab({
                 style={{
                   fontSize: 10,
                   fontWeight: 500,
-                  color: '#6366f1',
-                  background: 'rgba(99, 102, 241, 0.1)',
+                  color: '#16A34A',
+                  background: 'rgba(22, 163, 74, 0.1)',
                   padding: '2px 6px',
                   borderRadius: 4,
                 }}
@@ -503,7 +503,7 @@ function BiasSummaryTab({
                   alignItems: 'center',
                   gap: 8,
                   fontSize: 12,
-                  color: '#6366f1',
+                  color: '#16A34A',
                   textDecoration: 'none',
                 }}
               >

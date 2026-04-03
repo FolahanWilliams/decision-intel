@@ -199,8 +199,8 @@ export function OutcomeTimeframePicker({
                 }}
                 style={{
                   padding: '8px 14px',
-                  background: isSelected ? 'rgba(251, 191, 36, 0.12)' : 'rgba(255, 255, 255, 0.03)',
-                  border: `1px solid ${isSelected ? 'rgba(251, 191, 36, 0.3)' : 'rgba(255, 255, 255, 0.08)'}`,
+                  background: isSelected ? 'rgba(251, 191, 36, 0.12)' : 'var(--bg-card)',
+                  border: `1px solid ${isSelected ? 'rgba(251, 191, 36, 0.3)' : 'var(--bg-elevated)'}`,
                   borderRadius: '8px',
                   cursor: 'pointer',
                   color: isSelected ? '#fbbf24' : 'var(--text-secondary)',
@@ -241,8 +241,8 @@ export function OutcomeTimeframePicker({
             style={{
               padding: '6px 10px',
               fontSize: '12px',
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--bg-elevated)',
               borderRadius: '6px',
               color: 'var(--text-primary)',
             }}

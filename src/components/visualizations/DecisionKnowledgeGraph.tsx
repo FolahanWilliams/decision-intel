@@ -93,7 +93,7 @@ const NODE_TYPE_CONFIG: Record<
   human_decision: { label: 'Human Decision', color: '#8b5cf6', shape: 'rect', size: 1.0 },
   person: { label: 'Person', color: '#14b8a6', shape: 'diamond', size: 0.6 },
   bias_pattern: { label: 'Bias Pattern', color: '#f59e0b', shape: 'triangle', size: 0.65 },
-  outcome: { label: 'Outcome', color: '#6366f1', shape: 'star', size: 0.55 },
+  outcome: { label: 'Outcome', color: '#16A34A', shape: 'star', size: 0.55 },
 };
 
 // ─── Edge Style Config ──────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ function getNodeFill(d: GraphNode): string {
     if (d.label === 'success') return '#22c55e';
     if (d.label === 'failure') return '#ef4444';
     if (d.label === 'mixed') return '#eab308';
-    return '#6366f1';
+    return '#16A34A';
   }
   return NODE_TYPE_CONFIG[d.type]?.color ?? '#64748b';
 }
@@ -960,7 +960,7 @@ export function DecisionKnowledgeGraph({
                 className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] transition-all"
                 style={{
                   backgroundColor: isVisible ? `${config.color}20` : 'transparent',
-                  border: `1px solid ${isVisible ? config.color + '60' : 'rgba(255,255,255,0.08)'}`,
+                  border: `1px solid ${isVisible ? config.color + '60' : 'var(--bg-elevated)'}`,
                   color: isVisible ? config.color : 'var(--text-muted)',
                   opacity: isVisible ? 1 : 0.5,
                 }}
