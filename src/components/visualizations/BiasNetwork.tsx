@@ -1012,7 +1012,7 @@ export function BiasNetwork({ biases = [], compact = false, onBiasClick }: BiasN
             >
               Total Connections
             </span>
-            <span style={{ fontSize: '20px', fontWeight: 800, color: '#FFFFFF' }}>
+            <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>
               {connections.length}
             </span>
           </div>
