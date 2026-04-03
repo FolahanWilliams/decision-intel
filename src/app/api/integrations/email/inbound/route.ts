@@ -167,6 +167,11 @@ export async function POST(req: NextRequest) {
 
     const { from, to, subject, text, html, attachments } = payload;
 
+    if (!to || typeof to !== 'string') {
+      log.warn('Inbound email missing "to" field, skipping');
+      return OK();
+    }
+
     // 4. Extract token from the "to" address
     const token = extractTokenFromAddress(to);
     if (!token) {
@@ -237,6 +242,16 @@ export async function POST(req: NextRequest) {
 
           // Generate content hash for deduplication
           const contentHash = createHash('sha256').update(buffer).digest('hex');
+
+          // Skip if identical content already analyzed for this user
+          const existingDoc = await prisma.document.findFirst({
+            where: { contentHash, userId },
+            select: { id: true },
+          });
+          if (existingDoc) {
+            log.info(`Duplicate content (hash: ${contentHash.slice(0, 8)}...), skipping: ${filename}`);
+            continue;
+          }
 
           // Encrypt if enabled
           const encryptedFields = isDocumentEncryptionEnabled()

@@ -480,7 +480,9 @@ function GoogleDriveFolderConfig() {
         </h4>
       </div>
       <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '10px', lineHeight: 1.5 }}>
-        Select which Google Drive folders to watch for new documents. New files will be auto-analyzed.
+        Select which Google Drive folders to watch. New or modified files in these folders are
+        automatically downloaded and analyzed every 10 minutes. Supported: PDF, DOCX, XLSX, CSV, PPTX,
+        Google Docs, Sheets, and Slides.
       </p>
 
       {folderList.length > 0 ? (
