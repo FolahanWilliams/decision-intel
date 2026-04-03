@@ -222,6 +222,9 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
         </div>
       </div>
 
+      {/* Email Forwarding */}
+      <EmailForwardingSection />
+
       {/* Notification Preferences */}
       <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.1s' }}>
         <div className="card-header">
@@ -642,6 +645,123 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function EmailForwardingSection() {
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [regenerating, setRegenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const domain = process.env.NEXT_PUBLIC_EMAIL_INBOUND_DOMAIN || 'in.decision-intel.com';
+
+  useEffect(() => {
+    fetch('/api/integrations/email/token')
+      .then(r => (r.ok ? r.json() : null))
+      .then(data => {
+        if (data?.token) setToken(data.token);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleGenerate = async () => {
+    setRegenerating(true);
+    try {
+      const res = await fetch('/api/integrations/email/token', { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        setToken(data.token);
+      }
+    } catch { /* ignore */ } finally {
+      setRegenerating(false);
+    }
+  };
+
+  const forwardingAddress = token ? `analyze+${token}@${domain}` : null;
+
+  const handleCopy = () => {
+    if (forwardingAddress) {
+      navigator.clipboard.writeText(forwardingAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.05s' }}>
+      <div className="card-header">
+        <h3 className="flex items-center gap-sm">
+          <MessageSquare size={18} />
+          Email Forwarding
+        </h3>
+      </div>
+      <div className="card-body">
+        <p className="text-xs text-muted mb-md" style={{ lineHeight: 1.6 }}>
+          Forward documents or paste decision text to your unique email address.
+          Attachments (PDF, DOCX, XLSX, CSV, PPTX) are auto-analyzed. No attachments? The email body is analyzed instead.
+        </p>
+        {loading ? (
+          <div className="text-xs text-muted">Loading...</div>
+        ) : forwardingAddress ? (
+          <div className="flex flex-col gap-sm">
+            <div
+              className="flex items-center gap-sm"
+              style={{
+                padding: 'var(--spacing-sm) var(--spacing-md)',
+                background: 'var(--bg-secondary)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+              }}
+            >
+              <code className="text-sm flex-1" style={{ color: 'var(--accent-primary)', wordBreak: 'break-all' }}>
+                {forwardingAddress}
+              </code>
+              <button
+                onClick={handleCopy}
+                className="text-xs font-medium"
+                style={{
+                  padding: '4px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  background: copied ? 'var(--accent-primary)' : 'var(--bg-card)',
+                  color: copied ? '#fff' : 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <button
+              onClick={handleGenerate}
+              disabled={regenerating}
+              className="text-xs text-muted"
+              style={{ cursor: 'pointer', background: 'none', border: 'none', textDecoration: 'underline', textAlign: 'left', padding: 0 }}
+            >
+              {regenerating ? 'Regenerating...' : 'Regenerate address'}
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleGenerate}
+            disabled={regenerating}
+            className="text-sm font-medium"
+            style={{
+              padding: '8px 20px',
+              borderRadius: 'var(--radius-md)',
+              border: 'none',
+              background: 'var(--accent-primary)',
+              color: '#fff',
+              cursor: regenerating ? 'wait' : 'pointer',
+            }}
+          >
+            {regenerating ? 'Generating...' : 'Generate Forwarding Address'}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

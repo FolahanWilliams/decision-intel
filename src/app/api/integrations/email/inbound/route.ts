@@ -238,6 +238,16 @@ export async function POST(req: NextRequest) {
           // Generate content hash for deduplication
           const contentHash = createHash('sha256').update(buffer).digest('hex');
 
+          // Skip if identical content already analyzed for this user
+          const existingDoc = await prisma.document.findFirst({
+            where: { contentHash, userId },
+            select: { id: true },
+          });
+          if (existingDoc) {
+            log.info(`Duplicate content (hash: ${contentHash.slice(0, 8)}...), skipping: ${filename}`);
+            continue;
+          }
+
           // Encrypt if enabled
           const encryptedFields = isDocumentEncryptionEnabled()
             ? encryptDocumentContent(parsedContent)
