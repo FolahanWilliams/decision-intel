@@ -139,8 +139,8 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     const VALID_STATUSES = ['active', 'passed', 'invested', 'written_off', 'exited'];
-    const VALID_STAGES = ['screening', 'dd', 'ic', 'closing', 'monitoring', 'exited'];
-    const VALID_DEAL_TYPES = ['direct', 'co_invest', 'secondary', 'fund'];
+    const VALID_STAGES = ['screening', 'due_diligence', 'ic_review', 'closing', 'portfolio', 'exited'];
+    const VALID_DEAL_TYPES = ['buyout', 'growth_equity', 'venture', 'secondary', 'add_on', 'recapitalization'];
 
     if (status && !VALID_STATUSES.includes(status)) {
       return NextResponse.json({ error: `Invalid status. Valid values: ${VALID_STATUSES.join(', ')}` }, { status: 400 });
