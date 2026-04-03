@@ -378,11 +378,11 @@ export default function DemoPage() {
                         background: isComplete
                           ? 'rgba(34, 197, 94, 0.15)'
                           : isActive
-                            ? 'rgba(255, 255, 255, 0.1)'
-                            : 'rgba(255, 255, 255, 0.03)',
+                            ? 'rgba(0, 0, 0, 0.04)'
+                            : 'rgba(0, 0, 0, 0.02)',
                         border: isActive
-                          ? '1px solid rgba(255, 255, 255, 0.2)'
-                          : '1px solid rgba(255, 255, 255, 0.06)',
+                          ? '1px solid rgba(0, 0, 0, 0.1)'
+                          : '1px solid rgba(0, 0, 0, 0.04)',
                       }}
                     >
                       {isComplete ? (
@@ -408,7 +408,7 @@ export default function DemoPage() {
             <div className="max-w-[480px] mx-auto mt-6">
               <div className="h-1 rounded-full bg-slate-100">
                 <div
-                  className="h-full rounded-full bg-white transition-all duration-500"
+                  className="h-full rounded-full bg-[#16A34A] transition-all duration-500"
                   style={{ width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%` }}
                 />
               </div>
@@ -575,7 +575,7 @@ export default function DemoPage() {
             )}
 
             {/* CTA */}
-            <div className="mt-12 text-center p-6 sm:p-10 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-slate-200">
+            <div className="mt-12 text-center p-6 sm:p-10 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200">
               <h3 className="text-lg sm:text-[22px] font-bold text-slate-900 mb-2">
                 This was a demo. Now try it on your own documents.
               </h3>
@@ -656,7 +656,7 @@ function DemoVideoSection() {
         </div>
       ) : (
         <div className="rounded-2xl border border-slate-200 bg-white p-12 sm:p-16 mb-8 flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-slate-100 border border-white/[0.1] flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
             <Play size={28} className="text-slate-400 ml-1" />
           </div>
           <p className="text-slate-500 text-sm max-w-[400px]">
@@ -984,7 +984,7 @@ function NoiseTab({ analysis }: { analysis: DemoAnalysis }) {
                               : b.value <= 60
                                 ? '#eab308'
                                 : '#ef4444'
-                            : 'rgba(255,255,255,0.2)',
+                            : 'rgba(0,0,0,0.1)',
                       }}
                     />
                   </div>
@@ -1380,7 +1380,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
       )}
 
       {/* Upsell CTA */}
-      <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-slate-200 text-center">
+      <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 text-center">
         <h3 className="text-lg font-bold text-slate-900 mb-2">
           This quick scan checks 14 common biases.
         </h3>
