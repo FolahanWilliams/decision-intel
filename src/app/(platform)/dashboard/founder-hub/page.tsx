@@ -32,6 +32,8 @@ import {
   ArrowDownRight,
   HelpCircle,
   Lightbulb,
+  Mail,
+  HardDrive,
 } from 'lucide-react';
 import {
   ALL_CASES,
@@ -945,6 +947,116 @@ function IntegrationsAndFlywheel() {
             with structured logging
           </li>
         </ul>
+      </div>
+
+      {/* Slack Deep Analysis */}
+      <div style={{ ...card, borderTop: '3px solid #4A154B' }}>
+        <div style={sectionTitle}>
+          <MessageSquare size={18} style={{ color: '#4A154B' }} /> Slack Deep Thread Analysis
+        </div>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
+          Run <code>/di analyze</code> inside any Slack thread to trigger a full decision analysis.
+          The bot fetches all thread messages, combines them with timestamps and speaker attribution,
+          and runs the complete analysis pipeline — then posts rich results back to the thread.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {[
+            {
+              title: 'Thread Fetching',
+              desc: 'conversations.replies API with pagination for threads with 100+ messages',
+            },
+            {
+              title: 'Speaker Attribution',
+              desc: 'Each message tagged with user + timestamp — detects group dynamics and influence patterns',
+            },
+            {
+              title: 'Full Pipeline',
+              desc: 'Creates a Document record and runs the same 11-node analysis pipeline as uploaded docs',
+            },
+            {
+              title: 'In-Thread Results',
+              desc: 'Rich Block Kit card posted directly to the thread with score, biases, and dashboard link',
+            },
+          ].map((item, i) => (
+            <div key={i} style={{ padding: 10, borderRadius: 8, background: 'var(--bg-tertiary)', fontSize: 12 }}>
+              <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 3 }}>{item.title}</div>
+              <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Email Forwarding */}
+      <div style={{ ...card, borderTop: '3px solid #16A34A' }}>
+        <div style={sectionTitle}>
+          <Mail size={18} style={{ color: '#16A34A' }} /> Email Forwarding Integration
+        </div>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
+          Every user gets a unique email address (<code>analyze+token@in.decision-intel.com</code>).
+          Forward any document or paste decision text — auto-analyzed with results emailed back.
+          Zero setup, works from any email client on any device.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {[
+            {
+              title: 'Attachment Parsing',
+              desc: 'PDF, DOCX, XLSX, CSV, PPTX extracted and analyzed automatically',
+            },
+            {
+              title: 'Body Text Fallback',
+              desc: 'No attachment? Email body text is analyzed as a decision document',
+            },
+            {
+              title: 'Confirmation Email',
+              desc: 'Immediate reply with link to results in dashboard',
+            },
+            {
+              title: 'Secure Token Auth',
+              desc: 'Unique per-user token, Resend webhook HMAC verification, rate + plan limits',
+            },
+          ].map((item, i) => (
+            <div key={i} style={{ padding: 10, borderRadius: 8, background: 'var(--bg-tertiary)', fontSize: 12 }}>
+              <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 3 }}>{item.title}</div>
+              <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Google Drive */}
+      <div style={{ ...card, borderTop: '3px solid #4285F4' }}>
+        <div style={sectionTitle}>
+          <HardDrive size={18} style={{ color: '#4285F4' }} /> Google Drive Connector
+        </div>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
+          Connect Google Drive, select folders to watch. New documents are auto-analyzed every 10
+          minutes. For PE/VC firms, deal memos landing in Drive are analyzed before anyone opens them.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {[
+            {
+              title: 'OAuth 2.0 Connection',
+              desc: 'Secure Google OAuth with encrypted refresh token storage (AES-256-GCM)',
+            },
+            {
+              title: 'Folder Watch',
+              desc: 'Select specific folders to monitor — only watched folders trigger analysis',
+            },
+            {
+              title: 'Google Docs Support',
+              desc: 'Google Docs, Sheets, Slides auto-exported to analyzable format + all standard files',
+            },
+            {
+              title: 'Polling Cron Job',
+              desc: 'Drive Changes API polled every 10 min. Deduplication via file ID tracking',
+            },
+          ].map((item, i) => (
+            <div key={i} style={{ padding: 10, borderRadius: 8, background: 'var(--bg-tertiary)', fontSize: 12 }}>
+              <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 3 }}>{item.title}</div>
+              <div style={{ color: 'var(--text-muted)', lineHeight: 1.5 }}>{item.desc}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Browser Extension */}

@@ -1,11 +1,11 @@
 import { google, drive_v3 } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
 import { encrypt, decrypt } from '@/lib/utils/encryption';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('GoogleDrive');
 
-export function createOAuth2Client(): OAuth2Client {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createOAuth2Client(): any {
   return new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
@@ -21,7 +21,7 @@ export async function createAuthenticatedClient(installation: {
   const refreshToken = decryptRefreshToken(installation);
   const oauth2Client = createOAuth2Client();
   oauth2Client.setCredentials({ refresh_token: refreshToken });
-  return google.drive({ version: 'v3', auth: oauth2Client });
+  return google.drive({ version: 'v3', auth: oauth2Client as any }); // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export function encryptRefreshToken(token: string): {

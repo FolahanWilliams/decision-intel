@@ -84,12 +84,14 @@ export async function GET(req: NextRequest) {
 
     // Get user email from Google userinfo API
     oauth2Client.setCredentials(tokens);
-    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client as any });
     const userInfo = await oauth2.userinfo.get();
     const driveEmail = userInfo.data.email || 'unknown';
 
     // Get start page token for the Changes API
-    const drive = google.drive({ version: 'v3', auth: oauth2Client });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const drive = google.drive({ version: 'v3', auth: oauth2Client as any });
     const startPageToken = await getStartPageToken(drive);
 
     const scopes = tokens.scope?.split(' ') || [];

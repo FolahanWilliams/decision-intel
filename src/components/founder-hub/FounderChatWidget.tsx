@@ -11,10 +11,11 @@ interface ChatMsg {
 const STARTER_QUESTIONS = [
   'Elevator pitch for a CSO?',
   'How do we beat competitors?',
-  'What did Strebulaev say?',
-  'Demo script for exec meeting',
   'What shipped recently?',
-  'Slack integration overview',
+  'Demo script for exec meeting',
+  'How does email forwarding work?',
+  'Google Drive integration overview',
+  'Slack deep analysis capabilities',
 ];
 
 export function FounderChatWidget({ founderPass }: { founderPass: string }) {
