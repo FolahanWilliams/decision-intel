@@ -1,6 +1,6 @@
 import { google, drive_v3 } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
-import { decrypt } from '@/lib/utils/encryption';
+import { encrypt, decrypt } from '@/lib/utils/encryption';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('GoogleDrive');
@@ -30,8 +30,7 @@ export function encryptRefreshToken(token: string): {
   refreshTokenTag: string;
 } {
   // Use the same encrypt() utility (AES-256-GCM) but map to Google Drive field names
-  const { encrypt: enc } = require('@/lib/utils/encryption');
-  const result = enc(token);
+  const result = encrypt(token);
   return {
     refreshTokenEncrypted: result.ciphertext,
     refreshTokenIv: result.iv,
