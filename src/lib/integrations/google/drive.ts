@@ -88,8 +88,10 @@ export async function getChangedFiles(
   };
 }
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB limit for Vercel memory safety
+
 export async function downloadFileContent(drive: drive_v3.Drive, fileId: string, mimeType: string): Promise<Buffer> {
-  // Google Docs/Sheets/Slides need to be exported
+  // Google Docs/Sheets/Slides need to be exported (they don't have a size field)
   const googleTypes: Record<string, string> = {
     'application/vnd.google-apps.document': 'application/pdf',
     'application/vnd.google-apps.spreadsheet': 'text/csv',
@@ -102,6 +104,13 @@ export async function downloadFileContent(drive: drive_v3.Drive, fileId: string,
       { responseType: 'arraybuffer' }
     );
     return Buffer.from(res.data as ArrayBuffer);
+  }
+
+  // Check file size before downloading to avoid OOM on Vercel
+  const metadata = await drive.files.get({ fileId, fields: 'size' });
+  const fileSize = parseInt(metadata.data.size || '0', 10);
+  if (fileSize > MAX_FILE_SIZE) {
+    throw new Error(`File too large: ${(fileSize / 1024 / 1024).toFixed(1)}MB exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit`);
   }
 
   const res = await drive.files.get(

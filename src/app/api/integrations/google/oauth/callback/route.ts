@@ -96,6 +96,14 @@ export async function GET(req: NextRequest) {
 
     const scopes = tokens.scope?.split(' ') || [];
 
+    // Verify required scope was granted
+    const REQUIRED_SCOPE = 'https://www.googleapis.com/auth/drive.readonly';
+    if (!scopes.includes(REQUIRED_SCOPE)) {
+      log.error(`Missing required scope: ${REQUIRED_SCOPE}. Received: ${scopes.join(', ')}`);
+      settingsUrl.searchParams.set('google', 'error');
+      return NextResponse.redirect(settingsUrl.toString());
+    }
+
     // Resolve org membership
     let userOrgId: string | null = null;
     try {

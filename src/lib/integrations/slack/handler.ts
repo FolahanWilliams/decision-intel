@@ -237,13 +237,14 @@ export async function fetchSlackThread(
     }
 
     for (const msg of data.messages || []) {
-      if (msg.text && !msg.bot_id) {
-        messages.push({ ts: msg.ts, user: msg.user || 'unknown', text: msg.text });
+      // Skip bot messages (those with bot_id or app_id), keep only human messages
+      if (msg.text && !msg.bot_id && !msg.app_id && msg.user) {
+        messages.push({ ts: msg.ts, user: msg.user, text: msg.text });
       }
     }
 
-    cursor = data.response_metadata?.next_cursor;
-  } while (cursor);
+    cursor = data.response_metadata?.next_cursor || '';
+  } while (cursor && cursor !== '');
 
   return messages;
 }

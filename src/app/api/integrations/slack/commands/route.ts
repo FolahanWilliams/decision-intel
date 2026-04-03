@@ -479,23 +479,40 @@ async function handleAnalyzeCommand(params: { channelId: string; userId: string;
 
         const participants = [...new Set(messages.map(m => m.user))];
 
-        // Find user ID for document ownership (Slack system user or installer)
+        // Find user ID + orgId for document ownership
         const installation = await prisma.slackInstallation.findUnique({
           where: { teamId: params.teamId, status: 'active' },
-          select: { installedByUserId: true },
+          select: { installedByUserId: true, orgId: true },
         }).catch(() => null);
         const docUserId = installation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || params.userId;
+
+        const contentHash = require('crypto').createHash('sha256').update(threadContent).digest('hex');
+        const sourceRef = `${params.channelId}:${params.threadTs}`;
+
+        // Check for existing analysis of this thread (deduplication)
+        const existing = await prisma.document.findFirst({
+          where: { source: 'slack', sourceRef },
+        }).catch(() => null);
+        if (existing) {
+          return NextResponse.json({
+            response_type: 'ephemeral',
+            text: ':white_check_mark: This thread has already been analyzed. Check the dashboard for results.',
+          });
+        }
 
         // Create a Document from the thread content
         const doc = await prisma.document.create({
           data: {
             userId: docUserId,
+            orgId: installation?.orgId || null,
             filename: `Slack Thread ${new Date().toISOString().slice(0, 10)}`,
             fileType: 'text/plain',
             fileSize: Buffer.byteLength(threadContent, 'utf-8'),
             content: threadContent,
             status: 'analyzing',
-            contentHash: require('crypto').createHash('sha256').update(threadContent).digest('hex'),
+            contentHash,
+            source: 'slack',
+            sourceRef,
           },
         });
 
