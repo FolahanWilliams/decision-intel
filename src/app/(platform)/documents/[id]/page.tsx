@@ -689,7 +689,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
   if (error || !document) {
     return (
-      <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
+      <div>
         <div className="card">
           <div className="card-body flex flex-col items-center gap-md">
             <AlertTriangle size={48} style={{ color: 'var(--error)' }} />
@@ -734,7 +734,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   return (
     <div
       className="container"
-      style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
+      style={{ paddingBottom: 'var(--spacing-2xl)' }}
     >
       {/* Breadcrumbs (#11) */}
       <Breadcrumbs
@@ -746,7 +746,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       />
 
       {/* Header */}
-      <header style={{ marginBottom: 'var(--spacing-xl)' }}>
+      <header style={{ marginBottom: 'var(--spacing-lg)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-md">
             <Link href="/dashboard" className="btn btn-ghost p-2" aria-label="Back to dashboard">
@@ -1454,7 +1454,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               className="grid grid-cols-2 md:grid-cols-4 gap-sm mb-lg"
               style={{ marginTop: toxicCombinations.length > 0 ? 0 : 'var(--spacing-md)' }}
             >
-              <div className="card" style={{ padding: '12px 16px' }}>
+              <div className="card" style={{ padding: '16px' }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1486,7 +1486,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '12px 16px' }}>
+              <div className="card" style={{ padding: '16px' }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1525,7 +1525,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '12px 16px' }}>
+              <div className="card" style={{ padding: '16px' }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1557,7 +1557,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '12px 16px' }}>
+              <div className="card" style={{ padding: '16px' }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1645,15 +1645,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             aria-selected={activeTab === tab.id}
                             aria-controls={`tabpanel-${tab.id}`}
                             onClick={() => handleTabChange(tab.id)}
-                            className="flex items-center gap-sm px-4 py-2 text-sm font-medium transition-colors -mb-px"
+                            className="flex items-center gap-sm text-sm font-medium transition-colors -mb-px"
                             style={
                               activeTab === tab.id
                                 ? {
+                                    padding: '10px 16px',
                                     background: 'var(--bg-card)',
                                     color: 'var(--text-primary)',
                                     borderBottom: '2px solid var(--accent-primary)',
                                   }
                                 : {
+                                    padding: '10px 16px',
                                     color: 'var(--text-muted)',
                                     background: 'transparent',
                                     borderBottom: '2px solid transparent',

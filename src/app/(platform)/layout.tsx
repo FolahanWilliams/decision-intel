@@ -21,12 +21,14 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           style={{
             flex: 1,
             overflowY: 'auto',
-            background: 'var(--bg-primary)',
+            background: 'var(--bg-secondary)',
             color: 'var(--text-primary)',
-            transition: 'color 0.3s',
+            transition: 'color 0.3s, background 0.3s',
           }}
         >
-          {children}
+          <div style={{ maxWidth: 1320, margin: '0 auto', padding: '32px 32px 64px' }}>
+            {children}
+          </div>
         </main>
       </div>
       <AnalysisProgressFloat />

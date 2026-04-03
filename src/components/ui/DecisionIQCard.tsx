@@ -34,8 +34,8 @@ export function DecisionIQCard() {
           <div
             className="stat-card-icon"
             style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              color: 'rgba(255, 255, 255, 0.5)',
+              background: 'var(--bg-card-hover)',
+              color: 'var(--text-secondary)',
               marginBottom: 0,
             }}
           >
@@ -70,8 +70,8 @@ export function DecisionIQCard() {
           <div
             className="stat-card-icon"
             style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              color: 'rgba(255, 255, 255, 0.5)',
+              background: 'var(--bg-card-hover)',
+              color: 'var(--text-secondary)',
               marginBottom: 0,
             }}
           >
@@ -127,7 +127,7 @@ export function DecisionIQCard() {
             transform: 'translateX(-50%)',
             width: '240px',
             background: 'rgba(15, 15, 20, 0.95)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
+            border: '1px solid var(--border-color)',
             borderRadius: '10px',
             padding: '12px',
             zIndex: 50,
@@ -160,7 +160,7 @@ export function DecisionIQCard() {
                   style={{
                     width: '48px',
                     height: '4px',
-                    background: 'rgba(255, 255, 255, 0.08)',
+                    background: 'var(--bg-elevated)',
                     borderRadius: '2px',
                     overflow: 'hidden',
                   }}
@@ -194,7 +194,7 @@ export function DecisionIQCard() {
               style={{
                 marginTop: '8px',
                 paddingTop: '8px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                borderTop: '1px solid var(--bg-elevated)',
                 fontSize: '10px',
                 color: diq.accuracyImprovement.improvementPct > 0 ? '#34d399' : '#f87171',
               }}
@@ -214,8 +214,8 @@ export function DecisionIQCard() {
               width: '10px',
               height: '10px',
               background: 'rgba(15, 15, 20, 0.95)',
-              borderRight: '1px solid rgba(255, 255, 255, 0.12)',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRight: '1px solid var(--border-color)',
+              borderBottom: '1px solid var(--border-color)',
             }}
           />
         </div>

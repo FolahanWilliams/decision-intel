@@ -23,7 +23,7 @@ import {
 } from '@/types/deals';
 
 const selectStyle: React.CSSProperties = {
-  padding: '6px 10px',
+  padding: '8px 12px',
   background: 'var(--bg-card-hover)',
   border: '1px solid var(--border-color)',
   borderRadius: 6,
@@ -285,7 +285,7 @@ export default function DealsPage() {
             <button
               onClick={() => setViewAndSave('list')}
               style={{
-                padding: '6px 10px',
+                padding: '8px 12px',
                 background: view === 'list' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',
@@ -300,7 +300,7 @@ export default function DealsPage() {
             <button
               onClick={() => setViewAndSave('board')}
               style={{
-                padding: '6px 10px',
+                padding: '8px 12px',
                 background: view === 'board' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',

@@ -113,15 +113,15 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
             marginBottom: 16,
           }}
         >
-          <RefreshCw size={14} style={{ color: '#6366f1', animation: 'spin 1s linear infinite' }} />
-          <span style={{ fontSize: 13, color: '#6366f1', fontWeight: 500 }}>
+          <RefreshCw size={14} style={{ color: '#16A34A', animation: 'spin 1s linear infinite' }} />
+          <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 500 }}>
             Generating Decision Brief...
           </span>
         </div>
         <div
           style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--bg-elevated)',
             borderRadius: 8,
             padding: 16,
             fontSize: 12,
@@ -240,7 +240,7 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
                   display: 'flex',
                   gap: 10,
                   padding: '8px 10px',
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--bg-card)',
                   borderRadius: 6,
                   borderLeft: `3px solid ${SEVERITY_COLORS[f.severity] || '#6b7280'}`,
                 }}
@@ -307,7 +307,7 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
         {brief.riskAssessment.topRisks.length > 0 && (
           <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <tr style={{ borderBottom: '1px solid var(--bg-elevated)' }}>
                 <th
                   style={{
                     textAlign: 'left',
@@ -345,7 +345,7 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
             </thead>
             <tbody>
               {brief.riskAssessment.topRisks.map((r, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                <tr key={i} style={{ borderBottom: '1px solid var(--bg-card-hover)' }}>
                   <td style={{ padding: '6px 8px', color: 'var(--text-primary)' }}>{r.risk}</td>
                   <td
                     style={{
@@ -427,7 +427,7 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
                   alignItems: 'center',
                   gap: 12,
                   padding: '8px 10px',
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'var(--bg-card)',
                   borderRadius: 6,
                 }}
               >
@@ -478,7 +478,7 @@ export function DecisionBriefTab({ dealId }: { dealId: string }) {
                             fontSize: 9,
                             padding: '1px 5px',
                             borderRadius: 3,
-                            background: 'rgba(255, 255, 255, 0.06)',
+                            background: 'var(--bg-card-hover)',
                             color: 'var(--text-muted)',
                           }}
                         >
@@ -523,8 +523,8 @@ function Section({
   return (
     <div
       style={{
-        background: 'rgba(255, 255, 255, 0.03)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--bg-elevated)',
         borderRadius: 10,
         padding: 16,
       }}

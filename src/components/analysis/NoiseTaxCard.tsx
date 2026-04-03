@@ -34,8 +34,8 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
     <div
       className="card animate-fade-in"
       style={{
-        border: '1px solid rgba(99, 102, 241, 0.15)',
-        background: 'rgba(99, 102, 241, 0.03)',
+        border: '1px solid rgba(22, 163, 74, 0.15)',
+        background: 'rgba(22, 163, 74, 0.03)',
       }}
     >
       <div
@@ -52,7 +52,7 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
             margin: 0,
           }}
         >
-          <DollarSign size={14} style={{ color: '#6366f1' }} />
+          <DollarSign size={14} style={{ color: '#16A34A' }} />
           Noise Tax Estimate
         </h4>
         <button
@@ -75,7 +75,7 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
             style={{
               fontSize: 28,
               fontWeight: 700,
-              color: projectedSavings > 0 ? '#6366f1' : '#34d399',
+              color: projectedSavings > 0 ? '#16A34A' : '#34d399',
               margin: 0,
               lineHeight: 1.2,
             }}
@@ -111,9 +111,9 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
                   padding: '3px 8px',
                   fontSize: 10,
                   borderRadius: 4,
-                  border: `1px solid ${decisionValue === v ? '#6366f1' : 'rgba(255,255,255,0.1)'}`,
-                  background: decisionValue === v ? 'rgba(99,102,241,0.15)' : 'transparent',
-                  color: decisionValue === v ? '#6366f1' : 'var(--text-muted)',
+                  border: `1px solid ${decisionValue === v ? '#16A34A' : 'rgba(255,255,255,0.1)'}`,
+                  background: decisionValue === v ? 'rgba(22,163,74,0.15)' : 'transparent',
+                  color: decisionValue === v ? '#16A34A' : 'var(--text-muted)',
                   cursor: 'pointer',
                   fontWeight: decisionValue === v ? 600 : 400,
                 }}

@@ -81,13 +81,13 @@ export function DqiMethodologyTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       {/* ── Section 1: Header Card ─────────────────────────────────────── */}
-      <div style={{ ...card, borderLeft: '3px solid #6366f1' }}>
+      <div style={{ ...card, borderLeft: '3px solid #16A34A' }}>
         <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary, #fff)', marginBottom: 6 }}>
           DQI Methodology v{METHODOLOGY_VERSION}
         </div>
         <div style={{ fontSize: 14, color: 'var(--text-muted, #71717a)', lineHeight: 1.6 }}>
           The Decision Quality Index is like a{' '}
-          <span style={{ color: '#6366f1', fontWeight: 600 }}>Lighthouse Score for decisions</span>{' '}
+          <span style={{ color: '#16A34A', fontWeight: 600 }}>Lighthouse Score for decisions</span>{' '}
           — a single 0-100 score with a fully published methodology. It quantifies how well a
           decision process manages cognitive biases, evidence quality, noise, process maturity,
           compliance risk, and historical pattern alignment.
@@ -212,17 +212,17 @@ export function DqiMethodologyTab() {
             marginBottom: 16,
           }}
         >
-          <div style={badge('#6366f1')}>146 Case Studies</div>
+          <div style={badge('#16A34A')}>146 Case Studies</div>
           <span style={{ color: 'var(--text-muted, #71717a)', fontSize: 18 }}>→</span>
           <div
             style={{
               padding: '8px 14px',
               borderRadius: 8,
-              border: '1px solid #6366f130',
-              background: '#6366f110',
+              border: '1px solid #16A34A30',
+              background: '#16A34A10',
               fontSize: 13,
               fontWeight: 600,
-              color: '#6366f1',
+              color: '#16A34A',
             }}
           >
             Correlation Engine
@@ -287,9 +287,9 @@ export function DqiMethodologyTab() {
                 padding: '6px 14px',
                 borderRadius: 6,
                 border: '1px solid',
-                borderColor: outcomeFilter === f ? '#6366f1' : 'var(--border-primary, #222)',
-                background: outcomeFilter === f ? '#6366f120' : 'transparent',
-                color: outcomeFilter === f ? '#6366f1' : 'var(--text-muted, #71717a)',
+                borderColor: outcomeFilter === f ? '#16A34A' : 'var(--border-primary, #222)',
+                background: outcomeFilter === f ? '#16A34A20' : 'transparent',
+                color: outcomeFilter === f ? '#16A34A' : 'var(--text-muted, #71717a)',
                 fontSize: 12,
                 fontWeight: 600,
                 cursor: 'pointer',

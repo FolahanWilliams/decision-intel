@@ -167,10 +167,10 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
         style={{
           position: 'relative',
           overflow: 'hidden',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--bg-elevated)',
           borderRadius: 'var(--liquid-radius)',
-          borderTop: '2px solid rgba(255, 255, 255, 0.15)',
+          borderTop: '2px solid var(--border-color)',
         }}
       >
         <div style={{ position: 'relative', padding: '24px' }}>
@@ -213,7 +213,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                   style={{
                     fontSize: '1.25rem',
                     fontWeight: 800,
-                    color: '#FAFAFA',
+                    color: 'var(--text-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
@@ -284,7 +284,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
               className="flex-1 flex gap-1 overflow-hidden"
               style={{
                 height: '8px',
-                background: 'rgba(255,255,255,0.04)',
+                background: 'var(--bg-card-hover)',
                 borderRadius: 'var(--radius-full)',
               }}
             >
@@ -400,7 +400,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                 position: 'relative',
                 overflow: 'hidden',
                 background: config.bgGradient,
-                border: `1px solid ${isSelected ? config.borderColor : 'rgba(255,255,255,0.06)'}`,
+                border: `1px solid ${isSelected ? config.borderColor : 'var(--bg-card-hover)'}`,
                 borderRadius: 'var(--liquid-radius)',
                 transition: 'all 0.3s',
                 boxShadow: isSelected ? `0 0 24px ${config.color}15` : 'none',
@@ -432,7 +432,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       {config.avatarInitials}
                     </div>
                     <div>
-                      <h4 style={{ fontWeight: 700, color: '#FAFAFA', fontSize: '14px' }}>
+                      <h4 style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '14px' }}>
                         {twin.name}
                       </h4>
                       <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{twin.role}</p>
@@ -467,8 +467,8 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                         style={{
                           width: 36,
                           height: 36,
-                          background: 'rgba(255,255,255,0.04)',
-                          border: '1px solid rgba(255,255,255,0.08)',
+                          background: 'var(--bg-card-hover)',
+                          border: '1px solid var(--bg-elevated)',
                           borderRadius: '50%',
                           display: 'flex',
                           alignItems: 'center',
@@ -479,7 +479,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                           style={{
                             width: 18,
                             height: 18,
-                            border: '2px solid rgba(255,255,255,0.15)',
+                            border: '2px solid var(--border-color)',
                             borderTopColor: config.color,
                             borderRadius: '50%',
                           }}
@@ -516,7 +516,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       <div
                         style={{
                           height: '4px',
-                          background: 'rgba(255,255,255,0.06)',
+                          background: 'var(--bg-card-hover)',
                           borderRadius: 'var(--radius-full)',
                           overflow: 'hidden',
                         }}
@@ -571,7 +571,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                       style={{
                         marginTop: '16px',
                         paddingTop: '16px',
-                        borderTop: '1px solid rgba(255,255,255,0.06)',
+                        borderTop: '1px solid var(--bg-card-hover)',
                       }}
                     >
                       <div className="flex items-center gap-2" style={{ marginBottom: '6px' }}>
@@ -628,15 +628,15 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             style={{
-              background: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--bg-elevated)',
               borderRadius: 'var(--liquid-radius)',
               padding: '24px',
             }}
           >
             <div className="flex items-center gap-3 mb-4">
               <Brain size={20} style={{ color: 'var(--text-highlight)' }} />
-              <h4 style={{ fontWeight: 800, color: '#FAFAFA' }}>Boardroom Analysis</h4>
+              <h4 style={{ fontWeight: 800, color: 'var(--text-primary)' }}>Boardroom Analysis</h4>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
@@ -763,7 +763,7 @@ export function BoardroomSimulator({ simulation }: BoardroomSimulatorProps) {
                         <div
                           style={{
                             paddingTop: '8px',
-                            borderTop: '1px solid rgba(255,255,255,0.06)',
+                            borderTop: '1px solid var(--bg-card-hover)',
                           }}
                         >
                           <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>

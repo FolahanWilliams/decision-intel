@@ -147,7 +147,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
               <div
                 style={{
                   padding: 'var(--spacing-sm) var(--spacing-md)',
-                  background: 'rgba(255, 255, 255, 0.04)',
+                  background: 'var(--bg-card-hover)',
                   borderRadius: 'var(--radius-md)',
                   textAlign: 'center',
                 }}
@@ -197,7 +197,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
               <div
                 style={{
                   padding: 'var(--spacing-sm) var(--spacing-md)',
-                  background: 'rgba(255, 255, 255, 0.04)',
+                  background: 'var(--bg-card-hover)',
                   borderRadius: 'var(--radius-md)',
                   textAlign: 'center',
                 }}
@@ -223,7 +223,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
               <div
                 style={{
                   padding: 'var(--spacing-sm) var(--spacing-md)',
-                  background: 'rgba(255, 255, 255, 0.04)',
+                  background: 'var(--bg-card-hover)',
                   borderRadius: 'var(--radius-md)',
                   textAlign: 'center',
                 }}
@@ -278,7 +278,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                     padding: '10px var(--spacing-md)',
                     borderBottom:
                       idx < Math.min(causalWeights.length, 5) - 1
-                        ? '1px solid rgba(255, 255, 255, 0.06)'
+                        ? '1px solid var(--bg-card-hover)'
                         : 'none',
                     gap: 'var(--spacing-sm)',
                   }}
@@ -342,7 +342,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                     style={{
                       width: '48px',
                       height: '4px',
-                      background: 'rgba(255, 255, 255, 0.08)',
+                      background: 'var(--bg-elevated)',
                       borderRadius: '2px',
                       overflow: 'hidden',
                       flexShrink: 0,
@@ -435,7 +435,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                     style={{
                       flex: 1,
                       height: '6px',
-                      background: 'rgba(255, 255, 255, 0.06)',
+                      background: 'var(--bg-card-hover)',
                       borderRadius: '3px',
                       overflow: 'hidden',
                       position: 'relative',
@@ -459,7 +459,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
                           top: '-1px',
                           width: '2px',
                           height: '8px',
-                          background: 'rgba(255, 255, 255, 0.4)',
+                          background: 'var(--text-muted)',
                           borderRadius: '1px',
                         }}
                       />
@@ -539,7 +539,7 @@ export default function TeamIntelligenceTab({ orgId }: { orgId: string }) {
               style={{
                 marginTop: 'var(--spacing-sm)',
                 height: '4px',
-                background: 'rgba(255, 255, 255, 0.06)',
+                background: 'var(--bg-card-hover)',
                 borderRadius: '2px',
                 overflow: 'hidden',
               }}

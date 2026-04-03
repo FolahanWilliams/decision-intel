@@ -69,7 +69,7 @@ export default function InviteAcceptPage() {
             <Loader2
               size={40}
               className="animate-spin"
-              style={{ color: '#6366f1', marginBottom: 16 }}
+              style={{ color: '#16A34A', marginBottom: 16 }}
             />
             <h2 style={{ marginBottom: 8 }}>Accepting Invitation...</h2>
             <p style={{ color: '#94a3b8' }}>Please wait while we add you to the team.</p>
@@ -109,7 +109,7 @@ export default function InviteAcceptPage() {
         {/* Auth Required */}
         {status === 'auth_required' && (
           <>
-            <Users size={40} style={{ color: '#6366f1', marginBottom: 16 }} />
+            <Users size={40} style={{ color: '#16A34A', marginBottom: 16 }} />
             <h2 style={{ marginBottom: 8 }}>Sign In Required</h2>
             <p style={{ color: '#94a3b8', marginBottom: 24 }}>
               You need to sign in or create an account before you can join the team.
@@ -121,7 +121,7 @@ export default function InviteAcceptPage() {
                 alignItems: 'center',
                 gap: 8,
                 padding: '12px 24px',
-                background: '#6366f1',
+                background: '#16A34A',
                 color: '#fff',
                 textDecoration: 'none',
                 borderRadius: 8,
@@ -145,7 +145,7 @@ export default function InviteAcceptPage() {
               style={{
                 display: 'inline-block',
                 padding: '10px 20px',
-                background: '#6366f1',
+                background: '#16A34A',
                 color: '#fff',
                 textDecoration: 'none',
                 borderRadius: 8,

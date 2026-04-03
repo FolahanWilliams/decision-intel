@@ -154,7 +154,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                       width: 20,
                       height: 20,
                       borderRadius: '50%',
-                      background: 'rgba(99, 102, 241, 0.15)',
+                      background: 'rgba(22, 163, 74, 0.15)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -162,7 +162,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                       marginTop: 1,
                     }}
                   >
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#6366f1' }}>{i + 1}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)' }}>{i + 1}</span>
                   </div>
                   <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                     {item}
@@ -212,8 +212,8 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                         width: 36,
                         height: 36,
                         borderRadius: 10,
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -283,8 +283,8 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   alignItems: 'center',
                   gap: 14,
                   padding: '14px 16px',
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-color)',
                   borderRadius: 10,
                   cursor: 'pointer',
                   color: 'inherit',
@@ -297,7 +297,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     width: 40,
                     height: 40,
                     borderRadius: 10,
-                    background: '#6366f1',
+                    background: 'var(--accent-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -324,8 +324,8 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                   alignItems: 'center',
                   gap: 14,
                   padding: '14px 16px',
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-color)',
                   borderRadius: 10,
                   cursor: loadingSample ? 'wait' : 'pointer',
                   color: 'inherit',
@@ -339,7 +339,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                     width: 40,
                     height: 40,
                     borderRadius: 10,
-                    background: 'rgba(255, 255, 255, 0.08)',
+                    background: 'var(--bg-card-hover)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

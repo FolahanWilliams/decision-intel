@@ -46,7 +46,7 @@ const fetcher = (url: string) =>
 
 const PLAN_COLORS: Record<string, string> = {
   free: '#A1A1AA',
-  pro: '#6366f1',
+  pro: '#16A34A',
   team: '#8b5cf6',
   enterprise: '#f59e0b',
 };
@@ -304,7 +304,7 @@ export function BillingSection() {
           <div
             style={{
               height: '6px',
-              background: 'rgba(255, 255, 255, 0.06)',
+              background: 'var(--bg-card-hover)',
               borderRadius: '3px',
               overflow: 'hidden',
               marginBottom: '8px',
@@ -327,7 +327,7 @@ export function BillingSection() {
               fontSize: '10px',
               padding: '2px 8px',
               borderRadius: '4px',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: 'var(--bg-card-hover)',
               color: 'var(--text-muted)',
             }}
           >
@@ -338,7 +338,7 @@ export function BillingSection() {
               fontSize: '10px',
               padding: '2px 8px',
               borderRadius: '4px',
-              background: 'rgba(255, 255, 255, 0.04)',
+              background: 'var(--bg-card-hover)',
               color: 'var(--text-muted)',
             }}
           >
@@ -382,8 +382,8 @@ export function BillingSection() {
             className="flex items-center gap-xs"
             style={{
               padding: '8px 14px',
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'var(--bg-card-hover)',
+              border: '1px solid var(--bg-active)',
               borderRadius: 'var(--radius-sm)',
               color: 'var(--text-secondary)',
               fontSize: '12px',
@@ -409,8 +409,8 @@ export function BillingSection() {
             className="flex items-center gap-xs"
             style={{
               padding: '8px 14px',
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'var(--bg-card-hover)',
+              border: '1px solid var(--bg-active)',
               borderRadius: 'var(--radius-sm)',
               color: 'var(--text-secondary)',
               fontSize: '12px',
@@ -471,7 +471,7 @@ export function BillingSection() {
                   style={{
                     padding: '6px 12px',
                     background: 'transparent',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    border: '1px solid var(--bg-active)',
                     borderRadius: 'var(--radius-sm)',
                     color: 'var(--text-muted)',
                     fontSize: '12px',

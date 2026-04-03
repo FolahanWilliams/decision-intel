@@ -43,7 +43,7 @@ const DONUT_COLORS = ['#f87171', '#fbbf24', '#34d399'];
 
 const tooltipStyle = {
   background: 'rgba(0, 0, 0, 0.75)',
-  border: '1px solid rgba(255,255,255,0.18)',
+  border: '1px solid var(--border-hover)',
   borderRadius: '12px',
   backdropFilter: 'blur(24px) saturate(180%)',
   boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.08) inset',
@@ -195,14 +195,14 @@ export function DashboardCharts({
                 <AreaChart data={scoreTrend} margin={{ top: 5, right: 5, left: -30, bottom: 0 }}>
                   <defs>
                     <linearGradient id="dashTrendGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="rgba(255,255,255,0.2)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="rgba(255,255,255,0.05)" stopOpacity={0} />
+                      <stop offset="5%" stopColor="var(--border-hover)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="var(--bg-card-hover)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
-                    stroke="rgba(255,255,255,0.08)"
+                    stroke="var(--bg-elevated)"
                   />
                   <XAxis
                     dataKey="date"
@@ -224,7 +224,7 @@ export function DashboardCharts({
                   <Area
                     type="monotone"
                     dataKey="score"
-                    stroke="rgba(255,255,255,0.5)"
+                    stroke="var(--text-secondary)"
                     strokeWidth={1.5}
                     fillOpacity={1}
                     fill="url(#dashTrendGrad)"
@@ -255,14 +255,14 @@ export function DashboardCharts({
                 >
                   <defs>
                     <linearGradient id="biasBarGrad" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="rgba(255,255,255,0.45)" stopOpacity={0.9} />
-                      <stop offset="100%" stopColor="rgba(255,255,255,0.15)" stopOpacity={0.5} />
+                      <stop offset="0%" stopColor="var(--text-muted)" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="var(--border-color)" stopOpacity={0.5} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     horizontal={false}
-                    stroke="rgba(255,255,255,0.08)"
+                    stroke="var(--bg-elevated)"
                   />
                   <XAxis
                     type="number"

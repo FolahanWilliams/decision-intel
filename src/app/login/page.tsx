@@ -80,7 +80,7 @@ function LoginContent() {
         className="fixed inset-0 pointer-events-none"
         style={{
           background: `
-            radial-gradient(ellipse 60% 50% at 20% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 50% at 20% 20%, rgba(22, 163, 74, 0.12) 0%, transparent 60%),
             radial-gradient(ellipse 50% 50% at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 60%),
             radial-gradient(ellipse 40% 30% at 60% 40%, rgba(245, 158, 11, 0.04) 0%, transparent 50%)
           `,
@@ -179,7 +179,7 @@ function LoginContent() {
                 title: 'Decision Quality Scoring',
                 description:
                   'Quantified scores with noise measurement and statistical jury analysis',
-                color: '#6366f1',
+                color: '#16A34A',
               },
               {
                 icon: Search,
@@ -375,10 +375,10 @@ function LoginContent() {
                 color: '#fff',
                 background:
                   'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
-                border: '1px solid rgba(99, 102, 241, 0.4)',
+                border: '1px solid rgba(22, 163, 74, 0.4)',
                 borderRadius: '14px',
                 boxShadow:
-                  '0 4px 16px rgba(99, 102, 241, 0.35), 0 1px 0 rgba(255,255,255,0.12) inset',
+                  '0 4px 16px rgba(22, 163, 74, 0.35), 0 1px 0 rgba(255,255,255,0.12) inset',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.7 : 1,
                 transition: 'all 0.15s',

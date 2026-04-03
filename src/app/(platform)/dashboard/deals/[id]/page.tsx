@@ -97,7 +97,7 @@ export default function DealDetailPage() {
         <div
           style={{
             height: 200,
-            background: 'rgba(255, 255, 255, 0.04)',
+            background: 'var(--bg-card-hover)',
             borderRadius: 12,
             animation: 'pulse 1.5s infinite',
           }}
@@ -153,8 +153,8 @@ export default function DealDetailPage() {
         {/* Header */}
         <div
           style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--bg-elevated)',
             borderRadius: 12,
             padding: '20px 24px',
             marginBottom: 20,
@@ -255,7 +255,7 @@ export default function DealDetailPage() {
               style={{
                 marginTop: 14,
                 paddingTop: 14,
-                borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                borderTop: '1px solid var(--bg-card-hover)',
               }}
             >
               <button
@@ -281,7 +281,7 @@ export default function DealDetailPage() {
           style={{
             display: 'flex',
             gap: 0,
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            borderBottom: '1px solid var(--bg-elevated)',
             marginBottom: 20,
           }}
         >
@@ -340,9 +340,9 @@ function DocumentsTab({
         style={{
           textAlign: 'center',
           padding: '40px 20px',
-          background: 'rgba(255, 255, 255, 0.02)',
+          background: 'var(--bg-card)',
           borderRadius: 10,
-          border: '1px dashed rgba(255, 255, 255, 0.1)',
+          border: '1px dashed var(--bg-active)',
         }}
       >
         <FileText size={32} style={{ color: 'var(--text-muted)', marginBottom: 8 }} />
@@ -475,8 +475,8 @@ function BiasSummaryTab({
   return (
     <div
       style={{
-        background: 'rgba(255, 255, 255, 0.03)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--bg-elevated)',
         borderRadius: 10,
         padding: '20px 24px',
       }}
@@ -583,7 +583,7 @@ function ValueProtectedCard({ dealId }: { dealId: string }) {
       </div>
 
       {roi.breakdown.filter(b => b.confirmed).length > 0 && (
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10 }}>
+        <div style={{ borderTop: '1px solid var(--bg-card-hover)', paddingTop: 10 }}>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>
             Confirmed Bias Breakdown
           </div>
@@ -639,8 +639,8 @@ function OutcomeTab({
       {deal.outcome?.notes && (
         <div
           style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--bg-elevated)',
             borderRadius: 10,
             padding: '14px 18px',
           }}
@@ -659,8 +659,8 @@ function OutcomeTab({
       {/* Form */}
       <div
         style={{
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--bg-elevated)',
           borderRadius: 10,
           padding: '18px 22px',
         }}

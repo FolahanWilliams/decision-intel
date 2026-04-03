@@ -18,7 +18,7 @@ interface ApiKey {
 const AVAILABLE_SCOPES = ['analyze', 'documents', 'outcomes', 'insights'] as const;
 
 const SCOPE_COLORS: Record<string, string> = {
-  analyze: '#6366f1',
+  analyze: '#16A34A',
   documents: '#38bdf8',
   outcomes: '#34d399',
   insights: '#fbbf24',

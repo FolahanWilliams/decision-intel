@@ -114,17 +114,17 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       style={{
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        border: '1px solid var(--bg-elevated)',
         borderRadius: '12px',
         overflow: 'hidden',
-        background: 'rgba(255, 255, 255, 0.02)',
+        background: 'var(--bg-card)',
       }}
     >
       {/* Header */}
       <div
         style={{
           padding: '14px 18px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          borderBottom: '1px solid var(--bg-card-hover)',
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
@@ -170,7 +170,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
                   borderRadius: '8px',
                   fontSize: '12px',
                   cursor: 'pointer',
-                  border: `1px solid ${isSelected ? 'rgba(167, 139, 250, 0.4)' : 'rgba(255, 255, 255, 0.08)'}`,
+                  border: `1px solid ${isSelected ? 'rgba(167, 139, 250, 0.4)' : 'var(--bg-elevated)'}`,
                   background: isSelected ? 'rgba(167, 139, 250, 0.08)' : 'transparent',
                   color: isSelected ? '#c4b5fd' : 'var(--text-secondary)',
                   transition: 'all 0.15s ease',
@@ -210,7 +210,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
             cursor: loading || selectedBiasTypes.size === 0 ? 'not-allowed' : 'pointer',
             background:
               loading || selectedBiasTypes.size === 0
-                ? 'rgba(255, 255, 255, 0.05)'
+                ? 'var(--bg-card-hover)'
                 : 'rgba(167, 139, 250, 0.15)',
             color: loading || selectedBiasTypes.size === 0 ? 'var(--text-muted)' : '#c4b5fd',
             transition: 'all 0.15s ease',
@@ -276,7 +276,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
           <div
             style={{
               padding: '10px 18px',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+              borderBottom: '1px solid var(--bg-card-hover)',
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
@@ -401,7 +401,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
                 position: 'relative',
                 height: '8px',
                 borderRadius: '4px',
-                background: 'rgba(255, 255, 255, 0.06)',
+                background: 'var(--bg-card-hover)',
                 overflow: 'hidden',
               }}
             >
@@ -413,7 +413,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
                   left: 0,
                   height: '100%',
                   width: `${Math.min(result.baselineProbability * 100, 100)}%`,
-                  background: 'rgba(255, 255, 255, 0.15)',
+                  background: 'var(--border-color)',
                   borderRadius: '4px',
                   transition: 'width 0.5s ease',
                 }}
@@ -452,7 +452,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
             <div
               style={{
                 padding: '10px 18px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+                borderTop: '1px solid var(--bg-card-hover)',
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '8px',
