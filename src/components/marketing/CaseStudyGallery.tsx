@@ -86,7 +86,7 @@ export function CaseStudyGallery() {
             {/* Minimal Header */}
             <div className="px-10 pt-8 pb-0 flex items-center justify-between">
               <span className="font-mono text-[9px] font-bold text-slate-400 tracking-widest bg-slate-50 px-2.5 py-1 rounded-md">
-                {c.caseId} // {c.year}
+                {c.caseId} / {c.year}
               </span>
               <RiskBadge score={c.dqiScore} />
             </div>
