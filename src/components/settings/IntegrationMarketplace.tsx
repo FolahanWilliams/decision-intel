@@ -1302,8 +1302,8 @@ export function IntegrationMarketplace() {
     }
   }, [slackStatus?.teamId]);
 
-  // Filter out Slack from the grid cards since it gets its own detail section
-  const otherIntegrations = INTEGRATIONS.filter(i => i.id !== 'slack');
+  // Filter out Slack and Google Drive from the grid cards since they get their own detail sections
+  const otherIntegrations = INTEGRATIONS.filter(i => i.id !== 'slack' && i.id !== 'google_drive');
 
   return (
     <div style={{ padding: 'var(--spacing-lg)', maxWidth: '1100px', margin: '0 auto' }}>
@@ -1369,6 +1369,14 @@ export function IntegrationMarketplace() {
             slackError={slackError}
             onDisconnect={handleDisconnect}
             disconnecting={disconnecting}
+          />
+
+          {/* Google Drive detail section */}
+          <GoogleDriveDetailSection
+            driveConfig={driveConfig}
+            driveLoading={driveLoading}
+            onDisconnect={handleDriveDisconnect}
+            disconnecting={driveDisconnecting}
           />
 
           {/* Other integrations grid */}
