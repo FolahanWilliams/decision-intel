@@ -587,7 +587,7 @@ export function InsightsPageContent() {
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
-                    stroke="rgba(255,255,255,0.04)"
+                    stroke="var(--border-color)"
                   />
                   <XAxis
                     dataKey="week"
@@ -765,7 +765,7 @@ export function InsightsPageContent() {
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
-                    stroke="rgba(255,255,255,0.04)"
+                    stroke="var(--border-color)"
                   />
                   <XAxis
                     dataKey="range"
@@ -829,7 +829,7 @@ export function InsightsPageContent() {
             <div className="card-body" style={{ height: 250 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
                   <XAxis
                     dataKey="overallScore"
                     type="number"
@@ -954,7 +954,7 @@ export function InsightsPageContent() {
                   <CartesianGrid
                     strokeDasharray="3 3"
                     horizontal={false}
-                    stroke="rgba(255,255,255,0.04)"
+                    stroke="var(--border-color)"
                   />
                   <XAxis
                     type="number"
@@ -1159,7 +1159,7 @@ export function InsightsPageContent() {
                     <CartesianGrid
                       strokeDasharray="3 3"
                       vertical={false}
-                      stroke="rgba(255,255,255,0.04)"
+                      stroke="var(--border-color)"
                     />
                     <XAxis
                       dataKey="label"
@@ -1488,7 +1488,7 @@ export function InsightsPageContent() {
                         key={item.category}
                         style={{
                           padding: '10px 12px',
-                          background: 'rgba(255, 255, 255, 0.03)',
+                          background: 'var(--bg-card)',
                           borderRadius: 'var(--radius-sm)',
                           border: `1px solid ${statusColor}20`,
                         }}

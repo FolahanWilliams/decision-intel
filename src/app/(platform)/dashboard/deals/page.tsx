@@ -24,8 +24,8 @@ import {
 
 const selectStyle: React.CSSProperties = {
   padding: '6px 10px',
-  background: 'rgba(255, 255, 255, 0.06)',
-  border: '1px solid rgba(255, 255, 255, 0.12)',
+  background: 'var(--bg-card-hover)',
+  border: '1px solid var(--border-color)',
   borderRadius: 6,
   color: 'var(--text-primary)',
   fontSize: 12,
@@ -276,8 +276,8 @@ export default function DealsPage() {
           <div
             style={{
               display: 'flex',
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
               borderRadius: 6,
               overflow: 'hidden',
             }}
@@ -359,7 +359,7 @@ export default function DealsPage() {
                 key={i}
                 style={{
                   height: 80,
-                  background: 'rgba(255, 255, 255, 0.04)',
+                  background: 'var(--bg-card)',
                   borderRadius: 10,
                   animation: 'pulse 1.5s infinite',
                 }}

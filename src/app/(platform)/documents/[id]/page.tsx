@@ -836,7 +836,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             height: '2px',
             marginTop: 'var(--spacing-md)',
             background:
-              'linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15), rgba(255,255,255,0.05))',
+              'linear-gradient(90deg, var(--border-color), transparent)',
             borderRadius: '1px',
           }}
         />
@@ -876,7 +876,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
       {analysis && (
         <div
           className="flex items-center justify-between mb-lg"
-          style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: 12 }}
+          style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: 12 }}
         >
           <div className="flex items-center gap-sm">
             <button
@@ -1292,7 +1292,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                     <div
                       style={{
                         padding: '12px 16px',
-                        background: 'rgba(255, 255, 255, 0.06)',
+                        background: 'var(--bg-card)',
                         borderBottom: '1px solid var(--border-color)',
                       }}
                     >
@@ -1320,7 +1320,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                 className="badge hover:opacity-80 transition-opacity"
                                 style={{
                                   textDecoration: 'none',
-                                  background: 'rgba(255, 255, 255, 0.05)',
+                                  background: 'var(--bg-card)',
                                   border: '1px solid var(--border-color)',
                                   color: 'var(--text-primary)',
                                   display: 'flex',
@@ -1606,7 +1606,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 className="flex flex-wrap items-end gap-0 mb-lg"
                 role="tablist"
                 aria-label="Analysis tabs"
-                style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}
+                style={{ borderBottom: '1px solid var(--border-color)' }}
               >
                 {TAB_GROUPS.map((group, gi) => (
                   <div key={group.label} className="flex items-end">
@@ -1649,9 +1649,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             style={
                               activeTab === tab.id
                                 ? {
-                                    background: 'rgba(255, 255, 255, 0.06)',
-                                    color: '#FFFFFF',
-                                    borderBottom: '2px solid #FFFFFF',
+                                    background: 'var(--bg-card)',
+                                    color: 'var(--text-primary)',
+                                    borderBottom: '2px solid var(--accent-primary)',
                                   }
                                 : {
                                     color: 'var(--text-muted)',
@@ -1856,7 +1856,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             cursor: 'pointer',
                             background:
                               selectedBias?.id === bias.id
-                                ? 'rgba(255, 255, 255, 0.06)'
+                                ? 'var(--bg-card)'
                                 : 'transparent',
                             borderLeft:
                               selectedBias?.id === bias.id
