@@ -45,6 +45,7 @@
     "dotenv": "^16.4.7",
     "exceljs": "^4.4.0",
     "framer-motion": "^12.34.0",
+    "googleapis": "^171.4.0",
     "html-to-text": "^9.0.5",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",

@@ -30,6 +30,11 @@ const OPTIONAL_ENV_VARS = [
   'SLACK_SIGNING_SECRET', // Slack event webhook verification
   'SLACK_BOT_TOKEN', // Legacy single-tenant bot token (fallback)
   'SLACK_TOKEN_ENCRYPTION_KEY', // AES-256 key for encrypting per-workspace tokens
+  'GOOGLE_CLIENT_ID', // Google OAuth app ID for Drive integration
+  'GOOGLE_CLIENT_SECRET', // Google OAuth app secret for Drive integration
+  'EMAIL_INBOUND_DOMAIN', // Domain for email forwarding (e.g., in.decision-intel.com)
+  'RESEND_WEBHOOK_SECRET', // HMAC secret for verifying inbound email webhooks
+  'EMAIL_FROM', // Sender address for outbound emails
 ];
 
 /**

@@ -132,12 +132,17 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 
 === INTEGRATIONS ===
 - Slack: Decision detection, pre-decision coaching with org-calibrated nudges, thread bias accumulation, audit summary card on commitment. 7 slash commands: /di help (Block Kit categorized), /di analyze (full audit + Copilot link), /di score (instant bias check), /di brief (org intelligence), /di status (quality trends + calibration), /di prior, /di outcome. App Home dashboard. Auto-creates CopilotSession after every Slack audit with "Continue in Copilot" button for seamless handoff.
+- Slack Deep Analysis: /di analyze in a thread fetches ALL thread messages via conversations.replies API, combines into structured document with timestamps + speakers, runs full analysis pipeline, posts rich Block Kit results back to thread. Turns any Slack discussion into an auditable decision analysis — zero friction.
+- Email Forwarding: Each user gets a unique email address (analyze+{token}@in.decision-intel.com). Forward any document or paste decision text → auto-analyzed → results emailed back with dashboard link. Supports PDF, DOCX, XLSX, CSV, PPTX attachments. Falls back to email body text if no attachments. Token-based auth, rate-limited, plan-limited.
+- Google Drive Connector: OAuth 2.0 connection to Google Drive. Select folders to watch → new documents auto-analyzed every 10 minutes via polling cron job. Supports Google Docs/Sheets/Slides (auto-exported) + all standard file types. Encrypted refresh token storage. Folder picker UI in Settings → Integrations.
 - Decision Knowledge Graph: 8 edge types, 5 node types, 5 anti-patterns, multi-touch attribution, edge learning from outcomes
 - Committee Decision Rooms: blind prior collection, consensus scoring (0-100), unanimity warning (Strebulaev), dissent quality score, bias briefing
 - Calibration Gamification: Bronze→Silver→Gold→Platinum, milestone tracking, "each outcome makes AI smarter"
 - Personal Calibration Dashboard: /calibration — per-user decision patterns, recurring biases with trends, calibration score, blind spots, strength patterns
 - Copilot AI Assistant: CopilotSession + CopilotTurn models for persistent AI coaching. Auto-seeded from Slack audits. Accessible from /dashboard/ai-assistant.
 - Intelligence Brief: Contextual org intelligence on empty dashboard states — shows top dangerous biases, maturity grade, decision stats, and page-specific tips.
+- Webhooks: 5 subscribable events (analysis.completed, outcome.reported, nudge.delivered, toxic_combination.detected, decision_room.updated) for custom integrations.
+- Public API v1: Scoped API keys with analyze, documents, outcomes, insights permissions. OpenAPI spec at /api/v1/openapi.
 
 === FOUNDER NOTES ===
 - Deepest moat is time-to-data, not features. Frame first 6 months as calibration investment.
@@ -148,6 +153,11 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Consider a "Decision Score" that's external-facing — like a credit score for organizational decision quality.
 
 === RECENTLY SHIPPED FEATURES (April 2026) ===
+- Email Forwarding Integration: Unique email address per user (analyze+{token}@in.decision-intel.com). Forward documents or paste text → auto-analyzed. Supports PDF, DOCX, XLSX, CSV, PPTX attachments. Confirmation email with dashboard link. Resend webhook with HMAC verification.
+- Google Drive Connector: OAuth 2.0 integration. Watch folders for new documents, auto-analyze every 10 minutes. Google Docs/Sheets/Slides auto-exported. Folder picker UI. Encrypted refresh token storage. Full marketplace card in Settings.
+- Slack Deep Thread Analysis: /di analyze in threads now fetches all messages, combines into structured document, runs full analysis pipeline, posts rich results back to thread. Zero-friction decision auditing from any Slack discussion.
+- Light Theme Default: Full platform migration from dark-first to light-first. 1,000+ dark hardcodes replaced with CSS variables. Green (#16A34A) accent. Dark mode preserved as toggle option.
+- Comprehensive Bug Fix Sweep: SQL injection fix ($executeRawUnsafe → $executeRaw), encryption key validation, OutcomeGate escape key handler, webhook error logging, deal API enum validation, rate limit headers.
 - Live Pipeline Graph: Expandable floating visualization of the 11-node LangGraph pipeline during analysis. Nodes light up in real-time (pending → running → complete) with glass-morphism styling, animated edges, and live bias/noise badges. Respects reduced-motion.
 - Per-Deal Audit Pricing: One-time Stripe payments scaled to deal ticket size ($499/<$10M, $1499/<$50M, $2999/<$200M, $4999/$200M+). Grants unlimited analyses for deal-linked documents, bypassing subscription limits. DealAuditPurchase model + DealAuditCTA component.
 - Toxic Mitigation Playbooks: Auto-generated research-backed debiasing steps for all 10 named patterns. Context-aware augmentation (very-high-stakes, small-group, unanimous-consensus add extra steps). Each step has owner, timing, priority, and academic citations.

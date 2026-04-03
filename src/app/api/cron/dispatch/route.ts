@@ -77,6 +77,7 @@ export async function GET() {
     '/api/cron/detect-outcomes',
     '/api/cron/infer-graph-edges',
     '/api/cron/retry-nudges',
+    '/api/cron/google-drive-sync',
     '/api/cache/cleanup',
   ];
 

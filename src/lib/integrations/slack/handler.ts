@@ -198,6 +198,58 @@ export function formatNudgeForSlack(
 }
 
 /**
+ * Fetch all messages from a Slack thread using conversations.replies API.
+ * Handles pagination for threads with 100+ messages.
+ */
+export async function fetchSlackThread(
+  channelId: string,
+  threadTs: string,
+  teamId?: string
+): Promise<Array<{ ts: string; user: string; text: string }>> {
+  const token = await resolveToken(teamId);
+  if (!token) {
+    throw new Error('No Slack bot token available');
+  }
+
+  const messages: Array<{ ts: string; user: string; text: string }> = [];
+  let cursor: string | undefined;
+
+  do {
+    const params = new URLSearchParams({
+      channel: channelId,
+      ts: threadTs,
+      limit: '100',
+      inclusive: 'true',
+    });
+    if (cursor) params.set('cursor', cursor);
+
+    const response = await fetch(
+      `https://slack.com/api/conversations.replies?${params}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const data = await response.json();
+    if (!data.ok) {
+      log.error('Failed to fetch Slack thread:', data.error);
+      throw new Error(`Slack API error: ${data.error}`);
+    }
+
+    for (const msg of data.messages || []) {
+      // Skip bot messages (those with bot_id or app_id), keep only human messages
+      if (msg.text && !msg.bot_id && !msg.app_id && msg.user) {
+        messages.push({ ts: msg.ts, user: msg.user, text: msg.text });
+      }
+    }
+
+    cursor = data.response_metadata?.next_cursor || '';
+  } while (cursor && cursor !== '');
+
+  return messages;
+}
+
+/**
  * Resolve a bot token for a given Slack workspace.
  *
  * Multi-tenant: looks up the encrypted token from SlackInstallation.
