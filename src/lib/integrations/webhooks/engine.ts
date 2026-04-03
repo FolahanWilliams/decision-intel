@@ -139,8 +139,8 @@ async function deliverWithRetry(
           success,
         },
       });
-    } catch {
-      log.warn('Failed to log webhook delivery');
+    } catch (err) {
+      log.warn('Failed to log webhook delivery:', err instanceof Error ? err.message : err);
     }
 
     if (success) {

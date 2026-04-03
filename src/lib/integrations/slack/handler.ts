@@ -215,6 +215,10 @@ export async function resolveToken(teamId?: string): Promise<string | null> {
       if (installation && installation.botTokenEncrypted) {
         return decryptToken(installation);
       }
+      // Installation exists but no encrypted token, or not found / not active
+      if (!installation) {
+        log.warn(`No active Slack installation found for team ${teamId} — token may be expired or revoked`);
+      }
     } catch (error) {
       log.error(`Failed to resolve token for team ${teamId}:`, error);
     }
