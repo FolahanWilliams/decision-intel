@@ -195,15 +195,15 @@ export default function DemoPage() {
   }, [activeTab]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-slate-200">
+    <div className="min-h-screen bg-white text-slate-900">
       {/* Header */}
-      <div className="bg-[#111111] border-b border-white/[0.08] px-4 sm:px-6 py-3 sticky top-0 z-50">
+      <div className="bg-[#0F172A] border-b border-slate-700 px-4 sm:px-6 py-3 sticky top-0 z-50">
         <div className="max-w-[960px] mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 no-underline text-inherit">
-            <Shield size={18} className="text-white" />
+            <Shield size={18} className="text-slate-50" />
             <span className="text-sm font-semibold">
-              <span className="text-white">Decision</span>
-              <span className="text-white/50 ml-1">Intel</span>
+              <span className="text-slate-50">Decision</span>
+              <span className="text-slate-400 ml-1">Intel</span>
             </span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
@@ -237,11 +237,11 @@ export default function DemoPage() {
 
             {/* Divider */}
             <div className="flex items-center gap-4 my-12">
-              <div className="flex-1 h-px bg-white/[0.08]" />
+              <div className="flex-1 h-px bg-slate-100" />
               <span className="text-xs text-slate-500 font-semibold tracking-widest uppercase">
                 Or try it yourself
               </span>
-              <div className="flex-1 h-px bg-white/[0.08]" />
+              <div className="flex-1 h-px bg-slate-100" />
             </div>
           </>
         )}
@@ -250,7 +250,7 @@ export default function DemoPage() {
         {!isSimulating && !showResults && !scanResult && (
           <div className="mb-10">
             <div className="text-center mb-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 leading-tight">
                 Interactive Demo
               </h2>
               <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto">
@@ -268,13 +268,13 @@ export default function DemoPage() {
                 <button
                   key={a.id}
                   onClick={() => startSimulation(idx)}
-                  className="text-left p-4 sm:p-5 rounded-xl bg-[#111111] border border-white/[0.08] cursor-pointer transition-all duration-200 hover:border-white/20 hover:bg-white/[0.03] group"
+                  className="text-left p-4 sm:p-5 rounded-xl bg-white border border-slate-200 cursor-pointer transition-all duration-200 hover:border-slate-200 hover:bg-slate-50 group"
                   style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
                 >
                   <div className="flex items-start justify-between">
                     <FileText
                       size={18}
-                      className="text-slate-500 group-hover:text-white transition-colors shrink-0 mt-0.5"
+                      className="text-slate-500 group-hover:text-slate-900 transition-colors shrink-0 mt-0.5"
                     />
                     <span
                       className="text-[11px] px-2 py-0.5 rounded-md font-bold"
@@ -292,12 +292,12 @@ export default function DemoPage() {
                     </span>
                   </div>
                   <div>
-                    <div className="text-[13px] font-semibold text-white mb-1">{a.shortName}</div>
+                    <div className="text-[13px] font-semibold text-slate-900 mb-1">{a.shortName}</div>
                     <div className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
                       {a.summary.slice(0, 120)}...
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 group-hover:text-white/70 transition-colors">
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 group-hover:text-slate-600 transition-colors">
                     <Upload size={12} />
                     <span>Click to analyze</span>
                     <ArrowRight
@@ -313,7 +313,7 @@ export default function DemoPage() {
             <div className="text-center">
               <button
                 onClick={() => setPasteMode(!pasteMode)}
-                className="text-xs text-slate-500 hover:text-white transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mx-auto"
+                className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mx-auto"
               >
                 <ClipboardPaste size={14} />
                 {pasteMode ? 'Hide text input' : 'Or paste your own text for a preview'}
@@ -324,7 +324,7 @@ export default function DemoPage() {
                 <textarea
                   value={pasteText}
                   onChange={e => setPasteText(e.target.value)}
-                  className="w-full h-32 bg-[#0a0a0a] border border-white/[0.12] rounded-xl p-4 text-sm text-slate-300 resize-none focus:outline-none focus:border-white/30 placeholder:text-slate-600"
+                  className="w-full h-32 bg-slate-50 border border-slate-300 rounded-xl p-4 text-sm text-slate-300 resize-none focus:outline-none focus:border-slate-300 placeholder:text-slate-600"
                   placeholder="Paste a decision memo, investment thesis, or strategic rationale..."
                 />
                 <div className="flex justify-between items-center mt-3">
@@ -353,8 +353,8 @@ export default function DemoPage() {
         {isSimulating && (
           <div className="mb-10">
             <div className="text-center mb-8">
-              <Loader2 size={32} className="text-white animate-spin mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-white mb-2">Analyzing document...</h2>
+              <Loader2 size={32} className="text-slate-900 animate-spin mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Analyzing document...</h2>
               <p className="text-slate-500 text-sm">{analysis?.shortName ?? 'Document'}</p>
             </div>
 
@@ -388,13 +388,13 @@ export default function DemoPage() {
                       {isComplete ? (
                         <CheckCircle2 size={16} className="text-green-500" />
                       ) : isActive ? (
-                        <Loader2 size={16} className="text-white animate-spin" />
+                        <Loader2 size={16} className="text-slate-900 animate-spin" />
                       ) : (
                         <StageIcon size={16} className="text-slate-600" />
                       )}
                     </div>
                     <span
-                      className={`text-[13px] font-medium ${isComplete ? 'text-green-500' : isActive ? 'text-white' : 'text-slate-600'}`}
+                      className={`text-[13px] font-medium ${isComplete ? 'text-green-500' : isActive ? 'text-slate-900' : 'text-slate-600'}`}
                     >
                       {stage.label}
                       {isActive && <span className="text-slate-500 ml-1.5 animate-pulse">...</span>}
@@ -406,7 +406,7 @@ export default function DemoPage() {
 
             {/* Overall progress bar */}
             <div className="max-w-[480px] mx-auto mt-6">
-              <div className="h-1 rounded-full bg-white/[0.06]">
+              <div className="h-1 rounded-full bg-slate-100">
                 <div
                   className="h-full rounded-full bg-white transition-all duration-500"
                   style={{ width: `${((currentStage + 1) / PIPELINE_STAGES.length) * 100}%` }}
@@ -429,7 +429,7 @@ export default function DemoPage() {
                   setShowResults(false);
                   setSelectedIdx(null);
                 }}
-                className="text-xs text-slate-500 hover:text-white transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
+                className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5"
               >
                 <ArrowRight size={12} className="rotate-180" />
                 Try another document
@@ -441,8 +441,8 @@ export default function DemoPage() {
                     onClick={() => startSimulation(idx)}
                     className={`px-2.5 py-1 rounded-md text-[11px] font-semibold cursor-pointer border transition-all ${
                       idx === selectedIdx
-                        ? 'border-white/30 bg-white/[0.06] text-white'
-                        : 'border-white/[0.08] bg-transparent text-slate-500 hover:text-white'
+                        ? 'border-slate-300 bg-slate-100 text-slate-900'
+                        : 'border-slate-200 bg-transparent text-slate-500 hover:text-slate-900'
                     }`}
                   >
                     {a.shortName}
@@ -516,7 +516,7 @@ export default function DemoPage() {
               role="tablist"
               aria-label="Analysis sections"
               onKeyDown={handleTabKeyDown}
-              className="flex gap-1 mb-6 overflow-x-auto pb-0.5 border-b border-white/[0.06] -mx-4 px-4 sm:mx-0 sm:px-0"
+              className="flex gap-1 mb-6 overflow-x-auto pb-0.5 border-b border-slate-200 -mx-4 px-4 sm:mx-0 sm:px-0"
               style={{ scrollbarWidth: 'none' }}
             >
               {TABS.map(tab => (
@@ -530,7 +530,7 @@ export default function DemoPage() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2.5 text-[11px] sm:text-[13px] whitespace-nowrap cursor-pointer transition-all duration-150 bg-transparent ${
                     activeTab === tab.id
-                      ? 'font-semibold text-white border-b-2 border-b-white'
+                      ? 'font-semibold text-slate-900 border-b-2 border-b-slate-900'
                       : 'font-normal text-slate-500 border-b-2 border-b-transparent'
                   }`}
                   style={{
@@ -575,8 +575,8 @@ export default function DemoPage() {
             )}
 
             {/* CTA */}
-            <div className="mt-12 text-center p-6 sm:p-10 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.08]">
-              <h3 className="text-lg sm:text-[22px] font-bold text-white mb-2">
+            <div className="mt-12 text-center p-6 sm:p-10 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-slate-200">
+              <h3 className="text-lg sm:text-[22px] font-bold text-slate-900 mb-2">
                 This was a demo. Now try it on your own documents.
               </h3>
               <p className="text-slate-500 text-sm mb-6 max-w-[500px] mx-auto">
@@ -596,7 +596,7 @@ export default function DemoPage() {
                 </button>
                 <Link
                   href="/login"
-                  className="px-7 py-3 rounded-[10px] bg-transparent border border-white/20 text-white font-semibold text-sm no-underline text-center"
+                  className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
                 >
                   Sign Up Free
                 </Link>
@@ -636,7 +636,7 @@ const DEMO_BOOKING_URL = process.env.NEXT_PUBLIC_DEMO_BOOKING_URL;
 function DemoVideoSection() {
   return (
     <div className="text-center">
-      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight">
+      <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
         See Decision Intel in Action
       </h1>
       <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto mb-8">
@@ -645,7 +645,7 @@ function DemoVideoSection() {
       </p>
 
       {DEMO_VIDEO_URL ? (
-        <div className="rounded-2xl overflow-hidden border border-white/[0.08] bg-[#111111] mb-8">
+        <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white mb-8">
           <iframe
             src={DEMO_VIDEO_URL}
             allowFullScreen
@@ -655,9 +655,9 @@ function DemoVideoSection() {
           />
         </div>
       ) : (
-        <div className="rounded-2xl border border-white/[0.08] bg-[#111111] p-12 sm:p-16 mb-8 flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center">
-            <Play size={28} className="text-white/40 ml-1" />
+        <div className="rounded-2xl border border-slate-200 bg-white p-12 sm:p-16 mb-8 flex flex-col items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-slate-100 border border-white/[0.1] flex items-center justify-center">
+            <Play size={28} className="text-slate-400 ml-1" />
           </div>
           <p className="text-slate-500 text-sm max-w-[400px]">
             Try the interactive demo below — upload a sample document and watch the 11-agent bias
@@ -679,7 +679,7 @@ function DemoVideoSection() {
             href={DEMO_BOOKING_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-7 py-3 rounded-[10px] bg-transparent border border-white/20 text-white font-semibold text-sm no-underline text-center"
+            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
             onClick={() => trackEvent('demo_video_cta_clicked', { target: 'book_call' })}
           >
             Book a Call <ExternalLink size={14} className="inline align-middle ml-1" />
@@ -687,7 +687,7 @@ function DemoVideoSection() {
         ) : (
           <Link
             href="/#pricing"
-            className="px-7 py-3 rounded-[10px] bg-transparent border border-white/20 text-white font-semibold text-sm no-underline text-center"
+            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
           >
             View Pricing
           </Link>
@@ -755,10 +755,10 @@ function BiasesTab({ analysis }: { analysis: DemoAnalysis }) {
         {analysis.biases.map((bias, idx) => (
           <div
             key={idx}
-            className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+            className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
           >
             <div className="flex flex-wrap items-center gap-2 mb-2.5">
-              <span className="font-bold text-sm text-white">
+              <span className="font-bold text-sm text-slate-900">
                 {bias.biasType.replace(/_/g, ' ')}
               </span>
               <SeverityBadge severity={bias.severity} />
@@ -800,10 +800,10 @@ function IntelligenceTab({ analysis }: { analysis: DemoAnalysis }) {
           {intelligence.recognitionCues.map((cue, idx) => (
             <div
               key={idx}
-              className="bg-[#0a0a0a] rounded-[10px] p-4 border border-white/[0.06] flex-1 min-w-[250px]"
+              className="bg-slate-50 rounded-[10px] p-4 border border-slate-200 flex-1 min-w-[250px]"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-[13px] text-white">{cue.title}</span>
+                <span className="font-bold text-[13px] text-slate-900">{cue.title}</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-400 font-bold">
                   {Math.round(cue.similarity * 100)}% match
                 </span>
@@ -821,7 +821,7 @@ function IntelligenceTab({ analysis }: { analysis: DemoAnalysis }) {
       >
         <div className="flex items-center gap-3 mb-4">
           <div className="text-[11px] text-slate-500">Recall Score</div>
-          <div className="flex-1 h-1.5 rounded-full bg-white/[0.06]">
+          <div className="flex-1 h-1.5 rounded-full bg-slate-100">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
@@ -835,7 +835,7 @@ function IntelligenceTab({ analysis }: { analysis: DemoAnalysis }) {
               }}
             />
           </div>
-          <div className="text-sm font-bold text-white">{intelligence.recallScore}/100</div>
+          <div className="text-sm font-bold text-slate-900">{intelligence.recallScore}/100</div>
         </div>
 
         <div className="flex flex-col gap-3">
@@ -849,10 +849,10 @@ function IntelligenceTab({ analysis }: { analysis: DemoAnalysis }) {
             return (
               <div
                 key={idx}
-                className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+                className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
               >
                 <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                  <span className="font-bold text-sm text-white">{c.title}</span>
+                  <span className="font-bold text-sm text-slate-900">{c.title}</span>
                   <span
                     className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold"
                     style={{ background: `${outcomeColor}15`, color: outcomeColor }}
@@ -885,21 +885,21 @@ function LogicTab({ analysis }: { analysis: DemoAnalysis }) {
         {analysis.logicalFallacies.map((f, idx) => (
           <div
             key={idx}
-            className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+            className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
           >
             <div className="flex flex-wrap items-center gap-2 mb-2.5">
-              <span className="font-bold text-sm text-white">{f.name}</span>
+              <span className="font-bold text-sm text-slate-900">{f.name}</span>
               <SeverityBadge severity={f.severity} />
               <span className="text-[11px] text-slate-500 sm:ml-auto">
                 Logic Score: {f.score}/100
               </span>
             </div>
-            <p className="text-slate-400 text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3 border-l-2 border-white/10">
+            <p className="text-slate-400 text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3 border-l-2 border-slate-200">
               &ldquo;{f.excerpt}&rdquo;
             </p>
             <p className="text-slate-300 text-[13px] m-0 leading-relaxed">{f.explanation}</p>
             {/* Score bar */}
-            <div className="mt-3 h-1 rounded-sm bg-white/[0.06]">
+            <div className="mt-3 h-1 rounded-sm bg-slate-100">
               <div
                 className="h-full rounded-sm transition-[width] duration-300"
                 style={{
@@ -972,7 +972,7 @@ function NoiseTab({ analysis }: { analysis: DemoAnalysis }) {
                   <span className="text-[11px] sm:text-xs text-slate-400 w-20 sm:w-[120px] shrink-0">
                     {b.label}
                   </span>
-                  <div className="flex-1 h-1.5 rounded-sm bg-white/[0.06]">
+                  <div className="flex-1 h-1.5 rounded-sm bg-slate-100">
                     <div
                       className="h-full rounded-sm transition-[width] duration-300"
                       style={{
@@ -1009,10 +1009,10 @@ function ComplianceTab({ analysis }: { analysis: DemoAnalysis }) {
           {analysis.compliance.frameworks.map((fw, idx) => (
             <div
               key={idx}
-              className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+              className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                <span className="font-bold text-sm text-white">{fw.name}</span>
+                <span className="font-bold text-sm text-slate-900">{fw.name}</span>
                 <div className="flex items-center gap-2.5">
                   <span
                     className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase tracking-wide"
@@ -1060,10 +1060,10 @@ function PreMortemTab({ analysis }: { analysis: DemoAnalysis }) {
         {analysis.preMortem.scenarios.map((s, idx) => (
           <div
             key={idx}
-            className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+            className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2.5">
-              <span className="font-bold text-sm text-white">{s.title}</span>
+              <span className="font-bold text-sm text-slate-900">{s.title}</span>
               <div className="flex gap-2">
                 <span className="text-[10px] px-2.5 py-0.5 rounded-xl bg-yellow-500/10 text-yellow-500 font-bold">
                   {Math.round(s.probability * 100)}% likely
@@ -1104,10 +1104,10 @@ function BoardroomTab({ analysis }: { analysis: DemoAnalysis }) {
                 ? '#eab308'
                 : '#22c55e';
           return (
-            <div key={idx} className="bg-[#0a0a0a] rounded-[10px] p-4 border border-white/[0.06]">
+            <div key={idx} className="bg-slate-50 rounded-[10px] p-4 border border-slate-200">
               <div className="flex justify-between items-center mb-2.5">
                 <div>
-                  <div className="font-bold text-[13px] text-white">{twin.name}</div>
+                  <div className="font-bold text-[13px] text-slate-900">{twin.name}</div>
                   <div className="text-[11px] text-slate-500">{twin.role}</div>
                 </div>
                 <span
@@ -1122,7 +1122,7 @@ function BoardroomTab({ analysis }: { analysis: DemoAnalysis }) {
               </div>
               {/* Confidence bar */}
               <div className="mb-2.5">
-                <div className="h-[3px] rounded-sm bg-white/[0.06]">
+                <div className="h-[3px] rounded-sm bg-slate-100">
                   <div
                     className="h-full rounded-sm"
                     style={{ width: `${twin.confidence * 100}%`, background: voteColor }}
@@ -1147,7 +1147,7 @@ function Section({
   icon,
   title,
   children,
-  borderColor = 'border-white/[0.08]',
+  borderColor = 'border-slate-200',
 }: {
   icon: React.ReactNode;
   title: string;
@@ -1155,8 +1155,8 @@ function Section({
   borderColor?: string;
 }) {
   return (
-    <div className={`bg-[#111111] border ${borderColor} rounded-xl p-4 sm:p-6 mb-4`}>
-      <h3 className="text-[15px] font-bold mb-4 flex items-center gap-2 text-white">
+    <div className={`bg-white border ${borderColor} rounded-xl p-4 sm:p-6 mb-4`}>
+      <h3 className="text-[15px] font-bold mb-4 flex items-center gap-2 text-slate-900">
         {icon} {title}
       </h3>
       {children}
@@ -1178,7 +1178,7 @@ function ScoreCard({
   smallValue?: boolean;
 }) {
   return (
-    <div className="bg-[#111111] border border-white/[0.08] rounded-xl py-3 sm:py-[18px] px-3 sm:px-3.5 text-center">
+    <div className="bg-white border border-slate-200 rounded-xl py-3 sm:py-[18px] px-3 sm:px-3.5 text-center">
       <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">{label}</div>
       <div
         className={`${smallValue ? 'text-lg sm:text-2xl' : 'text-2xl sm:text-4xl'} font-extrabold leading-none`}
@@ -1193,7 +1193,7 @@ function ScoreCard({
 
 function MiniCard({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="bg-[#111111] border border-white/[0.08] rounded-[10px] p-3 sm:p-4">
+    <div className="bg-white border border-slate-200 rounded-[10px] p-3 sm:p-4">
       <div className="text-[11px] text-slate-500 mb-1 tracking-wide">{label}</div>
       <div className="text-[13px] font-semibold" style={{ color }}>
         {value}
@@ -1218,7 +1218,7 @@ function SeverityBadge({ severity }: { severity: string }) {
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.08]">
+    <div className="px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200">
       <span className="text-[10px] text-slate-500">{label} </span>
       <span className="text-xs font-semibold text-slate-200">{value}</span>
     </div>
@@ -1228,7 +1228,7 @@ function StatPill({ label, value }: { label: string; value: string }) {
 function SwotQuadrant({ title, items, color }: { title: string; items: string[]; color: string }) {
   return (
     <div
-      className="bg-[#111111] border border-white/[0.08] rounded-xl p-4 sm:p-[18px]"
+      className="bg-white border border-slate-200 rounded-xl p-4 sm:p-[18px]"
       style={{ borderTop: `3px solid ${color}` }}
     >
       <h4 className="text-[13px] font-bold m-0 mb-3 tracking-wide" style={{ color }}>
@@ -1280,7 +1280,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
       {/* Back button */}
       <button
         onClick={onBack}
-        className="text-xs text-slate-500 hover:text-white transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mb-6"
+        className="text-xs text-slate-500 hover:text-slate-900 transition-colors cursor-pointer bg-transparent border-none flex items-center gap-1.5 mb-6"
       >
         <ArrowRight size={12} className="rotate-180" />
         Scan different text
@@ -1306,14 +1306,14 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
       {/* Score Cards */}
       {result.biasCount > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-7">
-          <div className="bg-[#111111] border border-white/[0.08] rounded-xl py-3 px-3 text-center">
+          <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center">
             <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">BIASES FOUND</div>
             <div className="text-2xl font-extrabold" style={{ color: riskColors[result.riskLevel] }}>
               {result.biasCount}
             </div>
             <div className="text-[11px] text-slate-500 mt-1">of 14 checked</div>
           </div>
-          <div className="bg-[#111111] border border-white/[0.08] rounded-xl py-3 px-3 text-center">
+          <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center">
             <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">RISK LEVEL</div>
             <div className="text-lg font-extrabold uppercase" style={{ color: riskColors[result.riskLevel] }}>
               {result.riskLevel}
@@ -1322,7 +1322,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
               {result.biases.filter(b => b.severity === 'critical' || b.severity === 'high').length} high/critical
             </div>
           </div>
-          <div className="bg-[#111111] border border-white/[0.08] rounded-xl py-3 px-3 text-center col-span-2 sm:col-span-1">
+          <div className="bg-white border border-slate-200 rounded-xl py-3 px-3 text-center col-span-2 sm:col-span-1">
             <div className="text-[10px] text-slate-500 mb-1.5 tracking-wide">SCAN TYPE</div>
             <div className="text-lg font-extrabold text-slate-300">Quick</div>
             <div className="text-[11px] text-slate-500 mt-1">
@@ -1334,18 +1334,18 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
 
       {/* Detected Biases */}
       {result.biases.length > 0 && (
-        <div className="bg-[#111111] border border-white/[0.08] rounded-xl p-4 sm:p-6 mb-4">
-          <h3 className="text-[15px] font-bold mb-4 flex items-center gap-2 text-white">
+        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 mb-4">
+          <h3 className="text-[15px] font-bold mb-4 flex items-center gap-2 text-slate-900">
             <Brain size={16} /> Detected Biases
           </h3>
           <div className="flex flex-col gap-3">
             {result.biases.map((bias, idx) => (
               <div
                 key={idx}
-                className="bg-[#0a0a0a] rounded-[10px] p-4 sm:p-[18px] border border-white/[0.06]"
+                className="bg-slate-50 rounded-[10px] p-4 sm:p-[18px] border border-slate-200"
               >
                 <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                  <span className="font-bold text-sm text-white">{bias.label}</span>
+                  <span className="font-bold text-sm text-slate-900">{bias.label}</span>
                   <SeverityBadge severity={bias.severity} />
                 </div>
                 <p
@@ -1368,9 +1368,9 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
 
       {/* No biases state */}
       {result.biases.length === 0 && (
-        <div className="bg-[#111111] border border-green-500/20 rounded-xl p-6 sm:p-8 mb-4 text-center">
+        <div className="bg-white border border-green-500/20 rounded-xl p-6 sm:p-8 mb-4 text-center">
           <CheckCircle2 size={32} className="text-green-500 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-white mb-2">Looking Good</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-2">Looking Good</h3>
           <p className="text-slate-400 text-sm max-w-[500px] mx-auto">
             No common cognitive biases detected in this text. The full analysis also checks for
             logical fallacies, decision noise, regulatory compliance, fact verification, and runs a
@@ -1380,8 +1380,8 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
       )}
 
       {/* Upsell CTA */}
-      <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/[0.08] text-center">
-        <h3 className="text-lg font-bold text-white mb-2">
+      <div className="mt-8 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-slate-200 text-center">
+        <h3 className="text-lg font-bold text-slate-900 mb-2">
           This quick scan checks 14 common biases.
         </h3>
         <p className="text-slate-500 text-sm mb-2 max-w-[550px] mx-auto">
@@ -1401,7 +1401,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
           ].map(feature => (
             <span
               key={feature}
-              className="text-[11px] px-2.5 py-1 rounded-full bg-white/[0.05] text-slate-400 border border-white/[0.08]"
+              className="text-[11px] px-2.5 py-1 rounded-full bg-slate-100 text-slate-400 border border-slate-200"
             >
               {feature}
             </span>
@@ -1418,7 +1418,7 @@ function QuickScanResults({ result, onBack }: { result: ScanResult; onBack: () =
           </button>
           <Link
             href="/login"
-            className="px-7 py-3 rounded-[10px] bg-transparent border border-white/20 text-white font-semibold text-sm no-underline text-center"
+            className="px-7 py-3 rounded-[10px] bg-transparent border border-slate-200 text-slate-900 font-semibold text-sm no-underline text-center"
           >
             Sign Up Free
           </Link>
