@@ -177,7 +177,6 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
     <div
       className="container"
       style={{
-        paddingTop: 'var(--spacing-2xl)',
         paddingBottom: 'var(--spacing-2xl)',
         maxWidth: 800,
       }}
@@ -279,7 +278,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                 }
                 disabled={isPending}
                 style={{
-                  padding: '6px 12px',
+                  padding: 'var(--spacing-sm) var(--spacing-md)',
                   background: 'var(--bg-tertiary)',
                   border: '1px solid var(--border-color)',
                   borderRadius: '4px',
@@ -299,7 +298,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
       </div>
 
       {/* Display Preferences */}
-      <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.2s' }}>
+      <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.2s' }}>
         <div className="card-header">
           <h3 className="flex items-center gap-sm">
             <Moon size={18} />

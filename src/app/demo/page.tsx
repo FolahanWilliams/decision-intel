@@ -236,7 +236,7 @@ export default function DemoPage() {
             <DemoVideoSection />
 
             {/* Divider */}
-            <div className="flex items-center gap-4 my-12">
+            <div className="flex items-center gap-4 my-8">
               <div className="flex-1 h-px bg-slate-100" />
               <span className="text-xs text-slate-500 font-semibold tracking-widest uppercase">
                 Or try it yourself
@@ -263,7 +263,7 @@ export default function DemoPage() {
             <div className="text-[11px] text-slate-500 mb-3 tracking-widest uppercase font-semibold">
               Choose a document to analyze
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               {DEMO_ANALYSES.map((a, idx) => (
                 <button
                   key={a.id}

@@ -721,10 +721,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div
-      className="container"
-      style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-2xl)' }}
-    >
+    <div>
       {/* Welcome modal for first-time users */}
       {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
 
@@ -842,7 +839,7 @@ export default function Dashboard() {
             {showKpiSettings && (
               <motion.div
                 initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
+                animate={{ opacity: 1, height: 'auto', marginBottom: 'var(--spacing-lg)' }}
                 exit={{ opacity: 0, height: 0, marginBottom: 0 }}
                 transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                 className="card liquid-glass-premium p-md"
@@ -882,7 +879,7 @@ export default function Dashboard() {
           </AnimatePresence>
 
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-md mb-xl"
+            className="grid grid-cols-2 md:grid-cols-4 gap-lg mb-xl"
             initial="hidden"
             animate="visible"
             variants={{
@@ -971,7 +968,7 @@ export default function Dashboard() {
                   >
                     <div
                       className="flex items-center justify-between"
-                      style={{ marginBottom: '16px' }}
+                      style={{ marginBottom: 'var(--spacing-md)' }}
                     >
                       <div
                         className="stat-card-icon"
@@ -1210,7 +1207,7 @@ export default function Dashboard() {
               {pendingFile && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {/* File preview */}
-                  <div className="flex items-center gap-md" style={{ padding: '12px', background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--border-color)' }}>
+                  <div className="flex items-center gap-md" style={{ padding: 'var(--spacing-md)', background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--border-color)' }}>
                     <div
                       style={{
                         width: 44,
@@ -1238,7 +1235,7 @@ export default function Dashboard() {
                   {/* Document type + Deal selectors — stacked for clarity */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     <div>
-                      <label className="text-xs text-muted font-medium" style={{ display: 'block', marginBottom: 4 }}>
+                      <label className="text-xs text-muted font-medium" style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
                         Document Type <span className="text-muted">(optional)</span>
                       </label>
                       <select
@@ -1264,7 +1261,7 @@ export default function Dashboard() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs text-muted font-medium" style={{ display: 'block', marginBottom: 4 }}>
+                      <label className="text-xs text-muted font-medium" style={{ display: 'block', marginBottom: 'var(--spacing-xs)' }}>
                         Link to Deal <span className="text-muted">(optional)</span>
                       </label>
                       <select
