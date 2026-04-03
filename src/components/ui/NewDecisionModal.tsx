@@ -97,7 +97,7 @@ export function NewDecisionModal() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.7)',
+        background: 'var(--overlay-backdrop)',
         backdropFilter: 'blur(4px)',
       }}
       onClick={handleClose}
@@ -177,7 +177,7 @@ export function NewDecisionModal() {
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                  e.currentTarget.style.background = 'var(--bg-card-hover)';
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.borderColor = 'var(--border-color)';

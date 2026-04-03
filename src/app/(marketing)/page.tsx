@@ -17,11 +17,10 @@ import {
   BarChart3,
   Users,
   Shield,
+  Zap,
   Target,
   Network,
 } from 'lucide-react';
-
-import { TractionCounters } from '@/components/marketing/TractionCounters';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
 
@@ -268,54 +267,155 @@ export default function LandingPage() {
               </Link>
             </div>
           </div>
-          {/* Institutional Audit Report Preview */}
-          <motion.div
-            initial={{ opacity: 0, x: 20, scale: 0.98 }}
-            whileInView={{ opacity: 1, x: 0, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+          {/* 4-Panel Process Visualization */}
+          <div
             style={{
-              position: 'relative',
-              borderRadius: 20,
-              overflow: 'hidden',
-              boxShadow: '0 20px 40px -15px rgba(0,0,0,0.15)',
-              border: `1px solid ${C.slate200}`,
-              background: C.white,
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 12,
             }}
           >
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%)',
-                zIndex: 10,
-                pointerEvents: 'none',
-              }}
-            />
-            <img 
-              src="/marketing/audit-preview.png" 
-              alt="Decision Audit Report Preview"
-              style={{
-                width: '100%',
-                height: 'auto',
-                display: 'block',
-                borderRadius: 16,
-              }}
-            />
-          </motion.div>
+            {[
+              {
+                step: '01',
+                label: 'Analyze',
+                desc: 'Upload deal memos & IC notes',
+                icon: '◎',
+                color: '#3B82F6',
+                bg: '#EFF6FF',
+                borderColor: '#BFDBFE',
+              },
+              {
+                step: '02',
+                label: 'Graph',
+                desc: 'Map decision relationships',
+                icon: '⬡',
+                color: '#8B5CF6',
+                bg: '#F5F3FF',
+                borderColor: '#DDD6FE',
+              },
+              {
+                step: '03',
+                label: 'Learn',
+                desc: 'Track outcomes & calibrate',
+                icon: '△',
+                color: '#F59E0B',
+                bg: '#FFFBEB',
+                borderColor: '#FDE68A',
+              },
+              {
+                step: '04',
+                label: 'Act',
+                desc: 'Mitigate bias & decide better',
+                icon: '→',
+                color: C.green,
+                bg: C.greenLight,
+                borderColor: '#BBF7D0',
+              },
+            ].map((panel, i) => (
+              <motion.div
+                key={panel.label}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
+                style={{
+                  background: panel.bg,
+                  border: `1px solid ${panel.borderColor}`,
+                  borderRadius: 14,
+                  padding: '24px 20px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Large faded step number */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: -8,
+                    right: 8,
+                    fontSize: 64,
+                    fontWeight: 800,
+                    color: panel.borderColor,
+                    lineHeight: 1,
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                  }}
+                >
+                  {panel.step}
+                </div>
+                {/* Icon */}
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    background: C.white,
+                    border: `1px solid ${panel.borderColor}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 18,
+                    color: panel.color,
+                    marginBottom: 12,
+                    fontWeight: 700,
+                  }}
+                >
+                  {panel.icon}
+                </div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: C.slate900, marginBottom: 4, position: 'relative', zIndex: 1 }}>
+                  {panel.label}
+                </div>
+                <div style={{ fontSize: 13, color: C.slate600, position: 'relative', zIndex: 1 }}>
+                  {panel.desc}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </section>
 
       {/* ── Stats Bar ───────────────────────────────────────────────── */}
-      {/* ── Stats Bar ───────────────────────────────────────────────── */}
-      <section style={{ 
-        background: C.slate50, 
-        borderTop: `1px solid ${C.slate200}`, 
-        borderBottom: `1px solid ${C.slate200}`,
-        padding: '80px 24px',
-      }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <TractionCounters />
+      <section style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}`, borderBottom: `1px solid ${C.slate200}` }}>
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: '0 auto',
+            padding: '48px 24px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 32,
+            textAlign: 'center',
+          }}
+          className="stats-grid"
+        >
+          {[
+            { icon: BarChart3, value: '55%', label: 'Decision variance hidden from teams', sub: 'Kahneman, "Noise" (2021)' },
+            { icon: TrendingUp, value: '146', label: 'Annotated failure case studies', sub: '8 industries, SEC filings & NTSB reports' },
+            { icon: Zap, value: '<60s', label: 'Full cognitive audit per document', sub: '11-agent pipeline, 20+ biases' },
+          ].map(({ icon: Icon, value, label, sub }) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: C.tealBg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Icon size={22} style={{ color: C.teal }} />
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>{value}</div>
+                <div style={{ fontSize: 13, color: C.slate600, marginTop: 2 }}>{label}</div>
+                <div style={{ fontSize: 11, color: C.slate400, marginTop: 1 }}>{sub}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -386,6 +486,22 @@ export default function LandingPage() {
                 }}
                 onClick={() => setExpandedCard(isOpen ? null : i)}
               >
+                {/* Background Number */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: -10,
+                    right: 12,
+                    fontSize: 120,
+                    fontWeight: 800,
+                    color: C.slate100,
+                    lineHeight: 1,
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                  }}
+                >
+                  {card.num}
+                </div>
 
                 {/* Icon */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20, position: 'relative', zIndex: 1 }}>
@@ -462,6 +578,195 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Case Studies ────────────────────────────────────────────── */}
+      <section id="case-studies" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
+          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: C.green, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+              Case Studies
+            </p>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 12 }}>
+              What Decision Intel Would Have Caught
+            </h2>
+            <p style={{ fontSize: 16, color: C.slate600, marginBottom: 48, maxWidth: 640 }}>
+              Retrospective analyses on publicly available strategic documents and press releases.
+              Every bias below was flaggable <em>before</em> the outcome was known.
+            </p>
+          </motion.div>
+
+          {/* Microsoft-Nokia */}
+          <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ background: C.white, border: `1px solid ${C.slate200}`, borderRadius: 16, padding: 32, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: C.green, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Case Study</p>
+            <h3 style={{ fontSize: 24, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>
+              Microsoft-Nokia: The $7.6B Write-Down
+            </h3>
+            <p style={{ fontSize: 15, color: C.slate600, lineHeight: 1.6, marginBottom: 24, maxWidth: 720 }}>
+              In 2013, Microsoft acquired Nokia&apos;s Devices &amp; Services division for $7.2B.
+              Two years later, they wrote down $7.6B — more than the entire purchase price.
+            </p>
+
+            {/* DQI Score */}
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ fontSize: 48, fontWeight: 800, color: '#EF4444', lineHeight: 1 }}>38</div>
+              <div style={{ fontSize: 13, color: C.slate400 }}>/ 100</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.green, marginTop: 2 }}>Decision Quality</div>
+            </div>
+
+            {/* Bias Cards Grid */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
+              {[
+                { name: 'Sunk Cost Fallacy', severity: 'CRITICAL', excerpt: 'Years of Windows Phone investment made abandoning unacceptable' },
+                { name: 'Overconfidence', severity: 'HIGH', excerpt: 'Sub-5% market share dismissed as fixable via acquisition' },
+                { name: 'Anchoring Bias', severity: 'HIGH', excerpt: 'Price anchored to Nokia\'s historical brand value' },
+                { name: 'Planning Fallacy', severity: 'HIGH', excerpt: 'Integration timeline vastly underestimated' },
+                { name: 'Hindsight Bias', severity: 'MEDIUM', excerpt: 'Ballmer anchored to strategic vision despite market signals' },
+              ].map(b => (
+                <div
+                  key={b.name}
+                  style={{
+                    background: C.white,
+                    border: `1px solid ${C.slate200}`,
+                    borderRadius: 10,
+                    padding: '10px 14px',
+                    minWidth: 180,
+                    flex: '1 1 180px',
+                    maxWidth: 240,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: C.slate900 }}>{b.name}</span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        borderRadius: 4,
+                        color: C.white,
+                        background: b.severity === 'CRITICAL' ? '#EF4444' : b.severity === 'HIGH' ? '#F59E0B' : '#94A3B8',
+                      }}
+                    >
+                      {b.severity}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: C.slate400, lineHeight: 1.4 }}>{b.excerpt}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+              <p style={{ fontSize: 12, color: C.slate400, fontStyle: 'italic', margin: 0 }}>
+                Analysis based on publicly available strategic documents, SEC filings, and press coverage.
+              </p>
+              <Link
+                href="/demo"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: C.slate900,
+                  textDecoration: 'none',
+                  padding: '8px 16px',
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 8,
+                }}
+              >
+                See the Full Analysis <ArrowRight size={14} />
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Divider */}
+          <p style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: C.slate400, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '32px 0' }}>
+            More Retrospective Analyses on Public Decisions
+          </p>
+
+          {/* WeWork */}
+          <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ background: C.white, border: `1px solid ${C.slate200}`, borderRadius: 16, padding: 32, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: C.green, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Case Study</p>
+            <h3 style={{ fontSize: 24, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>
+              WeWork IPO: The $39B Valuation Collapse
+            </h3>
+            <p style={{ fontSize: 15, color: C.slate600, lineHeight: 1.6, marginBottom: 24, maxWidth: 720 }}>
+              SoftBank&apos;s Vision Fund valued WeWork at $47B in early 2019. By September, the failed IPO
+              exposed governance failures and the valuation cratered to $8B.
+            </p>
+
+            {/* DQI Score */}
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ fontSize: 48, fontWeight: 800, color: '#EF4444', lineHeight: 1 }}>29</div>
+              <div style={{ fontSize: 13, color: C.slate400 }}>/ 100</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: C.green, marginTop: 2 }}>Decision Quality</div>
+            </div>
+
+            {/* Bias Cards Grid */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
+              {[
+                { name: 'Halo Effect', severity: 'CRITICAL', excerpt: 'Founder charisma over fundamentals' },
+                { name: 'Anchoring Bias', severity: 'CRITICAL', excerpt: 'Prior $47B round as anchor' },
+                { name: 'Herding Behavior', severity: 'HIGH', excerpt: 'Follow-on investors mimicked SoftBank' },
+                { name: 'Overconfidence', severity: 'HIGH', excerpt: '"Community-adjusted EBITDA" accepted' },
+                { name: 'Narrative Fallacy', severity: 'HIGH', excerpt: '"Next Amazon" story vs. unit economics' },
+                { name: 'Authority Bias', severity: 'MEDIUM', excerpt: 'SoftBank brand suppressed dissent' },
+              ].map(b => (
+                <div
+                  key={b.name}
+                  style={{
+                    background: C.white,
+                    border: `1px solid ${C.slate200}`,
+                    borderRadius: 10,
+                    padding: '10px 14px',
+                    minWidth: 180,
+                    flex: '1 1 180px',
+                    maxWidth: 240,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: C.slate900 }}>{b.name}</span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        borderRadius: 4,
+                        color: C.white,
+                        background: b.severity === 'CRITICAL' ? '#EF4444' : b.severity === 'HIGH' ? '#F59E0B' : '#94A3B8',
+                      }}
+                    >
+                      {b.severity}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: C.slate400, lineHeight: 1.4 }}>{b.excerpt}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+              <p style={{ fontSize: 12, color: C.slate400, fontStyle: 'italic', margin: 0 }}>
+                Analysis based on publicly available S-1 filing, investor presentations, and press coverage.
+              </p>
+              <Link
+                href="/demo"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: C.slate900,
+                  textDecoration: 'none',
+                  padding: '8px 16px',
+                  border: `1px solid ${C.slate200}`,
+                  borderRadius: 8,
+                }}
+              >
+                See the Full Analysis <ArrowRight size={14} />
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* ── Features ────────────────────────────────────────────────── */}
       <section id="features" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>

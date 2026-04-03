@@ -388,7 +388,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                     height: 40,
                     background: slackStatus?.connected
                       ? 'rgba(34, 197, 94, 0.15)'
-                      : 'rgba(255, 255, 255, 0.06)',
+                      : 'var(--bg-card-hover)',
                     borderRadius: '10px',
                     display: 'flex',
                     alignItems: 'center',
@@ -477,8 +477,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                       style={{
                         fontSize: '11px',
                         padding: '2px 8px',
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        background: 'var(--bg-card-hover)',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '12px',
                         color: 'var(--text-secondary)',
                       }}
@@ -573,7 +573,7 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0,0,0,0.8)',
+            background: 'var(--overlay-heavy)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

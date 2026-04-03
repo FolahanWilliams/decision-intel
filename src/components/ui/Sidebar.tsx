@@ -89,8 +89,8 @@ export default function Sidebar() {
           top: '52px',
           left: '12px',
           zIndex: 60,
-          background: 'rgba(255, 255, 255, 0.04)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--bg-elevated)',
           borderRadius: 'var(--radius-full)',
           color: 'var(--text-primary)',
           padding: '8px',
@@ -112,7 +112,7 @@ export default function Sidebar() {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0,0,0,0.7)',
+            background: 'var(--overlay-bg, rgba(0,0,0,0.7))',
             zIndex: 69,
             backdropFilter: 'blur(4px)',
           }}
@@ -141,7 +141,7 @@ export default function Sidebar() {
           transition:
             'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
           overflow: 'hidden',
-          boxShadow: '1px 0 0 rgba(255, 255, 255, 0.06) inset, 4px 0 24px rgba(0, 0, 0, 0.4)',
+          boxShadow: '1px 0 0 var(--bg-card-hover) inset, var(--liquid-shadow)',
         }}
       >
         {/* Brand */}
@@ -218,8 +218,8 @@ export default function Sidebar() {
             }
             className="hidden md:flex"
             style={{
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--bg-elevated)',
               borderRadius: 'var(--radius-full)',
               color: 'var(--text-muted)',
               cursor: 'pointer',
@@ -274,8 +274,8 @@ export default function Sidebar() {
               width: '100%',
               padding: collapsed ? '8px' : '8px 12px',
               marginBottom: '16px',
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              background: 'var(--bg-card-hover)',
+              border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-full)',
               color: 'var(--text-muted)',
               fontSize: '12px',
@@ -294,8 +294,8 @@ export default function Sidebar() {
                 style={{
                   fontSize: '10px',
                   padding: '1px 5px',
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  background: 'var(--bg-card-hover)',
+                  border: '1px solid var(--bg-elevated)',
                   borderRadius: '6px',
                   color: 'var(--text-muted)',
                 }}
@@ -320,7 +320,7 @@ export default function Sidebar() {
               background: 'var(--accent-primary)',
               border: 'none',
               borderRadius: 'var(--radius-lg)',
-              color: '#fff',
+              color: 'var(--text-on-accent, #fff)',
               fontSize: '13px',
               fontWeight: 600,
               cursor: 'pointer',
@@ -532,7 +532,7 @@ export default function Sidebar() {
         <div
           style={{
             padding: collapsed ? '12px' : '12px 20px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.18)',
+            borderTop: '1px solid var(--border-color)',
           }}
         >
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -580,7 +580,7 @@ export default function Sidebar() {
         <div
           style={{
             padding: collapsed ? '12px' : '16px 20px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.18)',
+            borderTop: '1px solid var(--border-color)',
           }}
         >
           <div
@@ -697,14 +697,14 @@ function NavItem({
               ? 'var(--text-primary)'
               : 'var(--text-secondary)',
           background: active
-            ? 'rgba(255, 255, 255, 0.15)'
+            ? 'var(--bg-elevated)'
             : hovered
-              ? 'rgba(255, 255, 255, 0.08)'
+              ? 'var(--bg-card-hover)'
               : 'transparent',
           border: active
-            ? '1px solid rgba(255, 255, 255, 0.28)'
+            ? '1px solid var(--border-color)'
             : hovered
-              ? '1px solid rgba(255, 255, 255, 0.14)'
+              ? '1px solid var(--border-color)'
               : '1px solid transparent',
           borderRadius: 'var(--radius-lg)',
           marginBottom: '2px',
@@ -714,7 +714,7 @@ function NavItem({
           backdropFilter: active || hovered ? 'blur(12px)' : 'none',
           WebkitBackdropFilter: active || hovered ? 'blur(12px)' : 'none',
           boxShadow: active
-            ? '0 1px 0 rgba(255,255,255,0.15) inset, 0 4px 12px rgba(0,0,0,0.4)'
+            ? '0 1px 0 var(--bg-elevated) inset, var(--liquid-shadow)'
             : 'none',
           transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
@@ -756,8 +756,8 @@ function NavItem({
             transform: 'translateY(-50%)',
             marginLeft: 8,
             padding: '6px 12px',
-            background: 'rgba(14, 14, 14, 0.95)',
-            border: '1px solid rgba(255, 255, 255, 0.10)',
+            background: 'var(--liquid-tint)',
+            border: '1px solid var(--border-color)',
             backdropFilter: 'blur(24px) saturate(160%)',
             WebkitBackdropFilter: 'blur(24px) saturate(160%)',
             borderRadius: 'var(--radius-lg)',

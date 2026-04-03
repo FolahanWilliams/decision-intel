@@ -426,7 +426,7 @@ export function CommandPalette() {
             id: 'ask-copilot',
             label: `Ask Copilot: "${truncated}"`,
             description: 'Start a new decision session with AI agents',
-            icon: <Zap size={16} style={{ color: '#00D2FF' }} />,
+            icon: <Zap size={16} style={{ color: 'var(--accent-primary)' }} />,
             action: () => {
               setOpen(false);
               router.push(
@@ -586,7 +586,7 @@ export function CommandPalette() {
         <div
           className="fixed inset-0"
           style={{
-            background: 'rgba(0, 0, 0, 0.5)',
+            background: 'var(--overlay-backdrop)',
             backdropFilter: 'blur(12px) saturate(150%)',
             WebkitBackdropFilter: 'blur(12px) saturate(150%)',
           }}
@@ -599,13 +599,13 @@ export function CommandPalette() {
           aria-label="Keyboard shortcuts"
           className="relative w-full max-w-sm mx-4 animate-slide-up liquid-glass-premium"
           style={{
-            background: 'rgba(30, 30, 30, 0.75)',
+            background: 'var(--bg-elevated)',
             backdropFilter: 'blur(40px) saturate(180%)',
             WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.20)',
+            border: '1px solid var(--border-color)',
             borderRadius: 'var(--radius-xl)',
             overflow: 'hidden',
-            boxShadow: '0 24px 80px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.10) inset',
+            boxShadow: 'var(--shadow-lg)',
           }}
         >
           <div
@@ -678,7 +678,7 @@ export function CommandPalette() {
       <div
         className="fixed inset-0"
         style={{
-          background: 'rgba(0, 0, 0, 0.5)',
+          background: 'var(--overlay-backdrop)',
           backdropFilter: 'blur(12px) saturate(150%)',
           WebkitBackdropFilter: 'blur(12px) saturate(150%)',
         }}
@@ -693,13 +693,13 @@ export function CommandPalette() {
         aria-label="Command palette"
         className="relative w-full max-w-lg mx-4 animate-slide-up liquid-glass-premium liquid-glass-fresnel"
         style={{
-          background: 'rgba(30, 30, 30, 0.75)',
+          background: 'var(--bg-elevated)',
           backdropFilter: 'blur(40px) saturate(180%)',
           WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-          border: '1px solid rgba(255, 255, 255, 0.20)',
+          border: '1px solid var(--border-color)',
           borderRadius: 'var(--radius-xl)',
           overflow: 'hidden',
-          boxShadow: '0 24px 80px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.10) inset',
+          boxShadow: 'var(--shadow-lg)',
         }}
       >
         {/* Search input */}
@@ -778,7 +778,7 @@ export function CommandPalette() {
                       padding: '8px var(--spacing-md)',
                       margin: '1px 4px',
                       background:
-                        idx === clampedIndex ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+                        idx === clampedIndex ? 'var(--bg-active-hover)' : 'transparent',
                       border: 'none',
                       borderRadius: 'var(--radius-md)',
                       cursor: 'pointer',
