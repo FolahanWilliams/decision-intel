@@ -38,7 +38,7 @@ function getConfidenceLabel(c: number): string {
 
 function getMethodLabel(method: string): { label: string; color: string } {
   if (method === 'backdoor') {
-    return { label: 'SCM Do-Calculus', color: '#a78bfa' };
+    return { label: 'SCM Do-Calculus', color: '#16A34A' };
   }
   return { label: 'Correlation Estimate', color: '#fbbf24' };
 }
@@ -130,7 +130,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
           gap: '10px',
         }}
       >
-        <GitCompare size={16} style={{ color: '#a78bfa' }} />
+        <GitCompare size={16} style={{ color: '#16A34A' }} />
         <div>
           <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
             What-If Intervention
@@ -170,8 +170,8 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
                   borderRadius: '8px',
                   fontSize: '12px',
                   cursor: 'pointer',
-                  border: `1px solid ${isSelected ? 'rgba(167, 139, 250, 0.4)' : 'var(--bg-elevated)'}`,
-                  background: isSelected ? 'rgba(167, 139, 250, 0.08)' : 'transparent',
+                  border: `1px solid ${isSelected ? 'rgba(22, 163, 74, 0.4)' : 'var(--bg-elevated)'}`,
+                  background: isSelected ? 'rgba(22, 163, 74, 0.08)' : 'transparent',
                   color: isSelected ? '#c4b5fd' : 'var(--text-secondary)',
                   transition: 'all 0.15s ease',
                 }}
@@ -181,7 +181,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
                   checked={isSelected}
                   onChange={() => toggleBias(biasType)}
                   style={{
-                    accentColor: '#a78bfa',
+                    accentColor: '#16A34A',
                     width: '14px',
                     height: '14px',
                     cursor: 'pointer',
@@ -211,7 +211,7 @@ export function InterventionPanel({ analysisId, biases }: InterventionPanelProps
             background:
               loading || selectedBiasTypes.size === 0
                 ? 'var(--bg-card-hover)'
-                : 'rgba(167, 139, 250, 0.15)',
+                : 'rgba(22, 163, 74, 0.15)',
             color: loading || selectedBiasTypes.size === 0 ? 'var(--text-muted)' : '#c4b5fd',
             transition: 'all 0.15s ease',
           }}

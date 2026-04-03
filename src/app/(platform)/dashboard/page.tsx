@@ -1319,19 +1319,19 @@ export default function Dashboard() {
               className="card mb-md animate-fade-in"
               style={{
                 padding: 'var(--spacing-md)',
-                background: 'rgba(99, 102, 241, 0.08)',
-                border: '1px solid rgba(99, 102, 241, 0.2)',
+                background: 'rgba(22, 163, 74, 0.08)',
+                border: '1px solid rgba(22, 163, 74, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 'var(--spacing-sm)',
               }}
             >
-              <FileText size={16} style={{ color: '#6366f1', flexShrink: 0 }} />
+              <FileText size={16} style={{ color: '#16A34A', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
                     fontSize: '11px',
-                    color: '#6366f1',
+                    color: '#16A34A',
                     fontWeight: 600,
                     marginBottom: '2px',
                   }}

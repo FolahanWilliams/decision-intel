@@ -113,7 +113,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Users size={16} style={{ color: '#a78bfa' }} />
+          <Users size={16} style={{ color: '#16A34A' }} />
           <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
             Decision Rooms
           </span>
@@ -123,8 +123,8 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                 fontSize: '11px',
                 padding: '2px 8px',
                 borderRadius: '10px',
-                background: 'rgba(167, 139, 250, 0.15)',
-                color: '#a78bfa',
+                background: 'rgba(22, 163, 74, 0.15)',
+                color: '#16A34A',
                 fontWeight: 600,
               }}
             >
@@ -137,10 +137,10 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
           style={{
             padding: '4px 12px',
             fontSize: '11px',
-            background: 'rgba(167, 139, 250, 0.1)',
-            border: '1px solid rgba(167, 139, 250, 0.2)',
+            background: 'rgba(22, 163, 74, 0.1)',
+            border: '1px solid rgba(22, 163, 74, 0.2)',
             borderRadius: '6px',
-            color: '#a78bfa',
+            color: '#16A34A',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -210,7 +210,7 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                   disabled={creating || !newTitle.trim()}
                   style={{
                     padding: '8px 16px',
-                    background: newTitle.trim() ? '#a78bfa' : 'var(--bg-card-hover)',
+                    background: newTitle.trim() ? '#16A34A' : 'var(--bg-card-hover)',
                     border: 'none',
                     borderRadius: '8px',
                     color: newTitle.trim() ? '#fff' : 'var(--text-muted)',
@@ -346,8 +346,8 @@ export function DecisionRoomList({ documentId, analysisId }: DecisionRoomListPro
                       fontSize: '10px',
                       padding: '2px 8px',
                       borderRadius: '10px',
-                      background: 'rgba(167, 139, 250, 0.15)',
-                      color: '#a78bfa',
+                      background: 'rgba(22, 163, 74, 0.15)',
+                      color: '#16A34A',
                       fontWeight: 600,
                     }}
                   >
@@ -512,7 +512,7 @@ export function BlindPriorForm({ roomId, onSubmitted }: BlindPriorFormProps) {
         disabled={saving || !action.trim()}
         style={{
           padding: '9px 20px',
-          background: action.trim() ? '#a78bfa' : 'var(--bg-card-hover)',
+          background: action.trim() ? '#16A34A' : 'var(--bg-card-hover)',
           border: 'none',
           borderRadius: '8px',
           color: action.trim() ? '#fff' : 'var(--text-muted)',

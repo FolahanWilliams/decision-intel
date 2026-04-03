@@ -162,7 +162,7 @@ export function JournalWidget() {
                 exit={{ opacity: 0, height: 0 }}
                 style={{
                   padding: '12px 18px',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                  borderBottom: '1px solid var(--bg-card-hover)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
@@ -263,7 +263,7 @@ export function JournalWidget() {
                         padding: '2px 8px',
                         fontSize: '10px',
                         background: 'transparent',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        border: '1px solid var(--bg-elevated)',
                         borderRadius: '4px',
                         color: 'var(--text-muted)',
                         cursor: 'pointer',

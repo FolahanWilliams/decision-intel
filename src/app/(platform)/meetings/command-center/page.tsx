@@ -163,7 +163,7 @@ function MiniGauge({ value, label, max = 1 }: { value: number; label: string; ma
 function SpeakerBar({ speakers }: { speakers: { name: string; speakTimeMs: number }[] }) {
   const total = speakers.reduce((s, sp) => s + sp.speakTimeMs, 0);
   if (total === 0) return null;
-  const colors = ['#6366f1', '#f59e0b', '#22c55e', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
+  const colors = ['#16A34A', '#f59e0b', '#22c55e', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
       <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Speaker Balance</span>
@@ -292,8 +292,8 @@ function MeetingCard({ meeting }: { meeting: MeetingSummary }) {
             <span
               className="flex items-center gap-sm"
               style={{
-                background: 'rgba(99,102,241,0.12)',
-                color: '#6366f1',
+                background: 'rgba(22,163,74,0.12)',
+                color: '#16A34A',
                 padding: '1px 8px',
                 borderRadius: '9999px',
                 fontWeight: 600,

@@ -286,10 +286,10 @@ export default function DealsPage() {
               onClick={() => setViewAndSave('list')}
               style={{
                 padding: '8px 12px',
-                background: view === 'list' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                background: view === 'list' ? 'rgba(22, 163, 74, 0.15)' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                color: view === 'list' ? '#6366f1' : 'var(--text-muted)',
+                color: view === 'list' ? '#16A34A' : 'var(--text-muted)',
                 display: 'flex',
                 alignItems: 'center',
               }}
@@ -301,10 +301,10 @@ export default function DealsPage() {
               onClick={() => setViewAndSave('board')}
               style={{
                 padding: '8px 12px',
-                background: view === 'board' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                background: view === 'board' ? 'rgba(22, 163, 74, 0.15)' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                color: view === 'board' ? '#6366f1' : 'var(--text-muted)',
+                color: view === 'board' ? '#16A34A' : 'var(--text-muted)',
                 display: 'flex',
                 alignItems: 'center',
               }}

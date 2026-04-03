@@ -922,7 +922,7 @@ function SwotTab({ analysis }: { analysis: DemoAnalysis }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
         <SwotQuadrant title="Strengths" items={swot.strengths} color="#22c55e" />
         <SwotQuadrant title="Weaknesses" items={swot.weaknesses} color="#ef4444" />
-        <SwotQuadrant title="Opportunities" items={swot.opportunities} color="#6366f1" />
+        <SwotQuadrant title="Opportunities" items={swot.opportunities} color="#16A34A" />
         <SwotQuadrant title="Threats" items={swot.threats} color="#f97316" />
       </div>
       <Section icon={<Lightbulb size={16} />} title="Strategic Advice">

@@ -233,7 +233,7 @@ function ConvictionBadge({ analysis }: { analysis: Analysis }) {
     });
   }, [analysis]);
 
-  const color = conviction.score >= 70 ? '#3b82f6' : conviction.score >= 40 ? '#a78bfa' : '#71717a';
+  const color = conviction.score >= 70 ? '#3b82f6' : conviction.score >= 40 ? '#16A34A' : '#71717a';
 
   return (
     <div style={{ textAlign: 'center', marginRight: '8px' }} title={conviction.interpretation}>
@@ -884,8 +884,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               className="text-sm font-medium px-3 py-1"
               style={{
                 borderRadius: 6,
-                background: viewMode === 'focused' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
-                color: viewMode === 'focused' ? '#6366f1' : 'var(--text-muted)',
+                background: viewMode === 'focused' ? 'rgba(22, 163, 74, 0.15)' : 'transparent',
+                color: viewMode === 'focused' ? '#16A34A' : 'var(--text-muted)',
                 border: 'none',
                 cursor: 'pointer',
               }}
@@ -897,8 +897,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               className="text-sm font-medium px-3 py-1"
               style={{
                 borderRadius: 6,
-                background: viewMode === 'full' ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
-                color: viewMode === 'full' ? '#6366f1' : 'var(--text-muted)',
+                background: viewMode === 'full' ? 'rgba(22, 163, 74, 0.15)' : 'transparent',
+                color: viewMode === 'full' ? '#16A34A' : 'var(--text-muted)',
                 border: 'none',
                 cursor: 'pointer',
               }}

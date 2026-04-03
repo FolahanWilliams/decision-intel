@@ -42,15 +42,15 @@ export default function OGImage() {
           width: 72,
           height: 72,
           borderRadius: 18,
-          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(59, 130, 246, 0.15))',
-          border: '1px solid rgba(99, 102, 241, 0.3)',
+          background: 'linear-gradient(135deg, rgba(22, 163, 74, 0.2), rgba(59, 130, 246, 0.15))',
+          border: '1px solid rgba(22, 163, 74, 0.3)',
           marginBottom: 32,
         }}
       >
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
           <path
             d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"
-            fill="rgba(99, 102, 241, 0.6)"
+            fill="rgba(22, 163, 74, 0.6)"
             stroke="rgba(129, 140, 248, 0.8)"
             strokeWidth="1.5"
           />
@@ -99,7 +99,7 @@ export default function OGImage() {
           left: 0,
           right: 0,
           height: 4,
-          background: 'linear-gradient(90deg, #6366f1, #3b82f6, #6366f1)',
+          background: 'linear-gradient(90deg, #16A34A, #3b82f6, #16A34A)',
         }}
       />
     </div>,
