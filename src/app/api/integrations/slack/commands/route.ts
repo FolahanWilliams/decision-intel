@@ -486,7 +486,8 @@ async function handleAnalyzeCommand(params: { channelId: string; userId: string;
         }).catch(() => null);
         const docUserId = installation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || params.userId;
 
-        const contentHash = require('crypto').createHash('sha256').update(threadContent).digest('hex');
+        const { createHash } = await import('crypto');
+        const contentHash = createHash('sha256').update(threadContent).digest('hex');
         const sourceRef = `${params.channelId}:${params.threadTs}`;
 
         // Check for existing analysis of this thread (deduplication)

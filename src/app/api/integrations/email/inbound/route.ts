@@ -167,6 +167,11 @@ export async function POST(req: NextRequest) {
 
     const { from, to, subject, text, html, attachments } = payload;
 
+    if (!to || typeof to !== 'string') {
+      log.warn('Inbound email missing "to" field, skipping');
+      return OK();
+    }
+
     // 4. Extract token from the "to" address
     const token = extractTokenFromAddress(to);
     if (!token) {
