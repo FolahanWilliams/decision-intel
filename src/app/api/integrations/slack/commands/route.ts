@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
       switch (subcommand) {
         case 'analyze':
-          return handleAnalyzeCommand({ channelId, userId, teamId });
+          return handleAnalyzeCommand({ channelId, userId, teamId, threadTs: params.get('thread_ts') || undefined });
         case 'score':
           return handleScoreCommand({ text: args, channelId });
         case 'brief':
@@ -453,9 +453,99 @@ async function handleBriefCommand(params: { userId: string; teamId: string }) {
 
 // ─── /di analyze ────────────────────────────────────────────────────────────
 
-async function handleAnalyzeCommand(params: { channelId: string; userId: string; teamId: string }) {
+async function handleAnalyzeCommand(params: { channelId: string; userId: string; teamId: string; threadTs?: string }) {
   try {
-    // Find the most recent decision in this channel
+    // ── Thread analysis: when /di analyze is invoked inside a thread ──
+    if (params.threadTs) {
+      try {
+        const { fetchSlackThread, formatAuditSummaryForSlack, deliverSlackNudge } = await import('@/lib/integrations/slack/handler');
+        const { analyzeDocument } = await import('@/lib/analysis/analyzer');
+
+        const messages = await fetchSlackThread(params.channelId, params.threadTs, params.teamId);
+        if (messages.length === 0) {
+          return NextResponse.json({
+            response_type: 'ephemeral',
+            text: 'No messages found in this thread.',
+          });
+        }
+
+        // Combine thread messages into structured content
+        const threadContent = messages
+          .map(m => {
+            const time = new Date(parseFloat(m.ts) * 1000).toISOString().slice(11, 16);
+            return `[${time}] <@${m.user}>: ${m.text}`;
+          })
+          .join('\n\n');
+
+        const participants = [...new Set(messages.map(m => m.user))];
+
+        // Find user ID for document ownership (Slack system user or installer)
+        const installation = await prisma.slackInstallation.findUnique({
+          where: { teamId: params.teamId, status: 'active' },
+          select: { installedByUserId: true },
+        }).catch(() => null);
+        const docUserId = installation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || params.userId;
+
+        // Create a Document from the thread content
+        const doc = await prisma.document.create({
+          data: {
+            userId: docUserId,
+            filename: `Slack Thread ${new Date().toISOString().slice(0, 10)}`,
+            fileType: 'text/plain',
+            fileSize: Buffer.byteLength(threadContent, 'utf-8'),
+            content: threadContent,
+            status: 'analyzing',
+            contentHash: require('crypto').createHash('sha256').update(threadContent).digest('hex'),
+          },
+        });
+
+        // Fire-and-forget: run analysis, then post results to thread
+        void (async () => {
+          try {
+            const result = await analyzeDocument(doc.id);
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
+            const biases = result.biases?.map(b => ({ biasType: b.biasType, severity: b.severity })) || [];
+            const summaryCard = formatAuditSummaryForSlack(
+              {
+                decisionQualityScore: result.overallScore ?? 0,
+                noiseScore: result.noiseScore ?? 0,
+                biasFindings: biases,
+                summary: result.summary || 'Analysis complete.',
+                analysisUrl: `${appUrl}/documents/${doc.id}`,
+              },
+              params.threadTs
+            );
+            summaryCard.channel = params.channelId;
+            await deliverSlackNudge(summaryCard, params.teamId);
+          } catch (err) {
+            log.error('Thread analysis failed:', err instanceof Error ? err.message : err);
+            // Post error to thread
+            await deliverSlackNudge(
+              {
+                channel: params.channelId,
+                text: 'Thread analysis failed. The team has been notified.',
+                blocks: [],
+                thread_ts: params.threadTs,
+              },
+              params.teamId
+            ).catch(() => {});
+          }
+        })();
+
+        return NextResponse.json({
+          response_type: 'ephemeral',
+          text: `:mag: Analyzing thread (${messages.length} messages, ${participants.length} participants)... Results will be posted to this thread shortly.`,
+        });
+      } catch (err) {
+        log.error('Thread analysis setup failed:', err instanceof Error ? err.message : err);
+        return NextResponse.json({
+          response_type: 'ephemeral',
+          text: 'Failed to start thread analysis. Please try again.',
+        });
+      }
+    }
+
+    // ── Channel analysis: find the most recent decision (existing behavior) ──
     const recentDecision = await prisma.humanDecision.findFirst({
       where: { source: 'slack', channel: params.channelId },
       orderBy: { createdAt: 'desc' },
