@@ -29,6 +29,10 @@ vi.mock('@/lib/utils/logger', () => ({
   createLogger: () => ({ info: vi.fn(), error: vi.fn(), warn: vi.fn() }),
 }));
 
+vi.mock('@/lib/utils/rate-limit', () => ({
+  checkRateLimit: vi.fn().mockResolvedValue({ success: true, limit: 20, remaining: 19, reset: 0 }),
+}));
+
 import { POST, GET, PATCH } from './route';
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
