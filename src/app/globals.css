@@ -1901,12 +1901,6 @@ tr:hover td {
   .gap-xl {
     gap: var(--spacing-md) !important;
   }
-
-  /* Slide-in panel animations */
-  @keyframes slideInRight {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
-  }
 }
 
 /* Slide-in panel animation */

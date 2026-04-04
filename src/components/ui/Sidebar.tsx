@@ -342,13 +342,10 @@ export default function Sidebar() {
             onNavigate={closeMobile}
           />
           <NavItem
-            href="/"
+            href="/dashboard?view=browse"
             icon={<FileText size={18} />}
             label="Documents"
-            active={
-              (pathname === '/' || pathname.startsWith('/documents')) &&
-              !pathname.includes('trends')
-            }
+            active={pathname.startsWith('/documents')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
