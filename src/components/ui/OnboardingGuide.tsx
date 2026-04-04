@@ -53,7 +53,10 @@ export function OnboardingGuide({ documentCount = 0 }: { documentCount?: number 
 
     // Then verify with API (fall back to showing guide if API fails)
     fetch('/api/onboarding')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Onboarding API returned ${res.status}`);
+        return res.json();
+      })
       .then(data => {
         if (data.onboardingCompleted) {
           localStorage.setItem(STORAGE_KEY, 'true');

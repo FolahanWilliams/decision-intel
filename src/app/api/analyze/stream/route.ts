@@ -198,7 +198,8 @@ export async function POST(request: NextRequest) {
 
     // Check for resumption with Last-Event-ID header
     const lastEventId = request.headers.get('Last-Event-ID');
-    const resumeFromId = lastEventId ? parseInt(lastEventId, 10) : 0;
+    const parsedEventId = lastEventId ? parseInt(lastEventId, 10) : 0;
+    const resumeFromId = Number.isNaN(parsedEventId) ? 0 : parsedEventId;
 
     // Check for cached checkpoint state if resuming
     let checkpoint: Record<string, unknown> | null = null;
@@ -576,13 +577,14 @@ export async function POST(request: NextRequest) {
 
           if (schemaDrift) {
             await prisma.$transaction(async tx => {
-              await tx.analysis.create({
+              const fallbackAnalysis = await tx.analysis.create({
                 data: {
                   documentId,
                   overallScore: (report.overallScore as number) || 0,
                   noiseScore: (report.noiseScore as number) || 0,
                   summary: (report.summary as string) || '',
                   modelVersion: process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview',
+                  version: nextVersion,
                   biases: {
                     create: detectedBiases.map(bias => ({
                       biasType: bias.biasType as string,
@@ -597,6 +599,8 @@ export async function POST(request: NextRequest) {
                 select: { id: true },
               });
 
+              createdAnalysisId = fallbackAnalysis.id;
+
               await tx.document.update({
                 where: { id: documentId },
                 data: { status: 'complete' },
@@ -606,6 +610,7 @@ export async function POST(request: NextRequest) {
 
           // Register prompt version and link to analysis (fire and forget)
           if (createdAnalysisId) {
+            const analysisIdForPrompt = createdAnalysisId;
             import('@/lib/prompts/registry')
               .then(async ({ registerPrompt }) => {
                 const promptContent = `model:${process.env.GEMINI_MODEL_NAME ?? 'gemini-3-flash-preview'}|nodes:${Object.keys(NODE_LABELS).join(',')}`;
@@ -615,7 +620,7 @@ export async function POST(request: NextRequest) {
                 );
                 await prisma.analysis
                   .update({
-                    where: { id: createdAnalysisId! },
+                    where: { id: analysisIdForPrompt },
                     data: { promptVersionId },
                   })
                   .catch(() => {}); // Schema drift — column may not exist
@@ -743,11 +748,12 @@ export async function POST(request: NextRequest) {
 
           // Send email notification (fire and forget)
           if (user?.email) {
+            const userEmail = user.email;
             import('@/lib/notifications/email')
               .then(({ notifyAnalysisComplete }) =>
                 notifyAnalysisComplete(
                   userId,
-                  user.email!,
+                  userEmail,
                   doc.filename,
                   (report.overallScore as number) || 0,
                   documentId

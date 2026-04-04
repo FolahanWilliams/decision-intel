@@ -56,7 +56,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing payload' }, { status: 400 });
     }
 
-    const payload: SlackActionPayload = JSON.parse(payloadStr);
+    let payload: SlackActionPayload;
+    try {
+      payload = JSON.parse(payloadStr);
+    } catch {
+      log.error('Failed to parse Slack action payload');
+      return NextResponse.json({ error: 'Invalid payload JSON' }, { status: 400 });
+    }
 
     if (payload.type !== 'block_actions') {
       return NextResponse.json({ ok: true });

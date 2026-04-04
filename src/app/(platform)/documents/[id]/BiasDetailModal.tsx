@@ -146,14 +146,12 @@ export function BiasDetailModal({
 
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (bias as any).userRating as number | null
+    bias.userRating ?? null
   );
 
   // Reset rating when navigating to a different bias
   useEffect(() => {
-    // @ts-expect-error - bias.userRating might exist if added to schema
-    setUserRating((bias as Record<string, unknown>).userRating as number | null);
+    setUserRating(bias.userRating ?? null);
   }, [bias]);
 
   const handleFeedback = async (rating: number) => {

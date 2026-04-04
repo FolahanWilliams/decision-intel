@@ -54,7 +54,10 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
 
     // Verify with API
     fetch('/api/onboarding')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Onboarding API returned ${res.status}`);
+        return res.json();
+      })
       .then(data => {
         if (data.onboardingCompleted) {
           localStorage.setItem(STORAGE_KEY, 'true');
