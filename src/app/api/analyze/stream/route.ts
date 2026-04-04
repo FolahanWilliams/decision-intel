@@ -418,19 +418,19 @@ export async function POST(request: NextRequest) {
           let schemaDrift = false;
           let createdAnalysisId: string | null = null;
 
+          // Pre-compute version outside the transaction so it's available
+          // to both the primary and schema-drift fallback paths.
+          const existingAnalysesForVersion = await prisma.analysis.findMany({
+            where: { documentId },
+            orderBy: { version: 'desc' },
+            take: 1,
+            select: { id: true, version: true, overallScore: true, noiseScore: true },
+          });
+          const previousAnalysis = existingAnalysesForVersion[0];
+          const nextVersion = previousAnalysis ? previousAnalysis.version + 1 : 1;
+
           try {
             await prisma.$transaction(async tx => {
-              // Check for existing analyses to determine version
-              const existingAnalyses = await tx.analysis.findMany({
-                where: { documentId },
-                orderBy: { version: 'desc' },
-                take: 1,
-                select: { id: true, version: true, overallScore: true, noiseScore: true },
-              });
-
-              const previousAnalysis = existingAnalyses[0];
-              const nextVersion = previousAnalysis ? previousAnalysis.version + 1 : 1;
-
               const newAnalysis = await tx.analysis.create({
                 data: {
                   documentId,

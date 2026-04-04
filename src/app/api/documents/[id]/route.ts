@@ -22,12 +22,30 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Include org-scoped documents so team members can view shared docs
+    // (matches the pattern used in the document listing route).
+    let where: { id: string; userId?: string; OR?: Array<Record<string, unknown>> } = { id, userId };
+    try {
+      const membership = await prisma.teamMember.findFirst({
+        where: { userId },
+        select: { orgId: true },
+      });
+      if (membership?.orgId) {
+        where = {
+          id,
+          OR: [{ userId }, { orgId: membership.orgId }],
+        };
+      }
+    } catch {
+      // Schema drift — fall back to userId-only
+    }
+
     // Try with all analysis fields first; fall back to core-only if
     // extended columns don't exist yet (schema drift / P2022).
     let document;
     try {
       document = await prisma.document.findFirst({
-        where: { id, userId },
+        where,
         select: {
           id: true,
           filename: true,
@@ -75,7 +93,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       if (code === 'P2021' || code === 'P2022') {
         log.warn('Schema drift: falling back to core analysis fields (' + code + ')');
         document = await prisma.document.findFirst({
-          where: { id, userId },
+          where: { id, userId }, // Fall back to userId-only on schema drift
           select: {
             id: true,
             filename: true,
@@ -135,11 +153,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Rate limit: 10 deletions per hour
+    // Rate limit: 10 deletions per hour (fail closed for destructive operations)
     const rateLimitResult = await checkRateLimit(userId, '/api/documents/delete', {
       windowMs: 60 * 60 * 1000,
       maxRequests: 10,
-      failMode: 'open',
+      failMode: 'closed',
     });
     if (!rateLimitResult.success) {
       return NextResponse.json(

@@ -11,6 +11,45 @@ import { prisma } from '@/lib/prisma';
 import { randomBytes } from 'crypto';
 import { WEBHOOK_EVENTS } from '@/lib/integrations/webhooks/events';
 
+/**
+ * Block webhook URLs pointing to private/internal networks (SSRF prevention).
+ */
+function isPrivateHostname(hostname: string): boolean {
+  // Localhost variants
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') return true;
+
+  // AWS metadata endpoint
+  if (hostname === '169.254.169.254') return true;
+
+  // Private IPv4 ranges
+  const ipv4Match = hostname.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+  if (ipv4Match) {
+    const [, a, b] = ipv4Match.map(Number);
+    if (a === 10) return true; // 10.0.0.0/8
+    if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12
+    if (a === 192 && b === 168) return true; // 192.168.0.0/16
+    if (a === 0) return true; // 0.0.0.0/8
+  }
+
+  return false;
+}
+
+function validateWebhookUrl(url: string): string | null {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return 'Invalid URL';
+  }
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    return 'URL must use http or https';
+  }
+  if (isPrivateHostname(parsed.hostname)) {
+    return 'URL must not point to a private or internal network address';
+  }
+  return null;
+}
+
 export async function GET(request: Request) {
   const auth = await authenticateApiRequest(request);
   if (auth.error) {
@@ -41,14 +80,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'url is required' }, { status: 400 });
   }
 
-  // Validate URL
-  try {
-    const parsed = new URL(url);
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
-      return NextResponse.json({ error: 'URL must use http or https' }, { status: 400 });
-    }
-  } catch {
-    return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
+  // Validate URL (blocks private/internal addresses to prevent SSRF)
+  const urlError = validateWebhookUrl(url);
+  if (urlError) {
+    return NextResponse.json({ error: urlError }, { status: 400 });
   }
 
   // Validate events

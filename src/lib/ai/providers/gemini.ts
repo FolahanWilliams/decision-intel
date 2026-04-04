@@ -10,11 +10,14 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('GeminiProvider');
 
-// Module-level singleton to avoid recreating the SDK client on every call
+// Module-level singleton to avoid recreating the SDK client on every call.
+// Keyed by API key to handle key rotation or multi-tenant scenarios.
 let _genAI: GoogleGenerativeAI | null = null;
+let _genAIKey: string | null = null;
 function getGenAI(apiKey: string): GoogleGenerativeAI {
-  if (!_genAI) {
+  if (!_genAI || _genAIKey !== apiKey) {
     _genAI = new GoogleGenerativeAI(apiKey);
+    _genAIKey = apiKey;
   }
   return _genAI;
 }

@@ -44,7 +44,7 @@ export async function checkRateLimit(
 ): Promise<RateLimitResult> {
   const now = new Date();
   const windowStart = new Date(now.getTime() - config.windowMs);
-  const failMode = config.failMode ?? 'open';
+  const failMode = config.failMode ?? 'closed';
 
   try {
     // Clean up old expired rate limit entries in the background.
