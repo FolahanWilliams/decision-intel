@@ -246,8 +246,27 @@ export async function POST(request: NextRequest) {
           },
         });
       } else if (code === 'P2002') {
-        // Unique constraint violation on contentHash — another user
-        // already has this hash. Safe to ignore: create without hash.
+        // Unique constraint violation on contentHash — concurrent upload
+        // of the same file. Return the existing document as a cache hit
+        // instead of creating a duplicate.
+        const existing = await prisma.document.findFirst({
+          where: { contentHash, userId },
+          include: {
+            analyses: { orderBy: { createdAt: 'desc' }, take: 1, include: { biases: true } },
+          },
+        });
+        if (existing) {
+          log.info('Concurrent upload resolved as cache hit: ' + existing.id);
+          return NextResponse.json({
+            id: existing.id,
+            filename: existing.filename,
+            status: existing.status,
+            cached: true,
+            message: 'Document already analyzed (Cached)',
+            analysis: (existing.analyses as unknown[])?.[0] || null,
+          });
+        }
+        // If not found (different user's hash), create without hash
         document = await prisma.document.create({
           data: {
             userId,

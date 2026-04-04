@@ -14,6 +14,8 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DecisionGraphAPI');
 
+export const maxDuration = 30;
+
 const EMPTY_GRAPH = {
   nodes: [],
   edges: [],
@@ -60,7 +62,9 @@ export async function GET(req: NextRequest) {
       nodeTypes,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' },
+    });
   } catch (error: unknown) {
     const code = (error as { code?: string }).code;
 

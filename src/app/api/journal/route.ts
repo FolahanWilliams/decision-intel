@@ -6,12 +6,22 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { toPrismaStringArray } from '@/lib/utils/prisma-json';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
 import { isDecisionMessage, extractDecisionFrame } from '@/lib/integrations/slack/handler';
+
+const JournalEntrySchema = z.object({
+  source: z.enum(['email_forward', 'calendar_webhook', 'manual', 'slack_digest']),
+  sourceRef: z.string().max(500).optional(),
+  title: z.string().min(1, 'Title is required').max(500),
+  content: z.string().min(1, 'Content is required').max(100_000),
+  participants: z.array(z.string().max(200)).max(100).optional().default([]),
+  scheduledAt: z.string().datetime().optional().nullable(),
+});
 
 const log = createLogger('JournalRoute');
 
@@ -61,22 +71,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { source, sourceRef, title, content, participants, scheduledAt } = body;
-
-    if (!source || !title || !content) {
+    const parsed = JournalEntrySchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Missing required fields: source, title, content' },
+        { error: parsed.error.issues[0]?.message || 'Invalid input' },
         { status: 400 }
       );
     }
 
-    const validSources = ['email_forward', 'calendar_webhook', 'manual', 'slack_digest'];
-    if (!validSources.includes(source)) {
-      return NextResponse.json(
-        { error: `Invalid source. Must be one of: ${validSources.join(', ')}` },
-        { status: 400 }
-      );
-    }
+    const { source, sourceRef, title, content, participants, scheduledAt } = parsed.data;
 
     // Extract decision statements from content
     const extractedDecisions = extractDecisions(content);
@@ -89,7 +92,7 @@ export async function POST(request: NextRequest) {
         title,
         content,
         extractedDecisions: toPrismaStringArray(extractedDecisions),
-        participants: toPrismaStringArray(participants || []),
+        participants: toPrismaStringArray(participants),
         scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
         processedAt: extractedDecisions.length > 0 ? new Date() : null,
         status: extractedDecisions.length > 0 ? 'processed' : 'pending',

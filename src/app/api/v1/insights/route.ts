@@ -14,8 +14,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { validateApiKey, requireScope, type ValidateError } from '@/lib/api/auth';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 
 const log = createLogger('PublicInsightsRoute');
+
+export const maxDuration = 30;
 
 export async function GET(request: NextRequest) {
   try {
@@ -68,6 +71,8 @@ export async function GET(request: NextRequest) {
           createdAt: { gte: startDate, lte: endDate },
         },
         select: { id: true },
+        take: 1000,
+        orderBy: { createdAt: 'desc' },
       });
 
       const analysisIds = analyses.map(a => a.id);
@@ -76,6 +81,7 @@ export async function GET(request: NextRequest) {
         const biases = await prisma.biasInstance.findMany({
           where: { analysisId: { in: analysisIds } },
           select: { biasType: true, severity: true },
+          take: 5000,
         });
 
         const biasCounts: Record<string, { count: number; severities: string[] }> = {};
@@ -111,8 +117,8 @@ export async function GET(request: NextRequest) {
 
         totalBiasesDetected = biases.length;
       }
-    } catch {
-      // Schema drift
+    } catch (err) {
+      if (!isSchemaDrift(err)) log.error('Failed to fetch bias stats:', err);
     }
 
     // ── Quality and noise trends ──────────────────────────────────
@@ -127,6 +133,7 @@ export async function GET(request: NextRequest) {
         },
         select: { overallScore: true, noiseScore: true, createdAt: true },
         orderBy: { createdAt: 'asc' },
+        take: 1000,
       });
 
       const buckets: Record<string, { scores: number[]; noises: number[] }> = {};
@@ -153,8 +160,8 @@ export async function GET(request: NextRequest) {
             Math.round((data.noises.reduce((a, b) => a + b, 0) / data.noises.length) * 10) / 10,
           count: data.noises.length,
         }));
-    } catch {
-      // Schema drift
+    } catch (err) {
+      if (!isSchemaDrift(err)) log.error('Failed to fetch quality trends:', err);
     }
 
     // ── Outcome stats ─────────────────────────────────────────────
@@ -167,6 +174,7 @@ export async function GET(request: NextRequest) {
           reportedAt: { gte: startDate },
         },
         select: { outcome: true, confirmedBiases: true, falsPositiveBiases: true },
+        take: 500,
       });
 
       if (outcomes.length > 0) {
@@ -185,17 +193,22 @@ export async function GET(request: NextRequest) {
           biasAccuracy: totalRated > 0 ? Math.round((totalConfirmed / totalRated) * 100) : 0,
         };
       }
-    } catch {
-      // Schema drift
+    } catch (err) {
+      if (!isSchemaDrift(err)) log.error('Failed to fetch outcome stats:', err);
     }
 
-    return NextResponse.json({
-      timeRange,
-      biasStats: { topBiases, totalBiasesDetected },
-      qualityTrends,
-      noiseTrends,
-      outcomeStats,
-    });
+    return NextResponse.json(
+      {
+        timeRange,
+        biasStats: { topBiases, totalBiasesDetected },
+        qualityTrends,
+        noiseTrends,
+        outcomeStats,
+      },
+      {
+        headers: { 'Cache-Control': 'private, max-age=60, stale-while-revalidate=120' },
+      }
+    );
   } catch (error) {
     log.error('Public insights API error:', error);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });

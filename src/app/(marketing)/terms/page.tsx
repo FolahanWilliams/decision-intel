@@ -2,9 +2,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service',
+  title: 'Terms of Service | Decision Intel',
   description:
     'Terms and conditions for using the Decision Intel platform. AI-powered decision intelligence for M&A and investment teams.',
+  openGraph: {
+    title: 'Terms of Service | Decision Intel',
+    description:
+      'Terms and conditions for using the Decision Intel platform. AI-powered decision intelligence for M&A and investment teams.',
+  },
 };
 
 export default function TermsOfServicePage() {

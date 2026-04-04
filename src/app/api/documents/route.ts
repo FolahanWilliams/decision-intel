@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DocumentsRoute');
@@ -31,6 +32,19 @@ export async function GET(request: Request) {
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limit: 60 requests per minute (generous for dashboard polling)
+    const rateLimitResult = await checkRateLimit(userId, '/api/documents', {
+      windowMs: 60 * 1000,
+      maxRequests: 60,
+      failMode: 'open',
+    });
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded' },
+        { status: 429, headers: { 'Retry-After': String(rateLimitResult.reset - Math.floor(Date.now() / 1000)) } }
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -147,12 +161,17 @@ export async function GET(request: Request) {
       };
     });
 
-    return NextResponse.json({
-      documents: transformedDocs,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    });
+    return NextResponse.json(
+      {
+        documents: transformedDocs,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      },
+      {
+        headers: { 'Cache-Control': 'private, max-age=5, stale-while-revalidate=10' },
+      }
+    );
   } catch (error) {
     log.error('Error fetching documents:', error);
     return NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 });

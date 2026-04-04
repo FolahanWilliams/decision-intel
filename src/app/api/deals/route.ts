@@ -172,10 +172,15 @@ export async function GET(request: NextRequest) {
       prisma.deal.count({ where }),
     ]);
 
-    return NextResponse.json({
-      data: deals,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
+    return NextResponse.json(
+      {
+        data: deals,
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      },
+      {
+        headers: { 'Cache-Control': 'private, max-age=10, stale-while-revalidate=20' },
+      }
+    );
   } catch (error) {
     log.error('Failed to fetch deals:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

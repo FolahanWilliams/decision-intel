@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
 import { DqiMethodologyTab } from '@/components/founder-hub/DqiMethodologyTab';
 import { CorrelationCausalTab } from '@/components/founder-hub/CorrelationCausalTab';
+import { ContentStudioTab } from '@/components/founder-hub/ContentStudioTab';
 import {
   Rocket,
   Brain,
@@ -56,7 +57,8 @@ type TabId =
   | 'stats'
   | 'playbook'
   | 'case_studies'
-  | 'correlation_causal';
+  | 'correlation_causal'
+  | 'content_studio';
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'overview', label: 'Product Overview', icon: <Rocket size={16} /> },
@@ -70,6 +72,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'playbook', label: 'Playbook & Research', icon: <BookOpen size={16} /> },
   { id: 'case_studies', label: 'Case Studies', icon: <Library size={16} /> },
   { id: 'correlation_causal', label: 'Correlation & Causal Graph', icon: <Network size={16} /> },
+  { id: 'content_studio', label: 'Content Studio', icon: <Zap size={16} /> },
 ];
 
 // ─── Shared Styles ──────────────────────────────────────────────────────────
@@ -4778,6 +4781,7 @@ export default function FounderHubPage() {
     playbook: <PlaybookAndResearch />,
     case_studies: <CaseStudiesTab />,
     correlation_causal: <ErrorBoundary sectionName="Correlation & Causal"><CorrelationCausalTab /></ErrorBoundary>,
+    content_studio: <ErrorBoundary sectionName="Content Studio"><ContentStudioTab founderPass={FOUNDER_PASS} /></ErrorBoundary>,
   };
 
   // TAB_CONTENT is rendered below after password gate

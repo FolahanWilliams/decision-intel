@@ -9,13 +9,13 @@ interface ChatMsg {
 }
 
 const STARTER_QUESTIONS = [
+  'Brainstorm LinkedIn posts for the Last-Mile Problem pillar',
+  'Draft a YouTube hook about rubber-stamp investment committees',
+  'What toxic combination case studies work best for content?',
   'Elevator pitch for a CSO?',
-  'How do we beat competitors?',
-  'What shipped recently?',
-  'Demo script for exec meeting',
-  'How does email forwarding work?',
-  'Google Drive integration overview',
-  'Slack deep analysis capabilities',
+  'Content ideas targeting PE/VC investment committees',
+  'How to frame Decision Intel without threatening IC members?',
+  'What Kahneman research supports the Decision Noise pillar?',
 ];
 
 export function FounderChatWidget({ founderPass }: { founderPass: string }) {
@@ -205,8 +205,7 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
               lineHeight: 1.6,
             }}
           >
-            Ask me about your product, competitors, sales strategy, market positioning, or research
-            frameworks.
+            Ask me about content strategy, LinkedIn/YouTube ideas, pillar topics, competitor positioning, or research frameworks for your content.
             <div
               style={{
                 display: 'flex',

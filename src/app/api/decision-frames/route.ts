@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
+
+const DecisionFrameSchema = z.object({
+  decisionStatement: z.string().min(1, 'Decision statement is required').max(2000),
+  defaultAction: z.string().min(1, 'Default action is required').max(2000),
+  successCriteria: z
+    .array(z.string().min(1).max(500))
+    .min(1, 'At least one success criterion is required')
+    .max(20),
+  failureCriteria: z
+    .array(z.string().min(1).max(500))
+    .min(1, 'At least one failure criterion is required')
+    .max(20),
+  stakeholders: z.array(z.string().min(1).max(200)).max(50).optional().default([]),
+});
 
 const log = createLogger('DecisionFramesRoute');
 
@@ -30,29 +45,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
+    const parsed = DecisionFrameSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message || 'Invalid input' },
+        { status: 400 }
+      );
+    }
+
     const { decisionStatement, defaultAction, successCriteria, failureCriteria, stakeholders } =
-      body;
-
-    if (!decisionStatement || !defaultAction) {
-      return NextResponse.json(
-        { error: 'Missing required fields: decisionStatement, defaultAction' },
-        { status: 400 }
-      );
-    }
-
-    if (!Array.isArray(successCriteria) || successCriteria.length === 0) {
-      return NextResponse.json(
-        { error: 'At least one success criterion is required' },
-        { status: 400 }
-      );
-    }
-
-    if (!Array.isArray(failureCriteria) || failureCriteria.length === 0) {
-      return NextResponse.json(
-        { error: 'At least one failure criterion is required' },
-        { status: 400 }
-      );
-    }
+      parsed.data;
 
     // Look up user's org membership
     let orgId: string | null = null;
@@ -74,7 +76,7 @@ export async function POST(request: NextRequest) {
         defaultAction,
         successCriteria,
         failureCriteria,
-        stakeholders: stakeholders || [],
+        stakeholders,
       },
     });
 

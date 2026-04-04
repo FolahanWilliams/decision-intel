@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { AlertTriangle, ArrowRight, CheckCircle, Clock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -100,6 +101,11 @@ interface OutcomeGateModalProps {
  * Users must report at least one outcome before they can run new analyses.
  */
 export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: OutcomeGateModalProps) {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Focus trap
+  useFocusTrap(panelRef, true);
+
   // Escape key as fallback close mechanism
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -170,6 +176,7 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
         onClick={onClose}
       />
       <motion.div
+        ref={panelRef}
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}

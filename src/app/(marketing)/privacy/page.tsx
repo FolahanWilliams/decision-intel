@@ -2,9 +2,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy',
+  title: 'Privacy Policy | Decision Intel',
   description:
     'How Decision Intel collects, uses, and protects your data. GDPR-compliant data processing for M&A and investment decision analysis.',
+  openGraph: {
+    title: 'Privacy Policy | Decision Intel',
+    description:
+      'How Decision Intel collects, uses, and protects your data. GDPR-compliant data processing for M&A and investment decision analysis.',
+  },
 };
 
 export default function PrivacyPolicyPage() {

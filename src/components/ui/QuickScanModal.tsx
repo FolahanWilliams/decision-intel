@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { X, Zap, Loader2, AlertTriangle, ArrowRight } from 'lucide-react';
 import { DQIBadge } from '@/components/ui/DQIBadge';
 import { trackEvent } from '@/lib/analytics/track';
@@ -38,6 +39,27 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
   const [result, setResult] = useState<QuickScanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const handleClose = useCallback(() => {
+    setContent('');
+    setResult(null);
+    setError(null);
+    onClose();
+  }, [onClose]);
+
+  // Escape key handler
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [open, handleClose]);
+
+  // Focus trap
+  useFocusTrap(panelRef, open);
 
   if (!open) return null;
 
@@ -70,22 +92,15 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
     }
   };
 
-  const handleClose = () => {
-    setContent('');
-    setResult(null);
-    setError(null);
-    onClose();
-  };
-
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Quick bias check"
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-      }}
-      onClick={e => {
-        if (e.target === e.currentTarget) handleClose();
       }}
     >
       {/* Overlay backdrop */}
@@ -100,6 +115,7 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
       />
       {/* Slide-in panel */}
       <div
+        ref={panelRef}
         className="card liquid-glass-premium"
         style={{
           position: 'absolute',

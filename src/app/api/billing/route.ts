@@ -9,6 +9,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { PLANS, PlanType } from '@/lib/stripe';
 import { createLogger } from '@/lib/utils/logger';
+import { isSchemaDrift } from '@/lib/utils/error';
 
 const log = createLogger('BillingAPI');
 
@@ -44,8 +45,10 @@ export async function GET() {
           stripeCustomerId: true,
         },
       });
-    } catch {
-      // Schema drift
+    } catch (err) {
+      if (!isSchemaDrift(err)) {
+        log.error('Failed to fetch subscription:', err);
+      }
     }
 
     const plan = (subscription?.plan as PlanType) || 'free';
@@ -65,8 +68,10 @@ export async function GET() {
           createdAt: { gte: startOfMonth },
         },
       });
-    } catch {
-      // Schema drift
+    } catch (err) {
+      if (!isSchemaDrift(err)) {
+        log.error('Failed to count analyses:', err);
+      }
     }
 
     const analysesLimit = limits.analysesPerMonth === Infinity ? -1 : limits.analysesPerMonth;
