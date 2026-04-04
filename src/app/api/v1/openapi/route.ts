@@ -4,7 +4,6 @@ import spec from '../openapi.json';
 export async function GET() {
   return NextResponse.json(spec, {
     headers: {
-      'Access-Control-Allow-Origin': '*',
       'Cache-Control': 'public, max-age=3600',
     },
   });
