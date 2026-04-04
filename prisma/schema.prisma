@@ -1370,3 +1370,19 @@ model GoogleDriveInstallation {
   @@index([status])
 }
 
+model FounderContent {
+  id          String   @id @default(cuid())
+  contentType String
+  title       String
+  body        String   @db.Text
+  topic       String?
+  tone        String?
+  status      String   @default("draft")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([contentType])
+  @@index([status])
+  @@index([createdAt])
+}
+
