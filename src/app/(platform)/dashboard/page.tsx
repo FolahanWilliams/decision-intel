@@ -21,9 +21,6 @@ import {
   TrendingUp,
   Clock,
   CloudUpload,
-  Settings,
-  Eye,
-  EyeOff,
 } from 'lucide-react';
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import Link from 'next/link';
@@ -54,31 +51,15 @@ import { useToast } from '@/components/ui/EnhancedToast';
 import { createClientLogger } from '@/lib/utils/logger';
 
 const log = createClientLogger('Dashboard');
-import { RiskTrendChart } from './RiskTrendChart';
-import { ComparativeAnalysis } from '@/components/visualizations/ComparativeAnalysis';
 import { OnboardingGuide } from '@/components/ui/OnboardingGuide';
 import { WelcomeModal } from '@/components/ui/WelcomeModal';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BulkUploadPanel } from '@/components/ui/BulkUploadPanel';
-import { formatDate, formatDateShort } from '@/lib/constants/human-audit';
+import { formatDate } from '@/lib/constants/human-audit';
 import { ActivityFeed } from '@/components/ui/ActivityFeed';
 import { useActivityFeed } from '@/hooks/useActivityFeed';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { SparklineChart } from '@/components/ui/SparklineChart';
-import { DashboardCharts } from '@/components/visualizations/DashboardCharts';
-import { GraphStatsCard } from '@/components/ui/GraphStatsCard';
-import dynamic from 'next/dynamic';
-const DecisionPerformance = dynamic(
-  () => import('@/components/visualizations/DecisionPerformance'),
-  { ssr: false }
-);
-const GraphHealthWidget = dynamic(
-  () =>
-    import('@/components/visualizations/GraphHealthWidget').then(m => ({
-      default: m.GraphHealthWidget,
-    })),
-  { ssr: false }
-);
 import { useDeals } from '@/hooks/useDeals';
 import { DOCUMENT_TYPES } from '@/types/deals';
 import { QuickScanModal } from '@/components/ui/QuickScanModal';
@@ -161,22 +142,10 @@ export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'complete' | 'analyzing' | 'pending'>(
     'all'
   );
-  const [showCharts, setShowCharts] = useState(false);
-  const [showTrend, setShowTrend] = useState(false);
-  const [showComparative, setShowComparative] = useState(false);
   const [docsPage, setDocsPage] = useState(1);
-
-  // KPI visibility state — initialized with defaults, hydrated from localStorage via useEffect
-  // to avoid React hydration mismatch (error #418)
-  const [showKpiSettings, setShowKpiSettings] = useState(false);
-  const kpiDefaults: Record<string, boolean> = {
-    'Total Documents': true,
-    Analyzed: true,
-    'Avg Quality': true,
-    'Decision IQ': true,
-  };
-  const [kpiVisibility, setKpiVisibility] = useState<Record<string, boolean>>(kpiDefaults);
-  const kpiHydrated = useRef(false);
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'scoreHigh' | 'scoreLow' | 'name'>('newest');
+  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set());
+  const [batchDeleting, setBatchDeleting] = useState(false);
 
   // Welcome modal for first-time users (triggered via ?welcome=true from auth callback)
   const [showWelcome, setShowWelcome] = useState(false);
@@ -219,29 +188,6 @@ export default function Dashboard() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Hydrate KPI visibility from localStorage after mount (avoids hydration mismatch)
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('dashboard_kpi_visibility');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object') {
-          setKpiVisibility(parsed);
-        }
-      }
-    } catch {
-      // Ignore — use defaults
-    }
-    kpiHydrated.current = true;
-  }, []);
-
-  // Save KPI visibility to localStorage when it changes (skip the initial hydration write)
-  useEffect(() => {
-    if (kpiHydrated.current) {
-      localStorage.setItem('dashboard_kpi_visibility', JSON.stringify(kpiVisibility));
-    }
-  }, [kpiVisibility]);
 
   // Debounce search input → searchQuery (300ms)
   useEffect(() => {
@@ -388,6 +334,49 @@ export default function Dashboard() {
     });
   }, [uploadedDocs, searchQuery, statusFilter]);
 
+  // Sorted documents based on sort selection
+  const sortedDocs = useMemo(() => {
+    const docs = [...filteredDocs];
+    switch (sortBy) {
+      case 'oldest':
+        return docs.sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime());
+      case 'scoreHigh':
+        return docs.sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+      case 'scoreLow':
+        return docs.sort((a, b) => (a.score ?? 101) - (b.score ?? 101));
+      case 'name':
+        return docs.sort((a, b) => a.filename.localeCompare(b.filename));
+      case 'newest':
+      default:
+        return docs.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
+    }
+  }, [filteredDocs, sortBy]);
+
+  // Clear selection when filters change
+  useEffect(() => {
+    setSelectedDocs(new Set());
+  }, [searchQuery, statusFilter, docsPage]);
+
+  // Batch delete handler
+  const handleBatchDelete = async () => {
+    if (selectedDocs.size === 0) return;
+    setBatchDeleting(true);
+    try {
+      await Promise.all(
+        Array.from(selectedDocs).map(id =>
+          fetch(`/api/documents/${id}`, { method: 'DELETE' })
+        )
+      );
+      setSelectedDocs(new Set());
+      mutateDocs();
+      showToast(`Deleted ${selectedDocs.size} document(s)`, 'success');
+    } catch {
+      showToast('Failed to delete some documents', 'error');
+    } finally {
+      setBatchDeleting(false);
+    }
+  };
+
   // Risk summary computed from analyzed documents
   const riskSummary = useMemo(() => {
     let high = 0,
@@ -420,33 +409,6 @@ export default function Dashboard() {
       .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
       .slice(-10)
       .map(d => d.score || 0);
-  }, [uploadedDocs]);
-
-  // Score trend data for DashboardCharts
-  const scoreTrendData = useMemo(() => {
-    return [...uploadedDocs]
-      .filter(d => d.score !== undefined)
-      .sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime())
-      .map(d => ({ date: formatDateShort(d.uploadedAt), score: d.score || 0 }));
-  }, [uploadedDocs]);
-
-  // Aggregate biases across all documents for DashboardCharts
-  const topBiases = useMemo(() => {
-    const counts: Record<string, number> = {};
-    uploadedDocs.forEach(doc => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const analyses = (doc as any).analyses;
-      if (analyses?.[0]?.biases) {
-        for (const bias of analyses[0].biases) {
-          const name = bias.name || bias.type || 'Unknown';
-          counts[name] = (counts[name] || 0) + 1;
-        }
-      }
-    });
-    return Object.entries(counts)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
   }, [uploadedDocs]);
 
   // Delete document handler — uses SWR mutate for cache invalidation
@@ -818,66 +780,6 @@ export default function Dashboard() {
       {/* Hero KPI Cards */}
       {uploadedDocs.length > 0 && (
         <>
-          {/* KPI Settings Button */}
-          <div className="flex justify-end mb-md">
-            <button
-              onClick={() => setShowKpiSettings(!showKpiSettings)}
-              className="btn btn-ghost p-sm flex items-center gap-xs text-xs"
-              style={{
-                background: showKpiSettings ? 'var(--bg-card-hover)' : 'transparent',
-                border: '1px solid var(--border-color)',
-              }}
-            >
-              <Settings size={14} />
-              <span>Customize KPIs</span>
-              {showKpiSettings ? <EyeOff size={12} /> : <Eye size={12} />}
-            </button>
-          </div>
-
-          {/* KPI Settings Panel */}
-          <AnimatePresence>
-            {showKpiSettings && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginBottom: 'var(--spacing-lg)' }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                className="card liquid-glass-premium p-md"
-              >
-                <div className="flex items-center gap-sm mb-sm">
-                  <Settings size={16} />
-                  <span className="text-sm font-semibold">Show/Hide KPI Cards</span>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-sm">
-                  {['Total Documents', 'Analyzed', 'Avg Quality', 'Decision IQ'].map(kpiName => (
-                    <label
-                      key={kpiName}
-                      className="flex items-center gap-xs cursor-pointer p-xs rounded hover:bg-white/5 transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={kpiVisibility[kpiName] ?? true}
-                        onChange={e => {
-                          setKpiVisibility(prev => ({
-                            ...prev,
-                            [kpiName]: e.target.checked,
-                          }));
-                        }}
-                        className="checkbox"
-                        style={{
-                          width: '14px',
-                          height: '14px',
-                          accentColor: 'var(--accent-primary)',
-                        }}
-                      />
-                      <span className="text-xs text-muted">{kpiName}</span>
-                    </label>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-lg mb-xl"
             initial="hidden"
@@ -927,9 +829,7 @@ export default function Dashboard() {
                 sparkColor: 'var(--text-muted)',
                 isCustom: true,
               },
-            ]
-              .filter(stat => kpiVisibility[stat.label] !== false)
-              .map(stat => {
+            ].map(stat => {
                 // Decision IQ uses its own self-contained component
                 if ((stat as Record<string, unknown>).isCustom) {
                   return (
@@ -1006,83 +906,6 @@ export default function Dashboard() {
               })}
           </motion.div>
         </>
-      )}
-
-      {/* Multi-Chart Dashboard Overview */}
-      {riskSummary.total > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="card mb-xl">
-            <button
-              onClick={() => setShowCharts(prev => !prev)}
-              className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
-              aria-expanded={showCharts}
-            >
-              <h3 className="flex items-center gap-2 text-base">
-                <BarChart3 size={18} style={{ color: 'var(--text-secondary)' }} />
-                Portfolio Overview
-                <span className="text-xs text-muted font-normal">
-                  ({riskSummary.total} analyzed)
-                </span>
-              </h3>
-              <ChevronRight
-                size={18}
-                className={`text-muted transition-transform ${showCharts ? 'rotate-90' : ''}`}
-              />
-            </button>
-            {showCharts && (
-              <div className="card-body pt-0">
-                <ErrorBoundary sectionName="Dashboard Charts">
-                  <DashboardCharts
-                    riskDistribution={{
-                      highRisk: riskSummary.high,
-                      mediumRisk: riskSummary.medium,
-                      lowRisk: riskSummary.low,
-                    }}
-                    scoreTrend={scoreTrendData}
-                    topBiases={topBiases}
-                    totalAnalyzed={riskSummary.total}
-                    avgScore={riskSummary.avg}
-                  />
-                </ErrorBoundary>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Decision Performance Dashboard — Outcome tracking, calibration, bias costs */}
-      {uploadedDocs.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <ErrorBoundary sectionName="Decision Performance">
-            <DecisionPerformance />
-          </ErrorBoundary>
-        </motion.div>
-      )}
-
-      {/* Decision Knowledge Graph Stats */}
-      {uploadedDocs.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <ErrorBoundary sectionName="Decision Graph">
-            <GraphStatsCard />
-          </ErrorBoundary>
-          <div className="mt-3">
-            <ErrorBoundary sectionName="Graph Health">
-              <GraphHealthWidget />
-            </ErrorBoundary>
-          </div>
-        </motion.div>
       )}
 
       {/* Stream timed out banner */}
@@ -1832,146 +1655,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Risk Trend - Collapsible (collapsed by default) */}
-          {uploadedDocs.some(d => d.score !== undefined) && (
-            <div className="card mb-xl">
-              <button
-                onClick={() => setShowTrend(prev => !prev)}
-                className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
-                aria-expanded={showTrend}
-              >
-                <h3 className="flex items-center gap-2 text-base">
-                  <BarChart3 size={18} style={{ color: 'var(--text-secondary)' }} />
-                  Decision Quality Trend
-                  <span className="text-xs text-muted font-normal">
-                    ({uploadedDocs.filter(d => d.score !== undefined).length} analyzed)
-                  </span>
-                </h3>
-                <ChevronRight
-                  size={18}
-                  className={`text-muted transition-transform ${showTrend ? 'rotate-90' : ''}`}
-                />
-              </button>
-              {showTrend && (
-                <div className="card-body pt-0">
-                  <ErrorBoundary sectionName="Risk Trend Chart">
-                    <RiskTrendChart
-                      data={[...uploadedDocs]
-                        .filter(d => d.score !== undefined)
-                        .sort(
-                          (a, b) =>
-                            new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime()
-                        )
-                        .map(d => ({
-                          date: formatDateShort(d.uploadedAt),
-                          score: d.score || 0,
-                        }))}
-                    />
-                  </ErrorBoundary>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Comparative Analysis - Collapsible (collapsed by default) */}
-          {uploadedDocs.filter(d => d.status === 'complete').length > 1 && (
-            <div className="card mb-xl">
-              <button
-                onClick={() => setShowComparative(prev => !prev)}
-                className="w-full card-header flex items-center justify-between hover:bg-white/5 transition-colors"
-                aria-expanded={showComparative}
-              >
-                <h3 className="flex items-center gap-2 text-base">
-                  <Scale size={18} style={{ color: 'var(--text-secondary)' }} />
-                  Comparative Intelligence
-                  <span className="text-xs text-muted font-normal">Document Benchmark</span>
-                </h3>
-                <ChevronRight
-                  size={18}
-                  className={`text-muted transition-transform ${showComparative ? 'rotate-90' : ''}`}
-                />
-              </button>
-              {showComparative && (
-                <div className="card-body">
-                  <ErrorBoundary sectionName="Comparative Analysis">
-                    <ComparativeAnalysis
-                      documents={uploadedDocs
-                        .filter(d => d.status === 'complete')
-                        .map(doc => {
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- detailed view returns analyses array
-                          const a = (doc as any).analyses?.[0];
-                          const biasCount = a?.biases?.length ?? 0;
-                          const noiseScore = a?.noiseScore ?? 50;
-                          return {
-                            id: doc.id,
-                            title: doc.filename,
-                            date: formatDate(doc.uploadedAt),
-                            scores: {
-                              quality: doc.score || 0,
-                              risk: doc.score ? 100 - doc.score : 50,
-                              bias: Math.min(biasCount * 10, 100),
-                              clarity: Math.max(0, 100 - noiseScore),
-                            },
-                          };
-                        })}
-                    />
-                  </ErrorBoundary>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Risk Overview */}
-          {riskSummary.total > 0 && (
-            <div className="grid grid-4 mb-xl gap-md">
-              <div className="card">
-                <div className="card-body text-center p-md">
-                  <div className="text-xs text-muted mb-1 font-medium">Analyzed</div>
-                  <div
-                    style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-highlight)' }}
-                  >
-                    {riskSummary.total}
-                  </div>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-body text-center p-md">
-                  <div className="text-xs text-muted mb-1 font-medium">Avg Score</div>
-                  <div
-                    style={{
-                      fontSize: '1.75rem',
-                      fontWeight: 800,
-                      color:
-                        riskSummary.avg >= 70
-                          ? 'var(--success)'
-                          : riskSummary.avg >= 40
-                            ? 'var(--warning)'
-                            : 'var(--error)',
-                    }}
-                  >
-                    {riskSummary.avg}
-                  </div>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-body text-center p-md">
-                  <div className="text-xs text-muted mb-1 font-medium">High Risk</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--error)' }}>
-                    {riskSummary.high}
-                  </div>
-                </div>
-              </div>
-              <div className="card">
-                <div className="card-body text-center p-md">
-                  <div className="text-xs text-muted mb-1 font-medium">Low Risk</div>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--success)' }}>
-                    {riskSummary.low}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Documents List */}
           <div id="documents" className="card">
             <div className="card-header flex items-center justify-between">
@@ -1979,7 +1662,7 @@ export default function Dashboard() {
                 <h3 className="text-base">Documents</h3>
                 {totalDocs > 0 && (
                   <span className="text-xs text-muted">
-                    {filteredDocs.length} shown · {totalDocs} total
+                    {sortedDocs.length} shown · {totalDocs} total
                   </span>
                 )}
               </div>
@@ -2030,6 +1713,19 @@ export default function Dashboard() {
                   <option value="analyzing">Analyzing</option>
                   <option value="pending">Pending</option>
                 </select>
+
+                <select
+                  value={sortBy}
+                  aria-label="Sort documents"
+                  onChange={e => setSortBy(e.target.value as typeof sortBy)}
+                  className="px-3 py-1.5 text-sm bg-primary border border-border"
+                >
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="scoreHigh">Score: High→Low</option>
+                  <option value="scoreLow">Score: Low→High</option>
+                  <option value="name">Name A-Z</option>
+                </select>
               </div>
             </div>
 
@@ -2063,7 +1759,7 @@ export default function Dashboard() {
                     },
                   ]}
                 />
-              ) : filteredDocs.length === 0 ? (
+              ) : sortedDocs.length === 0 ? (
                 <div className="flex flex-col items-center gap-sm p-xl text-center">
                   <Search size={32} style={{ color: 'var(--text-muted)', opacity: 0.4 }} />
                   <p className="text-sm text-muted">No matches found</p>
@@ -2080,13 +1776,48 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {filteredDocs.map((doc, idx) => (
+                  {/* Select all header */}
+                  <div className="flex items-center gap-md p-md" style={{ background: 'var(--bg-secondary)' }}>
+                    <input
+                      type="checkbox"
+                      aria-label="Select all documents"
+                      checked={selectedDocs.size === sortedDocs.length && sortedDocs.length > 0}
+                      onChange={e => {
+                        if (e.target.checked) {
+                          setSelectedDocs(new Set(sortedDocs.map(d => d.id)));
+                        } else {
+                          setSelectedDocs(new Set());
+                        }
+                      }}
+                      style={{ width: 14, height: 14, accentColor: 'var(--accent-primary)', cursor: 'pointer' }}
+                    />
+                    <span className="text-xs text-muted">
+                      {selectedDocs.size > 0
+                        ? `${selectedDocs.size} selected`
+                        : `${sortedDocs.length} documents`}
+                    </span>
+                  </div>
+                  {sortedDocs.map((doc, idx) => (
                     <div
                       key={doc.id}
                       className="flex items-center justify-between p-md hover:bg-secondary/50 transition-colors animate-fade-in"
                       style={{ animationDelay: `${idx * 0.03}s` }}
                     >
                       <div className="flex items-center gap-md min-w-0">
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${doc.filename}`}
+                          checked={selectedDocs.has(doc.id)}
+                          onChange={e => {
+                            setSelectedDocs(prev => {
+                              const next = new Set(prev);
+                              if (e.target.checked) next.add(doc.id);
+                              else next.delete(doc.id);
+                              return next;
+                            });
+                          }}
+                          style={{ width: 14, height: 14, accentColor: 'var(--accent-primary)', cursor: 'pointer', flexShrink: 0 }}
+                        />
                         <div
                           style={{
                             width: 32,
@@ -2214,6 +1945,43 @@ export default function Dashboard() {
               )}
             </div>
           </div>
+
+          {/* Batch action bar */}
+          {selectedDocs.size > 0 && (
+            <div
+              className="flex items-center justify-between p-sm mt-sm"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+              }}
+            >
+              <span className="text-sm font-medium">
+                {selectedDocs.size} document{selectedDocs.size > 1 ? 's' : ''} selected
+              </span>
+              <div className="flex items-center gap-sm">
+                <button
+                  onClick={() => setSelectedDocs(new Set())}
+                  className="btn btn-ghost text-sm"
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={handleBatchDelete}
+                  disabled={batchDeleting}
+                  className="btn btn-sm flex items-center gap-xs text-sm"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    color: 'var(--error)',
+                  }}
+                >
+                  {batchDeleting ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                  Delete Selected
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Documents Paginator */}
           {docsTotalPages > 1 && (

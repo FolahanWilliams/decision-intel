@@ -27,6 +27,8 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
         border: '1px solid var(--liquid-border, rgba(255,255,255,0.08))',
         borderRadius: '12px',
         flexShrink: 0,
+        overflowX: 'auto',
+        scrollbarWidth: 'none',
       }}
     >
       {tabs.map(tab => {
@@ -36,7 +38,7 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
             style={{
-              flex: 1,
+              flex: tabs.length <= 5 ? 1 : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

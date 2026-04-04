@@ -13,20 +13,14 @@ import {
   Search,
   ChevronLeft,
   LogOut as LogOutIcon,
-  GitCompareArrows,
-  BrainCircuit,
   Video,
-  BookOpen,
   Users,
-  Network,
   Sparkles,
   Plus,
   ChevronRight as ChevronR,
   PenLine,
-  Plug,
   Briefcase,
   BookTemplate,
-  TrendingUp,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { ThemeToggle, ThemeToggleCompact } from '@/components/ThemeToggle';
@@ -38,8 +32,6 @@ export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
     Intelligence: true,
-    Decisions: true,
-    Reference: true,
     'Team & Settings': true,
   });
 
@@ -394,49 +386,14 @@ export default function Sidebar() {
             href="/dashboard/analytics"
             icon={<BarChart3 size={18} />}
             label="Analytics"
-            description="Trends, DNA, explainability & fingerprint"
+            description="Trends, quality, outcomes & decision graph"
             active={
               pathname.startsWith('/dashboard/analytics') ||
               pathname === '/dashboard/insights' ||
               pathname.startsWith('/dashboard/explainability') ||
-              pathname.startsWith('/dashboard/fingerprint')
-            }
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/outcome-flywheel"
-            icon={<TrendingUp size={18} />}
-            label="Outcome Flywheel"
-            description="Track which decisions paid off"
-            active={pathname.startsWith('/dashboard/outcome-flywheel')}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-          <NavItem
-            href="/dashboard/decision-graph"
-            icon={<Network size={18} />}
-            label="Decision Graph"
-            description="Map relationships between decisions"
-            active={pathname === '/dashboard/decision-graph'}
-            collapsed={collapsed}
-            onNavigate={closeMobile}
-          />
-
-          </CollapsibleSection>
-
-          <CollapsibleSection
-            label="Decisions"
-            collapsed={collapsed}
-            isOpen={!collapsedSections.Decisions}
-            onToggle={() => toggleSection('Decisions')}
-          >
-          <NavItem
-            href="/dashboard/decision-quality"
-            icon={<BrainCircuit size={18} />}
-            label="Decision Quality"
-            description="Audits, nudges, calibration & experiments"
-            active={
+              pathname.startsWith('/dashboard/fingerprint') ||
+              pathname.startsWith('/dashboard/outcome-flywheel') ||
+              pathname.startsWith('/dashboard/decision-graph') ||
               pathname.startsWith('/dashboard/decision-quality') ||
               pathname.startsWith('/dashboard/cognitive-audits') ||
               pathname.startsWith('/calibration') ||
@@ -470,32 +427,6 @@ export default function Sidebar() {
           </CollapsibleSection>
 
           <CollapsibleSection
-            label="Reference"
-            collapsed={collapsed}
-            isOpen={!collapsedSections.Reference}
-            onToggle={() => toggleSection('Reference')}
-          >
-            <NavItem
-              href="/dashboard/compare"
-              icon={<GitCompareArrows size={18} />}
-              label="Compare"
-              description="Side-by-side document comparison"
-              active={pathname === '/dashboard/compare'}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
-            <NavItem
-              href="/dashboard/bias-library"
-              icon={<BookOpen size={18} />}
-              label="Bias Library"
-              description="Learn about cognitive biases"
-              active={pathname === '/dashboard/bias-library'}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
-          </CollapsibleSection>
-
-          <CollapsibleSection
             label="Team & Settings"
             collapsed={collapsed}
             isOpen={!collapsedSections['Team & Settings']}
@@ -511,18 +442,14 @@ export default function Sidebar() {
               onNavigate={closeMobile}
             />
             <NavItem
-              href="/dashboard/settings/integrations"
-              icon={<Plug size={18} />}
-              label="Integrations"
-              active={pathname.startsWith('/dashboard/settings/integrations')}
-              collapsed={collapsed}
-              onNavigate={closeMobile}
-            />
-            <NavItem
               href="/dashboard/settings"
               icon={<Settings size={18} />}
               label="Settings"
-              active={pathname === '/dashboard/settings' || pathname === '/dashboard/audit-log'}
+              active={
+                pathname === '/dashboard/settings' ||
+                pathname.startsWith('/dashboard/settings/') ||
+                pathname === '/dashboard/audit-log'
+              }
               collapsed={collapsed}
               onNavigate={closeMobile}
             />
