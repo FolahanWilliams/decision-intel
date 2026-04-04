@@ -38,11 +38,10 @@ export default function NewDecisionPage() {
   const [failureCriteria, setFailureCriteria] = useState<string[]>(['']);
   const [stakeholders, setStakeholders] = useState<string[]>(['']);
 
-  const canSubmit =
-    decisionStatement.trim().length >= 10 &&
-    defaultAction.trim().length >= 10 &&
-    successCriteria.some(c => c.trim().length > 0) &&
-    failureCriteria.some(c => c.trim().length > 0);
+  // Only the decision statement is required. Everything else (default action,
+  // success/failure criteria, stakeholders) is optional so users can capture
+  // a frame in one sentence and enrich it later — or skip framing entirely.
+  const canSubmit = decisionStatement.trim().length >= 3;
 
   function addCriterion(list: string[], setter: (v: string[]) => void) {
     setter([...list, '']);
@@ -116,9 +115,9 @@ export default function NewDecisionPage() {
               <Target className="h-6 w-6 text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Frame Your Decision</h1>
+              <h1 className="text-2xl font-bold text-white">Frame Your Decision <span className="text-sm font-normal text-zinc-500">(optional)</span></h1>
               <p className="text-sm text-zinc-400">
-                Define your decision parameters before uploading a document for analysis
+                A one-line decision statement is all we need — or skip framing entirely and upload directly.
               </p>
             </div>
           </div>
@@ -127,9 +126,10 @@ export default function NewDecisionPage() {
         {/* Why this matters */}
         <div className="mb-6 rounded-lg border border-indigo-500/20 bg-indigo-950/20 p-4">
           <p className="text-sm text-indigo-200">
-            By capturing your intent <strong>before</strong> analysis, we create a more accurate
-            audit. The AI will evaluate your document against your stated objectives, not just
-            generic criteria. This also builds your organization&apos;s decision archive.
+            Framing is <strong>optional but helpful</strong>. If you capture your intent before
+            analysis, the AI audits your document against your stated objectives instead of
+            generic criteria. You can always skip framing, or fill in only the decision statement
+            and enrich the rest later.
           </p>
         </div>
 
@@ -152,7 +152,7 @@ export default function NewDecisionPage() {
           {/* Default Action */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-zinc-300">
-              Default Action <span className="text-indigo-400">*</span>
+              Default Action <span className="text-xs font-normal text-zinc-500">(optional)</span>
             </label>
             <p className="mb-2 text-xs text-zinc-500">
               Without further analysis, what would you do?
@@ -170,7 +170,7 @@ export default function NewDecisionPage() {
           <div>
             <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-zinc-300">
               <CheckCircle2 className="h-4 w-4 text-green-400" />
-              Success Criteria <span className="text-indigo-400">*</span>
+              Success Criteria <span className="text-xs font-normal text-zinc-500">(optional)</span>
             </label>
             <p className="mb-2 text-xs text-zinc-500">This decision succeeds if...</p>
             {successCriteria.map((criterion, i) => (
@@ -207,7 +207,7 @@ export default function NewDecisionPage() {
           <div>
             <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-zinc-300">
               <AlertTriangle className="h-4 w-4 text-red-400" />
-              Failure Criteria <span className="text-indigo-400">*</span>
+              Failure Criteria <span className="text-xs font-normal text-zinc-500">(optional)</span>
             </label>
             <p className="mb-2 text-xs text-zinc-500">This decision fails if...</p>
             {failureCriteria.map((criterion, i) => (
@@ -281,17 +281,21 @@ export default function NewDecisionPage() {
             </div>
           )}
 
-          <div className="flex items-center gap-4 pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:gap-4">
             <button
               type="submit"
               disabled={!canSubmit || isSubmitting}
               className="flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isSubmitting ? 'Submitting...' : 'Frame Decision & Upload Document'}
+              {isSubmitting ? 'Submitting...' : 'Save Frame & Upload Document'}
             </button>
-            <Link href="/dashboard/documents" className="text-sm text-zinc-400 hover:text-zinc-300">
-              Skip framing (upload directly)
+            <Link
+              href="/dashboard/documents"
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-5 py-2.5 text-sm font-medium text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800 hover:text-white"
+            >
+              Skip framing — upload directly
+              <ArrowLeft className="h-4 w-4 rotate-180" />
             </Link>
           </div>
         </form>

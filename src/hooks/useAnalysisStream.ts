@@ -122,7 +122,9 @@ export function useAnalysisStream(options: StreamOptions) {
         let errorMessage = `Analysis failed (${res.status})`;
         try {
           const errorData = await res.json();
-          // Handle outcome gate (423) — surface structured gate info
+          // Legacy: server no longer returns 423 for outcome gate (the gate
+          // is now a non-blocking reminder delivered via SSE `outcome_reminder`
+          // events). Kept for backward compatibility with older deployments.
           if (res.status === 423 && errorData.code === 'OUTCOME_GATE') {
             setOutcomeGate({
               pendingCount: errorData.pendingOutcomes,

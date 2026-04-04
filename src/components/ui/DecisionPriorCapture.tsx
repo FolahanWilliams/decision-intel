@@ -54,6 +54,9 @@ export function DecisionPriorCapture({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Collapsed by default — this capture is optional and should not visually
+  // dominate the analysis page. Users who want to track calibration expand it.
+  const [collapsed, setCollapsed] = useState(true);
 
   const confidenceLabel = getConfidenceLabel(confidence);
 
@@ -122,35 +125,54 @@ export function DecisionPriorCapture({
         background: 'var(--bg-card)',
       }}
     >
-      {/* Header */}
-      <div
+      {/* Header — clickable to toggle */}
+      <button
+        type="button"
+        onClick={() => setCollapsed(c => !c)}
+        aria-expanded={!collapsed}
         style={{
+          width: '100%',
           padding: compact ? '12px 16px' : '14px 18px',
-          borderBottom: '1px solid var(--bg-card-hover)',
+          borderBottom: collapsed ? 'none' : '1px solid var(--bg-card-hover)',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
           gap: '10px',
+          background: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+          cursor: 'pointer',
+          textAlign: 'left',
+          color: 'var(--text-primary)',
         }}
       >
-        <Brain size={16} style={{ color: 'var(--text-secondary)' }} />
-        <div>
-          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
-            Record Your Prior
-          </span>
-          <span
-            style={{
-              fontSize: '11px',
-              color: 'var(--text-muted)',
-              display: 'block',
-              marginTop: '2px',
-            }}
-          >
-            Capture your position before the AI audit — this powers your calibration curve
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+          <Brain size={16} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
+          <div style={{ minWidth: 0 }}>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+              Optional: Record Your Pre-Analysis Position
+            </span>
+            <span
+              style={{
+                fontSize: '11px',
+                color: 'var(--text-muted)',
+                display: 'block',
+                marginTop: '2px',
+              }}
+            >
+              Track how your thinking evolves — helps build your personal calibration score over time
+            </span>
+          </div>
         </div>
-      </div>
+        {collapsed ? (
+          <ChevronDown size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+        ) : (
+          <ChevronUp size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+        )}
+      </button>
 
       {/* Form */}
+      {!collapsed && (
       <div
         style={{
           padding: compact ? '12px 16px' : '16px 18px',
@@ -317,13 +339,14 @@ export function DecisionPriorCapture({
             }}
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Target size={14} />}
-            Lock In Prior
+            Save Position
           </button>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-            Recorded before the AI audit begins
+            Optional — skip if you prefer
           </span>
         </div>
       </div>
+      )}
     </div>
   );
 }

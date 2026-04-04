@@ -138,27 +138,11 @@ export async function POST(request: NextRequest) {
     // Decrypt document content transparently (supports both encrypted and legacy plaintext)
     const docContent = getDocumentContent(doc);
 
-    // ── Outcome enforcement gate ──────────────────────────────────────
-    // The behavioral data flywheel only works when users close the loop.
-    // Soft-gate: warn when 3+ analyses lack outcomes (>30 days old).
-    // Hard-gate: block new analyses when 5+ outcomes are overdue.
+    // ── Outcome reminders (non-blocking) ──────────────────────────────
+    // Progressive nudges encouraging users to close the loop. Never blocks
+    // analysis — if pendingCount >= SOFT_THRESHOLD, an `outcome_reminder`
+    // SSE event is emitted downstream so the client can surface a banner.
     const outcomeGate = await checkOutcomeGate(userId);
-
-    if (!outcomeGate.allowed) {
-      log.info(
-        `Outcome gate: blocking user ${userId} with ${outcomeGate.pendingCount} unreported outcomes`
-      );
-      return NextResponse.json(
-        {
-          error: 'Outcome reporting required before new analyses',
-          code: 'OUTCOME_GATE',
-          pendingOutcomes: outcomeGate.pendingCount,
-          pendingAnalysisIds: outcomeGate.pendingAnalysisIds,
-          message: outcomeGate.message,
-        },
-        { status: 423 }
-      );
-    }
 
     // Guard against concurrent analysis with atomic check-and-set.
     // Uses updateMany with a predicate to avoid TOCTOU race conditions:

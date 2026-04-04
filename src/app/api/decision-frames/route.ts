@@ -5,17 +5,24 @@ import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
 
+// Decision framing is encouraged but never mandatory — the only hard
+// requirement is a non-empty decisionStatement so the record can be listed.
+// All other fields (default action, success/failure criteria, stakeholders)
+// are optional so enterprise users can capture a frame in one line and
+// enrich it later.
 const DecisionFrameSchema = z.object({
   decisionStatement: z.string().min(1, 'Decision statement is required').max(2000),
-  defaultAction: z.string().min(1, 'Default action is required').max(2000),
+  defaultAction: z.string().max(2000).optional().default(''),
   successCriteria: z
     .array(z.string().min(1).max(500))
-    .min(1, 'At least one success criterion is required')
-    .max(20),
+    .max(20)
+    .optional()
+    .default([]),
   failureCriteria: z
     .array(z.string().min(1).max(500))
-    .min(1, 'At least one failure criterion is required')
-    .max(20),
+    .max(20)
+    .optional()
+    .default([]),
   stakeholders: z.array(z.string().min(1).max(200)).max(50).optional().default([]),
 });
 

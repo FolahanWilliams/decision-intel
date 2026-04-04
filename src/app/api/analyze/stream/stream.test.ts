@@ -302,19 +302,28 @@ describe('POST /api/analyze/stream', () => {
     expect(body.error).toContain('not found');
   });
 
-  it('returns 423 with OUTCOME_GATE when too many unreported outcomes', async () => {
+  it('does NOT block analysis when outcomes are pending — gate is now non-blocking', async () => {
+    // Simulate 6 pending outcomes — previously this returned HTTP 423.
+    // The gate is now a non-blocking reminder delivered via SSE
+    // `outcome_reminder` events, so the analysis must still proceed.
     mockCheckOutcomeGate.mockResolvedValue({
-      allowed: false,
+      allowed: true,
       pendingCount: 6,
+      level: 'hard',
       pendingAnalysisIds: ['a1', 'a2', 'a3', 'a4', 'a5', 'a6'],
-      message: 'You have 6 unreported outcomes',
+      message: 'You have 6 analyses awaiting outcome reports.',
     });
 
     const res = await POST(makeRequest({ documentId: 'doc_123' }));
-    expect(res.status).toBe(423);
-    const body = await res.json();
-    expect(body.code).toBe('OUTCOME_GATE');
-    expect(body.pendingOutcomes).toBe(6);
+    // Must not return 423 — analysis is allowed to proceed regardless of
+    // pending outcome count. The handler may still return other statuses
+    // (e.g. 200 SSE, 409 lock contention) depending on downstream mocks,
+    // but 423 / OUTCOME_GATE is no longer a valid response.
+    expect(res.status).not.toBe(423);
+    if (res.status >= 400) {
+      const body = await res.json().catch(() => ({}));
+      expect(body.code).not.toBe('OUTCOME_GATE');
+    }
   });
 
   it('returns 409 when analysis is already in progress (fresh)', async () => {

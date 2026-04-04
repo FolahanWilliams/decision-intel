@@ -24,6 +24,7 @@ export const PLANS = {
     analysesPerMonth: 3,
     maxPages: 10,
     biasTypes: 5,
+    maxTeamMembers: 3,
   },
   pro: {
     name: 'Professional',
@@ -33,6 +34,7 @@ export const PLANS = {
     analysesPerMonth: 50,
     maxPages: 100,
     biasTypes: 20,
+    maxTeamMembers: 10,
   },
   team: {
     name: 'Team',
@@ -41,6 +43,7 @@ export const PLANS = {
     analysesPerMonth: 250,
     maxPages: 200,
     biasTypes: 20,
+    maxTeamMembers: 50,
   },
   enterprise: {
     name: 'Enterprise',
@@ -48,6 +51,7 @@ export const PLANS = {
     analysesPerMonth: Infinity,
     maxPages: Infinity,
     biasTypes: 20,
+    maxTeamMembers: Infinity,
   },
 } as const;
 

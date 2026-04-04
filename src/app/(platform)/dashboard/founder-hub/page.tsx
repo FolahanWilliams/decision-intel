@@ -6,6 +6,7 @@ import { FounderChatWidget } from '@/components/founder-hub/FounderChatWidget';
 import { DqiMethodologyTab } from '@/components/founder-hub/DqiMethodologyTab';
 import { CorrelationCausalTab } from '@/components/founder-hub/CorrelationCausalTab';
 import { ContentStudioTab } from '@/components/founder-hub/ContentStudioTab';
+import { MethodologiesAndPrinciplesTab } from '@/components/founder-hub/MethodologiesAndPrinciplesTab';
 import {
   Rocket,
   Brain,
@@ -35,6 +36,7 @@ import {
   Lightbulb,
   Mail,
   HardDrive,
+  GraduationCap,
 } from 'lucide-react';
 import {
   ALL_CASES,
@@ -56,6 +58,7 @@ type TabId =
   | 'sales'
   | 'stats'
   | 'playbook'
+  | 'methodologies'
   | 'case_studies'
   | 'correlation_causal'
   | 'content_studio';
@@ -70,6 +73,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'sales', label: 'Sales Toolkit', icon: <MessageSquare size={16} /> },
   { id: 'stats', label: 'Live Stats', icon: <TrendingUp size={16} /> },
   { id: 'playbook', label: 'Playbook & Research', icon: <BookOpen size={16} /> },
+  { id: 'methodologies', label: 'Methodologies & Principles', icon: <GraduationCap size={16} /> },
   { id: 'case_studies', label: 'Case Studies', icon: <Library size={16} /> },
   { id: 'correlation_causal', label: 'Correlation & Causal Graph', icon: <Network size={16} /> },
   { id: 'content_studio', label: 'Content Studio', icon: <Zap size={16} /> },
@@ -4122,6 +4126,14 @@ function formatBias(s: string) {
     .join(' ');
 }
 
+function MethodologiesAndPrinciples() {
+  return (
+    <ErrorBoundary sectionName="Methodologies & Principles">
+      <MethodologiesAndPrinciplesTab />
+    </ErrorBoundary>
+  );
+}
+
 function CaseStudiesTab() {
   const [filter, setFilter] = useState<'all' | 'failures' | 'successes'>('all');
   const [industryFilter, setIndustryFilter] = useState<string>('all');
@@ -4779,6 +4791,7 @@ export default function FounderHubPage() {
     sales: <SalesToolkit />,
     stats: <LiveStats />,
     playbook: <PlaybookAndResearch />,
+    methodologies: <MethodologiesAndPrinciples />,
     case_studies: <CaseStudiesTab />,
     correlation_causal: <ErrorBoundary sectionName="Correlation & Causal"><CorrelationCausalTab /></ErrorBoundary>,
     content_studio: <ErrorBoundary sectionName="Content Studio"><ContentStudioTab founderPass={FOUNDER_PASS} /></ErrorBoundary>,

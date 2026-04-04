@@ -22,20 +22,30 @@ interface OutcomeGateBannerProps {
   pendingCount: number;
   pendingAnalysisIds: string[];
   onDismiss?: () => void;
+  /**
+   * Visual severity. `'soft'` (default) = gentle reminder for 3-4 pending;
+   * `'hard'` = stronger amber/red treatment for 5+ pending. Both are
+   * non-blocking and dismissible.
+   */
+  level?: 'soft' | 'hard';
 }
 
 /**
- * Dismissible banner shown when users have 3-4 pending outcomes (soft gate).
- * Encourages outcome reporting without blocking analysis.
+ * Dismissible banner shown when users have pending outcomes awaiting reports.
+ * Encourages outcome reporting without ever blocking analysis. The `level`
+ * prop controls visual severity for soft vs. hard reminder tiers.
  */
 export function OutcomeGateBanner({
   pendingCount,
   pendingAnalysisIds,
   onDismiss,
+  level = 'soft',
 }: OutcomeGateBannerProps) {
   const [dismissed, setDismissed] = useState(false);
 
   if (dismissed) return null;
+
+  const isHard = level === 'hard';
 
   return (
     <motion.div
@@ -46,19 +56,21 @@ export function OutcomeGateBanner({
       style={{
         borderRadius: '12px',
         overflow: 'hidden',
+        border: isHard ? '1px solid rgba(239, 68, 68, 0.35)' : undefined,
+        boxShadow: isHard ? '0 0 0 1px rgba(239, 68, 68, 0.15)' : undefined,
       }}
     >
       <Suspense
         fallback={
           <div style={{ padding: 12, background: 'var(--bg-secondary)', borderRadius: 12 }}>
-            <Clock size={16} style={{ color: '#fbbf24' }} />
+            <Clock size={16} style={{ color: isHard ? '#ef4444' : '#fbbf24' }} />
           </div>
         }
       >
         <CalibrationScorecard
           pendingCount={pendingCount}
           pendingAnalysisIds={pendingAnalysisIds}
-          gateLevel="soft"
+          gateLevel={level}
           onReportOutcome={() => {
             window.location.href = '/dashboard?view=browse&status=complete';
           }}
@@ -97,8 +109,10 @@ interface OutcomeGateModalProps {
 }
 
 /**
- * Blocking modal shown when users have 5+ pending outcomes (hard gate).
- * Users must report at least one outcome before they can run new analyses.
+ * @deprecated The outcome gate no longer blocks analyses. Use
+ * `OutcomeGateBanner` with `level="hard"` for the stronger reminder
+ * treatment instead. Kept only for backward compatibility; do not render
+ * in new code.
  */
 export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: OutcomeGateModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
