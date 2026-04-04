@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 const log = createLogger('FeedbackRoute');
 
@@ -25,6 +26,14 @@ export async function POST(request: NextRequest) {
     const userId = user?.id;
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const rateLimitResult = await checkRateLimit(userId, '/api/feedback', {
+      windowMs: 60 * 60 * 1000,
+      maxRequests: 20,
+    });
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     let body;

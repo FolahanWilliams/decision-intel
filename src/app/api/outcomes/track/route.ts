@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { DecisionOutcome } from '@prisma/client';
 
 const log = createLogger('OutcomeTracking');
@@ -23,6 +24,14 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const rateLimitResult = await checkRateLimit(user.id, '/api/outcomes/track', {
+      windowMs: 60 * 60 * 1000,
+      maxRequests: 20,
+    });
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     const body = await req.json();

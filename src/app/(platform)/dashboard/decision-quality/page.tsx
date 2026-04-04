@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BrainCircuit, Bell, Target, FlaskConical } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TabBar } from '@/components/ui/TabBar';
 import { AuditsPageContent } from '@/components/audits/AuditsPageContent';
@@ -62,7 +63,7 @@ function DecisionQualityInner() {
 export default function DecisionQualityPage() {
   return (
     <ErrorBoundary sectionName="Decision Quality">
-      <Suspense fallback={null}>
+      <Suspense fallback={<PageSkeleton />}>
         <DecisionQualityInner />
       </Suspense>
     </ErrorBoundary>

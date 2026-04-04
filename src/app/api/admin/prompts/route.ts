@@ -15,6 +15,7 @@ import {
 } from '@/lib/prompts/registry';
 import { createLogger } from '@/lib/utils/logger';
 import { verifyAdmin, ADMIN_DENIED } from '@/lib/utils/admin';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 const log = createLogger('AdminPrompts');
 
@@ -81,6 +82,14 @@ export async function POST(req: NextRequest) {
     const admin = await verifyAdmin();
     if (!admin) return ADMIN_DENIED;
 
+    const rateLimitResult = await checkRateLimit(admin.id, '/api/admin/prompts', {
+      windowMs: 60 * 60 * 1000,
+      maxRequests: 10,
+    });
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
+
     const body = await req.json();
     const { name, content } = body;
 
@@ -123,6 +132,14 @@ export async function PUT(req: NextRequest) {
   try {
     const admin = await verifyAdmin();
     if (!admin) return ADMIN_DENIED;
+
+    const rateLimitResult = await checkRateLimit(admin.id, '/api/admin/prompts', {
+      windowMs: 60 * 60 * 1000,
+      maxRequests: 10,
+    });
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
 
     const body = await req.json();
     const { name, version } = body;

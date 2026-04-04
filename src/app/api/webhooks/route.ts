@@ -10,6 +10,7 @@ import { authenticateApiRequest } from '@/lib/utils/api-auth';
 import { prisma } from '@/lib/prisma';
 import { randomBytes } from 'crypto';
 import { WEBHOOK_EVENTS } from '@/lib/integrations/webhooks/events';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 /**
  * Block webhook URLs pointing to private/internal networks (SSRF prevention).
@@ -71,6 +72,14 @@ export async function POST(request: Request) {
   const auth = await authenticateApiRequest(request);
   if (auth.error) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
+  const rateLimitResult = await checkRateLimit(auth.userId!, '/api/webhooks', {
+    windowMs: 60 * 60 * 1000,
+    maxRequests: 20,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
   }
 
   const body = await request.json();

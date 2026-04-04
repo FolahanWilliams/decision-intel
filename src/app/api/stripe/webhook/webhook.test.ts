@@ -48,11 +48,22 @@ vi.mock('@/lib/stripe', () => ({
 const mockSubscriptionUpsert = vi.fn();
 const mockSubscriptionUpdate = vi.fn();
 
+const mockAuditLogFindFirst = vi.fn().mockResolvedValue(null);
+const mockAuditLogCreate = vi.fn().mockResolvedValue({ id: 'audit-1' });
+const mockDealAuditPurchaseCreate = vi.fn().mockResolvedValue({ id: 'dap-1' });
+
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     subscription: {
       upsert: (...args: unknown[]) => mockSubscriptionUpsert(...args),
       update: (...args: unknown[]) => mockSubscriptionUpdate(...args),
+    },
+    auditLog: {
+      findFirst: (...args: unknown[]) => mockAuditLogFindFirst(...args),
+      create: (...args: unknown[]) => mockAuditLogCreate(...args),
+    },
+    dealAuditPurchase: {
+      create: (...args: unknown[]) => mockDealAuditPurchaseCreate(...args),
     },
   },
 }));
@@ -98,6 +109,9 @@ beforeEach(() => {
   mockHeaders.set('stripe-signature', 'sig_test_123');
   mockRequestBody = '{"test": true}';
   process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_secret';
+  // Reset idempotency mocks to allow processing
+  mockAuditLogFindFirst.mockResolvedValue(null);
+  mockAuditLogCreate.mockResolvedValue({ id: 'audit-1' });
 
   // Default: constructEvent returns a benign unhandled event
   mockConstructEvent.mockReturnValue({

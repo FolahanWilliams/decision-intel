@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useInsights } from '@/hooks/useInsights';
 import { useTrends } from '@/hooks/useTrends';
 import { DecisionRadar } from '@/components/visualizations/DecisionRadar';
@@ -46,6 +45,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 // Breadcrumbs handled by parent page
 import { BackToTop } from '@/components/ui/BackToTop';
 import dynamic from 'next/dynamic';
@@ -359,69 +359,7 @@ export function InsightsPageContent() {
   if (!insights || insights.empty) {
     return (
       <div className="container" style={{ paddingTop: 'var(--spacing-2xl)' }}>
-        <div
-          className="flex items-center justify-between"
-          style={{
-            marginBottom: 'var(--spacing-xl)',
-            paddingBottom: 'var(--spacing-md)',
-            borderBottom: '1px solid var(--border-color)',
-          }}
-        >
-          <div>
-            <h1 style={{ fontSize: '1.25rem', marginBottom: '4px', border: 'none', padding: 0 }}>
-              Visual Insights
-            </h1>
-          </div>
-        </div>
-        <div className="card">
-          <div
-            className="card-body flex flex-col items-center"
-            style={{ padding: 'var(--spacing-2xl) var(--spacing-xl)', textAlign: 'center' }}
-          >
-            <BarChart3
-              size={40}
-              style={{ color: 'var(--text-muted)', marginBottom: '16px', opacity: 0.5 }}
-            />
-            <h3
-              style={{
-                fontSize: '14px',
-                marginBottom: '8px',
-                color: 'var(--text-secondary)',
-                fontWeight: 600,
-              }}
-            >
-              Awaiting Data
-            </h3>
-            <p
-              style={{
-                color: 'var(--text-muted)',
-                fontSize: '13px',
-                maxWidth: '360px',
-                lineHeight: 1.7,
-              }}
-            >
-              No analyses detected. Upload and scan documents to populate cross-document
-              intelligence visualizations.
-            </p>
-            <div
-              style={{
-                marginTop: '20px',
-                fontSize: '12px',
-                color: 'var(--accent-primary)',
-                fontWeight: 600,
-              }}
-            >
-              Run an analysis to get started
-            </div>
-            <Link
-              href="/dashboard"
-              className="btn btn-primary"
-              style={{ marginTop: '16px', fontSize: '11px' }}
-            >
-              Go to Dashboard
-            </Link>
-          </div>
-        </div>
+        <EnhancedEmptyState type="insights" />
       </div>
     );
   }

@@ -31,6 +31,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
+    // Idempotency check: skip if this event was already processed
+    const existing = await prisma.auditLog.findFirst({
+      where: { resourceId: event.id, action: 'stripe.webhook' },
+    });
+    if (existing) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+
+    let orgId: string | undefined;
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -69,7 +79,8 @@ export async function POST(request: NextRequest) {
 
         // Handle one-time deal audit payment
         if (session.mode === 'payment' && session.metadata?.type === 'deal_audit') {
-          const { userId: auditUserId, dealId, tier, ticketSize, orgId } = session.metadata;
+          const { userId: auditUserId, dealId, tier, ticketSize, orgId: metaOrgId } = session.metadata;
+          orgId = metaOrgId;
           if (auditUserId && dealId && tier) {
             try {
               await prisma.dealAuditPurchase.create({
@@ -162,6 +173,18 @@ export async function POST(request: NextRequest) {
       default:
         log.debug(`Unhandled Stripe event: ${event.type}`);
     }
+
+    // Record successful processing for idempotency
+    await prisma.auditLog.create({
+      data: {
+        userId: 'system',
+        orgId: orgId || 'stripe',
+        action: 'stripe.webhook',
+        resource: 'stripe_event',
+        resourceId: event.id,
+        details: { type: event.type },
+      },
+    });
 
     return NextResponse.json({ received: true });
   } catch (err) {

@@ -10,6 +10,7 @@ import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 const log = createLogger('DecisionRoomsRoute');
 
@@ -22,6 +23,14 @@ export async function POST(request: NextRequest) {
 
     if (!user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const rateLimitResult = await checkRateLimit(user.id, '/api/decision-rooms', {
+      windowMs: 60 * 60 * 1000,
+      maxRequests: 20,
+    });
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     let body;

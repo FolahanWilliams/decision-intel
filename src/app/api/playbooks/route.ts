@@ -12,6 +12,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { isSchemaDrift } from '@/lib/utils/error';
 import { BUILT_IN_PLAYBOOKS, PLAYBOOK_CATEGORIES } from '@/lib/playbooks/templates';
 import { Prisma } from '@prisma/client';
+import { checkRateLimit } from '@/lib/utils/rate-limit';
 
 const log = createLogger('PlaybooksAPI');
 
@@ -80,6 +81,14 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const rateLimitResult = await checkRateLimit(user.id, '/api/playbooks', {
+      windowMs: 60 * 60 * 1000,
+      maxRequests: 20,
+    });
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
     }
 
     const body = await request.json();

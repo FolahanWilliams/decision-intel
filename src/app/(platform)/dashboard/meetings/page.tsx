@@ -19,6 +19,7 @@ import {
   Vote,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TabBar } from '@/components/ui/TabBar';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
@@ -576,7 +577,7 @@ function MeetingsInner() {
 export default function MeetingsPage() {
   return (
     <ErrorBoundary sectionName="Meetings & Rooms">
-      <Suspense fallback={null}>
+      <Suspense fallback={<PageSkeleton />}>
         <MeetingsInner />
       </Suspense>
     </ErrorBoundary>
