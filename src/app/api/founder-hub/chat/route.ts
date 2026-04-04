@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
           role: 'model',
           parts: [
             {
-              text: "Understood. I'm your Decision Intel strategic advisor with full knowledge of the platform, competitors, market strategy, sales playbook, and research foundations. Ask me anything.",
+              text: "Understood. I'm your Decision Intel strategic advisor. I will answer in clear prose without markdown bold, em dashes, or section headers, and lead with the answer rather than preamble.",
             },
           ],
         },
