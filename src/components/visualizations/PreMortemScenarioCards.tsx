@@ -8,11 +8,21 @@ import {
   ChevronUp,
   CheckSquare,
   Square,
+  RotateCcw,
+  Swords,
 } from 'lucide-react';
+
+interface RedTeamObjection {
+  objection: string;
+  targetClaim: string;
+  reasoning: string;
+}
 
 interface PreMortemScenarioCardsProps {
   failureScenarios: string[];
   preventiveMeasures: string[];
+  inversion?: string[];
+  redTeam?: RedTeamObjection[];
 }
 
 interface ScenarioCard {
@@ -30,9 +40,13 @@ interface ScenarioCard {
 export function PreMortemScenarioCards({
   failureScenarios,
   preventiveMeasures,
+  inversion,
+  redTeam,
 }: PreMortemScenarioCardsProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [checkedMeasures, setCheckedMeasures] = useState<Set<number>>(new Set());
+  const [showInversion, setShowInversion] = useState(false);
+  const [showRedTeam, setShowRedTeam] = useState(false);
 
   const cards = useMemo(() => {
     // Simple deterministic hash to generate stable "random" values per scenario
@@ -82,7 +96,10 @@ export function PreMortemScenarioCards({
   const preparednessPercent =
     totalMeasures > 0 ? Math.round((completedCount / totalMeasures) * 100) : 0;
 
-  if (failureScenarios.length === 0) {
+  const hasInversion = !!(inversion && inversion.length > 0);
+  const hasRedTeam = !!(redTeam && redTeam.length > 0);
+
+  if (failureScenarios.length === 0 && !hasInversion && !hasRedTeam) {
     return (
       <div className="text-center p-6 text-muted text-sm">No pre-mortem scenarios available.</div>
     );
@@ -246,6 +263,102 @@ export function PreMortemScenarioCards({
           );
         })}
       </div>
+
+      {/* Inversion section (Munger) */}
+      {hasInversion && (
+        <div className="border border-border bg-card/50">
+          <button
+            onClick={() => setShowInversion(s => !s)}
+            className="w-full text-left p-3 flex items-center justify-between hover:bg-muted/10 transition-colors"
+            aria-expanded={showInversion}
+          >
+            <span className="text-sm font-semibold flex items-center gap-2">
+              <RotateCcw size={14} className="text-indigo-400" />
+              Inversion: what would guarantee failure? ({inversion!.length})
+            </span>
+            {showInversion ? (
+              <ChevronUp size={14} className="text-muted" />
+            ) : (
+              <ChevronDown size={14} className="text-muted" />
+            )}
+          </button>
+          {showInversion && (
+            <div className="border-t border-border/50 p-3 space-y-2">
+              <p className="text-[11px] text-muted italic mb-2">
+                Charlie Munger: invert the success criteria. Every item below is a causal lever a
+                hostile actor could pull to guarantee this initiative fails.
+              </p>
+              <ul className="space-y-2">
+                {inversion!.map((item, i) => (
+                  <li
+                    key={i}
+                    className="p-2 bg-indigo-500/5 border border-indigo-500/10 text-xs text-foreground/80 leading-relaxed flex gap-2"
+                  >
+                    <span className="text-indigo-400 font-bold flex-shrink-0">{i + 1}.</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Red Team / 10th Man section (RAND) */}
+      {hasRedTeam && (
+        <div className="border border-border bg-card/50">
+          <button
+            onClick={() => setShowRedTeam(s => !s)}
+            className="w-full text-left p-3 flex items-center justify-between hover:bg-muted/10 transition-colors"
+            aria-expanded={showRedTeam}
+          >
+            <span className="text-sm font-semibold flex items-center gap-2">
+              <Swords size={14} className="text-rose-400" />
+              Red Team / 10th Man dissent ({redTeam!.length})
+            </span>
+            {showRedTeam ? (
+              <ChevronUp size={14} className="text-muted" />
+            ) : (
+              <ChevronDown size={14} className="text-muted" />
+            )}
+          </button>
+          {showRedTeam && (
+            <div className="border-t border-border/50 p-3 space-y-3">
+              <p className="text-[11px] text-muted italic mb-2">
+                RAND 10th Man rule: a structured dissenter must argue against the consensus even if
+                they agree, to surface the weakest load-bearing assumption.
+              </p>
+              {redTeam!.map((r, i) => (
+                <div
+                  key={i}
+                  className="p-3 bg-rose-500/5 border border-rose-500/10 text-xs space-y-2"
+                >
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wide text-rose-400 mb-1">
+                      Objection
+                    </div>
+                    <p className="text-foreground/80 leading-relaxed">{r.objection}</p>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wide text-muted mb-1">
+                      Target claim
+                    </div>
+                    <p className="text-foreground/60 leading-relaxed italic">
+                      &ldquo;{r.targetClaim}&rdquo;
+                    </p>
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-wide text-muted mb-1">
+                      Why it&apos;s load-bearing
+                    </div>
+                    <p className="text-foreground/70 leading-relaxed">{r.reasoning}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

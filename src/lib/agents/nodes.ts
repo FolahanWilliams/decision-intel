@@ -45,6 +45,7 @@ import {
   buildInvestmentNoiseOverlay,
   PE_BOARDROOM_PERSONAS,
 } from '../prompts/investment-vertical';
+import { computeDQChain } from '../scoring/dq-chain';
 
 // ============================================================
 // CONSTANTS
@@ -1865,6 +1866,29 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       ),
       recognitionCues: state.recognitionCues ?? undefined,
       narrativePreMortem: state.narrativePreMortem ?? undefined,
+      dqChain: computeDQChain({
+        logicalAnalysis: state.logicalAnalysis,
+        swotAnalysis: state.swotAnalysis,
+        cognitiveAnalysis: state.cognitiveAnalysis,
+        factCheck: state.factCheckResult
+          ? {
+              totalClaims: state.factCheckResult.verifications?.length || 0,
+              verifiedClaims: (state.factCheckResult.verifications || []).filter(
+                v => v.verdict === 'VERIFIED'
+              ).length,
+              contradictedClaims: (state.factCheckResult.verifications || []).filter(
+                v => v.verdict === 'CONTRADICTED'
+              ).length,
+              score: state.factCheckResult.score ?? 50,
+            }
+          : undefined,
+        noiseStdDev: state.noiseStats?.stdDev,
+        biasCount: (state.biasAnalysis || []).length,
+        hasDecisionFrame: !!state.logicalAnalysis?.conclusion,
+        hasOwner: false,
+        hasDefaultAction: !!state.logicalAnalysis?.verdict,
+        preMortemCount: state.preMortem?.failureScenarios?.length || 0,
+      }),
     } satisfies AnalysisResult,
   };
 }

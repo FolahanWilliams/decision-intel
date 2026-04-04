@@ -107,7 +107,12 @@ const GraphState = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => null,
   }),
-  preMortem: Annotation<{ failureScenarios: string[]; preventiveMeasures: string[] } | null>({
+  preMortem: Annotation<{
+    failureScenarios: string[];
+    preventiveMeasures: string[];
+    inversion?: string[];
+    redTeam?: Array<{ objection: string; targetClaim: string; reasoning: string }>;
+  } | null>({
     reducer: (x, y) => y ?? x,
     default: () => null,
   }),

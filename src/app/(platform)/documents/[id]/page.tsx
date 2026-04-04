@@ -19,6 +19,7 @@ import {
   Globe,
   GitCompareArrows,
   BookOpen,
+  Link2,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { SSEReader } from '@/lib/sse';
@@ -86,6 +87,9 @@ const EvidenceTab = lazy(() =>
 );
 const PerspectivesTab = lazy(() =>
   import('./tabs/PerspectivesTab').then(m => ({ default: m.PerspectivesTab }))
+);
+const DQChainTab = lazy(() =>
+  import('./tabs/DQChainTab').then(m => ({ default: m.DQChainTab }))
 );
 
 interface VerificationSource {
@@ -177,6 +181,7 @@ interface Analysis {
   outcomeStatus?: string;
   recognitionCues?: RecognitionCuesResult;
   narrativePreMortem?: NarrativePreMortem;
+  dqChain?: import('@/types').DQChainSummary;
 }
 
 interface Document {
@@ -196,13 +201,21 @@ interface Document {
   } | null;
 }
 
-type TabId = 'overview' | 'evidence' | 'swot' | 'noise' | 'perspectives' | 'intelligence';
+type TabId =
+  | 'overview'
+  | 'evidence'
+  | 'swot'
+  | 'noise'
+  | 'dq-chain'
+  | 'perspectives'
+  | 'intelligence';
 
 const VALID_TABS: TabId[] = [
   'overview',
   'evidence',
   'swot',
   'noise',
+  'dq-chain',
   'perspectives',
   'intelligence',
 ];
@@ -723,6 +736,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           { id: 'evidence', label: 'Evidence', icon: CheckCircle },
           { id: 'swot', label: 'SWOT', icon: Lightbulb },
           { id: 'noise', label: 'Noise', icon: Info },
+          { id: 'dq-chain', label: 'DQ Chain', icon: Link2 },
         ],
       },
       {
@@ -1819,6 +1833,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         noiseStats={analysis.noiseStats}
                         noiseBenchmarks={analysis.noiseBenchmarks}
                       />
+                    </ErrorBoundary>
+                  )}
+                  {activeTab === 'dq-chain' && (
+                    <ErrorBoundary sectionName="Decision Quality Chain">
+                      <DQChainTab dqChain={analysis?.dqChain} />
                     </ErrorBoundary>
                   )}
                   {activeTab === 'perspectives' && (

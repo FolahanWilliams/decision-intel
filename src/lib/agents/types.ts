@@ -64,6 +64,12 @@ export interface AuditState {
   preMortem?: {
     failureScenarios: string[];
     preventiveMeasures: string[];
+    inversion?: string[];
+    redTeam?: Array<{
+      objection: string;
+      targetClaim: string;
+      reasoning: string;
+    }>;
   };
   compliance?: ComplianceResult;
   sentimentAnalysis?: {

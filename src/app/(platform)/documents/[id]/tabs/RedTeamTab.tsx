@@ -28,6 +28,12 @@ interface RedTeamTabProps {
   preMortem?: {
     failureScenarios: string[];
     preventiveMeasures: string[];
+    inversion?: string[];
+    redTeam?: Array<{
+      objection: string;
+      targetClaim: string;
+      reasoning: string;
+    }>;
   };
 }
 
@@ -315,6 +321,8 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
                   <PreMortemScenarioCards
                     failureScenarios={preMortem.failureScenarios}
                     preventiveMeasures={preMortem.preventiveMeasures}
+                    inversion={preMortem.inversion}
+                    redTeam={preMortem.redTeam}
                   />
                 </ErrorBoundary>
               </div>
