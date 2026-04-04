@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { Loader2, Copy, Save, Edit3, Linkedin, Twitter, FileText, Quote } from 'lucide-react';
+import { Loader2, Copy, Save, Edit3, Linkedin, Twitter, FileText, Quote, Video } from 'lucide-react';
 import { card, sectionTitle } from '../shared-styles';
 
 const CONTENT_TYPES = [
@@ -9,7 +9,39 @@ const CONTENT_TYPES = [
   { id: 'twitter_thread', label: 'Twitter/X', icon: Twitter, color: '#1d9bf0' },
   { id: 'blog_draft', label: 'Blog Draft', icon: FileText, color: '#22c55e' },
   { id: 'snippet', label: 'Snippet', icon: Quote, color: '#f59e0b' },
+  { id: 'video_script', label: 'YouTube Script', icon: Video, color: '#ff0000' },
 ] as const;
+
+const CONTENT_PILLARS = [
+  { id: '', label: 'Any Pillar', color: 'var(--text-muted, #71717a)' },
+  { id: 'last_mile', label: 'Last-Mile Problem', color: '#ef4444' },
+  { id: 'decision_noise', label: 'Decision Noise', color: '#8b5cf6' },
+  { id: 'toxic_combos', label: 'Toxic Combinations', color: '#f59e0b' },
+] as const;
+
+const TOPIC_SUGGESTIONS: Record<string, string[]> = {
+  last_mile: [
+    'Why Perfect Financial Models Still Lead to Failed Deals',
+    'The 70-90% M&A Failure Rate Nobody Talks About',
+    'Anchoring to Entry Price: The Silent Deal Killer',
+    'Management Halo Effect in Due Diligence',
+    'The Gap Between Data Quality and Decision Quality',
+  ],
+  decision_noise: [
+    'Your Investment Committee Is a Rubber Stamp (Here\'s Proof)',
+    'The "Statistical Jury" Concept for Better IC Decisions',
+    'Winner\'s Curse: Why 65% of Deals Overpay',
+    'Simulating the Boardroom: The Decision Twin Concept',
+    'Why Your IC Produces Different Answers on Different Days',
+  ],
+  toxic_combos: [
+    'Anatomy of an Echo Chamber Deal',
+    'Boeing 737 MAX: The Bias Combination Nobody Caught',
+    'The Optimism Trap: When Anchoring Meets Overconfidence',
+    'Why Single-Bias Detection Is Not Enough',
+    'Lehman Brothers: A Predictable Catastrophe',
+  ],
+};
 
 interface ContentGeneratorProps {
   founderPass: string;
@@ -26,6 +58,8 @@ interface ContentGeneratorProps {
   onSave: (content: string) => void;
   isEditing: boolean;
   setIsEditing: (e: boolean) => void;
+  pillar: string;
+  setPillar: (p: string) => void;
 }
 
 export function ContentGenerator({
@@ -43,6 +77,8 @@ export function ContentGenerator({
   onSave,
   isEditing,
   setIsEditing,
+  pillar,
+  setPillar,
 }: ContentGeneratorProps) {
   const handleGenerate = useCallback(async () => {
     if (isGenerating) return;
@@ -63,6 +99,7 @@ export function ContentGenerator({
           topic: topic.trim() || undefined,
           tone,
           voiceNotes: voiceNotes.trim() || undefined,
+          pillar: pillar || undefined,
         }),
       });
 
@@ -110,7 +147,7 @@ export function ContentGenerator({
     } finally {
       setIsGenerating(false);
     }
-  }, [founderPass, contentType, topic, tone, voiceNotes, isGenerating, setIsGenerating, setGeneratedContent, setIsEditing]);
+  }, [founderPass, contentType, topic, tone, voiceNotes, pillar, isGenerating, setIsGenerating, setGeneratedContent, setIsEditing]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(generatedContent);
@@ -151,6 +188,37 @@ export function ContentGenerator({
         })}
       </div>
 
+      {/* Content pillar selector */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted, #71717a)', marginBottom: 8 }}>
+          Content Pillar
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {CONTENT_PILLARS.map(p => {
+            const active = pillar === p.id;
+            return (
+              <button
+                key={p.id}
+                onClick={() => setPillar(p.id)}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: active ? `2px solid ${p.color}` : '2px solid var(--border-primary, #222)',
+                  background: active ? `${p.color}15` : 'transparent',
+                  color: active ? p.color : 'var(--text-secondary, #a1a1aa)',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Topic input */}
       <input
         type="text"
@@ -173,6 +241,31 @@ export function ContentGenerator({
           if (e.key === 'Enter' && !isGenerating) handleGenerate();
         }}
       />
+
+      {/* Topic suggestions for selected pillar */}
+      {pillar && TOPIC_SUGGESTIONS[pillar] && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16, marginTop: -8 }}>
+          {TOPIC_SUGGESTIONS[pillar].map(suggestion => (
+            <button
+              key={suggestion}
+              onClick={() => setTopic(suggestion)}
+              style={{
+                padding: '4px 10px',
+                borderRadius: 6,
+                fontSize: 11,
+                cursor: 'pointer',
+                border: '1px solid var(--border-primary, #222)',
+                background: topic === suggestion ? 'var(--border-primary, #222)' : 'transparent',
+                color: 'var(--text-secondary, #a1a1aa)',
+                transition: 'all 0.15s',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Generate button */}
       <button

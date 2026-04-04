@@ -20,6 +20,7 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
   twitter_thread: { label: 'Twitter/X', color: '#1d9bf0' },
   blog_draft: { label: 'Blog', color: '#22c55e' },
   snippet: { label: 'Snippet', color: '#f59e0b' },
+  video_script: { label: 'YouTube', color: '#ff0000' },
 };
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -113,6 +114,7 @@ export function ContentLibrary({
           <option value="twitter_thread">Twitter/X</option>
           <option value="blog_draft">Blog</option>
           <option value="snippet">Snippet</option>
+          <option value="video_script">YouTube Script</option>
         </select>
 
         <select

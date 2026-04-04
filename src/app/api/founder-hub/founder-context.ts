@@ -136,4 +136,50 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Pre-Decision Evidence: 6 case studies now include original documents from BEFORE outcomes were known (board memos, SEC filings, earnings calls). Shows what the platform would have flagged — eliminating hindsight bias from the analysis.
 - Pairwise Interaction Learning: Causal learning engine detects multi-bias interaction effects (bias pairs with joint failure rate >1.3x expected from independence).
 - Self-Activating Historical Alignment: DQI historicalAlignment component auto-computes from correlation engine when no explicit alignment data exists — no more default 60 scores.
+
+=== CONTENT STRATEGY ===
+Target audience: M&A teams, PE/VC investment committees, corporate development groups.
+Goal: Build founder credibility on LinkedIn and YouTube as the authority bridging raw financial data and human cognitive performance in deal-making.
+
+THREE CONTENT PILLARS:
+
+PILLAR 1 — "Last-Mile Problem" in Deal Diligence
+Core thesis: Perfect financial models still lead to failed deals because the human decision element is ignored.
+Key angles:
+- 70–90% of M&A transactions fail to create expected value — the bottleneck isn't data, it's the "last mile" where insights fail to change human behavior because decision-makers are predictably irrational
+- Cognitive biases invisible in standard DD: anchoring to entry price, management halo effect stretching valuations, sunk cost in add-on acquisitions
+- Decision Intel bridges this gap with automated cognitive bias auditing — the missing layer between financial analytics and capital allocation
+- Busy deal teams rely heavily on descriptive/predictive analytics but consistently ignore the human element
+
+PILLAR 2 — Exposing "Decision Noise"
+Core thesis: Investment committees produce wildly inconsistent decisions that nobody measures (Kahneman's noise research).
+Key angles:
+- "Rubber-Stamp" IC problem: competitive dynamics trigger winner's curse in 65% of cases; confirmation bias leads committees to rubber-stamp deal rationale rather than stress-test it
+- "Statistical Jury" concept: run deal documents past multiple independent, objective evaluators to measure variance (noise) before capital is committed — this is exactly what DI's triple-judge scoring does
+- "Decision Twin" / Simulating the Boardroom: groupthink and authority bias silence genuine debate; simulate boardroom personas (Operating Partner, Risk Committee Chair, Sector Specialist) to predict votes and surface minority dissent — this is DI's Boardroom Simulation feature
+- Kahneman's insurance underwriter study: expected 10% variability, actual 55% — noise is at least as damaging as bias
+
+PILLAR 3 — "Toxic Combinations" and Compound Risk
+Core thesis: Individual biases are manageable; combinations are catastrophic — and they're detectable before deals close.
+Key angles:
+- "Echo Chamber" Deal anatomy: confirmation bias + groupthink mathematically amplifies risk; a single bias is rarely fatal but toxic combinations of individually benign biases can be catastrophic
+- Historical case studies: Boeing 737 MAX (sunk cost + time pressure + authority bias visible in 2011 board memo), Lehman Brothers (herd + anchoring + overconfidence), Yahoo's Google rejection (status quo + anchoring)
+- Named patterns from DI's engine: "Optimism Trap" (anchoring + overconfidence + time pressure), "Sunk Ship" (sunk cost + escalation + absent dissent), "Echo Chamber" (confirmation + groupthink + absent dissent)
+- DI's 20x20 compound scoring matrix and 10 named toxic patterns with org-calibrated weights are the product proof points
+
+CONTENT FRAMEWORK — Minto Pyramid Principle:
+All content should follow BLUF (Bottom Line Up Front) structure:
+1. LEAD with the provocative conclusion or key insight (the "so what") — this is the hook
+2. SUPPORT with 2-3 key arguments or data-backed reasons
+3. DETAIL with specific data, case studies, or research citations
+This mirrors how PE/VC professionals consume information: conclusion first, evidence on demand.
+
+TACTICAL EMPATHY (Chris Voss methodology):
+When content challenges existing decision processes, use tactical empathy:
+- Acknowledge the audience's expertise and current process before introducing counter-intuitive findings
+- Use "labeling" — name the emotion/resistance before it surfaces ("It might seem like we're questioning your judgment...")
+- Frame Decision Intel as augmenting, not replacing, expert judgment — "swing with confidence because you've stress-tested the decision"
+- Lead with curiosity, not criticism: "What if..." rather than "You're wrong because..."
+- Mirror the audience's language (deal flow, thesis, conviction, IC memo, CIM, DD) to build rapport
+- When discussing implementation with defensive deal sponsors, use structured empathy to manage emotions and build consensus
 `.trim();

@@ -88,7 +88,47 @@ const CONTENT_INSTRUCTIONS: Record<string, string> = {
 - Suitable for email signatures, slide decks, bios, newsletters
 - Should stand completely alone without context
 - Convey one powerful idea about decision intelligence`,
+
+  video_script: `Write a YouTube video script (5-8 minutes when read aloud, ~800-1200 words). Structure:
+- HOOK (first 15 seconds): A provocative question or startling statistic that stops the scroll
+- CONTEXT (30 seconds): Why this matters to M&A teams / PE/VC investment committees RIGHT NOW
+- KEY ARGUMENT 1: Core insight with specific evidence (case study, data point, or research)
+- KEY ARGUMENT 2: Second supporting insight, ideally from a different angle
+- KEY ARGUMENT 3 (optional): Third insight or counterargument acknowledgment
+- CALLBACK: Connect back to the hook — close the loop
+- CTA: Subscribe + specific next action (download, comment, check link)
+Format notes:
+- Write in spoken language — use contractions, rhetorical questions, direct address ("you")
+- Include [B-ROLL] or [GRAPHIC] markers where visual aids would help
+- Mark emphasis with **bold** for words to stress vocally
+- Each section should be clearly labeled with a heading`,
 };
+
+// ─── Content Pillars ────────────────────────────────────────────────────────
+
+const PILLAR_CONTEXT: Record<string, string> = {
+  last_mile: `CONTENT PILLAR: "Last-Mile Problem" in Deal Diligence
+Focus on: 70-90% M&A failure rate from human factors, anchoring to entry price, management halo effect, the gap between data quality and decision quality. Position Decision Intel as bridging this last mile.
+Suggested angles: Why perfect financial models fail, the human element DD misses, cognitive biases invisible in spreadsheets.`,
+
+  decision_noise: `CONTENT PILLAR: Exposing "Decision Noise"
+Focus on: IC inconsistency nobody measures, "Rubber-Stamp" committees, winner's curse (65%), confirmation bias in deal advocacy. Reference Kahneman's noise research. Use "Statistical Jury" and "Decision Twin" concepts.
+Suggested angles: Why your IC produces different answers on different days, the rubber-stamp problem, simulating the boardroom.`,
+
+  toxic_combos: `CONTENT PILLAR: "Toxic Combinations" and Compound Risk
+Focus on: Individual biases are manageable but combinations are catastrophic. Reference Echo Chamber pattern, Boeing 737 MAX, Lehman Brothers. Use named patterns (Optimism Trap, Sunk Ship). Highlight 20x20 compound scoring matrix.
+Suggested angles: Why single-bias detection is a feature but compound risk scoring is a product, echo chamber deals, historical catastrophes that were predictable.`,
+};
+
+const MINTO_INSTRUCTION = `
+STRUCTURE (Minto Pyramid — BLUF):
+1. LEAD with the provocative conclusion or key insight first (the "so what")
+2. SUPPORT with 2-3 key arguments
+3. DETAIL with specific data, case studies, or research citations
+PE/VC professionals want the conclusion first, evidence on demand.`;
+
+const TACTICAL_EMPATHY_INSTRUCTION = `
+TACTICAL EMPATHY: Acknowledge the audience's expertise before challenging their process. Use labeling ("It might seem like..."). Frame as augmenting expert judgment, not replacing it. Lead with curiosity ("What if..."), not criticism. Mirror deal-making language (deal flow, thesis, conviction, IC memo).`;
 
 // ─── POST: Generate (SSE) or Save ───────────────────────────────────────────
 
@@ -133,10 +173,10 @@ export async function POST(request: NextRequest) {
 
   // ── Generate (SSE stream) ──
   if (action === 'generate') {
-    const { contentType, topic, tone, voiceNotes } = body;
+    const { contentType, topic, tone, voiceNotes, pillar } = body;
     if (!contentType || !CONTENT_INSTRUCTIONS[contentType]) {
       return NextResponse.json(
-        { error: 'Invalid contentType. Valid: linkedin_post, twitter_thread, blog_draft, snippet' },
+        { error: 'Invalid contentType. Valid: linkedin_post, twitter_thread, blog_draft, snippet, video_script' },
         { status: 400 }
       );
     }
@@ -145,15 +185,18 @@ export async function POST(request: NextRequest) {
     const toneLabel = tone || 'authoritative';
     const voiceExtra = voiceNotes ? `\n\nAdditional voice/style notes from the founder:\n${String(voiceNotes).slice(0, 2000)}` : '';
     const topicLine = topic ? `\n\nTopic/angle to write about: ${String(topic).slice(0, 1000)}` : '';
+    const pillarExtra = pillar && PILLAR_CONTEXT[pillar] ? `\n\n${PILLAR_CONTEXT[pillar]}` : '';
 
     const systemPrompt = `${FOUNDER_CONTEXT}
 
-You are the founder's personal content writer. Generate social media content that builds thought leadership in decision intelligence and cognitive bias auditing.
+You are the founder's personal content writer. Generate social media content that builds thought leadership in decision intelligence and cognitive bias auditing for M&A teams, PE/VC investment committees, and corporate development groups.
 
 CONTENT TYPE INSTRUCTIONS:
 ${typeInstructions}
+${MINTO_INSTRUCTION}
+${TACTICAL_EMPATHY_INSTRUCTION}
 
-VOICE/TONE: ${toneLabel}${voiceExtra}${topicLine}
+VOICE/TONE: ${toneLabel}${voiceExtra}${pillarExtra}${topicLine}
 
 Write the content now. Output ONLY the content itself — no meta-commentary, no "Here's your post:", no wrapper text.`;
 

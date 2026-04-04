@@ -30,6 +30,7 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
 
   // Generation state
   const [contentType, setContentType] = useState('linkedin_post');
+  const [pillar, setPillar] = useState('');
   const [topic, setTopic] = useState('');
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -106,7 +107,9 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
           contentType,
           title,
           body: content,
-          topic: topic.trim() || undefined,
+          topic: pillar
+            ? `[pillar:${pillar}] ${topic.trim() || 'general'}`
+            : topic.trim() || undefined,
           tone,
           status: 'draft',
         }),
@@ -118,7 +121,7 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
     } catch {
       // silent
     }
-  }, [founderPass, contentType, topic, tone, fetchLibrary]);
+  }, [founderPass, contentType, pillar, topic, tone, fetchLibrary]);
 
   return (
     <div>
@@ -135,6 +138,8 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
         founderPass={founderPass}
         contentType={contentType}
         setContentType={setContentType}
+        pillar={pillar}
+        setPillar={setPillar}
         topic={topic}
         setTopic={setTopic}
         generatedContent={generatedContent}
