@@ -160,9 +160,9 @@ const SECTION_C: Entry[] = [
     name: 'Reference Class Forecasting and the Outside View',
     origin: 'Bent Flyvbjerg and Daniel Kahneman, multiple papers on megaproject forecasting.',
     summary: 'Instead of forecasting from project-specific details (inside view), look at the base rate of comparable projects (outside view). Humans wildly over-rely on the inside view.',
-    why: 'For a PE buyer staring at an IC memo, the single most persuasive number is the historical base rate of deals with this ticket size, sector, and sponsor profile. Perfect fit for an Outside View panel on the analysis page.',
-    surface: 'Roadmap: Outside View panel pulling comparable deal base rates',
-    shipped: false,
+    why: 'For a PE buyer staring at an IC memo, the single most persuasive number is the historical base rate of deals with this ticket size, sector, and sponsor profile.',
+    surface: 'src/lib/data/reference-class-forecasting.ts, src/components/ui/OutsideViewCard.tsx, shown on the document Overview tab',
+    shipped: true,
   },
   {
     name: 'Inversion',
@@ -293,24 +293,24 @@ const SECTION_E: Entry[] = [
     origin: 'The Challenger Sale (2011), CEB (now Gartner) research on 6,000+ reps.',
     summary: 'Top sales performers teach customers something counterintuitive about their own business, tailor the message, and take control of the conversation. Relationship builders are the worst performers in complex B2B.',
     why: 'Decision Intel is literally a Challenger product. It teaches buyers that their current process is biased and noisy in measurable ways. This is the single most natural sales motion to adopt.',
-    surface: 'Roadmap: Challenger playbook in Sales Toolkit, teach-pitch-take-control scripts',
-    shipped: false,
+    surface: 'Sales Toolkit tab, Challenger Sale Playbook card (Teach / Tailor / Take Control)',
+    shipped: true,
   },
   {
     name: 'Neil Rackham, SPIN Selling',
     origin: 'SPIN Selling (1988). Huthwaite research on 35,000+ sales calls.',
     summary: 'Situation, Problem, Implication, Need-payoff. Large-ticket sales are won by asking a specific sequence of discovery questions that make the buyer articulate their own pain.',
     why: 'Ready-made structure for discovery calls. The Implication stage is where noise and bias data becomes a sharp argument.',
-    surface: 'Roadmap: SPIN discovery scripts in Sales Toolkit',
-    shipped: false,
+    surface: 'Sales Toolkit tab, SPIN Discovery Script card (Situation / Problem / Implication / Need-Payoff)',
+    shipped: true,
   },
   {
     name: 'Dick Dunkel, MEDDPICC',
     origin: 'MEDDIC originated at PTC (1996), extended by Dick Dunkel and Andy Whyte.',
     summary: 'Metrics, Economic buyer, Decision criteria, Decision process, Paper process, Identify pain, Champion, Competition. Enterprise deal qualification checklist.',
     why: 'Any enterprise deal above $50k should be scored on these eight dimensions weekly. Keeps the pipeline honest and surfaces dying deals early.',
-    surface: 'Roadmap: MEDDPICC qualification template in Sales Toolkit',
-    shipped: false,
+    surface: 'Sales Toolkit tab, MEDDPICC Qualification Checklist card',
+    shipped: true,
   },
   {
     name: 'Kim and Mauborgne, Blue Ocean Strategy',
@@ -442,17 +442,18 @@ export function MethodologiesAndPrinciplesTab() {
           Roadmap frameworks ranked by expected leverage. Each is documented above, ready to be
           turned into a product ticket.
         </div>
+        <div style={{ ...bodyText, marginBottom: 8 }}>
+          Recently shipped: Reference Class Forecasting (Outside View panel), Challenger Sale
+          playbook, MEDDPICC qualification checklist, SPIN discovery script.
+        </div>
         <ol style={{ ...bodyText, paddingLeft: 20 }}>
-          <li>Reference Class Forecasting (highest ROI, M&amp;A base rates are hugely persuasive)</li>
-          <li>Jobs-to-be-Done positioning rewrite</li>
-          <li>Challenger Sale motion adoption</li>
-          <li>Outside View and Inversion prompts in Decision Rooms</li>
-          <li>MEDDPICC qualification template in the Sales Toolkit tab</li>
-          <li>Decision Quality Chain scorecard</li>
+          <li>Jobs-to-be-Done positioning rewrite of the landing page</li>
+          <li>Inversion and Red Team prompts inside Decision Rooms</li>
+          <li>Decision Quality Chain scorecard as a companion to DQI</li>
           <li>Cynefin-based routing in the analysis pipeline</li>
           <li>Wisdom-of-Crowds explicit citation in Decision Rooms marketing</li>
           <li>StoryBrand rewrite of the landing page</li>
-          <li>Aggregation Theory moat essay in Playbook</li>
+          <li>Aggregation Theory moat essay in the Playbook tab</li>
         </ol>
       </div>
     </div>

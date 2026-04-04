@@ -16,6 +16,7 @@ import { DecisionTimeline } from '@/components/visualizations/DecisionTimeline';
 import { DQIBadge } from '@/components/visualizations/DQIBadge';
 import { System1GaugeBar } from '@/components/visualizations/System1GaugeBar';
 import { BiologicalRiskBadge } from '@/components/ui/BiologicalRiskBadge';
+import { OutsideViewCard } from '@/components/ui/OutsideViewCard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ResearchInsight } from '@/types';
 
@@ -58,6 +59,8 @@ interface OverviewTabProps {
   compoundAdjustments?: Array<{ source: string; delta: number; description: string }>;
   recognitionCues?: RecognitionCuesResult;
   narrativePreMortem?: NarrativePreMortem;
+  dealSector?: string | null;
+  dealTicketSize?: number | null;
 }
 
 const SEVERITY_BADGE_STYLES: Record<string, string> = {
@@ -83,6 +86,8 @@ export function OverviewTab({
   compoundAdjustments,
   recognitionCues,
   narrativePreMortem,
+  dealSector,
+  dealTicketSize,
 }: OverviewTabProps) {
   const [showRpd, setShowRpd] = useState(false);
   const hasRpd = !!(recognitionCues || narrativePreMortem);
@@ -176,6 +181,11 @@ export function OverviewTab({
           </div>
         </ErrorBoundary>
       )}
+
+      {/* 0.5 Outside View — reference class forecasting from 146 historical cases */}
+      <ErrorBoundary sectionName="Outside View">
+        <OutsideViewCard sector={dealSector} ticketSize={dealTicketSize} />
+      </ErrorBoundary>
 
       {/* 1. Document Text Highlighter — replaces old BiasHeatmap with sidebar linking */}
       <ErrorBoundary sectionName="Document Bias Highlighter">

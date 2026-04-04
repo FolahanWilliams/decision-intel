@@ -2674,6 +2674,260 @@ function SalesToolkit() {
           ))}
         </div>
       </div>
+
+      {/* ─── Challenger Sale playbook ────────────────────────────────────── */}
+      <div style={{ ...card, borderLeft: '3px solid #3b82f6' }}>
+        <div style={sectionTitle}>
+          <Target size={18} style={{ color: '#3b82f6' }} /> The Challenger Sale Playbook
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+          Matt Dixon and Brent Adamson, CEB/Gartner research on 6,000+ reps. Top enterprise performers
+          teach the buyer something counterintuitive about their own business, tailor the insight,
+          then take control. Decision Intel is a natural Challenger product because the pitch itself
+          is a reframe of how buyers think about their own decision process.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+          <div
+            style={{
+              padding: 12,
+              borderRadius: 8,
+              background: 'rgba(59, 130, 246, 0.06)',
+              border: '1px solid rgba(59, 130, 246, 0.15)',
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#3b82f6', marginBottom: 6 }}>
+              1. TEACH
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Lead with the counterintuitive insight, not the product. Example: &quot;Kahneman&apos;s
+              insurance underwriter study found 55% variance where people expected 10%. Your IC has
+              the same problem and nobody measures it.&quot; The reframe is the hook.
+            </div>
+          </div>
+          <div
+            style={{
+              padding: 12,
+              borderRadius: 8,
+              background: 'rgba(59, 130, 246, 0.06)',
+              border: '1px solid rgba(59, 130, 246, 0.15)',
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#3b82f6', marginBottom: 6 }}>
+              2. TAILOR
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Translate the insight into the buyer&apos;s vocabulary. For a PE partner: thesis
+              confirmation, management halo, winner&apos;s curse. For a corporate strategist: strategic
+              drift, groupthink, escalation of commitment. Mirror their language, not yours.
+            </div>
+          </div>
+          <div
+            style={{
+              padding: 12,
+              borderRadius: 8,
+              background: 'rgba(59, 130, 246, 0.06)',
+              border: '1px solid rgba(59, 130, 246, 0.15)',
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#3b82f6', marginBottom: 6 }}>
+              3. TAKE CONTROL
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Don&apos;t ask &quot;what do you think?&quot; after the demo. Direct the next step:
+              &quot;Send me the last three IC memos that went sideways. I will run them through the
+              engine and we will reconvene Thursday.&quot; Constructive tension over consensus.
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            marginTop: 12,
+            padding: 10,
+            borderRadius: 8,
+            background: 'rgba(59, 130, 246, 0.04)',
+            border: '1px dashed rgba(59, 130, 246, 0.25)',
+            fontSize: 11,
+            color: 'var(--text-muted)',
+            lineHeight: 1.6,
+          }}
+        >
+          <strong style={{ color: 'var(--text-primary)' }}>Why this fits Decision Intel:</strong>{' '}
+          Relationship Builders are the worst performers in complex B2B. Challengers close deals
+          because they change how the buyer thinks. Our product is a reframe. Lean into it.
+        </div>
+      </div>
+
+      {/* ─── MEDDPICC qualification checklist ───────────────────────────── */}
+      <div style={{ ...card, borderLeft: '3px solid #8b5cf6' }}>
+        <div style={sectionTitle}>
+          <CheckCircle size={18} style={{ color: '#8b5cf6' }} /> MEDDPICC Qualification Checklist
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+          Score every enterprise opportunity above $50k on these eight dimensions weekly. Deals that
+          cannot answer all eight by week 4 should be triaged, not nursed. Originated at PTC (1996),
+          extended by Dick Dunkel and Andy Whyte.
+        </p>
+        <div style={{ display: 'grid', gap: 8 }}>
+          {[
+            {
+              letter: 'M',
+              name: 'Metrics',
+              prompt:
+                'What is the quantified economic impact we are delivering? For DI: $X avoided loss per flagged toxic combination, Y hours saved per IC cycle.',
+            },
+            {
+              letter: 'E',
+              name: 'Economic Buyer',
+              prompt:
+                'Who personally signs the PO? Do we have direct access or only through a champion? If champion-only, this deal will slip.',
+            },
+            {
+              letter: 'D',
+              name: 'Decision Criteria',
+              prompt:
+                'What criteria will the buyer use to compare us to alternatives? Are the criteria written down? Have we influenced them?',
+            },
+            {
+              letter: 'D',
+              name: 'Decision Process',
+              prompt:
+                'Who signs off and in what order? How many committees? What is the realistic close timeline given that process?',
+            },
+            {
+              letter: 'P',
+              name: 'Paper Process',
+              prompt:
+                'Security review, legal redlines, procurement, vendor onboarding. Map every form and signature before the deal is verbally won.',
+            },
+            {
+              letter: 'I',
+              name: 'Identify Pain',
+              prompt:
+                'What specifically hurts today? A bad IC call they still regret? A noisy committee? If the pain is abstract, the deal is not real.',
+            },
+            {
+              letter: 'C',
+              name: 'Champion',
+              prompt:
+                'Is there one internal person who sells for us when we are not in the room and has authority to move the deal forward? Named, not assumed.',
+            },
+            {
+              letter: 'C',
+              name: 'Competition',
+              prompt:
+                'Incumbent, do-nothing, build-it-in-house, and any direct competitor. For DI the most common competitor is do-nothing dressed up as &quot;we have a good process.&quot;',
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '40px 160px 1fr',
+                gap: 12,
+                padding: '8px 12px',
+                borderRadius: 6,
+                background: 'rgba(139, 92, 246, 0.04)',
+                border: '1px solid rgba(139, 92, 246, 0.12)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 18,
+                  fontWeight: 800,
+                  color: '#8b5cf6',
+                  textAlign: 'center',
+                }}
+              >
+                {item.letter}
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                {item.name}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                {item.prompt}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ─── SPIN discovery script ──────────────────────────────────────── */}
+      <div style={{ ...card, borderLeft: '3px solid #f59e0b' }}>
+        <div style={sectionTitle}>
+          <MessageSquare size={18} style={{ color: '#f59e0b' }} /> SPIN Discovery Script
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+          Neil Rackham&apos;s research on 35,000+ sales calls. Large-ticket sales are won by asking
+          a specific sequence of questions that make the buyer articulate their own pain. Use these
+          verbatim on the first discovery call.
+        </p>
+        {[
+          {
+            stage: 'Situation',
+            color: '#f59e0b',
+            questions: [
+              'Walk me through how your IC reviews a deal today, from memo drafting to final vote.',
+              'How many deals did you review last year and how many closed?',
+              'Who writes the memo, who reviews it, and how do dissenting views get captured?',
+            ],
+          },
+          {
+            stage: 'Problem',
+            color: '#f59e0b',
+            questions: [
+              'When was the last time you greenlit a deal you later regretted? What would you have wanted to see before voting yes?',
+              'How do you know when your committee is rubber-stamping versus genuinely debating?',
+              'How do you track whether your ICs improve over time?',
+            ],
+          },
+          {
+            stage: 'Implication',
+            color: '#f59e0b',
+            questions: [
+              'If one out of every ten yes-votes is actually a bad call, what does that cost this fund over a vintage?',
+              'When the noise in your committee is invisible, how do you tell a bold bet from a biased one?',
+              'If a competitor firm had a measurable decision quality score and you did not, would LPs eventually ask about it?',
+            ],
+          },
+          {
+            stage: 'Need-Payoff',
+            color: '#f59e0b',
+            questions: [
+              'If you could see the bias and noise profile of every IC memo in under 60 seconds, would you run it on the next three deals?',
+              'What would it be worth to catch one Echo Chamber pattern before capital was committed?',
+              'If your partners saw a rising Decision Quality Index over two quarters, how would that change your LP narrative?',
+            ],
+          },
+        ].map((block, i) => (
+          <div key={i} style={{ marginBottom: 12 }}>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: block.color,
+                marginBottom: 6,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}
+            >
+              {block.stage}
+            </div>
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 20,
+                fontSize: 12,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.7,
+              }}
+            >
+              {block.questions.map((q, j) => (
+                <li key={j}>{q}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
