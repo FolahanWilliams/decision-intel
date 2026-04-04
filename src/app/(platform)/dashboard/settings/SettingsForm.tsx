@@ -15,6 +15,7 @@ import {
   MessageSquare,
   ExternalLink,
   Unplug,
+  Plug,
 } from 'lucide-react';
 import { updateUserSettings, UserSettingsData } from '@/app/actions/settings';
 import { useTheme } from 'next-themes';
@@ -25,6 +26,7 @@ import type { SlackInstallationStatus } from '@/types/human-audit';
 import { PersonaManager } from './PersonaManager';
 import { BillingSection } from '@/components/ui/BillingSection';
 import { ApiKeysSection } from '@/components/ui/ApiKeysSection';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 const log = createClientLogger('Settings');
 
@@ -173,6 +175,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
     });
   };
 
+  const activeTab = searchParams.get('tab') || 'account';
+
   return (
     <div
       className="container"
@@ -190,377 +194,403 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
         <p className="text-muted">Manage your account preferences and notifications</p>
       </header>
 
-      {/* Account Information */}
-      <div className="card mb-lg animate-fade-in">
-        <div className="card-header">
-          <h3 className="flex items-center gap-sm">
-            <User size={18} />
-            Account Information
-          </h3>
-        </div>
-        <div className="card-body">
-          <div className="grid grid-2 gap-lg">
-            <div>
-              <label className="text-xs text-muted mb-xs font-medium block">Email</label>
-              <div
-                style={{
-                  padding: 'var(--spacing-md)',
-                  background: 'var(--bg-secondary)',
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                {userEmail || 'Connected via Google'}
-              </div>
+      <Tabs
+        value={activeTab}
+        onValueChange={tab => router.replace(`/dashboard/settings?tab=${tab}`, { scroll: false })}
+      >
+        <TabsList className="mb-lg" style={{ display: 'flex', gap: '4px' }}>
+          <TabsTrigger value="account" className="flex items-center gap-xs">
+            <User size={14} /> Account
+          </TabsTrigger>
+          <TabsTrigger value="preferences" className="flex items-center gap-xs">
+            <Bell size={14} /> Preferences
+          </TabsTrigger>
+          <TabsTrigger value="connections" className="flex items-center gap-xs">
+            <Plug size={14} /> Connections
+          </TabsTrigger>
+        </TabsList>
+
+        {/* ── Account Tab ──────────────────────────── */}
+        <TabsContent value="account">
+          {/* Account Information */}
+          <div className="card mb-lg animate-fade-in">
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <User size={18} />
+                Account Information
+              </h3>
             </div>
-            <div>
-              <label className="text-xs text-muted mb-xs font-medium block">
-                Plan &amp; Billing
-              </label>
-              <BillingSection />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Email Forwarding */}
-      <EmailForwardingSection />
-
-      {/* Notification Preferences */}
-      <div className="card mb-lg animate-fade-in" style={{ animationDelay: '0.1s' }}>
-        <div className="card-header">
-          <h3 className="flex items-center gap-sm">
-            <Bell size={18} />
-            Notification Preferences
-          </h3>
-        </div>
-        <div className="card-body">
-          <div className="flex flex-col gap-lg">
-            {!emailConfigured && (
-              <div className="flex items-start gap-sm rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
-                <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                <span>
-                  Email delivery is not configured. Toggling these settings will save your
-                  preferences, but no emails will be sent until the email provider is set up.
-                </span>
-              </div>
-            )}
-            <ToggleOption
-              label="Email Notifications"
-              description="Receive email updates about your analyses"
-              checked={emailNotifications}
-              onChange={setEmailNotifications}
-              disabled={isPending}
-            />
-            <ToggleOption
-              label="Analysis Alerts"
-              description="Get notified when document analysis completes"
-              checked={analysisAlerts}
-              onChange={setAnalysisAlerts}
-              disabled={isPending}
-            />
-            <ToggleOption
-              label="Weekly Digest"
-              description="Receive a weekly summary of your risk assessments"
-              checked={weeklyDigest}
-              onChange={setWeeklyDigest}
-              disabled={isPending}
-            />
-
-            {/* Notification Severity Threshold */}
-            <div className="flex items-center justify-between">
-              <div>
-                <div style={{ fontWeight: 500, marginBottom: '2px' }}>Severity Threshold</div>
-                <div className="text-xs text-muted">
-                  Only receive notifications at or above this severity level
-                </div>
-              </div>
-              <select
-                value={notificationSeverity}
-                onChange={e =>
-                  setNotificationSeverity(e.target.value as 'all' | 'high_critical' | 'critical')
-                }
-                disabled={isPending}
-                style={{
-                  padding: 'var(--spacing-sm) var(--spacing-md)',
-                  background: 'var(--bg-tertiary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '4px',
-                  color: 'var(--text-primary)',
-                  fontSize: '13px',
-                  cursor: isPending ? 'not-allowed' : 'pointer',
-                  opacity: isPending ? 0.5 : 1,
-                }}
-              >
-                <option value="all">All notifications</option>
-                <option value="high_critical">High &amp; Critical only</option>
-                <option value="critical">Critical only</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Display Preferences */}
-      <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.2s' }}>
-        <div className="card-header">
-          <h3 className="flex items-center gap-sm">
-            <Moon size={18} />
-            Display Preferences
-          </h3>
-        </div>
-        <div className="card-body">
-          <div className="flex flex-col gap-lg">
-            <ToggleOption
-              label="Dark Mode"
-              description="Use dark theme (default)"
-              checked={darkMode}
-              onChange={setDarkMode}
-              disabled={isPending}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Security */}
-      <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.4s' }}>
-        <div className="card-header">
-          <h3 className="flex items-center gap-sm">
-            <Shield size={18} />
-            Security
-          </h3>
-        </div>
-        <div className="card-body">
-          <div className="grid grid-2 gap-lg">
-            <div
-              style={{
-                padding: 'var(--spacing-md)',
-                background: 'rgba(34, 197, 94, 0.1)',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-              }}
-            >
-              <div className="flex items-center gap-sm mb-sm">
-                <CheckCircle size={16} style={{ color: 'var(--success)' }} />
-                <span className="text-xs font-bold" style={{ color: 'var(--success)' }}>
-                  Two-Factor Auth
-                </span>
-              </div>
-              <p className="text-xs text-muted">Managed by Supabase</p>
-            </div>
-            <div
-              style={{
-                padding: 'var(--spacing-md)',
-                background: 'rgba(34, 197, 94, 0.1)',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-              }}
-            >
-              <div className="flex items-center gap-sm mb-sm">
-                <CheckCircle size={16} style={{ color: 'var(--success)' }} />
-                <span className="text-xs font-bold" style={{ color: 'var(--success)' }}>
-                  Data Encryption
-                </span>
-              </div>
-              <p className="text-xs text-muted">AES-256 at rest</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Integrations */}
-      <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.45s' }}>
-        <div className="card-header">
-          <h3 className="flex items-center gap-sm">
-            <MessageSquare size={18} />
-            Integrations
-          </h3>
-        </div>
-        <div className="card-body">
-          <div
-            style={{
-              padding: 'var(--spacing-lg)',
-              background: 'var(--bg-secondary)',
-              border: '1px solid var(--liquid-border)',
-              borderRadius: '8px',
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-md">
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    background: slackStatus?.connected
-                      ? 'rgba(34, 197, 94, 0.15)'
-                      : 'var(--bg-card-hover)',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <MessageSquare
-                    size={20}
+            <div className="card-body">
+              <div className="grid grid-2 gap-lg">
+                <div>
+                  <label className="text-xs text-muted mb-xs font-medium block">Email</label>
+                  <div
                     style={{
-                      color: slackStatus?.connected ? 'var(--success)' : 'var(--text-secondary)',
+                      padding: 'var(--spacing-md)',
+                      background: 'var(--bg-secondary)',
+                      color: 'var(--text-secondary)',
                     }}
-                  />
+                  >
+                    {userEmail || 'Connected via Google'}
+                  </div>
                 </div>
                 <div>
-                  <div style={{ fontWeight: 600, marginBottom: '2px' }}>Slack</div>
-                  {slackLoading ? (
-                    <div className="text-xs text-muted">Checking connection...</div>
-                  ) : slackStatus?.connected ? (
-                    <div className="text-xs" style={{ color: 'var(--success)' }}>
-                      Connected to <strong>{slackStatus.teamName}</strong>
-                      {slackStatus.installedAt && (
-                        <span className="text-muted">
-                          {' '}
-                          &middot; since {new Date(slackStatus.installedAt).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-xs text-muted">
-                      Connect your Slack workspace to audit decisions in real-time
-                    </div>
-                  )}
+                  <label className="text-xs text-muted mb-xs font-medium block">
+                    Plan &amp; Billing
+                  </label>
+                  <BillingSection />
                 </div>
               </div>
-              <div className="flex items-center gap-sm">
-                {slackStatus?.connected ? (
-                  <button
-                    onClick={handleSlackDisconnect}
-                    disabled={disconnecting}
-                    className="btn flex items-center gap-sm"
+            </div>
+          </div>
+
+          {/* Email Forwarding */}
+          <EmailForwardingSection />
+
+          {/* Security */}
+          <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <Shield size={18} />
+                Security
+              </h3>
+            </div>
+            <div className="card-body">
+              <div className="grid grid-2 gap-lg">
+                <div
+                  style={{
+                    padding: 'var(--spacing-md)',
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                  }}
+                >
+                  <div className="flex items-center gap-sm mb-sm">
+                    <CheckCircle size={16} style={{ color: 'var(--success)' }} />
+                    <span className="text-xs font-bold" style={{ color: 'var(--success)' }}>
+                      Two-Factor Auth
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted">Managed by Supabase</p>
+                </div>
+                <div
+                  style={{
+                    padding: 'var(--spacing-md)',
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
+                  }}
+                >
+                  <div className="flex items-center gap-sm mb-sm">
+                    <CheckCircle size={16} style={{ color: 'var(--success)' }} />
+                    <span className="text-xs font-bold" style={{ color: 'var(--success)' }}>
+                      Data Encryption
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted">AES-256 at rest</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Danger Zone */}
+          <div
+            className="card mt-xl animate-fade-in"
+            style={{ animationDelay: '0.2s', borderColor: 'var(--error)' }}
+          >
+            <div className="card-header" style={{ borderBottomColor: 'rgba(239,68,68,0.3)' }}>
+              <h3 className="flex items-center gap-sm" style={{ color: 'var(--error)' }}>
+                <AlertTriangle size={18} />
+                Danger Zone
+              </h3>
+            </div>
+            <div className="card-body">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div style={{ fontWeight: 500, marginBottom: '4px' }}>Delete all my data</div>
+                  <div className="text-xs text-muted">
+                    Permanently removes all your documents, analyses, audit logs, and settings. This
+                    cannot be undone.
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="btn flex items-center gap-sm"
+                  style={{
+                    background: 'transparent',
+                    borderColor: 'var(--error)',
+                    color: 'var(--error)',
+                    flexShrink: 0,
+                    marginLeft: '24px',
+                  }}
+                >
+                  <Trash2 size={14} />
+                  Delete my data
+                </button>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* ── Preferences Tab ──────────────────────────── */}
+        <TabsContent value="preferences">
+          {/* Notification Preferences */}
+          <div className="card mb-lg animate-fade-in">
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <Bell size={18} />
+                Notification Preferences
+              </h3>
+            </div>
+            <div className="card-body">
+              <div className="flex flex-col gap-lg">
+                {!emailConfigured && (
+                  <div className="flex items-start gap-sm rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+                    <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                    <span>
+                      Email delivery is not configured. Toggling these settings will save your
+                      preferences, but no emails will be sent until the email provider is set up.
+                    </span>
+                  </div>
+                )}
+                <ToggleOption
+                  label="Email Notifications"
+                  description="Receive email updates about your analyses"
+                  checked={emailNotifications}
+                  onChange={setEmailNotifications}
+                  disabled={isPending}
+                />
+                <ToggleOption
+                  label="Analysis Alerts"
+                  description="Get notified when document analysis completes"
+                  checked={analysisAlerts}
+                  onChange={setAnalysisAlerts}
+                  disabled={isPending}
+                />
+                <ToggleOption
+                  label="Weekly Digest"
+                  description="Receive a weekly summary of your risk assessments"
+                  checked={weeklyDigest}
+                  onChange={setWeeklyDigest}
+                  disabled={isPending}
+                />
+
+                {/* Notification Severity Threshold */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div style={{ fontWeight: 500, marginBottom: '2px' }}>Severity Threshold</div>
+                    <div className="text-xs text-muted">
+                      Only receive notifications at or above this severity level
+                    </div>
+                  </div>
+                  <select
+                    value={notificationSeverity}
+                    onChange={e =>
+                      setNotificationSeverity(e.target.value as 'all' | 'high_critical' | 'critical')
+                    }
+                    disabled={isPending}
                     style={{
-                      background: 'transparent',
-                      borderColor: 'var(--error)',
-                      color: 'var(--error)',
+                      padding: 'var(--spacing-sm) var(--spacing-md)',
+                      background: 'var(--bg-tertiary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '4px',
+                      color: 'var(--text-primary)',
                       fontSize: '13px',
+                      cursor: isPending ? 'not-allowed' : 'pointer',
+                      opacity: isPending ? 0.5 : 1,
                     }}
                   >
-                    {disconnecting ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      <Unplug size={14} />
-                    )}
-                    {disconnecting ? 'Disconnecting...' : 'Disconnect'}
-                  </button>
-                ) : (
-                  <a
-                    href="/api/integrations/slack/oauth"
-                    className="btn btn-primary flex items-center gap-sm"
-                    style={{ fontSize: '13px', textDecoration: 'none' }}
-                  >
-                    <ExternalLink size={14} />
-                    Add to Slack
-                  </a>
-                )}
+                    <option value="all">All notifications</option>
+                    <option value="high_critical">High &amp; Critical only</option>
+                    <option value="critical">Critical only</option>
+                  </select>
+                </div>
               </div>
             </div>
-
-            {slackStatus?.connected && slackStatus.scopes && (
-              <div
-                style={{
-                  marginTop: 'var(--spacing-md)',
-                  paddingTop: 'var(--spacing-md)',
-                  borderTop: '1px solid var(--liquid-border)',
-                }}
-              >
-                <div
-                  className="text-xs text-muted"
-                  style={{ marginBottom: '6px', fontWeight: 600 }}
-                >
-                  Permissions granted
-                </div>
-                <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
-                  {slackStatus.scopes.map(scope => (
-                    <span
-                      key={scope}
-                      style={{
-                        fontSize: '11px',
-                        padding: '2px 8px',
-                        background: 'var(--bg-card-hover)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '12px',
-                        color: 'var(--text-secondary)',
-                      }}
-                    >
-                      {scope}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
-          <p className="text-xs text-muted" style={{ marginTop: 'var(--spacing-md)' }}>
-            When connected, Decision Intel monitors decision-related messages in your channels and
-            provides real-time cognitive bias nudges. All content is anonymized before analysis.
-          </p>
-        </div>
-      </div>
-
-      {/* API Keys */}
-      <ApiKeysSection />
-
-      {/* Boardroom Personas */}
-      <PersonaManager />
-
-      {/* Save Button */}
-      <div className="flex items-center justify-end gap-md">
-        {saved && (
-          <span className="flex items-center gap-sm text-sm" style={{ color: 'var(--success)' }}>
-            <CheckCircle size={16} />
-            Settings saved!
-          </span>
-        )}
-        <button
-          onClick={handleSave}
-          disabled={isPending}
-          className="btn btn-primary flex items-center gap-sm"
-        >
-          {isPending ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          {isPending ? 'Saving...' : 'Save Changes'}
-        </button>
-      </div>
-
-      {/* Danger Zone */}
-      <div
-        className="card mt-xl animate-fade-in"
-        style={{ animationDelay: '0.5s', borderColor: 'var(--error)' }}
-      >
-        <div className="card-header" style={{ borderBottomColor: 'rgba(239,68,68,0.3)' }}>
-          <h3 className="flex items-center gap-sm" style={{ color: 'var(--error)' }}>
-            <AlertTriangle size={18} />
-            Danger Zone
-          </h3>
-        </div>
-        <div className="card-body">
-          <div className="flex items-center justify-between">
-            <div>
-              <div style={{ fontWeight: 500, marginBottom: '4px' }}>Delete all my data</div>
-              <div className="text-xs text-muted">
-                Permanently removes all your documents, analyses, audit logs, and settings. This
-                cannot be undone.
+          {/* Display Preferences */}
+          <div className="card mb-xl animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <Moon size={18} />
+                Display Preferences
+              </h3>
+            </div>
+            <div className="card-body">
+              <div className="flex flex-col gap-lg">
+                <ToggleOption
+                  label="Dark Mode"
+                  description="Use dark theme (default)"
+                  checked={darkMode}
+                  onChange={setDarkMode}
+                  disabled={isPending}
+                />
               </div>
             </div>
+          </div>
+
+          {/* Boardroom Personas */}
+          <PersonaManager />
+
+          {/* Save Button */}
+          <div className="flex items-center justify-end gap-md mt-lg">
+            {saved && (
+              <span className="flex items-center gap-sm text-sm" style={{ color: 'var(--success)' }}>
+                <CheckCircle size={16} />
+                Settings saved!
+              </span>
+            )}
             <button
-              onClick={() => setShowDeleteModal(true)}
-              className="btn flex items-center gap-sm"
-              style={{
-                background: 'transparent',
-                borderColor: 'var(--error)',
-                color: 'var(--error)',
-                flexShrink: 0,
-                marginLeft: '24px',
-              }}
+              onClick={handleSave}
+              disabled={isPending}
+              className="btn btn-primary flex items-center gap-sm"
             >
-              <Trash2 size={14} />
-              Delete my data
+              {isPending ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              {isPending ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
-        </div>
-      </div>
+        </TabsContent>
+
+        {/* ── Connections Tab ──────────────────────────── */}
+        <TabsContent value="connections">
+          {/* Integrations */}
+          <div className="card mb-xl animate-fade-in">
+            <div className="card-header">
+              <h3 className="flex items-center gap-sm">
+                <MessageSquare size={18} />
+                Integrations
+              </h3>
+            </div>
+            <div className="card-body">
+              <div
+                style={{
+                  padding: 'var(--spacing-lg)',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--liquid-border)',
+                  borderRadius: '8px',
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-md">
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        background: slackStatus?.connected
+                          ? 'rgba(34, 197, 94, 0.15)'
+                          : 'var(--bg-card-hover)',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <MessageSquare
+                        size={20}
+                        style={{
+                          color: slackStatus?.connected ? 'var(--success)' : 'var(--text-secondary)',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 600, marginBottom: '2px' }}>Slack</div>
+                      {slackLoading ? (
+                        <div className="text-xs text-muted">Checking connection...</div>
+                      ) : slackStatus?.connected ? (
+                        <div className="text-xs" style={{ color: 'var(--success)' }}>
+                          Connected to <strong>{slackStatus.teamName}</strong>
+                          {slackStatus.installedAt && (
+                            <span className="text-muted">
+                              {' '}
+                              &middot; since {new Date(slackStatus.installedAt).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-xs text-muted">
+                          Connect your Slack workspace to audit decisions in real-time
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-sm">
+                    {slackStatus?.connected ? (
+                      <button
+                        onClick={handleSlackDisconnect}
+                        disabled={disconnecting}
+                        className="btn flex items-center gap-sm"
+                        style={{
+                          background: 'transparent',
+                          borderColor: 'var(--error)',
+                          color: 'var(--error)',
+                          fontSize: '13px',
+                        }}
+                      >
+                        {disconnecting ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Unplug size={14} />
+                        )}
+                        {disconnecting ? 'Disconnecting...' : 'Disconnect'}
+                      </button>
+                    ) : (
+                      <a
+                        href="/api/integrations/slack/oauth"
+                        className="btn btn-primary flex items-center gap-sm"
+                        style={{ fontSize: '13px', textDecoration: 'none' }}
+                      >
+                        <ExternalLink size={14} />
+                        Add to Slack
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {slackStatus?.connected && slackStatus.scopes && (
+                  <div
+                    style={{
+                      marginTop: 'var(--spacing-md)',
+                      paddingTop: 'var(--spacing-md)',
+                      borderTop: '1px solid var(--liquid-border)',
+                    }}
+                  >
+                    <div
+                      className="text-xs text-muted"
+                      style={{ marginBottom: '6px', fontWeight: 600 }}
+                    >
+                      Permissions granted
+                    </div>
+                    <div className="flex items-center gap-sm" style={{ flexWrap: 'wrap' }}>
+                      {slackStatus.scopes.map(scope => (
+                        <span
+                          key={scope}
+                          style={{
+                            fontSize: '11px',
+                            padding: '2px 8px',
+                            background: 'var(--bg-card-hover)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '12px',
+                            color: 'var(--text-secondary)',
+                          }}
+                        >
+                          {scope}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <p className="text-xs text-muted" style={{ marginTop: 'var(--spacing-md)' }}>
+                When connected, Decision Intel monitors decision-related messages in your channels and
+                provides real-time cognitive bias nudges. All content is anonymized before analysis.
+              </p>
+            </div>
+          </div>
+
+          {/* API Keys */}
+          <ApiKeysSection />
+        </TabsContent>
+      </Tabs>
 
       {/* Delete confirmation modal */}
       {showDeleteModal && (

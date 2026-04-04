@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { BarChart3, Dna, Lightbulb, Fingerprint } from 'lucide-react';
+import { BarChart3, Dna, Lightbulb, Fingerprint, BrainCircuit, TrendingUp, Network } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -19,9 +19,19 @@ const TABS = [
   { key: 'dna', label: 'Decision DNA', icon: <Dna size={15} /> },
   { key: 'explainability', label: 'Explainability', icon: <Lightbulb size={15} /> },
   { key: 'fingerprint', label: 'Fingerprint', icon: <Fingerprint size={15} /> },
+  { key: 'quality', label: 'Decision Quality', icon: <BrainCircuit size={15} /> },
+  { key: 'flywheel', label: 'Outcome Flywheel', icon: <TrendingUp size={15} /> },
+  { key: 'graph', label: 'Decision Graph', icon: <Network size={15} /> },
 ];
 
-const VALID_VIEWS = new Set(['trends', 'dna', 'explainability', 'fingerprint']);
+const VALID_VIEWS = new Set(['trends', 'dna', 'explainability', 'fingerprint', 'quality', 'flywheel', 'graph']);
+
+// Tabs that navigate to separate pages instead of rendering inline
+const NAV_TABS: Record<string, string> = {
+  quality: '/dashboard/decision-quality',
+  flywheel: '/dashboard/outcome-flywheel',
+  graph: '/dashboard/decision-graph',
+};
 
 function AnalyticsInner() {
   const searchParams = useSearchParams();
@@ -49,7 +59,13 @@ function AnalyticsInner() {
           <TabBar
             tabs={TABS}
             activeTab={view}
-            onTabChange={key => router.replace(`/dashboard/analytics?view=${key}`, { scroll: false })}
+            onTabChange={key => {
+              if (NAV_TABS[key]) {
+                router.push(NAV_TABS[key]);
+              } else {
+                router.replace(`/dashboard/analytics?view=${key}`, { scroll: false });
+              }
+            }}
           />
         )}
       </div>

@@ -15,6 +15,8 @@ interface TabBarProps {
 }
 
 export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
+  const manyTabs = tabs.length > 5;
+
   return (
     <div
       style={{
@@ -27,6 +29,8 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
         border: '1px solid var(--liquid-border, rgba(255,255,255,0.08))',
         borderRadius: '12px',
         flexShrink: 0,
+        overflowX: 'auto',
+        scrollbarWidth: 'none',
       }}
     >
       {tabs.map(tab => {
@@ -35,13 +39,14 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
+            title={tab.label}
             style={{
-              flex: 1,
+              flex: manyTabs ? 'none' : 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              padding: '10px 16px',
+              padding: manyTabs ? '10px 12px' : '10px 16px',
               fontSize: '13px',
               fontWeight: isActive ? 700 : 500,
               color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
@@ -54,7 +59,11 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
             }}
           >
             {tab.icon}
-            {tab.label}
+            {manyTabs ? (
+              <span className="hidden sm:inline">{tab.label}</span>
+            ) : (
+              tab.label
+            )}
           </button>
         );
       })}

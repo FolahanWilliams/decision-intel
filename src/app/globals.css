@@ -1856,7 +1856,10 @@ tr:hover td {
 }
 
 @media (max-width: 640px) {
-  .upload-zone { padding: var(--spacing-lg); }
+  .upload-zone {
+    padding: var(--spacing-lg);
+    min-height: 140px;
+  }
 
   .container {
     padding-left: 1rem !important;
@@ -1880,6 +1883,30 @@ tr:hover td {
   .card-header {
     padding: var(--spacing-sm) var(--spacing-md);
   }
+
+  /* Touch-friendly tap targets */
+  .btn, button {
+    min-height: 36px;
+  }
+
+  .btn-sm {
+    min-height: 32px;
+  }
+
+  /* Reduce grid gaps on small screens */
+  .gap-lg {
+    gap: var(--spacing-sm) !important;
+  }
+
+  .gap-xl {
+    gap: var(--spacing-md) !important;
+  }
+}
+
+/* Slide-in panel animation */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
 }
 
 /* ═══════════════════════════════════════════

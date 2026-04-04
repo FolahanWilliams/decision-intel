@@ -83,25 +83,36 @@ export function QuickScanModal({ open, onClose }: QuickScanModalProps) {
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.6)',
-        backdropFilter: 'blur(4px)',
       }}
       onClick={e => {
         if (e.target === e.currentTarget) handleClose();
       }}
     >
+      {/* Overlay backdrop */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(2px)',
+        }}
+        onClick={handleClose}
+      />
+      {/* Slide-in panel */}
       <div
         className="card liquid-glass-premium"
         style={{
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
           width: '100%',
-          maxWidth: 560,
-          maxHeight: '85vh',
+          maxWidth: 440,
           overflow: 'auto',
           padding: '24px',
-          position: 'relative',
+          borderRadius: 0,
+          borderLeft: '1px solid var(--liquid-border)',
+          animation: 'slideInRight 0.25s ease-out',
         }}
       >
         {/* Header */}
