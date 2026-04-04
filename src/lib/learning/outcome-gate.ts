@@ -1,17 +1,17 @@
 /**
- * Outcome Enforcement Gate
+ * Outcome Reminder Gate
  *
- * Implements mandatory outcome tracking as a moat strategy.
- * The behavioral data flywheel only produces value when users close the loop
- * by reporting what actually happened after their decisions.
+ * Surfaces progressive, non-blocking nudges asking users to report outcomes
+ * on past analyses. The behavioral data flywheel produces more value as users
+ * close the loop, but outcome reporting is encouraged — never mandatory — so
+ * enterprise adoption is not gated behind workflow commitments.
  *
- * Gate levels:
- *   - SOFT (3+ pending): surface reminders, include in SSE stream
- *   - HARD (5+ pending): block new analyses until outcomes are reported
+ * Gate levels (informational only — `allowed` is always true):
+ *   - SOFT (3+ pending): gentle reminder in SSE stream and dashboard banner
+ *   - HARD (5+ pending): stronger visual banner with escalated copy
  *
- * This is deliberately user-facing friction that converts into platform
- * value — each reported outcome improves calibration accuracy, creating
- * switching costs competitors cannot replicate without 18+ months of data.
+ * Each reported outcome still improves calibration accuracy and personalizes
+ * bias detection, so the incentive structure remains intact without friction.
  */
 
 import { prisma } from '@/lib/prisma';
@@ -78,12 +78,11 @@ export async function checkOutcomeGate(userId: string): Promise<OutcomeGateResul
     const pendingAnalysisIds = pendingAnalyses.map((a: { id: string; createdAt: Date }) => a.id);
 
     if (pendingCount >= OUTCOME_GATE.HARD_THRESHOLD) {
-      const unblockCount = pendingCount - OUTCOME_GATE.HARD_THRESHOLD + 1;
       return {
-        allowed: false,
+        allowed: true,
         pendingCount,
         level: 'hard',
-        message: `You have ${pendingCount} completed analyses awaiting outcome reports. Report outcomes for at least ${unblockCount} to unlock new analyses. Every outcome reported makes your future analyses more accurate.`,
+        message: `You have ${pendingCount} analyses awaiting outcome reports. Reporting outcomes improves your calibration accuracy and unlocks personalized bias detection. We recommend catching up soon.`,
         pendingAnalysisIds,
       };
     }

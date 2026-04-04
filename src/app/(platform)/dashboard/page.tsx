@@ -41,7 +41,7 @@ import { useNotifications } from '@/components/ui/NotificationCenter';
 import { useAnalysisProgress } from '@/components/ui/AnalysisProgressBar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
-import { OutcomeGateBanner, OutcomeGateModal } from '@/components/ui/OutcomeGate';
+import { OutcomeGateBanner } from '@/components/ui/OutcomeGate';
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
 import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
@@ -230,8 +230,10 @@ export default function Dashboard() {
     pendingCount: number;
     analysisIds: string[];
   } | null>(null);
-  const [showOutcomeGateModal, setShowOutcomeGateModal] = useState(false);
-  const [outcomeGateInfo, setOutcomeGateInfo] = useState<OutcomeGateInfo | null>(null);
+  // Legacy hard-gate state — server no longer returns 423, so this only
+  // populates on older deployments. Rendered as a dismissible banner, never
+  // a blocking modal.
+  const [hardGateInfo, setHardGateInfo] = useState<OutcomeGateInfo | null>(null);
 
   // Bias count accumulator for pipeline graph badges
   const biasCountRef = useRef(0);
@@ -259,11 +261,10 @@ export default function Dashboard() {
     },
   });
 
-  // Show outcome gate modal when the hook detects a hard gate
+  // Surface hard-gate reminder banner when the hook reports legacy gate info.
   useEffect(() => {
     if (outcomeGate) {
-      setOutcomeGateInfo(outcomeGate);
-      setShowOutcomeGateModal(true);
+      setHardGateInfo(outcomeGate);
     }
   }, [outcomeGate]);
 
@@ -967,19 +968,16 @@ export default function Dashboard() {
         <DraftOutcomeBanner />
       </div>
 
-      {/* Outcome Gate Modal (hard gate — 5+ pending outcomes, blocks analysis) */}
-      {showOutcomeGateModal && outcomeGateInfo && (
-        <OutcomeGateModal
-          gateInfo={outcomeGateInfo}
-          onClose={() => {
-            setShowOutcomeGateModal(false);
-            setOutcomeGateInfo(null);
-          }}
-          onOutcomeSubmitted={() => {
-            // Refresh the docs list after outcome submitted
-            mutateDocs(undefined, { revalidate: true });
-          }}
-        />
+      {/* Outcome Gate Banner (hard reminder — 5+ pending outcomes, non-blocking) */}
+      {hardGateInfo && (
+        <div className="mb-lg">
+          <OutcomeGateBanner
+            pendingCount={hardGateInfo.pendingCount}
+            pendingAnalysisIds={hardGateInfo.pendingAnalysisIds}
+            level="hard"
+            onDismiss={() => setHardGateInfo(null)}
+          />
+        </div>
       )}
 
       {/* Onboarding Guide — persists across view switches */}
