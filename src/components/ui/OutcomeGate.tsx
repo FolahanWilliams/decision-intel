@@ -157,24 +157,32 @@ export function OutcomeGateModal({ gateInfo, onClose, onOutcomeSubmitted }: Outc
         position: 'fixed',
         inset: 0,
         zIndex: 100,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.6)',
-        backdropFilter: 'blur(4px)',
       }}
     >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+      {/* Overlay backdrop */}
+      <div
         style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(2px)',
+        }}
+        onClick={onClose}
+      />
+      <motion.div
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
           width: '100%',
-          maxWidth: '520px',
-          margin: '16px',
+          maxWidth: '480px',
           background: 'var(--bg-secondary, #1a1a2e)',
-          border: '1px solid rgba(239, 68, 68, 0.2)',
-          borderRadius: '16px',
-          overflow: 'hidden',
+          borderLeft: '1px solid rgba(239, 68, 68, 0.2)',
+          overflow: 'auto',
         }}
       >
         {/* Header */}

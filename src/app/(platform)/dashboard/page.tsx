@@ -33,7 +33,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import useSWR from 'swr';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useAnalysisStream } from '@/hooks/useAnalysisStream';
@@ -1928,16 +1927,38 @@ export default function Dashboard() {
                           </>
                         )}
 
-                        <button
-                          onClick={() =>
-                            setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })
-                          }
-                          className="p-1.5 text-muted hover:text-error transition-colors rounded"
-                          title="Delete"
-                          aria-label={`Delete ${doc.filename}`}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        {deleteModal.open && deleteModal.docId === doc.id ? (
+                          <div className="flex items-center gap-xs">
+                            <span className="text-xs text-muted">Delete?</span>
+                            <button
+                              onClick={handleDelete}
+                              disabled={deleting}
+                              className="px-2 py-0.5 text-xs rounded"
+                              style={{ background: 'rgba(239,68,68,0.15)', color: 'var(--error)', border: '1px solid rgba(239,68,68,0.3)' }}
+                            >
+                              {deleting ? <Loader2 size={10} className="animate-spin" /> : 'Yes'}
+                            </button>
+                            <button
+                              onClick={() => setDeleteModal({ open: false, docId: '', filename: '' })}
+                              disabled={deleting}
+                              className="px-2 py-0.5 text-xs text-muted rounded"
+                              style={{ border: '1px solid var(--border-color)' }}
+                            >
+                              No
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() =>
+                              setDeleteModal({ open: true, docId: doc.id, filename: doc.filename })
+                            }
+                            className="p-1.5 text-muted hover:text-error transition-colors rounded"
+                            title="Delete"
+                            aria-label={`Delete ${doc.filename}`}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -2053,38 +2074,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <Dialog
-        open={deleteModal.open}
-        onOpenChange={open => {
-          if (!open && !deleting) setDeleteModal({ open: false, docId: '', filename: '' });
-        }}
-      >
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-sm">
-              <AlertTriangle size={20} className="text-error shrink-0" />
-              Delete Document?
-            </DialogTitle>
-            <DialogDescription>
-              {deleteModal.filename} will be permanently removed.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteModal({ open: false, docId: '', filename: '' })}
-              disabled={deleting}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
-              {deleting ? <Loader2 size={14} className="animate-spin" /> : 'Delete'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Quick Scan Modal */}
+      {/* Quick Scan Panel */}
       <QuickScanModal open={quickScanOpen} onClose={() => setQuickScanOpen(false)} />
     </div>
   );

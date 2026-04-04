@@ -17,6 +17,8 @@ import {
   Brain,
   Users,
   Globe,
+  GitCompareArrows,
+  BookOpen,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { SSEReader } from '@/lib/sse';
@@ -840,6 +842,42 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             borderRadius: '1px',
           }}
         />
+
+        {/* Contextual actions */}
+        {analysis && (
+          <div className="flex items-center gap-sm" style={{ marginTop: 'var(--spacing-sm)' }}>
+            <Link
+              href={`/dashboard/compare?doc=${document.id}`}
+              className="flex items-center gap-xs text-xs"
+              style={{
+                padding: '4px 12px',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-muted)',
+                textDecoration: 'none',
+                transition: 'all 0.15s',
+              }}
+            >
+              <GitCompareArrows size={12} />
+              Compare
+            </Link>
+            <Link
+              href="/dashboard/bias-library"
+              className="flex items-center gap-xs text-xs"
+              style={{
+                padding: '4px 12px',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-muted)',
+                textDecoration: 'none',
+                transition: 'all 0.15s',
+              }}
+            >
+              <BookOpen size={12} />
+              Bias Library
+            </Link>
+          </div>
+        )}
       </header>
 
       {/* Executive Summary */}
