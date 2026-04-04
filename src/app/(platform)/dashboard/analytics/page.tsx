@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BarChart3, Dna, Lightbulb, Fingerprint, BrainCircuit, TrendingUp, Network } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -9,10 +9,20 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TabBar } from '@/components/ui/TabBar';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useInsights } from '@/hooks/useInsights';
-import { InsightsPageContent } from '@/components/insights/InsightsPageContent';
-import { DecisionDNAPageContent } from '@/components/dna/DecisionDNAPageContent';
-import { ExplainabilityContent } from '@/components/explainability/ExplainabilityContent';
-import { FingerprintContent } from '@/components/fingerprint/FingerprintContent';
+
+// Lazy-load heavy visualization components — only the active tab's bundle is loaded
+const InsightsPageContent = lazy(() =>
+  import('@/components/insights/InsightsPageContent').then(m => ({ default: m.InsightsPageContent }))
+);
+const DecisionDNAPageContent = lazy(() =>
+  import('@/components/dna/DecisionDNAPageContent').then(m => ({ default: m.DecisionDNAPageContent }))
+);
+const ExplainabilityContent = lazy(() =>
+  import('@/components/explainability/ExplainabilityContent').then(m => ({ default: m.ExplainabilityContent }))
+);
+const FingerprintContent = lazy(() =>
+  import('@/components/fingerprint/FingerprintContent').then(m => ({ default: m.FingerprintContent }))
+);
 
 const TABS = [
   { key: 'trends', label: 'Trends & Insights', icon: <BarChart3 size={15} /> },
@@ -74,12 +84,14 @@ function AnalyticsInner() {
           <EnhancedEmptyState type="insights" />
         </div>
       ) : (
-        <div style={{ marginTop: 'var(--spacing-md)' }}>
-          {view === 'trends' && <InsightsPageContent />}
-          {view === 'dna' && <DecisionDNAPageContent />}
-          {view === 'explainability' && <ExplainabilityContent />}
-          {view === 'fingerprint' && <FingerprintContent />}
-        </div>
+        <Suspense fallback={<PageSkeleton />}>
+          <div style={{ marginTop: 'var(--spacing-md)' }}>
+            {view === 'trends' && <InsightsPageContent />}
+            {view === 'dna' && <DecisionDNAPageContent />}
+            {view === 'explainability' && <ExplainabilityContent />}
+            {view === 'fingerprint' && <FingerprintContent />}
+          </div>
+        </Suspense>
       )}
     </div>
   );
