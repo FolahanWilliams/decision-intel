@@ -238,6 +238,7 @@ export async function analyzeDocument(
                   : undefined
                 : undefined
             ),
+            forgottenQuestions: toPrismaJson(result.forgottenQuestions || undefined),
           } satisfies Prisma.AnalysisUncheckedCreateInput,
         });
 

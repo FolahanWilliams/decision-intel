@@ -6,3 +6,4 @@ export { RedTeamTab } from './RedTeamTab';
 export { BoardroomTab } from './BoardroomTab';
 export { SimulatorTab } from './SimulatorTab';
 export { DQChainTab } from './DQChainTab';
+export { ForgottenQuestionsTab } from './ForgottenQuestionsTab';

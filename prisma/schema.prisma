@@ -72,6 +72,7 @@ model Analysis {
   preMortemRating     Int?
   recognitionCues     Json?
   narrativePreMortem  Json?
+  forgottenQuestions  Json?
 
   // Version tracking and prompt reference
   version         Int             @default(1)

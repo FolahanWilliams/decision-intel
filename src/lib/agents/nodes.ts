@@ -6,6 +6,7 @@ import {
   NoiseBenchmark,
   CausalIntelligenceResult,
   RecognitionCuesResult,
+  ForgottenQuestionsResult,
 } from '../../types';
 import {
   GoogleGenerativeAI,
@@ -25,6 +26,7 @@ import {
   buildFactCheckRefinementPrompt,
   buildMetaJudgePrompt,
   buildRpdRecognitionPrompt,
+  buildForgottenQuestionsPrompt,
 } from './prompts';
 import { searchSimilarDocuments, searchSimilarWithOutcomes } from '../rag/embeddings';
 import { prisma } from '../prisma';
@@ -1443,6 +1445,135 @@ export async function rpdRecognitionNode(state: AuditState): Promise<Partial<Aud
 }
 
 // ============================================================
+// FORGOTTEN QUESTIONS NODE — Unknown-Unknowns Surface
+// ============================================================
+// Compares the memo against its reference class of historical analogs
+// and surfaces the critical questions the memo never asks but its
+// closest analogs had to answer. This is the most legible
+// "unknown unknowns" feature in the product.
+export async function forgottenQuestionsNode(
+  state: AuditState
+): Promise<Partial<AuditState>> {
+  // SECURITY: anonymization gate — same pattern as other content-touching nodes
+  if (state.anonymizationStatus !== 'success') {
+    log.warn('forgottenQuestionsNode: anonymization not confirmed — skipping');
+    return { forgottenQuestions: undefined };
+  }
+
+  const content = truncateText(state.structuredContent || '');
+  if (!content) {
+    return { forgottenQuestions: undefined };
+  }
+
+  try {
+    log.info('Running Forgotten Questions analysis...');
+
+    // Step 1: Assemble reference class from curated case studies
+    // Deferred import so cold analysis paths don't pay the cost.
+    const { computeReferenceClass } = await import('../data/reference-class-forecasting');
+
+    // Look up deal context if we have a dealId — mirrors the rpd node pattern.
+    let sector: string | null = null;
+    let ticketSize: number | null = null;
+    if (state.dealId) {
+      try {
+        const deal = await prisma.deal.findUnique({
+          where: { id: state.dealId },
+          select: { sector: true, ticketSize: true },
+        });
+        sector = deal?.sector ?? null;
+        ticketSize = deal?.ticketSize != null ? Number(deal.ticketSize) : null;
+      } catch {
+        // Non-fatal — fall back to global reference class
+      }
+    }
+
+    const refClass = computeReferenceClass({ sector, ticketSize });
+
+    // Use the most representative 6 analogs (3 failures + 3 successes when available)
+    const analogs = [
+      ...refClass.topFailures.slice(0, 3),
+      ...refClass.topSuccesses.slice(0, 3),
+    ];
+
+    if (analogs.length === 0) {
+      log.warn('ForgottenQuestions: no analogs in reference class');
+      return { forgottenQuestions: undefined };
+    }
+
+    const analogSummaries = analogs
+      .map((c, i) => {
+        const lessons = (c.lessonsLearned || []).slice(0, 2).join(' ');
+        const primary = c.primaryBias ? ` (primary bias: ${c.primaryBias})` : '';
+        return `Analog ${i + 1}: ${c.company} — ${c.title} [${c.outcome}]${primary}
+  Context: ${c.decisionContext.slice(0, 260)}
+  Key lesson: ${lessons.slice(0, 260)}`;
+      })
+      .join('\n\n');
+
+    const prompt = buildForgottenQuestionsPrompt({
+      referenceClassLabel: refClass.label,
+      analogSummaries,
+      hasDealContext: sector != null || ticketSize != null,
+    });
+
+    const result = await withGeminiResilience(
+      () =>
+        withTimeout(
+          getStandardSafetyGroundedModel().generateContent([
+            prompt,
+            `Memo under review:\n<memo>\n${content}\n</memo>`,
+          ]),
+          75000
+        ),
+      2,
+      1000,
+      10000
+    );
+
+    const text = result.response?.text ? result.response.text() : '';
+    const data = parseJSON(text);
+    const parsed = data?.forgottenQuestions as ForgottenQuestionsResult | undefined;
+
+    if (!parsed || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+      log.warn('ForgottenQuestions: LLM returned no grounded questions');
+      return { forgottenQuestions: undefined };
+    }
+
+    // Clamp to the [3, 7] contract and normalise severities.
+    const questions = parsed.questions.slice(0, 7).map(q => ({
+      question: String(q.question || '').slice(0, 500),
+      whyItMatters: String(q.whyItMatters || '').slice(0, 500),
+      biasGuarded: String(q.biasGuarded || '').slice(0, 80),
+      analogCompany: q.analogCompany ? String(q.analogCompany).slice(0, 120) : undefined,
+      severity: (['low', 'medium', 'high', 'critical'] as const).includes(
+        (q.severity as 'low' | 'medium' | 'high' | 'critical') ?? 'medium'
+      )
+        ? q.severity
+        : ('medium' as const),
+    }));
+
+    const forgottenQuestions: ForgottenQuestionsResult = {
+      questions,
+      headline: parsed.headline ? String(parsed.headline).slice(0, 300) : undefined,
+      analogsUsed: Array.isArray(parsed.analogsUsed)
+        ? parsed.analogsUsed.map(String).slice(0, 10)
+        : analogs.map(a => a.company).slice(0, 10),
+      generatedAt: new Date().toISOString(),
+    };
+
+    log.info(
+      `ForgottenQuestions: surfaced ${questions.length} gaps from ${analogs.length} analogs (${refClass.matchedBy})`
+    );
+
+    return { forgottenQuestions };
+  } catch (e) {
+    log.error('Forgotten Questions node failed:', e instanceof Error ? e.message : String(e));
+    return { forgottenQuestions: undefined };
+  }
+}
+
+// ============================================================
 // META-JUDGE (Adversarial Debate Protocol)
 // ============================================================
 
@@ -1866,6 +1997,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       ),
       recognitionCues: state.recognitionCues ?? undefined,
       narrativePreMortem: state.narrativePreMortem ?? undefined,
+      forgottenQuestions: state.forgottenQuestions ?? undefined,
       dqChain: computeDQChain({
         logicalAnalysis: state.logicalAnalysis,
         swotAnalysis: state.swotAnalysis,

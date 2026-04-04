@@ -509,6 +509,7 @@ export async function POST(request: NextRequest) {
                         : undefined
                       : undefined
                   ),
+                  forgottenQuestions: toPrismaJson(report.forgottenQuestions || undefined),
                 } satisfies Prisma.AnalysisUncheckedCreateInput,
               });
 
