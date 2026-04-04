@@ -229,6 +229,23 @@ describe('POST /api/upload', () => {
     expect(body.error).toContain('empty');
   });
 
+  it('returns 429 when monthly plan limit exceeded', async () => {
+    mockCheckAnalysisLimit.mockResolvedValue({
+      allowed: false,
+      plan: 'free',
+      used: 3,
+      limit: 3,
+    });
+
+    const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
+    const req = createMockRequest(file);
+    const res = await POST(req);
+
+    expect(res.status).toBe(429);
+    const body = await res.json();
+    expect(body.error).toContain('limit');
+  });
+
   it('handles schema drift on create (P2022) by falling back', async () => {
     mockParseFile.mockResolvedValue('Valid content for analysis');
     const schemaDriftError = new Error('Column not found') as Error & { code: string };
