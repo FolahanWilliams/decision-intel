@@ -294,14 +294,30 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ outcome });
     }
 
-    // Get all outcomes for user or organization
+    // Get all outcomes for the authenticated user's scope.
+    // If userId is provided, only allow it if it matches the authenticated user
+    // or they share an org (prevents cross-user data leakage).
+    const effectiveUserId = user.id;
     const membership = await prisma.teamMember.findFirst({
-      where: { userId: userId || user.id },
+      where: { userId: effectiveUserId },
     });
+
+    // If a different userId was requested, verify they're in the same org
+    if (userId && userId !== user.id) {
+      if (!membership?.orgId) {
+        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+      }
+      const targetMembership = await prisma.teamMember.findFirst({
+        where: { userId, orgId: membership.orgId },
+      });
+      if (!targetMembership) {
+        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+      }
+    }
 
     const outcomes = await prisma.decisionOutcome.findMany({
       where: {
-        ...(membership?.orgId ? { orgId: membership.orgId } : { userId: userId || user.id }),
+        ...(membership?.orgId ? { orgId: membership.orgId } : { userId: effectiveUserId }),
         reportedAt: {
           gte: startDate,
           lte: endDate,
