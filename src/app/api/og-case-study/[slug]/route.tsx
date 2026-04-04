@@ -12,13 +12,14 @@ import {
   isSuccessOutcome,
   type CaseStudy,
 } from '@/lib/data/case-studies';
+import { formatIndustry, formatOutcome, formatBiasName } from '@/lib/utils/labels';
 
 export const runtime = 'nodejs';
 
 type RouteContext = { params: Promise<{ slug: string }> };
 
 function outcomeLabel(outcome: CaseStudy['outcome']): string {
-  return outcome.replace(/_/g, ' ').toUpperCase();
+  return formatOutcome(outcome).toUpperCase();
 }
 
 function outcomeColor(outcome: CaseStudy['outcome']): string {
@@ -37,7 +38,9 @@ export async function GET(_req: Request, { params }: RouteContext): Promise<Resp
 
     const badgeColor = outcomeColor(caseStudy.outcome);
     const hasDeep = !!caseStudy.preDecisionEvidence;
-    const primaryBias = caseStudy.primaryBias || caseStudy.biasesPresent[0] || '';
+    const primaryBias = formatBiasName(
+      caseStudy.primaryBias || caseStudy.biasesPresent[0] || ''
+    );
 
     return new ImageResponse(
       (
@@ -103,7 +106,7 @@ export async function GET(_req: Request, { params }: RouteContext): Promise<Resp
                 display: 'flex',
               }}
             >
-              {caseStudy.industry.replace(/_/g, ' ')} &middot; {caseStudy.year}
+              {formatIndustry(caseStudy.industry)} &middot; {caseStudy.year}
             </div>
             {hasDeep && (
               <div

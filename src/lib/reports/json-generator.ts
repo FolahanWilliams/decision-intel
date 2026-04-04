@@ -1,3 +1,5 @@
+import { formatBiasName } from '@/lib/utils/labels';
+
 interface JsonReportData {
   filename: string;
   uploadedAt: string;
@@ -69,6 +71,7 @@ export function generateJsonReport(data: JsonReportData): string {
     summary: data.summary,
     biases: data.biases?.map(b => ({
       type: b.biasType,
+      label: formatBiasName(b.biasType),
       severity: b.severity,
       excerpt: b.excerpt,
       explanation: b.explanation,

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Globe, Loader2, TrendingDown, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { formatBiasName } from '@/lib/utils/labels';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -25,12 +26,6 @@ interface BiasGenomeResult {
 interface BiasGenomeBenchmarkProps {
   /** User's own bias rates for comparison */
   userBiasRates?: Record<string, number>;
-}
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-function formatBiasName(biasType: string): string {
-  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 // ─── Component ──────────────────────────────────────────────────────────────

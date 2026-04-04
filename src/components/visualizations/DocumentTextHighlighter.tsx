@@ -12,7 +12,7 @@ import {
   Minimize2,
   BarChart3,
 } from 'lucide-react';
-import { getBiasDisplayName } from '@/lib/utils/bias-normalize';
+import { formatBiasName } from '@/lib/utils/labels';
 import { getBiasColor, resetBiasColors, type BiasColorSet } from '@/lib/utils/bias-colors';
 
 interface DocumentTextHighlighterProps {
@@ -355,7 +355,7 @@ export function DocumentTextHighlighter({
                       }}
                       aria-pressed={biasTypeFilter === biasType}
                     >
-                      {getBiasDisplayName(biasType)} ({count})
+                      {formatBiasName(biasType)} ({count})
                     </button>
                   );
                 })}
@@ -520,7 +520,7 @@ export function DocumentTextHighlighter({
                   }}
                   role="button"
                   tabIndex={0}
-                  aria-label={`${getBiasDisplayName(bias.biasType)} (${bias.severity})`}
+                  aria-label={`${formatBiasName(bias.biasType)} (${bias.severity})`}
                   className={`relative cursor-pointer transition-all duration-200 ${
                     isVisible ? 'underline decoration-2' : ''
                   }`}
@@ -562,7 +562,7 @@ export function DocumentTextHighlighter({
                         color: '#fff',
                       }}
                     >
-                      {getBiasDisplayName(bias.biasType)}
+                      {formatBiasName(bias.biasType)}
                     </span>
                   )}
                   {seg.text}
@@ -653,7 +653,7 @@ export function DocumentTextHighlighter({
                         color: typeColor?.text,
                       }}
                     >
-                      {getBiasDisplayName(bias.biasType)}
+                      {formatBiasName(bias.biasType)}
                     </span>
                     <div className="flex items-center gap-1">
                       {bias.confidence != null && (
@@ -718,7 +718,7 @@ export function DocumentTextHighlighter({
                     />
                   </div>
                 </div>
-                <p className="text-xs font-semibold text-foreground mb-1">{bias.biasType}</p>
+                <p className="text-xs font-semibold text-foreground mb-1">{formatBiasName(bias.biasType)}</p>
                 <p className="text-[11px] text-muted italic line-clamp-2">
                   &quot;{bias.excerpt}&quot;
                 </p>
@@ -758,7 +758,7 @@ export function DocumentTextHighlighter({
           >
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-bold text-foreground">
-                {getBiasDisplayName(biases[hoveredBiasIdx].biasType)}
+                {formatBiasName(biases[hoveredBiasIdx].biasType)}
               </span>
               <span
                 className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded"

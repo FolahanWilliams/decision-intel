@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { AlertTriangle, CheckCircle, BookOpen, Sparkles } from 'lucide-react';
 import { isFailureOutcome, isSuccessOutcome, type CaseStudy } from '@/lib/data/case-studies';
 import { trackEvent } from '@/lib/analytics/track';
+import { formatIndustry, formatOutcome, formatBiasName } from '@/lib/utils/labels';
 
 interface GridCase {
   slug: string;
@@ -111,7 +112,7 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
           <option value="all">All industries</option>
           {industries.map(ind => (
             <option key={ind} value={ind}>
-              {ind.replace(/_/g, ' ')}
+              {formatIndustry(ind)}
             </option>
           ))}
         </select>
@@ -208,7 +209,7 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
                     borderRadius: 999,
                   }}
                 >
-                  {c.outcome.replace(/_/g, ' ')}
+                  {formatOutcome(c.outcome)}
                 </span>
                 {isFailureOutcome(c.outcome) ? (
                   <AlertTriangle size={12} color="#DC2626" />
@@ -262,7 +263,7 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
                     marginBottom: 8,
                   }}
                 >
-                  <strong>Primary bias:</strong> {c.primaryBias}
+                  <strong>Primary bias:</strong> {formatBiasName(c.primaryBias)}
                 </div>
               )}
 

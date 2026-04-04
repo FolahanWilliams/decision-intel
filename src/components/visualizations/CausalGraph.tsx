@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { formatBiasName } from '@/lib/utils/labels';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   AlertCircle,
@@ -570,10 +571,3 @@ function BiasDetails({ biasType, weights }: { biasType: string; weights: CausalW
   );
 }
 
-// Helper function to format bias names
-function formatBiasName(biasType: string): string {
-  return biasType
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, str => str.toUpperCase())
-    .trim();
-}

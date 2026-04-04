@@ -3,6 +3,7 @@
 import { AlertTriangle, CheckCircle, Shield } from 'lucide-react';
 import { BiasInstance } from '@/types';
 import { SEVERITY_COLORS } from '@/lib/constants/human-audit';
+import { formatBiasName } from '@/lib/utils/labels';
 
 const SEVERITY_ORDER: Record<string, number> = {
   critical: 0,
@@ -76,7 +77,7 @@ export function ActionableNudges({ biases }: ActionableNudgesProps) {
               >
                 <AlertTriangle size={13} style={{ color, flexShrink: 0 }} />
                 <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-                  {bias.biasType}
+                  {formatBiasName(bias.biasType)}
                 </span>
                 <span
                   style={{

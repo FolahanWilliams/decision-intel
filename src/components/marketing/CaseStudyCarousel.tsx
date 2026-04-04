@@ -13,6 +13,7 @@ import {
   type CaseStudy,
 } from '@/lib/data/case-studies';
 import { trackEvent } from '@/lib/analytics/track';
+import { formatIndustry, formatOutcome, formatBiasName } from '@/lib/utils/labels';
 
 const C = {
   navy: '#0F172A',
@@ -173,7 +174,7 @@ export function CaseStudyCarousel() {
                         borderRadius: 999,
                       }}
                     >
-                      {c.outcome.replace(/_/g, ' ')}
+                      {formatOutcome(c.outcome)}
                     </span>
                     {isFailureOutcome(c.outcome) ? (
                       <AlertTriangle size={12} color="#DC2626" />
@@ -213,12 +214,12 @@ export function CaseStudyCarousel() {
                     {c.company}
                   </h3>
                   <p style={{ fontSize: 12, color: C.slate500, margin: 0, marginBottom: 14 }}>
-                    {c.year} &middot; {c.industry.replace(/_/g, ' ')}
+                    {c.year} &middot; {formatIndustry(c.industry)}
                   </p>
 
                   {c.primaryBias && (
                     <div style={{ fontSize: 12, color: C.slate600, marginBottom: 8 }}>
-                      <strong style={{ color: C.slate900 }}>Flagged:</strong> {c.primaryBias}
+                      <strong style={{ color: C.slate900 }}>Flagged:</strong> {formatBiasName(c.primaryBias)}
                     </div>
                   )}
 

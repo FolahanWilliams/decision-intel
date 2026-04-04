@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ShieldAlert, TrendingDown, AlertTriangle, Loader2 } from 'lucide-react';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface RiskData {
   riskScore: number;
@@ -26,10 +27,6 @@ function formatCurrency(value: number, currency: string): string {
   } catch {
     return `${currency} ${value.toLocaleString()}`;
   }
-}
-
-function formatBiasName(biasType: string): string {
-  return biasType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function getRiskColor(score: number): string {

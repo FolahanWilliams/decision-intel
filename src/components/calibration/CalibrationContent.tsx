@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { CalibrationProfile } from '@/types';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { formatBiasName } from '@/lib/utils/labels';
 
 function TrendIcon({ trend }: { trend: 'increasing' | 'decreasing' | 'stable' }) {
   if (trend === 'decreasing') return <TrendingDown size={12} className="text-emerald-400" />;
@@ -187,8 +188,8 @@ export function CalibrationContent() {
                       className="flex items-center justify-between p-2 border border-border"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-foreground capitalize">
-                          {bias.biasType.replace(/_/g, ' ')}
+                        <span className="text-xs font-medium text-foreground">
+                          {formatBiasName(bias.biasType)}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
