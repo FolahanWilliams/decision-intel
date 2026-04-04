@@ -7,6 +7,7 @@ import {
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { NewDecisionModal } from '@/components/ui/NewDecisionModal';
 import { AuthGuard } from '@/components/ui/AuthGuard';
+import { UsageMeter } from '@/components/billing/UsageMeter';
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
   return (
     <AnalysisProgressProvider>
@@ -29,6 +30,15 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           }}
         >
           <div style={{ maxWidth: 1320, margin: '0 auto', padding: '32px 32px 64px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                marginBottom: 16,
+              }}
+            >
+              <UsageMeter />
+            </div>
             {children}
           </div>
         </main>
