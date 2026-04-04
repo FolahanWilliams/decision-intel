@@ -57,6 +57,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           contentTag: true,
           uploadedAt: true,
           status: true,
+          deal: {
+            select: {
+              id: true,
+              name: true,
+              sector: true,
+              ticketSize: true,
+            },
+          },
           analyses: {
             orderBy: { createdAt: 'desc' },
             select: {
@@ -130,7 +138,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const decryptedContent = getDocumentContent(
       document as Parameters<typeof getDocumentContent>[0]
     );
-    return NextResponse.json({ ...docFields, content: decryptedContent });
+    // Normalise Prisma Decimal (deal.ticketSize) to a plain number so the
+    // client can compare it numerically without importing Decimal.
+    const dealRaw = (docFields as { deal?: { ticketSize?: unknown } | null }).deal;
+    const deal = dealRaw
+      ? {
+          ...dealRaw,
+          ticketSize:
+            dealRaw.ticketSize != null ? Number(dealRaw.ticketSize as unknown as string) : null,
+        }
+      : null;
+    return NextResponse.json({ ...docFields, deal, content: decryptedContent });
   } catch (error) {
     log.error('Error fetching document:', error);
     return NextResponse.json({ error: 'Failed to fetch document' }, { status: 500 });

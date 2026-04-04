@@ -188,6 +188,12 @@ interface Document {
   uploadedAt: string;
   status: string;
   analyses: Analysis[];
+  deal?: {
+    id: string;
+    name: string;
+    sector: string | null;
+    ticketSize: number | null;
+  } | null;
 }
 
 type TabId = 'overview' | 'evidence' | 'swot' | 'noise' | 'perspectives' | 'intelligence';
@@ -1724,6 +1730,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         compoundAdjustments={analysis?.compliance?.compoundScoring?.adjustments}
                         recognitionCues={analysis?.recognitionCues}
                         narrativePreMortem={analysis?.narrativePreMortem}
+                        dealSector={document.deal?.sector ?? null}
+                        dealTicketSize={document.deal?.ticketSize ?? null}
                       />
                     </ErrorBoundary>
                   )}
