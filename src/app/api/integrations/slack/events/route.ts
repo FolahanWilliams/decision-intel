@@ -61,7 +61,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
-    const payload: SlackWebhookPayload = JSON.parse(rawBody);
+    let payload: SlackWebhookPayload;
+    try {
+      payload = JSON.parse(rawBody);
+    } catch {
+      log.error('Failed to parse Slack event payload');
+      return NextResponse.json({ ok: true }); // Return 200 to avoid Slack retries
+    }
 
     // Handle Slack URL verification challenge
     if (payload.type === 'url_verification' && payload.challenge) {
