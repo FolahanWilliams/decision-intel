@@ -145,31 +145,30 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Prompt version not found' }, { status: 404 });
     }
 
-    // Deactivate all versions
-    await prisma.promptVersion.updateMany({
-      where: { name },
-      data: { isActive: false },
-    });
-
-    // Activate the target version
-    await prisma.promptVersion.update({
-      where: { id: targetPrompt.id },
-      data: { isActive: true },
-    });
-
-    // Log audit trail
-    await prisma.auditLog.create({
-      data: {
-        userId: admin.id,
-        action: 'prompt.rollback',
-        resource: 'prompt',
-        resourceId: targetPrompt.id,
-        details: {
-          name,
-          rolledBackTo: version,
+    // Atomically deactivate all versions and activate the target to prevent
+    // concurrent rollbacks from leaving zero active versions.
+    await prisma.$transaction([
+      prisma.promptVersion.updateMany({
+        where: { name },
+        data: { isActive: false },
+      }),
+      prisma.promptVersion.update({
+        where: { id: targetPrompt.id },
+        data: { isActive: true },
+      }),
+      prisma.auditLog.create({
+        data: {
+          userId: admin.id,
+          action: 'prompt.rollback',
+          resource: 'prompt',
+          resourceId: targetPrompt.id,
+          details: {
+            name,
+            rolledBackTo: version,
+          },
         },
-      },
-    });
+      }),
+    ]);
 
     return NextResponse.json({
       message: `Rolled back ${name} to version ${version}`,

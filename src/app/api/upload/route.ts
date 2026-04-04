@@ -290,9 +290,9 @@ export async function POST(request: NextRequest) {
       throw new Error(`Storage Upload Failed: ${uploadError.message}`);
     }
 
-    // Link to DecisionFrame if frameId was provided
+    // Link to DecisionFrame if frameId was provided (fire-and-forget)
     if (frameId) {
-      prisma.decisionFrame
+      void prisma.decisionFrame
         .updateMany({
           where: { id: frameId, userId, documentId: { equals: null } },
           data: { documentId: document.id },

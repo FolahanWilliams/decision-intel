@@ -13,6 +13,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
+import { safeCompare } from '@/lib/utils/safe-compare';
 
 const log = createLogger('ShareLink');
 
@@ -160,7 +161,7 @@ export async function GET(req: NextRequest) {
         // Legacy SHA-256 hash (64 hex characters)
         const { createHash } = await import('crypto');
         const hash = createHash('sha256').update(password).digest('hex');
-        passwordValid = hash === link.password;
+        passwordValid = safeCompare(hash, link.password);
 
         // If valid, transparently upgrade to bcrypt
         if (passwordValid) {
@@ -213,8 +214,10 @@ export async function GET(req: NextRequest) {
       ])
       .catch(err => log.warn('Share link tracking failed:', err));
 
-    // Generate ETag based on analysis updated timestamp and view count
-    const etag = `"${analysis.id}-${analysis.updatedAt.getTime()}-${link.viewCount}"`;
+    // Generate ETag based on analysis updated timestamp and view count.
+    // Use viewCount + 1 because the fire-and-forget increment above has
+    // already been dispatched — the next request will see this new count.
+    const etag = `"${analysis.id}-${analysis.updatedAt.getTime()}-${link.viewCount + 1}"`;
 
     // Check If-None-Match header for conditional request
     const ifNoneMatch = req.headers.get('if-none-match');
