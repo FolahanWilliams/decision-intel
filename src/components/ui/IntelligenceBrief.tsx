@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { TrendingUp, AlertTriangle, Target, Zap } from 'lucide-react';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface CausalWeight {
   biasType: string;
@@ -34,10 +35,6 @@ const CONTEXT_ICONS: Record<BriefContext, React.ReactNode> = {
   nudges: <Zap size={16} className="text-purple-400" />,
   effectiveness: <TrendingUp size={16} className="text-emerald-400" />,
 };
-
-function formatBiasName(raw: string): string {
-  return raw.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function getContextualTip(context: BriefContext, data: IntelligenceData): string {
   const topBias = data.causalWeights[0];

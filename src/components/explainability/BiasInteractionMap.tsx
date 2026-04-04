@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface Interaction {
   from: string;
@@ -188,6 +189,3 @@ function LegendItem({ color, label, dot }: { color: string; label: string; dot?:
   );
 }
 
-function formatBiasName(type: string): string {
-  return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}

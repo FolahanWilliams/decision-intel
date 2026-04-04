@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { formatBiasName } from '@/lib/utils/labels';
 
 // Define types locally to match the structure we pass from the page
 export interface ReportBiasInstance {
@@ -331,7 +332,7 @@ export class PdfGenerator {
     }
 
     const tableData = biases.map(bias => [
-      bias.biasType,
+      formatBiasName(bias.biasType),
       bias.severity.toUpperCase(),
       bias.excerpt,
       bias.explanation,

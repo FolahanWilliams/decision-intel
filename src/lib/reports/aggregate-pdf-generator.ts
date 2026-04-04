@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface RiskSummary {
   totalDocuments: number;
@@ -233,7 +234,7 @@ export class AggregatePdfGenerator {
     this.doc.setFont('helvetica', 'bold');
     this.doc.text('Top Systemic Biases', 20, startY);
 
-    const tableData = sortedBiases.map(([type, count]) => [type, count]);
+    const tableData = sortedBiases.map(([type, count]) => [formatBiasName(type), count]);
 
     autoTable(this.doc, {
       startY: startY + 10,

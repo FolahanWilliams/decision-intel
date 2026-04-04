@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useCallback, useRef } from 'react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { formatBiasName } from '@/lib/utils/labels';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -1167,7 +1168,7 @@ function ClusterView({
                     transition: prefersReducedMotion ? 'none' : 'all 0.15s',
                   }}
                 >
-                  {bias.biasType}
+                  {formatBiasName(bias.biasType)}
                 </button>
               ))}
             </div>

@@ -13,6 +13,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { formatBiasName } from '@/lib/utils/labels';
 import { useFingerprint } from '@/hooks/useFingerprint';
 import { type ContextualPattern } from '@/lib/learning/fingerprint-engine';
 import {
@@ -208,8 +209,8 @@ export function FingerprintContent() {
                   {fingerprint.topPatterns.map((pattern, i) => (
                     <div key={i} className="p-3 border border-border">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-foreground capitalize">
-                          {pattern.biasType.replace(/_/g, ' ')}
+                        <span className="text-xs font-medium text-foreground">
+                          {formatBiasName(pattern.biasType)}
                         </span>
                         <div className="flex items-center gap-2">
                           <TrendIcon trend={pattern.trend} />

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, Quote, AlertTriangle } from 'lucide-react';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface BiasEvidence {
   type: string;
@@ -253,6 +254,3 @@ export function EvidenceTrail({
   );
 }
 
-function formatBiasName(type: string): string {
-  return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}

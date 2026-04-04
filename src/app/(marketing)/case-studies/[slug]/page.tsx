@@ -14,6 +14,12 @@ import {
 import { computeReferenceClass } from '@/lib/data/reference-class-forecasting';
 import { CaseStudyNav, BRAND_COLORS as C } from '../CaseStudyNav';
 import { CaseStudyCta } from './CaseStudyCta';
+import {
+  formatIndustry,
+  formatDocumentType,
+  formatBiasName,
+  humanize,
+} from '@/lib/utils/labels';
 
 export const dynamicParams = false;
 
@@ -207,7 +213,7 @@ export default async function CaseStudyDetailPage({
                 borderRadius: 999,
               }}
             >
-              {caseStudy.industry.replace(/_/g, ' ')}
+              {formatIndustry(caseStudy.industry)}
             </span>
             <span style={{ fontSize: 13, color: '#64748B' }}>{caseStudy.year}</span>
           </div>
@@ -292,7 +298,7 @@ export default async function CaseStudyDetailPage({
                     marginBottom: 8,
                   }}
                 >
-                  {deep.documentType.replace(/_/g, ' ')} &middot; {deep.date}
+                  {formatDocumentType(deep.documentType)} &middot; {deep.date}
                 </div>
                 <blockquote
                   style={{
@@ -375,7 +381,7 @@ export default async function CaseStudyDetailPage({
                           borderRadius: 999,
                         }}
                       >
-                        {bias}
+                        {formatBiasName(bias)}
                       </span>
                     ))}
                   </div>
@@ -441,7 +447,7 @@ export default async function CaseStudyDetailPage({
                   }}
                 >
                   {bias === caseStudy.primaryBias ? '★ ' : ''}
-                  {bias}
+                  {formatBiasName(bias)}
                 </span>
               ))}
             </div>
@@ -507,7 +513,7 @@ export default async function CaseStudyDetailPage({
         {/* Source */}
         <section style={{ marginBottom: 40 }}>
           <p style={{ fontSize: 12, color: '#64748B', margin: 0 }}>
-            Source: {caseStudy.source} ({caseStudy.sourceType.replace(/_/g, ' ')})
+            Source: {caseStudy.source} ({humanize(caseStudy.sourceType)})
           </p>
         </section>
 
@@ -519,7 +525,7 @@ export default async function CaseStudyDetailPage({
         {/* Related */}
         {related.length > 0 && (
           <section>
-            <SectionTitle>Related cases in {caseStudy.industry.replace(/_/g, ' ')}</SectionTitle>
+            <SectionTitle>Related cases in {formatIndustry(caseStudy.industry)}</SectionTitle>
             <div style={{ display: 'grid', gap: 12 }}>
               {related.map(r => {
                 const rOutcome = outcomeColor(r.outcome);

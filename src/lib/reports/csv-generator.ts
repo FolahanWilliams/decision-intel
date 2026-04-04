@@ -1,4 +1,5 @@
 import { ReportAnalysisData } from './pdf-generator';
+import { formatBiasName } from '@/lib/utils/labels';
 
 export class CsvGenerator {
   public generateReport(filename: string, analysis: ReportAnalysisData) {
@@ -29,7 +30,7 @@ export class CsvGenerator {
       for (const bias of analysis.biases) {
         sections.push(
           this.formatRow([
-            bias.biasType,
+            formatBiasName(bias.biasType),
             bias.severity,
             bias.excerpt,
             bias.explanation,

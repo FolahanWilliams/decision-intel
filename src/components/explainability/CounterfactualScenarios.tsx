@@ -1,5 +1,7 @@
 'use client';
 
+import { formatBiasName } from '@/lib/utils/labels';
+
 interface Scenario {
   biasRemoved: string;
   historicalSampleSize: number;
@@ -226,6 +228,3 @@ export function CounterfactualScenarios({
   );
 }
 
-function formatBiasName(type: string): string {
-  return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}

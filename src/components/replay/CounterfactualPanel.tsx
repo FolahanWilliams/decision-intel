@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Beaker, TrendingUp, TrendingDown, Minus, X } from 'lucide-react';
 import type { AnalysisResult } from '@/types';
+import { formatBiasName } from '@/lib/utils/labels';
 import {
   calculateCounterfactualScore,
   type ScoreOverrides,
@@ -106,7 +107,7 @@ export function CounterfactualPanel({ analysis, step, onClose }: CounterfactualP
                     textDecoration: isRemoved ? 'line-through' : 'none',
                   }}
                 >
-                  {bias.biasType}
+                  {formatBiasName(bias.biasType)}
                 </button>
               );
             })}

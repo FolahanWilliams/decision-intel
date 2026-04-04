@@ -5,6 +5,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { formatBiasName } from '@/lib/utils/labels';
 
 const log = createLogger('LineageExport');
 
@@ -15,7 +16,7 @@ export interface DecisionLineageRecord {
   timestamp: string;
   score: number;
   participants: string[];
-  biasesDetected: Array<{ type: string; severity: string }>;
+  biasesDetected: Array<{ type: string; label: string; severity: string }>;
   nudgesServed: Array<{
     type: string;
     severity: string;
@@ -129,7 +130,11 @@ export async function generateLineageExport(
       timestamp: a.createdAt.toISOString(),
       score: a.overallScore,
       participants: [],
-      biasesDetected: a.biases.map(b => ({ type: b.biasType, severity: b.severity })),
+      biasesDetected: a.biases.map(b => ({
+        type: b.biasType,
+        label: formatBiasName(b.biasType),
+        severity: b.severity,
+      })),
       nudgesServed: nudges
         .filter(n => n.humanDecisionId === a.id)
         .map(n => ({
@@ -190,7 +195,7 @@ export function lineageToCSV(records: DecisionLineageRecord[]): string {
     escapeCSV(r.label),
     escapeCSV(r.timestamp),
     escapeCSV(r.score),
-    escapeCSV(r.biasesDetected.map(b => b.type).join('; ')),
+    escapeCSV(r.biasesDetected.map(b => b.label).join('; ')),
     escapeCSV(r.biasesDetected.map(b => b.severity).join('; ')),
     escapeCSV(r.outcome?.result || 'pending'),
     escapeCSV(r.outcome?.impactScore ?? ''),

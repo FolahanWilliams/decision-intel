@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Loader2, TrendingDown, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatBiasName } from '@/lib/utils/labels';
 
 interface RootCauseAttribution {
   biasType: string;
@@ -79,7 +80,7 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
                   ) : (
                     <TrendingUp size={12} className="text-red-400" />
                   )}
-                  <span className="text-sm font-medium text-white">{attr.biasType}</span>
+                  <span className="text-sm font-medium text-white">{formatBiasName(attr.biasType)}</span>
                   <span
                     className={cn(
                       'px-1.5 py-0.5 rounded text-[10px] font-medium',

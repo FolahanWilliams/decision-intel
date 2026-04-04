@@ -116,15 +116,21 @@ export default function LandingPage() {
 
           {/* Desktop Nav */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden-mobile">
-            {['Features', 'How It Works', 'Case Studies', 'Pricing'].map(item => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                style={{ fontSize: 14, color: '#CBD5E1', textDecoration: 'none', fontWeight: 500 }}
-              >
-                {item}
-              </a>
-            ))}
+            {['Features', 'How It Works', 'Case Studies', 'Pricing'].map(item => {
+              const href =
+                item === 'Case Studies'
+                  ? '/case-studies'
+                  : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
+              return (
+                <a
+                  key={item}
+                  href={href}
+                  style={{ fontSize: 14, color: '#CBD5E1', textDecoration: 'none', fontWeight: 500 }}
+                >
+                  {item}
+                </a>
+              );
+            })}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }} className="hidden-mobile">
@@ -160,16 +166,22 @@ export default function LandingPage() {
         {/* Mobile Menu */}
         {mobileNavOpen && (
           <div style={{ background: C.navyLight, padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {['Features', 'How It Works', 'Case Studies', 'Pricing'].map(item => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                onClick={() => setMobileNavOpen(false)}
-                style={{ fontSize: 15, color: '#CBD5E1', textDecoration: 'none', padding: '8px 0' }}
-              >
-                {item}
-              </a>
-            ))}
+            {['Features', 'How It Works', 'Case Studies', 'Pricing'].map(item => {
+              const href =
+                item === 'Case Studies'
+                  ? '/case-studies'
+                  : `#${item.toLowerCase().replace(/\s+/g, '-')}`;
+              return (
+                <a
+                  key={item}
+                  href={href}
+                  onClick={() => setMobileNavOpen(false)}
+                  style={{ fontSize: 15, color: '#CBD5E1', textDecoration: 'none', padding: '8px 0' }}
+                >
+                  {item}
+                </a>
+              );
+            })}
             <Link href="/login" style={{ fontSize: 15, color: '#CBD5E1', textDecoration: 'none', padding: '8px 0' }}>
               Sign In
             </Link>
@@ -630,195 +642,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Case Studies ────────────────────────────────────────────── */}
-      <section id="case-studies" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-          <motion.div {...fadeIn} transition={{ duration: 0.5 }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: C.green, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
-              Case Studies
-            </p>
-            <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 12 }}>
-              What Decision Intel Would Have Caught
-            </h2>
-            <p style={{ fontSize: 16, color: C.slate600, marginBottom: 48, maxWidth: 640 }}>
-              Retrospective analyses on publicly available strategic documents and press releases.
-              Every bias below was flaggable <em>before</em> the outcome was known.
-            </p>
-          </motion.div>
-
-          {/* Microsoft-Nokia */}
-          <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ background: C.white, border: `1px solid ${C.slate200}`, borderRadius: 16, padding: 32, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: C.green, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Case Study</p>
-            <h3 style={{ fontSize: 24, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>
-              Microsoft-Nokia: The $7.6B Write-Down
-            </h3>
-            <p style={{ fontSize: 15, color: C.slate600, lineHeight: 1.6, marginBottom: 24, maxWidth: 720 }}>
-              In 2013, Microsoft acquired Nokia&apos;s Devices &amp; Services division for $7.2B.
-              Two years later, they wrote down $7.6B — more than the entire purchase price.
-            </p>
-
-            {/* DQI Score */}
-            <div style={{ marginBottom: 24 }}>
-              <div style={{ fontSize: 48, fontWeight: 800, color: '#EF4444', lineHeight: 1 }}>38</div>
-              <div style={{ fontSize: 13, color: C.slate400 }}>/ 100</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: C.green, marginTop: 2 }}>Decision Quality</div>
-            </div>
-
-            {/* Bias Cards Grid */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
-              {[
-                { name: 'Sunk Cost Fallacy', severity: 'CRITICAL', excerpt: 'Years of Windows Phone investment made abandoning unacceptable' },
-                { name: 'Overconfidence', severity: 'HIGH', excerpt: 'Sub-5% market share dismissed as fixable via acquisition' },
-                { name: 'Anchoring Bias', severity: 'HIGH', excerpt: 'Price anchored to Nokia\'s historical brand value' },
-                { name: 'Planning Fallacy', severity: 'HIGH', excerpt: 'Integration timeline vastly underestimated' },
-                { name: 'Hindsight Bias', severity: 'MEDIUM', excerpt: 'Ballmer anchored to strategic vision despite market signals' },
-              ].map(b => (
-                <div
-                  key={b.name}
-                  style={{
-                    background: C.white,
-                    border: `1px solid ${C.slate200}`,
-                    borderRadius: 10,
-                    padding: '10px 14px',
-                    minWidth: 180,
-                    flex: '1 1 180px',
-                    maxWidth: 240,
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: C.slate900 }}>{b.name}</span>
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        padding: '2px 6px',
-                        borderRadius: 4,
-                        color: C.white,
-                        background: b.severity === 'CRITICAL' ? '#EF4444' : b.severity === 'HIGH' ? '#F59E0B' : '#94A3B8',
-                      }}
-                    >
-                      {b.severity}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 12, color: C.slate400, lineHeight: 1.4 }}>{b.excerpt}</div>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-              <p style={{ fontSize: 12, color: C.slate400, fontStyle: 'italic', margin: 0 }}>
-                Analysis based on publicly available strategic documents, SEC filings, and press coverage.
-              </p>
-              <Link
-                href="/demo"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: C.slate900,
-                  textDecoration: 'none',
-                  padding: '8px 16px',
-                  border: `1px solid ${C.slate200}`,
-                  borderRadius: 8,
-                }}
-              >
-                See the Full Analysis <ArrowRight size={14} />
-              </Link>
-            </div>
-          </motion.div>
-
-          {/* Divider */}
-          <p style={{ textAlign: 'center', fontSize: 12, fontWeight: 600, color: C.slate400, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '32px 0' }}>
-            More Retrospective Analyses on Public Decisions
-          </p>
-
-          {/* WeWork */}
-          <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ background: C.white, border: `1px solid ${C.slate200}`, borderRadius: 16, padding: 32, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: C.green, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Case Study</p>
-            <h3 style={{ fontSize: 24, fontWeight: 700, color: C.slate900, marginBottom: 8 }}>
-              WeWork IPO: The $39B Valuation Collapse
-            </h3>
-            <p style={{ fontSize: 15, color: C.slate600, lineHeight: 1.6, marginBottom: 24, maxWidth: 720 }}>
-              SoftBank&apos;s Vision Fund valued WeWork at $47B in early 2019. By September, the failed IPO
-              exposed governance failures and the valuation cratered to $8B.
-            </p>
-
-            {/* DQI Score */}
-            <div style={{ marginBottom: 24 }}>
-              <div style={{ fontSize: 48, fontWeight: 800, color: '#EF4444', lineHeight: 1 }}>29</div>
-              <div style={{ fontSize: 13, color: C.slate400 }}>/ 100</div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: C.green, marginTop: 2 }}>Decision Quality</div>
-            </div>
-
-            {/* Bias Cards Grid */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
-              {[
-                { name: 'Halo Effect', severity: 'CRITICAL', excerpt: 'Founder charisma over fundamentals' },
-                { name: 'Anchoring Bias', severity: 'CRITICAL', excerpt: 'Prior $47B round as anchor' },
-                { name: 'Herding Behavior', severity: 'HIGH', excerpt: 'Follow-on investors mimicked SoftBank' },
-                { name: 'Overconfidence', severity: 'HIGH', excerpt: '"Community-adjusted EBITDA" accepted' },
-                { name: 'Narrative Fallacy', severity: 'HIGH', excerpt: '"Next Amazon" story vs. unit economics' },
-                { name: 'Authority Bias', severity: 'MEDIUM', excerpt: 'SoftBank brand suppressed dissent' },
-              ].map(b => (
-                <div
-                  key={b.name}
-                  style={{
-                    background: C.white,
-                    border: `1px solid ${C.slate200}`,
-                    borderRadius: 10,
-                    padding: '10px 14px',
-                    minWidth: 180,
-                    flex: '1 1 180px',
-                    maxWidth: 240,
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: C.slate900 }}>{b.name}</span>
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        padding: '2px 6px',
-                        borderRadius: 4,
-                        color: C.white,
-                        background: b.severity === 'CRITICAL' ? '#EF4444' : b.severity === 'HIGH' ? '#F59E0B' : '#94A3B8',
-                      }}
-                    >
-                      {b.severity}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 12, color: C.slate400, lineHeight: 1.4 }}>{b.excerpt}</div>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-              <p style={{ fontSize: 12, color: C.slate400, fontStyle: 'italic', margin: 0 }}>
-                Analysis based on publicly available S-1 filing, investor presentations, and press coverage.
-              </p>
-              <Link
-                href="/demo"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: C.slate900,
-                  textDecoration: 'none',
-                  padding: '8px 16px',
-                  border: `1px solid ${C.slate200}`,
-                  borderRadius: 8,
-                }}
-              >
-                See the Full Analysis <ArrowRight size={14} />
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
       {/* ── Features ────────────────────────────────────────────────── */}
       <section id="features" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
@@ -968,7 +791,7 @@ export default function LandingPage() {
                 desc: 'For PE funds and M&A teams with dedicated support',
                 features: ['Unlimited analyses', 'Everything in Team', 'Unlimited team seats', 'SSO & custom taxonomy', 'Dedicated support', 'Custom playbooks', 'SLA guarantee'],
                 cta: 'Contact Sales',
-                action: () => { window.location.href = 'mailto:team@decision-intel.com?subject=Enterprise%20Inquiry'; },
+                action: () => { window.location.href = 'mailto:folahanwilliams@gmail.com?subject=Enterprise%20Inquiry'; },
                 outline: true,
                 popular: false,
               },
@@ -1176,20 +999,26 @@ export default function LandingPage() {
 
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 700, color: C.white, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Product</h4>
-            {['Features', 'How It Works', 'Case Studies', 'Pricing', 'Resources'].map(l => (
-              <a key={l} href={`#${l.toLowerCase().replace(/\s+/g, '-')}`} style={{ display: 'block', fontSize: 14, color: '#94A3B8', textDecoration: 'none', marginBottom: 10 }}>
-                {l}
-              </a>
-            ))}
+            {['Features', 'How It Works', 'Case Studies', 'Pricing', 'Resources'].map(l => {
+              const href =
+                l === 'Case Studies'
+                  ? '/case-studies'
+                  : `#${l.toLowerCase().replace(/\s+/g, '-')}`;
+              return (
+                <a key={l} href={href} style={{ display: 'block', fontSize: 14, color: '#94A3B8', textDecoration: 'none', marginBottom: 10 }}>
+                  {l}
+                </a>
+              );
+            })}
           </div>
 
           <div>
             <h4 style={{ fontSize: 13, fontWeight: 700, color: C.white, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Contact Us</h4>
-            <a href="tel:+12673254830" style={{ display: 'block', fontSize: 14, color: '#94A3B8', textDecoration: 'none', marginBottom: 10 }}>
-              (267) 325-4830
+            <a href="tel:+447539443572" style={{ display: 'block', fontSize: 14, color: '#94A3B8', textDecoration: 'none', marginBottom: 10 }}>
+              +44 7539 443572
             </a>
-            <a href="mailto:team@decision-intel.com" style={{ display: 'block', fontSize: 14, color: '#94A3B8', textDecoration: 'none', marginBottom: 10 }}>
-              team@decision-intel.com
+            <a href="mailto:folahanwilliams@gmail.com" style={{ display: 'block', fontSize: 14, color: '#94A3B8', textDecoration: 'none', marginBottom: 10 }}>
+              folahanwilliams@gmail.com
             </a>
           </div>
 

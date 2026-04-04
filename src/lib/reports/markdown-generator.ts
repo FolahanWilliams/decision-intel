@@ -1,3 +1,5 @@
+import { formatBiasName } from '@/lib/utils/labels';
+
 interface MarkdownReportData {
   filename: string;
   uploadedAt: string;
@@ -82,7 +84,7 @@ export function generateMarkdownReport(data: MarkdownReportData): string {
     lines.push('## Cognitive Biases Detected');
     lines.push('');
     for (const bias of data.biases) {
-      lines.push(`### ${bias.biasType} (\`${bias.severity}\`)`);
+      lines.push(`### ${formatBiasName(bias.biasType)} (\`${bias.severity}\`)`);
       lines.push('');
       lines.push(`> "${bias.excerpt}"`);
       lines.push('');
