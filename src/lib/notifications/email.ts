@@ -26,6 +26,8 @@ interface EmailPayload {
   subject: string;
   html: string;
   text?: string;
+  /** If true, include List-Unsubscribe headers for CAN-SPAM/GDPR compliance. */
+  includeUnsubscribe?: boolean;
 }
 
 /** Escape HTML entities to prevent XSS in email templates */
@@ -48,19 +50,33 @@ async function sendEmail(payload: EmailPayload): Promise<SendResult> {
   }
 
   try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+    const unsubscribeUrl = `${appUrl}/dashboard/settings`;
+
+    // Build Resend email payload
+    const emailBody: Record<string, unknown> = {
+      from: EMAIL_FROM,
+      to: [payload.to],
+      subject: payload.subject,
+      html: payload.html,
+      text: payload.text,
+    };
+
+    // Add List-Unsubscribe headers for CAN-SPAM / GDPR compliance
+    if (payload.includeUnsubscribe && appUrl) {
+      emailBody.headers = {
+        'List-Unsubscribe': `<${unsubscribeUrl}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      };
+    }
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: EMAIL_FROM,
-        to: [payload.to],
-        subject: payload.subject,
-        html: payload.html,
-        text: payload.text,
-      }),
+      body: JSON.stringify(emailBody),
     });
 
     if (!res.ok) {
@@ -155,7 +171,7 @@ export async function notifyAnalysisComplete(
     </div>
   `;
 
-  const result = await sendEmail({ to: email, subject, html });
+  const result = await sendEmail({ to: email, subject, html, includeUnsubscribe: true });
   await logNotification(userId, 'email', 'analysis_complete', subject, result);
 }
 
@@ -226,7 +242,7 @@ export async function sendWeeklyDigest(
     </div>
   `;
 
-  const result = await sendEmail({ to: email, subject, html });
+  const result = await sendEmail({ to: email, subject, html, includeUnsubscribe: true });
   await logNotification(userId, 'email', 'weekly_digest', subject, result);
 }
 
@@ -332,7 +348,7 @@ export async function deliverEmailNudge(
     </div>
   `;
 
-  const result = await sendEmail({ to: email, subject, html });
+  const result = await sendEmail({ to: email, subject, html, includeUnsubscribe: true });
   await logNotification(userId, 'email', 'nudge', subject, result);
 }
 
@@ -427,6 +443,6 @@ export async function notifyOutcomeReminder(
     </div>
   `;
 
-  const result = await sendEmail({ to: email, subject, html });
+  const result = await sendEmail({ to: email, subject, html, includeUnsubscribe: true });
   await logNotification(userId, 'email', 'outcome_reminder', subject, result);
 }

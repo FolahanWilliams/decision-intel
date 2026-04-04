@@ -125,6 +125,75 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/**
+ * PATCH /api/team/invite — Resend an invite (resets expiry and re-sends email)
+ */
+export async function PATCH(req: NextRequest) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const inviteId = body?.id;
+
+    if (!inviteId || typeof inviteId !== 'string') {
+      return NextResponse.json({ error: 'Missing invite ID' }, { status: 400 });
+    }
+
+    const invite = await prisma.teamInvite.findUnique({
+      where: { id: inviteId },
+    });
+    if (!invite) {
+      return NextResponse.json({ error: 'Invite not found' }, { status: 404 });
+    }
+
+    // Must be owner or admin
+    const membership = await prisma.teamMember.findFirst({
+      where: { userId: user.id, orgId: invite.orgId, role: { in: ['owner', 'admin'] } },
+    });
+    if (!membership) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    }
+
+    if (invite.status !== 'pending') {
+      return NextResponse.json({ error: 'Only pending invites can be resent' }, { status: 400 });
+    }
+
+    // Reset expiry to 7 days from now
+    const updated = await prisma.teamInvite.update({
+      where: { id: inviteId },
+      data: { expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
+    });
+
+    // Re-send email
+    const org = await prisma.organization.findUnique({ where: { id: invite.orgId } });
+    import('@/lib/notifications/email')
+      .then(({ notifyTeamInvite }) =>
+        notifyTeamInvite(
+          invite.email,
+          (user.user_metadata as Record<string, string> | undefined)?.full_name ||
+            user.email ||
+            'A teammate',
+          org?.name || 'a team',
+          invite.token
+        )
+      )
+      .catch(err => log.error('Resend invite email failed:', err));
+
+    log.info(`Invite resent to ${invite.email} for org ${invite.orgId}`);
+    return NextResponse.json(updated);
+  } catch (error) {
+    log.error('Failed to resend invite:', error);
+    return NextResponse.json({ error: 'Failed to resend invite' }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: NextRequest) {
   const supabase = await createClient();
   const {

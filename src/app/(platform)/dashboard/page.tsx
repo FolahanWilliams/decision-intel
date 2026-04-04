@@ -1427,6 +1427,28 @@ export default function Dashboard() {
                         analyses used this month ({billingData.planName})
                       </p>
                     )}
+                    {billingData &&
+                      billingData.limits.analysesPerMonth > 0 &&
+                      billingData.planName?.toLowerCase() === 'starter' &&
+                      billingData.usage.analysesThisMonth / billingData.limits.analysesPerMonth >= 0.8 && (
+                        <Link
+                          href="/dashboard/settings"
+                          className="text-xs"
+                          style={{
+                            marginTop: '4px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            color: 'var(--warning, #eab308)',
+                            fontWeight: 600,
+                          }}
+                        >
+                          <AlertTriangle size={12} />
+                          {billingData.usage.analysesThisMonth >= billingData.limits.analysesPerMonth
+                            ? 'Limit reached — upgrade to continue analyzing'
+                            : 'Approaching limit — upgrade for more analyses'}
+                        </Link>
+                      )}
                   </div>
                 </div>
               </div>

@@ -19,6 +19,7 @@ import {
   FileText,
   Activity,
   Brain,
+  RefreshCw,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useToast } from '@/components/ui/EnhancedToast';
@@ -602,6 +603,7 @@ function InviteRow({
   onRevoke: () => void;
 }) {
   const [revoking, setRevoking] = useState(false);
+  const [resending, setResending] = useState(false);
   const { showToast } = useToast();
 
   const handleRevoke = async () => {
@@ -618,6 +620,28 @@ function InviteRow({
       showToast('Failed to revoke invite', 'error');
     } finally {
       setRevoking(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResending(true);
+    try {
+      const res = await fetch('/api/team/invite', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: invite.id }),
+      });
+      if (res.ok) {
+        showToast('Invite resent', 'success');
+        onRevoke(); // refresh the list to show updated expiry
+      } else {
+        const data = await res.json().catch(() => ({}));
+        showToast(data.error || 'Failed to resend invite', 'error');
+      }
+    } catch {
+      showToast('Failed to resend invite', 'error');
+    } finally {
+      setResending(false);
     }
   };
 
@@ -661,21 +685,38 @@ function InviteRow({
           </div>
         </div>
       </div>
-      <button
-        onClick={handleRevoke}
-        disabled={revoking}
-        className="btn flex items-center gap-sm"
-        style={{
-          background: 'transparent',
-          borderColor: 'var(--error)',
-          color: 'var(--error)',
-          fontSize: '12px',
-          padding: '4px 10px',
-        }}
-      >
-        {revoking ? <Loader2 size={12} className="animate-spin" /> : <X size={12} />}
-        Revoke
-      </button>
+      <div className="flex items-center gap-xs">
+        <button
+          onClick={handleResend}
+          disabled={resending || revoking}
+          className="btn flex items-center gap-sm"
+          style={{
+            background: 'transparent',
+            borderColor: 'var(--text-muted)',
+            color: 'var(--text-secondary)',
+            fontSize: '12px',
+            padding: '4px 10px',
+          }}
+        >
+          {resending ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+          Resend
+        </button>
+        <button
+          onClick={handleRevoke}
+          disabled={revoking || resending}
+          className="btn flex items-center gap-sm"
+          style={{
+            background: 'transparent',
+            borderColor: 'var(--error)',
+            color: 'var(--error)',
+            fontSize: '12px',
+            padding: '4px 10px',
+          }}
+        >
+          {revoking ? <Loader2 size={12} className="animate-spin" /> : <X size={12} />}
+          Revoke
+        </button>
+      </div>
     </div>
   );
 }

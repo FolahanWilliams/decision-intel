@@ -370,6 +370,23 @@ export function BillingSection() {
             Upgrade to Pro — 14-day free trial
           </button>
         )}
+
+        {/* Compare plans link */}
+        <a
+          href="/#pricing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-xs"
+          style={{
+            marginTop: 'var(--spacing-xs)',
+            justifyContent: 'center',
+            fontSize: '12px',
+            color: 'var(--text-muted)',
+            textDecoration: 'none',
+          }}
+        >
+          Compare all plans <ExternalLink size={11} />
+        </a>
       </div>
 
       {/* ── Part C: Quick Actions ──────────────────────────── */}
