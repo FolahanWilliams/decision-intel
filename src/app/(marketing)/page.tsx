@@ -216,17 +216,16 @@ export default function LandingPage() {
                 marginBottom: 20,
               }}
             >
-              The Decision
+              Trust your IC&rsquo;s yes.
               <br />
-              Performance OS
-              <br />
-              <span style={{ color: C.green }}>for M&A</span>
+              <span style={{ color: C.green }}>Or know why you shouldn&rsquo;t.</span>
             </h1>
-            <p style={{ fontSize: 18, color: C.slate600, lineHeight: 1.7, marginBottom: 32, maxWidth: 500 }}>
-              M&A teams, corporate development groups, and investment committees
-              make high-stakes decisions on incomplete information. Our platform
-              audits the cognitive biases hiding in every deal memo — so you can
-              swing with confidence.
+            <p style={{ fontSize: 18, color: C.slate600, lineHeight: 1.7, marginBottom: 32, maxWidth: 520 }}>
+              Before you wire $50M, run the memo through the only engine that
+              audits the cognitive biases hiding in every deal. Decision Intel
+              gives investment committees a blind, unflinching second read in
+              under 60 seconds, so you can sign with confidence or pull the brake
+              before capital moves.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link
@@ -245,7 +244,7 @@ export default function LandingPage() {
                   textDecoration: 'none',
                 }}
               >
-                Try the Demo <ArrowRight size={16} />
+                Audit a memo now <ArrowRight size={16} />
               </Link>
               <Link
                 href="/login"
@@ -265,6 +264,35 @@ export default function LandingPage() {
               >
                 Try Free
               </Link>
+            </div>
+            <div
+              style={{
+                marginTop: 28,
+                padding: '16px 20px',
+                borderLeft: `3px solid ${C.green}`,
+                background: C.greenLight,
+                borderRadius: 6,
+                maxWidth: 520,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: C.green,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  marginBottom: 6,
+                }}
+              >
+                The job you&rsquo;re hiring us for
+              </div>
+              <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6, margin: 0 }}>
+                When I&rsquo;m about to commit capital on a deal that looks right,
+                help me know whether my team&rsquo;s conviction survives a blind,
+                unbiased stress test, so I can sign with confidence or stop the
+                wire before it goes out.
+              </p>
             </div>
           </div>
           {/* 4-Panel Process Visualization */}
@@ -439,8 +467,8 @@ export default function LandingPage() {
               icon: FileSearch,
               phase: 'PHASE_01',
               num: '01',
-              title: 'Capture & Frame',
-              desc: 'Upload IC memos, deal theses, diligence reports, or CIMs. Define success criteria and your prior beliefs before the committee reviews.',
+              title: 'Upload the memo',
+              desc: 'Drop in IC memos, deal theses, diligence reports, or CIMs. Capture each committee member\u2019s prior belief privately, before the room starts reinforcing itself.',
               bullets: ['PDF, DOCX, Excel, CSV support', 'Decision framing with success/failure criteria', 'Blind prior collection before group discussion', 'Slack integration for real-time capture'],
               color: '#3B82F6',
               colorBg: '#EFF6FF',
@@ -449,8 +477,8 @@ export default function LandingPage() {
               icon: Brain,
               phase: 'PHASE_02',
               num: '02',
-              title: 'AI Cognitive Audit',
-              desc: '11-agent pipeline detects 20+ biases, runs a statistical jury for noise, and simulates a boardroom of Decision Twins to stress-test your deal thesis.',
+              title: 'Get the blind second opinion',
+              desc: 'An 11-agent pipeline stress-tests the thesis: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated boardroom argues against your deal before your real one does.',
               bullets: ['20+ cognitive biases with confidence scores', '3 independent noise judges (Kahneman)', 'Boardroom simulation with custom personas', 'Fact-checking via Google Search grounding'],
               color: '#8B5CF6',
               colorBg: '#F5F3FF',
@@ -459,8 +487,8 @@ export default function LandingPage() {
               icon: TrendingUp,
               phase: 'PHASE_03',
               num: '03',
-              title: 'Track & Improve',
-              desc: 'Outcomes are detected automatically from follow-up documents, Slack, and web intelligence. Confirm with one click and watch your calibration sharpen.',
+              title: 'Know why your team believed what they believed',
+              desc: 'Outcomes are detected automatically from follow-up documents, Slack, and web intelligence. Every deal closes the feedback loop, so your next conviction is measurably more trustworthy than your last.',
               bullets: ['Autonomous outcome detection', 'Calibration dashboards', 'Bias cost estimates', 'Toxic combination alerts with mitigation playbooks'],
               color: C.green,
               colorBg: C.greenLight,

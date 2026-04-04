@@ -48,6 +48,14 @@ export interface AnalysisResult {
   preMortem?: {
     failureScenarios: string[];
     preventiveMeasures: string[];
+    /** Munger inversion: concrete conditions/actions that would guarantee failure. */
+    inversion?: string[];
+    /** RAND 10th Man structured dissent: hostile objections with cited claims. */
+    redTeam?: Array<{
+      objection: string;
+      targetClaim: string;
+      reasoning: string;
+    }>;
   };
   sentiment?: {
     score: number;
@@ -69,6 +77,27 @@ export interface AnalysisResult {
   metaVerdict?: string;
   recognitionCues?: RecognitionCuesResult;
   narrativePreMortem?: NarrativePreMortem;
+  /** Howard & Matheson Decision Quality Chain — process-quality companion to DQI. */
+  dqChain?: DQChainSummary;
+}
+
+/**
+ * Compact Decision Quality Chain payload carried on AnalysisResult.
+ * The full element list (with rationale and inputs) is computed at
+ * `src/lib/scoring/dq-chain.ts`. This summary type is re-exported so
+ * UI code can import from `@/types` without reaching into scoring.
+ */
+export interface DQChainSummary {
+  elements: Array<{
+    id: 'frame' | 'alternatives' | 'information' | 'values' | 'reasoning' | 'commitment';
+    label: string;
+    score: number;
+    rationale: string;
+    inputs: string[];
+  }>;
+  chainScore: number;
+  weakestLink: 'frame' | 'alternatives' | 'information' | 'values' | 'reasoning' | 'commitment';
+  summary: string;
 }
 
 /** Causal AI Layer output — org-specific learned causal insights */

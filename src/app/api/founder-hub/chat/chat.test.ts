@@ -199,4 +199,65 @@ describe('POST /api/founder-hub/chat', () => {
     await POST(makeRequest({ message: longMessage }, PASS));
     expect(mockSendMessageStream).toHaveBeenCalledWith('x'.repeat(5000));
   });
+
+  describe('response-style sanitizer', () => {
+    function makeStream(parts: string[]) {
+      return {
+        stream: (async function* () {
+          for (const p of parts) yield { text: () => p };
+        })(),
+      };
+    }
+
+    async function runWith(parts: string[]): Promise<string> {
+      mockSendMessageStream.mockResolvedValue(makeStream(parts));
+      const res = await POST(makeRequest({ message: 'test' }, PASS));
+      const raw = await readStream(res);
+      // Extract concatenated chunk texts from the SSE payloads
+      const lines = raw.split('\n').filter(l => l.startsWith('data: '));
+      let out = '';
+      for (const line of lines) {
+        const obj = JSON.parse(line.slice(6));
+        if (obj.type === 'chunk' && typeof obj.text === 'string') out += obj.text;
+      }
+      return out;
+    }
+
+    it('strips markdown bold delimiters within a single chunk', async () => {
+      const out = await runWith(['Hello **world** done']);
+      expect(out).toBe('Hello world done');
+    });
+
+    it('strips markdown bold delimiters split across chunks', async () => {
+      const out = await runWith(['Hello **wo', 'rld** done']);
+      expect(out).toBe('Hello world done');
+    });
+
+    it('handles a single trailing asterisk across boundaries', async () => {
+      // Reconstructed stream content is 'Hello ** world **end**'; stripping
+      // the two bold pairs leaves a double-space between Hello and world.
+      const out = await runWith(['Hello *', '* world **end**']);
+      expect(out).toBe('Hello  world end');
+    });
+
+    it('replaces em dash with comma space', async () => {
+      const out = await runWith(['Yes\u2014absolutely']);
+      expect(out).toBe('Yes, absolutely');
+    });
+
+    it('replaces en dash with comma space', async () => {
+      const out = await runWith(['Yes\u2013absolutely']);
+      expect(out).toBe('Yes, absolutely');
+    });
+
+    it('strips underscore bold delimiters', async () => {
+      const out = await runWith(['Hello __world__ done']);
+      expect(out).toBe('Hello world done');
+    });
+
+    it('flushes trailing held character on stream end', async () => {
+      const out = await runWith(['done*']);
+      expect(out).toBe('done*');
+    });
+  });
 });

@@ -3348,7 +3348,7 @@ function ResearchCard({
 
 function PlaybookAndResearch() {
   const [section, setSection] = useState<
-    'all' | 'vc' | 'foundations' | 'category' | 'gtm' | 'strategy'
+    'all' | 'vc' | 'foundations' | 'category' | 'gtm' | 'strategy' | 'moat'
   >('all');
   const [expandedResearch, setExpandedResearch] = useState<Set<string>>(new Set());
 
@@ -3362,7 +3362,7 @@ function PlaybookAndResearch() {
   }, []);
 
   const expandAll = useCallback(() => {
-    setExpandedResearch(new Set(['vc', 'foundations', 'category', 'gtm', 'strategy']));
+    setExpandedResearch(new Set(['vc', 'foundations', 'category', 'gtm', 'strategy', 'moat']));
   }, []);
 
   const collapseAll = useCallback(() => {
@@ -3376,6 +3376,7 @@ function PlaybookAndResearch() {
     { id: 'category' as const, label: 'Category Creation' },
     { id: 'gtm' as const, label: 'GTM & Sales' },
     { id: 'strategy' as const, label: 'Founder Strategy' },
+    { id: 'moat' as const, label: 'Moat Theory' },
   ];
 
   return (
@@ -4259,6 +4260,48 @@ function PlaybookAndResearch() {
                   'Map your concentric expansion circles (already in Market Strategy tab)',
                   'Allocate 50% of time to distribution, not just product',
                   'Build referral incentive for pilot customers',
+                ]}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ── Moat Theory ── */}
+      {(section === 'all' || section === 'moat') && (
+        <>
+          <div
+            style={{ ...card, borderLeft: '3px solid #06b6d4', marginTop: 16, cursor: 'pointer' }}
+            onClick={() => toggleResearchSection('moat')}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#06b6d4' }}>Moat Theory</div>
+              <ChevronDown
+                size={16}
+                style={{
+                  color: '#06b6d4',
+                  transform: expandedResearch.has('moat') ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
+            </div>
+          </div>
+          {expandedResearch.has('moat') && (
+            <div style={{ ...card, borderLeft: '3px solid #06b6d4', marginTop: -8 }}>
+              <ResearchCard
+                title="Ben Thompson: Aggregation Theory and the Behavioural-Data Moat"
+                source="Stratechery"
+                type="Long-form Essay Series"
+                color="#06b6d4"
+                link="https://stratechery.com/aggregation-theory/"
+                insight='In commodity-LLM markets the model is not the moat; the calibrated outcome data is. Aggregation Theory says value accrues to whoever owns the demand-side user relationship plus the feedback loop that feeds it. For Decision Intel, every LLM vendor is a substitutable supplier below the behavioural dataset. The 18-month corpus of org-calibrated CausalEdge weights, nudge acceptance rates, outcome-gate resolutions, and calibration scores is the supplier-modularization layer. A competitor with a better Gemini prompt has no path to replicate that loop under 18 months of real customer behaviour. This is why "we use 3 judges and a 20x20 matrix" is a feature story, and "we own the decision outcomes" is the moat story.'
+                product="Every product surface must write back to the dataset: Outcome Gate, nudge acceptance, calibration deltas, toxic pattern false-positive rates, org-specific CausalEdge weights. Anything that just calls Gemini without feeding the loop is a commodity feature. Aggregation Theory is why the Copilot AI Assistant must persist CopilotTurns and why the Calibration dashboard must survive as a first-class product, not a nice-to-have."
+                startup='Investor pitch reframe: "The model is replaceable. The behavioural dataset is not. We are the aggregator between decision-makers and calibrated outcomes." Map DI to aggregation theory explicitly in the deck: demand side (IC members), internalized distribution (Slack, Drive, Email connectors), modularized supply (any LLM). Every commodity LLM release makes our moat deeper, not shallower.'
+                actions={[
+                  'Add an "Aggregation Theory" slide to the investor deck mapping DI onto the three layers',
+                  'Audit every product surface for write-back to the behavioural dataset; flag surfaces that only read',
+                  'In founder essays, lead with "the model is replaceable, the data is not"',
+                  'Cross-link to the Methodologies and Principles tab entry for Aggregation Theory',
                 ]}
               />
             </div>

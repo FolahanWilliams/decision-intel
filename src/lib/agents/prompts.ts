@@ -473,6 +473,8 @@ Perform a comprehensive MULTI-DIMENSIONAL analysis on the provided text in a SIN
 ## DIMENSION 2: STRATEGIC ASSESSMENT
 - SWOT Analysis: Internal Strengths/Weaknesses, External Opportunities/Threats.
 - Pre-Mortem: Imagine this initiative has FAILED 1 year from now — identify failure causes and preventive measures.
+- Inversion (Munger): Invert the success criteria. List 3-5 concrete actions or conditions that would GUARANTEE this initiative fails. Do not list vague risks; list causal levers a hostile actor could pull.
+- Red Team / 10th Man dissent (RAND): Write 2-4 of the sharpest objections a hostile reviewer would raise. Each must cite a specific claim in the document and explain why it is the weakest load-bearing assumption.
 - Use Google Search to verify external Opportunities and Threats with real-world data.
 
 ## DIMENSION 3: COGNITIVE DIVERSITY (Red Team)
@@ -506,6 +508,16 @@ Output Format: Return ONLY valid JSON matching this exact schema:
   "preMortem": {
     "failureScenarios": ["scenario 1", "scenario 2"],
     "preventiveMeasures": ["measure 1", "measure 2"],
+    "inversion": [
+      "3-5 concrete actions or conditions that would GUARANTEE failure (Munger inversion)."
+    ],
+    "redTeam": [
+      {
+        "objection": "The sharpest objection a hostile 10th Man reviewer would raise.",
+        "targetClaim": "Exact claim in the document the objection attacks.",
+        "reasoning": "Why this is the weakest load-bearing assumption."
+      }
+    ],
     "warStories": [
       {
         "title": "The [Company] Collapse: When [pattern] Met [reality]",

@@ -115,12 +115,36 @@ export async function POST(req: NextRequest) {
 
     const stream = new ReadableStream({
       async start(controller) {
+        // Safety net for the chat response-style contract (see FOUNDER_CONTEXT
+        // RESPONSE STYLE block). Even if Gemini ignores the prompt, we strip
+        // markdown bold delimiters and replace em/en dashes on every chunk.
+        // A single trailing `*` or `_` is held back so we correctly detect
+        // `**` / `__` pairs that straddle chunk boundaries.
+        let carry = '';
+        const sanitize = (raw: string): string => {
+          let s = carry + raw;
+          carry = '';
+          if (s.endsWith('*') && !s.endsWith('**')) {
+            carry = '*';
+            s = s.slice(0, -1);
+          } else if (s.endsWith('_') && !s.endsWith('__')) {
+            carry = '_';
+            s = s.slice(0, -1);
+          }
+          return s
+            .replace(/\*\*/g, '')
+            .replace(/__/g, '')
+            .replace(/[\u2014\u2013]/g, ', ');
+        };
         try {
           for await (const chunk of result.stream) {
-            const text = chunk.text();
+            const text = sanitize(chunk.text());
             if (text) {
               controller.enqueue(ENCODER.encode(formatSSE({ type: 'chunk', text })));
             }
+          }
+          if (carry) {
+            controller.enqueue(ENCODER.encode(formatSSE({ type: 'chunk', text: carry })));
           }
           controller.enqueue(ENCODER.encode(formatSSE({ type: 'done' })));
         } catch (err) {
