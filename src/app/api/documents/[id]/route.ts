@@ -92,6 +92,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               metaVerdict: true,
               recognitionCues: true,
               narrativePreMortem: true,
+              forgottenQuestions: true,
             },
           },
         },

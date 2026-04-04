@@ -10,6 +10,7 @@ import {
   ComplianceResult,
   RecognitionCuesResult,
   NarrativePreMortem,
+  ForgottenQuestionsResult,
 } from '@/types';
 import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
 import { type CrossDocContext } from '@/lib/rag/cross-document-context';
@@ -88,6 +89,9 @@ export interface AuditState {
   // Klein RPD Framework
   recognitionCues?: RecognitionCuesResult;
   narrativePreMortem?: NarrativePreMortem;
+
+  // "Forgotten Questions" — unknown-unknowns the memo never asks
+  forgottenQuestions?: ForgottenQuestionsResult;
 
   // Final Output
   finalReport?: AnalysisResult;

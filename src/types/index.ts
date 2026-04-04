@@ -79,6 +79,37 @@ export interface AnalysisResult {
   narrativePreMortem?: NarrativePreMortem;
   /** Howard & Matheson Decision Quality Chain — process-quality companion to DQI. */
   dqChain?: DQChainSummary;
+  /** Questions the memo never asks but historical analogs had to answer. */
+  forgottenQuestions?: ForgottenQuestionsResult;
+}
+
+/**
+ * "Forgotten Questions" — the unknown-unknowns surface. Drawn from the gap
+ * between what the memo addresses and what its closest historical analogs
+ * were forced to answer. Each question is grounded in a specific analog
+ * and the bias it guards against.
+ */
+export interface ForgottenQuestionsResult {
+  questions: ForgottenQuestion[];
+  /** Optional executive summary — "these 3 things the memo never asks" */
+  headline?: string;
+  /** Case IDs / titles that seeded the questions */
+  analogsUsed?: string[];
+  /** Generation timestamp (ISO) */
+  generatedAt?: string;
+}
+
+export interface ForgottenQuestion {
+  /** The question the memo should have asked */
+  question: string;
+  /** Why the analog had to answer this — one sentence */
+  whyItMatters: string;
+  /** Bias this question guards against (from the 31-bias taxonomy) */
+  biasGuarded: string;
+  /** Which historical analog raised this question */
+  analogCompany?: string;
+  /** Severity if left unaddressed */
+  severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
 /**

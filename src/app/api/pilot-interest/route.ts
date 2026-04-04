@@ -1,0 +1,110 @@
+/**
+ * Pilot Interest Capture — POST /api/pilot-interest
+ *
+ * Captures inbound pilot interest from the public case-study library CTAs
+ * and from other marketing surfaces. Writes to `AnalyticsEvent` (no new
+ * table needed at pilot scale) and fires a Slack webhook if configured.
+ *
+ * Public. No auth. Email + optional case slug/company, rate-limited by IP
+ * through the same middleware as the rest of the marketing API.
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { createLogger } from '@/lib/utils/logger';
+import { z } from 'zod';
+
+const log = createLogger('PilotInterest');
+
+const PilotInterestSchema = z.object({
+  email: z.string().email({ message: 'Enter a valid email address.' }).max(254),
+  caseSlug: z.string().max(200).optional(),
+  company: z.string().max(200).optional(),
+  source: z.string().max(100).optional(),
+});
+
+async function notifySlack(payload: {
+  email: string;
+  caseSlug?: string;
+  company?: string;
+  referer: string | null;
+}): Promise<void> {
+  const webhook = process.env.SLACK_WEBHOOK_URL;
+  if (!webhook) return;
+
+  const caseLine = payload.caseSlug
+    ? `• case: *${payload.company ?? payload.caseSlug}* (${payload.caseSlug})`
+    : '• source: direct';
+  const text = [
+    `:inbox_tray: *New pilot interest*`,
+    `• email: \`${payload.email}\``,
+    caseLine,
+    payload.referer ? `• referer: ${payload.referer}` : null,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  try {
+    // Fire-and-forget; never block the response on Slack.
+    await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+  } catch (err) {
+    log.warn('Slack webhook failed', { error: err });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => null);
+    const parsed = PilotInterestSchema.safeParse(body);
+
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      return NextResponse.json(
+        { error: first?.message ?? 'Invalid request', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { email, caseSlug, company, source } = parsed.data;
+    const referer = req.headers.get('referer');
+
+    try {
+      await prisma.analyticsEvent.create({
+        data: {
+          name: 'pilot_interest_submitted',
+          properties: {
+            email,
+            caseSlug: caseSlug ?? null,
+            company: company ?? null,
+            source: source ?? 'case_study_cta',
+            referer: referer ?? null,
+          } as object,
+          userId: null,
+          sessionId: null,
+        },
+      });
+    } catch (err: unknown) {
+      const prismaError = err as { code?: string };
+      // Schema drift protection matches the analytics sink's behavior.
+      if (prismaError.code === 'P2021' || prismaError.code === 'P2022') {
+        log.warn('AnalyticsEvent table missing, continuing without persistence', {
+          code: prismaError.code,
+        });
+      } else {
+        throw err;
+      }
+    }
+
+    // Fire-and-forget Slack ping; don't await the promise chain longer than needed.
+    void notifySlack({ email, caseSlug, company, referer });
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    log.error('Failed to record pilot interest', { error: err });
+    return NextResponse.json({ error: 'Submission failed' }, { status: 500 });
+  }
+}

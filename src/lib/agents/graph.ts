@@ -11,6 +11,7 @@ import {
   intelligenceNode,
   metaJudgeNode,
   rpdRecognitionNode,
+  forgottenQuestionsNode,
 } from './nodes';
 import {
   AnalysisResult,
@@ -24,6 +25,7 @@ import {
   ComplianceResult,
   RecognitionCuesResult,
   NarrativePreMortem,
+  ForgottenQuestionsResult,
 } from '@/types';
 import { type IntelligenceContext } from '@/lib/intelligence/contextBuilder';
 import { type CrossDocContext } from '@/lib/rag/cross-document-context';
@@ -171,6 +173,10 @@ const GraphState = Annotation.Root({
     reducer: (x, y) => y ?? x,
     default: () => null,
   }),
+  forgottenQuestions: Annotation<ForgottenQuestionsResult | null>({
+    reducer: (x, y) => y ?? x,
+    default: () => null,
+  }),
 });
 
 // Routing function: only allow content into the analysis pipeline when
@@ -195,6 +201,7 @@ const workflow = new StateGraph(GraphState)
   .addNode('deepAnalysisNode', deepAnalysisNode) // linguistic + strategic + cognitiveDiversity
   .addNode('simulationNode', simulationNode) // decisionTwin + memoryRecall
   .addNode('rpdRecognitionNode', rpdRecognitionNode) // Klein RPD pattern recognition
+  .addNode('forgottenQuestionsNode', forgottenQuestionsNode) // unknown-unknowns surface
   .addNode('metaJudgeNode', metaJudgeNode) // debate orchestration
   .addNode('riskScorer', riskScorerNode)
 
@@ -217,14 +224,16 @@ const workflow = new StateGraph(GraphState)
   .addEdge('intelligenceGatherer', 'deepAnalysisNode')
   .addEdge('intelligenceGatherer', 'simulationNode')
   .addEdge('intelligenceGatherer', 'rpdRecognitionNode')
+  .addEdge('intelligenceGatherer', 'forgottenQuestionsNode')
 
-  // Fan-in: 6 super-nodes → metaJudgeNode
+  // Fan-in: 7 super-nodes → metaJudgeNode
   .addEdge('biasDetective', 'metaJudgeNode')
   .addEdge('noiseJudge', 'metaJudgeNode')
   .addEdge('verificationNode', 'metaJudgeNode')
   .addEdge('deepAnalysisNode', 'metaJudgeNode')
   .addEdge('simulationNode', 'metaJudgeNode')
   .addEdge('rpdRecognitionNode', 'metaJudgeNode')
+  .addEdge('forgottenQuestionsNode', 'metaJudgeNode')
 
   // Meta Judge -> Final Risk Scorer
   .addEdge('metaJudgeNode', 'riskScorer')

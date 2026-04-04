@@ -20,6 +20,7 @@ import {
   GitCompareArrows,
   BookOpen,
   Link2,
+  HelpCircle,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/EnhancedToast';
 import { SSEReader } from '@/lib/sse';
@@ -90,6 +91,9 @@ const PerspectivesTab = lazy(() =>
 );
 const DQChainTab = lazy(() =>
   import('./tabs/DQChainTab').then(m => ({ default: m.DQChainTab }))
+);
+const ForgottenQuestionsTab = lazy(() =>
+  import('./tabs/ForgottenQuestionsTab').then(m => ({ default: m.ForgottenQuestionsTab }))
 );
 
 interface VerificationSource {
@@ -182,6 +186,7 @@ interface Analysis {
   recognitionCues?: RecognitionCuesResult;
   narrativePreMortem?: NarrativePreMortem;
   dqChain?: import('@/types').DQChainSummary;
+  forgottenQuestions?: import('@/types').ForgottenQuestionsResult;
 }
 
 interface Document {
@@ -208,7 +213,8 @@ type TabId =
   | 'noise'
   | 'dq-chain'
   | 'perspectives'
-  | 'intelligence';
+  | 'intelligence'
+  | 'forgotten-questions';
 
 const VALID_TABS: TabId[] = [
   'overview',
@@ -218,6 +224,7 @@ const VALID_TABS: TabId[] = [
   'dq-chain',
   'perspectives',
   'intelligence',
+  'forgotten-questions',
 ];
 
 // Map old tab IDs to new ones for backward compatibility
@@ -743,6 +750,20 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         label: 'Scenarios',
         tabs: [{ id: 'perspectives', label: 'Perspectives', icon: Users }],
       },
+      ...(analysis?.forgottenQuestions?.questions?.length
+        ? [
+            {
+              label: 'Unknown Unknowns',
+              tabs: [
+                {
+                  id: 'forgotten-questions' as const,
+                  label: 'Forgotten Questions',
+                  icon: HelpCircle,
+                },
+              ],
+            },
+          ]
+        : []),
       ...(analysis?.intelligenceContext
         ? [
             {
@@ -1860,6 +1881,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   {activeTab === 'intelligence' && (
                     <ErrorBoundary sectionName="Intelligence Context">
                       <IntelligenceTab intelligenceContext={analysis?.intelligenceContext} />
+                    </ErrorBoundary>
+                  )}
+                  {activeTab === 'forgotten-questions' && (
+                    <ErrorBoundary sectionName="Forgotten Questions">
+                      <ForgottenQuestionsTab
+                        forgottenQuestions={analysis?.forgottenQuestions}
+                        analysisId={analysis?.id}
+                      />
                     </ErrorBoundary>
                   )}
                 </Suspense>

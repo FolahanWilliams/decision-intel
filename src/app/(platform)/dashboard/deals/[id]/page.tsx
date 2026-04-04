@@ -20,6 +20,7 @@ import { DealFormModal } from '@/components/deals/DealFormModal';
 import { DealOutcomeForm } from '@/components/deals/DealOutcomeForm';
 import { DealOutcomeDisplay } from '@/components/deals/DealOutcomeDisplay';
 import { DecisionBriefTab } from '@/components/deals/DecisionBriefTab';
+import { UpgradeFromAudit } from '@/components/deals/UpgradeFromAudit';
 import {
   STAGE_COLORS,
   DEAL_TYPE_COLORS,
@@ -149,6 +150,8 @@ export default function DealDetailPage() {
         >
           <ArrowLeft size={14} /> Projects
         </Link>
+
+        <UpgradeFromAudit dealId={dealId} />
 
         {/* Header */}
         <div

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
+import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
 import {
   Brain,
   FileSearch,
@@ -418,34 +419,57 @@ export default function LandingPage() {
           className="stats-grid"
         >
           {[
-            { icon: BarChart3, value: '55%', label: 'Decision variance hidden from teams', sub: 'Kahneman, "Noise" (2021)' },
-            { icon: TrendingUp, value: '146', label: 'Annotated failure case studies', sub: '8 industries, SEC filings & NTSB reports' },
-            { icon: Zap, value: '<60s', label: 'Full cognitive audit per document', sub: '11-agent pipeline, 20+ biases' },
-          ].map(({ icon: Icon, value, label, sub }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 12,
-                  background: C.tealBg,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Icon size={22} style={{ color: C.teal }} />
+            { icon: BarChart3, value: '55%', label: 'Decision variance hidden from teams', sub: 'Kahneman, "Noise" (2021)', href: null as string | null },
+            { icon: TrendingUp, value: '146', label: 'Annotated failure case studies', sub: '8 industries, SEC filings & NTSB reports', href: '/case-studies' as string | null },
+            { icon: Zap, value: '<60s', label: 'Full cognitive audit per document', sub: '11-agent pipeline, 20+ biases', href: null as string | null },
+          ].map(({ icon: Icon, value, label, sub, href }) => {
+            const content = (
+              <>
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 12,
+                    background: C.tealBg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon size={22} style={{ color: C.teal }} />
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: 32, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>{value}</div>
+                  <div style={{ fontSize: 13, color: C.slate600, marginTop: 2 }}>{label}</div>
+                  <div style={{ fontSize: 11, color: C.slate400, marginTop: 1 }}>{sub}</div>
+                </div>
+              </>
+            );
+            const baseStyle = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 } as const;
+            if (href) {
+              return (
+                <Link
+                  key={label}
+                  href={href}
+                  onClick={() => trackEvent('stats_chip_click', { href })}
+                  style={{ ...baseStyle, textDecoration: 'none', color: 'inherit' }}
+                >
+                  {content}
+                </Link>
+              );
+            }
+            return (
+              <div key={label} style={baseStyle}>
+                {content}
               </div>
-              <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: 32, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>{value}</div>
-                <div style={{ fontSize: 13, color: C.slate600, marginTop: 2 }}>{label}</div>
-                <div style={{ fontSize: 11, color: C.slate400, marginTop: 1 }}>{sub}</div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
+
+      {/* ── Case Study Carousel ─────────────────────────────────────── */}
+      <CaseStudyCarousel />
 
       {/* ── How It Works ────────────────────────────────────────────── */}
       <section id="how-it-works" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>

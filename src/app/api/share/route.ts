@@ -80,6 +80,27 @@ export async function POST(req: NextRequest) {
     log.info(
       `Share link created for analysis ${analysisId} by ${user.id}${isCaseStudy ? ' (case study)' : ''}`
     );
+
+    // Referrer/funnel attribution lives in AnalyticsEvent so we can answer
+    // "shares created → viewed → signup_from_share" without a schema
+    // migration on ShareLink itself. Fire-and-forget, never fails creation.
+    prisma.analyticsEvent
+      .create({
+        data: {
+          name: 'share_link_created',
+          userId: user.id,
+          properties: {
+            shareLinkId: link.id,
+            token: link.token,
+            analysisId,
+            isCaseStudy: link.isCaseStudy,
+            hasPassword: !!passwordHash,
+          },
+        },
+      })
+      .catch(() => {
+        /* analytics must never break share creation */
+      });
     return NextResponse.json(
       {
         token: link.token,

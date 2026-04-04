@@ -75,6 +75,38 @@ export async function POST(request: NextRequest) {
           });
 
           log.info(`Subscription created: ${plan} for user ${userId}`);
+
+          // Deal-audit → subscription attribution: if this user paid for a
+          // single-deal audit in the last 30 days, log the conversion so the
+          // funnel query can measure one-off → recurring lift without adding
+          // a schema column.
+          try {
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+            const recentAudit = await prisma.dealAuditPurchase.findFirst({
+              where: { userId, status: 'active', createdAt: { gte: thirtyDaysAgo } },
+              orderBy: { createdAt: 'desc' },
+              select: { id: true, dealId: true, tier: true, createdAt: true },
+            });
+            if (recentAudit) {
+              await prisma.analyticsEvent.create({
+                data: {
+                  name: 'deal_audit_converted_to_subscription',
+                  userId,
+                  properties: {
+                    plan,
+                    auditId: recentAudit.id,
+                    auditDealId: recentAudit.dealId,
+                    auditTier: recentAudit.tier,
+                    daysFromAuditToSubscribe: Math.floor(
+                      (Date.now() - recentAudit.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+                    ),
+                  },
+                },
+              });
+            }
+          } catch (attrErr) {
+            log.warn('Deal-audit attribution failed (non-fatal):', attrErr);
+          }
         }
 
         // Handle one-time deal audit payment

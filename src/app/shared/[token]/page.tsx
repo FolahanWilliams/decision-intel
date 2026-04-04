@@ -276,6 +276,11 @@ export default function SharedAnalysisPage() {
       if (data.isCaseStudy || isCaseStudy) {
         trackEvent('case_study_viewed');
       }
+      trackEvent('share_link_viewed', {
+        token,
+        isCaseStudy: !!data.isCaseStudy,
+        analysisId: data.analysis?.id,
+      });
       setRequiresPassword(false);
     } catch {
       setError('Network error. Please try again.');
