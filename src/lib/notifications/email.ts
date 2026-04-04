@@ -446,3 +446,61 @@ export async function notifyOutcomeReminder(
   const result = await sendEmail({ to: email, subject, html, includeUnsubscribe: true });
   await logNotification(userId, 'email', 'outcome_reminder', subject, result);
 }
+
+/**
+ * Notify a user that they are approaching their monthly analysis limit.
+ * Fires once per billing period per user (idempotency enforced by the caller
+ * checking NotificationLog for an existing `usage_limit_80` entry this month).
+ */
+export async function notifyUsageLimit(
+  userId: string,
+  opts: {
+    planName: string;
+    used: number;
+    limit: number;
+    percentUsed: number;
+    nextPlanName: string;
+    nextPlanCheckoutUrl: string;
+  }
+): Promise<void> {
+  const settings = await prisma.userSettings
+    .findUnique({ where: { userId } })
+    .catch(() => null);
+  if (settings && !settings.emailNotifications) return;
+
+  const email = await getUserEmail(userId);
+  if (!email) {
+    log.warn(`Cannot send usage limit nudge — no email for user ${userId}`);
+    return;
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+  const subject = `You've used ${opts.percentUsed}% of your ${opts.planName} plan`;
+  const safePlanName = escapeHtml(opts.planName);
+  const safeNextPlan = escapeHtml(opts.nextPlanName);
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto;">
+      <div style="background: #0f0f23; padding: 24px; border-radius: 12px; color: #e2e8f0;">
+        <h2 style="margin: 0 0 16px; color: #fff;">You're approaching your monthly limit</h2>
+        <p style="color: #94a3b8; margin: 0 0 20px;">
+          You've used <strong style="color:#fff;">${opts.used} of ${opts.limit}</strong>
+          analyses on the ${safePlanName} plan this month (${opts.percentUsed}%).
+          Upgrade to ${safeNextPlan} to keep auditing without interruption.
+        </p>
+
+        <a href="${escapeHtml(opts.nextPlanCheckoutUrl)}"
+           style="display: inline-block; padding: 12px 24px; background: #16A34A; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600;">
+          Upgrade to ${safeNextPlan}
+        </a>
+
+        <p style="color: #64748b; font-size: 12px; margin-top: 24px;">
+          You received this because your usage crossed 80% of your plan limit.
+          Manage notifications in your
+          <a href="${appUrl}/dashboard/settings" style="color: #16A34A;">settings</a>.
+        </p>
+      </div>
+    </div>
+  `;
+  const result = await sendEmail({ to: email, subject, html, includeUnsubscribe: true });
+  await logNotification(userId, 'email', 'usage_limit_80', subject, result);
+}
