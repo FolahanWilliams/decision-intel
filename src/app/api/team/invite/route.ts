@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/utils/rate-limit';
+import { checkTeamSizeLimit } from '@/lib/utils/plan-limits';
+import { PLANS } from '@/lib/stripe';
 import { createLogger } from '@/lib/utils/logger';
 import { z } from 'zod';
 
@@ -81,12 +83,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Limit team size
-    const memberCount = await prisma.teamMember.count({
-      where: { orgId: membership.orgId },
-    });
-    if (memberCount >= 20) {
-      return NextResponse.json({ error: 'Team size limit reached (20 members)' }, { status: 403 });
+    // Enforce plan-based team size tier. Limits come from PLANS in
+    // src/lib/stripe.ts (Starter 3 / Professional 10 / Team 50 / Enterprise ∞).
+    // Pending invites count against the limit so the cap can't be bypassed.
+    const seatCheck = await checkTeamSizeLimit(membership.orgId);
+    if (!seatCheck.allowed) {
+      const planName = PLANS[seatCheck.plan].name;
+      const limitLabel = Number.isFinite(seatCheck.limit) ? String(seatCheck.limit) : 'unlimited';
+      return NextResponse.json(
+        {
+          error: `Team size limit reached for the ${planName} plan (${seatCheck.used}/${limitLabel} seats, including pending invites). Upgrade your plan to add more teammates.`,
+          code: 'TEAM_SIZE_LIMIT',
+          plan: seatCheck.plan,
+          used: seatCheck.used,
+          limit: seatCheck.limit,
+        },
+        { status: 403 }
+      );
     }
 
     const invite = await prisma.teamInvite.create({

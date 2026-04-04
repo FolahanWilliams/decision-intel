@@ -229,21 +229,32 @@ describe('POST /api/upload', () => {
     expect(body.error).toContain('empty');
   });
 
-  it('returns 429 when monthly plan limit exceeded', async () => {
+  it('allows uploads even when monthly analysis limit is exceeded', async () => {
+    // Uploads are now decoupled from the analysis quota — users can store
+    // documents freely and only hit the plan limit at analysis time.
     mockCheckAnalysisLimit.mockResolvedValue({
       allowed: false,
       plan: 'free',
       used: 3,
       limit: 3,
     });
+    mockParseFile.mockResolvedValue('Valid content for analysis');
+    mockDocCreate.mockResolvedValue({
+      id: 'doc_over_quota',
+      filename: 'test.txt',
+      status: 'pending',
+    });
 
     const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
     const req = createMockRequest(file);
     const res = await POST(req);
 
-    expect(res.status).toBe(429);
-    const body = await res.json();
-    expect(body.error).toContain('limit');
+    // Must not return a plan-limit rejection — upload succeeds regardless.
+    expect(res.status).not.toBe(429);
+    if (res.status >= 400) {
+      const body = await res.json().catch(() => ({}));
+      expect(body.code).not.toBe('PLAN_LIMIT');
+    }
   });
 
   it('handles schema drift on create (P2022) by falling back', async () => {
