@@ -18,6 +18,14 @@ import { GOVERNMENT_SUCCESS_CASES } from './successes/government-successes';
 
 export type { CaseStudy, CaseOutcome, Industry, SourceType } from './types';
 export { isFailureOutcome, isSuccessOutcome } from './types';
+export {
+  slugify,
+  getCaseBySlug,
+  getCaseById,
+  getSlugForCase,
+  getAllCaseSlugs,
+  getDeepCases,
+} from './slugs';
 
 // ---------------------------------------------------------------------------
 // Legacy adapter: wrap FailureCase with defaults for new CaseStudy fields
