@@ -63,6 +63,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate field lengths to prevent oversized AI prompts
+    const MAX_FIELD_LENGTH = 500;
+    for (const [field, val] of Object.entries({ name, role, focus, values, bias })) {
+      if (typeof val !== 'string' || val.length > MAX_FIELD_LENGTH) {
+        return NextResponse.json(
+          { error: `${field} must be a string of at most ${MAX_FIELD_LENGTH} characters` },
+          { status: 400 }
+        );
+      }
+    }
+
     // Check limit
     const count = await prisma.boardroomPersona.count({
       where: { userId: user.id, isActive: true },

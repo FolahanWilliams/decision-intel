@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import {
   BookTemplate,
   Plus,
@@ -54,7 +56,7 @@ const RISK_COLORS: Record<string, string> = {
   aggressive: '#22c55e',
 };
 
-export default function PlaybooksPage() {
+function PlaybooksPageContent() {
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -517,17 +519,19 @@ export default function PlaybooksPage() {
 
           {/* Empty State */}
           {playbooks.length === 0 && !loading && (
-            <div
-              style={{
-                textAlign: 'center',
-                padding: 60,
-                color: 'var(--text-muted)',
-                fontSize: 14,
-              }}
-            >
-              No playbooks found
-              {selectedCategory ? ' in this category' : ''}.
-            </div>
+            <EnhancedEmptyState
+              type="generic"
+              title={selectedCategory ? 'No playbooks in this category' : 'No playbooks yet'}
+              description="Decision playbooks are pre-configured analysis templates for common high-stakes decisions. Create one to optimize your bias detection pipeline."
+              actions={[
+                {
+                  label: 'New Playbook',
+                  onClick: () => setShowCreate(true),
+                  variant: 'primary',
+                  icon: <Plus size={16} />,
+                },
+              ]}
+            />
           )}
         </div>
       )}
@@ -746,5 +750,13 @@ export default function PlaybooksPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function PlaybooksPage() {
+  return (
+    <ErrorBoundary sectionName="playbooks">
+      <PlaybooksPageContent />
+    </ErrorBoundary>
   );
 }

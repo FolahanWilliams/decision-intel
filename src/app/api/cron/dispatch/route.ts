@@ -99,13 +99,19 @@ export async function GET() {
 
   log.info(`Dispatching ${jobsToRun.length} cron jobs (day=${dayOfWeek})`);
 
-  // Run jobs sequentially to avoid overwhelming the server
+  // Run jobs sequentially to avoid overwhelming the server.
+  // Failed jobs get one retry after a short delay.
   const results: JobResult[] = [];
   for (const job of jobsToRun) {
-    const result = await runJob(baseUrl, job, cronSecret);
+    let result = await runJob(baseUrl, job, cronSecret);
+    if (result.status === 'error') {
+      log.warn(`Cron job ${job} failed, retrying in 2s: ${result.error}`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      result = await runJob(baseUrl, job, cronSecret);
+    }
     results.push(result);
     if (result.status === 'error') {
-      log.error(`Cron job ${job} failed: ${result.error}`);
+      log.error(`Cron job ${job} failed after retry: ${result.error}`);
     } else {
       log.info(`Cron job ${job} completed in ${result.ms}ms`);
     }

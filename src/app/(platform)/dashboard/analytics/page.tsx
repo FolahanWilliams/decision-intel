@@ -4,8 +4,11 @@ import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BarChart3, Dna, Lightbulb, Fingerprint } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { TabBar } from '@/components/ui/TabBar';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
+import { useInsights } from '@/hooks/useInsights';
 import { InsightsPageContent } from '@/components/insights/InsightsPageContent';
 import { DecisionDNAPageContent } from '@/components/dna/DecisionDNAPageContent';
 import { ExplainabilityContent } from '@/components/explainability/ExplainabilityContent';
@@ -25,6 +28,9 @@ function AnalyticsInner() {
   const router = useRouter();
   const rawView = searchParams.get('view') ?? 'trends';
   const view = VALID_VIEWS.has(rawView) ? rawView : 'trends';
+  const { insights, isLoading } = useInsights();
+
+  const hasNoData = !isLoading && (!insights || insights.empty);
 
   return (
     <div>
@@ -39,18 +45,26 @@ function AnalyticsInner() {
             Trends, insights, decision profile, explainability, and cognitive fingerprint
           </p>
         </header>
-        <TabBar
-          tabs={TABS}
-          activeTab={view}
-          onTabChange={key => router.replace(`/dashboard/analytics?view=${key}`, { scroll: false })}
-        />
+        {!hasNoData && (
+          <TabBar
+            tabs={TABS}
+            activeTab={view}
+            onTabChange={key => router.replace(`/dashboard/analytics?view=${key}`, { scroll: false })}
+          />
+        )}
       </div>
-      <div style={{ marginTop: 'var(--spacing-md)' }}>
-        {view === 'trends' && <InsightsPageContent />}
-        {view === 'dna' && <DecisionDNAPageContent />}
-        {view === 'explainability' && <ExplainabilityContent />}
-        {view === 'fingerprint' && <FingerprintContent />}
-      </div>
+      {hasNoData ? (
+        <div className="container" style={{ paddingTop: 'var(--spacing-xl)' }}>
+          <EnhancedEmptyState type="insights" />
+        </div>
+      ) : (
+        <div style={{ marginTop: 'var(--spacing-md)' }}>
+          {view === 'trends' && <InsightsPageContent />}
+          {view === 'dna' && <DecisionDNAPageContent />}
+          {view === 'explainability' && <ExplainabilityContent />}
+          {view === 'fingerprint' && <FingerprintContent />}
+        </div>
+      )}
     </div>
   );
 }
@@ -58,7 +72,7 @@ function AnalyticsInner() {
 export default function AnalyticsPage() {
   return (
     <ErrorBoundary sectionName="Analytics">
-      <Suspense fallback={null}>
+      <Suspense fallback={<PageSkeleton />}>
         <AnalyticsInner />
       </Suspense>
     </ErrorBoundary>

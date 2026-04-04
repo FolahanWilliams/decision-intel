@@ -156,6 +156,40 @@ export function getPoolStats() {
   };
 }
 
+// Transient Prisma error codes that are safe to retry
+const TRANSIENT_ERROR_CODES = new Set([
+  'P1001', // Can't reach database server
+  'P1002', // Database server timed out
+  'P1008', // Operations timed out
+  'P2024', // Timed out fetching a new connection from the pool
+]);
+
+/**
+ * Retry a database operation on transient failures.
+ * Use for read queries and idempotent writes only.
+ */
+export async function withRetry<T>(
+  operation: () => Promise<T>,
+  maxRetries = 2
+): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      const code = (error as { code?: string }).code;
+      if (!code || !TRANSIENT_ERROR_CODES.has(code) || attempt === maxRetries) {
+        throw error;
+      }
+      const delayMs = Math.min(1000 * Math.pow(2, attempt), 4000);
+      log.warn(`Transient DB error (${code}), retry ${attempt + 1}/${maxRetries} in ${delayMs}ms`);
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
+  throw lastError;
+}
+
 // Gracefully handle shutdown
 process.on('beforeExit', async () => {
   if (globalForPrisma.prisma) {

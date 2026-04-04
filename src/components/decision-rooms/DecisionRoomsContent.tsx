@@ -12,6 +12,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 
 interface Room {
   id: string;
@@ -178,20 +179,19 @@ export function DecisionRoomsContent() {
 
         {/* Empty State */}
         {!isLoading && !error && filteredRooms.length === 0 && (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '60px 20px',
-              border: '1px dashed var(--glass-border)',
-              borderRadius: 'var(--radius-md)',
-              color: 'var(--text-muted)',
-            }}
-          >
-            <p style={{ fontSize: 15, marginBottom: 6 }}>No decision rooms yet.</p>
-            <p style={{ fontSize: 13 }}>
-              Create one from a document analysis to enable blind prior voting.
-            </p>
-          </div>
+          <EnhancedEmptyState
+            type="generic"
+            title="No decision rooms yet"
+            description="Create a decision room from a document analysis to enable blind prior voting and collaborative decision-making."
+            actions={[
+              {
+                label: 'Create Room',
+                href: '/dashboard/documents',
+                variant: 'primary',
+                icon: <Plus size={16} />,
+              },
+            ]}
+          />
         )}
 
         {/* Room Cards Grid */}

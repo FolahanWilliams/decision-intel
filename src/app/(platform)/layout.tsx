@@ -6,9 +6,11 @@ import {
 } from '@/components/ui/AnalysisProgressBar';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { NewDecisionModal } from '@/components/ui/NewDecisionModal';
+import { AuthGuard } from '@/components/ui/AuthGuard';
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
   return (
     <AnalysisProgressProvider>
+      <AuthGuard />
       <a href="#main-content" className="skip-nav">
         Skip to main content
       </a>

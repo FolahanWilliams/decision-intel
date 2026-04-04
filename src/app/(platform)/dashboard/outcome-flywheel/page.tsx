@@ -15,6 +15,7 @@ import {
   ArrowDownRight,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface FlywheelData {
@@ -742,7 +743,7 @@ function FlywheelInner() {
 export default function OutcomeFlywheelPage() {
   return (
     <ErrorBoundary sectionName="Outcome Flywheel">
-      <Suspense fallback={null}>
+      <Suspense fallback={<PageSkeleton />}>
         <FlywheelInner />
       </Suspense>
     </ErrorBoundary>
