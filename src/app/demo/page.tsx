@@ -196,25 +196,25 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      {/* Header */}
-      <div className="bg-[#0F172A] border-b border-slate-700 px-4 sm:px-6 py-3 sticky top-0 z-50">
+      {/* Header — matches the marketing site's white nav (not the old dark bar) */}
+      <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sticky top-0 z-50">
         <div className="max-w-[960px] mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 no-underline text-inherit">
-            <Shield size={18} className="text-slate-50" />
+            <Shield size={18} className="text-green-600" />
             <span className="text-sm font-semibold">
-              <span className="text-slate-50">Decision</span>
+              <span className="text-slate-900">Decision</span>
               <span className="text-slate-400 ml-1">Intel</span>
             </span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden sm:inline text-[11px] px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-500 font-semibold tracking-wide">
+            <span className="hidden sm:inline text-[11px] px-2.5 py-1 rounded-full bg-green-50 text-green-600 font-semibold tracking-wide border border-green-100">
               INTERACTIVE DEMO
             </span>
             <button
               onClick={handleTryNow}
               disabled={loadingSample}
               aria-busy={loadingSample}
-              className="text-xs sm:text-[13px] px-3 sm:px-4 py-1.5 rounded-lg bg-white text-black font-semibold border-none cursor-pointer disabled:opacity-70 disabled:cursor-wait"
+              className="text-xs sm:text-[13px] px-3 sm:px-4 py-1.5 rounded-lg bg-green-600 text-white font-semibold border-none cursor-pointer disabled:opacity-70 disabled:cursor-wait hover:bg-green-700 transition-colors"
             >
               {loadingSample ? (
                 <span className="flex items-center gap-1.5">
@@ -249,64 +249,85 @@ export default function DemoPage() {
         {/* Interactive Demo Section */}
         {!isSimulating && !showResults && !scanResult && (
           <div className="mb-10">
-            <div className="text-center mb-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 leading-tight">
-                Interactive Demo
+            <div className="text-center mb-10">
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3 leading-tight">
+                Interactive <span className="text-green-600">Demo</span>
               </h2>
-              <p className="text-slate-400 text-sm sm:text-base max-w-[600px] mx-auto">
+              <p className="text-slate-500 text-sm sm:text-base max-w-[600px] mx-auto leading-relaxed">
                 Pick a real-world case study and watch the AI pipeline analyze it in real time. No
                 login required.
               </p>
             </div>
 
             {/* Sample Document Cards */}
-            <div className="text-[11px] text-slate-500 mb-3 tracking-widest uppercase font-semibold">
+            <div className="text-[11px] text-green-600 mb-4 tracking-widest uppercase font-semibold flex items-center gap-2">
+              <FileText size={13} />
               Choose a document to analyze
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              {DEMO_ANALYSES.map((a, idx) => (
-                <button
-                  key={a.id}
-                  onClick={() => startSimulation(idx)}
-                  className="text-left p-4 sm:p-5 rounded-xl bg-white border border-slate-200 cursor-pointer transition-all duration-200 hover:border-slate-200 hover:bg-slate-50 group"
-                  style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
-                >
-                  <div className="flex items-start justify-between">
-                    <FileText
-                      size={18}
-                      className="text-slate-500 group-hover:text-slate-900 transition-colors shrink-0 mt-0.5"
-                    />
-                    <span
-                      className="text-[11px] px-2 py-0.5 rounded-md font-bold"
-                      style={{
-                        background: `${a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444'}15`,
-                        color:
-                          a.overallScore >= 70
-                            ? '#22c55e'
-                            : a.overallScore >= 40
-                              ? '#eab308'
-                              : '#ef4444',
-                      }}
-                    >
-                      DQI {a.overallScore}/100
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-[13px] font-semibold text-slate-900 mb-1">{a.shortName}</div>
-                    <div className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
-                      {a.summary.slice(0, 120)}...
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+              {DEMO_ANALYSES.map((a, idx) => {
+                const scoreColor = a.overallScore >= 70 ? '#22c55e' : a.overallScore >= 40 ? '#eab308' : '#ef4444';
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => startSimulation(idx)}
+                    className="text-left rounded-2xl bg-white border border-slate-200 cursor-pointer transition-all duration-200 hover:border-green-200 hover:shadow-lg group"
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '16px',
+                      padding: '28px 24px',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                    }}
+                  >
+                    {/* Icon + DQI badge row */}
+                    <div className="flex items-start justify-between">
+                      <div
+                        className="shrink-0"
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 12,
+                          background: '#F0FDF4',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <FileText size={20} style={{ color: '#16A34A' }} />
+                      </div>
+                      <span
+                        className="text-xs px-2.5 py-1 rounded-lg font-bold"
+                        style={{
+                          background: `${scoreColor}12`,
+                          color: scoreColor,
+                          border: `1px solid ${scoreColor}30`,
+                        }}
+                      >
+                        DQI {a.overallScore}/100
+                      </span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 group-hover:text-slate-600 transition-colors">
-                    <Upload size={12} />
-                    <span>Click to analyze</span>
-                    <ArrowRight
-                      size={12}
-                      className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
-                  </div>
-                </button>
-              ))}
+
+                    {/* Title + description */}
+                    <div>
+                      <div className="text-base font-bold text-slate-900 mb-1.5 leading-tight">{a.shortName}</div>
+                      <div className="text-sm text-slate-500 leading-relaxed line-clamp-2">
+                        {a.summary.slice(0, 140)}...
+                      </div>
+                    </div>
+
+                    {/* CTA footer */}
+                    <div className="flex items-center gap-2 text-xs text-green-600 font-semibold group-hover:text-green-700 transition-colors mt-auto pt-2 border-t border-slate-100">
+                      <Upload size={13} />
+                      <span>Click to analyze</span>
+                      <ArrowRight
+                        size={13}
+                        className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+                      />
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Paste Your Own Text */}

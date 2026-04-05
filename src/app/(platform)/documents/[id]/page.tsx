@@ -46,9 +46,7 @@ import { DecisionRoomList } from '@/components/ui/DecisionRoomCard';
 import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinationCard';
 import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
-import { RiskScoreCard } from '@/components/analysis/RiskScoreCard';
-import { ActOnThisPanel } from '@/components/analysis/ActOnThisPanel';
-import { SimilarDecisionsBanner } from '@/components/analysis/SimilarDecisionsBanner';
+import { DecisionScorecard } from '@/components/analysis/DecisionScorecard';
 import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
@@ -1295,31 +1293,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             </div>
           )}
 
-          {/* M9.1 — "Have We Seen This Before?" banner. Fetches structurally
-              similar prior decisions and shows them as a row of outcome-coded
-              cards. Renders above the risk score so the institutional memory
-              lands before the new number does. */}
+          {/* S-1 Decision Scorecard — consolidates SimilarDecisionsBanner +
+              RiskScoreCard + ActOnThisPanel into ONE card with three internal
+              sections. Reduces above-fold card count from 11 → 9 and unifies
+              the mental model: "score → history → next step" as one artifact. */}
           {analysis && (
             <div className="mb-lg">
-              <SimilarDecisionsBanner analysisId={analysis.id} />
-            </div>
-          )}
-
-          {/* Risk-Adjusted Decision Score */}
-          {analysis && (
-            <div className="mb-lg">
-              <RiskScoreCard analysisId={analysis.id} />
-            </div>
-          )}
-
-          {/* Act on this — M6 Bias → Playbook suggestions. Rendered directly
-              below the risk score so users see the concrete next step at
-              the highest-leverage moment (right after absorbing the score). */}
-          {analysis && analysis.biases && analysis.biases.length > 0 && (
-            <div className="mb-lg">
-              <ActOnThisPanel
+              <DecisionScorecard
                 analysisId={analysis.id}
-                biases={analysis.biases}
+                biases={analysis.biases ?? []}
                 documentType={document.documentType ?? null}
               />
             </div>

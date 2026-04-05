@@ -92,8 +92,10 @@ export default function PersonProfilePage({
       try {
         const res = await fetch('/api/team');
         if (!res.ok) return;
-        const data = (await res.json()) as { orgId?: string };
-        if (data.orgId) setOrgId(data.orgId);
+        // /api/team returns { organization: { id, ... }, role } — not { orgId }
+        // (BUG-3 fix: was casting to { orgId?: string } which always produced undefined)
+        const data = (await res.json()) as { organization?: { id: string } | null };
+        if (data.organization?.id) setOrgId(data.organization.id);
       } catch {
         // fall through — profile fetch will surface the error
       }

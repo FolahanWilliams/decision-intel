@@ -74,7 +74,7 @@ export async function seedDemoAnalyses(
       // Cross-link the seeded analyses with decision graph edges so the
       // graph UI renders meaningful topology on first load. Each pair that
       // shares a dominant bias gets a `shared_bias` edge.
-      await seedDecisionEdges(tx, corpus, analysisByDemoId, orgId);
+      await seedDecisionEdges(tx, corpus, analysisByDemoId, orgId, userId);
     });
   } catch (err) {
     log.error('Seed transaction failed', err);
@@ -189,7 +189,8 @@ async function seedDecisionEdges(
   tx: Tx,
   corpus: CorpusEntry[],
   analysisByDemoId: Map<string, string>,
-  orgId: string | null
+  orgId: string | null,
+  userId: string
 ): Promise<void> {
   const dominantBiases = corpus.map(entry => ({
     demoId: entry.demoId,
@@ -226,7 +227,10 @@ async function seedDecisionEdges(
           confidence: 0.9,
           description: `Shares ${shared.length} high-severity bias${shared.length > 1 ? 'es' : ''}: ${shared.join(', ')}`,
           metadata: { sharedBiases: shared, seedEntry: true },
-          createdBy: 'system',
+          // BUG-4 fix: user-scope seed edges must be attributable to their
+          // creator so clearSampleData can scope its delete correctly.
+          // Org-scope edges use 'system' (they belong to the whole org).
+          createdBy: orgId ? 'system' : userId,
           isSample: true,
         },
       });
@@ -248,9 +252,15 @@ export async function clearSampleData(
 ): Promise<{ documentsDeleted: number; humanDecisionsDeleted: number; edgesDeleted: number }> {
   const scopeFilter = orgId ? { orgId } : { userId, orgId: null };
 
-  // Delete edges first (no FK cascades into them from documents)
+  // Delete edges first (no FK cascades into them from documents).
+  // BUG-4 fix: in user-scope mode (orgId=null), DecisionEdge has no
+  // userId column — so we scope by createdBy instead. seedDecisionEdges
+  // now sets createdBy=userId for user-scope edges (instead of 'system')
+  // so this filter correctly targets only the caller's seed edges.
   const edges = await prisma.decisionEdge.deleteMany({
-    where: { isSample: true, ...(orgId ? { orgId } : {}) },
+    where: orgId
+      ? { isSample: true, orgId }
+      : { isSample: true, orgId: null, createdBy: userId },
   });
 
   // Delete human decisions (cascades CognitiveAudit, Nudges, etc.)
