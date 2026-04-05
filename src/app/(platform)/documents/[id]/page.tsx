@@ -33,6 +33,7 @@ const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
 import { OutcomeReporter } from './OutcomeReporter';
 import { DraftOutcomeCard } from '@/components/ui/DraftOutcomeCard';
+import { SampleBadge } from '@/components/ui/SampleBadge';
 import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/DecisionPriorCapture';
 import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
@@ -197,6 +198,7 @@ interface Document {
   content: string;
   uploadedAt: string;
   status: string;
+  isSample?: boolean;
   analyses: Analysis[];
   deal?: {
     id: string;
@@ -796,7 +798,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               <ArrowLeft size={20} />
             </Link>
             <div>
-              <h1 className="text-xl font-semibold">{document.filename}</h1>
+              <h1 className="text-xl font-semibold inline-flex items-center gap-sm">
+                {document.filename}
+                {document.isSample && <SampleBadge />}
+              </h1>
               <p className="text-sm text-muted">
                 {formatDate(document.uploadedAt)} • {(document.fileSize / 1024).toFixed(1)} KB
               </p>

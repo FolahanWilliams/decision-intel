@@ -27,6 +27,7 @@ model Document {
   dealId      String?
   source     String?
   sourceRef  String?
+  isSample   Boolean             @default(false) // Synthetic seed doc — clearable via /api/demo/clear-samples
   deal        Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)
   analyses    Analysis[]
   embeddings  DecisionEmbedding[]
@@ -41,6 +42,7 @@ model Document {
   @@index([userId, uploadedAt])
   @@index([orgId, uploadedAt])
   @@index([source, sourceRef])
+  @@index([orgId, isSample])
 }
 
 model Analysis {
@@ -83,6 +85,9 @@ model Analysis {
   outcomeStatus   String          @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
   outcomeDueAt    DateTime?       // When outcome should be reported
 
+  // Synthetic seed analysis — flagged SAMPLE, clearable via /api/demo/clear-samples
+  isSample        Boolean         @default(false)
+
   document            Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
   biases              BiasInstance[]
   versions     AnalysisVersion[]
@@ -96,6 +101,7 @@ model Analysis {
 
   @@index([documentId])
   @@index([createdAt])
+  @@index([isSample])
 }
 
 model BiasInstance {
@@ -387,6 +393,7 @@ model HumanDecision {
   status           String          @default("pending")
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+  isSample         Boolean         @default(false) // Synthetic seed — clearable via /api/demo/clear-samples
   cognitiveAudit   CognitiveAudit?
   meeting          Meeting?
   nudges           Nudge[]
@@ -399,6 +406,7 @@ model HumanDecision {
   @@index([channel])
   @@index([createdAt])
   @@index([contentHash])
+  @@index([orgId, isSample])
 }
 
 model CognitiveAudit {
@@ -975,6 +983,7 @@ model DecisionEdge {
   // Provenance
   createdBy     String   @default("system") // "system" | userId
   isManual      Boolean  @default(false)
+  isSample      Boolean  @default(false) // Synthetic seed edge — clearable via /api/demo/clear-samples
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -986,6 +995,7 @@ model DecisionEdge {
   @@index([edgeType])
   @@index([strength])
   @@index([orgId, createdAt])
+  @@index([orgId, isSample])
 }
 
 // ─── Autonomous Outcome Detection ────────────────────────────────────────

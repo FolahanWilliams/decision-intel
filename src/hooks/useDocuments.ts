@@ -12,6 +12,7 @@ interface UploadedDoc {
   status: string;
   score?: number;
   uploadedAt: string;
+  isSample?: boolean;
 }
 
 interface DocumentsResponse {
