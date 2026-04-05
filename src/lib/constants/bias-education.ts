@@ -1,5 +1,26 @@
 import type { BiasCategory } from '@/types';
 
+/**
+ * Structured academic reference for a cognitive bias.
+ *
+ * `citation` is the human-readable full reference (used by existing UI surfaces
+ * as a string fallback). The other fields are structured so the UI can render
+ * a clickable DOI link, a hover card with author/venue/year, or feed a Works
+ * Cited section in exported PDFs.
+ */
+export interface AcademicReference {
+  /** Full formatted citation, APA-style. Always present. */
+  citation: string;
+  authors: string;
+  year: string;
+  title: string;
+  venue: string;
+  /** DOI without the https://doi.org/ prefix, e.g. "10.1126/science.185.4157.1124". */
+  doi?: string;
+  /** Stable URL for works without a DOI (books, pre-DOI papers, etc.). */
+  url?: string;
+}
+
 export interface BiasEducationContent {
   realWorldExample: {
     title: string;
@@ -9,7 +30,7 @@ export interface BiasEducationContent {
   };
   debiasingTechniques: string[];
   relatedBiases: Array<{ key: BiasCategory; reason: string }>;
-  academicReference: string;
+  academicReference: AcademicReference;
   quickTip: string;
   difficulty: 'easy' | 'moderate' | 'hard';
 }
@@ -38,8 +59,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Initial beliefs act as anchors that confirmation bias reinforces',
       },
     ],
-    academicReference:
-      'Wason, P.C. (1960). "On the failure to eliminate hypotheses in a conceptual task." Quarterly Journal of Experimental Psychology.',
+    academicReference: {
+      citation:
+        'Wason, P.C. (1960). "On the failure to eliminate hypotheses in a conceptual task." Quarterly Journal of Experimental Psychology, 12(3), 129–140.',
+      authors: 'Wason, P.C.',
+      year: '1960',
+      title: 'On the failure to eliminate hypotheses in a conceptual task',
+      venue: 'Quarterly Journal of Experimental Psychology, 12(3), 129–140',
+      doi: '10.1080/17470216008416717',
+    },
     quickTip:
       'Before deciding, write down what evidence would change your mind — then go look for it.',
     difficulty: 'hard',
@@ -67,8 +95,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Once anchored, people seek data confirming the anchor value',
       },
     ],
-    academicReference:
-      'Tversky, A. & Kahneman, D. (1974). "Judgment under Uncertainty: Heuristics and Biases." Science, 185(4157).',
+    academicReference: {
+      citation:
+        'Tversky, A. & Kahneman, D. (1974). "Judgment under Uncertainty: Heuristics and Biases." Science, 185(4157), 1124–1131.',
+      authors: 'Tversky, A. & Kahneman, D.',
+      year: '1974',
+      title: 'Judgment under Uncertainty: Heuristics and Biases',
+      venue: 'Science, 185(4157), 1124–1131',
+      doi: '10.1126/science.185.4157.1124',
+    },
     quickTip:
       'Always ask: "Would I reach the same conclusion if the first number I saw was different?"',
     difficulty: 'moderate',
@@ -93,8 +128,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       },
       { key: 'framing_effect', reason: 'Vivid examples frame perception of probability' },
     ],
-    academicReference:
-      'Tversky, A. & Kahneman, D. (1973). "Availability: A heuristic for judging frequency and probability." Cognitive Psychology, 5(2).',
+    academicReference: {
+      citation:
+        'Tversky, A. & Kahneman, D. (1973). "Availability: A heuristic for judging frequency and probability." Cognitive Psychology, 5(2), 207–232.',
+      authors: 'Tversky, A. & Kahneman, D.',
+      year: '1973',
+      title: 'Availability: A heuristic for judging frequency and probability',
+      venue: 'Cognitive Psychology, 5(2), 207–232',
+      doi: '10.1016/0010-0285(73)90033-9',
+    },
     quickTip: 'When a risk feels scary, look up the actual statistics before adjusting your plans.',
     difficulty: 'moderate',
   },
@@ -118,7 +160,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       },
       { key: 'bandwagon_effect', reason: 'People join the majority to avoid social friction' },
     ],
-    academicReference: 'Janis, I.L. (1972). "Victims of Groupthink." Houghton Mifflin.',
+    academicReference: {
+      citation:
+        'Janis, I.L. (1972). Victims of Groupthink: A Psychological Study of Foreign-Policy Decisions and Fiascoes. Boston: Houghton Mifflin.',
+      authors: 'Janis, I.L.',
+      year: '1972',
+      title: 'Victims of Groupthink: A Psychological Study of Foreign-Policy Decisions and Fiascoes',
+      venue: 'Houghton Mifflin (book)',
+      url: 'https://psycnet.apa.org/record/1975-29417-000',
+    },
     quickTip: "If everyone agrees too quickly, that's a red flag — not a green light.",
     difficulty: 'hard',
   },
@@ -145,8 +195,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Authority endorsement creates a bandwagon others follow',
       },
     ],
-    academicReference:
-      'Milgram, S. (1963). "Behavioral Study of Obedience." Journal of Abnormal and Social Psychology, 67(4).',
+    academicReference: {
+      citation:
+        'Milgram, S. (1963). "Behavioral Study of Obedience." Journal of Abnormal and Social Psychology, 67(4), 371–378.',
+      authors: 'Milgram, S.',
+      year: '1963',
+      title: 'Behavioral Study of Obedience',
+      venue: 'Journal of Abnormal and Social Psychology, 67(4), 371–378',
+      doi: '10.1037/h0040525',
+    },
     quickTip: 'Separate the argument from the arguer — evaluate evidence, not credentials.',
     difficulty: 'moderate',
   },
@@ -170,8 +227,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Following authorities can trigger broader bandwagon effects',
       },
     ],
-    academicReference:
-      'Leibenstein, H. (1950). "Bandwagon, Snob, and Veblen Effects in the Theory of Consumers\' Demand." Quarterly Journal of Economics, 64(2).',
+    academicReference: {
+      citation:
+        'Leibenstein, H. (1950). "Bandwagon, Snob, and Veblen Effects in the Theory of Consumers\' Demand." Quarterly Journal of Economics, 64(2), 183–207.',
+      authors: 'Leibenstein, H.',
+      year: '1950',
+      title: "Bandwagon, Snob, and Veblen Effects in the Theory of Consumers' Demand",
+      venue: 'Quarterly Journal of Economics, 64(2), 183–207',
+      doi: '10.2307/1882692',
+    },
     quickTip:
       'Popularity is not proof. Ask: "What\'s the evidence this works, separate from who else is doing it?"',
     difficulty: 'easy',
@@ -193,8 +257,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       { key: 'planning_fallacy', reason: 'Overconfidence in timelines is the planning fallacy' },
       { key: 'hindsight_bias', reason: 'Past "correct" predictions inflate future confidence' },
     ],
-    academicReference:
-      'Moore, D.A. & Healy, P.J. (2008). "The trouble with overconfidence." Psychological Review, 115(2).',
+    academicReference: {
+      citation:
+        'Moore, D.A. & Healy, P.J. (2008). "The trouble with overconfidence." Psychological Review, 115(2), 502–517.',
+      authors: 'Moore, D.A. & Healy, P.J.',
+      year: '2008',
+      title: 'The trouble with overconfidence',
+      venue: 'Psychological Review, 115(2), 502–517',
+      doi: '10.1037/0033-295X.115.2.502',
+    },
     quickTip: "Add 30% to your worst-case estimate — that's probably closer to realistic.",
     difficulty: 'hard',
   },
@@ -221,8 +292,16 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'After the fact, people selectively remember confirming signals',
       },
     ],
-    academicReference:
-      'Fischhoff, B. (1975). "Hindsight is not equal to foresight: The effect of outcome knowledge on judgment under uncertainty." Journal of Experimental Psychology.',
+    academicReference: {
+      citation:
+        'Fischhoff, B. (1975). "Hindsight is not equal to foresight: The effect of outcome knowledge on judgment under uncertainty." Journal of Experimental Psychology: Human Perception and Performance, 1(3), 288–299.',
+      authors: 'Fischhoff, B.',
+      year: '1975',
+      title:
+        'Hindsight is not equal to foresight: The effect of outcome knowledge on judgment under uncertainty',
+      venue: 'Journal of Experimental Psychology: Human Perception and Performance, 1(3), 288–299',
+      doi: '10.1037/0096-1523.1.3.288',
+    },
     quickTip:
       'Before reviewing what happened, write down what you expected — then compare honestly.',
     difficulty: 'moderate',
@@ -250,8 +329,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Initial optimistic estimates anchor subsequent adjustments',
       },
     ],
-    academicReference:
-      'Kahneman, D. & Tversky, A. (1979). "Intuitive prediction: biases and corrective procedures." TIMS Studies in Management Science, 12.',
+    academicReference: {
+      citation:
+        'Kahneman, D. & Tversky, A. (1979). "Intuitive prediction: biases and corrective procedures." TIMS Studies in Management Science, 12, 313–327.',
+      authors: 'Kahneman, D. & Tversky, A.',
+      year: '1979',
+      title: 'Intuitive prediction: biases and corrective procedures',
+      venue: 'TIMS Studies in Management Science, 12, 313–327',
+      url: 'https://apps.dtic.mil/sti/pdfs/ADA047747.pdf',
+    },
     quickTip:
       'How long did similar projects actually take? Use that as your baseline, not your optimism.',
     difficulty: 'moderate',
@@ -276,8 +362,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Loss aversion on invested resources drives sunk cost thinking',
       },
     ],
-    academicReference:
-      'Kahneman, D. & Tversky, A. (1979). "Prospect Theory: An Analysis of Decision under Risk." Econometrica, 47(2).',
+    academicReference: {
+      citation:
+        'Kahneman, D. & Tversky, A. (1979). "Prospect Theory: An Analysis of Decision under Risk." Econometrica, 47(2), 263–291.',
+      authors: 'Kahneman, D. & Tversky, A.',
+      year: '1979',
+      title: 'Prospect Theory: An Analysis of Decision under Risk',
+      venue: 'Econometrica, 47(2), 263–291',
+      doi: '10.2307/1914185',
+    },
     quickTip:
       'Ask: "If I didn\'t already have this, would I pay to get it?" That reveals whether you\'re protecting a loss or making a smart choice.',
     difficulty: 'moderate',
@@ -305,8 +398,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Confidence that more investment will turn things around',
       },
     ],
-    academicReference:
-      'Arkes, H.R. & Blumer, C. (1985). "The psychology of sunk cost." Organizational Behavior and Human Decision Processes, 35(1).',
+    academicReference: {
+      citation:
+        'Arkes, H.R. & Blumer, C. (1985). "The psychology of sunk cost." Organizational Behavior and Human Decision Processes, 35(1), 124–140.',
+      authors: 'Arkes, H.R. & Blumer, C.',
+      year: '1985',
+      title: 'The psychology of sunk cost',
+      venue: 'Organizational Behavior and Human Decision Processes, 35(1), 124–140',
+      doi: '10.1016/0749-5978(85)90049-4',
+    },
     quickTip:
       'Money already spent is gone. The only question is: "What\'s the best use of the NEXT dollar?"',
     difficulty: 'moderate',
@@ -334,8 +434,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Investment in the current state makes change feel wasteful',
       },
     ],
-    academicReference:
-      'Samuelson, W. & Zeckhauser, R. (1988). "Status quo bias in decision making." Journal of Risk and Uncertainty, 1(1).',
+    academicReference: {
+      citation:
+        'Samuelson, W. & Zeckhauser, R. (1988). "Status quo bias in decision making." Journal of Risk and Uncertainty, 1(1), 7–59.',
+      authors: 'Samuelson, W. & Zeckhauser, R.',
+      year: '1988',
+      title: 'Status quo bias in decision making',
+      venue: 'Journal of Risk and Uncertainty, 1(1), 7–59',
+      doi: '10.1007/BF00055564',
+    },
     quickTip: 'Inaction is also a decision. Ask: "What is the cost of NOT changing?"',
     difficulty: 'easy',
   },
@@ -359,8 +466,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Framing activates selective attention to certain aspects',
       },
     ],
-    academicReference:
-      'Tversky, A. & Kahneman, D. (1981). "The framing of decisions and the psychology of choice." Science, 211(4481).',
+    academicReference: {
+      citation:
+        'Tversky, A. & Kahneman, D. (1981). "The framing of decisions and the psychology of choice." Science, 211(4481), 453–458.',
+      authors: 'Tversky, A. & Kahneman, D.',
+      year: '1981',
+      title: 'The framing of decisions and the psychology of choice',
+      venue: 'Science, 211(4481), 453–458',
+      doi: '10.1126/science.7455683',
+    },
     quickTip:
       'Flip the frame: if the data was presented oppositely, would you still reach the same conclusion?',
     difficulty: 'easy',
@@ -388,8 +502,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Expectations create internal frames that filter perception',
       },
     ],
-    academicReference:
-      'Hastorf, A.H. & Cantril, H. (1954). "They saw a game: A case study." Journal of Abnormal and Social Psychology, 49(1).',
+    academicReference: {
+      citation:
+        'Hastorf, A.H. & Cantril, H. (1954). "They saw a game: A case study." Journal of Abnormal and Social Psychology, 49(1), 129–134.',
+      authors: 'Hastorf, A.H. & Cantril, H.',
+      year: '1954',
+      title: 'They saw a game: A case study',
+      venue: 'Journal of Abnormal and Social Psychology, 49(1), 129–134',
+      doi: '10.1037/h0057880',
+    },
     quickTip:
       'Ask someone who disagrees with you to read the same document — compare what each of you noticed.',
     difficulty: 'hard',
@@ -411,8 +532,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       { key: 'availability_heuristic', reason: 'Recent events are more mentally available' },
       { key: 'anchoring_bias', reason: 'Recent data points anchor subsequent judgments' },
     ],
-    academicReference:
-      'Murdock, B.B. (1962). "The serial position effect of free recall." Journal of Experimental Psychology, 64(5).',
+    academicReference: {
+      citation:
+        'Murdock, B.B. (1962). "The serial position effect of free recall." Journal of Experimental Psychology, 64(5), 482–488.',
+      authors: 'Murdock, B.B.',
+      year: '1962',
+      title: 'The serial position effect of free recall',
+      venue: 'Journal of Experimental Psychology, 64(5), 482–488',
+      doi: '10.1037/h0045106',
+    },
     quickTip:
       'Before making a judgment based on recent data, check whether the longer-term trend tells a different story.',
     difficulty: 'easy',
@@ -437,8 +565,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Grabbing the most available answer instead of investigating',
       },
     ],
-    academicReference:
-      'Stanovich, K.E. & West, R.F. (2000). "Individual differences in reasoning: Implications for the rationality debate." Behavioral and Brain Sciences, 23(5).',
+    academicReference: {
+      citation:
+        'Stanovich, K.E. & West, R.F. (2000). "Individual differences in reasoning: Implications for the rationality debate?" Behavioral and Brain Sciences, 23(5), 645–665.',
+      authors: 'Stanovich, K.E. & West, R.F.',
+      year: '2000',
+      title: 'Individual differences in reasoning: Implications for the rationality debate?',
+      venue: 'Behavioral and Brain Sciences, 23(5), 645–665',
+      doi: '10.1017/S0140525X00003435',
+    },
     quickTip:
       "If a high-stakes decision took less than an hour, you probably didn't think hard enough.",
     difficulty: 'moderate',
@@ -463,8 +598,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'A positive halo makes you seek confirming evidence',
       },
     ],
-    academicReference:
-      'Thorndike, E.L. (1920). "A constant error in psychological ratings." Journal of Applied Psychology, 4(1), 25–29.',
+    academicReference: {
+      citation:
+        'Thorndike, E.L. (1920). "A constant error in psychological ratings." Journal of Applied Psychology, 4(1), 25–29.',
+      authors: 'Thorndike, E.L.',
+      year: '1920',
+      title: 'A constant error in psychological ratings',
+      venue: 'Journal of Applied Psychology, 4(1), 25–29',
+      doi: '10.1037/h0071663',
+    },
     quickTip:
       'If you can\'t name a specific weakness in the option you favor, you\'re probably under a halo.',
     difficulty: 'moderate',
@@ -492,8 +634,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Believing you can predict random outcomes',
       },
     ],
-    academicReference:
-      'Tversky, A. & Kahneman, D. (1971). "Belief in the law of small numbers." Psychological Bulletin, 76(2), 105–110.',
+    academicReference: {
+      citation:
+        'Tversky, A. & Kahneman, D. (1971). "Belief in the law of small numbers." Psychological Bulletin, 76(2), 105–110.',
+      authors: 'Tversky, A. & Kahneman, D.',
+      year: '1971',
+      title: 'Belief in the law of small numbers',
+      venue: 'Psychological Bulletin, 76(2), 105–110',
+      doi: '10.1037/h0031322',
+    },
     quickTip:
       'Past outcomes only predict future ones when there is a genuine causal link — not just a pattern.',
     difficulty: 'moderate',
@@ -521,8 +670,16 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Incomplete tasks feel like losses, driving irrational action',
       },
     ],
-    academicReference:
-      'Zeigarnik, B. (1927). "On finished and unfinished tasks." Psychologische Forschung, 9, 1–85.',
+    academicReference: {
+      citation:
+        'Zeigarnik, B. (1927). "Das Behalten erledigter und unerledigter Handlungen" [On finished and unfinished tasks]. Psychologische Forschung, 9, 1–85.',
+      authors: 'Zeigarnik, B.',
+      year: '1927',
+      title:
+        'Das Behalten erledigter und unerledigter Handlungen [On finished and unfinished tasks]',
+      venue: 'Psychologische Forschung, 9, 1–85',
+      doi: '10.1007/BF02409755',
+    },
     quickTip:
       'If a past missed opportunity keeps coming up in your current deliberation, name it and set it aside.',
     difficulty: 'hard',
@@ -550,8 +707,15 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         reason: 'Choice overload triggers low-effort decision shortcuts',
       },
     ],
-    academicReference:
-      'Iyengar, S.S. & Lepper, M.R. (2000). "When choice is demotivating." Journal of Personality and Social Psychology, 79(6), 995–1006.',
+    academicReference: {
+      citation:
+        'Iyengar, S.S. & Lepper, M.R. (2000). "When choice is demotivating: Can one desire too much of a good thing?" Journal of Personality and Social Psychology, 79(6), 995–1006.',
+      authors: 'Iyengar, S.S. & Lepper, M.R.',
+      year: '2000',
+      title: 'When choice is demotivating: Can one desire too much of a good thing?',
+      venue: 'Journal of Personality and Social Psychology, 79(6), 995–1006',
+      doi: '10.1037/0022-3514.79.6.995',
+    },
     quickTip:
       'If your team has been evaluating options for weeks without converging, you probably have too many options.',
     difficulty: 'easy',

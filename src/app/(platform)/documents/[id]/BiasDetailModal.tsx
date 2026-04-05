@@ -10,6 +10,7 @@ import {
   BookOpen,
   Shield,
   GraduationCap,
+  Link2,
 } from 'lucide-react';
 import { BiasInstance } from '@/types';
 import { createClientLogger } from '@/lib/utils/logger';
@@ -471,8 +472,64 @@ export function BiasDetailModal({
                       </div>
                     ))}
                   </div>
-                  <div style={{ marginTop: '8px', fontSize: '10px', color: 'var(--text-muted)' }}>
-                    📚 {edu.academicReference}
+                  {/* Research Foundation — citation + optional DOI link */}
+                  <div
+                    style={{
+                      marginTop: '10px',
+                      padding: '10px 12px',
+                      background: 'var(--bg-primary)',
+                      borderRadius: '6px',
+                      borderLeft: '2px solid var(--text-muted)',
+                    }}
+                  >
+                    <div
+                      className="flex items-center gap-sm"
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        color: 'var(--text-muted)',
+                        marginBottom: 4,
+                      }}
+                    >
+                      <GraduationCap size={12} />
+                      Research Foundation
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {edu.academicReference.citation}
+                    </div>
+                    {(edu.academicReference.doi || edu.academicReference.url) && (
+                      <a
+                        href={
+                          edu.academicReference.doi
+                            ? `https://doi.org/${edu.academicReference.doi}`
+                            : edu.academicReference.url
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 3,
+                          fontSize: '10px',
+                          color: 'var(--accent, #3b82f6)',
+                          marginTop: 4,
+                          textDecoration: 'none',
+                        }}
+                      >
+                        <Link2 size={10} />
+                        {edu.academicReference.doi
+                          ? `DOI: ${edu.academicReference.doi}`
+                          : 'View source'}
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>

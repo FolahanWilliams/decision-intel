@@ -1,6 +1,8 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { formatBiasName } from '@/lib/utils/labels';
+import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
+import type { BiasCategory } from '@/types';
 
 interface RiskSummary {
   totalDocuments: number;
@@ -53,6 +55,16 @@ export class AggregatePdfGenerator {
     }
 
     this.addBiasAnalysis(documents);
+
+    // Works Cited — every bias type flagged in the report gets its academic
+    // reference surfaced, converting the PDF into a credibility artifact.
+    const biasTypesInReport = new Set<string>();
+    documents.forEach(d => {
+      d.analyses[0]?.biases.forEach(b => biasTypesInReport.add(b.biasType));
+    });
+    if (biasTypesInReport.size > 0) {
+      this.addWorksCited(Array.from(biasTypesInReport));
+    }
 
     this.addFooter();
     this.doc.save(`risk-audit-portfolio-${new Date().toISOString().split('T')[0]}.pdf`);
@@ -246,6 +258,112 @@ export class AggregatePdfGenerator {
         0: { cellWidth: 100 },
         1: { cellWidth: 40, halign: 'center' },
       },
+    });
+  }
+
+  /**
+   * Works Cited section — looks up the academic reference for every bias type
+   * present in the report and renders a de-duplicated, formally cited list.
+   * Turns the PDF into a credibility artifact: every finding is backed by a
+   * specific peer-reviewed paper (Kahneman, Tversky, Arkes, Milgram, etc.)
+   * with DOI when available.
+   */
+  public addWorksCited(biasTypes: string[]) {
+    // Normalize + dedupe bias keys to their BIAS_EDUCATION entries
+    const seen = new Set<string>();
+    const refs: Array<{
+      key: string;
+      citation: string;
+      doi?: string;
+      url?: string;
+    }> = [];
+
+    biasTypes.forEach(raw => {
+      const normalized = raw
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z_]/g, '') as BiasCategory;
+      if (seen.has(normalized)) return;
+      const entry = BIAS_EDUCATION[normalized];
+      if (!entry) return;
+      seen.add(normalized);
+      refs.push({
+        key: normalized,
+        citation: entry.academicReference.citation,
+        doi: entry.academicReference.doi,
+        url: entry.academicReference.url,
+      });
+    });
+
+    if (refs.length === 0) return;
+
+    // Sort alphabetically by citation for scholarly convention
+    refs.sort((a, b) => a.citation.localeCompare(b.citation));
+
+    // New page for Works Cited
+    this.doc.addPage();
+    this.addPageHeader('Research Foundations');
+
+    this.doc.setFontSize(10);
+    this.doc.setFont('helvetica', 'italic');
+    this.doc.setTextColor(100, 100, 100);
+    this.doc.text(
+      'Every bias flagged in this report is grounded in peer-reviewed research.',
+      20,
+      60
+    );
+    this.doc.text(
+      'The references below are the original sources for each detection methodology.',
+      20,
+      66
+    );
+
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.setTextColor(30, 30, 30);
+    this.doc.setFontSize(9);
+
+    let y = 78;
+    const pageBottomY = 270;
+    const lineHeight = 4.4;
+
+    refs.forEach((ref, i) => {
+      // Page break if we would overflow
+      const estimatedLines = Math.ceil(this.doc.getTextWidth(ref.citation) / 165) + 2;
+      const estimatedHeight = estimatedLines * lineHeight + 4;
+      if (y + estimatedHeight > pageBottomY) {
+        this.doc.addPage();
+        this.addPageHeader('Research Foundations (cont.)');
+        y = 60;
+      }
+
+      // Entry number + friendly bias name
+      this.doc.setFont('helvetica', 'bold');
+      this.doc.setTextColor(30, 41, 59);
+      this.doc.text(`[${i + 1}] ${formatBiasName(ref.key)}`, 20, y);
+      y += lineHeight + 1;
+
+      // Citation body (wrapped)
+      this.doc.setFont('helvetica', 'normal');
+      this.doc.setTextColor(50, 50, 50);
+      const wrapped = this.doc.splitTextToSize(ref.citation, 170) as string[];
+      wrapped.forEach(line => {
+        this.doc.text(line, 24, y);
+        y += lineHeight;
+      });
+
+      // DOI / URL as a footnote line
+      if (ref.doi) {
+        this.doc.setTextColor(59, 130, 246);
+        const doiText = `DOI: https://doi.org/${ref.doi}`;
+        this.doc.textWithLink(doiText, 24, y, { url: `https://doi.org/${ref.doi}` });
+        y += lineHeight;
+      } else if (ref.url) {
+        this.doc.setTextColor(59, 130, 246);
+        this.doc.textWithLink(`Source: ${ref.url}`, 24, y, { url: ref.url });
+        y += lineHeight;
+      }
+
+      y += 3; // spacing between entries
     });
   }
 
