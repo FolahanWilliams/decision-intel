@@ -441,6 +441,7 @@ model Nudge {
   targetUserId    String?
   orgId           String?
   humanDecisionId String?
+  analysisId      String?        // M6: nudges sourced from analysis completion path
   nudgeType       String
   message         String
   createdAt       DateTime       @default(now())
@@ -466,6 +467,7 @@ model Nudge {
   humanDecision   HumanDecision? @relation(fields: [humanDecisionId], references: [id])
 
   @@index([humanDecisionId])
+  @@index([analysisId])
   @@index([orgId])
   @@index([nudgeType])
   @@index([targetUserId])
@@ -1324,6 +1326,50 @@ model DecisionPlaybook {
   @@index([userId])
   @@index([category])
   @@index([isBuiltIn])
+}
+
+// ─── Playbook Invocation (M6 — Bias → Playbook → Nudge pipeline) ─────────
+//
+// Tracks when a user runs a playbook in response to a detected bias
+// fingerprint on an analysis. Powers:
+//   (a) the "did they act on our suggestion" conversion funnel,
+//   (b) the 48-hour follow-up nudge asking how the session went,
+//   (c) eventual feedback into calibration weights (M6.5): which playbooks
+//       actually move outcomes for this specific org.
+//
+// Playbook ID is a free-form string — it can reference either a built-in
+// template (`builtin_<index>`) or a custom DecisionPlaybook row. Storing
+// it as a string (not a relation) avoids a forced FK to DecisionPlaybook
+// for the 6 built-in templates that don't have DB rows.
+model PlaybookInvocation {
+  id                   String    @id @default(cuid())
+  userId               String
+  orgId                String?
+  analysisId           String?   // Source bias fingerprint (optional for direct invocations)
+  humanDecisionId      String?   // Or sourced from a human decision audit
+  playbookId           String    // "builtin_0" | DecisionPlaybook.id
+  playbookName         String    // Denormalized for display + analytics stability
+  playbookCategory     String?   // Denormalized for funnel slicing
+  matchedToxicCombo    String?   // If suggested because of a named toxic pattern
+  source               String    @default("suggestion") // suggestion | manual | nudge
+  status               String    @default("started")    // started | completed | abandoned
+  startedAt            DateTime  @default(now())
+  completedAt          DateTime?
+  /** User-reported 1–5 rating: did this playbook help? Fed into feedback loop. */
+  effectivenessRating  Int?
+  /** Free-text notes from the user after running the playbook. */
+  notes                String?   @db.Text
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([analysisId])
+  @@index([humanDecisionId])
+  @@index([playbookId])
+  @@index([playbookCategory])
+  @@index([status])
+  @@index([orgId, startedAt])
 }
 
 // ─── Calibration Journey (Outcome Gate Gamification) ─────────────────────

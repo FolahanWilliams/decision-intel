@@ -47,6 +47,7 @@ import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinati
 import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { RiskScoreCard } from '@/components/analysis/RiskScoreCard';
+import { ActOnThisPanel } from '@/components/analysis/ActOnThisPanel';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ActionableNudges } from '@/components/analysis/ActionableNudges';
@@ -201,6 +202,7 @@ interface Document {
   uploadedAt: string;
   status: string;
   isSample?: boolean;
+  documentType?: string | null;
   analyses: Analysis[];
   deal?: {
     id: string;
@@ -1251,6 +1253,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           {analysis && (
             <div className="mb-lg">
               <RiskScoreCard analysisId={analysis.id} />
+            </div>
+          )}
+
+          {/* Act on this — M6 Bias → Playbook suggestions. Rendered directly
+              below the risk score so users see the concrete next step at
+              the highest-leverage moment (right after absorbing the score). */}
+          {analysis && analysis.biases && analysis.biases.length > 0 && (
+            <div className="mb-lg">
+              <ActOnThisPanel
+                analysisId={analysis.id}
+                biases={analysis.biases}
+                documentType={document.documentType ?? null}
+              />
             </div>
           )}
 
