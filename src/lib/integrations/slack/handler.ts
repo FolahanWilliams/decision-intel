@@ -1205,7 +1205,7 @@ export async function publishAppHome(slackUserId: string, teamId?: string): Prom
             {
               type: 'button',
               text: { type: 'plain_text', text: 'View Bias Library' },
-              url: `${appUrl}/dashboard/bias-library`,
+              url: `${appUrl}/dashboard/analytics?view=library`,
             },
           ],
         }

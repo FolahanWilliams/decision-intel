@@ -43,6 +43,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { OutcomeGateBanner } from '@/components/ui/OutcomeGate';
 import { DraftOutcomeBanner } from '@/components/ui/DraftOutcomeBanner';
+import { SampleDataBanner } from '@/components/ui/SampleDataBanner';
+import { SampleBadge } from '@/components/ui/SampleBadge';
 import { JournalWidget } from '@/components/ui/JournalWidget';
 import { DecisionTriageWidget } from '@/components/ui/DecisionTriageWidget';
 import { NudgeWidget } from '@/components/dashboard/NudgeWidget';
@@ -963,6 +965,12 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
+      {/* Sample Data Banner — offers seed-in-one-click for cold-start orgs
+          and "ready to clear" once user has enough real analyses (M4) */}
+      <div className="mb-lg">
+        <SampleDataBanner />
+      </div>
+
       {/* Draft Outcome Detection Banner */}
       <div className="mb-lg">
         <DraftOutcomeBanner />
@@ -1454,7 +1462,10 @@ export default function Dashboard() {
                               <FileText size={18} style={{ color: 'var(--text-highlight)' }} />
                             </div>
                             <div>
-                              <span className="font-medium text-sm">{doc.filename}</span>
+                              <span className="font-medium text-sm inline-flex items-center gap-2">
+                                {doc.filename}
+                                {doc.isSample && <SampleBadge size="xs" />}
+                              </span>
                               <p className="text-xs text-muted mt-0.5">
                                 Analysis in progress — results will appear when complete
                               </p>
@@ -1829,7 +1840,10 @@ export default function Dashboard() {
                         >
                           <FileText size={16} style={{ color: 'var(--text-secondary)' }} />
                         </div>
-                        <span className="truncate text-sm font-medium">{doc.filename}</span>
+                        <span className="truncate text-sm font-medium inline-flex items-center gap-2">
+                          {doc.filename}
+                          {doc.isSample && <SampleBadge size="xs" />}
+                        </span>
                       </div>
 
                       <div className="flex items-center gap-md shrink-0">

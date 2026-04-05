@@ -18,6 +18,7 @@ import { createLogger } from '@/lib/utils/logger';
 import { computePageRank } from './centrality';
 import { detectGraphAntiPatterns, type GraphAntiPattern } from './graph-patterns';
 import { resolveEntities } from './entity-resolution';
+import { searchSimilarDocuments } from '@/lib/rag/embeddings';
 
 const log = createLogger('GraphBuilder');
 
@@ -650,4 +651,358 @@ function computeStats(
     mostConnectedNode,
     avgDegree: nodes.length > 0 ? Number((totalDegree / nodes.length).toFixed(1)) : 0,
   };
+}
+
+// ─── M9.1 — "Have We Seen This Before?" ──────────────────────────────────────
+
+/**
+ * Structurally-similar prior decision as rendered in the banner.
+ */
+export interface SimilarDecision {
+  analysisId: string;
+  documentId: string;
+  filename: string;
+  overallScore: number;
+  createdAt: string;
+  /** RAG semantic similarity (0–1). */
+  semanticSimilarity: number;
+  /** 0–100 composite rank combining semantic similarity + outcome boost. */
+  matchScore: number;
+  /** Outcome status if reported; null if still pending. */
+  outcome: 'success' | 'partial_success' | 'failure' | 'too_early' | null;
+  /** Top 3 detected bias types on the historical analysis. */
+  topBiases: string[];
+  /** Short excerpt from the historical document for hover preview. */
+  excerpt: string;
+}
+
+/**
+ * "Have we seen this before?" — finds structurally similar past decisions
+ * in the same org by running semantic similarity against the new
+ * analysis's embedding, then reranking by outcome signal.
+ *
+ * Formula (simplified from the full moat formula in the plan):
+ *   matchScore = 70% semantic + 30% outcome boost
+ *
+ * The plan's full "60% semantic + 30% graph distance + 10% outcome"
+ * formula is what we eventually want, but the graph-distance term
+ * requires a 2-hop traversal per candidate which is too expensive for
+ * the first ship. Outcome-boost alone is the highest-signal simplification:
+ * prior decisions WITH known outcomes are weighted more than pending ones.
+ */
+export async function findSimilarDecisions(
+  analysisId: string,
+  limit = 3
+): Promise<SimilarDecision[]> {
+  try {
+    const analysis = await prisma.analysis.findUnique({
+      where: { id: analysisId },
+      include: {
+        document: {
+          select: {
+            id: true,
+            userId: true,
+            orgId: true,
+            content: true,
+            filename: true,
+          },
+        },
+      },
+    });
+
+    if (!analysis) {
+      log.warn(`findSimilarDecisions: analysis ${analysisId} not found`);
+      return [];
+    }
+
+    // Query RAG with the source document content (first 2k chars is plenty
+    // for a decent embedding match). Fetch 3x the desired limit so we have
+    // headroom for reranking.
+    const candidateLimit = Math.max(10, limit * 4);
+    const similar = await searchSimilarDocuments(
+      analysis.document.content.slice(0, 2000),
+      analysis.document.userId,
+      candidateLimit,
+      analysis.document.id // Exclude self
+    );
+
+    if (similar.length === 0) return [];
+
+    // Join RAG results back to Analysis rows so we can pull outcome +
+    // biases + createdAt. Scope to the same org when the caller has one.
+    const candidateDocIds = similar.map(s => s.documentId);
+    const candidateAnalyses = await prisma.analysis.findMany({
+      where: {
+        documentId: { in: candidateDocIds },
+        ...(analysis.document.orgId
+          ? { document: { orgId: analysis.document.orgId } }
+          : {}),
+      },
+      include: {
+        document: { select: { id: true, filename: true, content: true } },
+        biases: {
+          select: { biasType: true, severity: true },
+          orderBy: { confidence: 'desc' },
+          take: 3,
+        },
+        outcome: { select: { outcome: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    // Build a lookup map for fast join
+    const analysisByDocId = new Map<string, (typeof candidateAnalyses)[number]>();
+    for (const a of candidateAnalyses) {
+      if (!analysisByDocId.has(a.document.id)) {
+        analysisByDocId.set(a.document.id, a);
+      }
+    }
+
+    // Merge similarity + outcome into the rerank score
+    const ranked: SimilarDecision[] = [];
+    for (const s of similar) {
+      const match = analysisByDocId.get(s.documentId);
+      if (!match) continue;
+
+      const outcome = match.outcome?.outcome as SimilarDecision['outcome'] | null;
+      // Outcome boost: +30 for known outcomes (stronger signal for the
+      // user), +0 for pending. This is the "10% outcome boost" from the
+      // plan formula, scaled up because we dropped the graph-distance term.
+      const outcomeBoost = outcome && outcome !== 'too_early' ? 30 : 0;
+      const matchScore = Math.round(s.similarity * 70 + outcomeBoost);
+
+      ranked.push({
+        analysisId: match.id,
+        documentId: match.document.id,
+        filename: match.document.filename,
+        overallScore: match.overallScore,
+        createdAt: match.createdAt.toISOString(),
+        semanticSimilarity: s.similarity,
+        matchScore,
+        outcome,
+        topBiases: match.biases.map(b => b.biasType),
+        excerpt: match.document.content.slice(0, 240),
+      });
+    }
+
+    ranked.sort((a, b) => b.matchScore - a.matchScore);
+    return ranked.slice(0, limit);
+  } catch (err: unknown) {
+    const code = (err as { code?: string })?.code;
+    if (code === 'P2021' || code === 'P2022') {
+      log.warn('Schema drift in findSimilarDecisions — returning empty result');
+      return [];
+    }
+    log.error('findSimilarDecisions failed:', err);
+    return [];
+  }
+}
+
+// ─── M9.2 — Person-Centric Profile ──────────────────────────────────────────
+
+/**
+ * Aggregate profile for a single person node in the decision graph.
+ * Drives the /dashboard/decision-graph/person/[encodedName] page.
+ */
+export interface PersonProfile {
+  canonicalName: string;
+  /** Decisions this person appears in as participant/stakeholder. */
+  decisionCount: number;
+  /** Count by outcome status across the person's decisions. */
+  outcomeCounts: {
+    success: number;
+    partial_success: number;
+    failure: number;
+    too_early: number;
+    pending: number;
+  };
+  /** Success rate over resolved outcomes (0–1), null if no outcomes. */
+  successRate: number | null;
+  /** Dominant biases detected across the person's decisions. */
+  biasFingerprint: Array<{ biasType: string; count: number }>;
+  /** Decision timeline, most recent first, capped at 20 for UI. */
+  recentDecisions: Array<{
+    analysisId: string;
+    filename: string;
+    overallScore: number;
+    outcome: string | null;
+    createdAt: string;
+    topBiases: string[];
+  }>;
+  /** Average decision-quality score across resolved decisions. */
+  avgScore: number | null;
+}
+
+/**
+ * Build a person-centric profile by canonical name (already lowercased
+ * and resolved via entity-resolution.ts). Org-scoped; caller must verify
+ * the user has access to the org before calling this.
+ *
+ * Not cheap — fans out to 3 queries (decision frames, human decisions,
+ * biases) and joins in-memory. Budget is fine for a one-person profile
+ * page; don't call this in a loop.
+ */
+export async function getPersonProfile(
+  canonicalName: string,
+  orgId: string
+): Promise<PersonProfile | null> {
+  const nameLower = canonicalName.toLowerCase().trim();
+  if (!nameLower) return null;
+
+  try {
+    // 1. Fetch all DecisionFrames for the org where this person is a stakeholder.
+    //    DecisionFrame.stakeholders is a String[] column — we filter
+    //    client-side after fetching because Prisma's has-any on arrays
+    //    is case-sensitive and our canonicalization needs lowercase match.
+    const frames = await prisma.decisionFrame.findMany({
+      where: {
+        document: { orgId },
+      },
+      include: {
+        document: {
+          select: {
+            id: true,
+            filename: true,
+            analyses: {
+              select: {
+                id: true,
+                overallScore: true,
+                createdAt: true,
+                biases: {
+                  select: { biasType: true },
+                  orderBy: { confidence: 'desc' },
+                  take: 5,
+                },
+                outcome: { select: { outcome: true } },
+              },
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+            },
+          },
+        },
+      },
+      take: 500, // Cap for safety — a single person in 500+ decisions is absurd
+    });
+
+    // 2. Also pull HumanDecisions where this person is in the participants array
+    const humanDecisions = await prisma.humanDecision.findMany({
+      where: {
+        orgId,
+      },
+      select: {
+        id: true,
+        participants: true,
+        content: true,
+        createdAt: true,
+        cognitiveAudit: { select: { decisionQualityScore: true } },
+      },
+      take: 500,
+    });
+
+    // 3. Entity-resolve the raw participant strings so we match across
+    //    "Jane Smith", "J. Smith", "smith, jane"
+    const allRawNames: string[] = [];
+    for (const f of frames) allRawNames.push(...(f.stakeholders || []));
+    for (const hd of humanDecisions) allRawNames.push(...(hd.participants || []));
+    const entityMap = resolveEntities(allRawNames);
+
+    const matchesCanonical = (raw: string): boolean => {
+      const lower = raw.toLowerCase().trim();
+      const entity = entityMap.get(lower);
+      return (entity?.canonicalName || lower) === nameLower;
+    };
+
+    // 4. Collect matching analyses
+    type Decision = PersonProfile['recentDecisions'][number];
+    const decisions: Decision[] = [];
+
+    for (const f of frames) {
+      if (!(f.stakeholders || []).some(matchesCanonical)) continue;
+      if (!f.document) continue;
+      const analysis = f.document.analyses[0];
+      if (!analysis) continue;
+      decisions.push({
+        analysisId: analysis.id,
+        filename: f.document.filename,
+        overallScore: analysis.overallScore,
+        outcome: analysis.outcome?.outcome ?? null,
+        createdAt: analysis.createdAt.toISOString(),
+        topBiases: analysis.biases.map(b => b.biasType),
+      });
+    }
+
+    // HumanDecisions count but don't add to the decisions list (they're
+    // not analyses) — we just use them in the decisionCount total.
+    let humanDecisionCount = 0;
+    for (const hd of humanDecisions) {
+      if ((hd.participants || []).some(matchesCanonical)) humanDecisionCount++;
+    }
+
+    if (decisions.length === 0 && humanDecisionCount === 0) {
+      return null;
+    }
+
+    // 5. Compute outcome counts
+    const outcomeCounts = {
+      success: 0,
+      partial_success: 0,
+      failure: 0,
+      too_early: 0,
+      pending: 0,
+    };
+    let scoreSum = 0;
+    let scoreCount = 0;
+    for (const d of decisions) {
+      if (d.outcome === 'success') outcomeCounts.success++;
+      else if (d.outcome === 'partial_success') outcomeCounts.partial_success++;
+      else if (d.outcome === 'failure') outcomeCounts.failure++;
+      else if (d.outcome === 'too_early') outcomeCounts.too_early++;
+      else outcomeCounts.pending++;
+      scoreSum += d.overallScore;
+      scoreCount++;
+    }
+
+    const resolved =
+      outcomeCounts.success + outcomeCounts.partial_success + outcomeCounts.failure;
+    const successRate =
+      resolved > 0
+        ? (outcomeCounts.success + outcomeCounts.partial_success * 0.5) / resolved
+        : null;
+
+    // 6. Bias fingerprint — count distinct bias types across the person's
+    //    analyses, return top 5 for a compact UI.
+    const biasTally = new Map<string, number>();
+    for (const d of decisions) {
+      for (const b of d.topBiases) {
+        biasTally.set(b, (biasTally.get(b) ?? 0) + 1);
+      }
+    }
+    const biasFingerprint = Array.from(biasTally.entries())
+      .map(([biasType, count]) => ({ biasType, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    // 7. Recent decisions — most recent first, capped at 20
+    decisions.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return {
+      canonicalName: nameLower,
+      decisionCount: decisions.length + humanDecisionCount,
+      outcomeCounts,
+      successRate,
+      biasFingerprint,
+      recentDecisions: decisions.slice(0, 20),
+      avgScore: scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 10) / 10 : null,
+    };
+  } catch (err: unknown) {
+    const code = (err as { code?: string })?.code;
+    if (code === 'P2021' || code === 'P2022') {
+      log.warn('Schema drift in getPersonProfile — returning null');
+      return null;
+    }
+    log.error('getPersonProfile failed:', err);
+    return null;
+  }
 }

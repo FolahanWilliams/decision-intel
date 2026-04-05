@@ -27,6 +27,7 @@ model Document {
   dealId      String?
   source     String?
   sourceRef  String?
+  isSample   Boolean             @default(false) // Synthetic seed doc — clearable via /api/demo/clear-samples
   deal        Deal?               @relation(fields: [dealId], references: [id], onDelete: SetNull)
   analyses    Analysis[]
   embeddings  DecisionEmbedding[]
@@ -41,6 +42,7 @@ model Document {
   @@index([userId, uploadedAt])
   @@index([orgId, uploadedAt])
   @@index([source, sourceRef])
+  @@index([orgId, isSample])
 }
 
 model Analysis {
@@ -83,6 +85,9 @@ model Analysis {
   outcomeStatus   String          @default("pending_outcome") // pending_outcome | outcome_logged | outcome_overdue
   outcomeDueAt    DateTime?       // When outcome should be reported
 
+  // Synthetic seed analysis — flagged SAMPLE, clearable via /api/demo/clear-samples
+  isSample        Boolean         @default(false)
+
   document            Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
   biases              BiasInstance[]
   versions     AnalysisVersion[]
@@ -96,6 +101,7 @@ model Analysis {
 
   @@index([documentId])
   @@index([createdAt])
+  @@index([isSample])
 }
 
 model BiasInstance {
@@ -387,6 +393,7 @@ model HumanDecision {
   status           String          @default("pending")
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+  isSample         Boolean         @default(false) // Synthetic seed — clearable via /api/demo/clear-samples
   cognitiveAudit   CognitiveAudit?
   meeting          Meeting?
   nudges           Nudge[]
@@ -399,6 +406,7 @@ model HumanDecision {
   @@index([channel])
   @@index([createdAt])
   @@index([contentHash])
+  @@index([orgId, isSample])
 }
 
 model CognitiveAudit {
@@ -433,6 +441,7 @@ model Nudge {
   targetUserId    String?
   orgId           String?
   humanDecisionId String?
+  analysisId      String?        // M6: nudges sourced from analysis completion path
   nudgeType       String
   message         String
   createdAt       DateTime       @default(now())
@@ -458,6 +467,7 @@ model Nudge {
   humanDecision   HumanDecision? @relation(fields: [humanDecisionId], references: [id])
 
   @@index([humanDecisionId])
+  @@index([analysisId])
   @@index([orgId])
   @@index([nudgeType])
   @@index([targetUserId])
@@ -785,6 +795,43 @@ model DecisionFrame {
 
 // ─── Decision Rooms (Real-Time Collaboration) ────────────────────────────
 
+// ─── M7 — Dr. Red Team Persona ────────────────────────────────────────────
+//
+// Tracks user-invoked Red Team challenges on analyses or decision rooms.
+// Persisted for four reasons:
+//   (a) the UI needs to show prior challenges on revisit so users can
+//       re-read the dissent they asked for,
+//   (b) the per-challenge usefulness rating feeds the feedback loop so
+//       we can calibrate which challenges users actually find valuable,
+//   (c) the AuditLog entry gives us a provable record that a decision
+//       was challenged before it was made (useful for compliance
+//       "documented dissent" requirements),
+//   (d) the playbook invocation pattern from M6 can eventually schedule
+//       follow-up nudges against these challenges ("did you answer the
+//       question Dr. Red Team asked you?").
+model RedTeamChallenge {
+  id                  String    @id @default(cuid())
+  userId              String    // who invoked Dr. Red Team
+  orgId               String?
+  analysisId          String?   // scope: the analysis being challenged
+  decisionRoomId      String?   // scope: the decision room being challenged
+  targetClaim         String    @db.Text // the single load-bearing assumption
+  primaryObjection    String    @db.Text
+  secondaryObjections String[]  // flexible array — 0..N
+  structuralQuestions String[]
+  closingLine         String    @db.Text
+  usefulRating        Int?      // null | -1 (not useful) | 0 (neutral) | 1 (useful)
+  notes               String?   @db.Text // free-text reaction
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([analysisId])
+  @@index([decisionRoomId])
+  @@index([orgId, createdAt])
+}
+
 model DecisionRoom {
   id            String          @id @default(cuid())
   documentId    String?
@@ -975,6 +1022,7 @@ model DecisionEdge {
   // Provenance
   createdBy     String   @default("system") // "system" | userId
   isManual      Boolean  @default(false)
+  isSample      Boolean  @default(false) // Synthetic seed edge — clearable via /api/demo/clear-samples
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -986,6 +1034,7 @@ model DecisionEdge {
   @@index([edgeType])
   @@index([strength])
   @@index([orgId, createdAt])
+  @@index([orgId, isSample])
 }
 
 // ─── Autonomous Outcome Detection ────────────────────────────────────────
@@ -1314,6 +1363,50 @@ model DecisionPlaybook {
   @@index([userId])
   @@index([category])
   @@index([isBuiltIn])
+}
+
+// ─── Playbook Invocation (M6 — Bias → Playbook → Nudge pipeline) ─────────
+//
+// Tracks when a user runs a playbook in response to a detected bias
+// fingerprint on an analysis. Powers:
+//   (a) the "did they act on our suggestion" conversion funnel,
+//   (b) the 48-hour follow-up nudge asking how the session went,
+//   (c) eventual feedback into calibration weights (M6.5): which playbooks
+//       actually move outcomes for this specific org.
+//
+// Playbook ID is a free-form string — it can reference either a built-in
+// template (`builtin_<index>`) or a custom DecisionPlaybook row. Storing
+// it as a string (not a relation) avoids a forced FK to DecisionPlaybook
+// for the 6 built-in templates that don't have DB rows.
+model PlaybookInvocation {
+  id                   String    @id @default(cuid())
+  userId               String
+  orgId                String?
+  analysisId           String?   // Source bias fingerprint (optional for direct invocations)
+  humanDecisionId      String?   // Or sourced from a human decision audit
+  playbookId           String    // "builtin_0" | DecisionPlaybook.id
+  playbookName         String    // Denormalized for display + analytics stability
+  playbookCategory     String?   // Denormalized for funnel slicing
+  matchedToxicCombo    String?   // If suggested because of a named toxic pattern
+  source               String    @default("suggestion") // suggestion | manual | nudge
+  status               String    @default("started")    // started | completed | abandoned
+  startedAt            DateTime  @default(now())
+  completedAt          DateTime?
+  /** User-reported 1–5 rating: did this playbook help? Fed into feedback loop. */
+  effectivenessRating  Int?
+  /** Free-text notes from the user after running the playbook. */
+  notes                String?   @db.Text
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([analysisId])
+  @@index([humanDecisionId])
+  @@index([playbookId])
+  @@index([playbookCategory])
+  @@index([status])
+  @@index([orgId, startedAt])
 }
 
 // ─── Calibration Journey (Outcome Gate Gamification) ─────────────────────

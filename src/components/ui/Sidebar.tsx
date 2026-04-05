@@ -371,11 +371,7 @@ export default function Sidebar() {
             icon={<Sparkles size={18} />}
             label="AI Assistant"
             description="Decision copilot & document chat"
-            active={
-              pathname.startsWith('/dashboard/ai-assistant') ||
-              pathname === '/dashboard/copilot' ||
-              pathname === '/dashboard/chat'
-            }
+            active={pathname.startsWith('/dashboard/ai-assistant')}
             collapsed={collapsed}
             onNavigate={closeMobile}
           />
@@ -386,9 +382,6 @@ export default function Sidebar() {
             description="Trends, quality, outcomes & decision graph"
             active={
               pathname.startsWith('/dashboard/analytics') ||
-              pathname === '/dashboard/insights' ||
-              pathname.startsWith('/dashboard/explainability') ||
-              pathname.startsWith('/dashboard/fingerprint') ||
               pathname.startsWith('/dashboard/outcome-flywheel') ||
               pathname.startsWith('/dashboard/decision-graph') ||
               pathname.startsWith('/dashboard/decision-quality') ||

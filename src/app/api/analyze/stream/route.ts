@@ -452,6 +452,7 @@ export async function POST(request: NextRequest) {
                       : ComplianceSchema.parse({})),
                     ...(report.compoundScoring ? { compoundScoring: report.compoundScoring } : {}),
                     ...(report.bayesianPriors ? { bayesianPriors: report.bayesianPriors } : {}),
+                    ...(report.calibration ? { calibration: report.calibration } : {}),
                   }),
                   preMortem: toPrismaJson(report.preMortem),
                   sentiment: toPrismaJson(
@@ -729,6 +730,93 @@ export async function POST(request: NextRequest) {
               'Failed to detect toxic combinations (non-critical): ' +
                 (toxicError instanceof Error ? toxicError.message : String(toxicError))
             );
+          }
+
+          // M6.4 — Analysis-path nudge generation (Bias Detective → Nudges)
+          //
+          // Previously nudges only fired from /api/human-decisions and the
+          // Slack/meeting paths. The analysis completion path was silent —
+          // meaning a user could upload a memo, see detected biases, and
+          // never receive an actionable follow-up. This closes that gap.
+          //
+          // Non-blocking: failures here must not fail the analysis.
+          if (createdAnalysisId && detectedBiases.length > 0) {
+            try {
+              const { generateNudges } = await import('@/lib/nudges/engine');
+              const analysisPathDecision = {
+                source: 'analysis' as const,
+                sourceRef: createdAnalysisId,
+                userId: userId!,
+                orgId: doc.orgId ?? null,
+                channel: null,
+                content: (report.summary as string) || '',
+                decisionType: doc.documentType ?? null,
+                participants: (report.speakers as string[]) || [],
+              };
+              const auditResultForNudges = {
+                decisionQualityScore: (report.overallScore as number) || 0,
+                biasFindings: detectedBiases.map(
+                  (b: Record<string, unknown>) => ({
+                    biasType: String(b.biasType ?? ''),
+                    severity: String(b.severity ?? 'low'),
+                    confidence:
+                      typeof b.confidence === 'number' ? b.confidence : 0.5,
+                    evidence: String(b.excerpt ?? ''),
+                  })
+                ),
+                summary: (report.metaVerdict as string) || (report.summary as string) || '',
+                dissenterCount: 0,
+                noiseLevel:
+                  typeof (report.noiseStats as { stdDev?: number })?.stdDev === 'number'
+                    ? (report.noiseStats as { stdDev: number }).stdDev
+                    : 0,
+              };
+
+              const nudges = await generateNudges({
+                decision: analysisPathDecision as unknown as Parameters<
+                  typeof generateNudges
+                >[0]['decision'],
+                auditResult: auditResultForNudges as unknown as Parameters<
+                  typeof generateNudges
+                >[0]['auditResult'],
+              });
+
+              // Persist nudges with analysisId linkage (M6 schema addition)
+              for (const nudge of nudges) {
+                try {
+                  await prisma.nudge.create({
+                    data: {
+                      analysisId: createdAnalysisId,
+                      targetUserId: userId,
+                      orgId: doc.orgId ?? null,
+                      nudgeType: nudge.nudgeType,
+                      triggerReason: nudge.triggerReason,
+                      message: nudge.message,
+                      severity: nudge.severity,
+                      channel: nudge.channel,
+                      ...(nudge.experimentId && { experimentId: nudge.experimentId }),
+                      ...(nudge.variantId && { variantId: nudge.variantId }),
+                    },
+                  });
+                } catch (nudgeErr) {
+                  log.debug(
+                    'Failed to persist analysis-path nudge (non-critical):',
+                    nudgeErr instanceof Error ? nudgeErr.message : String(nudgeErr)
+                  );
+                }
+              }
+
+              if (nudges.length > 0) {
+                log.info(
+                  `Analysis-path nudges created: ${nudges.length} for analysis ${createdAnalysisId}`
+                );
+              }
+            } catch (nudgeErr) {
+              log.warn(
+                'Analysis-path nudge generation failed (non-critical): ' +
+                  (nudgeErr instanceof Error ? nudgeErr.message : String(nudgeErr))
+              );
+            }
           }
 
           // Send email notification (fire and forget)

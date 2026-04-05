@@ -306,7 +306,7 @@ export function BiasEducationCard({
                 {education.difficulty.toUpperCase()}
               </span>
             </div>
-            <div className="flex items-center gap-sm" title={education.academicReference}>
+            <div className="flex items-center gap-sm" title={education.academicReference.citation}>
               <GraduationCap size={12} style={{ color: 'var(--text-muted)' }} />
               <span
                 style={{
@@ -318,8 +318,27 @@ export function BiasEducationCard({
                   whiteSpace: 'nowrap',
                 }}
               >
-                {education.academicReference}
+                {education.academicReference.citation}
               </span>
+              {education.academicReference.doi && (
+                <a
+                  href={`https://doi.org/${education.academicReference.doi}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  title={`DOI: ${education.academicReference.doi}`}
+                  style={{
+                    fontSize: '10px',
+                    color: 'var(--text-muted)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 2,
+                  }}
+                >
+                  <Link2 size={10} />
+                  DOI
+                </a>
+              )}
             </div>
           </div>
         </div>

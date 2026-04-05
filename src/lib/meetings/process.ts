@@ -268,6 +268,44 @@ export async function processMeeting(meetingId: string, userId: string): Promise
         .catch(err => log.error('Failed to persist nudge:', err));
     }
 
+    // M5.3 — Passive outcome detection from the meeting transcript.
+    // Matches the transcript against pending-outcome analyses in the
+    // same org. Runs in parallel with the intelligence assembly since
+    // neither depends on the other. Fire-and-forget; non-blocking.
+    (async () => {
+      try {
+        // Resolve orgId from the user's membership (meetings don't carry
+        // their own orgId in the current schema).
+        let orgId: string | null = null;
+        try {
+          const membership = await prisma.teamMember.findFirst({
+            where: { userId },
+            select: { orgId: true },
+          });
+          orgId = membership?.orgId ?? null;
+        } catch {
+          // teamMember table may not exist in some envs — fall back to user scope
+        }
+        const { detectOutcomeFromMeeting } = await import('@/lib/learning/outcome-inference');
+        const drafts = await detectOutcomeFromMeeting(
+          meetingId,
+          transcriptionResult.fullText,
+          userId,
+          orgId
+        );
+        if (drafts.length > 0) {
+          log.info(
+            `Meeting ${meetingId}: ${drafts.length} draft outcome(s) detected from transcript`
+          );
+        }
+      } catch (err) {
+        log.warn(
+          'Meeting outcome detection failed (non-critical): ' +
+            (err instanceof Error ? err.message : String(err))
+        );
+      }
+    })();
+
     // ── Step 6: Store meeting intelligence results ──────────────────
     const intelligence = await intelligencePromise;
     if (intelligence) {

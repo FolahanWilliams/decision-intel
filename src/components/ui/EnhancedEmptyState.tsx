@@ -71,7 +71,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
       },
       {
         label: 'Learn More',
-        href: '/dashboard/bias-library',
+        href: '/dashboard/analytics?view=library',
         variant: 'secondary',
         icon: <Brain className="w-4 h-4" />,
       },
@@ -133,7 +133,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
       },
       {
         label: 'View Bias Library',
-        href: '/dashboard/bias-library',
+        href: '/dashboard/analytics?view=library',
         variant: 'secondary',
       },
     ],

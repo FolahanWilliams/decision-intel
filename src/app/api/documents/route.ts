@@ -77,6 +77,7 @@ export async function GET(request: Request) {
       status: true,
       fileSize: true,
       uploadedAt: true,
+      isSample: true,
       analyses: {
         orderBy: { createdAt: 'desc' } as const,
         take: 1,
@@ -128,6 +129,7 @@ export async function GET(request: Request) {
       status: string;
       fileSize: number | null;
       uploadedAt: Date;
+      isSample?: boolean;
       analyses: Array<{
         overallScore: number | null;
         noiseScore?: number | null;
@@ -144,6 +146,7 @@ export async function GET(request: Request) {
         status: doc.status,
         fileSize: doc.fileSize,
         uploadedAt: doc.uploadedAt,
+        isSample: doc.isSample ?? false,
         score: latestAnalysis?.overallScore ?? undefined,
         // Include details if requested and available
         ...(detailed &&

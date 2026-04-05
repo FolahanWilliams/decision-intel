@@ -33,6 +33,8 @@ const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
 import { OutcomeReporter } from './OutcomeReporter';
 import { DraftOutcomeCard } from '@/components/ui/DraftOutcomeCard';
+import { SampleBadge } from '@/components/ui/SampleBadge';
+import { CalibrationChip } from '@/components/analysis/CalibrationChip';
 import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/DecisionPriorCapture';
 import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
@@ -45,6 +47,9 @@ import { ToxicCombinationCard } from '@/components/visualizations/ToxicCombinati
 import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { RiskScoreCard } from '@/components/analysis/RiskScoreCard';
+import { ActOnThisPanel } from '@/components/analysis/ActOnThisPanel';
+import { SimilarDecisionsBanner } from '@/components/analysis/SimilarDecisionsBanner';
+import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ActionableNudges } from '@/components/analysis/ActionableNudges';
@@ -72,7 +77,7 @@ const BiasNetwork = dynamic(
   { ssr: false }
 );
 import { ShareModal } from '@/components/ui/ShareModal';
-import { Share2 } from 'lucide-react';
+import { Share2, ShieldCheck } from 'lucide-react';
 
 // Lazy-loaded tab components
 const OverviewTab = lazy(() =>
@@ -156,6 +161,7 @@ interface Analysis {
         reason: string;
       }>;
     };
+    calibration?: import('@/types').CalibrationInsight;
   };
   swotAnalysis?: SwotAnalysisResult;
   logicalAnalysis?: LogicalAnalysisResult;
@@ -197,6 +203,8 @@ interface Document {
   content: string;
   uploadedAt: string;
   status: string;
+  isSample?: boolean;
+  documentType?: string | null;
   analyses: Analysis[];
   deal?: {
     id: string;
@@ -796,7 +804,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               <ArrowLeft size={20} />
             </Link>
             <div>
-              <h1 className="text-xl font-semibold">{document.filename}</h1>
+              <h1 className="text-xl font-semibold inline-flex items-center gap-sm">
+                {document.filename}
+                {document.isSample && <SampleBadge />}
+              </h1>
               <p className="text-sm text-muted">
                 {formatDate(document.uploadedAt)} • {(document.fileSize / 1024).toFixed(1)} KB
               </p>
@@ -851,7 +862,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               )}
               {analysis && (
                 <Link
-                  href={`/dashboard/explainability?analysisId=${analysis.id}`}
+                  href={`/dashboard/analytics?view=explainability&analysisId=${analysis.id}`}
                   className="btn btn-secondary btn-sm flex items-center gap-sm"
                   aria-label="Explain score"
                 >
@@ -869,9 +880,63 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   Share & Export
                 </button>
               )}
+              {/* M8 — Audit Defense Packet: Pro-gated regulator-grade PDF
+                  export. Opens the export endpoint directly; the server
+                  returns a 402 if the user is on the free tier, which we
+                  surface as a friendly upgrade prompt. */}
+              {analysis && (
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(
+                        `/api/compliance/audit-packet/${analysis.id}`
+                      );
+                      if (res.status === 402) {
+                        alert(
+                          'Audit Defense Packet export requires the Pro plan or higher. Upgrade to unlock regulator-grade compliance reports.'
+                        );
+                        return;
+                      }
+                      if (!res.ok) {
+                        alert('Failed to generate Audit Defense Packet. Please try again.');
+                        return;
+                      }
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      const a = window.document.createElement('a');
+                      a.href = url;
+                      const contentDisposition = res.headers.get('content-disposition') || '';
+                      const match = contentDisposition.match(/filename="([^"]+)"/);
+                      a.download = match?.[1] || `audit-defense-${analysis.id}.pdf`;
+                      window.document.body.appendChild(a);
+                      a.click();
+                      window.document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    } catch {
+                      alert('Failed to download Audit Defense Packet.');
+                    }
+                  }}
+                  className="btn btn-secondary btn-sm flex items-center gap-sm"
+                  aria-label="Export Audit Defense Packet"
+                  title="Export a regulator-grade PDF citing every framework section triggered by this decision"
+                >
+                  <ShieldCheck size={14} />
+                  Audit Defense Packet
+                </button>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Calibration dual-score chip (M10 — visible flywheel).
+            Renders under the header whenever an analysis exists; internally
+            decides whether to show the calibrated score or the gamified
+            unlock hint based on the org's confirmed-outcome sample size. */}
+        {analysis?.compliance?.calibration && (
+          <div style={{ marginTop: 'var(--spacing-sm)', display: 'flex', justifyContent: 'flex-end' }}>
+            <CalibrationChip calibration={analysis.compliance.calibration} />
+          </div>
+        )}
 
         {/* Gradient accent line */}
         <div
@@ -903,7 +968,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               Compare
             </Link>
             <Link
-              href="/dashboard/bias-library"
+              href="/dashboard/analytics?view=library"
               className="flex items-center gap-xs text-xs"
               style={{
                 padding: '4px 12px',
@@ -1230,10 +1295,43 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             </div>
           )}
 
+          {/* M9.1 — "Have We Seen This Before?" banner. Fetches structurally
+              similar prior decisions and shows them as a row of outcome-coded
+              cards. Renders above the risk score so the institutional memory
+              lands before the new number does. */}
+          {analysis && (
+            <div className="mb-lg">
+              <SimilarDecisionsBanner analysisId={analysis.id} />
+            </div>
+          )}
+
           {/* Risk-Adjusted Decision Score */}
           {analysis && (
             <div className="mb-lg">
               <RiskScoreCard analysisId={analysis.id} />
+            </div>
+          )}
+
+          {/* Act on this — M6 Bias → Playbook suggestions. Rendered directly
+              below the risk score so users see the concrete next step at
+              the highest-leverage moment (right after absorbing the score). */}
+          {analysis && analysis.biases && analysis.biases.length > 0 && (
+            <div className="mb-lg">
+              <ActOnThisPanel
+                analysisId={analysis.id}
+                biases={analysis.biases}
+                documentType={document.documentType ?? null}
+              />
+            </div>
+          )}
+
+          {/* M7 — Dr. Red Team. The dissent without the social cost.
+              User-invoked: does nothing until clicked. When clicked, generates
+              a signature adversarial response against the decision's weakest
+              load-bearing assumption. */}
+          {analysis && (
+            <div className="mb-lg">
+              <DrRedTeamCard analysisId={analysis.id} />
             </div>
           )}
 
