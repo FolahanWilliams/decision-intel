@@ -13,6 +13,23 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('DecisionGraphEdgesAPI');
 
+/**
+ * Returns the set of orgIds the user belongs to (may be empty).
+ * Personal-scope rows (orgId = null) are always owned by their creator
+ * and must be verified separately via createdBy.
+ */
+async function getUserOrgIds(userId: string): Promise<string[]> {
+  try {
+    const memberships = await prisma.teamMember.findMany({
+      where: { userId },
+      select: { orgId: true },
+    });
+    return memberships.map(m => m.orgId);
+  } catch {
+    return [];
+  }
+}
+
 const VALID_EDGE_TYPES = [
   'influenced_by',
   'escalated_from',
@@ -87,9 +104,17 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 });
     }
 
-    // Verify the edge exists and user has access (same org)
+    // Verify the edge exists and user has access (same org, or personal edge they created)
     const existing = await prisma.decisionEdge.findUnique({ where: { id } });
     if (!existing) {
+      return NextResponse.json({ error: 'Edge not found' }, { status: 404 });
+    }
+
+    const userOrgIds = await getUserOrgIds(user.id);
+    const hasAccess = existing.orgId
+      ? userOrgIds.includes(existing.orgId)
+      : existing.createdBy === user.id;
+    if (!hasAccess) {
       return NextResponse.json({ error: 'Edge not found' }, { status: 404 });
     }
 
@@ -140,6 +165,19 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
+    const existing = await prisma.decisionEdge.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: 'Edge not found' }, { status: 404 });
+    }
+
+    const userOrgIds = await getUserOrgIds(user.id);
+    const hasAccess = existing.orgId
+      ? userOrgIds.includes(existing.orgId)
+      : existing.createdBy === user.id;
+    if (!hasAccess) {
+      return NextResponse.json({ error: 'Edge not found' }, { status: 404 });
+    }
+
     await prisma.decisionEdge.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {

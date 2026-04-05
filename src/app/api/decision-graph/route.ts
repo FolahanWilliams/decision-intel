@@ -35,10 +35,14 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const orgId = searchParams.get('orgId');
-  const timeRange = parseInt(searchParams.get('timeRange') || '90', 10);
+  const rawTimeRange = parseInt(searchParams.get('timeRange') || '90', 10);
+  const timeRange =
+    Number.isFinite(rawTimeRange) && rawTimeRange > 0 ? Math.min(rawTimeRange, 3650) : 90;
   const highlightNode = searchParams.get('highlightNode');
-  const depth = parseInt(searchParams.get('depth') || '0', 10);
-  const limit = Math.min(parseInt(searchParams.get('limit') || '200', 10), 500);
+  const rawDepth = parseInt(searchParams.get('depth') || '0', 10);
+  const depth = Number.isFinite(rawDepth) && rawDepth >= 0 ? Math.min(rawDepth, 5) : 0;
+  const rawLimit = parseInt(searchParams.get('limit') || '200', 10);
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 200, 500);
   const nodeTypesParam = searchParams.get('nodeTypes');
   const nodeTypes = nodeTypesParam
     ? nodeTypesParam
