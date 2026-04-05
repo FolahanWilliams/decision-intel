@@ -90,7 +90,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     actions: [
       {
         label: 'Upload First Document',
-        href: '/',
+        href: '/dashboard',
         variant: 'primary',
         icon: <Plus className="w-4 h-4" />,
       },
@@ -223,7 +223,7 @@ const emptyStateConfigs: Record<EmptyStateType, EmptyStateConfig> = {
     actions: [
       {
         label: 'Browse Documents',
-        href: '/',
+        href: '/dashboard?view=browse',
         variant: 'primary',
       },
     ],

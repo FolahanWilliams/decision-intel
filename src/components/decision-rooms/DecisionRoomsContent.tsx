@@ -186,7 +186,7 @@ export function DecisionRoomsContent() {
             actions={[
               {
                 label: 'Create Room',
-                href: '/dashboard/documents',
+                href: '/dashboard?view=browse',
                 variant: 'primary',
                 icon: <Plus size={16} />,
               },

@@ -89,8 +89,8 @@ export default function NewDecisionPage() {
       }
 
       const { id } = await res.json();
-      // Redirect to document upload with frame context
-      router.push(`/dashboard/documents?frameId=${id}`);
+      // Redirect to dashboard upload area with frame context
+      router.push(`/dashboard?frameId=${id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
