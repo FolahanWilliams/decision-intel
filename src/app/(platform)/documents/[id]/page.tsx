@@ -75,7 +75,7 @@ const BiasNetwork = dynamic(
   { ssr: false }
 );
 import { ShareModal } from '@/components/ui/ShareModal';
-import { Share2 } from 'lucide-react';
+import { Share2, ShieldCheck } from 'lucide-react';
 
 // Lazy-loaded tab components
 const OverviewTab = lazy(() =>
@@ -876,6 +876,50 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 >
                   <Share2 size={14} />
                   Share & Export
+                </button>
+              )}
+              {/* M8 — Audit Defense Packet: Pro-gated regulator-grade PDF
+                  export. Opens the export endpoint directly; the server
+                  returns a 402 if the user is on the free tier, which we
+                  surface as a friendly upgrade prompt. */}
+              {analysis && (
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(
+                        `/api/compliance/audit-packet/${analysis.id}`
+                      );
+                      if (res.status === 402) {
+                        alert(
+                          'Audit Defense Packet export requires the Pro plan or higher. Upgrade to unlock regulator-grade compliance reports.'
+                        );
+                        return;
+                      }
+                      if (!res.ok) {
+                        alert('Failed to generate Audit Defense Packet. Please try again.');
+                        return;
+                      }
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      const a = window.document.createElement('a');
+                      a.href = url;
+                      const contentDisposition = res.headers.get('content-disposition') || '';
+                      const match = contentDisposition.match(/filename="([^"]+)"/);
+                      a.download = match?.[1] || `audit-defense-${analysis.id}.pdf`;
+                      window.document.body.appendChild(a);
+                      a.click();
+                      window.document.body.removeChild(a);
+                      URL.revokeObjectURL(url);
+                    } catch {
+                      alert('Failed to download Audit Defense Packet.');
+                    }
+                  }}
+                  className="btn btn-secondary btn-sm flex items-center gap-sm"
+                  aria-label="Export Audit Defense Packet"
+                  title="Export a regulator-grade PDF citing every framework section triggered by this decision"
+                >
+                  <ShieldCheck size={14} />
+                  Audit Defense Packet
                 </button>
               )}
             </div>
