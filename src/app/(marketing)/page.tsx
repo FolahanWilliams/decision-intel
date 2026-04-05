@@ -21,6 +21,7 @@ import {
   Zap,
   Target,
   Network,
+  AlertTriangle,
 } from 'lucide-react';
 
 /* ─── Color Tokens ──────────────────────────────────────────────────────── */
@@ -597,14 +598,15 @@ export default function LandingPage() {
             margin: '0 auto',
             padding: '48px 24px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 32,
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 24,
             textAlign: 'center',
           }}
           className="stats-grid"
         >
           {[
             { icon: BarChart3, value: '55%', label: 'Decision variance hidden from teams', sub: 'Kahneman, "Noise" (2021)', href: null as string | null },
+            { icon: AlertTriangle, value: '$1.3T', label: 'Annual M&A value destroyed by cognitive bias', sub: 'McKinsey, Malmendier & Tate', href: null as string | null },
             { icon: TrendingUp, value: '146', label: 'Annotated failure case studies', sub: '8 industries, SEC filings & NTSB reports', href: '/case-studies' as string | null },
             { icon: Zap, value: '<60s', label: 'Full cognitive audit per document', sub: '11-agent pipeline, 20+ biases', href: null as string | null },
           ].map(({ icon: Icon, value, label, sub, href }) => {
@@ -1038,16 +1040,27 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FAQ + Competitor Comparison (2-column layout) ────────── */}
-      <section id="faq" style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-        <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ marginBottom: 48 }}>
-          <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900 }}>Frequently Asked Questions</h2>
-        </motion.div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 40 }}>
-          {/* On desktop: 55% FAQ / 45% competitor panel side-by-side */}
-          <div style={{ display: 'grid', gridTemplateColumns: '55fr 45fr', gap: 32 }} className="faq-grid">
-            {/* Left — FAQ Accordion */}
+      {/* ── FAQ + Competitor Comparison (quarter-point centered layout) ── */}
+      <section id="faq" style={{ maxWidth: 1400, margin: '0 auto', padding: '80px 24px' }}>
+        {/* Two-column grid: each column centered at the page quarter-points
+            (25% and 75% of the full width). The grid uses equal 1fr columns
+            with generous internal padding so content sits at the visual
+            center of each half-space. */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 64,
+          }}
+          className="faq-grid"
+        >
+          {/* Left quarter — FAQ heading + accordion */}
+          <div style={{ display: 'flex', flexDirection: 'column', maxWidth: 480, margin: '0 auto' }}>
+            <motion.div {...fadeIn} transition={{ duration: 0.5 }} style={{ marginBottom: 32 }}>
+              <h2 style={{ fontSize: 32, fontWeight: 700, color: C.slate900, lineHeight: 1.2 }}>
+                Frequently Asked<br />Questions
+              </h2>
+            </motion.div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[
                 { q: 'How is sensitive data protected?', a: 'All documents are encrypted with AES-256-GCM at rest and TLS 1.3 in transit. A GDPR anonymization layer removes PII before any AI processing. Your data never leaves our SOC 2 certified infrastructure.' },
@@ -1095,8 +1108,10 @@ export default function LandingPage() {
                 );
               })}
             </div>
+          </div>
 
-            {/* Right — Competitor Comparison Card */}
+          {/* Right quarter — Competitor Comparison Card */}
+          <div style={{ maxWidth: 480, margin: '0 auto', width: '100%' }}>
             <CompetitorComparisonCard />
           </div>
         </div>
