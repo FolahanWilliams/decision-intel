@@ -550,22 +550,6 @@ export default function LandingPage() {
                 }}
                 onClick={() => setExpandedCard(isOpen ? null : i)}
               >
-                {/* Background Number */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: -10,
-                    right: 12,
-                    fontSize: 120,
-                    fontWeight: 800,
-                    color: C.slate100,
-                    lineHeight: 1,
-                    pointerEvents: 'none',
-                    userSelect: 'none',
-                  }}
-                >
-                  {card.num}
-                </div>
 
                 {/* Icon */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20, position: 'relative', zIndex: 1 }}>
