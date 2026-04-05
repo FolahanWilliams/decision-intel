@@ -367,11 +367,14 @@ export default function Sidebar() {
             onToggle={() => toggleSection('Intelligence')}
           >
           <NavItem
-            href="/dashboard/ai-assistant"
+            href="/dashboard/ask"
             icon={<Sparkles size={18} />}
-            label="AI Assistant"
+            label="Ask"
             description="Decision copilot & document chat"
-            active={pathname.startsWith('/dashboard/ai-assistant')}
+            active={
+              pathname.startsWith('/dashboard/ask') ||
+              pathname.startsWith('/dashboard/ai-assistant')
+            }
             collapsed={collapsed}
             onNavigate={closeMobile}
           />

@@ -321,7 +321,7 @@ export function DecisionDNAPageContent() {
             you decide, the smarter your agents become.
           </p>
           <Link
-            href="/dashboard/ai-assistant?mode=copilot"
+            href="/dashboard/ask?mode=copilot"
             className="btn btn-primary"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
           >

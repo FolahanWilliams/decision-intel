@@ -85,7 +85,7 @@ export function CopilotPageContent() {
       promptHandledRef.current = true;
       startNewSession(initialPrompt);
       sendMessage(initialPrompt);
-      router.replace('/dashboard/ai-assistant?mode=copilot');
+      router.replace('/dashboard/ask?mode=copilot');
     }
   }, [initialPrompt, sessionId, startNewSession, sendMessage, router]);
 
