@@ -2,7 +2,7 @@
 
 import { Suspense, lazy } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { BarChart3, Dna, Lightbulb, Fingerprint, BrainCircuit, TrendingUp, Network } from 'lucide-react';
+import { BarChart3, Dna, Lightbulb, Fingerprint, BrainCircuit, TrendingUp, Network, BookOpen } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -23,18 +23,31 @@ const ExplainabilityContent = lazy(() =>
 const FingerprintContent = lazy(() =>
   import('@/components/fingerprint/FingerprintContent').then(m => ({ default: m.FingerprintContent }))
 );
+const BiasLibraryContent = lazy(() =>
+  import('@/components/insights/BiasLibraryContent').then(m => ({ default: m.BiasLibraryContent }))
+);
 
 const TABS = [
   { key: 'trends', label: 'Trends & Insights', icon: <BarChart3 size={15} /> },
   { key: 'dna', label: 'Decision DNA', icon: <Dna size={15} /> },
   { key: 'explainability', label: 'Explainability', icon: <Lightbulb size={15} /> },
   { key: 'fingerprint', label: 'Fingerprint', icon: <Fingerprint size={15} /> },
+  { key: 'library', label: 'Bias Library', icon: <BookOpen size={15} /> },
   { key: 'quality', label: 'Decision Quality', icon: <BrainCircuit size={15} /> },
   { key: 'flywheel', label: 'Outcome Flywheel', icon: <TrendingUp size={15} /> },
   { key: 'graph', label: 'Decision Graph', icon: <Network size={15} /> },
 ];
 
-const VALID_VIEWS = new Set(['trends', 'dna', 'explainability', 'fingerprint', 'quality', 'flywheel', 'graph']);
+const VALID_VIEWS = new Set([
+  'trends',
+  'dna',
+  'explainability',
+  'fingerprint',
+  'library',
+  'quality',
+  'flywheel',
+  'graph',
+]);
 
 // Tabs that navigate to separate pages instead of rendering inline
 const NAV_TABS: Record<string, string> = {
@@ -90,6 +103,7 @@ function AnalyticsInner() {
             {view === 'dna' && <DecisionDNAPageContent />}
             {view === 'explainability' && <ExplainabilityContent />}
             {view === 'fingerprint' && <FingerprintContent />}
+            {view === 'library' && <BiasLibraryContent />}
           </div>
         </Suspense>
       )}

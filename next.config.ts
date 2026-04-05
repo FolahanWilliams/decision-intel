@@ -2,6 +2,22 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    // Legacy dashboard URLs that used to be thin redirect shim pages.
+    // Preserved at the Next layer so external bookmarks, shared links, and
+    // stale browser history continue to work after the shim files are deleted.
+    // Uses temporary (307) redirects rather than permanent (308) in case we
+    // ever want to restore one of these routes as a standalone page.
+    return [
+      { source: '/dashboard/chat', destination: '/dashboard/ai-assistant?mode=chat', permanent: false },
+      { source: '/dashboard/copilot', destination: '/dashboard/ai-assistant?mode=copilot', permanent: false },
+      { source: '/dashboard/cognitive-audits', destination: '/dashboard/decision-quality?tab=audits', permanent: false },
+      { source: '/dashboard/insights', destination: '/dashboard/analytics?view=trends', permanent: false },
+      { source: '/dashboard/explainability', destination: '/dashboard/analytics?view=explainability', permanent: false },
+      { source: '/dashboard/fingerprint', destination: '/dashboard/analytics?view=fingerprint', permanent: false },
+      { source: '/dashboard/bias-library', destination: '/dashboard/analytics?view=library', permanent: false },
+    ];
+  },
   async headers() {
     // Content Security Policy
     const cspHeader = `

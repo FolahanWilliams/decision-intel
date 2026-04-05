@@ -196,7 +196,7 @@ export function CommandPalette() {
         label: 'Bias Library',
         description: 'Learn about cognitive biases',
         icon: <BookOpen size={16} />,
-        action: () => navigate('/dashboard/bias-library'),
+        action: () => navigate('/dashboard/analytics?view=library'),
         keywords: ['education', 'learn', 'bias', 'debiasing'],
       },
       {

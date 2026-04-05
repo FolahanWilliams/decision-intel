@@ -851,7 +851,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               )}
               {analysis && (
                 <Link
-                  href={`/dashboard/explainability?analysisId=${analysis.id}`}
+                  href={`/dashboard/analytics?view=explainability&analysisId=${analysis.id}`}
                   className="btn btn-secondary btn-sm flex items-center gap-sm"
                   aria-label="Explain score"
                 >
@@ -903,7 +903,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               Compare
             </Link>
             <Link
-              href="/dashboard/bias-library"
+              href="/dashboard/analytics?view=library"
               className="flex items-center gap-xs text-xs"
               style={{
                 padding: '4px 12px',
