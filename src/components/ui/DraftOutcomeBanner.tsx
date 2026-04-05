@@ -1,7 +1,20 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Lightbulb, Check, X, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import {
+  Lightbulb,
+  Check,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  FileText,
+  MessageCircle,
+  Mail,
+  Mic,
+  Globe,
+  Clock,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface DraftOutcome {
@@ -19,6 +32,45 @@ interface DraftOutcome {
 
 function formatSource(source: string): string {
   return source.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/**
+ * Icon + color per source channel (M5.4). Keeps the channel visible at a
+ * glance in the banner so users can tell whether a draft came from a
+ * forwarded email, a Slack message, or a meeting transcript.
+ */
+function sourceVisuals(source: string): { Icon: typeof FileText; color: string } {
+  switch (source) {
+    case 'document':
+      return { Icon: FileText, color: '#60a5fa' }; // blue
+    case 'slack':
+      return { Icon: MessageCircle, color: '#a78bfa' }; // purple
+    case 'email':
+      return { Icon: Mail, color: '#f472b6' }; // pink
+    case 'meeting':
+      return { Icon: Mic, color: '#fbbf24' }; // amber
+    case 'web_intelligence':
+      return { Icon: Globe, color: '#4ade80' }; // green
+    default:
+      return { Icon: Lightbulb, color: '#71717a' };
+  }
+}
+
+/**
+ * "2 days ago" style relative timestamp. Cheap, no dep on date-fns.
+ * M5.4: surfaces draft age so stale drafts can be noticed + cleared.
+ */
+function relativeTime(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+  if (days < 1) {
+    const hours = Math.floor(ms / (60 * 60 * 1000));
+    return hours < 1 ? 'just now' : `${hours}h ago`;
+  }
+  if (days === 1) return '1 day ago';
+  if (days < 7) return `${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`;
 }
 
 function outcomeBadge(outcome: string): string {
@@ -94,6 +146,32 @@ export function DraftOutcomeBanner() {
           <span className="text-sm font-medium">
             {drafts.length} decision{drafts.length !== 1 ? 's' : ''} may have outcomes detected
           </span>
+          {/* M5.4 — surface per-source activity chips so users can tell at
+              a glance which passive channels the flywheel is firing from. */}
+          <div className="flex items-center gap-1 ml-1">
+            {(() => {
+              const sourceSet = new Set(drafts.map(d => d.source));
+              return Array.from(sourceSet).map(src => {
+                const { Icon: SrcIcon, color } = sourceVisuals(src);
+                const count = drafts.filter(d => d.source === src).length;
+                return (
+                  <span
+                    key={src}
+                    title={`${count} from ${formatSource(src)}`}
+                    className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
+                    style={{
+                      color,
+                      background: `${color}15`,
+                      border: `1px solid ${color}30`,
+                    }}
+                  >
+                    <SrcIcon className="h-2.5 w-2.5" />
+                    {count}
+                  </span>
+                );
+              });
+            })()}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">Review</span>
@@ -130,9 +208,24 @@ export function DraftOutcomeBanner() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span>Via {formatSource(draft.source)}</span>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                {(() => {
+                  const { Icon: SourceIcon, color: sourceColor } = sourceVisuals(draft.source);
+                  return (
+                    <span
+                      className="inline-flex items-center gap-1"
+                      style={{ color: sourceColor }}
+                    >
+                      <SourceIcon className="h-3 w-3" />
+                      {formatSource(draft.source)}
+                    </span>
+                  );
+                })()}
                 <span>Confidence: {(draft.confidence * 100).toFixed(0)}%</span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {relativeTime(draft.createdAt)}
+                </span>
               </div>
 
               {draft.evidence.length > 0 && (

@@ -351,6 +351,39 @@ export async function POST(req: NextRequest) {
       `Processed inbound email: ${createdDocIds.length} document(s) created for user ${userId}`
     );
 
+    // M5.1 — Passive outcome detection on the raw email body. Runs
+    // AFTER document creation so the document channel catches attached
+    // memos AND this email-specific channel catches short "FYI Project X
+    // closed last week" updates that wouldn't hit the RAG similarity
+    // threshold as standalone documents. Fire-and-forget; never blocks
+    // the webhook response to Resend.
+    const outcomeEmailBody = text || html || '';
+    if (outcomeEmailBody.trim().length > 0) {
+      import('@/lib/learning/outcome-inference')
+        .then(({ detectOutcomeFromEmail }) =>
+          detectOutcomeFromEmail(
+            subject || '',
+            outcomeEmailBody,
+            typeof from === 'string' ? from : '',
+            userId,
+            userOrgId
+          )
+        )
+        .then(drafts => {
+          if (drafts.length > 0) {
+            log.info(
+              `Email outcome detection: ${drafts.length} draft outcome(s) created from inbound email`
+            );
+          }
+        })
+        .catch(err =>
+          log.warn(
+            'Email outcome detection failed (non-critical): ' +
+              (err instanceof Error ? err.message : String(err))
+          )
+        );
+    }
+
     return OK();
   } catch (error) {
     log.error('Unhandled error in email inbound webhook:', error);

@@ -1,14 +1,20 @@
 /**
  * Autonomous Outcome Detection Engine
  *
- * Detects decision outcomes from 3 channels:
+ * Detects decision outcomes from 5 passive channels:
  *   1. New documents (semantic matching via RAG embeddings)
  *   2. Slack messages (outcome language patterns)
  *   3. Web intelligence (news search for public outcomes)
+ *   4. Email inbound (M5 — forwarded emails mentioning past decisions)
+ *   5. Meeting transcripts (M5 — decision language inside meetings)
  *
  * All detections create DraftOutcomes requiring human confirmation —
  * never auto-submits to the calibration engine. This preserves data
  * quality while reducing the friction that breaks the feedback loop.
+ *
+ * Calendar channel deferred: requires a Google Calendar webhook that
+ * does not yet exist in this codebase. Will land when the webhook
+ * integration is built.
  */
 
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
@@ -19,14 +25,27 @@ const log = createLogger('OutcomeInference');
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+/**
+ * All supported outcome-detection source channels. Adding a new channel
+ * means: (a) extending this union, (b) adding a new detect...() function
+ * that builds an OutcomeInferenceResult with the corresponding `source`,
+ * (c) wiring a hook in the relevant integration.
+ */
+export type OutcomeSource =
+  | 'document'
+  | 'slack'
+  | 'web_intelligence'
+  | 'email'
+  | 'meeting';
+
 export interface OutcomeInferenceResult {
   outcomeDetected: boolean;
   outcome: 'success' | 'partial_success' | 'failure' | 'inconclusive';
   confidence: number; // 0-1
   evidence: string[]; // quotes or article titles supporting inference
   matchedCriteria: string[]; // which success/failure criteria were matched
-  source: 'document' | 'slack' | 'web_intelligence';
-  sourceRef: string; // document ID, slack message ts, or article URL
+  source: OutcomeSource;
+  sourceRef: string; // document ID, slack message ts, article URL, email hash, meeting id
 }
 
 export interface DraftOutcomeData {
@@ -73,7 +92,7 @@ function buildOutcomeInferencePrompt(
   successCriteria: string[],
   failureCriteria: string[],
   evidence: string,
-  source: 'document' | 'slack' | 'web_intelligence'
+  source: OutcomeSource
 ): string {
   return `You are an outcome detection specialist. Analyze the provided evidence to determine whether a prior decision's outcome has become apparent.
 
@@ -608,6 +627,269 @@ function buildWebSearchQuery(decisionStatement: string): string | null {
     .slice(0, 150);
 
   return `${query} outcome results`;
+}
+
+// ─── Channel 4: Email-Based Outcome Detection (M5.1) ───────────────────────
+
+/**
+ * Detect decision outcomes from a forwarded / inbound email.
+ *
+ * Why this is a separate channel from the document path: inbound emails
+ * already flow through /api/integrations/email/inbound which creates a
+ * Document for the email body (the document channel catches those). This
+ * email-specific channel runs on SHORT emails where the document channel
+ * struggles — a 2-sentence "FYI Phoenix closed last week" won't produce
+ * strong enough RAG similarity to match to a prior decision, but has all
+ * the signal a focused LLM pass needs.
+ *
+ * Strategy: fetch the org's recent pending-outcome analyses directly,
+ * then ask the LLM to check the email body against each one's decision
+ * frame. No RAG dependency — the candidate set is bounded (last 90d of
+ * pending decisions) so the cost is tiny.
+ */
+export async function detectOutcomeFromEmail(
+  emailSubject: string,
+  emailBody: string,
+  senderEmail: string,
+  userId: string,
+  orgId: string | null
+): Promise<OutcomeInferenceResult[]> {
+  const results: OutcomeInferenceResult[] = [];
+
+  // Cheap early-exit: ignore emails that clearly don't contain outcome
+  // language. Saves LLM calls on marketing / calendar invite noise.
+  const body = `${emailSubject}\n\n${emailBody}`.toLowerCase();
+  if (!isOutcomeMessage(body)) return results;
+
+  try {
+    // Fetch pending-outcome analyses scoped to the org (or user if no org).
+    // Cap at 20 — more than enough for the "recent open decisions" window.
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+    const pendingAnalyses = await prisma.analysis.findMany({
+      where: {
+        outcomeStatus: 'pending_outcome',
+        createdAt: { gte: ninetyDaysAgo },
+        ...(orgId
+          ? { document: { orgId } }
+          : { document: { userId } }),
+      },
+      select: {
+        id: true,
+        summary: true,
+        document: {
+          select: {
+            filename: true,
+            orgId: true,
+            decisionFrame: {
+              select: {
+                decisionStatement: true,
+                successCriteria: true,
+                failureCriteria: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+
+    if (pendingAnalyses.length === 0) return results;
+
+    // Hash the email body as the sourceRef so repeated forwards of the
+    // same email don't create duplicate drafts.
+    const emailHash = await import('crypto').then(c =>
+      c.createHash('sha256').update(body).digest('hex').slice(0, 16)
+    );
+
+    const model = getModel();
+
+    for (const analysis of pendingAnalyses) {
+      const frame = analysis.document.decisionFrame;
+      if (!frame || frame.successCriteria.length === 0) continue;
+
+      // Cheap text filter: require at least one token from the decision
+      // statement to appear in the email body before we spend an LLM call.
+      // Handles the most common case (unrelated emails) for ~free.
+      const statementTokens = frame.decisionStatement
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(t => t.length >= 5);
+      const hasTokenMatch = statementTokens.some(t => body.includes(t));
+      if (!hasTokenMatch) continue;
+
+      try {
+        const prompt = buildOutcomeInferencePrompt(
+          frame.decisionStatement,
+          frame.successCriteria,
+          frame.failureCriteria,
+          `From: ${senderEmail}\nSubject: ${emailSubject}\n\n${emailBody.slice(0, 3000)}`,
+          'email'
+        );
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        const parsed = JSON.parse(text);
+
+        // Higher confidence bar for email (0.75) — emails are noisier than
+        // documents. Don't want to bombard users with low-confidence drafts.
+        if (parsed.outcomeDetected && parsed.confidence >= 0.75) {
+          const inference: OutcomeInferenceResult = {
+            outcomeDetected: true,
+            outcome: parsed.outcome,
+            confidence: parsed.confidence,
+            evidence: parsed.evidence || [],
+            matchedCriteria: parsed.matchedCriteria || [],
+            source: 'email',
+            sourceRef: `email:${emailHash}`,
+          };
+          results.push(inference);
+          await saveDraftOutcome(analysis.id, inference);
+          log.info(
+            `Email outcome inferred for analysis ${analysis.id}: ${parsed.outcome} (confidence=${parsed.confidence})`
+          );
+        }
+      } catch (err) {
+        log.debug(
+          `Email inference failed for analysis ${analysis.id}:`,
+          err instanceof Error ? err.message : String(err)
+        );
+      }
+    }
+  } catch (err) {
+    log.warn('detectOutcomeFromEmail failed (non-critical):', err);
+  }
+
+  return results;
+}
+
+// ─── Channel 5: Meeting-Transcript Outcome Detection (M5.3) ────────────────
+
+/**
+ * Detect decision outcomes from a meeting transcript.
+ *
+ * Meetings are the highest-leverage passive channel — most decisions
+ * actually happen in meetings, not in memos. When a meeting transcript
+ * contains a decision moment ("we'll go with X", "let's pass on Y",
+ * "green-lit the acquisition"), match it against the org's pending
+ * analyses / human decisions and create DraftOutcomes.
+ *
+ * Also handles the inverse: when a meeting references a PRIOR decision
+ * and mentions how it's playing out ("Phoenix launched last month —
+ * churn is worse than forecast"), that's outcome signal even if the
+ * current meeting isn't itself a decision.
+ */
+export async function detectOutcomeFromMeeting(
+  meetingId: string,
+  transcript: string,
+  userId: string,
+  orgId: string | null
+): Promise<OutcomeInferenceResult[]> {
+  const results: OutcomeInferenceResult[] = [];
+
+  if (!transcript || transcript.length < 50) return results;
+
+  try {
+    // Fetch recent pending-outcome analyses for the scope
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+    const pendingAnalyses = await prisma.analysis.findMany({
+      where: {
+        outcomeStatus: 'pending_outcome',
+        createdAt: { gte: ninetyDaysAgo },
+        ...(orgId
+          ? { document: { orgId } }
+          : { document: { userId } }),
+      },
+      select: {
+        id: true,
+        summary: true,
+        document: {
+          select: {
+            filename: true,
+            orgId: true,
+            decisionFrame: {
+              select: {
+                decisionStatement: true,
+                successCriteria: true,
+                failureCriteria: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+
+    if (pendingAnalyses.length === 0) return results;
+
+    // Transcripts can be huge. Truncate to first + last 3k chars so we
+    // catch both opening framing ("today we're deciding on Phoenix") and
+    // closing commits ("so we're going ahead"). This fits in a single
+    // Gemini Flash call even for hour-long meetings.
+    const transcriptWindow =
+      transcript.length > 6000
+        ? `${transcript.slice(0, 3000)}\n\n[... middle truncated ...]\n\n${transcript.slice(-3000)}`
+        : transcript;
+
+    const lowerTranscript = transcriptWindow.toLowerCase();
+    const model = getModel();
+
+    for (const analysis of pendingAnalyses) {
+      const frame = analysis.document.decisionFrame;
+      if (!frame || frame.successCriteria.length === 0) continue;
+
+      // Token filter before LLM call — same pattern as email channel
+      const statementTokens = frame.decisionStatement
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(t => t.length >= 5);
+      const hasTokenMatch = statementTokens.some(t => lowerTranscript.includes(t));
+      if (!hasTokenMatch) continue;
+
+      try {
+        const prompt = buildOutcomeInferencePrompt(
+          frame.decisionStatement,
+          frame.successCriteria,
+          frame.failureCriteria,
+          `MEETING TRANSCRIPT:\n\n${transcriptWindow}`,
+          'meeting'
+        );
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        const parsed = JSON.parse(text);
+
+        // Meetings are high-signal (people actually announcing decisions)
+        // so we accept slightly lower confidence (0.7) than email.
+        if (parsed.outcomeDetected && parsed.confidence >= 0.7) {
+          const inference: OutcomeInferenceResult = {
+            outcomeDetected: true,
+            outcome: parsed.outcome,
+            confidence: parsed.confidence,
+            evidence: parsed.evidence || [],
+            matchedCriteria: parsed.matchedCriteria || [],
+            source: 'meeting',
+            sourceRef: `meeting:${meetingId}`,
+          };
+          results.push(inference);
+          await saveDraftOutcome(analysis.id, inference);
+          log.info(
+            `Meeting outcome inferred for analysis ${analysis.id} from meeting ${meetingId}: ${parsed.outcome} (confidence=${parsed.confidence})`
+          );
+        }
+      } catch (err) {
+        log.debug(
+          `Meeting inference failed for analysis ${analysis.id}:`,
+          err instanceof Error ? err.message : String(err)
+        );
+      }
+    }
+  } catch (err) {
+    log.warn('detectOutcomeFromMeeting failed (non-critical):', err);
+  }
+
+  return results;
 }
 
 // ─── Draft Outcome Persistence ──────────────────────────────────────────────
