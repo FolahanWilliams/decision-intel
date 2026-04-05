@@ -412,7 +412,18 @@ export async function searchSimilarDocuments(
   queryText: string,
   userId: string,
   limit: number = 5,
-  excludeDocumentId?: string
+  excludeDocumentId?: string,
+  /**
+   * When provided, search within the org's documents instead of the
+   * user's personal documents. This is critical for findSimilarDecisions
+   * (M9.1) where teammates' memos must be included in the candidate pool
+   * for the "Have we seen this before?" banner to work across a team.
+   *
+   * The userId parameter is still required for backward compatibility
+   * with callers that don't have an orgId (personal-scope searches).
+   * When orgId IS provided, userId is ignored for the SQL WHERE clause.
+   */
+  orgId?: string
 ): Promise<
   Array<{
     documentId: string;
@@ -431,8 +442,13 @@ export async function searchSimilarDocuments(
     // $queryRawUnsafe is required here because PgBouncer does not support
     // prepared statements with pgvector ::vector casts.
     assertSafeEmbeddingVector(embeddingVector);
-    assertSafeId(userId, 'userId');
     const safeLimit = Math.max(1, Math.min(50, Math.floor(limit)));
+
+    // Scope: org-level when orgId is provided (team search), user-level
+    // otherwise (personal workspace or backward-compat callers).
+    const scopeColumn = orgId ? '"orgId"' : '"userId"';
+    const scopeValue = orgId ?? userId;
+    assertSafeId(scopeValue, orgId ? 'orgId' : 'userId');
 
     let results: Array<{
       document_id: string;
@@ -441,7 +457,7 @@ export async function searchSimilarDocuments(
       similarity: number;
     }>;
 
-    // Use parameterized queries for userId/excludeDocumentId.
+    // Use parameterized queries for scope value/excludeDocumentId.
     // The embedding vector and limit are validated above and safe to interpolate
     // (vector is server-generated floats, limit is Math.floor'd int).
     if (excludeDocumentId) {
@@ -454,11 +470,11 @@ export async function searchSimilarDocuments(
             1 - (de.embedding <=> '${embeddingVector}'::vector) as similarity
         FROM "DecisionEmbedding" de
         JOIN "Document" d ON d.id = de."documentId"
-        WHERE d."userId" = $1
+        WHERE d.${scopeColumn} = $1
         AND de."documentId" != $2
         ORDER BY de.embedding <=> '${embeddingVector}'::vector
         LIMIT ${safeLimit}`,
-        userId,
+        scopeValue,
         excludeDocumentId
       );
     } else {
@@ -470,10 +486,10 @@ export async function searchSimilarDocuments(
             1 - (de.embedding <=> '${embeddingVector}'::vector) as similarity
         FROM "DecisionEmbedding" de
         JOIN "Document" d ON d.id = de."documentId"
-        WHERE d."userId" = $1
+        WHERE d.${scopeColumn} = $1
         ORDER BY de.embedding <=> '${embeddingVector}'::vector
         LIMIT ${safeLimit}`,
-        userId
+        scopeValue
       );
     }
 

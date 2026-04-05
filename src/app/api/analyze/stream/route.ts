@@ -743,14 +743,20 @@ export async function POST(request: NextRequest) {
           if (createdAnalysisId && detectedBiases.length > 0) {
             try {
               const { generateNudges } = await import('@/lib/nudges/engine');
+              // Every document uploaded through the analysis pipeline is by
+              // definition a strategic decision (IC memo, pitch deck, board
+              // proposal). The nudge engine's highStakesTypes check expects
+              // DecisionType enum values ('strategic' | 'vendor_eval' |
+              // 'approval'), NOT document-type values ('ic_memo' |
+              // 'pitch_deck'). Hardcoding 'strategic' ensures pre-mortem and
+              // shallow-verification nudges fire correctly for analysis-path
+              // decisions. (BUG-2 fix)
               const analysisPathDecision = {
-                source: 'analysis' as const,
+                source: 'manual' as const, // closest valid DecisionSource for analysis path
                 sourceRef: createdAnalysisId,
-                userId: userId!,
-                orgId: doc.orgId ?? null,
-                channel: null,
+                channel: undefined,
                 content: (report.summary as string) || '',
-                decisionType: doc.documentType ?? null,
+                decisionType: 'strategic' as const,
                 participants: (report.speakers as string[]) || [],
               };
               const auditResultForNudges = {

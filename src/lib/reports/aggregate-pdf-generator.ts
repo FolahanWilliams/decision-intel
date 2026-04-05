@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { createHash } from 'crypto';
 import { formatBiasName } from '@/lib/utils/labels';
 import { BIAS_EDUCATION } from '@/lib/constants/bias-education';
 import type { BiasCategory } from '@/types';
@@ -433,9 +434,6 @@ export class AggregatePdfGenerator {
    * the generator.
    */
   private computeDefensePacketHash(input: AuditDefensePacketInput): string {
-    // Import crypto lazily and synchronously — jspdf is sync so we need this
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { createHash } = require('crypto') as typeof import('crypto');
     const canonical = JSON.stringify(
       {
         analysisId: input.analysisId,

@@ -719,11 +719,16 @@ export async function findSimilarDecisions(
     // for a decent embedding match). Fetch 3x the desired limit so we have
     // headroom for reranking.
     const candidateLimit = Math.max(10, limit * 4);
+    // Search at org scope when the analysis belongs to an org — teammates'
+    // memos must be in the candidate pool for institutional memory to work
+    // across a team (BUG-1 fix). Falls back to user scope for personal
+    // workspaces where orgId is null.
     const similar = await searchSimilarDocuments(
       analysis.document.content.slice(0, 2000),
       analysis.document.userId,
       candidateLimit,
-      analysis.document.id // Exclude self
+      analysis.document.id, // Exclude self
+      analysis.document.orgId ?? undefined // Org scope when available
     );
 
     if (similar.length === 0) return [];
