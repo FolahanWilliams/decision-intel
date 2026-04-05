@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import useSWR from 'swr';
 import {
   CreditCard,
@@ -372,10 +373,8 @@ export function BillingSection() {
         )}
 
         {/* Compare plans link */}
-        <a
+        <Link
           href="/#pricing"
-          target="_blank"
-          rel="noopener noreferrer"
           className="flex items-center gap-xs"
           style={{
             marginTop: 'var(--spacing-xs)',
@@ -386,7 +385,7 @@ export function BillingSection() {
           }}
         >
           Compare all plans <ExternalLink size={11} />
-        </a>
+        </Link>
       </div>
 
       {/* ── Part C: Quick Actions ──────────────────────────── */}
