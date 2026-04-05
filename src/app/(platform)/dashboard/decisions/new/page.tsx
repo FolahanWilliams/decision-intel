@@ -291,7 +291,7 @@ export default function NewDecisionPage() {
               {isSubmitting ? 'Submitting...' : 'Save Frame & Upload Document'}
             </button>
             <Link
-              href="/dashboard/documents"
+              href="/dashboard?view=browse"
               className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-5 py-2.5 text-sm font-medium text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800 hover:text-white"
             >
               Skip framing — upload directly

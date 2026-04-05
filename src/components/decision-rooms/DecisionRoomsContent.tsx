@@ -99,7 +99,7 @@ export function DecisionRoomsContent() {
             )}
           </div>
           <a
-            href="/dashboard/documents"
+            href="/dashboard?view=browse"
             className="flex items-center gap-sm"
             style={{
               padding: '8px 16px',
