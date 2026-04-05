@@ -48,6 +48,7 @@ import { ScoringBreakdown } from '@/components/visualizations/ScoringBreakdown';
 import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { RiskScoreCard } from '@/components/analysis/RiskScoreCard';
 import { ActOnThisPanel } from '@/components/analysis/ActOnThisPanel';
+import { SimilarDecisionsBanner } from '@/components/analysis/SimilarDecisionsBanner';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ActionableNudges } from '@/components/analysis/ActionableNudges';
@@ -1290,6 +1291,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           {document && (
             <div className="mb-lg">
               <DecisionRoomList documentId={document.id} analysisId={analysis?.id} />
+            </div>
+          )}
+
+          {/* M9.1 — "Have We Seen This Before?" banner. Fetches structurally
+              similar prior decisions and shows them as a row of outcome-coded
+              cards. Renders above the risk score so the institutional memory
+              lands before the new number does. */}
+          {analysis && (
+            <div className="mb-lg">
+              <SimilarDecisionsBanner analysisId={analysis.id} />
             </div>
           )}
 

@@ -233,9 +233,23 @@ export default function DecisionGraphPage() {
             <option value="90">Last 90 days</option>
             <option value="180">Last 6 months</option>
             <option value="365">Last year</option>
+            <option value="730">Last 2 years</option>
           </select>
         </div>
       </div>
+
+      {/* M9.3 — Continuous temporal slider. Lets users scrub the graph's
+          time window at day-level granularity between 7 and 730 days.
+          The dropdown above handles the 5 common presets; this slider
+          handles everything else. Debounced update so dragging doesn't
+          flood the graph API. */}
+      <TimeRangeSlider
+        value={timeRange}
+        onChange={days => {
+          setTimeRange(days);
+          setReport(null);
+        }}
+      />
 
       <ErrorBoundary>
         {orgError ? (
@@ -482,6 +496,103 @@ export default function DecisionGraphPage() {
           </ErrorBoundary>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── M9.3 — Temporal Range Slider ─────────────────────────────────────────
+
+/**
+ * Continuous time-window slider for the Decision Graph. Complements the
+ * preset dropdown by letting users scrub the window at day granularity
+ * between 7 and 730 days. Updates are debounced (300ms) so dragging
+ * doesn't flood the graph API with requests.
+ */
+function TimeRangeSlider({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (days: number) => void;
+}) {
+  const [local, setLocal] = useState(value);
+
+  // Keep local in sync when the parent state changes via the dropdown
+  useEffect(() => {
+    setLocal(value);
+  }, [value]);
+
+  // Debounce outward updates: commit only after 300ms of no further changes
+  useEffect(() => {
+    if (local === value) return;
+    const handle = setTimeout(() => {
+      onChange(local);
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [local, value, onChange]);
+
+  const label = (() => {
+    if (local >= 365) {
+      const years = (local / 365).toFixed(local % 365 === 0 ? 0 : 1);
+      return `Last ${years} year${local >= 730 ? 's' : ''}`;
+    }
+    if (local >= 30) {
+      const months = Math.round(local / 30);
+      return `Last ${months} month${months === 1 ? '' : 's'}`;
+    }
+    return `Last ${local} day${local === 1 ? '' : 's'}`;
+  })();
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '10px 14px',
+        marginBottom: 16,
+        background: 'rgba(255, 255, 255, 0.02)',
+        border: '1px solid rgba(255, 255, 255, 0.06)',
+        borderRadius: 8,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 10,
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+          color: 'var(--text-muted)',
+          minWidth: 85,
+        }}
+      >
+        Time Window
+      </span>
+      <input
+        type="range"
+        min={7}
+        max={730}
+        step={1}
+        value={local}
+        onChange={e => setLocal(parseInt(e.target.value, 10))}
+        aria-label="Time range in days"
+        style={{
+          flex: 1,
+          accentColor: '#8b5cf6',
+        }}
+      />
+      <span
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          minWidth: 100,
+          textAlign: 'right',
+          fontFamily: "'JetBrains Mono', monospace",
+        }}
+      >
+        {label}
+      </span>
     </div>
   );
 }
