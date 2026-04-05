@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
@@ -208,6 +208,25 @@ export default function LandingPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [isAnnual, setIsAnnual] = useState(false);
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+
+  // After login redirects back to /?scrollTo=pricing, scroll to the
+  // pricing section so the user picks up where they left off.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const target = params.get('scrollTo');
+    if (target) {
+      // Small delay so the page has time to render the section
+      setTimeout(() => {
+        const el = document.getElementById(target);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Clean up the URL so refreshing doesn't re-scroll
+        const clean = new URL(window.location.href);
+        clean.searchParams.delete('scrollTo');
+        window.history.replaceState({}, '', clean.pathname + clean.hash);
+      }, 300);
+    }
+  }, []);
 
   const handleCheckout = async (plan: 'pro' | 'team') => {
     setCheckoutLoading(plan);
@@ -894,7 +913,7 @@ export default function LandingPage() {
                 desc: 'Try the bias engine on 3 deal documents',
                 features: ['3 analyses/month', '5 bias types', '10 pages per doc', '3 team seats', 'Community support'],
                 cta: 'Get Started',
-                action: () => { window.location.href = '/login'; },
+                action: () => { window.location.href = '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing'); },
                 outline: true,
                 popular: false,
               },

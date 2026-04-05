@@ -19,6 +19,11 @@ const nextConfig: NextConfig = {
       { source: '/dashboard/explainability', destination: '/dashboard/analytics?view=explainability', permanent: false },
       { source: '/dashboard/fingerprint', destination: '/dashboard/analytics?view=fingerprint', permanent: false },
       { source: '/dashboard/bias-library', destination: '/dashboard/analytics?view=library', permanent: false },
+      // /pricing doesn't have its own page — the pricing section lives at
+      // /#pricing on the marketing landing page. Components like UsageMeter
+      // and UpgradeFromAudit link to /pricing directly, so this redirect
+      // prevents a 404.
+      { source: '/pricing', destination: '/#pricing', permanent: false },
     ];
   },
   async headers() {
