@@ -9,8 +9,11 @@ const nextConfig: NextConfig = {
     // Uses temporary (307) redirects rather than permanent (308) in case we
     // ever want to restore one of these routes as a standalone page.
     return [
-      { source: '/dashboard/chat', destination: '/dashboard/ai-assistant?mode=chat', permanent: false },
-      { source: '/dashboard/copilot', destination: '/dashboard/ai-assistant?mode=copilot', permanent: false },
+      // M3.1 — Ask surface replaces the old AI Assistant tab page. All
+      // three legacy URLs land on /dashboard/ask with the mode preserved.
+      { source: '/dashboard/ai-assistant', destination: '/dashboard/ask', permanent: false },
+      { source: '/dashboard/chat', destination: '/dashboard/ask?mode=chat', permanent: false },
+      { source: '/dashboard/copilot', destination: '/dashboard/ask?mode=copilot', permanent: false },
       { source: '/dashboard/cognitive-audits', destination: '/dashboard/decision-quality?tab=audits', permanent: false },
       { source: '/dashboard/insights', destination: '/dashboard/analytics?view=trends', permanent: false },
       { source: '/dashboard/explainability', destination: '/dashboard/analytics?view=explainability', permanent: false },

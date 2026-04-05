@@ -712,7 +712,7 @@ async function processSlackDecision(
       if (summaryChannel) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.decisionintel.ai';
         const copilotUrl = copilotSessionId
-          ? `${appUrl}/dashboard/ai-assistant?mode=copilot&session=${copilotSessionId}`
+          ? `${appUrl}/dashboard/ask?mode=copilot&session=${copilotSessionId}`
           : undefined;
 
         const summaryPayload = formatAuditSummaryForSlack(

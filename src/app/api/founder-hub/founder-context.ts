@@ -87,7 +87,7 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Committee Decision Rooms: blind prior collection, consensus scoring (0-100), unanimity warning (Strebulaev), dissent quality score, bias briefing
 - Calibration Gamification: Bronze→Silver→Gold→Platinum, milestone tracking, "each outcome makes AI smarter"
 - Personal Calibration Dashboard: /calibration — per-user decision patterns, recurring biases with trends, calibration score, blind spots, strength patterns
-- Copilot AI Assistant: CopilotSession + CopilotTurn models for persistent AI coaching. Auto-seeded from Slack audits. Accessible from /dashboard/ai-assistant.
+- Copilot AI Assistant: CopilotSession + CopilotTurn models for persistent AI coaching. Auto-seeded from Slack audits. Accessible from /dashboard/ask?mode=copilot (M3.1 renamed from /dashboard/ai-assistant; legacy URL still redirects).
 - Intelligence Brief: Contextual org intelligence on empty dashboard states — shows top dangerous biases, maturity grade, decision stats, and page-specific tips.
 - Webhooks: 5 subscribable events (analysis.completed, outcome.reported, nudge.delivered, toxic_combination.detected, decision_room.updated) for custom integrations.
 - Public API v1: Scoped API keys with analyze, documents, outcomes, insights permissions. OpenAPI spec at /api/v1/openapi.

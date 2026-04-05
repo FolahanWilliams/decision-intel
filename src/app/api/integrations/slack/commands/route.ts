@@ -609,7 +609,7 @@ async function handleAnalyzeCommand(params: { channelId: string; userId: string;
           select: { id: true },
         });
         if (copilotSession) {
-          copilotUrl = `${appUrl}/dashboard/ai-assistant?mode=copilot&session=${copilotSession.id}`;
+          copilotUrl = `${appUrl}/dashboard/ask?mode=copilot&session=${copilotSession.id}`;
         }
       } catch {
         // JSON path query not supported or schema drift

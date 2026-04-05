@@ -172,7 +172,7 @@ export function CommandPalette() {
         label: 'AI Assistant — Decision Copilot',
         description: 'AI agents that help you build better decisions',
         icon: <Zap size={16} />,
-        action: () => navigate('/dashboard/ai-assistant?mode=copilot'),
+        action: () => navigate('/dashboard/ask?mode=copilot'),
         keywords: ['copilot', 'agent', 'decision', 'advisor'],
       },
       {
@@ -180,7 +180,7 @@ export function CommandPalette() {
         label: 'AI Assistant — Document Chat',
         description: 'Ask questions about your documents',
         icon: <MessageSquare size={16} />,
-        action: () => navigate('/dashboard/ai-assistant?mode=chat'),
+        action: () => navigate('/dashboard/ask?mode=chat'),
         keywords: ['ask', 'question', 'rag', 'ai', 'chat'],
       },
       {
@@ -266,7 +266,7 @@ export function CommandPalette() {
         description: 'Start a fresh conversation',
         icon: <Zap size={16} />,
         action: () => {
-          navigate('/dashboard/ai-assistant?mode=chat');
+          navigate('/dashboard/ask?mode=chat');
         },
         keywords: ['conversation', 'new', 'start'],
       },
@@ -430,7 +430,7 @@ export function CommandPalette() {
             action: () => {
               setOpen(false);
               router.push(
-                `/dashboard/ai-assistant?mode=copilot&prompt=${encodeURIComponent(rawQuery)}`
+                `/dashboard/ask?mode=copilot&prompt=${encodeURIComponent(rawQuery)}`
               );
             },
             keywords: [],
