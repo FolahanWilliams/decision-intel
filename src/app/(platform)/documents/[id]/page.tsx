@@ -49,6 +49,7 @@ import { RelatedDecisions } from '@/components/ui/RelatedDecisions';
 import { RiskScoreCard } from '@/components/analysis/RiskScoreCard';
 import { ActOnThisPanel } from '@/components/analysis/ActOnThisPanel';
 import { SimilarDecisionsBanner } from '@/components/analysis/SimilarDecisionsBanner';
+import { DrRedTeamCard } from '@/components/analysis/DrRedTeamCard';
 import { RecommendationsPanel } from '@/components/ui/RecommendationsPanel';
 import { ExecutiveSummary } from '@/components/visualizations/ExecutiveSummary';
 import { ActionableNudges } from '@/components/analysis/ActionableNudges';
@@ -1321,6 +1322,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 biases={analysis.biases}
                 documentType={document.documentType ?? null}
               />
+            </div>
+          )}
+
+          {/* M7 — Dr. Red Team. The dissent without the social cost.
+              User-invoked: does nothing until clicked. When clicked, generates
+              a signature adversarial response against the decision's weakest
+              load-bearing assumption. */}
+          {analysis && (
+            <div className="mb-lg">
+              <DrRedTeamCard analysisId={analysis.id} />
             </div>
           )}
 

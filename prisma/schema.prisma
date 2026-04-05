@@ -795,6 +795,43 @@ model DecisionFrame {
 
 // ─── Decision Rooms (Real-Time Collaboration) ────────────────────────────
 
+// ─── M7 — Dr. Red Team Persona ────────────────────────────────────────────
+//
+// Tracks user-invoked Red Team challenges on analyses or decision rooms.
+// Persisted for four reasons:
+//   (a) the UI needs to show prior challenges on revisit so users can
+//       re-read the dissent they asked for,
+//   (b) the per-challenge usefulness rating feeds the feedback loop so
+//       we can calibrate which challenges users actually find valuable,
+//   (c) the AuditLog entry gives us a provable record that a decision
+//       was challenged before it was made (useful for compliance
+//       "documented dissent" requirements),
+//   (d) the playbook invocation pattern from M6 can eventually schedule
+//       follow-up nudges against these challenges ("did you answer the
+//       question Dr. Red Team asked you?").
+model RedTeamChallenge {
+  id                  String    @id @default(cuid())
+  userId              String    // who invoked Dr. Red Team
+  orgId               String?
+  analysisId          String?   // scope: the analysis being challenged
+  decisionRoomId      String?   // scope: the decision room being challenged
+  targetClaim         String    @db.Text // the single load-bearing assumption
+  primaryObjection    String    @db.Text
+  secondaryObjections String[]  // flexible array — 0..N
+  structuralQuestions String[]
+  closingLine         String    @db.Text
+  usefulRating        Int?      // null | -1 (not useful) | 0 (neutral) | 1 (useful)
+  notes               String?   @db.Text // free-text reaction
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([orgId])
+  @@index([analysisId])
+  @@index([decisionRoomId])
+  @@index([orgId, createdAt])
+}
+
 model DecisionRoom {
   id            String          @id @default(cuid())
   documentId    String?

@@ -1435,6 +1435,7 @@ function StrategyAndPositioning() {
       <ComplianceFrameworkMoatNarrative />
       <DecisionGraphMoatNarrative />
       <OutcomeFlywheelNarrative />
+      <DrRedTeamNarrative />
 
       {/* ── Founder Pitch Script ── */}
       <FounderPitchScript />
@@ -2556,6 +2557,83 @@ function OutcomeFlywheelNarrative() {
           </p>
           <p style={{ marginBottom: 0, fontStyle: 'italic', color: 'var(--text-primary)' }}>
             An 18-month lead here is functionally an insurmountable one. A competitor copying the codebase on day one would still need 18 months of a paying customer&apos;s outcome history to match a single org&apos;s calibration. Multiply by every customer.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DrRedTeamNarrative() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div style={{ ...card, borderLeft: '3px solid #dc2626' }}>
+      <div style={{ ...sectionTitle, cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>
+        <AlertTriangle size={18} style={{ color: '#dc2626' }} /> Dr. Red Team — Dissent Without The Social Cost
+        <span style={{ marginLeft: 'auto', color: 'var(--text-muted)' }}>
+          {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        </span>
+      </div>
+      {expanded && (
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, marginTop: 12 }}>
+          <p style={{ marginBottom: 12 }}>
+            Every senior partner has an objection they don&apos;t raise. Not because they don&apos;t see it
+            — because raising it would cost them politically. The junior analyst pushing back on the
+            MD. The partner who has to work with the acquirer next quarter. The board member who
+            doesn&apos;t want to humiliate the CEO who championed the deal.{' '}
+            <strong style={{ color: 'var(--text-primary)' }}>
+              The sharpest objections in any IC are the ones that never get said out loud.
+            </strong>
+          </p>
+          <p style={{ marginBottom: 12 }}>
+            Dr. Red Team is not a generic &quot;devil&apos;s advocate&quot; LLM. It is a
+            purpose-built persona with a custom prompt (see{' '}
+            <code style={{ background: 'rgba(220, 38, 38, 0.1)', padding: '1px 5px', borderRadius: 3 }}>
+              buildRedTeamPersonaPrompt
+            </code>{' '}
+            in <code>src/lib/agents/prompts.ts</code>) that reads the decision, picks the single
+            most load-bearing assumption, cites a specific detected bias, and mounts the strongest
+            possible attack. It ends every response with one brutal closing line — the kind of
+            sentence that would reshape the room if a human partner said it.
+          </p>
+          <p style={{ marginBottom: 12 }}>
+            <strong style={{ color: 'var(--text-primary)' }}>Why it matters for the pitch:</strong>{' '}
+            the standard objection to AI bias tools is &quot;this is just an LLM&quot;. Dr. Red Team
+            is the counter: a <em>specific persona framed for a specific human problem</em>. It is
+            the first feature where the LLM is doing something humans genuinely cannot — every
+            human in the room has a social cost of speaking, and the AI has zero. The job to be
+            done is not bias detection; it is structured permission to dissent.
+          </p>
+          <div
+            style={{
+              padding: '12px 16px',
+              background: 'rgba(220, 38, 38, 0.05)',
+              borderRadius: 8,
+              border: '1px solid rgba(220, 38, 38, 0.15)',
+              marginBottom: 12,
+            }}
+          >
+            <div style={{ fontWeight: 700, color: '#fca5a5', marginBottom: 6, fontSize: 13 }}>
+              <Lightbulb
+                size={14}
+                style={{ display: 'inline', verticalAlign: '-2px', marginRight: 6 }}
+              />
+              The Demo Line
+            </div>
+            <p style={{ margin: 0, fontStyle: 'italic', color: 'var(--text-primary)' }}>
+              &ldquo;You already know what the bias detector finds. Now click this button. Dr. Red
+              Team will tell you the thing your partners won&apos;t.&rdquo;
+            </p>
+          </div>
+          <p style={{ marginBottom: 0 }}>
+            <strong style={{ color: 'var(--text-primary)' }}>Where it lives:</strong> inline card on
+            every analysis detail page, directly below the Act-on-this playbook suggestions.
+            User-invoked — it does nothing until clicked, and the click itself is the psychological
+            commitment. Every invocation is AuditLog&apos;d as &quot;decision was challenged before
+            it was made&quot;, which is a compliance-grade &quot;documented dissent&quot; signal for
+            regulated industries. Every response gets a thumbs-up/down for the calibration feedback
+            loop — over time the system learns which types of challenges this specific org finds
+            most valuable.
           </p>
         </div>
       )}
