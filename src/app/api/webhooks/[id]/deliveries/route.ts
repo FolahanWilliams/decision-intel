@@ -26,7 +26,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   const url = new URL(request.url);
-  const limit = Math.min(parseInt(url.searchParams.get('limit') || '20', 10), 100);
+  const parsedLimit = parseInt(url.searchParams.get('limit') || '20', 10);
+  const limit = Math.min(Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 20, 100);
 
   const deliveries = await prisma.webhookDelivery.findMany({
     where: { subscriptionId: id },

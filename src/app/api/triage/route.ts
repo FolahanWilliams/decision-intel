@@ -23,7 +23,8 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const orgId = searchParams.get('orgId');
-  const limit = parseInt(searchParams.get('limit') || '5', 10);
+  const parsedLimit = parseInt(searchParams.get('limit') || '5', 10);
+  const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 5;
 
   if (!orgId) {
     return NextResponse.json({ error: 'orgId is required' }, { status: 400 });
