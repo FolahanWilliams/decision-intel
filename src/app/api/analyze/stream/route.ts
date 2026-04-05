@@ -452,6 +452,7 @@ export async function POST(request: NextRequest) {
                       : ComplianceSchema.parse({})),
                     ...(report.compoundScoring ? { compoundScoring: report.compoundScoring } : {}),
                     ...(report.bayesianPriors ? { bayesianPriors: report.bayesianPriors } : {}),
+                    ...(report.calibration ? { calibration: report.calibration } : {}),
                   }),
                   preMortem: toPrismaJson(report.preMortem),
                   sentiment: toPrismaJson(

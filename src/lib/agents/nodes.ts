@@ -1706,10 +1706,18 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
   // 1. Bias Deductions (Compound Scoring with Ontology Interaction Weights)
   //    Uses the proprietary compound scoring engine for interaction-weighted
   //    bias severity instead of simple additive penalties.
+  //
+  //    M10 — we compute twice: once WITH org calibration (the headline score
+  //    users see) and once WITHOUT (the industry baseline). The delta between
+  //    them is the visible flywheel surface.
   let compoundScoreResult: Awaited<
     ReturnType<typeof import('@/lib/scoring/compound-engine').computeCompoundScore>
   > | null = null;
+  let staticCompoundResult: Awaited<
+    ReturnType<typeof import('@/lib/scoring/compound-engine').computeCompoundScore>
+  > | null = null;
   let biasDeductions = 0;
+  let staticBiasDeductions = 0;
 
   try {
     const { computeCompoundScore } = await import('@/lib/scoring/compound-engine');
@@ -1744,30 +1752,38 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       log.info('PE/VC context: auto-setting monetary stakes to very_high for compound scoring');
     }
 
-    compoundScoreResult = computeCompoundScore(
-      100,
-      detectedBiases,
-      {
-        monetaryStakes,
-        participantCount: speakers.length,
-        dissentPresent: hasDissent,
-        timelineWeeks: null,
-        documentAgeWeeks: 0,
-        wordCount,
-        rawContent: state.structuredContent || undefined,
-      },
-      {
-        orgCalibration: Object.keys(orgCalibration).length > 0 ? orgCalibration : undefined,
-      }
-    );
+    const compoundContext = {
+      monetaryStakes,
+      participantCount: speakers.length,
+      dissentPresent: hasDissent,
+      timelineWeeks: null,
+      documentAgeWeeks: 0,
+      wordCount,
+      rawContent: state.structuredContent || undefined,
+    };
+
+    compoundScoreResult = computeCompoundScore(100, detectedBiases, compoundContext, {
+      orgCalibration: Object.keys(orgCalibration).length > 0 ? orgCalibration : undefined,
+    });
+
+    // M10: compute the baseline (industry default) score alongside, so the
+    // UI can render a delta that shows how much this org's calibration has
+    // shifted the assessment. Only actually differs when orgCalibration is
+    // present — otherwise the two results are identical and delta = 0.
+    staticCompoundResult =
+      Object.keys(orgCalibration).length > 0
+        ? computeCompoundScore(100, detectedBiases, compoundContext, {})
+        : compoundScoreResult;
 
     // Use compound-adjusted deduction (difference between raw and calibrated)
     biasDeductions = Math.round(100 - compoundScoreResult.calibratedScore);
+    staticBiasDeductions = Math.round(100 - staticCompoundResult.calibratedScore);
     log.info(
       `Compound scoring: raw_penalty=${compoundScoreResult.rawScore - compoundScoreResult.calibratedScore}, ` +
         `multiplier=${compoundScoreResult.compoundMultiplier}, ` +
         `context=${compoundScoreResult.contextAdjustment}, ` +
-        `interactions=${compoundScoreResult.biasScores.filter(b => b.interactionMultiplier > 1.05).length}`
+        `interactions=${compoundScoreResult.biasScores.filter(b => b.interactionMultiplier > 1.05).length}, ` +
+        `calibration_delta=${biasDeductions - staticBiasDeductions}`
     );
   } catch {
     // Fallback to simple additive scoring if compound engine fails
@@ -1780,6 +1796,17 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
         const multiplier = causalMultipliers.get(biasKey) ?? 1.0;
         const clampedMultiplier = Math.max(0.3, Math.min(2.5, multiplier));
         return acc + Math.round(basePenalty * clampedMultiplier);
+      },
+      0
+    );
+    // M10: in the fallback path the baseline is the same math without
+    // the causal multiplier — produces an honest delta even when the
+    // compound engine isn't available.
+    staticBiasDeductions = (state.biasAnalysis || []).reduce(
+      (acc: number, b: { severity?: string }) => {
+        const severity = (b.severity || 'low').toLowerCase();
+        const basePenalty = severityWeights[severity] || 5;
+        return acc + basePenalty;
       },
       0
     );
@@ -1913,9 +1940,55 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
   // Clamp 0-100
   overallScore = Math.max(0, Math.min(100, Math.round(overallScore)));
 
+  // M10 — industry-baseline variant of the same formula. Only the bias
+  // deduction differs (no causal weights applied). Everything else (noise,
+  // trust, logic, diversity, feedback) is identical so we get a clean
+  // apples-to-apples delta that isolates the flywheel's contribution.
+  let staticOverallScore =
+    baseScore -
+    staticBiasDeductions -
+    noisePenalty -
+    trustPenalty -
+    logicPenalty -
+    diversityPenalty -
+    feedbackAdjustment;
+  staticOverallScore = Math.max(0, Math.min(100, Math.round(staticOverallScore)));
+
   log.info(
-    `Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) - Diversity(${diversityPenalty.toFixed(1)}) - Feedback(${feedbackAdjustment.toFixed(1)}) = ${overallScore}`
+    `Scoring: Base(100) - Biases(${biasDeductions}) - Noise(${noisePenalty.toFixed(1)}) - Trust(${trustPenalty.toFixed(1)}) - Logic(${logicPenalty.toFixed(1)}) - Diversity(${diversityPenalty.toFixed(1)}) - Feedback(${feedbackAdjustment.toFixed(1)}) = ${overallScore} (static=${staticOverallScore}, Δ=${overallScore - staticOverallScore})`
   );
+
+  // M10 — build the calibration insight object. Sample size = confirmed
+  // decision outcomes for the scope. Gated by the UI at sampleSize >= 5.
+  const CALIBRATION_UNLOCK = 5;
+  let calibrationSampleSize = 0;
+  try {
+    calibrationSampleSize = await prisma.decisionOutcome.count({
+      where: effectiveOrgId
+        ? { orgId: effectiveOrgId, outcome: { in: ['success', 'partial_success', 'failure'] } }
+        : { userId: state.userId, outcome: { in: ['success', 'partial_success', 'failure'] } },
+    });
+  } catch {
+    // DecisionOutcome table may not exist — treat as cold start
+  }
+  const calibrationSource: 'causal' | 'default' =
+    causalWeightsForReport.length > 0 ? 'causal' : 'default';
+  const calibrationDelta = overallScore - staticOverallScore;
+  const calibrationHeadline = buildCalibrationHeadline(
+    calibrationDelta,
+    calibrationSampleSize,
+    calibrationSource,
+    causalWeightsForReport
+  );
+  const calibrationInsight = {
+    calibratedOverallScore: overallScore,
+    staticOverallScore,
+    calibrationDelta,
+    calibrationSource,
+    sampleSize: calibrationSampleSize,
+    unlockThreshold: CALIBRATION_UNLOCK,
+    headline: calibrationHeadline,
+  };
 
   return {
     finalReport: {
@@ -1988,6 +2061,7 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
             biasAdjustments: bayesianResult.biasAdjustments,
           }
         : undefined,
+      calibration: calibrationInsight,
       causalIntelligence: await buildCausalIntelligenceReport(
         effectiveOrgId || state.userId || '',
         causalWeightsForReport,
@@ -2023,6 +2097,58 @@ export async function riskScorerNode(state: AuditState): Promise<Partial<AuditSt
       }),
     } satisfies AnalysisResult,
   };
+}
+
+// ============================================================
+// CALIBRATION HEADLINE BUILDER (M10)
+// ============================================================
+
+/**
+ * Generate a one-line human-readable summary of how the org's calibration
+ * has shifted the risk score away from the industry baseline. Rendered by
+ * the UI next to the dual score display. Server-side generation ensures
+ * tone / translation changes happen in one place.
+ */
+function buildCalibrationHeadline(
+  delta: number,
+  sampleSize: number,
+  source: 'causal' | 'default',
+  causalWeights: Array<{
+    biasType: string;
+    dangerMultiplier: number;
+    sampleSize: number;
+  }>
+): string {
+  // Cold start — the calibrated score is hidden in the UI, but we still
+  // return a useful hint for the "unlock" affordance.
+  if (sampleSize < 5) {
+    const remaining = 5 - sampleSize;
+    return `Your calibrated score unlocks at 5 confirmed outcomes — ${remaining} more to go.`;
+  }
+
+  if (source === 'default' || causalWeights.length === 0) {
+    return `Based on ${sampleSize} confirmed outcomes — no bias-outcome patterns detected yet. Baseline severity weights still apply.`;
+  }
+
+  // Pick the single bias with the largest deviation from baseline (1.0)
+  // to surface in the headline — users remember one concrete thing.
+  const dominant = [...causalWeights].sort(
+    (a, b) => Math.abs(b.dangerMultiplier - 1) - Math.abs(a.dangerMultiplier - 1)
+  )[0];
+
+  const dominantName = dominant?.biasType.replace(/_/g, ' ') ?? 'bias patterns';
+  const dominantMultiplier = dominant?.dangerMultiplier ?? 1;
+
+  if (Math.abs(delta) < 1) {
+    return `Based on ${sampleSize} confirmed outcomes — your org's bias profile matches industry baseline closely.`;
+  }
+
+  if (delta < 0) {
+    // Calibrated score is LOWER (more risky) than baseline
+    return `Based on ${sampleSize} outcomes, your org rates ${dominantName} ${dominantMultiplier.toFixed(1)}x heavier than industry baseline. This decision is ${Math.abs(delta)} points riskier than it looks.`;
+  }
+  // Calibrated score is HIGHER (safer) than baseline
+  return `Based on ${sampleSize} outcomes, your org has absorbed similar ${dominantName} patterns before. This decision scores ${delta} points better than industry baseline.`;
 }
 
 // ============================================================

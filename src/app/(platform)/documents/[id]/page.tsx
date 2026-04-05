@@ -34,6 +34,7 @@ import { BiasDetailModal } from './BiasDetailModal';
 import { OutcomeReporter } from './OutcomeReporter';
 import { DraftOutcomeCard } from '@/components/ui/DraftOutcomeCard';
 import { SampleBadge } from '@/components/ui/SampleBadge';
+import { CalibrationChip } from '@/components/analysis/CalibrationChip';
 import { DecisionPriorCapture, PostAnalysisPrior } from '@/components/ui/DecisionPriorCapture';
 import { OutcomeTimeframePicker } from '@/components/ui/OutcomeTimeframePicker';
 import { CounterfactualPanel } from '@/components/ui/CounterfactualPanel';
@@ -157,6 +158,7 @@ interface Analysis {
         reason: string;
       }>;
     };
+    calibration?: import('@/types').CalibrationInsight;
   };
   swotAnalysis?: SwotAnalysisResult;
   logicalAnalysis?: LogicalAnalysisResult;
@@ -877,6 +879,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             </div>
           </div>
         </div>
+
+        {/* Calibration dual-score chip (M10 — visible flywheel).
+            Renders under the header whenever an analysis exists; internally
+            decides whether to show the calibrated score or the gamified
+            unlock hint based on the org's confirmed-outcome sample size. */}
+        {analysis?.compliance?.calibration && (
+          <div style={{ marginTop: 'var(--spacing-sm)', display: 'flex', justifyContent: 'flex-end' }}>
+            <CalibrationChip calibration={analysis.compliance.calibration} />
+          </div>
+        )}
 
         {/* Gradient accent line */}
         <div
