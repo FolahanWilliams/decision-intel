@@ -19,6 +19,8 @@ const EXEMPT_PATHS = [
   '/api/cron/', // Uses Bearer token authentication
   '/api/health', // Read-only health check
   '/api/stripe/webhook', // Stripe sends its own signature verification
+  '/api/pilot-interest', // Public lead capture form, no auth needed
+  '/api/integrations/email/', // Inbound email webhooks with HMAC verification
 ];
 
 /**
