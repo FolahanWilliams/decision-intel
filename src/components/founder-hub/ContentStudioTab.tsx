@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { VoiceConfig } from './content-studio/VoiceConfig';
 import { ContentGenerator } from './content-studio/ContentGenerator';
 import { ContentLibrary } from './content-studio/ContentLibrary';
+import { CaseStudyPicker } from './content-studio/CaseStudyPicker';
+import { CaseStudyAnalyzer } from './content-studio/CaseStudyAnalyzer';
+import type { CaseStudy } from '@/lib/data/case-studies/types';
 
 const STORAGE_KEY = 'founder-content-studio-voice';
 
@@ -41,6 +44,9 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
   const [filterType, setFilterType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [libraryLoading, setLibraryLoading] = useState(true);
+
+  // Case study visual generator state
+  const [selectedCaseStudy, setSelectedCaseStudy] = useState<CaseStudy | null>(null);
 
   // Hydrate voice config from localStorage
   useEffect(() => {
@@ -155,6 +161,20 @@ export function ContentStudioTab({ founderPass }: ContentStudioTabProps) {
         isEditing={isEditing}
         setIsEditing={setIsEditing}
       />
+
+      {selectedCaseStudy ? (
+        <CaseStudyAnalyzer
+          caseStudy={selectedCaseStudy}
+          onBack={() => setSelectedCaseStudy(null)}
+          onUseInPost={caseTopic => {
+            setTopic(caseTopic);
+            setPillar('toxic_combos');
+            setSelectedCaseStudy(null);
+          }}
+        />
+      ) : (
+        <CaseStudyPicker onSelectCase={setSelectedCaseStudy} />
+      )}
 
       <ContentLibrary
         founderPass={founderPass}
