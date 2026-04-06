@@ -11,7 +11,14 @@ import { MUSK_ANALYSES } from './analyses/musk-tesla';
 import { HUANG_ANALYSES } from './analyses/huang-nvidia';
 import { ZUCKERBERG_ANALYSES } from './analyses/zuckerberg-meta';
 
-export type { PublicCompanyAnalysis, DqiGrade, DqiComponents, BiasExcerpt, StockPerformance, FilingType } from './types';
+export type {
+  PublicCompanyAnalysis,
+  DqiGrade,
+  DqiComponents,
+  BiasExcerpt,
+  StockPerformance,
+  FilingType,
+} from './types';
 
 // ---------------------------------------------------------------------------
 // Combined exports
@@ -35,9 +42,7 @@ export function getLeaderboard(): PublicCompanyAnalysis[] {
 
 /** Filter analyses by stock ticker */
 export function getAnalysisByTicker(ticker: string): PublicCompanyAnalysis[] {
-  return DECISION_ALPHA_ANALYSES.filter(
-    a => a.ticker.toLowerCase() === ticker.toLowerCase()
-  );
+  return DECISION_ALPHA_ANALYSES.filter(a => a.ticker.toLowerCase() === ticker.toLowerCase());
 }
 
 /** Filter analyses by CEO name (partial match) */
@@ -51,9 +56,10 @@ export function getAlphaStatistics() {
   const analyses = DECISION_ALPHA_ANALYSES;
   const totalAnalyses = analyses.length;
 
-  const avgDqi = totalAnalyses > 0
-    ? Math.round(analyses.reduce((sum, a) => sum + a.dqiScore, 0) / totalAnalyses)
-    : 0;
+  const avgDqi =
+    totalAnalyses > 0
+      ? Math.round(analyses.reduce((sum, a) => sum + a.dqiScore, 0) / totalAnalyses)
+      : 0;
 
   const gradeDistribution: Record<DqiGrade, number> = { A: 0, B: 0, C: 0, D: 0, F: 0 };
   const biasCounts: Record<string, number> = {};
@@ -72,16 +78,14 @@ export function getAlphaStatistics() {
     }
   }
 
-  const avgBiasesPerAnalysis = totalAnalyses > 0
-    ? Math.round((totalBiases / totalAnalyses) * 10) / 10
-    : 0;
+  const avgBiasesPerAnalysis =
+    totalAnalyses > 0 ? Math.round((totalBiases / totalAnalyses) * 10) / 10 : 0;
 
   const topBiases = Object.entries(biasCounts)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5);
 
-  const topToxicCombos = Object.entries(toxicComboCounts)
-    .sort(([, a], [, b]) => b - a);
+  const topToxicCombos = Object.entries(toxicComboCounts).sort(([, a], [, b]) => b - a);
 
   return {
     totalAnalyses,

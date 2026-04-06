@@ -54,7 +54,7 @@ export const ZUCKERBERG_ANALYSES: PublicCompanyAnalysis[] = [
       'The bandwagon effect in AI investment is strongest when a CEO has a recent failure (metaverse) that creates pressure to demonstrate strategic relevance.',
     ],
     source:
-      "Meta Platforms 2024 Annual Report, CEO Letter (February 2025); Meta Q4 2024 Earnings Call",
+      'Meta Platforms 2024 Annual Report, CEO Letter (February 2025); Meta Q4 2024 Earnings Call',
     sourceType: 'annual_report',
 
     ceoName: 'Mark Zuckerberg',
@@ -111,7 +111,7 @@ export const ZUCKERBERG_ANALYSES: PublicCompanyAnalysis[] = [
       {
         biasType: 'overconfidence_bias',
         excerpt:
-          'I believe this will be the most transformative year in Meta\'s history. The AI products we\'re building will redefine how people connect.',
+          "I believe this will be the most transformative year in Meta's history. The AI products we're building will redefine how people connect.",
         explanation:
           '"Most transformative year in history" is superlative confidence language. Meta said similar things about the metaverse rebrand (2021), Reels launch (2022), and Year of Efficiency (2023). The pattern of annual superlatives suggests calibration drift.',
         severity: 'high',
@@ -135,7 +135,7 @@ export const ZUCKERBERG_ANALYSES: PublicCompanyAnalysis[] = [
 
     contentAngles: [
       "Zuckerberg's Letter Triggers 'Sunk Ship' — The Same Pattern That Sank Kodak",
-      'The $50B Question: Is Meta\'s Metaverse Investment Strategy or Sunk Cost Fallacy?',
+      "The $50B Question: Is Meta's Metaverse Investment Strategy or Sunk Cost Fallacy?",
       "Bandwagon Effect in AI: Why 'Everyone Else Is Doing It' Isn't a Strategy",
       "Meta's DQI 52: Strong Evidence Quality Can't Save Poor Decision Process",
       'How to Spot Sunk Cost Fallacy in CEO Communications: A Meta Case Study',

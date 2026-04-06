@@ -151,7 +151,7 @@ function initializeNodes(): GraphNode[] {
 
   // Outcomes — far edges
   outcomes.forEach((n, i) => {
-    const angle = Math.PI * 0.25 + (Math.PI * 0.5 * i);
+    const angle = Math.PI * 0.25 + Math.PI * 0.5 * i;
     const r = 175;
     result.push({
       ...n,
@@ -430,12 +430,7 @@ function EdgeLine({
           strokeLinecap="round"
           opacity={0}
         >
-          <animate
-            attributeName="opacity"
-            values="0;0.3;0"
-            dur="2.5s"
-            repeatCount="indefinite"
-          />
+          <animate attributeName="opacity" values="0;0.3;0" dur="2.5s" repeatCount="indefinite" />
         </line>
       )}
     </g>
@@ -604,7 +599,8 @@ export function HeroDecisionGraph() {
                 {hoveredEdgeCount} connection{hoveredEdgeCount !== 1 ? 's' : ''}
                 {hoveredToxicCount > 0 && (
                   <span style={{ color: COLORS.edge.toxic, fontWeight: 600 }}>
-                    {' · '}{hoveredToxicCount} toxic
+                    {' · '}
+                    {hoveredToxicCount} toxic
                   </span>
                 )}
               </span>

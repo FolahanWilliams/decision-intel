@@ -17,12 +17,7 @@ export const HUANG_ANALYSES: PublicCompanyAnalysis[] = [
     estimatedImpact: '$3T+ market cap, 200%+ revenue growth',
     impactDirection: 'positive',
 
-    biasesPresent: [
-      'overconfidence_bias',
-      'framing_effect',
-      'anchoring_bias',
-      'confirmation_bias',
-    ],
+    biasesPresent: ['overconfidence_bias', 'framing_effect', 'anchoring_bias', 'confirmation_bias'],
     primaryBias: 'framing_effect',
     toxicCombinations: ['Optimism Trap'],
     beneficialPatterns: ['External Advisors'],
@@ -115,10 +110,10 @@ export const HUANG_ANALYSES: PublicCompanyAnalysis[] = [
     },
 
     contentAngles: [
-      'Jensen Huang Scores DQI 58 — Why the AI King\'s Communication Has a Blind Spot',
-      "NVIDIA's \"Platform Company\" Frame: Genius Strategy or Textbook Framing Effect?",
+      "Jensen Huang Scores DQI 58 — Why the AI King's Communication Has a Blind Spot",
+      'NVIDIA\'s "Platform Company" Frame: Genius Strategy or Textbook Framing Effect?',
       'The Anchoring Problem: When 409% Growth Becomes Your Baseline',
-      "Is NVIDIA the Next Intel? What Bias Analysis Reveals About Peak-Cycle CEO Language",
+      'Is NVIDIA the Next Intel? What Bias Analysis Reveals About Peak-Cycle CEO Language',
       "Every AI Company Says 'Industrial Revolution.' Here's Why That's a Bias Red Flag.",
     ],
     headlineHook:

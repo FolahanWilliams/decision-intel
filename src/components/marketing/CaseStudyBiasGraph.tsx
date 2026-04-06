@@ -96,12 +96,7 @@ interface Props {
   size?: number;
 }
 
-export function CaseStudyBiasGraph({
-  biases,
-  primaryBias,
-  toxicCombinations,
-  size = 180,
-}: Props) {
+export function CaseStudyBiasGraph({ biases, primaryBias, toxicCombinations, size = 180 }: Props) {
   const [hoveredBias, setHoveredBias] = useState<string | null>(null);
 
   // Compute node positions in a radial layout
@@ -154,10 +149,7 @@ export function CaseStudyBiasGraph({
     return result;
   }, [biases, toxicCombinations]);
 
-  const nodeMap = useMemo(
-    () => Object.fromEntries(nodes.map((n: BiasNode) => [n.id, n])),
-    [nodes]
-  );
+  const nodeMap = useMemo(() => Object.fromEntries(nodes.map((n: BiasNode) => [n.id, n])), [nodes]);
 
   // Which biases are connected to the hovered one?
   const connectedToHover = useMemo(() => {
@@ -178,19 +170,13 @@ export function CaseStudyBiasGraph({
       style={{ position: 'relative', width: size, height: size + 28, margin: '0 auto' }}
       onMouseLeave={() => setHoveredBias(null)}
     >
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
-        style={{ display: 'block' }}
-      >
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block' }}>
         {/* Edges */}
         {edges.map((e: BiasEdge, i: number) => {
           const from = nodeMap[e.from];
           const to = nodeMap[e.to];
           if (!from || !to) return null;
-          const isHighlighted =
-            hoveredBias && (e.from === hoveredBias || e.to === hoveredBias);
+          const isHighlighted = hoveredBias && (e.from === hoveredBias || e.to === hoveredBias);
           const isToxic = e.pattern !== '';
           return (
             <motion.line

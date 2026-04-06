@@ -1199,8 +1199,10 @@ export default function LandingPage() {
                 lineHeight: 1.5,
               }}
             >
-              The average bad deal costs <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span>.
-              {' '}Your team&apos;s decision audit costs <span style={{ fontWeight: 700, color: C.green }}>$349/month</span>.
+              The average bad deal costs{' '}
+              <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span>. Your team&apos;s
+              decision audit costs{' '}
+              <span style={{ fontWeight: 700, color: C.green }}>$349/month</span>.
             </p>
 
             {/* Annual/Monthly Toggle */}
