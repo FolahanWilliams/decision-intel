@@ -60,7 +60,7 @@ function RecentAnalysesPicker() {
 
   const analysisItems =
     data?.documents?.flatMap(doc =>
-      doc.analyses.map(analysis => ({
+      (doc.analyses ?? []).map(analysis => ({
         ...analysis,
         filename: doc.filename,
       }))

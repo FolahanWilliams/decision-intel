@@ -376,8 +376,7 @@ export const DEMO_NOKIA: DemoAnalysis = {
       riskLevel: 'critical',
       description:
         'Prior $1B annual commitment to Nokia created psychological attachment that made walking away feel like wasting past investments, driving escalation.',
-      historicalExample:
-        'Microsoft wrote down $7.6B \u2014 more than the entire purchase price.',
+      historicalExample: 'Microsoft wrote down $7.6B \u2014 more than the entire purchase price.',
     },
     {
       name: 'Echo Chamber',

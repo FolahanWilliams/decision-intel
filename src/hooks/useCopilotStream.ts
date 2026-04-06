@@ -242,7 +242,9 @@ export function useCopilotStream(): UseCopilotStreamReturn {
           id: nextId(),
           role: t.role as string,
           agentType: t.agentType as CopilotAgentType | undefined,
-          agentLabel: t.agentType ? (AGENT_LABELS[t.agentType as CopilotAgentType] || 'Agent') : undefined,
+          agentLabel: t.agentType
+            ? AGENT_LABELS[t.agentType as CopilotAgentType] || 'Agent'
+            : undefined,
           content: t.content as string,
           sources: t.sources as CopilotSource[] | undefined,
           isStreaming: false,

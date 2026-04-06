@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { DecisionIQCard } from '@/components/ui/DecisionIQCard';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
@@ -122,7 +123,9 @@ export default function Dashboard() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadPhase, setUploadPhase] = useState<'uploading' | 'analyzing'>('uploading');
   const [error, setError] = useState<string | null>(null);
-  const [activeView, setActiveView] = useState<DashboardView>('upload');
+  const searchParams = useSearchParams();
+  const initialView = searchParams.get('view') === 'browse' ? 'browse' : 'upload';
+  const [activeView, setActiveView] = useState<DashboardView>(initialView);
   const globalDragCounter = useRef(0);
 
   // Upload confirmation state

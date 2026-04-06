@@ -15,9 +15,13 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
 
   // Noise tax calculation based on Kahneman's Noise research
   // noiseScore is 0-100 where higher = noisier
-  const noiseTaxRate = (noiseScore / 100) * 0.15;
+  // When noiseScore is 0 but biases exist, use a conservative default (35)
+  // to avoid showing $0 for documents that clearly have decision quality issues
+  const effectiveNoiseScore = noiseScore > 0 ? noiseScore : biasCount > 0 ? 35 : 0;
+  const noiseTaxRate = (effectiveNoiseScore / 100) * 0.15;
   const biasAmplifier = 1 + biasCount * 0.02;
-  const improvementRoom = (100 - overallScore) / 100;
+  // Ensure at least 10% improvement room so we never show $0 when biases exist
+  const improvementRoom = Math.max((100 - overallScore) / 100, biasCount > 0 ? 0.1 : 0);
   const projectedSavings = Math.round(
     decisionValue * noiseTaxRate * biasAmplifier * improvementRoom
   );
@@ -36,11 +40,17 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
       style={{
         border: '1px solid rgba(22, 163, 74, 0.15)',
         background: 'rgba(22, 163, 74, 0.03)',
+        borderRadius: 12,
       }}
     >
       <div
         className="card-header"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '18px 20px',
+        }}
       >
         <h4
           style={{
@@ -69,7 +79,7 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
           <Info size={13} />
         </button>
       </div>
-      <div className="card-body" style={{ padding: '12px 16px' }}>
+      <div className="card-body" style={{ padding: '20px 24px' }}>
         <div style={{ textAlign: 'center', marginBottom: 12 }}>
           <p
             style={{

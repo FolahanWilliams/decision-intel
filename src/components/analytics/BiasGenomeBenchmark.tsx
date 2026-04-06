@@ -47,9 +47,7 @@ export function BiasGenomeBenchmark() {
   });
 
   // Top 3 most costly biases
-  const costliestBiases = genome.genome
-    .filter(e => e.costDelta < 0)
-    .slice(0, 3);
+  const costliestBiases = genome.genome.filter(e => e.costDelta < 0).slice(0, 3);
 
   return (
     <div className="container" style={{ paddingTop: 'var(--spacing-xl)' }}>

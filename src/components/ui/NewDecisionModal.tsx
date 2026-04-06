@@ -17,7 +17,7 @@ const OPTIONS = [
     icon: Sparkles,
     title: 'Think Through a Decision',
     description: 'Get help from your AI advisory team',
-    href: '/dashboard/ask?mode=copilot',
+    href: '/dashboard/ask',
   },
   {
     key: 'audit',

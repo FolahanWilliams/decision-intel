@@ -50,6 +50,94 @@ const fadeIn = {
   viewport: { once: true },
 };
 
+// ── Newsletter Form (shared by newsletter section + footer) ─────────────
+
+function NewsletterForm({ source = 'footer' }: { source?: string }) {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'done' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes('@')) return;
+    setStatus('submitting');
+    trackEvent('newsletter_subscribe', { source });
+    try {
+      const res = await fetch('/api/pilot-interest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: `newsletter_${source}` }),
+      });
+      if (!res.ok) throw new Error();
+      setStatus('done');
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  if (status === 'done') {
+    return (
+      <p style={{ fontSize: 14, color: C.green, fontWeight: 600 }}>
+        You&apos;re in. First brief arrives this week.
+      </p>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: 'flex', gap: 8, maxWidth: 420, margin: '0 auto' }}
+    >
+      <input
+        type="email"
+        value={email}
+        onChange={e => {
+          setEmail(e.target.value);
+          if (status === 'error') setStatus('idle');
+        }}
+        placeholder="your@email.com"
+        required
+        disabled={status === 'submitting'}
+        style={{
+          flex: 1,
+          padding: '12px 16px',
+          fontSize: 14,
+          borderRadius: 8,
+          border: '1px solid #334155',
+          background: '#1E293B',
+          color: C.white,
+          outline: 'none',
+        }}
+        aria-label="Email address"
+      />
+      <button
+        type="submit"
+        disabled={status === 'submitting'}
+        style={{
+          padding: '12px 20px',
+          borderRadius: 8,
+          border: 'none',
+          background: C.green,
+          color: C.white,
+          fontSize: 14,
+          fontWeight: 600,
+          cursor: status === 'submitting' ? 'wait' : 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+        }}
+      >
+        {status === 'submitting' ? 'Subscribing...' : 'Subscribe'}
+        {status !== 'submitting' && <ArrowRight size={14} />}
+      </button>
+      {status === 'error' && (
+        <p style={{ fontSize: 12, color: '#FCA5A5', margin: '8px 0 0', width: '100%' }}>
+          Something went wrong. Try again.
+        </p>
+      )}
+    </form>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    LANDING PAGE
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -369,7 +457,13 @@ export default function LandingPage() {
             href="/"
             style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}
           >
-            <Image src="/logo.png" alt="Decision Intel" width={28} height={28} style={{ borderRadius: 6, objectFit: 'cover' }} />
+            <Image
+              src="/logo.png"
+              alt="Decision Intel"
+              width={28}
+              height={28}
+              style={{ borderRadius: 6, objectFit: 'cover' }}
+            />
             <span
               style={{ fontSize: 18, fontWeight: 700, color: C.white, letterSpacing: '-0.02em' }}
             >
@@ -1633,6 +1727,44 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Newsletter ─────────────────────────────────────────────── */}
+      <section style={{ background: '#0B1120', borderTop: '1px solid #1E293B' }}>
+        <div
+          style={{
+            maxWidth: 720,
+            margin: '0 auto',
+            padding: '64px 24px',
+            textAlign: 'center',
+          }}
+        >
+          <h3
+            style={{
+              fontSize: 24,
+              fontWeight: 700,
+              color: C.white,
+              marginBottom: 8,
+            }}
+          >
+            The Decision Intelligence Brief
+          </h3>
+          <p
+            style={{
+              fontSize: 15,
+              color: '#94A3B8',
+              lineHeight: 1.7,
+              marginBottom: 24,
+              maxWidth: 520,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          >
+            One real-world case study per week, broken down with the cognitive biases that were
+            detectable before the outcome was known. Free, unsubscribe anytime.
+          </p>
+          <NewsletterForm source="landing_newsletter" />
+        </div>
+      </section>
+
       {/* ── Footer ──────────────────────────────────────────────────── */}
       <footer style={{ background: C.navy, color: '#CBD5E1' }}>
         <div
@@ -1648,7 +1780,13 @@ export default function LandingPage() {
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-              <Brain size={22} style={{ color: C.green }} />
+              <Image
+                src="/logo.png"
+                alt="Decision Intel"
+                width={24}
+                height={24}
+                style={{ borderRadius: 6, objectFit: 'cover' }}
+              />
               <span style={{ fontSize: 18, fontWeight: 700, color: C.white }}>Decision Intel</span>
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: '#94A3B8', maxWidth: 280 }}>
@@ -1744,38 +1882,9 @@ export default function LandingPage() {
               Stay Updated
             </h4>
             <p style={{ fontSize: 14, color: '#94A3B8', marginBottom: 12 }}>
-              Subscribe to our email information
+              Weekly case study with cognitive biases
             </p>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input
-                type="email"
-                placeholder="Email address"
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  fontSize: 14,
-                  borderRadius: 8,
-                  border: '1px solid #334155',
-                  background: '#1E293B',
-                  color: C.white,
-                  outline: 'none',
-                }}
-              />
-              <button
-                style={{
-                  padding: '10px 16px',
-                  borderRadius: 8,
-                  border: 'none',
-                  background: C.green,
-                  color: C.white,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <ArrowRight size={16} />
-              </button>
-            </div>
+            <NewsletterForm source="footer" />
           </div>
         </div>
 

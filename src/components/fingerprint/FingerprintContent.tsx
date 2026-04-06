@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import {
   Brain,
@@ -320,11 +321,8 @@ export function FingerprintContent() {
 
                   {/* Data rows */}
                   {heatmapData.biasTypes.map(bias => (
-                    <>
-                      <div
-                        key={`label-${bias}`}
-                        className="text-[10px] text-foreground p-1 capitalize truncate"
-                      >
+                    <React.Fragment key={bias}>
+                      <div className="text-[10px] text-foreground p-1 capitalize truncate">
                         {bias.replace(/_/g, ' ')}
                       </div>
                       {heatmapData.quarters.map(q => {
@@ -347,7 +345,7 @@ export function FingerprintContent() {
                           </div>
                         );
                       })}
-                    </>
+                    </React.Fragment>
                   ))}
                 </div>
               )}
