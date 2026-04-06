@@ -86,7 +86,6 @@ export const CaseStudyBiasGraphExport = forwardRef<SVGSVGElement, Props>(
   function CaseStudyBiasGraphExport({ caseStudy, width, height }, ref) {
     const { biasesPresent: biases, primaryBias, toxicCombinations } = caseStudy;
     const cx = width / 2;
-    const cy = height / 2;
     const headerH = 60;
     const footerH = 36;
     const graphCy = headerH + (height - headerH - footerH) / 2;

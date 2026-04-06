@@ -9,6 +9,7 @@ import { ContentStudioTab } from '@/components/founder-hub/ContentStudioTab';
 import { MethodologiesAndPrinciplesTab } from '@/components/founder-hub/MethodologiesAndPrinciplesTab';
 import { FounderTipsTab } from '@/components/founder-hub/FounderTipsTab';
 import { DecisionAlphaTab } from '@/components/founder-hub/DecisionAlphaTab';
+import { InvestorDefenseTab } from '@/components/founder-hub/InvestorDefenseTab';
 import {
   Rocket,
   Brain,
@@ -65,6 +66,7 @@ type TabId =
   | 'correlation_causal'
   | 'decision_alpha'
   | 'content_studio'
+  | 'investor_defense'
   | 'founder_tips';
 
 const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
@@ -82,6 +84,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'correlation_causal', label: 'Correlation & Causal Graph', icon: <Network size={16} /> },
   { id: 'decision_alpha', label: 'Decision Alpha', icon: <TrendingUp size={16} /> },
   { id: 'content_studio', label: 'Content Studio', icon: <Zap size={16} /> },
+  { id: 'investor_defense', label: 'Investor Defense', icon: <Crosshair size={16} /> },
   { id: 'founder_tips', label: 'Founder Tips', icon: <Lightbulb size={16} /> },
 ];
 
@@ -5917,6 +5920,11 @@ export default function FounderHubPage() {
     content_studio: (
       <ErrorBoundary sectionName="Content Studio">
         <ContentStudioTab founderPass={FOUNDER_PASS} />
+      </ErrorBoundary>
+    ),
+    investor_defense: (
+      <ErrorBoundary sectionName="Investor Defense">
+        <InvestorDefenseTab />
       </ErrorBoundary>
     ),
     founder_tips: (

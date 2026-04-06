@@ -9,7 +9,6 @@ import {
   sectionTitle,
   label,
   badge,
-  formatBias,
   formatIndustry,
   OUTCOME_COLORS,
   OUTCOME_LABELS,
