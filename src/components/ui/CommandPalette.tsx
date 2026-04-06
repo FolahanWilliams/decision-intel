@@ -6,7 +6,6 @@ import {
   Search,
   LayoutDashboard,
   BarChart3,
-  MessageSquare,
   GitCompareArrows,
   Settings,
   ClipboardList,
