@@ -53,7 +53,11 @@ export async function POST(request: NextRequest) {
     );
 
     // Enrich results with graph edge counts (non-blocking best-effort)
-    let enrichedResults: Array<{ documentId: string; graphEdgeCount?: number; [key: string]: unknown }> = results;
+    let enrichedResults: Array<{
+      documentId: string;
+      graphEdgeCount?: number;
+      [key: string]: unknown;
+    }> = results;
     try {
       const docIds = results.map((r: { documentId: string }) => r.documentId);
       if (docIds.length > 0) {

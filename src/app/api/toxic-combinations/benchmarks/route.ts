@@ -60,9 +60,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Count global average combos per org in last 90 days
-    const globalStats = await prisma.$queryRaw<
-      Array<{ avg_combos: number; org_count: bigint }>
-    >`
+    const globalStats = await prisma.$queryRaw<Array<{ avg_combos: number; org_count: bigint }>>`
       SELECT
         AVG(combo_count) as avg_combos,
         COUNT(*) as org_count
@@ -79,16 +77,13 @@ export async function GET(req: NextRequest) {
     const orgCount = Number(globalStats[0]?.org_count || 1);
 
     // Build per-pattern comparison
-    const globalMap = new Map(
-      globalPatterns.map(p => [p.biasTypes.sort().join('|'), p])
-    );
+    const globalMap = new Map(globalPatterns.map(p => [p.biasTypes.sort().join('|'), p]));
 
     const comparisons = orgPatterns.map(orgP => {
       const key = orgP.biasTypes.sort().join('|');
       const globalP = globalMap.get(key);
-      const ratio = globalP && globalP.failureRate > 0
-        ? orgP.failureRate / globalP.failureRate
-        : null;
+      const ratio =
+        globalP && globalP.failureRate > 0 ? orgP.failureRate / globalP.failureRate : null;
 
       return {
         biasTypes: orgP.biasTypes,
@@ -98,7 +93,14 @@ export async function GET(req: NextRequest) {
         ratio: ratio ? Math.round(ratio * 10) / 10 : null,
         orgSampleSize: orgP.sampleSize,
         globalSampleSize: globalP?.sampleSize ?? 0,
-        status: ratio === null ? 'no_benchmark' : ratio > 1.5 ? 'above_average' : ratio < 0.7 ? 'below_average' : 'average',
+        status:
+          ratio === null
+            ? 'no_benchmark'
+            : ratio > 1.5
+              ? 'above_average'
+              : ratio < 0.7
+                ? 'below_average'
+                : 'average',
       };
     });
 

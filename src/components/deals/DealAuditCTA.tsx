@@ -12,10 +12,10 @@ interface DealAuditCTAProps {
 }
 
 const TIERS = [
-  { id: 'small',  label: 'Emerging',   maxTicket: 10_000_000,   price: 499 },
-  { id: 'mid',    label: 'Growth',     maxTicket: 50_000_000,   price: 1499 },
-  { id: 'large',  label: 'Core',       maxTicket: 200_000_000,  price: 2999 },
-  { id: 'mega',   label: 'Flagship',   maxTicket: Infinity,     price: 4999 },
+  { id: 'small', label: 'Emerging', maxTicket: 10_000_000, price: 499 },
+  { id: 'mid', label: 'Growth', maxTicket: 50_000_000, price: 1499 },
+  { id: 'large', label: 'Core', maxTicket: 200_000_000, price: 2999 },
+  { id: 'mega', label: 'Flagship', maxTicket: Infinity, price: 4999 },
 ];
 
 function getTier(ticketSize: number) {
@@ -23,7 +23,11 @@ function getTier(ticketSize: number) {
 }
 
 function formatCurrency(amount: number, currency: string = 'USD') {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
 }
 
 function formatTicketSize(amount: number) {
@@ -33,7 +37,13 @@ function formatTicketSize(amount: number) {
   return `$${amount}`;
 }
 
-export function DealAuditCTA({ dealId, dealName, ticketSize, currency = 'USD', hasPurchase }: DealAuditCTAProps) {
+export function DealAuditCTA({
+  dealId,
+  dealName,
+  ticketSize,
+  currency = 'USD',
+  hasPurchase,
+}: DealAuditCTAProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -133,16 +143,30 @@ export function DealAuditCTA({ dealId, dealName, ticketSize, currency = 'USD', h
         </span>
       </div>
 
-      <div style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+      <div
+        style={{
+          fontSize: '28px',
+          fontWeight: 700,
+          color: 'var(--text-primary)',
+          marginBottom: '4px',
+        }}
+      >
         {formatCurrency(tier.price, currency)}
-        <span style={{ fontSize: '13px', fontWeight: 400, color: 'var(--text-muted)', marginLeft: '4px' }}>
+        <span
+          style={{
+            fontSize: '13px',
+            fontWeight: 400,
+            color: 'var(--text-muted)',
+            marginLeft: '4px',
+          }}
+        >
           one-time
         </span>
       </div>
 
       <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-        Full cognitive bias audit for {dealName} ({formatTicketSize(ticketSize)} deal).
-        Unlimited analyses for all linked documents.
+        Full cognitive bias audit for {dealName} ({formatTicketSize(ticketSize)} deal). Unlimited
+        analyses for all linked documents.
       </div>
 
       <button

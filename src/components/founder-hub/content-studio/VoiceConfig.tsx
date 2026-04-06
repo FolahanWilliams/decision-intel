@@ -19,7 +19,14 @@ interface VoiceConfigProps {
   setIsOpen: (o: boolean) => void;
 }
 
-export function VoiceConfig({ tone, setTone, voiceNotes, setVoiceNotes, isOpen, setIsOpen }: VoiceConfigProps) {
+export function VoiceConfig({
+  tone,
+  setTone,
+  voiceNotes,
+  setVoiceNotes,
+  isOpen,
+  setIsOpen,
+}: VoiceConfigProps) {
   const activeTone = TONES.find(t => t.id === tone) || TONES[0];
 
   return (
@@ -39,9 +46,7 @@ export function VoiceConfig({ tone, setTone, voiceNotes, setVoiceNotes, isOpen, 
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           🎙️ Brand Voice
-          {!isOpen && (
-            <span style={badge(activeTone.color)}>{activeTone.label}</span>
-          )}
+          {!isOpen && <span style={badge(activeTone.color)}>{activeTone.label}</span>}
         </span>
         {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
       </button>
@@ -49,7 +54,14 @@ export function VoiceConfig({ tone, setTone, voiceNotes, setVoiceNotes, isOpen, 
       {isOpen && (
         <div>
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted, #71717a)', marginBottom: 8 }}>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--text-muted, #71717a)',
+                marginBottom: 8,
+              }}
+            >
               Tone
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -63,7 +75,10 @@ export function VoiceConfig({ tone, setTone, voiceNotes, setVoiceNotes, isOpen, 
                     fontSize: 13,
                     fontWeight: 600,
                     cursor: 'pointer',
-                    border: tone === t.id ? `2px solid ${t.color}` : '2px solid var(--border-primary, #222)',
+                    border:
+                      tone === t.id
+                        ? `2px solid ${t.color}`
+                        : '2px solid var(--border-primary, #222)',
                     background: tone === t.id ? `${t.color}15` : 'transparent',
                     color: tone === t.id ? t.color : 'var(--text-secondary, #a1a1aa)',
                     transition: 'all 0.15s',
@@ -76,7 +91,14 @@ export function VoiceConfig({ tone, setTone, voiceNotes, setVoiceNotes, isOpen, 
           </div>
 
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted, #71717a)', marginBottom: 8 }}>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--text-muted, #71717a)',
+                marginBottom: 8,
+              }}
+            >
               Custom Voice Notes
             </div>
             <textarea

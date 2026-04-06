@@ -114,8 +114,6 @@ describe('getEventUserCount', () => {
     mockFindMany.mockResolvedValue([{ userId: 'a' }, { userId: 'b' }, { userId: 'c' }]);
     const n = await getEventUserCount('analysis_complete');
     expect(n).toBe(3);
-    expect(mockFindMany).toHaveBeenCalledWith(
-      expect.objectContaining({ distinct: ['userId'] })
-    );
+    expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ distinct: ['userId'] }));
   });
 });

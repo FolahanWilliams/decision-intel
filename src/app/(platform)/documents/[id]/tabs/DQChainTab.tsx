@@ -26,7 +26,15 @@ export function DQChainTab({ dqChain }: DQChainTabProps) {
   const { elements, chainScore, weakestLink, summary } = dqChain;
 
   const grade =
-    chainScore >= 80 ? 'A' : chainScore >= 65 ? 'B' : chainScore >= 50 ? 'C' : chainScore >= 35 ? 'D' : 'F';
+    chainScore >= 80
+      ? 'A'
+      : chainScore >= 65
+        ? 'B'
+        : chainScore >= 50
+          ? 'C'
+          : chainScore >= 35
+            ? 'D'
+            : 'F';
   const gradeColor =
     chainScore >= 80
       ? 'text-emerald-400'
@@ -64,9 +72,9 @@ export function DQChainTab({ dqChain }: DQChainTabProps) {
               </div>
               <h3 className="text-lg font-semibold text-foreground">Process Quality Scorecard</h3>
               <p className="text-xs text-muted mt-1 max-w-2xl leading-relaxed">
-                A chain is only as strong as its weakest link. The chain score is the minimum
-                across the six elements, because in practice the weakest link sinks the decision
-                no matter how strong the others are.
+                A chain is only as strong as its weakest link. The chain score is the minimum across
+                the six elements, because in practice the weakest link sinks the decision no matter
+                how strong the others are.
               </p>
             </div>
             <div className="text-right flex-shrink-0">
@@ -103,9 +111,7 @@ export function DQChainTab({ dqChain }: DQChainTabProps) {
                       </span>
                     )}
                   </div>
-                  <span className="text-sm font-bold tabular-nums text-foreground">
-                    {el.score}
-                  </span>
+                  <span className="text-sm font-bold tabular-nums text-foreground">{el.score}</span>
                 </div>
                 <div className="h-2 bg-muted/20 overflow-hidden mb-2">
                   <div

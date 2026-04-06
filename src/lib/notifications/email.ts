@@ -45,7 +45,9 @@ type SendResult = 'sent' | 'dry_run' | 'failed';
 
 async function sendEmail(payload: EmailPayload): Promise<SendResult> {
   if (!RESEND_API_KEY) {
-    log.warn(`[DRY RUN] Email not sent (RESEND_API_KEY not configured): "${payload.subject}" to ${payload.to}`);
+    log.warn(
+      `[DRY RUN] Email not sent (RESEND_API_KEY not configured): "${payload.subject}" to ${payload.to}`
+    );
     return 'dry_run';
   }
 
@@ -463,9 +465,7 @@ export async function notifyUsageLimit(
     nextPlanCheckoutUrl: string;
   }
 ): Promise<void> {
-  const settings = await prisma.userSettings
-    .findUnique({ where: { userId } })
-    .catch(() => null);
+  const settings = await prisma.userSettings.findUnique({ where: { userId } }).catch(() => null);
   if (settings && !settings.emailNotifications) return;
 
   const email = await getUserEmail(userId);

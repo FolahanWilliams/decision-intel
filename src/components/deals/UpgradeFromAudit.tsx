@@ -92,13 +92,15 @@ export function UpgradeFromAudit({ dealId }: Props) {
         <Sparkles size={22} style={{ color: '#22c55e' }} />
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>
+        <div
+          style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}
+        >
           Get this analysis monthly &mdash; for less
         </div>
         <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
           You purchased a one-off audit for this deal. The {target.label} plan runs the same
-          pipeline across every deal in your pipeline for a flat monthly rate. Most teams
-          break even after two deals.
+          pipeline across every deal in your pipeline for a flat monthly rate. Most teams break even
+          after two deals.
         </div>
       </div>
       <Link

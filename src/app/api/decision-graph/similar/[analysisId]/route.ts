@@ -39,10 +39,7 @@ export async function GET(
     // we shipped in the very first commit of this branch.
     const { searchParams } = new URL(request.url);
     const rawLimit = parseInt(searchParams.get('limit') || '3', 10);
-    const limit = Math.min(
-      Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 3,
-      10
-    );
+    const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 3, 10);
 
     // Ownership check — user must own the analysis or belong to its org
     const analysis = await prisma.analysis.findUnique({

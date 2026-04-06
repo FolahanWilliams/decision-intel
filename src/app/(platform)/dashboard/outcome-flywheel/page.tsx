@@ -273,7 +273,14 @@ function FlywheelInner() {
                 transform="rotate(-90 48 48)"
                 style={{ transition: 'stroke-dashoffset 0.5s ease' }}
               />
-              <text x="48" y="44" textAnchor="middle" fill="var(--accent-primary)" fontSize="18" fontWeight="700">
+              <text
+                x="48"
+                y="44"
+                textAnchor="middle"
+                fill="var(--accent-primary)"
+                fontSize="18"
+                fontWeight="700"
+              >
                 {Math.round(flywheelHealth.loopClosureRate)}%
               </text>
               <text x="48" y="58" textAnchor="middle" fill="var(--text-muted)" fontSize="8">

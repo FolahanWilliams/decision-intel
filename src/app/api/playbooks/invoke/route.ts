@@ -28,9 +28,7 @@ interface InvokeBody {
   source?: 'suggestion' | 'manual' | 'nudge';
 }
 
-function resolveBuiltinPlaybook(
-  playbookId: string
-): { name: string; category: string } | null {
+function resolveBuiltinPlaybook(playbookId: string): { name: string; category: string } | null {
   if (!playbookId.startsWith('builtin_')) return null;
   const idx = parseInt(playbookId.slice('builtin_'.length), 10);
   if (!Number.isFinite(idx) || idx < 0 || idx >= BUILT_IN_PLAYBOOKS.length) return null;

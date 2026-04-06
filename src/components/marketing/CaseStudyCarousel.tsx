@@ -64,7 +64,14 @@ export function CaseStudyCarousel() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          style={{ marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}
+          style={{
+            marginBottom: 40,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            flexWrap: 'wrap',
+            gap: 16,
+          }}
         >
           <div>
             <p
@@ -92,10 +99,11 @@ export function CaseStudyCarousel() {
             >
               Real decisions, analyzed the same way we analyze yours.
             </h2>
-            <p style={{ fontSize: 17, color: C.slate600, margin: 0, maxWidth: 640, lineHeight: 1.5 }}>
-              We took the pre-decision memos from {featured.length} famous deals,
-              stripped the hindsight, and ran them through our pipeline. Here&apos;s
-              what we would have flagged.
+            <p
+              style={{ fontSize: 17, color: C.slate600, margin: 0, maxWidth: 640, lineHeight: 1.5 }}
+            >
+              We took the pre-decision memos from {featured.length} famous deals, stripped the
+              hindsight, and ran them through our pipeline. Here&apos;s what we would have flagged.
             </p>
           </div>
 
@@ -161,7 +169,15 @@ export function CaseStudyCarousel() {
                     transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginBottom: 12,
+                      flexWrap: 'wrap',
+                    }}
+                  >
                     <span
                       style={{
                         fontSize: 10,
@@ -219,7 +235,8 @@ export function CaseStudyCarousel() {
 
                   {c.primaryBias && (
                     <div style={{ fontSize: 12, color: C.slate600, marginBottom: 8 }}>
-                      <strong style={{ color: C.slate900 }}>Flagged:</strong> {formatBiasName(c.primaryBias)}
+                      <strong style={{ color: C.slate900 }}>Flagged:</strong>{' '}
+                      {formatBiasName(c.primaryBias)}
                     </div>
                   )}
 

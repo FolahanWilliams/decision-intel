@@ -59,11 +59,7 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
             }}
           >
             {tab.icon}
-            {manyTabs ? (
-              <span className="hidden sm:inline">{tab.label}</span>
-            ) : (
-              tab.label
-            )}
+            {manyTabs ? <span className="hidden sm:inline">{tab.label}</span> : tab.label}
           </button>
         );
       })}

@@ -27,7 +27,8 @@ const CASE_STUDIES: CaseStudy[] = [
     impact: '$209B Asset Collapse',
     dqiScore: 22,
     primaryBias: 'Duration Bias',
-    summary: 'A critical duration mismatch anchored to historic low rates, compounded by a 12-month vacancy in senior risk leadership.',
+    summary:
+      'A critical duration mismatch anchored to historic low rates, compounded by a 12-month vacancy in senior risk leadership.',
     year: 2023,
   },
   {
@@ -39,7 +40,8 @@ const CASE_STUDIES: CaseStudy[] = [
     impact: '$243B Market Cap Loss',
     dqiScore: 18,
     primaryBias: 'Status Quo Bias',
-    summary: 'Institutional dismissal of touch-interfaces as "niche" and internal suppression of negative research and development data.',
+    summary:
+      'Institutional dismissal of touch-interfaces as "niche" and internal suppression of negative research and development data.',
     year: 2007,
   },
   {
@@ -51,7 +53,8 @@ const CASE_STUDIES: CaseStudy[] = [
     impact: '$74B Shareholder Loss',
     dqiScore: 12,
     primaryBias: 'Groupthink',
-    summary: 'Systemic use of off-balance-sheet entities enabled by a punitive corporate culture that actively silenced internal dissent.',
+    summary:
+      'Systemic use of off-balance-sheet entities enabled by a punitive corporate culture that actively silenced internal dissent.',
     year: 2001,
   },
 ];
@@ -75,7 +78,7 @@ export function CaseStudyGallery() {
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {CASE_STUDIES.map((c) => (
+        {CASE_STUDIES.map(c => (
           <motion.div
             key={c.id}
             initial={{ opacity: 0, y: 30 }}
@@ -97,9 +100,7 @@ export function CaseStudyGallery() {
                 <p className="text-[10px] font-bold text-red-600 uppercase tracking-[0.2em] mb-2">
                   Material Loss Estimate
                 </p>
-                <h2 className="text-4xl font-black text-slate-900 tracking-tight">
-                  {c.impact}
-                </h2>
+                <h2 className="text-4xl font-black text-slate-900 tracking-tight">{c.impact}</h2>
               </div>
 
               {/* Company & Title */}
@@ -142,8 +143,9 @@ export function CaseStudyGallery() {
       <div className="mt-20 flex flex-col items-center text-center">
         <div className="w-16 h-px bg-slate-100 mb-8" />
         <p className="text-xs text-slate-400 font-medium max-w-2xl leading-relaxed uppercase tracking-[0.1em]">
-          All historical failures audited and verified by our proprietary Intelligence Audit Pipeline.
-          Results indicate a 94.2% detection rate for cognitive distortions prior to material loss.
+          All historical failures audited and verified by our proprietary Intelligence Audit
+          Pipeline. Results indicate a 94.2% detection rate for cognitive distortions prior to
+          material loss.
         </p>
       </div>
     </div>

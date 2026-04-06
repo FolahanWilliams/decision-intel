@@ -2,7 +2,16 @@
 
 import { Suspense, lazy } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { BarChart3, Dna, Lightbulb, Fingerprint, BrainCircuit, TrendingUp, Network, BookOpen } from 'lucide-react';
+import {
+  BarChart3,
+  Dna,
+  Lightbulb,
+  Fingerprint,
+  BrainCircuit,
+  TrendingUp,
+  Network,
+  BookOpen,
+} from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -12,16 +21,24 @@ import { useInsights } from '@/hooks/useInsights';
 
 // Lazy-load heavy visualization components — only the active tab's bundle is loaded
 const InsightsPageContent = lazy(() =>
-  import('@/components/insights/InsightsPageContent').then(m => ({ default: m.InsightsPageContent }))
+  import('@/components/insights/InsightsPageContent').then(m => ({
+    default: m.InsightsPageContent,
+  }))
 );
 const DecisionDNAPageContent = lazy(() =>
-  import('@/components/dna/DecisionDNAPageContent').then(m => ({ default: m.DecisionDNAPageContent }))
+  import('@/components/dna/DecisionDNAPageContent').then(m => ({
+    default: m.DecisionDNAPageContent,
+  }))
 );
 const ExplainabilityContent = lazy(() =>
-  import('@/components/explainability/ExplainabilityContent').then(m => ({ default: m.ExplainabilityContent }))
+  import('@/components/explainability/ExplainabilityContent').then(m => ({
+    default: m.ExplainabilityContent,
+  }))
 );
 const FingerprintContent = lazy(() =>
-  import('@/components/fingerprint/FingerprintContent').then(m => ({ default: m.FingerprintContent }))
+  import('@/components/fingerprint/FingerprintContent').then(m => ({
+    default: m.FingerprintContent,
+  }))
 );
 const BiasLibraryContent = lazy(() =>
   import('@/components/insights/BiasLibraryContent').then(m => ({ default: m.BiasLibraryContent }))

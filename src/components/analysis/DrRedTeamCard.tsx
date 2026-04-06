@@ -96,15 +96,11 @@ export function DrRedTeamCard({ analysisId }: { analysisId: string }) {
       });
 
       if (res.status === 429) {
-        setError(
-          'Rate limit reached — Dr. Red Team is tired. Try again in an hour.'
-        );
+        setError('Rate limit reached — Dr. Red Team is tired. Try again in an hour.');
         return;
       }
       if (res.status === 503) {
-        setError(
-          'Dr. Red Team is unavailable right now. The underlying model returned an error.'
-        );
+        setError('Dr. Red Team is unavailable right now. The underlying model returned an error.');
         return;
       }
       if (!res.ok) {
@@ -138,9 +134,7 @@ export function DrRedTeamCard({ analysisId }: { analysisId: string }) {
         const data = (await res.json()) as { challenge: RedTeamChallenge };
         setCurrent(data.challenge);
         setHistory(prev =>
-          prev
-            ? prev.map(c => (c.id === data.challenge.id ? data.challenge : c))
-            : prev
+          prev ? prev.map(c => (c.id === data.challenge.id ? data.challenge : c)) : prev
         );
       }
     } finally {
@@ -227,8 +221,8 @@ export function DrRedTeamCard({ analysisId }: { analysisId: string }) {
                 marginBottom: 12,
               }}
             >
-              Every senior partner has an objection they don&apos;t raise because the room
-              would resent it. Dr. Red Team is the partner who doesn&apos;t care.
+              Every senior partner has an objection they don&apos;t raise because the room would
+              resent it. Dr. Red Team is the partner who doesn&apos;t care.
             </p>
             <button
               type="button"
@@ -533,9 +527,7 @@ function ChallengeContent({
           flexWrap: 'wrap',
         }}
       >
-        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-          Was this useful?
-        </span>
+        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Was this useful?</span>
         <button
           type="button"
           onClick={() => onRate(1)}

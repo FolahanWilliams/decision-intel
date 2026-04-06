@@ -78,7 +78,10 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const parsed = PatchSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Validation failed', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.issues },
+        { status: 400 }
+      );
     }
 
     const data = parsed.data;
@@ -97,7 +100,9 @@ export async function PATCH(request: NextRequest) {
       select: { monitoredChannels: true, nudgeFrequency: true },
     });
 
-    log.info(`Slack config updated by ${user.id}: channels=${updated.monitoredChannels.length}, frequency=${updated.nudgeFrequency}`);
+    log.info(
+      `Slack config updated by ${user.id}: channels=${updated.monitoredChannels.length}, frequency=${updated.nudgeFrequency}`
+    );
 
     return NextResponse.json(updated);
   } catch (error) {

@@ -11,23 +11,18 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     summary:
       'In 2007, the iPod generated 40% of Apple\'s revenue. Steve Jobs launched the iPhone knowing it would cannibalize iPod sales — which it did, with iPod revenue declining 70% by 2012. But the iPhone became the most profitable product in consumer electronics history, generating over $200 billion in cumulative revenue by 2012. Jobs explicitly overrode internal resistance from the iPod team, framing the decision as "if we don\'t cannibalize ourselves, someone else will."',
     decisionContext:
-      'Whether to launch a smartphone product that would directly cannibalize Apple\'s most profitable product line (iPod), risking short-term revenue disruption for uncertain long-term market opportunity.',
+      "Whether to launch a smartphone product that would directly cannibalize Apple's most profitable product line (iPod), risking short-term revenue disruption for uncertain long-term market opportunity.",
     outcome: 'exceptional_success',
     impactScore: 98,
     estimatedImpact: '$3T+ market cap created; redefined mobile computing',
     impactDirection: 'positive',
-    biasesPresent: [
-      'overconfidence_bias',
-      'loss_aversion',
-      'sunk_cost_fallacy',
-      'anchoring_bias',
-    ],
+    biasesPresent: ['overconfidence_bias', 'loss_aversion', 'sunk_cost_fallacy', 'anchoring_bias'],
     primaryBias: 'loss_aversion',
     toxicCombinations: [],
     beneficialPatterns: ['The Controlled Burn'],
     biasesManaged: ['loss_aversion', 'sunk_cost_fallacy'],
     mitigationFactors: [
-      'CEO personally championed the disruption of the company\'s own cash cow',
+      "CEO personally championed the disruption of the company's own cash cow",
       'Framed as existential necessity rather than optional growth bet',
       'Iterative development through internal prototyping before public commitment',
       'Maintained iPod team morale by positioning iPhone as evolution, not replacement',
@@ -46,7 +41,7 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     lessonsLearned: [
       'Loss aversion was present but managed through a "cannibalize yourself first" framing that converted fear of loss into competitive urgency.',
       'The sunk cost in iPod ecosystem was explicitly acknowledged and then deliberately set aside — the team was told "the iPod has done its job."',
-      'Survivorship bias risk is medium: Jobs\'s conviction happened to align with market reality, but a less capable execution could have destroyed both product lines.',
+      "Survivorship bias risk is medium: Jobs's conviction happened to align with market reality, but a less capable execution could have destroyed both product lines.",
     ],
     source:
       'Walter Isaacson, "Steve Jobs" (2011); Apple Inc. 10-K filings (2007-2012); Yukari Iwatani Kane, "Haunted Empire" (2014)',
@@ -54,7 +49,8 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         'Steve Jobs, Macworld keynote (January 9, 2007): "Today Apple is going to reinvent the phone... An iPod, a phone, an internet communicator — these are not three separate devices. This is one device." Internal Apple board presentation (2006, described in Isaacson biography): Jobs argued "the phone is going to eat the iPod. The question is whether it\'s going to be our phone or someone else\'s." The iPod generated $9.15 billion in FY2006 — roughly 40% of Apple\'s $19.3 billion total revenue. iPod team members privately expressed concern that the iPhone would "kill our baby."',
-      source: 'Macworld 2007 keynote transcript; Isaacson "Steve Jobs" (2011) Ch. 36; Apple 10-K FY2006',
+      source:
+        'Macworld 2007 keynote transcript; Isaacson "Steve Jobs" (2011) Ch. 36; Apple 10-K FY2006',
       date: '2007-01-09',
       documentType: 'public_statement',
       detectableRedFlags: [
@@ -88,18 +84,13 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     impactScore: 95,
     estimatedImpact: '$250B+ market cap created; disrupted $600B global media industry',
     impactDirection: 'positive',
-    biasesPresent: [
-      'status_quo_bias',
-      'loss_aversion',
-      'planning_fallacy',
-      'anchoring_bias',
-    ],
+    biasesPresent: ['status_quo_bias', 'loss_aversion', 'planning_fallacy', 'anchoring_bias'],
     primaryBias: 'status_quo_bias',
     toxicCombinations: [],
     beneficialPatterns: ['The Controlled Burn', 'The Patient Bet'],
     biasesManaged: ['status_quo_bias', 'loss_aversion'],
     mitigationFactors: [
-      'CEO studied Blockbuster\'s failure to pivot and used it as a counter-example',
+      "CEO studied Blockbuster's failure to pivot and used it as a counter-example",
       'Gradual streaming investment allowed learning before full commitment',
       'Willingness to admit and reverse the Qwikster mistake quickly',
       'Board supported multi-year margin compression for strategic positioning',
@@ -116,7 +107,7 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
       iterativeProcess: true,
     },
     lessonsLearned: [
-      'Studying competitors\' failures (Blockbuster) as a deliberate debiasing technique helped Netflix leadership overcome status quo bias.',
+      "Studying competitors' failures (Blockbuster) as a deliberate debiasing technique helped Netflix leadership overcome status quo bias.",
       'The Qwikster mistake shows that even correct strategic direction can fail tactically — but the willingness to quickly reverse course preserved the strategic vision.',
       'Planning fallacy was present (streaming took longer to become profitable than projected) but was mitigated by maintaining the DVD business as a cash flow bridge.',
     ],
@@ -126,21 +117,17 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         'Netflix 2007 Annual Letter to Shareholders (January 2008): "We named our company Netflix, not DVD-by-mail, because we believed the future of movie delivery was over the internet... We started streaming in January 2007 at no extra charge to our DVD subscribers. We expect streaming to be a small part of the value for some years to come." The letter explicitly warned investors that streaming investment would compress margins: "We are investing heavily in streaming, which will reduce our operating margins in the near term." Q4 2007 earnings call: Hastings stated "The DVD business is still growing, but the future is clearly streaming."',
-      source: 'Netflix 2007 Annual Letter to Shareholders; Netflix Q4 2007 Earnings Call Transcript; Netflix 10-K FY2007',
+      source:
+        'Netflix 2007 Annual Letter to Shareholders; Netflix Q4 2007 Earnings Call Transcript; Netflix 10-K FY2007',
       date: '2008-01-25',
       documentType: 'public_statement',
       detectableRedFlags: [
         'Investing in streaming before broadband penetration supported mass adoption — only 55% of US homes had broadband in 2007',
         'Margin compression acknowledged upfront — short-term earnings would decline',
-        'DVD business still growing — classic innovator\'s dilemma of investing away from current strength',
+        "DVD business still growing — classic innovator's dilemma of investing away from current strength",
         'No proven streaming content licensing model existed yet — infrastructure bet on unbuilt ecosystem',
       ],
-      flaggableBiases: [
-        'status_quo_bias',
-        'loss_aversion',
-        'planning_fallacy',
-        'anchoring_bias',
-      ],
+      flaggableBiases: ['status_quo_bias', 'loss_aversion', 'planning_fallacy', 'anchoring_bias'],
       hypotheticalAnalysis:
         'DI Platform would flag: "Patient Bet" + "Controlled Burn" beneficial patterns detected. Key distinction: this decision acknowledges risk transparently (CEO publicly warning about margin compression) rather than hiding it. Status quo bias is present in the organization (DVD still growing) but leadership is ACTIVELY managing it by studying Blockbuster\'s failure. Planning fallacy risk: streaming profitability timeline likely underestimated — platform would recommend maintaining DVD cash flow bridge for 3-5 years longer than management projects. Verdict: biases present but mitigation factors are strong. Iterative rollout (streaming free for existing subscribers) de-risks the bet. Recommendation: Proceed with caution on timeline — ensure DVD business is not prematurely cannibalized before streaming economics are proven.',
     },
@@ -153,18 +140,14 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     year: 2003,
     yearRealized: 2015,
     summary:
-      'Amazon Web Services began as an internal infrastructure project in 2003, launched publicly in 2006, and grew into a $80+ billion annual revenue business by 2022. Jeff Bezos bet that Amazon\'s internal computing infrastructure could be productized for external developers. Wall Street analysts dismissed the project as a distraction from e-commerce. Andy Jassy led the effort with a small team, operating with minimal resources for years before reaching profitability.',
+      "Amazon Web Services began as an internal infrastructure project in 2003, launched publicly in 2006, and grew into a $80+ billion annual revenue business by 2022. Jeff Bezos bet that Amazon's internal computing infrastructure could be productized for external developers. Wall Street analysts dismissed the project as a distraction from e-commerce. Andy Jassy led the effort with a small team, operating with minimal resources for years before reaching profitability.",
     decisionContext:
       'Whether to invest in building and selling cloud infrastructure as a service — a market that did not yet exist — while the core e-commerce business was still proving its own profitability to skeptical investors.',
     outcome: 'exceptional_success',
     impactScore: 97,
     estimatedImpact: '$80B+ annual revenue; created $1.5T cloud computing market',
     impactDirection: 'positive',
-    biasesPresent: [
-      'overconfidence_bias',
-      'anchoring_bias',
-      'confirmation_bias',
-    ],
+    biasesPresent: ['overconfidence_bias', 'anchoring_bias', 'confirmation_bias'],
     primaryBias: 'overconfidence_bias',
     toxicCombinations: [],
     beneficialPatterns: ['The Patient Bet', 'The Platform Leap'],
@@ -189,7 +172,7 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     lessonsLearned: [
       'Overconfidence bias was present (Bezos believed Amazon could serve external developers better than anyone) but was mitigated by iterative development and customer feedback loops.',
       'Anchoring bias was managed by NOT anchoring to competitor pricing or existing market definitions — AWS created a new category.',
-      'Survivorship risk is medium: the bet could have easily failed if the internal infrastructure wasn\'t genuinely world-class or if enterprise adoption had been slower.',
+      "Survivorship risk is medium: the bet could have easily failed if the internal infrastructure wasn't genuinely world-class or if enterprise adoption had been slower.",
     ],
     source:
       'Brad Stone, "The Everything Store" (2013); Amazon 10-K filings (2006-2015); AWS re:Invent keynotes (2012-2015)',
@@ -210,15 +193,10 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     impactScore: 96,
     estimatedImpact: '$2.2T+ in market cap created (2014-2024)',
     impactDirection: 'positive',
-    biasesPresent: [
-      'status_quo_bias',
-      'sunk_cost_fallacy',
-      'loss_aversion',
-      'anchoring_bias',
-    ],
+    biasesPresent: ['status_quo_bias', 'sunk_cost_fallacy', 'loss_aversion', 'anchoring_bias'],
     primaryBias: 'status_quo_bias',
     toxicCombinations: [],
-    beneficialPatterns: ['The Controlled Burn', 'The Outsider\'s Lens', 'The Platform Leap'],
+    beneficialPatterns: ['The Controlled Burn', "The Outsider's Lens", 'The Platform Leap'],
     biasesManaged: ['status_quo_bias', 'sunk_cost_fallacy', 'loss_aversion'],
     mitigationFactors: [
       'New CEO from outside the Windows division brought fresh perspective',
@@ -239,8 +217,8 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
       iterativeProcess: true,
     },
     lessonsLearned: [
-      'Nadella\'s willingness to write off the Nokia acquisition immediately demonstrated that sunk cost management requires visible, painful action — not just words.',
-      'Embracing Linux and open source — the opposite of Microsoft\'s historical competitive strategy — showed that overcoming status quo bias sometimes requires doing the most culturally uncomfortable thing.',
+      "Nadella's willingness to write off the Nokia acquisition immediately demonstrated that sunk cost management requires visible, painful action — not just words.",
+      "Embracing Linux and open source — the opposite of Microsoft's historical competitive strategy — showed that overcoming status quo bias sometimes requires doing the most culturally uncomfortable thing.",
       'The "growth mindset" framework gave employees a psychological model for understanding why change was necessary, reducing resistance at every level.',
     ],
     source:
@@ -255,18 +233,14 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     year: 2012,
     yearRealized: 2023,
     summary:
-      'NVIDIA was a $10B gaming GPU company when CEO Jensen Huang began investing in GPU computing for AI research around 2012. The CUDA platform (launched 2006) was initially unprofitable and dismissed by analysts. Huang bet that parallel processing would be the foundation of AI/ML training. When the deep learning revolution arrived (AlexNet, 2012), NVIDIA had a decade of invested tooling. By 2023, NVIDIA\'s market cap exceeded $1 trillion as the indispensable infrastructure for AI.',
+      "NVIDIA was a $10B gaming GPU company when CEO Jensen Huang began investing in GPU computing for AI research around 2012. The CUDA platform (launched 2006) was initially unprofitable and dismissed by analysts. Huang bet that parallel processing would be the foundation of AI/ML training. When the deep learning revolution arrived (AlexNet, 2012), NVIDIA had a decade of invested tooling. By 2023, NVIDIA's market cap exceeded $1 trillion as the indispensable infrastructure for AI.",
     decisionContext:
       'Whether to invest significant R&D resources in GPU computing for non-gaming applications (scientific computing, AI/ML), cannibalizing gaming-focused engineering resources for a market that had no proven demand.',
     outcome: 'exceptional_success',
     impactScore: 99,
     estimatedImpact: '$3T+ market cap; created the AI compute infrastructure market',
     impactDirection: 'positive',
-    biasesPresent: [
-      'confirmation_bias',
-      'overconfidence_bias',
-      'anchoring_bias',
-    ],
+    biasesPresent: ['confirmation_bias', 'overconfidence_bias', 'anchoring_bias'],
     primaryBias: 'confirmation_bias',
     toxicCombinations: [],
     beneficialPatterns: ['The Patient Bet', 'The Platform Leap'],
@@ -274,7 +248,7 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     mitigationFactors: [
       'CUDA platform built an ecosystem moat through developer adoption before competitors recognized the market',
       'Maintained profitable gaming business as cash flow bridge during the unprofitable compute investment',
-      'CEO\'s engineering background allowed deep technical conviction rather than pure financial analysis',
+      "CEO's engineering background allowed deep technical conviction rather than pure financial analysis",
       'Partnered with AI researchers (universities, labs) to validate compute architecture choices',
     ],
     survivorshipBiasRisk: 'high',
@@ -289,9 +263,9 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
       iterativeProcess: true,
     },
     lessonsLearned: [
-      'Confirmation bias was PRESENT and arguably BENEFICIAL — Huang\'s conviction about GPU computing\'s future persisted despite years of skepticism, and it happened to be correct.',
+      "Confirmation bias was PRESENT and arguably BENEFICIAL — Huang's conviction about GPU computing's future persisted despite years of skepticism, and it happened to be correct.",
       'This case illustrates that biases are not inherently negative; confirmation bias in pursuit of a correct insight can create massive value. The key is whether the underlying thesis is valid.',
-      'Survivorship bias risk is high: if deep learning had not emerged as the dominant AI paradigm, NVIDIA\'s GPU compute bet could have been a costly dead end.',
+      "Survivorship bias risk is high: if deep learning had not emerged as the dominant AI paradigm, NVIDIA's GPU compute bet could have been a costly dead end.",
     ],
     source:
       'NVIDIA 10-K filings (2012-2023); Jensen Huang keynotes (GTC 2012-2023); Tae Kim, "The Nvidia Way" (2024)',
@@ -312,11 +286,7 @@ export const TECHNOLOGY_SUCCESS_CASES: CaseStudy[] = [
     impactScore: 90,
     estimatedImpact: '$200B+ in market cap created (2013-2023)',
     impactDirection: 'positive',
-    biasesPresent: [
-      'loss_aversion',
-      'status_quo_bias',
-      'anchoring_bias',
-    ],
+    biasesPresent: ['loss_aversion', 'status_quo_bias', 'anchoring_bias'],
     primaryBias: 'loss_aversion',
     toxicCombinations: [],
     beneficialPatterns: ['The Controlled Burn', 'The Platform Leap'],

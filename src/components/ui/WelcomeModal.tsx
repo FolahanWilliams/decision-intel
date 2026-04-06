@@ -165,7 +165,9 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
                       marginTop: 1,
                     }}
                   >
-                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)' }}>{i + 1}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)' }}>
+                      {i + 1}
+                    </span>
                   </div>
                   <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                     {item}

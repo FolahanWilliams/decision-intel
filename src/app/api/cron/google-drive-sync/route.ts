@@ -32,9 +32,12 @@ const MIME_MAP: Record<string, string> = {
   'application/pdf': 'application/pdf',
   'text/plain': 'text/plain',
   'text/csv': 'text/csv',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 };
 
 export async function GET() {
@@ -152,7 +155,9 @@ export async function GET() {
       }
     }
 
-    log.info(`Google Drive sync complete: ${totalFilesProcessed} files processed, ${totalErrors} errors`);
+    log.info(
+      `Google Drive sync complete: ${totalFilesProcessed} files processed, ${totalErrors} errors`
+    );
 
     return NextResponse.json({
       installations: installations.length,

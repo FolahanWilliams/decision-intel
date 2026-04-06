@@ -13,16 +13,8 @@ import { isSchemaDrift } from '@/lib/utils/error';
 const DecisionFrameSchema = z.object({
   decisionStatement: z.string().min(1, 'Decision statement is required').max(2000),
   defaultAction: z.string().max(2000).optional().default(''),
-  successCriteria: z
-    .array(z.string().min(1).max(500))
-    .max(20)
-    .optional()
-    .default([]),
-  failureCriteria: z
-    .array(z.string().min(1).max(500))
-    .max(20)
-    .optional()
-    .default([]),
+  successCriteria: z.array(z.string().min(1).max(500)).max(20).optional().default([]),
+  failureCriteria: z.array(z.string().min(1).max(500)).max(20).optional().default([]),
   stakeholders: z.array(z.string().min(1).max(200)).max(50).optional().default([]),
 });
 

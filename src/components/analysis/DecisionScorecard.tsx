@@ -24,11 +24,7 @@ interface DecisionScorecardProps {
   documentType?: string | null;
 }
 
-export function DecisionScorecard({
-  analysisId,
-  biases,
-  documentType,
-}: DecisionScorecardProps) {
+export function DecisionScorecard({ analysisId, biases, documentType }: DecisionScorecardProps) {
   const hasBiases = biases && biases.length > 0;
 
   return (
@@ -62,11 +58,7 @@ export function DecisionScorecard({
             borderTop: '1px solid var(--border-color, #E2E8F0)',
           }}
         >
-          <ActOnThisPanel
-            analysisId={analysisId}
-            biases={biases}
-            documentType={documentType}
-          />
+          <ActOnThisPanel analysisId={analysisId} biases={biases} documentType={documentType} />
         </div>
       )}
     </div>

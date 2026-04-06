@@ -43,10 +43,7 @@ export function ForgottenQuestionsTab({
 }: ForgottenQuestionsTabProps) {
   const [addressed, setAddressed] = useState<Set<number>>(new Set());
 
-  const questions = useMemo(
-    () => forgottenQuestions?.questions ?? [],
-    [forgottenQuestions]
-  );
+  const questions = useMemo(() => forgottenQuestions?.questions ?? [], [forgottenQuestions]);
 
   useEffect(() => {
     if (questions.length > 0 && analysisId) {
@@ -63,9 +60,9 @@ export function ForgottenQuestionsTab({
         <div className="card">
           <div className="card-body">
             <div className="text-center p-8 text-muted">
-              No forgotten questions surfaced for this memo. Either this memo is
-              unusually thorough relative to its reference class, or we did not
-              find close enough historical analogs to compare against.
+              No forgotten questions surfaced for this memo. Either this memo is unusually thorough
+              relative to its reference class, or we did not find close enough historical analogs to
+              compare against.
             </div>
           </div>
         </div>
@@ -102,10 +99,9 @@ export function ForgottenQuestionsTab({
                   Questions this memo never asks
                 </h4>
                 <p className="text-xs text-muted leading-relaxed">
-                  Drawn from the gap between this memo and its closest historical
-                  analogs. Every question below was answered &mdash; or fatally
-                  ignored &mdash; in a comparable real decision. These are the
-                  unknown unknowns by construction.
+                  Drawn from the gap between this memo and its closest historical analogs. Every
+                  question below was answered &mdash; or fatally ignored &mdash; in a comparable
+                  real decision. These are the unknown unknowns by construction.
                 </p>
                 {forgottenQuestions.headline && (
                   <p className="mt-3 text-sm text-foreground/90 italic leading-relaxed">
@@ -142,20 +138,14 @@ export function ForgottenQuestionsTab({
 
         <div className="flex flex-col gap-md">
           {questions.map((q, i) => {
-            const severity = (q.severity ?? 'medium') as
-              | 'low'
-              | 'medium'
-              | 'high'
-              | 'critical';
+            const severity = (q.severity ?? 'medium') as 'low' | 'medium' | 'high' | 'critical';
             const styles = SEVERITY_STYLES[severity] ?? SEVERITY_STYLES.medium;
             const isAddressed = addressed.has(i);
 
             return (
               <div
                 key={i}
-                className={`card border-l-4 ${styles.border} ${
-                  isAddressed ? 'opacity-60' : ''
-                }`}
+                className={`card border-l-4 ${styles.border} ${isAddressed ? 'opacity-60' : ''}`}
               >
                 <div className="card-body">
                   <div className="flex items-start justify-between gap-3 mb-2">

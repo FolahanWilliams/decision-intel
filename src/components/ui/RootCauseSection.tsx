@@ -80,7 +80,9 @@ export function RootCauseSection({ analysisId, orgId }: RootCauseSectionProps) {
                   ) : (
                     <TrendingUp size={12} className="text-red-400" />
                   )}
-                  <span className="text-sm font-medium text-white">{formatBiasName(attr.biasType)}</span>
+                  <span className="text-sm font-medium text-white">
+                    {formatBiasName(attr.biasType)}
+                  </span>
                   <span
                     className={cn(
                       'px-1.5 py-0.5 rounded text-[10px] font-medium',

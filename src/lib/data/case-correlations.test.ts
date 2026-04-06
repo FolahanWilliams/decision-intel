@@ -133,27 +133,18 @@ describe('computeCorrelationMultiplier', () => {
   });
 
   it('with known failure-pattern biases returns multiplier >= 1.0', () => {
-    const result = computeCorrelationMultiplier(
-      ['confirmation_bias', 'overconfidence'],
-      {}
-    );
+    const result = computeCorrelationMultiplier(['confirmation_bias', 'overconfidence'], {});
     expect(result.multiplier).toBeGreaterThanOrEqual(1.0);
   });
 
   it('returns matchedPairs array and matchedSuccessPatterns array', () => {
-    const result = computeCorrelationMultiplier(
-      ['confirmation_bias', 'overconfidence'],
-      {}
-    );
+    const result = computeCorrelationMultiplier(['confirmation_bias', 'overconfidence'], {});
     expect(Array.isArray(result.matchedPairs)).toBe(true);
     expect(Array.isArray(result.matchedSuccessPatterns)).toBe(true);
   });
 
   it('returns beneficialDamping as number', () => {
-    const result = computeCorrelationMultiplier(
-      ['confirmation_bias'],
-      { dissentEncouraged: true }
-    );
+    const result = computeCorrelationMultiplier(['confirmation_bias'], { dissentEncouraged: true });
     expect(typeof result.beneficialDamping).toBe('number');
   });
 });

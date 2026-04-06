@@ -24,7 +24,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     // Include org-scoped documents so team members can view shared docs
     // (matches the pattern used in the document listing route).
-    let where: { id: string; userId?: string; OR?: Array<Record<string, unknown>> } = { id, userId };
+    let where: { id: string; userId?: string; OR?: Array<Record<string, unknown>> } = {
+      id,
+      userId,
+    };
     try {
       const membership = await prisma.teamMember.findFirst({
         where: { userId },
@@ -211,9 +214,9 @@ export async function DELETE(
         log.warn('FK constraint blocked delete — attempting raw cleanup for document', id);
         // Clean up any orphaned rows in legacy tables that still reference
         // this document with ON DELETE RESTRICT.
-        await prisma
-          .$executeRaw`DELETE FROM "HumanDecisionAudit" WHERE "documentId" = ${id}`
-          .catch(() => {});
+        await prisma.$executeRaw`DELETE FROM "HumanDecisionAudit" WHERE "documentId" = ${id}`.catch(
+          () => {}
+        );
         // Retry the delete
         await prisma.document.delete({ where: { id } });
       } else {

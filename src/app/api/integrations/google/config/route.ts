@@ -72,7 +72,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const parsed = UpdateFoldersSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Validation failed', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.issues },
+        { status: 400 }
+      );
     }
 
     const installation = await getInstallationForUser(user.id);
@@ -86,7 +89,9 @@ export async function POST(request: NextRequest) {
       select: { monitoredFolders: true },
     });
 
-    log.info(`Google Drive folders updated by ${user.id}: ${updated.monitoredFolders.length} folders`);
+    log.info(
+      `Google Drive folders updated by ${user.id}: ${updated.monitoredFolders.length} folders`
+    );
 
     return NextResponse.json(updated);
   } catch (error) {

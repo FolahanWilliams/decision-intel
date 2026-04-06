@@ -136,7 +136,9 @@ export async function GET(request: NextRequest) {
 
         const target = UPGRADE_TARGET[plan];
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
-        const checkoutUrl = target ? `${appUrl}/pricing?plan=${target}&from=usage_nudge` : `${appUrl}/pricing`;
+        const checkoutUrl = target
+          ? `${appUrl}/pricing?plan=${target}&from=usage_nudge`
+          : `${appUrl}/pricing`;
 
         await notifyUsageLimit(userId, {
           planName: PLANS[plan].name,
@@ -161,4 +163,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Cron failed' }, { status: 500 });
   }
 }
-

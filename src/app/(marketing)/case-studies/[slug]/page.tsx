@@ -14,12 +14,7 @@ import {
 import { computeReferenceClass } from '@/lib/data/reference-class-forecasting';
 import { CaseStudyNav, BRAND_COLORS as C } from '../CaseStudyNav';
 import { CaseStudyCta } from './CaseStudyCta';
-import {
-  formatIndustry,
-  formatDocumentType,
-  formatBiasName,
-  humanize,
-} from '@/lib/utils/labels';
+import { formatIndustry, formatDocumentType, formatBiasName, humanize } from '@/lib/utils/labels';
 
 export const dynamicParams = false;
 
@@ -281,9 +276,9 @@ export default async function CaseStudyDetailPage({
           <section style={{ marginBottom: 40 }}>
             <SectionTitle>What we would have flagged at decision time</SectionTitle>
             <p style={{ fontSize: 14, color: '#475569', marginBottom: 20, lineHeight: 1.6 }}>
-              The analysis below was produced from the pre-decision document only
-              &mdash; no hindsight. This is what the platform would have surfaced
-              if it had been running {caseStudy.year > 2000 ? `in ${deep.date}` : `at the time`}.
+              The analysis below was produced from the pre-decision document only &mdash; no
+              hindsight. This is what the platform would have surfaced if it had been running{' '}
+              {caseStudy.year > 2000 ? `in ${deep.date}` : `at the time`}.
             </p>
 
             <div style={{ display: 'grid', gap: 20 }}>
@@ -420,10 +415,9 @@ export default async function CaseStudyDetailPage({
                 lineHeight: 1.6,
               }}
             >
-              <strong>Deep hindsight-stripped analysis coming soon.</strong>{' '}
-              This case is part of our ongoing backfill to reconstruct what the
-              platform would have flagged at decision time. The summary and
-              bias profile below are drawn from primary sources.
+              <strong>Deep hindsight-stripped analysis coming soon.</strong> This case is part of
+              our ongoing backfill to reconstruct what the platform would have flagged at decision
+              time. The summary and bias profile below are drawn from primary sources.
             </div>
           </section>
         )}
@@ -573,9 +567,7 @@ export default async function CaseStudyDetailPage({
                       <div style={{ fontSize: 16, fontWeight: 700, color: C.navy }}>
                         {r.company}
                       </div>
-                      <div style={{ fontSize: 13, color: '#64748B', marginTop: 2 }}>
-                        {r.title}
-                      </div>
+                      <div style={{ fontSize: 13, color: '#64748B', marginTop: 2 }}>{r.title}</div>
                     </Card>
                   </Link>
                 );

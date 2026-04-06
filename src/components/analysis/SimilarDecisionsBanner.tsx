@@ -126,9 +126,7 @@ export function SimilarDecisionsBanner({ analysisId }: { analysisId: string }) {
   }
 
   // Count known outcomes for the header summary
-  const withOutcomes = decisions.filter(
-    d => d.outcome && d.outcome !== 'too_early'
-  );
+  const withOutcomes = decisions.filter(d => d.outcome && d.outcome !== 'too_early');
   const failures = decisions.filter(d => d.outcome === 'failure').length;
 
   return (
@@ -149,9 +147,7 @@ export function SimilarDecisionsBanner({ analysisId }: { analysisId: string }) {
       >
         <div className="flex items-center gap-sm">
           <History size={16} style={{ color: '#a78bfa' }} />
-          <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>
-            Have We Seen This Before?
-          </h3>
+          <h3 style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>Have We Seen This Before?</h3>
           <span
             style={{
               fontSize: 11,
@@ -159,7 +155,8 @@ export function SimilarDecisionsBanner({ analysisId }: { analysisId: string }) {
               marginLeft: 4,
             }}
           >
-            {decisions.length} structurally similar prior decision{decisions.length === 1 ? '' : 's'}
+            {decisions.length} structurally similar prior decision
+            {decisions.length === 1 ? '' : 's'}
             {withOutcomes.length > 0 && (
               <>
                 {' '}

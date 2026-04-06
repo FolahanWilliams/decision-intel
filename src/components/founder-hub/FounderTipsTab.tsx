@@ -110,7 +110,7 @@ const SECTION_NARRATIVE: Tip[] = [
   {
     title: 'Your gross-margin slide is your best slide — stop burying it',
     principle:
-      'At ~97% gross margins with $0.03–0.07 API cost against $129 Pro pricing, you are a pre-seed investor\'s dream. Most AI startups at your stage are underwater on gross margin. You are not.',
+      "At ~97% gross margins with $0.03–0.07 API cost against $129 Pro pricing, you are a pre-seed investor's dream. Most AI startups at your stage are underwater on gross margin. You are not.",
     rationale:
       'Pre-seed investors have been burned by AI wrapper companies whose unit economics are terrible once you back out the API costs. Your unit economics are the opposite of that pattern, and you buried them on slide 8. The most durable thing you can show a skeptical investor in 2026 is that you will not run out of money and you do not need to raise again at any particular price. Gross margin is how you prove it without saying it.',
     action:
@@ -167,7 +167,6 @@ const SECTION_MOAT: Tip[] = [
       'Put the consent checkbox for anonymized outcome aggregation in onboarding NOW, while you have ~0 customers. Retroactive consent at 100 customers is legally painful and morally ugly. Build a public teaser page showing 10 anonymized incidents. Gate the full searchable database behind Pro+.',
   },
 ];
-
 
 // ─── Section 3 — GTM & Wedge ──────────────────────────────────────────────
 
@@ -247,9 +246,17 @@ export function FounderTipsTab() {
     <div>
       <div style={{ ...card, borderTop: '3px solid #00d2ff' }}>
         <div style={sectionTitle}>
-          <Compass size={18} style={{ color: '#00d2ff' }} /> Founder Tips — Strategic Principles To Refer Back To
+          <Compass size={18} style={{ color: '#00d2ff' }} /> Founder Tips — Strategic Principles To
+          Refer Back To
         </div>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary, #b4b4bc)', lineHeight: 1.6, marginBottom: 0 }}>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--text-secondary, #b4b4bc)',
+            lineHeight: 1.6,
+            marginBottom: 0,
+          }}
+        >
           Fourteen principles grounded in your specific position: solo founder, 16, Nigeria, PE/VC
           wedge, Wiz advisor, 97% gross margins, 183K LoC already shipped. Re-read when deciding
           what to build next, what to kill, what to say in a pitch, and what to ignore.

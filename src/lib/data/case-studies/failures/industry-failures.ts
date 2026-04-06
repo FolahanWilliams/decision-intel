@@ -9,7 +9,7 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     year: 2018,
     yearRealized: 2019,
     summary:
-      'Boeing\'s 737 MAX featured the MCAS (Maneuvering Characteristics Augmentation System) that relied on a single angle-of-attack sensor with no redundancy. To avoid costly pilot retraining that would reduce the MAX\'s competitive advantage against Airbus, Boeing minimized MCAS disclosure to airlines and the FAA. Two crashes — Lion Air 610 (October 2018) and Ethiopian Airlines 302 (March 2019) — killed 346 people. The MAX was grounded worldwide for 20 months.',
+      "Boeing's 737 MAX featured the MCAS (Maneuvering Characteristics Augmentation System) that relied on a single angle-of-attack sensor with no redundancy. To avoid costly pilot retraining that would reduce the MAX's competitive advantage against Airbus, Boeing minimized MCAS disclosure to airlines and the FAA. Two crashes — Lion Air 610 (October 2018) and Ethiopian Airlines 302 (March 2019) — killed 346 people. The MAX was grounded worldwide for 20 months.",
     decisionContext:
       'Whether to design the 737 MAX MCAS system with redundant sensors and comprehensive pilot training, accepting higher costs and longer delivery timelines, or minimize changes to preserve the "no new type rating required" selling point.',
     outcome: 'catastrophic_failure',
@@ -51,13 +51,14 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         'Boeing\'s 2011 board presentation on the 737 MAX program (reconstructed from House Committee report): Boeing evaluated two options — a clean-sheet narrow-body design (est. $15-20B, 7-10 year timeline) vs. re-engining the existing 737 airframe with new LEAP engines (est. $3B, 3-5 year timeline). The board approved the re-engine approach in August 2011, citing: "Airbus is already taking orders for the A320neo. We cannot afford to cede the narrow-body market for a decade." Internal engineering memo (2012): "The larger LEAP engines change the aircraft\'s handling characteristics, particularly at high angles of attack. We recommend augmentation through a new flight control law." The MCAS system was designed as a "minor flight control modification" — framing that enabled Boeing to classify it as not requiring new type certification.',
-      source: 'House Committee on Transportation and Infrastructure report (2020), Chapter 4; Boeing internal emails and memos cited in DOJ deferred prosecution agreement; FAA ODA audit findings',
+      source:
+        'House Committee on Transportation and Infrastructure report (2020), Chapter 4; Boeing internal emails and memos cited in DOJ deferred prosecution agreement; FAA ODA audit findings',
       date: '2011-08-01',
       documentType: 'board_memo',
       detectableRedFlags: [
         'Choosing 3-5 year timeline over 7-10 year timeline primarily due to competitive pressure — time pressure overriding engineering completeness',
         'Framing a flight control system change as "minor modification" to avoid regulatory scrutiny — classic framing effect',
-        'Engineering team\'s recommendation for augmentation acknowledged the handling change but was not paired with redundancy requirements',
+        "Engineering team's recommendation for augmentation acknowledged the handling change but was not paired with redundancy requirements",
         'Unanimous board consensus with no documented dissent — 20 participants yet no one flagged the safety tradeoff explicitly',
         '"No new type rating" as a selling point — anchoring customer value proposition to pilot training avoidance rather than safety',
       ],
@@ -80,9 +81,9 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     year: 2015,
     yearRealized: 2018,
     summary:
-      'Elizabeth Holmes founded Theranos claiming its Edison device could run hundreds of blood tests from a single finger prick. The technology never worked as claimed — most tests were run on modified commercial machines. A Wall Street Journal investigation by John Carreyrou in 2015 exposed the fraud. The company\'s $9 billion valuation went to zero. Holmes was convicted of four counts of wire fraud in 2022.',
+      "Elizabeth Holmes founded Theranos claiming its Edison device could run hundreds of blood tests from a single finger prick. The technology never worked as claimed — most tests were run on modified commercial machines. A Wall Street Journal investigation by John Carreyrou in 2015 exposed the fraud. The company's $9 billion valuation went to zero. Holmes was convicted of four counts of wire fraud in 2022.",
     decisionContext:
-      'Whether investors, board members, and retail pharmacy partners (Walgreens) should have demanded independent validation of Theranos\'s core technology claims before committing billions in capital and customer trust.',
+      "Whether investors, board members, and retail pharmacy partners (Walgreens) should have demanded independent validation of Theranos's core technology claims before committing billions in capital and customer trust.",
     outcome: 'catastrophic_failure',
     impactScore: 88,
     estimatedImpact: '$9B valuation to zero; potential patient harm from inaccurate results',
@@ -112,7 +113,7 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     },
     lessonsLearned: [
       'A board stacked with political luminaries (Kissinger, Shultz, Mattis) but zero medical device experts created the ultimate authority bias — credibility without competence.',
-      'Walgreens invested $140 million without ever independently validating the core technology, relying instead on Holmes\'s reputation and board prestige.',
+      "Walgreens invested $140 million without ever independently validating the core technology, relying instead on Holmes's reputation and board prestige.",
       'When employees raised concerns, they were silenced with NDAs and threats — dissent suppression is the strongest predictor of catastrophic fraud.',
     ],
     source:
@@ -176,7 +177,7 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     summary:
       'In 2000, Netflix co-founder Reed Hastings offered to sell Netflix to Blockbuster for $50 million. Blockbuster CEO John Antioco reportedly laughed at the proposal. Blockbuster had 9,000 stores and $6 billion in revenue. By 2004, Blockbuster launched its own online service but was too late and underfunded. Blockbuster filed for bankruptcy in 2010. Netflix grew to a $150+ billion market cap.',
     decisionContext:
-      'Whether to acquire Netflix for $50M and integrate its DVD-by-mail subscription model into Blockbuster\'s brick-and-mortar empire, or dismiss it as a niche business.',
+      "Whether to acquire Netflix for $50M and integrate its DVD-by-mail subscription model into Blockbuster's brick-and-mortar empire, or dismiss it as a niche business.",
     outcome: 'catastrophic_failure',
     impactScore: 93,
     estimatedImpact: '$6B revenue to zero; Netflix grew to $150B+',
@@ -221,9 +222,9 @@ export const INDUSTRY_FAILURE_CASES: CaseStudy[] = [
     year: 2005,
     yearRealized: 2018,
     summary:
-      'Sears, once America\'s largest retailer with $50 billion in annual revenue and the original mail-order catalog business, failed to transition to e-commerce despite having the perfect historical precedent. CEO Eddie Lampert\'s strategy focused on financial engineering, share buybacks, and real estate monetization rather than digital transformation. From 2005 to 2018, Sears spent $6 billion on buybacks while investing almost nothing in e-commerce or store renovation. The company filed for bankruptcy in October 2018.',
+      "Sears, once America's largest retailer with $50 billion in annual revenue and the original mail-order catalog business, failed to transition to e-commerce despite having the perfect historical precedent. CEO Eddie Lampert's strategy focused on financial engineering, share buybacks, and real estate monetization rather than digital transformation. From 2005 to 2018, Sears spent $6 billion on buybacks while investing almost nothing in e-commerce or store renovation. The company filed for bankruptcy in October 2018.",
     decisionContext:
-      'Whether to invest heavily in e-commerce transformation — leveraging Sears\' catalog heritage, distribution network, and customer data — or pursue financial engineering through buybacks and asset stripping.',
+      "Whether to invest heavily in e-commerce transformation — leveraging Sears' catalog heritage, distribution network, and customer data — or pursue financial engineering through buybacks and asset stripping.",
     outcome: 'catastrophic_failure',
     impactScore: 86,
     estimatedImpact: '$12B+ in market cap destroyed; 250,000+ jobs lost over 15 years',

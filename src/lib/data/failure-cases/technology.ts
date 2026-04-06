@@ -47,7 +47,12 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         'A working digital camera prototype had already been built internally in 1975, proving technical feasibility',
         'Declining film margins were being ignored in favor of absolute revenue figures that masked underlying erosion',
       ],
-      flaggableBiases: ['status_quo_bias', 'confirmation_bias', 'loss_aversion', 'sunk_cost_fallacy'],
+      flaggableBiases: [
+        'status_quo_bias',
+        'confirmation_bias',
+        'loss_aversion',
+        'sunk_cost_fallacy',
+      ],
       hypotheticalAnalysis:
         "A decision intelligence system would have flagged the internal contradiction between Kodak's own 1981 research predicting digital dominance and the company's continued $5B+ annual film investment. The 30-year timeline created false comfort — the bias detector would have identified status quo bias and loss aversion in leadership's refusal to cannibalize profitable film revenue.",
     },
@@ -101,7 +106,12 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         'Developer ecosystem for Symbian was shrinking as third-party developers migrated to emerging platforms',
         "Apple's iPhone launch in January 2007 was creating a new smartphone category that invalidated Nokia's feature-phone assumptions",
       ],
-      flaggableBiases: ['status_quo_bias', 'overconfidence_bias', 'groupthink', 'confirmation_bias'],
+      flaggableBiases: [
+        'status_quo_bias',
+        'overconfidence_bias',
+        'groupthink',
+        'confirmation_bias',
+      ],
       hypotheticalAnalysis:
         "Decision intelligence would have flagged the contradiction between declining Symbian developer engagement metrics and the board's decision to double down on the platform. The anchoring to existing 40% market share masked the velocity of change — a noise analysis would have shown unprecedented inter-analyst disagreement about smartphone OS futures.",
     },
@@ -147,7 +157,8 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
     preDecisionEvidence: {
       document:
         'After evaluating the Netflix proposal, we have concluded that online DVD rental represents a very small niche segment of the market. Our core customers value the in-store browsing experience and immediate availability. Late fee revenue of approximately $800 million annually remains essential to our business model, and we see no reason to disrupt a proven revenue stream for an unproven digital concept.',
-      source: 'Blockbuster Board Meeting Minutes, CEO John Antioco\'s assessment after meeting with Netflix co-founders Reed Hastings and Marc Randolph',
+      source:
+        "Blockbuster Board Meeting Minutes, CEO John Antioco's assessment after meeting with Netflix co-founders Reed Hastings and Marc Randolph",
       date: '2000-04-15',
       documentType: 'board_memo',
       detectableRedFlags: [
@@ -388,7 +399,12 @@ export const TECHNOLOGY_CASES: FailureCase[] = [
         "Facebook's network effects and switching costs were systematically underestimated in the project rationale",
         'No organic growth mechanism was identified — the strategy relied entirely on coerced adoption through product bundling',
       ],
-      flaggableBiases: ['confirmation_bias', 'overconfidence_bias', 'bandwagon_effect', 'planning_fallacy'],
+      flaggableBiases: [
+        'confirmation_bias',
+        'overconfidence_bias',
+        'bandwagon_effect',
+        'planning_fallacy',
+      ],
       hypotheticalAnalysis:
         "A decision intelligence tool would have detected overconfidence bias in the top-down mandate and confirmation bias in the lack of internal dissent channels. The absence of any user-demand signal in the project memo — combined with the forced integration strategy — would have triggered high-confidence warnings about the 'build it and they will come' assumption being driven by planning fallacy rather than evidence.",
     },

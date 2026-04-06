@@ -95,19 +95,25 @@ export async function GET() {
       weeklyDecisionCount = await prisma.humanDecision.count({
         where: { userId: user.id, source: 'slack', createdAt: { gte: oneWeekAgo } },
       });
-    } catch { /* schema drift */ }
+    } catch {
+      /* schema drift */
+    }
 
     try {
       weeklyNudgeCount = await prisma.nudge.count({
         where: { targetUserId: user.id, channel: 'slack', createdAt: { gte: oneWeekAgo } },
       });
-    } catch { /* schema drift */ }
+    } catch {
+      /* schema drift */
+    }
 
     try {
       weeklyOutcomeCount = await prisma.decisionOutcome.count({
         where: { userId: user.id, reportedAt: { gte: oneWeekAgo } },
       });
-    } catch { /* schema drift */ }
+    } catch {
+      /* schema drift */
+    }
 
     try {
       const acknowledged = await prisma.nudge.count({
@@ -119,7 +125,9 @@ export async function GET() {
       if (acknowledged > 0) {
         nudgeHelpfulRate = Math.round((helpful / acknowledged) * 100);
       }
-    } catch { /* schema drift */ }
+    } catch {
+      /* schema drift */
+    }
 
     return NextResponse.json({
       recentDecisions: recentDecisions.map(d => ({

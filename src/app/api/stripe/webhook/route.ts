@@ -111,7 +111,13 @@ export async function POST(request: NextRequest) {
 
         // Handle one-time deal audit payment
         if (session.mode === 'payment' && session.metadata?.type === 'deal_audit') {
-          const { userId: auditUserId, dealId, tier, ticketSize, orgId: metaOrgId } = session.metadata;
+          const {
+            userId: auditUserId,
+            dealId,
+            tier,
+            ticketSize,
+            orgId: metaOrgId,
+          } = session.metadata;
           orgId = metaOrgId;
           if (auditUserId && dealId && tier) {
             try {

@@ -384,7 +384,9 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                   <select
                     value={notificationSeverity}
                     onChange={e =>
-                      setNotificationSeverity(e.target.value as 'all' | 'high_critical' | 'critical')
+                      setNotificationSeverity(
+                        e.target.value as 'all' | 'high_critical' | 'critical'
+                      )
                     }
                     disabled={isPending}
                     style={{
@@ -434,7 +436,10 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
           {/* Save Button */}
           <div className="flex items-center justify-end gap-md mt-lg">
             {saved && (
-              <span className="flex items-center gap-sm text-sm" style={{ color: 'var(--success)' }}>
+              <span
+                className="flex items-center gap-sm text-sm"
+                style={{ color: 'var(--success)' }}
+              >
                 <CheckCircle size={16} />
                 Settings saved!
               </span>
@@ -487,7 +492,9 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                       <MessageSquare
                         size={20}
                         style={{
-                          color: slackStatus?.connected ? 'var(--success)' : 'var(--text-secondary)',
+                          color: slackStatus?.connected
+                            ? 'var(--success)'
+                            : 'var(--text-secondary)',
                         }}
                       />
                     </div>
@@ -501,7 +508,8 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
                           {slackStatus.installedAt && (
                             <span className="text-muted">
                               {' '}
-                              &middot; since {new Date(slackStatus.installedAt).toLocaleDateString()}
+                              &middot; since{' '}
+                              {new Date(slackStatus.installedAt).toLocaleDateString()}
                             </span>
                           )}
                         </div>
@@ -581,8 +589,9 @@ export default function SettingsForm({ initialSettings, userEmail }: SettingsFor
               </div>
 
               <p className="text-xs text-muted" style={{ marginTop: 'var(--spacing-md)' }}>
-                When connected, Decision Intel monitors decision-related messages in your channels and
-                provides real-time cognitive bias nudges. All content is anonymized before analysis.
+                When connected, Decision Intel monitors decision-related messages in your channels
+                and provides real-time cognitive bias nudges. All content is anonymized before
+                analysis.
               </p>
             </div>
           </div>
@@ -705,7 +714,9 @@ function EmailForwardingSection() {
         const data = await res.json();
         setToken(data.token);
       }
-    } catch { /* ignore */ } finally {
+    } catch {
+      /* ignore */
+    } finally {
       setRegenerating(false);
     }
   };
@@ -730,8 +741,9 @@ function EmailForwardingSection() {
       </div>
       <div className="card-body">
         <p className="text-xs text-muted mb-md" style={{ lineHeight: 1.6 }}>
-          Forward documents or paste decision text to your unique email address.
-          Attachments (PDF, DOCX, XLSX, CSV, PPTX) are auto-analyzed. No attachments? The email body is analyzed instead.
+          Forward documents or paste decision text to your unique email address. Attachments (PDF,
+          DOCX, XLSX, CSV, PPTX) are auto-analyzed. No attachments? The email body is analyzed
+          instead.
         </p>
         {loading ? (
           <div className="text-xs text-muted">Loading...</div>
@@ -746,7 +758,10 @@ function EmailForwardingSection() {
                 border: '1px solid var(--border-color)',
               }}
             >
-              <code className="text-sm flex-1" style={{ color: 'var(--accent-primary)', wordBreak: 'break-all' }}>
+              <code
+                className="text-sm flex-1"
+                style={{ color: 'var(--accent-primary)', wordBreak: 'break-all' }}
+              >
                 {forwardingAddress}
               </code>
               <button
@@ -769,7 +784,14 @@ function EmailForwardingSection() {
               onClick={handleGenerate}
               disabled={regenerating}
               className="text-xs text-muted"
-              style={{ cursor: 'pointer', background: 'none', border: 'none', textDecoration: 'underline', textAlign: 'left', padding: 0 }}
+              style={{
+                cursor: 'pointer',
+                background: 'none',
+                border: 'none',
+                textDecoration: 'underline',
+                textAlign: 'left',
+                padding: 0,
+              }}
             >
               {regenerating ? 'Regenerating...' : 'Regenerate address'}
             </button>

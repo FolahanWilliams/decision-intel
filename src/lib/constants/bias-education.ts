@@ -165,7 +165,8 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
         'Janis, I.L. (1972). Victims of Groupthink: A Psychological Study of Foreign-Policy Decisions and Fiascoes. Boston: Houghton Mifflin.',
       authors: 'Janis, I.L.',
       year: '1972',
-      title: 'Victims of Groupthink: A Psychological Study of Foreign-Policy Decisions and Fiascoes',
+      title:
+        'Victims of Groupthink: A Psychological Study of Foreign-Policy Decisions and Fiascoes',
       venue: 'Houghton Mifflin (book)',
       url: 'https://psycnet.apa.org/record/1975-29417-000',
     },
@@ -608,7 +609,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
       doi: '10.1037/h0071663',
     },
     quickTip:
-      'If you can\'t name a specific weakness in the option you favor, you\'re probably under a halo.',
+      "If you can't name a specific weakness in the option you favor, you're probably under a halo.",
     difficulty: 'moderate',
   },
   gamblers_fallacy: {
@@ -649,7 +650,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
   },
   zeigarnik_effect: {
     realWorldExample: {
-      title: 'Yahoo\'s Incomplete Acquisitions',
+      title: "Yahoo's Incomplete Acquisitions",
       description:
         'Yahoo famously passed on acquiring Google (2002) and Facebook (2006). In subsequent acquisition decisions, the unfinished business of those missed deals heavily influenced strategy — leading to the overpriced $1.1B acquisition of Tumblr, partly driven by the psychological weight of previous "ones that got away."',
       company: 'Yahoo',
@@ -688,7 +689,7 @@ export const BIAS_EDUCATION: Record<BiasCategory, BiasEducationContent> = {
     realWorldExample: {
       title: 'Jam Study and Enterprise Software Selection',
       description:
-        'Sheena Iyengar\'s famous study showed customers were 10x more likely to purchase when offered 6 jam varieties vs. 24. The same effect plagues enterprise procurement: when evaluating too many vendor options, committees often default to the incumbent or delay decisions indefinitely.',
+        "Sheena Iyengar's famous study showed customers were 10x more likely to purchase when offered 6 jam varieties vs. 24. The same effect plagues enterprise procurement: when evaluating too many vendor options, committees often default to the incumbent or delay decisions indefinitely.",
       company: 'Columbia University / Enterprise Procurement',
       year: '2000',
     },

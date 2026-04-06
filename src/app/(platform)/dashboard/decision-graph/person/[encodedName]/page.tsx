@@ -182,9 +182,7 @@ export default function PersonProfilePage({
             <User size={28} color="#fff" />
           </div>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>
-              {titleCase(canonicalName)}
-            </h1>
+            <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>{titleCase(canonicalName)}</h1>
             <p className="text-muted text-sm" style={{ margin: 0 }}>
               {profile
                 ? `${profile.decisionCount} decision${profile.decisionCount === 1 ? '' : 's'} in this organization`
@@ -194,10 +192,7 @@ export default function PersonProfilePage({
         </header>
 
         {loading && (
-          <div
-            className="card"
-            style={{ padding: 'var(--spacing-2xl)', textAlign: 'center' }}
-          >
+          <div className="card" style={{ padding: 'var(--spacing-2xl)', textAlign: 'center' }}>
             <Loader2
               size={24}
               className="animate-spin"
@@ -281,7 +276,8 @@ export default function PersonProfilePage({
             <div className="card-header">
               <h3 className="text-sm font-semibold">Bias Fingerprint</h3>
               <span className="text-xs text-muted">
-                Top {profile.biasFingerprint.length} bias types across all of {titleCase(canonicalName)}\u2019s decisions
+                Top {profile.biasFingerprint.length} bias types across all of{' '}
+                {titleCase(canonicalName)}\u2019s decisions
               </span>
             </div>
             <div
@@ -321,8 +317,7 @@ export default function PersonProfilePage({
                         style={{
                           height: '100%',
                           width: `${pct}%`,
-                          background:
-                            'linear-gradient(90deg, #8b5cf6, #ec4899)',
+                          background: 'linear-gradient(90deg, #8b5cf6, #ec4899)',
                           transition: 'width 0.5s ease',
                         }}
                       />
@@ -367,8 +362,7 @@ export default function PersonProfilePage({
                       textDecoration: 'none',
                       color: 'inherit',
                       padding: '10px var(--spacing-lg)',
-                      borderTop:
-                        i === 0 ? 'none' : '1px solid var(--border-color)',
+                      borderTop: i === 0 ? 'none' : '1px solid var(--border-color)',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 12,
@@ -496,9 +490,7 @@ function StatCard({
       >
         {value}
       </div>
-      {sub && (
-        <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{sub}</div>
-      )}
+      {sub && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{sub}</div>}
     </div>
   );
 }

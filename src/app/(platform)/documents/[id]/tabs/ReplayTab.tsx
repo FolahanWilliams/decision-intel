@@ -313,9 +313,7 @@ export function ReplayTab({ analysisData }: ReplayTabProps) {
                           gap: '6px',
                           padding: '6px 12px',
                           fontSize: '12px',
-                          background: showCounterfactual
-                            ? 'var(--bg-card)'
-                            : 'transparent',
+                          background: showCounterfactual ? 'var(--bg-card)' : 'transparent',
                           border: '1px solid var(--border-color)',
                           borderRadius: 'var(--radius-full)',
                           color: 'var(--text-highlight)',

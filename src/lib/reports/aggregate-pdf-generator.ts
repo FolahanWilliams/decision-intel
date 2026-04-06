@@ -496,16 +496,8 @@ export class AggregatePdfGenerator {
     this.doc.setFont('helvetica', 'normal');
     this.doc.setTextColor(200, 200, 200);
     const metaY = Math.max(titleY + 4, 90);
-    this.doc.text(
-      `Analysis ID: ${input.analysisId}`,
-      20,
-      metaY
-    );
-    this.doc.text(
-      `Generated: ${input.generatedAt.toISOString()}`,
-      20,
-      metaY + 5
-    );
+    this.doc.text(`Analysis ID: ${input.analysisId}`, 20, metaY);
+    this.doc.text(`Generated: ${input.generatedAt.toISOString()}`, 20, metaY + 5);
     this.doc.text(`Org: ${input.orgName || 'Personal'}`, 20, metaY + 10);
 
     // Below-hero content
@@ -634,11 +626,7 @@ export class AggregatePdfGenerator {
       this.doc.setFont('helvetica', 'bold');
       this.doc.setFontSize(11);
       this.doc.setTextColor(30, 41, 59);
-      this.doc.text(
-        `${trig.provision.section} — ${trig.provision.title}`,
-        20,
-        y
-      );
+      this.doc.text(`${trig.provision.section} — ${trig.provision.title}`, 20, y);
       y += 6;
 
       // Risk weight indicator
@@ -673,10 +661,7 @@ export class AggregatePdfGenerator {
       this.doc.setFont('helvetica', 'italic');
       this.doc.setFontSize(9);
       this.doc.setTextColor(80, 80, 100);
-      const mechLines = this.doc.splitTextToSize(
-        `Mechanism: ${trig.explanation}`,
-        170
-      ) as string[];
+      const mechLines = this.doc.splitTextToSize(`Mechanism: ${trig.explanation}`, 170) as string[];
       mechLines.forEach(line => {
         if (y > pageBottomY) {
           this.doc.addPage();
@@ -690,9 +675,7 @@ export class AggregatePdfGenerator {
 
       // Supporting excerpt from the analyzed document — pick the first
       // bias finding whose type is in triggeringBiases as the evidence
-      const evidenceBias = input.biasFindings.find(b =>
-        trig.triggeringBiases.includes(b.biasType)
-      );
+      const evidenceBias = input.biasFindings.find(b => trig.triggeringBiases.includes(b.biasType));
       if (evidenceBias && evidenceBias.excerpt) {
         this.doc.setFillColor(248, 248, 250);
         const excerptLines = this.doc.splitTextToSize(

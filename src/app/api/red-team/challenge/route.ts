@@ -202,8 +202,7 @@ export async function POST(req: NextRequest) {
       log.error('Red Team LLM call failed:', llmErr);
       return NextResponse.json(
         {
-          error:
-            'Dr. Red Team is unavailable right now. The underlying model returned an error.',
+          error: 'Dr. Red Team is unavailable right now. The underlying model returned an error.',
         },
         { status: 503 }
       );
@@ -214,8 +213,7 @@ export async function POST(req: NextRequest) {
       log.warn('Failed to parse Red Team response:', rawText.slice(0, 300));
       return NextResponse.json(
         {
-          error:
-            'Dr. Red Team produced a malformed response. Please try again.',
+          error: 'Dr. Red Team produced a malformed response. Please try again.',
         },
         { status: 502 }
       );
@@ -266,8 +264,7 @@ export async function POST(req: NextRequest) {
       log.warn('Schema drift during Red Team challenge:', code);
       return NextResponse.json(
         {
-          error:
-            'Dr. Red Team is not yet available. Database migration pending.',
+          error: 'Dr. Red Team is not yet available. Database migration pending.',
         },
         { status: 503, headers: { 'Retry-After': '300' } }
       );
@@ -290,10 +287,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const analysisId = searchParams.get('analysisId');
     if (!analysisId) {
-      return NextResponse.json(
-        { error: 'analysisId query param is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'analysisId query param is required' }, { status: 400 });
     }
 
     // Ownership check reuses the same pattern

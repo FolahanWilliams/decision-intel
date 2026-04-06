@@ -188,4 +188,3 @@ function LegendItem({ color, label, dot }: { color: string; label: string; dot?:
     </div>
   );
 }
-

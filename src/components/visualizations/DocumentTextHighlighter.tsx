@@ -718,7 +718,9 @@ export function DocumentTextHighlighter({
                     />
                   </div>
                 </div>
-                <p className="text-xs font-semibold text-foreground mb-1">{formatBiasName(bias.biasType)}</p>
+                <p className="text-xs font-semibold text-foreground mb-1">
+                  {formatBiasName(bias.biasType)}
+                </p>
                 <p className="text-[11px] text-muted italic line-clamp-2">
                   &quot;{bias.excerpt}&quot;
                 </p>

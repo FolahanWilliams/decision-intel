@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     if (!checkRateLimit(userId)) {
       return NextResponse.json({
         response_type: 'ephemeral',
-        text: 'You\'re sending commands too quickly. Please wait a moment and try again.',
+        text: "You're sending commands too quickly. Please wait a moment and try again.",
       });
     }
 
@@ -103,7 +103,12 @@ export async function POST(req: NextRequest) {
 
       switch (subcommand) {
         case 'analyze':
-          return handleAnalyzeCommand({ channelId, userId, teamId, threadTs: params.get('thread_ts') || undefined });
+          return handleAnalyzeCommand({
+            channelId,
+            userId,
+            teamId,
+            threadTs: params.get('thread_ts') || undefined,
+          });
         case 'score':
           return handleScoreCommand({ text: args, channelId });
         case 'brief':
@@ -453,12 +458,18 @@ async function handleBriefCommand(params: { userId: string; teamId: string }) {
 
 // ─── /di analyze ────────────────────────────────────────────────────────────
 
-async function handleAnalyzeCommand(params: { channelId: string; userId: string; teamId: string; threadTs?: string }) {
+async function handleAnalyzeCommand(params: {
+  channelId: string;
+  userId: string;
+  teamId: string;
+  threadTs?: string;
+}) {
   try {
     // ── Thread analysis: when /di analyze is invoked inside a thread ──
     if (params.threadTs) {
       try {
-        const { fetchSlackThread, formatAuditSummaryForSlack, deliverSlackNudge } = await import('@/lib/integrations/slack/handler');
+        const { fetchSlackThread, formatAuditSummaryForSlack, deliverSlackNudge } =
+          await import('@/lib/integrations/slack/handler');
         const { analyzeDocument } = await import('@/lib/analysis/analyzer');
 
         const messages = await fetchSlackThread(params.channelId, params.threadTs, params.teamId);
@@ -480,20 +491,25 @@ async function handleAnalyzeCommand(params: { channelId: string; userId: string;
         const participants = [...new Set(messages.map(m => m.user))];
 
         // Find user ID + orgId for document ownership
-        const installation = await prisma.slackInstallation.findUnique({
-          where: { teamId: params.teamId, status: 'active' },
-          select: { installedByUserId: true, orgId: true },
-        }).catch(() => null);
-        const docUserId = installation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || params.userId;
+        const installation = await prisma.slackInstallation
+          .findUnique({
+            where: { teamId: params.teamId, status: 'active' },
+            select: { installedByUserId: true, orgId: true },
+          })
+          .catch(() => null);
+        const docUserId =
+          installation?.installedByUserId || process.env.SLACK_SYSTEM_USER_ID || params.userId;
 
         const { createHash } = await import('crypto');
         const contentHash = createHash('sha256').update(threadContent).digest('hex');
         const sourceRef = `${params.channelId}:${params.threadTs}`;
 
         // Check for existing analysis of this thread (deduplication)
-        const existing = await prisma.document.findFirst({
-          where: { source: 'slack', sourceRef },
-        }).catch(() => null);
+        const existing = await prisma.document
+          .findFirst({
+            where: { source: 'slack', sourceRef },
+          })
+          .catch(() => null);
         if (existing) {
           return NextResponse.json({
             response_type: 'ephemeral',
@@ -522,7 +538,8 @@ async function handleAnalyzeCommand(params: { channelId: string; userId: string;
           try {
             const result = await analyzeDocument(doc.id);
             const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.decision-intel.com';
-            const biases = result.biases?.map(b => ({ biasType: b.biasType, severity: b.severity })) || [];
+            const biases =
+              result.biases?.map(b => ({ biasType: b.biasType, severity: b.severity })) || [];
             const summaryCard = formatAuditSummaryForSlack(
               {
                 decisionQualityScore: result.overallScore ?? 0,
@@ -1015,10 +1032,7 @@ async function handleStatusCommand(params: { userId: string; teamId: string }) {
       });
     }
 
-    blocks.push(
-      { type: 'divider' },
-      { type: 'actions', elements: statusActions }
-    );
+    blocks.push({ type: 'divider' }, { type: 'actions', elements: statusActions });
 
     return NextResponse.json({
       response_type: 'ephemeral',
@@ -1157,9 +1171,8 @@ async function handleChannelStatsCommand(params: { channelId: string; teamId: st
     const scores = decisions
       .map(d => d.cognitiveAudit?.decisionQualityScore)
       .filter((s): s is number => s != null);
-    const avgScore = scores.length > 0
-      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-      : 0;
+    const avgScore =
+      scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
     const bestScore = scores.length > 0 ? Math.max(...scores) : 0;
     const worstScore = scores.length > 0 ? Math.min(...scores) : 0;
 
@@ -1170,7 +1183,8 @@ async function handleChannelStatsCommand(params: { channelId: string; teamId: st
       const olderAvg = scores.slice(mid).reduce((a, b) => a + b, 0) / (scores.length - mid);
       const newerAvg = scores.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
       const diff = newerAvg - olderAvg;
-      const trendEmoji = diff > 2 ? ':arrow_up:' : diff < -2 ? ':arrow_down:' : ':left_right_arrow:';
+      const trendEmoji =
+        diff > 2 ? ':arrow_up:' : diff < -2 ? ':arrow_down:' : ':left_right_arrow:';
       const trendLabel = diff > 2 ? 'Improving' : diff < -2 ? 'Declining' : 'Stable';
       trendText = `${trendEmoji} ${trendLabel} (${diff > 0 ? '+' : ''}${Math.round(diff)} pts)`;
     }
@@ -1185,20 +1199,24 @@ async function handleChannelStatsCommand(params: { channelId: string; teamId: st
         }
       }
     }
-    const topBiases = [...biasCounts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
+    const topBiases = [...biasCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
 
-    const biasText = topBiases.length > 0
-      ? topBiases
-          .map(([type, count]) => {
-            const label = BIAS_LABELS[type] || type.replace(/_/g, ' ');
-            return `:warning: ${label} (${count}x)`;
-          })
-          .join('\n')
-      : '_Not enough data_';
+    const biasText =
+      topBiases.length > 0
+        ? topBiases
+            .map(([type, count]) => {
+              const label = BIAS_LABELS[type] || type.replace(/_/g, ' ');
+              return `:warning: ${label} (${count}x)`;
+            })
+            .join('\n')
+        : '_Not enough data_';
 
-    const scoreEmoji = avgScore >= 70 ? ':large_green_circle:' : avgScore >= 40 ? ':large_yellow_circle:' : ':red_circle:';
+    const scoreEmoji =
+      avgScore >= 70
+        ? ':large_green_circle:'
+        : avgScore >= 40
+          ? ':large_yellow_circle:'
+          : ':red_circle:';
 
     const blocks: Array<Record<string, unknown>> = [
       {

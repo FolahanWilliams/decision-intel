@@ -205,7 +205,8 @@ export function FounderChatWidget({ founderPass }: { founderPass: string }) {
               lineHeight: 1.6,
             }}
           >
-            Ask me about content strategy, LinkedIn/YouTube ideas, pillar topics, competitor positioning, or research frameworks for your content.
+            Ask me about content strategy, LinkedIn/YouTube ideas, pillar topics, competitor
+            positioning, or research frameworks for your content.
             <div
               style={{
                 display: 'flex',

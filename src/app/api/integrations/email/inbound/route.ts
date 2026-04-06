@@ -63,9 +63,7 @@ function verifyWebhookSignature(req: NextRequest, body: string): boolean {
 
   // Svix sends multiple signatures separated by space; check if any match
   const signatures = svixSignature.split(' ');
-  const hmac = createHmac('sha256', secretBytes)
-    .update(signedContent)
-    .digest('base64');
+  const hmac = createHmac('sha256', secretBytes).update(signedContent).digest('base64');
 
   return signatures.some((sig: string) => {
     const sigValue = sig.replace(/^v1,/, '');
@@ -249,7 +247,9 @@ export async function POST(req: NextRequest) {
             select: { id: true },
           });
           if (existingDoc) {
-            log.info(`Duplicate content (hash: ${contentHash.slice(0, 8)}...), skipping: ${filename}`);
+            log.info(
+              `Duplicate content (hash: ${contentHash.slice(0, 8)}...), skipping: ${filename}`
+            );
             continue;
           }
 
@@ -279,9 +279,7 @@ export async function POST(req: NextRequest) {
           // Fire-and-forget: trigger analysis
           import('@/lib/analysis/analyzer')
             .then(({ analyzeDocument }) => analyzeDocument(document.id))
-            .catch((err) =>
-              log.error(`Analysis failed for document ${document.id}:`, err)
-            );
+            .catch(err => log.error(`Analysis failed for document ${document.id}:`, err));
         } catch (err) {
           log.error(`Failed to process attachment ${attachment.filename}:`, err);
         }
@@ -296,13 +294,9 @@ export async function POST(req: NextRequest) {
         return OK();
       }
 
-      const documentContent = subject
-        ? `Subject: ${subject}\n\n${bodyContent}`
-        : bodyContent;
+      const documentContent = subject ? `Subject: ${subject}\n\n${bodyContent}` : bodyContent;
 
-      const contentHash = createHash('sha256')
-        .update(Buffer.from(documentContent))
-        .digest('hex');
+      const contentHash = createHash('sha256').update(Buffer.from(documentContent)).digest('hex');
 
       const encryptedFields = isDocumentEncryptionEnabled()
         ? encryptDocumentContent(documentContent)
@@ -329,9 +323,7 @@ export async function POST(req: NextRequest) {
         // Fire-and-forget: trigger analysis
         import('@/lib/analysis/analyzer')
           .then(({ analyzeDocument }) => analyzeDocument(document.id))
-          .catch((err) =>
-            log.error(`Analysis failed for document ${document.id}:`, err)
-          );
+          .catch(err => log.error(`Analysis failed for document ${document.id}:`, err));
       } catch (err) {
         log.error('Failed to create document from email body:', err);
       }
@@ -341,7 +333,7 @@ export async function POST(req: NextRequest) {
     if (createdDocIds.length > 0) {
       const senderEmail = typeof from === 'string' ? from : '';
       if (senderEmail) {
-        sendConfirmationEmail(senderEmail, createdDocIds.length, subject || '').catch((err) =>
+        sendConfirmationEmail(senderEmail, createdDocIds.length, subject || '').catch(err =>
           log.error('Failed to send confirmation email:', err)
         );
       }

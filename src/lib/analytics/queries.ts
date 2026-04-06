@@ -35,10 +35,7 @@ export interface FunnelResult {
  * window. Subsequent steps require the user to have completed all prior steps
  * in order.
  */
-export async function getFunnel(
-  steps: string[],
-  window: QueryWindow = {}
-): Promise<FunnelResult> {
+export async function getFunnel(steps: string[], window: QueryWindow = {}): Promise<FunnelResult> {
   if (steps.length === 0) {
     return { steps: [], totalEntered: 0, totalCompleted: 0, conversionPct: 0 };
   }
@@ -146,7 +143,10 @@ export async function getCohortRetention(
   }
 
   if (cohortMap.size === 0) {
-    return { cohortSize: 0, buckets: dayBuckets.map(d => ({ dayOffset: d, retained: 0, retentionPct: 0 })) };
+    return {
+      cohortSize: 0,
+      buckets: dayBuckets.map(d => ({ dayOffset: d, retained: 0, retentionPct: 0 })),
+    };
   }
 
   const retentionEvents = await prisma.analyticsEvent.findMany({
@@ -164,7 +164,9 @@ export async function getCohortRetention(
     if (!ev.userId) continue;
     const cohortDate = cohortMap.get(ev.userId);
     if (!cohortDate) continue;
-    const offset = Math.floor((ev.createdAt.getTime() - cohortDate.getTime()) / (1000 * 60 * 60 * 24));
+    const offset = Math.floor(
+      (ev.createdAt.getTime() - cohortDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
     if (offset < 0) continue;
     const current = userDayOffset.get(ev.userId);
     if (current === undefined || offset < current) {

@@ -1,9 +1,32 @@
 'use client';
 import { useState, useMemo } from 'react';
-import { BarChart3, Target, Brain, ChevronRight, ChevronDown, AlertTriangle, TrendingUp } from 'lucide-react';
-import { WEIGHTS, GRADE_THRESHOLDS, SYSTEM1_BIASES, METHODOLOGY_VERSION, computeSyntheticDQI, computeHistoricalPercentile } from '@/lib/scoring/dqi';
+import {
+  BarChart3,
+  Target,
+  Brain,
+  ChevronRight,
+  ChevronDown,
+  AlertTriangle,
+  TrendingUp,
+} from 'lucide-react';
+import {
+  WEIGHTS,
+  GRADE_THRESHOLDS,
+  SYSTEM1_BIASES,
+  METHODOLOGY_VERSION,
+  computeSyntheticDQI,
+  computeHistoricalPercentile,
+} from '@/lib/scoring/dqi';
 import { ALL_CASES, isFailureOutcome, isSuccessOutcome } from '@/lib/data/case-studies';
-import { card, sectionTitle, label, badge, formatBias, OUTCOME_COLORS, OUTCOME_LABELS } from './shared-styles';
+import {
+  card,
+  sectionTitle,
+  label,
+  badge,
+  formatBias,
+  OUTCOME_COLORS,
+  OUTCOME_LABELS,
+} from './shared-styles';
 import type { CaseOutcome } from '@/lib/data/case-studies/types';
 
 // ---------------------------------------------------------------------------
@@ -30,7 +53,7 @@ const COMPONENT_LABELS: Record<string, string> = {
 
 const COMPONENT_DESCRIPTIONS: Record<string, string> = {
   biasLoad:
-    'Starts at 100. Subtracts severity-weighted penalties per detected bias: critical=-20, high=-12, medium=-6, low=-2. Uses square-root diminishing returns so many moderate biases don\'t overwhelm a few critical ones.',
+    "Starts at 100. Subtracts severity-weighted penalties per detected bias: critical=-20, high=-12, medium=-6, low=-2. Uses square-root diminishing returns so many moderate biases don't overwhelm a few critical ones.",
   noiseLevel:
     'Based on judge panel standard deviation. stdDev of 0 → score 100, stdDev of 30+ → score 0. +5 bonus for having 3+ independent judges. Lower inter-judge variance = better decision quality.',
   evidenceQuality:
@@ -63,12 +86,16 @@ export function DqiMethodologyTab() {
   const [outcomeFilter, setOutcomeFilter] = useState<'all' | 'success' | 'failure'>('all');
 
   // Pre-compute case study benchmarks
-  const caseRankings = useMemo(() => ALL_CASES.map(c => ({
-    company: c.company,
-    dqi: computeSyntheticDQI(c),
-    outcome: c.outcome,
-    year: c.year,
-  })).sort((a, b) => b.dqi - a.dqi), []);
+  const caseRankings = useMemo(
+    () =>
+      ALL_CASES.map(c => ({
+        company: c.company,
+        dqi: computeSyntheticDQI(c),
+        outcome: c.outcome,
+        year: c.year,
+      })).sort((a, b) => b.dqi - a.dqi),
+    []
+  );
 
   const filteredCases = caseRankings.filter(c => {
     if (outcomeFilter === 'success') return isSuccessOutcome(c.outcome as CaseOutcome);
@@ -82,7 +109,14 @@ export function DqiMethodologyTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       {/* ── Section 1: Header Card ─────────────────────────────────────── */}
       <div style={{ ...card, borderLeft: '3px solid #16A34A' }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary, #fff)', marginBottom: 6 }}>
+        <div
+          style={{
+            fontSize: 22,
+            fontWeight: 800,
+            color: 'var(--text-primary, #fff)',
+            marginBottom: 6,
+          }}
+        >
           DQI Methodology v{METHODOLOGY_VERSION}
         </div>
         <div style={{ fontSize: 14, color: 'var(--text-muted, #71717a)', lineHeight: 1.6 }}>
@@ -168,13 +202,13 @@ export function DqiMethodologyTab() {
                     ) : (
                       <ChevronRight size={16} color="var(--text-muted, #71717a)" />
                     )}
-                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary, #fff)' }}>
+                    <span
+                      style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary, #fff)' }}
+                    >
                       {COMPONENT_LABELS[key]}
                     </span>
                   </div>
-                  <span style={badge(COMPONENT_COLORS[key])}>
-                    {Math.round(weight * 100)}%
-                  </span>
+                  <span style={badge(COMPONENT_COLORS[key])}>{Math.round(weight * 100)}%</span>
                 </button>
                 {isExpanded && (
                   <div
@@ -263,8 +297,8 @@ export function DqiMethodologyTab() {
             <span style={{ color: '#ef4444', fontWeight: 600 }}>decreases</span>.
           </p>
           <p style={{ margin: 0 }}>
-            If your pattern matches success patterns with active mitigation (like Apple&apos;s managed
-            cannibalization), the score{' '}
+            If your pattern matches success patterns with active mitigation (like Apple&apos;s
+            managed cannibalization), the score{' '}
             <span style={{ color: '#22c55e', fontWeight: 600 }}>increases</span>.
           </p>
         </div>
@@ -420,8 +454,8 @@ export function DqiMethodologyTab() {
               System 2 (Deliberative)
             </div>
             <div style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--text-muted, #71717a)' }}>
-              All other detected biases (confirmation, groupthink, sunk cost, planning fallacy, etc.)
-              are classified as deliberative System 2 biases.
+              All other detected biases (confirmation, groupthink, sunk cost, planning fallacy,
+              etc.) are classified as deliberative System 2 biases.
             </div>
           </div>
         </div>
@@ -436,8 +470,8 @@ export function DqiMethodologyTab() {
             color: 'var(--text-muted, #71717a)',
           }}
         >
-          <strong style={{ color: 'var(--text-primary, #fff)' }}>Scoring impact:</strong>{' '}
-          When &gt;70% of detected biases are System 1:{' '}
+          <strong style={{ color: 'var(--text-primary, #fff)' }}>Scoring impact:</strong> When
+          &gt;70% of detected biases are System 1:{' '}
           <span style={{ color: '#ef4444', fontWeight: 600 }}>-8 process maturity penalty</span>.
           When &lt;40% are System 1:{' '}
           <span style={{ color: '#22c55e', fontWeight: 600 }}>+5 deliberative bonus</span>.
@@ -460,7 +494,10 @@ export function DqiMethodologyTab() {
                   padding: '12px 8px',
                   textAlign: 'center',
                   background: `${t.color}20`,
-                  borderRight: i < GRADE_THRESHOLDS.length - 1 ? '1px solid var(--border-primary, #222)' : 'none',
+                  borderRight:
+                    i < GRADE_THRESHOLDS.length - 1
+                      ? '1px solid var(--border-primary, #222)'
+                      : 'none',
                 }}
               >
                 <div style={{ fontSize: 22, fontWeight: 800, color: t.color }}>{t.grade}</div>

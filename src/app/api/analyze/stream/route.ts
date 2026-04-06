@@ -761,15 +761,12 @@ export async function POST(request: NextRequest) {
               };
               const auditResultForNudges = {
                 decisionQualityScore: (report.overallScore as number) || 0,
-                biasFindings: detectedBiases.map(
-                  (b: Record<string, unknown>) => ({
-                    biasType: String(b.biasType ?? ''),
-                    severity: String(b.severity ?? 'low'),
-                    confidence:
-                      typeof b.confidence === 'number' ? b.confidence : 0.5,
-                    evidence: String(b.excerpt ?? ''),
-                  })
-                ),
+                biasFindings: detectedBiases.map((b: Record<string, unknown>) => ({
+                  biasType: String(b.biasType ?? ''),
+                  severity: String(b.severity ?? 'low'),
+                  confidence: typeof b.confidence === 'number' ? b.confidence : 0.5,
+                  evidence: String(b.excerpt ?? ''),
+                })),
                 summary: (report.metaVerdict as string) || (report.summary as string) || '',
                 dissenterCount: 0,
                 noiseLevel:

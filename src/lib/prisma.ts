@@ -168,10 +168,7 @@ const TRANSIENT_ERROR_CODES = new Set([
  * Retry a database operation on transient failures.
  * Use for read queries and idempotent writes only.
  */
-export async function withRetry<T>(
-  operation: () => Promise<T>,
-  maxRetries = 2
-): Promise<T> {
+export async function withRetry<T>(operation: () => Promise<T>, maxRetries = 2): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {

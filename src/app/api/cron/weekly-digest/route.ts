@@ -140,80 +140,105 @@ export async function GET(req: NextRequest) {
 
           // Gather org-wide stats for the week
           const [decisionCount, orgBiasInstances, orgOutcomes] = await Promise.all([
-            prisma.humanDecision.count({
-              where: { orgId, createdAt: { gte: oneWeekAgo } },
-            }).catch(() => 0),
-            prisma.biasInstance.findMany({
-              where: {
-                analysis: { document: { orgId }, createdAt: { gte: oneWeekAgo } },
-              },
-              select: { biasType: true },
-            }).catch(() => []),
-            prisma.decisionOutcome.count({
-              where: { orgId },
-            }).catch(() => 0),
+            prisma.humanDecision
+              .count({
+                where: { orgId, createdAt: { gte: oneWeekAgo } },
+              })
+              .catch(() => 0),
+            prisma.biasInstance
+              .findMany({
+                where: {
+                  analysis: { document: { orgId }, createdAt: { gte: oneWeekAgo } },
+                },
+                select: { biasType: true },
+              })
+              .catch(() => []),
+            prisma.decisionOutcome
+              .count({
+                where: { orgId },
+              })
+              .catch(() => 0),
           ]);
 
           // Also count document analyses
-          const orgDocCount = await prisma.document.count({
-            where: { orgId, status: 'complete', updatedAt: { gte: oneWeekAgo } },
-          }).catch(() => 0);
+          const orgDocCount = await prisma.document
+            .count({
+              where: { orgId, status: 'complete', updatedAt: { gte: oneWeekAgo } },
+            })
+            .catch(() => 0);
 
           // Avg DQI for the week
-          const orgScores = await prisma.analysis.findMany({
-            where: { document: { orgId }, createdAt: { gte: oneWeekAgo } },
-            select: { overallScore: true },
-          }).catch(() => []);
-          const avgOrgScore = orgScores.length > 0
-            ? orgScores.reduce((sum, a) => sum + (a.overallScore ?? 0), 0) / orgScores.length
-            : 0;
+          const orgScores = await prisma.analysis
+            .findMany({
+              where: { document: { orgId }, createdAt: { gte: oneWeekAgo } },
+              select: { overallScore: true },
+            })
+            .catch(() => []);
+          const avgOrgScore =
+            orgScores.length > 0
+              ? orgScores.reduce((sum, a) => sum + (a.overallScore ?? 0), 0) / orgScores.length
+              : 0;
 
           // Top biases
           const orgBiasCounts = new Map<string, number>();
           for (const bi of orgBiasInstances) {
             orgBiasCounts.set(bi.biasType, (orgBiasCounts.get(bi.biasType) || 0) + 1);
           }
-          const topOrgBiases = [...orgBiasCounts.entries()]
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3);
+          const topOrgBiases = [...orgBiasCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
 
           // Pending outcomes
-          const pendingOutcomes = await prisma.analysis.count({
-            where: {
-              document: { orgId },
-              outcomeStatus: { in: ['pending_outcome', 'outcome_overdue'] },
-            },
-          }).catch(() => 0);
+          const pendingOutcomes = await prisma.analysis
+            .count({
+              where: {
+                document: { orgId },
+                outcomeStatus: { in: ['pending_outcome', 'outcome_overdue'] },
+              },
+            })
+            .catch(() => 0);
 
           // Skip if no activity
           if (decisionCount === 0 && orgDocCount === 0) continue;
 
           // Build Block Kit digest
-          const { deliverSlackNudge, resolveToken } = await import(
-            '@/lib/integrations/slack/handler'
-          );
+          const { deliverSlackNudge, resolveToken } =
+            await import('@/lib/integrations/slack/handler');
 
           const token = await resolveToken(install.teamId);
           if (!token) continue;
 
           const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.decisionintel.ai';
-          const scoreEmoji = avgOrgScore >= 70 ? ':large_green_circle:' : avgOrgScore >= 40 ? ':large_yellow_circle:' : ':red_circle:';
+          const scoreEmoji =
+            avgOrgScore >= 70
+              ? ':large_green_circle:'
+              : avgOrgScore >= 40
+                ? ':large_yellow_circle:'
+                : ':red_circle:';
 
-          const biasText = topOrgBiases.length > 0
-            ? topOrgBiases.map(([type, count]) => `:warning: ${type.replace(/_/g, ' ')} (${count}x)`).join('\n')
-            : '_None detected this week_';
+          const biasText =
+            topOrgBiases.length > 0
+              ? topOrgBiases
+                  .map(([type, count]) => `:warning: ${type.replace(/_/g, ' ')} (${count}x)`)
+                  .join('\n')
+              : '_None detected this week_';
 
           const blocks: Array<Record<string, unknown>> = [
             {
               type: 'header',
-              text: { type: 'plain_text', text: 'Weekly Decision Intelligence Digest', emoji: true },
+              text: {
+                type: 'plain_text',
+                text: 'Weekly Decision Intelligence Digest',
+                emoji: true,
+              },
             },
             {
               type: 'section',
               fields: [
                 { type: 'mrkdwn', text: `*Documents Analyzed*\n${orgDocCount}` },
                 { type: 'mrkdwn', text: `*Decisions Captured*\n${decisionCount}` },
-                { type: 'mrkdwn', text: `*Avg DQI Score*\n${scoreEmoji} ${Math.round(avgOrgScore)}/100` },
+                {
+                  type: 'mrkdwn',
+                  text: `*Avg DQI Score*\n${scoreEmoji} ${Math.round(avgOrgScore)}/100`,
+                },
                 { type: 'mrkdwn', text: `*Outcomes Logged*\n${orgOutcomes}` },
               ],
             },
@@ -255,7 +280,10 @@ export async function GET(req: NextRequest) {
             {
               type: 'context',
               elements: [
-                { type: 'mrkdwn', text: `_Weekly digest for ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}_ | Manage in <${appUrl}/dashboard/settings|Settings>` },
+                {
+                  type: 'mrkdwn',
+                  text: `_Weekly digest for ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}_ | Manage in <${appUrl}/dashboard/settings|Settings>`,
+                },
               ],
             }
           );

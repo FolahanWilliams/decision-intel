@@ -75,7 +75,11 @@ export function RedTeamTab({ analysisId, cognitiveAnalysis, preMortem }: RedTeam
   const counterArguments = cognitiveAnalysis?.counterArguments ?? [];
 
   const gapColor =
-    blindSpotGap < 50 ? 'text-red-600 dark:text-red-400' : blindSpotGap < 80 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400';
+    blindSpotGap < 50
+      ? 'text-red-600 dark:text-red-400'
+      : blindSpotGap < 80
+        ? 'text-amber-600 dark:text-amber-400'
+        : 'text-emerald-600 dark:text-emerald-400';
   const gapLabel =
     blindSpotGap < 50
       ? 'Tunnel Vision Detected'

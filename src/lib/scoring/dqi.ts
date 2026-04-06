@@ -132,7 +132,7 @@ export const WEIGHTS = {
   evidenceQuality: 0.18,
   processMaturity: 0.13,
   complianceRisk: 0.13,
-  historicalAlignment: 0.10,
+  historicalAlignment: 0.1,
 };
 
 const BIAS_SEVERITY_COST: Record<string, number> = {
@@ -159,10 +159,14 @@ export const METHODOLOGY_VERSION = '2.0.0';
 
 /** Biases associated with fast, heuristic (System 1) processing */
 export const SYSTEM1_BIASES = new Set([
-  'anchoring_bias', 'anchoring',
-  'availability_heuristic', 'availability',
-  'recency_bias', 'recency',
-  'framing_effect', 'framing',
+  'anchoring_bias',
+  'anchoring',
+  'availability_heuristic',
+  'availability',
+  'recency_bias',
+  'recency',
+  'framing_effect',
+  'framing',
   'loss_aversion',
   'halo_effect',
   'bandwagon_effect',
@@ -622,15 +626,18 @@ export function getHistoricalComparisons(dqiScore: number): Array<{
   }
 
   // Find closest success case above
-  const successAbove = benchmarks
-    .find(b => b.dqi > dqiScore && (b.outcome.includes('success')));
+  const successAbove = benchmarks.find(b => b.dqi > dqiScore && b.outcome.includes('success'));
   if (successAbove) {
     comparisons.push({ ...successAbove, relation: 'below' });
   }
 
   // Find comparable case (within 5 points)
-  const comparable = benchmarks
-    .find(b => Math.abs(b.dqi - dqiScore) <= 5 && b.company !== failureBelow?.company && b.company !== successAbove?.company);
+  const comparable = benchmarks.find(
+    b =>
+      Math.abs(b.dqi - dqiScore) <= 5 &&
+      b.company !== failureBelow?.company &&
+      b.company !== successAbove?.company
+  );
   if (comparable) {
     comparisons.push({ ...comparable, relation: 'comparable' });
   }

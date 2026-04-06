@@ -17,10 +17,7 @@ import { createLogger } from '@/lib/utils/logger';
 
 const log = createLogger('PlaybookInvokeDetailAPI');
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -44,10 +41,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
     const {
@@ -93,8 +87,7 @@ export async function PATCH(
     }
 
     // Truncate notes at 2000 chars to prevent abuse
-    const notes =
-      typeof body.notes === 'string' ? body.notes.slice(0, 2000) : undefined;
+    const notes = typeof body.notes === 'string' ? body.notes.slice(0, 2000) : undefined;
 
     const updated = await prisma.playbookInvocation.update({
       where: { id },

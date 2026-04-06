@@ -536,9 +536,8 @@ function computeBiasOutcomeDivergence(allCases: CaseStudy[]): BiasOutcomeDiverge
 
     // How often was this bias managed in success cases?
     const managedInSuccesses = successes.filter(c => c.biasesManaged.includes(bias));
-    const mitigationFrequency = successes.length > 0
-      ? managedInSuccesses.length / successes.length
-      : 0;
+    const mitigationFrequency =
+      successes.length > 0 ? managedInSuccesses.length / successes.length : 0;
 
     // What mitigation factors appeared most in successes vs failures?
     const successMitigators = new Map<string, number>();
@@ -584,9 +583,12 @@ function computeSuccessPatterns(successCases: CaseStudy[]): SuccessPatternCorrel
 
       // Find required conditions (context factors common across cases)
       const conditions: string[] = [];
-      const dissentRate = cases.filter(c => c.contextFactors.dissentEncouraged).length / cases.length;
-      const advisorRate = cases.filter(c => c.contextFactors.externalAdvisors).length / cases.length;
-      const iterativeRate = cases.filter(c => c.contextFactors.iterativeProcess).length / cases.length;
+      const dissentRate =
+        cases.filter(c => c.contextFactors.dissentEncouraged).length / cases.length;
+      const advisorRate =
+        cases.filter(c => c.contextFactors.externalAdvisors).length / cases.length;
+      const iterativeRate =
+        cases.filter(c => c.contextFactors.iterativeProcess).length / cases.length;
       if (dissentRate > 0.5) conditions.push('dissent_encouraged');
       if (advisorRate > 0.5) conditions.push('external_advisors');
       if (iterativeRate > 0.5) conditions.push('iterative_process');
@@ -760,7 +762,8 @@ export function computeCorrelationMultiplier(
     // Require at least one context condition match and one bias overlap
     if (contextTotal > 0 && contextMatch > 0) {
       matchedSuccessPatterns.push(sp);
-      const matchStrength = (contextMatch / contextTotal) * (biasOverlap.length / sp.associatedBiasesManaged.length);
+      const matchStrength =
+        (contextMatch / contextTotal) * (biasOverlap.length / sp.associatedBiasesManaged.length);
       beneficialDamping -= matchStrength * 0.15;
     }
   }

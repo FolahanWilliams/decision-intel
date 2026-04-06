@@ -13,7 +13,9 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user?.id || !user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -31,10 +33,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Look up the deal and verify access
-    const membership = await prisma.teamMember.findFirst({
-      where: { userId: user.id },
-      select: { orgId: true },
-    }).catch(() => null);
+    const membership = await prisma.teamMember
+      .findFirst({
+        where: { userId: user.id },
+        select: { orgId: true },
+      })
+      .catch(() => null);
 
     const deal = await prisma.deal.findFirst({
       where: { id: dealId, orgId: membership?.orgId || user.id },
@@ -50,28 +54,39 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing active purchase
-    const existing = await prisma.dealAuditPurchase.findFirst({
-      where: { dealId, status: 'active' },
-    }).catch(() => null);
+    const existing = await prisma.dealAuditPurchase
+      .findFirst({
+        where: { dealId, status: 'active' },
+      })
+      .catch(() => null);
 
     if (existing) {
-      return NextResponse.json({ error: 'Deal audit already purchased', purchaseId: existing.id }, { status: 409 });
+      return NextResponse.json(
+        { error: 'Deal audit already purchased', purchaseId: existing.id },
+        { status: 409 }
+      );
     }
 
     const ticketSize = Number(deal.ticketSize);
     const tier = getDealAuditTier(ticketSize);
 
     if (!tier.priceId) {
-      return NextResponse.json({ error: 'Deal audit pricing not configured for this tier' }, { status: 503 });
+      return NextResponse.json(
+        { error: 'Deal audit pricing not configured for this tier' },
+        { status: 503 }
+      );
     }
 
     // Check for existing Stripe customer
-    const existingSub = await prisma.subscription.findFirst({
-      where: { userId: user.id },
-      select: { stripeCustomerId: true },
-    }).catch(() => null);
+    const existingSub = await prisma.subscription
+      .findFirst({
+        where: { userId: user.id },
+        select: { stripeCustomerId: true },
+      })
+      .catch(() => null);
 
-    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const origin =
+      request.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
     const session = await getStripe().checkout.sessions.create({
       mode: 'payment',

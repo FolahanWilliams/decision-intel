@@ -593,7 +593,9 @@ export async function runFullRecalibration(orgId?: string | null): Promise<{
     try {
       const result = await updateCausalModel(orgId);
       causalModelUpdated = result != null;
-      log.info(`Causal model ${causalModelUpdated ? 'updated' : 'skipped (insufficient data)'} for ${orgId}`);
+      log.info(
+        `Causal model ${causalModelUpdated ? 'updated' : 'skipped (insufficient data)'} for ${orgId}`
+      );
     } catch (error) {
       log.error(`Causal model update failed for ${orgId}:`, error);
     }
@@ -606,5 +608,10 @@ export async function runFullRecalibration(orgId?: string | null): Promise<{
       `causal=${causalModelUpdated}`
   );
 
-  return { biasSeverity, nudgeThresholds, twinWeights, causalModel: { updated: causalModelUpdated } };
+  return {
+    biasSeverity,
+    nudgeThresholds,
+    twinWeights,
+    causalModel: { updated: causalModelUpdated },
+  };
 }

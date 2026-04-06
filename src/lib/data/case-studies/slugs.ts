@@ -54,7 +54,10 @@ function buildSlugMap(): {
 
     // Still collides (same company + year) — append the id tail.
     if (bySlug.has(slug)) {
-      const tail = c.id.replace(/[^a-z0-9]+/gi, '').slice(-4).toLowerCase();
+      const tail = c.id
+        .replace(/[^a-z0-9]+/gi, '')
+        .slice(-4)
+        .toLowerCase();
       slug = `${slug}-${tail}`;
     }
 

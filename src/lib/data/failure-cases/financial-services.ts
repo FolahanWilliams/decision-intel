@@ -313,7 +313,7 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         'groupthink',
       ],
       hypotheticalAnalysis:
-        "Decision intelligence would have flagged the extreme concentration risk and the foundational assumption that national housing prices could not decline simultaneously — an assumption contradicted by historical data from Japan (1990s) and regional US markets. The absence of correlated-default stress testing would have triggered immediate model risk warnings.",
+        'Decision intelligence would have flagged the extreme concentration risk and the foundational assumption that national housing prices could not decline simultaneously — an assumption contradicted by historical data from Japan (1990s) and regional US markets. The absence of correlated-default stress testing would have triggered immediate model risk warnings.',
     },
     source:
       'Financial Crisis Inquiry Commission Report (2011); Congressional Oversight Panel, "The AIG Rescue" (2010)',
@@ -374,7 +374,7 @@ export const FINANCIAL_SERVICES_CASES: FailureCase[] = [
         'halo_effect',
       ],
       hypotheticalAnalysis:
-        "Decision intelligence would have flagged the unusual trustee account structure as a verification gap — the inability to independently confirm €1.9B in assets through standard audit procedures was a critical red flag. The pattern of attacking short-sellers rather than providing transparent rebuttals would have triggered authority bias and confirmation bias warnings.",
+        'Decision intelligence would have flagged the unusual trustee account structure as a verification gap — the inability to independently confirm €1.9B in assets through standard audit procedures was a critical red flag. The pattern of attacking short-sellers rather than providing transparent rebuttals would have triggered authority bias and confirmation bias warnings.',
     },
     source:
       'German Parliamentary Inquiry into Wirecard (2021); FT investigative series by Dan McCrum (2015-2020)',

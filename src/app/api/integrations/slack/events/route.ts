@@ -190,7 +190,12 @@ export async function POST(req: NextRequest) {
                   // Run audit in background, then post summary card to thread
                   const decisionInputForAudit = slackEventToDecisionInput(payload);
                   if (decisionInputForAudit) {
-                    processSlackDecision(humanDecision.id, decisionInputForAudit, teamId, installationConfig?.nudgeFrequency)
+                    processSlackDecision(
+                      humanDecision.id,
+                      decisionInputForAudit,
+                      teamId,
+                      installationConfig?.nudgeFrequency
+                    )
                       .then(auditResult => {
                         if (auditResult) {
                           const summaryCard = formatAuditSummaryForSlack(
@@ -516,7 +521,12 @@ export async function POST(req: NextRequest) {
       });
 
       // Run audit in background (don't block Slack's 3-second timeout)
-      processSlackDecision(humanDecision.id, decisionInput, teamId, installationConfig?.nudgeFrequency).catch(err => {
+      processSlackDecision(
+        humanDecision.id,
+        decisionInput,
+        teamId,
+        installationConfig?.nudgeFrequency
+      ).catch(err => {
         log.error(`Background Slack audit failed for ${humanDecision.id}:`, err);
       });
 
@@ -630,11 +640,7 @@ async function processSlackDecision(
             ? nudge.severity === 'critical'
             : false; // 'off' = never deliver
 
-      if (
-        nudgeRecord &&
-        shouldDeliverNudge &&
-        sourceRef
-      ) {
+      if (nudgeRecord && shouldDeliverNudge && sourceRef) {
         const [channel, threadTs] = sourceRef.split(':');
         if (channel) {
           const slackPayload = formatNudgeForSlack(nudge, threadTs, nudgeRecord.id);

@@ -84,7 +84,9 @@ async function deliverWithRetry(
       },
     });
     if (recentCount >= MAX_DELIVERIES_PER_HOUR) {
-      log.warn(`Webhook ${subscriptionId} exceeded ${MAX_DELIVERIES_PER_HOUR} deliveries/hour, throttling`);
+      log.warn(
+        `Webhook ${subscriptionId} exceeded ${MAX_DELIVERIES_PER_HOUR} deliveries/hour, throttling`
+      );
       return;
     }
   } catch {

@@ -243,6 +243,8 @@ function buildRationale(
   }
 
   return `Detected ${topBias}${
-    overlapCount > 1 ? ` (and ${overlapCount - 1} other matching bias${overlapCount > 2 ? 'es' : ''})` : ''
+    overlapCount > 1
+      ? ` (and ${overlapCount - 1} other matching bias${overlapCount > 2 ? 'es' : ''})`
+      : ''
   }. The "${playbook.personaConfig.roles[0]?.name ?? 'primary'}" persona in this playbook is specifically framed to challenge it.`;
 }

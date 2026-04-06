@@ -40,13 +40,13 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
       iterativeProcess: false,
     },
     lessonsLearned: [
-      'When the auditor and the board both defer to management\'s accounting interpretations without independent challenge, the system of checks fails completely.',
+      "When the auditor and the board both defer to management's accounting interpretations without independent challenge, the system of checks fails completely.",
       'Mark-to-market accounting of illiquid long-term contracts allowed leadership to manufacture consensus around artificial earnings growth.',
       'Whistleblower warnings that are escalated only to the people responsible for the problem cannot function as a corrective mechanism.',
     ],
     preDecisionEvidence: {
       document:
-        'Has Enron become a risky place to work? For those of us who didn\'t get rich over the last few years, can we afford to stay? I am incredibly nervous that we will implode in a wave of accounting scandals. The Raptor and Condor transactions, which use Enron stock to hedge mark-to-market losses in our merchant investments, are deeply concerning — they rely on Enron\'s stock price remaining high to remain solvent.',
+        "Has Enron become a risky place to work? For those of us who didn't get rich over the last few years, can we afford to stay? I am incredibly nervous that we will implode in a wave of accounting scandals. The Raptor and Condor transactions, which use Enron stock to hedge mark-to-market losses in our merchant investments, are deeply concerning — they rely on Enron's stock price remaining high to remain solvent.",
       source: 'Sherron Watkins, memo to CEO Ken Lay',
       date: 'August 15, 2001',
       documentType: 'internal_memo',
@@ -54,16 +54,11 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
         'Off-balance-sheet SPEs structured to hide over $1B in debt from investors',
         'Mark-to-market accounting applied to illiquid, long-term energy contracts with no observable market prices',
         'CFO Andrew Fastow personally managing LJM partnerships that transacted directly with Enron — a direct conflict of interest',
-        'Board-approved waiver of Enron\'s own code of ethics to permit CFO\'s dual role',
+        "Board-approved waiver of Enron's own code of ethics to permit CFO's dual role",
       ],
-      flaggableBiases: [
-        'overconfidence',
-        'groupthink',
-        'authority_bias',
-        'confirmation_bias',
-      ],
+      flaggableBiases: ['overconfidence', 'groupthink', 'authority_bias', 'confirmation_bias'],
       hypotheticalAnalysis:
-        'A decision intelligence platform would have flagged the structural conflict of interest in the CFO running both sides of SPE transactions, the circular dependency between Enron\'s stock price and its hedging vehicles, and the absence of independent challenge to mark-to-market valuations on assets with no liquid market. The combination of groupthink and authority bias in the board\'s ethics-code waiver would have triggered a critical governance alert.',
+        "A decision intelligence platform would have flagged the structural conflict of interest in the CFO running both sides of SPE transactions, the circular dependency between Enron's stock price and its hedging vehicles, and the absence of independent challenge to mark-to-market valuations on assets with no liquid market. The combination of groupthink and authority bias in the board's ethics-code waiver would have triggered a critical governance alert.",
     },
     source:
       'Enron Corp. Chapter 11 filing, S.D. Tex. Case No. 01-16034; Powers Committee Report (February 2002); Bethany McLean and Peter Elkind, "The Smartest Guys in the Room" (2003)',
@@ -77,19 +72,14 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
     year: 2002,
     yearRealized: 2002,
     summary:
-      'WorldCom\'s CEO Bernie Ebbers and CFO Scott Sullivan orchestrated an $11 billion accounting fraud by capitalizing operating expenses as capital expenditures, inflating reported earnings. Internal auditor Cynthia Cooper discovered the fraud in June 2002 despite resistance from senior finance executives. The company filed for bankruptcy in July 2002 with $107 billion in assets — surpassing Enron as the largest U.S. bankruptcy at the time.',
+      "WorldCom's CEO Bernie Ebbers and CFO Scott Sullivan orchestrated an $11 billion accounting fraud by capitalizing operating expenses as capital expenditures, inflating reported earnings. Internal auditor Cynthia Cooper discovered the fraud in June 2002 despite resistance from senior finance executives. The company filed for bankruptcy in July 2002 with $107 billion in assets — surpassing Enron as the largest U.S. bankruptcy at the time.",
     decisionContext:
       'Whether to continue capitalizing line costs (operating expenses) as capital expenditures to maintain the appearance of profitability and meet Wall Street earnings estimates.',
     outcome: 'catastrophic_failure',
     impactScore: 96,
     estimatedImpact: '$180B in market capitalization destroyed',
     impactDirection: 'negative',
-    biasesPresent: [
-      'authority_bias',
-      'groupthink',
-      'confirmation_bias',
-      'sunk_cost_fallacy',
-    ],
+    biasesPresent: ['authority_bias', 'groupthink', 'confirmation_bias', 'sunk_cost_fallacy'],
     primaryBias: 'authority_bias',
     toxicCombinations: ['Echo Chamber', 'Sunk Ship'],
     beneficialPatterns: [],
@@ -108,12 +98,12 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
     },
     lessonsLearned: [
       'Authority bias toward the CEO created an environment where the CFO felt empowered to commit fraud rather than report disappointing results.',
-      'The sunk cost of WorldCom\'s acquisition-driven growth strategy made leadership incapable of admitting the organic growth model was broken.',
+      "The sunk cost of WorldCom's acquisition-driven growth strategy made leadership incapable of admitting the organic growth model was broken.",
       'Internal audit independence — Cynthia Cooper reported to the audit committee, not the CFO — was the only mechanism that ultimately exposed the fraud.',
     ],
     preDecisionEvidence: {
       document:
-        'Effective immediately, all line cost entries above $5 million are to be reclassified from operating expense accounts to capital expenditure accounts under the prepaid capacity line item. This adjustment reflects management\'s revised view that these costs represent long-term network investments with multi-year useful lives. Do not discuss these reclassifications with external auditors until further notice.',
+        "Effective immediately, all line cost entries above $5 million are to be reclassified from operating expense accounts to capital expenditure accounts under the prepaid capacity line item. This adjustment reflects management's revised view that these costs represent long-term network investments with multi-year useful lives. Do not discuss these reclassifications with external auditors until further notice.",
       source: 'CFO Scott Sullivan, internal accounting policy directive to WorldCom comptroller',
       date: '2001',
       documentType: 'internal_memo',
@@ -122,13 +112,9 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
         'Revenue declining quarter-over-quarter while reported earnings remained stable, masking deterioration through accounting adjustments',
         'Internal auditor Cynthia Cooper blocked from reviewing general ledger entries by senior finance staff',
       ],
-      flaggableBiases: [
-        'authority_bias',
-        'groupthink',
-        'sunk_cost_fallacy',
-      ],
+      flaggableBiases: ['authority_bias', 'groupthink', 'sunk_cost_fallacy'],
       hypotheticalAnalysis:
-        'A decision intelligence platform would have detected the anomalous divergence between declining telecom revenue industry-wide and WorldCom\'s stable reported earnings, flagging the sudden spike in capitalized line costs as inconsistent with historical patterns. The directive to exclude external auditors from reviewing entries would have triggered a critical transparency alert, and authority bias scoring would have identified the CFO\'s unilateral control over accounting classifications as a single point of failure.',
+        "A decision intelligence platform would have detected the anomalous divergence between declining telecom revenue industry-wide and WorldCom's stable reported earnings, flagging the sudden spike in capitalized line costs as inconsistent with historical patterns. The directive to exclude external auditors from reviewing entries would have triggered a critical transparency alert, and authority bias scoring would have identified the CFO's unilateral control over accounting classifications as a single point of failure.",
     },
     source:
       'WorldCom Inc. Chapter 11 filing, S.D.N.Y. Case No. 02-13533; SEC v. WorldCom Inc. (2002); Cynthia Cooper, "Extraordinary Circumstances" (2008)',
@@ -142,7 +128,7 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
     year: 2022,
     yearRealized: 2022,
     summary:
-      'FTX, valued at $32 billion, collapsed in November 2022 when it was revealed that founder Sam Bankman-Fried had diverted $8 billion in customer funds to sister company Alameda Research. The collapse was triggered by a CoinDesk report revealing Alameda\'s balance sheet was dominated by FTX\'s own FTT token. No board oversight, no independent risk management, and a culture of deference to SBF\'s perceived genius allowed the fraud to persist.',
+      "FTX, valued at $32 billion, collapsed in November 2022 when it was revealed that founder Sam Bankman-Fried had diverted $8 billion in customer funds to sister company Alameda Research. The collapse was triggered by a CoinDesk report revealing Alameda's balance sheet was dominated by FTX's own FTT token. No board oversight, no independent risk management, and a culture of deference to SBF's perceived genius allowed the fraud to persist.",
     decisionContext:
       'Whether investors, partners, and board members should have demanded standard corporate governance controls (independent board, audited financials, segregated customer funds) from a rapidly growing crypto exchange run by a celebrated founder.',
     outcome: 'catastrophic_failure',
@@ -180,7 +166,8 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
     preDecisionEvidence: {
       document:
         'FTX operates with a lean organizational structure optimized for speed. The company does not maintain a formal board of directors, as the founder retains strategic decision-making authority. There is no chief financial officer; financial oversight is handled directly by the founding team. Compliance and risk management functions are embedded within engineering, reflecting our technology-first approach to regulatory engagement.',
-      source: 'FTX Series B investor presentation deck, provided to Sequoia Capital and other investors',
+      source:
+        'FTX Series B investor presentation deck, provided to Sequoia Capital and other investors',
       date: '2021',
       documentType: 'strategy_document',
       detectableRedFlags: [
@@ -189,14 +176,9 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
         'No audit committee or independent financial oversight — founder personally controlled all treasury functions',
         'Sequoia invested $214M based on stated "intuition about the founder" rather than governance due diligence',
       ],
-      flaggableBiases: [
-        'halo_effect',
-        'authority_bias',
-        'groupthink',
-        'overconfidence',
-      ],
+      flaggableBiases: ['halo_effect', 'authority_bias', 'groupthink', 'overconfidence'],
       hypotheticalAnalysis:
-        'A decision intelligence platform would have immediately flagged the absence of basic corporate governance — no board, no CFO, no compliance officer — as a critical structural risk for any entity custodying customer assets. The halo effect surrounding the founder\'s public profile and effective altruism narrative would have been identified as displacing standard due diligence. The platform would have rated this investment as failing minimum governance thresholds regardless of growth metrics.',
+        "A decision intelligence platform would have immediately flagged the absence of basic corporate governance — no board, no CFO, no compliance officer — as a critical structural risk for any entity custodying customer assets. The halo effect surrounding the founder's public profile and effective altruism narrative would have been identified as displacing standard due diligence. The platform would have rated this investment as failing minimum governance thresholds regardless of growth metrics.",
     },
     source:
       'FTX Trading Ltd. Chapter 11 filing, D. Del. Case No. 22-11068; John J. Ray III First Day Declaration (November 2022); U.S. v. Bankman-Fried, S.D.N.Y. 22-cr-673',
@@ -210,9 +192,9 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
     year: 2023,
     yearRealized: 2023,
     summary:
-      'SVB invested heavily in long-duration government bonds and mortgage-backed securities during the zero-interest-rate era. When the Fed rapidly raised rates in 2022-2023, SVB\'s bond portfolio lost $17 billion in unrealized value. A poorly communicated capital raise triggered a bank run, with $42 billion withdrawn in a single day. The FDIC seized the bank on March 10, 2023 — the second-largest bank failure in U.S. history.',
+      "SVB invested heavily in long-duration government bonds and mortgage-backed securities during the zero-interest-rate era. When the Fed rapidly raised rates in 2022-2023, SVB's bond portfolio lost $17 billion in unrealized value. A poorly communicated capital raise triggered a bank run, with $42 billion withdrawn in a single day. The FDIC seized the bank on March 10, 2023 — the second-largest bank failure in U.S. history.",
     decisionContext:
-      'Whether to maintain a heavily concentrated portfolio of long-duration fixed-income securities or hedge interest rate risk through diversification and derivatives, given the Fed\'s signaled shift toward tightening monetary policy.',
+      "Whether to maintain a heavily concentrated portfolio of long-duration fixed-income securities or hedge interest rate risk through diversification and derivatives, given the Fed's signaled shift toward tightening monetary policy.",
     outcome: 'catastrophic_failure',
     impactScore: 91,
     estimatedImpact: '$209B in assets seized; depositor panic across regional banks',
@@ -257,12 +239,7 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
         'No interest rate hedges in place since Q1 2021 despite Fed signaling aggressive tightening',
         'CFO position vacant for 8 months during the most significant rate environment shift in decades',
       ],
-      flaggableBiases: [
-        'status_quo_bias',
-        'anchoring_bias',
-        'overconfidence',
-        'normalcy_bias',
-      ],
+      flaggableBiases: ['status_quo_bias', 'anchoring_bias', 'overconfidence', 'normalcy_bias'],
       hypotheticalAnalysis:
         'A decision intelligence platform would have flagged the duration mismatch as a critical risk, modeling the mark-to-market loss exposure under a 300-400bps rate increase scenario. The 97% uninsured deposit concentration would have triggered an immediate liquidity stress alert — any loss of confidence could produce withdrawal rates far exceeding historical norms. The vacant CFO role during a period requiring active balance sheet management would have been surfaced as a governance gap amplifying execution risk.',
     },
@@ -315,14 +292,14 @@ export const FINANCIAL_FAILURE_CASES: CaseStudy[] = [
     ],
     preDecisionEvidence: {
       document:
-        'GE Capital is the growth engine of this company, and we intend to expand its reach. Financial services now represent our highest-return businesses, generating consistent double-digit earnings growth. We will continue to deploy capital into financial services — insurance, commercial lending, and consumer finance — where GE\'s management discipline and operational rigor give us a structural advantage over traditional banks. Our industrial businesses provide the foundation, but GE Capital provides the growth.',
+        "GE Capital is the growth engine of this company, and we intend to expand its reach. Financial services now represent our highest-return businesses, generating consistent double-digit earnings growth. We will continue to deploy capital into financial services — insurance, commercial lending, and consumer finance — where GE's management discipline and operational rigor give us a structural advantage over traditional banks. Our industrial businesses provide the foundation, but GE Capital provides the growth.",
       source: 'Jeff Immelt, 2003 annual shareholder letter',
       date: '2003',
       documentType: 'public_statement',
       detectableRedFlags: [
         'GE Capital growing to contribute 55% of consolidated earnings, transforming an industrial conglomerate into a de facto unregulated bank',
         'Industrial conglomerate structure masking financial services concentration risk from investors and regulators',
-        'Complexity of GE Capital\'s portfolio — insurance, subprime lending, commercial real estate — making independent risk assessment nearly impossible',
+        "Complexity of GE Capital's portfolio — insurance, subprime lending, commercial real estate — making independent risk assessment nearly impossible",
         'Stock buybacks and dividend increases funded by financial leverage rather than industrial cash flows',
       ],
       flaggableBiases: [
