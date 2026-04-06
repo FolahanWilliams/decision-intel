@@ -91,6 +91,7 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Intelligence Brief: Contextual org intelligence on empty dashboard states — shows top dangerous biases, maturity grade, decision stats, and page-specific tips.
 - Webhooks: 5 subscribable events (analysis.completed, outcome.reported, nudge.delivered, toxic_combination.detected, decision_room.updated) for custom integrations.
 - Public API v1: Scoped API keys with analyze, documents, outcomes, insights permissions. OpenAPI spec at /api/v1/openapi.
+- Founder AI Chat: Password-gated floating chat widget in Founder Hub. SSE streaming via Gemini with full product/market/sales context injection. 7 starter questions. Session memory (last 10 messages). Response sanitization (no markdown, no em dashes). Used for strategic advising, content brainstorming, pitch rehearsal, and competitive positioning.
 
 === FOUNDER NOTES ===
 - Deepest moat is time-to-data, not features. Frame first 6 months as calibration investment.
@@ -130,7 +131,10 @@ Demo script: Upload → Score reveal (pause for effect) → Bias walkthrough (sp
 - Quick Bias Check: Dashboard modal for instant <5s bias scan via paste. Shared Gemini utility across extension + platform.
 - Counterfactual Analysis API: "What-if" decision path computation with narrative explanations.
 - Enterprise Project Types: M&A, Strategic Initiative, Risk Assessment, Vendor Evaluation, Product Launch, Restructuring — alongside existing PE/VC types.
-- Founder Hub Streamlining: Now 11 tabs — Product Overview, Analysis Pipeline, Scoring Engine, DQI Methodology, Integrations & Flywheel, Strategy & Positioning, Sales Toolkit, Live Stats, Playbook & Research, Case Studies, Correlation & Causal Graph. Global search (⌘K), responsive tab strip.
+- Founder Hub Expansion: Now 14 tabs — Product Overview, Analysis Pipeline, Scoring Engine, DQI Methodology, Integrations & Flywheel, Strategy & Positioning, Sales Toolkit, Live Stats, Playbook & Research, Methodologies & Principles, Case Studies, Correlation & Causal Graph, Content Studio, Founder Tips. Global search (⌘K), responsive tab strip, floating AI chat widget.
+- Content Studio: AI-powered content generation for LinkedIn posts, Twitter/X threads, blog drafts, snippets, and YouTube scripts. Three content pillars (Last-Mile Problem, Decision Noise, Toxic Combinations). Tone customization (authoritative, conversational, technical, inspirational). Voice notes persistence. Minto Pyramid (BLUF) structure enforced. Content library with draft/ready/posted status management. Powered by Gemini with full founder context injection.
+- Methodologies & Principles Tab: Academic grounding for all platform features — Kahneman, Klein, Tetlock, Duke, Sibony, Strebulaev, Lochhead, Thiel frameworks with implementation mapping.
+- Founder Tips Tab: 14 personalized strategic principles across 4 sections (Narrative & Positioning, Moat Discipline, GTM & Wedge, Execution). Grounded in founder's specific position. Each tip has principle, rationale, and concrete action.
 - DQI Methodology Tab: Full transparency on 6-component DQI scoring — weight breakdown, component formulas, case study DQI rankings, System 1 vs System 2 bias classification, grade scale.
 - Correlation & Causal Graph Tab: Visualizes cross-case correlations — bias co-occurrence pairs, industry risk profiles, severity predictors, context amplifiers, seed weights, and inline SVG causal graph (biases → outcomes).
 - Pre-Decision Evidence: 6 case studies now include original documents from BEFORE outcomes were known (board memos, SEC filings, earnings calls). Shows what the platform would have flagged — eliminating hindsight bias from the analysis.
