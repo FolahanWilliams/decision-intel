@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createLogger } from '@/lib/utils/logger';
+import { sendNewsletterWelcome } from '@/lib/notifications/email';
 import { z } from 'zod';
 
 const log = createLogger('PilotInterest');
@@ -96,6 +97,11 @@ export async function POST(req: NextRequest) {
 
     // Fire-and-forget Slack ping; don't await the promise chain longer than needed.
     void notifySlack({ email, caseSlug, company, referer });
+
+    // Send welcome email for newsletter subscriptions (fire-and-forget)
+    if (source?.startsWith('newsletter_')) {
+      void sendNewsletterWelcome(email);
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {

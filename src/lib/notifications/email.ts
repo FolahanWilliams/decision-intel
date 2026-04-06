@@ -14,7 +14,7 @@ import { createLogger } from '@/lib/utils/logger';
 const log = createLogger('EmailNotifications');
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Decision Intel <notifications@decisionintel.app>';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Decision Intel <notifications@decision-intel.com>';
 
 /** Whether email delivery is configured (RESEND_API_KEY is set). */
 export function isEmailConfigured(): boolean {
@@ -43,7 +43,7 @@ function escapeHtml(str: string): string {
 /** Sentinel return value distinguishing "not configured" from "send failure". */
 type SendResult = 'sent' | 'dry_run' | 'failed';
 
-async function sendEmail(payload: EmailPayload): Promise<SendResult> {
+export async function sendEmail(payload: EmailPayload): Promise<SendResult> {
   if (!RESEND_API_KEY) {
     log.warn(
       `[DRY RUN] Email not sent (RESEND_API_KEY not configured): "${payload.subject}" to ${payload.to}`
@@ -503,4 +503,71 @@ export async function notifyUsageLimit(
   `;
   const result = await sendEmail({ to: email, subject, html, includeUnsubscribe: true });
   await logNotification(userId, 'email', 'usage_limit_80', subject, result);
+}
+
+/**
+ * Send welcome email to new newsletter subscribers.
+ * Called from the pilot-interest endpoint for newsletter sign-ups.
+ */
+export async function sendNewsletterWelcome(email: string): Promise<SendResult> {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://decision-intel.com';
+  const subject = 'Welcome to the Decision Intelligence Brief';
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto;">
+      <div style="background: #0f0f23; padding: 32px 24px; border-radius: 12px; color: #e2e8f0;">
+        <div style="margin-bottom: 24px;">
+          <span style="font-size: 20px; font-weight: 700; color: #fff;">Decision Intel</span>
+          <span style="color: #16A34A; margin-left: 4px;">≫</span>
+        </div>
+
+        <h1 style="margin: 0 0 8px; font-size: 22px; color: #fff; font-weight: 700;">
+          Welcome to the Decision Intelligence Brief
+        </h1>
+        <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+          Every week, you'll receive one real-world business decision — broken down with the
+          cognitive biases that were detectable <em>before</em> the outcome was known.
+        </p>
+
+        <div style="background: #1a1a2e; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+          <div style="font-size: 13px; font-weight: 600; color: #16A34A; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+            What to expect
+          </div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 8px 12px 8px 0; vertical-align: top; color: #16A34A; font-size: 16px;">&#x2713;</td>
+              <td style="padding: 8px 0; color: #e2e8f0; font-size: 14px; line-height: 1.5;">
+                <strong>Bias Breakdown</strong> — Which cognitive biases were present, how they compounded, and what made them dangerous
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 12px 8px 0; vertical-align: top; color: #16A34A; font-size: 16px;">&#x2713;</td>
+              <td style="padding: 8px 0; color: #e2e8f0; font-size: 14px; line-height: 1.5;">
+                <strong>Pre-Decision Evidence</strong> — What was visible in the documents before the outcome was known, eliminating hindsight bias
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 12px 8px 0; vertical-align: top; color: #16A34A; font-size: 16px;">&#x2713;</td>
+              <td style="padding: 8px 0; color: #e2e8f0; font-size: 14px; line-height: 1.5;">
+                <strong>Lessons for Your Decisions</strong> — Actionable patterns you can apply to your own strategic decisions and deal reviews
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <a href="${appUrl}/case-studies"
+           style="display: inline-block; padding: 12px 24px; background: #16A34A; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
+          Explore Case Studies
+        </a>
+
+        <p style="color: #64748b; font-size: 12px; margin-top: 32px; line-height: 1.5;">
+          You're receiving this because you subscribed to the Decision Intelligence Brief.
+          If you didn't subscribe, you can safely ignore this email.
+          <br /><br />
+          Decision Intel &middot; The Decision Performance OS for M&amp;A and investment teams
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({ to: email, subject, html, includeUnsubscribe: true });
 }
