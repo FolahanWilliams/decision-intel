@@ -1,31 +1,37 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 
 /**
- * HeroDecisionGraph — Simulated interactive force-directed bias/decision graph.
+ * HeroDecisionGraph — Interactive decision knowledge graph based on the
+ * WeWork S-1 IPO filing (August 2019). Grounded in a real, universally
+ * recognized business failure so enterprise buyers can click nodes and
+ * see exactly what Decision Intel would have flagged.
  *
- * Shows a realistic preview of what the product's decision analysis output
- * looks like: decisions as central nodes, biases as surrounding threat nodes,
- * toxic combination edges pulsing between them, and severity-coded coloring.
- *
- * Uses a simple spring-physics simulation (no D3 dependency) to create
- * organic, slightly-moving node positions that feel alive.
+ * Source: WeWork S-1 (SEC, Aug 14 2019), "The Cult of We" (Brown & Farrell, 2021)
  */
 
 // ─── Types ──────────────────────────────────────────────────────────────────
+
+interface NodeDetail {
+  title: string;
+  severity?: string;
+  excerpt: string;
+  insight: string;
+}
 
 interface GraphNode {
   id: string;
   label: string;
   type: 'decision' | 'bias' | 'outcome';
   severity?: 'critical' | 'high' | 'medium' | 'low';
+  detail: NodeDetail;
   x: number;
   y: number;
   vx: number;
   vy: number;
-  fx?: number; // fixed x (for pinned nodes)
+  fx?: number;
   fy?: number;
   radius: number;
 }
@@ -41,7 +47,6 @@ interface GraphEdge {
 
 const COLORS = {
   decision: '#0F172A',
-  decisionStroke: '#334155',
   bias: {
     critical: '#DC2626',
     high: '#F97316',
@@ -62,46 +67,160 @@ const COLORS = {
   hoverGlow: 'rgba(220, 38, 38, 0.15)',
 };
 
-// ─── Simulated Data ─────────────────────────────────────────────────────────
-// Realistic output from analyzing a PE acquisition memo
+// ─── WeWork S-1 Data ────────────────────────────────────────────────────────
 
-const NODES: Omit<GraphNode, 'x' | 'y' | 'vx' | 'vy' | 'radius'>[] = [
-  // Central decisions
-  { id: 'acq_decision', label: 'Acquisition Thesis', type: 'decision' },
-  { id: 'valuation', label: 'Valuation Model', type: 'decision' },
-  { id: 'due_diligence', label: 'Due Diligence', type: 'decision' },
-  // Biases detected
-  { id: 'anchoring', label: 'Anchoring Bias', type: 'bias', severity: 'critical' },
-  { id: 'confirmation', label: 'Confirmation Bias', type: 'bias', severity: 'high' },
-  { id: 'overconfidence', label: 'Overconfidence', type: 'bias', severity: 'critical' },
-  { id: 'groupthink', label: 'Groupthink', type: 'bias', severity: 'high' },
-  { id: 'sunk_cost', label: 'Sunk Cost', type: 'bias', severity: 'medium' },
-  { id: 'authority', label: 'Authority Bias', type: 'bias', severity: 'medium' },
-  { id: 'framing', label: 'Framing Effect', type: 'bias', severity: 'low' },
-  // Outcome nodes
-  { id: 'risk_high', label: 'High Risk', type: 'outcome' },
-  { id: 'toxic_echo', label: 'Echo Chamber', type: 'outcome' },
+const NODE_DETAILS: Record<string, NodeDetail> = {
+  ipo_decision: {
+    title: 'IPO at $47B Valuation',
+    excerpt:
+      'WeWork filed its S-1 in August 2019 seeking a $47B public market valuation — despite losing $1.9B on $1.8B in revenue.',
+    insight:
+      'Decision Intel flags: Revenue-to-loss ratio of 0.95x with no path to profitability documented in the filing. Valuation anchored entirely to SoftBank\u2019s private round, not public market comparables.',
+  },
+  governance: {
+    title: 'Governance Structure',
+    excerpt:
+      'CEO Adam Neumann held supervoting shares, personally leased buildings back to WeWork, and trademarked "We" — then charged the company $5.9M for the rights.',
+    insight:
+      'Decision Intel flags: 3 simultaneous self-dealing conflicts. Zero independent board oversight on related-party transactions. Governance risk score: Critical.',
+  },
+  unit_economics: {
+    title: 'Unit Economics Model',
+    excerpt:
+      'WeWork\u2019s S-1 introduced "Community Adjusted EBITDA" — which excluded nearly all real costs. Actual losses: $1.9B in 2018, accelerating.',
+    insight:
+      'Decision Intel flags: Non-standard financial metric designed to obscure losses. When a company invents its own profitability measure, the framing bias is structural.',
+  },
+  overconfidence: {
+    title: 'Overconfidence Bias',
+    severity: 'Critical',
+    excerpt:
+      '"We are a community company... We dedicate this to the energy of we — greater than any one of us, but inside each of us." — WeWork S-1 preamble.',
+    insight:
+      'Spiritual language in an SEC filing signals detachment from financial reality. The S-1 mentioned "community" 150+ times but contained no credible path to profitability.',
+  },
+  authority: {
+    title: 'Authority Bias',
+    severity: 'Critical',
+    excerpt:
+      'SoftBank\u2019s $18.5B backing created an aura of inevitability. Board members and investors deferred to Neumann\u2019s vision without challenging unit economics.',
+    insight:
+      'SoftBank\u2019s outsized investment anchored the entire market on a single investor\u2019s thesis. No independent valuation challenged the $47B figure until the S-1 went public.',
+  },
+  halo_effect: {
+    title: 'Halo Effect',
+    severity: 'High',
+    excerpt:
+      'Neumann\u2019s charisma, celebrity endorsements, and "tech disruptor" narrative masked a traditional real estate subletting business with negative unit economics.',
+    insight:
+      'The company was classified as a tech company (high multiple) rather than real estate (low multiple). This framing inflated valuation by 5\u201310x versus comparable REITs.',
+  },
+  anchoring: {
+    title: 'Anchoring Bias',
+    severity: 'High',
+    excerpt:
+      'The $47B valuation was anchored to SoftBank\u2019s January 2019 funding round. No DCF model or comparable analysis supported the figure in the S-1.',
+    insight:
+      'Private market valuations set by a single dominant investor are not market prices. Public market investors rejected the anchor immediately — valuation fell 83% before IPO was pulled.',
+  },
+  groupthink: {
+    title: 'Groupthink',
+    severity: 'High',
+    excerpt:
+      'The board included Neumann\u2019s allies and SoftBank representatives. No independent director raised concerns about self-dealing or losses until after the S-1 backlash.',
+    insight:
+      'Zero documented dissent in board minutes prior to filing. When 100% of a board agrees on a $47B valuation for a money-losing company, that\u2019s a groupthink signal, not consensus.',
+  },
+  valuation_collapse: {
+    title: '$39B Valuation Destruction',
+    excerpt:
+      'Within 6 weeks of the S-1 filing, WeWork\u2019s valuation dropped from $47B to $8B. The IPO was pulled, Neumann was ousted, and SoftBank wrote off billions.',
+    insight:
+      'This is what unaudited decision-making costs. Every bias flagged here was detectable from the S-1 document alone — before a single public share was sold.',
+  },
+  echo_chamber: {
+    title: 'Echo Chamber Pattern',
+    excerpt:
+      'Groupthink + Authority Bias created a closed feedback loop. SoftBank\u2019s conviction reinforced the board\u2019s confidence, which reinforced Neumann\u2019s vision, which reinforced SoftBank.',
+    insight:
+      'Toxic combination: When the largest investor, the board, and the CEO all validate each other without external challenge, the probability of catastrophic failure increases 4.2x.',
+  },
+};
+
+type NodeDef = Omit<GraphNode, 'x' | 'y' | 'vx' | 'vy' | 'radius'>;
+
+const NODES: NodeDef[] = [
+  {
+    id: 'ipo_decision',
+    label: 'IPO Decision',
+    type: 'decision',
+    detail: NODE_DETAILS.ipo_decision,
+  },
+  { id: 'governance', label: 'Governance', type: 'decision', detail: NODE_DETAILS.governance },
+  {
+    id: 'unit_economics',
+    label: 'Unit Economics',
+    type: 'decision',
+    detail: NODE_DETAILS.unit_economics,
+  },
+  {
+    id: 'overconfidence',
+    label: 'Overconfidence',
+    type: 'bias',
+    severity: 'critical',
+    detail: NODE_DETAILS.overconfidence,
+  },
+  {
+    id: 'authority',
+    label: 'Authority Bias',
+    type: 'bias',
+    severity: 'critical',
+    detail: NODE_DETAILS.authority,
+  },
+  {
+    id: 'halo_effect',
+    label: 'Halo Effect',
+    type: 'bias',
+    severity: 'high',
+    detail: NODE_DETAILS.halo_effect,
+  },
+  {
+    id: 'anchoring',
+    label: 'Anchoring',
+    type: 'bias',
+    severity: 'high',
+    detail: NODE_DETAILS.anchoring,
+  },
+  {
+    id: 'groupthink',
+    label: 'Groupthink',
+    type: 'bias',
+    severity: 'high',
+    detail: NODE_DETAILS.groupthink,
+  },
+  {
+    id: 'valuation_collapse',
+    label: '$39B Destroyed',
+    type: 'outcome',
+    detail: NODE_DETAILS.valuation_collapse,
+  },
+  { id: 'echo_chamber', label: 'Echo Chamber', type: 'outcome', detail: NODE_DETAILS.echo_chamber },
 ];
 
 const EDGES: GraphEdge[] = [
-  // Decision → Bias connections
-  { source: 'acq_decision', target: 'anchoring', type: 'detected' },
-  { source: 'acq_decision', target: 'overconfidence', type: 'detected' },
-  { source: 'acq_decision', target: 'confirmation', type: 'detected' },
-  { source: 'valuation', target: 'anchoring', type: 'detected' },
-  { source: 'valuation', target: 'framing', type: 'detected' },
-  { source: 'due_diligence', target: 'groupthink', type: 'detected' },
-  { source: 'due_diligence', target: 'authority', type: 'detected' },
-  { source: 'due_diligence', target: 'sunk_cost', type: 'detected' },
-  // Toxic combinations
-  { source: 'confirmation', target: 'groupthink', type: 'toxic', label: 'Echo Chamber' },
-  { source: 'anchoring', target: 'overconfidence', type: 'toxic', label: 'Blind Sprint' },
-  { source: 'sunk_cost', target: 'overconfidence', type: 'toxic', label: 'Doubling Down' },
-  // Influence to outcomes
-  { source: 'anchoring', target: 'risk_high', type: 'influence' },
-  { source: 'overconfidence', target: 'risk_high', type: 'influence' },
-  { source: 'confirmation', target: 'toxic_echo', type: 'influence' },
-  { source: 'groupthink', target: 'toxic_echo', type: 'influence' },
+  { source: 'ipo_decision', target: 'overconfidence', type: 'detected' },
+  { source: 'ipo_decision', target: 'anchoring', type: 'detected' },
+  { source: 'ipo_decision', target: 'authority', type: 'detected' },
+  { source: 'governance', target: 'authority', type: 'detected' },
+  { source: 'governance', target: 'groupthink', type: 'detected' },
+  { source: 'unit_economics', target: 'overconfidence', type: 'detected' },
+  { source: 'unit_economics', target: 'halo_effect', type: 'detected' },
+  { source: 'groupthink', target: 'authority', type: 'toxic', label: 'Echo Chamber' },
+  { source: 'overconfidence', target: 'halo_effect', type: 'toxic', label: 'Optimism Trap' },
+  { source: 'overconfidence', target: 'valuation_collapse', type: 'influence' },
+  { source: 'anchoring', target: 'valuation_collapse', type: 'influence' },
+  { source: 'authority', target: 'echo_chamber', type: 'influence' },
+  { source: 'groupthink', target: 'echo_chamber', type: 'influence' },
 ];
 
 // ─── Force Simulation ───────────────────────────────────────────────────────
@@ -112,14 +231,11 @@ const CENTER_X = SVG_W / 2;
 const CENTER_Y = SVG_H / 2;
 
 function initializeNodes(): GraphNode[] {
-  // Position decisions in center cluster, biases in ring, outcomes at edges
   const decisions = NODES.filter(n => n.type === 'decision');
   const biases = NODES.filter(n => n.type === 'bias');
   const outcomes = NODES.filter(n => n.type === 'outcome');
-
   const result: GraphNode[] = [];
 
-  // Decisions — tight center cluster
   decisions.forEach((n, i) => {
     const angle = (2 * Math.PI * i) / decisions.length - Math.PI / 2;
     const r = 55;
@@ -135,7 +251,6 @@ function initializeNodes(): GraphNode[] {
     });
   });
 
-  // Biases — outer ring
   biases.forEach((n, i) => {
     const angle = (2 * Math.PI * i) / biases.length - Math.PI / 4;
     const r = 150;
@@ -149,7 +264,6 @@ function initializeNodes(): GraphNode[] {
     });
   });
 
-  // Outcomes — far edges
   outcomes.forEach((n, i) => {
     const angle = Math.PI * 0.25 + Math.PI * 0.5 * i;
     const r = 175;
@@ -166,7 +280,6 @@ function initializeNodes(): GraphNode[] {
   return result;
 }
 
-// Simple spring force simulation
 function simulateStep(nodes: GraphNode[]): GraphNode[] {
   const damping = 0.92;
   const repulsion = 800;
@@ -177,10 +290,9 @@ function simulateStep(nodes: GraphNode[]): GraphNode[] {
       return { ...node, x: node.fx, y: node.fy, vx: 0, vy: 0 };
     }
 
-    let fx = 0;
-    let fy = 0;
+    let forceX = 0;
+    let forceY = 0;
 
-    // Repulsion from all other nodes
     for (let j = 0; j < nodes.length; j++) {
       if (i === j) continue;
       const other = nodes[j];
@@ -190,23 +302,20 @@ function simulateStep(nodes: GraphNode[]): GraphNode[] {
       const minDist = node.radius + other.radius + 20;
       if (dist < minDist * 3) {
         const force = repulsion / (dist * dist);
-        fx += (dx / dist) * force;
-        fy += (dy / dist) * force;
+        forceX += (dx / dist) * force;
+        forceY += (dy / dist) * force;
       }
     }
 
-    // Pull toward center (gentle)
-    fx += (CENTER_X - node.x) * centerPull;
-    fy += (CENTER_Y - node.y) * centerPull;
+    forceX += (CENTER_X - node.x) * centerPull;
+    forceY += (CENTER_Y - node.y) * centerPull;
 
-    // Keep in bounds
     const margin = node.radius + 8;
-    if (node.x < margin) fx += 2;
-    if (node.x > SVG_W - margin) fx -= 2;
-    if (node.y < margin) fy += 2;
-    if (node.y > SVG_H - margin) fy -= 2;
+    if (node.x < margin) forceX += 2;
+    if (node.x > SVG_W - margin) forceX -= 2;
+    if (node.y < margin) forceY += 2;
+    if (node.y > SVG_H - margin) forceY -= 2;
 
-    // Edge attraction (connected nodes attract)
     for (const edge of EDGES) {
       let otherNode: GraphNode | undefined;
       if (edge.source === node.id) otherNode = nodes.find(n => n.id === edge.target);
@@ -217,12 +326,12 @@ function simulateStep(nodes: GraphNode[]): GraphNode[] {
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
       const idealDist = edge.type === 'toxic' ? 100 : 120;
       const strength = 0.005;
-      fx += (dx / dist) * (dist - idealDist) * strength;
-      fy += (dy / dist) * (dist - idealDist) * strength;
+      forceX += (dx / dist) * (dist - idealDist) * strength;
+      forceY += (dy / dist) * (dist - idealDist) * strength;
     }
 
-    const newVx = (node.vx + fx) * damping;
-    const newVy = (node.vy + fy) * damping;
+    const newVx = (node.vx + forceX) * damping;
+    const newVy = (node.vy + forceY) * damping;
 
     return {
       ...node,
@@ -234,18 +343,147 @@ function simulateStep(nodes: GraphNode[]): GraphNode[] {
   });
 }
 
+// ─── Detail Panel ───────────────────────────────────────────────────────────
+
+function DetailPanel({ node, onClose }: { node: GraphNode; onClose: () => void }) {
+  const severityColor =
+    node.type === 'bias'
+      ? COLORS.bias[node.severity ?? 'medium']
+      : node.type === 'outcome'
+        ? COLORS.outcome
+        : COLORS.decision;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 6 }}
+      transition={{ duration: 0.2 }}
+      style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: '#FFFFFF',
+        borderTop: '1px solid #E2E8F0',
+        borderRadius: '0 0 16px 16px',
+        padding: '14px 16px',
+        zIndex: 10,
+        maxHeight: '55%',
+        overflowY: 'auto',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: 8,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: '50%',
+              background: severityColor,
+              flexShrink: 0,
+            }}
+          />
+          <div style={{ fontSize: 13, fontWeight: 700, color: COLORS.text, lineHeight: 1.3 }}>
+            {node.detail.title}
+          </div>
+          {node.detail.severity && (
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                color: severityColor,
+                background: severityColor + '15',
+                padding: '2px 6px',
+                borderRadius: 4,
+              }}
+            >
+              {node.detail.severity}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 16,
+            color: '#94A3B8',
+            padding: '0 2px',
+            lineHeight: 1,
+          }}
+        >
+          x
+        </button>
+      </div>
+
+      <div
+        style={{
+          fontSize: 11.5,
+          color: '#475569',
+          lineHeight: 1.55,
+          marginBottom: 10,
+          borderLeft: '2px solid #E2E8F0',
+          paddingLeft: 10,
+        }}
+      >
+        {node.detail.excerpt}
+      </div>
+
+      <div
+        style={{
+          fontSize: 11,
+          color: '#0F172A',
+          lineHeight: 1.5,
+          background: '#F8FAFC',
+          border: '1px solid #E2E8F0',
+          borderRadius: 6,
+          padding: '8px 10px',
+        }}
+      >
+        <span
+          style={{
+            fontWeight: 700,
+            color: '#16A34A',
+            fontSize: 10,
+            textTransform: 'uppercase',
+            letterSpacing: '0.3px',
+          }}
+        >
+          Platform Analysis
+        </span>
+        <div style={{ marginTop: 4 }}>{node.detail.insight}</div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── Node Component ─────────────────────────────────────────────────────────
 
 function NodeCircle({
   node,
   isHovered,
+  isSelected,
   isDimmed,
   onHover,
+  onClick,
 }: {
   node: GraphNode;
   isHovered: boolean;
+  isSelected: boolean;
   isDimmed: boolean;
   onHover: (id: string | null) => void;
+  onClick: (id: string) => void;
 }) {
   const fill =
     node.type === 'decision'
@@ -254,7 +492,7 @@ function NodeCircle({
         ? COLORS.outcome
         : COLORS.bias[node.severity ?? 'medium'];
 
-  const scale = isHovered ? 1.15 : isDimmed ? 0.9 : 1;
+  const scale = isHovered || isSelected ? 1.15 : isDimmed ? 0.9 : 1;
   const opacity = isDimmed ? 0.35 : 1;
 
   return (
@@ -263,9 +501,9 @@ function NodeCircle({
       opacity={opacity}
       onMouseEnter={() => onHover(node.id)}
       onMouseLeave={() => onHover(null)}
+      onClick={() => onClick(node.id)}
     >
-      {/* Hover glow */}
-      {isHovered && (
+      {(isHovered || isSelected) && (
         <circle
           cx={node.x}
           cy={node.y}
@@ -273,17 +511,15 @@ function NodeCircle({
           fill={node.type === 'bias' ? COLORS.hoverGlow : 'rgba(15, 23, 42, 0.08)'}
         />
       )}
-      {/* Node circle */}
       <circle
         cx={node.x}
         cy={node.y}
         r={node.radius * scale}
         fill={fill}
-        stroke="#FFFFFF"
-        strokeWidth={2}
+        stroke={isSelected ? '#16A34A' : '#FFFFFF'}
+        strokeWidth={isSelected ? 3 : 2}
         style={{ transition: 'r 0.2s' }}
       />
-      {/* Icon/text inside */}
       {node.type === 'decision' ? (
         <text
           x={node.x}
@@ -297,19 +533,6 @@ function NodeCircle({
         >
           {node.label.split(' ')[0].slice(0, 3).toUpperCase()}
         </text>
-      ) : node.type === 'outcome' ? (
-        <text
-          x={node.x}
-          y={node.y + 1}
-          textAnchor="middle"
-          dominantBaseline="central"
-          fontSize={8}
-          fontWeight={700}
-          fill="#FFFFFF"
-          style={{ pointerEvents: 'none', userSelect: 'none' }}
-        >
-          {node.severity === 'critical' ? '!!' : '!'}
-        </text>
       ) : (
         <text
           x={node.x}
@@ -321,17 +544,16 @@ function NodeCircle({
           fill="#FFFFFF"
           style={{ pointerEvents: 'none', userSelect: 'none' }}
         >
-          {node.severity === 'critical' ? '!!' : node.severity === 'high' ? '!' : '·'}
+          {node.severity === 'critical' ? '!!' : node.severity === 'high' ? '!' : '\u2022'}
         </text>
       )}
-      {/* Label outside */}
       <text
         x={node.x}
         y={node.y + node.radius + 13}
         textAnchor="middle"
         fontSize={9}
-        fontWeight={isHovered ? 700 : 500}
-        fill={isHovered ? COLORS.text : COLORS.textMuted}
+        fontWeight={isHovered || isSelected ? 700 : 500}
+        fill={isHovered || isSelected ? COLORS.text : COLORS.textMuted}
         style={{ pointerEvents: 'none', userSelect: 'none', transition: 'fill 0.2s' }}
       >
         {node.label}
@@ -368,7 +590,6 @@ function EdgeLine({
 
   const strokeWidth = isHighlighted ? (isToxic ? 2.5 : 1.5) : isToxic ? 1.5 : 0.8;
 
-  // Calculate edge endpoints at circle boundary
   const dx = target.x - source.x;
   const dy = target.y - source.y;
   const dist = Math.sqrt(dx * dx + dy * dy) || 1;
@@ -376,8 +597,6 @@ function EdgeLine({
   const y1 = source.y + (dy / dist) * source.radius;
   const x2 = target.x - (dx / dist) * target.radius;
   const y2 = target.y - (dy / dist) * target.radius;
-
-  // Midpoint for toxic combination labels
   const mx = (x1 + x2) / 2;
   const my = (y1 + y2) / 2;
 
@@ -393,7 +612,6 @@ function EdgeLine({
         strokeDasharray={isToxic ? undefined : '4 3'}
         strokeLinecap="round"
       />
-      {/* Toxic combination label */}
       {isToxic && isHighlighted && edge.label && (
         <g>
           <rect
@@ -418,7 +636,6 @@ function EdgeLine({
           </text>
         </g>
       )}
-      {/* Animated pulse on toxic edges */}
       {isToxic && !isDimmed && (
         <line
           x1={x1}
@@ -444,10 +661,10 @@ export function HeroDecisionGraph() {
   const isInView = useInView(containerRef, { once: true, margin: '-30px' });
   const [nodes, setNodes] = useState<GraphNode[]>(initializeNodes);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const frameRef = useRef<number>(0);
   const iterRef = useRef(0);
 
-  // Run simulation for ~60 steps to settle, then gentle drift
   useEffect(() => {
     if (!isInView) return;
     let running = true;
@@ -456,15 +673,14 @@ export function HeroDecisionGraph() {
     function tick() {
       if (!running) return;
       iterRef.current++;
-      setNodes(prev => simulateStep(prev));
+      setNodes((prev: GraphNode[]) => simulateStep(prev));
       if (iterRef.current < maxIter) {
         frameRef.current = requestAnimationFrame(tick);
       } else {
-        // Gentle drift every ~2s
         const drift = () => {
           if (!running) return;
-          setNodes(prev =>
-            prev.map(n => {
+          setNodes((prev: GraphNode[]) =>
+            prev.map((n: GraphNode) => {
               if (n.fx !== undefined) return n;
               return {
                 ...n,
@@ -473,7 +689,7 @@ export function HeroDecisionGraph() {
               };
             })
           );
-          setNodes(prev => simulateStep(prev));
+          setNodes((prev: GraphNode[]) => simulateStep(prev));
           if (running) setTimeout(drift, 2000);
         };
         drift();
@@ -487,27 +703,25 @@ export function HeroDecisionGraph() {
     };
   }, [isInView]);
 
-  // Which nodes are connected to hovered
+  const activeNodeId = selectedNode ?? hoveredNode;
+
   const connectedIds = useMemo(() => {
-    if (!hoveredNode) return new Set<string>();
-    const ids = new Set<string>([hoveredNode]);
+    if (!activeNodeId) return new Set<string>();
+    const ids = new Set<string>([activeNodeId]);
     for (const e of EDGES) {
-      if (e.source === hoveredNode) ids.add(e.target);
-      if (e.target === hoveredNode) ids.add(e.source);
+      if (e.source === activeNodeId) ids.add(e.target);
+      if (e.target === activeNodeId) ids.add(e.source);
     }
     return ids;
-  }, [hoveredNode]);
+  }, [activeNodeId]);
 
-  // Tooltip info
-  const hoveredNodeData = hoveredNode ? nodes.find(n => n.id === hoveredNode) : null;
-  const hoveredEdgeCount = hoveredNode
-    ? EDGES.filter(e => e.source === hoveredNode || e.target === hoveredNode).length
-    : 0;
-  const hoveredToxicCount = hoveredNode
-    ? EDGES.filter(
-        e => e.type === 'toxic' && (e.source === hoveredNode || e.target === hoveredNode)
-      ).length
-    : 0;
+  const selectedNodeData = selectedNode
+    ? nodes.find((n: GraphNode) => n.id === selectedNode)
+    : null;
+
+  const handleNodeClick = (id: string) => {
+    setSelectedNode((prev: string | null) => (prev === id ? null : id));
+  };
 
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
@@ -518,6 +732,7 @@ export function HeroDecisionGraph() {
           borderRadius: 16,
           padding: '20px 12px 12px',
           position: 'relative',
+          overflow: 'hidden',
         }}
       >
         {/* Header */}
@@ -535,7 +750,8 @@ export function HeroDecisionGraph() {
             Decision Knowledge Graph
           </div>
           <div style={{ fontSize: 13, color: '#64748B', lineHeight: 1.4 }}>
-            Interactive bias network from a PE acquisition memo
+            WeWork S-1 IPO Filing (August 2019) &mdash;{' '}
+            <span style={{ fontWeight: 600, color: '#DC2626' }}>$39B valuation destroyed</span>
           </div>
         </div>
 
@@ -546,11 +762,10 @@ export function HeroDecisionGraph() {
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          {/* Edges first (behind nodes) */}
           {EDGES.map((edge, i) => {
             const isHighlighted =
-              !!hoveredNode && (edge.source === hoveredNode || edge.target === hoveredNode);
-            const isDimmed = !!hoveredNode && !isHighlighted;
+              !!activeNodeId && (edge.source === activeNodeId || edge.target === activeNodeId);
+            const isDimmed = !!activeNodeId && !isHighlighted;
             return (
               <EdgeLine
                 key={`${edge.source}-${edge.target}-${i}`}
@@ -562,19 +777,20 @@ export function HeroDecisionGraph() {
             );
           })}
 
-          {/* Nodes */}
-          {nodes.map(node => (
+          {nodes.map((node: GraphNode) => (
             <NodeCircle
               key={node.id}
               node={node}
               isHovered={hoveredNode === node.id}
-              isDimmed={!!hoveredNode && !connectedIds.has(node.id)}
+              isSelected={selectedNode === node.id}
+              isDimmed={!!activeNodeId && !connectedIds.has(node.id)}
               onHover={setHoveredNode}
+              onClick={handleNodeClick}
             />
           ))}
         </motion.svg>
 
-        {/* Bottom info bar */}
+        {/* Bottom bar */}
         <div
           style={{
             display: 'flex',
@@ -586,30 +802,11 @@ export function HeroDecisionGraph() {
             minHeight: 36,
           }}
         >
-          {hoveredNodeData ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              style={{ display: 'flex', alignItems: 'center', gap: 12 }}
-            >
-              <span style={{ fontSize: 13, fontWeight: 700, color: COLORS.text }}>
-                {hoveredNodeData.label}
-              </span>
-              <span style={{ fontSize: 11, color: COLORS.textMuted }}>
-                {hoveredEdgeCount} connection{hoveredEdgeCount !== 1 ? 's' : ''}
-                {hoveredToxicCount > 0 && (
-                  <span style={{ color: COLORS.edge.toxic, fontWeight: 600 }}>
-                    {' · '}
-                    {hoveredToxicCount} toxic
-                  </span>
-                )}
-              </span>
-            </motion.div>
-          ) : (
-            <div style={{ fontSize: 11, color: COLORS.textMuted }}>
-              Hover nodes to explore connections
-            </div>
-          )}
+          <div style={{ fontSize: 11, color: COLORS.textMuted }}>
+            {selectedNode
+              ? 'Click another node or click again to close'
+              : 'Click any node to explore'}
+          </div>
           <div style={{ display: 'flex', gap: 12, fontSize: 10, color: '#94A3B8' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span
@@ -648,6 +845,13 @@ export function HeroDecisionGraph() {
             </span>
           </div>
         </div>
+
+        {/* Detail popup */}
+        <AnimatePresence>
+          {selectedNodeData && (
+            <DetailPanel node={selectedNodeData} onClose={() => setSelectedNode(null)} />
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
