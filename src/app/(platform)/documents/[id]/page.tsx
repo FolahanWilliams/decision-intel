@@ -1088,7 +1088,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               }`,
             }}
           >
-            <div className="card-body" style={{ padding: '16px 20px' }}>
+            <div className="card-body" style={{ padding: '20px 24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                 <span
                   style={{
@@ -1145,7 +1145,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      padding: '14px 20px',
+                      padding: '18px 20px',
                     }}
                   >
                     <h3
@@ -1388,7 +1388,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             >
               <div
                 className="card-header"
-                style={{ background: 'var(--bg-secondary)', padding: '14px 20px' }}
+                style={{ background: 'var(--bg-secondary)', padding: '18px 20px' }}
               >
                 <h3 className="flex items-center gap-sm text-xs">
                   <Terminal size={14} /> Live Scan Feed
@@ -1631,7 +1631,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               className="grid grid-cols-2 md:grid-cols-4 gap-lg mb-xl"
               style={{ marginTop: toxicCombinations.length > 0 ? 0 : 'var(--spacing-md)' }}
             >
-              <div className="card" style={{ padding: '16px 20px', borderRadius: 12 }}>
+              <div className="card" style={{ padding: '20px 24px', borderRadius: 12 }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1663,7 +1663,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '16px 20px', borderRadius: 12 }}>
+              <div className="card" style={{ padding: '20px 24px', borderRadius: 12 }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1702,7 +1702,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '16px 20px', borderRadius: 12 }}>
+              <div className="card" style={{ padding: '20px 24px', borderRadius: 12 }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1734,7 +1734,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '16px 20px', borderRadius: 12 }}>
+              <div className="card" style={{ padding: '20px 24px', borderRadius: 12 }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1834,14 +1834,14 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                                     background: 'var(--bg-card)',
                                     color: 'var(--text-primary)',
                                     borderBottom: '2px solid var(--accent-primary)',
-                                    borderRadius: '6px 6px 0 0',
+                                    borderRadius: '8px 8px 0 0',
                                   }
                                 : {
                                     padding: '10px 18px',
                                     color: 'var(--text-muted)',
                                     background: 'transparent',
                                     borderBottom: '2px solid transparent',
-                                    borderRadius: '6px 6px 0 0',
+                                    borderRadius: '8px 8px 0 0',
                                   }
                             }
                           >
@@ -2001,11 +2001,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
 
             {/* Right Column: Bias Sidebar */}
             <ErrorBoundary sectionName="Bias Sidebar">
-              <div className="flex flex-col gap-lg">
+              <div className="flex flex-col gap-xl">
                 <div className="card" style={{ borderRadius: 12 }}>
                   <div
                     className="card-body p-md flex justify-around"
-                    style={{ padding: '16px 20px' }}
+                    style={{ padding: '20px 24px' }}
                   >
                     <div className="text-center">
                       <div
@@ -2034,7 +2034,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   className="card"
                   style={{ alignSelf: 'start', width: '100%', borderRadius: 12 }}
                 >
-                  <div className="card-header" style={{ padding: '14px 20px' }}>
+                  <div className="card-header" style={{ padding: '18px 20px' }}>
                     <h3>Detected Biases</h3>
                   </div>
                   <div
@@ -2057,7 +2057,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                           }}
                           style={{
                             padding: '12px 16px',
-                            margin: '4px 8px',
+                            margin: '6px 8px',
                             borderRadius: 8,
                             cursor: 'pointer',
                             background:

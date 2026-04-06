@@ -49,7 +49,7 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '14px 20px',
+          padding: '18px 20px',
         }}
       >
         <h4
@@ -79,7 +79,7 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
           <Info size={13} />
         </button>
       </div>
-      <div className="card-body" style={{ padding: '16px 20px' }}>
+      <div className="card-body" style={{ padding: '20px 24px' }}>
         <div style={{ textAlign: 'center', marginBottom: 12 }}>
           <p
             style={{
