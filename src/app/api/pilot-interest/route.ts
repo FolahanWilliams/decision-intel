@@ -83,20 +83,15 @@ export async function POST(req: NextRequest) {
             source: source ?? 'case_study_cta',
             referer: referer ?? null,
           } as object,
-          userId: null,
-          sessionId: null,
         },
       });
     } catch (err: unknown) {
-      const prismaError = err as { code?: string };
-      // Schema drift protection matches the analytics sink's behavior.
-      if (prismaError.code === 'P2021' || prismaError.code === 'P2022') {
-        log.warn('AnalyticsEvent table missing, continuing without persistence', {
-          code: prismaError.code,
-        });
-      } else {
-        throw err;
-      }
+      // Never fail the user-facing submission due to analytics persistence issues.
+      // Log the error but continue — the Slack notification is the critical path.
+      log.warn('Failed to persist pilot interest to AnalyticsEvent', {
+        error: err instanceof Error ? err.message : String(err),
+        code: (err as { code?: string }).code,
+      });
     }
 
     // Fire-and-forget Slack ping; don't await the promise chain longer than needed.
