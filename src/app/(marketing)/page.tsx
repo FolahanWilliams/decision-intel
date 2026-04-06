@@ -1193,7 +1193,7 @@ export default function LandingPage() {
             <p
               style={{
                 fontSize: 15,
-                color: C.slate500,
+                color: C.slate600,
                 margin: '0 auto 24px',
                 maxWidth: 520,
                 lineHeight: 1.5,
