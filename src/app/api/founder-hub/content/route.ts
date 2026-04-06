@@ -130,6 +130,16 @@ Suggested angles: Why your IC produces different answers on different days, the 
   toxic_combos: `CONTENT PILLAR: "Toxic Combinations" and Compound Risk
 Focus on: Individual biases are manageable but combinations are catastrophic. Reference Echo Chamber pattern, Boeing 737 MAX, Lehman Brothers. Use named patterns (Optimism Trap, Sunk Ship). Highlight 20x20 compound scoring matrix.
 Suggested angles: Why single-bias detection is a feature but compound risk scoring is a product, echo chamber deals, historical catastrophes that were predictable.`,
+
+  decision_alpha: `CONTENT PILLAR: "Decision Alpha" — Bias Signals from Public Markets
+Focus on: We applied the DQI engine to public CEO communications and scored their decision quality. Key data points:
+- Buffett (BRK) DQI 82/B: Only 2 biases detected, no toxic combinations. Highest-scoring CEO. Explicit error acknowledgment drives score.
+- Musk (TSLA) DQI 41/D: 6 biases detected, 2 toxic combinations (Optimism Trap + Blind Sprint). Critical overconfidence on FSD timelines. Planning fallacy on Optimus.
+- Huang (NVDA) DQI 58/C: Strong framing effect — repositioning NVIDIA as "platform company." Anchoring to 409% growth rate. Optimism Trap detected.
+- Zuckerberg (META) DQI 52/C: "Sunk Ship" toxic combination on $50B metaverse. Sunk cost language reframed as "long-term conviction." Bandwagon effect on AI investment.
+Average DQI: 58. Most common bias: overconfidence. Most common toxic combo: Optimism Trap (3 of 4 CEOs).
+Suggested angles: CEO leaderboard rankings, bias showdowns (Buffett vs Musk), why communication patterns predict stock performance, what Intel/Nokia/BlackBerry CEOs said at their peaks, "Most Biased CEO Letters" listicles.
+Tone: Authoritative but accessible. Data-driven. Use specific DQI scores and bias names. Position this as proof that Decision Intel's engine works on the most public, scrutinized documents in markets.`,
 };
 
 const MINTO_INSTRUCTION = `

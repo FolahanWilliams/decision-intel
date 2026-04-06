@@ -8,6 +8,7 @@ import { CorrelationCausalTab } from '@/components/founder-hub/CorrelationCausal
 import { ContentStudioTab } from '@/components/founder-hub/ContentStudioTab';
 import { MethodologiesAndPrinciplesTab } from '@/components/founder-hub/MethodologiesAndPrinciplesTab';
 import { FounderTipsTab } from '@/components/founder-hub/FounderTipsTab';
+import { DecisionAlphaTab } from '@/components/founder-hub/DecisionAlphaTab';
 import {
   Rocket,
   Brain,
@@ -62,6 +63,7 @@ type TabId =
   | 'methodologies'
   | 'case_studies'
   | 'correlation_causal'
+  | 'decision_alpha'
   | 'content_studio'
   | 'founder_tips';
 
@@ -78,6 +80,7 @@ const TABS: Array<{ id: TabId; label: string; icon: React.ReactNode }> = [
   { id: 'methodologies', label: 'Methodologies & Principles', icon: <GraduationCap size={16} /> },
   { id: 'case_studies', label: 'Case Studies', icon: <Library size={16} /> },
   { id: 'correlation_causal', label: 'Correlation & Causal Graph', icon: <Network size={16} /> },
+  { id: 'decision_alpha', label: 'Decision Alpha', icon: <TrendingUp size={16} /> },
   { id: 'content_studio', label: 'Content Studio', icon: <Zap size={16} /> },
   { id: 'founder_tips', label: 'Founder Tips', icon: <Lightbulb size={16} /> },
 ];
@@ -5904,6 +5907,11 @@ export default function FounderHubPage() {
     correlation_causal: (
       <ErrorBoundary sectionName="Correlation & Causal">
         <CorrelationCausalTab />
+      </ErrorBoundary>
+    ),
+    decision_alpha: (
+      <ErrorBoundary sectionName="Decision Alpha">
+        <DecisionAlphaTab />
       </ErrorBoundary>
     ),
     content_studio: (
