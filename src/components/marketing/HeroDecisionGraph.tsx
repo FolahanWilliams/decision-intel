@@ -225,8 +225,8 @@ const EDGES: GraphEdge[] = [
 
 // ─── Force Simulation ───────────────────────────────────────────────────────
 
-const SVG_W = 520;
-const SVG_H = 400;
+const SVG_W = 580;
+const SVG_H = 480;
 const CENTER_X = SVG_W / 2;
 const CENTER_Y = SVG_H / 2;
 
@@ -238,7 +238,7 @@ function initializeNodes(): GraphNode[] {
 
   decisions.forEach((n, i) => {
     const angle = (2 * Math.PI * i) / decisions.length - Math.PI / 2;
-    const r = 55;
+    const r = 65;
     result.push({
       ...n,
       x: CENTER_X + r * Math.cos(angle),
@@ -253,7 +253,7 @@ function initializeNodes(): GraphNode[] {
 
   biases.forEach((n, i) => {
     const angle = (2 * Math.PI * i) / biases.length - Math.PI / 4;
-    const r = 150;
+    const r = 170;
     result.push({
       ...n,
       x: CENTER_X + r * Math.cos(angle),
@@ -266,7 +266,7 @@ function initializeNodes(): GraphNode[] {
 
   outcomes.forEach((n, i) => {
     const angle = Math.PI * 0.25 + Math.PI * 0.5 * i;
-    const r = 175;
+    const r = 200;
     result.push({
       ...n,
       x: CENTER_X + r * Math.cos(angle),

@@ -53,7 +53,8 @@ export async function updateSession(request: NextRequest) {
       !request.nextUrl.pathname.startsWith('/api/stripe') &&
       !request.nextUrl.pathname.startsWith('/api/cron') &&
       !request.nextUrl.pathname.startsWith('/api/health') &&
-      !request.nextUrl.pathname.startsWith('/api/integrations/slack'));
+      !request.nextUrl.pathname.startsWith('/api/integrations/slack') &&
+      !request.nextUrl.pathname.startsWith('/api/pilot-interest'));
 
   // Allow extension requests to bypass middleware protection so the route handler
   // can authenticate them using the custom x-extension-key.
