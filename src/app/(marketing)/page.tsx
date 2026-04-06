@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
@@ -368,7 +369,7 @@ export default function LandingPage() {
             href="/"
             style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}
           >
-            <Brain size={24} style={{ color: C.green }} />
+            <Image src="/logo.png" alt="Decision Intel" width={28} height={28} style={{ borderRadius: 6, objectFit: 'cover' }} />
             <span
               style={{ fontSize: 18, fontWeight: 700, color: C.white, letterSpacing: '-0.02em' }}
             >

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   Shield,
@@ -167,7 +168,7 @@ export default function DemoPage() {
       <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sticky top-0 z-50">
         <div className="max-w-[960px] mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 no-underline text-inherit">
-            <Shield size={18} className="text-green-600" />
+            <Image src="/logo.png" alt="Decision Intel" width={24} height={24} style={{ borderRadius: 6, objectFit: 'cover' }} />
             <span className="text-sm font-semibold">
               <span className="text-slate-900">Decision</span>
               <span className="text-slate-400 ml-1">Intel</span>
