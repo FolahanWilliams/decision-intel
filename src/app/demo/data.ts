@@ -42,6 +42,14 @@ export interface DemoPreMortem {
   }>;
 }
 
+export interface DemoToxicCombination {
+  name: string;
+  biases: string[];
+  riskLevel: 'critical' | 'high';
+  description: string;
+  historicalExample?: string;
+}
+
 export interface DemoAnalysis {
   id: string;
   documentName: string;
@@ -83,6 +91,7 @@ export interface DemoAnalysis {
     }>;
     patternMatch: string;
   };
+  toxicCombinations?: DemoToxicCombination[];
   outcome?: {
     what: string;
     when: string;
@@ -360,6 +369,33 @@ export const DEMO_NOKIA: DemoAnalysis = {
     patternMatch:
       'This closely resembles the "Declining Platform Acquisition" archetype seen in HP/Palm and Google/Motorola — high failure rate when acquiring hardware companies during ecosystem collapse.',
   },
+  toxicCombinations: [
+    {
+      name: 'Sunk Ship',
+      biases: ['Sunk Cost Fallacy', 'Escalation of Commitment'],
+      riskLevel: 'critical',
+      description:
+        'Prior $1B annual commitment to Nokia created psychological attachment that made walking away feel like wasting past investments, driving escalation.',
+      historicalExample:
+        'Microsoft wrote down $7.6B \u2014 more than the entire purchase price.',
+    },
+    {
+      name: 'Echo Chamber',
+      biases: ['Confirmation Bias', 'Groupthink'],
+      riskLevel: 'critical',
+      description:
+        'Selective market analysis supporting the acquisition narrative with no documented dissent from the board.',
+    },
+    {
+      name: 'Anchored Overreach',
+      biases: ['Anchoring Bias', 'Overconfidence Bias'],
+      riskLevel: 'high',
+      description:
+        'The $7.2B price anchored to Nokia\u2019s asking price combined with wildly optimistic 15% market share projections created a valuation disconnected from reality.',
+      historicalExample:
+        'Nokia\u2019s smartphone share was already in freefall from 35% to 14%, yet projections assumed a reversal with no historical precedent.',
+    },
+  ],
   outcome: {
     what: 'Microsoft wrote down $7.6B of the acquisition value and laid off 7,800 former Nokia employees.',
     when: 'July 2015 \u2014 22 months after deal closed',
@@ -639,6 +675,33 @@ export const DEMO_PHOENIX: DemoAnalysis = {
     patternMatch:
       'This resembles the "Overconfident International Expansion" pattern — simultaneous multi-market entry without local validation, driven by board pressure rather than market readiness signals.',
   },
+  toxicCombinations: [
+    {
+      name: 'Authority Cascade',
+      biases: ['Anchoring Bias', 'Groupthink'],
+      riskLevel: 'critical',
+      description:
+        'The CEO\u2019s 30-year experience anchored the entire market selection while 95% team consensus suppressed dissent. Authority-driven decisions amplified by group conformity eliminate the error-correction mechanisms a decision of this magnitude requires.',
+      historicalExample:
+        'WeWork\u2019s international expansion was similarly driven by Adam Neumann\u2019s conviction, bypassing market validation. The company retreated from multiple markets within 18 months.',
+    },
+    {
+      name: 'Momentum Trap',
+      biases: ['Sunk Cost Fallacy', 'Bandwagon Effect'],
+      riskLevel: 'critical',
+      description:
+        'The $15M already spent creates forward momentum that is reinforced by competitor FOMO. Together they create an unstoppable push to continue regardless of evidence, because stopping feels like both waste and falling behind.',
+    },
+    {
+      name: 'Optimism Spiral',
+      biases: ['Overconfidence Bias', 'Confirmation Bias'],
+      riskLevel: 'high',
+      description:
+        'Best-case-only projections ($30M by Q2) are validated by cherry-picking a single partnership success. Overconfidence generates the projections; confirmation bias selects only the evidence that supports them.',
+      historicalExample:
+        'Uber projected rapid European adoption based on US success, but sales cycles were 2-3x longer and regulatory costs 5x higher than planned.',
+    },
+  ],
 };
 
 // ─── Example 3: Series B Investment Memo ────────────────────────────
@@ -921,6 +984,33 @@ export const DEMO_SERIES_B: DemoAnalysis = {
     patternMatch:
       'This resembles the "Promising Digital Health Platform with Regulatory Risk" pattern. Similar companies succeed when FDA timelines are realistic and reimbursement is secured early, but fail when regulatory assumptions are anchored to best-case scenarios.',
   },
+  toxicCombinations: [
+    {
+      name: 'Rosy Runway',
+      biases: ['Optimism Bias', 'Anchoring Bias'],
+      riskLevel: 'high',
+      description:
+        'The $28B top-down TAM anchors revenue expectations while optimistic FDA timelines compress the path to profitability. Together they create a financial model that looks viable but collapses under realistic assumptions \u2014 the SAM is likely $4-7B and the De Novo pathway averages 14-18 months, not 10.',
+      historicalExample:
+        'Theranos anchored to a $200B diagnostics TAM while assuming best-case regulatory timelines. Investors who challenged neither assumption lost $600M+.',
+    },
+    {
+      name: 'Consensus Fog',
+      biases: ['Groupthink', 'Framing Effect'],
+      riskLevel: 'high',
+      description:
+        'Unanimous investment committee consensus combined with a valuation framed as a "discount" (31.7x vs. cherry-picked 42x median) prevents critical examination. The strong consensus signals that the bear case was never given equal weight.',
+    },
+    {
+      name: 'Survivorship Lens',
+      biases: ['Availability Bias', 'Framing Effect'],
+      riskLevel: 'critical',
+      description:
+        'Livongo\u2019s $18.5B exit and Nuvance\u2019s IPO are the most cognitively available healthtech outcomes, creating a frame where exceptional exits feel normal. The dozens of healthtech failures from the same era are invisible, distorting the expected return distribution.',
+      historicalExample:
+        'Post-2022 healthtech multiples contracted 60-70%. Investors who anchored to 2020-2021 peak-era exits systematically overpaid in subsequent rounds.',
+    },
+  ],
   outcome: {
     what: 'Meridian secured $45M at $380M pre-money. Initial FDA pathway was restructured after 18-month review delay, validating the pre-mortem scenario.',
     when: 'August 2025 — close completed; FDA delay confirmed by Q4 2026',
