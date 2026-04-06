@@ -38,6 +38,9 @@ interface UseCopilotStreamReturn {
   error: string | null;
   activeAgent: CopilotAgentType | null;
   sessionId: string | null;
+  suggestions: string[];
+  pinnedDocumentId: string | null;
+  setPinnedDocumentId: (id: string | null) => void;
   sendMessage: (text: string, forcedAgent?: CopilotAgentType) => Promise<void>;
   startNewSession: (decisionPrompt: string) => void;
   clearMessages: () => void;
@@ -59,6 +62,8 @@ export function useCopilotStream(): UseCopilotStreamReturn {
   const [activeAgent, setActiveAgent] = useState<CopilotAgentType | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [decisionPrompt, setDecisionPrompt] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [pinnedDocumentId, setPinnedDocumentId] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const messagesRef = useRef<CopilotMessage[]>(messages);
   messagesRef.current = messages;
@@ -81,6 +86,7 @@ export function useCopilotStream(): UseCopilotStreamReturn {
 
       setMessages(prev => [...prev, userMsg, agentMsg]);
       setIsStreaming(true);
+      setSuggestions([]);
 
       abortRef.current = new AbortController();
 
@@ -93,6 +99,9 @@ export function useCopilotStream(): UseCopilotStreamReturn {
         }
         if (forcedAgent) {
           body.forcedAgent = forcedAgent;
+        }
+        if (pinnedDocumentId) {
+          body.pinnedDocumentId = pinnedDocumentId;
         }
 
         const res = await fetch('/api/copilot', {
@@ -156,6 +165,11 @@ export function useCopilotStream(): UseCopilotStreamReturn {
                   : m
               )
             );
+          } else if (event.type === 'suggestions') {
+            const items = event.suggestions as string[] | undefined;
+            if (items && items.length > 0) {
+              setSuggestions(items);
+            }
           } else if (event.type === 'error') {
             setError((event.message as string) || 'An error occurred');
           }
@@ -183,7 +197,7 @@ export function useCopilotStream(): UseCopilotStreamReturn {
         abortRef.current = null;
       }
     },
-    [isStreaming, sessionId, decisionPrompt]
+    [isStreaming, sessionId, decisionPrompt, pinnedDocumentId]
   );
 
   const startNewSession = useCallback((prompt: string) => {
@@ -287,6 +301,9 @@ export function useCopilotStream(): UseCopilotStreamReturn {
     error,
     activeAgent,
     sessionId,
+    suggestions,
+    pinnedDocumentId,
+    setPinnedDocumentId,
     sendMessage,
     startNewSession,
     clearMessages,
