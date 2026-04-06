@@ -1167,35 +1167,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Pricing Anchor — Loss aversion framing ──────────────────── */}
-      <section
-        style={{
-          background: '#FEF2F2',
-          borderTop: '1px solid #FECACA',
-          borderBottom: '1px solid #FECACA',
-          padding: '28px 24px',
-          textAlign: 'center',
-        }}
-      >
-        <motion.p
-          {...fadeIn}
-          transition={{ duration: 0.5 }}
-          style={{
-            maxWidth: 720,
-            margin: '0 auto',
-            fontSize: 18,
-            color: '#991B1B',
-            fontWeight: 600,
-            lineHeight: 1.5,
-          }}
-        >
-          The average bad deal costs{' '}
-          <span style={{ fontWeight: 800, fontSize: 22 }}>$8.2M</span>.
-          A Decision Intel audit costs{' '}
-          <span style={{ fontWeight: 800, fontSize: 22, color: C.green }}>$129/month</span>.
-        </motion.p>
-      </section>
-
       {/* ── Pricing ─────────────────────────────────────────────────── */}
       <section id="pricing" style={{ background: C.slate50, borderTop: `1px solid ${C.slate200}` }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
@@ -1216,9 +1187,21 @@ export default function LandingPage() {
             >
               Pricing
             </p>
-            <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 16 }}>
+            <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 12 }}>
               Simple, Transparent Pricing
             </h2>
+            <p
+              style={{
+                fontSize: 15,
+                color: C.slate500,
+                margin: '0 auto 24px',
+                maxWidth: 520,
+                lineHeight: 1.5,
+              }}
+            >
+              The average bad deal costs <span style={{ fontWeight: 700, color: C.slate900 }}>$8.2M</span>.
+              {' '}Your team&apos;s decision audit costs <span style={{ fontWeight: 700, color: C.green }}>$349/month</span>.
+            </p>
 
             {/* Annual/Monthly Toggle */}
             <div
