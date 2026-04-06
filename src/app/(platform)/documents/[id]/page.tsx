@@ -584,7 +584,20 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
         logicalAnalysis: analysis.logicalAnalysis,
         swotAnalysis: analysis.swotAnalysis,
         cognitiveAnalysis: analysis.cognitiveAnalysis,
-        factCheck: analysis.factCheck,
+        factCheck: analysis.factCheck
+          ? {
+              totalClaims: analysis.factCheck.verifications?.length ?? 0,
+              verifiedClaims:
+                analysis.factCheck.verifications?.filter(
+                  (v: Verification) => v.verdict === 'VERIFIED'
+                ).length ?? 0,
+              contradictedClaims:
+                analysis.factCheck.verifications?.filter(
+                  (v: Verification) => v.verdict === 'CONTRADICTED'
+                ).length ?? 0,
+              score: analysis.factCheck.score,
+            }
+          : undefined,
         noiseStdDev: analysis.noiseStats?.stdDev,
         biasCount: biases.length,
         preMortemCount: analysis.preMortem?.failureScenarios?.length,
