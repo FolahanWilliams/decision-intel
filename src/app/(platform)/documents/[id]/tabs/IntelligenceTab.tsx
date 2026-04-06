@@ -62,7 +62,7 @@ export function IntelligenceTab({ intelligenceContext }: IntelligenceTabProps) {
       </div>
 
       {/* Macro Summary */}
-      {ctx.macroSummary && ctx.macroSummary !== 'Macro data temporarily unavailable.' && (
+      {ctx.macroSummary && !ctx.macroSummary.toLowerCase().includes('unavailable') && (
         <div
           className="card"
           style={{ padding: '16px', borderLeft: '3px solid var(--accent-primary)' }}
