@@ -12,10 +12,14 @@ import {
   Brain,
   CheckCircle2,
   Menu,
+  Pin,
+  FileText,
+  X,
 } from 'lucide-react';
 import { CopilotChat } from '@/components/copilot/CopilotChat';
 import { ResolveDecisionModal } from '@/components/copilot/ResolveDecisionModal';
 import { useCopilotStream } from '@/hooks/useCopilotStream';
+import { useDocuments } from '@/hooks/useDocuments';
 import { type CopilotAgentType } from '@/lib/copilot/types';
 
 interface SessionSummary {
@@ -41,12 +45,22 @@ export function CopilotPageContent() {
     error,
     activeAgent,
     sessionId,
+    suggestions,
+    pinnedDocumentId,
+    setPinnedDocumentId,
     sendMessage,
     startNewSession,
     clearMessages,
     loadSession,
     resolveSession,
   } = useCopilotStream();
+
+  const { documents } = useDocuments();
+  const [showDocPicker, setShowDocPicker] = useState(false);
+
+  // Documents available for pinning (those that have a score / have been analyzed)
+  const analyzedDocs = documents.filter(d => d.score != null);
+  const pinnedDoc = analyzedDocs.find(d => d.id === pinnedDocumentId);
 
   // Load sessions on mount
   const fetchSessions = useCallback(async () => {
@@ -85,7 +99,7 @@ export function CopilotPageContent() {
       promptHandledRef.current = true;
       startNewSession(initialPrompt);
       sendMessage(initialPrompt);
-      router.replace('/dashboard/ask?mode=copilot');
+      router.replace('/dashboard/ask');
     }
   }, [initialPrompt, sessionId, startNewSession, sendMessage, router]);
 
@@ -146,7 +160,7 @@ export function CopilotPageContent() {
       <div
         className={`${showSidebar ? 'fixed inset-y-0 left-0 z-30 pt-16' : 'hidden'} lg:relative lg:block lg:pt-0 w-72 flex-shrink-0 border-r border-zinc-800 bg-zinc-900/50 flex flex-col`}
       >
-        <div className="p-4 border-b border-zinc-800">
+        <div className="p-4 border-b border-zinc-800 space-y-2">
           <button
             onClick={handleNewDecision}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
@@ -154,6 +168,63 @@ export function CopilotPageContent() {
             <Plus className="h-4 w-4" />
             New Decision
           </button>
+
+          {/* Document pin */}
+          <div className="relative">
+            <button
+              onClick={() => setShowDocPicker(!showDocPicker)}
+              className={`flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-colors ${
+                pinnedDoc
+                  ? 'border-green-700 bg-green-900/20 text-green-300'
+                  : 'border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300'
+              }`}
+            >
+              <Pin className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate flex-1 text-left">
+                {pinnedDoc ? pinnedDoc.filename : 'Pin a document'}
+              </span>
+              {pinnedDoc && (
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    setPinnedDocumentId(null);
+                  }}
+                  className="flex-shrink-0 text-zinc-500 hover:text-zinc-300"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </button>
+
+            {showDocPicker && (
+              <div className="absolute top-full left-0 right-0 mt-1 z-50 rounded-lg border border-zinc-700 bg-zinc-800 shadow-xl max-h-48 overflow-y-auto">
+                {analyzedDocs.length === 0 ? (
+                  <div className="px-3 py-4 text-xs text-zinc-500 text-center">
+                    No analyzed documents yet.
+                  </div>
+                ) : (
+                  analyzedDocs.map(d => (
+                    <button
+                      key={d.id}
+                      onClick={() => {
+                        setPinnedDocumentId(d.id === pinnedDocumentId ? null : d.id);
+                        setShowDocPicker(false);
+                      }}
+                      className={`flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-zinc-700 ${
+                        d.id === pinnedDocumentId ? 'text-green-300' : 'text-zinc-300'
+                      }`}
+                    >
+                      <FileText className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate flex-1 text-left">{d.filename}</span>
+                      {d.score != null && (
+                        <span className="text-[10px] text-zinc-500">{d.score}/100</span>
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
@@ -296,33 +367,89 @@ export function CopilotPageContent() {
             isStreaming={isStreaming}
             error={error}
             activeAgent={activeAgent}
+            suggestions={suggestions}
+            pinnedDocName={pinnedDoc?.filename}
             onSendMessage={handleSendMessage}
             onResolve={canResolve ? () => setShowResolveModal(true) : undefined}
             onDismissError={() => {
               /* error is managed by hook state */
             }}
+            onUnpinDoc={() => setPinnedDocumentId(null)}
           />
         ) : (
-          /* Empty State */
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center">
-                <Brain className="h-8 w-8 text-zinc-500" />
-              </div>
-              <div className="space-y-1">
-                <h2 className="text-lg font-medium text-zinc-200">Decision Copilot</h2>
-                <p className="text-sm text-zinc-500 max-w-sm">
-                  Your personal AI advisory team. Start a new decision session and let your agents
-                  help you build, challenge, and refine your thinking.
+          /* Empty State with starter questions */
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="w-full max-w-2xl space-y-6">
+              <div className="text-center space-y-2">
+                <div className="mx-auto w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center">
+                  <Sparkles className="h-7 w-7 text-blue-400" />
+                </div>
+                <h2 className="text-lg font-medium text-zinc-200">
+                  Your AI Advisory Team
+                </h2>
+                <p className="text-sm text-zinc-500 max-w-md mx-auto">
+                  Start a structured decision session, or ask a question about your documents.
+                  Pin a document in the sidebar for focused Q&amp;A with source citations.
                 </p>
               </div>
+
               <button
                 onClick={handleNewDecision}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
+                className="mx-auto flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
               >
                 <Plus className="h-4 w-4" />
-                Start Your First Decision
+                New Decision Session
               </button>
+
+              {/* Starter questions */}
+              <div className="space-y-2">
+                <p className="text-[10px] text-zinc-500 uppercase tracking-wider text-center">
+                  Or try asking
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {[
+                    'What patterns do you see in my decision-making?',
+                    'What biases were most commonly found across my documents?',
+                    'Compare the risk levels across my analyzed documents.',
+                    'Which document had the best decision quality and why?',
+                  ].map(q => (
+                    <button
+                      key={q}
+                      onClick={() => {
+                        startNewSession(q);
+                        sendMessage(q);
+                      }}
+                      className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-3 text-left text-xs text-zinc-400 hover:border-zinc-600 hover:text-zinc-300 transition-colors"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Analyzed document chips */}
+              {analyzedDocs.length > 0 && (
+                <div className="text-center">
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">
+                    Your documents
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 justify-center">
+                    {analyzedDocs.slice(0, 6).map(d => (
+                      <button
+                        key={d.id}
+                        onClick={() => {
+                          setPinnedDocumentId(d.id);
+                          handleNewDecision();
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 px-2.5 py-1 text-[11px] text-zinc-400 hover:border-zinc-500 hover:text-zinc-300 transition-colors"
+                      >
+                        <FileText className="h-3 w-3" />
+                        <span className="truncate max-w-[120px]">{d.filename}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

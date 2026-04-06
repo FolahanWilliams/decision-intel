@@ -11,9 +11,12 @@ import {
   Brain,
   CheckCircle,
   X,
+  Pin,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { AgentBadge } from './AgentBadge';
+import { SourceAttribution } from '@/components/chat/SourceAttribution';
+import { SuggestedQuestions } from '@/components/chat/SuggestedQuestions';
 import { type CopilotMessage } from '@/hooks/useCopilotStream';
 import { type CopilotAgentType } from '@/lib/copilot/types';
 
@@ -22,9 +25,12 @@ interface CopilotChatProps {
   isStreaming: boolean;
   error: string | null;
   activeAgent: CopilotAgentType | null;
+  suggestions?: string[];
+  pinnedDocName?: string | null;
   onSendMessage: (text: string, forcedAgent?: CopilotAgentType) => void;
   onResolve?: () => void;
   onDismissError?: () => void;
+  onUnpinDoc?: () => void;
 }
 
 const QUICK_ACTIONS: Array<{
@@ -66,9 +72,12 @@ export function CopilotChat({
   isStreaming,
   error,
   activeAgent,
+  suggestions = [],
+  pinnedDocName,
   onSendMessage,
   onResolve,
   onDismissError,
+  onUnpinDoc,
 }: CopilotChatProps) {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -104,6 +113,24 @@ export function CopilotChat({
 
   return (
     <div className="flex h-full flex-col">
+      {/* Pinned document banner */}
+      {pinnedDocName && (
+        <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 bg-zinc-800/40">
+          <span className="text-xs text-zinc-400">
+            <Pin className="inline h-3 w-3 mr-1" />
+            Chatting about <span className="font-medium text-zinc-200">{pinnedDocName}</span>
+          </span>
+          {onUnpinDoc && (
+            <button
+              onClick={onUnpinDoc}
+              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
@@ -144,12 +171,7 @@ export function CopilotChat({
               </div>
               {msg.sources && msg.sources.length > 0 && (
                 <div className="mt-2 border-t border-zinc-600 pt-2">
-                  <p className="text-xs text-zinc-400 mb-1">Sources:</p>
-                  {msg.sources.map((s, i) => (
-                    <span key={i} className="text-xs text-zinc-500 mr-2">
-                      {s.filename} ({Math.round(s.similarity * 100)}%)
-                    </span>
-                  ))}
+                  <SourceAttribution sources={msg.sources} />
                 </div>
               )}
             </div>
@@ -166,6 +188,13 @@ export function CopilotChat({
             )}
           </div>
         )}
+
+        {/* Follow-up suggestions */}
+        <SuggestedQuestions
+          questions={suggestions}
+          onSelect={q => onSendMessage(q)}
+          isVisible={!isStreaming && suggestions.length > 0}
+        />
 
         {/* Scroll anchor */}
         <div ref={bottomAnchorRef} />

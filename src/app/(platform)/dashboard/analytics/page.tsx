@@ -4,9 +4,7 @@ import { Suspense, lazy } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   BarChart3,
-  Dna,
   Lightbulb,
-  Fingerprint,
   BrainCircuit,
   TrendingUp,
   Network,
@@ -25,19 +23,14 @@ const InsightsPageContent = lazy(() =>
     default: m.InsightsPageContent,
   }))
 );
-const DecisionDNAPageContent = lazy(() =>
-  import('@/components/dna/DecisionDNAPageContent').then(m => ({
-    default: m.DecisionDNAPageContent,
-  }))
-);
 const ExplainabilityContent = lazy(() =>
   import('@/components/explainability/ExplainabilityContent').then(m => ({
     default: m.ExplainabilityContent,
   }))
 );
-const FingerprintContent = lazy(() =>
-  import('@/components/fingerprint/FingerprintContent').then(m => ({
-    default: m.FingerprintContent,
+const DecisionIntelligenceContent = lazy(() =>
+  import('@/components/analytics/DecisionIntelligenceContent').then(m => ({
+    default: m.DecisionIntelligenceContent,
   }))
 );
 const BiasLibraryContent = lazy(() =>
@@ -46,9 +39,8 @@ const BiasLibraryContent = lazy(() =>
 
 const TABS = [
   { key: 'trends', label: 'Trends & Insights', icon: <BarChart3 size={15} /> },
-  { key: 'dna', label: 'Decision DNA', icon: <Dna size={15} /> },
+  { key: 'intelligence', label: 'Decision Intelligence', icon: <BrainCircuit size={15} /> },
   { key: 'explainability', label: 'Explainability', icon: <Lightbulb size={15} /> },
-  { key: 'fingerprint', label: 'Fingerprint', icon: <Fingerprint size={15} /> },
   { key: 'library', label: 'Bias Library', icon: <BookOpen size={15} /> },
   { key: 'quality', label: 'Decision Quality', icon: <BrainCircuit size={15} /> },
   { key: 'flywheel', label: 'Outcome Flywheel', icon: <TrendingUp size={15} /> },
@@ -57,9 +49,8 @@ const TABS = [
 
 const VALID_VIEWS = new Set([
   'trends',
-  'dna',
+  'intelligence',
   'explainability',
-  'fingerprint',
   'library',
   'quality',
   'flywheel',
@@ -77,7 +68,15 @@ function AnalyticsInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const rawView = searchParams.get('view') ?? 'trends';
-  const view = VALID_VIEWS.has(rawView) ? rawView : 'trends';
+  // Redirect legacy DNA/Fingerprint URLs to the merged Decision Intelligence tab
+  const normalizedView =
+    rawView === 'dna' || rawView === 'fingerprint' ? 'intelligence' : rawView;
+  const view = VALID_VIEWS.has(normalizedView) ? normalizedView : 'trends';
+
+  // Replace URL if we normalized a legacy view
+  if (normalizedView !== rawView) {
+    router.replace(`/dashboard/analytics?view=${view}`, { scroll: false });
+  }
   const { insights, isLoading } = useInsights();
 
   const hasNoData = !isLoading && (!insights || insights.empty);
@@ -92,7 +91,7 @@ function AnalyticsInner() {
             <h1>Analytics</h1>
           </div>
           <p className="text-muted">
-            Trends, insights, decision profile, explainability, and cognitive fingerprint
+            Trends, decision intelligence, explainability, and industry benchmarks
           </p>
         </header>
         {!hasNoData && (
@@ -117,9 +116,8 @@ function AnalyticsInner() {
         <Suspense fallback={<PageSkeleton />}>
           <div style={{ marginTop: 'var(--spacing-md)' }}>
             {view === 'trends' && <InsightsPageContent />}
-            {view === 'dna' && <DecisionDNAPageContent />}
+            {view === 'intelligence' && <DecisionIntelligenceContent />}
             {view === 'explainability' && <ExplainabilityContent />}
-            {view === 'fingerprint' && <FingerprintContent />}
             {view === 'library' && <BiasLibraryContent />}
           </div>
         </Suspense>

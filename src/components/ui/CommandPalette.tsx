@@ -168,20 +168,12 @@ export function CommandPalette() {
         keywords: ['diff', 'side by side'],
       },
       {
-        id: 'ai-assistant-copilot',
-        label: 'AI Assistant — Decision Copilot',
-        description: 'AI agents that help you build better decisions',
+        id: 'ask',
+        label: 'Ask — AI Advisory Team',
+        description: 'Decision copilot, document Q&A, and source citations',
         icon: <Zap size={16} />,
-        action: () => navigate('/dashboard/ask?mode=copilot'),
-        keywords: ['copilot', 'agent', 'decision', 'advisor'],
-      },
-      {
-        id: 'ai-assistant-chat',
-        label: 'AI Assistant — Document Chat',
-        description: 'Ask questions about your documents',
-        icon: <MessageSquare size={16} />,
-        action: () => navigate('/dashboard/ask?mode=chat'),
-        keywords: ['ask', 'question', 'rag', 'ai', 'chat'],
+        action: () => navigate('/dashboard/ask'),
+        keywords: ['copilot', 'agent', 'decision', 'advisor', 'ask', 'question', 'rag', 'ai', 'chat'],
       },
       {
         id: 'outcome-flywheel',
@@ -266,7 +258,7 @@ export function CommandPalette() {
         description: 'Start a fresh conversation',
         icon: <Zap size={16} />,
         action: () => {
-          navigate('/dashboard/ask?mode=chat');
+          navigate('/dashboard/ask');
         },
         keywords: ['conversation', 'new', 'start'],
       },
@@ -429,7 +421,7 @@ export function CommandPalette() {
             icon: <Zap size={16} style={{ color: 'var(--accent-primary)' }} />,
             action: () => {
               setOpen(false);
-              router.push(`/dashboard/ask?mode=copilot&prompt=${encodeURIComponent(rawQuery)}`);
+              router.push(`/dashboard/ask?prompt=${encodeURIComponent(rawQuery)}`);
             },
             keywords: [],
           },
