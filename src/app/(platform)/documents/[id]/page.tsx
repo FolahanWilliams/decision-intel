@@ -27,7 +27,9 @@ import { SSEReader } from '@/lib/sse';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClientLogger } from '@/lib/utils/logger';
 import { formatDate } from '@/lib/constants/human-audit';
+import { formatBiasName } from '@/lib/utils/labels';
 import { computeConviction } from '@/lib/scoring/conviction';
+import { computeDQChain } from '@/lib/scoring/dq-chain';
 
 const log = createClientLogger('DocumentDetail');
 import { BiasDetailModal } from './BiasDetailModal';
@@ -573,6 +575,24 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
   const analysis = document?.analyses?.[0];
   const biases = useMemo(() => analysis?.biases || [], [analysis]);
   const selectedBiasIndex = selectedBias ? biases.findIndex(b => b.id === selectedBias.id) : -1;
+
+  // Compute DQ Chain on the client from available analysis data
+  const dqChain = useMemo(() => {
+    if (!analysis) return undefined;
+    try {
+      return computeDQChain({
+        logicalAnalysis: analysis.logicalAnalysis,
+        swotAnalysis: analysis.swotAnalysis,
+        cognitiveAnalysis: analysis.cognitiveAnalysis,
+        factCheck: analysis.factCheck,
+        noiseStdDev: analysis.noiseStats?.stdDev,
+        biasCount: biases.length,
+        preMortemCount: analysis.preMortem?.failureScenarios?.length,
+      });
+    } catch {
+      return undefined;
+    }
+  }, [analysis, biases.length]);
 
   // Fetch decision prior for this analysis
   useEffect(() => {
@@ -1932,7 +1952,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   )}
                   {activeTab === 'dq-chain' && (
                     <ErrorBoundary sectionName="Decision Quality Chain">
-                      <DQChainTab dqChain={analysis?.dqChain} />
+                      <DQChainTab dqChain={dqChain} />
                     </ErrorBoundary>
                   )}
                   {activeTab === 'perspectives' && (
@@ -2034,7 +2054,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                         >
                           <div className="flex items-center justify-between">
                             <span style={{ fontWeight: 500, fontSize: '13px' }}>
-                              {bias.biasType}
+                              {formatBiasName(bias.biasType)}
                             </span>
                             <ChevronRight size={14} style={{ color: 'var(--text-muted)' }} />
                           </div>

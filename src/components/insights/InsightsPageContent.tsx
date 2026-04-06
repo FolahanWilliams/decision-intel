@@ -663,7 +663,7 @@ export function InsightsPageContent() {
               </div>
               <div className="card-body">
                 <BiasNetwork
-                  biases={insights.biasTreemap.map(b => ({
+                  biases={(insights.biasTreemap ?? []).map(b => ({
                     biasType: b.name,
                     severity:
                       (insights.biasSeverity[b.name] ?? 50) >= 80

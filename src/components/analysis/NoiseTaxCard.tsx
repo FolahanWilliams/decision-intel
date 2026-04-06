@@ -15,9 +15,13 @@ export function NoiseTaxCard({ overallScore, noiseScore, biasCount }: NoiseTaxCa
 
   // Noise tax calculation based on Kahneman's Noise research
   // noiseScore is 0-100 where higher = noisier
-  const noiseTaxRate = (noiseScore / 100) * 0.15;
+  // When noiseScore is 0 but biases exist, use a conservative default (35)
+  // to avoid showing $0 for documents that clearly have decision quality issues
+  const effectiveNoiseScore = noiseScore > 0 ? noiseScore : biasCount > 0 ? 35 : 0;
+  const noiseTaxRate = (effectiveNoiseScore / 100) * 0.15;
   const biasAmplifier = 1 + biasCount * 0.02;
-  const improvementRoom = (100 - overallScore) / 100;
+  // Ensure at least 10% improvement room so we never show $0 when biases exist
+  const improvementRoom = Math.max((100 - overallScore) / 100, biasCount > 0 ? 0.1 : 0);
   const projectedSavings = Math.round(
     decisionValue * noiseTaxRate * biasAmplifier * improvementRoom
   );

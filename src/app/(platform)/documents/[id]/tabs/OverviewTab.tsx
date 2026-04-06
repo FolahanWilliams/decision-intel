@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { BiasInstance, RecognitionCuesResult, NarrativePreMortem } from '@/types';
 import { formatDate } from '@/lib/utils/format-date';
+import { formatBiasName } from '@/lib/utils/labels';
 import { Brain, Lightbulb, ExternalLink, BarChart3, Eye, ChevronDown } from 'lucide-react';
 import { DocumentTextHighlighter } from '@/components/visualizations/DocumentTextHighlighter';
 import { BiasSparklineWithData } from '@/components/visualizations/BiasSparkline';
@@ -295,7 +296,7 @@ export function OverviewTab({
                     <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
                       <div className="flex items-center gap-3">
                         <span className={`text-xs font-bold uppercase px-2 py-0.5 ${badgeStyle}`}>
-                          {bias.biasType}
+                          {formatBiasName(bias.biasType)}
                         </span>
                         <span className={`text-xs capitalize ${badgeStyle} px-1.5 py-0.5`}>
                           {bias.severity}

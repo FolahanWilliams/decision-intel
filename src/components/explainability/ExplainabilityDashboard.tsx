@@ -194,9 +194,9 @@ export function ExplainabilityDashboard({ analysisId }: { analysisId: string }) 
   }
 
   const hasCompoundAdjustments = (data.compoundScoring?.adjustments?.length ?? 0) > 0;
-  const hasBiasInteractions = data.biasInteractions.length > 0;
-  const hasBiologicalSignals = data.biologicalSignals.some(s => s.detected);
-  const hasCounterfactuals = data.counterfactuals.scenarios.length > 0;
+  const hasBiasInteractions = (data.biasInteractions?.length ?? 0) > 0;
+  const hasBiologicalSignals = data.biologicalSignals?.some(s => s.detected) ?? false;
+  const hasCounterfactuals = (data.counterfactuals?.scenarios?.length ?? 0) > 0;
 
   return (
     <div style={{ padding: 'var(--spacing-lg)', maxWidth: '1200px', margin: '0 auto' }}>
