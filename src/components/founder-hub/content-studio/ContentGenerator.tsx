@@ -27,6 +27,7 @@ const CONTENT_PILLARS = [
   { id: 'last_mile', label: 'Last-Mile Problem', color: '#ef4444' },
   { id: 'decision_noise', label: 'Decision Noise', color: '#8b5cf6' },
   { id: 'toxic_combos', label: 'Toxic Combinations', color: '#f59e0b' },
+  { id: 'decision_alpha', label: 'Decision Alpha', color: '#06b6d4' },
 ] as const;
 
 const TOPIC_SUGGESTIONS: Record<string, string[]> = {
@@ -50,6 +51,13 @@ const TOPIC_SUGGESTIONS: Record<string, string[]> = {
     'The Optimism Trap: When Anchoring Meets Overconfidence',
     'Why Single-Bias Detection Is Not Enough',
     'Lehman Brothers: A Predictable Catastrophe',
+  ],
+  decision_alpha: [
+    "The Decision Quality of America's Top CEOs — Ranked",
+    'Warren Buffett vs. Elon Musk: A Cognitive Bias Showdown',
+    "What Jensen Huang's GTC Keynote Reveals About Overconfidence",
+    'The 5 Most Biased CEO Letters of 2025',
+    'Why CEO Communication Style Predicts Stock Performance',
   ],
 };
 
