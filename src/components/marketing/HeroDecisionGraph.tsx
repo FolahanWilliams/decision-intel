@@ -225,8 +225,8 @@ const EDGES: GraphEdge[] = [
 
 // ─── Force Simulation ───────────────────────────────────────────────────────
 
-const SVG_W = 580;
-const SVG_H = 480;
+const SVG_W = 700;
+const SVG_H = 560;
 const CENTER_X = SVG_W / 2;
 const CENTER_Y = SVG_H / 2;
 
@@ -238,14 +238,14 @@ function initializeNodes(): GraphNode[] {
 
   decisions.forEach((n, i) => {
     const angle = (2 * Math.PI * i) / decisions.length - Math.PI / 2;
-    const r = 65;
+    const r = 80;
     result.push({
       ...n,
       x: CENTER_X + r * Math.cos(angle),
       y: CENTER_Y + r * Math.sin(angle),
       vx: 0,
       vy: 0,
-      radius: 24,
+      radius: 28,
       fx: CENTER_X + r * Math.cos(angle),
       fy: CENTER_Y + r * Math.sin(angle),
     });
@@ -253,27 +253,27 @@ function initializeNodes(): GraphNode[] {
 
   biases.forEach((n, i) => {
     const angle = (2 * Math.PI * i) / biases.length - Math.PI / 4;
-    const r = 170;
+    const r = 210;
     result.push({
       ...n,
       x: CENTER_X + r * Math.cos(angle),
       y: CENTER_Y + r * Math.sin(angle),
       vx: 0,
       vy: 0,
-      radius: n.severity === 'critical' ? 18 : n.severity === 'high' ? 15 : 12,
+      radius: n.severity === 'critical' ? 22 : n.severity === 'high' ? 18 : 15,
     });
   });
 
   outcomes.forEach((n, i) => {
     const angle = Math.PI * 0.25 + Math.PI * 0.5 * i;
-    const r = 200;
+    const r = 250;
     result.push({
       ...n,
       x: CENTER_X + r * Math.cos(angle),
       y: CENTER_Y + r * Math.sin(angle),
       vx: 0,
       vy: 0,
-      radius: 16,
+      radius: 20,
     });
   });
 
@@ -282,7 +282,7 @@ function initializeNodes(): GraphNode[] {
 
 function simulateStep(nodes: GraphNode[]): GraphNode[] {
   const damping = 0.92;
-  const repulsion = 800;
+  const repulsion = 1200;
   const centerPull = 0.003;
 
   return nodes.map((node, i) => {
@@ -324,7 +324,7 @@ function simulateStep(nodes: GraphNode[]): GraphNode[] {
       const dx = otherNode.x - node.x;
       const dy = otherNode.y - node.y;
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const idealDist = edge.type === 'toxic' ? 100 : 120;
+      const idealDist = edge.type === 'toxic' ? 130 : 150;
       const strength = 0.005;
       forceX += (dx / dist) * (dist - idealDist) * strength;
       forceY += (dy / dist) * (dist - idealDist) * strength;

@@ -594,14 +594,14 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px 60px' }}>
+      <section style={{ maxWidth: 1400, margin: '0 auto', padding: '80px 24px 60px' }}>
         <motion.div
           {...fadeIn}
           transition={{ duration: 0.5 }}
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 64,
+            gridTemplateColumns: '5fr 7fr',
+            gap: 48,
             alignItems: 'center',
           }}
           className="hero-grid"
@@ -1824,6 +1824,10 @@ export default function LandingPage() {
           .footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
           h1 { font-size: 36px !important; }
           h2 { font-size: 28px !important; }
+        }
+
+        @media (min-width: 769px) and (max-width: 1100px) {
+          .hero-grid { grid-template-columns: 1fr !important; }
         }
 
         @media (min-width: 769px) and (max-width: 1024px) {
