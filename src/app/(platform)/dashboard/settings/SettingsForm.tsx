@@ -852,8 +852,9 @@ function ToggleOption({
         style={{
           width: 48,
           height: 26,
+          borderRadius: 13,
           background: checked ? '#FFFFFF' : 'var(--bg-tertiary)',
-          border: 'none',
+          border: '1px solid var(--border-color)',
           cursor: disabled ? 'not-allowed' : 'pointer',
           opacity: disabled ? 0.5 : 1,
           position: 'relative',
@@ -864,10 +865,12 @@ function ToggleOption({
           style={{
             width: 20,
             height: 20,
-            background: checked ? '#000' : '#fff',
+            borderRadius: 10,
+            background: checked ? 'var(--text-primary)' : 'var(--text-muted)',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
             position: 'absolute',
-            top: 3,
-            left: checked ? 25 : 3,
+            top: 2,
+            left: checked ? 24 : 2,
             transition: 'left 0.2s',
           }}
         />

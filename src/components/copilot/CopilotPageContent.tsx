@@ -151,16 +151,25 @@ export function CopilotPageContent() {
       {/* Mobile sidebar toggle */}
       <button
         onClick={() => setShowSidebar(!showSidebar)}
-        className="lg:hidden fixed top-[4.5rem] left-3 z-40 rounded-lg border border-zinc-700 bg-zinc-800 p-2 text-zinc-300 hover:bg-zinc-700"
+        className="lg:hidden fixed top-[4.5rem] left-3 z-40 rounded-lg border p-2"
+        style={{
+          background: 'var(--bg-tertiary)',
+          borderColor: 'var(--border-color)',
+          color: 'var(--text-secondary)',
+        }}
       >
         <Menu className="h-4 w-4" />
       </button>
 
       {/* Sidebar — Session List */}
       <div
-        className={`${showSidebar ? 'fixed inset-y-0 left-0 z-30 pt-16' : 'hidden'} lg:relative lg:block lg:pt-0 w-72 flex-shrink-0 border-r border-zinc-800 bg-zinc-900/50 flex flex-col`}
+        className={`${showSidebar ? 'fixed inset-y-0 left-0 z-30 pt-16' : 'hidden'} lg:relative lg:block lg:pt-0 w-72 flex-shrink-0 border-r flex flex-col`}
+        style={{
+          background: 'var(--bg-secondary)',
+          borderColor: 'var(--border-color)',
+        }}
       >
-        <div className="p-4 border-b border-zinc-800 space-y-2">
+        <div className="p-4 border-b space-y-2" style={{ borderColor: 'var(--border-color)' }}>
           <button
             onClick={handleNewDecision}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
@@ -173,11 +182,20 @@ export function CopilotPageContent() {
           <div className="relative">
             <button
               onClick={() => setShowDocPicker(!showDocPicker)}
-              className={`flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-colors ${
+              className="flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-xs transition-colors ask-card"
+              style={
                 pinnedDoc
-                  ? 'border-green-700 bg-green-900/20 text-green-300'
-                  : 'border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300'
-              }`}
+                  ? {
+                      borderColor: 'var(--success)',
+                      background: 'rgba(22, 163, 74, 0.08)',
+                      color: 'var(--success)',
+                    }
+                  : {
+                      background: 'var(--bg-card)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-secondary)',
+                    }
+              }
             >
               <Pin className="h-3 w-3 flex-shrink-0" />
               <span className="truncate flex-1 text-left">
@@ -189,7 +207,8 @@ export function CopilotPageContent() {
                     e.stopPropagation();
                     setPinnedDocumentId(null);
                   }}
-                  className="flex-shrink-0 text-zinc-500 hover:text-zinc-300"
+                  className="flex-shrink-0"
+                  style={{ color: 'var(--text-muted)' }}
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -197,9 +216,19 @@ export function CopilotPageContent() {
             </button>
 
             {showDocPicker && (
-              <div className="absolute top-full left-0 right-0 mt-1 z-50 rounded-lg border border-zinc-700 bg-zinc-800 shadow-xl max-h-48 overflow-y-auto">
+              <div
+                className="absolute top-full left-0 right-0 mt-1 z-50 rounded-lg border max-h-48 overflow-y-auto"
+                style={{
+                  background: 'var(--bg-elevated)',
+                  borderColor: 'var(--border-color)',
+                  boxShadow: 'var(--shadow-lg)',
+                }}
+              >
                 {analyzedDocs.length === 0 ? (
-                  <div className="px-3 py-4 text-xs text-zinc-500 text-center">
+                  <div
+                    className="px-3 py-4 text-xs text-center"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
                     No analyzed documents yet.
                   </div>
                 ) : (
@@ -210,14 +239,17 @@ export function CopilotPageContent() {
                         setPinnedDocumentId(d.id === pinnedDocumentId ? null : d.id);
                         setShowDocPicker(false);
                       }}
-                      className={`flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors hover:bg-zinc-700 ${
-                        d.id === pinnedDocumentId ? 'text-green-300' : 'text-zinc-300'
-                      }`}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-xs transition-colors ask-session"
+                      style={{
+                        color: d.id === pinnedDocumentId ? 'var(--success)' : 'var(--text-primary)',
+                      }}
                     >
                       <FileText className="h-3 w-3 flex-shrink-0" />
                       <span className="truncate flex-1 text-left">{d.filename}</span>
                       {d.score != null && (
-                        <span className="text-[10px] text-zinc-500">{d.score}/100</span>
+                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                          {d.score}/100
+                        </span>
                       )}
                     </button>
                   ))
@@ -230,10 +262,10 @@ export function CopilotPageContent() {
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {loadingSessions ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
+              <Loader2 className="h-5 w-5 animate-spin" style={{ color: 'var(--text-muted)' }} />
             </div>
           ) : sessions.length === 0 ? (
-            <div className="px-3 py-8 text-center text-xs text-zinc-500">
+            <div className="px-3 py-8 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
               No decision sessions yet.
               <br />
               Start your first one above.
@@ -242,11 +274,11 @@ export function CopilotPageContent() {
             sessions.map(s => (
               <div
                 key={s.id}
-                className={`group flex items-center gap-2 rounded-lg px-3 py-2.5 cursor-pointer transition-colors ${
-                  sessionId === s.id
-                    ? 'bg-zinc-700/50 text-zinc-100'
-                    : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
-                }`}
+                className="group flex items-center gap-2 rounded-lg px-3 py-2.5 cursor-pointer transition-colors ask-session"
+                style={{
+                  background: sessionId === s.id ? 'var(--bg-active)' : 'transparent',
+                  color: sessionId === s.id ? 'var(--text-primary)' : 'var(--text-secondary)',
+                }}
                 onClick={() => {
                   loadSession(s.id);
                   setShowSidebar(false);
@@ -259,17 +291,20 @@ export function CopilotPageContent() {
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{s.title}</p>
-                  <div className="flex items-center gap-2 text-xs text-zinc-500">
+                  <div
+                    className="flex items-center gap-2 text-xs"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
                     <Clock className="h-3 w-3" />
                     <span>{new Date(s.updatedAt).toLocaleDateString()}</span>
-                    <span className="text-zinc-600">|</span>
+                    <span style={{ color: 'var(--text-muted)' }}>|</span>
                     <span>{s.turnCount} turns</span>
                     {s.status === 'resolved' && (
                       <span className="text-green-500 font-medium">Resolved</span>
                     )}
                     {s.dqiScore != null && (
                       <>
-                        <span className="text-zinc-600">|</span>
+                        <span style={{ color: 'var(--text-muted)' }}>|</span>
                         <span>DQI {s.dqiScore}</span>
                       </>
                     )}
@@ -280,9 +315,10 @@ export function CopilotPageContent() {
                     e.stopPropagation();
                     handleDeleteSession(s.id);
                   }}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-zinc-600 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 p-1 rounded transition-opacity"
+                  style={{ color: 'var(--text-muted)' }}
                 >
-                  <Trash2 className="h-3 w-3 text-zinc-400" />
+                  <Trash2 className="h-3 w-3" />
                 </button>
               </div>
             ))
@@ -300,10 +336,10 @@ export function CopilotPageContent() {
                 <div className="mx-auto w-12 h-12 rounded-full bg-blue-600/20 flex items-center justify-center">
                   <Sparkles className="h-6 w-6 text-blue-400" />
                 </div>
-                <h2 className="text-xl font-semibold text-zinc-100">
+                <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                   What decision are you working on?
                 </h2>
-                <p className="text-sm text-zinc-400">
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                   Describe the decision, question, or problem you&apos;re thinking through. Your
                   copilot agents will help you structure, challenge, and refine it.
                 </p>
@@ -321,13 +357,19 @@ export function CopilotPageContent() {
                   }}
                   placeholder="e.g., Should we raise Series A now or wait 6 months? We have 14 months of runway and the market is uncertain..."
                   rows={4}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="ask-input w-full rounded-lg border px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  style={{
+                    background: 'var(--bg-card)',
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-primary)',
+                  }}
                   autoFocus
                 />
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => setShowPromptInput(false)}
-                    className="rounded-lg px-4 py-2 text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
+                    className="rounded-lg px-4 py-2 text-sm transition-colors"
+                    style={{ color: 'var(--text-secondary)' }}
                   >
                     Cancel
                   </button>
@@ -352,7 +394,12 @@ export function CopilotPageContent() {
                   <button
                     key={example}
                     onClick={() => setPromptInput(example)}
-                    className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-3 text-left text-xs text-zinc-400 hover:border-zinc-600 hover:text-zinc-300 transition-colors"
+                    className="rounded-lg border p-3 text-left text-xs transition-colors ask-card"
+                    style={{
+                      background: 'var(--bg-card)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-secondary)',
+                    }}
                   >
                     {example}
                   </button>
@@ -381,11 +428,16 @@ export function CopilotPageContent() {
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="w-full max-w-2xl space-y-6">
               <div className="text-center space-y-2">
-                <div className="mx-auto w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center">
+                <div
+                  className="mx-auto w-14 h-14 rounded-full flex items-center justify-center"
+                  style={{ background: 'var(--bg-tertiary)' }}
+                >
                   <Sparkles className="h-7 w-7 text-blue-400" />
                 </div>
-                <h2 className="text-lg font-medium text-zinc-200">Your AI Advisory Team</h2>
-                <p className="text-sm text-zinc-500 max-w-md mx-auto">
+                <h2 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
+                  Your AI Advisory Team
+                </h2>
+                <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--text-muted)' }}>
                   Start a structured decision session, or ask a question about your documents. Pin a
                   document in the sidebar for focused Q&amp;A with source citations.
                 </p>
@@ -401,7 +453,10 @@ export function CopilotPageContent() {
 
               {/* Starter questions */}
               <div className="space-y-2">
-                <p className="text-[10px] text-zinc-500 uppercase tracking-wider text-center">
+                <p
+                  className="text-[10px] uppercase tracking-wider text-center"
+                  style={{ color: 'var(--text-muted)' }}
+                >
                   Or try asking
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -417,7 +472,12 @@ export function CopilotPageContent() {
                         startNewSession(q);
                         sendMessage(q);
                       }}
-                      className="rounded-lg border border-zinc-700 bg-zinc-800/50 p-3 text-left text-xs text-zinc-400 hover:border-zinc-600 hover:text-zinc-300 transition-colors"
+                      className="rounded-lg border p-3 text-left text-xs transition-colors ask-card"
+                      style={{
+                        background: 'var(--bg-card)',
+                        borderColor: 'var(--border-color)',
+                        color: 'var(--text-secondary)',
+                      }}
                     >
                       {q}
                     </button>
@@ -428,7 +488,10 @@ export function CopilotPageContent() {
               {/* Analyzed document chips */}
               {analyzedDocs.length > 0 && (
                 <div className="text-center">
-                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2">
+                  <p
+                    className="text-[10px] uppercase tracking-wider mb-2"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
                     Your documents
                   </p>
                   <div className="flex flex-wrap gap-1.5 justify-center">
@@ -439,7 +502,12 @@ export function CopilotPageContent() {
                           setPinnedDocumentId(d.id);
                           handleNewDecision();
                         }}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-800/50 px-2.5 py-1 text-[11px] text-zinc-400 hover:border-zinc-500 hover:text-zinc-300 transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors ask-card"
+                        style={{
+                          background: 'var(--bg-card)',
+                          borderColor: 'var(--border-color)',
+                          color: 'var(--text-secondary)',
+                        }}
                       >
                         <FileText className="h-3 w-3" />
                         <span className="truncate max-w-[120px]">{d.filename}</span>

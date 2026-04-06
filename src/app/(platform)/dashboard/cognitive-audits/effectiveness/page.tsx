@@ -375,7 +375,7 @@ export default function EffectivenessPage() {
                         <div
                           style={{
                             flex: ne.notHelpful,
-                            background: 'var(--text-muted)',
+                            background: '#6B7280',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
