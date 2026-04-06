@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { AlertTriangle, CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
+import { CaseStudyBiasGraph } from './CaseStudyBiasGraph';
 import {
   ALL_CASES,
   getDeepCases,
@@ -237,6 +238,25 @@ export function CaseStudyCarousel() {
                     <div style={{ fontSize: 12, color: C.slate600, marginBottom: 8 }}>
                       <strong style={{ color: C.slate900 }}>Flagged:</strong>{' '}
                       {formatBiasName(c.primaryBias)}
+                    </div>
+                  )}
+
+                  {/* Interactive Bias Web */}
+                  {c.biasesPresent.length >= 2 && (
+                    <div
+                      style={{
+                        margin: '12px -6px',
+                        padding: '8px 0',
+                        borderTop: `1px solid ${C.slate100}`,
+                        borderBottom: `1px solid ${C.slate100}`,
+                      }}
+                    >
+                      <CaseStudyBiasGraph
+                        biases={c.biasesPresent}
+                        primaryBias={c.primaryBias}
+                        toxicCombinations={c.toxicCombinations}
+                        size={180}
+                      />
                     </div>
                   )}
 
