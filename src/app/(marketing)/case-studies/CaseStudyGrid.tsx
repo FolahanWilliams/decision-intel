@@ -83,8 +83,8 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
           onChange={e => setQuery(e.target.value)}
           placeholder="Search company or title…"
           style={{
-            flex: '1 1 240px',
-            minWidth: 200,
+            flex: '1 1 100%',
+            minWidth: 0,
             padding: '10px 14px',
             border: `1px solid ${C.slate200}`,
             borderRadius: 8,
@@ -97,10 +97,12 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
           value={industry}
           onChange={e => setIndustry(e.target.value)}
           style={{
+            flex: '1 1 auto',
+            minWidth: 0,
             padding: '10px 14px',
             border: `1px solid ${C.slate200}`,
             borderRadius: 8,
-            fontSize: 14,
+            fontSize: 13,
             background: '#FFFFFF',
             cursor: 'pointer',
           }}
@@ -117,10 +119,12 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
           value={outcomeFilter}
           onChange={e => setOutcomeFilter(e.target.value as OutcomeFilter)}
           style={{
+            flex: '1 1 auto',
+            minWidth: 0,
             padding: '10px 14px',
             border: `1px solid ${C.slate200}`,
             borderRadius: 8,
-            fontSize: 14,
+            fontSize: 13,
             background: '#FFFFFF',
             cursor: 'pointer',
           }}
@@ -134,10 +138,12 @@ export function CaseStudyGrid({ cases, industries }: CaseStudyGridProps) {
           value={depthFilter}
           onChange={e => setDepthFilter(e.target.value as DepthFilter)}
           style={{
+            flex: '1 1 auto',
+            minWidth: 0,
             padding: '10px 14px',
             border: `1px solid ${C.slate200}`,
             borderRadius: 8,
-            fontSize: 14,
+            fontSize: 13,
             background: '#FFFFFF',
             cursor: 'pointer',
           }}

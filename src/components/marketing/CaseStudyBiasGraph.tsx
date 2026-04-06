@@ -189,8 +189,7 @@ export function CaseStudyBiasGraph({ biases, primaryBias, toxicCombinations, siz
               strokeWidth={isHighlighted ? 2 : isToxic ? 1.5 : 0.5}
               strokeDasharray={isToxic ? undefined : '3 3'}
               initial={{ pathLength: 0, opacity: 0 }}
-              whileInView={{ pathLength: 1, opacity: 1 }}
-              viewport={{ once: true }}
+              animate={{ pathLength: 1, opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.2 + i * 0.1 }}
             />
           );
@@ -206,8 +205,7 @@ export function CaseStudyBiasGraph({ biases, primaryBias, toxicCombinations, siz
             <motion.g
               key={node.id}
               initial={{ opacity: 0, scale: 0 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: 0.1 + i * 0.06 }}
               style={{ cursor: 'pointer' }}
               onMouseEnter={() => setHoveredBias(node.id)}

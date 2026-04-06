@@ -59,9 +59,10 @@ export function CaseStudyNav() {
             Decision Intel
           </span>
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>
           <Link
             href="/case-studies"
+            className="nav-link-hide-mobile"
             style={{
               fontSize: 14,
               color: '#CBD5E1',
@@ -74,7 +75,7 @@ export function CaseStudyNav() {
           <Link
             href="/"
             style={{
-              fontSize: 14,
+              fontSize: 13,
               color: '#CBD5E1',
               textDecoration: 'none',
               fontWeight: 500,
@@ -85,13 +86,14 @@ export function CaseStudyNav() {
           <Link
             href="/demo"
             style={{
-              fontSize: 14,
+              fontSize: 13,
               color: C.white,
               textDecoration: 'none',
               fontWeight: 600,
               background: C.green,
-              padding: '8px 16px',
+              padding: '7px 14px',
               borderRadius: 8,
+              whiteSpace: 'nowrap',
             }}
           >
             Request a pilot

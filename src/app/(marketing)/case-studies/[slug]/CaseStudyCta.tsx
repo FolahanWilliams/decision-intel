@@ -132,8 +132,8 @@ export function CaseStudyCta({ slug, company, hasDeepAnalysis }: CaseStudyCtaPro
           required
           disabled={status === 'submitting'}
           style={{
-            flex: 1,
-            minWidth: 240,
+            flex: '1 1 200px',
+            minWidth: 0,
             padding: '12px 16px',
             borderRadius: 8,
             border: '1px solid rgba(255,255,255,0.18)',
