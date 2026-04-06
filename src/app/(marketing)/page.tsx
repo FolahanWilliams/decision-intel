@@ -393,6 +393,9 @@ export default function LandingPage() {
           className="hero-grid"
         >
           <div>
+            <p style={{ fontSize: 13, fontWeight: 600, color: C.green, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
+              Grammarly for strategic decisions
+            </p>
             <h1
               style={{
                 fontSize: 48,
@@ -403,16 +406,17 @@ export default function LandingPage() {
                 marginBottom: 20,
               }}
             >
-              Trust your IC&rsquo;s yes.
+              Every memo has biases.
               <br />
-              <span style={{ color: C.green }}>Or know why you shouldn&rsquo;t.</span>
+              <span style={{ color: C.green }}>We find them in 60 seconds.</span>
             </h1>
             <p style={{ fontSize: 18, color: C.slate600, lineHeight: 1.7, marginBottom: 32, maxWidth: 520 }}>
-              Before you wire $50M, run the memo through the only engine that
-              audits the cognitive biases hiding in every deal. Decision Intel
-              gives investment committees a blind, unflinching second read in
-              under 60 seconds, so you can sign with confidence or pull the brake
-              before capital moves.
+              Grammarly catches grammar errors before you hit send. Decision Intel
+              catches cognitive biases before you sign the deal. Upload any
+              strategic document &mdash; board memo, deal thesis, strategy
+              proposal &mdash; and get a comprehensive bias audit with compliance
+              mapping, noise measurement, and a calibrated risk score in under
+              a minute.
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Link
@@ -431,7 +435,7 @@ export default function LandingPage() {
                   textDecoration: 'none',
                 }}
               >
-                Audit a memo now <ArrowRight size={16} />
+                Audit a document now <ArrowRight size={16} />
               </Link>
               <Link
                 href="/login"
@@ -475,10 +479,10 @@ export default function LandingPage() {
                 The job you&rsquo;re hiring us for
               </div>
               <p style={{ fontSize: 14, color: C.slate600, lineHeight: 1.6, margin: 0 }}>
-                When I&rsquo;m about to commit capital on a deal that looks right,
-                help me know whether my team&rsquo;s conviction survives a blind,
-                unbiased stress test, so I can sign with confidence or stop the
-                wire before it goes out.
+                When my team is about to commit on a decision that looks right,
+                help me know whether our conviction survives a blind, unbiased
+                stress test &mdash; so we can move forward with confidence or
+                pause before it&rsquo;s irreversible.
               </p>
             </div>
           </div>
@@ -494,7 +498,7 @@ export default function LandingPage() {
               {
                 step: '01',
                 label: 'Analyze',
-                desc: 'Upload deal memos & IC notes',
+                desc: 'Upload any strategic document',
                 icon: '◎',
                 color: '#3B82F6',
                 bg: '#EFF6FF',
@@ -606,7 +610,7 @@ export default function LandingPage() {
         >
           {[
             { icon: BarChart3, value: '55%', label: 'Decision variance hidden from teams', sub: 'Kahneman, "Noise" (2021)', href: null as string | null },
-            { icon: AlertTriangle, value: '$1.3T', label: 'Annual M&A value destroyed by cognitive bias', sub: 'McKinsey, Malmendier & Tate', href: null as string | null },
+            { icon: AlertTriangle, value: '$1.3T', label: 'Annual enterprise value eroded by cognitive bias', sub: 'McKinsey, Malmendier & Tate', href: null as string | null },
             { icon: TrendingUp, value: '146', label: 'Annotated failure case studies', sub: '8 industries, SEC filings & NTSB reports', href: '/case-studies' as string | null },
             { icon: Zap, value: '<60s', label: 'Full cognitive audit per document', sub: '11-agent pipeline, 20+ biases', href: null as string | null },
           ].map(({ icon: Icon, value, label, sub, href }) => {
@@ -665,10 +669,10 @@ export default function LandingPage() {
             How it Works
           </p>
           <h2 style={{ fontSize: 36, fontWeight: 700, color: C.slate900, marginBottom: 16, letterSpacing: '-0.01em' }}>
-            Streamline Your M&A Process
+            Decision Hygiene in Three Steps
           </h2>
           <p style={{ fontSize: 18, color: C.slate600, marginBottom: 48, maxWidth: 560 }}>
-            From deal memo to verified outcome in three steps.
+            From strategic document to verified outcome &mdash; for any decision-critical team.
           </p>
         </motion.div>
 
@@ -678,8 +682,8 @@ export default function LandingPage() {
               icon: FileSearch,
               phase: 'PHASE_01',
               num: '01',
-              title: 'Upload the memo',
-              desc: 'Drop in IC memos, deal theses, diligence reports, or CIMs. Capture each committee member\u2019s prior belief privately, before the room starts reinforcing itself.',
+              title: 'Upload the document',
+              desc: 'Drop in board memos, deal theses, strategy proposals, diligence reports, or any decision document. Capture each stakeholder\u2019s prior belief privately, before the room starts reinforcing itself.',
               bullets: ['PDF, DOCX, Excel, CSV support', 'Decision framing with success/failure criteria', 'Blind prior collection before group discussion', 'Slack integration for real-time capture'],
               color: '#3B82F6',
               colorBg: '#EFF6FF',
@@ -689,7 +693,7 @@ export default function LandingPage() {
               phase: 'PHASE_02',
               num: '02',
               title: 'Get the blind second opinion',
-              desc: 'An 11-agent pipeline stress-tests the thesis: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated boardroom argues against your deal before your real one does.',
+              desc: 'An 11-agent pipeline stress-tests the document: 20+ biases detected, a three-judge statistical jury measures noise, and a simulated boardroom argues against your proposal before your real one does.',
               bullets: ['20+ cognitive biases with confidence scores', '3 independent noise judges (Kahneman)', 'Boardroom simulation with custom personas', 'Fact-checking via Google Search grounding'],
               color: '#8B5CF6',
               colorBg: '#F5F3FF',
@@ -912,7 +916,7 @@ export default function LandingPage() {
                 name: 'Starter',
                 price: 0,
                 priceAnnual: 0,
-                desc: 'Try the bias engine on 3 deal documents',
+                desc: 'Try the bias engine on 3 strategic documents',
                 features: ['3 analyses/month', '5 bias types', '10 pages per doc', '3 team seats', 'Community support'],
                 cta: 'Get Started',
                 action: () => { window.location.href = '/login?redirect=' + encodeURIComponent('/?scrollTo=pricing'); },
@@ -923,7 +927,7 @@ export default function LandingPage() {
                 name: 'Professional',
                 price: 349,
                 priceAnnual: 279,
-                desc: 'For deal teams running IC memos through the gauntlet',
+                desc: 'For decision-makers running strategic documents through the gauntlet',
                 features: ['50 analyses/month', '20+ bias types', '100 pages per doc', '10 team seats', 'Outcome tracking', 'Decision Twin'],
                 cta: 'Start Free Trial',
                 action: () => handleCheckout('pro'),
@@ -935,7 +939,7 @@ export default function LandingPage() {
                 name: 'Team',
                 price: 999,
                 priceAnnual: 799,
-                desc: 'For investment committees with deal pipeline + Slack',
+                desc: 'For decision committees with document pipeline + Slack',
                 features: ['250 analyses/month', 'Everything in Pro', '50 team seats', 'Slack integration', 'Decision Rooms', 'Compliance mapping', 'Team calibration'],
                 cta: 'Start Free Trial',
                 action: () => handleCheckout('team'),
@@ -947,7 +951,7 @@ export default function LandingPage() {
                 name: 'Enterprise',
                 price: -1,
                 priceAnnual: -1,
-                desc: 'For PE funds and M&A teams with dedicated support',
+                desc: 'For enterprise teams with dedicated support and custom workflows',
                 features: ['Unlimited analyses', 'Everything in Team', 'Unlimited team seats', 'SSO & custom taxonomy', 'Dedicated support', 'Custom playbooks', 'SLA guarantee'],
                 cta: 'Contact Sales',
                 action: () => { window.location.href = 'mailto:folahanwilliams@gmail.com?subject=Enterprise%20Inquiry'; },
