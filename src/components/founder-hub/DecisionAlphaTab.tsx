@@ -92,11 +92,16 @@ function gradeBadge(grade: string, score: number): React.ReactNode {
 
 function severityColor(severity: string): string {
   switch (severity) {
-    case 'critical': return '#ef4444';
-    case 'high': return '#f97316';
-    case 'medium': return '#eab308';
-    case 'low': return '#84cc16';
-    default: return '#71717a';
+    case 'critical':
+      return '#ef4444';
+    case 'high':
+      return '#f97316';
+    case 'medium':
+      return '#eab308';
+    case 'low':
+      return '#84cc16';
+    default:
+      return '#71717a';
   }
 }
 
@@ -105,9 +110,19 @@ function returnIndicator(val: number | undefined): React.ReactNode {
   const color = val > 0 ? '#22c55e' : val < 0 ? '#ef4444' : '#71717a';
   const Icon = val > 0 ? ArrowUpRight : val < 0 ? ArrowDownRight : Minus;
   return (
-    <span style={{ color, fontWeight: 600, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+    <span
+      style={{
+        color,
+        fontWeight: 600,
+        fontSize: 13,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 2,
+      }}
+    >
       <Icon size={12} />
-      {val > 0 ? '+' : ''}{val.toFixed(1)}%
+      {val > 0 ? '+' : ''}
+      {val.toFixed(1)}%
     </span>
   );
 }
@@ -140,14 +155,16 @@ function AnalysisDetail({ analysis }: { analysis: PublicCompanyAnalysis }) {
           marginBottom: 16,
         }}
       >
-        {([
-          ['Bias Load', analysis.dqiComponents.biasLoad, '28%'],
-          ['Noise Level', analysis.dqiComponents.noiseLevel, '18%'],
-          ['Evidence Quality', analysis.dqiComponents.evidenceQuality, '18%'],
-          ['Process Maturity', analysis.dqiComponents.processMaturity, '13%'],
-          ['Compliance Risk', analysis.dqiComponents.complianceRisk, '13%'],
-          ['Historical Alignment', analysis.dqiComponents.historicalAlignment, '10%'],
-        ] as [string, number, string][]).map(([name, score, weight]) => (
+        {(
+          [
+            ['Bias Load', analysis.dqiComponents.biasLoad, '28%'],
+            ['Noise Level', analysis.dqiComponents.noiseLevel, '18%'],
+            ['Evidence Quality', analysis.dqiComponents.evidenceQuality, '18%'],
+            ['Process Maturity', analysis.dqiComponents.processMaturity, '13%'],
+            ['Compliance Risk', analysis.dqiComponents.complianceRisk, '13%'],
+            ['Historical Alignment', analysis.dqiComponents.historicalAlignment, '10%'],
+          ] as [string, number, string][]
+        ).map(([name, score, weight]) => (
           <div
             key={name}
             style={{
@@ -161,7 +178,13 @@ function AnalysisDetail({ analysis }: { analysis: PublicCompanyAnalysis }) {
             <div style={{ fontSize: 10, color: 'var(--text-muted, #71717a)', marginBottom: 4 }}>
               {name} ({weight})
             </div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: GRADE_COLORS[score >= 70 ? 'B' : score >= 55 ? 'C' : 'D'] ?? '#71717a' }}>
+            <div
+              style={{
+                fontSize: 20,
+                fontWeight: 800,
+                color: GRADE_COLORS[score >= 70 ? 'B' : score >= 55 ? 'C' : 'D'] ?? '#71717a',
+              }}
+            >
               {score}
             </div>
           </div>
@@ -281,14 +304,18 @@ function AnalysisDetail({ analysis }: { analysis: PublicCompanyAnalysis }) {
             }}
           >
             <div style={{ fontSize: 12, color: 'var(--text-muted, #71717a)' }}>
-              Price at filing: <span style={{ color: 'var(--text-primary, #fff)', fontWeight: 600 }}>${analysis.stockPerformance.priceAtFiling.toLocaleString()}</span>
+              Price at filing:{' '}
+              <span style={{ color: 'var(--text-primary, #fff)', fontWeight: 600 }}>
+                ${analysis.stockPerformance.priceAtFiling.toLocaleString()}
+              </span>
             </div>
             {analysis.stockPerformance.return6mo !== undefined && (
               <div style={{ fontSize: 12, color: 'var(--text-muted, #71717a)' }}>
                 6mo return: {returnIndicator(analysis.stockPerformance.return6mo)}
                 {analysis.stockPerformance.sp500Return6mo !== undefined && (
                   <span style={{ marginLeft: 4, fontSize: 11, color: '#71717a' }}>
-                    (S&P: {analysis.stockPerformance.sp500Return6mo > 0 ? '+' : ''}{analysis.stockPerformance.sp500Return6mo}%)
+                    (S&P: {analysis.stockPerformance.sp500Return6mo > 0 ? '+' : ''}
+                    {analysis.stockPerformance.sp500Return6mo}%)
                   </span>
                 )}
               </div>
@@ -298,7 +325,8 @@ function AnalysisDetail({ analysis }: { analysis: PublicCompanyAnalysis }) {
                 12mo return: {returnIndicator(analysis.stockPerformance.return12mo)}
                 {analysis.stockPerformance.sp500Return12mo !== undefined && (
                   <span style={{ marginLeft: 4, fontSize: 11, color: '#71717a' }}>
-                    (S&P: {analysis.stockPerformance.sp500Return12mo > 0 ? '+' : ''}{analysis.stockPerformance.sp500Return12mo}%)
+                    (S&P: {analysis.stockPerformance.sp500Return12mo > 0 ? '+' : ''}
+                    {analysis.stockPerformance.sp500Return12mo}%)
                   </span>
                 )}
               </div>
@@ -311,7 +339,15 @@ function AnalysisDetail({ analysis }: { analysis: PublicCompanyAnalysis }) {
       <div style={subLabel}>Content Angles for Content Studio</div>
       <ul style={{ margin: 0, paddingLeft: 18, marginBottom: 12 }}>
         {analysis.contentAngles.map((angle, i) => (
-          <li key={i} style={{ fontSize: 12, color: 'var(--text-secondary, #b4b4bc)', marginBottom: 4, lineHeight: 1.5 }}>
+          <li
+            key={i}
+            style={{
+              fontSize: 12,
+              color: 'var(--text-secondary, #b4b4bc)',
+              marginBottom: 4,
+              lineHeight: 1.5,
+            }}
+          >
             {angle}
           </li>
         ))}
@@ -321,7 +357,15 @@ function AnalysisDetail({ analysis }: { analysis: PublicCompanyAnalysis }) {
       <div style={subLabel}>Key Insights</div>
       <ul style={{ margin: 0, paddingLeft: 18 }}>
         {analysis.lessonsLearned.map((lesson, i) => (
-          <li key={i} style={{ fontSize: 12, color: 'var(--text-secondary, #b4b4bc)', marginBottom: 4, lineHeight: 1.5 }}>
+          <li
+            key={i}
+            style={{
+              fontSize: 12,
+              color: 'var(--text-secondary, #b4b4bc)',
+              marginBottom: 4,
+              lineHeight: 1.5,
+            }}
+          >
             {lesson}
           </li>
         ))}
@@ -346,20 +390,29 @@ export function DecisionAlphaTab() {
           Decision Alpha: Bias Signals from Public Markets
         </div>
         <div style={{ ...bodyText, marginBottom: 16 }}>
-          Decision Alpha applies the DQI engine to public CEO communications — annual shareholder letters,
-          earnings call transcripts, and SEC filings. By analyzing the cognitive bias signatures in how
-          leaders communicate their strategic decisions, we can score decision quality and correlate it
-          with company performance. This is the same engine used for IC memos and board documents — now
-          applied to the most scrutinized documents in public markets.
+          Decision Alpha applies the DQI engine to public CEO communications — annual shareholder
+          letters, earnings call transcripts, and SEC filings. By analyzing the cognitive bias
+          signatures in how leaders communicate their strategic decisions, we can score decision
+          quality and correlate it with company performance. This is the same engine used for IC
+          memos and board documents — now applied to the most scrutinized documents in public
+          markets.
         </div>
 
         {/* Stat Badges */}
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           {[
             { label: 'CEOs Analyzed', value: stats.totalAnalyses, color: '#06b6d4' },
-            { label: 'Average DQI', value: stats.avgDqi, color: stats.avgDqi >= 70 ? '#22c55e' : stats.avgDqi >= 55 ? '#eab308' : '#f97316' },
+            {
+              label: 'Average DQI',
+              value: stats.avgDqi,
+              color: stats.avgDqi >= 70 ? '#22c55e' : stats.avgDqi >= 55 ? '#eab308' : '#f97316',
+            },
             { label: 'Avg Biases / Filing', value: stats.avgBiasesPerAnalysis, color: '#8b5cf6' },
-            { label: 'Toxic Combos Found', value: stats.topToxicCombos.reduce((sum, [, c]) => sum + c, 0), color: '#ef4444' },
+            {
+              label: 'Toxic Combos Found',
+              value: stats.topToxicCombos.reduce((sum, [, c]) => sum + c, 0),
+              color: '#ef4444',
+            },
           ].map(s => (
             <div
               key={s.label}
@@ -373,7 +426,17 @@ export function DecisionAlphaTab() {
               }}
             >
               <div style={{ fontSize: 24, fontWeight: 800, color: s.color }}>{s.value}</div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted, #71717a)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</div>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: 'var(--text-muted, #71717a)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                }}
+              >
+                {s.label}
+              </div>
             </div>
           ))}
         </div>
@@ -434,10 +497,13 @@ export function DecisionAlphaTab() {
                   background: isExpanded ? 'var(--bg-tertiary, #0a0a0a)' : 'transparent',
                 }}
                 onMouseEnter={e => {
-                  if (!isExpanded) (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-tertiary, #0a0a0a)';
+                  if (!isExpanded)
+                    (e.currentTarget as HTMLDivElement).style.background =
+                      'var(--bg-tertiary, #0a0a0a)';
                 }}
                 onMouseLeave={e => {
-                  if (!isExpanded) (e.currentTarget as HTMLDivElement).style.background = 'transparent';
+                  if (!isExpanded)
+                    (e.currentTarget as HTMLDivElement).style.background = 'transparent';
                 }}
               >
                 <div style={{ fontWeight: 700, color: 'var(--text-muted, #71717a)' }}>
@@ -453,7 +519,10 @@ export function DecisionAlphaTab() {
                 <div>
                   {analysis.toxicCombinations.length > 0 ? (
                     <span style={{ color: '#ef4444', fontSize: 12 }}>
-                      <AlertTriangle size={11} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                      <AlertTriangle
+                        size={11}
+                        style={{ verticalAlign: 'middle', marginRight: 4 }}
+                      />
                       {analysis.toxicCombinations[0]}
                     </span>
                   ) : (
@@ -474,7 +543,8 @@ export function DecisionAlphaTab() {
           Headline Hooks for Content
         </div>
         <div style={{ ...bodyText, marginBottom: 12 }}>
-          Pre-written hooks for LinkedIn, Twitter, and blog content. Use these in Content Studio with the &quot;Decision Alpha&quot; pillar.
+          Pre-written hooks for LinkedIn, Twitter, and blog content. Use these in Content Studio
+          with the &quot;Decision Alpha&quot; pillar.
         </div>
         {DECISION_ALPHA_ANALYSES.map(a => (
           <div
@@ -504,26 +574,26 @@ export function DecisionAlphaTab() {
           Methodology: DQI for CEO Communications
         </div>
         <div style={bodyText}>
-          <strong style={{ color: 'var(--text-primary, #fff)' }}>What we analyze:</strong> The linguistic
-          and cognitive patterns in CEO public communications — annual letters, earnings calls, SEC filings.
-          The same 20-bias detection engine and 20x20 compound scoring matrix used for IC memos is applied
-          to these public documents.
+          <strong style={{ color: 'var(--text-primary, #fff)' }}>What we analyze:</strong> The
+          linguistic and cognitive patterns in CEO public communications — annual letters, earnings
+          calls, SEC filings. The same 20-bias detection engine and 20x20 compound scoring matrix
+          used for IC memos is applied to these public documents.
         </div>
         <div style={{ ...bodyText, marginTop: 12 }}>
-          <strong style={{ color: 'var(--text-primary, #fff)' }}>Scoring adjustments:</strong> Public
-          CEO communications lack certain signals available in internal documents (committee process,
-          dissent presence, prior submissions). The Process Maturity component is therefore scored
-          based on linguistic indicators: acknowledgment of uncertainty, consideration of alternatives,
-          explicit error attribution, and stakeholder diversity referenced. Evidence Quality relies on
-          specificity of claims vs. vague assertions.
+          <strong style={{ color: 'var(--text-primary, #fff)' }}>Scoring adjustments:</strong>{' '}
+          Public CEO communications lack certain signals available in internal documents (committee
+          process, dissent presence, prior submissions). The Process Maturity component is therefore
+          scored based on linguistic indicators: acknowledgment of uncertainty, consideration of
+          alternatives, explicit error attribution, and stakeholder diversity referenced. Evidence
+          Quality relies on specificity of claims vs. vague assertions.
         </div>
         <div style={{ ...bodyText, marginTop: 12 }}>
-          <strong style={{ color: 'var(--text-primary, #fff)' }}>Important caveat:</strong> CEO letters
-          are crafted communications, often reviewed by legal and IR teams. Detected biases may reflect
-          strategic narrative choices rather than genuine cognitive biases. However, research shows that
-          CEO communication patterns correlate with actual decision-making style (Hambrick &amp; Mason, 1984;
-          Chatterjee &amp; Hambrick, 2007). The signal is in the pattern across multiple filings, not
-          any single excerpt.
+          <strong style={{ color: 'var(--text-primary, #fff)' }}>Important caveat:</strong> CEO
+          letters are crafted communications, often reviewed by legal and IR teams. Detected biases
+          may reflect strategic narrative choices rather than genuine cognitive biases. However,
+          research shows that CEO communication patterns correlate with actual decision-making style
+          (Hambrick &amp; Mason, 1984; Chatterjee &amp; Hambrick, 2007). The signal is in the
+          pattern across multiple filings, not any single excerpt.
         </div>
       </div>
 

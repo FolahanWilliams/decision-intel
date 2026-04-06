@@ -66,7 +66,7 @@ const CHART_W = SVG_W - PADDING.left - PADDING.right;
 const CHART_H = SVG_H - PADDING.top - PADDING.bottom;
 
 const Y_MIN = -50; // -$50M
-const Y_MAX = 5;   // slight space above $0
+const Y_MAX = 5; // slight space above $0
 
 function xScale(i: number): number {
   return PADDING.left + (i / (DATA.length - 1)) * CHART_W;
@@ -102,7 +102,15 @@ function buildAreaPath(): string {
 
 // ─── Animated Counter ────────────────────────────────────────────────────────
 
-function CountUp({ target, prefix = '', suffix = '' }: { target: number; prefix?: string; suffix?: string }) {
+function CountUp({
+  target,
+  prefix = '',
+  suffix = '',
+}: {
+  target: number;
+  prefix?: string;
+  suffix?: string;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
 
@@ -119,7 +127,9 @@ function CountUp({ target, prefix = '', suffix = '' }: { target: number; prefix?
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 1.8 }}
         >
-          {prefix}{Math.abs(target)}{suffix}
+          {prefix}
+          {Math.abs(target)}
+          {suffix}
         </motion.span>
       ) : (
         `${prefix}0${suffix}`

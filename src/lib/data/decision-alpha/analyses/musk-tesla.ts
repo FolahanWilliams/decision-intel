@@ -44,7 +44,7 @@ export const MUSK_ANALYSES: PublicCompanyAnalysis[] = [
     },
 
     lessonsLearned: [
-      'CEO earnings calls with 6+ detectable biases and no dissent signals represent elevated decision risk regardless of the company\'s historical success.',
+      "CEO earnings calls with 6+ detectable biases and no dissent signals represent elevated decision risk regardless of the company's historical success.",
       'The "Optimism Trap" toxic combination (anchoring + overconfidence + time pressure) appears frequently in founder-CEO communications during business model transitions.',
       'Winner Effect amplification is strongest when past success is used to justify unrelated future predictions (automotive success → robotics success).',
     ],
@@ -115,7 +115,7 @@ export const MUSK_ANALYSES: PublicCompanyAnalysis[] = [
         excerpt:
           'Look at what happened with ChatGPT — nobody expected AI to move this fast. The same thing is about to happen with physical AI.',
         explanation:
-          'Using the readily available, highly salient example of ChatGPT\'s success to predict success in a fundamentally different domain (physical robotics). Availability heuristic: the most mentally accessible AI success story is generalized to all AI applications.',
+          "Using the readily available, highly salient example of ChatGPT's success to predict success in a fundamentally different domain (physical robotics). Availability heuristic: the most mentally accessible AI success story is generalized to all AI applications.",
         severity: 'medium',
       },
     ],
@@ -128,7 +128,7 @@ export const MUSK_ANALYSES: PublicCompanyAnalysis[] = [
       "Elon Musk's Earnings Call Triggered 2 Toxic Combinations. Here's What They Mean.",
       'DQI 41: Why Tesla\'s Q1 Call Is a Case Study in the "Optimism Trap"',
       'The Winner Effect in CEO Communications: Tesla as a Case Study',
-      '6 Biases in One Earnings Call: Deconstructing Musk\'s AI Pivot Narrative',
+      "6 Biases in One Earnings Call: Deconstructing Musk's AI Pivot Narrative",
       "Planning Fallacy Alert: Musk's Timeline Predictions vs. Historical Accuracy",
     ],
     headlineHook:

@@ -46,7 +46,7 @@ export const BUFFETT_ANALYSES: PublicCompanyAnalysis[] = [
       'Anchoring to intrinsic value rather than market price produces more stable decision frameworks.',
       'Buffett\'s "owner\'s manual" approach creates accountability structures that constrain future bias.',
     ],
-    source: 'Berkshire Hathaway 2024 Annual Report, Chairman\'s Letter (February 22, 2025)',
+    source: "Berkshire Hathaway 2024 Annual Report, Chairman's Letter (February 22, 2025)",
     sourceType: 'annual_report',
 
     // CEO-specific fields
