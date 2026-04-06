@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { Compass, Target, Shield, Rocket, Hammer } from 'lucide-react';
+import { Compass, Target, Shield, Rocket, Hammer, Wrench } from 'lucide-react';
 
 /**
  * Founder Tips — personalized strategic principles for the Decision Intel
@@ -241,6 +241,38 @@ const SECTION_EXECUTION: Tip[] = [
   },
 ];
 
+// ─── Section 5 — Refinement & Consolidation ─────────────────────────────
+
+const SECTION_REFINEMENT: Tip[] = [
+  {
+    title: 'Your 30+ routes are a surface area liability, not a feature count asset',
+    principle:
+      'Every route a user never visits is a maintenance burden that slows you down and a cognitive burden that confuses them. Consolidation is not retreat, it is focus.',
+    rationale:
+      'You have 30+ dashboard routes, 14 Founder Hub tabs, 45+ visualization components, and 189 total components. At your stage, surface area works against you in three ways: (1) every route needs loading states, error handling, and responsive design maintained separately, (2) new users drown in options before they find the core value, and (3) every new feature you ship has to play nicely with 30 existing pages. The most successful B2B SaaS products at your stage have 5-7 core screens, not 30. The ones that survive past Series A are the ones that ruthlessly consolidated before scaling. Your analysis detail page, copilot, and dashboard are the core trio. Everything else should justify its existence by driving users to one of those three.',
+    action:
+      'Run your own analytics (or add them) to identify which routes get <5% of pageviews. For each, decide: merge into a parent page, gate behind a "power user" toggle, or delete. Target: reduce top-level sidebar items by 30% this quarter. Blog the process using Tip 14.',
+  },
+  {
+    title: 'Polish the first 60 seconds, not the last 60 features',
+    principle:
+      'A demo that is flawless for the first 60 seconds and missing 10 features beats a demo that has every feature but stutters on the upload screen.',
+    rationale:
+      'You have a live pipeline graph, boardroom simulation, toxic combination detection, counterfactual analysis, decision rooms, calibration gamification, knowledge graphs, and a dozen more features. But the make-or-break moment for every prospect is: upload a document, see the DQI score, and feel the "oh wow" moment. If the upload is slow, the progress bar is confusing, or the score reveal is anticlimactic, nothing else matters. The best enterprise demos in the world (Figma, Linear, Wiz) nail the first 60 seconds so hard that the prospect forgets to ask about features. Your first 60 seconds should be: drag-drop upload, the live pipeline graph lighting up nodes in real time, score reveal with a pause for dramatic effect, and then the first bias excerpt with the exact quote highlighted. Polish that sequence until it is cinematic. Everything after that sells itself.',
+    action:
+      'Record yourself doing the demo 5 times. Watch each recording. Time the gap between "upload" and "score visible." If it is more than 15 seconds, optimize. Add a subtle sound or haptic on score reveal if the browser supports it. Test with 3 non-technical people and ask them what they remember. If they do not mention the score, the reveal needs work.',
+  },
+  {
+    title: 'Your Founder Hub is your second brain, treat it like a product',
+    principle:
+      'The Founder Hub with 14 tabs, Content Studio, and AI chat is the most unusual and potentially most defensible internal tool in your stack. It is also the thing investors will screenshot and share.',
+    rationale:
+      'Most founders keep strategy in Notion, content in Google Docs, sales scripts in email drafts, and competitor intel in their head. You built a single integrated tool that connects your product knowledge, sales playbooks, research foundations, case studies, content generation, and strategic principles in one place, with an AI that has full context. This is not just an internal tool. It is a proof point for the product thesis: decision quality improves when context is structured, searchable, and augmented by AI. During a pitch, casually showing the Founder Hub as "how I use Decision Intel on my own company" is the most powerful demo you can give because it eliminates the "does the founder even use this?" question. Keep refining it. Consider eventually productizing the pattern as a "Strategy Hub" template for enterprise customers.',
+    action:
+      'Next investor call: share your screen on the Founder Hub for 30 seconds as a throwaway moment. Say "This is how I run my own strategy" and switch to the real demo. Watch their reaction. If they lean in, you have a second product line.',
+  },
+];
+
 export function FounderTipsTab() {
   return (
     <div>
@@ -257,8 +289,8 @@ export function FounderTipsTab() {
             marginBottom: 0,
           }}
         >
-          Fourteen principles grounded in your specific position: solo founder, 16, Nigeria, PE/VC
-          wedge, Wiz advisor, 97% gross margins, 183K LoC already shipped. Re-read when deciding
+          Seventeen principles grounded in your specific position: solo founder, 16, Nigeria, PE/VC
+          wedge, Wiz advisor, 97% gross margins, 183K+ LoC already shipped. Re-read when deciding
           what to build next, what to kill, what to say in a pitch, and what to ignore.
         </p>
       </div>
@@ -296,6 +328,16 @@ export function FounderTipsTab() {
         </div>
         {SECTION_EXECUTION.map((t, i) => (
           <TipBlock key={t.title} t={t} idx={i + 11} />
+        ))}
+      </div>
+
+      <div style={{ ...card, borderLeft: '3px solid #ec4899' }}>
+        <div style={sectionTitle}>
+          <Wrench size={18} style={{ color: '#ec4899' }} /> Section 5 — Refinement &amp;
+          Consolidation
+        </div>
+        {SECTION_REFINEMENT.map((t, i) => (
+          <TipBlock key={t.title} t={t} idx={i + 15} />
         ))}
       </div>
     </div>
