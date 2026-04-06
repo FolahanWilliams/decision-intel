@@ -41,6 +41,7 @@ export const metadata: Metadata = {
   },
 };
 
+import { Analytics } from '@vercel/analytics/next';
 import { ToastProvider } from '@/components/ui/EnhancedToast';
 import { ThemeProvider } from '@/components/theme-provider';
 import { NotificationProvider } from '@/components/ui/NotificationCenter';
@@ -77,6 +78,7 @@ export default function RootLayout({
                   <ToastProvider>
                     <WebVitalsReporter />
                     {children}
+                    <Analytics />
                   </ToastProvider>
                 </TooltipProvider>
               </NotificationProvider>
