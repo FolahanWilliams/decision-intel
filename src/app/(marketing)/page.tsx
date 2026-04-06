@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
+import { LossAversionChart } from '@/components/marketing/LossAversionChart';
 import {
   Brain,
   FileSearch,
@@ -663,7 +664,7 @@ export default function LandingPage() {
                   textDecoration: 'none',
                 }}
               >
-                Audit a document now <ArrowRight size={16} />
+                Find what your team missed <ArrowRight size={16} />
               </Link>
               <Link
                 href="/login"
@@ -681,7 +682,7 @@ export default function LandingPage() {
                   textDecoration: 'none',
                 }}
               >
-                Try Free
+                See your hidden risk &mdash; free
               </Link>
             </div>
             <div
@@ -713,120 +714,8 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-          {/* 4-Panel Process Visualization */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 12,
-            }}
-          >
-            {[
-              {
-                step: '01',
-                label: 'Analyze',
-                desc: 'Upload any strategic document',
-                icon: '◎',
-                color: '#3B82F6',
-                bg: '#EFF6FF',
-                borderColor: '#BFDBFE',
-              },
-              {
-                step: '02',
-                label: 'Graph',
-                desc: 'Map decision relationships',
-                icon: '⬡',
-                color: '#8B5CF6',
-                bg: '#F5F3FF',
-                borderColor: '#DDD6FE',
-              },
-              {
-                step: '03',
-                label: 'Learn',
-                desc: 'Track outcomes & calibrate',
-                icon: '△',
-                color: '#F59E0B',
-                bg: '#FFFBEB',
-                borderColor: '#FDE68A',
-              },
-              {
-                step: '04',
-                label: 'Act',
-                desc: 'Mitigate bias & decide better',
-                icon: '→',
-                color: C.green,
-                bg: C.greenLight,
-                borderColor: '#BBF7D0',
-              },
-            ].map((panel, i) => (
-              <motion.div
-                key={panel.label}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
-                style={{
-                  background: panel.bg,
-                  border: `1px solid ${panel.borderColor}`,
-                  borderRadius: 14,
-                  padding: '24px 20px',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
-              >
-                {/* Large faded step number */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: -8,
-                    right: 8,
-                    fontSize: 64,
-                    fontWeight: 800,
-                    color: panel.borderColor,
-                    lineHeight: 1,
-                    pointerEvents: 'none',
-                    userSelect: 'none',
-                  }}
-                >
-                  {panel.step}
-                </div>
-                {/* Icon */}
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    background: C.white,
-                    border: `1px solid ${panel.borderColor}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 18,
-                    color: panel.color,
-                    marginBottom: 12,
-                    fontWeight: 700,
-                  }}
-                >
-                  {panel.icon}
-                </div>
-                <div
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 700,
-                    color: C.slate900,
-                    marginBottom: 4,
-                    position: 'relative',
-                    zIndex: 1,
-                  }}
-                >
-                  {panel.label}
-                </div>
-                <div style={{ fontSize: 13, color: C.slate600, position: 'relative', zIndex: 1 }}>
-                  {panel.desc}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {/* Loss Aversion Chart — shows hidden decision costs */}
+          <LossAversionChart />
         </motion.div>
       </section>
 
@@ -854,28 +743,28 @@ export default function LandingPage() {
             {
               icon: BarChart3,
               value: '55%',
-              label: 'Decision variance hidden from teams',
+              label: 'Of your decision risk is invisible to your team',
               sub: 'Kahneman, "Noise" (2021)',
               href: null as string | null,
             },
             {
               icon: AlertTriangle,
               value: '$1.3T',
-              label: 'Annual enterprise value eroded by cognitive bias',
+              label: 'Lost annually to decisions nobody audits',
               sub: 'McKinsey, Malmendier & Tate',
               href: null as string | null,
             },
             {
               icon: TrendingUp,
               value: '146',
-              label: 'Annotated failure case studies',
+              label: 'Preventable failures we reverse-engineered',
               sub: '8 industries, SEC filings & NTSB reports',
               href: '/case-studies' as string | null,
             },
             {
               icon: Zap,
               value: '<60s',
-              label: 'Full cognitive audit per document',
+              label: 'To find what your team missed',
               sub: '11-agent pipeline, 20+ biases',
               href: null as string | null,
             },
@@ -1276,6 +1165,35 @@ export default function LandingPage() {
             );
           })}
         </div>
+      </section>
+
+      {/* ── Pricing Anchor — Loss aversion framing ──────────────────── */}
+      <section
+        style={{
+          background: '#FEF2F2',
+          borderTop: '1px solid #FECACA',
+          borderBottom: '1px solid #FECACA',
+          padding: '28px 24px',
+          textAlign: 'center',
+        }}
+      >
+        <motion.p
+          {...fadeIn}
+          transition={{ duration: 0.5 }}
+          style={{
+            maxWidth: 720,
+            margin: '0 auto',
+            fontSize: 18,
+            color: '#991B1B',
+            fontWeight: 600,
+            lineHeight: 1.5,
+          }}
+        >
+          The average bad deal costs{' '}
+          <span style={{ fontWeight: 800, fontSize: 22 }}>$8.2M</span>.
+          A Decision Intel audit costs{' '}
+          <span style={{ fontWeight: 800, fontSize: 22, color: C.green }}>$129/month</span>.
+        </motion.p>
       </section>
 
       {/* ── Pricing ─────────────────────────────────────────────────── */}
