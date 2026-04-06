@@ -89,7 +89,7 @@ export function CaseStudyCarousel() {
             </p>
             <h2
               style={{
-                fontSize: 36,
+                fontSize: 'clamp(24px, 4vw, 36px)',
                 fontWeight: 700,
                 color: C.slate900,
                 margin: 0,
@@ -101,7 +101,7 @@ export function CaseStudyCarousel() {
               Real decisions, analyzed the same way we analyze yours.
             </h2>
             <p
-              style={{ fontSize: 17, color: C.slate600, margin: 0, maxWidth: 640, lineHeight: 1.5 }}
+              style={{ fontSize: 'clamp(14px, 2.5vw, 17px)', color: C.slate600, margin: 0, maxWidth: 640, lineHeight: 1.5 }}
             >
               We took the pre-decision memos from {featured.length} famous deals, stripped the
               hindsight, and ran them through our pipeline. Here&apos;s what we would have flagged.

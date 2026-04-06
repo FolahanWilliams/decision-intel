@@ -73,7 +73,7 @@ export default function CaseStudyIndexPage() {
           </div>
           <h1
             style={{
-              fontSize: 48,
+              fontSize: 'clamp(28px, 5vw, 48px)',
               fontWeight: 800,
               lineHeight: 1.1,
               margin: 0,
@@ -89,7 +89,7 @@ export default function CaseStudyIndexPage() {
           </h1>
           <p
             style={{
-              fontSize: 18,
+              fontSize: 'clamp(14px, 2.5vw, 18px)',
               color: '#CBD5E1',
               lineHeight: 1.6,
               maxWidth: 680,
@@ -102,7 +102,7 @@ export default function CaseStudyIndexPage() {
             outcome.
           </p>
 
-          <div style={{ display: 'flex', gap: 32, marginTop: 32, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 24, marginTop: 32, flexWrap: 'wrap' }}>
             <Stat value={String(ALL_CASES.length)} label="curated cases" />
             <Stat value={String(deepCount)} label="deep analyses" />
             <Stat value={String(industries.length)} label="industries" />
@@ -125,8 +125,8 @@ export default function CaseStudyIndexPage() {
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div>
-      <div style={{ fontSize: 32, fontWeight: 800, color: C.white, lineHeight: 1 }}>{value}</div>
+    <div style={{ minWidth: 0 }}>
+      <div style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, color: C.white, lineHeight: 1 }}>{value}</div>
       <div
         style={{
           fontSize: 11,

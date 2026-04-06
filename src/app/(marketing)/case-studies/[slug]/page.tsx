@@ -93,7 +93,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <h2
       style={{
-        fontSize: 24,
+        fontSize: 'clamp(20px, 3vw, 24px)',
         fontWeight: 700,
         color: C.navy,
         marginBottom: 16,
@@ -215,7 +215,7 @@ export default async function CaseStudyDetailPage({
 
           <h1
             style={{
-              fontSize: 40,
+              fontSize: 'clamp(28px, 5vw, 40px)',
               fontWeight: 800,
               color: C.navy,
               lineHeight: 1.15,
@@ -227,7 +227,7 @@ export default async function CaseStudyDetailPage({
           </h1>
           <p
             style={{
-              fontSize: 20,
+              fontSize: 'clamp(16px, 3vw, 20px)',
               color: '#334155',
               marginTop: 8,
               fontWeight: 500,
@@ -470,16 +470,16 @@ export default async function CaseStudyDetailPage({
               Across all {referenceClass.n} curated case studies in our library:
             </p>
             <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-              <div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: '#DC2626' }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 'clamp(24px, 4vw, 28px)', fontWeight: 800, color: '#DC2626' }}>
                   {(referenceClass.failureRate * 100).toFixed(0)}%
                 </div>
                 <div style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase' }}>
                   base failure rate
                 </div>
               </div>
-              <div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: C.green }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 'clamp(24px, 4vw, 28px)', fontWeight: 800, color: C.green }}>
                   {(referenceClass.successRate * 100).toFixed(0)}%
                 </div>
                 <div style={{ fontSize: 11, color: '#64748B', textTransform: 'uppercase' }}>

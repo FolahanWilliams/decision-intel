@@ -773,9 +773,9 @@ export default function LandingPage() {
               <>
                 <div
                   style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 12,
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
                     background: C.tealBg,
                     display: 'flex',
                     alignItems: 'center',
@@ -783,22 +783,21 @@ export default function LandingPage() {
                     flexShrink: 0,
                   }}
                 >
-                  <Icon size={22} style={{ color: C.teal }} />
+                  <Icon size={18} style={{ color: C.teal }} />
                 </div>
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: 32, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>
+                <div style={{ textAlign: 'left', minWidth: 0 }}>
+                  <div style={{ fontSize: 28, fontWeight: 800, color: C.slate900, lineHeight: 1 }}>
                     {value}
                   </div>
-                  <div style={{ fontSize: 13, color: C.slate600, marginTop: 2 }}>{label}</div>
-                  <div style={{ fontSize: 11, color: C.slate400, marginTop: 1 }}>{sub}</div>
+                  <div style={{ fontSize: 12, color: C.slate600, marginTop: 2, lineHeight: 1.4 }}>{label}</div>
+                  <div style={{ fontSize: 10, color: C.slate400, marginTop: 1 }}>{sub}</div>
                 </div>
               </>
             );
             const baseStyle = {
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: 16,
+              gap: 12,
             } as const;
             if (href) {
               return (
@@ -1817,13 +1816,19 @@ export default function LandingPage() {
         @media (max-width: 768px) {
           .hidden-mobile { display: none !important; }
           .show-mobile-only { display: block !important; }
-          .hero-grid { grid-template-columns: 1fr !important; }
-          .stats-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .hero-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; }
           .cards-grid { grid-template-columns: 1fr !important; }
           .pricing-grid { grid-template-columns: 1fr !important; }
-          .footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-          h1 { font-size: 36px !important; }
-          h2 { font-size: 28px !important; }
+          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
+          .faq-grid { gap: 32px !important; }
+          h1 { font-size: 32px !important; }
+          h2 { font-size: 26px !important; }
+        }
+        @media (max-width: 480px) {
+          .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+          .footer-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          h1 { font-size: 28px !important; }
         }
 
         @media (min-width: 769px) and (max-width: 1100px) {
