@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/analytics/track';
 import { CaseStudyCarousel } from '@/components/marketing/CaseStudyCarousel';
-import { LossAversionChart } from '@/components/marketing/LossAversionChart';
+import { HeroTabs } from '@/components/marketing/HeroTabs';
 import {
   Brain,
   FileSearch,
@@ -714,8 +714,8 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-          {/* Loss Aversion Chart — shows hidden decision costs */}
-          <LossAversionChart />
+          {/* Hero Tabs — Loss aversion chart + Decision knowledge graph */}
+          <HeroTabs />
         </motion.div>
       </section>
 
