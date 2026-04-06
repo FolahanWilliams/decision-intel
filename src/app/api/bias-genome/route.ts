@@ -61,7 +61,10 @@ export async function GET() {
       } catch (error) {
         const code = (error as { code?: string }).code;
         if (code !== 'P2021' && code !== 'P2022') {
-          log.error('Failed to compute org stats:', error instanceof Error ? error.message : String(error));
+          log.error(
+            'Failed to compute org stats:',
+            error instanceof Error ? error.message : String(error)
+          );
         }
       }
     }

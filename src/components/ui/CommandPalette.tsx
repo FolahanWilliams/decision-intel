@@ -172,7 +172,17 @@ export function CommandPalette() {
         description: 'Decision copilot, document Q&A, and source citations',
         icon: <Zap size={16} />,
         action: () => navigate('/dashboard/ask'),
-        keywords: ['copilot', 'agent', 'decision', 'advisor', 'ask', 'question', 'rag', 'ai', 'chat'],
+        keywords: [
+          'copilot',
+          'agent',
+          'decision',
+          'advisor',
+          'ask',
+          'question',
+          'rag',
+          'ai',
+          'chat',
+        ],
       },
       {
         id: 'outcome-flywheel',

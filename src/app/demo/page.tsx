@@ -168,7 +168,13 @@ export default function DemoPage() {
       <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sticky top-0 z-50">
         <div className="max-w-[960px] mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 no-underline text-inherit">
-            <Image src="/logo.png" alt="Decision Intel" width={24} height={24} style={{ borderRadius: 6, objectFit: 'cover' }} />
+            <Image
+              src="/logo.png"
+              alt="Decision Intel"
+              width={24}
+              height={24}
+              style={{ borderRadius: 6, objectFit: 'cover' }}
+            />
             <span className="text-sm font-semibold">
               <span className="text-slate-900">Decision</span>
               <span className="text-slate-400 ml-1">Intel</span>
@@ -419,7 +425,11 @@ export default function DemoPage() {
 
         {/* Results (shown after simulation or when revisiting) */}
         {showResults && analysis && (
-          <div ref={resultsRef} className="py-8" style={{ scrollBehavior: 'smooth', color: 'var(--text-primary)' }}>
+          <div
+            ref={resultsRef}
+            className="py-8"
+            style={{ scrollBehavior: 'smooth', color: 'var(--text-primary)' }}
+          >
             {/* Back / Re-select */}
             <div className="flex items-center justify-between mb-6">
               <button
@@ -459,12 +469,19 @@ export default function DemoPage() {
                     href={`#${s.id}`}
                     title={s.label}
                     className="group flex items-center gap-2"
-                    onClick={e => { e.preventDefault(); document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' }); }}
+                    onClick={e => {
+                      e.preventDefault();
+                      document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' });
+                    }}
                   >
-                    <span className={`text-[10px] opacity-0 group-hover:opacity-100 transition-opacity ${activeSection === s.id ? '!opacity-100 text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
+                    <span
+                      className={`text-[10px] opacity-0 group-hover:opacity-100 transition-opacity ${activeSection === s.id ? '!opacity-100 text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}
+                    >
                       {s.label}
                     </span>
-                    <span className={`w-2 h-2 rounded-full transition-all ${activeSection === s.id ? 'bg-green-500 scale-125' : 'bg-[var(--bg-tertiary)] group-hover:bg-[var(--accent-primary)]'}`} />
+                    <span
+                      className={`w-2 h-2 rounded-full transition-all ${activeSection === s.id ? 'bg-green-500 scale-125' : 'bg-[var(--bg-tertiary)] group-hover:bg-[var(--accent-primary)]'}`}
+                    />
                   </a>
                 ))}
               </nav>
@@ -479,43 +496,104 @@ export default function DemoPage() {
                     </h1>
                     <p className="text-[var(--text-muted)] text-xs sm:text-[13px] m-0">
                       Analyzed by Decision Intel &middot;{' '}
-                      {new Date(analysis.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {new Date(analysis.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
                     </p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-8">
-                  <ScoreCard label="DECISION QUALITY" value={`${analysis.overallScore}`} sub="/100" color={scoreColor} />
-                  <ScoreCard label="NOISE SCORE" value={`${analysis.noiseScore}`} sub={analysis.noiseScore <= 30 ? 'Low noise' : analysis.noiseScore <= 60 ? 'Moderate' : 'High inconsistency'} color={noiseColor} />
-                  <ScoreCard label="BIASES DETECTED" value={`${analysis.biases.length}`} sub={`${analysis.biases.filter(b => b.severity === 'critical').length} critical`} color="#ef4444" />
-                  <ScoreCard label="BOARD VERDICT" value={analysis.simulation.overallVerdict} sub={`${analysis.simulation.twins.filter(t => t.vote === 'REJECT').length} of ${analysis.simulation.twins.length} reject`} color={analysis.simulation.overallVerdict === 'REJECT' ? '#ef4444' : analysis.simulation.overallVerdict === 'APPROVE' ? '#22c55e' : '#eab308'} smallValue />
+                  <ScoreCard
+                    label="DECISION QUALITY"
+                    value={`${analysis.overallScore}`}
+                    sub="/100"
+                    color={scoreColor}
+                  />
+                  <ScoreCard
+                    label="NOISE SCORE"
+                    value={`${analysis.noiseScore}`}
+                    sub={
+                      analysis.noiseScore <= 30
+                        ? 'Low noise'
+                        : analysis.noiseScore <= 60
+                          ? 'Moderate'
+                          : 'High inconsistency'
+                    }
+                    color={noiseColor}
+                  />
+                  <ScoreCard
+                    label="BIASES DETECTED"
+                    value={`${analysis.biases.length}`}
+                    sub={`${analysis.biases.filter(b => b.severity === 'critical').length} critical`}
+                    color="#ef4444"
+                  />
+                  <ScoreCard
+                    label="BOARD VERDICT"
+                    value={analysis.simulation.overallVerdict}
+                    sub={`${analysis.simulation.twins.filter(t => t.vote === 'REJECT').length} of ${analysis.simulation.twins.length} reject`}
+                    color={
+                      analysis.simulation.overallVerdict === 'REJECT'
+                        ? '#ef4444'
+                        : analysis.simulation.overallVerdict === 'APPROVE'
+                          ? '#22c55e'
+                          : '#eab308'
+                    }
+                    smallValue
+                  />
                 </div>
                 {/* Executive summary */}
                 <Section icon={<BarChart3 size={16} />} title="Executive Summary">
-                  <p className="text-[var(--text-secondary)] leading-relaxed m-0 text-sm">{analysis.summary}</p>
+                  <p className="text-[var(--text-secondary)] leading-relaxed m-0 text-sm">
+                    {analysis.summary}
+                  </p>
                 </Section>
               </div>
 
               {/* Section 2: Biases */}
               <div id="biases" className="scroll-mt-20">
-                <Section icon={<Brain size={16} />} title={`Cognitive Biases Detected (${analysis.biases.length})`}>
+                <Section
+                  icon={<Brain size={16} />}
+                  title={`Cognitive Biases Detected (${analysis.biases.length})`}
+                >
                   <div className="flex flex-col gap-3">
-                    {(showAllBiases ? analysis.biases : analysis.biases.slice(0, 4)).map((bias, idx) => (
-                      <div key={idx} className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]">
-                        <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                          <span className="font-bold text-sm text-[var(--text-primary)]">{bias.biasType.replace(/_/g, ' ')}</span>
-                          <SeverityBadge severity={bias.severity} />
-                          <span className="text-[11px] text-[var(--text-muted)] sm:ml-auto">{Math.round(bias.confidence * 100)}% confidence</span>
+                    {(showAllBiases ? analysis.biases : analysis.biases.slice(0, 4)).map(
+                      (bias, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
+                        >
+                          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                            <span className="font-bold text-sm text-[var(--text-primary)]">
+                              {bias.biasType.replace(/_/g, ' ')}
+                            </span>
+                            <SeverityBadge severity={bias.severity} />
+                            <span className="text-[11px] text-[var(--text-muted)] sm:ml-auto">
+                              {Math.round(bias.confidence * 100)}% confidence
+                            </span>
+                          </div>
+                          <p
+                            className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3"
+                            style={{ borderLeft: `2px solid ${sevColor(bias.severity)}30` }}
+                          >
+                            &ldquo;{bias.excerpt}&rdquo;
+                          </p>
+                          <p className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 leading-relaxed">
+                            {bias.explanation}
+                          </p>
+                          <p className="text-green-500/80 text-[13px] m-0 leading-relaxed">
+                            <strong>Recommendation:</strong> {bias.suggestion}
+                          </p>
                         </div>
-                        <p className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 italic leading-relaxed pl-3" style={{ borderLeft: `2px solid ${sevColor(bias.severity)}30` }}>
-                          &ldquo;{bias.excerpt}&rdquo;
-                        </p>
-                        <p className="text-[var(--text-secondary)] text-[13px] m-0 mb-2.5 leading-relaxed">{bias.explanation}</p>
-                        <p className="text-green-500/80 text-[13px] m-0 leading-relaxed"><strong>Recommendation:</strong> {bias.suggestion}</p>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                   {analysis.biases.length > 4 && !showAllBiases && (
-                    <button onClick={() => setShowAllBiases(true)} className="mt-3 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors bg-transparent border border-[var(--border-color)] rounded-lg px-3 py-1.5 cursor-pointer">
+                    <button
+                      onClick={() => setShowAllBiases(true)}
+                      className="mt-3 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors bg-transparent border border-[var(--border-color)] rounded-lg px-3 py-1.5 cursor-pointer"
+                    >
                       Show all {analysis.biases.length} biases
                     </button>
                   )}
@@ -527,7 +605,17 @@ export default function DemoPage() {
                 <Section icon={<Target size={16} />} title="Decision Noise Analysis">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 mb-6">
                     <div className="text-center">
-                      <div className="text-4xl sm:text-5xl font-extrabold leading-none" style={{ color: analysis.noiseScore <= 30 ? '#22c55e' : analysis.noiseScore <= 60 ? '#eab308' : '#ef4444' }}>
+                      <div
+                        className="text-4xl sm:text-5xl font-extrabold leading-none"
+                        style={{
+                          color:
+                            analysis.noiseScore <= 30
+                              ? '#22c55e'
+                              : analysis.noiseScore <= 60
+                                ? '#eab308'
+                                : '#ef4444',
+                        }}
+                      >
                         {analysis.noiseScore}
                       </div>
                       <div className="text-xs text-[var(--text-muted)] mt-1">/ 100</div>
@@ -536,16 +624,36 @@ export default function DemoPage() {
                       <div className="flex flex-wrap gap-2 mb-3">
                         <StatPill label="Mean" value={analysis.noiseStats.mean.toString()} />
                         <StatPill label="Std Dev" value={analysis.noiseStats.stdDev.toFixed(1)} />
-                        <StatPill label="Variance" value={analysis.noiseStats.variance.toFixed(0)} />
+                        <StatPill
+                          label="Variance"
+                          value={analysis.noiseStats.variance.toFixed(0)}
+                        />
                       </div>
                       <div className="flex flex-col gap-2">
                         {analysis.noiseBenchmarks.map((b, i) => (
                           <div key={i} className="flex items-center gap-2.5">
-                            <span className="text-[11px] sm:text-xs text-[var(--text-secondary)] w-20 sm:w-[120px] shrink-0">{b.label}</span>
+                            <span className="text-[11px] sm:text-xs text-[var(--text-secondary)] w-20 sm:w-[120px] shrink-0">
+                              {b.label}
+                            </span>
                             <div className="flex-1 h-1.5 rounded-sm bg-[var(--bg-tertiary)]">
-                              <div className="h-full rounded-sm transition-[width] duration-300" style={{ width: `${Math.min(b.value, 100)}%`, background: i === 0 ? (b.value <= 30 ? '#22c55e' : b.value <= 60 ? '#eab308' : '#ef4444') : 'rgba(255,255,255,0.15)' }} />
+                              <div
+                                className="h-full rounded-sm transition-[width] duration-300"
+                                style={{
+                                  width: `${Math.min(b.value, 100)}%`,
+                                  background:
+                                    i === 0
+                                      ? b.value <= 30
+                                        ? '#22c55e'
+                                        : b.value <= 60
+                                          ? '#eab308'
+                                          : '#ef4444'
+                                      : 'rgba(255,255,255,0.15)',
+                                }}
+                              />
                             </div>
-                            <span className="text-xs font-semibold text-[var(--text-primary)] w-[30px] text-right">{b.value}</span>
+                            <span className="text-xs font-semibold text-[var(--text-primary)] w-[30px] text-right">
+                              {b.value}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -559,23 +667,50 @@ export default function DemoPage() {
                 <Section icon={<Users size={16} />} title="Boardroom Simulation — Decision Twins">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {analysis.simulation.twins.map((twin, idx) => {
-                      const voteColor = twin.vote === 'REJECT' ? '#ef4444' : twin.vote === 'CONDITIONAL APPROVE' ? '#eab308' : '#22c55e';
+                      const voteColor =
+                        twin.vote === 'REJECT'
+                          ? '#ef4444'
+                          : twin.vote === 'CONDITIONAL APPROVE'
+                            ? '#eab308'
+                            : '#22c55e';
                       return (
-                        <div key={idx} className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 border border-[var(--border-color)]">
+                        <div
+                          key={idx}
+                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 border border-[var(--border-color)]"
+                        >
                           <div className="flex justify-between items-center mb-2.5">
                             <div>
-                              <div className="font-bold text-[13px] text-[var(--text-primary)]">{twin.name}</div>
-                              <div className="text-[11px] text-[var(--text-muted)]">{twin.role}</div>
+                              <div className="font-bold text-[13px] text-[var(--text-primary)]">
+                                {twin.name}
+                              </div>
+                              <div className="text-[11px] text-[var(--text-muted)]">
+                                {twin.role}
+                              </div>
                             </div>
-                            <span className="text-[10px] px-2 py-0.5 rounded-md font-bold" style={{ background: `${voteColor}15`, color: voteColor }}>{twin.vote}</span>
+                            <span
+                              className="text-[10px] px-2 py-0.5 rounded-md font-bold"
+                              style={{ background: `${voteColor}15`, color: voteColor }}
+                            >
+                              {twin.vote}
+                            </span>
                           </div>
                           <div className="mb-2.5">
                             <div className="h-[3px] rounded-sm bg-[var(--bg-tertiary)]">
-                              <div className="h-full rounded-sm" style={{ width: `${twin.confidence * 100}%`, background: voteColor }} />
+                              <div
+                                className="h-full rounded-sm"
+                                style={{
+                                  width: `${twin.confidence * 100}%`,
+                                  background: voteColor,
+                                }}
+                              />
                             </div>
-                            <div className="text-[10px] text-[var(--text-muted)] mt-0.5">{Math.round(twin.confidence * 100)}% confidence</div>
+                            <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                              {Math.round(twin.confidence * 100)}% confidence
+                            </div>
                           </div>
-                          <p className="text-[var(--text-secondary)] text-xs m-0 leading-relaxed">{twin.rationale}</p>
+                          <p className="text-[var(--text-secondary)] text-xs m-0 leading-relaxed">
+                            {twin.rationale}
+                          </p>
                         </div>
                       );
                     })}
@@ -586,27 +721,51 @@ export default function DemoPage() {
               {/* Section 5: Toxic Combinations */}
               {analysis.toxicCombinations && analysis.toxicCombinations.length > 0 && (
                 <div id="toxic" className="scroll-mt-20">
-                  <Section icon={<AlertTriangle size={16} className="text-red-500" />} title="Toxic Combinations — Compound Risk Patterns">
+                  <Section
+                    icon={<AlertTriangle size={16} className="text-red-500" />}
+                    title="Toxic Combinations — Compound Risk Patterns"
+                  >
                     <p className="text-[var(--text-secondary)] text-[13px] mb-4 leading-relaxed">
-                      Individual biases are manageable. When they combine with contextual factors, compound risk can be 8x worse than any single factor.
+                      Individual biases are manageable. When they combine with contextual factors,
+                      compound risk can be 8x worse than any single factor.
                     </p>
                     <div className="flex flex-col gap-3">
                       {analysis.toxicCombinations.map((tc, idx) => (
-                        <div key={idx} className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]">
+                        <div
+                          key={idx}
+                          className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
+                        >
                           <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                            <span className="font-bold text-sm text-[var(--text-primary)]">{tc.name}</span>
-                            <span className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase tracking-wide" style={{ background: tc.riskLevel === 'critical' ? '#ef444415' : '#f9731615', color: tc.riskLevel === 'critical' ? '#ef4444' : '#f97316' }}>
+                            <span className="font-bold text-sm text-[var(--text-primary)]">
+                              {tc.name}
+                            </span>
+                            <span
+                              className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase tracking-wide"
+                              style={{
+                                background: tc.riskLevel === 'critical' ? '#ef444415' : '#f9731615',
+                                color: tc.riskLevel === 'critical' ? '#ef4444' : '#f97316',
+                              }}
+                            >
                               {tc.riskLevel}
                             </span>
                           </div>
                           <div className="flex flex-wrap gap-1.5 mb-2.5">
                             {tc.biases.map((b, bi) => (
-                              <span key={bi} className="text-[10px] px-2 py-0.5 rounded-md bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)]">{b}</span>
+                              <span
+                                key={bi}
+                                className="text-[10px] px-2 py-0.5 rounded-md bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)]"
+                              >
+                                {b}
+                              </span>
                             ))}
                           </div>
-                          <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">{tc.description}</p>
+                          <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">
+                            {tc.description}
+                          </p>
                           {tc.historicalExample && (
-                            <p className="text-red-400/70 text-[12px] m-0 mt-2 leading-relaxed italic">{tc.historicalExample}</p>
+                            <p className="text-red-400/70 text-[12px] m-0 mt-2 leading-relaxed italic">
+                              {tc.historicalExample}
+                            </p>
                           )}
                         </div>
                       ))}
@@ -619,21 +778,42 @@ export default function DemoPage() {
               <div id="premortem" className="scroll-mt-20">
                 <Section icon={<Skull size={16} />} title="Pre-Mortem Analysis">
                   <p className="text-[var(--text-secondary)] text-[13px] mb-4 leading-relaxed">
-                    Imagine it&apos;s 2 years from now and this decision has failed spectacularly. What went wrong?
+                    Imagine it&apos;s 2 years from now and this decision has failed spectacularly.
+                    What went wrong?
                   </p>
                   <div className="flex flex-col gap-3">
                     {analysis.preMortem.scenarios.map((s, idx) => (
-                      <div key={idx} className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]">
+                      <div
+                        key={idx}
+                        className="bg-[var(--bg-tertiary)] rounded-[10px] p-4 sm:p-[18px] border border-[var(--border-color)]"
+                      >
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2.5">
-                          <span className="font-bold text-sm text-[var(--text-primary)]">{s.title}</span>
+                          <span className="font-bold text-sm text-[var(--text-primary)]">
+                            {s.title}
+                          </span>
                           <div className="flex gap-2">
-                            <span className="text-[10px] px-2.5 py-0.5 rounded-xl bg-yellow-500/10 text-yellow-500 font-bold">{Math.round(s.probability * 100)}% likely</span>
-                            <span className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase" style={{ background: `${s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308'}15`, color: s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308' }}>
+                            <span className="text-[10px] px-2.5 py-0.5 rounded-xl bg-yellow-500/10 text-yellow-500 font-bold">
+                              {Math.round(s.probability * 100)}% likely
+                            </span>
+                            <span
+                              className="text-[10px] px-2.5 py-0.5 rounded-xl font-bold uppercase"
+                              style={{
+                                background: `${s.impact === 'catastrophic' ? '#ef4444' : s.impact === 'severe' ? '#f97316' : '#eab308'}15`,
+                                color:
+                                  s.impact === 'catastrophic'
+                                    ? '#ef4444'
+                                    : s.impact === 'severe'
+                                      ? '#f97316'
+                                      : '#eab308',
+                              }}
+                            >
                               {s.impact}
                             </span>
                           </div>
                         </div>
-                        <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">{s.description}</p>
+                        <p className="text-[var(--text-secondary)] text-[13px] m-0 leading-relaxed">
+                          {s.description}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -645,16 +825,25 @@ export default function DemoPage() {
                 <div className="mt-8 p-4 sm:p-5 bg-red-500/[0.06] border border-red-500/20 rounded-xl">
                   <div className="flex items-center gap-2 mb-2.5">
                     <TrendingUp size={16} className="text-red-500" />
-                    <span className="text-[13px] font-bold text-red-500 tracking-wide">KNOWN OUTCOME</span>
+                    <span className="text-[13px] font-bold text-red-500 tracking-wide">
+                      KNOWN OUTCOME
+                    </span>
                   </div>
-                  <p className="text-[var(--text-secondary)] text-sm m-0 mb-1.5 leading-relaxed">{analysis.outcome.what}</p>
-                  <p className="text-[var(--text-muted)] text-xs m-0">{analysis.outcome.when} &middot; {analysis.outcome.impact}</p>
+                  <p className="text-[var(--text-secondary)] text-sm m-0 mb-1.5 leading-relaxed">
+                    {analysis.outcome.what}
+                  </p>
+                  <p className="text-[var(--text-muted)] text-xs m-0">
+                    {analysis.outcome.when} &middot; {analysis.outcome.impact}
+                  </p>
                 </div>
               )}
             </div>
 
             {/* CTA */}
-            <div className="mt-12 text-center p-6 sm:p-10 rounded-2xl border border-[var(--border-color)]" style={{ background: 'var(--bg-secondary)' }}>
+            <div
+              className="mt-12 text-center p-6 sm:p-10 rounded-2xl border border-[var(--border-color)]"
+              style={{ background: 'var(--bg-secondary)' }}
+            >
               <h3 className="text-lg sm:text-[22px] font-bold text-[var(--text-primary)] mb-2">
                 This was a demo. Now try it on your own documents.
               </h3>

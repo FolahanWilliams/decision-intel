@@ -384,12 +384,10 @@ export function CopilotPageContent() {
                 <div className="mx-auto w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center">
                   <Sparkles className="h-7 w-7 text-blue-400" />
                 </div>
-                <h2 className="text-lg font-medium text-zinc-200">
-                  Your AI Advisory Team
-                </h2>
+                <h2 className="text-lg font-medium text-zinc-200">Your AI Advisory Team</h2>
                 <p className="text-sm text-zinc-500 max-w-md mx-auto">
-                  Start a structured decision session, or ask a question about your documents.
-                  Pin a document in the sidebar for focused Q&amp;A with source citations.
+                  Start a structured decision session, or ask a question about your documents. Pin a
+                  document in the sidebar for focused Q&amp;A with source citations.
                 </p>
               </div>
 

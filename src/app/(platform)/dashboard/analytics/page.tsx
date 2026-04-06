@@ -2,14 +2,7 @@
 
 import { Suspense, lazy } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import {
-  BarChart3,
-  Lightbulb,
-  BrainCircuit,
-  TrendingUp,
-  Network,
-  BookOpen,
-} from 'lucide-react';
+import { BarChart3, Lightbulb, BrainCircuit, TrendingUp, Network, BookOpen } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageSkeleton } from '@/components/ui/LoadingSkeleton';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -69,8 +62,7 @@ function AnalyticsInner() {
   const router = useRouter();
   const rawView = searchParams.get('view') ?? 'trends';
   // Redirect legacy DNA/Fingerprint URLs to the merged Decision Intelligence tab
-  const normalizedView =
-    rawView === 'dna' || rawView === 'fingerprint' ? 'intelligence' : rawView;
+  const normalizedView = rawView === 'dna' || rawView === 'fingerprint' ? 'intelligence' : rawView;
   const view = VALID_VIEWS.has(normalizedView) ? normalizedView : 'trends';
 
   // Replace URL if we normalized a legacy view
