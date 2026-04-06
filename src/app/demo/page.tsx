@@ -419,7 +419,7 @@ export default function DemoPage() {
 
         {/* Results (shown after simulation or when revisiting) */}
         {showResults && analysis && (
-          <div ref={resultsRef} className="text-[var(--text-primary)] py-8" style={{ scrollBehavior: 'smooth', background: 'var(--bg-primary)', marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)', paddingLeft: 'max(1rem, calc(50vw - 580px))', paddingRight: 'max(1rem, calc(50vw - 580px))' }}>
+          <div ref={resultsRef} className="py-8" style={{ scrollBehavior: 'smooth', color: 'var(--text-primary)' }}>
             {/* Back / Re-select */}
             <div className="flex items-center justify-between mb-6">
               <button
