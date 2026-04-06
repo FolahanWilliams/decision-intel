@@ -1145,6 +1145,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
+                      padding: '14px 20px',
                     }}
                   >
                     <h3
@@ -1385,7 +1386,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
               className="card animate-fade-in"
               style={{ animationDelay: '0.4s', background: 'var(--bg-card)' }}
             >
-              <div className="card-header" style={{ background: 'var(--bg-secondary)' }}>
+              <div
+                className="card-header"
+                style={{ background: 'var(--bg-secondary)', padding: '14px 20px' }}
+              >
                 <h3 className="flex items-center gap-sm text-xs">
                   <Terminal size={14} /> Live Scan Feed
                 </h3>
@@ -1624,10 +1628,10 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           {/* Key Findings Summary Bar */}
           {analysis && (
             <div
-              className="grid grid-cols-2 md:grid-cols-4 gap-sm mb-lg"
+              className="grid grid-cols-2 md:grid-cols-4 gap-lg mb-xl"
               style={{ marginTop: toxicCombinations.length > 0 ? 0 : 'var(--spacing-md)' }}
             >
-              <div className="card" style={{ padding: '16px' }}>
+              <div className="card" style={{ padding: '16px 20px', borderRadius: 12 }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1659,7 +1663,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '16px' }}>
+              <div className="card" style={{ padding: '16px 20px', borderRadius: 12 }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1698,7 +1702,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '16px' }}>
+              <div className="card" style={{ padding: '16px 20px', borderRadius: 12 }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1730,7 +1734,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div className="card" style={{ padding: '16px' }}>
+              <div className="card" style={{ padding: '16px 20px', borderRadius: 12 }}>
                 <div
                   style={{
                     fontSize: '10px',
@@ -1771,7 +1775,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
           {/* Tabs + Content */}
           <div
             className="grid"
-            style={{ gridTemplateColumns: '1fr 350px', gap: 'var(--spacing-lg)' }}
+            style={{ gridTemplateColumns: '1fr 380px', gap: 'var(--spacing-xl)' }}
           >
             <div className="flex flex-col gap-lg">
               {/* Tab Bar with group labels */}
@@ -1779,7 +1783,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                 className="flex flex-wrap items-end gap-0 mb-lg"
                 role="tablist"
                 aria-label="Analysis tabs"
-                style={{ borderBottom: '1px solid var(--border-color)' }}
+                style={{
+                  borderBottom: '1px solid var(--border-color)',
+                  borderRadius: '8px 8px 0 0',
+                  overflow: 'hidden',
+                }}
               >
                 {TAB_GROUPS.map((group, gi) => (
                   <div key={group.label} className="flex items-end">
@@ -1822,16 +1830,18 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             style={
                               activeTab === tab.id
                                 ? {
-                                    padding: '10px 16px',
+                                    padding: '10px 18px',
                                     background: 'var(--bg-card)',
                                     color: 'var(--text-primary)',
                                     borderBottom: '2px solid var(--accent-primary)',
+                                    borderRadius: '6px 6px 0 0',
                                   }
                                 : {
-                                    padding: '10px 16px',
+                                    padding: '10px 18px',
                                     color: 'var(--text-muted)',
                                     background: 'transparent',
                                     borderBottom: '2px solid transparent',
+                                    borderRadius: '6px 6px 0 0',
                                   }
                             }
                           >
@@ -1992,8 +2002,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
             {/* Right Column: Bias Sidebar */}
             <ErrorBoundary sectionName="Bias Sidebar">
               <div className="flex flex-col gap-lg">
-                <div className="card">
-                  <div className="card-body p-md flex justify-around">
+                <div className="card" style={{ borderRadius: 12 }}>
+                  <div
+                    className="card-body p-md flex justify-around"
+                    style={{ padding: '16px 20px' }}
+                  >
                     <div className="text-center">
                       <div
                         style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}
@@ -2017,8 +2030,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                   </div>
                 </div>
 
-                <div className="card" style={{ alignSelf: 'start', width: '100%' }}>
-                  <div className="card-header">
+                <div
+                  className="card"
+                  style={{ alignSelf: 'start', width: '100%', borderRadius: 12 }}
+                >
+                  <div className="card-header" style={{ padding: '14px 20px' }}>
                     <h3>Detected Biases</h3>
                   </div>
                   <div
@@ -2040,9 +2056,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ id:
                             }
                           }}
                           style={{
-                            padding: 'var(--spacing-md)',
-                            borderBottom:
-                              idx < biases.length - 1 ? '1px solid var(--border-color)' : 'none',
+                            padding: '12px 16px',
+                            margin: '4px 8px',
+                            borderRadius: 8,
                             cursor: 'pointer',
                             background:
                               selectedBias?.id === bias.id ? 'var(--bg-card)' : 'transparent',
